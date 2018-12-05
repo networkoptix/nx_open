@@ -2,11 +2,12 @@
 
 #include <QtCore/QFile>
 
+#include <nx/vms/client/core/common/utils/encoded_string.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <utils/common/util.h>
-#include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -141,7 +142,7 @@ QString QnStartupParameters::createAuthenticationString(const nx::utils::Url& ur
     if (!version.isNull() && version < kEncodeSupportVersion)
         return QString::fromUtf8(url.toEncoded());
 
-    QnEncodedString encoded(QString::fromUtf8(url.toEncoded()));
+    nx::vms::client::core::EncodedString encoded(QString::fromUtf8(url.toEncoded()));
     return kEncodeAuthMagic + encoded.encoded();
 }
 
@@ -150,7 +151,7 @@ nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
     if (string.startsWith(kEncodeAuthMagic))
     {
         string = string.mid(kEncodeAuthMagic.length());
-        string = QnEncodedString::fromEncoded(string).value();
+        string = nx::vms::client::core::EncodedString::fromEncoded(string).value();
     }
 
     return nx::utils::Url::fromUserInput(string);

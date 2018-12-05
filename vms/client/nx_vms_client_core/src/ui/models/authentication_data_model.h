@@ -3,7 +3,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QUuid>
 
-#include <utils/common/encoded_credentials.h>
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 namespace nx::vms::client::core {
 

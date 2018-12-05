@@ -4,15 +4,19 @@
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEncodedCredentials, (eq)(json), QnEncodedCredentials_Fields)
 
-QnEncodedCredentials::QnEncodedCredentials(const QString& user, const QString& password):
+QnEncodedCredentials::QnEncodedCredentials(
+    const QString& user,
+    const QString& password,
+    const QByteArray& key)
+    :
     user(user),
-    password(password)
+    password(password, key)
 {
 }
 
-QnEncodedCredentials::QnEncodedCredentials(const nx::utils::Url& url):
+QnEncodedCredentials::QnEncodedCredentials(const nx::utils::Url& url, const QByteArray& key):
     user(url.userName()),
-    password(url.password())
+    password(url.password(), key)
 {
 }
 

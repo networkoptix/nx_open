@@ -2,12 +2,13 @@
 
 #include <QtWidgets/QWidget>
 
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/scope_guard.h>
 
 #include <utils/common/connective.h>
-#include <utils/common/encoded_credentials.h>
 
 class QQuickView;
 

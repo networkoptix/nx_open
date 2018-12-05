@@ -7,10 +7,11 @@
 
 #include <common/common_module_aware.h>
 
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
+
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 
-#include <utils/common/encoded_credentials.h>
 #include <network/cloud_system_data.h>
 
 class QSettings;

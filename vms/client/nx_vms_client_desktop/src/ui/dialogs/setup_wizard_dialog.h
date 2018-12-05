@@ -1,10 +1,9 @@
 #pragma once
 
 #include <client_core/connection_context_aware.h>
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 #include <ui/dialogs/common/dialog.h>
-
-#include <utils/common/encoded_credentials.h>
 
 class QnSetupWizardDialogPrivate;
 class QnSetupWizardDialog: public QnDialog, public QnConnectionContextAware

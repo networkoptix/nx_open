@@ -7,7 +7,7 @@
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
-#include <utils/common/encoded_credentials.h>
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 class QSettings;
 

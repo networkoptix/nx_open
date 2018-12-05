@@ -2,10 +2,11 @@
 
 #include <QtCore/QUrl>
 
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
+
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
-#include <utils/common/encoded_credentials.h>
 
 namespace nx::vms::client::core {
 namespace helpers {

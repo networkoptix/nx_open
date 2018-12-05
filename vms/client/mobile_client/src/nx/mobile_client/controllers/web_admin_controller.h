@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/encoded_credentials.h>
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 class QnMobileClientUiController;
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <utils/crypt/encoded_string.h>
+#include <nx/vms/client/core/common/utils/encoded_string.h>
 #include <nx/utils/url.h>
 
 struct QnEncodedCredentials
 {
     QString user;
-    QnEncodedString password;
+    nx::vms::client::core::EncodedString password;
 
 private:
     Q_GADGET
@@ -15,8 +15,12 @@ private:
 
 public:
     QnEncodedCredentials() = default;
-    QnEncodedCredentials(const QString& user, const QString& password);
-    explicit QnEncodedCredentials(const nx::utils::Url& url);
+    QnEncodedCredentials(
+        const QString& user,
+        const QString& password,
+        const QByteArray& key = QByteArray());
+
+    explicit QnEncodedCredentials(const nx::utils::Url& url, const QByteArray& key = QByteArray());
 
     QString decodedPassword() const;
 
