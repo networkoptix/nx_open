@@ -7,17 +7,20 @@
 namespace nx {
 namespace network {
 
-class UDTSocketImpl:
+class UdtSocketImpl:
     public CommonSocketImpl
 {
 public:
     UDTSOCKET udtHandle;
 
-    UDTSocketImpl(UDTSOCKET _udtHandle = UDT::INVALID_SOCK):
+    UdtSocketImpl(UDTSOCKET _udtHandle = UDT::INVALID_SOCK):
         udtHandle(_udtHandle)
     {
         isUdtSocket = true;
     }
+
+    UdtSocketImpl(const UdtSocketImpl&) = delete;
+    UdtSocketImpl& operator=(const UdtSocketImpl&) = delete;
 };
 
 } // namespace network
