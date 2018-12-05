@@ -313,7 +313,8 @@ void Instrument::sendInstalledNotifications(bool installed) {
 
 bool Instrument::event(QGraphicsScene* watched, QEvent* event)
 {
-    return dispatchEvent(watched, QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event));
+    QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event);
+    return dispatchEvent(watched, event);
 }
 
 bool Instrument::event(QGraphicsView* watched, QEvent* event)
@@ -330,7 +331,8 @@ bool Instrument::event(QWidget* watched, QEvent* event)
 
 bool Instrument::sceneEvent(QGraphicsItem* watched, QEvent* event)
 {
-    return dispatchEvent(watched, QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event));
+    QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event);
+    return dispatchEvent(watched, event);
 }
 
 template<class T>

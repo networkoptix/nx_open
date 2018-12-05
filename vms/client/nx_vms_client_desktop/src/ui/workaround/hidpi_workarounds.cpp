@@ -352,48 +352,44 @@ void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
     label->setFixedSize(fixedSize);
 }
 
-QEvent* QnHiDpiWorkarounds::fixupGraphicsSceneEvent(QEvent* source, bool* processed)
+bool QnHiDpiWorkarounds::fixupGraphicsSceneEvent(QEvent* event)
 {
-    auto processedGuard = nx::utils::makeScopeGuard(
-        [processed]()
-        {
-            if (processed)
-                *processed = true;
-        });
+    if (!event)
+        return false;
 
-    switch (source->type())
+    switch (event->type())
     {
         case QEvent::GraphicsSceneMouseMove:
         case QEvent::GraphicsSceneMousePress:
         case QEvent::GraphicsSceneMouseRelease:
         case QEvent::GraphicsSceneMouseDoubleClick:
         {
-            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(source);
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             mouseEvent->setScreenPos(fixupScreenPos(
                 mouseEvent->widget(), mouseEvent->scenePos(), mouseEvent->screenPos()));
             mouseEvent->setLastScreenPos(fixupScreenPos(
                 mouseEvent->widget(), mouseEvent->lastScenePos(), mouseEvent->lastScreenPos()));
-            return mouseEvent;
+            return true;
         }
 
         case QEvent::GraphicsSceneHoverEnter:
         case QEvent::GraphicsSceneHoverLeave:
         case QEvent::GraphicsSceneHoverMove:
         {
-            auto hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(source);
+            auto hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
             hoverEvent->setScreenPos(fixupScreenPos(
                 hoverEvent->widget(), hoverEvent->scenePos(), hoverEvent->screenPos()));
             hoverEvent->setLastScreenPos(fixupScreenPos(
                 hoverEvent->widget(), hoverEvent->lastScenePos(), hoverEvent->lastScreenPos()));
-            return hoverEvent;
+            return true;
         }
 
         case QEvent::GraphicsSceneContextMenu:
         {
-            auto menuEvent = static_cast<QGraphicsSceneContextMenuEvent*>(source);
+            auto menuEvent = static_cast<QGraphicsSceneContextMenuEvent*>(event);
             menuEvent->setScreenPos(fixupScreenPos(
                 menuEvent->widget(), menuEvent->scenePos(), menuEvent->screenPos()));
-            return menuEvent;
+            return true;
         }
 
         case QEvent::GraphicsSceneDragEnter:
@@ -401,23 +397,22 @@ QEvent* QnHiDpiWorkarounds::fixupGraphicsSceneEvent(QEvent* source, bool* proces
         case QEvent::GraphicsSceneDragMove:
         case QEvent::GraphicsSceneDrop:
         {
-            auto dndEvent = static_cast<QGraphicsSceneDragDropEvent*>(source);
+            auto dndEvent = static_cast<QGraphicsSceneDragDropEvent*>(event);
             dndEvent->setScreenPos(fixupScreenPos(
                 dndEvent->widget(), dndEvent->scenePos(), dndEvent->screenPos()));
-            return dndEvent;
+            return true;
         }
 
         case QEvent::GraphicsSceneWheel:
         {
-            auto wheelEvent = static_cast<QGraphicsSceneWheelEvent*>(source);
+            auto wheelEvent = static_cast<QGraphicsSceneWheelEvent*>(event);
             wheelEvent->setScreenPos(fixupScreenPos(
                 wheelEvent->widget(), wheelEvent->scenePos(), wheelEvent->screenPos()));
-            return wheelEvent;
+            return true;
         }
 
         default:
-            processedGuard.disarm();
-            return source;
+            return false;
     }
 }
 
@@ -429,10 +424,8 @@ QEvent* QnHiDpiWorkarounds::fixupEvent(
 
     // First, handle Graphics Scene events. They are fixed up in place, without making a copy.
 
-    bool fixedUp = false;
-    const auto sceneEvent = fixupGraphicsSceneEvent(source, &fixedUp);
-    if (fixedUp)
-        return sceneEvent;
+    if (fixupGraphicsSceneEvent(source))
+        return source;
 
     // Second, handle other events. They are fixed as a copy, but losing spontaneous flag.
 

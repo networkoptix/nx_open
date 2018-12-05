@@ -23,7 +23,7 @@ public:
      * It leads to a bunch of problems. We attempt to fix it by recomputing from local pos.
      */
     static QEvent* fixupEvent(QWidget* widget, QEvent* source, std::unique_ptr<QEvent>& target);
-    static QEvent* fixupGraphicsSceneEvent(QEvent* source, bool* processed = nullptr);
+    static bool fixupGraphicsSceneEvent(QEvent* event); //< Modifies event without making a copy.
 
     static void init();
 
