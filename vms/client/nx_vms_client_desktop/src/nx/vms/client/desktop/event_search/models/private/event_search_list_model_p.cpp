@@ -9,6 +9,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <ui/common/notification_levels.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -115,7 +116,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             return QVariant::fromValue(pixmap(eventParams));
 
         case Qt::ForegroundRole:
-            return QVariant::fromValue(color(eventParams.eventType));
+            return QVariant::fromValue(color(eventParams));
 
         case Qn::DescriptionTextRole:
             return description(eventParams);
@@ -416,27 +417,9 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
     }
 }
 
-QColor EventSearchListModel::Private::color(vms::api::EventType eventType)
+QColor EventSearchListModel::Private::color(const vms::event::EventParameters& parameters)
 {
-    switch (eventType)
-    {
-        case nx::vms::api::EventType::cameraDisconnectEvent:
-        case nx::vms::api::EventType::storageFailureEvent:
-        case nx::vms::api::EventType::serverFailureEvent:
-            return qnGlobals->errorTextColor();
-
-        case nx::vms::api::EventType::networkIssueEvent:
-        case nx::vms::api::EventType::cameraIpConflictEvent:
-        case nx::vms::api::EventType::serverConflictEvent:
-            return qnGlobals->warningTextColor();
-
-        case nx::vms::api::EventType::backupFinishedEvent:
-            return qnGlobals->successTextColor();
-
-        //case nx::vms::api::EventType::licenseIssueEvent: //< TODO: normal or warning?
-        default:
-            return QColor();
-    }
+    return QnNotificationLevel::notificationTextColor(QnNotificationLevel::valueOf(parameters));
 }
 
 bool EventSearchListModel::Private::hasPreview(vms::api::EventType eventType)

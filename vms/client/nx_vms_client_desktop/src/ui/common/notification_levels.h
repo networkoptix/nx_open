@@ -22,7 +22,8 @@ enum class Value
     LevelCount
 };
 
-Value valueOf(const nx::vms::event::AbstractActionPtr &businessAction);
+Value valueOf(const nx::vms::event::AbstractActionPtr& action);
+Value valueOf(const nx::vms::event::EventParameters& params);
 Value valueOf(QnSystemHealth::MessageType messageType);
 
 QColor notificationTextColor(Value level);
