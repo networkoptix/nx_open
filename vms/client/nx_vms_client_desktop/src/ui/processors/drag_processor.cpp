@@ -174,6 +174,8 @@ void DragProcessor::transitionInternalHelper(State newState) {
         }
         break;
     case Running:
+        if (QApplication::activePopupWidget())
+            return;
         switch(m_state) {
         case Waiting:
             if(m_handler != NULL) {
