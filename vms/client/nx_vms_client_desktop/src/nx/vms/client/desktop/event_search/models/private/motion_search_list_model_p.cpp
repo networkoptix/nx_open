@@ -157,11 +157,6 @@ bool MotionSearchListModel::Private::isCameraApplicable(
     return camera && camera->hasFlags(Qn::motion);
 }
 
-bool MotionSearchListModel::Private::hasAccessRights() const
-{
-    return true;
-}
-
 void MotionSearchListModel::Private::clearData()
 {
     ScopedReset reset(q, !m_data.empty());
@@ -172,13 +167,13 @@ void MotionSearchListModel::Private::clearData()
 
 void MotionSearchListModel::Private::truncateToMaximumCount()
 {
-    this->truncateDataToMaximumCount(m_data,
+    q->truncateDataToMaximumCount(m_data,
         [](const MotionChunk& chunk) { return chunk.period.startTime(); });
 }
 
 void MotionSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    this->truncateDataToTimePeriod(
+    q->truncateDataToTimePeriod(
         m_data, upperBoundPredicate, q->relevantTimePeriod());
 }
 

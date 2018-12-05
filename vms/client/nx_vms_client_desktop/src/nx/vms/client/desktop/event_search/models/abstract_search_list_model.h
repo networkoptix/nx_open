@@ -5,6 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 
 class ManagedCameraSet;
@@ -73,6 +75,9 @@ public:
     /** Returns whether the model with current settings performs any data filtering. */
     virtual bool isConstrained() const;
 
+    /** Returns whether current user has enough access rights to use this model. */
+    virtual bool hasAccessRights() const;
+
     // The following functions should be overridden in asynchronous fetch models.
     virtual bool fetchInProgress() const;
     virtual bool cancelFetch();
@@ -98,8 +103,8 @@ signals:
 protected:
     // These functions must be overridden in derived classes.
 
-    /** Returns whether fetch can be started and there's more data to fetch in selected direction. */
-    virtual bool canFetch() const = 0;
+    /** Returns whether fetch can be started. */
+    virtual bool canFetchNow() const;
 
     /** Requests next data fetch in selected direction. */
     virtual void requestFetch() = 0;
@@ -111,9 +116,20 @@ protected:
      * Doesn't need to reset fetched time window. */
     virtual void truncateToRelevantTimePeriod() = 0;
 
+    template<class DataContainer, class UpperBoundPredicate>
+    void truncateDataToTimePeriod(DataContainer& data,
+        UpperBoundPredicate upperBoundPredicate,
+        const QnTimePeriod& period,
+        std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
+
     /** Truncate fetched data to maximal item count at front or back,
      * depending on current fetch direction. Must update fetched time window correspondingly. */
     virtual void truncateToMaximumCount() = 0;
+
+    template<class DataContainer>
+    void truncateDataToMaximumCount(DataContainer& data,
+        std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
+        std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
     /** Returns whether specified camera is applicable for this model. */
     virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const;
@@ -146,6 +162,93 @@ private:
 
     const QScopedPointer<ManagedCameraSet> m_cameraSet; //< Relevant camera set.
 };
+
+//-------------------------------------------------------------------------------------------------
+// Template method implementation.
+
+template<class DataContainer, class UpperBoundPredicate>
+void AbstractSearchListModel::truncateDataToTimePeriod(
+    DataContainer& data,
+    UpperBoundPredicate upperBoundPredicate,
+    const QnTimePeriod& period,
+    std::function<void(typename DataContainer::const_reference)> itemCleanup)
+{
+    if (data.empty())
+        return;
+
+    // Remove records later than end of the period.
+    const auto frontEnd = std::upper_bound(data.begin(), data.end(),
+        period.endTime(), upperBoundPredicate);
+
+    const auto frontLength = std::distance(data.begin(), frontEnd);
+    if (frontLength != 0)
+    {
+        ScopedRemoveRows removeRows(this, 0, frontLength - 1);
+        if (itemCleanup)
+            std::for_each(data.begin(), frontEnd, itemCleanup);
+        data.erase(data.begin(), frontEnd);
+    }
+
+    // Remove records earlier than start of the period.
+    const auto tailBegin = std::upper_bound(data.begin(), data.end(),
+        period.startTime(), upperBoundPredicate);
+
+    const auto tailLength = std::distance(tailBegin, data.end());
+    if (tailLength != 0)
+    {
+        const auto tailStart = std::distance(data.begin(), tailBegin);
+        ScopedRemoveRows removeRows(this, tailStart, tailStart + tailLength - 1);
+        if (itemCleanup)
+            std::for_each(tailBegin, data.end(), itemCleanup);
+        data.erase(tailBegin, data.end());
+    }
+}
+
+template<class DataContainer>
+void AbstractSearchListModel::truncateDataToMaximumCount(DataContainer& data,
+    std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
+    std::function<void(typename DataContainer::const_reference)> itemCleanup)
+{
+    if (maximumCount() <= 0)
+        return;
+
+    const int toRemove = int(data.size()) - maximumCount();
+    if (toRemove <= 0)
+        return;
+
+    if (fetchDirection() == FetchDirection::earlier)
+    {
+        ScopedRemoveRows removeRows(this, 0, toRemove - 1);
+        const auto removeEnd = data.begin() + toRemove;
+        if (itemCleanup)
+            std::for_each(data.begin(), removeEnd, itemCleanup);
+
+        data.erase(data.begin(), removeEnd);
+
+        // If top is truncated, go out of live mode.
+        setLive(false);
+    }
+    else
+    {
+        NX_ASSERT(fetchDirection() == FetchDirection::later);
+        const auto index = int(data.size()) - toRemove;
+        const auto removeBegin = data.begin() + index;
+
+        ScopedRemoveRows removeRows(this, index, index + toRemove - 1);
+        if (itemCleanup)
+            std::for_each(removeBegin, data.end(), itemCleanup);
+
+        data.erase(removeBegin, data.end());
+    }
+
+    auto timeWindow = fetchedTimeWindow();
+    if (fetchDirection() == FetchDirection::earlier)
+        timeWindow.truncate(timestamp(data.front()).count());
+    else
+        timeWindow.truncateFront(timestamp(data.back()).count());
+
+    setFetchedTimeWindow(timeWindow);
+}
 
 } // namespace nx::vms::client::desktop
 

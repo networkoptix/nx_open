@@ -46,7 +46,6 @@ public:
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
-    virtual bool hasAccessRights() const override;
 
 private:
     using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;

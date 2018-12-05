@@ -75,9 +75,20 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 {
-    return parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later)
-        ? false
-        : canFetch();
+    if (parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later))
+        return false;
+
+    if (!canFetchNow() || !hasAccessRights())
+        return false;
+
+    if (fetchedTimeWindow().isEmpty())
+        return true;
+
+    if (fetchDirection() == FetchDirection::earlier)
+        return fetchedTimeWindow().startTimeMs > relevantTimePeriod().startTimeMs;
+
+    NX_ASSERT(fetchDirection() == FetchDirection::later);
+    return fetchedTimeWindow().endTimeMs() < relevantTimePeriod().endTimeMs();
 }
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
@@ -95,6 +106,11 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     {
         requestFetch();
     }
+}
+
+bool AbstractSearchListModel::canFetchNow() const
+{
+    return true;
 }
 
 bool AbstractSearchListModel::isFilterDegenerate() const
@@ -131,6 +147,11 @@ bool AbstractSearchListModel::cancelFetch()
 bool AbstractSearchListModel::isConstrained() const
 {
     return m_relevantTimePeriod != QnTimePeriod::anytime();
+}
+
+bool AbstractSearchListModel::hasAccessRights() const
+{
+    return true;
 }
 
 const QnTimePeriod& AbstractSearchListModel::relevantTimePeriod() const
