@@ -10,6 +10,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/system_commands.h>
+#include <utils/common/synctime.h>
 
 #include <api/test_api_requests.h>
 #include <test_support/utils.h>
@@ -133,6 +134,7 @@ protected:
     void whenServerLaunched()
     {
         ASSERT_TRUE(m_server->start());
+        m_serverStartTime = qnSyncTime->currentMSecsSinceEpoch();
         m_backupDir = m_server->serverModule()->settings().backupDir();
         m_dataDir = m_server->serverModule()->settings().dataDir();
     }
@@ -217,7 +219,13 @@ protected:
         const auto& currentFile = backupFilesData.front();
 
         ASSERT_NE(previousFile.timestamp, currentFile.timestamp);
-        ASSERT_LT(currentFile.timestamp - previousFile.timestamp - timeout.count(), 1000);
+        const int allowedTimeGapMs = 1000 + std::max<int64_t>(
+            0,
+            m_serverStartTime - previousFile.timestamp - timeout.count());
+
+        ASSERT_LT(
+            currentFile.timestamp - previousFile.timestamp - timeout.count(),
+            allowedTimeGapMs);
     }
 
     void whenAllBackupFilesDataCollected()
@@ -232,6 +240,7 @@ private:
     QString m_backupDir;
     QString m_dataDir;
     nx::ut::utils::WorkDirResource m_dirResource;
+    int64_t m_serverStartTime = 0;
 
     void waitForAllBackupFilesToBeCreated()
     {
