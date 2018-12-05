@@ -20,7 +20,7 @@
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Ваш обліковий запис успішно активовано",
     "SYSTEM NAME SAVED": "Ім'я системи збережено",
     "ACCOUNT IS CREATED": "Обліковий запис створено",
-    "CONFIRMATION MESSAGE IS SENT TO": " Повідомлення про підтвердження надсилається на %email%",
+    "CONFIRMATION MESSAGE IS SENT TO": "Повідомлення про підтвердження надсилається на %email%",
     "CANNOT SAVE PASSWORD": "Не вдається зберегти пароль:",
     "PASSWORD INCORRECT": "Введений пароль невірний.",
     "TOO MANY ATTEMPTS TEXT": "Забагато спроб. Спробуйте пізніше.",

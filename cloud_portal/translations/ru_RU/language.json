@@ -10,7 +10,7 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",

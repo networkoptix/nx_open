@@ -275,7 +275,7 @@
       "transcoding": "Umkodierung",
       "unknown": "Unbekannt",
       "copyToClipboard": "in zwischenablage kopieren",
-      "copyDefaultText": "Kopieren",
+      "copyDefaultText": "copieren",
       "copyActiveText": "in die zwischenablage kopiert"
     },
     "systemOffline": "System offline",
@@ -302,8 +302,8 @@
     },
     "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
     "voiceCommands": {
-      "play": "Abspielen",
-      "pause": "Pause",
+      "play": "abspielen",
+      "pause": "pause",
       "live": "live gehen | live anzeigen",
       "view": "ansicht + [kameraname]",
       "search": "finden + [text für suchleiste]",

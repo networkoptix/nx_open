@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
     "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked": "Bu hesap geçici olarak kilitlendi.Lütfen bir süre sonra tekrar deneyin.",
+    "accountBlocked": "Bu hesap geçici olarak kilitlendi. Lütfen bir süre sonra tekrar deneyin.",
     "notFound": "Bulunamadı",
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",
@@ -137,7 +137,7 @@
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
     "thisSystem": "sistem",
-    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez."
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez"
   },
   "passwordRequirements": {
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",

@@ -19,7 +19,7 @@
 	"Disconnect": "Bağlantıyı kes",
 	"Disconnect System from %PRODUCT_NAME%?": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
 	"Download": "İndir",
-	"Download %VMS_NAME%": "İndir {{VMS_NAME}}",
+	"Download %VMS_NAME%": "İndir %VMS_NAME%",
 	"Download Chrome": "Chrome'u indir",
 	"Download Firefox": "Firefox indir",
 	"Download Links:": "İndirme linki:",
