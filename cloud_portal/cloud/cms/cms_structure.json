@@ -378,17 +378,19 @@
           {
             "label": "Public Downloads",
             "name": "%PUBLIC_DOWNLOADS%",
-            "value": "on",
+            "value": "true",
             "description": "Allows all users to view the downloads page. If unchecked users must have a special permission to view the downloads page.",
             "advanced": true,
+            "optional": true,
             "type": "check_box"
           },
           {
             "label": "Public Release History",
             "name": "%PUBLIC_RELEASE_HISTORY%",
-            "value": "",
+            "value": "false",
             "description": "Allows all users to view the release history page. If unchecked users must have a special permission to view the release history page.",
             "advanced": true,
+            "optional": true,
             "type": "check_box"
           }
         ]

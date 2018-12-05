@@ -141,8 +141,7 @@ class CustomContextForm(forms.Form):
 
             elif data_structure.type == DataStructure.DATA_TYPES.check_box:
                 # Off value for check box is empty string
-                if record_value == 'off':
-                    record_value = ''
+                record_value = 'on' if record_value else ''
                 self.fields[data_structure.name] = forms.BooleanField(label=ds_label,
                                                                       help_text=ds_description,
                                                                       initial=record_value,
@@ -233,7 +232,7 @@ class CustomizationForm(forms.ModelForm):
 
     def clean_parent(self):
         data = self.cleaned_data['parent']
-        if not Customization.objects.exclude(id__in=self.instance.get_children_ids(self.instance)). \
+        if data and not Customization.objects.exclude(id__in=self.instance.get_children_ids(self.instance)). \
                 exclude(id=self.instance.id).filter(id=data.id).exists():
             raise ValueError('Invalid customization was selected')
         return data

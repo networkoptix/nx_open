@@ -149,6 +149,11 @@ def update_from_object(cms_structure):
                     except IOError:
                         pass
 
+                # Checkboxes should always be optional otherwise they can initially be false but will always be true
+                # if modified.
+                elif data_structure.type == DataStructure.DATA_TYPES.check_box:
+                    data_structure.optional = True
+
                 data_structure.meta_settings = meta if meta else {}
                 data_structure.default = value
                 data_structure.save()
