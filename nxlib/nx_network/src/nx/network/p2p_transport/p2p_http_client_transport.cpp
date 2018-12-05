@@ -166,7 +166,7 @@ void P2PHttpClientTransport::startReading()
                         {
                             m_userReadHandlerPair->first->append(data);
 
-                            utils::ObjectDestructionFlag::Watcher watcher(&m_objectDestructionFlag);
+                            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
                             m_userReadHandlerPair->second(SystemError::noError, data.size());
                             if (watcher.objectDestroyed())
                                 return;
