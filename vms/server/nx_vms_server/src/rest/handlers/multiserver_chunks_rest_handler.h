@@ -28,6 +28,11 @@ public:
         const QnChunksRequestData& request,
         const QnRestConnectionProcessor* owner) const;
 
+
+    static MultiServerPeriodDataList mergeDataWithSameId(
+        const MultiServerPeriodDataList& periodList,
+        int limit,
+        Qt::SortOrder sortOrder);
 private:
     MultiServerPeriodDataList loadDataSync(
         const QnChunksRequestData& request,

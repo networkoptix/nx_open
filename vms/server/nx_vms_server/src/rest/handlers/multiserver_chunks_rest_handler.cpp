@@ -202,15 +202,19 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     return outputData;
 }
 
-MultiServerPeriodDataList mergeDataWithSameId(
+MultiServerPeriodDataList QnMultiserverChunksRestHandler::mergeDataWithSameId(
     const MultiServerPeriodDataList& periodList,
     int limit,
     Qt::SortOrder sortOrder)
 {
     MultiServerPeriodDataList result;
+    QSet<QnUuid> processedId;
     for (int i = 0; i < periodList.size(); ++i)
     {
         const auto guid = periodList[i].guid;
+        if (processedId.contains(guid))
+            continue;
+        processedId << guid;
         std::vector<QnTimePeriodList> periodsToMerge;
         periodsToMerge.push_back(periodList[i].periods);
         for (int j = i + 1; j < periodList.size(); ++j)
