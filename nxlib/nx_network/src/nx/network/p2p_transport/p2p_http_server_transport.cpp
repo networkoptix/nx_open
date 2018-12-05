@@ -275,7 +275,7 @@ void P2PHttpServerTransport::cancelIoInAioThread(nx::network::aio::EventType eve
 
 aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
 {
-    return getAioThread();
+    return BasicPollable::getAioThread();
 }
 
 SocketAddress P2PHttpServerTransport::getForeignAddress() const
