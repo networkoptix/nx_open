@@ -182,13 +182,13 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     if (options.H264)
     {
         encoding = UnderstandableVideoCodec::H264;
-        for (const auto& resolution : options.H264->ResolutionsAvailable)
+        for (const auto& resolution: options.H264->ResolutionsAvailable)
         {
             if (resolution)
                 resolutions << QSize(resolution->Width, resolution->Height);
         }
 
-        for (const auto& profile : options.H264->H264ProfilesSupported)
+        for (const auto& profile: options.H264->H264ProfilesSupported)
             h264Profiles << profile;
         std::sort(h264Profiles.begin(), h264Profiles.end());
 
@@ -210,7 +210,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     {
         encoding = UnderstandableVideoCodec::JPEG;
 
-        for (const auto& resolution : options.JPEG->ResolutionsAvailable)
+        for (const auto& resolution: options.JPEG->ResolutionsAvailable)
         {
             if (resolution)
                 resolutions << QSize(resolution->Width, resolution->Height);
@@ -226,7 +226,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     }
     else if (options.MPEG4)
     {
-        // We ignore MPEG4 and don't support it.
+        NX_DEBUG(this, "Device has MPEG4 video encoder, but server ignores it.");
     }
 
     if (options.QualityRange)
@@ -308,8 +308,8 @@ std::vector<QnPlOnvifResource::VideoOptionsLocal>
         QnBounds frameRateBounds)
 {
     std::vector<QnPlOnvifResource::VideoOptionsLocal> result;
-    constexpr int maxCount = 2; // H264 + JPEG
-    result.reserve(maxCount);
+    constexpr int kMaxCount = 2; // H264 + JPEG
+    result.reserve(kMaxCount);
 
     result.push_back(VideoOptionsLocal(id, options, frameRateBounds));
 
@@ -2255,7 +2255,7 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
         const auto optionsList = VideoOptionsLocal::createVideoOptionsLocalList(
             QString::fromStdString(token), *options, frameRateBounds);
 
-        for (const auto& options : optionsList)
+        for (const auto& options: optionsList)
             *dstOptionsList << options;
     }
     else
@@ -3985,7 +3985,7 @@ void QnPlOnvifResource::handleAllNotifications(const _onvifEvents__PullMessagesR
 
     // Notifications with timestamps older then minNotificationTime are ignored.
     const time_t minNotificationTime = response.CurrentTime - timeSinceLastResponseSec;
-    for (const auto& notification : response.oasisWsnB2__NotificationMessage)
+    for (const auto& notification: response.oasisWsnB2__NotificationMessage)
     {
         if (notification)
             handleOneNotification(*notification, minNotificationTime);
@@ -4030,7 +4030,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOut
         return false;
     }
 
-    for (const auto& output : response.RelayOutputs)
+    for (const auto& output: response.RelayOutputs)
     {
         if (output)
         {
