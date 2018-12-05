@@ -2038,6 +2038,8 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
             action(action::ToggleTimelineAction)->setChecked(true);
             setAreaSelectionType(AreaType::motion);
+
+            selectThisWidget(true); //< Single-select this widget.
         }
         else
         {
