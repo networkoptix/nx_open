@@ -532,6 +532,7 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
     const QRectF rect) const
 {
     std::map<QString, QString> result;
+    result.emplace(kHanwhaChannelProperty, channel());
 
     if (rect.width() > 1 || rect.height() > 1)
     {
