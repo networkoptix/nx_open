@@ -87,10 +87,6 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
             if (m_failed)
                 return handler(SystemError::connectionAbort, 0);
 
-            NX_ASSERT(!m_postInProgress);
-            if (m_postInProgress)
-                return handler(SystemError::notSupported, 0);
-
             m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
                 m_messageType,
                 buffer));
@@ -108,12 +104,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                     const std::size_t transferred = resultCode == SystemError::noError
                         ? bufferSize : 0;
 
-                    utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
                     handler(resultCode, transferred);
-                    if (watcher.objectDestroyed())
-                        return;
-
-                    m_postInProgress = 0;
                 });
 
         });
