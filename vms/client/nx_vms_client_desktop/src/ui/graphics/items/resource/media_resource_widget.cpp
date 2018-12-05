@@ -2017,25 +2017,41 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 {
     if (changedFlags.testFlag(DisplayMotion))
     {
-        if (QnAbstractArchiveStreamReader *reader = d->display()->archiveReader())
+        const bool motionSearchEnabled = options().testFlag(DisplayMotion);
+
+        if (auto reader = d->display()->archiveReader())
         {
             using namespace nx::vms::api;
             StreamDataFilters filter = reader->streamDataFilter();
-            filter.setFlag(StreamDataFilter::motion, options() & DisplayMotion);
+            filter.setFlag(StreamDataFilter::motion, motionSearchEnabled);
             filter.setFlag(StreamDataFilter::media);
             reader->setStreamDataFilter(filter);
         }
 
-        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
+        titleBar()->rightButtonsBar()->setButtonsChecked(
+            Qn::MotionSearchButton, motionSearchEnabled);
 
-        if (options().testFlag(DisplayMotion))
+        if (motionSearchEnabled)
         {
-            setProperty(Qn::MotionSelectionModifiers, 0);
+            titleBar()->rightButtonsBar()->setButtonsChecked(
+                Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
+
+            action(action::ToggleTimelineAction)->setChecked(true);
+            setAreaSelectionType(AreaType::motion);
         }
         else
         {
-            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
+            unsetAreaSelectionType(AreaType::motion);
         }
+
+        setOption(WindowResizingForbidden, motionSearchEnabled);
+
+        if (motionSearchEnabled)
+            setProperty(Qn::MotionSelectionModifiers, 0);
+        else
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); //< Use defaults.
+
+        emit motionSearchModeEnabled(motionSearchEnabled);
     }
 
     base_type::optionsChangedNotify(changedFlags);
@@ -2824,28 +2840,7 @@ void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
 
 void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 {
-    if (isMotionSearchModeEnabled() == enabled)
-        return;
-
     setOption(DisplayMotion, enabled);
-    titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, enabled);
-
-    if (enabled)
-    {
-        titleBar()->rightButtonsBar()->setButtonsChecked(
-            Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
-
-        action(action::ToggleTimelineAction)->setChecked(true);
-        setAreaSelectionType(AreaType::motion);
-    }
-    else
-    {
-        unsetAreaSelectionType(AreaType::motion);
-    }
-
-    setOption(WindowResizingForbidden, enabled);
-
-    emit motionSearchModeEnabled(enabled);
 }
 
 bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
