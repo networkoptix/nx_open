@@ -20,7 +20,7 @@
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Ditt konto har aktiverats",
     "SYSTEM NAME SAVED": "Systemnamnet sparat",
     "ACCOUNT IS CREATED": "Kontot är skapat",
-    "CONFIRMATION MESSAGE IS SENT TO": " Bekräftelsemail skickas till %email%",
+    "CONFIRMATION MESSAGE IS SENT TO": "Bekräftelsemail skickas till %email%",
     "CANNOT SAVE PASSWORD": "Kan inte spara lösenord:",
     "PASSWORD INCORRECT": "Nuvarande lösenord är inkorrekt.",
     "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
