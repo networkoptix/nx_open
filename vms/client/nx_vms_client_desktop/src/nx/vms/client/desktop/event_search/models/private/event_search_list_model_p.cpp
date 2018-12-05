@@ -404,6 +404,19 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 parameters.description, QPalette().light().color());
 
+        case EventType::pluginEvent:
+        {
+            switch (QnNotificationLevel::valueOf(parameters))
+            {
+                case QnNotificationLevel::Value::CriticalNotification:
+                    return qnSkin->pixmap("events/alert_red.png");
+                case QnNotificationLevel::Value::ImportantNotification:
+                    return qnSkin->pixmap("events/alert_yellow.png");
+                default:
+                    return qnSkin->pixmap("events/alert.png");
+            }
+        }
+
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case nx::vms::api::EventType::cameraMotionEvent:
         case nx::vms::api::EventType::cameraInputEvent:
