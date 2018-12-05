@@ -8,7 +8,7 @@ namespace nx::network {
 
 namespace {
 
-static const int kMaxMessageQueueSize = 100;
+static const int kMaxMessageQueueSize = 500;
 
 } // namespace
 
@@ -25,8 +25,6 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     using namespace std::chrono_literals;
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
-    //m_writeHttpClient->setSendTimeout(60s);
-    //m_writeHttpClient->setResponseReadTimeout(60s);
 
     m_writeHttpClient->bindToAioThread(m_readHttpClient->getAioThread());
     m_readHttpClient->post([this]() { startReading(); });
@@ -37,11 +35,18 @@ P2PHttpClientTransport::~P2PHttpClientTransport()
     pleaseStopSync();
 }
 
+void P2PHttpClientTransport::stopWhileInAioThread()
+{
+    m_writeHttpClient.reset();
+    m_readHttpClient.reset();
+}
+
 void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
     m_readHttpClient->post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
+            // Don't call readSomeAsync() again, before a previous handler has called back.
             NX_ASSERT(!m_userReadHandlerPair);
             if (m_userReadHandlerPair)
                 return handler(SystemError::notSupported, 0);
@@ -50,7 +55,8 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
             {
                 if (m_failed)
                 {
-                    NX_VERBOSE(this,
+                    NX_VERBOSE(
+                        this,
                         "The connection is in a failed state, but we have some"
                         " buffered messages left. Handing them out");
                 }
@@ -64,15 +70,12 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 
             if (m_failed)
             {
-                NX_VERBOSE(this, lm("The connection failed. Reporting with a read handler"));
+                NX_VERBOSE(this, lm("The connection has failed. Reporting with a read handler"));
                 handler(SystemError::connectionAbort, 0);
                 return;
             }
 
-            NX_VERBOSE(this,
-                "Got a read request but the incomingMessage queue is empty. "
-                "Saving it for now.");
-
+            // No incoming message in the queue.
             m_userReadHandlerPair.reset(new std::pair<nx::Buffer* const, IoCompletionHandler>(
                 buffer,
                 std::move(handler)));
@@ -93,7 +96,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
 
             m_writeHttpClient->doPost(
                 m_url ? *m_url : m_readHttpClient->url(),
-                [this, handler = std::move(handler), bufferSize = buffer.size()]
+                [this, handler = std::move(handler), bufferSize = buffer.size()]()
                 {
                     const bool isResponseValid = m_writeHttpClient->response()
                         && m_writeHttpClient->response()->statusLine.statusCode
@@ -133,13 +136,6 @@ aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
     return m_readHttpClient->getAioThread();
 }
 
-void P2PHttpClientTransport::pleaseStopSync()
-{
-    m_readHttpClient->pleaseStopSync();
-    if (m_writeHttpClient)
-        m_writeHttpClient->pleaseStopSync();
-}
-
 SocketAddress P2PHttpClientTransport::getForeignAddress() const
 {
     nx::utils::promise<SocketAddress> p;
@@ -169,7 +165,12 @@ void P2PHttpClientTransport::startReading()
                         else
                         {
                             m_userReadHandlerPair->first->append(data);
+
+                            utils::ObjectDestructionFlag::Watcher watcher(&m_objectDestructionFlag);
                             m_userReadHandlerPair->second(SystemError::noError, data.size());
+                            if (watcher.objectDestroyed())
+                                return;
+
                             m_userReadHandlerPair.reset();
                         }
                     }

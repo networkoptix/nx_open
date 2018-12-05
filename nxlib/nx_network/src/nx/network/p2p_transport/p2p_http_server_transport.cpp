@@ -12,6 +12,7 @@ P2PHttpServerTransport::P2PHttpServerTransport(
     m_sendSocket(std::move(socket)),
     m_messageType(messageType)
 {
+    m_sendSocket->setNonBlockingMode(true);
     m_readContext.parser.setMessage(&m_readContext.message);
     m_timer.bindToAioThread(m_sendSocket->getAioThread());
     m_sendBuffer.reserve(4096);
@@ -96,8 +97,6 @@ void P2PHttpServerTransport::onBytesRead(
         return;
     }
 
-    size_t totalBytesProcessed = 0;
-
     auto completionHandler =
         [this](SystemError::ErrorCode error, IoCompletionHandler handler)
         {
@@ -108,6 +107,8 @@ void P2PHttpServerTransport::onBytesRead(
 
             m_readContext.reset();
         };
+
+    size_t totalBytesProcessed = 0;
 
     while (totalBytesProcessed != transferred)
     {
@@ -128,7 +129,7 @@ void P2PHttpServerTransport::onBytesRead(
         case server::ParserState::readingBody:
         case server::ParserState::readingMessage:
             buffer->append(m_readContext.parser.fetchMessageBody());
-            m_readContext.buffer.remove(0, totalBytesProcessed);
+            m_readContext.buffer.remove(0, bytesProcessed);
             break;
         case server::ParserState::init:
             NX_ASSERT(false, "Should never get here");
@@ -137,7 +138,6 @@ void P2PHttpServerTransport::onBytesRead(
         }
     }
 
-    m_readContext.buffer.remove(0, totalBytesProcessed);
     readFromSocket(buffer, std::move(handler));
 }
 
@@ -275,23 +275,16 @@ aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
     return m_sendSocket->getAioThread();
 }
 
-void P2PHttpServerTransport::pleaseStopSync()
-{
-    m_sendSocket->cancelIOSync(aio::etWrite);
-    m_sendSocket->cancelIOSync(aio::etRead);
-    m_sendSocket->pleaseStopSync();
-    if (m_readSocket)
-    {
-        m_readSocket->cancelIOSync(aio::etWrite);
-        m_readSocket->cancelIOSync(aio::etRead);
-        m_readSocket->pleaseStopSync();
-    }
-    m_timer.pleaseStopSync();
-}
-
 SocketAddress P2PHttpServerTransport::getForeignAddress() const
 {
     return m_sendSocket->getForeignAddress();
+}
+
+void P2PHttpServerTransport::stopWhileInAioThread()
+{
+    m_timer.cancelSync();
+    m_sendSocket.reset();
+    m_readSocket.reset();
 }
 
 void P2PHttpServerTransport::ReadContext::reset()

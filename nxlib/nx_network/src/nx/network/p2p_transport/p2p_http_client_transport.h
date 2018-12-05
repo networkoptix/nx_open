@@ -5,6 +5,7 @@
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/object_destruction_flag.h>
 
 namespace nx::network {
 
@@ -29,7 +30,6 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
     virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual void pleaseStopSync() override;
     virtual SocketAddress getForeignAddress() const override;
 
 private:
@@ -48,12 +48,6 @@ private:
         const nx::Buffer& m_data;
     };
 
-    enum class FrameContentType
-    {
-        payload,
-        dummy
-    };
-
     using UserReadHandlePair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
 
     HttpClientPtr m_writeHttpClient;
@@ -65,8 +59,10 @@ private:
     websocket::FrameType m_messageType;
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
+    utils::ObjectDestructionFlag m_destructionFlag;
 
     void startReading();
+    virtual void stopWhileInAioThread() override;
 };
 
 } // namespace nx::network

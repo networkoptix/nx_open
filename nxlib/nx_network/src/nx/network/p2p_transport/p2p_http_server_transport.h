@@ -17,7 +17,12 @@ public:
 
     virtual ~P2PHttpServerTransport() override;
 
+    /**
+     * This function should be called before any readSomeAsync(). In case if the readSomeAsync()
+     * fails, a new POST socket might be provided via this function.
+     */
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
+
     /**
      * This should be called before all other operations. Transport becomes operational only after
      * onGetRequestReceived() callback is fired.
@@ -29,7 +34,6 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
     virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual void pleaseStopSync() override;
     virtual SocketAddress getForeignAddress() const override;
 
 private:
@@ -69,6 +73,8 @@ private:
         IoCompletionHandler userHandler,
         utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler);
     static void addDateHeader(http::HttpHeaders* headers);
+
+    virtual void stopWhileInAioThread() override;
 };
 
 } // namespace nx::network
