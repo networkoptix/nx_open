@@ -59,6 +59,8 @@ bool QnAbstractTransactionTransport::shouldTransactionBeSentToPeer(const QnAbstr
         {
             return false;
         }
+        if (transaction.peerID == kCloudPeerId)
+            return false; //< Don't send cloud transactions back to the Cloud.
     }
 
     return true;
