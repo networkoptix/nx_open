@@ -14,6 +14,7 @@ P2PHttpServerTransport::P2PHttpServerTransport(
 {
     m_sendSocket->setNonBlockingMode(true);
     m_readContext.parser.setMessage(&m_readContext.message);
+    BasicPollable::bindToAioThread(m_sendSocket->getAioThread());
     m_timer.bindToAioThread(m_sendSocket->getAioThread());
     m_sendBuffer.reserve(4096);
     m_readContext.buffer.reserve(4096);

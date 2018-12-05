@@ -26,6 +26,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
 
+    BasicPollable::bindToAioThread(m_readHttpClient->getAioThread());
     m_writeHttpClient->bindToAioThread(m_readHttpClient->getAioThread());
     m_readHttpClient->post([this]() { startReading(); });
 }
