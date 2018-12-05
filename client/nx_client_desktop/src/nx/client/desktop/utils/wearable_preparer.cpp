@@ -159,7 +159,10 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
         QString startTimeString = QLatin1String(delegate->getTagValue("creation_time"));
         QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
         if (startDateTime.isValid())
+        {
+            startDateTime.setTimeSpec(Qt::UTC);
             startTimeMs = startDateTime.toMSecsSinceEpoch();
+        }
     }
 
     if (startTimeMs == 0)
