@@ -444,15 +444,19 @@ Item
                 }
             }
 
-            Button
+            IconButton
             {
                 id: motionSearchModeButton
 
-                text: checked ? "-" : "+"
+                width: 40
+                height: width
                 checked: false
                 checkable: true
                 anchors.left:  calendarButton.right
                 anchors.verticalCenter: parent.verticalCenter
+                icon.source: lp("/images/motion.svg")
+                normalIconColor: ColorTheme.contrast1
+                checkedIconColor: ColorTheme.base1
             }
 
             Row
