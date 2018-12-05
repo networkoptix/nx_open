@@ -2,6 +2,7 @@
 #include "ptz_rotation_migration_structs.h"
 
 #include <nx/utils/std/optional.h>
+#include <nx/utils/log/log.h>
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -13,6 +14,8 @@ namespace migration {
 namespace ptz {
 
 namespace {
+
+const QString kLogTag("PtzRotationMigration");
 
 std::optional<QString> convertPresets(const QString& oldSerializedPresets)
 {
@@ -64,11 +67,15 @@ bool addRotationToPresets(QSqlDatabase& database)
         const auto id = presetQuery.value(0).toString();
         auto serializedPresets = presetQuery.value(1).toString();
 
-        const auto convertedPresets = convertPresets(serializedPresets);
-        if (convertedPresets == std::nullopt)
-            return false;
-
-        presetRecords[id] = *convertedPresets;
+        if (const auto convertedPresets = convertPresets(serializedPresets))
+        {
+            presetRecords[id] = *convertedPresets;
+        }
+        else
+        {
+            presetRecords[id] = "{}";
+            NX_WARNING(kLogTag, "Unable to deserialize preset record, resetting it");
+        }
     }
 
     QSqlQuery updatePresetsQuery(database);
