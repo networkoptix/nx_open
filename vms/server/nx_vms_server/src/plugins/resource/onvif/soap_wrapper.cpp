@@ -341,7 +341,7 @@ int DeviceSoapWrapper::setRelayOutputSettings(_onvifDevice__SetRelayOutputSettin
     return invokeMethod(&DeviceBindingProxy::SetRelayOutputSettings, &request, response);
 }
 
-int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
+int DeviceSoapWrapper::getCapabilities(_onvifDevice__GetCapabilities& request, _onvifDevice__GetCapabilitiesResponse& response)
 {
     return invokeMethod(&DeviceBindingProxy::GetCapabilities, &request, response);
 }

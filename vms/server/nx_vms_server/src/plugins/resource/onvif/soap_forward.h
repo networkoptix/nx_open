@@ -28,8 +28,6 @@ class _onvifDevice__SystemRebootResponse;
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
-typedef _onvifDevice__GetCapabilities CapabilitiesReq;
-typedef _onvifDevice__GetCapabilitiesResponse CapabilitiesResp;
 typedef _onvifDevice__GetServices GetServicesReq;
 typedef _onvifDevice__GetServicesResponse GetServicesResp;
 typedef _onvifDevice__GetDeviceInformation DeviceInfoReq;
