@@ -15,8 +15,6 @@ namespace ptz {
 
 namespace {
 
-const QString kLogTag("PtzRotationMigration");
-
 std::optional<QString> convertPresets(const QString& oldSerializedPresets)
 {
     using namespace nx::core;
@@ -52,7 +50,7 @@ std::optional<QString> convertPresets(const QString& oldSerializedPresets)
 
 } // namespace
 
-bool addRotationToPresets(QSqlDatabase& database)
+bool addRotationToPresets(const QString& logTag, QSqlDatabase& database)
 {
     static const QString kPresetQuery = lm("SELECT id, value FROM vms_kvpair WHERE name='%1'")
         .arg(kPresetsPropertyKey);
@@ -73,11 +71,13 @@ bool addRotationToPresets(QSqlDatabase& database)
         }
         else
         {
-            presetRecords[id] = QJson::serialized(QnPtzPresetRecordHash());
+            const auto defaultValue = QJson::serialized(QnPtzPresetRecordHash());
+            presetRecords[id] = defaultValue;
             NX_WARNING(
-                kLogTag,
-                lm("Unable to deserialize a preset record, resetting it. %1")
-                    .arg(serializedPresets));
+                logTag,
+                lm("Unable to deserialize a preset record while executing migration, "
+                    "setting a default value (%1) to the property %2. The old value: %3")
+                    .args(defaultValue, kPresetsPropertyKey, serializedPresets));
         }
     }
 

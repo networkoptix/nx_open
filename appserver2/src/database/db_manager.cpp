@@ -1676,7 +1676,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
-        return ec2::migration::ptz::addRotationToPresets(m_sdb)
+        const QString logTag = toString(typeid(QnDbManager));
+        return ec2::migration::ptz::addRotationToPresets(logTag, m_sdb)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
