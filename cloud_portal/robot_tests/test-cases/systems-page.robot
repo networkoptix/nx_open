@@ -136,6 +136,32 @@ Should not show systems dropdown with no systems
     Validate Log In
     Element Should Not Be Visible    ${SYSTEMS DROPDOWN}
 
+Search should highlight system name
+    [tags]    C41891
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS}
+    Wait Until Element Is Visible    //span[@class="highlighted" and text()="${AUTO TESTS}"]
+
+Search should highlight owner name
+    [tags]    C41891
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${TEST FIRST NAME}
+    Wait Until Element Is Visible    //span[@class="highlighted" and text()="${TEST FIRST NAME}"]
+
+Search can be cleared by x button
+    [tags]    C41891
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${TEST FIRST NAME}
+    Wait Until Element Is Visible    ${SYSTEM SEARCH X BUTTON}
+    Click Link    ${SYSTEM SEARCH X BUTTON}
+    Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
+
 should update owner name in systems list, if it's changed
     Go To    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    None
@@ -159,4 +185,3 @@ should update owner name in systems list, if it's changed
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
     Reset user owner first/last name
-
