@@ -161,12 +161,13 @@ PageBase
 
         controls:
         [
-            Button
+            MotionAreaButton
             {
+                visible: video.motionController && video.motionController.customRoiExists
+                anchors.verticalCenter: parent.verticalCenter
+
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
-
-                visible: video.motionController && video.motionController.customRoiExists
 
                 onClicked:
                 {
