@@ -44,10 +44,10 @@ private:
         std::string toString() const
         {
             return
-                std::string("nxId: ") + nxId +
-                ", device: { name: " + device.name +
-                ", path: " + device.path +
-                ", uid: " + device.uniqueId + " }";
+                std::string("nxId: ") + nxId
+                + ", device: { name: " + device.name
+                + ", path: " + device.path
+                + ", uid: " + device.uniqueId + " }";
         }
     };
 

@@ -18,23 +18,37 @@ namespace usb_cam {
 namespace {
 
 static constexpr const char kVendorName[] = "usb_cam";
-static constexpr const char kQtMacAddressDelimiter[] = ":";
-static constexpr const char kNxMacAddressDelimiter[] = "-";
 
-static std::string getEthernetMacAddress()
+static std::string getMacAddress()
 {
-    for (const auto & iFace : QNetworkInterface::allInterfaces())
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+
+    for (const auto & iFace : interfaces)
     {
         if(iFace.type() == QNetworkInterface::Ethernet)
         {
             // The media server modifies the mac address delimiter from ":" to "-",
             // so do it preemptively to avoid adding the unique id with the wrong delimiter.
-            return iFace.hardwareAddress().replace(
-                kQtMacAddressDelimiter, 
-                kNxMacAddressDelimiter).toStdString();
+            return iFace.hardwareAddress().replace(":", "-").toStdString();
         }
     }
-    return {};
+
+    // Raspberry Pi 3A+ doesn't have an ethernet port, so fall back to wifi.
+    for (const auto & iFace : interfaces)
+    {
+        if (iFace.type() == QNetworkInterface::Wifi)
+            return iFace.hardwareAddress().replace(":", "-").toStdString();
+    }
+
+    // No Wifi? Maybe the loop back interface for Raspberry Pi 0, which has no network interface.
+    for (const auto & iFace : interfaces)
+    {
+        if (iFace.type() == QNetworkInterface::Loopback)
+            return iFace.hardwareAddress().replace(":", "-").toStdString();
+    }
+
+    // Give up.
+    return std::string();
 }
 
 bool isRpiMmal(const std::string& deviceName)
@@ -149,7 +163,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(device.nxId);
-    NX_DEBUG(this, "addOrUpdateCamera");
+    NX_DEBUG(this, "addOrUpdateCamera attempting to add device: %1", device.toString());
     if(it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
@@ -172,8 +186,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
         {
             NX_DEBUG(
                 this,
-                "Device already found: %1",
-                device.toString());
+                "Device already found");
         }
     }
 }
@@ -194,18 +207,22 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     {
         std::string nxId;
 
-        // Convert camera uniqueId to one guaranteed to work with the media server.
         // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
         if (isRpiMmal(device.name))
-        {
-            nxId = getEthernetMacAddress();
-        }
-        else
-        {
-            nxId = QCryptographicHash::hash(
-                device.uniqueId.c_str(),
-                QCryptographicHash::Md5).toHex().constData();
-        }
+            nxId = getMacAddress();
+
+        // Fall back to device unique id for normal usb cameras.
+        if (nxId.empty())
+            nxId = device.uniqueId;
+
+        // If nxId is still empty, fall back to volatile device path.
+        if (nxId.empty())
+            nxId = device.path;
+
+        // Convert the id to one guaranteed to work with the media server - no special characters.
+        nxId = QCryptographicHash::hash(
+            nxId.c_str(),
+            QCryptographicHash::Md5).toHex().constData();
 
         DeviceDataWithNxId nxDevice(device, nxId);
         
