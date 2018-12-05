@@ -205,17 +205,8 @@
                 };
                 
                 function updateVideoSource(playingPosition) {
-                    
                     // clear preview for next camera
                     $scope.preview = '';
-                    
-                    if (!$scope.activeCamera ||
-                        $scope.activeCamera.status === 'Unauthorized') {
-                        
-                        $scope.activeVideoSource = {src: ''};
-                        
-                        return;
-                    }
                     
                     var salt = '&' + Math.random(),
                         cameraId = $scope.activeCamera.id,
