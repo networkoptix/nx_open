@@ -53,8 +53,7 @@ protected:
         ASSERT_TRUE((bool) clientSocket);
         ASSERT_TRUE((bool) serverSocket);
 
-        std::unique_ptr<nx::network::http::AsyncClient> clientHttpClient(
-            new http::AsyncClient(std::move(clientSocket)));
+        auto clientHttpClient = std::make_unique<http::AsyncClient>(std::move(clientSocket));
 
         m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
         m_client.reset(new P2PHttpClientTransport(
@@ -79,8 +78,6 @@ protected:
     {
         auto connectionContext = std::make_shared<ConnectionContext>();
         auto readyFuture = connectionContext->promise.get_future();
-        connectionContext->server = m_server;
-        connectionContext->client = m_client;
 
         m_server->sendAsync(
             m_serverSendBuffer,
@@ -105,8 +102,6 @@ protected:
     {
         auto connectionContext = std::make_shared<ConnectionContext>();
         auto readyFuture = connectionContext->promise.get_future();
-        connectionContext->server = m_server;
-        connectionContext->client = m_client;
 
         m_client->sendAsync(
             m_clientSendBuffer,
@@ -132,8 +127,6 @@ private:
     {
         int sendCount = 0;
         int readCount  = 0;
-        std::shared_ptr<P2PHttpServerTransport> server;
-        std::shared_ptr<P2PHttpClientTransport> client;
         nx::utils::promise<void> promise;
     };
 
@@ -180,7 +173,7 @@ private:
         ASSERT_EQ(SystemError::noError, error);
         ASSERT_LE(m_serverSendBuffer.size(), transferred);
 
-        connectionContext->server->sendAsync(
+        m_server->sendAsync(
             m_serverSendBuffer,
             [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
             {
