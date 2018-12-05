@@ -120,9 +120,6 @@ void DragProcessor::transitionInternalHelper(State newState) {
     m_transitionCounter++;
     int transitionCounter = m_transitionCounter;
 
-    if (QApplication::activePopupWidget() && newState == Running)
-        newState = Waiting;
-
     /* Note that handler may trigger another transition. */
     switch(newState) {
     case Waiting:
