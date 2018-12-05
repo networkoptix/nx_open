@@ -95,7 +95,7 @@ Controller::Controller(
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine.incomingCommandDispatcher().removeHandler
         <ec2::command::SaveSystemMergeHistoryRecord>();
 
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
@@ -249,7 +249,7 @@ void Controller::initializeDataSynchronizationEngine()
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine.incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
@@ -269,7 +269,7 @@ void Controller::initializeDataSynchronizationEngine()
 nx::sql::DBResult Controller::copyExternalTransaction(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const nx::clusterdb::engine::EditableSerializableTransaction& transaction)
+    const nx::clusterdb::engine::EditableSerializableCommand& transaction)
 {
     if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
         return nx::sql::DBResult::ok;

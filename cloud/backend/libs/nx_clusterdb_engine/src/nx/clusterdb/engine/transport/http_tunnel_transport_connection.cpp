@@ -52,8 +52,8 @@ std::string HttpTunnelTransportConnection::connectionGuid() const
 }
 
 void HttpTunnelTransportConnection::sendTransaction(
-    TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const TransactionSerializer>& transactionSerializer)
+    CommandTransportHeader transportHeader,
+    const std::shared_ptr<const CommandSerializer>& transactionSerializer)
 {
     auto serializedTransaction = transactionSerializer->serialize(
         m_connectionRequestAttributes.remotePeer.dataFormat,

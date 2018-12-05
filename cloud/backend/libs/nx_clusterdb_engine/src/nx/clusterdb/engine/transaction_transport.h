@@ -21,7 +21,7 @@ class QnTransactionTransportBase;
 class ConnectionGuardSharedState;
 } // namespace ec2
 
-namespace nx::clusterdb::engine { class TransactionLog; }
+namespace nx::clusterdb::engine { class CommandLog; }
 
 namespace nx::clusterdb::engine::transport {
 
@@ -63,8 +63,8 @@ public:
     virtual void setOnGotTransaction(CommandDataHandler handler) override;
     virtual std::string connectionGuid() const override;
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const TransactionSerializer>& transactionSerializer) override;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const CommandSerializer>& transactionSerializer) override;
     virtual void closeConnection() override;
 
     void receivedTransaction(
@@ -94,12 +94,12 @@ private:
     void onGotTransaction(
         Qn::SerializationFormat tranFormat,
         QByteArray data,
-        CommandTransportHeader transportHeader);
+        VmsTransportHeader transportHeader);
 
     void forwardTransactionToProcessor(
         Qn::SerializationFormat tranFormat,
         QByteArray data,
-        CommandTransportHeader transportHeader);
+        VmsTransportHeader transportHeader);
 
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
 

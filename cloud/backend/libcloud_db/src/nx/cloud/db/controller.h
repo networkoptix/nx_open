@@ -105,7 +105,7 @@ private:
     nx::sql::DBResult copyExternalTransaction(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const nx::clusterdb::engine::EditableSerializableTransaction& transaction);
+        const nx::clusterdb::engine::EditableSerializableCommand& transaction);
 
     void initializeSecurity();
 };

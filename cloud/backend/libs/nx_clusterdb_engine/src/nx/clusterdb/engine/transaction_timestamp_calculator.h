@@ -12,13 +12,13 @@ namespace nx::clusterdb::engine {
 
 using Timestamp = nx::vms::api::Timestamp;
 
-class TransactionTimestampCalculator
+class CommandTimestampCalculator
 {
 public:
     /**
      * @param currentTimeSinceEpochFunc If not specified, current system time is used
      */
-    TransactionTimestampCalculator(
+    CommandTimestampCalculator(
         std::function<std::chrono::milliseconds()> currentTimeSinceEpochFunc = nullptr);
 
     /** Should be initiailized with max timestamp present in transaction log. */

@@ -11,8 +11,8 @@ namespace nx::clusterdb::engine {
 
 OutgoingTransactionSorter::OutgoingTransactionSorter(
     const std::string& systemId,
-    VmsTransactionLogCache* vmsTransactionLogCache,
-    AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
+    CommandLogCache* vmsTransactionLogCache,
+    AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher)
 :
     m_systemId(systemId),
     m_vmsTransactionLogCache(vmsTransactionLogCache),
@@ -30,7 +30,7 @@ OutgoingTransactionSorter::~OutgoingTransactionSorter()
 }
 
 void OutgoingTransactionSorter::registerTransactionSequence(
-    VmsTransactionLogCache::TranId cacheTranId,
+    CommandLogCache::TranId cacheTranId,
     OutgoingTransactionSorter::TransactionSequence transactionSequence)
 {
     QnMutexLocker lock(&m_mutex);
@@ -38,8 +38,8 @@ void OutgoingTransactionSorter::registerTransactionSequence(
 }
 
 void OutgoingTransactionSorter::addTransaction(
-    VmsTransactionLogCache::TranId cacheTranId,
-    std::unique_ptr<const SerializableAbstractTransaction> transaction)
+    CommandLogCache::TranId cacheTranId,
+    std::unique_ptr<const SerializableAbstractCommand> transaction)
 {
     QnMutexLocker lock(&m_mutex);
     const auto sequence = transaction->header().persistentInfo.sequence;
@@ -50,7 +50,7 @@ void OutgoingTransactionSorter::addTransaction(
         sequence);
 }
 
-void OutgoingTransactionSorter::rollback(VmsTransactionLogCache::TranId cacheTranId)
+void OutgoingTransactionSorter::rollback(CommandLogCache::TranId cacheTranId)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -72,7 +72,7 @@ void OutgoingTransactionSorter::rollback(VmsTransactionLogCache::TranId cacheTra
     dispatchTransactions();
 }
 
-void OutgoingTransactionSorter::commit(VmsTransactionLogCache::TranId cacheTranId)
+void OutgoingTransactionSorter::commit(CommandLogCache::TranId cacheTranId)
 {
     // TranContext tranContext;
     QnMutexLocker lock(&m_mutex);
@@ -107,7 +107,7 @@ void OutgoingTransactionSorter::dispatchTransactions()
 
     for (;;)
     {
-        std::vector<VmsTransactionLogCache::TranId> tranToCommitIds = findTransactionsToSend(lock);
+        std::vector<CommandLogCache::TranId> tranToCommitIds = findTransactionsToSend(lock);
         if (tranToCommitIds.empty())
             return;
 
@@ -116,11 +116,11 @@ void OutgoingTransactionSorter::dispatchTransactions()
     }
 }
 
-std::vector<VmsTransactionLogCache::TranId> OutgoingTransactionSorter::findTransactionsToSend(
+std::vector<CommandLogCache::TranId> OutgoingTransactionSorter::findTransactionsToSend(
     const QnMutexLockerBase& /*lock*/)
 {
-    std::vector<VmsTransactionLogCache::TranId> completedTranIds;
-    std::set<VmsTransactionLogCache::TranId> tranIdsNotFullyChecked;
+    std::vector<CommandLogCache::TranId> completedTranIds;
+    std::set<CommandLogCache::TranId> tranIdsNotFullyChecked;
 
     for (auto it = m_transactionsBySequence.begin();
         it != m_transactionsBySequence.end();
@@ -152,7 +152,7 @@ std::vector<VmsTransactionLogCache::TranId> OutgoingTransactionSorter::findTrans
 
 void OutgoingTransactionSorter::dispatchTransactions(
     const QnMutexLockerBase& /*lock*/,
-    VmsTransactionLogCache::TranId tranId)
+    CommandLogCache::TranId tranId)
 {
     TranContext tranContext;
     auto it = m_transactions.find(tranId);
@@ -171,7 +171,7 @@ void OutgoingTransactionSorter::dispatchTransactions(
 }
 
 void OutgoingTransactionSorter::deliverTransactions(
-    std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions)
+    std::vector<std::unique_ptr<const SerializableAbstractCommand>> transactions)
 {
     // We MUST ensure transactions are delivered to m_outgoingTransactionDispatcher in a correct order.
     // If we just release mutex here, order will be undefined.
@@ -195,7 +195,7 @@ void OutgoingTransactionSorter::deliverTransactions(
 
 void OutgoingTransactionSorter::registerTransactionSequence(
     const QnMutexLockerBase& /*lock*/,
-    VmsTransactionLogCache::TranId cacheTranId,
+    CommandLogCache::TranId cacheTranId,
     TransactionSequence transactionSequence)
 {
     TranContext& tranContext = m_transactions[cacheTranId];

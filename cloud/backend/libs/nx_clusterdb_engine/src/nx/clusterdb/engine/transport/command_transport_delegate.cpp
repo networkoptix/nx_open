@@ -44,15 +44,15 @@ std::string CommandTransportDelegate::connectionGuid() const
     return m_delegatee->connectionGuid();
 }
 
-const TransactionTransportHeader&
+const CommandTransportHeader&
     CommandTransportDelegate::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_delegatee->commonTransportHeaderOfRemoteTransaction();
 }
 
 void CommandTransportDelegate::sendTransaction(
-    TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
+    CommandTransportHeader transportHeader,
+    const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer)
 {
     m_delegatee->sendTransaction(
         std::move(transportHeader),

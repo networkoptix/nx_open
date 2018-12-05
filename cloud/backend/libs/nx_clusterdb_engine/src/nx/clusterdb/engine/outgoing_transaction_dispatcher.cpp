@@ -2,18 +2,16 @@
 
 namespace nx::clusterdb::engine {
 
-static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
-
-OutgoingTransactionDispatcher::OutgoingTransactionDispatcher(
+OutgoingCommandDispatcher::OutgoingCommandDispatcher(
     const OutgoingCommandFilter& filter)
     :
     m_filter(filter)
 {
 }
 
-void OutgoingTransactionDispatcher::dispatchTransaction(
+void OutgoingCommandDispatcher::dispatchTransaction(
     const std::string& systemId,
-    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
+    std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
     if (!m_filter.satisfies(transactionSerializer->header()))
         return;
@@ -23,8 +21,8 @@ void OutgoingTransactionDispatcher::dispatchTransaction(
         std::move(transactionSerializer));
 }
 
-OutgoingTransactionDispatcher::OnNewTransactionSubscription&
-    OutgoingTransactionDispatcher::onNewTransactionSubscription()
+OutgoingCommandDispatcher::OnNewTransactionSubscription&
+    OutgoingCommandDispatcher::onNewTransactionSubscription()
 {
     return m_onNewTransactionSubscription;
 }

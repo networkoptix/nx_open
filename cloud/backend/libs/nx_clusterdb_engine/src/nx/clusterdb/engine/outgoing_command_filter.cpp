@@ -4,6 +4,7 @@
 
 namespace nx::clusterdb::engine {
 
+// TODO: ak Remove it from here!
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
 OutgoingCommandFilter::OutgoingCommandFilter()
