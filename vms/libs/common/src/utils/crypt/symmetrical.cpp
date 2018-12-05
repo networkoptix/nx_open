@@ -2,7 +2,7 @@
 
 #include <array>
 #include <cstdint>
-#include <cstring> // CBC mode, for memset
+#include <cstring> //< CBC mode, for memset
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
@@ -22,8 +22,8 @@ namespace detail {
 
 
 #if defined(CBC) && CBC
-    const uint8_t iv[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
-        0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    const uint8_t iv[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+        0x0c, 0x0d, 0x0e, 0x0f};
 
     void AES128_CBC_encrypt_buffer(
         uint8_t* output,
@@ -44,7 +44,7 @@ QnMutex stateMutex;
 static constexpr size_t kKeySize = 16;
 
 // Hardcoded random key, generated from guid.
-const QByteArray kMask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312");
+static const QByteArray kMask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312");
 const int kMaskSize = kMask.size();
 
 using KeyType = std::array<uint8_t, kKeySize>;
@@ -127,7 +127,7 @@ QByteArray decodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>
 QByteArray encodeAES128CBC(const QByteArray& data, const QByteArray& key)
 {
     const QByteArray actualKey = key.isEmpty() ? detail::kMask : key;
-    return encodeAES128CBC(data, detail::keyFromByteArray(key));
+    return encodeAES128CBC(data, detail::keyFromByteArray(actualKey));
 }
 
 QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key)
