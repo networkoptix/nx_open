@@ -4,6 +4,14 @@
 
 namespace nx::utils {
 
+/**
+ * Generate random 16-bytes length key (sufficient for AES cryptography).
+ */
+QByteArray generateAesExtraKey();
+
+/**
+ * Encode data with the provided key using XOR cypher.
+ */
 QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey = QByteArray());
 
 /**

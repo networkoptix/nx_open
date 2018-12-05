@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring> //< CBC mode, for memset
 
+#include <nx/utils/uuid.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -65,6 +66,11 @@ KeyType keyFromByteArray(const QByteArray& data)
 }
 
 } // namespace detail
+
+QByteArray generateAesExtraKey()
+{
+    return QnUuid::createUuid().toRfc4122();
+}
 
 QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey)
 {
