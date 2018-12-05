@@ -73,7 +73,7 @@ bool addRotationToPresets(QSqlDatabase& database)
         }
         else
         {
-            presetRecords[id] = "{}";
+            presetRecords[id] = QJson::serialized(QnPtzPresetRecordHash());
             NX_WARNING(
                 kLogTag,
                 lm("Unable to deserialize a preset record, resetting it. %1")
