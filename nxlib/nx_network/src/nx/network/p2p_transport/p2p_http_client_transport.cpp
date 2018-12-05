@@ -26,9 +26,9 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
 
-    BasicPollable::bindToAioThread(m_readHttpClient->getAioThread());
-    m_writeHttpClient->bindToAioThread(m_readHttpClient->getAioThread());
-    m_readHttpClient->post([this]() { startReading(); });
+    m_readHttpClient->bindToAioThread(getAioThread());
+    m_writeHttpClient->bindToAioThread(getAioThread());
+    post([this]() { startReading(); });
 }
 
 P2PHttpClientTransport::~P2PHttpClientTransport()
@@ -44,7 +44,7 @@ void P2PHttpClientTransport::stopWhileInAioThread()
 
 void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
-    m_readHttpClient->post(
+    post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             // Don't call readSomeAsync() again, before a previous handler has called back.
@@ -85,7 +85,7 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 
 void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
-    m_readHttpClient->post(
+    post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             if (m_failed)
@@ -116,9 +116,10 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
 
 void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_readHttpClient->post(
+    post(
         [this, aioThread]()
         {
+            BasicPollable::bindToAioThread(aioThread);
             m_readHttpClient->bindToAioThread(aioThread);
             if (m_writeHttpClient)
                 m_writeHttpClient->bindToAioThread(aioThread);
@@ -134,7 +135,7 @@ void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eve
 
 aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
 {
-    return m_readHttpClient->getAioThread();
+    return getAioThread();
 }
 
 SocketAddress P2PHttpClientTransport::getForeignAddress() const
@@ -142,7 +143,7 @@ SocketAddress P2PHttpClientTransport::getForeignAddress() const
     nx::utils::promise<SocketAddress> p;
     auto f = p.get_future();
     m_readHttpClient->post(
-        [this, p = std::move(p)]() mutable
+        [this, &p]() mutable
         {
             p.set_value(m_readHttpClient->socket()->getForeignAddress());
         });

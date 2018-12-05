@@ -12,10 +12,11 @@ P2PHttpServerTransport::P2PHttpServerTransport(
     m_sendSocket(std::move(socket)),
     m_messageType(messageType)
 {
-    m_sendSocket->setNonBlockingMode(true);
     m_readContext.parser.setMessage(&m_readContext.message);
-    BasicPollable::bindToAioThread(m_sendSocket->getAioThread());
-    m_timer.bindToAioThread(m_sendSocket->getAioThread());
+
+    m_sendSocket->setNonBlockingMode(true);
+    m_sendSocket->bindToAioThread(getAioThread());
+    m_timer.bindToAioThread(getAioThread());
     m_sendBuffer.reserve(4096);
     m_readContext.buffer.reserve(4096);
 }
@@ -53,18 +54,18 @@ P2PHttpServerTransport::~P2PHttpServerTransport()
 
 void P2PHttpServerTransport::gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket)
 {
-    m_sendSocket->post(
+    post(
         [this, socket = std::move(socket)]() mutable
         {
             m_readSocket = std::move(socket);
             m_readSocket->setNonBlockingMode(true);
-            m_readSocket->bindToAioThread(m_sendSocket->getAioThread());
+            m_readSocket->bindToAioThread(getAioThread());
         });
 }
 
 void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
-    m_sendSocket->post(
+    post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             if (m_onGetRequestReceived)
@@ -188,7 +189,7 @@ void P2PHttpServerTransport::sendResponse(
 
 void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
-    m_sendSocket->post(
+    post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
             if (m_onGetRequestReceived)
@@ -254,9 +255,10 @@ QByteArray P2PHttpServerTransport::makeFrameHeader() const
 
 void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_sendSocket->post(
+    post(
         [this, aioThread]()
         {
+            BasicPollable::bindToAioThread(aioThread);
             m_sendSocket->bindToAioThread(aioThread);
             if (m_readSocket)
                 m_readSocket->bindToAioThread(aioThread);
@@ -273,7 +275,7 @@ void P2PHttpServerTransport::cancelIoInAioThread(nx::network::aio::EventType eve
 
 aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
 {
-    return m_sendSocket->getAioThread();
+    return getAioThread();
 }
 
 SocketAddress P2PHttpServerTransport::getForeignAddress() const
