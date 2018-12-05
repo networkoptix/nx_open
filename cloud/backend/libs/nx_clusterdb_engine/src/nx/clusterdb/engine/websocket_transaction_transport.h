@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <memory>
 
 #include "abstract_transaction_transport.h"
@@ -75,7 +76,7 @@ private:
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
-    vms::api::TranState m_remoteSubscription; //< remote -> local subscription
+    std::optional<vms::api::TranState> m_remoteSubscription; //< remote -> local subscription
     const std::string m_systemId;
     std::string m_connectionGuid;
 };

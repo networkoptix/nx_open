@@ -52,7 +52,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     connect(this, &ConnectionBase::allDataSent,
         [this]()
         {
-            if (!m_sendHandshakeDone && !m_tranLogRequestInProgress)
+            if (m_remoteSubscription && !m_sendHandshakeDone && !m_tranLogRequestInProgress)
                 readTransactions(); //< Continue reading
         });
 
@@ -145,11 +145,12 @@ void WebSocketTransactionTransport::reportCommandReceived(
 
 void WebSocketTransactionTransport::readTransactions()
 {
-    using namespace std::placeholders;
+    NX_CRITICAL(m_remoteSubscription);
+
     m_tranLogRequestInProgress = true;
     
     ReadCommandsFilter filter;
-    filter.from = m_remoteSubscription;
+    filter.from = *m_remoteSubscription;
     filter.maxTransactionsToReturn = kMaxTransactionsPerIteration;
 
     m_transactionLogReader->readTransactions(
