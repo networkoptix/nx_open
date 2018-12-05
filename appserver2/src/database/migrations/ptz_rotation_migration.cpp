@@ -74,7 +74,10 @@ bool addRotationToPresets(QSqlDatabase& database)
         else
         {
             presetRecords[id] = "{}";
-            NX_WARNING(kLogTag, "Unable to deserialize preset record, resetting it");
+            NX_WARNING(
+                kLogTag,
+                lm("Unable to deserialize a preset record, resetting it. %1")
+                    .arg(serializedPresets));
         }
     }
 
