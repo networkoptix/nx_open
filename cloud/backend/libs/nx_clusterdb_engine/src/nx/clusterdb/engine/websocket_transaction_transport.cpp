@@ -154,7 +154,7 @@ void WebSocketTransactionTransport::readTransactions()
 
     m_transactionLogReader->readTransactions(
         filter,
-        std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
+        [this](auto&&... args) { onTransactionsReadFromLog(std::move(args)...); });
 }
 
 void WebSocketTransactionTransport::onTransactionsReadFromLog(
@@ -165,17 +165,14 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
     m_tranLogRequestInProgress = false;
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
-        NX_DEBUG(
-            this,
-            lm("systemId %1. Error reading transaction log (%2). "
-                "Closing connection to the peer %3")
-            .args(m_transactionLogReader->systemId(),
-                toString(resultCode), remotePeerEndpoint()));
+        NX_DEBUG(this, lm("systemId %1. Error reading transaction log (%2). "
+            "Closing connection to the peer %3")
+            .args(m_transactionLogReader->systemId(), toString(resultCode), remotePeerEndpoint()));
         setState(State::Error);   //closing connection
         return;
     }
 
-    // Posting transactions to send
+    // Posting transactions to send.
     for (auto& tranData: serializedTransactions)
     {
         sendMessage(
@@ -184,6 +181,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
                 remotePeer().dataFormat,
                 highestProtocolVersionCompatibleWithRemotePeer()));
     }
+
     m_remoteSubscription = readedUpTo;
     if (resultCode == ResultCode::ok)
         m_sendHandshakeDone = true; //< All data are sent.
@@ -254,7 +252,7 @@ void WebSocketTransactionTransport::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
-    NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");
+    NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
 }
 
 } // namespace nx::clusterdb::engine::transport
