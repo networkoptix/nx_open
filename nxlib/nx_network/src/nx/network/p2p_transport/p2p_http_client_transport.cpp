@@ -28,6 +28,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     //m_writeHttpClient->setSendTimeout(60s);
     //m_writeHttpClient->setResponseReadTimeout(60s);
 
+    m_writeHttpClient->bindToAioThread(m_readHttpClient->getAioThread());
     m_readHttpClient->post([this]() { startReading(); });
 }
 
@@ -75,7 +76,7 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
             m_userReadHandlerPair.reset(new std::pair<nx::Buffer* const, IoCompletionHandler>(
                 buffer,
                 std::move(handler)));
-         });
+        });
 }
 
 void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
