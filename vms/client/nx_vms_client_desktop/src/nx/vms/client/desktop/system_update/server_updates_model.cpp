@@ -36,15 +36,6 @@ ServerUpdatesModel::ServerUpdatesModel(
         this, &ServerUpdatesModel::atItemChanged);
 }
 
-/*
-void ServerUpdatesModel::setResourceFeed(QnResourcePool* pool)
-{
-    resetResourses(pool);
-    connect(pool, &QnResourcePool::resourceAdded, this, &ServerUpdatesModel::at_resourceAdded);
-    connect(pool, &QnResourcePool::resourceRemoved, this, &ServerUpdatesModel::at_resourceRemoved);
-}
-*/
-
 int ServerUpdatesModel::columnCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
@@ -59,17 +50,6 @@ int ServerUpdatesModel::rowCount(const QModelIndex& parent) const
         return 0;
     return m_tracker->peersCount();
 }
-
-/*
-void ServerUpdatesModel::clearState()
-{
-    for (auto& item: m_items)
-    {
-        item->state = StatusCode::idle;
-        item->progress = 0;
-        item->statusMessage = "Waiting for data";
-    }
-}*/
 
 QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -175,7 +155,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
         {
             case Qt::DecorationRole:
                 if (column == NameColumn)
-                    return qnResIconCache->icon(QnResourceIconCache::LocalResources);
+                    return qnResIconCache->icon(QnResourceIconCache::User);
                 break;
             default:
                 break;
@@ -193,59 +173,6 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
     return base_type::flags(index);
 }
 
-void ServerUpdatesModel::setServersInstalling(QSet<QnUuid> targets, bool installing)
-{
-    for (const auto& uid: targets)
-    {
-        if (auto item = m_tracker->findItemById(uid))
-        {
-            if (item->installing == installing)
-                continue;
-            item->installing = installing;
-            QModelIndex idx = index(item->row, 0);
-            emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
-        }
-    }
-}
-
-void ServerUpdatesModel::resetResourses(QnResourcePool* pool)
-{
-    beginResetModel();
-    /*
-    for (const auto& item: m_items)
-    {
-        if (const auto server = getServer(item.get()))
-        {
-            disconnect(server.data(), &QnResource::statusChanged,
-                this, &ServerUpdatesModel::at_resourceChanged);
-            disconnect(server.data(), &QnMediaServerResource::versionChanged,
-                this, &ServerUpdatesModel::at_resourceChanged);
-            disconnect(server.data(), &QnResource::flagsChanged,
-                this, &ServerUpdatesModel::at_resourceChanged);
-        }
-    }
-    m_items.clear();
-
-    const auto allServers = pool->getAllServers(Qn::AnyStatus);
-    for (const QnMediaServerResourcePtr &server : allServers)
-        addItemForServer(server);
-
-    for (const auto& server: pool->getIncompatibleServers())
-    {
-        if (!server || !helpers::serverBelongsToCurrentSystem(server))
-            continue;
-
-        // Adds newly added to system server which is not authorized
-        // or with old protocol version
-        addItemForServer(server);
-    }
-
-    addItemForClient();
-    */
-    endResetModel();
-    //updateContentsIndex();
-}
-
 void ServerUpdatesModel::updateVersionColumn()
 {
     int count = m_tracker->peersCount();
@@ -256,12 +183,6 @@ void ServerUpdatesModel::updateVersionColumn()
 
 void ServerUpdatesModel::atItemAdded(UpdateItemPtr item)
 {
-    /*
-    if (server->hasFlags(Qn::fake_server)
-        && !helpers::serverBelongsToCurrentSystem(server))
-    {
-        return;
-    }*/
     NX_ASSERT(item);
     if (!item)
         return;
@@ -360,7 +281,7 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex &leftIndex, const QModel
     if(result != 0)
         return result < 0;
 
-    /* We want the order to be defined even for items with the same name. */
+    // We want the order to be defined even for items with the same name.
     return left->id < right->id;
 }
 

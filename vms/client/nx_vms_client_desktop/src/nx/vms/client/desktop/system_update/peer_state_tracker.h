@@ -78,6 +78,7 @@ public:
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    void setPeersInstalling(QSet<QnUuid> targets, bool installing);
     void clearState();
 
 public:
@@ -90,6 +91,11 @@ public:
     QSet<QnUuid> getPeersInstalling() const;
     QSet<QnUuid> getPeersCompleteInstall() const;
     QSet<QnUuid> getServersWithChangedProtocol() const;
+
+public:
+    // We connect it to ClientUpdateTool::updateStateChanged and turn it to a proper
+    // peer state inside our task sets.
+    void atClientupdateStateChanged(int state, int percentComplete);
 
 signals:
     void itemAdded(UpdateItemPtr item);

@@ -762,7 +762,8 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
         m_skippedRequests.unite(m_activeRequests);
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_remoteUpdateStatus = {};
-    m_updatesModel->setServersInstalling(targets);
+
+    m_stateTracker->setPeersInstalling(targets, true);
 
     auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {

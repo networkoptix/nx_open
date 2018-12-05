@@ -163,6 +163,7 @@ private:
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
+    void syncDebugInfoToUi();
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
@@ -216,15 +217,13 @@ private:
 
     // This sets are changed every time we are initiating some update action.
     // Set of servers that are currently active.
-    QSet<QnUuid> m_serversActive;
+    QSet<QnUuid> m_peersActive;
     // Set of servers that are used for the current task.
-    QSet<QnUuid> m_serversIssued;
+    QSet<QnUuid> m_peersIssued;
     // A set of servers that have completed current task.
-    QSet<QnUuid> m_serversComplete;
+    QSet<QnUuid> m_peersComplete;
     // A set of servers that have failed current task.
-    QSet<QnUuid> m_serversFailed;
-    // A set of servers which task was canceled.
-    QSet<QnUuid> m_serversCanceled;
+    QSet<QnUuid> m_peersFailed;
 };
 
 } // namespace nx::vms::client::desktop

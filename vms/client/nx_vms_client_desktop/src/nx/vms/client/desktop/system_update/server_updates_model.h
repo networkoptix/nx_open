@@ -44,7 +44,6 @@ public:
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);
-    void setServersInstalling(QSet<QnUuid> targets, bool installing = true);
 
     // Overrides for QAbstractTableModel
     int columnCount(const QModelIndex& parent) const override;
@@ -60,12 +59,7 @@ public:
     void clearState();
 
 private:
-    void resetResourses(QnResourcePool* pool);
     void updateVersionColumn();
-    //void updateContentsIndex();
-
-    void addItemForServer(QnMediaServerResourcePtr server);
-    void addItemForClient();
 
 private:
     void atItemChanged(UpdateItemPtr item);

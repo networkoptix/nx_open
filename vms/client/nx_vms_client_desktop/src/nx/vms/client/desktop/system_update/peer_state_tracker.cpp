@@ -8,6 +8,7 @@
 #include <network/system_helpers.h>
 #include <nx/utils/app_info.h>
 #include <ui/workbench/workbench_context.h>
+#include "client_update_tool.h"
 
 namespace nx::vms::client::desktop {
 
@@ -104,9 +105,27 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->progress = status.second.progress * 100;
             item->statusMessage = status.second.message;
             item->state = status.second.code;
+            if (item->state == StatusCode::latestUpdateInstalled && item->installing)
+                item->installing = false;
             item->offline = (status.second.code == StatusCode::offline);
             //QModelIndex idx = index(item->row, 0);
             //emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+            emit itemChanged(item);
+        }
+    }
+}
+
+void PeerStateTracker::setPeersInstalling(QSet<QnUuid> targets, bool installing)
+{
+    for (const auto& uid: targets)
+    {
+        if (auto item = findItemById(uid))
+        {
+            if (item->installing == installing)
+                continue;
+            if (item->state == StatusCode::latestUpdateInstalled)
+                continue;
+            item->installing = installing;
             emit itemChanged(item);
         }
     }
@@ -279,6 +298,62 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
     updateServerData(server, item);
 }
 
+void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
+{
+    NX_ASSERT(m_clientItem);
+    using State = ClientUpdateTool::State;
+
+    m_clientItem->installing = false;
+    m_clientItem->installed = false;
+    m_clientItem->progress = 0;
+
+    switch (State(state))
+    {
+        case State::initial:
+            m_clientItem->state = StatusCode::idle;
+            m_clientItem->statusMessage = "Client has no update task";
+            break;
+        case State::readyDownload:
+            m_clientItem->state = StatusCode::idle;
+            m_clientItem->statusMessage = "Client is ready to download update";
+            break;
+        case State::downloading:
+            m_clientItem->state = StatusCode::downloading;
+            m_clientItem->progress = percentComplete;
+            m_clientItem->statusMessage = "Client is downloading an update";
+            break;
+        case State::readyInstall:
+            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->progress = 100;
+            m_clientItem->statusMessage = "Client is ready to download update";
+            break;
+        case State::installing:
+            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->installing = true;
+            m_clientItem->statusMessage = "Client is installing update";
+            break;
+        case State::complete:
+            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->installing = false;
+            m_clientItem->installed = true;
+            m_clientItem->progress = 100;
+            m_clientItem->statusMessage = "Client has installed an update";
+            break;
+        case State::error:
+            m_clientItem->state = StatusCode::error;
+            m_clientItem->statusMessage = "Client has failed to download an update";
+            break;
+        case State::applauncherError:
+            m_clientItem->state = StatusCode::error;
+            m_clientItem->statusMessage = "Client has failed to install an update";
+            break;
+        default:
+            break;
+    }
+
+    emit itemChanged(m_clientItem);
+}
+
 UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server)
 {
     NX_ASSERT(server);
@@ -305,12 +380,10 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = commonModule()->globalSettings()->localSystemId();
     item->component = UpdateItem::Component::client;
-    auto version = nx::utils::AppInfo::applicationVersion();
-    item->version = nx::utils::SoftwareVersion(version);
     item->row = m_items.size();
     m_clientItem = item;
-
     m_items.push_back(item);
+    updateClientData();
     return m_clientItem;
 }
 
@@ -357,15 +430,21 @@ void PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     }
 
     if (changed)
-    {
-        //emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
         emit itemChanged(item);
-    }
 }
 
 void PeerStateTracker::updateClientData()
 {
+    bool changed = false;
+    auto version = nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
+    if (m_clientItem->version != version)
+    {
+        m_clientItem->version = version;
+        changed = true;
+    }
 
+    if (changed)
+        emit itemChanged(m_clientItem);
 }
 
 void PeerStateTracker::updateContentsIndex()
