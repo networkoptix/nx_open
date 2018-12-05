@@ -668,7 +668,7 @@ qint64 QnMediaServerResource::utcOffset(qint64 defaultValue) const
 {
     bool present = true;
     const auto offset = getProperty(
-        ResourcePropertyKey::MediaServer::kTimezoneUtcOffset).toLongLong(&present);
+        ResourcePropertyKey::Server::kTimezoneUtcOffset).toLongLong(&present);
 
     if (present && offset != Qn::InvalidUtcOffset)
         return offset;
