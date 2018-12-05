@@ -38,13 +38,13 @@ module.exports = merge(common, {
                 test   : /\.s?css$/,
                 exclude: /src/,
                 use    : ExtractTextPlugin.extract({
-                    fallback: "style-loader",
+                    fallback: 'style-loader',
                     use     : [
                         {
                             loader : 'css-loader',
                             options: {
                                 url      : false,
-                                // minimize : true,
+                                minimize : true,
                                 sourceMap: false
                             }
                         },
