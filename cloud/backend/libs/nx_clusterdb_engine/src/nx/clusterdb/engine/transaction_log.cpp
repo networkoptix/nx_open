@@ -1,8 +1,6 @@
 #include "transaction_log.h"
 
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
-
+#include <nx/sql/query.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
 
@@ -245,10 +243,9 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     NX_DEBUG(this, lm("Fetching transactions"));
 
     // TODO: #ak move to TransactionDataObject
-    QSqlQuery selectTransactionStateQuery(*queryContext->connection()->qtSqlConnection());
+    nx::sql::SqlQuery selectTransactionStateQuery(queryContext->connection());
     selectTransactionStateQuery.setForwardOnly(true);
-    selectTransactionStateQuery.prepare(
-        R"sql(
+    selectTransactionStateQuery.prepare(R"sql(
         SELECT tl.system_id as system_id,
                tss.timestamp_hi as settings_timestamp_hi,
                peer_guid,
@@ -262,11 +259,15 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
         ORDER BY tl.system_id, timestamp_hi, timestamp DESC
         )sql");
 
-    if (!selectTransactionStateQuery.exec())
+    try
     {
-        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this), lm("Error loading transaction log. %1")
-            .arg(selectTransactionStateQuery.lastError().text()));
-        return nx::sql::DBResult::ioError;
+        selectTransactionStateQuery.exec();
+    }
+    catch (const std::exception& e)
+    {
+        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this),
+            lm("Error loading transaction log. %1").arg(e.what()));
+        throw;
     }
 
     NX_DEBUG(this, lm("Fetched transactions"));
@@ -275,9 +276,9 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     int count = 0;
     while (selectTransactionStateQuery.next())
     {
-        const std::string systemId = selectTransactionStateQuery.value("system_id").toString().toStdString();
-        const nx::String peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toLatin1();
-        const nx::String dbGuid = selectTransactionStateQuery.value("db_guid").toString().toLatin1();
+        const auto systemId = selectTransactionStateQuery.value("system_id").toString().toStdString();
+        const auto peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toStdString();
+        const auto dbGuid = selectTransactionStateQuery.value("db_guid").toString().toStdString();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
         const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
         vms::api::Timestamp timestamp;
@@ -348,7 +349,8 @@ nx::sql::DBResult TransactionLog::fetchTransactions(
             return dbResult;
     }
 
-    // TODO #ak currentState is not correct here since it can be limited by "to" and "maxTransactionsToReturn"
+    // TODO #ak currentState is not correct here since it can be limited by "to" and 
+    // "maxTransactionsToReturn".
     outputData->state = currentState;
     outputData->resultCode = ResultCode::ok;
 
