@@ -18,6 +18,9 @@ TableView::TableView(QWidget* parent):
     /* Make the defaults consistent with QTreeView: */
     horizontalHeader()->setHighlightSections(false);
     verticalHeader()->setHighlightSections(false);
+
+    /* By default, text in headers should be aligned by the left border (VMS-11641) */
+    horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 }
 
 QSize TableView::viewportSizeHint() const
