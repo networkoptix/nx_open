@@ -25,7 +25,6 @@ WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
         this, &WatermarkPreviewDialog::updateDataFromControls);
     connect(ui->frequencySlider, &QSlider::valueChanged,
         this, &WatermarkPreviewDialog::updateDataFromControls);
-
 }
 
 WatermarkPreviewDialog::~WatermarkPreviewDialog()
@@ -65,9 +64,9 @@ void WatermarkPreviewDialog::updateDataFromControls()
 void WatermarkPreviewDialog::drawPreview()
 {
     QPixmap image = *m_baseImage;
-    const auto watermark = nx::core::createWatermarkImage(
-        core::Watermark{m_settings, kPreviewUsername}, QSize(1920, 1080));
+    const auto watermark = nx::core::createWatermarkImage({m_settings, kPreviewUsername}, QSize(1920, 1080));
     QPainter painter(&image);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
     painter.drawPixmap(image.rect(), watermark, watermark.rect());
     ui->image->setPixmap(image);
 }

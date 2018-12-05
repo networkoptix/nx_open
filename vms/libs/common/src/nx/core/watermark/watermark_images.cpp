@@ -88,6 +88,16 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
             : QSize(size.width() * maxSize / size.height(), maxSize);
     }
 
+    // We also limit biggest dimension to be at least 1000. This is needed mostly
+    // for small previews during export.
+    constexpr int minSize = 1200;
+    if (!predefinedAspect && (size.width() < minSize && size.height() < minSize))
+    {
+        size = size.width() > size.height()
+            ? QSize(minSize, size.height() * minSize / size.width())
+            : QSize(size.width() * minSize / size.height(), minSize);
+    }
+
     // Create new watermark pixmap.
     auto pixmap = nx::core::createWatermarkImage(watermark, size);
 
@@ -136,6 +146,7 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     QPainter painter(&pixmap);
     auto color = kWatermarkColor;
     color.setAlphaF(watermark.settings.opacity);
+    painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setPen(color);
     painter.setFont(font);
 
