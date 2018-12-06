@@ -198,8 +198,11 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
         return std::make_tuple(SystemError::noError, 0);
     }
 
+    // Converter has not moved to "failed" state, so we have a recoverable error here.
+
     NX_ASSERT(
-        result == utils::bstream::StreamIoError::wouldBlock,
+        result == utils::bstream::StreamIoError::wouldBlock ||
+            result == utils::bstream::StreamIoError::osError,
         lm("result = %1").args(result));
     return std::make_tuple(SystemError::wouldBlock, -1);
 }

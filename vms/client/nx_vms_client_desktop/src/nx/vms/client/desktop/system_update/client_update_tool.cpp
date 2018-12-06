@@ -257,7 +257,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
-            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+            NX_VERBOSE(this) << "atDownloaderStatusChanged(" << fileInformation.name
                 << ") - finally downloaded file to" << m_downloader->filePath(fileInformation.name);
             setState(State::readyInstall);
             break;

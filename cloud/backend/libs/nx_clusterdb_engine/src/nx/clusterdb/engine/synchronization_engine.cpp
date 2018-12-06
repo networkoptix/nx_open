@@ -18,12 +18,12 @@ SyncronizationEngine::SyncronizationEngine(
     m_supportedProtocolRange(supportedProtocolRange),
     m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),
-    m_transactionLog(
+    m_commandLog(
         peerId,
         m_supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
-    m_incomingTransactionDispatcher(&m_transactionLog),
+    m_incomingTransactionDispatcher(&m_commandLog),
     m_connectionManager(
         peerId,
         settings,
@@ -32,7 +32,7 @@ SyncronizationEngine::SyncronizationEngine(
         &m_outgoingTransactionDispatcher),
     m_transportManager(
         m_supportedProtocolRange,
-        &m_transactionLog,
+        &m_commandLog,
         m_outgoingCommandFilter,
         peerId.toSimpleByteArray().toStdString()),
     m_connector(
@@ -41,13 +41,13 @@ SyncronizationEngine::SyncronizationEngine(
     m_httpTransportAcceptor(
         peerId,
         m_supportedProtocolRange,
-        &m_transactionLog,
+        &m_commandLog,
         &m_connectionManager,
         m_outgoingCommandFilter),
     m_webSocketAcceptor(
         peerId,
         m_supportedProtocolRange,
-        &m_transactionLog,
+        &m_commandLog,
         &m_connectionManager,
         m_outgoingCommandFilter),
     m_statisticsProvider(
@@ -63,36 +63,36 @@ SyncronizationEngine::~SyncronizationEngine()
     m_startedAsyncCallsCounter.wait();
 }
 
-OutgoingTransactionDispatcher&
+OutgoingCommandDispatcher&
     SyncronizationEngine::outgoingTransactionDispatcher()
 {
     return m_outgoingTransactionDispatcher;
 }
 
-const OutgoingTransactionDispatcher&
+const OutgoingCommandDispatcher&
     SyncronizationEngine::outgoingTransactionDispatcher() const
 {
     return m_outgoingTransactionDispatcher;
 }
 
-TransactionLog& SyncronizationEngine::transactionLog()
+CommandLog& SyncronizationEngine::transactionLog()
 {
-    return m_transactionLog;
+    return m_commandLog;
 }
 
-const TransactionLog& SyncronizationEngine::transactionLog() const
+const CommandLog& SyncronizationEngine::transactionLog() const
 {
-    return m_transactionLog;
+    return m_commandLog;
 }
 
-IncomingTransactionDispatcher&
-    SyncronizationEngine::incomingTransactionDispatcher()
+IncomingCommandDispatcher&
+    SyncronizationEngine::incomingCommandDispatcher()
 {
     return m_incomingTransactionDispatcher;
 }
 
-const IncomingTransactionDispatcher&
-    SyncronizationEngine::incomingTransactionDispatcher() const
+const IncomingCommandDispatcher&
+    SyncronizationEngine::incomingCommandDispatcher() const
 {
     return m_incomingTransactionDispatcher;
 }
@@ -212,7 +212,7 @@ void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
         systemId.c_str(),
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
         {
-            m_transactionLog.markSystemForDeletion(systemId.c_str());
+            m_commandLog.markSystemForDeletion(systemId.c_str());
         });
 }
 

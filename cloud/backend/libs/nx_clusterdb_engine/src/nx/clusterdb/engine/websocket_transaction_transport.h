@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <memory>
 
 #include "abstract_transaction_transport.h"
@@ -13,18 +14,18 @@
 
 #include "compatible_ec2_protocol_version.h"
 
-namespace nx::clusterdb::engine { class TransactionLog; }
+namespace nx::clusterdb::engine { class CommandLog; }
 
 namespace nx::clusterdb::engine::transport {
 
-class WebSocketTransactionTransport:
+class WebsocketCommandTransport:
     public AbstractConnection,
     public nx::p2p::ConnectionBase
 {
 public:
-    WebSocketTransactionTransport(
+    WebsocketCommandTransport(
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* const transactionLog,
+        CommandLog* const transactionLog,
         const std::string& systemId,
         const OutgoingCommandFilter& filter,
         const std::string& connectionId,
@@ -36,10 +37,10 @@ public:
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
     virtual void setOnGotTransaction(CommandHandler handler) override;
     virtual std::string connectionGuid() const override;
-    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
+    virtual const CommandTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) override;
     virtual void start() override;
 
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
@@ -68,14 +69,14 @@ private:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
-    TransactionTransportHeader m_commonTransactionHeader;
+    CommandTransportHeader m_commonTransactionHeader;
     ConnectionClosedSubscription m_connectionClosedSubscription;
     CommandHandler m_gotTransactionEventHandler;
-    std::unique_ptr<TransactionLogReader> m_transactionLogReader;
+    std::unique_ptr<CommandLogReader> m_transactionLogReader;
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
-    vms::api::TranState m_remoteSubscription; //< remote -> local subscription
+    std::optional<vms::api::TranState> m_remoteSubscription; //< remote -> local subscription
     const std::string m_systemId;
     std::string m_connectionGuid;
 };

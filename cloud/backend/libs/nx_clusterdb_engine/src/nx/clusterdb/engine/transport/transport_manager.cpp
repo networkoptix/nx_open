@@ -11,12 +11,12 @@ namespace nx::clusterdb::engine::transport {
 
 TransportManager::TransportManager(
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* transactionLog,
+    CommandLog* transactionLog,
     const OutgoingCommandFilter& outgoingCommandFilter,
     const std::string& nodeId)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_transactionLog(transactionLog),
+    m_commandLog(transactionLog),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_nodeId(nodeId)
 {
@@ -40,7 +40,7 @@ std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createC
 #else
     return std::make_unique<HttpTransportConnector>(
         m_protocolVersionRange,
-        m_transactionLog,
+        m_commandLog,
         m_outgoingCommandFilter,
         syncApiTargetUrl,
         systemId,

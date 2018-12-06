@@ -422,7 +422,7 @@ void ServerUpdateTool::uploadPackage(const nx::update::Package& package, QDir st
             continue;
         }
 
-        auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
+        auto callback = [tool = QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
         {
             if (tool)
                 tool->atUploadWorkerState(serverId, state);
@@ -579,8 +579,7 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
         activeServers = m_activeServers;
     }
 
-    auto cm = commonModule();
-    return verifyUpdateContents(cm, contents, activeServers);
+    return verifyUpdateContents(commonModule(), contents, activeServers);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)

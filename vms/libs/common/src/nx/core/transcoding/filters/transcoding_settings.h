@@ -76,13 +76,6 @@ struct TimestampOverlaySettings: OverlaySettings
     virtual Type type() const override { return Type::timestamp; }
 };
 
-// struct WatermarkOverlaySettings:
-//     Watermark,
-//     OverlaySettings
-// {
-//     virtual Type type() const { return Type::watermark; }
-// };
-
 } // namespace transcoding
 } // namespace core
 } // namespace nx

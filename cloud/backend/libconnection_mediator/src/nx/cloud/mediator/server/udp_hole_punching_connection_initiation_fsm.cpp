@@ -543,7 +543,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionResultRequest(
 
 void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 {
-    if (m_state < State::waitingConnectionResult)
+    if (m_state > State::init && m_state < State::waitingConnectionResult)
         sendConnectResponse(result, api::ConnectResponse());
 
     m_state = State::fini;

@@ -23,30 +23,27 @@ class TemporaryAccountPasswordManager:
 public:
     TemporaryAccountPasswordManager():
         m_timeShift(nx::utils::test::ClockType::system),
-        m_expirationPeriod(7)
+        m_expirationPeriod(7),
+        m_prolongationPeriod(std::chrono::hours(24))
     {
-        m_factoryFuncBak = dao::TemporaryCredentialsDaoFactory::instance()
-            .setCustomFunc([this]() { return createDao(); });
+        m_settings.removeExpiredTemporaryCredentialsPeriod = std::chrono::milliseconds(1);
 
-        conf::AccountManager settings;
-        settings.removeExpiredTemporaryCredentialsPeriod = std::chrono::milliseconds(1);
-
-        m_tempPasswordManager =
-            std::make_unique<nx::cloud::db::TemporaryAccountPasswordManager>(
-                settings,
-                m_attrNameset,
-                &persistentDbManager()->queryExecutor());
+        initializeTempPasswordManager();
 
         m_email = BusinessDataGenerator::generateRandomEmailAddress();
     }
 
-    ~TemporaryAccountPasswordManager()
+protected:
+    std::chrono::seconds expirationPeriod() const
     {
-        dao::TemporaryCredentialsDaoFactory::instance().setCustomFunc(
-            std::exchange(m_factoryFuncBak, nullptr));
+        return m_expirationPeriod;
     }
 
-protected:
+    std::chrono::seconds prolongationPeriod() const
+    {
+        return *m_prolongationPeriod;
+    }
+
     void generateTemporaryCredentials()
     {
         using namespace std::chrono;
@@ -55,6 +52,11 @@ protected:
         m_credentials.expirationTimestampUtc = 
             duration_cast<seconds>(nx::utils::timeSinceEpoch() + m_expirationPeriod).count();
         m_credentials.maxUseCount = 100;
+        if (m_prolongationPeriod)
+        {
+            m_credentials.prolongationPeriodSec =
+                duration_cast<seconds>(*m_prolongationPeriod).count();
+        }
         m_tempPasswordManager->addRandomCredentials(m_email, &m_credentials);
     }
 
@@ -70,9 +72,21 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, done.get_future().get());
     }
 
+    void givenProlongatedCredentials()
+    {
+        addTemporaryCredentials();
+        whenPeriodPasses(expirationPeriod() / 2);
+        assertCredentialsAreAuthenticated();
+    }
+
     void whenExpirationPeriodPasses()
     {
-        m_timeShift.applyRelativeShift(m_expirationPeriod);
+        whenPeriodPasses(m_expirationPeriod);
+    }
+
+    void whenPeriodPasses(std::chrono::seconds period)
+    {
+        m_timeShift.applyRelativeShift(period);
     }
 
     void thenCredentialsAreRemoved()
@@ -91,17 +105,16 @@ protected:
         ASSERT_NE(api::ResultCode::ok, authenticateCredentials());
     }
 
-    api::ResultCode authenticateCredentials()
+    void whenRestart()
     {
-        nx::utils::stree::ResourceContainer authProperties;
+        m_tempPasswordManager.reset();
+        initializeTempPasswordManager();
+    }
 
-        std::promise<api::ResultCode> done;
-        m_tempPasswordManager->authenticateByName(
-            m_credentials.login.c_str(),
-            [](auto...) { return true; }, //< Password check functor.
-            &authProperties,
-            [&done](api::ResultCode result) { done.set_value(result); });
-        return done.get_future().get();
+    void thenCredentialsAreStillProlongated()
+    {
+        whenPeriodPasses(prolongationPeriod());
+        assertCredentialsAreAuthenticated();
     }
     
     void waitUntilCredentialsArePermanentlyDeleted()
@@ -109,7 +122,7 @@ protected:
         for (;;)
         {
             const auto credentials =
-                m_dao->find(nullptr, nx::utils::stree::ResourceNameSet(), m_credentials);
+                m_dao.find(nullptr, nx::utils::stree::ResourceNameSet(), m_credentials);
 
             if (!credentials)
                 break;
@@ -128,19 +141,49 @@ protected:
 
 private:
     CdbAttrNameSet m_attrNameset;
+    conf::AccountManager m_settings;
+    dao::memory::TemporaryCredentialsDao m_dao;
     std::unique_ptr<nx::cloud::db::TemporaryAccountPasswordManager> m_tempPasswordManager;
     data::TemporaryAccountCredentials m_credentials;
     std::string m_email;
     nx::utils::test::ScopedTimeShift m_timeShift;
     const std::chrono::hours m_expirationPeriod;
-    dao::TemporaryCredentialsDaoFactory::Function m_factoryFuncBak;
-    dao::memory::TemporaryCredentialsDao* m_dao = nullptr;
+    std::optional<std::chrono::seconds> m_prolongationPeriod;
 
-    std::unique_ptr<dao::AbstractTemporaryCredentialsDao> createDao()
+    void initializeTempPasswordManager()
     {
-        auto dao = std::make_unique<dao::memory::TemporaryCredentialsDao>();
-        m_dao = dao.get();
-        return dao;
+        m_tempPasswordManager =
+            std::make_unique<nx::cloud::db::TemporaryAccountPasswordManager>(
+                m_settings,
+                m_attrNameset,
+                &persistentDbManager()->queryExecutor(),
+                &m_dao);
+    }
+
+    api::ResultCode authenticateCredentials()
+    {
+        nx::utils::stree::ResourceContainer authProperties;
+        authProperties.put(attr::requestPath, "/any/request/path");
+
+        std::promise<api::ResultCode> done;
+        m_tempPasswordManager->authenticateByName(
+            m_credentials.login.c_str(),
+            [](auto...) { return true; }, //< Password check functor.
+            &authProperties,
+            [&done](api::ResultCode result) { done.set_value(result); });
+
+        auto resultCode = done.get_future().get();
+        if (resultCode != api::ResultCode::ok)
+            return resultCode;
+
+        if (!m_tempPasswordManager->authorize(
+                *authProperties.get<std::string>(attr::credentialsId),
+                authProperties))
+        {
+            return api::ResultCode::notAuthorized;
+        }
+
+        return api::ResultCode::ok;
     }
 };
 
@@ -161,6 +204,31 @@ TEST_F(TemporaryAccountPasswordManager, credentials_are_removed_after_expiration
     addTemporaryCredentials();
     whenExpirationPeriodPasses();
     waitUntilCredentialsArePermanentlyDeleted();
+}
+
+TEST_F(TemporaryAccountPasswordManager, credentials_cannot_be_used_after_expiration)
+{
+    addTemporaryCredentials();
+    whenExpirationPeriodPasses();
+    assertCredentialsAreNotAuthenticated();
+}
+
+TEST_F(TemporaryAccountPasswordManager, credentials_prolongated_automatically)
+{
+    addTemporaryCredentials();
+   
+    whenPeriodPasses(expirationPeriod() / 2);
+    assertCredentialsAreAuthenticated();
+
+    whenPeriodPasses(expirationPeriod() / 2);
+    assertCredentialsAreAuthenticated();
+}
+
+TEST_F(TemporaryAccountPasswordManager, prolongation_is_persistent)
+{
+    givenProlongatedCredentials();
+    whenRestart();
+    thenCredentialsAreStillProlongated();
 }
 
 } // namespace nx::cloud::db::test

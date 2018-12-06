@@ -16,12 +16,12 @@ namespace nx::clusterdb::engine::transport {
 WebSocketTransportAcceptor::WebSocketTransportAcceptor(
     const QnUuid& moduleGuid,
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* transactionLog,
+    CommandLog* transactionLog,
     ConnectionManager* connectionManager,
     const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_transactionLog(transactionLog),
+    m_commandLog(transactionLog),
     m_connectionManager(connectionManager),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
@@ -107,9 +107,9 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
 
     const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();
 
-    auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
+    auto transactionTransport = std::make_unique<WebsocketCommandTransport>(
         m_protocolVersionRange,
-        m_transactionLog,
+        m_commandLog,
         systemId.c_str(),
         m_outgoingCommandFilter,
         connectionId,

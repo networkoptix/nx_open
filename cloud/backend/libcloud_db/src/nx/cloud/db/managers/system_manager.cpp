@@ -76,20 +76,20 @@ SystemManager::SystemManager(
     // Since it may lead to inconsistence between transactions and data cache (for a quite short period, though).
 
     // Registering transaction handler.
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveUser>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::RemoveUser>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
 
     // Currently this transaction can only rename some system.
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SetResourceParam>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3));
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::RemoveResourceParam>(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3));
 
@@ -98,16 +98,16 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::RemoveResourceParam>();
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::SetResourceParam>();
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::RemoveUser>();
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::SaveUser>();
 
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
@@ -212,7 +212,7 @@ void SystemManager::bindSystemToAccount(
                 std::move(completionHandler));
         };
 
-    // Creating db transaction via TransactionLog.
+    // Creating db transaction via CommandLog.
     m_ec2SyncronizationEngine->transactionLog().startDbTransaction(
         newSystemDataPtr->systemData.id.c_str(),
         std::move(dbUpdateFunc),

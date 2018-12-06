@@ -23,7 +23,7 @@ struct TransactionData
 struct TransactionLogRecord
 {
     nx::Buffer hash;
-    std::unique_ptr<const TransactionSerializer> serializer;
+    std::unique_ptr<const CommandSerializer> serializer;
 };
 
 /**
