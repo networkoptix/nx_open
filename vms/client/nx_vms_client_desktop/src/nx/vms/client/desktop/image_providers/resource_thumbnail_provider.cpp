@@ -1,5 +1,7 @@
 #include "resource_thumbnail_provider.h"
 
+#include <chrono>
+
 #include <QtGui/QPainter>
 
 #include <api/server_rest_connection.h>
@@ -56,7 +58,8 @@ struct ResourceThumbnailProvider::Private
         }
         else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
         {
-            baseProvider.reset(new FfmpegImageProvider(resource, request.usecSinceEpoch));
+            baseProvider.reset(new FfmpegImageProvider(resource,
+                std::chrono::microseconds(request.usecSinceEpoch), request.size));
         }
         else
         {

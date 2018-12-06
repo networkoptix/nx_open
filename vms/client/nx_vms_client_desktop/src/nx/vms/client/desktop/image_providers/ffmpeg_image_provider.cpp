@@ -1,5 +1,7 @@
 #include "ffmpeg_image_provider.h"
 
+#include <limits>
+
 #include <QtConcurrent>
 
 #include <client/client_globals.h>
@@ -10,19 +12,31 @@
 #include <utils/media/frame_info.h>
 #include <utils/common/delayed.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
 
+// TODO: #vkutin #gdm Support customAspectRatio and videoLayout.
+
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
+using nx::vms::client::core::Geometry;
 
 struct FfmpegImageProvider::Private
 {
     const QnResourcePtr resource;
     QImage image;
     Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
+    microseconds position = -1ms;
+    const QSize maximumSize;
 
-    explicit Private(const QnResourcePtr& resource):
-        resource(resource)
+    explicit Private(const QnResourcePtr& resource, microseconds position, const QSize& maxSize):
+        resource(resource),
+        position(position),
+        maximumSize(
+            maxSize.width() > 0 ? maxSize.width() : std::numeric_limits<int>::max(),
+            maxSize.height() > 0 ? maxSize.height() : std::numeric_limits<int>::max())
     {
     }
 
@@ -31,17 +45,25 @@ struct FfmpegImageProvider::Private
         static QThreadPool staticThreadPool;
         return &staticThreadPool;
     }
+
+    QSize boundedSize(const QSize& size) const
+    {
+        return Geometry::bounded(size, maximumSize, Qt::KeepAspectRatio).toSize();
+    }
 };
 
-FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent):
-    FfmpegImageProvider(resource, -1, parent)
+FfmpegImageProvider::FfmpegImageProvider(
+    const QnResourcePtr& resource, const QSize& maximumSize, QObject* parent)
+    :
+    FfmpegImageProvider(resource, -1ms, maximumSize, parent)
 {
 }
 
-FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, qint64 positionUsec, QObject* parent):
+FfmpegImageProvider::FfmpegImageProvider(
+    const QnResourcePtr& resource, microseconds position, const QSize& maximumSize, QObject* parent)
+    :
     base_type(parent),
-    d(new Private(resource)),
-    m_positionUsec(positionUsec)
+    d(new Private(resource, position, maximumSize))
 {
 }
 
@@ -56,7 +78,8 @@ QImage FfmpegImageProvider::image() const
 
 QSize FfmpegImageProvider::sizeHint() const
 {
-    return d->image.size();
+    static constexpr QSize kDefaultSize(1920, 1080);
+    return d->image.isNull() ? d->boundedSize(kDefaultSize) : d->image.size();
 }
 
 Qn::ThumbnailStatus FfmpegImageProvider::status() const
@@ -78,7 +101,12 @@ void FfmpegImageProvider::load(bool sync)
             if (d->status != Qn::ThumbnailStatus::Loading)
                 return;
 
-            d->image = image;
+            const auto size = d->boundedSize(image.size());
+
+            d->image = size != image.size()
+                ? image.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation)
+                : image;
+
             d->status = image.isNull()
                 ? Qn::ThumbnailStatus::NoData
                 : Qn::ThumbnailStatus::Loaded;
@@ -89,10 +117,10 @@ void FfmpegImageProvider::load(bool sync)
         });
 
     auto future = QtConcurrent::run(d->threadPool(),
-        [resource = d->resource, positionUs = m_positionUsec, thread = thread(), callback]()
+        [resource = d->resource, position = d->position, thread = thread(), callback]()
         {
             const auto image =
-                [resource, positionUs]() -> QImage
+                [resource, position]() -> QImage
                 {
                     QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());
                     if (!archiveDelegate->open(resource))
@@ -102,7 +130,7 @@ void FfmpegImageProvider::load(bool sync)
                     if (!archiveDelegate->findStreams())
                         return {};
 
-                    if (positionUs == -1) //< Seek to middle
+                    if (position < 0ms) //< Seek to middle
                     {
                         const qint64 startTime = archiveDelegate->startTime();
                         const qint64 endTime = archiveDelegate->endTime();
@@ -111,7 +139,7 @@ void FfmpegImageProvider::load(bool sync)
                     }
                     else
                     {
-                        archiveDelegate->seek(positionUs, false);
+                        archiveDelegate->seek(position.count(), false);
                     }
 
                     // Loading frame.
