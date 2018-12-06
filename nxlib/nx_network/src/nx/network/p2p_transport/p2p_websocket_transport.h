@@ -9,7 +9,8 @@ namespace nx::network {
 class NX_NETWORK_API P2PWebsocketTransport : public IP2PTransport
 {
 public:
-    P2PWebsocketTransport(std::unique_ptr<AbstractStreamSocket> socket,
+    P2PWebsocketTransport(
+        std::unique_ptr<AbstractStreamSocket> socket,
         websocket::FrameType frameType);
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;

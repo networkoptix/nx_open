@@ -28,7 +28,7 @@ enum class Role
 };
 
 static const nx::Buffer kHandlerPath = "/testP2PConnection";
-static const nx::Buffer kTestJson = R"json({"testJsonName": "testJsonValue"})json";
+static const nx::Buffer kTestMessage = "Hello! Your connection seems to work";
 static const nx::utils::log::Tag kWebsocketUtilityTag{QString("P2PUtility")};
 
 struct
@@ -131,13 +131,14 @@ class P2PConnection:
 public:
     P2PConnection(aio::AbstractAioThread* aioThread): Waitable(aioThread)
     {
-        m_httpClient.bindToAioThread(aioThread);
+        m_httpClient->bindToAioThread(aioThread);
     }
 
-    P2PConnection(aio::AbstractAioThread *aioThread,
-        std::unique_ptr<AbstractStreamSocket> socket): Waitable(aioThread)
+    P2PConnection(
+        aio::AbstractAioThread *aioThread,
+        P2pTransportPtr p2pTransport): Waitable(aioThread)
     {
-        m_p2pTransport.reset(new websocket::WebSocket(std::move(socket), websocket::FrameType::text));
+        m_p2pTransport = std::move(p2pTransport);
         m_timer.bindToAioThread(aioThread);
         m_p2pTransport->bindToAioThread(aioThread);
     }
@@ -149,10 +150,11 @@ public:
 
         NX_VERBOSE(this, lm("connecting to %1").args(config.url));
 
-        m_httpClient.setUserName(config.userName);
-        m_httpClient.setUserPassword(config.userPassword);
-        m_httpClient.addRequestHeaders(websocketHeaders);
-        m_httpClient.doGet(config.url,
+        m_httpClient->setUserName(config.userName);
+        m_httpClient->setUserPassword(config.userPassword);
+        m_httpClient->addRequestHeaders(websocketHeaders);
+        m_httpClient->doGet(
+            config.url,
             [self = shared_from_this(),
             this, completionHandler = std::move(completionHandler)]() mutable
             {
@@ -162,7 +164,8 @@ public:
 
     void startReading()
     {
-        m_p2pTransport->readSomeAsync(&m_readBuffer,
+        m_p2pTransport->readSomeAsync(
+            &m_readBuffer,
             [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
             { onRead(errorCode, bytesRead); });
     }
@@ -170,7 +173,8 @@ public:
     void startSending()
     {
         NX_VERBOSE(this, "Starting sending test messages to the peer");
-        m_p2pTransport->sendAsync(kTestJson,
+        m_p2pTransport->sendAsync(
+            kTestMessage,
             [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
                 size_t bytesRead)
             {
@@ -179,7 +183,7 @@ public:
     }
 
 private:
-    http::AsyncClient m_httpClient;
+    std::unique_ptr<http::AsyncClient> m_httpClient = std::make_unique<http::AsyncClient>();
     P2pTransportPtr m_p2pTransport;
     nx::Buffer m_readBuffer;
     aio::Timer m_timer;
@@ -192,45 +196,60 @@ private:
             return;
         }
 
-        if (m_httpClient.state() == nx::network::http::AsyncClient::State::sFailed
-            || !m_httpClient.response())
+        if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed
+            || !m_httpClient->response())
         {
             NX_INFO(this, "http client failed to connect to host");
             stopInAioThread();
             return;
         }
 
-        const int statusCode = m_httpClient.response()->statusLine.statusCode;
+        const int statusCode = m_httpClient->response()->statusLine.statusCode;
         NX_VERBOSE(this, lm("http client status code: %1").args(statusCode));
+        NX_VERBOSE(this, lm("http client connected successfully to the %1").args(config.url));
 
-        if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
+        if (statusCode == http::StatusCode::switchingProtocols)
+        {
+            NX_INFO(this, "Server reported readiness for a websocket connection");
+
+            auto validationError = websocket::validateResponse(
+                m_httpClient->request(),
+                *m_httpClient->response());
+
+            if (validationError != websocket::Error::noError)
+            {
+                NX_INFO(
+                    this,
+                    lm("websocket handshake validation error: %1").args((int) validationError));
+                stopInAioThread();
+                return;
+            }
+
+            NX_VERBOSE(this, "websocket handshake response validated successfully");
+            NX_INFO(this, "successfully connected via WEBSOCKET, starting reading");
+
+            m_p2pTransport.reset(new P2PWebsocketTransport(
+                m_httpClient->takeSocket(),
+                websocket::FrameType::text));
+
+            m_p2pTransport->bindToAioThread(m_aioThread);
+            m_httpClient->pleaseStopSync();
+        }
+        else if (statusCode == http::StatusCode::ok)
+        {
+            NX_INFO(this, "Server reported readiness for a http connection");
+
+            m_p2pTransport.reset(new P2PHttpClientTransport(
+                std::move(m_httpClient),
+                websocket::FrameType::text));
+        }
+        else
         {
             NX_INFO(this, lm("http client got invalid response code %1").args(statusCode));
             stopInAioThread();
             return;
         }
 
-        NX_VERBOSE(this, lm("http client connected successfully to the %1").args(config.url));
-
-        auto validationError = websocket::validateResponse(m_httpClient.request(),
-            *m_httpClient.response());
-        if (validationError != websocket::Error::noError)
-        {
-            NX_INFO(this, lm("websocket handshake validation error: %1").args((int) validationError));
-            stopInAioThread();
-            return;
-        }
-
-        NX_VERBOSE(this, "websocket handshake response validated successfully");
-        NX_INFO(this, "successfully connected, starting reading");
-
-        m_p2pTransport.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
-            websocket::FrameType::text));
-        m_p2pTransport->bindToAioThread(m_aioThread);
-
-        m_httpClient.pleaseStopSync();
-
-        m_p2pTransport->start();
         completionHandler();
     }
 
@@ -287,7 +306,8 @@ private:
                     NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
                     return;
                 }
-                m_p2pTransport->sendAsync(kTestJson,
+                m_p2pTransport->sendAsync(
+                    kTestMessage,
                     [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
                         size_t bytesRead)
                     {
@@ -300,15 +320,18 @@ private:
 class P2PConnectionAcceptor: public Waitable
 {
 public:
-    P2PConnectionAcceptor(aio::AbstractAioThread* aioThread,
+    P2PConnectionAcceptor(
+        aio::AbstractAioThread* aioThread,
         std::function<void(P2PConnectionPtr)> userCompletionHandler)
         :
         Waitable(aioThread),
         m_userCompletionHandler(userCompletionHandler)
     {
         m_httpServer.bindToAioThread(aioThread);
-        m_httpServer.registerRequestProcessorFunc(kHandlerPath,
-            [this](http::RequestContext requestContext,
+        m_httpServer.registerRequestProcessorFunc(
+            kHandlerPath,
+            [this](
+                http::RequestContext requestContext,
                 http::RequestProcessedHandler requestCompletionHandler)
             {
                 onAccept(std::move(requestContext), std::move(requestCompletionHandler));
@@ -317,14 +340,20 @@ public:
 
     bool startListening()
     {
-        SocketAddress serverSocketAddress(QString::fromLatin1(config.serverAddress),
+        SocketAddress serverSocketAddress(
+            QString::fromLatin1(config.serverAddress),
             config.serverPort);
+
         if (!m_httpServer.bindAndListen(serverSocketAddress))
         {
-            NX_INFO(this, lm("failed to start http server, address: %1, port: %2")
-                .args(config.serverAddress, config.serverPort));
+            NX_INFO(
+                this,
+                lm("failed to start http server, address: %1, port: %2")
+                    .args(config.serverAddress, config.serverPort));
+
             return false;
         }
+
         NX_INFO(this, lm("starting to accept websocket connections via %1").args(kHandlerPath));
         return true;
     }
@@ -333,45 +362,76 @@ private:
     http::TestHttpServer m_httpServer;
     std::function<void(P2PConnectionPtr)> m_userCompletionHandler;
 
-    void onAccept(http::RequestContext requestContext,
+    void onAccept(
+        http::RequestContext requestContext,
         http::RequestProcessedHandler requestCompletionHandler)
     {
         if (m_stopped)
         {
-            NX_VERBOSE(this, "accepted request while in stopeed state, exiting");
+            NX_VERBOSE(this, "accepted request while in stopped state, exiting");
             return;
         }
+
         auto error = websocket::validateRequest(requestContext.request, requestContext.response);
         if (error != websocket::Error::noError)
         {
             NX_INFO(this, lm("error validating websocket request: %1").args((int) error));
-            requestCompletionHandler(http::StatusCode::badRequest);
-            return;
+            NX_INFO(this, lm("switching to http mode"));
+
+            requestContext.connection->setSendCompletionHandler(
+                [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
+                {
+                    auto p2pTransport = P2pTransportPtr(
+                        new P2PHttpServerTransport(
+                            connection->takeSocket(),
+                            nx::network::websocket::FrameType::text));
+
+                    auto p2pConnection = std::make_shared<P2PConnection>(
+                        config.aioThread,
+                        std::move(p2pTransport));
+
+                    m_userCompletionHandler(p2pConnection);
+                });
+
+            requestCompletionHandler(http::StatusCode::ok);
         }
-        NX_VERBOSE(this, "received websocket connection request, headers validated succesfully");
-        requestContext.connection->setSendCompletionHandler(
-            [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
-            {
-                auto P2PConnection = std::make_shared<P2PConnection>(
-                    config.aioThread,
-                    connection->takeSocket());
-                m_userCompletionHandler(P2PConnection);
-            });
-        requestCompletionHandler(nx::network::http::StatusCode::switchingProtocols);
+        else
+        {
+            NX_VERBOSE(
+                this,
+                "received websocket connection request, headers validated succesfully");
+
+            requestContext.connection->setSendCompletionHandler(
+                [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
+                {
+                    auto p2pTransport = P2pTransportPtr(
+                        new P2PWebsocketTransport(
+                            connection->takeSocket(),
+                            nx::network::websocket::FrameType::text));
+
+                    auto p2pConnection = std::make_shared<P2PConnection>(
+                        config.aioThread,
+                        std::move(p2pTransport));
+
+                    m_userCompletionHandler(p2pConnection);
+                });
+
+            requestCompletionHandler(nx::network::http::StatusCode::switchingProtocols);
+        }
     }
 };
 
 static void connectAndListen()
 {
-    auto P2PConnection = std::make_shared<P2PConnection>(config.aioThread);
-    waitablePoolInstance->addWaitable(P2PConnection);
-    P2PConnection->connectAsync(
-        [P2PConnection]() { P2PConnection->startReading(); });
+    auto p2pConnection = std::make_shared<P2PConnection>(config.aioThread);
+    waitablePoolInstance->addWaitable(p2pConnection);
+    p2pConnection->connectAsync([p2pConnection]() { p2pConnection->startReading(); });
 }
 
 static void startAccepting()
 {
-    auto acceptor = std::make_shared<P2PConnectionAcceptor>(config.aioThread,
+    auto acceptor = std::make_shared<P2PConnectionAcceptor>(
+        config.aioThread,
         [](P2PConnectionPtr P2PConnection)
         {
             if (!P2PConnection)
@@ -379,8 +439,10 @@ static void startAccepting()
             waitablePoolInstance->addWaitable(P2PConnection);
             P2PConnection->startSending();
         });
+
     if (!acceptor->startListening())
         return;
+
     waitablePoolInstance->addWaitable(acceptor);
 }
 
