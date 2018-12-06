@@ -1385,13 +1385,18 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
 
-    colors[Qn::RecordingContent] = !d->motionSearchMode
+    const auto archiveContentColor = !d->motionSearchMode
         ? d->chunkColor
         : (d->loadingState ? d->loadingChunkColor : d->motionModeChunkColor);
+    colors[Qn::RecordingContent] = archiveContentColor;
 
-    colors[Qn::MotionContent] = d->loadingState
-        ? d->motionLoadingColor
-        : d->motionColor;
+    colors[Qn::MotionContent] =
+        [this, archiveContentColor]
+        {
+            if (d->motionSearchMode)
+                return d->loadingState ? d->motionLoadingColor : d->motionColor;
+            return archiveContentColor;
+        }();
 
     colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
 
