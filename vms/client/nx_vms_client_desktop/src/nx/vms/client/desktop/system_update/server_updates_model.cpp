@@ -254,8 +254,8 @@ bool SortedPeerUpdatesModel::filterAcceptsRow(int sourceRow, const QModelIndex& 
 {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
     auto item = index.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
-    //if (!m_showClients && item && item->component == UpdateItem::Component::client)
-    //    return false;
+    if (!m_showClients && item && item->component == UpdateItem::Component::client)
+        return false;
     return true;
 }
 
