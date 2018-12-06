@@ -165,7 +165,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
             const auto serverHost = system->getServerHost(firstServerId);
 
             connectToLocalSystem(system->id(), serverHost.toString(),
-                credentials.user, credentials.password.value(),
+                credentials.user, credentials.password.decoded(),
                 kAlwaysStorePassword, kNeverAutologin);
 
             return;
@@ -324,7 +324,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
-    connectToSystemInternal(        
+    connectToSystemInternal(
         systemId,
         helpers::parseConnectionUrlFromUserInput(serverUrl),
         QnEncodedCredentials(userName, password),
@@ -392,7 +392,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 
             auto url = serverUrl;
             if (!credentials.password.isEmpty())
-                url.setPassword(credentials.password.value());
+                url.setPassword(credentials.password.decoded());
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 

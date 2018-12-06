@@ -916,7 +916,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     nx::utils::Url url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
-    url.setPassword(credentials.password.value());
+    url.setPassword(credentials.password.decoded());
 
     action::Parameters connectParams{Qn::UrlRole, url};
     connectParams.setArgument(Qn::StoreSessionRole, true);

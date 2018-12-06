@@ -31,7 +31,7 @@ QString WebAdminController::getCredentials() const
 {
     QJsonObject json;
     json[lit("localLogin")] = m_credentials.user;
-    json[lit("localPassword")] = m_credentials.password.value();
+    json[lit("localPassword")] = m_credentials.password.decoded();
     return QString::fromUtf8(QJsonDocument(json).toJson(QJsonDocument::Compact));
 }
 

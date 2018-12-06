@@ -17,45 +17,87 @@ static const QString kEncodedWithCustomKey("ff3b1fd59d619cb9e3623c0d74375210");
 TEST(EncodedString, emptyStringIsEmpty)
 {
     EncodedString empty;
-    ASSERT_EQ(empty.value(), QString());
+    ASSERT_EQ(empty.decoded(), QString());
     ASSERT_EQ(empty.encoded(), QString());
     ASSERT_TRUE(empty.isEmpty());
 }
 
-TEST(EncodedString, encodedStringDiffers)
+TEST(EncodedString, encodedStringFromDecodedDiffers)
 {
-    EncodedString s(kSample);
-    ASSERT_EQ(s.value(), kSample);
+    const auto s = EncodedString::fromDecoded(kSample);
+    ASSERT_EQ(s.decoded(), kSample);
     ASSERT_EQ(s.encoded(), kEncodedWithDefaultKey);
-    ASSERT_NE(s.value(), s.encoded());
+    ASSERT_NE(s.decoded(), s.encoded());
     ASSERT_FALSE(s.isEmpty());
 }
 
 TEST(EncodedString, decodeFromEncodedWithDefaultKey)
 {
-    EncodedString s = EncodedString::fromEncoded(kEncodedWithDefaultKey);
-    ASSERT_EQ(s.value(), kSample);
+    const auto s = EncodedString::fromEncoded(kEncodedWithDefaultKey);
     ASSERT_EQ(s.encoded(), kEncodedWithDefaultKey);
-    ASSERT_NE(s.value(), s.encoded());
+    ASSERT_EQ(s.decoded(), kSample);
+    ASSERT_NE(s.decoded(), s.encoded());
     ASSERT_FALSE(s.isEmpty());
 }
 
 TEST(EncodedString, encodedWithCustomKeyStringDiffers)
 {
-    EncodedString s(kSample, kCustomKey);
-    ASSERT_EQ(s.value(), kSample);
+    const auto s = EncodedString::fromDecoded(kSample, kCustomKey);
+    ASSERT_EQ(s.decoded(), kSample);
     ASSERT_EQ(s.encoded(), kEncodedWithCustomKey);
-    ASSERT_NE(s.value(), s.encoded());
+    ASSERT_NE(s.decoded(), s.encoded());
     ASSERT_FALSE(s.isEmpty());
 }
 
 TEST(EncodedString, decodeFromEncodedWithCustomKey)
 {
-    EncodedString s = EncodedString::fromEncoded(kEncodedWithCustomKey, kCustomKey);
-    ASSERT_EQ(s.value(), kSample);
+    const auto s = EncodedString::fromEncoded(kEncodedWithCustomKey, kCustomKey);
+    ASSERT_EQ(s.decoded(), kSample);
     ASSERT_EQ(s.encoded(), kEncodedWithCustomKey);
-    ASSERT_NE(s.value(), s.encoded());
+    ASSERT_NE(s.decoded(), s.encoded());
     ASSERT_FALSE(s.isEmpty());
+}
+
+TEST(EncodedString, initializeDecodedAfterConstructing)
+{
+    EncodedString s;
+    s.setDecoded(kSample);
+    ASSERT_EQ(s.encoded(), kEncodedWithDefaultKey);
+}
+
+TEST(EncodedString, initializeDecodedAfterConstructingWithCustomKey)
+{
+    EncodedString s(kCustomKey);
+    s.setDecoded(kSample);
+    ASSERT_EQ(s.encoded(), kEncodedWithCustomKey);
+}
+
+TEST(EncodedString, changeDecodedKey)
+{
+    auto s = EncodedString::fromDecoded(kSample);
+    s.setKey(kCustomKey);
+    ASSERT_EQ(s.encoded(), kEncodedWithCustomKey);
+}
+
+TEST(EncodedString, initializeEncodedAfterConstructing)
+{
+    EncodedString s;
+    s.setEncoded(kEncodedWithDefaultKey);
+    ASSERT_EQ(s.decoded(), kSample);
+}
+
+TEST(EncodedString, initializeEncodedAfterConstructingWithCustomKey)
+{
+    EncodedString s(kCustomKey);
+    s.setEncoded(kEncodedWithCustomKey);
+    ASSERT_EQ(s.decoded(), kSample);
+}
+
+TEST(EncodedString, changeEncodedKey)
+{
+    auto s = EncodedString::fromEncoded(kEncodedWithCustomKey);
+    s.setKey(kCustomKey);
+    ASSERT_EQ(s.decoded(), kSample);
 }
 
 } // namespace test
