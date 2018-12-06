@@ -385,7 +385,9 @@ private:
         auto error = websocket::validateRequest(requestContext.request, requestContext.response);
         if (error != websocket::Error::noError || config.mode == Mode::http)
         {
-            NX_INFO(this, lm("error validating websocket request: %1").args((int) error));
+            if (config.mode != Mode::http)
+                NX_INFO(this, lm("error validating websocket request: %1").args((int) error));
+
             NX_INFO(this, lm("switching to http mode"));
 
             requestContext.connection->setSendCompletionHandler(
