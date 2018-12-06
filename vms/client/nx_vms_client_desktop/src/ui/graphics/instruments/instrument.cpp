@@ -30,6 +30,7 @@
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/animation_timer.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
@@ -310,19 +311,27 @@ void Instrument::sendInstalledNotifications(bool installed) {
     }
 }
 
-bool Instrument::event(QGraphicsScene *watched, QEvent *event) {
+bool Instrument::event(QGraphicsScene* watched, QEvent* event)
+{
+    QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event);
     return dispatchEvent(watched, event);
 }
 
-bool Instrument::event(QGraphicsView *watched, QEvent *event) {
-    return dispatchEvent(watched, event);
+bool Instrument::event(QGraphicsView* watched, QEvent* event)
+{
+    std::unique_ptr<QEvent> eventCopyBuffer;
+    return dispatchEvent(watched, QnHiDpiWorkarounds::fixupEvent(watched, event, eventCopyBuffer));
 }
 
-bool Instrument::event(QWidget *watched, QEvent *event) {
-    return dispatchEvent(watched, event);
+bool Instrument::event(QWidget* watched, QEvent* event)
+{
+    std::unique_ptr<QEvent> eventCopyBuffer;
+    return dispatchEvent(watched, QnHiDpiWorkarounds::fixupEvent(watched, event, eventCopyBuffer));
 }
 
-bool Instrument::sceneEvent(QGraphicsItem *watched, QEvent *event) {
+bool Instrument::sceneEvent(QGraphicsItem* watched, QEvent* event)
+{
+    QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event);
     return dispatchEvent(watched, event);
 }
 

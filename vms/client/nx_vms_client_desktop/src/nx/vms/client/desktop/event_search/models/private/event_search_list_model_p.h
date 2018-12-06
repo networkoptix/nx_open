@@ -62,7 +62,7 @@ private:
     QString title(vms::api::EventType eventType) const;
     QString description(const vms::event::EventParameters& parameters) const;
     static QPixmap pixmap(const vms::event::EventParameters& parameters);
-    static QColor color(vms::api::EventType eventType);
+    static QColor color(const vms::event::EventParameters& parameters);
     static bool hasPreview(vms::api::EventType eventType);
 
 private:

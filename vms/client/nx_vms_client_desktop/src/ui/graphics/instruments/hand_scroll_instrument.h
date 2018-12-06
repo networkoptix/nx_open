@@ -1,19 +1,20 @@
-#ifndef QN_HAND_SCROLL_INSTRUMENT_H
-#define QN_HAND_SCROLL_INSTRUMENT_H
+#pragma once
 
-#include <QtGui/QCursor>
-#include <ui/processors/kinetic_process_handler.h>
-#include <common/common_globals.h>
 #include "drag_processing_instrument.h"
 
-class HandScrollInstrument: public DragProcessingInstrument, protected KineticProcessHandler {
-    Q_OBJECT;
+#include <common/common_globals.h>
+#include <ui/processors/kinetic_process_handler.h>
 
-    typedef DragProcessingInstrument base_type;
+class HandScrollInstrument:
+    public DragProcessingInstrument,
+    protected KineticProcessHandler
+{
+    Q_OBJECT
+    using base_type = DragProcessingInstrument;
 
 public:
-    HandScrollInstrument(QObject *parent);
-    virtual ~HandScrollInstrument();
+    explicit HandScrollInstrument(QObject* parent);
+    virtual ~HandScrollInstrument() override;
 
     Qt::MouseButtons mouseButtons() const;
     void setMouseButtons(Qt::MouseButtons mouseButtons);
@@ -21,28 +22,27 @@ public:
     void emulate(QPoint viewportDelta);
 
 signals:
-    void scrollProcessStarted(QGraphicsView *view);
-    void scrollStarted(QGraphicsView *view);
-    void scrollFinished(QGraphicsView *view);
-    void scrollProcessFinished(QGraphicsView *view);
+    void scrollProcessStarted(QGraphicsView* view);
+    void scrollStarted(QGraphicsView* view);
+    void scrollFinished(QGraphicsView* view);
+    void scrollProcessFinished(QGraphicsView* view);
 
 protected:
     virtual void aboutToBeDisabledNotify() override;
 
-    virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool mousePressEvent(QWidget* viewport, QMouseEvent* event) override;
 
-    virtual void startDragProcess(DragInfo *info) override;
-    virtual void startDrag(DragInfo *info) override;
-    virtual void dragMove(DragInfo *info) override;
-    virtual void finishDrag(DragInfo *info) override;
-    virtual void finishDragProcess(DragInfo *info) override;
+    virtual void startDragProcess(DragInfo* info) override;
+    virtual void startDrag(DragInfo* info) override;
+    virtual void dragMove(DragInfo* info) override;
+    virtual void finishDrag(DragInfo* info) override;
+    virtual void finishDragProcess(DragInfo* info) override;
 
-    virtual void kineticMove(const QVariant &distance) override;
+    virtual void kineticMove(const QVariant& distance) override;
     virtual void finishKinetic() override;
 
 private:
     Qt::MouseButtons m_mouseButtons;
-    QCursor m_originalCursor;
     QPointer<QGraphicsView> m_currentView;
 };
 
@@ -52,6 +52,3 @@ private:
  * thus enabled.
  */
 #define NoHandScrollOver _id("_qn_noHandScrollOver")
-
-
-#endif // QN_HAND_SCROLL_INSTRUMENT_H

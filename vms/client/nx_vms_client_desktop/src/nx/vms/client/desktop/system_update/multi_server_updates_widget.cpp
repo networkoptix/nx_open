@@ -170,7 +170,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     if (auto horizontalHeader = ui->tableView->horizontalHeader())
     {
-        horizontalHeader->setDefaultAlignment(Qt::AlignLeft);
         horizontalHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::ProgressColumn, QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::StatusMessageColumn,
