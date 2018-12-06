@@ -392,6 +392,25 @@
             "advanced": true,
             "optional": true,
             "type": "check_box"
+          },
+          {
+            "label": "Downloads per platform",
+            "name": "%AVAILABLE_DOWNLOADS_PLATFORM%",
+            "description": "",
+            "advanced": true,
+            "optional": true,
+            "type": "select",
+            "value" : "['mac', 'linux', 'windows']",
+            "meta": {
+              "multi": true,
+              "options": [
+                "mac",
+                "linux",
+                "windows",
+                "arm",
+                "sdk"
+              ]
+            }
           }
         ]
       }
