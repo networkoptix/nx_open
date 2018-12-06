@@ -5,8 +5,8 @@
 
 namespace nx::clusterdb::engine {
 
-class NX_DATA_SYNC_ENGINE_API SerializableAbstractTransaction:
-    public TransactionSerializer
+class NX_DATA_SYNC_ENGINE_API SerializableAbstractCommand:
+    public CommandSerializer
 {
 public:
     virtual const CommandHeader& header() const = 0;
@@ -14,11 +14,11 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_DATA_SYNC_ENGINE_API EditableSerializableTransaction:
-    public SerializableAbstractTransaction
+class NX_DATA_SYNC_ENGINE_API EditableSerializableCommand:
+    public SerializableAbstractCommand
 {
 public:
-    virtual std::unique_ptr<EditableSerializableTransaction> clone() const = 0;
+    virtual std::unique_ptr<EditableSerializableCommand> clone() const = 0;
     virtual void setHeader(CommandHeader header) = 0;
     virtual nx::Buffer hash() const = 0;
 };
@@ -26,11 +26,11 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 template<typename CommandDescriptor>
-class SerializableTransaction:
-    public EditableSerializableTransaction
+class SerializableCommand:
+    public EditableSerializableCommand
 {
 public:
-    SerializableTransaction(Command<typename CommandDescriptor::Data> transaction):
+    SerializableCommand(Command<typename CommandDescriptor::Data> transaction):
         m_transaction(std::move(transaction))
     {
     }
@@ -54,7 +54,7 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader,
+        const CommandTransportHeader& transportHeader,
         int /*transactionFormatVersion*/) const override
     {
         //NX_ASSERT(transactionFormatVersion == nx_ec::EC2_PROTO_VERSION);
@@ -76,9 +76,9 @@ public:
         return m_transaction;
     }
 
-    virtual std::unique_ptr<EditableSerializableTransaction> clone() const override
+    virtual std::unique_ptr<EditableSerializableCommand> clone() const override
     {
-        return std::make_unique<SerializableTransaction<CommandDescriptor>>(
+        return std::make_unique<SerializableCommand<CommandDescriptor>>(
             m_transaction);
     }
 
@@ -109,10 +109,10 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 template<typename CommandDescriptor>
-std::unique_ptr<SerializableTransaction<CommandDescriptor>> makeSerializer(
+std::unique_ptr<SerializableCommand<CommandDescriptor>> makeSerializer(
     Command<typename CommandDescriptor::Data> command)
 {
-    using Serializer = SerializableTransaction<CommandDescriptor>;
+    using Serializer = SerializableCommand<CommandDescriptor>;
     return std::make_unique<Serializer>(std::move(command));
 }
 

@@ -36,7 +36,7 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader,
+        const CommandTransportHeader& transportHeader,
         int transactionFormatVersion) const override
     {
         if (targetFormat == Qn::UbjsonFormat /*&&
@@ -58,10 +58,10 @@ private:
  */
 template<typename CommandDescriptor>
 class UbjsonSerializedTransaction:
-    public BaseUbjsonSerializedTransaction<SerializableTransaction<CommandDescriptor>>
+    public BaseUbjsonSerializedTransaction<SerializableCommand<CommandDescriptor>>
 {
     using base_type =
-        BaseUbjsonSerializedTransaction<SerializableTransaction<CommandDescriptor>>;
+        BaseUbjsonSerializedTransaction<SerializableCommand<CommandDescriptor>>;
 
 public:
     UbjsonSerializedTransaction(
@@ -89,7 +89,7 @@ public:
 };
 
 class DummySerializable:
-    public TransactionSerializer
+    public CommandSerializer
 {
 public:
     virtual nx::Buffer serialize(
@@ -102,7 +102,7 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat /*targetFormat*/,
-        const TransactionTransportHeader& /*transportHeader*/,
+        const CommandTransportHeader& /*transportHeader*/,
         int /*transactionFormatVersion*/) const override
     {
         NX_ASSERT(false);

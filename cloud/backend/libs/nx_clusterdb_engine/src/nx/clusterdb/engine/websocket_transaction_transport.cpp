@@ -10,9 +10,9 @@ namespace nx::clusterdb::engine::transport {
 
 static constexpr int kMaxTransactionsPerIteration = 17;
 
-WebSocketTransactionTransport::WebSocketTransactionTransport(
+WebsocketCommandTransport::WebsocketCommandTransport(
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* const transactionLog,
+    CommandLog* const transactionLog,
     const std::string& systemId,
     const OutgoingCommandFilter& filter,
     const std::string& connectionId,
@@ -28,7 +28,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         std::make_unique<nx::p2p::ConnectionContext>()),
     m_protocolVersionRange(protocolVersionRange),
     m_commonTransactionHeader(protocolVersionRange.currentVersion()),
-    m_transactionLogReader(std::make_unique<TransactionLogReader>(
+    m_transactionLogReader(std::make_unique<CommandLogReader>(
         transactionLog,
         systemId,
         remotePeerData.dataFormat,
@@ -48,11 +48,11 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     this->webSocket()->setAliveTimeout(keepAliveTimeout);
 
-    connect(this, &ConnectionBase::gotMessage, this, &WebSocketTransactionTransport::onGotMessage);
+    connect(this, &ConnectionBase::gotMessage, this, &WebsocketCommandTransport::onGotMessage);
     connect(this, &ConnectionBase::allDataSent,
         [this]()
         {
-            if (!m_sendHandshakeDone && !m_tranLogRequestInProgress)
+            if (m_remoteSubscription && !m_sendHandshakeDone && !m_tranLogRequestInProgress)
                 readTransactions(); //< Continue reading
         });
 
@@ -63,21 +63,21 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     startReading();
 }
 
-void WebSocketTransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+void WebsocketCommandTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractConnection::bindToAioThread(aioThread);
     nx::p2p::ConnectionBase::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
 }
 
-void WebSocketTransactionTransport::stopWhileInAioThread()
+void WebsocketCommandTransport::stopWhileInAioThread()
 {
     AbstractConnection::stopWhileInAioThread();
     nx::p2p::ConnectionBase::stopWhileInAioThread();
     m_transactionLogReader.reset();
 }
 
-void WebSocketTransactionTransport::onGotMessage(
+void WebsocketCommandTransport::onGotMessage(
     QWeakPointer<nx::p2p::ConnectionBase> /*connection*/,
     nx::p2p::MessageType messageType,
     const QByteArray& payload)
@@ -115,10 +115,10 @@ void WebSocketTransactionTransport::onGotMessage(
     }
 }
 
-void WebSocketTransactionTransport::reportCommandReceived(
+void WebsocketCommandTransport::reportCommandReceived(
     QByteArray commandBuffer)
 {
-    TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
+    CommandTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = remotePeerEndpoint();
     cdbTransportHeader.systemId = m_transactionLogReader->systemId();
     cdbTransportHeader.connectionId = connectionGuid();
@@ -143,21 +143,22 @@ void WebSocketTransactionTransport::reportCommandReceived(
         std::move(cdbTransportHeader));
 }
 
-void WebSocketTransactionTransport::readTransactions()
+void WebsocketCommandTransport::readTransactions()
 {
-    using namespace std::placeholders;
+    NX_CRITICAL(m_remoteSubscription);
+
     m_tranLogRequestInProgress = true;
     
     ReadCommandsFilter filter;
-    filter.from = m_remoteSubscription;
+    filter.from = *m_remoteSubscription;
     filter.maxTransactionsToReturn = kMaxTransactionsPerIteration;
 
     m_transactionLogReader->readTransactions(
         filter,
-        std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
+        [this](auto&&... args) { onTransactionsReadFromLog(std::move(args)...); });
 }
 
-void WebSocketTransactionTransport::onTransactionsReadFromLog(
+void WebsocketCommandTransport::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
     vms::api::TranState readedUpTo)
@@ -165,17 +166,14 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
     m_tranLogRequestInProgress = false;
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
-        NX_DEBUG(
-            this,
-            lm("systemId %1. Error reading transaction log (%2). "
-                "Closing connection to the peer %3")
-            .args(m_transactionLogReader->systemId(),
-                toString(resultCode), remotePeerEndpoint()));
+        NX_DEBUG(this, lm("systemId %1. Error reading transaction log (%2). "
+            "Closing connection to the peer %3")
+            .args(m_transactionLogReader->systemId(), toString(resultCode), remotePeerEndpoint()));
         setState(State::Error);   //closing connection
         return;
     }
 
-    // Posting transactions to send
+    // Posting transactions to send.
     for (auto& tranData: serializedTransactions)
     {
         sendMessage(
@@ -184,22 +182,23 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
                 remotePeer().dataFormat,
                 highestProtocolVersionCompatibleWithRemotePeer()));
     }
+
     m_remoteSubscription = readedUpTo;
     if (resultCode == ResultCode::ok)
         m_sendHandshakeDone = true; //< All data are sent.
 }
 
-network::SocketAddress WebSocketTransactionTransport::remotePeerEndpoint() const
+network::SocketAddress WebsocketCommandTransport::remotePeerEndpoint() const
 {
     return webSocket()->socket()->getForeignAddress();
 }
 
-ConnectionClosedSubscription& WebSocketTransactionTransport::connectionClosedSubscription()
+ConnectionClosedSubscription& WebsocketCommandTransport::connectionClosedSubscription()
 {
     return m_connectionClosedSubscription;
 }
 
-void WebSocketTransactionTransport::setState(State state)
+void WebsocketCommandTransport::setState(State state)
 {
     if (state == State::Error)
     {
@@ -210,25 +209,25 @@ void WebSocketTransactionTransport::setState(State state)
     nx::p2p::ConnectionBase::setState(state);
 }
 
-void WebSocketTransactionTransport::setOnGotTransaction(CommandHandler handler)
+void WebsocketCommandTransport::setOnGotTransaction(CommandHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-std::string WebSocketTransactionTransport::connectionGuid() const
+std::string WebsocketCommandTransport::connectionGuid() const
 {
     return m_connectionGuid;
 }
 
-const TransactionTransportHeader&
-    WebSocketTransactionTransport::commonTransportHeaderOfRemoteTransaction() const
+const CommandTransportHeader&
+    WebsocketCommandTransport::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransactionHeader;
 }
 
-void WebSocketTransactionTransport::sendTransaction(
-    TransactionTransportHeader /*transportHeader*/,
-    const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
+void WebsocketCommandTransport::sendTransaction(
+    CommandTransportHeader /*transportHeader*/,
+    const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer)
 {
     if (!m_sendHandshakeDone)
         return; //< Send data in progress. This transaction will be delivered later
@@ -239,22 +238,22 @@ void WebSocketTransactionTransport::sendTransaction(
     sendMessage(nx::p2p::MessageType::pushTransactionData, serializedTransaction);
 }
 
-void WebSocketTransactionTransport::start()
+void WebsocketCommandTransport::start()
 {
 }
 
-int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
+int WebsocketCommandTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
     return remotePeer().protoVersion >= m_protocolVersionRange.begin()
         ? m_protocolVersionRange.currentVersion()
         : remotePeer().protoVersion;
 }
 
-void WebSocketTransactionTransport::fillAuthInfo(
+void WebsocketCommandTransport::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
-    NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");
+    NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
 }
 
 } // namespace nx::clusterdb::engine::transport

@@ -34,8 +34,8 @@ public:
     virtual std::string connectionGuid() const override;
 
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const TransactionSerializer>& transactionSerializer) override;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const CommandSerializer>& transactionSerializer) override;
 
     virtual void closeConnection() override;
 

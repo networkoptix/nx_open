@@ -14,7 +14,7 @@ struct HttpTransportTypes
 
 INSTANTIATE_TYPED_TEST_CASE_P(
     Http,
-    TransportAcceptance,
+    CommandPipelineAcceptance,
     HttpTransportTypes);
 
 } // namespace nx::clusterdb::engine::transport::test

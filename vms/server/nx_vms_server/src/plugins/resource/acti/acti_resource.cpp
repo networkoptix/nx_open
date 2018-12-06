@@ -587,7 +587,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     // Save this check for backward compatibility
     // since SYSTEM_INFO request potentially can work without auth
-    if (nx::network::http::StatusCode::unauthorized != status)
+    if (nx::network::http::StatusCode::unauthorized == status)
         setStatus(Qn::Unauthorized);
 
     if (!nx::network::http::StatusCode::isSuccessCode(status))

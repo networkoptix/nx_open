@@ -26,7 +26,7 @@
 
 namespace nx::clusterdb::engine {
 
-class AbstractOutgoingTransactionDispatcher;
+class AbstractOutgoingCommandDispatcher;
 
 struct NX_DATA_SYNC_ENGINE_API ReadCommandsFilter
 {
@@ -41,12 +41,12 @@ struct NX_DATA_SYNC_ENGINE_API ReadCommandsFilter
 
 /**
  * Supports multiple transactions related to a single system at the same time.
- * In this case transactions will reported to AbstractOutgoingTransactionDispatcher
+ * In this case transactions will reported to AbstractOutgoingCommandDispatcher
  * in ascending sequence order.
  *
  * @note Calls with the same nx::sql::QueryContext object MUST happen within single thread.
  */
-class NX_DATA_SYNC_ENGINE_API TransactionLog
+class NX_DATA_SYNC_ENGINE_API CommandLog
 {
 public:
     using NewTransactionHandler = nx::utils::MoveOnlyFunc<void()>;
@@ -60,17 +60,17 @@ public:
         nx::sql::DBResult(
             nx::sql::QueryContext* /*queryContext*/,
             const std::string& /*systemId*/,
-            const nx::clusterdb::engine::EditableSerializableTransaction& /*transaction*/)>;
+            const nx::clusterdb::engine::EditableSerializableCommand& /*transaction*/)>;
 
     /**
      * Fills internal cache.
      * @throw std::runtime_error In case of failure to pre-fill data cache.
      */
-    TransactionLog(
+    CommandLog(
         const QnUuid& peerId,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager,
-        AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
+        AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher);
 
     /**
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
@@ -99,7 +99,7 @@ public:
     nx::sql::DBResult checkIfNeededAndSaveToLog(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const SerializableTransaction<CommandDescriptor>& transaction)
+        const SerializableCommand<CommandDescriptor>& transaction)
     {
         const auto transactionHash = CommandDescriptor::hash(transaction.get().params);
 
@@ -167,7 +167,7 @@ public:
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         const nx::Buffer& transactionHash,
-        std::unique_ptr<SerializableAbstractTransaction> transactionSerializer);
+        std::unique_ptr<SerializableAbstractCommand> transactionSerializer);
 
     template<typename TransactionSerializerType>
     nx::sql::DBResult saveLocalTransaction(
@@ -229,18 +229,18 @@ public:
 private:
     struct DbTransactionContext
     {
-        VmsTransactionLogCache::TranId cacheTranId = VmsTransactionLogCache::InvalidTranId;
+        CommandLogCache::TranId cacheTranId = CommandLogCache::InvalidTranId;
         nx::sql::QueryContext* queryContext = nullptr;
     };
 
     struct TransactionLogContext
     {
-        VmsTransactionLogCache cache;
+        CommandLogCache cache;
         OutgoingTransactionSorter outgoingTransactionsSorter;
 
         TransactionLogContext(
             const std::string& systemId,
-            AbstractOutgoingTransactionDispatcher* outgoingTransactionDispatcher)
+            AbstractOutgoingCommandDispatcher* outgoingTransactionDispatcher)
             :
             outgoingTransactionsSorter(
                 systemId,
@@ -266,7 +266,7 @@ private:
     const QnUuid m_peerId;
     const ProtocolVersionRange m_supportedProtocolRange;
     nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
-    AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
+    AbstractOutgoingCommandDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
     DbTransactionContextMap m_dbTransactionContexts;
     std::map<std::string, std::unique_ptr<TransactionLogContext>> m_systemIdToTransactionLog;
@@ -304,7 +304,7 @@ private:
     nx::sql::DBResult invokeExternalProcessor(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const SerializableTransaction<CommandDescriptor>& transaction)
+        const SerializableCommand<CommandDescriptor>& transaction)
     {
         if (!m_onTransactionReceivedHandler)
             return nx::sql::DBResult::ok;
@@ -322,7 +322,7 @@ private:
 
     vms::api::Timestamp generateNewTransactionTimestamp(
         const QnMutexLockerBase& lock,
-        VmsTransactionLogCache::TranId cacheTranId,
+        CommandLogCache::TranId cacheTranId,
         const std::string& systemId);
 
     void onDbTransactionCompleted(

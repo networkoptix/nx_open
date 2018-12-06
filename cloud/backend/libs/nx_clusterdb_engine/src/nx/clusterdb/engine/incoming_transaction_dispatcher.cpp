@@ -10,28 +10,28 @@
 
 namespace nx::clusterdb::engine {
 
-IncomingTransactionDispatcher::IncomingTransactionDispatcher(
-    TransactionLog* const transactionLog)
+IncomingCommandDispatcher::IncomingCommandDispatcher(
+    CommandLog* const transactionLog)
     :
-    m_transactionLog(transactionLog)
+    m_commandLog(transactionLog)
 {
 }
 
-IncomingTransactionDispatcher::~IncomingTransactionDispatcher()
+IncomingCommandDispatcher::~IncomingCommandDispatcher()
 {
     m_aioTimer.pleaseStopSync();
 }
 
-IncomingTransactionDispatcher::WatchTransactionSubscription&
-    IncomingTransactionDispatcher::watchTransactionSubscription()
+IncomingCommandDispatcher::WatchCommandSubscription&
+    IncomingCommandDispatcher::watchCommandSubscription()
 {
     return m_watchTransactionSubscription;
 }
 
-void IncomingTransactionDispatcher::dispatchTransaction(
-    TransactionTransportHeader transportHeader,
+void IncomingCommandDispatcher::dispatchTransaction(
+    CommandTransportHeader transportHeader,
     std::unique_ptr<DeserializableCommandData> commandData,
-    TransactionProcessedHandler completionHandler)
+    CommandProcessedHandler completionHandler)
 {
     m_watchTransactionSubscription.notify(
         transportHeader,
@@ -39,11 +39,11 @@ void IncomingTransactionDispatcher::dispatchTransaction(
 
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_transactionProcessors.find(commandData->header().command);
+    auto it = m_commandProcessors.find(commandData->header().command);
     if (commandData->header().command == command::UpdatePersistentSequence::code)
         return; // TODO: #ak Do something.
 
-    if (it == m_transactionProcessors.end() || it->second->markedForRemoval)
+    if (it == m_commandProcessors.end() || it->second->markedForRemoval)
     {
         NX_VERBOSE(this, lm("Received unsupported transaction %1")
             .arg(commandData->header().command));
@@ -61,7 +61,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     lock.unlock();
 
     // TODO: should we always call completionHandler in the same thread?
-    return it->second->processor->processTransaction(
+    return it->second->processor->process(
         std::move(transportHeader),
         std::move(commandData),
         [it, completionHandler = std::move(completionHandler)](
@@ -73,15 +73,15 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         });
 }
 
-void IncomingTransactionDispatcher::removeHandler(int commandCode)
+void IncomingCommandDispatcher::removeHandler(int commandCode)
 {
-    std::unique_ptr<TransactionProcessorContext> processor;
+    std::unique_ptr<CommandProcessorContext> processor;
 
     {
         QnMutexLocker lock(&m_mutex);
 
-        auto processorIter = m_transactionProcessors.find(commandCode);
-        if (processorIter == m_transactionProcessors.end())
+        auto processorIter = m_commandProcessors.find(commandCode);
+        if (processorIter == m_commandProcessors.end())
             return;
         processorIter->second->markedForRemoval = true;
 
@@ -89,7 +89,7 @@ void IncomingTransactionDispatcher::removeHandler(int commandCode)
             processorIter->second->usageCountDecreased.wait(lock.mutex());
 
         processor.swap(processorIter->second);
-        m_transactionProcessors.erase(processorIter);
+        m_commandProcessors.erase(processorIter);
     }
 }
 

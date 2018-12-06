@@ -40,11 +40,11 @@ namespace nx::clusterdb::engine {
 
 class SynchronizationSettings;
 
-class IncomingTransactionDispatcher;
-class OutgoingTransactionDispatcher;
-class TransactionLog;
+class IncomingCommandDispatcher;
+class OutgoingCommandDispatcher;
+class CommandLog;
 class CommonHttpConnection;
-class TransactionTransportHeader;
+class CommandTransportHeader;
 
 struct SystemStatusDescriptor
 {
@@ -95,8 +95,8 @@ public:
         const QnUuid& moduleGuid,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& protocolVersionRange,
-        IncomingTransactionDispatcher* const transactionDispatcher,
-        OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
+        IncomingCommandDispatcher* const transactionDispatcher,
+        OutgoingCommandDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
 
     bool addNewConnection(ConnectionContext connectionContext);
@@ -113,7 +113,7 @@ public:
      */
     void dispatchTransaction(
         const std::string& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
+        std::shared_ptr<const SerializableAbstractCommand> transactionSerializer);
 
     std::vector<SystemConnectionInfo> getConnections() const;
     std::size_t getConnectionCount() const;
@@ -149,8 +149,8 @@ private:
 
     const SynchronizationSettings& m_settings;
     const ProtocolVersionRange m_protocolVersionRange;
-    IncomingTransactionDispatcher* const m_transactionDispatcher;
-    OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
+    IncomingCommandDispatcher* const m_transactionDispatcher;
+    OutgoingCommandDispatcher* const m_outgoingTransactionDispatcher;
     const vms::api::PeerData m_localPeerData;
     ConnectionDict m_connections;
     mutable QnMutex m_mutex;
@@ -185,7 +185,7 @@ private:
     void onGotTransaction(
         const std::string& connectionId,
         std::unique_ptr<DeserializableCommandData> commandData,
-        TransactionTransportHeader transportHeader);
+        CommandTransportHeader transportHeader);
 
     void onTransactionDone(const std::string& connectionId, ResultCode resultCode);
 };
