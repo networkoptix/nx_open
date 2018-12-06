@@ -528,7 +528,7 @@ PageBase
                     return false;
 
                 if (video.motionController.drawingRoi)
-                    return;
+                    return false;
 
                 return video.item.moving && !video.motionController.customRoiExists;
             }
