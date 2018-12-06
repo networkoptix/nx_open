@@ -3544,6 +3544,11 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     std::vector<void*> memToFreeOnResponseDone;
     memToFreeOnResponseDone.reserve(3); //we have 3 memory allocation below
 
+    struct SOAP_ENV__Header* header = (struct SOAP_ENV__Header*)malloc(sizeof(SOAP_ENV__Header));
+    memToFreeOnResponseDone.push_back(header);
+    memset(header, 0, sizeof(*header));
+    soapWrapper->getProxy()->soap->header = header;
+
     char* buf = (char*)malloc(512);
     memToFreeOnResponseDone.push_back(buf);
 
@@ -3551,13 +3556,14 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     sprintf(buf, "PT%lldS", roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND);
     request.Timeout = buf;
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
-    QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
-    strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
-    struct SOAP_ENV__Header* header = (struct SOAP_ENV__Header*)malloc(sizeof(SOAP_ENV__Header));
-    memToFreeOnResponseDone.push_back(header);
-    memset(header, 0, sizeof(*header));
-    soapWrapper->getProxy()->soap->header = header;
-    soapWrapper->getProxy()->soap->header->subscriptionID = buf;
+
+    if (m_onvifNotificationSubscriptionID.isEmpty())
+    {
+        QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
+        strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
+        soapWrapper->getProxy()->soap->header->subscriptionID = buf;
+    }
+
     //TODO #ak move away check for "Samsung"
     if (!m_onvifNotificationSubscriptionReference.isEmpty() && !getVendor().contains(lit("Samsung")))
     {
