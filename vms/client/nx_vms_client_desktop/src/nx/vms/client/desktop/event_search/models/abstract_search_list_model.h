@@ -103,7 +103,9 @@ signals:
 protected:
     // These functions must be overridden in derived classes.
 
-    /** Returns whether fetch can be started. */
+    /** Returns whether fetch can be started at this moment.
+     * It shouldn't check whether if can be started at all.
+     * For example, asynchronous fetch models should check here if fetch is in progress. */
     virtual bool canFetchNow() const;
 
     /** Requests next data fetch in selected direction. */
