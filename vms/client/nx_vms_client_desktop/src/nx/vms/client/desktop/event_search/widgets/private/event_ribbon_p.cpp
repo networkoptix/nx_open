@@ -12,7 +12,8 @@
 #include <QtWidgets/QApplication>
 
 #include <client/client_globals.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/media_resource.h>
+#include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
@@ -282,23 +283,21 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     const auto modelIndex = m_model->index(index);
 
-    const auto previewCamera = modelIndex.data(Qn::ResourceRole).value<QnResourcePtr>()
-        .dynamicCast<QnVirtualCameraResource>();
-
-    if (!previewCamera)
+    const auto previewResource = modelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (!previewResource.dynamicCast<QnMediaResource>())
         return;
 
     const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
-        : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
 
-    nx::api::CameraImageRequest request;
-    request.camera = previewCamera;
+    nx::api::ResourceImageRequest request;
+    request.resource = previewResource;
     request.usecSinceEpoch =
         previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = nx::api::ImageRequest::kDefaultRotation;
@@ -310,14 +309,14 @@ void EventRibbon::Private::updateTilePreview(int index)
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider && (request.camera != previewProvider->requestData().camera
+    if (previewProvider && (request.resource != previewProvider->requestData().resource
         || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
     {
         previewProvider.reset();
     }
 
     if (!previewProvider)
-        previewProvider.reset(new CameraThumbnailProvider(request));
+        previewProvider.reset(new ResourceThumbnailProvider(request));
 
     widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
