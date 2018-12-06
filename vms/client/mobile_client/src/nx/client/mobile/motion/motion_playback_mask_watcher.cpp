@@ -16,8 +16,8 @@ public:
     bool active() const;
     void setActive(bool value);
 
-    core::MediaPlayer* mediaPlayer();
-    void setMediaPlayer(core::MediaPlayer* value);
+    nx::vms::client::core::MediaPlayer* mediaPlayer();
+    void setMediaPlayer(nx::vms::client::core::MediaPlayer* value);
 
     QnCameraChunkProvider* chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider* value);
@@ -30,7 +30,7 @@ public:
     MotionPlaybackMaskWatcher* const q;
     bool activeWatcher = false;
     QnTimePeriodList periods;
-    nx::client::core::MediaPlayer* player = nullptr;
+    nx::vms::client::core::MediaPlayer* player = nullptr;
     QnCameraChunkProvider* provider = nullptr;
 };
 
@@ -53,12 +53,12 @@ void MotionPlaybackMaskWatcher::Private::setActive(bool value)
     updatePlayerPeriods();
 }
 
-core::MediaPlayer* MotionPlaybackMaskWatcher::Private::mediaPlayer()
+nx::vms::client::core::MediaPlayer* MotionPlaybackMaskWatcher::Private::mediaPlayer()
 {
     return player;
 }
 
-void MotionPlaybackMaskWatcher::Private::setMediaPlayer(core::MediaPlayer* value)
+void MotionPlaybackMaskWatcher::Private::setMediaPlayer(nx::vms::client::core::MediaPlayer* value)
 {
     if (player == value)
         return;
@@ -140,12 +140,12 @@ void MotionPlaybackMaskWatcher::setActive(bool value)
     d->setActive(value);
 }
 
-core::MediaPlayer* MotionPlaybackMaskWatcher::mediaPlayer() const
+nx::vms::client::core::MediaPlayer* MotionPlaybackMaskWatcher::mediaPlayer() const
 {
     return d->mediaPlayer();
 }
 
-void MotionPlaybackMaskWatcher::setMediaPlayer(core::MediaPlayer* player)
+void MotionPlaybackMaskWatcher::setMediaPlayer(nx::vms::client::core::MediaPlayer* player)
 {
     d->setMediaPlayer(player);
 }

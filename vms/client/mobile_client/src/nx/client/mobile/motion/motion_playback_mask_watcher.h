@@ -4,7 +4,7 @@
 
 class QnCameraChunkProvider;
 
-namespace nx::client::core { class MediaPlayer; }
+namespace nx::vms::client::core { class MediaPlayer; }
 
 namespace nx::client::mobile
 {
@@ -19,7 +19,7 @@ class MotionPlaybackMaskWatcher: public QObject
         WRITE setActive
         NOTIFY activeChanged)
 
-    Q_PROPERTY(nx::client::core::MediaPlayer* mediaPlayer
+    Q_PROPERTY(nx::vms::client::core::MediaPlayer* mediaPlayer
         READ mediaPlayer
         WRITE setMediaPlayer
         NOTIFY mediaPlayerChanged)
@@ -38,8 +38,8 @@ public:
     bool active() const;
     void setActive(bool value);
 
-    core::MediaPlayer* mediaPlayer() const;
-    void setMediaPlayer(core::MediaPlayer* player);
+    nx::vms::client::core::MediaPlayer* mediaPlayer() const;
+    void setMediaPlayer(nx::vms::client::core::MediaPlayer* player);
 
     QnCameraChunkProvider* chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider* provider);
