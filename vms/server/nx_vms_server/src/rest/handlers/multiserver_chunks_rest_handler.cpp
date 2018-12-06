@@ -54,8 +54,15 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(
             bool success = false;
             if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
             {
-                remoteData = QnCompressedTime::deserialized(
-                    msgBody, MultiServerPeriodDataList(), &success);
+                if (ctx->request().groupBy == QnChunksRequestData::GroupBy::none)
+                {
+                    remoteData.push_back(MultiServerPeriodData());
+                    remoteData.back().periods = QnCompressedTime::deserialized(msgBody, QnTimePeriodList(), &success);
+                }
+                else
+                {
+                    remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
+                }
             }
 
             NX_VERBOSE(this)
