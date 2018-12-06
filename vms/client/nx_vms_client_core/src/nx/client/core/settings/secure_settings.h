@@ -21,13 +21,13 @@ class SecureSettings:
 public:
     SecureSettings();
 
-    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
+    using SystemAuthenticationDataHash = QHash<QnUuid, QList<EncodedCredentials>>;
 
     // System credentials by local system id.
     Property<SystemAuthenticationDataHash> systemAuthenticationData{
         this, "systemAuthenticationData"};
 
-    Property<QnEncodedCredentials> cloudCredentials{
+    Property<EncodedCredentials> cloudCredentials{
         this, "cloudCredentials"};
 };
 

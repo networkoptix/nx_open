@@ -32,7 +32,7 @@ void migratePasswordFromCustomConnections()
             const nx::utils::Url url = settings->value(kUrlTag).toString();
             const auto userName = url.userName();
 
-            QnEncodedCredentials credentials(userName, decodedPassword);
+            nx::vms::client::core::EncodedCredentials credentials(userName, decodedPassword);
             if (credentials.isValid())
             {
                 auto& credentialsList = authData[localSystemId];

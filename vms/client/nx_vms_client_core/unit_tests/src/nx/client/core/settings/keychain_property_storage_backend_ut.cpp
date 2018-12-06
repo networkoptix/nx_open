@@ -49,12 +49,12 @@ public:
         return static_cast<KeychainBackend*>(base_type::backend());
     }
 
-    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
+    using SystemAuthenticationDataHash = QHash<QnUuid, QList<EncodedCredentials>>;
 
     Property<QString> string{
         this, "string"};
 
-    Property<QnEncodedCredentials> encodedCredentials{
+    Property<EncodedCredentials> encodedCredentials{
         this, "encodedCredentials"};
 
     Property<StringHash> stringHash{
@@ -105,7 +105,7 @@ TEST_F(KeychainBackendStorageTest, string)
 
 TEST_F(KeychainBackendStorageTest, encodedCredentials)
 {
-    static const QnEncodedCredentials kTestValue("user", "password", {});
+    static const EncodedCredentials kTestValue("user", "password", {});
     settings->encodedCredentials = kTestValue;
     settings->reload();
     ASSERT_EQ(kTestValue, settings->encodedCredentials());

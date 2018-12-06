@@ -32,9 +32,9 @@ void clearSavedPasswords()
     const auto credentialsHash = secureSettings()->systemAuthenticationData();
     for (auto it = credentialsHash.begin(); it != credentialsHash.end(); ++it)
     {
-        QList<QnEncodedCredentials> credentials;
+        QList<EncodedCredentials> credentials;
         for (const auto& currentCredential: it.value())
-            credentials.append(QnEncodedCredentials(currentCredential.user, QString()));
+            credentials.append(EncodedCredentials(currentCredential.user, QString()));
         result[it.key()] = credentials;
     }
     secureSettings()->systemAuthenticationData = result;
@@ -59,7 +59,7 @@ void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
     qnClientCoreSettings->setRecentLocalConnections(connections);
 }
 
-void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials)
+void storeCredentials(const QnUuid& localSystemId, const EncodedCredentials& credentials)
 {
     NX_DEBUG(kCredentialsLogTag, lm("Saving credentials of %1 to the system %2")
         .args(credentials.user, localSystemId));
@@ -72,7 +72,7 @@ void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& c
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-        [&credentials](const QnEncodedCredentials& other)
+        [&credentials](const EncodedCredentials& other)
         {
             return credentials.user == other.user;
         });
@@ -101,7 +101,7 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
         auto& credentialsList = credentialsHash[localSystemId];
 
         auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-            [&userName](const QnEncodedCredentials& other)
+            [&userName](const EncodedCredentials& other)
             {
                 return userName == other.user;
             });
@@ -113,13 +113,13 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
     secureSettings()->systemAuthenticationData = credentialsHash;
 }
 
-QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName)
+EncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName)
 {
     auto credentialsHash = secureSettings()->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-        [&userName](const QnEncodedCredentials& other)
+        [&userName](const EncodedCredentials& other)
         {
             return userName == other.user;
         });
@@ -127,7 +127,7 @@ QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& 
     if (it != credentialsList.end())
         return *it;
 
-    return QnEncodedCredentials();
+    return EncodedCredentials();
 }
 
 bool hasCredentials(const QnUuid& localSystemId)

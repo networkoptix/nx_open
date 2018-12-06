@@ -327,7 +327,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     connectToSystemInternal(
         systemId,
         helpers::parseConnectionUrlFromUserInput(serverUrl),
-        QnEncodedCredentials(userName, password),
+        nx::vms::client::core::EncodedCredentials(userName, password),
         storePassword,
         autoLogin);
 }
@@ -348,7 +348,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
             auto authData = nx::vms::client::core::secureSettings()->systemAuthenticationData();
             auto& credentialsList = authData[localId];
             const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-                [userName](const QnEncodedCredentials& other)
+                [userName](const nx::vms::client::core::EncodedCredentials& other)
                 {
                     return other.user == userName;
                 });
@@ -358,7 +358,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
             const auto insertionIndex = it - credentialsList.begin();
             credentialsList.erase(it);
-            credentialsList.insert(insertionIndex, QnEncodedCredentials(userName, QString()));
+            credentialsList.insert(insertionIndex, nx::vms::client::core::EncodedCredentials(userName, QString()));
 
             nx::vms::client::core::secureSettings()->systemAuthenticationData = authData;
         };
@@ -375,7 +375,7 @@ void QnWorkbenchWelcomeScreen::forceActiveFocus()
 void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QString& systemId,
     const nx::utils::Url& serverUrl,
-    const QnEncodedCredentials& credentials,
+    const nx::vms::client::core::EncodedCredentials& credentials,
     bool storePassword,
     bool autoLogin,
     const nx::utils::SharedGuardPtr& completionTracker)

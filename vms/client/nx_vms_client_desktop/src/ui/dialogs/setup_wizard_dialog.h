@@ -23,9 +23,9 @@ public:
 
     void loadPage();
 
-    QnEncodedCredentials localCredentials() const;
-    QnEncodedCredentials cloudCredentials() const;
-    void setCloudCredentials(const QnEncodedCredentials& value);
+    nx::vms::client::core::EncodedCredentials localCredentials() const;
+    nx::vms::client::core::EncodedCredentials cloudCredentials() const;
+    void setCloudCredentials(const nx::vms::client::core::EncodedCredentials& value);
 
     bool savePassword() const;
 

@@ -197,7 +197,7 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
 
-    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
+    qnCloudStatusWatcher->setCredentials(nx::vms::client::core::EncodedCredentials(
         q->ui->loginInputField->text().trimmed(),
         q->ui->passwordInputField->text().trimmed()));
 }
@@ -216,7 +216,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
     // TODO: #GDM Store temporary credentials?
     const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
-    nx::vms::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
+    nx::vms::client::core::secureSettings()->cloudCredentials = nx::vms::client::core::EncodedCredentials(
         q->ui->loginInputField->text().trimmed(),
         stayLoggedIn
             ? q->ui->passwordInputField->text().trimmed()

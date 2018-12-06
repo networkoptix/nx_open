@@ -66,7 +66,7 @@ CredentialsStoreDialog::CredentialsStoreDialog(QWidget *parent):
         [this]()
         {
             auto data = core::secureSettings()->systemAuthenticationData();
-            data[QnUuid::createUuid()].push_back(QnEncodedCredentials("test", "test", {}));
+            data[QnUuid::createUuid()].push_back(core::EncodedCredentials("test", "test", {}));
             core::secureSettings()->systemAuthenticationData = data;
             d->rebuildModel();
         });

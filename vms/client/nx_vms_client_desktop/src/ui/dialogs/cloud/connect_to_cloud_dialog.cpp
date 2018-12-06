@@ -369,7 +369,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
 
             if (stayLoggedIn)
             {
-                QnEncodedCredentials credentials(cloudLogin, cloudPassword);
+                nx::vms::client::core::EncodedCredentials credentials(cloudLogin, cloudPassword);
                 nx::vms::client::core::secureSettings()->cloudCredentials = credentials;
                 qnCloudStatusWatcher->setCredentials(credentials);
             }

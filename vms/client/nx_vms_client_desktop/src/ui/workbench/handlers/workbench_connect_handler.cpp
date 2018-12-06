@@ -546,8 +546,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
             : "Password must be cleared");
 
         const auto credentials = (storePassword
-            ? QnEncodedCredentials(url)
-            : QnEncodedCredentials(url.userName(), QString()));
+            ? nx::vms::client::core::EncodedCredentials(url)
+            : nx::vms::client::core::EncodedCredentials(url.userName(), QString()));
 
         nx::vms::client::core::helpers::storeCredentials(localId, credentials);
         qnClientCoreSettings->save();

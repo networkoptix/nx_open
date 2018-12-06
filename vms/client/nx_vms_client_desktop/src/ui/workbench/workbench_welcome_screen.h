@@ -130,7 +130,7 @@ private:
     void connectToSystemInternal(
         const QString& systemId,
         const nx::utils::Url& serverUrl,
-        const QnEncodedCredentials& credentials,
+        const nx::vms::client::core::EncodedCredentials& credentials,
         bool storePassword,
         bool autoLogin,
         const nx::utils::SharedGuardPtr& completionTracker = nullptr);

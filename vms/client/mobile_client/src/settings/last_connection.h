@@ -16,7 +16,7 @@ struct LastConnectionData
 {
     QString systemName;
     nx::utils::Url url;
-    QnEncodedCredentials credentials;
+    nx::vms::client::core::EncodedCredentials credentials;
 
     nx::utils::Url urlWithCredentials() const;
 };

@@ -13,7 +13,7 @@ class AuthenticationDataModel: public QAbstractListModel
     typedef QAbstractListModel base_type;
 
     Q_PROPERTY(QUuid systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
-    Q_PROPERTY(QnEncodedCredentials defaultCredentials
+    Q_PROPERTY(EncodedCredentials defaultCredentials
         READ defaultCredentials NOTIFY defaultCredentialsChanged)
 
 public:
@@ -30,7 +30,7 @@ public:
     QUuid systemId() const;
     void setSystemId(const QUuid& localId);
 
-    QnEncodedCredentials defaultCredentials() const;
+    EncodedCredentials defaultCredentials() const;
 
 public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -45,7 +45,7 @@ signals:
 
 private:
     QUuid m_systemId;
-    QList<QnEncodedCredentials> m_credentialsList;
+    QList<EncodedCredentials> m_credentialsList;
 };
 
 } // namespace nx::vms::client::core

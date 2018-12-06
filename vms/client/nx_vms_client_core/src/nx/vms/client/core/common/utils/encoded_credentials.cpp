@@ -2,11 +2,11 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEncodedCredentials, (eq)(json), QnEncodedCredentials_Fields)
+namespace nx::vms::client::core {
 
-using namespace nx::vms::client::core;
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EncodedCredentials, (eq)(json), EncodedCredentials_Fields)
 
-QnEncodedCredentials::QnEncodedCredentials(
+EncodedCredentials::EncodedCredentials(
     const QString& user,
     const QString& password,
     const QByteArray& key)
@@ -16,22 +16,34 @@ QnEncodedCredentials::QnEncodedCredentials(
 {
 }
 
-QnEncodedCredentials::QnEncodedCredentials(const nx::utils::Url& url, const QByteArray& key):
-    QnEncodedCredentials(url.userName(), url.password(), key)
+EncodedCredentials::EncodedCredentials(const nx::utils::Url& url, const QByteArray& key):
+    EncodedCredentials(url.userName(), url.password(), key)
 {
 }
 
-QString QnEncodedCredentials::decodedPassword() const
+QByteArray EncodedCredentials::key() const
+{
+    return password.key();
+}
+
+void EncodedCredentials::setKey(const QByteArray& key)
+{
+    password.setKey(key);
+}
+
+QString EncodedCredentials::decodedPassword() const
 {
     return password.decoded();
 }
 
-bool QnEncodedCredentials::isEmpty() const
+bool EncodedCredentials::isEmpty() const
 {
     return user.isEmpty() && password.isEmpty();
 }
 
-bool QnEncodedCredentials::isValid() const
+bool EncodedCredentials::isValid() const
 {
     return !user.isEmpty() && !password.isEmpty();
 }
+
+} // namespace nx::vms::client::core

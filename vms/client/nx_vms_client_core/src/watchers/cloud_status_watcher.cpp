@@ -105,7 +105,7 @@ public:
 
     std::string cloudHost;
     int cloudPort;
-    QnEncodedCredentials credentials;
+    nx::vms::client::core::EncodedCredentials credentials;
     QString effectiveUserName;
     bool stayConnected;
     QnCloudStatusWatcher::ErrorCode errorCode;
@@ -233,7 +233,7 @@ QnCloudStatusWatcher::~QnCloudStatusWatcher()
 {
 }
 
-QnEncodedCredentials QnCloudStatusWatcher::credentials() const
+nx::vms::client::core::EncodedCredentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
     return d->credentials;
@@ -302,15 +302,15 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void QnCloudStatusWatcher::resetCredentials()
 {
-    setCredentials(QnEncodedCredentials());
+    setCredentials(nx::vms::client::core::EncodedCredentials());
 }
 
-bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
+bool QnCloudStatusWatcher::setCredentials(const nx::vms::client::core::EncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
     const auto loweredCredentials =
-        QnEncodedCredentials(credentials.user.toLower(), credentials.password.decoded());
+        nx::vms::client::core::EncodedCredentials(credentials.user.toLower(), credentials.password.decoded());
 
     if (d->credentials == loweredCredentials)
         return false;
@@ -332,10 +332,10 @@ bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
     return true;
 }
 
-QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
+nx::vms::client::core::EncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
 {
     Q_D(QnCloudStatusWatcher);
-    const QnEncodedCredentials result(
+    const nx::vms::client::core::EncodedCredentials result(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
     d->createTemporaryCredentials();

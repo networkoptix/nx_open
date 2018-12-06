@@ -16,9 +16,9 @@ extern const nx::utils::log::Tag kCredentialsLogTag;
 void clearSavedPasswords();
 void storeConnection(const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url &url);
 void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url = nx::utils::Url());
-void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials);
+void storeCredentials(const QnUuid& localSystemId, const EncodedCredentials& credentials);
 void removeCredentials(const QnUuid& localSystemId, const QString& userName = QString());
-QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName);
+EncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName);
 bool hasCredentials(const QnUuid& localSystemId);
 
 } // namespace helpers

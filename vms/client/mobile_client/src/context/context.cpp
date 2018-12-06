@@ -292,7 +292,7 @@ nx::utils::Url QnContext::getWebSocketUrl() const
 bool QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
     // TODO: #GDM do we need store temporary credentials here?
-    QnEncodedCredentials credentials(login, password);
+    nx::vms::client::core::EncodedCredentials credentials(login, password);
     nx::vms::client::core::secureSettings()->cloudCredentials = credentials;
     const bool result = cloudStatusWatcher()->setCredentials(credentials);
     return result;

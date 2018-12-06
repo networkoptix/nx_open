@@ -35,7 +35,10 @@ public:
     /** Create from encoded value. */
     static EncodedString fromEncoded(const QString& encoded, const QByteArray& key = QByteArray());
 
+    /** Extra cryptography key. */
     QByteArray key() const;
+
+    /** Reset extra cryptography key. All calculated and cached values will be invalidated. */
     void setKey(const QByteArray& key);
 
     QString decoded() const;

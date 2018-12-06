@@ -21,7 +21,7 @@ class QnCloudStatusWatcherPrivate;
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>, public QnCommonModuleAware
 {
     Q_OBJECT
-    Q_PROPERTY(QnEncodedCredentials credentials READ credentials NOTIFY credentialsChanged)
+    Q_PROPERTY(nx::vms::client::core::EncodedCredentials credentials READ credentials NOTIFY credentialsChanged)
     Q_PROPERTY(QString effectiveUserName READ effectiveUserName NOTIFY effectiveUserNameChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
@@ -54,9 +54,9 @@ public:
     explicit QnCloudStatusWatcher(QObject* parent = nullptr, bool isMobile = true);
     virtual ~QnCloudStatusWatcher() override;
 
-    QnEncodedCredentials credentials() const;
+    nx::vms::client::core::EncodedCredentials credentials() const;
     void resetCredentials();
-    bool setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
+    bool setCredentials(const nx::vms::client::core::EncodedCredentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
@@ -88,7 +88,7 @@ public:
     /**
      * Get temporary credentials for one-time use. Fast sequential calls will get the same result.
      */
-    QnEncodedCredentials createTemporaryCredentials();
+    nx::vms::client::core::EncodedCredentials createTemporaryCredentials();
 
     Status status() const;
 

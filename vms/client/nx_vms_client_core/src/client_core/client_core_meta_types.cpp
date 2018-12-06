@@ -66,7 +66,7 @@ void initializeMetaTypes()
 
     QnCommonMetaTypes::initialize();
 
-    QnJsonSerializer::registerSerializer<QnEncodedCredentials>();
+    QnJsonSerializer::registerSerializer<EncodedCredentials>();
 
     qRegisterMetaType<QnStringSet>();
     qRegisterMetaTypeStreamOperators<QnStringSet>();

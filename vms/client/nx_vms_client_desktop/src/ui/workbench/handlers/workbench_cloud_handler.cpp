@@ -79,10 +79,10 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    nx::vms::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
+    nx::vms::client::core::secureSettings()->cloudCredentials = nx::vms::client::core::EncodedCredentials(
         nx::vms::client::core::secureSettings()->cloudCredentials().user, QString());
     /* Updating login if were logged under temporary credentials. */
-    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
+    qnCloudStatusWatcher->setCredentials(nx::vms::client::core::EncodedCredentials(
         qnCloudStatusWatcher->effectiveUserName(), QString()));
 }
 

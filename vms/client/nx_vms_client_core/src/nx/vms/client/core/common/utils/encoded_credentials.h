@@ -1,12 +1,16 @@
 #pragma once
 
+#include <QtCore/QtGlobal>
+
 #include <nx/vms/client/core/common/utils/encoded_string.h>
 #include <nx/utils/url.h>
 
-struct QnEncodedCredentials
+namespace nx::vms::client::core {
+
+struct EncodedCredentials
 {
     QString user;
-    nx::vms::client::core::EncodedString password;
+    EncodedString password;
 
 private:
     Q_GADGET
@@ -14,13 +18,19 @@ private:
     Q_PROPERTY(QString password READ decodedPassword CONSTANT)
 
 public:
-    QnEncodedCredentials() = default;
-    QnEncodedCredentials(
+    EncodedCredentials() = default;
+    EncodedCredentials(
         const QString& user,
         const QString& password,
         const QByteArray& key = QByteArray());
 
-    explicit QnEncodedCredentials(const nx::utils::Url& url, const QByteArray& key = QByteArray());
+    explicit EncodedCredentials(const nx::utils::Url& url, const QByteArray& key = QByteArray());
+
+    /** Extra cryptography key. */
+    QByteArray key() const;
+
+    /** Reset extra cryptography key. All calculated and cached values will be invalidated. */
+    void setKey(const QByteArray& key);
 
     QString decodedPassword() const;
 
@@ -30,5 +40,10 @@ public:
     Q_INVOKABLE bool isValid() const;
 };
 
-#define QnEncodedCredentials_Fields (user)(password)
-QN_FUSION_DECLARE_FUNCTIONS(QnEncodedCredentials, (metatype)(eq)(json))
+#define EncodedCredentials_Fields (user)(password)
+
+QN_FUSION_DECLARE_FUNCTIONS(EncodedCredentials, (eq)(json))
+
+} // namespace nx::vms::client::core
+
+Q_DECLARE_METATYPE(nx::vms::client::core::EncodedCredentials)

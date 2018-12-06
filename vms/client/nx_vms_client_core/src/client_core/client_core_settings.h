@@ -40,7 +40,7 @@ public:
         PropertiesCount
     };
 
-    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
+    using SystemAuthenticationDataHash = QHash<QnUuid, QList<nx::vms::client::core::EncodedCredentials>>;
     using RecentLocalConnectionsHash = QHash<QnUuid, nx::vms::client::core::LocalConnectionData>;
     using WeightDataList = QList<nx::vms::client::core::WeightData>;
     using KnownServerConnection = nx::vms::client::core::watchers::KnownServerConnections::Connection;

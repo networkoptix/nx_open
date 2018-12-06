@@ -15,7 +15,7 @@ void migrateAuthenticationData()
     if (secureSettings()->systemAuthenticationData().isEmpty())
         secureSettings()->systemAuthenticationData = oldData;
 
-    const QnEncodedCredentials oldCloudCredentials(
+    const EncodedCredentials oldCloudCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword());
     qnClientCoreSettings->setCloudLogin(QString());
     qnClientCoreSettings->setCloudPassword(QString());
