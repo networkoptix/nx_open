@@ -522,8 +522,17 @@ PageBase
         {
             id: videoNavigation
 
-            changingMotionRoi: video.motionController
-                && (video.motionController.drawingRoi || video.item.moving)
+            changingMotionRoi:
+            {
+                if (!video.motionController)
+                    return false;
+
+                if (video.motionController.drawingRoi)
+                    return;
+
+                return video.item.moving && !video.motionController.customRoiExists;
+            }
+
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
