@@ -123,6 +123,7 @@
         {% endblock %}
 
         {% get_review_state original.state as state %}
+        {% if perms.cms.publish_version %}
         {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update %}
             <div class="submit-row">
                 {% if state == 'Accepted' %}
@@ -146,6 +147,7 @@
                 {% endif %}
             {% endif %}
             </div>
+        {% endif %}
         {% endif %}
         <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">

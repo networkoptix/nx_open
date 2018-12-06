@@ -381,7 +381,7 @@ admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
 
 class UserGroupsToProductPermissionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'group', 'product',)
-    list_filter = (CustomizationFilter, )
+    list_filter = ('product', )
 
 
 admin.site.register(UserGroupsToProductPermissions, UserGroupsToProductPermissionsAdmin)

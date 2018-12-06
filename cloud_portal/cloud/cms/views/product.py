@@ -179,15 +179,19 @@ def review(request):
             messages.success(request, "Version {} has been accepted".format(product_review.version.id))
 
     elif any(action in request.POST for action in ['reject', 'ask_question']):
-        if 'reject' in request.POST:
+        if 'reject' in request.POST and UserGroupsToProductPermissions.\
+                check_permission(request.user, get_cloud_portal_product(settings.CUSTOMIZATION), 'cms.publish_version'):
             modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.rejected, request.user)
             messages.success(request, "Version {} has been rejected".format(product_review.version.id))
             product_review = ProductCustomizationReview.objects.get(id=review_id)
+        elif 'reject' in request.POST:
+            raise PermissionDenied
 
         message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
         product_review.notes += message
         product_review.save()
-
+    elif any(action in request.POST for action in ['publish', 'force_update']):
+        raise PermissionDenied
     else:
         messages.error(request, "Invalid option selected")
 

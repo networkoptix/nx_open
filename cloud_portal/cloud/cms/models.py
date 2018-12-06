@@ -427,8 +427,10 @@ class UserGroupsToProductPermissions(models.Model):
         groups = UserGroupsToProductPermissions.objects.filter(product=product,
                                                                group_id__in=user.groups.values_list('id', flat=True))
         if permission:
-            # need to remove app_label to get codename
-            codename = permission[permission.find('.')+1:]
+            codename = permission
+            if permission.find('.') > -1:
+                # need to remove app_label to get codename
+                codename = permission[permission.find('.')+1:]
             groups = groups.filter(group__permissions__codename=codename)
         return groups.exists()
 
