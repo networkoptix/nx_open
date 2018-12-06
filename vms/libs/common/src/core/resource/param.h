@@ -49,6 +49,7 @@ namespace ResourcePropertyKey
     static const QString kStreamUrls("streamUrls");
     static const QString kAudioCodec("audioCodec");
     static const QString kPtzCapabilities("ptzCapabilities");
+    static const QString kPtzTargetChannel("ptzTargetChannel");
     static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
     static const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
     static const QString kUserIsAllowedToOverridePtzCapabilities(
