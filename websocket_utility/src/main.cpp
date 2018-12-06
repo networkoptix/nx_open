@@ -9,7 +9,9 @@
 #include <signal.h>
 
 #include <nx/network/aio/timer.h>
-#include <nx/network/websocket/websocket.h>
+#include <nx/network/p2p_transport/p2p_http_client_transport.h>
+#include <nx/network/p2p_transport/p2p_http_server_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_transport.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
@@ -25,9 +27,9 @@ enum class Role
     client
 };
 
-static const nx::Buffer kHandlerPath = "/testWebsocketConnection";
+static const nx::Buffer kHandlerPath = "/testP2PConnection";
 static const nx::Buffer kTestJson = R"json({"testJsonName": "testJsonValue"})json";
-static const nx::utils::log::Tag kWebsocketUtilityTag{QString("WebsocketUtility")};
+static const nx::utils::log::Tag kWebsocketUtilityTag{QString("P2PUtility")};
 
 struct
 {
@@ -119,25 +121,25 @@ private:
 
 static WaitablePool* waitablePoolInstance;
 
-class WebsocketConnection;
-using WebsocketConnectionPtr = std::shared_ptr<WebsocketConnection>;
+class P2PConnection;
+using P2PConnectionPtr = std::shared_ptr<P2PConnection>;
 
-class WebsocketConnection:
+class P2PConnection:
     public Waitable,
-    public std::enable_shared_from_this<WebsocketConnection>
+    public std::enable_shared_from_this<P2PConnection>
 {
 public:
-    WebsocketConnection(aio::AbstractAioThread* aioThread): Waitable(aioThread)
+    P2PConnection(aio::AbstractAioThread* aioThread): Waitable(aioThread)
     {
         m_httpClient.bindToAioThread(aioThread);
     }
 
-    WebsocketConnection(aio::AbstractAioThread *aioThread,
+    P2PConnection(aio::AbstractAioThread *aioThread,
         std::unique_ptr<AbstractStreamSocket> socket): Waitable(aioThread)
     {
-        m_websocket.reset(new websocket::WebSocket(std::move(socket), websocket::FrameType::text));
+        m_p2pTransport.reset(new websocket::WebSocket(std::move(socket), websocket::FrameType::text));
         m_timer.bindToAioThread(aioThread);
-        m_websocket->bindToAioThread(aioThread);
+        m_p2pTransport->bindToAioThread(aioThread);
     }
 
     void connectAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -160,7 +162,7 @@ public:
 
     void startReading()
     {
-        m_websocket->readSomeAsync(&m_readBuffer,
+        m_p2pTransport->readSomeAsync(&m_readBuffer,
             [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
             { onRead(errorCode, bytesRead); });
     }
@@ -168,7 +170,7 @@ public:
     void startSending()
     {
         NX_VERBOSE(this, "Starting sending test messages to the peer");
-        m_websocket->sendAsync(kTestJson,
+        m_p2pTransport->sendAsync(kTestJson,
             [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
                 size_t bytesRead)
             {
@@ -178,7 +180,7 @@ public:
 
 private:
     http::AsyncClient m_httpClient;
-    WebSocketPtr m_websocket;
+    P2pTransportPtr m_p2pTransport;
     nx::Buffer m_readBuffer;
     aio::Timer m_timer;
 
@@ -222,13 +224,13 @@ private:
         NX_VERBOSE(this, "websocket handshake response validated successfully");
         NX_INFO(this, "successfully connected, starting reading");
 
-        m_websocket.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
+        m_p2pTransport.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
             websocket::FrameType::text));
-        m_websocket->bindToAioThread(m_aioThread);
+        m_p2pTransport->bindToAioThread(m_aioThread);
 
         m_httpClient.pleaseStopSync();
 
-        m_websocket->start();
+        m_p2pTransport->start();
         completionHandler();
     }
 
@@ -258,7 +260,7 @@ private:
         NX_VERBOSE(this, lm("message content: %1").args(m_readBuffer));
         m_readBuffer = nx::Buffer();
 
-        m_websocket->readSomeAsync(&m_readBuffer,
+        m_p2pTransport->readSomeAsync(&m_readBuffer,
             [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
             { onRead(errorCode, bytesRead); });
     }
@@ -285,7 +287,7 @@ private:
                     NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
                     return;
                 }
-                m_websocket->sendAsync(kTestJson,
+                m_p2pTransport->sendAsync(kTestJson,
                     [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
                         size_t bytesRead)
                     {
@@ -295,11 +297,11 @@ private:
     }
 };
 
-class WebsocketConnectionAcceptor: public Waitable
+class P2PConnectionAcceptor: public Waitable
 {
 public:
-    WebsocketConnectionAcceptor(aio::AbstractAioThread* aioThread,
-        std::function<void(WebsocketConnectionPtr)> userCompletionHandler)
+    P2PConnectionAcceptor(aio::AbstractAioThread* aioThread,
+        std::function<void(P2PConnectionPtr)> userCompletionHandler)
         :
         Waitable(aioThread),
         m_userCompletionHandler(userCompletionHandler)
@@ -329,7 +331,7 @@ public:
 
 private:
     http::TestHttpServer m_httpServer;
-    std::function<void(WebsocketConnectionPtr)> m_userCompletionHandler;
+    std::function<void(P2PConnectionPtr)> m_userCompletionHandler;
 
     void onAccept(http::RequestContext requestContext,
         http::RequestProcessedHandler requestCompletionHandler)
@@ -350,9 +352,10 @@ private:
         requestContext.connection->setSendCompletionHandler(
             [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
             {
-                auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread,
+                auto P2PConnection = std::make_shared<P2PConnection>(
+                    config.aioThread,
                     connection->takeSocket());
-                m_userCompletionHandler(websocketConnection);
+                m_userCompletionHandler(P2PConnection);
             });
         requestCompletionHandler(nx::network::http::StatusCode::switchingProtocols);
     }
@@ -360,21 +363,21 @@ private:
 
 static void connectAndListen()
 {
-    auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread);
-    waitablePoolInstance->addWaitable(websocketConnection);
-    websocketConnection->connectAsync(
-        [websocketConnection]() { websocketConnection->startReading(); });
+    auto P2PConnection = std::make_shared<P2PConnection>(config.aioThread);
+    waitablePoolInstance->addWaitable(P2PConnection);
+    P2PConnection->connectAsync(
+        [P2PConnection]() { P2PConnection->startReading(); });
 }
 
 static void startAccepting()
 {
-    auto acceptor = std::make_shared<WebsocketConnectionAcceptor>(config.aioThread,
-        [](WebsocketConnectionPtr websocketConnection)
+    auto acceptor = std::make_shared<P2PConnectionAcceptor>(config.aioThread,
+        [](P2PConnectionPtr P2PConnection)
         {
-            if (!websocketConnection)
+            if (!P2PConnection)
                 return;
-            waitablePoolInstance->addWaitable(websocketConnection);
-            websocketConnection->startSending();
+            waitablePoolInstance->addWaitable(P2PConnection);
+            P2PConnection->startSending();
         });
     if (!acceptor->startListening())
         return;
@@ -395,16 +398,16 @@ static const char* const kInvalidOptionsMessage = "invalid options, run with --h
 
 static void printHelp()
 {
-    printf("Usage:\n CLIENT MODE: websocket_utility --url <url> --username <username> " \
+    printf("Usage:\n CLIENT MODE: p2p_utility --url <url> --username <username> " \
            "--password <password>\n");
-    printf(" SERVER MODE: websocket_utility [--server-address <server-address> (default: 0.0.0.0)] " \
+    printf(" SERVER MODE: p2p_utility [--server-address <server-address> (default: 0.0.0.0)] " \
            "--server-port <server-port>\n");
     printf("Additional options:\n --log-level <'verbose' OR 'info'(default)>\n "\
            "--role <'client'(default) OR 'server'>\n " \
            "--protocol-name <protocol-name(default: 'nxp2p')>\n --help\n");
     printf("Note:\n");
-    printf(" In case if you want to connect to the websocket utility run in the server mode, client"
-           " url path must be '/testWebsocketConnection'.\n");
+    printf(" In case if you want to connect to the p2p utility run in a server mode, client"
+           " url path must be '/testP2PConnection'.\n");
 }
 
 static void prepareConfig(int argc, const char* argv[])
