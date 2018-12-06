@@ -22,11 +22,13 @@ public:
     virtual QSize sizeHint() const override;
     virtual Qn::ThumbnailStatus status() const override;
 
-signals:
-    void loadDelayed(const QImage& image);
+    void loadSync() { load(true); }
 
 protected:
-    virtual void doLoadAsync() override;
+    virtual void doLoadAsync() override { load(false); }
+
+private:
+    void load(bool sync);
 
 private:
     struct Private;
