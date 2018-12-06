@@ -1,16 +1,14 @@
 #include "hls_live_playlist_manager.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <utils/media/media_stream_cache.h>
 
-namespace nx {
-namespace vms::server {
-namespace hls {
+namespace nx::vms::server::hls {
 
-static const size_t CHUNKS_IN_PLAYLIST = 3;
+static constexpr std::size_t kChunksPerPlaylist = 3;
 
 LivePlaylistManager::LivePlaylistManager(
     MediaStreamCache* const mediaStreamCache,
@@ -19,9 +17,6 @@ LivePlaylistManager::LivePlaylistManager(
     :
     m_mediaStreamCache(mediaStreamCache),
     m_targetDurationUSec(targetDurationUSec),
-    m_mediaSequence(0),
-    m_totalPlaylistDuration(0),
-    m_blockID(-1),
     m_removedChunksToKeepCount(removedChunksToKeepCount),
     m_onKeyFrameSubscriptionId(nx::utils::kInvalidSubscriptionId),
     m_onDiscontinueSubscriptionId(nx::utils::kInvalidSubscriptionId)
@@ -40,20 +35,17 @@ LivePlaylistManager::LivePlaylistManager(
 
 LivePlaylistManager::~LivePlaylistManager()
 {
-    if (m_blockID != -1)
+    if (m_blockId != -1)
     {
-        m_mediaStreamCache->unblockData(m_blockID);
-        m_blockID = -1;
+        m_mediaStreamCache->unblockData(m_blockId);
+        m_blockId = -1;
     }
 
-    m_mediaStreamCache->streamTimeDiscontinuityFoundSubscription().removeSubscription(m_onDiscontinueSubscriptionId);
+    m_mediaStreamCache->streamTimeDiscontinuityFoundSubscription()
+        .removeSubscription(m_onDiscontinueSubscriptionId);
     m_mediaStreamCache->keyFrameFoundSubscription().removeSubscription(m_onKeyFrameSubscriptionId);
 }
 
-//!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data
-/*!
-\return Number of chunks generated
-*/
 size_t LivePlaylistManager::generateChunkList(
     std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
     bool* const endOfStreamReached) const
@@ -62,14 +54,17 @@ size_t LivePlaylistManager::generateChunkList(
 
     m_inactivityTimer.restart();
 
-    //NOTE commented code is a trick to minimize live delay with hls playback. But current implementation results in
-    //playback freezing and switching to lo-quality, since downloading is done with same speed as playback and HLS client thinks bandwidth is not sufficient.
-    //But, something can still be done to minimize that delay
+    // NOTE: Commented code is a trick to minimize live delay with hls playback.
+    // But, the current implementation results in playback freezing and switching to lo-quality,
+    // since downloading is done with same speed as playback and HLS client thinks bandwidth 
+    // is not sufficient.
+    // But, something can still be done to minimize that delay.
+    // 
     //if( m_chunks.empty() )
     //{
     //    //initializing with dummy chunks
     //    qint64 currentTimestamp = qnSyncTime->currentUSecsSinceEpoch();
-    //    for( unsigned int i = 0; i < CHUNKS_IN_PLAYLIST; ++i )
+    //    for( unsigned int i = 0; i < kChunksPerPlaylist; ++i )
     //    {
     //        ChunkData chunk;
     //        chunk.alias = lit("live_chunk_%1").arg(i);
@@ -95,10 +90,10 @@ void LivePlaylistManager::clear()
 {
     QnMutexLocker lk(&m_mutex);
     m_totalPlaylistDuration = 0;
-    if (m_blockID != -1)
+    if (m_blockId != -1)
     {
-        m_mediaStreamCache->unblockData(m_blockID);
-        m_blockID = -1;
+        m_mediaStreamCache->unblockData(m_blockId);
+        m_blockId = -1;
     }
     m_chunks.clear();
     while (!m_timestampToBlock.empty())
@@ -121,7 +116,7 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_VERBOSE(this, lit("got key frame %1").arg(currentPacketTimestampUSec));
+    NX_VERBOSE(this, lm("got key frame %1").arg(currentPacketTimestampUSec));
 
     if (m_currentChunk.mediaSequence > 0)
     {
@@ -138,8 +133,8 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
             if (chunkIter == m_chunks.end())
             {
                 m_chunks.push_back(m_currentChunk);
-                NX_VERBOSE(this, lit("Added chunk (%1:%2). Total chunks %3").
-                    arg(m_chunks.back().startTimestamp).arg(m_chunks.back().duration).arg(m_chunks.size()));
+                NX_VERBOSE(this, lm("Added chunk (%1:%2). Total chunks %3").
+                    args(m_chunks.back().startTimestamp, m_chunks.back().duration, m_chunks.size()));
             }
             else
             {
@@ -155,8 +150,8 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
             //The server MUST NOT remove a media segment from the Playlist file if
             //   the duration of the Playlist file minus the duration of the segment
             //   is less than three times the target duration.
-            while ((m_totalPlaylistDuration - m_chunks.front().duration > m_targetDurationUSec * CHUNKS_IN_PLAYLIST) &&
-                   (m_chunks.size() > CHUNKS_IN_PLAYLIST)) //< In case of a large GOP (it is common for second stream)
+            while ((m_totalPlaylistDuration - m_chunks.front().duration > m_targetDurationUSec * kChunksPerPlaylist) &&
+                   (m_chunks.size() > kChunksPerPlaylist)) //< In case of a large GOP (it is common for second stream)
                                                            // first condition may produce 1 or 2 chunks per playlist which is bad for iOS.
             {
                 //When the server removes a media segment from the Playlist, the
@@ -168,7 +163,8 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
                 if (m_removedChunksToKeepCount < 0)
                 {
                     //spec-defined behavour.
-                    keepChunkDataTillTimestamp = m_chunks.front().startTimestamp + m_chunks.front().duration * 2 + playlistDurationBak;
+                    keepChunkDataTillTimestamp = m_chunks.front().startTimestamp +
+                        m_chunks.front().duration * 2 + playlistDurationBak;
                     //adding additional m_chunks.front().duration, since (m_chunks.front().startTimestamp + m_chunks.front().duration) is current playlist start timestamp
                 }
                 else
@@ -186,19 +182,21 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
 
                 m_totalPlaylistDuration -= m_chunks.front().duration;
 
-                NX_VERBOSE(this, lit("Removing chunk (%1:%2). Total chunks left %3").
-                    arg(m_chunks.front().startTimestamp).arg(m_chunks.front().duration).arg(m_chunks.size()));
+                NX_VERBOSE(this, lm("Removing chunk (%1:%2). Total chunks left %3")
+                    .args(m_chunks.front().startTimestamp, m_chunks.front().duration,
+                        m_chunks.size()));
                 m_chunks.pop_front();
             }
 
             NX_ASSERT(!m_chunks.empty());
 
-            while (!m_timestampToBlock.empty() && (m_timestampToBlock.front().second < m_chunks.front().startTimestamp))
+            while (!m_timestampToBlock.empty() &&
+                (m_timestampToBlock.front().second < m_chunks.front().startTimestamp))
             {
                 m_timestampToBlock.pop();
                 //locking chunk data in media data in conformance with draft-pantos-http-live-streaming-10
                 m_mediaStreamCache->moveBlocking(
-                    m_blockID,
+                    m_blockId,
                     !m_timestampToBlock.empty()
                     ? m_timestampToBlock.front().first
                     : m_chunks.front().startTimestamp);
@@ -208,16 +206,14 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
 
     if (m_currentChunk.mediaSequence == 0)
     {
-        //creating new chunk
+        // Creating new chunk.
         m_currentChunk.startTimestamp = currentPacketTimestampUSec;
         m_currentChunk.mediaSequence = ++m_mediaSequence;
         m_currentChunk.duration = 0;
     }
 
-    if (m_blockID == -1)
-        m_blockID = m_mediaStreamCache->blockData(currentPacketTimestampUSec);
+    if (m_blockId == -1)
+        m_blockId = m_mediaStreamCache->blockData(currentPacketTimestampUSec);
 }
 
-} // namespace hls
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::hls

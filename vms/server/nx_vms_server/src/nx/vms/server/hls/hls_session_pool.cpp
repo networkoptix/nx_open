@@ -214,7 +214,7 @@ bool SessionPool::add(Session* session, unsigned int keepAliveTimeoutMS)
 Session* SessionPool::find(const QString& id) const
 {
     QnMutexLocker lk(&m_mutex);
-    std::map<QString, SessionContext>::const_iterator it = m_sessionByID.find(id);
+    auto it = m_sessionByID.find(id);
     if (it == m_sessionByID.end())
         return NULL;
     // Session with keep-alive timeout can only be accessed under lock.
@@ -238,6 +238,7 @@ QString SessionPool::generateUniqueID()
 void SessionPool::lockSessionID(const QString& id)
 {
     QnMutexLocker lk(&m_mutex);
+
     while (!m_lockedIDs.insert(id).second)
         m_cond.wait(lk.mutex());
 
@@ -267,7 +268,7 @@ void SessionPool::unlockSessionID(const QString& id)
 void SessionPool::onTimer(const quint64& timerID)
 {
     QnMutexLocker lk(&m_mutex);
-    std::map<quint64, QString>::iterator timerIter = m_taskToSessionID.find(timerID);
+    auto timerIter = m_taskToSessionID.find(timerID);
     if (timerIter == m_taskToSessionID.end())
         return; //it is possible just after lockSessionID call
     removeNonSafe(timerIter->second);    //removes timerIter also
@@ -275,7 +276,7 @@ void SessionPool::onTimer(const quint64& timerID)
 
 void SessionPool::removeNonSafe(const QString& id)
 {
-    std::map<QString, SessionContext>::const_iterator it = m_sessionByID.find(id);
+    auto it = m_sessionByID.find(id);
     if (it == m_sessionByID.end())
         return;
     if (it->second.removeTaskID != 0)
