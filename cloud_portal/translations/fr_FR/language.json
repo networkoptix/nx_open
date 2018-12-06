@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Les versions de Safari antérieures à 10 ne sont pas supportées"
   },
   "passwordRequirements": {
+    "good": "bon",
+    "fair": "juste",
+    "minLength": "trop court",
     "minLengthMessage": "Mot de passe doit contenir au moins 8 caractères",
+    "required": "incorrect",
     "requiredMessage": "Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
+    "weak": "faible",
     "weakMessage": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
     "strongMessage": "Mot de passe fort!",
+    "common": "trop commun",
     "commonMessage": "Ce mot de passe est en haut de la liste des plus populaires dans le monde",
     "missingMessage": "Mot de passe requis"
   },
@@ -291,7 +297,7 @@
       "noArmSupport": "Ce navigateur ou ce périphérique ne supporte pas la lecture vidéo à partir de serveurs basés sur ARM.",
       "noFormat": "Ce navigateur ne supporte pas la lecture vidéo de cette caméra.",
       "ieNoWebm": "Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
-      "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
+      "ieWin10": "S.V.P utilisez les navigateurs Edge Microsoft ou Google Chrome.",
       "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium."
     },
     "searchCamPlaceholder": "Recherche",

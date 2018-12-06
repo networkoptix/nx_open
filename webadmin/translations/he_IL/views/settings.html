@@ -8,8 +8,7 @@
                 מכשיר זה מיועד לעבודה עם דיסק קשיח מותקן. <br>יש לכבות את המכשיר ולהתקין דיסק קשיח.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                התקן זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 קונפיגורציית הרשת של מכשיר זה אינה תקינה. <br>יש לחבר את המכשיר לרשת ולהגדיר לו כתובת.
@@ -44,7 +43,7 @@
                     <div ng-if="user.isOwner">
                         <h3>נתק את השרת מן המערכת</h3>
                         <p>פעולה זו תנתק שרת מהמערכת תוך שמירה על מסד הנתונים, משתמשים מקומיים ותצורה.
-                            ארכיון הווידאו יישאר שלם. כל משתמשי הענן יימחקו.</p>
+                            ארכיון הווידאו יישאר שלם. <b>כל משתמשי הענן יימחקו.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>
                     </div>
                     <div>
@@ -138,7 +137,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>הגדרות רשת להתקן.</h3>
+                        <h3>הגדרות רשת להתקן</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
                         <button class="btn btn-default" ng-click="saveNetworkSettings()">שמור הגדרות ואתחל את ההתקן</button>
                     </div>

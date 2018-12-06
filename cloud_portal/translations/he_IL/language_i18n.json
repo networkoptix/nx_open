@@ -64,7 +64,7 @@
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "אנו ממליצים להתקין את הגרסאות העדכניות ביותר של Google Chrome או של Mozilla Firefox, אך ניתן להשתמש בכל דפדפן אינטרנט מודרני אחר.",
 	"What's new?": "מה חדש?",
 	"Wrong password": "סיסמא שגויה",
-	"You can merge cloud Systems, where you are owner.": "ניתן למזג מערכות ענן, שבהן אתה הבעלים.",
+	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "באפשרותך למזג רק מערכות הענן שבהן יש לך הרשאות \"בעלים\".",
 	"You can only merge Systems in which you have owner permissions.": "ניתן למזג רק מערכות שבהן יש לך הרשאות בעלים.",
 	"Your browser is not supported": "הדפדפן שלך אינו נתמך",
 	"is incompatible.": "אינו תואם.",

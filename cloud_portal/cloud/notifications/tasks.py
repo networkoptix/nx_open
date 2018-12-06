@@ -33,7 +33,7 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
                 customization,
                 queue,
                 attempt,
-                traceback.format_exc())
+                traceback.format_exc().replace("Traceback", ""))
 
     if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
@@ -41,7 +41,15 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
         logger.error(error_formatted)
 
 
+def send_email_log(_task):
+    def wrapper(*args, **kwargs):
+        logger.info("Start {} was run with args {}, kwargs: {}".format(_task.__name__, args, kwargs))
+        return _task(*args, **kwargs)
+    return wrapper
+
+
 @shared_task
+@send_email_log
 def send_email(user_email, type, message, customization, queue="", attempt=1):
     lang = get_language_for_email(user_email, customization)
     try:

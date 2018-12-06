@@ -1,7 +1,7 @@
 version: '3'
 services:
   webapp:
-    image: mediaserver:4.0.0.28077
+    image: dockermediaserver
     ports:
       - "7001:7001"
     network_mode: "host"

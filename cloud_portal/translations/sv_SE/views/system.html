@@ -1,13 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
-        <h1>Failed to access System</h1>
-        <h3>This link is broken,<br>
-            System may be disconnected from %PRODUCT_NAME%,<br>
-            Access to this System may be revoked, <br>
-            or you may be logged into a different account
+        <h1>Misslyckades med att komma åt System</h1>
+        <h3>Den här länken är trasig, <br>
+            Systemet kan kopplas från %PRODUCT_NAME%, <br>
+            Tillgång till det här systemet kan återkallas, <br>
+            eller du kan vara inloggad på ett annat konto
         </h3>
         <p class="mt-4 d-flex justify-content-center">
-            <a href="/systems" class="btn btn-primary">Available Systems list</a>
+            <a href="/systems" class="btn btn-primary">Tillgängliga system</a>
         </p>
     </div>
 
@@ -19,7 +19,7 @@
         <div class="col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
-                    You do not have access to System information.
+                    Du har inte tillgång till systeminformation.
                 </span>
             </div>
             <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>

@@ -12,7 +12,9 @@ ${url}             ${ENV}
 
 *** Keywords ***
 Restart
-    Go To    ${url}
+    Close Browser
+    Open Browser and go to URL    ${url}
+
 *** Test Cases ***
 About page is correctly displayed
     [tags]    C41541
@@ -28,6 +30,17 @@ Known limitations". Support link is clickable and lead to the proper site
     Wait Until Element Is Visible    ${FOOTER KNOWN LIMITS LINK}
     Click Link    ${FOOTER KNOWN LIMITS LINK}
     Location Should Be    ${ENV}${KNOWN LIMITATIONS URL}
+    Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
+    Click Link    ${REMOTE CONNECTIVITY TILE LINK}
+   ${tabs}    Get Window Handles
+    Select Window    @{tabs}[1]
+    Location Should Contain    ${SUPPORT URL}
+    Select Window    @{tabs}[0]
+    Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
+    Click Link    ${SUPPORT TILE LINK}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[2]
+    Location Should Contain    ${SUPPORT URL}
 
 Support leads to the proper support site
     [tags]    C41544
@@ -54,7 +67,7 @@ Copyright leads to the proper site
     Wait Until Element Is Visible    ${FOOTER COPYRIGHT LINK}
     Click Link    ${FOOTER COPYRIGHT LINK}
     ${tabs}    Get Window Handles
-    Select Window    @{tabs}[2]
+    Select Window    @{tabs}[1]
     Location Should Be    ${COPYRIGHT URL}
 
 Change interface language
