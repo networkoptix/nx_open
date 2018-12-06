@@ -14,7 +14,6 @@
 
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/utils/scope_guard.h>
 
 // TODO: #vkutin #gdm Support customAspectRatio and videoLayout.
 
