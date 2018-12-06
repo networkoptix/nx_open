@@ -111,4 +111,29 @@ TEST_F(MotionArchive, findMotionDesc)
     ASSERT_EQ(deltaMs,result[0].durationMs);
 }
 
+TEST_F(MotionArchive, findMotionWithFilter)
+{
+    createTestData();
+    QnChunksRequestData request = createRequest(Qt::SortOrder::AscendingOrder);
+    request.limit = 50;
+
+    QList<QRegion> rectFilter;
+    rectFilter << QRect(0, 0, 1, 1);
+    request.filter = QJson::serialized<QList<QRegion>>(rectFilter);
+
+    checkData(serverModule().motionHelper()->matchImage(request), request.limit);
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    std::reverse(m_numericDates.begin(), m_numericDates.end());
+    checkData(serverModule().motionHelper()->matchImage(request), request.limit);
+
+    request.sortOrder = Qt::SortOrder::AscendingOrder;
+    rectFilter.clear();
+    rectFilter << QRect(Qn::kMotionGridWidth/2, Qn::kMotionGridHeight/2, 1, 1);
+    request.filter = QJson::serialized<QList<QRegion>>(rectFilter);
+
+    checkData(serverModule().motionHelper()->matchImage(request), 0);
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    checkData(serverModule().motionHelper()->matchImage(request), 0);
+}
+
 } // nx::vms::server::test

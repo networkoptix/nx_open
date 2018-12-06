@@ -887,7 +887,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     }
     const auto networkIfInfo = networkIfList.join(", ");
     if (m_mediaServer->setProperty(
-        ResourcePropertyKey::MediaServer::Statistics::kNetworkInterfaces, networkIfInfo))
+        ResourcePropertyKey::Server::kNetworkInterfaces, networkIfInfo))
     {
         m_mediaServer->saveProperties();
     }
@@ -1198,16 +1198,17 @@ void MediaServerProcess::updateAddressesList()
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
 {
-    namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
+    namespace Server = ResourcePropertyKey::Server;
     const auto hwInfo = HardwareInformation::instance();
-    server->setProperty(Statistics::kCpuArchitecture, hwInfo.cpuArchitecture);
-    server->setProperty(Statistics::kCpuModelName, hwInfo.cpuModelName);
-    server->setProperty(Statistics::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
-    server->setProperty(Statistics::kProductNameShort, QnAppInfo::productNameShort());
-    server->setProperty(Statistics::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
-    server->setProperty(Statistics::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
-    server->setProperty(Statistics::kPublicIp, m_ipDiscovery->publicIP().toString());
-    server->setProperty(Statistics::kSystemRuntime, nx::vms::api::SystemInformation::currentSystemRuntime());
+    server->setProperty(Server::kCpuArchitecture, hwInfo.cpuArchitecture);
+    server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName);
+    server->setProperty(Server::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
+    server->setProperty(Server::kProductNameShort, QnAppInfo::productNameShort());
+    server->setProperty(Server::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
+    server->setProperty(Server::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Server::kPublicIp, m_ipDiscovery->publicIP().toString());
+    server->setProperty(Server::kSystemRuntime,
+        nx::vms::api::SystemInformation::currentSystemRuntime());
 
     if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
@@ -1223,7 +1224,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
             auto hhds = content.split("\n", QString::SkipEmptyParts);
             for (auto& hdd : hhds)
                 hdd = hdd.trimmed();
-            server->setProperty(Statistics::kHddList, hhds.join(", "),
+            server->setProperty(Server::kHddList, hhds.join(", "),
                                 QnResource::NO_ALLOW_EMPTY);
         }
     }
@@ -1235,7 +1236,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
         qnServerDb->setBookmarkCountController(
             [server](size_t count)
             {
-                server->setProperty(Statistics::kBookmarkCount, QString::number(count));
+                server->setProperty(Server::kBookmarkCount, QString::number(count));
                 server->saveProperties();
             });
     #endif
@@ -1272,7 +1273,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(ResourcePropertyKey::MediaServer::Statistics::kPublicIp,
+        if (server->setProperty(ResourcePropertyKey::Server::kPublicIp,
             publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
             server->saveProperties();
 
@@ -3843,16 +3844,16 @@ void MediaServerProcess::connectSignals()
     connect(m_udtInternetTrafficTimer.get(), &QTimer::timeout,
         [common = commonModule()]()
         {
-            namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
+            namespace Server = ResourcePropertyKey::Server;
             QnResourcePtr server = common->resourcePool()->getResourceById(common->moduleGUID());
-            const auto old = server->getProperty(Statistics::kUdtInternetTraffic_bytes).toULongLong();
+            const auto old = server->getProperty(Server::kUdtInternetTraffic_bytes).toULongLong();
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong)current;
-            if (server->setProperty(Statistics::kUdtInternetTraffic_bytes, QString::number(update))
+            if (server->setProperty(Server::kUdtInternetTraffic_bytes, QString::number(update))
                 && server->saveProperties())
             {
                 NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(
-                    Statistics::kUdtInternetTraffic_bytes, update));
+                    Server::kUdtInternetTraffic_bytes, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });

@@ -391,7 +391,21 @@ void ServerMessageBus::stop()
 
 void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
-    auto data = serializeSubscribeAllRequest(m_db->transactionLog()->getTransactionsState());
+    const auto& state = m_db->transactionLog()->getTransactionsState();
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+    {
+        QVector<vms::api::PersistentIdData> data;
+        QVector<qint32> indexes;
+        for (auto itr = state.values.cbegin(); itr != state.values.cend(); ++itr)
+        {
+            data << itr.key();
+            indexes << itr.value();
+        }
+        printSubscribeMessage(
+            connection->remotePeer().id, data, indexes);
+    }
+
+    auto data = serializeSubscribeAllRequest(state);
     data.data()[0] = (quint8)MessageType::subscribeAll;
     connection->sendMessage(data);
     context(connection)->isLocalStarted = true;

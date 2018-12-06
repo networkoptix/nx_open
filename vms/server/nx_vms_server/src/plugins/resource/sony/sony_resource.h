@@ -17,7 +17,6 @@
 #include "nx/streaming/media_data_packet.h"
 #include "../onvif/onvif_resource.h"
 
-
 class QnPlSonyResource: public QnPlOnvifResource
 {
     static int MAX_RESOLUTION_DECREASES_NUM;
@@ -31,7 +30,8 @@ public:
     virtual int getMaxOnvifRequestTries() const override { return 5; }
 
 protected:
-    virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& capabilitiesResponse) override;
+    virtual CameraDiagnostics::Result customInitialization(
+        const _onvifDevice__GetCapabilitiesResponse& capabilitiesResponse) override;
 
     virtual CameraDiagnostics::Result updateResourceCapabilities() override;
 

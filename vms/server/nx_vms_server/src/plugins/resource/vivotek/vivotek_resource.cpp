@@ -45,7 +45,8 @@ VivotekResource::VivotekResource(QnMediaServerModule* serverModule):
 {
 }
 
-CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesResp& onvifCapabilities)
+CameraDiagnostics::Result VivotekResource::initializeMedia(
+    const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities)
 {
     auto result = base_type::initializeMedia(onvifCapabilities);
     if (!result)
