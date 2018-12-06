@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 
 namespace nx {
 namespace hpm {
@@ -23,9 +23,9 @@ public:
     {
         String id;
         String authKey;
-        bool mediatorEnabled;
+        bool mediatorEnabled = true;
 
-        System();
+        System() = default;
         System(
             String authKey_,
             bool mediatorEnabled_ = false);
@@ -70,7 +70,7 @@ public:
 };
 
 /**
- * Cloud DB data interface over nx::cdb::api::ConnectionFactory.
+ * Cloud DB data interface over nx::cloud::db::api::ConnectionFactory.
  */
 class CloudDataProvider:
     public AbstractCloudDataProvider
@@ -101,8 +101,8 @@ private:
     bool m_isTerminated;
     nx::utils::TimerManager::TimerGuard m_timerGuard;
 
-    std::unique_ptr< cdb::api::ConnectionFactory > m_connectionFactory;
-    std::unique_ptr< cdb::api::Connection > m_connection;
+    std::unique_ptr< nx::cloud::db::api::ConnectionFactory > m_connectionFactory;
+    std::unique_ptr< nx::cloud::db::api::Connection > m_connection;
 };
 
 } // namespace hpm

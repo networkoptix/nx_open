@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Twój system</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Złącz z innym systemem</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Złącz z innym systemem</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Odłącz od
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Odłącz od
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -29,14 +29,22 @@
         <button class="btn btn-default" ng-click="delete()">Odłącz od mojego konta</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
             jest w trakcie złączania z tym systemem</div>
         <hr />
         <div class="merge-info-text">W zależności od rozmiaru bazy danych może to potrwać do kilku godzin</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>Ten system jest w trakcie złączania z <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />
         <div class="merge-info-text">

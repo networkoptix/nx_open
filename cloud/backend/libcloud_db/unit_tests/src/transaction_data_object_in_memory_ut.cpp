@@ -5,16 +5,15 @@
 #include <nx/sql/detail/query_execution_thread.h>
 #include <nx/vms/api/data/user_data.h>
 
-#include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include <transaction/transaction_descriptor.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace ec2 {
 namespace dao {
 namespace memory {
@@ -22,7 +21,7 @@ namespace test {
 
 class TransactionDataObjectInMemory:
     public ::testing::Test,
-    public nx::cdb::test::BasePersistentDataTest
+    public nx::cloud::db::test::BasePersistentDataTest
 {
 public:
     TransactionDataObjectInMemory():
@@ -66,7 +65,7 @@ protected:
 
     void verifyThatOnlyLastOneIsPresent()
     {
-        const std::vector<data_sync_engine::dao::TransactionLogRecord> transactions = readAllTransaction();
+        const std::vector<clusterdb::engine::dao::TransactionLogRecord> transactions = readAllTransaction();
 
         ASSERT_EQ(1U, transactions.size());
         ASSERT_EQ(
@@ -76,7 +75,7 @@ protected:
 
     void verifyThatDataObjectIsEmpty()
     {
-        const std::vector<data_sync_engine::dao::TransactionLogRecord> transactions =
+        const std::vector<clusterdb::engine::dao::TransactionLogRecord> transactions =
             readAllTransaction();
         ASSERT_EQ(0U, transactions.size());
     }
@@ -100,27 +99,27 @@ private:
     const QnUuid m_peerDbId;
     const std::string m_systemId;
     std::int64_t m_peerSequence;
-    data_sync_engine::dao::memory::TransactionDataObject m_transactionDataObject;
+    clusterdb::engine::dao::memory::TransactionDataObject m_transactionDataObject;
     nx::vms::api::UserData m_transactionData;
-    data_sync_engine::Command<nx::vms::api::UserData> m_lastAddedTransaction;
+    clusterdb::engine::Command<nx::vms::api::UserData> m_lastAddedTransaction;
     nx::sql::DbConnectionHolder m_dbConnectionHolder;
     std::shared_ptr<nx::sql::QueryContext> m_currentTran;
 
     void init()
     {
         const auto sharing =
-            cdb::test::BusinessDataGenerator::generateRandomSharing(
-                cdb::test::BusinessDataGenerator::generateRandomAccount(),
+            nx::cloud::db::test::BusinessDataGenerator::generateRandomSharing(
+                nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(),
                 m_systemId);
         ec2::convert(sharing, &m_transactionData);
     }
 
     template<typename TransactionDataType>
-    void saveTransaction(const data_sync_engine::Command<TransactionDataType>& transaction)
+    void saveTransaction(const clusterdb::engine::Command<TransactionDataType>& transaction)
     {
         const auto tranHash = ::ec2::transactionHash(transaction.command, transaction.params).toSimpleByteArray();
         const auto ubjsonSerializedTransaction = QnUbjson::serialized(transaction);
-        data_sync_engine::dao::TransactionData transactionData{
+        clusterdb::engine::dao::TransactionData transactionData{
             m_systemId,
             transaction,
             tranHash,
@@ -132,9 +131,9 @@ private:
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
-    data_sync_engine::Command<nx::vms::api::UserData> generateTransaction()
+    clusterdb::engine::Command<nx::vms::api::UserData> generateTransaction()
     {
-        data_sync_engine::Command<nx::vms::api::UserData> transaction(m_peerGuid);
+        clusterdb::engine::Command<nx::vms::api::UserData> transaction(m_peerGuid);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_peerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
@@ -144,9 +143,9 @@ private:
         return transaction;
     }
 
-    std::vector<data_sync_engine::dao::TransactionLogRecord> readAllTransaction()
+    std::vector<clusterdb::engine::dao::TransactionLogRecord> readAllTransaction()
     {
-        std::vector<data_sync_engine::dao::TransactionLogRecord> transactions;
+        std::vector<clusterdb::engine::dao::TransactionLogRecord> transactions;
         const auto resultCode = m_transactionDataObject.fetchTransactionsOfAPeerQuery(
             m_currentTran ? m_currentTran.get() : nullptr,
             m_systemId,
@@ -184,5 +183,4 @@ TEST_F(TransactionDataObjectInMemory, DISABLED_tran_rollback)
 } // namespace memory
 } // namespace dao
 } // namespace ec2
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

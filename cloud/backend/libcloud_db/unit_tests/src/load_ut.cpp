@@ -8,8 +8,7 @@
 #include "functional_tests/test_setup.h"
 #include "functional_tests/system_ut.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class CdbLoadTest:
@@ -104,5 +103,4 @@ TEST_F(CdbLoadTest, manyClients)
 #endif
 
 } // namespace cdb
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

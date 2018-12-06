@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
@@ -77,9 +77,9 @@ protected:
         m_vmsSystem->peer(index).stop();
     }
 
-    void givenTwoServerCloudSystem()
+    void givenCloudSystemWithServerCount(int count)
     {
-        m_vmsSystem = createVmsSystem(2);
+        m_vmsSystem = createVmsSystem(count);
         ASSERT_NE(nullptr, m_vmsSystem);
 
         ASSERT_TRUE(m_vmsSystem->connectToCloud(&cloud(), m_ownerAccount));
@@ -106,8 +106,8 @@ protected:
 
         auto client = m_vmsSystem->peer(index).mediaServerClient();
 
-        nx::cdb::api::SystemSharing systemSharing;
-        systemSharing.accessRole = nx::cdb::api::SystemAccessRole::advancedViewer;
+        nx::cloud::db::api::SystemSharing systemSharing;
+        systemSharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
         systemSharing.isEnabled = true;
         systemSharing.accountEmail = m_cloudAccounts.back().email;
         systemSharing.systemId = m_vmsSystem->cloudSystemId();
@@ -115,16 +115,27 @@ protected:
             QnUuid::fromArbitraryData(m_cloudAccounts.back().email).toSimpleString().toStdString();
 
         nx::vms::api::UserData userData;
-        nx::cdb::ec2::convert(systemSharing, &userData);
+        nx::cloud::db::ec2::convert(systemSharing, &userData);
 
         ASSERT_EQ(::ec2::ErrorCode::ok, client->ec2SaveUser(userData));
     }
 
+    void addCloudUserOnCloud()
+    {
+        const auto account = cloud().registerCloudAccount();
+        ASSERT_EQ(
+            nx::cloud::db::api::ResultCode::ok,
+            cloud().cdb().shareSystem(
+                m_ownerAccount,
+                m_vmsSystem->cloudSystemId(),
+                account.email,
+                nx::cloud::db::api::SystemAccessRole::viewer));
+    }
+
 private:
-    Cloud m_cloud;
     std::unique_ptr<VmsSystem> m_vmsSystem;
-    nx::cdb::AccountWithPassword m_ownerAccount;
-    std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
+    nx::cloud::db::AccountWithPassword m_ownerAccount;
+    std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 };
@@ -133,9 +144,26 @@ std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommo
 
 TEST_F(
     VmsCloudDataSynchronization,
+    data_added_while_mediaserver_is_offline_is_synchronized_when_back_online)
+{
+    givenCloudSystemWithServerCount(1);
+    
+    addCloudUserOnServer(0);
+    addCloudUserOnCloud();
+    waitForDataSynchronized(cloud(), server(0));
+
+    stopServer(0);
+    addCloudUserOnCloud();
+    startServer(0);
+
+    waitForDataSynchronized(cloud(), server(0));
+}
+
+TEST_F(
+    VmsCloudDataSynchronization,
     another_mediaserver_synchronizes_data_to_cloud)
 {
-    givenTwoServerCloudSystem();
+    givenCloudSystemWithServerCount(2);
     stopServer(1);
 
     addRandomNonCloudDataToServer(0);
@@ -145,7 +173,7 @@ TEST_F(
 
 TEST_F(VmsCloudDataSynchronization, using_cloud_does_not_trim_data)
 {
-    givenTwoServerCloudSystem();
+    givenCloudSystemWithServerCount(2);
     stopServer(1);
 
     addRandomNonCloudDataToServer(0);

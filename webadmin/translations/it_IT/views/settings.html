@@ -4,20 +4,20 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Questo dispositivo è progettato per funzionare con l'unità disco fisso installata. <br> Spegni il dispositivo e installa un'unità disco fisso.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Questo dispositivo necessita di una connessione di rete per funzionare.<br>Si prega di collegarlo alla rete locale o Internet
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Questo dispositivo ha una configurazione di rete errata. <br> Collegalo alla rete o impostare un indirizzo IP corretto.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Porta</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -99,12 +99,12 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Questo sistema non è collegato a {{Config.cloud.productName}}
+                            <uib-alert type="warning">Questo sistema non è collegato a {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank"> Ulteriori informazioni </a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Collegare il server ad Internet per eseguire la configurazione {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connessione Internet richiesta per connettere il sistema a {{Config.cloud.productName}}</alert>
+                                   target="_blank"> Ulteriori informazioni </a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">Collegare il server ad Internet per eseguire la configurazione {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connessione Internet richiesta per connettere il sistema a {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient"> Connetti a {{Config.cloud.productName}}</button> <a ng-if="!mode.liteClient"  class="btn btn-default"
@@ -115,21 +115,23 @@
 
 
                     <div>
-                        <h3>Traffic encription</h3>
+                        <h3>Crittografia del traffico</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encription
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Forzare la Crittografia del traffico
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Force Video Traffic Encription
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
+                                           ng-checked="checkTrafficEncryption()">
+                                    Forzare la Crittografia del traffico Video
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Salva</button>
                         </form>
                     </div>
                 </uib-tab>

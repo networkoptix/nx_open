@@ -15,12 +15,6 @@ TAGS
 doc/html
 doc/log.txt
 
-func_tests/.tox
-func_tests/.cache
-func_tests/.rnd
-func_tests/report.html
-func_tests/doc/html
-
 *.orig
 *.rej
 .vscode
@@ -116,7 +110,6 @@ cloud_portal/robot_tests/{geckodriver.log,venv}
 cloud_portal/front_end/.sass-cache
 cloud_portal/front_end/dist
 
-<<<<<<< local
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
 
@@ -158,17 +151,17 @@ syntax: regexp
 ^Makefile$
 ^app_process$
 
-nx_cloud/cloud_tests/health_site/dist
-nx_cloud/cloud_tests/health_site/node_modules
-nx_cloud/backend/cloud_tests/health_site/node_modules
-nx_cloud/backend/cloud_tests/health_site/dist
-nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
-nx_cloud/backend/cloud_tests/monitoring/env
-nx_cloud/backend/cloud_tests/monitoring/dist
-nx_cloud_deploy/log_alarm_dispatcher/env
-nx_cloud_deploy/log_alarm_dispatcher/dist/log_alarm_dispatcher.zip
-nx_cloud_deploy/log_alarm_dispatcher/event.json
-nx_cloud_deploy/log_alarm_dispatcher/message.json
+cloud/cloud_tests/health_site/dist
+cloud/cloud_tests/health_site/node_modules
+cloud/backend/cloud_tests/health_site/node_modules
+cloud/backend/cloud_tests/health_site/dist
+cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
+cloud/backend/cloud_tests/monitoring/env
+cloud/backend/cloud_tests/monitoring/dist
+cloud_deploy/log_alarm_dispatcher/env
+cloud_deploy/log_alarm_dispatcher/dist/log_alarm_dispatcher.zip
+cloud_deploy/log_alarm_dispatcher/event.json
+cloud_deploy/log_alarm_dispatcher/message.json
 
 tags
 nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info

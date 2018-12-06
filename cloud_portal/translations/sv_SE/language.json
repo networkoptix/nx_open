@@ -256,7 +256,7 @@
   },
   "activeActions": {
     "sendConfirm": "Resend activation link",
-    "resetPassword": "Reset Password",
+    "resetPassword": "Återställ lösenord",
     "setNewPassword": "Save password",
     "setNewPasswordLabel": "New password"
   },

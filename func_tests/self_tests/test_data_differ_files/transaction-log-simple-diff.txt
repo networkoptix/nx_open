@@ -1,6 +1,0 @@
-/ transaction removed "{03d134dd-5ad3-1978-a89b-a28d3140618f}|saveWebPage" null
-/ transaction removed "{5b2f4738-df7a-7c27-41c9-6be5a6e2a250}|saveWebPage" null
-/ transaction removed "{6ecff4f8-9934-e41e-062e-40fb68a4ecc2}|setResourceParam" null
-/ transaction added null "{03d134dd-5ad3-1978-a89b-a28d3140618f}|saveWebPage"
-/ transaction added null "{5b2f4738-df7a-7c27-41c9-6be5a6e2a250}|saveWebPage"
-/ transaction added null "{6ecff4f8-9934-e41e-062e-40fb68a4ecc2}|setResourceParam"

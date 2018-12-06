@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+Det finns en ny revision för {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+Klicka på länken för att se utkast {{ message.id }} för {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Länk till granskning: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+På denna sida kan du
+1) Skapa en förhandsgranskning för att se de senaste ändringarna.
+2) Publicera den här versionen som uppdaterar allt innehåll.
+3) Redigera sammanhang genom att klicka på redigera inspelningsknappen. För att se dessa ändringar måste du skapa en ny version.

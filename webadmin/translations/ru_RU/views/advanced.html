@@ -116,36 +116,20 @@
 
     <h2>Настройки журнала</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Уровень детализации основного журнала</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} уровень журналирования</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Нет: Журнал отключён.</option>
-                    <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="ERROR">Ошибки: Записывать ошибки.</option>
-                    <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
-                    <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Нет: Журнал отключён.</option>
+                    <option value="always">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
+                    <option value="error">Ошибки: Записывать ошибки.</option>
+                    <option value="warning">Предупреждение: Записывать ошибки и предупреждения.</option>
+                    <option value="info">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
+                    <option value="debug">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
+                    <option value="debug2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Уровень журнала транзакций</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Нет: Журнал отключён.</option>
-                    <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="ERROR">Ошибки: Записывать ошибки.</option>
-                    <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
-                    <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Сохранить</button>
         </div>
@@ -199,7 +183,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Предупреждение!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Предупреждение!</b> Некоторые изменения требуют перезапуска <b>всех</b> серверов в системе.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
         </div>

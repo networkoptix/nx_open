@@ -1,0 +1,21 @@
+LIBRARY "wix_custom_actions"
+
+EXPORTS
+
+GenerateGuidsForServers
+CheckPorts
+FindFreePorts
+CopyMediaServerProfile
+CopyAppServerProfile
+CopyAppServerNotificationFiles
+DeleteRegistryKeys
+DeleteAllRegistryKeys
+CopyHostedFiles
+PopulateRestoreVersions
+CAQuitExecAndWarn
+DeleteOldMediaserverSettings
+GenerateSystemName
+DetectIfSystemIsStandalone
+SetPreviousServerInstalled
+CleanAutorunRegistryKeys
+CleanClientRegistryKeys

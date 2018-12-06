@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/client/data/auth_data.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
@@ -60,7 +60,7 @@ protected:
                 ownerAccount(),
                 cloudSystem(),
                 m_additionalCloudUsers.back().email,
-                nx::cdb::api::SystemAccessRole::viewer);
+                nx::cloud::db::api::SystemAccessRole::viewer);
         }
     }
 
@@ -89,7 +89,7 @@ protected:
         changeAccountPassword(m_invitedAccount.email, m_invitedAccount.password);
 
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             cdb()->getAccount(
                 m_invitedAccount.email,
                 m_invitedAccount.password,
@@ -98,14 +98,14 @@ protected:
 
     void whenUserRegistersInCloudSkippingInviteEmail()
     {
-        m_invitedAccount = nx::cdb::test::BusinessDataGenerator::generateRandomAccount(
+        m_invitedAccount = nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(
             m_invitedUserEc2Data.email.toStdString());
 
         waitForUserToAppearInCloud(m_invitedAccount.email);
 
-        m_prevActivationCode = nx::cdb::api::AccountConfirmationCode();
+        m_prevActivationCode = nx::cloud::db::api::AccountConfirmationCode();
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             cdb()->addAccount(&m_invitedAccount, &m_invitedAccount.password, &*m_prevActivationCode));
     }
 
@@ -114,7 +114,7 @@ protected:
         ASSERT_TRUE(static_cast<bool>(m_prevActivationCode));
         std::string accountEmail;
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             cdb()->activateAccount(*m_prevActivationCode, &accountEmail));
     }
 
@@ -132,7 +132,7 @@ protected:
                     QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
                     &params));
             auto authInfoIter = std::find_if(params.begin(), params.end(),
-                [](auto param) { return param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName; });
+                [](auto param) { return param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName; });
             if (authInfoIter != params.end())
             {
                 if (!initialAuthInfo)
@@ -148,28 +148,28 @@ protected:
 
     void thenUserCanStillLogin()
     {
-        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        nx::vms::api::ResourceParamDataList vmsSettings;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetSettings(&vmsSettings));
+        waitUntilUserLoginFuncPasses([this]() { return checkIfOwnerCanLogin(); });
     }
 
     void thenAllUsersCanStillLogin()
     {
-        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         for (const auto& account: m_additionalCloudUsers)
         {
-            mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+            nx::network::http::Credentials credentials(
                 account.email.c_str(),
-                nx::network::http::PasswordAuthToken(account.password.c_str())));
+                nx::network::http::PasswordAuthToken(account.password.c_str()));
 
-            nx::vms::api::UserDataList users;
-            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
+            waitUntilUserLoginFuncPasses(
+                [this, credentials]()
+                {
+                    return checkIfUserCanLogin(credentials);
+                });
         }
     }
 
-    void thenInvitedUserCanLoginToTheSystem()
+    void thenInvitedUserCanLoginToTheSystemEventually()
     {
-        ASSERT_EQ(ec2::ErrorCode::ok, checkInvitedUserLoginToVms());
+        waitUntilUserLoginFuncPasses([this](){ return checkInvitedUserLoginToVms(); });
     }
 
     void thenInvitedUserCannotLoginToTheSystem()
@@ -178,10 +178,10 @@ protected:
     }
 
 private:
-    std::vector<nx::cdb::AccountWithPassword> m_additionalCloudUsers;
+    std::vector<nx::cloud::db::AccountWithPassword> m_additionalCloudUsers;
     nx::vms::api::UserData m_invitedUserEc2Data;
-    nx::cdb::AccountWithPassword m_invitedAccount;
-    boost::optional<nx::cdb::api::AccountConfirmationCode> m_prevActivationCode;
+    nx::cloud::db::AccountWithPassword m_invitedAccount;
+    boost::optional<nx::cloud::db::api::AccountConfirmationCode> m_prevActivationCode;
 
     virtual void SetUp() override
     {
@@ -202,7 +202,7 @@ private:
                 mediaServerClient->ec2GetResourceParams(
                     QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
                     &params));
-            if (resourceParamPresent(params, nx::cdb::api::kVmsUserAuthInfoAttributeName))
+            if (resourceParamPresent(params, nx::cloud::db::api::kVmsUserAuthInfoAttributeName))
                 break;
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
@@ -212,10 +212,10 @@ private:
     {
         std::string confirmationCode;
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             cdb()->resetAccountPassword(email, &confirmationCode));
 
-        nx::cdb::api::AccountUpdateData accountUpdate;
+        nx::cloud::db::api::AccountUpdateData accountUpdate;
         accountUpdate.passwordHa1 = nx::network::http::calcHa1(
             email.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
@@ -228,7 +228,7 @@ private:
             tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).toStdString();
 
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             cdb()->updateAccount(email, tmpPassword, accountUpdate));
     }
 
@@ -240,6 +240,46 @@ private:
             nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
         nx::vms::api::UserDataList users;
         return mediaServerClient->ec2GetUsers(&users);
+    }
+
+    ec2::ErrorCode checkIfUserCanLogin(
+        const nx::network::http::Credentials& credentials)
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        mediaServerClient->setUserCredentials(credentials);
+
+        nx::vms::api::UserDataList users;
+        return mediaServerClient->ec2GetUsers(&users);
+    }
+
+    ec2::ErrorCode checkIfOwnerCanLogin()
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        nx::vms::api::ResourceParamDataList vmsSettings;
+        return mediaServerClient->ec2GetSettings(&vmsSettings);
+    }
+
+    template<typename CheckUserLoginFunc>
+    void waitUntilUserLoginFuncPasses(CheckUserLoginFunc checkUserLoginFunc)
+    {
+        for (;;)
+        {
+            const auto result = checkUserLoginFunc();
+            switch (result)
+            {
+                case ec2::ErrorCode::ok:
+                    return;
+
+                case ec2::ErrorCode::unauthorized:
+                case ec2::ErrorCode::forbidden:
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    continue;
+
+                default:
+                    FAIL() << toString(result).toStdString();
+                    break;
+            }
+        }
     }
 };
 
@@ -280,7 +320,7 @@ TEST_P(
     whenUserCompletesRegistrationInCloud();
     whenVmsLostConnectionToTheCloud();
 
-    thenInvitedUserCanLoginToTheSystem();
+    thenInvitedUserCanLoginToTheSystemEventually();
 }
 
 TEST_P(
@@ -293,7 +333,7 @@ TEST_P(
     whenUserActivatesAccountByFollowingActivationLink();
     whenVmsLostConnectionToTheCloud();
 
-    thenInvitedUserCanLoginToTheSystem();
+    thenInvitedUserCanLoginToTheSystemEventually();
 }
 
 TEST_P(

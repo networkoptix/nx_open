@@ -1,4 +1,0 @@
-/cameras camera removed "ec2_test_cam_150" null
-/cameras camera added null "ec2_test_cam_1000"
-/cameras/ec2_test_cam_62/mac unicode changed "92-61-00-00-00-3E" "92-61-00-00-00-FF"
-/cameras/ec2_test_cam_117 dict removed "groupId" null

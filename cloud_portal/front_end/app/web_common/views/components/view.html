@@ -22,18 +22,25 @@
     <tr>
         <td>
             <div class="view-wrapper">
-                <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera" search-cams="searchCams"
-                              show-camera-panel="showCameraPanel" class="cameras-panel-wrapper"
-                              ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
+                <camera-panel cameras-provider="camerasProvider"
+                              active-camera="activeCamera"
+                              search-cams="searchCams"
+                              show-camera-panel="showCameraPanel"
+                              is-embeded="isEmbeded"
+                              class="cameras-panel-wrapper"
+                              ng-class="{'hide-panel':!showCameraPanel, 'on-top': showOnTop}"></camera-panel>
             </div>
         </td>
         <td width="100%">
             <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
             <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
-                <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
+                <div class="view-panel" ng-class="{'no-archive': !canViewArchive, 'no-controls' : !showTimeline}">
                     <div class="fullscreen-area" ng-class="{'fullscreen': isFullscreen}">
                         <div class="fullscreen-hoverarea">
-                            <div class="stick-to-top top-gradient" ng-class="{'hide-fullscreen': isFullscreen}">
+                            <div class="stick-to-top top-gradient"
+                                 ng-class="{'hide-fullscreen': isFullscreen}"
+                                 ng-if="showCameraHeader">
+
                                 <div class="webclient-panel webclient-bottom-border">
                                     <div class="float-right">
                                         <div class="video-title-buffer">&nbsp;</div>
@@ -41,8 +48,8 @@
                                                 <button class="cast-button" is="google-cast-button" id="castbutton"
                                                         ng-click="showWarning()"></button>
                                             </span>
-                                        <div class="btn-group video-settings-icon" ng-init="showSettings = false">
-                                            <span class="video-icon" ng-click="showSettings = !showSettings">
+                                        <div class="btn-group video-settings-icon">
+                                            <span class="video-icon" ng-click="toggleSettingsMenu()">
                                                 <span class="glyphicon glyphicon-cog"></span>
                                             </span>
                                             <ul class="dropdown-menu video-settings"
@@ -79,6 +86,15 @@
                                                             &nbsp;Voice Commands
                                                         </span>
                                                 </li>
+                                                <li class="video-settings-divider buffer" ></li>
+                                                <li class="video-settings-button"
+                                                    ng-if="betaMode && !isEmbeded"
+                                                    ng-click="showEmbed();">
+                                                        <span>
+                                                            <span class="glyphicon glyphicon-bullhorn"></span>
+                                                            &nbsp;Embed
+                                                        </span>
+                                                </li>
                                             </ul>
                                         </div>
                                         <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
@@ -91,9 +107,12 @@
                                             </span>
                                     </div>
                                     <div class="hide-excess-text video-title">
-                                            <span class="visible-xs" ng-click="showCamerasPanel()"
+                                            <span class="d-block d-md-none float-left" ng-click="showCamerasPanel()"
                                                   ng-class="{'back-button': !showCameraPanel}">
-                                                <span class="glyphicon glyphicon-arrow-left"></span>
+                                                <span
+                                                        class="glyphicon glyphicon-arrow-left"
+                                                        ng-if="showCamerasMenu">
+                                                </span>
                                             </span>
                                         <camera-status camera="activeCamera" type="'video'"></camera-status>
                                         <span class="caption-row video-name">
@@ -129,7 +148,10 @@
                         </div>
                     </div>
 
-                    <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">
+                    <div class="stick-to-bottom"
+                         ng-class="{invisible:!activeCamera}"
+                         ng-if="showTimeline">
+
                         <timeline
                                 camera-status="activeCamera.status"
                                 can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"

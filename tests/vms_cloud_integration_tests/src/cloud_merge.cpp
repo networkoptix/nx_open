@@ -5,8 +5,8 @@
 #include <test_support/peer_wrapper.h>
 #include <test_support/merge_test_fixture.h>
 
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 #include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
@@ -90,7 +90,7 @@ protected:
         }
     }
 
-    nx::cdb::AccountWithPassword registerCloudUser()
+    nx::cloud::db::AccountWithPassword registerCloudUser()
     {
         return m_cdb.addActivatedAccount2();
     }
@@ -123,14 +123,14 @@ protected:
     {
         for (;;)
         {
-            std::vector<nx::cdb::api::SystemDataEx> systems;
+            std::vector<nx::cloud::db::api::SystemDataEx> systems;
             ASSERT_EQ(
-                nx::cdb::api::ResultCode::ok,
+                nx::cloud::db::api::ResultCode::ok,
                 m_cdb.getSystems(m_cloudAccounts[0].email, m_cloudAccounts[0].password, &systems));
             ASSERT_GT(systems.size(), 0U);
             bool everySystemIsOnline = true;
             for (const auto& system: systems)
-                everySystemIsOnline &= system.stateOfHealth == nx::cdb::api::SystemHealth::online;
+                everySystemIsOnline &= system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
 
             if (everySystemIsOnline)
                 break;
@@ -146,7 +146,7 @@ protected:
     void whenMergeSystemsWithCloudDbRequest()
     {
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.mergeSystems(
                 m_cloudAccounts[0],
                 m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
@@ -158,7 +158,7 @@ protected:
         m_cdb.stop();
     }
 
-    void thenMergeSucceded()
+    void thenMergeSucceeded()
     {
         ASSERT_EQ(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
     }
@@ -184,6 +184,17 @@ protected:
         }
     }
 
+    void andSlaveSystemDisappearedFromCloudDb()
+    {
+        std::vector<nx::cloud::db::api::SystemDataEx> systems;
+        ASSERT_EQ(
+            nx::cloud::db::api::ResultCode::ok,
+            m_cdb.getSystems(
+                m_cloudAccounts[0].email, m_cloudAccounts[0].password,
+                &systems));
+        ASSERT_EQ(1U, systems.size());
+    }
+
     void thenMergedSystemDisappearedFromCloud()
     {
         waitUntilAllCloudCredentialsAreNotValidExcept(m_systemCloudCredentials[0]);
@@ -192,9 +203,9 @@ protected:
     void thenCloudCredentialsAreValid(
         const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
-        nx::cdb::api::SystemDataEx systemData;
+        nx::cloud::db::api::SystemDataEx systemData;
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.getSystem(
                 cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
                 cloudCredentials.systemId.toStdString(), &systemData));
@@ -203,9 +214,9 @@ protected:
     void thenCloudCredentialsAreNotValid(
         const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
-        nx::cdb::api::SystemDataEx systemData;
+        nx::cloud::db::api::SystemDataEx systemData;
         ASSERT_NE(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.getSystem(
                 cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
                 cloudCredentials.systemId.toStdString(), &systemData));
@@ -219,12 +230,12 @@ protected:
             if (cloudCredentials.systemId == cloudCredentialsException.systemId)
                 continue;
 
-            nx::cdb::api::SystemDataEx systemData;
+            nx::cloud::db::api::SystemDataEx systemData;
             const auto resultCode = m_cdb.getSystem(
                 cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
                 cloudCredentials.systemId.toStdString(), &systemData);
 
-            if (resultCode == nx::cdb::api::ResultCode::ok)
+            if (resultCode == nx::cloud::db::api::ResultCode::ok)
                 return false;
         }
 
@@ -248,9 +259,9 @@ protected:
         // Waiting until cloud has all that users vms has.
         for (;;)
         {
-            std::vector<nx::cdb::api::SystemSharingEx> cloudUsers;
+            std::vector<nx::cloud::db::api::SystemSharingEx> cloudUsers;
             ASSERT_EQ(
-                nx::cdb::api::ResultCode::ok,
+                nx::cloud::db::api::ResultCode::ok,
                 m_cdb.getSystemSharings(
                     cloudCredentials.systemId.toStdString(),
                     cloudCredentials.key.toStdString(),
@@ -287,13 +298,31 @@ protected:
 
     void thenMergeFullyCompleted()
     {
-        thenMergeSucceded();
+        thenMergeSucceeded();
         andAllServersAreInterconnected();
         andAllServersSynchronizedData();
         andMergeHistoryRecordIsAdded();
+
+        waitUntilVmsTransactionLogMatchesCloudOne();
+
+        andSlaveSystemDisappearedFromCloudDb();
     }
 
-    void waitUntilVmsTranscationLogMatchesCloudOne(int peerIndex = 0)
+    void waitToSystemToBeOnline()
+    {
+        for (;;)
+        {
+            if (systemIsOnline(m_systemMergeFixture.peer(0)
+                    .getCloudCredentials().systemId.toStdString()))
+            {
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
+    void waitUntilVmsTransactionLogMatchesCloudOne(int peerIndex = 0)
     {
         auto mediaServerClient = m_systemMergeFixture.peer(peerIndex).mediaServerClient();
 
@@ -318,6 +347,13 @@ protected:
                 m_systemMergeFixture.peer(peerIndex).getCloudCredentials().systemId.toStdString(),
                 &cloudTransactionLog);
 
+            std::sort(
+                vmsTransactionLog.begin(), vmsTransactionLog.end(),
+                [](const auto& left, const auto& right) { return left.tranGuid < right.tranGuid; });
+            std::sort(
+                cloudTransactionLog.begin(), cloudTransactionLog.end(),
+                [](const auto& left, const auto& right) { return left.tranGuid < right.tranGuid; });
+
             if (vmsTransactionLog == cloudTransactionLog)
                 break;
 
@@ -325,15 +361,15 @@ protected:
         }
     }
 
-    void shareSystem(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    void shareSystem(int index, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.shareSystem(
                 m_cloudAccounts[index],
                 m_systemMergeFixture.peer(index).getCloudCredentials().systemId.toStdString(),
                 cloudUser.email,
-                nx::cdb::api::SystemAccessRole::cloudAdmin));
+                nx::cloud::db::api::SystemAccessRole::cloudAdmin));
     }
 
     void disconnectFromCloud(int index)
@@ -341,17 +377,17 @@ protected:
         ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
     }
 
-    void assertUserIsAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
+    void assertUserIsAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_TRUE(testUserLogin(peerIndex, cloudUser));
     }
 
-    void assertUserIsNotAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
+    void assertUserIsNotAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_FALSE(testUserLogin(peerIndex, cloudUser));
     }
 
-    bool testUserLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    bool testUserLogin(int index, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         using namespace nx::network::http;
 
@@ -364,9 +400,9 @@ protected:
     }
 
 private:
-    nx::cdb::CdbLauncher m_cdb;
+    nx::cloud::db::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
-    std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
+    std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
     nx::network::http::TestHttpServer m_httpProxy;
 
@@ -396,7 +432,7 @@ private:
 
     bool connectToCloud(
         ::ec2::test::PeerWrapper& peerWrapper,
-        const nx::cdb::AccountWithPassword& ownerAccount)
+        const nx::cloud::db::AccountWithPassword& ownerAccount)
     {
         const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
         if (!peerWrapper.saveCloudSystemCredentials(
@@ -419,6 +455,20 @@ private:
             system.id,
             peerWrapper.endpoint());
         return true;
+    }
+
+    bool systemIsOnline(const std::string& systemId)
+    {
+        nx::cloud::db::api::SystemDataEx system;
+        if (m_cdb.getSystem(
+                m_cloudAccounts[0].email, m_cloudAccounts[0].password,
+                systemId,
+                &system) != nx::cloud::db::api::ResultCode::ok)
+        {
+            return false;
+        }
+
+        return system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
     }
 };
 
@@ -467,7 +517,7 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
     whenMergeSystems();
 
     thenMergeFullyCompleted();
-    waitUntilVmsTranscationLogMatchesCloudOne();
+    waitUntilVmsTransactionLogMatchesCloudOne();
 }
 
 TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_cloud_system)
@@ -478,20 +528,20 @@ TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_clou
     const auto someCloudUser = registerCloudUser();
 
     shareSystem(newerSystemIndex, someCloudUser);
-    waitUntilVmsTranscationLogMatchesCloudOne(newerSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(newerSystemIndex);
 
     disconnectFromCloud(newerSystemIndex); //< Every cloud user is removed from system.
     assertUserIsNotAbleToLogin(newerSystemIndex, someCloudUser);
 
-    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
 
     whenMergeSystems();
     thenMergeFullyCompleted();
 
-    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
 
     shareSystem(olderSystemIndex, someCloudUser);
-    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
     assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
 }
 

@@ -1,9 +1,10 @@
 set(nx_enable_werror ON)
 
+add_subdirectory(libs)
 add_subdirectory(cloud_db_client)
+add_subdirectory(nx_cloud_connectivity)
 
 if(withClouds OR withDesktopClient)
-    add_subdirectory(librelaying)
     add_subdirectory(libvms_gateway_core)
 endif()
 
@@ -11,8 +12,6 @@ if(withClouds)
     add_subdirectory(vms_gateway)
     add_subdirectory(libconnection_mediator)
     add_subdirectory(connection_mediator)
-    add_subdirectory(nx_data_sync_engine)
-    add_subdirectory(nx_key_value_db)
     add_subdirectory(libcloud_db)
     add_subdirectory(cloud_db)
     add_subdirectory(libtraffic_relay)

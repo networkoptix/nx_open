@@ -18,6 +18,14 @@ angular.module('cloudApp')
                     page.title(value ? value + ' -' : '');
                     systemsProvider.forceUpdateSystems();
                 });
+                
+                $scope.$watch('system.mergeInfo', function(mergeInfo){
+                    if (mergeInfo) {
+                        setMergeStatus(mergeInfo)
+                    } else{
+                        $scope.currentlyMerging = false;
+                    }
+                })
             });
 
             function getMergeTarget(targetSystemId) {
@@ -215,7 +223,7 @@ angular.module('cloudApp')
                 dialogs.confirm(L.system.confirmUnshare,
                     L.system.confirmUnshareTitle,
                     L.system.confirmUnshareAction,
-                    'btn-danger', 'Cancel')
+                    'btn-danger', L.dialogs.cancelButton)
                     .then(function (result) {
                         if (result) {
                             // Run a process of sharing

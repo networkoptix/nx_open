@@ -226,13 +226,15 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 
     if (!httpEndpoints.empty())
     {
-        return nx::utils::Url(lm("http://%1/")
-            .arg(httpEndpoints[0].toStdString()).toQString());
+        return network::url::Builder()
+            .setScheme(network::http::kUrlSchemeName)
+            .setEndpoint(httpEndpoints[0]);
     }
     else if (!httpsEndpoints.empty())
     {
-        return nx::utils::Url(lm("https://%1/")
-            .arg(httpsEndpoints[0].toStdString()).toQString());
+        return network::url::Builder()
+            .setScheme(network::http::kSecureUrlSchemeName)
+            .setEndpoint(httpsEndpoints[0]);
     }
     else
     {
@@ -272,8 +274,9 @@ void BasicTestFixture::startExchangingFixedData()
     QnMutexLocker lock(&m_mutex);
 
     m_httpClients.push_back(std::make_unique<nx::network::http::AsyncClient>());
-    m_httpClients.back()->setSendTimeout(std::chrono::seconds::zero());
-    m_httpClients.back()->setResponseReadTimeout(std::chrono::seconds::zero());
+    m_httpClients.back()->setSendTimeout(kNoTimeout);
+    m_httpClients.back()->setResponseReadTimeout(kNoTimeout);
+    m_httpClients.back()->setMessageBodyReadTimeout(kNoTimeout);
 
     ++m_unfinishedRequestsLeft;
 

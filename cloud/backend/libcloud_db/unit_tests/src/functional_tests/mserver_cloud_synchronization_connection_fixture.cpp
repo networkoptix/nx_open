@@ -5,8 +5,7 @@
 
 #include <nx_ec/ec_proto_version.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 Ec2MserverCloudSynchronizationConnection::Ec2MserverCloudSynchronizationConnection()
@@ -148,5 +147,4 @@ int Ec2MserverCloudSynchronizationConnection::numberOfConnectionsInACertainState
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

@@ -47,11 +47,6 @@ AbstractCloudDataProviderFactory::FactoryFunc
 }
 
 
-AbstractCloudDataProvider::System::System():
-    mediatorEnabled(false)
-{
-}
-
 AbstractCloudDataProvider::System::System(String authKey_, bool mediatorEnabled_):
     authKey(std::move(authKey_)),
     mediatorEnabled(mediatorEnabled_)
@@ -85,13 +80,13 @@ std::ostream& operator<<(
 const std::chrono::milliseconds CloudDataProvider::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 5 );
 
-static nx::cdb::api::ConnectionFactory* makeConnectionFactory(
+static nx::cloud::db::api::ConnectionFactory* makeConnectionFactory(
     const std::optional<nx::utils::Url>& cdbUrl)
 {
     auto factory = createConnectionFactory();
     if (factory && cdbUrl)
     {
-        NX_ALWAYS(typeid(nx::cdb::api::ConnectionFactory), lm("set url %1"), cdbUrl);
+        NX_ALWAYS(typeid(nx::cloud::db::api::ConnectionFactory), lm("set url %1"), cdbUrl);
         factory->setCloudUrl(cdbUrl->toString().toStdString());
     }
     return factory;
@@ -140,10 +135,10 @@ std::optional< AbstractCloudDataProvider::System >
 void CloudDataProvider::updateSystemsAsync()
 {
     m_connection->systemManager()->getSystemsFiltered(
-        cdb::api::Filter(/* Empty filter to get all systems independent of customization. */),
-        [this](cdb::api::ResultCode code, cdb::api::SystemDataExList systems)
+        nx::cloud::db::api::Filter(/* Empty filter to get all systems independent of customization. */),
+        [this](nx::cloud::db::api::ResultCode code, nx::cloud::db::api::SystemDataExList systems)
         {
-            if (code != cdb::api::ResultCode::ok)
+            if (code != nx::cloud::db::api::ResultCode::ok)
             {
                 NX_UTILS_LOG((std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
                     ? utils::log::Level::error

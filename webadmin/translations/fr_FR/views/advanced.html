@@ -106,7 +106,7 @@
             Aucun disque de stockage principal a été sélectionné pour l’écriture - vidéo ne sera pas entrgistré sur ce serveur.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Quantité d'espace réservé est supérieure à l'espace libre. Séquences vidéo actuelles peuvent être supprimées pour libérer de l'espace.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Corrigez tous les paramètres en surbrillance pour l’enregistrer</div>
 
@@ -116,36 +116,20 @@
 
     <h2>Paramètres journal</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Niveau journal principal</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Auncun: Journal désactivée.</option>
-                    <option value="ALWAYS">Toujours: Journal d'erreurs, avertissements et messages plus importants.</option>
-                    <option value="ERROR">Erreur: Erreurs dans le journal seulement.</option>
-                    <option value="WARNING">Attention: Journal d'avertissements et d'erreurs.</option>
-                    <option value="INFO">Info: Journal d'erreurs, avertissements et tous les messages.</option>
-                    <option value="DEBUG">Debug: Journal tous message système et information débogage.</option>
-                    <option value="DEBUG2">Debug2: Journal tous message système et information débogage étendues.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Auncun: Journal désactivée.</option>
+                    <option value="always">Toujours: Journal d'erreurs, avertissements et messages plus importants.</option>
+                    <option value="error">Erreur: Erreurs dans le journal seulement.</option>
+                    <option value="warning">Attention: Journal d'avertissements et d'erreurs.</option>
+                    <option value="info">Info: Journal d'erreurs, avertissements et tous les messages.</option>
+                    <option value="debug">Debug: Journal tous message système et information débogage.</option>
+                    <option value="debug2">Debug2: Journal tous message système et information débogage étendues.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Niveau journal de transaction</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Auncun: Journal désactivée.</option>
-                    <option value="ALWAYS">Toujours: Journal d'erreurs, avertissements et messages plus importants.</option>
-                    <option value="ERROR">Erreur: Erreurs dans le journal seulement.</option>
-                    <option value="WARNING">Attention: Journal d'avertissements et d'erreurs.</option>
-                    <option value="INFO">Info: Journal d'erreurs, avertissements et tous les messages.</option>
-                    <option value="DEBUG">Debug: Journal tous message système et information débogage.</option>
-                    <option value="DEBUG2">Debug2: Journal tous message système et information débogage étendues.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Enregistrer</button>
         </div>

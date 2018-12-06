@@ -2,8 +2,8 @@
 <div class="container auth-hidden">
     <h1 class="process-success d-flex align-items-center flex-column mt-5"
         ng-if="(register.success || registerSuccess) && !activated">
-        <span>Account is created.</span>
-        <span>Confirmation message is sent to</span>
+        <span>Обліковий запис створено</span>
+        <span>Підтвердження відправлено на</span>
         <span><strong>{{account.email}}</strong></span>
     </h1>
 
@@ -30,7 +30,7 @@
                        required name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Поле "Ім'я" обов'язкове до заповнення</span>
+                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Поле "Ім'я" обов'язково до заповнення</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
@@ -43,12 +43,12 @@
                        required name="lastName" autocomplete="off">
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Поле "Прізвище" обов'язкове до заповнення</span>
+                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Прізвище (обов'язково)</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
-                <label for="registerEmail" class="text-left text-md-right control-label">Електронна пошта</label>
+                <label for="registerEmail" class="text-left text-md-right control-label">Email</label>
             </div>
             <div class="col-md-4">
                 <input ng-hide="lockEmail" type="email" class="form-control"
@@ -87,7 +87,7 @@
                             <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
                         </svg>
                     </span>
-                    <span class="text">I agree to the <a href="/content/eula" target="_blank">Terms & Conditions</a> and <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a></span>
+                    <span class="text">Я згоден з<a href="/content/eula" target="_blank">умовами</a> и <a href="%PRIVACY_LINK%" target="_blank">правилами конфіденційності</a></span>
                 </label>
             </div>
             <div class="col-md-4">

@@ -7,4 +7,18 @@ label {
     font-weight   : 500;
     line-height   : 16px;
     margin-bottom : 8px;
+    color         : $dark9;
+
+    &[disabled] {
+        opacity : .3;
+        cursor  : default;
+    }
+
+    &:hover:not([disabled]) {
+        color : $dark1;
+    }
+
+    &:active:not([disabled]) {
+        color : $dark9 !important;
+    }
 }
