@@ -69,7 +69,8 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     NX_VERBOSE(this) << "ServerUpdateTool will output temp files to " << path;
 
     m_uploadManager.reset(new UploadManager());
-    m_updatesModel.reset(new ServerUpdatesModel(this));
+    m_stateTracker.reset(new PeerStateTracker(this));
+    m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
@@ -128,9 +129,6 @@ void ServerUpdateTool::loadInternalState()
                 // TODO: Check if we really need more robust state restoration.
                 m_updateCheck = checkUpdateFromFile(stored.file);
                 break;
-            //case OfflineUpdateState::unpack:
-            //case OfflineUpdateState::done:
-            //case OfflineUpdateState::error:
             default:
                 m_offlineUpdaterState = OfflineUpdateState::initial;
         }
@@ -287,38 +285,15 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
     m_offlineUpdateCheckResult.set_value(contents);
 }
 
-void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
-{
-    QObject::disconnect(m_onAddedResource);
-    QObject::disconnect(m_onRemovedResource);
-    QObject::disconnect(m_onUpdatedResource);
-
-    m_activeServers.clear();
-    const auto allServers = pool->getAllServers(Qn::AnyStatus);
-    for (const QnMediaServerResourcePtr &server : allServers)
-    {
-        const auto status = server->getStatus();
-        if (status == Qn::Offline || status == Qn::Unauthorized)
-            continue;
-        m_activeServers[server->getId()] = server;
-    }
-
-    m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
-        this, &ServerUpdateTool::atResourceAdded);
-    m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
-        this, &ServerUpdateTool::atResourceRemoved);
-    // TODO: Should replace it by connecting to each resource
-    m_onUpdatedResource = connect(pool, &QnResourcePool::resourceChanged,
-        this, &ServerUpdateTool::atResourceChanged);
-}
-
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result;
-    auto items = m_updatesModel->getServerData();
+    auto items = m_stateTracker->getAllItems();
     for (auto record: items)
     {
-        auto server = record->server;
+        auto server = m_stateTracker->getServer(record.get());
+        if (!server)
+            continue;
         bool isOurServer = !server->hasFlags(Qn::fake_server)
             || helpers::serverBelongsToCurrentSystem(server);
 
@@ -573,12 +548,8 @@ void ServerUpdateTool::stopUpload()
 
 bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
 {
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
-    {
-        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
-        activeServers = m_activeServers;
-    }
-
+    NX_ASSERT(m_stateTracker);
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
     return verifyUpdateContents(commonModule(), contents, activeServers);
 }
 
@@ -626,31 +597,6 @@ void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
     progress.current += 100 * m_completeDownloads.size();
     progress.done += m_completeDownloads.size();
     progress.max += 100 * m_issuedDownloads.size();
-}
-
-void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
-{
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        m_activeServers[server->getId()] = server;
-    // TODO: We should check new server for uploading operations
-}
-
-void ServerUpdateTool::atResourceRemoved(const QnResourcePtr& resource)
-{
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        m_activeServers.erase(server->getId());
-    // TODO: We should remove this server from uploading operations
-}
-
-void ServerUpdateTool::atResourceChanged(const QnResourcePtr& resource)
-{
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-    // Relevant state transitions:
-    //  - Offline->Online. Should start upload for this server
-    //  - Online->Offline|Unauthorized|Incompatible. Should stop upload operation.
-    //  - Stopped being part of this system: WTF?
 }
 
 bool ServerUpdateTool::hasRemoteChanges() const
@@ -722,12 +668,28 @@ void ServerUpdateTool::requestStopAction()
     for (const auto& file: m_activeDownloads)
         m_downloader->deleteFile(file.first);
     m_activeDownloads.clear();
-
-    m_updatesModel->clearState();
+    m_stateTracker->clearState();
 }
 
-void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info)
+void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info, QSet<QnUuid> targets)
 {
+    QSet<QnUuid> servers;
+    for (auto id: targets)
+    {
+        auto item = m_stateTracker->findItemById(id);
+        if (item->component == UpdateItem::Component::server)
+            servers.insert(id);
+    }
+    if (servers.empty())
+    {
+        NX_WARNING(this)
+            << "requestStartUpdate(" << info.version
+            << ") - target list contains no server to update";
+        return;
+    }
+    NX_VERBOSE(this)
+        << "requestStartUpdate(" << info.version
+        << ") - sending /ec2/startUpdate command";
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         connection->updateActionStart(info);
@@ -745,7 +707,8 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
         m_skippedRequests.unite(m_activeRequests);
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_remoteUpdateStatus = {};
-    m_updatesModel->setServersInstalling(targets);
+
+    m_stateTracker->setPeersInstalling(targets, true);
 
     auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -828,112 +791,21 @@ void ServerUpdateTool::requestRemoteUpdateState()
     }
 }
 
-QSet<QnUuid> ServerUpdateTool::getAllServers() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        result.insert(item->server->getId());
-    }
-    return result;
-}
-
-std::map<QnUuid, nx::update::Status::Code> ServerUpdateTool::getAllServerStates() const
-{
-    std::map<QnUuid, nx::update::Status::Code> result;
-
-    for (const auto& item: m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        result.insert(std::make_pair(item->server->getId(), item->state));
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdateTool::getServersInState(StatusCode state) const
-{
-    QSet<QnUuid> result;
-    for (const auto& item: m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        if (item->state == state)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdateTool::getOfflineServers() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        if (item->offline)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdateTool::getLegacyServers() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        if (item->onlyLegacyUpdate)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        if (item->installing)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdateTool::getServersCompleteInstall() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        if (item->installed)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdateTool::getServersWithChangedProtocol() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_updatesModel->getServerData())
-    {
-        if (!item->server)
-            continue;
-        if (item->changedProtocol)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {
     return m_updatesModel;
+}
+
+std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
+{
+    return m_stateTracker;
+}
+
+QnMediaServerResourcePtr ServerUpdateTool::getServer(const UpdateItem* item) const
+{
+    if (!item)
+        return QnMediaServerResourcePtr();
+    return resourcePool()->getResourceById<QnMediaServerResource>(item->id);
 }
 
 ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(

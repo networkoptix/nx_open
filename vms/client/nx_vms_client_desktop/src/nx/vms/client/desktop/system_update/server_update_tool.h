@@ -30,6 +30,8 @@ namespace nx::vms::client::desktop {
 
 class UploadManager;
 class ServerUpdatesModel;
+class PeerStateTracker;
+struct UpdateItem;
 
 /**
  * A tool to interact with remote server state.
@@ -58,8 +60,6 @@ public:
     ServerUpdateTool(QObject* parent = nullptr);
     ~ServerUpdateTool();
 
-    void setResourceFeed(QnResourcePool* pool);
-
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
@@ -84,7 +84,7 @@ public:
      * Asks mediaservers to start the update process.
      * @param info - update manifest
      */
-    void requestStartUpdate(const nx::update::Information& info);
+    void requestStartUpdate(const nx::update::Information& info, QSet<QnUuid> targets);
 
     /**
      * Asks mediaservers to stop the update process.
@@ -162,34 +162,13 @@ public:
 
     bool haveActiveUpdate() const;
 
-    // Get current set of servers.
-    QSet<QnUuid> getAllServers() const;
-
-    std::map<QnUuid, nx::update::Status::Code> getAllServerStates() const;
-
-    // Get servers with specified update status.
-    QSet<QnUuid> getServersInState(nx::update::Status::Code status) const;
-
-    // Get servers that are offline right now.
-    QSet<QnUuid> getOfflineServers() const;
-
-    // Get servers that are incompatible with the new update system.
-    QSet<QnUuid> getLegacyServers() const;
-
-    // Get servers that have completed installation process.
-    QSet<QnUuid> getServersCompleteInstall() const;
-
-    // Get servers that have started update installation.
-    // Note: only client, that have sent an 'install' command can know about this state.
-    QSet<QnUuid> getServersInstalling() const;
-
-    // Get servers, which are installing updates for too long.
-    QSet<QnUuid> getServersWithStalledUpdate() const;
-
     // Get servers with updated protocol.
     QSet<QnUuid> getServersWithChangedProtocol() const;
 
     std::shared_ptr<ServerUpdatesModel> getModel();
+    std::shared_ptr<PeerStateTracker> getStateTracker();
+
+    QnMediaServerResourcePtr getServer(const UpdateItem* item) const;
 
     // These are debug functions that return URL to appropriate mediaserver API calls.
     // This URLs are clickable at MultiServerUpdateWidget. This allows testers to
@@ -227,16 +206,10 @@ signals:
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
 
 private:
-    // Handlers for resource updates.
-    void atResourceAdded(const QnResourcePtr& resource);
-    void atResourceRemoved(const QnResourcePtr& resource);
-    void atResourceChanged(const QnResourcePtr& resource);
-
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
     void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void atExtractFilesFinished(int code);
-
     void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
@@ -272,12 +245,6 @@ private:
     bool m_checkingRemoteUpdateStatus = false;
     mutable std::recursive_mutex m_statusLock;
 
-    // Servers we do work with.
-    std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
-
-    // Explicit connections to resource pool events.
-    QMetaObject::Connection m_onAddedResource, m_onRemovedResource, m_onUpdatedResource;
-
     // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
     std::unique_ptr<UploadManager> m_uploadManager;
     std::set<QString> m_activeUploads;
@@ -305,6 +272,7 @@ private:
     QSet<rest::Handle> m_activeRequests;
     QSet<rest::Handle> m_skippedRequests;
 
+    std::shared_ptr<PeerStateTracker> m_stateTracker;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
 
     using Clock = std::chrono::steady_clock;
