@@ -285,32 +285,6 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
     m_offlineUpdateCheckResult.set_value(contents);
 }
 
-void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
-{
-    QObject::disconnect(m_onAddedResource);
-    QObject::disconnect(m_onRemovedResource);
-    QObject::disconnect(m_onUpdatedResource);
-
-    m_activeServers.clear();
-    const auto allServers = pool->getAllServers(Qn::AnyStatus);
-    for (const QnMediaServerResourcePtr &server : allServers)
-    {
-        const auto status = server->getStatus();
-        if (status == Qn::Offline || status == Qn::Unauthorized)
-            continue;
-        m_activeServers[server->getId()] = server;
-    }
-
-    m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
-        this, &ServerUpdateTool::atResourceAdded);
-    m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
-        this, &ServerUpdateTool::atResourceRemoved);
-    // TODO: Should replace it by connecting to each resource
-    m_onUpdatedResource = connect(pool, &QnResourcePool::resourceChanged,
-        this, &ServerUpdateTool::atResourceChanged);
-    m_stateTracker->setResourceFeed(pool);
-}
-
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result;
@@ -574,12 +548,8 @@ void ServerUpdateTool::stopUpload()
 
 bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
 {
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
-    {
-        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
-        activeServers = m_activeServers;
-    }
-
+    NX_ASSERT(m_stateTracker);
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
     return verifyUpdateContents(commonModule(), contents, activeServers);
 }
 
@@ -627,31 +597,6 @@ void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
     progress.current += 100 * m_completeDownloads.size();
     progress.done += m_completeDownloads.size();
     progress.max += 100 * m_issuedDownloads.size();
-}
-
-void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
-{
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        m_activeServers[server->getId()] = server;
-    // TODO: We should check new server for uploading operations
-}
-
-void ServerUpdateTool::atResourceRemoved(const QnResourcePtr& resource)
-{
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        m_activeServers.erase(server->getId());
-    // TODO: We should remove this server from uploading operations
-}
-
-void ServerUpdateTool::atResourceChanged(const QnResourcePtr& resource)
-{
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-    // Relevant state transitions:
-    //  - Offline->Online. Should start upload for this server
-    //  - Online->Offline|Unauthorized|Incompatible. Should stop upload operation.
-    //  - Stopped being part of this system: WTF?
 }
 
 bool ServerUpdateTool::hasRemoteChanges() const

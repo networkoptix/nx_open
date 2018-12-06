@@ -60,8 +60,6 @@ public:
     ServerUpdateTool(QObject* parent = nullptr);
     ~ServerUpdateTool();
 
-    void setResourceFeed(QnResourcePool* pool);
-
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
@@ -208,16 +206,10 @@ signals:
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
 
 private:
-    // Handlers for resource updates.
-    void atResourceAdded(const QnResourcePtr& resource);
-    void atResourceRemoved(const QnResourcePtr& resource);
-    void atResourceChanged(const QnResourcePtr& resource);
-
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
     void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void atExtractFilesFinished(int code);
-
     void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
@@ -252,13 +244,6 @@ private:
     RemoteStatus m_remoteUpdateStatus;
     bool m_checkingRemoteUpdateStatus = false;
     mutable std::recursive_mutex m_statusLock;
-
-    // Servers we do work with.
-    // TODO: Why do we keep this
-    std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
-
-    // Explicit connections to resource pool events.
-    QMetaObject::Connection m_onAddedResource, m_onRemovedResource, m_onUpdatedResource;
 
     // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
     std::unique_ptr<UploadManager> m_uploadManager;

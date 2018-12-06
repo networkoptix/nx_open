@@ -27,6 +27,7 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     for (auto item: m_items)
         emit itemRemoved(item);
     m_items.clear();
+    m_activeServers.clear();
 
     addItemForClient();
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
@@ -108,8 +109,6 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 item->installing = false;
             item->offline = (status.second.code == StatusCode::offline);
-            //QModelIndex idx = index(item->row, 0);
-            //emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
             emit itemChanged(item);
         }
     }
@@ -144,6 +143,7 @@ void PeerStateTracker::clearState()
 
 std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() const
 {
+    QnMutexLocker locker(&m_dataLock);
     std::map<QnUuid, nx::update::Status::Code> result;
 
     for (const auto& item: m_items)
@@ -153,13 +153,21 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
     return result;
 }
 
+std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::getActiveServers() const
+{
+    QnMutexLocker locker(&m_dataLock);
+    return m_activeServers;
+}
+
 QList<UpdateItemPtr> PeerStateTracker::getAllItems() const
 {
+    QnMutexLocker locker(&m_dataLock);
     return m_items;
 }
 
 QSet<QnUuid> PeerStateTracker::getAllPeers() const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
         result.insert(item->id);
@@ -168,6 +176,7 @@ QSet<QnUuid> PeerStateTracker::getAllPeers() const
 
 QSet<QnUuid> PeerStateTracker::getServersInState(StatusCode state) const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
@@ -179,6 +188,7 @@ QSet<QnUuid> PeerStateTracker::getServersInState(StatusCode state) const
 
 QSet<QnUuid> PeerStateTracker::getOfflineServers() const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
         if (item->offline)
@@ -188,6 +198,7 @@ QSet<QnUuid> PeerStateTracker::getOfflineServers() const
 
 QSet<QnUuid> PeerStateTracker::getLegacyServers() const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
@@ -201,6 +212,7 @@ QSet<QnUuid> PeerStateTracker::getLegacyServers() const
 
 QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
         if (item->installing)
@@ -210,6 +222,7 @@ QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
 
 QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
         if (item->installed)
@@ -219,6 +232,7 @@ QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
 
 QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
 {
+    QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
@@ -246,14 +260,16 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
+    UpdateItemPtr item;
+    {
+        QnMutexLocker locker(&m_dataLock);
+        m_activeServers[server->getId()] = server;
+        item = addItemForServer(server);
+        updateServerData(server, item);
+    }
 
-    //int row = m_items.size();
-    //beginInsertRows(QModelIndex(), row, row);
-    auto item = addItemForServer(server);
     updateContentsIndex();
     emit itemAdded(item);
-    //endInsertRows();
-
 }
 
 void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
@@ -262,13 +278,6 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     if (!server)
         return;
 
-    auto item = findItemById(server->getId());
-    if (!item)
-    {
-        // Warning here
-        return;
-    }
-
     disconnect(server.data(), &QnResource::statusChanged,
         this, &PeerStateTracker::atResourceChanged);
     disconnect(server.data(), &QnMediaServerResource::versionChanged,
@@ -276,12 +285,15 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     disconnect(server.data(), &QnResource::flagsChanged,
         this, &PeerStateTracker::atResourceChanged);
 
-    //QModelIndex idx = createIndex(item->row, 0);
-    //if (!idx.isValid())
-    //    return;
-
-    m_items.removeAt(item->row);
-    updateContentsIndex();
+    auto item = findItemById(server->getId());
+    if (!item)
+        return;
+    {
+        QnMutexLocker locker(&m_dataLock);
+        m_activeServers.erase(server->getId());
+        m_items.removeAt(item->row);
+        updateContentsIndex();
+    }
 
     emit itemRemoved(item);
 }
@@ -292,10 +304,18 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
     if (!server)
         return;
 
-    auto item = findItemById(resource->getId());
-    if (!item)
-        return;
-    updateServerData(server, item);
+    bool changed = false;
+
+    UpdateItemPtr item;
+    {
+        QnMutexLocker locker(&m_dataLock);
+        item = findItemById(resource->getId());
+        if (!item)
+            return;
+        changed = updateServerData(server, item);
+    }
+    if (changed)
+        emit itemChanged(item);
 }
 
 void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
@@ -371,7 +391,6 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
         this, &PeerStateTracker::atResourceChanged);
     connect(server.data(), &QnResource::flagsChanged,
         this, &PeerStateTracker::atResourceChanged);
-    updateServerData(server, item);
     return item;
 }
 
@@ -384,10 +403,11 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
+    emit itemChanged(m_clientItem);
     return m_clientItem;
 }
 
-void PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item)
+bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item)
 {
     bool changed = false;
     auto status = server->getStatus();
@@ -429,11 +449,10 @@ void PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    if (changed)
-        emit itemChanged(item);
+    return changed;
 }
 
-void PeerStateTracker::updateClientData()
+bool PeerStateTracker::updateClientData()
 {
     bool changed = false;
     auto version = nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
@@ -443,8 +462,7 @@ void PeerStateTracker::updateClientData()
         changed = true;
     }
 
-    if (changed)
-        emit itemChanged(m_clientItem);
+    return changed;
 }
 
 void PeerStateTracker::updateContentsIndex()

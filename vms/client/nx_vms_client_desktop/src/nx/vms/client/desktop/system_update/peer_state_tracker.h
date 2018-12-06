@@ -15,7 +15,9 @@ namespace nx::vms::client::desktop {
 
 using StatusCode = nx::update::Status::Code;
 
-// This structure keeps all the information necessary to display current state of the server.
+/**
+ * This structure keeps all the information necessary to display current state of the server.
+ */
 struct UpdateItem
 {
     enum Roles
@@ -37,7 +39,7 @@ struct UpdateItem
     /** Current version of the component. */
     nx::utils::SoftwareVersion version;
     Component component;
-    // Flag for servers, that can be updated using legacy 3.2 system
+    /** Flag for servers, that can be updated using legacy 3.2 system. */
     bool onlyLegacyUpdate = false;
     bool legacyUpdateUsed = false;
     /** Client is uploading files to this server. */
@@ -71,7 +73,7 @@ public:
     int peersCount() const;
     /**
      * Get pointer to mediaserver from UpdateItem.
-     * It will return nullptr if item is not a server.
+     * It will return nullptr if the item is not a server.
      */
     QnMediaServerResourcePtr getServer(const UpdateItem* item) const;
 
@@ -83,6 +85,8 @@ public:
 
 public:
     std::map<QnUuid, nx::update::Status::Code> getAllPeerStates() const;
+    std::map<QnUuid, QnMediaServerResourcePtr> getActiveServers() const;
+
     QList<UpdateItemPtr> getAllItems() const;
     QSet<QnUuid> getAllPeers() const;
     QSet<QnUuid> getServersInState(StatusCode state) const;
@@ -93,8 +97,10 @@ public:
     QSet<QnUuid> getServersWithChangedProtocol() const;
 
 public:
-    // We connect it to ClientUpdateTool::updateStateChanged and turn it to a proper
-    // peer state inside our task sets.
+    /**
+     * We connect it to ClientUpdateTool::updateStateChanged and turn it to a proper
+     * peer state inside our task sets.
+     */
     void atClientupdateStateChanged(int state, int percentComplete);
 
 signals:
@@ -111,9 +117,9 @@ protected:
 protected:
     UpdateItemPtr addItemForServer(QnMediaServerResourcePtr server);
     UpdateItemPtr addItemForClient();
-    // Reads data from resource to UpdateItem
-    void updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item);
-    void updateClientData();
+    /** Reads data from resource to UpdateItem. */
+    bool updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item);
+    bool updateClientData();
     void updateContentsIndex();
 
 private:
@@ -125,6 +131,11 @@ private:
 
     QList<UpdateItemPtr> m_items;
     UpdateItemPtr m_clientItem;
+
+    /** Servers we do work with. */
+    std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
+
+    mutable QnMutex m_dataLock;
 };
 
 } // namespace nx::vms::client::desktop

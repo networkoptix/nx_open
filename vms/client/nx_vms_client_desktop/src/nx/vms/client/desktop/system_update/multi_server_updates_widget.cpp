@@ -165,7 +165,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_sortedModel.get(), &SortedPeerUpdatesModel::dataChanged,
         this, &MultiServerUpdatesWidget::atModelDataChanged);
 
-    m_serverUpdateTool->setResourceFeed(resourcePool());
+    m_stateTracker->setResourceFeed(resourcePool());
 
     // the column does not matter because the model uses column-independent sorting
     m_sortedModel->sort(0);
@@ -1259,7 +1259,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             if (!m_peersActive.contains(id))
             {
                 NX_VERBOSE(this)
-                    << "processRemoteInstalling() - peer "
+                    << "processRemoteInstalling() - peer"
                     << id << "has resumed installation";
                 m_peersActive.insert(id);
                 peersToRestartUpdate.insert(id);
