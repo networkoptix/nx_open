@@ -89,9 +89,9 @@ bool HevcParser::processData(
     m_lastRtpTimestamp = rtpTimestamp;
 
     // Check buffer overflow
-    if (!gotData && m_videoFrameSize > (int)MAX_ALLOWED_FRAME_SIZE)
+    if (!gotData && m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
     {
-        NX_WARNING(this, lm("RTP parser buffer overflow."));
+        NX_WARNING(this, "RTP parser buffer overflow.");
         handlePacketLoss(m_previousPacketSequenceNumber, sequenceNumber);
         return reset();
     }
