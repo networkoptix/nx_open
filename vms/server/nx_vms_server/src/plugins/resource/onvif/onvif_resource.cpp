@@ -3733,8 +3733,11 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     if (response.SubscriptionReference.Address)
     {
+        // While debugging port-forwarded devices it may be necessary to switch of port updating
+        // in fromOnvifDiscoveredUrl function, i.e. updatePort parameter should be set to false.
+        // Don't forget to restore true after working with port-forwarded device.
         m_onvifNotificationSubscriptionReference =
-            fromOnvifDiscoveredUrl(response.SubscriptionReference.Address);
+            fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, /*updatePort*/true);
     }
 
     QnMutexLocker lk(&m_ioPortMutex);
@@ -3837,36 +3840,42 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
             m_timeDrift));
     soapWrapper->soap()->imode |= SOAP_XML_IGNORENS;
 
-    std::vector<void*> memToFreeOnResponseDone;
-    memToFreeOnResponseDone.reserve(3); //we have 3 memory allocation below
-
-    char* buf = (char*)malloc(512);
-    memToFreeOnResponseDone.push_back(buf);
-
     _onvifEvents__PullMessages request;
     request.Timeout = (m_pullMessagesResponseElapsedTimer.elapsed() -
         m_previousPullMessagesResponseTimeMs) / MS_PER_SECOND * MS_PER_SECOND;
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
-    QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
-    strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
-    struct SOAP_ENV__Header* header = (struct SOAP_ENV__Header*)malloc(sizeof(SOAP_ENV__Header));
+
+    std::vector<void*> memToFreeOnResponseDone;
+    constexpr int kExperctedAllocationsCount = 4;
+    memToFreeOnResponseDone.reserve(kExperctedAllocationsCount);
+
+    struct SOAP_ENV__Header* header = (struct SOAP_ENV__Header*) malloc(sizeof(SOAP_ENV__Header));
     memToFreeOnResponseDone.push_back(header);
     memset(header, 0, sizeof(*header));
     soapWrapper->soap()->header = header;
-    soapWrapper->soap()->header->SubscriptionId = buf;
+
+    if(!m_onvifNotificationSubscriptionID.isEmpty())
+    {
+        QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
+        char* SubscriptionIdBuf = (char*) malloc(512);
+        memToFreeOnResponseDone.push_back(SubscriptionIdBuf);
+        strcpy(SubscriptionIdBuf, onvifNotificationSubscriptionIDLatin1.data());
+        soapWrapper->soap()->header->SubscriptionId = SubscriptionIdBuf;
+    }
+
     //TODO #ak move away check for "Samsung"
     if (!m_onvifNotificationSubscriptionReference.isEmpty() && !getVendor().contains(lit("Samsung")))
     {
         const QByteArray& onvifNotificationSubscriptionReferenceUtf8 = m_onvifNotificationSubscriptionReference.toUtf8();
-        char* buf = (char*)malloc(onvifNotificationSubscriptionReferenceUtf8.size()+1);
-        memToFreeOnResponseDone.push_back(buf);
-        strcpy(buf, onvifNotificationSubscriptionReferenceUtf8.constData());
-        soapWrapper->soap()->header->wsa5__To = buf;
+        char* toBuf = (char*) malloc(onvifNotificationSubscriptionReferenceUtf8.size()+1);
+        memToFreeOnResponseDone.push_back(toBuf);
+        strcpy(toBuf, onvifNotificationSubscriptionReferenceUtf8.constData());
+        soapWrapper->soap()->header->wsa5__To = toBuf;
     }
 
     // Very few devices need wsa__Action and wsa__ReplyTo to be filled, but sometimes they do.
     wsa5__EndpointReferenceType* replyTo =
-        (wsa5__EndpointReferenceType*)malloc(sizeof(wsa5__EndpointReferenceType));
+        (wsa5__EndpointReferenceType*) malloc(sizeof(wsa5__EndpointReferenceType));
     memToFreeOnResponseDone.push_back(replyTo);
     memset(replyTo, 0, sizeof(*replyTo));
     static const char* kReplyTo = "http://www.w3.org/2005/08/addressing/anonymous";
