@@ -20,8 +20,8 @@ QnByteArrayConstRef::QnByteArrayConstRef(
     m_offset(offset),
     m_count(count == npos ? src.size() - offset : count)
 {
-    NX_ASSERT(m_offset <= (size_type)src.size());
-    NX_ASSERT(m_count <= (size_type)src.size());
+    NX_ASSERT(m_offset <= (size_type)src.size(), lm("offset %1, size %2").args(m_offset, m_count));
+    NX_ASSERT(m_count <= (size_type)src.size(), lm("offset %1, size %2").args(m_offset, m_count));
 }
 
 const QnByteArrayConstRef::value_type* QnByteArrayConstRef::data() const

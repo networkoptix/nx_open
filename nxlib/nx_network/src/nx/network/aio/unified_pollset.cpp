@@ -280,7 +280,7 @@ bool UnifiedPollSet::add(Pollable* const sock, EventType eventType, void* /*user
 
     if (sock->impl()->isUdtSocket)
         return addUdtSocket(
-            static_cast<UDTSocketImpl*>(sock->impl())->udtHandle,
+            static_cast<UdtSocketImpl*>(sock->impl())->udtHandle,
             udtEvent,
             sock);
     else
@@ -295,7 +295,7 @@ void UnifiedPollSet::remove(Pollable* const sock, EventType eventType)
     int udtEvent = mapAioEventToUdtEvent(eventType);
     if (sock->impl()->isUdtSocket)
     {
-        auto udtHandle = static_cast<UDTSocketImpl*>(sock->impl())->udtHandle;
+        auto udtHandle = static_cast<UdtSocketImpl*>(sock->impl())->udtHandle;
         removeUdtSocket(udtHandle, udtEvent);
 
         if ((udtEvent & UDT_EPOLL_IN) > 0 &&

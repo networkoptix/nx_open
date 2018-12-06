@@ -15,21 +15,21 @@ CustomerManager::CustomerManager(
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->incomingTransactionDispatcher()
-        .registerTransactionHandler<command::SaveCustomer>(
+    m_syncronizationEngine->incomingCommandDispatcher()
+        .registerCommandHandler<command::SaveCustomer>(
             [this](auto&&... args) { return processSaveCustomer(std::move(args)...); });
 
-    m_syncronizationEngine->incomingTransactionDispatcher()
-        .registerTransactionHandler<command::RemoveCustomer>(
+    m_syncronizationEngine->incomingCommandDispatcher()
+        .registerCommandHandler<command::RemoveCustomer>(
             [this](auto&&... args) { return processRemoveCustomer(std::move(args)...); });
 }
 
 CustomerManager::~CustomerManager()
 {
-    m_syncronizationEngine->incomingTransactionDispatcher()
+    m_syncronizationEngine->incomingCommandDispatcher()
         .removeHandler<command::RemoveCustomer>();
 
-    m_syncronizationEngine->incomingTransactionDispatcher()
+    m_syncronizationEngine->incomingCommandDispatcher()
         .removeHandler<command::SaveCustomer>();
 }
 

@@ -13,7 +13,7 @@
 
 namespace nx::clusterdb::engine {
 
-class AbstractOutgoingTransactionDispatcher;
+class AbstractOutgoingCommandDispatcher;
 
 /**
  * Postpones outgoing transaction delivery to ensure transactions are sent with
@@ -26,8 +26,8 @@ public:
 
     OutgoingTransactionSorter(
         const std::string& systemId,
-        VmsTransactionLogCache* vmsTransactionLogCache,
-        AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
+        CommandLogCache* vmsTransactionLogCache,
+        AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher);
 
     ~OutgoingTransactionSorter();
 
@@ -37,15 +37,15 @@ public:
      * actual OutgoingTransactionSorter::addTransaction call.
      */
     void registerTransactionSequence(
-        VmsTransactionLogCache::TranId cacheTranId,
+        CommandLogCache::TranId cacheTranId,
         TransactionSequence transactionSequence);
 
     void addTransaction(
-        VmsTransactionLogCache::TranId cacheTranId,
-        std::unique_ptr<const SerializableAbstractTransaction> transaction);
+        CommandLogCache::TranId cacheTranId,
+        std::unique_ptr<const SerializableAbstractCommand> transaction);
 
-    void rollback(VmsTransactionLogCache::TranId cacheTranId);
-    void commit(VmsTransactionLogCache::TranId cacheTranId);
+    void rollback(CommandLogCache::TranId cacheTranId);
+    void commit(CommandLogCache::TranId cacheTranId);
 
 protected:
     std::size_t transactionsCommitted() const;
@@ -54,16 +54,16 @@ protected:
 private:
     struct TranContext
     {
-        std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions;
+        std::vector<std::unique_ptr<const SerializableAbstractCommand>> transactions;
         bool isCommitted = false;
         TransactionSequence maxSequence = 0;
     };
 
     const std::string m_systemId;
-    VmsTransactionLogCache* m_vmsTransactionLogCache;
-    AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
-    std::map<VmsTransactionLogCache::TranId, TranContext> m_transactions;
-    std::map<TransactionSequence, VmsTransactionLogCache::TranId> m_transactionsBySequence;
+    CommandLogCache* m_vmsTransactionLogCache;
+    AbstractOutgoingCommandDispatcher* const m_outgoingTransactionDispatcher;
+    std::map<CommandLogCache::TranId, TranContext> m_transactions;
+    std::map<TransactionSequence, CommandLogCache::TranId> m_transactionsBySequence;
     QnMutex m_mutex;
     std::size_t m_transactionsCommitted;
     std::size_t m_transactionsDelivered;
@@ -71,18 +71,18 @@ private:
 
     void dispatchTransactions();
 
-    std::vector<VmsTransactionLogCache::TranId> findTransactionsToSend(
+    std::vector<CommandLogCache::TranId> findTransactionsToSend(
         const QnMutexLockerBase& /*lock*/);
 
     void dispatchTransactions(
         const QnMutexLockerBase& /*lock*/,
-        VmsTransactionLogCache::TranId tranId);
+        CommandLogCache::TranId tranId);
     void deliverTransactions(
-        std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions);
+        std::vector<std::unique_ptr<const SerializableAbstractCommand>> transactions);
 
     void registerTransactionSequence(
         const QnMutexLockerBase& /*lock*/,
-        VmsTransactionLogCache::TranId cacheTranId,
+        CommandLogCache::TranId cacheTranId,
         TransactionSequence transactionSequence);
 };
 

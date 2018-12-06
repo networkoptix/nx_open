@@ -22,11 +22,11 @@ public:
 
     virtual std::string connectionGuid() const override;
 
-    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
+    virtual const CommandTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
 
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) override;
 
     virtual void start() override;
 

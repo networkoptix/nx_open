@@ -19,8 +19,8 @@ class TestOutgoingTransactionSorter:
 public:
     TestOutgoingTransactionSorter(
         const std::string& systemId,
-        VmsTransactionLogCache* vmsTransactionLogCache,
-        AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
+        CommandLogCache* vmsTransactionLogCache,
+        AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher)
     :
         OutgoingTransactionSorter(
             systemId,
@@ -37,10 +37,10 @@ public:
 };
 
 class TestTransaction:
-    public SerializableAbstractTransaction
+    public SerializableAbstractCommand
 {
 public:
-    TestTransaction(const QnUuid& peerId, VmsTransactionLogCache::TranId tranId):
+    TestTransaction(const QnUuid& peerId, CommandLogCache::TranId tranId):
         m_header(peerId),
         m_tranId(tranId)
     {
@@ -55,7 +55,7 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat /*targetFormat*/,
-        const TransactionTransportHeader& /*transportHeader*/,
+        const CommandTransportHeader& /*transportHeader*/,
         int /*transactionFormatVersion*/) const override
     {
         return nx::Buffer();
@@ -71,21 +71,21 @@ public:
         return m_header;
     }
 
-    VmsTransactionLogCache::TranId tranId() const
+    CommandLogCache::TranId tranId() const
     {
         return m_tranId;
     }
 
 private:
     CommandHeader m_header;
-    VmsTransactionLogCache::TranId m_tranId;
+    CommandLogCache::TranId m_tranId;
 };
 
 class TransactionSharedWrapper:
-    public SerializableAbstractTransaction
+    public SerializableAbstractCommand
 {
 public:
-    TransactionSharedWrapper(std::shared_ptr<SerializableAbstractTransaction> sharedTransaction):
+    TransactionSharedWrapper(std::shared_ptr<SerializableAbstractCommand> sharedTransaction):
         m_sharedTransaction(std::move(sharedTransaction))
     {
     }
@@ -99,7 +99,7 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader,
+        const CommandTransportHeader& transportHeader,
         int transactionFormatVersion) const override
     {
         return m_sharedTransaction->serialize(
@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    const std::shared_ptr<SerializableAbstractTransaction> m_sharedTransaction;
+    const std::shared_ptr<SerializableAbstractCommand> m_sharedTransaction;
 };
 
 class OutgoingTransactionSorter:
@@ -216,7 +216,7 @@ protected:
         }
     }
 
-    void commit(VmsTransactionLogCache::TranId tranId)
+    void commit(CommandLogCache::TranId tranId)
     {
         m_transactionSorter.commit(tranId);
 
@@ -229,11 +229,11 @@ protected:
     }
 
 protected:
-    std::deque<VmsTransactionLogCache::TranId> m_tranIds;
+    std::deque<CommandLogCache::TranId> m_tranIds;
     TestOutgoingTransactionDispatcher m_testOutgoingTransactionDispatcher;
 
 private:
-    VmsTransactionLogCache m_transactionCache;
+    CommandLogCache m_transactionCache;
     TestOutgoingTransactionSorter m_transactionSorter;
     std::atomic<int> m_prevSequence;
     std::vector<std::shared_ptr<TestTransaction>> m_transactionsGenerated;
@@ -241,7 +241,7 @@ private:
     std::pair<std::size_t, std::size_t> m_transactionCountRange;
     QnMutex m_mutex;
 
-    void addTransaction(VmsTransactionLogCache::TranId tranId)
+    void addTransaction(CommandLogCache::TranId tranId)
     {
         auto transaction = std::make_shared<TestTransaction>(QnUuid::createUuid(), tranId);
         transaction->header().persistentInfo.sequence = ++m_prevSequence;
@@ -314,7 +314,7 @@ protected:
         m_threads.resize(threadCount);
         for (auto& thread: m_threads)
         {
-            std::vector<VmsTransactionLogCache::TranId> transactionsForThread =
+            std::vector<CommandLogCache::TranId> transactionsForThread =
                 selectRandomTransactions(transactionPerThreadCount);
             thread = nx::utils::thread(
                 std::bind(&FtOutgoingTransactionSorter::testThreadMain, this,
@@ -328,9 +328,9 @@ protected:
 private:
     std::vector<nx::utils::thread> m_threads;
 
-    std::vector<VmsTransactionLogCache::TranId> selectRandomTransactions(int maxTranCount)
+    std::vector<CommandLogCache::TranId> selectRandomTransactions(int maxTranCount)
     {
-        std::vector<VmsTransactionLogCache::TranId> result;
+        std::vector<CommandLogCache::TranId> result;
         result.reserve(maxTranCount);
         for (int i = 0; (i < maxTranCount) && (!m_tranIds.empty()); ++i)
         {
@@ -342,7 +342,7 @@ private:
         return result;
     }
 
-    void testThreadMain(std::vector<VmsTransactionLogCache::TranId> tranIds)
+    void testThreadMain(std::vector<CommandLogCache::TranId> tranIds)
     {
         for (const auto& tranId: tranIds)
             commit(tranId);

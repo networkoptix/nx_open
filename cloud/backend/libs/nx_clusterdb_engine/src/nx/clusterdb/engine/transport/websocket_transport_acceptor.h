@@ -12,7 +12,7 @@ namespace nx::clusterdb::engine {
 class ConnectionManager;
 class ProtocolVersionRange;
 class OutgoingCommandFilter;
-class TransactionLog;
+class CommandLog;
 
 } // namespace nx::clusterdb::engine
 
@@ -24,7 +24,7 @@ public:
     WebSocketTransportAcceptor(
         const QnUuid& moduleGuid,
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* transactionLog,
+        CommandLog* transactionLog,
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
@@ -35,7 +35,7 @@ public:
 
 private:
     const ProtocolVersionRange& m_protocolVersionRange;
-    TransactionLog* m_transactionLog;
+    CommandLog* m_commandLog;
     ConnectionManager* m_connectionManager;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     const vms::api::PeerData m_localPeerData;

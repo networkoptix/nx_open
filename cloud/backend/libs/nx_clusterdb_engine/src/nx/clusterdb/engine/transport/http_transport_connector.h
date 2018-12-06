@@ -9,7 +9,7 @@
 
 namespace nx::clusterdb::engine {
 
-class TransactionLog;
+class CommandLog;
 class OutgoingCommandFilter;
 
 } // namespace nx::clusterdb::engine
@@ -62,7 +62,7 @@ class NX_DATA_SYNC_ENGINE_API HttpTransportConnector:
 public:
     HttpTransportConnector(
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* transactionLog,
+        CommandLog* transactionLog,
         const OutgoingCommandFilter& outgoingCommandFilter,
         const nx::utils::Url& nodeUrl,
         const std::string& systemId,
@@ -77,7 +77,7 @@ protected:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
-    TransactionLog* m_transactionLog = nullptr;
+    CommandLog* m_commandLog = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     const std::string m_systemId;
     HttpCommandPipelineConnector m_pipelineConnector;

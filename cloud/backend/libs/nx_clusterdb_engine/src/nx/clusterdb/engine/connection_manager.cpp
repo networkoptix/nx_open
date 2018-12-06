@@ -21,8 +21,8 @@ ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& protocolVersionRange,
-    IncomingTransactionDispatcher* const transactionDispatcher,
-    OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
+    IncomingCommandDispatcher* const transactionDispatcher,
+    OutgoingCommandDispatcher* const outgoingTransactionDispatcher)
 :
     m_settings(settings),
     m_protocolVersionRange(protocolVersionRange),
@@ -59,13 +59,13 @@ ConnectionManager::~ConnectionManager()
 
 void ConnectionManager::dispatchTransaction(
     const std::string& systemId,
-    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
+    std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
     NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching command %2")
         .args(systemId, toString(transactionSerializer->header())));
 
     // Generating transport header.
-    TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+    CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.systemId = systemId;
     transportHeader.vmsTransportHeader.distance = 1;
     transportHeader.vmsTransportHeader.processedPeers.insert(m_localPeerData.id);
@@ -381,7 +381,7 @@ void ConnectionManager::removeConnection(const std::string& connectionId)
 void ConnectionManager::onGotTransaction(
     const std::string& connectionId,
     std::unique_ptr<DeserializableCommandData> commandData,
-    TransactionTransportHeader transportHeader)
+    CommandTransportHeader transportHeader)
 {
     m_transactionDispatcher->dispatchTransaction(
         std::move(transportHeader),

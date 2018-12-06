@@ -15,45 +15,45 @@
 
 namespace nx::clusterdb::engine {
 
-class TransactionLog;
+class CommandLog;
 
 /**
  * Dispaches transaction received from remote peer to a corresponding processor.
  */
-class NX_DATA_SYNC_ENGINE_API IncomingTransactionDispatcher
+class NX_DATA_SYNC_ENGINE_API IncomingCommandDispatcher
 {
 public:
-    using WatchTransactionSubscription = nx::utils::Subscription<
-        const TransactionTransportHeader&,
+    using WatchCommandSubscription = nx::utils::Subscription<
+        const CommandTransportHeader&,
         const CommandHeader&>;
 
-    IncomingTransactionDispatcher(TransactionLog* const transactionLog);
-    virtual ~IncomingTransactionDispatcher();
+    IncomingCommandDispatcher(CommandLog* const transactionLog);
+    virtual ~IncomingCommandDispatcher();
 
     /**
      * @note Method is non-blocking, result is delivered by invoking completionHandler.
      */
     void dispatchTransaction(
-        TransactionTransportHeader transportHeader,
+        CommandTransportHeader transportHeader,
         std::unique_ptr<DeserializableCommandData> commandData,
-        TransactionProcessedHandler completionHandler);
+        CommandProcessedHandler completionHandler);
 
     /**
      * Register processor function by command type.
      */
     template<typename CommandDescriptor>
-    void registerTransactionHandler(
-        typename TransactionProcessor<CommandDescriptor>::
+    void registerCommandHandler(
+        typename CommandProcessor<CommandDescriptor>::
             ProcessEc2TransactionFunc processTranFunc)
     {
-        using SpecificCommandProcessor = TransactionProcessor<CommandDescriptor>;
+        using SpecificCommandProcessor = CommandProcessor<CommandDescriptor>;
 
-        auto context = std::make_unique<TransactionProcessorContext>();
+        auto context = std::make_unique<CommandProcessorContext>();
         context->processor = std::make_unique<SpecificCommandProcessor>(
-            m_transactionLog,
+            m_commandLog,
             std::move(processTranFunc));
 
-        m_transactionProcessors.emplace(
+        m_commandProcessors.emplace(
             CommandDescriptor::code,
             std::move(context));
     }
@@ -67,11 +67,11 @@ public:
     {
         using SpecificCommandProcessor = SpecialCommandProcessor<CommandDescriptor>;
 
-        auto context = std::make_unique<TransactionProcessorContext>();
+        auto context = std::make_unique<CommandProcessorContext>();
         context->processor = std::make_unique<SpecificCommandProcessor>(
             std::move(processTranFunc));
 
-        m_transactionProcessors.emplace(
+        m_commandProcessors.emplace(
             CommandDescriptor::code,
             std::move(context));
     }
@@ -85,27 +85,27 @@ public:
         removeHandler(CommandDescriptor::code);
     }
 
-    WatchTransactionSubscription& watchTransactionSubscription();
+    WatchCommandSubscription& watchCommandSubscription();
 
 private:
-    struct TransactionProcessorContext
+    struct CommandProcessorContext
     {
-        std::unique_ptr<AbstractTransactionProcessor> processor;
+        std::unique_ptr<AbstractCommandProcessor> processor;
         bool markedForRemoval = false;
         std::atomic<int> usageCount;
         QnWaitCondition usageCountDecreased;
 
-        TransactionProcessorContext(): usageCount(0) {}
+        CommandProcessorContext(): usageCount(0) {}
     };
 
-    using TransactionProcessors =
-        std::map<int, std::unique_ptr<TransactionProcessorContext>>;
+    using CommandProcessors =
+        std::map<int, std::unique_ptr<CommandProcessorContext>>;
 
-    TransactionLog* const m_transactionLog;
-    TransactionProcessors m_transactionProcessors;
+    CommandLog* const m_commandLog;
+    CommandProcessors m_commandProcessors;
     nx::network::aio::Timer m_aioTimer;
     mutable QnMutex m_mutex;
-    WatchTransactionSubscription m_watchTransactionSubscription;
+    WatchCommandSubscription m_watchTransactionSubscription;
 
     void removeHandler(int commandCode);
 };

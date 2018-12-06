@@ -29,12 +29,12 @@
 namespace nx::clusterdb::engine {
 namespace test {
 
-class TransactionLog:
+class CommandLog:
     public nx::cloud::db::test::BasePersistentDataTest,
     public ::testing::Test
 {
 public:
-    TransactionLog(dao::DataObjectType dataObjectType):
+    CommandLog(dao::DataObjectType dataObjectType):
         BasePersistentDataTest(DbInitializationType::delayed),
         m_protocolVersionRange(
             nx::cloud::db::kMinSupportedProtocolVersion,
@@ -51,7 +51,7 @@ public:
         initializeTransactionLog();
     }
 
-    ~TransactionLog()
+    ~CommandLog()
     {
         clusterdb::engine::dao::TransactionDataObjectFactory::instance()
             .setCustomFunc(std::move(m_factoryFuncBak));
@@ -71,15 +71,15 @@ public:
         // Initializing system's transaction log.
         const std::string systemId = getSystem(0).id.c_str();
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&clusterdb::engine::TransactionLog::updateTimestampHiForSystem,
-                m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));
+            std::bind(&clusterdb::engine::CommandLog::updateTimestampHiForSystem,
+                m_commandLog.get(), _1, systemId, getSystem(0).systemSequence));
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
 protected:
-    const std::unique_ptr<clusterdb::engine::TransactionLog>& transactionLog()
+    const std::unique_ptr<clusterdb::engine::CommandLog>& transactionLog()
     {
-        return m_transactionLog;
+        return m_commandLog;
     }
 
     const QnUuid& peerId() const
@@ -94,7 +94,7 @@ protected:
 
     void reinitialiseTransactionLog()
     {
-        m_transactionLog.reset();
+        m_commandLog.reset();
         initializeTransactionLog();
     }
 
@@ -106,13 +106,13 @@ protected:
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     ProtocolVersionRange m_protocolVersionRange;
-    std::unique_ptr<clusterdb::engine::TransactionLog> m_transactionLog;
+    std::unique_ptr<clusterdb::engine::CommandLog> m_commandLog;
     const QnUuid m_peerId;
     clusterdb::engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
 
     void initializeTransactionLog()
     {
-        m_transactionLog = std::make_unique<clusterdb::engine::TransactionLog>(
+        m_commandLog = std::make_unique<clusterdb::engine::CommandLog>(
             m_peerId,
             m_protocolVersionRange,
             &persistentDbManager()->queryExecutor(),
@@ -121,11 +121,11 @@ private:
 };
 
 class TransactionLogSameTransaction:
-    public TransactionLog
+    public CommandLog
 {
 public:
     TransactionLogSameTransaction():
-        TransactionLog(dao::DataObjectType::rdbms),
+        CommandLog(dao::DataObjectType::rdbms),
         m_systemId(nx::cloud::db::test::BusinessDataGenerator::generateRandomSystemId()),
         m_otherPeerId(QnUuid::createUuid()),
         m_otherPeerDbId(QnUuid::createUuid()),
@@ -259,7 +259,7 @@ protected:
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                clusterdb::engine::SerializableTransaction<nx::cloud::db::ec2::command::SaveUser>(
+                clusterdb::engine::SerializableCommand<nx::cloud::db::ec2::command::SaveUser>(
                     std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
@@ -508,11 +508,11 @@ public:
     };
 
     TestTransactionController(
-        const std::unique_ptr<clusterdb::engine::TransactionLog>& transactionLog,
+        const std::unique_ptr<clusterdb::engine::CommandLog>& transactionLog,
         const nx::cloud::db::api::SystemData& system,
         const nx::cloud::db::api::AccountData& accountToShareWith)
         :
-        m_transactionLog(transactionLog),
+        m_commandLog(transactionLog),
         m_system(system),
         m_accountToShareWith(accountToShareWith),
         m_completedState(State::init),
@@ -531,7 +531,7 @@ public:
 
         m_completedState = State::startedTransaction;
         m_desiredState = State::startedTransaction;
-        m_transactionLog->startDbTransaction(
+        m_commandLog->startDbTransaction(
             m_system.id.c_str(),
             std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
@@ -551,7 +551,7 @@ public:
     }
 
 private:
-    const std::unique_ptr<clusterdb::engine::TransactionLog>& m_transactionLog;
+    const std::unique_ptr<clusterdb::engine::CommandLog>& m_commandLog;
     const nx::cloud::db::api::SystemData m_system;
     const nx::cloud::db::api::AccountData m_accountToShareWith;
     State m_completedState;
@@ -636,7 +636,7 @@ private:
         nx::cloud::db::ec2::convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
-        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog
+        auto dbResult = m_commandLog->generateTransactionAndSaveToLog
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext,
                 m_sharing.systemId.c_str(),
@@ -667,11 +667,11 @@ private:
 };
 
 class TransactionLogOverlappingTransactions:
-    public TransactionLog
+    public CommandLog
 {
 public:
     TransactionLogOverlappingTransactions():
-        TransactionLog(dao::DataObjectType::ram)
+        CommandLog(dao::DataObjectType::ram)
     {
         persistentDbManager()->queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
     }

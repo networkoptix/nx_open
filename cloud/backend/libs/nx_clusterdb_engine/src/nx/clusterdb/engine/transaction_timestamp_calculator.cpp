@@ -4,7 +4,7 @@ namespace nx::clusterdb::engine {
 
 constexpr const int kTimeShiftDelta = 1000;
 
-TransactionTimestampCalculator::TransactionTimestampCalculator(
+CommandTimestampCalculator::CommandTimestampCalculator(
     std::function<std::chrono::milliseconds()> currentTimeSinceEpochFunc)
     :
     m_currentTimeSinceEpochFunc(std::move(currentTimeSinceEpochFunc)),
@@ -19,14 +19,14 @@ TransactionTimestampCalculator::TransactionTimestampCalculator(
             };
 }
 
-void TransactionTimestampCalculator::init(Timestamp initialValue)
+void CommandTimestampCalculator::init(Timestamp initialValue)
 {
     m_lastTimestamp = initialValue;
     m_baseTime = m_lastTimestamp.ticks;
     m_relativeTimer.restart();
 }
 
-Timestamp TransactionTimestampCalculator::calculateNextTimeStamp()
+Timestamp CommandTimestampCalculator::calculateNextTimeStamp()
 {
     const qint64 absoluteTime = m_currentTimeSinceEpochFunc().count();
 
@@ -62,14 +62,14 @@ Timestamp TransactionTimestampCalculator::calculateNextTimeStamp()
     return m_lastTimestamp;
 }
 
-void TransactionTimestampCalculator::reset()
+void CommandTimestampCalculator::reset()
 {
     m_baseTime = m_currentTimeSinceEpochFunc().count();
     m_lastTimestamp = Timestamp::fromInteger(m_baseTime);
     m_relativeTimer.restart();
 }
 
-void TransactionTimestampCalculator::shiftTimestampIfNeeded(
+void CommandTimestampCalculator::shiftTimestampIfNeeded(
     const Timestamp& receivedTransactionTimestamp)
 {
     QnMutexLocker lock(&m_timeMutex);

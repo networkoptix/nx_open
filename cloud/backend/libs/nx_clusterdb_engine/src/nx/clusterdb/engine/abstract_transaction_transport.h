@@ -23,11 +23,11 @@ using ConnectionClosedEventHandler =
 using CommandDataHandler = nx::utils::MoveOnlyFunc<void(
     Qn::SerializationFormat,
     const QByteArray&,
-    TransactionTransportHeader)>;
+    CommandTransportHeader)>;
 
 using CommandHandler = nx::utils::MoveOnlyFunc<void(
     std::unique_ptr<DeserializableCommandData>,
-    TransactionTransportHeader)>;
+    CommandTransportHeader)>;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -49,8 +49,8 @@ public:
     virtual std::string connectionGuid() const = 0;
 
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const TransactionSerializer>& transactionSerializer) = 0;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const CommandSerializer>& transactionSerializer) = 0;
 
     virtual void closeConnection() = 0;
 };
@@ -69,11 +69,11 @@ public:
 
     virtual std::string connectionGuid() const = 0;
 
-    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const = 0;
+    virtual const CommandTransportHeader& commonTransportHeaderOfRemoteTransaction() const = 0;
 
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) = 0;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) = 0;
 
     virtual void start() = 0;
 };
