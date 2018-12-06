@@ -20,6 +20,8 @@ public:
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void pleaseStopSync() override;
     virtual SocketAddress getForeignAddress() const override;
+    virtual void start(
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
 private:
     WebSocketPtr m_webSocket;

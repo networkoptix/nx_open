@@ -27,7 +27,8 @@ public:
      * This should be called before all other operations. Transport becomes operational only after
      * onGetRequestReceived() callback is fired.
      */
-    void start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived);
+    virtual void start(
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived) override;
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;

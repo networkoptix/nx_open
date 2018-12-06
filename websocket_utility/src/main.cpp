@@ -27,6 +27,13 @@ enum class Role
     client
 };
 
+enum class Mode
+{
+    http,
+    websocket,
+    automatic
+};
+
 static const nx::Buffer kHandlerPath = "/testP2PConnection";
 static const nx::Buffer kTestMessage = "Hello! Your connection seems to work";
 static const nx::utils::log::Tag kWebsocketUtilityTag{QString("P2PUtility")};
@@ -41,6 +48,7 @@ struct
     nx::Buffer serverAddress = "0.0.0.0";
     int serverPort;
     aio::AbstractAioThread* aioThread = nullptr;
+    Mode mode = Mode::automatic;
 } config;
 
 class Waitable
@@ -140,7 +148,6 @@ public:
     {
         m_p2pTransport = std::move(p2pTransport);
         m_timer.bindToAioThread(aioThread);
-        m_p2pTransport->bindToAioThread(aioThread);
     }
 
     void connectAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -233,6 +240,7 @@ private:
                 websocket::FrameType::text));
 
             m_p2pTransport->bindToAioThread(m_aioThread);
+            m_p2pTransport->start();
             m_httpClient->pleaseStopSync();
         }
         else if (statusCode == http::StatusCode::ok)
@@ -242,6 +250,8 @@ private:
             m_p2pTransport.reset(new P2PHttpClientTransport(
                 std::move(m_httpClient),
                 websocket::FrameType::text));
+            m_p2pTransport->bindToAioThread(m_aioThread);
+            m_p2pTransport->start();
         }
         else
         {
@@ -354,7 +364,7 @@ public:
             return false;
         }
 
-        NX_INFO(this, lm("starting to accept websocket connections via %1").args(kHandlerPath));
+        NX_INFO(this, lm("starting to accept p2p connections via %1").args(kHandlerPath));
         return true;
     }
 
@@ -373,7 +383,7 @@ private:
         }
 
         auto error = websocket::validateRequest(requestContext.request, requestContext.response);
-        if (error != websocket::Error::noError)
+        if (error != websocket::Error::noError || config.mode == Mode::http)
         {
             NX_INFO(this, lm("error validating websocket request: %1").args((int) error));
             NX_INFO(this, lm("switching to http mode"));
@@ -381,16 +391,20 @@ private:
             requestContext.connection->setSendCompletionHandler(
                 [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
                 {
-                    auto p2pTransport = P2pTransportPtr(
-                        new P2PHttpServerTransport(
-                            connection->takeSocket(),
-                            nx::network::websocket::FrameType::text));
+                    auto p2pTransport = new P2PHttpServerTransport(
+                        connection->takeSocket(),
+                        nx::network::websocket::FrameType::text);
 
-                    auto p2pConnection = std::make_shared<P2PConnection>(
-                        config.aioThread,
-                        std::move(p2pTransport));
+                    p2pTransport->bindToAioThread(m_aioThread);
+                    p2pTransport->start(
+                        [p2pTransport, this](SystemError::ErrorCode error)
+                        {
+                            auto p2pConnection = std::make_shared<P2PConnection>(
+                                config.aioThread,
+                                P2pTransportPtr(p2pTransport));
 
-                    m_userCompletionHandler(p2pConnection);
+                            m_userCompletionHandler(p2pConnection);
+                        });
                 });
 
             requestCompletionHandler(http::StatusCode::ok);
@@ -408,6 +422,9 @@ private:
                         new P2PWebsocketTransport(
                             connection->takeSocket(),
                             nx::network::websocket::FrameType::text));
+
+                    p2pTransport->bindToAioThread(m_aioThread);
+                    p2pTransport->start();
 
                     auto p2pConnection = std::make_shared<P2PConnection>(
                         config.aioThread,
@@ -446,27 +463,17 @@ static void startAccepting()
     waitablePoolInstance->addWaitable(acceptor);
 }
 
-static const char* const kProtocolNameOption = "--protocol-name";
-static const char* const kUrlOption = "--url";
-static const char* const kUserNameOption = "--username";
-static const char* const kPasswordOption = "--password";
-static const char* const kServerAddressOption = "--server-address";
-static const char* const kServerPortOption = "--server-port";
-static const char* const kRoleOption = "--role";
-static const char* const kLogLevelOption = "--log-level";
-static const char* const kHelpOption = "--help";
-
-static const char* const kInvalidOptionsMessage = "invalid options, run with --help";
-
 static void printHelp()
 {
     printf("Usage:\n CLIENT MODE: p2p_utility --url <url> --username <username> " \
            "--password <password>\n");
     printf(" SERVER MODE: p2p_utility [--server-address <server-address> (default: 0.0.0.0)] " \
            "--server-port <server-port>\n");
-    printf("Additional options:\n --log-level <'verbose' OR 'info'(default)>\n "\
-           "--role <'client'(default) OR 'server'>\n " \
-           "--protocol-name <protocol-name(default: 'nxp2p')>\n --help\n");
+    printf("Additional options:\n --log-level <'verbose' OR 'info'(default)>\n" \
+           "--role <'client'(default) OR 'server'>\n" \
+           "--protocol-name <protocol-name(default: 'nxp2p')>\n" \
+           "--mode <'auto'(default) OR 'http' OR 'websocket'>\n" \
+           "--help\n");
     printf("Note:\n");
     printf(" In case if you want to connect to the p2p utility run in a server mode, client"
            " url path must be '/testP2PConnection'.\n");
@@ -476,7 +483,7 @@ static void prepareConfig(int argc, const char* argv[])
 {
     for (int i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], kHelpOption) == 0)
+        if (strcmp(argv[i], "--help") == 0)
         {
             printHelp();
             exit(EXIT_SUCCESS);
@@ -484,32 +491,32 @@ static void prepareConfig(int argc, const char* argv[])
 
         if (argv[i][0] != '-' || i == argc - 1)
         {
-            NX_INFO(kWebsocketUtilityTag, kInvalidOptionsMessage);
+            NX_INFO(kWebsocketUtilityTag, "invalid options, run with --help");
             exit(EXIT_SUCCESS);
         }
 
-        if (strcmp(argv[i], kProtocolNameOption) == 0)
+        if (strcmp(argv[i], "--protocol-name") == 0)
             config.protocolName = argv[++i];
-        else if (strcmp(argv[i], kUrlOption) == 0)
+        else if (strcmp(argv[i], "--url") == 0)
             config.url = argv[++i];
-        else if (strcmp(argv[i], kUserNameOption) == 0)
+        else if (strcmp(argv[i], "--username") == 0)
             config.userName = argv[++i];
-        else if (strcmp(argv[i], kPasswordOption) == 0)
+        else if (strcmp(argv[i], "--password") == 0)
             config.userPassword = argv[++i];
-        else if (strcmp(argv[i], kServerAddressOption) == 0)
+        else if (strcmp(argv[i], "--server-address") == 0)
             config.serverAddress = argv[++i];
-        else if (strcmp(argv[i], kServerPortOption) == 0)
+        else if (strcmp(argv[i], "--server-port") == 0)
             config.serverPort = strtol(argv[++i], nullptr, 10);
-        else if (strcmp(argv[i], kRoleOption) == 0)
+        else if (strcmp(argv[i], "--role") == 0 && i + 1 < argc)
         {
             if (strcmp(argv[i + 1], "client") == 0)
                 config.role = Role::client;
-            if (strcmp(argv[i + 1], "server") == 0)
+            else if (strcmp(argv[i + 1], "server") == 0)
                 config.role = Role::server;
 
             ++i;
         }
-        else if (strcmp(argv[i], kLogLevelOption) == 0)
+        else if (strcmp(argv[i], "--log-level") == 0 && i + 1 < argc)
         {
             if (strcmp(argv[i + 1], "verbose") == 0)
             {
@@ -521,6 +528,15 @@ static void prepareConfig(int argc, const char* argv[])
                 nx::utils::log::mainLogger()->setLevelFilters(nx::utils::log::LevelFilters{
                     {QnLog::MAIN_LOG_ID, nx::utils::log::Level::info}});
             }
+            ++i;
+        }
+        else if (strcmp(argv[i], "--mode") == 0 && i + 1 < argc)
+        {
+            if (strcmp(argv[i + 1], "http") == 0)
+                config.mode = Mode::http;
+            else if (strcmp(argv[i + 1], "websocket") == 0)
+                config.mode = Mode::websocket;
+
             ++i;
         }
     }

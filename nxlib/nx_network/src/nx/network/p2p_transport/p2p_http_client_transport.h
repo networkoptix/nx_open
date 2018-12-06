@@ -31,6 +31,8 @@ public:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual SocketAddress getForeignAddress() const override;
+    virtual void start(
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
 private:
     class PostBodySource: public http::AbstractMsgBodySource

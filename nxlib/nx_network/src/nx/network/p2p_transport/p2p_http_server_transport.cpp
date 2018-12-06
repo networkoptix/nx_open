@@ -255,15 +255,11 @@ QByteArray P2PHttpServerTransport::makeFrameHeader() const
 
 void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    post(
-        [this, aioThread]()
-        {
-            BasicPollable::bindToAioThread(aioThread);
-            m_sendSocket->bindToAioThread(aioThread);
-            if (m_readSocket)
-                m_readSocket->bindToAioThread(aioThread);
-            m_timer.bindToAioThread(aioThread);
-        });
+    BasicPollable::bindToAioThread(aioThread);
+    m_sendSocket->bindToAioThread(aioThread);
+    if (m_readSocket)
+        m_readSocket->bindToAioThread(aioThread);
+    m_timer.bindToAioThread(aioThread);
 }
 
 void P2PHttpServerTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)

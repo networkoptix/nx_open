@@ -31,6 +31,12 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     post([this]() { startReading(); });
 }
 
+void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
+{
+    if (onStart)
+        post([onStart = std::move(onStart)] { onStart(SystemError::noError); });
+}
+
 P2PHttpClientTransport::~P2PHttpClientTransport()
 {
     pleaseStopSync();
@@ -116,14 +122,10 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
 
 void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    post(
-        [this, aioThread]()
-        {
-            BasicPollable::bindToAioThread(aioThread);
-            m_readHttpClient->bindToAioThread(aioThread);
-            if (m_writeHttpClient)
-                m_writeHttpClient->bindToAioThread(aioThread);
-        });
+    BasicPollable::bindToAioThread(aioThread);
+    m_readHttpClient->bindToAioThread(aioThread);
+    if (m_writeHttpClient)
+        m_writeHttpClient->bindToAioThread(aioThread);
 }
 
 void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)

@@ -9,8 +9,15 @@ P2PWebsocketTransport::P2PWebsocketTransport(
     m_webSocket(new WebSocket(std::move(socket), frameType))
 {
     // TODO: #akulikov change that to real value
+    BasicPollable::bindToAioThread(m_webSocket->getAioThread());
     m_webSocket->setAliveTimeout(std::chrono::seconds(60));
+}
+
+void P2PWebsocketTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
+{
     m_webSocket->start();
+    if (onStart)
+        post([onStart = std::move(onStart)] { onStart(SystemError::noError); });
 }
 
 void P2PWebsocketTransport::readSomeAsync(nx::Buffer* const buffer,

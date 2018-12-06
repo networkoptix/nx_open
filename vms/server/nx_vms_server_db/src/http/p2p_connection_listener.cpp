@@ -337,12 +337,13 @@ void ConnectionProcessor::run()
             QUrlQuery(d->request.requestLine.url.query()),
             userAccessData(remotePeer),
             onConnectionClosedCallback);
+        p2pTransport->start();
     }
     else
     {
-        std::shared_ptr<P2PHttpServerTransport> p2pHttpServerTransport(new P2PHttpServerTransport(
+        auto p2pHttpServerTransport = new P2PHttpServerTransport(
             std::move(d->socket),
-            dataFormat));
+            dataFormat);
 
         auto onGetReceivedCallback =
             [messageBus,
@@ -359,13 +360,14 @@ void ConnectionProcessor::run()
                     messageBus->gotConnectionFromRemotePeer(
                         remotePeer,
                         std::move(connectionLockGuard),
-                        P2pTransportPtr(p2pHttpServerTransport.get()),
+                        P2pTransportPtr(p2pHttpServerTransport),
                         query,
                         accessData,
                         onConnectionClosedCallback);
                 }
                 else
                 {
+                    delete p2pHttpServerTransport;
                     // #TODO: #rvasilenko Implement this.
                 }
             };
