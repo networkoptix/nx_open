@@ -135,6 +135,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
+    m_stateTracker->setResourceFeed(resourcePool());
 
     QFont versionLabelFont;
     versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
@@ -164,8 +165,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     connect(m_sortedModel.get(), &SortedPeerUpdatesModel::dataChanged,
         this, &MultiServerUpdatesWidget::atModelDataChanged);
-
-    m_stateTracker->setResourceFeed(resourcePool());
 
     // the column does not matter because the model uses column-independent sorting
     m_sortedModel->sort(0);

@@ -38,6 +38,11 @@ public:
         ColumnCount
     };
 
+    enum Roles
+    {
+        UpdateItemRole = Qn::RoleCount,
+    };
+
     explicit ServerUpdatesModel(
         std::shared_ptr<PeerStateTracker> tracker,
         QObject* parent);
@@ -46,10 +51,10 @@ public:
     void setColors(const QnServerUpdatesColors& colors);
 
     // Overrides for QAbstractTableModel
-    int columnCount(const QModelIndex& parent) const override;
-    int rowCount(const QModelIndex& parent) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    QVariant data(const QModelIndex& index, int role) const override;
+    virtual int columnCount(const QModelIndex& parent) const override;
+    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
     // Need this to allow delegate to spawn editor
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
@@ -77,15 +82,18 @@ private:
     QnServerUpdatesColors m_versionColors;
 };
 
-class SortedPeerUpdatesModel : public QSortFilterProxyModel {
+class SortedPeerUpdatesModel:
+    public QSortFilterProxyModel
+{
     Q_OBJECT
+
 public:
-    explicit SortedPeerUpdatesModel(QObject *parent = 0);
+    explicit SortedPeerUpdatesModel(QObject* parent = 0);
     void setShowClients(bool show);
 
 protected:
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 
 private:
     bool m_showClients = false;

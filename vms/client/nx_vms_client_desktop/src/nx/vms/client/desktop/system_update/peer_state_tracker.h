@@ -1,7 +1,6 @@
 #pragma once
-
-#include <QtCore/QAbstractTableModel>
 #include <memory> // for shared_ptr
+#include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
@@ -20,11 +19,6 @@ using StatusCode = nx::update::Status::Code;
  */
 struct UpdateItem
 {
-    enum Roles
-    {
-        UpdateItemRole = Qn::RoleCount,
-    };
-
     enum class Component
     {
         server,

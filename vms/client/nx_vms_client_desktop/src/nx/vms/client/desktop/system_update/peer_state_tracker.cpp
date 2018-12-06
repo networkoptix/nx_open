@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <network/system_helpers.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
@@ -250,13 +251,16 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     if (!server)
         return;
 
+    if (!helpers::serverBelongsToCurrentSystem(server))
+        return;
     const auto status = server->getStatus();
-    if (status == Qn::Offline || status == Qn::Unauthorized)
+    if (status == Qn::Unauthorized)
         return;
 
-    if (server->hasFlags(Qn::fake_server)
-        && !helpers::serverBelongsToCurrentSystem(server))
+    bool fake = server->hasFlags(Qn::fake_server);
+    if (fake)
     {
+        NX_DEBUG(this) << "atResourceAdded() - server" << server->getName() << "seems to be fake";
         return;
     }
 
@@ -276,6 +280,8 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
+        return;
+    if (!helpers::serverBelongsToCurrentSystem(server))
         return;
 
     disconnect(server.data(), &QnResource::statusChanged,

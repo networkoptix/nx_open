@@ -81,6 +81,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
 
     auto item = m_tracker->findItemByRow(index.row());
 
+    NX_ASSERT(item);
     if (!item)
         return QVariant();
 
@@ -108,7 +109,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             }
             break;
 
-        case UpdateItem::UpdateItemRole:
+        case ServerUpdatesModel::UpdateItemRole:
             return QVariant::fromValue(item);
 
         case Qt::CheckStateRole:
@@ -145,7 +146,6 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             case Qt::DecorationRole:
                 if (column == NameColumn)
                     return qnResIconCache->icon(server);
-                break;
                 break;
         }
     }
@@ -195,6 +195,7 @@ void ServerUpdatesModel::atItemAdded(UpdateItemPtr item)
 
 void ServerUpdatesModel::atItemRemoved(UpdateItemPtr item)
 {
+    NX_ASSERT(item);
     if (!item)
         return;
 
@@ -236,8 +237,7 @@ void ServerUpdatesModel::setColors(const QnServerUpdatesColors& colors)
     emit dataChanged(index(0, VersionColumn), index(count - 1, VersionColumn));
 }
 
-
-SortedPeerUpdatesModel::SortedPeerUpdatesModel(QObject *parent) :
+SortedPeerUpdatesModel::SortedPeerUpdatesModel(QObject* parent):
     QSortFilterProxyModel(parent)
 {
 }
@@ -250,19 +250,19 @@ void SortedPeerUpdatesModel::setShowClients(bool show)
     invalidateFilter();
 }
 
-bool SortedPeerUpdatesModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+bool SortedPeerUpdatesModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    auto item = index.data(UpdateItem::UpdateItemRole).value<UpdateItemPtr>();
-    if (!m_showClients && item && item->component == UpdateItem::Component::client)
-        return false;
+    auto item = index.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
+    //if (!m_showClients && item && item->component == UpdateItem::Component::client)
+    //    return false;
     return true;
 }
 
-bool SortedPeerUpdatesModel::lessThan(const QModelIndex &leftIndex, const QModelIndex &rightIndex) const
+bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModelIndex& rightIndex) const
 {
-    auto left = leftIndex.data(UpdateItem::UpdateItemRole).value<UpdateItemPtr>();
-    auto right = rightIndex.data(UpdateItem::UpdateItemRole).value<UpdateItemPtr>();
+    auto left = leftIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
+    auto right = rightIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
 
     /* Security check. */
     if (!left || !right)
