@@ -82,23 +82,23 @@
     },
     "owner": {
       "label": "Dono",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "description": "Acesso não restrito, incluindo a capacidade de partilhar e conectar/desconectar o sistema da \"Cloud\""
     },
     "viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Visualizador",
+      "description": "Pode visualizar o vídeo ao vivo e pesquisar o arquivo"
     },
     "liveViewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Visualizador ao vivo",
+      "description": "Só pode visualizar o vídeo ao vivo"
     },
     "advancedViewer": {
-      "label": "Advanced Viewer",
+      "label": "Visualizador Avançado",
       "description": "Pode ver vídeos ao vivo, navegar no arquivo, configurar câmeras, controlar PTZ etc"
     },
     "custom": {
       "label": "Personalizadas",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "Use a aplicação Cliente %VMS_NAME% para configurar permissões personalizadas"
     }
   },
   "errorCodes": {
@@ -116,10 +116,10 @@
     "cantActivatePrefix": "Cannot activate your account",
     "cantSendConfirmationPrefix": "Cannot send confirmation Email",
     "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Wrong password",
+    "notAuthorized": "Senha incorrecta",
     "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongParameters": "Some parameters on the form are incorrect",
-    "wrongCode": "Account is already activated or confirmation code is incorrect",
+    "wrongCode": "A conta já está activada ou o código de confirmação está incorreto",
     "wrongCodeRestore": "Confirmation code is already used or incorrect",
     "forbidden": "You do not have permissions to perform this action",
     "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
@@ -131,7 +131,7 @@
     "emailNotFound": "Account does not exist.",
     "EmailAlreadyExists": "This Email is already registered",
     "oldPasswordMistmatch": "Current password is incorrect.",
-    "passwordMismatch": "Wrong password",
+    "passwordMismatch": "Senha incorrecta",
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
     "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
+    "good": "good",
+    "fair": "fair",
+    "minLength": "too short",
     "minLengthMessage": "Password must contain at least 8 characters",
+    "required": "incorrect",
     "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "weak": "weak",
     "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage": "Strong password!",
+    "strongMessage": "Senha forte!",
+    "common": "too common",
     "commonMessage": "Esta senha está principais senhas mais populares no mundo",
     "missingMessage": "A senha é necessária"
   },
@@ -274,25 +280,25 @@
       "lowStream": "Low stream",
       "transcoding": "Transcoding",
       "unknown": "Desconhecido",
-      "copyToClipboard": "copy to clipboard",
+      "copyToClipboard": "copiar para o Clipboard",
       "copyDefaultText": "copiar",
-      "copyActiveText": "copied to clipboard"
+      "copyActiveText": "copiado para o Clipboard"
     },
-    "systemOffline": "System Offline",
+    "systemOffline": "Sistema Offline",
     "systemHasNoCameras": "NO CAMERAS",
     "cameraStates": {
       "offline": "Offline",
       "error": "Erro",
-      "unauthorized": "Authentication required",
-      "noData": "No data",
-      "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
-      "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
-      "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-      "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
-      "noFormat": "This browser does not support video playback from this camera.",
-      "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-      "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
-      "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+      "unauthorized": "Necessária autenticação",
+      "noData": "Sem dados",
+      "iosVideoTooLarge": "O iOS não suporta vídeos maiores que fullHD (2MP: 1920x1080).",
+      "flashRequired": "Por favor, <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> para reproduzir vídeos.",
+      "flashOrWebmRequired": "Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> ou o <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para reproduzir vídeo no Internet Explorer.",
+      "noArmSupport": "Este navegador ou dispositivo não suporta a reprodução de vídeo a partir de servidores baseados em ARM.",
+      "noFormat": "Este browser não suporta a reprodução de vídeo desta câmara.",
+      "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para o Internet Explorer.",
+      "ieWin10": "Por favor, utilize browsers Microsoft Edge ou Google Chrome.",
+      "ubuntuNX": "Este navegador não suporta vídeo de servidores baseados em ARM. Por favor, use o navegador Chromium."
     },
     "searchCamPlaceholder": "Pesquisar",
     "resolution": {
@@ -300,19 +306,19 @@
       "high": "Alta",
       "low": "Baixa"
     },
-    "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+    "chromeCastWarning": "O Chromecast consome muitos recursos e pode causar problemas no seu servidor.",
     "voiceCommands": {
       "play": "reproduzir",
       "pause": "pausa",
       "live": "go to live | show me live",
       "view": "view + [camera name]",
       "search": "find + [text for searchbar]",
-      "clear search": "clear search",
+      "clear search": "limpar pesquisa",
       "expand server": "expand server + [server name]",
       "collapse server": "collapse server + [server name]",
-      "expand all servers": "expand all servers",
-      "collapse all servers": "collapse all servers",
-      "stop listening": "stop listening",
+      "expand all servers": "expandir todos os servidores",
+      "collapse all servers": "recolher todos os servidores",
+      "stop listening": "parar de ouvir",
       "help": "help | show commands"
     }
   }

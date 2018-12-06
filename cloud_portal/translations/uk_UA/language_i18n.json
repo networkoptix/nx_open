@@ -64,7 +64,7 @@
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "Ми рекомендуємо встановлювати останні версії Google Chrome або Mozilla Firefox, але ви можете використовувати будь-який інший сучасний веб-браузер.",
 	"What's new?": "Що нового?",
 	"Wrong password": "Невірний пароль",
-	"You can merge cloud Systems, where you are owner.": "Ви можете об'єднати хмарні системи, де ви є власником.",
+	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "Ви можете обє’днати лише ті Хмарні системи, у який є дозволи Власника.",
 	"You can only merge Systems in which you have owner permissions.": "Ви можете об'єднувати тільки ті системи, в яких у вас є права власника.",
 	"Your browser is not supported": "Ваш браузер не підтримується",
 	"is incompatible.": "несумісний.",

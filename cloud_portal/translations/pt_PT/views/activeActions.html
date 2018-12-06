@@ -1,29 +1,29 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success && !loading">
-            Your account is successfully activated
+            A sua conta foi gravada com sucesso
         </h1>
         <h1 class="process-success" ng-if="activate.success && !loading">
-            <a class="btn btn-default" href="/login">Log In</a>
+            <a class="btn btn-default" href="/login">Iniciar sessão</a>
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success && !loading">
-            Account is already activated or confirmation code is incorrect
+            A conta já está activada ou o código de confirmação está incorreto
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Your account is successfully activated
+            A sua conta foi activada com sucesso
         </h1>
         <h1 class="process-success">
-            <a class="btn btn-default" href="/login">Log In</a>
+            <a class="btn btn-default" href="/login">Iniciar sessão</a>
         </h1>
     </div>
 
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in %PRODUCT_NAME%</h1>
+            <h1>Você registou em %PRODUCT_NAME%</h1>
             <p>We've sent you a letter with activation link to {{data.email}}.<br>
                 Please activate your account by visiting this link.</p>
         </div>
@@ -60,12 +60,12 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            As instruções de reset de senha são enviadas para o e-mail <br>{{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Reset Password</h1>
+        <h1>Reset da Senha</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
@@ -96,15 +96,15 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
-            Password successfully saved
+            Senha guardada com sucesso
         </h1>
         <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login" translate>Log In</a>
+            <a class="btn btn-default" href="/login" translate>Iniciar sessão</a>
         </div>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"
               novalidate>
-            <h1 translate>Set New Password</h1>
+            <h1 translate>Definir nova senha</h1>
 
             <password-input ng-model="data.newPassword"
                             id="'newPassword'"

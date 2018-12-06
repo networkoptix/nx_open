@@ -116,7 +116,7 @@
         "updateNotificationsEnabled": "Notificações de actualização habilitadas",
         "upnpPortMappingEnabled": "Mapeamento de portas UPNP activado",
         "useTextEmailFormat": "Enviar e-mails de texto simples",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "Use o feed de linha do Windows em emails",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -144,35 +144,35 @@
         "cloudError": "Não é possível fazer o \"merge\" dos sistemas. O sistema dependente está conectado à \"Cloud\". É precisa desconectar primeiro.",
         "cloudBothError": "Não é possível fazer o \"merge\" dos sistemas. Ambos os sistemas estão conectados à \"Cloud\". É precisa desconectar um deles primeiro.",
         "cloudHostConflict": "Não é possível fazer o \"merge\" dos sistemas, porque os servidores estão criados com diferentes hosts na \"Cloud\"",
-        "licenceError": "Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
-        "connectionFailed": "Connection failed: ",
+        "licenceError": "Aviso! Você está prestes a efectuar o \"Merge\" de Sistemas com licenças Starter. Apenas é permitida uma licença Starter por sistema, e por isso a segunda licença será desativada. Efectuar o \"Merge\" mesmo assim?",
+        "connectionFailed": "A ligação falhou: ",
         "unknownError": "Erro desconhecido",
-        "mergeFailed": "Merge failed: ",
-        "mergeSucceed": "Merge succeed.",
-        "newSystemDisplayName": "New system",
-        "incompatibleProtocol": "incompatible version",
-        "incompatibleCloudHost": "cloud conflict",
-        "incompatibleCloudState": "cloud connected"
+        "mergeFailed": "Falhou o \"Merge\": ",
+        "mergeSucceed": "\"Merge\" feito com sucesso.",
+        "newSystemDisplayName": "Novo sistema",
+        "incompatibleProtocol": "versão incompatível",
+        "incompatibleCloudHost": "conflito de \"Cloud\"",
+        "incompatibleCloudState": "\"Cloud\" conectada"
     },
     "login": {
-        "incorrectPassword": "Login or password is incorrect",
+        "incorrectPassword": "Login ou senha incorrectos",
         "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
-        "cannotGetUser": "Server failure: cannot retrieve current user data"
+        "cannotGetUser": "Falha do servidor: não é possível obter os dados do utilizador actual"
     },
     "offlineDialog": {
         "serverOffline": "servidor offline"
     },
     "restartDialog": {
-        "serverStarting": "server is starting",
-        "serverRestarting": "server is restarting",
+        "serverStarting": "o servidor está a ser iniciado",
+        "serverRestarting": "o servidor está a ser reiniciado",
         "serverOffline": "servidor offline"
     },
     "fileUpload": {
-        "started": "Update successfully started. It will take several minutes",
-        "upToDate": "Update failed. The provided version is already installed.",
-        "invalidFile": "Update failed. Provided file is not a valid update archive.",
+        "started": "Actualização iniciada com sucesso. Levará vários minutos",
+        "upToDate": "A actualização falhou. A versão fornecida já está instalada.",
+        "invalidFile": "Actualização falhou. O ficheiro fornecido não é um arquivo de actualização válido.",
         "incompatibleSystem": "Actualização falhou. O ficheiro fornecido é indicado para outro sistema.",
         "extractionError": "Actualização falhou. Espaço insuficiente para extrair o arquivo, verifique o armazenamento disponível.",
         "installationError": "Actualização falhou. Não é possível executar o script de instalação.",

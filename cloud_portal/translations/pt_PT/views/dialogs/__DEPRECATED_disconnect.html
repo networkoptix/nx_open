@@ -5,7 +5,7 @@
                 All cloud users will be deleted.
             </p>
             <p>
-                System will be accessible through local network with local administrator account.
+                O sistema estará acessível através da rede local com conta de administrador local.
             </p>
             <p>
                 Enter password to continue.
@@ -17,7 +17,7 @@
                        name="password" type="password" required autofocus>
                 <p class="help-block" >
                     <span class="input-error" ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
-                        Password is required
+                        A senha é obrigatória
                     </span>
                 </p>
             </div>
@@ -28,7 +28,7 @@
                             action-type="'danger'"
                             button-text="$root.L.system.confirmDisconnectAction"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" >Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="close()" >Cancelar</button>
         </div>
     </form>
 </div>

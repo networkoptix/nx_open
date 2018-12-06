@@ -1,6 +1,6 @@
-New message
+Nytt meddelande
 
-Type: {{message.type}}
+Typ: {{message.type}}
 Data: {{{message.data}}}
 
-There is no specific template for this type of message
+Det finns ingen specifik mall för denna typ av meddelande
