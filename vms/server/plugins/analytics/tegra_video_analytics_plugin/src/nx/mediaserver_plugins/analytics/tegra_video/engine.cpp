@@ -30,52 +30,24 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
 std::string Engine::manifest() const
 {
     return /*suppress newline*/1 + R"json(
-{
-    "pluginId": "nx.tegraVideo",
-    "pluginName": {
-        "value": "TegraVideo Analytics Plugin",
-        "localization": {
-            "ru_RU": "TegraVideo analytics engine Plugin (stub for Russian text)"
-        }
-    },
     "eventTypes": [
         {
             "id": "nx.tegraVideo.humanEnteredTheArea",
-            "name": {
-                "value": "Human entered the area.",
-                "localization": {
-                    "ru_RU": "Chelovek voznik (stub for Russian text)"
-                }
-            }
+            "name": "Human entered the area."
         },
         {
             "id": "nx.tegraVideo.humanLeftTheArea",
-            "name": {
-                "value": "Human left the area",
-                "localization": {
-                    "ru_RU": "Chelovek svalil (stub for Russian text)"
-                }
-            }
+            "name": "Human left the area"
         }
     ],
     "objectTypes": [
         {
             "id": "nx.tegraVideo.car",
-            "name": {
-                "value": "Car",
-                "localization": {
-                    "ru_RU": "Mashina (stub for Russian text)"
-                }
-            }
+            "name": "Car"
         },
         {
             "id": "nx.tegraVideo.human",
-            "name": {
-                "value": "Human",
-                "localization": {
-                    "ru_RU": "Chelovek (stub for Russian text)"
-                }
-            }
+            "name": "Human"
         }
     ]
 }

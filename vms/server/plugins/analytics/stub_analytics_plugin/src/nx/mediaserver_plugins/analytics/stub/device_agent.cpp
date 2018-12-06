@@ -60,15 +60,11 @@ std::string DeviceAgent::manifest() const
     "eventTypes": [
         {
             "id": ")json" + kLineCrossingEventType + R"json(",
-            "name": {
-                "value": "Line crossing"
-            }
+            "name": "Line crossing"
         },
         {
             "id": ")json" + kObjectInTheAreaEventType + R"json(",
-            "name": {
-                "value": "Object in the area"
-            },
+            "name": "Object in the area",
             "flags": "stateDependent|regionDependent"
         }
     ]

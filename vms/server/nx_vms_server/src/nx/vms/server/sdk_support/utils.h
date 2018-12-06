@@ -161,7 +161,7 @@ std::map<QString, Descriptor> descriptorsFromItemList(
         else
         {
             descriptor.id = item.id;
-            descriptor.name = item.name.value;
+            descriptor.name = item.name;
         }
 
         if constexpr (detail::hasPaths<Descriptor>::value)

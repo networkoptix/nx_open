@@ -32,7 +32,7 @@ nx::sdk::analytics::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     auto packet = new nx::sdk::analytics::CommonEventMetadataPacket();
     auto commonEvent = new nx::sdk::analytics::CommonEvent();
     commonEvent->setTypeId(eventType.id.toStdString());
-    commonEvent->setDescription(eventType.name.value.toStdString());
+    commonEvent->setDescription(eventType.name.toStdString());
     commonEvent->setAuxiliaryData(std::to_string(logicalId));
 
     packet->addEvent(commonEvent);

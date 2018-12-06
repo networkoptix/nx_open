@@ -17,7 +17,7 @@ QString buildCaption(
     const HikvisionEvent& event)
 {
     const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
-    return descriptor.name.value;
+    return descriptor.name;
 }
 
 QString buildDescription(

@@ -97,39 +97,29 @@ std::string Engine::manifest() const
     "eventTypes": [
         {
             "id": ")json" + kLineCrossingEventType + R"json(",
-            "name": {
-                "value": "Line crossing"
-            }
+            "name": "Line crossing"
         },
         {
             "id": ")json" + kObjectInTheAreaEventType + R"json(",
-            "name": {
-                "value": "Object in the area"
-            },
+            "name": "Object in the area",
             "flags": "stateDependent|regionDependent"
         }
     ],
     "objectTypes": [
         {
             "id": ")json" + kCarObjectType + R"json(",
-            "name": {
-                "value": "Car"
-            }
+            "name": "Car"
         },
         {
             "id": ")json" + kHumanFaceObjectType + R"json(",
-            "name": {
-                "value": "Human face"
-            }
+            "name": "Human face"
         }
     ],
     "capabilities": ")json" + m_capabilities + R"json(",
     "objectActions": [
         {
             "id": "nx.stub.addToList",
-            "name": {
-                "value": "Add to list"
-            },
+            "name": "Add to list",
             "supportedObjectTypeIds": [
                 ")json" + kCarObjectType + R"json("
             ],
@@ -153,9 +143,7 @@ std::string Engine::manifest() const
         },
         {
             "id": "nx.stub.addPerson",
-            "name": {
-                "value": "Add person (URL-based)"
-            },
+            "name": "Add person (URL-based)",
             "supportedObjectTypeIds": [
                 ")json" + kCarObjectType + R"json("
             ]

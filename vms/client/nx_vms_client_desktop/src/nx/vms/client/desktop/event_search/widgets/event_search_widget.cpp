@@ -285,7 +285,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                 {
                     const auto& descriptor = entry.second;
                     addMenuAction(currentMenu,
-                        descriptor.item.name.value,
+                        descriptor.item.name,
                         EventType::analyticsSdkEvent, descriptor.getId());
 
                     if (!currentSelectionStillAvailable && currentSelection == descriptor.getId())

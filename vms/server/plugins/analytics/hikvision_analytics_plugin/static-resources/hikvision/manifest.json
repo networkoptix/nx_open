@@ -2,270 +2,201 @@
     "capabilities": "deviceModelDependent",
     "eventTypes": [
         {
-            "id": "nx.hikvision.loitering", 
-            "name": {
-                "value": "Loitering detection", 
-                "localization": {}
-            }, 
-            "internalName": "loitering", 
-            "description": "Loitering %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "id": "nx.hikvision.loitering",
+            "name": "Loitering detection",
+            "internalName": "loitering",
+            "description": "Loitering %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.fielddetection", 
-            "name": {
-                "value": "Intrusion detection", 
-                "localization": {}
-            }, 
-            "internalName": "fielddetection,FieldDetect,FiledDetect", 
+            "id": "nx.hikvision.fielddetection",
+            "name": "Intrusion detection",
+            "internalName": "fielddetection,FieldDetect,FiledDetect",
             "_comment": "FiledDetect is misspelled FieldDetect - found in DS-2CD2132-I camera",
-            "description": "Intrusion %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "description": "Intrusion %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.group", 
-            "name": {
-                "value": "Group detection", 
-                "localization": {}
-            }, 
-            "internalName": "group", 
-            "description": "Group %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "id": "nx.hikvision.group",
+            "name": "Group detection",
+            "internalName": "group",
+            "description": "Group %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.videoloss", 
-            "name": {
-                "value": "Video loss detection", 
-                "localization": {}
-            }, 
-            "internalName": "videoloss", 
-            "description": "videoloss %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "id": "nx.hikvision.videoloss",
+            "name": "Video loss detection",
+            "internalName": "videoloss",
+            "description": "videoloss %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.rapidMove", 
-            "name": {
-                "value": "Rapid move detection", 
-                "localization": {}
-            }, 
-            "internalName": "rapidMove", 
-            "description": "Rapid move %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "id": "nx.hikvision.rapidMove",
+            "name": "Rapid move detection",
+            "internalName": "rapidMove",
+            "description": "Rapid move %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.parking", 
-            "name": {
-                "value": "Parking detection", 
-                "localization": {}
-            }, 
-            "internalName": "parking", 
-            "description": "Parking %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "id": "nx.hikvision.parking",
+            "name": "Parking detection",
+            "internalName": "parking",
+            "description": "Parking %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.Face", 
-            "name": {
-                "value": "Face detection", 
-                "localization": {}
-            }, 
-            "_": "Following fields belong to private plugin implementation.", 
-            "internalName": "FaceDetect", 
-            "description": "Face %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "is not detected", 
+            "id": "nx.hikvision.Face",
+            "name": "Face detection",
+            "_": "Following fields belong to private plugin implementation.",
+            "internalName": "FaceDetect",
+            "description": "Face %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.LineDetect,linedetection", 
-            "name": {
-                "value": "Virtual line crossing", 
-                "localization": {}
-            }, 
-            "internalName": "LineDetect,linedetection", 
-            "description": "Virtual line #%1 was crossed", 
-            "flags": "regionDependent | stateDependent", 
+            "id": "nx.hikvision.LineDetect,linedetection",
+            "name": "Virtual line crossing",
+            "internalName": "LineDetect,linedetection",
+            "description": "Virtual line #%1 was crossed",
+            "flags": "regionDependent | stateDependent",
             "regionDescription": "#%1"
-        }, 
+        },
         {
-            "id": "nx.hikvision.RegionEntrance", 
-            "name": {
-                "value": "Entering the area", 
-                "localization": {}
-            }, 
-            "internalName": "RegionEntrance", 
-            "description": "Object has entered %1", 
-            "flags": "regionDependent", 
+            "id": "nx.hikvision.RegionEntrance",
+            "name": "Entering the area",
+            "internalName": "RegionEntrance",
+            "description": "Object has entered %1",
+            "flags": "regionDependent",
             "regionDescription": " the region #%1"
-        }, 
+        },
         {
-            "id": "nx.hikvision.RegionExiting", 
-            "name": {
-                "value": "Exiting the area", 
-                "localization": {}
-            }, 
-            "internalName": "RegionExiting", 
-            "description": "Object has exited %1", 
-            "flags": "regionDependent", 
+            "id": "nx.hikvision.RegionExiting",
+            "name": "Exiting the area",
+            "internalName": "RegionExiting",
+            "description": "Object has exited %1",
+            "flags": "regionDependent",
             "regionDescription": " the region #%1"
-        }, 
+        },
         {
-            "id": "nx.hikvision.AudioException", 
-            "name": {
-                "value": "Audio exception", 
-                "localization": {}
-            }, 
-            "internalName": "AudioException", 
-            "description": "The audio volume level is %1 the threshold", 
-            "positiveState": "above", 
-            "negativeState": "below", 
+            "id": "nx.hikvision.AudioException",
+            "name": "Audio exception",
+            "internalName": "AudioException",
+            "description": "The audio volume level is %1 the threshold",
+            "positiveState": "above",
+            "negativeState": "below",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.Tamper,shelteralarm", 
-            "name": {
-                "value": "Tampering detection", 
-                "localization": {}
-            }, 
-            "internalName": "Tamper,shelteralarm", 
-            "description": "Tampering %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "has ended", 
+            "id": "nx.hikvision.Tamper,shelteralarm",
+            "name": "Tampering detection",
+            "internalName": "Tamper,shelteralarm",
+            "description": "Tampering %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.Defocus", 
-            "name": {
-                "value": "Defocusing detection", 
-                "localization": {}
-            }, 
-            "internalName": "Defocus", 
-            "description": "Defocusing %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "has ended", 
+            "id": "nx.hikvision.Defocus",
+            "name": "Defocusing detection",
+            "internalName": "Defocus",
+            "description": "Defocusing %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.Motion,VMD", 
-            "name": {
-                "value": "Motion detection", 
-                "localization": {}
-            }, 
-            "internalName": "Motion,VMD", 
-            "description": "Motion %1%2", 
-            "positiveState": "has been detected", 
-            "negativeState": "has ended", 
-            "flags": "stateDependent | regionDependent", 
+            "id": "nx.hikvision.Motion,VMD",
+            "name": "Motion detection",
+            "internalName": "Motion,VMD",
+            "description": "Motion %1%2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent | regionDependent",
             "regionDescription": "  in the region #%1"
-        }, 
+        },
         {
-            "id": "nx.hikvision.UnattendedBaggage", 
-            "name": {
-                "value": "Unattended baggage", 
-                "localization": {}
-            }, 
-            "internalName": "UnattendedBaggage", 
-            "description": "Unattended baggage %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "has ended", 
+            "id": "nx.hikvision.UnattendedBaggage",
+            "name": "Unattended baggage",
+            "internalName": "UnattendedBaggage",
+            "description": "Unattended baggage %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.AttendedBaggage", 
-            "name": {
-                "value": "Object removal", 
-                "localization": {}
-            }, 
-            "internalName": "AttendedBaggage", 
-            "description": "Object removal %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "has ended", 
+            "id": "nx.hikvision.AttendedBaggage",
+            "name": "Object removal",
+            "internalName": "AttendedBaggage",
+            "description": "Object removal %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.SceneChange", 
-            "name": {
-                "value": "Scene changed", 
-                "localization": {}
-            }, 
-            "internalName": "SceneChange", 
-            "description": "Scene has been changed", 
+            "id": "nx.hikvision.SceneChange",
+            "name": "Scene changed",
+            "internalName": "SceneChange",
+            "description": "Scene has been changed",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.AttendedBaggage", 
-            "name": {
-                "value": "Attended baggage", 
-                "localization": {}
-            }, 
-            "internalName": "AttendedBaggage", 
-            "description": "Attended baggage %1", 
-            "positiveState": "has been detected", 
-            "negativeState": "has ended", 
+            "id": "nx.hikvision.AttendedBaggage",
+            "name": "Attended baggage",
+            "internalName": "AttendedBaggage",
+            "description": "Attended baggage %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
             "flags": "stateDependent"
-        }, 
+        },
         {
-            "id": "nx.hikvision.BlackList", 
-            "name": {
-                "value": "LPR - Black list", 
-                "localization": {}
-            }, 
-            "internalName": "BlackList", 
-            "description": "Black list", 
-            "dependedEvent": "lpr,otherlist", 
+            "id": "nx.hikvision.BlackList",
+            "name": "LPR - Black list",
+            "internalName": "BlackList",
+            "description": "Black list",
+            "dependedEvent": "lpr,otherlist",
             "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
-        }, 
+        },
         {
-            "id": "nx.hikvision.WhiteList", 
-            "name": {
-                "value": "LPR - White list", 
-                "localization": {}
-            }, 
-            "internalName": "WhiteList", 
-            "description": "White list", 
-            "dependedEvent": "lpr,otherlist", 
+            "id": "nx.hikvision.WhiteList",
+            "name": "LPR - White list",
+            "internalName": "WhiteList",
+            "description": "White list",
+            "dependedEvent": "lpr,otherlist",
             "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
-        }, 
+        },
         {
-            "id": "nx.hikvision.otherlist", 
-            "name": {
-                "value": "LPR - Other list", 
-                "localization": {}
-            }, 
-            "internalName": "otherlist", 
-            "description": "Other list", 
-            "dependedEvent": "lpr", 
+            "id": "nx.hikvision.otherlist",
+            "name": "LPR - Other list",
+            "internalName": "otherlist",
+            "description": "Other list",
+            "dependedEvent": "lpr",
             "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
-        }, 
+        },
         {
-            "id": "nx.hikvision.Vehicle", 
-            "name": {
-                "value": "Vehicle detected", 
-                "localization": {}
-            }, 
-            "internalName": "Vehicle", 
-            "description": "Vehicle detected", 
+            "id": "nx.hikvision.Vehicle",
+            "name": "Vehicle detected",
+            "internalName": "Vehicle",
+            "description": "Vehicle detected",
             "flags": "stateDependent"
         }
-    ], 
+    ],
     "groups": [
         {
-            "id": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}", 
-            "name": {
-                "value": "LPR", 
-                "localization": {}
-            }
+            "id": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}",
+            "name": "LPR"
         }
     ]
 }

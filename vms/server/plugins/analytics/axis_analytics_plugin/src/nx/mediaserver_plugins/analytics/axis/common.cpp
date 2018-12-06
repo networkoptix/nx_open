@@ -42,11 +42,11 @@ QString ignoreNamespaces(const QString& tags)
 EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
 {
     const QString eventTypeId = QString::fromLatin1(supportedEventType.fullName().c_str());
-    name.value = supportedEventType.description.c_str();
-    if (name.value.simplified().isEmpty())
+    name = supportedEventType.description.c_str();
+    if (name.simplified().isEmpty())
     {
-        name.value = supportedEventType.fullName().c_str();
-        name.value = ignoreNamespaces(name.value);
+        name = supportedEventType.fullName().c_str();
+        name = ignoreNamespaces(name);
     }
     flags = (supportedEventType.stateful)
         ? nx::vms::api::analytics::EventTypeFlag::stateDependent
