@@ -59,7 +59,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
-        v["ffmpeg"] = "3.1.9"
+        v["ffmpeg"] = "3.1.9-2"
 
     if platform == "macosx":
         v["ffmpeg"] = "3.1.9"
@@ -84,14 +84,15 @@ def determine_package_versions(
     if box == "rpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "jessie" 
-        v["ffmpeg"] = "3.1.1"
+        v["sysroot"] = "jessie"
+        v["ffmpeg"] = "3.1.1-1"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
 
     if box == "tx1":
-        v["festival"] = "2.1x"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
 
     if not "festival-vox" in v:
@@ -162,14 +163,13 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
-        sync("windows/signtool", path_variable="signtool_directory")
         sync("windows/ilmerge", path_variable="ilmerge_directory")
 
     if platform in ("windows", "linux"):
         sync("%s/pandoc" % platform, path_variable="pandoc_directory")
 
     if box == "edge1":
-        sync("cpro-1.0.0-2")
+        sync("cpro-1.0.1")
         sync("gdb")
 
     if arch == "x64":

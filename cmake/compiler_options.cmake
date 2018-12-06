@@ -18,6 +18,12 @@ if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     endif()
 endif()
 
+if(developerBuild)
+    set(CMAKE_WIN32_EXECUTABLE OFF)
+else()
+    set(CMAKE_WIN32_EXECUTABLE ON)
+endif()
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -56,13 +62,17 @@ if(WINDOWS)
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
     set(API_IMPORT_MACRO "")
-    set(API_EXPORT_MACRO "")
+    set(API_EXPORT_MACRO "") #< TODO: Consider using "__attribute__((visibility(\"default\")))".
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(NOT WINDOWS)
         add_definitions(-D_DEBUG)
     endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wall -Wextra)
 endif()
 
 if(WINDOWS)
@@ -79,15 +89,22 @@ if(WINDOWS)
         /wd4100
 
         /we4717
+
         # Deletion of pointer to incomplete type 'X'; no destructor called.
         /we4150
+
         # Not all control paths return a value.
         /we4715
+
         # Macro redefinition.
         /we4005
+
         # Unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given
         # constant.
         /we4806
+
+        # 'identifier' : type name first seen using 'objecttype1' now seen using 'objecttype2'
+        /we4099
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
@@ -104,7 +121,7 @@ if(WINDOWS)
     endif()
 
     set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags} /entry:mainCRTStartup")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
 
@@ -114,9 +131,6 @@ if(WINDOWS)
 
     set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
-    if(NOT developerBuild)
-        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
-    endif()
     unset(_extra_linker_flags)
 endif()
 
@@ -140,6 +154,7 @@ if(UNIX)
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
+            -Werror=mismatched-tags
         )
     endif()
 endif()

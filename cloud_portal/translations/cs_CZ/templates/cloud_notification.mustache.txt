@@ -1,0 +1,3 @@
+Dobrý den, {{message.userFullName}}
+
+{{message.text_body}}

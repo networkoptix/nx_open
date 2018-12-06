@@ -1,8 +1,8 @@
-<alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
+<uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
     <p><b>開発者向け ご意見をお寄せください</b></p>
     <p>私たちの開発チームは、SDKとAPIを使用してインテグレーションを開発する開発者からのフィードバックに常に関心を持っています
         開発者の経験を向上させる方法の提案、またはチームと話したい場合は、フィードバックフォームにご記入ください
     </p>
     <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">レビューを書く</a></p>
-</alert>
+</uib-alert>

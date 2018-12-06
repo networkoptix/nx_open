@@ -1,11 +1,12 @@
 {
+  "language": "en_US",
   "language_name": "ภาษาไทย",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "ตกลง",
     "cancelButton": "ยกเลิก",
-    "loginTitle": "ยินดีต้อนรับสู่ %PRODUCT_NAME%",
+    "loginTitle": "เข้าสู่ระบบ %PRODUCT_NAME%",
     "loginButton": "ลงชื่อเข้าสู่ระบบ",
     "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "แสดงขั้นสูง",
-      "description": "สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "ผู้ดูแลระบบ",
@@ -166,7 +167,7 @@
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",
-    "confirmDisconnectTitle": "ตัดการเชื่อมต่อระบบจาก %PRODUCT_NAME% หรือไม่?",
+    "confirmDisconnectTitle": "ยกเลิกการเชื่อมต่อระบบจาก %PRODUCT_NAME%?",
     "confirmDisconnectAction": "ตัดการเชื่อมต่อ",
     "confirmUnshareFromMe": "คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
     "confirmUnshareFromMeTitle": "ยกเลิกการเชื่อมต่อระบบหรือไม่?",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "ลบ",
     "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "ระบบทั้งหมด",
     "systems": "ระบบ"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "สตรีมสูง",
+      "lowStream": "สตรีมต่ำ",
+      "transcoding": "การแปลงรหัส",
+      "unknown": "ม่รู้จัก",
+      "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
+      "copyDefaultText": "สำเนา",
+      "copyActiveText": "คัดลอกไปยังคลิปบอร์ด"
+    },
+    "systemOffline": "ระบบออฟไลน์",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "ออฟไลน์",
+      "error": "ข้อผิดพลาด",
+      "unauthorized": "จำเป็นต้องระบุตัวตนผู้ใช้",
+      "noData": "ไม่มีข้อมูล",
+      "iosVideoTooLarge": "iOS ไม่สนับสนุนวิดีโอที่ใหญ่กว่า fullHD (2MP: 1920x1080)",
+      "flashRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> สำหรับเล่นวิดีโอ",
+      "flashOrWebmRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
+      "noArmSupport": "เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
+      "noFormat": "เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
+      "ieNoWebm": "โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
+      "ieWin10": "โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
+      "ubuntuNX": "เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน"
+    },
+    "searchCamPlaceholder": "ค้นหา",
+    "resolution": {
+      "auto": "อัตโนมัติ",
+      "high": "สูง",
+      "low": "ต่ำ"
+    },
+    "chromeCastWarning": "Chromecast เป็นทรัพยากรที่เข้มข้นและอาจทำให้เกิดปัญหาบนเซิร์ฟเวอร์ของคุณ",
+    "voiceCommands": {
+      "play": "เล่น",
+      "pause": "หยุด",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "ล้างการค้นหา",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "ขยายเซิร์ฟเวอร์ทั้งหมด",
+      "collapse all servers": "ยุบเซิร์ฟเวอร์ทั้งหมด",
+      "stop listening": "หยุดฟัง",
+      "help": "help | show commands"
+    }
   }
 }

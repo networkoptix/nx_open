@@ -44,10 +44,12 @@
         "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
         "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "System was disconnected from {{CLOUD_NAME}} successfully",
+        "disconnectedFromCloudError": "Cannot disconnect the system",
 
         "confirmDisconnectFromSystem":"Detach server from current system",
         "confirmDisconnectFromSystemAction": "Detach",
         "disconnectedFromSystemSuccess": "Server was detached from the system successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
 
         "connectedSuccess": "System was connected successfully",
         "createLocalOwnerTitle":"Create local administrator",
@@ -134,7 +136,8 @@
         "videoTrafficEncryptionForced": "Force video traffic encryption",
 
         "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info":{
         "tabs":{
@@ -159,7 +162,7 @@
         "duplicateServersError": "Cannot merge systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Connection failed: ",
         "unknownError": "Unknown error",
-        "mergeFailed": "Merge failed: ",
+        "mergeFailed": "Merge failed",
         "mergeSucceed": "Merge succeed.",
         "newSystemDisplayName": "New system",
         "incompatibleProtocol":"incompatible version",

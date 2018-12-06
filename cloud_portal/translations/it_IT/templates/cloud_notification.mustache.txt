@@ -1,3 +1,3 @@
-Buongiorno, {{message.full_name}}
+Buongiorno, {{message.userFullName}}
 
 {{message.text_body}}

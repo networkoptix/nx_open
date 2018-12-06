@@ -12,9 +12,9 @@
 #include <fstream>
 
 #if defined(_WIN32)
-    #include <direct.h>
+    #include <direct.h> //< For mkdir().
 #else
-    #include <sys/stat.h> //< For mkdir function.
+    #include <sys/stat.h> //< For mkdir().
 #endif
 
 namespace nx {
@@ -200,7 +200,7 @@ static void createDir(const std::string& dir)
 #if defined(_WIN32)
     const int resultCode = _mkdir(dir.c_str());
 #else
-    const int resultCode = mkdir(dir.c_str(), 0777);
+        const int resultCode = mkdir(dir.c_str(), /*octal*/ 0777);
 #endif
     if (resultCode != 0)
         fatalError("Unable to create dir: [%s]", dir.c_str());

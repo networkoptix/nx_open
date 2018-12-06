@@ -349,11 +349,23 @@ angular.module('webadminApp')
             }
         }
 
+        function normalizeUrl(url){
+            var hasPort = url.match(/:\d+/);
+            var hasProtocol= url.indexOf('//')>=0;
+            if(!hasPort){
+                url = url + ':' + Config.defaultPort;
+            }
+            if(!hasProtocol){
+                url = 'http://' + url;
+            }
+            return url;
+        }
         function connectToAnotherSystem(){
             $log.log("Connect to another system");
             $log.log($scope.settings.remoteSystem);
 
             var systemUrl = $scope.settings.remoteSystem.url || $scope.settings.remoteSystem;
+            systemUrl = normalizeUrl(systemUrl);
             $scope.settings.remoteError = false;
 
             $log.log("Request /api/mergeSystems ...");

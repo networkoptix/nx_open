@@ -19,6 +19,7 @@ Open Browser and go to URL
     run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
     ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
+    Set Selenium Timeout    10
     Check Language
     Go To    ${url}
 
@@ -26,7 +27,7 @@ Regular Open Browser
     [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    Set Window Size    1920    1080
 
 Docker Open Browser
     [Arguments]    ${url}
@@ -44,46 +45,49 @@ Set Chrome Options
     [Return]    ${options}
 
 Check Language
-    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
+#    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
+    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
-
     Wait Until Element Is Visible    ${LOG IN BUTTON}
-    Click Element    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    20
+    Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
+    Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
 
 Log Out
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Wait Until Page Contains Element    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Sleep    .05    #Ubuntu was clicking too soon
-    Click Link    ${ACCOUNT DROPDOWN}
+    Click Button    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Validate Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Element Is Visible    ${ANONYMOUS BODY}
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}    20
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -93,7 +97,7 @@ Register
     ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
     Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX VISIBLE}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Success
@@ -133,6 +137,38 @@ Activate
     Element Should Be Visible    ${ACTIVATION SUCCESS}
     Location Should Be    ${url}/activate/success
 
+Restore password
+    [arguments]    ${email}
+    Open Browser and go to URL    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    ${link}    Get Email Link    ${email}    restore_password
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
+    #sometimes the DB doesn't update with the new code before it's used by the test.  This is to wait for the DB update.
+    Sleep    20
+    Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
+
+    Click Button    ${SAVE PASSWORD}
+    Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
+    Click Link    ${RESET SUCCESS LOG IN LINK}
+    Log In    ${email}    ${BASE PASSWORD}    None
+    Validate Log In
+    Close Browser
+
+Share To
+    [arguments]    ${random email}    ${permissions}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${random email}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
     Wait Until Element Is Not Visible    ${SHARE MODAL}
@@ -140,10 +176,12 @@ Edit User Permissions In Systems
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
-    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
-    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
-    Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
-    Click Element    ${EDIT PERMISSIONS SAVE}
+    Wait Until Element Is Visible    ${EDIT PERMISSIONS DROPDOWN}
+    Click Element    ${EDIT PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
+    Click Button    ${EDIT PERMISSIONS SAVE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
@@ -187,7 +225,12 @@ Failure Tasks
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}
+    \  Wait Until Element Is Visible    ${element}    20
+
+Elements Should Not Be Visible
+    [arguments]    @{elements}
+    :FOR     ${element}  IN  @{elements}
+    \  Element Should Not Be Visible    ${element}
 
 #Reset resources
 Clean up email noperm
@@ -230,7 +273,7 @@ Reset user noperm first/last name
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    Register Keyword To Run On Failure    NONE
+
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Register Keyword To Run On Failure    Failure Tasks
@@ -241,6 +284,8 @@ Reset user noperm first/last name
     Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    # In case Kyle forgets about this it's a test to see if it fixes a problem with not changing the name back in some cases
+    Sleep    2
     Close Browser
 
 Reset user owner first/last name
@@ -248,11 +293,11 @@ Reset user owner first/last name
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    button=None
     Validate Log In
-    Register Keyword To Run On Failure    NONE
+
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
     Register Keyword To Run On Failure    Failure Tasks
-
+    Sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -260,17 +305,6 @@ Reset user owner first/last name
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
-
-Reset user password to base
-    [arguments]    ${email}    ${current password}
-    Go To    ${url}/account/password
-    Log In    ${email}    ${current password}    None
-    Validate Log In
-    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Input Text    ${CURRENT PASSWORD INPUT}    ${current password}
-    Input Text    ${NEW PASSWORD INPUT}    ${BASE PASSWORD}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 Add notowner
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
@@ -283,7 +317,7 @@ Add notowner
     Close Browser
 
 Make sure notowner is in the system
-    Register Keyword To Run On Failure    None/
+    Register Keyword To Run On Failure    None
     Open Browser and Go To URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In

@@ -1,0 +1,16 @@
+<h1>Hej, {{message.userFullName}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> har delat åtkomst till videostyrningssystemet "{{message.system_name}}" med dig.
+
+För att visa och hantera det, skapa ett konto på <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> Använd din nuvarande e-postadress och följ ytterligare instruktioner.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Du har fått tillgång till videohanteringssystem "{{message.system_name}}".
+
+För att visa och hantera det, skapa ett konto på <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> Använd din nuvarande e-postadress och följ ytterligare instruktioner.</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> Skapa konto </a>
+

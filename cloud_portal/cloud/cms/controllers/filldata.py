@@ -40,12 +40,37 @@ def target_file(file_name, customization, language_code, preview):
 
 def process_context_structure(customization, context, content,
                               language, version_id, preview, force_global_files):
+    def replace_in(adict, key, value):
+        for dict_key in adict.keys():
+            itm_type = type(adict[dict_key])
+            if itm_type not in [str, unicode, dict, list]:
+                continue
+
+            if itm_type is list:
+                for item in adict[dict_key]:
+                    if type(item) in [str, unicode]:
+                        idx = adict[dict_key].index(item)
+                        adict[dict_key][idx] = item.replace(key, value)
+                    elif item in [dict, list]:
+                        replace_in(item, key, value)
+
+            elif itm_type is dict:
+                replace_in(adict[dict_key], key, value)
+
+            elif key in adict[dict_key]:
+                adict[dict_key] = adict[dict_key].replace(key, value)
+
     for datastructure in context.datastructure_set.order_by('order').all():
         try:
             content_value = datastructure.find_actual_value(customization, language, version_id)
             # replace marker with value
             if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-                content = content.replace(datastructure.name, content_value)
+                if type(content) == dict:
+                    # Process language JSON file
+                    replace_in(content, datastructure.name, content_value)
+                else:
+                    content = content.replace(datastructure.name, content_value)
+
             elif content_value or datastructure.optional:
                 if context.is_global and not force_global_files:
                     # do not update files from global contexts all the time
@@ -85,14 +110,27 @@ def process_context(context, language_code, customization, preview, version_id, 
     language = Language.by_code(language_code, customization.default_language)
     skin = customization.read_global_value('%SKIN%')
     context_template_text = context.template_for_language(language, customization.default_language, skin)
+
+    # check if the file is language JSON
+    if context.file_path.endswith(".json") and isinstance(context_template_text, unicode):
+        try:
+            context_template_text = json.loads(context_template_text)
+        except ValueError:
+            print("Failed to decode file -> " + context.file_path)
+
     if not context_template_text:
         context_template_text = ''
+
     content = process_context_structure(customization, context, context_template_text, language,
                                         version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
                 customization, global_context, content, None, version_id, preview, False)
+
+    # If json -> dump it to string
+    if type(content) == dict:
+        content = json.dumps(content)
 
     return content
 
@@ -156,13 +194,19 @@ def init_skin(customization_name, product='cloud_portal'):
     # 1. read skin for this customization
     customization = Customization.objects.get(name=customization_name)
     skin = customization.read_global_value('%SKIN%')
+
+    logger.info("Init " + skin + " skin for " + customization_name)
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
     distutils.dir_util.copy_tree(from_dir, target_dir)
     distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
+
+    logger.info("Fill content for " + customization_name)
     # 3. run fill_content
     fill_content(customization_name, product, preview=False, incremental=False)
+
+    logger.info("Fill preview for " + customization_name)
     fill_content(customization_name, product, preview=True, incremental=False)
 
 
@@ -269,6 +313,7 @@ def fill_content(customization_name='default', product_name='cloud_portal',
         changed_languages = customization.languages_list
 
     for context in changed_contexts:
+        logger.info("Process context: " + context.name + " file:" + context.file_path)
         # now we need to check what languages were changes
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages

@@ -458,7 +458,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
-        timeManager.init(Config.webclient.useServerTime);
+        timeManager.init(Config.webclient.useServerTime, Config.webclient.useSystemTime);
 
         systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
             $scope.canViewArchive = result;

@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -31,22 +30,20 @@ can be opened in anonymous state
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
-can be closed after clicking on background
+can be closed by clicking on the X
+    [tags]    C24212
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Click Element At Coordinates    //div[@uib-modal-backdrop='modal-backdrop']/..    10    10
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
+    Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
-    Page Should Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
+    [tags]    C24212    C24213
     Log In    ${email}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}
-    Wait Until Element Is Visible    ${LOG OUT BUTTON}
-    Click Link    ${LOG OUT BUTTON}
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
+    Log Out
+    Validate Log Out
 
 redirects to systems after log In
     Log In    ${email}    ${password}
@@ -58,45 +55,31 @@ after log In, display user's email and menu in top right corner
     Set Window Size    1920    1080
     Log In    ${email}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
-
-valid but unregistered email shows error message
-    Log In    ${EMAIL UNREGISTERED}    ${password}
-    Wait Until Element Is Visible    ${ALERT}
+    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}/span[text()="${email}"]
 
 allows log in with existing email in uppercase
     ${email uppercase}    Convert To Uppercase    ${email}
     Log In    ${email uppercase}    ${password}
     Validate Log In
 
-shows red outline if field is wrong/empty after blur
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Wait Until Element Is Visible    ${LOG IN BUTTON}
-    Click Element    ${LOG IN BUTTON}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}/parent::div[contains(@class, 'has-error')]    ${PASSWORD INPUT}/parent::div[contains(@class, 'has-error')]
-
 allows log in with 'Remember Me checkmark' switched off
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
-    Click Element    ${REMEMBER ME CHECKBOX}
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    input text    ${EMAIL INPUT}    ${email}
-    input text    ${PASSWORD INPUT}    ${password}
-    click button    ${LOG IN BUTTON}
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Click Element    ${REMEMBER ME CHECKBOX VISIBLE}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX REAL}
+    Log In    ${email}    ${password}    None
     Validate Log In
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form
     Log In    ${email}    'aderhgadehf'
-    Wait Until Element Is Visible    ${FORGOT PASSWORD}
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
+    [tags]    C41872
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -108,18 +91,19 @@ passes email from email input to Restore password page, even without clicking 'L
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
-redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
-    [tags]    email
+shows non-activated user message when not activated at login; Resend activation button sends email
+    [tags]    email    C41865
     Go To    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
-    Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
+    Register    'mark'    'hamill'    ${random email}    ${password}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
-    Location Should Be    ${url}/activate
     Validate Register Email Received    ${random email}
-    Click Button    ${RESEND ACTIVATION LINK BUTTON}
-    Validate Register Email Received    ${random email}
+    Click Link    ${RESEND ACTIVATION LINK BUTTON}
+    Activate    ${random email}
+    Log In    ${random email}    ${password}
+    Validate Log In
 
 displays password masked
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
@@ -133,7 +117,7 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log In
     Log Out
     Go Back
-    Validate Log Out
+    Wait Until Element Is Visible    ${LOG IN MODAL}
 
 handles more than 255 symbols email and password
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
@@ -173,9 +157,10 @@ should respond to Esc key and close dialog
 should respond to Enter key and log in
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
     Press Key    ${PASSWORD INPUT}    ${ENTER}
     Validate Log In
 
@@ -190,12 +175,12 @@ should respond to Tab key
 should respond to Space key and toggle checkbox
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
-    Set Focus To Element    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}    ${SPACEBAR}
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}    ${SPACEBAR}
-    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}
+    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX VISIBLE}
+    Set Focus To Element    ${REMEMBER ME CHECKBOX REAL}
+    Press Key    ${REMEMBER ME CHECKBOX REAL}    ${SPACEBAR}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX REAL}
+    Press Key    ${REMEMBER ME CHECKBOX REAL}    ${SPACEBAR}
+    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX REAL}
 
 handles two tabs, updates second tab state if logout is done on first
     Go To    ${url}/register
@@ -222,4 +207,4 @@ handles two tabs, updates second tab state if logout is done on first
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/systems
     Reload Page
-    Validate Log Out
+    Wait Until Element Is Visible    ${LOG IN MODAL}

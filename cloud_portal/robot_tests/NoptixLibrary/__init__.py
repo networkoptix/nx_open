@@ -3,6 +3,7 @@
 
 import imaplib
 import re
+from platform import system
 import email.header
 from email.parser import HeaderParser
 import os.path
@@ -43,8 +44,11 @@ class NoptixLibrary(object):
             time.sleep(.2)
         return emails
 
-    def get_random_symbol_email(self):
-        return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
+    def get_random_symbol_email(self, email):
+        index = email.find('@')
+        email = email[:index] + \
+            "+!#$%'*-/=?^_`{|}~" + str(time.time()) + email[index:]
+        return email
 
     def wait_until_textfield_contains(self, locator, expected, timeout=10):
         seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
@@ -58,7 +62,23 @@ class NoptixLibrary(object):
                 if value == expected:
                     return
             except:
-                not_found = "No element found with text " + expected
+                pass
+            time.sleep(.2)
+        raise Exception("No element found with text " + expected)
+
+    def wait_until_element_has_style(self, locator, styleAttribute, expected, timeout=10):
+        seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
+        timeout = timeout + time.time()
+        not_found = None
+
+        while time.time() < timeout:
+            try:
+                element = seleniumlib.find_element(locator)
+                value = element.value_of_css_property(styleAttribute)
+                if value == expected:
+                    return
+            except:
+                not_found = "No element found with style " + expected
             time.sleep(.2)
         raise AssertionError(not_found)
 
@@ -117,7 +137,47 @@ class NoptixLibrary(object):
 
     def check_file_exists(self, url):
         linkInfo = head(url)
-        if int(linkInfo.status_code) == 200 and int(linkInfo.headers['Content-Length']) > 1000:
+        if int(linkInfo.status_code) == 200: #and int(linkInfo.headers['Content-Length']) > 1000:
             return
         else:
             raise Exception("File does not appear to be available.")
+
+    def check_in_list(self, expected, found):
+        for url in expected:
+            if found in url:
+                return
+            elif re.search(url, found):
+                return
+        raise Exception(url + " was not in the email.")
+
+    def get_os(self):
+        plat = system()
+        if plat == "Windows":
+            return "Windows"
+        elif plat == "Darwin":
+            return "MacOS"
+        elif plat == "Linux":
+            return "Linux"
+        else:
+            raise Exception("Mismatched platform")
+
+    def check_email_button(self, body, env, color):
+        pat = '(<a class="btn" href="{})(.[^>]*)(background-color: {};)'.format(
+            env, color)
+        if re.search(pat, body) == None:
+            raise Exception("Button background-color was not found.")
+
+    def check_email_user_names(self, body, fName, lName):
+        pat = '(<h1.*>).*({} {}</h1>)'.format(fName, lName)
+        if re.search(pat, body) == None:
+            raise Exception("User name was not in the email.")
+
+    def check_email_cloud_name(self, body, cloudName):
+        pat = '(<p).*({}).*(</p>)'.format(cloudName)
+        if re.search(pat, body) == None:
+            raise Exception("Cloud name was not in the email.")
+
+    def check_for_blank_target(self, body, url):
+        pat = '(<a class="btn" href="{})(.[^>]*)(target=_blank)'.format(url)
+        if re.search(pat, body) == None:
+            raise Exception("Button target was not 'blank'.")

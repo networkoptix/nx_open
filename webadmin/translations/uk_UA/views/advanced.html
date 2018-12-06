@@ -116,36 +116,20 @@
 
     <h2>Налаштування журналу</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Рівень деталізації основного журналу</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Ні: Журнал вимкнено.</option>
-                    <option value="ALWAYS">Завжди: Записувати помилки, попередження і найважливіші повідомлення.</option>
-                    <option value="ERROR">Помилки: Записувати помилки.</option>
-                    <option value="WARNING">Попередження: Записувати помилки і попередження.</option>
-                    <option value="INFO">Інфо: Записувати помилки, попередження і все повідомлення.</option>
-                    <option value="DEBUG">Налагодження: Записувати всі системні повідомлення і налагодження.</option>
-                    <option value="DEBUG2">Налагодження2: Записувати всі системні повідомлення і розширену зневадження.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Ні: Журнал вимкнено.</option>
+                    <option value="always">Завжди: Записувати помилки, попередження і найважливіші повідомлення.</option>
+                    <option value="error">Помилки: Записувати помилки.</option>
+                    <option value="warning">Попередження: Записувати помилки і попередження.</option>
+                    <option value="info">Інфо: Записувати помилки, попередження і все повідомлення.</option>
+                    <option value="debug">Налагодження: Записувати всі системні повідомлення і налагодження.</option>
+                    <option value="debug2">Налагодження2: Записувати всі системні повідомлення і розширену зневадження.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Рівень журналу транзакцій</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Ні: Журнал вимкнено.</option>
-                    <option value="ALWAYS">Завжди: Записувати помилки, попередження і найважливіші повідомлення.</option>
-                    <option value="ERROR">Помилки: Записувати помилки.</option>
-                    <option value="WARNING">Попередження: Записувати помилки і попередження.</option>
-                    <option value="INFO">Інфо: Записувати помилки, попередження і все повідомлення.</option>
-                    <option value="DEBUG">Налагодження: Записувати всі системні повідомлення і налагодження.</option>
-                    <option value="DEBUG2">Налагодження2: Записувати всі системні повідомлення і розширену зневадження.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Зберегти</button>
         </div>

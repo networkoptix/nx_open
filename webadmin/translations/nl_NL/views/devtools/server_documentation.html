@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        Server documentatie
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Deze instellingen zijn toegankelijk via:</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                Voor Windows in registersleutel:
+                Computer\HKEY_LOCAL_MACHINE\SOFTWARE\"{{Config.productName}}"\"{{Config.productName}} Media Server"
+            </p>
+            <p>
+                Voor alle andere platformen wordt het in een configuratiebestand geplaatst:
+                /opt/{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">Serverinstellingen</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>Naam</th>
+                        <th>Omschrijving</th>
+                        <th>Standaardwaarde</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

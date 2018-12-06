@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 #Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -27,9 +26,9 @@ Open New Browser On Failure
 Go to download page
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
-#    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
-#    Log In    ${email}    ${password}    button=None
-#    Validate Log In
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Log In    ${email}    ${password}    button=None
+    Validate Log In
     Wait Until Elements Are Visible    ${DOWNLOADS HEADER}    ${WINDOWS TAB}
     Click Link    ${WINDOWS TAB}
 
@@ -55,14 +54,23 @@ Download link takes you to the /downloads page
 Going to the downloads page anonymous asks for login and closing takes you back to home
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
-    Wait Until Element Is Visible    ${WINDOWS TAB}
-    Click Link    ${WINDOWS TAB}
-#    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
-#    Click Button    ${LOG IN CLOSE BUTTON}
-    Location Should Be    ${url}/download/Windows
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Click Button    ${LOG IN CLOSE BUTTON}
+    Location Should Be    ${url}/
 
 Going to the downloads page anonymous asks for login and login shows downloads page
     Go to download page
+
+Going to the downloads page should show you the tab according to your OS
+    [tags]    C41550
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Log In    ${email}    ${password}    button=None
+    Validate Log In
+    Wait Until Elements Are Visible    ${DOWNLOADS HEADER}    ${WINDOWS TAB}
+    ${os}    Get OS
+    Wait Until Element Is Visible    //a[contains(@class,"active") and @id="${os}"]
 
 Make sure each tab changes the text to show the corresponding OS and url
     Go to download page

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
+    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
+    xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+    xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:saml1="urn:oasis:names:tc:SAML:1.0:assertion"
+    xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+    xmlns:wsc="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
+    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+    xmlns:onvifPacs="http://www.onvif.org/ver10/pacs"
+    xmlns:xmime="http://tempuri.org/xmime.xsd"
+    xmlns:xop="http://www.w3.org/2004/08/xop/include"
+    xmlns:onvifXsd="http://www.onvif.org/ver10/schema"
+    xmlns:oasisWsrf="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:oasisWsnT1="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:oasisWsrfR2="http://docs.oasis-open.org/wsrf/r-2"
+    xmlns:onvifAccessControl="http://www.onvif.org/ver10/accesscontrol/wsdl"
+    xmlns:onvifAccessRules="http://www.onvif.org/ver10/accessrules/wsdl"
+    xmlns:onvifActionEngine="http://www.onvif.org/ver10/actionengine/wsdl"
+    xmlns:onvifAdvancedSecurity-assb="http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding"
+    xmlns:onvifAdvancedSecurity-db="http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding"
+    xmlns:onvifAdvancedSecurity-kb="http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding"
+    xmlns:onvifAdvancedSecurity-tsb="http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding"
+    xmlns:onvifAdvancedSecurity="http://www.onvif.org/ver10/advancedsecurity/wsdl"
+    xmlns:onvifAnalytics-aeb="http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
+    xmlns:onvifAnalytics-reb="http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
+    xmlns:onvifAnalytics="http://www.onvif.org/ver20/analytics/wsdl"
+    xmlns:onvifAnalyticsDevice="http://www.onvif.org/ver10/analyticsdevice/wsdl"
+    xmlns:onvifCredential="http://www.onvif.org/ver10/credential/wsdl"
+    xmlns:onvifDevice="http://www.onvif.org/ver10/device/wsdl"
+    xmlns:onvifDeviceIO="http://www.onvif.org/ver10/deviceIO/wsdl"
+    xmlns:onvifDisplay="http://www.onvif.org/ver10/display/wsdl"
+    xmlns:onvifDoorControl="http://www.onvif.org/ver10/doorcontrol/wsdl"
+    xmlns:onvifEvents-cpb="http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
+    xmlns:onvifEvents-eb="http://www.onvif.org/ver10/events/wsdl/EventBinding"
+    xmlns:onvifEvents-ncb="http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
+    xmlns:onvifEvents-npb="http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding"
+    xmlns:onvifEvents-ppb="http://www.onvif.org/ver10/events/wsdl/PullPointBinding"
+    xmlns:onvifEvents="http://www.onvif.org/ver10/events/wsdl"
+    xmlns:onvifEvents-pps="http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
+    xmlns:onvifEvents-psmb="http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
+    xmlns:oasisWsnB2="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:onvifEvents-smb="http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
+    xmlns:onvifImg="http://www.onvif.org/ver20/imaging/wsdl"
+    xmlns:onvifMedia="http://www.onvif.org/ver10/media/wsdl"
+    xmlns:onvifMedia2="http://www.onvif.org/ver20/media/wsdl"
+    xmlns:onvifNetwork-dlb="http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
+    xmlns:onvifNetwork-rdb="http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
+    xmlns:onvifNetwork="http://www.onvif.org/ver10/network/wsdl"
+    xmlns:onvifProvisioning="http://www.onvif.org/ver10/provisioning/wsdl"
+    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl"
+    xmlns:onvifReceiver="http://www.onvif.org/ver10/receiver/wsdl"
+    xmlns:onvifRecording="http://www.onvif.org/ver10/recording/wsdl"
+    xmlns:onvifReplay="http://www.onvif.org/ver10/replay/wsdl"
+    xmlns:onvifScedule="http://www.onvif.org/ver10/schedule/wsdl"
+    xmlns:onvifSearch="http://www.onvif.org/ver10/search/wsdl"
+    xmlns:onvifThermal="http://www.onvif.org/ver10/thermal/wsdl">
+ <!-- struct SOAP_ENV__Header *soap::header -->
+ <SOAP-ENV:Header>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <!-- __onvifEvents_pps__Seek(..., _onvifEvents__Seek *onvifEvents__Seek, ...) -->
+   <!-- _onvifEvents__Seek *onvifEvents__Seek -->
+   <onvifEvents:Seek>
+    <!-- time_t UtcTime -->
+    <onvifEvents:UtcTime>2018-10-29T21:59:18Z</onvifEvents:UtcTime>
+    <!-- bool *Reverse -->
+    <onvifEvents:Reverse>false</onvifEvents:Reverse>
+    <!-- std::vector<struct soap_dom_element> __any -->
+    <!-- a repetition of 0 or more of the following -->
+
+   </onvifEvents:Seek>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

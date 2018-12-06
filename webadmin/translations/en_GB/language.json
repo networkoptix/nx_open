@@ -76,7 +76,6 @@
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Enable edge recording",
         "eventLogPeriodDays": "Event log period (days)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
         "ldapSearchFilter": "LDAP search filter",
@@ -110,10 +109,21 @@
         "systemName": "System name",
         "takeCameraOwnershipWithoutLock": "Take cameras ownership without lock",
         "timeSynchronizationEnabled": "Time synchronization enabled",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Update notifications enabled",
         "upnpPortMappingEnabled": "UPNP port mapping enabled",
         "useTextEmailFormat": "Send plain-text emails",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -145,7 +155,8 @@
         "incompatibleCloudState": "cloud connected"
     },
     "login": {
-        "incorrectPassword": "Login or password is incorrect"
+        "incorrectPassword": "Login or password is incorrect",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Server failure: cannot retrieve current user data"

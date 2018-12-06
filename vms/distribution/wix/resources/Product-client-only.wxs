@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+
+    <?include BuildVars.wxi ?>
+
+    <Product
+        Id="*"
+        Name="$(var.productName) Client"
+        Language="1033"
+        Version="$(var.releaseVersionFull)"
+        Manufacturer="$(var.companyName)"
+        UpgradeCode="$(var.clientUpgradeCode)">
+
+        <Package
+            Id="*"
+            InstallerVersion="405"
+            Compressed="yes"
+            Keywords="Installer"
+            Comments="$(var.ProductTitle)"
+            Manufacturer="$(var.companyName)"
+            InstallPrivileges="elevated"
+            InstallScope="perMachine"/>
+
+        <?include ControlPanel.wxi ?>
+        <?include installer_states.wxi ?>
+
+        <Property Id="CLIENT_NAME" Value="$(var.clientInternalName)"/>
+        <Property Id="REINSTALLMODE" Value="dmus"/>
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"/>
+
+        <?if $(var.arch) = x86 ?>
+        <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
+            <![CDATA[ NOT VersionNT64 ]]>
+        </Condition>
+        <?endif?>
+
+        <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">$(var.msiUpgrade)</SetProperty>
+        <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
+
+        <Property Id="INSTALL_CLIENT" Secure="yes"/>
+        <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
+            <![CDATA[ $(var.msiFirstTimeInstall) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+        </SetProperty>
+
+        <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch">
+            <![CDATA[ CLIENT_DIRECTORY_REG = "" ]]>
+        </SetProperty>
+
+        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomizationDir)/wixsetup/Binary/eve/eve_logo-493x58.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomizationDir)/wixsetup/Binary/eve/eve_logo-493x312.bmp" />
+
+        <!-- Logo -->
+        <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
+        <Icon Id="icon_desktop.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
+
+        <!-- Add property to access from custom actions -->
+        <Property Id="ARCHITECTURE" Value="$(var.arch)" />
+        <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
+
+        <!-- Properties -->
+        <Property Id="WelcomeDlg_Title" Value="$(var.ProductTitle)" />
+
+        <!-- Client properties-->
+        <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
+        <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="7001"/>
+        <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
+        <Property Id="CLIENT_VMS_MODE" Value="1"/>
+        <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
+            <RegistrySearch
+                Id="ClientDirectoryReg"
+                Root="HKCU"
+                Key="Software\[Manufacturer]\$(var.clientInternalName)"
+                Name="mediaRoot"
+                Type="raw"
+                Win64="yes"/>
+        </Property>
+
+        <Property Id="CLIENT_DIRECTORY_REG32" Secure="yes">
+            <RegistrySearch
+                Id="ClientDirectoryReg32"
+                Root="HKCU"
+                Key="Software\[Manufacturer]\$(var.clientInternalName)"
+                Name="mediaRoot"
+                Type="raw"
+                Win64="no"/>
+        </Property>
+
+        <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
+
+        <CustomAction
+            Id="CleanAutorunRegistryKeys"
+            BinaryKey="CustomActions.dll"
+            DllEntry="CleanAutorunRegistryKeys"
+            Execute="immediate"
+            Impersonate="yes"/>
+
+        <CustomAction
+            Id="CleanClientRegistryKeys_Cmd"
+            Property="CleanClientRegistryKeys"
+            Value="$(var.clientRegPath)"
+            Execute="immediate"
+            Impersonate="yes"/>
+
+        <CustomAction
+            Id="CleanClientRegistryKeys"
+            BinaryKey="CustomActions.dll"
+            DllEntry="CleanClientRegistryKeys"
+            Execute="deferred"
+            Impersonate="yes"/>
+
+        <!-- Custom actions -->
+        <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="minilauncher.exe" ExeCommand=""/>
+        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
+
+
+        <!-- Trying to kill old applauncher forcibly. It was named as minilaucher is named currently. Actual always. -->
+        <CustomAction Id="CloseOldApplauncherAction_Cmd" Property="CloseOldApplauncherAction"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.minilauncherBinaryName)"' Execute="immediate" />
+        <CustomAction Id="CloseOldApplauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <!-- Trying to kill new Applauncher forcibly. It is actual when fully uninstalling the client. -->
+        <CustomAction Id="CloseApplauncherAction_Cmd" Property="CloseApplauncherAction"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.applauncherBinaryName)"' Execute="immediate" />
+        <CustomAction Id="CloseApplauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <?if $(var.developerBuild) = true ?>
+            <CustomAction Id="developerDebugInfo" Script="vbscript">
+                <![CDATA[
+                    Function testProperty(x)
+                        If Len(session.Property(x)) > 0 Then
+                            MsgBox(x & " : " & session.Property(x))
+                        End If
+                    End Function
+
+                    testProperty("Installed")
+                    testProperty("REMOVE")
+                    testProperty("PREVIOUSVERSIONSINSTALLED")
+                    testProperty("UPGRADINGPRODUCTCODE")
+                ]]>
+            </CustomAction>
+        <?endif?>
+
+        <MajorUpgrade
+            AllowDowngrades="yes"
+            Schedule="afterInstallInitialize"
+            MigrateFeatures="yes" />
+
+        <InstallUISequence>
+            <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
+            <FindRelatedProducts Before="AppSearch" />
+            <AppSearch Before="LaunchConditions" />
+        </InstallUISequence>
+
+        <InstallExecuteSequence>
+            <FindRelatedProducts Before="AppSearch" />
+            <AppSearch Before="LaunchConditions" />
+
+            <?if $(var.developerBuild) = true ?>
+                <Custom Action="developerDebugInfo" After="InstallInitialize" />
+            <?endif?>
+
+            <Custom Action="CleanAutorunRegistryKeys" Before="InstallFinalize">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CleanClientRegistryKeys_Cmd" After="CleanAutorunRegistryKeys">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CloseApplauncherAction_Cmd" After="CleanClientRegistryKeys">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CloseApplauncherAction" After="CloseApplauncherAction_Cmd">$(var.msiFullUninstall)</Custom>
+
+            <!-- Old applauncher must be killed in any scenario except clean install. -->
+            <Custom Action="CloseOldApplauncherAction_Cmd" Before="CloseApplauncherAction">Installed</Custom>
+            <Custom Action="CloseOldApplauncherAction" Before="StopServices">Installed</Custom>
+        </InstallExecuteSequence>
+
+        <Media Id="1" Cabinet="client.cab" EmbedCab="yes" />
+        <Media Id="2" Cabinet="shared.cab" EmbedCab="$(var.NoStrip)" />
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="MyPicturesFolder">
+                <Directory Id="$(var.customization)BgDir" Name="$(var.clientName) Backgrounds"/>
+            </Directory>
+
+            <Directory Id="$(var.ProgramFilesFolder)">
+                <Directory Id="NetworkOptix" Name="$(var.companyInstallPath)">
+                    <Directory Id="INSTALLDIR" Name="$(var.productName)">
+                    </Directory>
+                </Directory>
+            </Directory>
+
+            <Directory Id="ProgramMenuFolder" Name="Programs">
+                <Directory Id="ProgramMenuDir" Name="$(var.companyName)">
+                    <Component Id="UninstallProgramMenuFolder" DiskId="1">
+                        <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
+                        <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
+                    </Component>
+                </Directory>
+            </Directory>
+
+            <Directory Id="DesktopFolder" Name="Desktop"/>
+            <Directory Id="StartupFolder" Name="Startup"/>
+        </Directory>
+
+        <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
+            <ComponentRef Id="AlwaysFiles"/>
+            <ComponentRef Id="UninstallProgramMenuFolder"/>
+        </Feature>
+
+        <FeatureRef Id="ClientFeature"/>
+
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <Property Id="WIXUI_CLIENT_DIRECTORY" Value="CLIENT_DIRECTORY"/>
+        <Property Id="WIXUI_SERVER_ALLOWCHANGEIP" Value="SERVER_ALLOWCHANGEIP"/>
+
+        <UIRef Id="ClientMsiUi"/>
+
+    </Product>
+</Wix>

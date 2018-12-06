@@ -36,9 +36,9 @@ set(customization.fullBundleUpgradeCode "{7f96fd2c-fa49-4a32-807c-ed60c4a4e5d2}"
 
 set(deb.customization.company.name "telstra")
 
-set(ios.new_bundle_identifier "com.telstra.telstramobile")
-set(ios.group_identifier "group.com.telstra.telstra")
-set(ios.sign.identity "iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)")
+set(ios.new_bundle_identifier "com.telstrabusinessandenterprise.videosurveillance")
+set(ios.group_identifier "group.com.telstrabusinessandenterprise")
+set(ios.sign.identity "iPhone Distribution: Telstra Software Group PTY LTD (P82Y83AYW9)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
@@ -50,7 +50,3 @@ set(mac.protocol_handler_bundle.identifier "com.telstra.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0031")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

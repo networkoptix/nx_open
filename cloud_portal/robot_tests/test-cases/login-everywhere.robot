@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -14,8 +13,9 @@ ${url}         ${ENV}
 
 *** Keywords ***
 Check Log In
-    Log In    ${EMAIL UNREGISTERED}    ${password}
-    Check For Alert    ${ACCOUNT DOES NOT EXIST}
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Log In    ${random email}    ${password}
+    Wait Until Element Is Visible    ${ACCOUNT NOT FOUND}
     Log In    ${email}    ${password}    None
     Validate Log In
 

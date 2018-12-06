@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -13,7 +12,6 @@ ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && a
 
 *** Keywords ***
 Verify In Account Page
-    Location Should Be    ${url}/account
     Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT DROPDOWN}
     sleep    .5
 
@@ -32,10 +30,11 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Can access the account page from dropdown
+    [tags]    C41573
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Link    ${ACCOUNT DROPDOWN}
+    Click Button    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${ACCOUNT SETTINGS BUTTON}
     Click Link    ${ACCOUNT SETTINGS BUTTON}
     Verify in account page
@@ -56,9 +55,11 @@ Accessing the account page from a direct link while logged out asks for login, o
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
+    Go To    ${url}/account
     Verify in account page
 
 Changing first name and saving maintains that setting
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -72,14 +73,15 @@ Changing first name and saving maintains that setting
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
+    sleep    2
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
-
 Changing last name and saving maintains that setting
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -98,6 +100,7 @@ Changing last name and saving maintains that setting
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 First name is required
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -108,6 +111,7 @@ First name is required
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 Last name is required
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -118,6 +122,7 @@ Last name is required
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 SPACE for first name is not valid
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -128,22 +133,42 @@ SPACE for first name is not valid
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 SPACE for last name is not valid
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
+    Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 Email field is un-editable
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
     ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
     Should Be True    "${read only}"
+
+Should respond to tab and go in the correct order
+    [tags]    C41838
+    Go To    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Press Key    ${ACCOUNT DROPDOWN}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT EMAIL}
+    Press Key    ${ACCOUNT EMAIL}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT FIRST NAME}
+    Press Key    ${ACCOUNT FIRST NAME}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT LAST NAME}
+    Press Key    ${ACCOUNT LAST NAME}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT LANGUAGE DROPDOWN}
+    Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT SAVE}
 
 Langauge is changeable on the account page
     Go To    ${url}/account
@@ -153,15 +178,15 @@ Langauge is changeable on the account page
     \  Sleep    1
     \  Verify In Account Page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${lang}']
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${lang}']/..
+    \  Click Button    ${ACCOUNT SAVE}
     \  Sleep    1    #to allow the system to change languages
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1[text()='${account}']
     Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
-    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']
+    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']
     Click Button    ${ACCOUNT SAVE}
     Sleep    1
     Verify In Account Page

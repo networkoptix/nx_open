@@ -1,4 +1,4 @@
-שלום, {{message.fullName}}
+שלום, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) שיתף גישה למערכת ניהול הוידאו "{{message.system_name}}".

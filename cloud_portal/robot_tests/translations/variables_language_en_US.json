@@ -2,11 +2,12 @@
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
     "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
-    "RELEASE HISTORY BUTTON TEXT"          :    "Release History",
+    "CONTINUE BUTTON TEXT"                 :    "Continue",
+    "RELEASE HISTORY BUTTON TEXT"          :    "Other releases, patches and beta versions",
     "RESET EMAIL SENT MESSAGE TEXT"        :    "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
-    "RESEND ACTIVATION LINK BUTTON TEXT"   :    "Resend activation link",
+    "RESEND ACTIVATION LINK BUTTON TEXT"   :    "Resend activation email",
 
     "SYSTEM NO ACCESS TEXT"                :    "Failed to access System",
     "DISCONNECT MODAL WARNING TEXT"        :    "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
@@ -14,6 +15,7 @@
     "AUTOTESTS OFFLINE TEXT"               :    "offline",
     "NEW PERMISSIONS SAVED"                :    "New permissions saved",
     "PERMISSIONS WERE REMOVED FROM"        :    "Permissions were removed from %email%",
+    "SYSYEM DELETED FROM ACCOUNT"          :    "System {{message.system_name}} is successfully deleted from your account",
 
     "RESET SUCCESS MESSAGE TEXT"           :    "Password successfully saved",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED"   :    "Your account is successfully saved",
@@ -25,29 +27,42 @@
     "CANNOT SAVE PASSWORD"                 :    "Cannot save password:",
     "PASSWORD INCORRECT"                   :    "Current password is incorrect.",
     "WRONG PASSWORD"                       :    "Wrong password",
-    "ACCOUNT DOES NOT EXIST"               :    "Account does not exist.",
+    "ACCOUNT NOT FOUND TEXT"               :    "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
+    "ACCOUNT DOES NOT EXIST"               :    "Account does not exist.",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
-    "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",
-    "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, configure cameras, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADMINISTRATOR"         :    "Unrestricted access including the ability to share",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER"    :    "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"        :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the %VMS_NAME% Client application to set up custom permissions",
+
+    "SYSTEM NAME IS REQUIRED TEXT"      :    "System name is required",
 
     "ACCOUNT TEXT"                         :    "Account",
 
     "EDIT USER BUTTON TEXT"                :    "Edit",
     "DELETE USER BUTTON TEXT"              :    "Delete",
-    "DELETE USER CANCEL BUTTON TEXT"       :    "Cancel",
+    "CANCEL BUTTON TEXT"                   :    "Cancel",
+    "SAVE BUTTON TEXT"                     :    "Save",
+    "SHARE BUTTON TEXT"                    :    "Share",
 
     "OWNER TEXT"                           :    "Owner",
     "ADMIN TEXT"                           :    "Administrator",
     "ADV VIEWER TEXT"                      :    "Advanced Viewer",
     "VIEWER TEXT"                          :    "Viewer",
-    "LIVE VIEWER TEXT"                     :    "Live Viewer",    
+    "LIVE VIEWER TEXT"                     :    "Live Viewer",
     "CUSTOM TEXT"                          :    "Custom",
     "YOUR SYSTEM TEXT"                     :    "Your System",
+    "YOUR PERMISSIONS TEXT"                :    "Your permissions:",
+
+    "ABOUT"                                :    "About",
+    "KNOWN LIMITATIONS"                    :    "Known limitations",
+    "SUPPORT"                              :    "Support",
+    "TERMS"                                :    "Terms",
+    "PRIVACY"                              :    "Privacy",
+    "COPYRIGHT"                            :    "Copyright",
 
     "DOWNLOADS HEADER TEXT"                :    "Download",
 
@@ -79,5 +94,12 @@
     "RELEASES TEXT"                        :    "Releases",
     "PATCHES TEXT"                         :    "Patches",
     "BETAS TEXT"                           :    "Betas",
-    "CLIENT ONLY TEXT"                     :    "Client only" 
+    "CLIENT ONLY TEXT"                     :    "Client only",
+
+    "PASSWORD TOO SHORT BADGE TEXT"        :    "too short",
+    "PASSWORD TOO COMMON BADGE TEXT"       :    "too common",
+    "PASSWORD IS WEAK BADGE TEXT"          :    "weak",
+    "PASSWORD IS FAIR BADGE TEXT"          :    "fair",
+    "PASSWORD IS GOOD BADGE TEXT"          :    "good",
+    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect"
 }

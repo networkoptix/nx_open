@@ -1,12 +1,13 @@
 {
+  "language": "ukr_UKR",
   "language_name": "Українська",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Гаразд",
-    "cancelButton": "Відмінити",
+    "okButton": "Ок",
+    "cancelButton": "Відміна",
     "loginTitle": "Увійдіть до %PRODUCT_NAME%",
-    "loginButton": "Увійти",
+    "loginButton": "Вхід",
     "logoutAuthorisedTitle": "Ви вже увійшли",
     "logoutAuthorisedContinueButton": "Продовжити",
     "logoutAuthorisedLogoutButton": "Вийти"
@@ -14,15 +15,15 @@
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
     "default": "%PRODUCT_NAME%",
-    "registerSuccess": "Вітаємо в",
+    "registerSuccess": "Ласкаво просимо на",
     "register": "Створити обліковий запис",
     "changePassword": "Змінити пароль -",
     "account": "Параметри облікового запису",
     "systems": "Системи -",
-    "system": "Система",
+    "system": "Система -",
     "systemShare": "Загальний доступ -",
     "activate": "Активувати обліковий запис -",
-    "activateSent": "Активувати обліковий запис",
+    "activateSent": "Активувати обліковий запис -",
     "activateSuccess": "Обліковий запис активований",
     "activateCode": "Активувати обліковий запис -",
     "restorePassword": "Відновити пароль -",
@@ -30,7 +31,7 @@
     "restorePasswordCode": "Відновити пароль -",
     "view": "Переглянути камери - ",
     "debug": "Відладка",
-    "login": "Увійти -",
+    "login": "Вхід -",
     "download": "Завантажити %VMS_NAME%",
     "downloadPlatform": "Завантажити %VMS_NAME% для ",
     "pageNotFound": "Сторінку не знайдено"
@@ -39,12 +40,12 @@
     "notActivated": "не активовано",
     "activated": "активовано",
     "online": "oнлайн",
-    "offline": "офлайн",
+    "offline": "поза мережею",
     "unavailable": "недоступний"
   },
   "accessRoles": {
     "disabled": {
-      "label": "Вимкнений",
+      "label": "Вимкнено",
       "description": "Користувач вимкнений і не може ввійти в систему"
     },
     "Owner": {
@@ -56,12 +57,12 @@
       "description": "Можна переглядати відео в реальному часі та переглядати архів"
     },
     "Live Viewer": {
-      "label": "Відео з камер",
+      "label": "Відео в реальному часі",
       "description": "Можна переглядати лише відео в реальному часі"
     },
     "Advanced Viewer": {
       "label": "Перегляд і налаштування",
-      "description": "Може дивитися відео в реальному часі, архів, змінювати налаштування камер, керувари RTZ і т. д"
+      "description": "Може дивитися живе відео, архів, управляти PTZ і т. Д"
     },
     "Administrator": {
       "label": "Адміністратор",
@@ -101,7 +102,7 @@
     }
   },
   "errorCodes": {
-    "ok": "гаразд",
+    "ok": "ок",
     "cantSendActivationPrefix": "Не вдається надіслати підтвердження електронною поштою",
     "cantDisconnectSystemPrefix": "Невдається видалити систему",
     "cantUnshareWithMeSystemPrefix": "Невдається видалити систему",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
+    "successMerge": "Система {{systemName}} була об’єднана з {{systemName}}",
     "permissionsRemoved": "{{email}} був позбавлений повноважень"
   },
   "account": {
@@ -254,7 +256,7 @@
   },
   "activeActions": {
     "sendConfirm": "Відправити посилання активації ще раз",
-    "resetPassword": "Скидання пароля",
+    "resetPassword": "Відновити пароль",
     "setNewPassword": "Зберегти пароль",
     "setNewPasswordLabel": "Новий пароль"
   },
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Всі системи",
     "systems": "Системи"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Висока якість",
+      "lowStream": "Низька якість",
+      "transcoding": "Перекодування",
+      "unknown": "Невідомо",
+      "copyToClipboard": "копіювати в буфер обміну",
+      "copyDefaultText": "копіювати",
+      "copyActiveText": "скопійовано до буфера обміну"
+    },
+    "systemOffline": "Система знаходиться поза мережею",
+    "systemHasNoCameras": "НЕМАЄ КАМЕР",
+    "cameraStates": {
+      "offline": "Поза мережею",
+      "error": "Помилка",
+      "unauthorized": "Потрібна авторизація",
+      "noData": "Немає даних",
+      "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
+      "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео.",
+      "flashOrWebmRequired": "Відео не може бути відтворено. Можливо, потрібно <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановитиAdobe Flash</a> або<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для відтворення відео в Internet Explorer.",
+      "noArmSupport": "Цей браузер або пристрій не підтримує відтворення відео з серверів на базі ARM.",
+      "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
+      "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+      "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
+      "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium."
+    },
+    "searchCamPlaceholder": "Пошук",
+    "resolution": {
+      "auto": "Авто",
+      "high": "Високий",
+      "low": "Низький"
+    },
+    "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
+    "voiceCommands": {
+      "play": "відтворити",
+      "pause": "пауза",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "очистити вікно пошуку",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "розгорнути всі сервери",
+      "collapse all servers": "згорнути всі сервери",
+      "stop listening": "припинити прослуховування",
+      "help": "help | show commands"
+    }
   }
 }

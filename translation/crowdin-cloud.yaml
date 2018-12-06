@@ -8,6 +8,9 @@ files:
     source: '/cloud_portal/front_end/app/language.json'
     translation: '/cloud_portal/translations/%locale_with_underscore%/language.json'
   -
+    source: '/cloud_portal/front_end/app/language_i18n.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/language_i18n.json'
+  -
     source: '/cloud_portal/front_end/app/views/**/*.*'
     translation: '/cloud_portal/translations/%locale_with_underscore%/views/**/%original_file_name%'
     ignore:

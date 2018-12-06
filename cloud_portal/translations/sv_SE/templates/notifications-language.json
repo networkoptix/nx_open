@@ -1,0 +1,20 @@
+{
+  "activate_account": {
+    "emailSubject": "Aktivera ditt konto"
+  },
+  "restore_password": {
+    "emailSubject": "Återställ ditt lösenord"
+  },
+  "system_invite": {
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} inbjuder till %PRODUCT_NAME%{{messaging.sharer_name}}{{^message.sharer_name}}Videosystem {{message.system_name}} delades med dig {{/ message.sharer_name}}"
+  },
+  "system_shared": {
+    "emailSubject": "Videosystemet {{message.system_name}} delades med dig"
+  },
+  "review_version": {
+    "emailSubject": "Version {{message.id}} är redo att ses över"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
+  }
+}
