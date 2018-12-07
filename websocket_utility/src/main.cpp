@@ -305,7 +305,7 @@ private:
         if (m_stopped)
         {
             NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
-            exit(EXIT_FAILURE);
+            return;
         }
 
         if (errorCode != SystemError::noError)
@@ -437,6 +437,8 @@ public:
                                 return;
                             }
                         }
+
+                        NX_INFO(this, "onPost: Found pair connection in the pool");
 
                         auto p2pConnection =
                             std::dynamic_pointer_cast<P2PConnection>(existingP2PConnection);
