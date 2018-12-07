@@ -40,7 +40,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                         this.integrationService.selectedPluginSubject.subscribe(plugin => {
                             this.plugin = plugin;
 
-                            if (this.plugin.pending) {
+                            if (this.plugin && this.plugin.pending) {
                                 this.translate
                                         .get([
                                             'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
