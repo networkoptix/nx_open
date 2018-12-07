@@ -175,7 +175,7 @@ void EventSearchListModel::Private::truncateToMaximumCount()
 
 void EventSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    q->truncateDataToTimePeriod(m_data, upperBoundPredicate, q->relevantTimePeriod());
+    q->truncateDataToTimePeriod(m_data, &startTime, q->relevantTimePeriod());
 }
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)

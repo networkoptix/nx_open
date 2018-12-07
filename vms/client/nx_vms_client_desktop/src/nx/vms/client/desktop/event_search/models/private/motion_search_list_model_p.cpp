@@ -47,6 +47,11 @@ microseconds midTime(const QnTimePeriod& period, qreal fraction = kPreviewTimeFr
         : microseconds(milliseconds(qint64(period.startTimeMs + period.durationMs * fraction)));
 }
 
+milliseconds startTime(const MotionChunk& chunk)
+{
+    return chunk.period.startTime();
+}
+
 static const auto lowerBoundPredicate =
     [](const MotionChunk& left, milliseconds right) { return left.period.startTime() > right; };
 
@@ -167,14 +172,12 @@ void MotionSearchListModel::Private::clearData()
 
 void MotionSearchListModel::Private::truncateToMaximumCount()
 {
-    q->truncateDataToMaximumCount(m_data,
-        [](const MotionChunk& chunk) { return chunk.period.startTime(); });
+    q->truncateDataToMaximumCount(m_data, &startTime);
 }
 
 void MotionSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    q->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod());
+    q->truncateDataToTimePeriod(m_data, &startTime, q->relevantTimePeriod());
 }
 
 rest::Handle MotionSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -250,7 +253,7 @@ void MotionSearchListModel::Private::fetchLive()
     if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
-    if (m_data.empty() && fetchInProgress())
+    if (m_data.empty() && (fetchInProgress() || q->canFetchMore()))
         return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : m_data.front().period.startTime());

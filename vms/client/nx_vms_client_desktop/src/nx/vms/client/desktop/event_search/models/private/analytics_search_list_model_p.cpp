@@ -272,7 +272,7 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
         };
 
     q->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+        m_data, &startTime, q->relevantTimePeriod(), itemCleanup);
 }
 
 bool AnalyticsSearchListModel::Private::isCameraApplicable(

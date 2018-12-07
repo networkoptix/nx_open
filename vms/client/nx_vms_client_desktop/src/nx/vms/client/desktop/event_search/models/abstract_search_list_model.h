@@ -118,9 +118,10 @@ protected:
      * Doesn't need to reset fetched time window. */
     virtual void truncateToRelevantTimePeriod() = 0;
 
-    template<class DataContainer, class UpperBoundPredicate>
+    // Helper to truncate data sorted in descending timestamp order.
+    template<class DataContainer>
     void truncateDataToTimePeriod(DataContainer& data,
-        UpperBoundPredicate upperBoundPredicate,
+        std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
         const QnTimePeriod& period,
         std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
@@ -128,6 +129,7 @@ protected:
      * depending on current fetch direction. Must update fetched time window correspondingly. */
     virtual void truncateToMaximumCount() = 0;
 
+    // Helper to truncate data sorted in descending timestamp order.
     template<class DataContainer>
     void truncateDataToMaximumCount(DataContainer& data,
         std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
@@ -168,19 +170,25 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Template method implementation.
 
-template<class DataContainer, class UpperBoundPredicate>
+template<class DataContainer>
 void AbstractSearchListModel::truncateDataToTimePeriod(
-    DataContainer& data,
-    UpperBoundPredicate upperBoundPredicate,
+    DataContainer& data, //< Must be sorted in descending order by timestamp!
+    std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
     const QnTimePeriod& period,
     std::function<void(typename DataContainer::const_reference)> itemCleanup)
 {
     if (data.empty())
         return;
 
+    const auto upperBoundPredicate =
+        [timestamp](std::chrono::milliseconds left, const auto& right)
+        {
+            return left > timestamp(right);
+        };
+
     // Remove records later than end of the period.
     const auto frontEnd = std::upper_bound(data.begin(), data.end(),
-        period.endTime(), upperBoundPredicate);
+        period.endTime() + 1, upperBoundPredicate);
 
     const auto frontLength = std::distance(data.begin(), frontEnd);
     if (frontLength != 0)
@@ -207,7 +215,8 @@ void AbstractSearchListModel::truncateDataToTimePeriod(
 }
 
 template<class DataContainer>
-void AbstractSearchListModel::truncateDataToMaximumCount(DataContainer& data,
+void AbstractSearchListModel::truncateDataToMaximumCount(
+    DataContainer& data, //< Must be sorted in descending order by timestamp!
     std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
     std::function<void(typename DataContainer::const_reference)> itemCleanup)
 {

@@ -143,8 +143,11 @@ void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
     const auto itemCleanup =
         [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
 
+    const auto timestampGetter =
+        [](const QnCameraBookmark& bookmark) { return bookmark.startTimeMs; };
+
     q->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+        m_data, timestampGetter, q->relevantTimePeriod(), itemCleanup);
 }
 
 rest::Handle BookmarkSearchListModel::Private::getBookmarks(
