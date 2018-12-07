@@ -90,10 +90,19 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     auto vendor = normalize(QString(deviceInfo->vendor));
     auto model = normalize(QString(deviceInfo->model));
 
-    if (vendor.startsWith(kDwMttVendor) && m_typedManifest.supportsModel(model))
-        return new DeviceAgent(this, *deviceInfo, m_typedManifest);
-    else
+    if (!vendor.startsWith(kDwMttVendor))
+    {
+        NX_PRINT << "Unsupported camera vendor: " << nx::kit::debug::toString(deviceInfo->vendor);
         return nullptr;
+    }
+
+    if (!m_typedManifest.supportsModel(model))
+    {
+        NX_PRINT << "Unsupported camera model: " << nx::kit::debug::toString(deviceInfo->model);
+        return nullptr;
+    }
+
+    return new DeviceAgent(this, *deviceInfo, m_typedManifest);
 }
 
 const IString* Engine::manifest(Error* error) const
