@@ -282,7 +282,7 @@ private:
             m_p2pTransport->start();
             m_httpClient->pleaseStopSync();
         }
-        else if (statusCode == http::StatusCode::ok)
+        else
         {
             NX_INFO(this, "Server reported readiness for a http connection");
 
@@ -292,11 +292,11 @@ private:
             m_p2pTransport->bindToAioThread(m_aioThread);
             m_p2pTransport->start();
         }
-        else
-        {
-            NX_INFO(this, lm("http client got invalid response code %1").args(statusCode));
+//        else
+//        {
+//            NX_INFO(this, lm("http client got invalid response code %1").args(statusCode));
             exit(EXIT_FAILURE);
-        }
+//        }
 
         completionHandler();
     }
@@ -390,7 +390,7 @@ public:
             kHandlerPath,
             [this](
                 http::RequestContext requestContext,
-                http::RequestProcessedHandler requestCompletionHandler)
+                http::RequestProcessedHandler /*requestCompletionHandler*/)
             {
                 const auto& headers = requestContext.request.headers;
                 auto guidHeaderIt = headers.find("X-P2P-GUID");

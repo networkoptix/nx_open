@@ -25,9 +25,9 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     using namespace std::chrono_literals;
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
-
     m_readHttpClient->bindToAioThread(getAioThread());
     m_writeHttpClient->bindToAioThread(getAioThread());
+
     post([this]() { startReading(); });
 }
 
