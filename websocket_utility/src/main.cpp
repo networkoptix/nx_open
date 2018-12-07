@@ -49,6 +49,7 @@ struct
     nx::Buffer serverAddress = "0.0.0.0";
     int serverPort;
     aio::AbstractAioThread* aioThread = nullptr;
+    aio::Timer* aioTimer = nullptr;
     Mode mode = Mode::automatic;
 } config;
 
@@ -69,6 +70,7 @@ public:
     }
 
     QByteArray guid() const { return m_guid; }
+    void setGuid(const nx::Buffer& guid) { m_guid = guid; }
 
 protected:
     aio::AbstractAioThread* m_aioThread = nullptr;
@@ -87,7 +89,7 @@ protected:
 private:
     nx::utils::promise<void> m_readyPromise;
     nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
-    QByteArray m_guid = QnUuid::createUuid().toByteArray();
+    QByteArray m_guid;
 };
 
 using WaitablePtr = std::shared_ptr<Waitable>;
@@ -180,7 +182,10 @@ public:
 
     void connectAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
+        const auto connectionGuid = QnUuid::createUuid().toByteArray();
+
         http::HttpHeaders additionalHeaders;
+        additionalHeaders.emplace("X-NX-P2P-GUID",connectionGuid);
         websocket::addClientHeaders(&additionalHeaders, config.protocolName);
 
         NX_VERBOSE(this, lm("connecting to %1").args(config.url));
@@ -191,9 +196,11 @@ public:
         m_httpClient->doGet(
             config.url,
             [self = shared_from_this(),
-            this, completionHandler = std::move(completionHandler)]() mutable
+            this,
+            completionHandler = std::move(completionHandler),
+            connectionGuid]() mutable
             {
-                onConnect(std::move(completionHandler));
+                onConnect(std::move(completionHandler), connectionGuid);
             });
     }
 
@@ -230,7 +237,9 @@ private:
     nx::Buffer m_readBuffer;
     aio::Timer m_timer;
 
-    void onConnect(nx::utils::MoveOnlyFunc<void()> completionHandler)
+    void onConnect(
+        nx::utils::MoveOnlyFunc<void()> completionHandler,
+        const QByteArray& connectionGuid)
     {
         if (m_stopped)
         {
@@ -282,7 +291,7 @@ private:
 
             m_p2pTransport.reset(new P2PHttpClientTransport(
                 std::move(m_httpClient),
-                guid(),
+                connectionGuid,
                 websocket::FrameType::text));
             m_p2pTransport->bindToAioThread(m_aioThread);
             m_p2pTransport->start();
@@ -315,7 +324,8 @@ private:
         NX_VERBOSE(this, lm("message content: %1").args(m_readBuffer));
         m_readBuffer = nx::Buffer();
 
-        m_p2pTransport->readSomeAsync(&m_readBuffer,
+        m_p2pTransport->readSomeAsync(
+            &m_readBuffer,
             [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
             { onRead(errorCode, bytesRead); });
     }
@@ -382,27 +392,66 @@ public:
                 http::RequestContext requestContext,
                 http::RequestProcessedHandler /*requestCompletionHandler*/)
             {
-                const auto& headers = requestContext.request.headers;
-                auto guidHeaderIt = headers.find("X-NX-P2P-GUID");
-
-                if (guidHeaderIt == headers.cend())
+                struct CheckForPairConnectionContext
                 {
-                    NX_INFO(this, "onPost: No GUID header in the incoming Http request headers");
-                    exit(EXIT_FAILURE);
-                }
+                    std::unique_ptr<AbstractStreamSocket> socket;
+                    http::HttpHeaders headers;
+                    int iterations = 0;
+                    nx::utils::MoveOnlyFunc<void()> apply = nullptr;
+                };
 
-                auto existingP2PConnection = waitablePoolInstance->findByGuid(guidHeaderIt->second);
-                if (!existingP2PConnection)
-                {
-                    NX_INFO(this, "onPost: Failed to find the matching connection in the pool");
-                    exit(EXIT_FAILURE);
-                }
+                auto sharedContext = std::make_shared<CheckForPairConnectionContext>();
+                sharedContext->socket = requestContext.connection->takeSocket();
+                sharedContext->headers = requestContext.request.headers;
 
-                auto p2pConnection =
-                    std::dynamic_pointer_cast<P2PConnection>(existingP2PConnection);
+                auto checkForPairConnection = [sharedContext, this]() mutable
+                    {
+                        auto guidHeaderIt = sharedContext->headers.find("X-NX-P2P-GUID");
+                        if (guidHeaderIt == sharedContext->headers.cend())
+                        {
+                            NX_INFO(
+                                this,
+                                "onPost: No GUID header in the incoming Http request headers");
+                            exit(EXIT_FAILURE);
+                        }
 
-                p2pConnection->gotIncomingPostConnection(
-                    std::move(requestContext.connection->takeSocket()));
+                        auto existingP2PConnection =
+                            waitablePoolInstance->findByGuid(guidHeaderIt->second);
+                        if (!existingP2PConnection)
+                        {
+                            if (++sharedContext->iterations > 30)
+                            {
+                                NX_INFO(
+                                    this,
+                                    "onPost: Failed to find the matching connection in the pool");
+                                exit(EXIT_FAILURE);
+                            }
+                            else
+                            {
+                                config.aioTimer->start(
+                                    std::chrono::milliseconds(100),
+                                    [sharedContext, this]
+                                    {
+                                        sharedContext->apply();
+                                    });
+                                return;
+                            }
+                        }
+
+                        auto p2pConnection =
+                            std::dynamic_pointer_cast<P2PConnection>(existingP2PConnection);
+
+                        p2pConnection->gotIncomingPostConnection(std::move(sharedContext->socket));
+                    };
+
+                sharedContext->apply = std::move(checkForPairConnection);
+
+                config.aioTimer->start(
+                    std::chrono::milliseconds(100),
+                    [sharedContext, this]
+                    {
+                        sharedContext->apply();
+                    });
 
             }, http::Method::post);
     }
@@ -450,11 +499,15 @@ private:
             NX_INFO(this, lm("switching to http mode"));
 
             requestContext.connection->setSendCompletionHandler(
-                [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
+                [connection = requestContext.connection,
+                headers = requestContext.request.headers,
+                this](SystemError::ErrorCode ecode)
                 {
                     if (ecode != SystemError::noError)
                     {
-                        NX_INFO(this, "Failed to respond to the incoming connection request");
+                        NX_INFO(
+                            this,
+                            "onAccept: Failed to respond to the incoming connection request");
                         stopInAioThread();
                         return;
                     }
@@ -465,11 +518,12 @@ private:
 
                     p2pTransport->bindToAioThread(m_aioThread);
                     p2pTransport->start(
-                        [p2pTransport, this](SystemError::ErrorCode error)
+                        [p2pTransport, this, headers = headers](
+                            SystemError::ErrorCode error)
                         {
                             if (error != SystemError::noError)
                             {
-                                NX_INFO(this, "Failed to start Http server connection");
+                                NX_INFO(this, "onAccept: Failed to start Http server connection");
                                 stopInAioThread();
                                 return;
                             }
@@ -478,6 +532,16 @@ private:
                                 config.aioThread,
                                 P2pTransportPtr(p2pTransport));
 
+                            auto guidHeaderIt = headers.find("X-NX-P2P-GUID");
+                            if (guidHeaderIt == headers.cend())
+                            {
+                                NX_INFO(
+                                    this,
+                                    "onGet: No GUID header in the incoming Http request headers");
+                                exit(EXIT_FAILURE);
+                            }
+
+                            p2pConnection->setGuid(guidHeaderIt->second);
                             m_userCompletionHandler(p2pConnection);
                         });
                 });
@@ -536,6 +600,7 @@ static void startAccepting()
             if (!P2PConnection)
                 return;
             waitablePoolInstance->addWaitable(P2PConnection);
+            NX_INFO(typeid(P2PConnectionAcceptor), "Accepted connection and added to the Pool");
             P2PConnection->start();
         });
 
@@ -696,6 +761,7 @@ int main(int argc, const char *argv[])
 
     aio::Timer timer;
     config.aioThread = timer.getAioThread();
+    config.aioTimer = &timer;
     switch (config.role)
     {
         case Role::server:
