@@ -88,6 +88,7 @@ bool deviceInfoFromResource(
     nx::sdk::DeviceInfo* outDeviceInfo)
 {
     using namespace nx::sdk;
+
     if (!outDeviceInfo)
     {
         NX_ASSERT(false, "Device info is invalid");
@@ -103,43 +104,43 @@ bool deviceInfoFromResource(
     strncpy(
         outDeviceInfo->vendor,
         device->getVendor().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->model,
         device->getModel().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->firmware,
         device->getFirmware().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->uid,
         device->getId().toByteArray().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->sharedId,
         device->getSharedId().toStdString().c_str(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->url,
         device->getUrl().toUtf8().data(),
-        CameraInfo::kTextParameterMaxLength);
+        DeviceInfo::kTextParameterMaxLength);
 
     auto auth = device->getAuth();
     strncpy(
         outDeviceInfo->login,
         auth.user().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->password,
         auth.password().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     outDeviceInfo->channel = device->getChannel();
     outDeviceInfo->logicalId = device->logicalId();
