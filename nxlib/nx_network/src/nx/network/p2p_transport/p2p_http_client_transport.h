@@ -20,6 +20,7 @@ public:
      */
     P2PHttpClientTransport(
         HttpClientPtr readHttpClient,
+        const nx::Buffer& connectionGuid,
         websocket::FrameType frameType = websocket::FrameType::binary,
         const boost::optional<utils::Url>& url = boost::none);
 
@@ -62,6 +63,7 @@ private:
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
     utils::ObjectDestructionFlag m_destructionFlag;
+    nx::Buffer m_connectionGuid;
 
     void startReading();
     virtual void stopWhileInAioThread() override;

@@ -14,13 +14,15 @@ static const int kMaxMessageQueueSize = 500;
 
 P2PHttpClientTransport::P2PHttpClientTransport(
     HttpClientPtr readHttpClient,
+    const nx::Buffer& connectionGuid,
     websocket::FrameType messageType,
     const boost::optional<utils::Url>& url)
     :
     m_writeHttpClient(new http::AsyncClient),
     m_readHttpClient(std::move(readHttpClient)),
     m_messageType(messageType),
-    m_url(url)
+    m_url(url),
+    m_connectionGuid(connectionGuid)
 {
     using namespace std::chrono_literals;
     m_readHttpClient->setResponseReadTimeout(0ms);
@@ -100,6 +102,10 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
             m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
                 m_messageType,
                 buffer));
+
+            http::HttpHeaders additionalHeaders;
+            additionalHeaders.emplace("X-NX-P2P-GUID", m_connectionGuid);
+            m_writeHttpClient->setAdditionalHeaders(additionalHeaders);
 
             m_writeHttpClient->doPost(
                 m_url ? *m_url : m_readHttpClient->url(),

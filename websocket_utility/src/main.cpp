@@ -68,9 +68,7 @@ public:
         m_readyFuture.wait();
     }
 
-    QByteArray guid() const { return m_id; }
-
-    void setGuid(const QByteArray& id) { m_id = id; }
+    QByteArray guid() const { return m_guid; }
 
 protected:
     aio::AbstractAioThread* m_aioThread = nullptr;
@@ -89,7 +87,7 @@ protected:
 private:
     nx::utils::promise<void> m_readyPromise;
     nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
-    QByteArray m_id;
+    QByteArray m_guid = QnUuid::createUuid().toByteArray();
 };
 
 using WaitablePtr = std::shared_ptr<Waitable>;
@@ -184,10 +182,6 @@ public:
     {
         http::HttpHeaders additionalHeaders;
         websocket::addClientHeaders(&additionalHeaders, config.protocolName);
-        const auto connectionGuid =  QnUuid::createUuid().toByteArray();
-        additionalHeaders.emplace("X-P2P-GUID", connectionGuid);
-
-        setGuid(connectionGuid);
 
         NX_VERBOSE(this, lm("connecting to %1").args(config.url));
 
@@ -288,15 +282,11 @@ private:
 
             m_p2pTransport.reset(new P2PHttpClientTransport(
                 std::move(m_httpClient),
+                guid(),
                 websocket::FrameType::text));
             m_p2pTransport->bindToAioThread(m_aioThread);
             m_p2pTransport->start();
         }
-//        else
-//        {
-//            NX_INFO(this, lm("http client got invalid response code %1").args(statusCode));
-            exit(EXIT_FAILURE);
-//        }
 
         completionHandler();
     }
@@ -393,7 +383,7 @@ public:
                 http::RequestProcessedHandler /*requestCompletionHandler*/)
             {
                 const auto& headers = requestContext.request.headers;
-                auto guidHeaderIt = headers.find("X-P2P-GUID");
+                auto guidHeaderIt = headers.find("X-NX-P2P-GUID");
 
                 if (guidHeaderIt == headers.cend())
                 {
