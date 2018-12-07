@@ -12,11 +12,7 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace cloud {
-namespace relay {
-namespace test {
+namespace nx::network::cloud::relay::test {
 
 using namespace nx::cloud::relay;
 
@@ -26,11 +22,9 @@ class RelayTest:
 public:
     RelayTest()
     {
-        using namespace std::placeholders;
-
         m_factoryFunctionBak =
             nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
-                std::bind(&RelayTest::createClient, this, _1));
+                [this](auto&&... args) { return createClient(std::move(args)...); });
 
         setKeepAliveReported(true);
     }
@@ -58,12 +52,9 @@ protected:
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         m_testHttpServer.registerRequestProcessorFunc(
             api::kServerIncomingConnectionsPath,
-            std::bind(&RelayTest::processIncomingConnection, this,
-                _1, _2));
+            [this](auto&&... args) { processIncomingConnection(std::move(args)...); });
 
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
@@ -108,8 +99,6 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        using namespace std::placeholders;
-
         if (m_serverType != ServerType::happy)
         {
             requestContext.connection->closeConnection(SystemError::connectionReset);
@@ -126,7 +115,7 @@ private:
         nx::network::http::RequestResult requestResult(
             nx::network::http::StatusCode::switchingProtocols);
         requestResult.connectionEvents.onResponseHasBeenSent =
-            std::bind(&RelayTest::saveConnection, this, _1);
+            [this](auto&&... args) { saveConnection(std::move(args)...); };
         completionHandler(std::move(requestResult));
     }
 
@@ -199,10 +188,8 @@ protected:
 
     void whenWaitingForConnectionActivation()
     {
-        using namespace std::placeholders;
-
         m_connection->waitForOriginatorToStartUsingConnection(
-            std::bind(&RelayReverseConnection::onConnectionActivated, this, _1));
+            [this](auto&&... args) { onConnectionActivated(std::move(args)...); });
     }
 
     void whenRelayActivatesConnection()
@@ -237,10 +224,8 @@ protected:
 
     void whenConnectingToTheRelayServer()
     {
-        using namespace std::placeholders;
-
         m_connection->connectToOriginator(
-            std::bind(&RelayReverseConnection::onConnectionToOriginatorCompletion, this, _1));
+            [this](auto&&... args) { onConnectionToOriginatorCompletion(std::move(args)...); });
     }
 
     void thenConnectionHasBeenEstablished()
@@ -449,10 +434,8 @@ protected:
 
     void whenStartedAccepting()
     {
-        using namespace std::placeholders;
-
         m_acceptor->acceptAsync(
-            std::bind(&RelayConnectionAcceptor::onAccepted, this, _1, _2));
+            [this](auto&&... args) { onAccepted(std::move(args)...); });
     }
 
     void thenAcceptorIsRegisteredOnRelay()
@@ -478,8 +461,4 @@ TEST_F(RelayConnectionAcceptor, registers_on_relay)
     thenAcceptorIsRegisteredOnRelay();
 }
 
-} // namespace test
-} // namespace relay
-} // namespace cloud
-} // namespace network
-} // namespace nx
+} // namespace nx::network::cloud::relay::test
