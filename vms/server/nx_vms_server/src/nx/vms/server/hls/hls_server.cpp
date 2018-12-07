@@ -55,8 +55,8 @@ static constexpr char kHlsPrefix[] = "/hls/";
 static constexpr quint64 kMillisPerSec = 1000;
 static constexpr quint64 kUsecPerMs = 1000;
 static constexpr quint64 kUsecPerSec = kMillisPerSec * kUsecPerMs;
-static constexpr unsigned int kDefaultHlsSessionLiveTimeoutMillis =
-    nx::vms::server::Settings::kDefaultHlsTargetDurationMs.count() * 7;
+static constexpr auto kDefaultHlsSessionLiveTimeout =
+    nx::vms::server::Settings::kDefaultHlsTargetDurationMs * 7;
 static constexpr int kCommonKeyFrameToNonKeyFrameRatio = 5;
 static constexpr int kDefaultPrimaryStreamBitrate = 4 * 1024 * 1024;
 
@@ -65,7 +65,8 @@ size_t HttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming =
 
 HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
     QnMediaServerModule* serverModule,
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(std::move(socket), owner),
     nx::vms::server::ServerModuleAware(serverModule),
@@ -184,7 +185,7 @@ void HttpLiveStreamingProcessor::run()
             case State::receiving:
                 if (!readSingleRequest())
                 {
-                    NX_WARNING(this, lm("Error reading/parsing request from %1 (%2). "
+                    NX_WARNING(this, lm("Error reading/parsing request from %1. "
                         "Terminating connection...").args(remoteHostAddress().toString()));
                     m_state = State::done;
                     break;
@@ -260,7 +261,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
     int fileNameStartIndex = path.lastIndexOf(QChar('/'));
     if (fileNameStartIndex == -1)
     {
-        NX_DEBUG(this, lit("HLS. Not found file name in path %1").arg(path));
+        NX_DEBUG(this, lm("HLS. Not found file name in path %1").args(path));
         return StatusCode::notFound;
     }
 
@@ -270,7 +271,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         int newFileNameStartIndex = path.midRef(0, path.size() - 1).lastIndexOf(QChar('/'));
         if (newFileNameStartIndex == -1)
         {
-            NX_DEBUG(this, lit("HLS. Not found file name (2) in path %1").arg(path));
+            NX_DEBUG(this, lm("HLS. Not found file name (2) in path %1").arg(path));
             return StatusCode::notFound;
         }
         fileName = path.midRef(newFileNameStartIndex + 1, fileNameStartIndex - (newFileNameStartIndex + 1));
@@ -292,7 +293,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         serverModule()->resourcePool(), resId);
     if (!resource)
     {
-        NX_DEBUG(this, lit("HLS. Requested resource %1 not found").arg(resId));
+        NX_DEBUG(this, lm("HLS. Requested resource %1 not found").arg(resId));
         return nx::network::http::StatusCode::notFound;
     }
 
@@ -310,8 +311,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
     QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
     if (!camResource)
     {
-        NX_DEBUG(this, lit("HLS. Requested resource %1 is not a camera").
-            arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())));
+        NX_DEBUG(this, lm("HLS. Requested resource %1 is not a camera").arg(shortFileName));
         return nx::network::http::StatusCode::notFound;
     }
 
@@ -365,12 +365,12 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         else
         {
             //detecting container format by extension
-            if (extension.isEmpty() || extension == lit("ts"))
-                containerFormat = lit("mpegts");
-            else if (extension == lit("mkv"))
-                containerFormat = lit("matroska");
-            else if (extension == lit("mp4"))
-                containerFormat = lit("mp4");
+            if (extension.isEmpty() || extension == "ts")
+                containerFormat = "mpegts";
+            else if (extension == "mkv")
+                containerFormat = "matroska";
+            else if (extension == "mp4")
+                containerFormat = "mp4";
         }
 
         if (containerFormat == "mpegts" ||
@@ -431,7 +431,7 @@ bool HttpLiveStreamingProcessor::prepareDataToSend()
         if (m_chunkInputStream->tryRead(&m_writeBuffer, kMaxBytesToRead))
         {
             NX_DEBUG(this, lm("Read %1 bytes from streaming chunk %2")
-                .args(m_writeBuffer.size() - sizeBak, (size_t)m_currentChunk.get(), 0, 16));
+                .args(m_writeBuffer.size() - sizeBak, m_currentChunk.get()));
             return !m_writeBuffer.isEmpty();
         }
 
@@ -442,7 +442,7 @@ bool HttpLiveStreamingProcessor::prepareDataToSend()
 
 const char* HttpLiveStreamingProcessor::mimeTypeByExtension(const QString& extension) const
 {
-    if (extension.toLower() == lit("m3u8"))
+    if (extension.toLower() == "m3u8")
         return nx::network::http::kApplicationMpegUrlMimeType;
 
     return nx::network::http::kAudioMpegUrlMimeType;
@@ -521,10 +521,10 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
             &session,
             error);
         if (result != nx::network::http::StatusCode::ok || error->error)
-        {
             return result;
-        }
-        if (!serverModule()->hlsSessionPool()->add(session, kDefaultHlsSessionLiveTimeoutMillis))
+        
+        if (!serverModule()->hlsSessionPool()->add(
+                std::unique_ptr<Session>(session), kDefaultHlsSessionLiveTimeout))
         {
             NX_ASSERT(false);
         }
@@ -666,15 +666,17 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     const hls::AbstractPlaylistManagerPtr& playlistManager = session->playlistManager(streamQuality);
     if (!playlistManager)
     {
-        NX_WARNING(this, lit("Got request to not available %1 quality of camera %2").
-            arg(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo")).arg(camResource->getUniqueId()));
+        NX_WARNING(this, lm("Got request to not available %1 quality of camera %2")
+            .args(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo"),
+                camResource->getUniqueId()));
         return nx::network::http::StatusCode::notFound;
     }
 
     const size_t chunksGenerated = playlistManager->generateChunkList(&chunkList, &isPlaylistClosed);
     if (chunkList.empty())   //no chunks generated
     {
-        NX_WARNING(this, lit("Failed to get chunks of resource %1").arg(camResource->getUniqueId()));
+        NX_WARNING(this, lm("Failed to get chunks of resource %1")
+            .args(camResource->getUniqueId()));
         return nx::network::http::StatusCode::noContent;
     }
 
@@ -873,9 +875,9 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         const bool chunkCompleted = m_currentChunk->waitForChunkReadyOrInternalBufferFilled();
 
         //chunk is ready, using it
-        NX_DEBUG(this, lit("Streaming %1 chunk %2 with size %3")
-            .arg(chunkCompleted ? lit("complete") : lit("incomplete"))
-            .arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()));
+        NX_DEBUG(this, lm("Streaming %1 chunk %2 with size %3")
+            .args(chunkCompleted ? "complete" : "incomplete",
+                m_currentChunk.get(), m_currentChunk->sizeInBytes()));
 
         auto rangeIter = request.headers.find("Range");
         if (rangeIter == request.headers.end() || !chunkCompleted)
@@ -1102,7 +1104,8 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
                 ->generateChunkList(&chunkList, &isPlaylistClosed);
             if (chunksGenerated >= m_minPlaylistSizeToStartStreaming)
             {
-                NX_VERBOSE(this, lit("HLS cache has been prefilled with %1 chunks").arg(chunksGenerated));
+                NX_VERBOSE(this, lm("HLS cache has been prefilled with %1 chunks")
+                    .args(chunksGenerated));
                 break;
             }
             QThread::msleep(PLAYLIST_CHECK_TIMEOUT_MS);
