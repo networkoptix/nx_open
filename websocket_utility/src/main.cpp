@@ -169,15 +169,7 @@ public:
             });
     }
 
-    void startReading()
-    {
-        m_p2pTransport->readSomeAsync(
-            &m_readBuffer,
-            [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
-            { onRead(errorCode, bytesRead); });
-    }
-
-    void startSending()
+    void start()
     {
         NX_VERBOSE(this, "Starting sending test messages to the peer");
         m_p2pTransport->sendAsync(
@@ -186,6 +178,13 @@ public:
                 size_t bytesRead)
             {
                 onSend(errorCode, bytesRead);
+            });
+
+        m_p2pTransport->readSomeAsync(
+            &m_readBuffer,
+            [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
+            {
+                onRead(errorCode, bytesRead);
             });
     }
 
@@ -310,7 +309,8 @@ private:
         }
 
         NX_INFO(this, "message sent");
-        m_timer.start(std::chrono::seconds(1),
+        m_timer.start(
+            std::chrono::seconds(1),
             [self = shared_from_this(), this]()
             {
                 if (m_stopped)
@@ -467,7 +467,7 @@ static void connectAndListen()
 {
     auto p2pConnection = std::make_shared<P2PConnection>(config.aioThread);
     waitablePoolInstance->addWaitable(p2pConnection);
-    p2pConnection->connectAsync([p2pConnection]() { p2pConnection->startReading(); });
+    p2pConnection->connectAsync([p2pConnection]() { p2pConnection->start(); });
 }
 
 static void startAccepting()
@@ -479,7 +479,7 @@ static void startAccepting()
             if (!P2PConnection)
                 return;
             waitablePoolInstance->addWaitable(P2PConnection);
-            P2PConnection->startSending();
+            P2PConnection->start();
         });
 
     if (!acceptor->startListening())
@@ -543,16 +543,17 @@ static void prepareConfig(int argc, const char* argv[])
         }
         else if (strcmp(argv[i], "--log-level") == 0 && i + 1 < argc)
         {
-            if (strcmp(argv[i + 1], "verbose") == 0)
+            if (strcmp(argv[i + 1], "VERBOSE") == 0)
             {
                 nx::utils::log::mainLogger()->setLevelFilters(nx::utils::log::LevelFilters{
                     {QnLog::MAIN_LOG_ID, nx::utils::log::Level::verbose}});
             }
-            else if (strcmp(argv[i + 1], "info") == 0)
+            else if (strcmp(argv[i + 1], "INFO") == 0)
             {
                 nx::utils::log::mainLogger()->setLevelFilters(nx::utils::log::LevelFilters{
                     {QnLog::MAIN_LOG_ID, nx::utils::log::Level::info}});
             }
+
             ++i;
         }
         else if (strcmp(argv[i], "--mode") == 0 && i + 1 < argc)
