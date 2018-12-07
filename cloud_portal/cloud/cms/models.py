@@ -549,7 +549,7 @@ class DataRecord(models.Model):
     product = models.ForeignKey(Product, default=None, null=True)
     language = models.ForeignKey(Language, null=True, blank=True)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, null=True)
+    customization = models.ForeignKey(Customization, default=None, blank=True, null=True)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
@@ -558,7 +558,7 @@ class DataRecord(models.Model):
         blank=True, related_name='created_%(class)s')
 
     value = models.TextField(default='', blank=True)
-    external_file = models.ForeignKey(ExternalFile, default=None, null=True)
+    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True)
 
     def __str__(self):
         return self.value

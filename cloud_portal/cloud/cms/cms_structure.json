@@ -396,19 +396,18 @@
           {
             "label": "Downloads per platform",
             "name": "%AVAILABLE_DOWNLOADS_PLATFORM%",
-            "description": "",
+            "description": "Platforms that are visible on the downloads page.",
             "advanced": true,
-            "optional": true,
             "type": "select",
-            "value" : "['mac', 'linux', 'windows']",
+            "value" : "[\"macos\", \"linux\", \"windows\"]",
             "meta": {
               "multi": true,
               "options": [
-                "mac",
-                "linux",
-                "windows",
                 "arm",
-                "sdk"
+                "linux",
+                "macos",
+                "sdk",
+                "windows"
               ]
             }
           }
