@@ -40,6 +40,8 @@ public:
 
     Q_INVOKABLE qint64 closestChunkEndMs(qint64 position, bool forward) const;
     Q_INVOKABLE void update();
+    Q_INVOKABLE bool hasChunks() const;
+    Q_INVOKABLE bool hasMotionChunks() const;
 
 signals:
     void timePeriodsUpdated();

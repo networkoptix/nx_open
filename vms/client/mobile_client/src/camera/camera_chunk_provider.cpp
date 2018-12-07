@@ -32,6 +32,8 @@ public:
     const QnTimePeriodList& periodList() const;
 
 private:
+    void updateInternal();
+
     void cleanLoader();
     void setLoading(bool value);
     void setTimePeriods(const QnTimePeriodList& periods);
@@ -44,6 +46,7 @@ private:
     QnTimePeriodList m_periodList;
     QString m_filter;
     bool m_loading = false;
+    int updateTriesCount = 0;
 };
 
 QnCameraChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
@@ -88,6 +91,14 @@ void QnCameraChunkProvider::ChunkProviderInternal::setResourceId(const QString& 
 
     connect(m_loader, &QnFlatCameraDataLoader::ready, this,
         [this](const QnAbstractCameraDataPtr& data) { setTimePeriods(data->dataSource()); });
+    connect(m_loader, &QnFlatCameraDataLoader::failed, this,
+        [this]()
+        {
+            if (--updateTriesCount > 0)
+                updateInternal();
+            else
+                setLoading(false);
+        });
 
     const auto historyPool = q->cameraHistoryPool();
     connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged, m_loader,
@@ -143,6 +154,12 @@ void QnCameraChunkProvider::ChunkProviderInternal::setFilter(const QString& filt
 }
 
 void QnCameraChunkProvider::ChunkProviderInternal::update()
+{
+    updateTriesCount = 3;
+    updateInternal();
+}
+
+void QnCameraChunkProvider::ChunkProviderInternal::updateInternal()
 {
     if (!m_loader)
         return;
@@ -203,6 +220,16 @@ QnCameraChunkProvider::QnCameraChunkProvider(QObject* parent):
 QnTimePeriodList QnCameraChunkProvider::timePeriods(Qn::TimePeriodContent contentType) const
 {
     return m_providers[contentType]->periodList();
+}
+
+bool QnCameraChunkProvider::hasChunks() const
+{
+    return m_providers[Qn::RecordingContent]->periodList().size();
+}
+
+bool QnCameraChunkProvider::hasMotionChunks() const
+{
+    return m_providers[Qn::MotionContent]->periodList().size();
 }
 
 QString QnCameraChunkProvider::resourceId() const
