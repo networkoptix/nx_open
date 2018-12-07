@@ -118,12 +118,19 @@ protected:
      * Doesn't need to reset fetched time window. */
     virtual void truncateToRelevantTimePeriod() = 0;
 
+    template<class Item>
+    using GetTimestampFunction =
+        std::function<std::chrono::milliseconds(const Item&)>;
+
+    template<class Item>
+    using ItemCleanupFunction = std::function<void(const Item&)>;
+
     // Helper to truncate data sorted in descending timestamp order.
     template<class DataContainer>
     void truncateDataToTimePeriod(DataContainer& data,
-        std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
+        GetTimestampFunction<typename DataContainer::value_type> getTimestamp,
         const QnTimePeriod& period,
-        std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
+        ItemCleanupFunction<typename DataContainer::value_type> itemCleanup = nullptr);
 
     /** Truncate fetched data to maximal item count at front or back,
      * depending on current fetch direction. Must update fetched time window correspondingly. */
@@ -132,8 +139,8 @@ protected:
     // Helper to truncate data sorted in descending timestamp order.
     template<class DataContainer>
     void truncateDataToMaximumCount(DataContainer& data,
-        std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
-        std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
+        GetTimestampFunction<typename DataContainer::value_type> getTimestamp,
+        ItemCleanupFunction<typename DataContainer::value_type> itemCleanup = nullptr);
 
     /** Returns whether specified camera is applicable for this model. */
     virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const;
@@ -173,22 +180,24 @@ private:
 template<class DataContainer>
 void AbstractSearchListModel::truncateDataToTimePeriod(
     DataContainer& data, //< Must be sorted in descending order by timestamp!
-    std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
+    GetTimestampFunction<typename DataContainer::value_type> getTimestamp,
     const QnTimePeriod& period,
-    std::function<void(typename DataContainer::const_reference)> itemCleanup)
+    ItemCleanupFunction<typename DataContainer::value_type> itemCleanup)
 {
+    using namespace std::chrono;
+
     if (data.empty())
         return;
 
     const auto upperBoundPredicate =
-        [timestamp](std::chrono::milliseconds left, const auto& right)
+        [getTimestamp](std::chrono::milliseconds left, const auto& right)
         {
-            return left > timestamp(right);
+            return left > getTimestamp(right);
         };
 
     // Remove records later than end of the period.
     const auto frontEnd = std::upper_bound(data.begin(), data.end(),
-        period.endTime() + std::chrono::milliseconds(1), upperBoundPredicate);
+        period.endTime() + 1ms, upperBoundPredicate);
 
     const auto frontLength = std::distance(data.begin(), frontEnd);
     if (frontLength != 0)
@@ -217,8 +226,8 @@ void AbstractSearchListModel::truncateDataToTimePeriod(
 template<class DataContainer>
 void AbstractSearchListModel::truncateDataToMaximumCount(
     DataContainer& data, //< Must be sorted in descending order by timestamp!
-    std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
-    std::function<void(typename DataContainer::const_reference)> itemCleanup)
+    GetTimestampFunction<typename DataContainer::value_type> getTimestamp,
+    ItemCleanupFunction<typename DataContainer::value_type> itemCleanup)
 {
     if (maximumCount() <= 0)
         return;
@@ -254,9 +263,9 @@ void AbstractSearchListModel::truncateDataToMaximumCount(
 
     auto timeWindow = fetchedTimeWindow();
     if (fetchDirection() == FetchDirection::earlier)
-        timeWindow.truncate(timestamp(data.front()).count());
+        timeWindow.truncate(getTimestamp(data.front()).count());
     else
-        timeWindow.truncateFront(timestamp(data.back()).count());
+        timeWindow.truncateFront(getTimestamp(data.back()).count());
 
     setFetchedTimeWindow(timeWindow);
 }
