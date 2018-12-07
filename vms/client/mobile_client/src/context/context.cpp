@@ -4,6 +4,8 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QScreen>
 
+#include <nx/vms/client/core/settings/client_core_settings.h>
+
 #include <camera/camera_thumbnail_cache.h>
 #include <utils/mobile_app_info.h>
 #include <common/common_module.h>
@@ -24,7 +26,6 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/address_resolver.h>
-#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/core/utils/operation_manager.h>
@@ -291,9 +292,8 @@ nx::utils::Url QnContext::getWebSocketUrl() const
 
 bool QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
-    // TODO: #GDM do we need store temporary credentials here?
-    nx::vms::client::core::EncodedCredentials credentials(login, password);
-    nx::vms::client::core::secureSettings()->cloudCredentials = credentials;
+    const nx::vms::common::Credentials credentials{login, password};
+    nx::vms::client::core::settings()->cloudCredentials = credentials;
     const bool result = cloudStatusWatcher()->setCredentials(credentials);
     return result;
 }

@@ -5,6 +5,8 @@
 #include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+
+#include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {

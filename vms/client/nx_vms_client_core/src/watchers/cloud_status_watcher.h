@@ -6,8 +6,7 @@
 #include <QtCore/QObject>
 
 #include <common/common_module_aware.h>
-
-#include <nx/vms/client/core/common/utils/encoded_credentials.h>
+#include <utils/common/credentials.h>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
@@ -18,10 +17,13 @@ class QSettings;
 class QnSystemDescription;
 class QnCloudStatusWatcherPrivate;
 
-class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>, public QnCommonModuleAware
+class QnCloudStatusWatcher:
+    public QObject, 
+    public Singleton<QnCloudStatusWatcher>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
-    Q_PROPERTY(nx::vms::client::core::EncodedCredentials credentials READ credentials NOTIFY credentialsChanged)
+    Q_PROPERTY(nx::vms::common::Credentials credentials READ credentials NOTIFY credentialsChanged)
     Q_PROPERTY(QString effectiveUserName READ effectiveUserName NOTIFY effectiveUserNameChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
@@ -54,9 +56,9 @@ public:
     explicit QnCloudStatusWatcher(QObject* parent = nullptr, bool isMobile = true);
     virtual ~QnCloudStatusWatcher() override;
 
-    nx::vms::client::core::EncodedCredentials credentials() const;
+    nx::vms::common::Credentials credentials() const;
     void resetCredentials();
-    bool setCredentials(const nx::vms::client::core::EncodedCredentials& credentials, bool initial = false);
+    bool setCredentials(const nx::vms::common::Credentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
@@ -88,7 +90,7 @@ public:
     /**
      * Get temporary credentials for one-time use. Fast sequential calls will get the same result.
      */
-    nx::vms::client::core::EncodedCredentials createTemporaryCredentials();
+    nx::vms::common::Credentials createTemporaryCredentials();
 
     Status status() const;
 

@@ -126,7 +126,7 @@ bool EncodedString::isEmpty() const
 
 bool EncodedString::operator==(const EncodedString& value) const
 {
-    if (m_mode != value.m_mode || m_key != value.m_key)
+    if (m_key != value.m_key)
         return false;
 
     switch (m_mode)
@@ -135,10 +135,10 @@ bool EncodedString::operator==(const EncodedString& value) const
             return true;
 
         case Mode::encoded:
-            return m_encodedValue == value.m_encodedValue;
+            return m_encodedValue == value.encoded();
 
         case Mode::decoded:
-            return m_decodedValue == value.m_decodedValue;
+            return m_decodedValue == value.decoded();
     }
 
     NX_ASSERT("Unreachable code");
@@ -171,7 +171,12 @@ QDataStream& operator>>(QDataStream& stream, EncodedString& value)
 
 void PrintTo(const EncodedString& value, ::std::ostream* os)
 {
-    *os << value.decoded().toStdString() << " (" << value.encoded().toStdString() << ")";
+    *os << value.decoded().toStdString()
+        << " ("
+        << value.key().toBase64().toStdString()
+        << "@"
+        << value.encoded().toStdString()
+        << ")";
 }
 
 } // namespace nx::vms::client::core

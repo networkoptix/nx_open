@@ -300,7 +300,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnIOPortDataList>();
     qRegisterMetaType<QList<QMap<QString, QString>>>();
 
-    qRegisterMetaType<QList<nx::common::utils::Credentials>>();
+    qRegisterMetaType<QList<nx::vms::common::Credentials>>();
     qRegisterMetaType<QnHttpConfigureRequestList>();
     qRegisterMetaType<QnBitrateList>();
     qRegisterMetaType<TwoWayAudioParams>();
@@ -322,8 +322,8 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
     QnJsonSerializer::registerSerializer<QnIOPortData>();
     QnJsonSerializer::registerSerializer<QnIOPortDataList>();
-    QnJsonSerializer::registerSerializer<nx::common::utils::Credentials>();
-    QnJsonSerializer::registerSerializer<QList<nx::common::utils::Credentials>>();
+    QnJsonSerializer::registerSerializer<nx::vms::common::Credentials>();
+    QnJsonSerializer::registerSerializer<QList<nx::vms::common::Credentials>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
     QnJsonSerializer::registerSerializer<TwoWayAudioParams>();

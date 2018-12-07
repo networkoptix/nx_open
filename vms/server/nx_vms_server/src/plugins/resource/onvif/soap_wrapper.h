@@ -626,10 +626,10 @@ private:
     QAuthenticator getDefaultPassword(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model) const;
-    std::list<nx::common::utils::Credentials> getPossibleCredentials(
+    std::list<nx::vms::common::Credentials> getPossibleCredentials(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model) const;
-    nx::common::utils::Credentials getForcedCredentials(
+    nx::vms::common::Credentials getForcedCredentials(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model);
     void calcTimeDrift();

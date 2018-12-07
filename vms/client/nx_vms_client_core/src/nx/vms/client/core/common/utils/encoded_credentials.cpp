@@ -46,4 +46,10 @@ bool EncodedCredentials::isValid() const
     return !user.isEmpty() && !password.isEmpty();
 }
 
+void PrintTo(const EncodedCredentials& value, ::std::ostream* os)
+{
+    *os << value.user.toStdString() << ": ";
+    PrintTo(value.password, os);
+}
+
 } // namespace nx::vms::client::core

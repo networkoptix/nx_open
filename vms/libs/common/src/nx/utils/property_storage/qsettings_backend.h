@@ -13,6 +13,9 @@ namespace property_storage {
 class QSettingsBackend: public AbstractBackend
 {
 public:
+    /**
+     * Note: backend takes ownership of QSettings object.
+     */
     QSettingsBackend(QSettings* settings, const QString& group = QString());
     virtual ~QSettingsBackend() override;
 

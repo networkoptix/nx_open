@@ -96,23 +96,23 @@ void QnSetupWizardDialog::loadPage()
     d->webView->load(url);
 }
 
-nx::vms::client::core::EncodedCredentials QnSetupWizardDialog::localCredentials() const
+nx::vms::common::Credentials QnSetupWizardDialog::localCredentials() const
 {
     Q_D(const QnSetupWizardDialog);
-    return nx::vms::client::core::EncodedCredentials(d->loginInfo.localLogin, d->loginInfo.localPassword);
+    return {d->loginInfo.localLogin, d->loginInfo.localPassword};
 }
 
-nx::vms::client::core::EncodedCredentials QnSetupWizardDialog::cloudCredentials() const
+nx::vms::common::Credentials QnSetupWizardDialog::cloudCredentials() const
 {
     Q_D(const QnSetupWizardDialog);
-    return nx::vms::client::core::EncodedCredentials(d->loginInfo.cloudEmail, d->loginInfo.cloudPassword);
+    return {d->loginInfo.cloudEmail, d->loginInfo.cloudPassword};
 }
 
-void QnSetupWizardDialog::setCloudCredentials(const nx::vms::client::core::EncodedCredentials& value)
+void QnSetupWizardDialog::setCloudCredentials(const nx::vms::common::Credentials& value)
 {
     Q_D(QnSetupWizardDialog);
     d->loginInfo.cloudEmail = value.user;
-    d->loginInfo.cloudPassword = value.password.decoded();
+    d->loginInfo.cloudPassword = value.password;
 }
 
 bool QnSetupWizardDialog::savePassword() const

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <client_core/connection_context_aware.h>
-#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 #include <ui/dialogs/common/dialog.h>
+#include <utils/common/credentials.h>
 
 class QnSetupWizardDialogPrivate;
 class QnSetupWizardDialog: public QnDialog, public QnConnectionContextAware
@@ -23,9 +23,9 @@ public:
 
     void loadPage();
 
-    nx::vms::client::core::EncodedCredentials localCredentials() const;
-    nx::vms::client::core::EncodedCredentials cloudCredentials() const;
-    void setCloudCredentials(const nx::vms::client::core::EncodedCredentials& value);
+    nx::vms::common::Credentials localCredentials() const;
+    nx::vms::common::Credentials cloudCredentials() const;
+    void setCloudCredentials(const nx::vms::common::Credentials& value);
 
     bool savePassword() const;
 
