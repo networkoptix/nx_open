@@ -248,8 +248,7 @@ private:
             || !m_httpClient->response())
         {
             NX_INFO(this, "http client failed to connect to host");
-            stopInAioThread();
-            return;
+            exit(EXIT_FAILURE);
         }
 
         const int statusCode = m_httpClient->response()->statusLine.statusCode;
@@ -269,8 +268,7 @@ private:
                 NX_INFO(
                     this,
                     lm("websocket handshake validation error: %1").args((int) validationError));
-                stopInAioThread();
-                return;
+                exit(EXIT_FAILURE);
             }
 
             NX_VERBOSE(this, "websocket handshake response validated successfully");
@@ -297,8 +295,7 @@ private:
         else
         {
             NX_INFO(this, lm("http client got invalid response code %1").args(statusCode));
-            stopInAioThread();
-            return;
+            exit(EXIT_FAILURE);
         }
 
         completionHandler();
@@ -309,21 +306,19 @@ private:
         if (m_stopped)
         {
             NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
-            return;
+            exit(EXIT_FAILURE);
         }
 
         if (errorCode != SystemError::noError)
         {
             NX_INFO(this, lm("read failed with error code: %1").args(errorCode));
-            stopInAioThread();
-            return;
+            exit(EXIT_FAILURE);
         }
 
         if (bytesRead == 0)
         {
             NX_INFO(this, "connection has been closed by remote peer");
-            stopInAioThread();
-            return;
+            exit(EXIT_FAILURE);
         }
 
         NX_INFO(this, "got message");
