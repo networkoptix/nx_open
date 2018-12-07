@@ -78,17 +78,17 @@ bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
     if (parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later))
         return false;
 
-    if (!canFetchNow() || !hasAccessRights())
+    if (!canFetchNow() || !hasAccessRights() || m_relevantTimePeriod.isEmpty())
         return false;
 
-    if (fetchedTimeWindow().isEmpty())
+    if (m_fetchedTimeWindow.isEmpty())
         return true;
 
     if (fetchDirection() == FetchDirection::earlier)
-        return fetchedTimeWindow().startTimeMs > relevantTimePeriod().startTimeMs;
+        return m_fetchedTimeWindow.startTimeMs > m_relevantTimePeriod.startTimeMs;
 
     NX_ASSERT(fetchDirection() == FetchDirection::later);
-    return fetchedTimeWindow().endTimeMs() < relevantTimePeriod().endTimeMs();
+    return m_fetchedTimeWindow.endTimeMs() < m_relevantTimePeriod.endTimeMs();
 }
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
@@ -99,7 +99,7 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     if (isFilterDegenerate())
     {
         NX_ASSERT(rowCount() == 0);
-        setFetchedTimeWindow(relevantTimePeriod());
+        setFetchedTimeWindow(m_relevantTimePeriod);
         finishFetch(FetchResult::complete);
     }
     else
@@ -115,7 +115,7 @@ bool AbstractSearchListModel::canFetchNow() const
 
 bool AbstractSearchListModel::isFilterDegenerate() const
 {
-    return relevantTimePeriod().isEmpty()
+    return m_relevantTimePeriod.isEmpty()
         || (cameraSet()->type() != ManagedCameraSet::Type::all && cameras().empty());
 }
 
@@ -247,7 +247,7 @@ bool AbstractSearchListModel::liveSupported() const
 
 bool AbstractSearchListModel::effectiveLiveSupported() const
 {
-    return liveSupported() && relevantTimePeriod().isInfinite();
+    return liveSupported() && m_relevantTimePeriod.isInfinite();
 }
 
 bool AbstractSearchListModel::isLive() const
