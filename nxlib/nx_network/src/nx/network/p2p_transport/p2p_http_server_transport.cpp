@@ -60,6 +60,14 @@ void P2PHttpServerTransport::gotPostConnection(std::unique_ptr<AbstractStreamSoc
             m_readSocket = std::move(socket);
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
+
+            if (m_userReadHandlerPair)
+            {
+                auto userReadHandlerPair = std::move(m_userReadHandlerPair);
+                readFromSocket(
+                    userReadHandlerPair->first,
+                    std::move(userReadHandlerPair->second));
+            }
         });
 }
 
@@ -77,6 +85,21 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 
 void P2PHttpServerTransport::readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
+    if (!m_readSocket)
+    {
+        NX_ASSERT(!m_userReadHandlerPair);
+        if (m_userReadHandlerPair)
+        {
+            m_userReadHandlerPair = nullptr;
+            handler(SystemError::notSupported, 0);
+        }
+
+        m_userReadHandlerPair = UserReadHandlerPair(
+            new std::pair<nx::Buffer* const, IoCompletionHandler>(buffer, std::move(handler)));
+
+        return;
+    }
+
     m_readSocket->readSomeAsync(
         &m_readContext.buffer,
         [this, handler = std::move(handler), buffer](

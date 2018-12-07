@@ -47,6 +47,7 @@ private:
 
         void reset();
     };
+    using UserReadHandlerPair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
 
     std::unique_ptr<AbstractStreamSocket> m_sendSocket;
     std::unique_ptr<AbstractStreamSocket> m_readSocket;
@@ -59,6 +60,7 @@ private:
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
         [](SystemError::ErrorCode) {};
     utils::ObjectDestructionFlag m_destructionFlag;
+    UserReadHandlerPair m_userReadHandlerPair;
 
     void onBytesRead(
         SystemError::ErrorCode error,

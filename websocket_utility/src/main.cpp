@@ -66,6 +66,10 @@ public:
         m_readyFuture.wait();
     }
 
+    QByteArray guid() const { return m_id; }
+
+    void setGuid(const QByteArray& id) { m_id = id; }
+
 protected:
     aio::AbstractAioThread* m_aioThread = nullptr;
     bool m_stopped = false;
@@ -83,6 +87,7 @@ protected:
 private:
     nx::utils::promise<void> m_readyPromise;
     nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
+    QByteArray m_id;
 };
 
 using WaitablePtr = std::shared_ptr<Waitable>;
@@ -117,8 +122,31 @@ public:
 
     void waitAll()
     {
-        for (const auto& waitable: m_waitables)
+        std::set<WaitablePtr> waitables;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            waitables = m_waitables;
+        }
+
+        for (const auto& waitable: waitables)
             waitable->waitForDone();
+    }
+
+    WaitablePtr findByGuid(const QByteArray& guid)
+    {
+        std::set<WaitablePtr> waitables;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            waitables = m_waitables;
+        }
+
+        for (const auto& waitable : waitables)
+        {
+            if (waitable->guid() == guid)
+                return waitable;
+        }
+
+        return WaitablePtr();
     }
 
 private:
@@ -152,14 +180,18 @@ public:
 
     void connectAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
-        http::HttpHeaders websocketHeaders;
-        websocket::addClientHeaders(&websocketHeaders, config.protocolName);
+        http::HttpHeaders additionalHeaders;
+        websocket::addClientHeaders(&additionalHeaders, config.protocolName);
+        const auto connectionGuid =  QnUuid::createUuid().toByteArray();
+        additionalHeaders.emplace("X-P2P-GUID", connectionGuid);
+
+        setGuid(connectionGuid);
 
         NX_VERBOSE(this, lm("connecting to %1").args(config.url));
 
         m_httpClient->setUserName(config.userName);
         m_httpClient->setUserPassword(config.userPassword);
-        m_httpClient->addRequestHeaders(websocketHeaders);
+        m_httpClient->addRequestHeaders(additionalHeaders);
         m_httpClient->doGet(
             config.url,
             [self = shared_from_this(),
@@ -348,6 +380,15 @@ public:
             {
                 onAccept(std::move(requestContext), std::move(requestCompletionHandler));
             }, http::Method::get);
+
+        m_httpServer.registerRequestProcessorFunc(
+            kHandlerPath,
+            [this](
+                http::RequestContext requestContext,
+                http::RequestProcessedHandler requestCompletionHandler)
+            {
+                onAccept(std::move(requestContext), std::move(requestCompletionHandler));
+            }, http::Method::post);
     }
 
     bool startListening()
@@ -397,7 +438,7 @@ private:
                 {
                     if (ecode != SystemError::noError)
                     {
-                        NX_INFO(this, "Failed to respond to the incoming connection");
+                        NX_INFO(this, "Failed to respond to the incoming connection request");
                         stopInAioThread();
                         return;
                     }

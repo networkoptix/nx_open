@@ -50,13 +50,13 @@ private:
         const nx::Buffer& m_data;
     };
 
-    using UserReadHandlePair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
+    using UserReadHandlerPair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
 
     HttpClientPtr m_writeHttpClient;
     HttpClientPtr m_readHttpClient;
     http::MultipartContentParser m_multipartContentParser;
     std::queue<nx::Buffer> m_incomingMessageQueue;
-    UserReadHandlePair m_userReadHandlerPair;
+    UserReadHandlerPair m_userReadHandlerPair;
     bool m_postInProgress = false;
     websocket::FrameType m_messageType;
     bool m_failed = false;
