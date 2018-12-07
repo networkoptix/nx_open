@@ -202,6 +202,10 @@
   &.offline{
     background-position: -121px -49px;
   }
+  
+  &.no-indicator {
+    display : none;
+  }
 }
 
 .video-status{
