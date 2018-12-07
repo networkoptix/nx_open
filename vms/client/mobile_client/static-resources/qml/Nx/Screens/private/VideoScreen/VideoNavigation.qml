@@ -25,6 +25,16 @@ Item
     property alias motionSearchMode: motionSearchModeButton.checked
     property alias motionFilter: cameraChunkProvider.motionFilter
     property alias changingMotionRoi: timeline.changingMotionRoi
+    property bool hasCustomRoi: false;
+
+    property string warningText//:
+//    {
+//        console.log("mode: ", motionSearchMode, ", loading: ", d.loadingChunks,
+//            ", chunks:", cameraChunkProvider.hasChunks(),
+//            ", motion:", cameraChunkProvider.hasMotionChunks())
+
+//    }
+
 
     signal ptzButtonClicked()
     signal switchToNextCamera()
@@ -33,6 +43,9 @@ Item
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
+
+    onHasCustomRoiChanged: d.updateWarningText()
+    onMotionSearchModeChanged: d.updateWarningText()
 
     Connections
     {
@@ -63,6 +76,9 @@ Item
     {
         id: d
 
+        readonly property bool loadingChunks:
+            cameraChunkProvider.loading
+            || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool playbackStarted: false
         property bool controlsNeeded:
@@ -83,6 +99,23 @@ Item
         Behavior on timelineOpacity
         {
             NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
+        }
+
+        onLoadingChunksChanged: updateWarningText()
+
+        function updateWarningText()
+        {
+            if (videoNavigation.loadingChunks)
+                return
+
+            if (!videoNavigation.motionSearchMode || cameraChunkProvider.hasMotionChunks())
+                videoNavigation.warningText = ""
+            else if (!cameraChunkProvider.hasChunks())
+                videoNavigation.warningText = qsTr("No motion data for this camera")
+            else if (hasCustomRoi)
+                videoNavigation.warningText = qsTr("No motion found in the selected area")
+            else
+                videoNavigation.warningText = qsTr("No motion found in the visible area")
         }
 
         readonly property bool hasArchive: timeline.startBound > 0
@@ -758,4 +791,6 @@ Item
         d.updateNavigatorPosition()
         liveModeButton.opacity = 0
     }
+
+
 }

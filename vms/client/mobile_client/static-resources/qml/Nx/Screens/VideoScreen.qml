@@ -138,55 +138,76 @@ PageBase
 
     sideNavigationEnabled: false
 
-    header: ToolBar
+    header: Column
     {
-        id: toolBar
-
-        y: statusBarHeight
-        title: videoScreenController.resourceHelper.resourceName
-        leftButtonIcon.source: lp("/images/arrow_back.png")
-        onLeftButtonClicked: Workflow.popCurrentScreen()
-        background: Image
-        {            
-            y: -toolBar.statusBarHeight
-            x: -mainWindow.leftPadding
-            width: mainWindow.width
-            height: 96
-            source: lp("/images/toolbar_gradient.png")
-        }
-
+        y: deviceStatusBarHeight
         opacity: d.uiOpacity
         visible: opacity > 0
-        titleOpacity: d.cameraUiOpacity
 
-        controls:
-        [
-            MotionAreaButton
+        ToolBar
+        {
+            id: toolBar
+
+            title: videoScreenController.resourceHelper.resourceName
+            leftButtonIcon.source: lp("/images/arrow_back.png")
+            onLeftButtonClicked: Workflow.popCurrentScreen()
+            background: Image
             {
-                visible: video.motionController && video.motionController.customRoiExists
-                anchors.verticalCenter: parent.verticalCenter
-
-                text: qsTr("Area")
-                icon.source: lp("/images/close.png")
-
-                onClicked:
-                {
-                    if (video.motionController)
-                        video.motionController.clearCustomRoi()
-                }
-            },
-
-            IconButton
-            {
-                icon.source: lp("/images/more_vert.png")
-                onClicked:
-                {
-                    menu.open()
-                }
+                y: -toolBar.statusBarHeight
+                x: -mainWindow.leftPadding
+                width: mainWindow.width
+                height: 96
+                source: lp("/images/toolbar_gradient.png")
             }
-        ]
-    }
 
+            titleOpacity: d.cameraUiOpacity
+
+            controls:
+            [
+                MotionAreaButton
+                {
+                    visible: video.motionController && video.motionController.customRoiExists
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: qsTr("Area")
+                    icon.source: lp("/images/close.png")
+
+                    onClicked:
+                    {
+                        if (video.motionController)
+                            video.motionController.clearCustomRoi()
+                    }
+                },
+
+                IconButton
+                {
+                    icon.source: lp("/images/more_vert.png")
+                    onClicked:
+                    {
+                        menu.open()
+                    }
+                }
+            ]
+        }
+
+        Rectangle
+        {
+            visible: banner.text.length
+            width: parent.width
+            height: 30
+
+            Text
+            {
+                id: banner
+
+                anchors.centerIn: parent
+
+                text: videoNavigation.warningText
+
+                onTextChanged: console.log("++++++++++++++++++++++++++++++", text)
+            }
+        }
+    }
     Menu
     {
         id: menu
@@ -533,6 +554,7 @@ PageBase
                 return video.item.moving && !video.motionController.customRoiExists;
             }
 
+            hasCustomRoi: video.motionController && video.motionController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
