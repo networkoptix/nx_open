@@ -8,14 +8,14 @@
 
 namespace nx::vms::client::desktop {
 
-class MotionSearchWidget: public AbstractSearchWidget
+class SimpleMotionSearchWidget: public AbstractSearchWidget
 {
     Q_OBJECT
     using base_type = AbstractSearchWidget;
 
 public:
-    MotionSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
-    virtual ~MotionSearchWidget() override;
+    SimpleMotionSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    virtual ~SimpleMotionSearchWidget() override;
 
     QList<QRegion> filterRegions() const;
     void setFilterRegions(const QList<QRegion>& value);

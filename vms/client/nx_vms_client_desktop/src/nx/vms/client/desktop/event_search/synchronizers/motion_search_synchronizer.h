@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop {
 
-class MotionSearchWidget;
+class SimpleMotionSearchWidget;
 
 /**
  * An utility class to synchronize Right Panel motion tab state with current media widget
@@ -15,14 +15,14 @@ class MotionSearchWidget;
 class MotionSearchSynchronizer: public AbstractSearchSynchronizer
 {
 public:
-    MotionSearchSynchronizer(QnWorkbenchContext* context, MotionSearchWidget* motionSearchWidget,
-        QObject* parent = nullptr);
+    MotionSearchSynchronizer(QnWorkbenchContext* context,
+        SimpleMotionSearchWidget* motionSearchWidget, QObject* parent = nullptr);
 
 private:
     void updateAreaSelection();
 
 private:
-    const QPointer<MotionSearchWidget> m_motionSearchWidget;
+    const QPointer<SimpleMotionSearchWidget> m_motionSearchWidget;
 };
 
 } // namespace nx::vms::client::desktop

@@ -22,7 +22,7 @@
 #include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/vms/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
@@ -45,7 +45,7 @@ EventPanel::Private::Private(EventPanel* q):
     m_tabs(new AnimatedTabWidget(new CompactTabBar(), q)),
     m_notificationsTab(new NotificationListWidget(m_tabs)),
     m_counterLabel(new NotificationCounterLabel(m_tabs->tabBar())),
-    m_motionTab(new MotionSearchWidget(context(), m_tabs)),
+    m_motionTab(new SimpleMotionSearchWidget(context(), m_tabs)),
     m_bookmarksTab(new BookmarkSearchWidget(context(), m_tabs)),
     m_eventsTab(new EventSearchWidget(context(), m_tabs)),
     m_analyticsTab(new AnalyticsSearchWidget(context(), m_tabs)),

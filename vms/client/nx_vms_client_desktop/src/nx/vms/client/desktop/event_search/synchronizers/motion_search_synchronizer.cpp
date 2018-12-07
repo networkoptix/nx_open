@@ -4,13 +4,13 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 
 namespace nx::vms::client::desktop {
 
 MotionSearchSynchronizer::MotionSearchSynchronizer(
     QnWorkbenchContext* context,
-    MotionSearchWidget* motionSearchWidget,
+    SimpleMotionSearchWidget* motionSearchWidget,
     QObject* parent)
     :
     AbstractSearchSynchronizer(context, parent),
@@ -57,7 +57,7 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
                 mediaWidget->setMotionSearchModeEnabled(isActive);
         });
 
-    connect(m_motionSearchWidget.data(), &MotionSearchWidget::filterRegionsChanged, this,
+    connect(m_motionSearchWidget.data(), &SimpleMotionSearchWidget::filterRegionsChanged, this,
         [this](const QList<QRegion>& value)
         {
             const auto mediaWidget = this->mediaWidget();

@@ -66,6 +66,10 @@ public:
     bool livePaused() const;
     void setLivePaused(bool value);
 
+    /** Whether the model can work without server connection, for example with local files. */
+    bool offlineAllowed() const;
+    void setOfflineAllowed(bool value);
+
     /** Time window fetched at this moment. */
     QnTimePeriod fetchedTimeWindow() const;
 
@@ -166,6 +170,7 @@ private:
     bool m_live = false; //< Live mode enabled state.
     bool m_livePaused = false; //< Live mode paused state.
     bool m_isOnline = false; //< Whether connection with server is fully established.
+    bool m_offlineAllowed = false; //< Whether the model can work without server connection.
 
     FetchDirection m_fetchDirection = FetchDirection::earlier; //< Direction for next fetch.
 
