@@ -92,30 +92,15 @@ void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 
 QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
 {
-    if (isInfinite() && other.isInfinite())
-        return QnTimePeriod(std::max(startTimeMs, other.startTimeMs), kInfiniteDuration);
+    qint64 start = std::max(startTimeMs, other.startTimeMs);
+    qint64 end = std::min(endTimeMs(), other.endTimeMs());
 
-    if (isInfinite()) {
-        if (startTimeMs > other.startTimeMs + other.durationMs)
-            return QnTimePeriod();
-        if (startTimeMs < other.startTimeMs)
-            return QnTimePeriod(other.startTimeMs, other.durationMs);
-        return QnTimePeriod(startTimeMs, other.durationMs - (startTimeMs - other.startTimeMs));
-    }
-
-    if (other.isInfinite()) {
-        if (other.startTimeMs > startTimeMs + durationMs)
-            return QnTimePeriod();
-        if (other.startTimeMs < startTimeMs)
-            return QnTimePeriod(startTimeMs, durationMs);
-        return QnTimePeriod(other.startTimeMs, durationMs - (other.startTimeMs - startTimeMs));
-    }
-
-    if (other.startTimeMs > startTimeMs + durationMs || startTimeMs > other.startTimeMs + other.durationMs)
+    if (start > end)
         return QnTimePeriod();
 
-    qint64 start = std::max(startTimeMs, other.startTimeMs);
-    qint64 end = std::min(startTimeMs + durationMs, other.startTimeMs + other.durationMs);
+    if (end == kMaxTimeValue)
+        return QnTimePeriod(start, kInfiniteDuration);
+
     return QnTimePeriod(start, end - start);
 }
 
