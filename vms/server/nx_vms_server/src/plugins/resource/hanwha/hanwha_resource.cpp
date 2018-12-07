@@ -1371,6 +1371,23 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         capabilities |= Ptz::AuxiliaryPtzCapability;
 
+    const auto ptzTargetChannel = resourceData().value<int>(ResourceDataKey::kPtzTargetChannel, -1);
+    NX_VERBOSE(this, "PTZ target channel: %1", ptzTargetChannel);
+    if (ptzTargetChannel != -1 && ptzTargetChannel != getChannel())
+    {
+        const auto id = physicalIdForChannel(ptzTargetChannel);
+        NX_DEBUG(this, "Set PTZ target channel id: %1", id);
+        setProperty(ResourcePropertyKey::kPtzTargetId, id);
+
+        // This is a workaround until client fixes a bug.
+        // capabilities |= Ptz::ContinuousPanTiltCapabilities;
+    }
+    else
+    {
+        if (hasProperty(ResourcePropertyKey::kPtzTargetId))
+            setProperty(ResourcePropertyKey::kPtzTargetId, QString());
+    }
+
     NX_DEBUG(this, "Supported PTZ capabilities: %1", ptzCapabilityBits(capabilities));
     if (isAnalogEncoder())
     {
@@ -1378,20 +1395,6 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         // and are empty by default.
         m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
-    }
-
-    const auto ptzTargetChannel = resourceData().value<int>(ResourcePropertyKey::kPtzTargetChannel, -1);
-    NX_VERBOSE(this, "PTZ target channel: %1", ptzTargetChannel);
-    if (ptzTargetChannel != -1 && ptzTargetChannel != getChannel())
-    {
-        const auto id = physicalIdForChannel(ptzTargetChannel);
-        NX_DEBUG(this, "Set PTZ target channel id: %1", id);
-        setProperty(ResourcePropertyKey::kPtzTargetChannel, id);
-    }
-    else
-    {
-        if (hasProperty(ResourcePropertyKey::kPtzTargetChannel))
-            setProperty(ResourcePropertyKey::kPtzTargetChannel, QString());
     }
 
     return CameraDiagnostics::NoErrorResult();
