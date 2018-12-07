@@ -998,7 +998,7 @@ void EventRibbon::Private::doUpdateView()
     const int height = m_viewport->height();
 
     const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
-        [this](int left, const TilePtr& right) { return left < right->position; });
+        [](int left, const TilePtr& right) { return left < right->position; });
 
     int firstIndexToUpdate = qMax<int>(0, secondInView - m_tiles.cbegin() - 1);
 

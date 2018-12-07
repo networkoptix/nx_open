@@ -148,7 +148,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qt::DisplayRole:
         {
             const auto fallbackTitle =
-                [this, typeId = object.objectTypeId]()
+                [typeId = object.objectTypeId]()
                 {
                     return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
                 };

@@ -188,7 +188,7 @@ void AbstractSearchListModel::truncateDataToTimePeriod(
 
     // Remove records later than end of the period.
     const auto frontEnd = std::upper_bound(data.begin(), data.end(),
-        period.endTime() + 1, upperBoundPredicate);
+        period.endTime() + std::chrono::milliseconds(1), upperBoundPredicate);
 
     const auto frontLength = std::distance(data.begin(), frontEnd);
     if (frontLength != 0)
