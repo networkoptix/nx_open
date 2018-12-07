@@ -94,7 +94,7 @@ void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
 {
     if (*timerId != 0)
     {
-        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
         *timerId = 0;
     }
 
@@ -105,7 +105,7 @@ void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
 /* Some cameras declare invalid max resolution */
 struct StrictResolution
 {
-    const char* model;
+    const char* model = nullptr;
     QSize maxRes;
 };
 
@@ -334,8 +334,7 @@ int QnPlOnvifResource::VideoOptionsLocal::restrictFrameRate(
 
 //-------------------------------------------------------------------------------------------------
 
-namespace
-{
+namespace {
 
 using VideoOptionsComparator = std::function<bool(
     const QnPlOnvifResource::VideoOptionsLocal&,
