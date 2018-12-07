@@ -294,19 +294,21 @@ private:
             { onRead(errorCode, bytesRead); });
     }
 
-    void onSend(SystemError::ErrorCode errorCode, size_t bytesRead)
+    void onSend(SystemError::ErrorCode errorCode, size_t /*bytesSent*/)
     {
         if (m_stopped)
         {
             NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
             return;
         }
+
         if (errorCode != SystemError::noError)
         {
             NX_INFO(this, lm("send failed with error code: %1").args(errorCode));
             stopInAioThread();
             return;
         }
+
         NX_INFO(this, "message sent");
         m_timer.start(std::chrono::seconds(1),
             [self = shared_from_this(), this]()
@@ -319,9 +321,9 @@ private:
                 m_p2pTransport->sendAsync(
                     kTestMessage,
                     [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
-                        size_t bytesRead)
+                        size_t bytesSent)
                     {
-                        onSend(errorCode, bytesRead);
+                        onSend(errorCode, bytesSent);
                     });
             });
     }
@@ -393,6 +395,13 @@ private:
             requestContext.connection->setSendCompletionHandler(
                 [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
                 {
+                    if (ecode != SystemError::noError)
+                    {
+                        NX_INFO(this, "Failed to respond to the incoming connection");
+                        stopInAioThread();
+                        return;
+                    }
+
                     auto p2pTransport = new P2PHttpServerTransport(
                         connection->takeSocket(),
                         nx::network::websocket::FrameType::text);
@@ -401,6 +410,13 @@ private:
                     p2pTransport->start(
                         [p2pTransport, this](SystemError::ErrorCode error)
                         {
+                            if (error != SystemError::noError)
+                            {
+                                NX_INFO(this, "Failed to start Http server connection");
+                                stopInAioThread();
+                                return;
+                            }
+
                             auto p2pConnection = std::make_shared<P2PConnection>(
                                 config.aioThread,
                                 P2pTransportPtr(p2pTransport));
@@ -420,6 +436,13 @@ private:
             requestContext.connection->setSendCompletionHandler(
                 [connection = requestContext.connection, this](SystemError::ErrorCode ecode)
                 {
+                    if (ecode != SystemError::noError)
+                    {
+                        NX_INFO(this, "Failed to respond to the incoming connection");
+                        stopInAioThread();
+                        return;
+                    }
+
                     auto p2pTransport = P2pTransportPtr(
                         new P2PWebsocketTransport(
                             connection->takeSocket(),
