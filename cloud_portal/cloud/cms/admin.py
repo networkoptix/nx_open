@@ -147,7 +147,7 @@ class ProductAdmin(CMSAdmin):
     product_settings.allow_tags = True
 
     def edit_product(self, obj):
-        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit contexts</a>',
+        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit content</a>',
                            reverse('admin:cms_contextproxy_changelist'), obj.id)
 
     edit_product.short_description = 'Edit page'
