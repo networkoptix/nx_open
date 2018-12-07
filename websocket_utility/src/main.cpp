@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <thread>
 #include <string.h>
+#include <algorithm>
 #include <stdlib.h>
 
 #include <signal.h>
@@ -55,6 +56,7 @@ class Waitable
 {
 public:
     Waitable(aio::AbstractAioThread* aioThread): m_aioThread(aioThread) {}
+    virtual ~Waitable() = default;
 
     void stop()
     {
@@ -199,6 +201,14 @@ public:
             {
                 onConnect(std::move(completionHandler));
             });
+    }
+
+    void gotIncomingPostConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+    {
+        auto p2pHttpServerConnection =
+            dynamic_cast<nx::network::P2PHttpServerTransport*>(m_p2pTransport.get());
+
+        p2pHttpServerConnection->gotPostConnection(std::move(socket));
     }
 
     void start()
@@ -387,7 +397,28 @@ public:
                 http::RequestContext requestContext,
                 http::RequestProcessedHandler requestCompletionHandler)
             {
-                onAccept(std::move(requestContext), std::move(requestCompletionHandler));
+                const auto& headers = requestContext.request.headers;
+                auto guidHeaderIt = headers.find("X-P2P-GUID");
+
+                if (guidHeaderIt == headers.cend())
+                {
+                    NX_INFO(this, "onPost: No GUID header in the incoming Http request headers");
+                    exit(EXIT_FAILURE);
+                }
+
+                auto existingP2PConnection = waitablePoolInstance->findByGuid(guidHeaderIt->second);
+                if (!existingP2PConnection)
+                {
+                    NX_INFO(this, "onPost: Failed to find the matching connection in the pool");
+                    exit(EXIT_FAILURE);
+                }
+
+                auto p2pConnection =
+                    std::dynamic_pointer_cast<P2PConnection>(existingP2PConnection);
+
+                p2pConnection->gotIncomingPostConnection(
+                    std::move(requestContext.connection->takeSocket()));
+
             }, http::Method::post);
     }
 
