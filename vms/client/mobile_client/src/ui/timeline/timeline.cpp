@@ -809,8 +809,13 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
         auto handleTimePeriodsUpdated =
             [this]()
             {
-                d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods(Qn::RecordingContent);
-                d->timePeriods[Qn::MotionContent] = d->chunkProvider->timePeriods(Qn::MotionContent);
+                const auto contentTypes = {Qn::RecordingContent, Qn::MotionContent};
+                for (const auto contentType: contentTypes)
+                {
+                    auto& periods = d->timePeriods[contentType];
+                    periods = d->chunkProvider->timePeriods(contentType);
+                    periods.end(); //< Forces deep copy.
+                }
                 update();
             };
 
