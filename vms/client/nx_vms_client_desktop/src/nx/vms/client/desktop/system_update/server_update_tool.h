@@ -84,7 +84,7 @@ public:
      * Asks mediaservers to start the update process.
      * @param info - update manifest
      */
-    void requestStartUpdate(const nx::update::Information& info, QSet<QnUuid> targets);
+    void requestStartUpdate(const nx::update::Information& info, const QSet<QnUuid>& targets);
 
     /**
      * Asks mediaservers to stop the update process.
@@ -95,7 +95,7 @@ public:
     /**
      * Asks mediaservers to start installation process.
      */
-    void requestInstallAction(QSet<QnUuid> targets);
+    void requestInstallAction(const QSet<QnUuid>& targets);
 
     // State for uploading offline update package.
     enum class OfflineUpdateState
@@ -113,7 +113,7 @@ public:
         error,
     };
 
-    std::future<UpdateContents> checkUpdateFromFile(QString file);
+    std::future<UpdateContents> checkUpdateFromFile(const QString& file);
     std::future<UpdateContents> checkRemoteUpdateInfo();
     // It is used to obtain future to update check that was started
     // inside loadInternalState method
@@ -129,7 +129,7 @@ public:
     void startUpload(
         const QnMediaServerResourcePtr& server,
         const QStringList& files,
-        QDir directory);
+        const QDir& directory);
     void stopUpload();
 
     QDir getDownloadDir() const;
@@ -168,8 +168,6 @@ public:
     std::shared_ptr<ServerUpdatesModel> getModel();
     std::shared_ptr<PeerStateTracker> getStateTracker();
 
-    QnMediaServerResourcePtr getServer(const UpdateItem* item) const;
-
     // These are debug functions that return URL to appropriate mediaserver API calls.
     // This URLs are clickable at MultiServerUpdateWidget. This allows testers to
     // check current update state easily and fill in a meaningful bug report.
@@ -194,7 +192,7 @@ public:
      * @param package Package to be uploaded
      * @param sourceDir Directory that contains this package
      */
-    void uploadPackage(const nx::update::Package& package, QDir sourceDir);
+    void uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
 
     /**
      * Updates URL of the current mediaserver.
@@ -215,10 +213,10 @@ private:
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
     rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server) const;
-    static void readUpdateManifest(QString path, UpdateContents& result);
+    static void readUpdateManifest(const QString& path, UpdateContents& result);
     QnMediaServerResourceList getServersForUpload();
 
-    void markUploadCompleted(QString uploadId);
+    void markUploadCompleted(const QString& uploadId);
     void saveInternalState();
     void loadInternalState();
     void changeUploadState(OfflineUpdateState newState);

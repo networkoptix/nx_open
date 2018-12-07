@@ -831,7 +831,7 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
         NX_INFO(this)
             << "atServerPackageDownloadFailed() - failed to download server package"
             << package.file << "error:" << error;
-        for (auto id: package.targets)
+        for (const auto& id: package.targets)
             m_peersFailed.insert(id);
     }
     else
@@ -856,7 +856,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         // We even can get a stale callback from /ec2/updateStatus, with data actual to
         // the moment right before we pressed 'Download'.
         // It will be very troublesome to properly wait for updated /ec2/updateStatus.
-        for (auto id: m_peersIssued)
+        for (const auto& id: m_peersIssued)
         {
             auto item = m_stateTracker->findItemById(id);
             if (!item)
@@ -1033,7 +1033,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
 {
     auto allStates = m_stateTracker->getAllPeerStates();
 
-    for (auto record: allStates)
+    for (const auto& record: allStates)
     {
         StatusCode state = record.second;
         auto id = record.first;
@@ -1246,7 +1246,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     QSet<QnUuid> peersToRestartUpdate;
     QSet<QnUuid> serversActive;
 
-    for (auto item: items)
+    for (const auto& item: items)
     {
         StatusCode state = item->state;
         auto id = item->id;

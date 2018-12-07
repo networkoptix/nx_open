@@ -151,7 +151,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::getUpdateCheck()
     return std::move(m_updateCheck);
 }
 
-std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
+std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(const QString& file)
 {
     NX_VERBOSE(this) << "checkUpdateFromFile(" << file << ")";
 
@@ -209,7 +209,8 @@ void ServerUpdateTool::changeUploadState(OfflineUpdateState newState)
     saveInternalState();
 }
 
-void ServerUpdateTool::readUpdateManifest(QString path, UpdateContents& result)
+void ServerUpdateTool::readUpdateManifest(
+    const QString& path, UpdateContents& result)
 {
     result.error = nx::update::InformationError::jsonError;
     result.sourceType = nx::update::UpdateSourceType::file;
@@ -289,7 +290,7 @@ QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result;
     auto items = m_stateTracker->getAllItems();
-    for (auto record: items)
+    for (const auto& record: items)
     {
         auto server = m_stateTracker->getServer(record.get());
         if (!server)
@@ -369,7 +370,9 @@ bool ServerUpdateTool::hasManualDownloads() const
     return !m_issuedDownloads.empty();
 }
 
-void ServerUpdateTool::uploadPackage(const nx::update::Package& package, QDir storageDir)
+void ServerUpdateTool::uploadPackage(
+    const nx::update::Package& package,
+    const QDir& storageDir)
 {
     NX_ASSERT(package.isValid());
 
@@ -457,7 +460,7 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
     m_offlineUpdateStateChanged = true;
 }
 
-void ServerUpdateTool::markUploadCompleted(QString uploadId)
+void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
 {
     m_activeUploads.erase(uploadId);
     m_completedUploads.insert(uploadId);
@@ -468,7 +471,10 @@ void ServerUpdateTool::markUploadCompleted(QString uploadId)
     }
 }
 
-void ServerUpdateTool::startUpload(const QnMediaServerResourcePtr& server, const QStringList& filesToUpload, QDir storageDir)
+void ServerUpdateTool::startUpload(
+    const QnMediaServerResourcePtr& server,
+    const QStringList& filesToUpload,
+    const QDir& storageDir)
 {
     NX_ASSERT(server);
     auto serverId = server->getId();
@@ -521,7 +527,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_completedUploads.clear();
     m_uploadStateById.clear();
 
-    for (auto server: recipients)
+    for (const auto& server: recipients)
         startUpload(server, contents.filesToUpload, contents.storageDir);
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
@@ -671,10 +677,12 @@ void ServerUpdateTool::requestStopAction()
     m_stateTracker->clearState();
 }
 
-void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info, QSet<QnUuid> targets)
+void ServerUpdateTool::requestStartUpdate(
+    const nx::update::Information& info,
+    const QSet<QnUuid>& targets)
 {
     QSet<QnUuid> servers;
-    for (auto id: targets)
+    for (const auto& id: targets)
     {
         auto item = m_stateTracker->findItemById(id);
         if (item->component == UpdateItem::Component::server)
@@ -701,7 +709,8 @@ void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info, Q
     m_remoteUpdateStatus = {};
 }
 
-void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
+void ServerUpdateTool::requestInstallAction(
+    const QSet<QnUuid>& targets)
 {
     if (!m_activeRequests.empty())
         m_skippedRequests.unite(m_activeRequests);
@@ -799,13 +808,6 @@ std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 {
     return m_stateTracker;
-}
-
-QnMediaServerResourcePtr ServerUpdateTool::getServer(const UpdateItem* item) const
-{
-    if (!item)
-        return QnMediaServerResourcePtr();
-    return resourcePool()->getResourceById<QnMediaServerResource>(item->id);
 }
 
 ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(
@@ -931,7 +933,7 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
     nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
     const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-    for (const QnMediaServerResourcePtr &server: allServers)
+    for (const QnMediaServerResourcePtr& server: allServers)
     {
         if (server->getVersion() < minimalVersion)
             minimalVersion = server->getVersion();

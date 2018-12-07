@@ -74,7 +74,7 @@ public:
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
-    void setPeersInstalling(QSet<QnUuid> targets, bool installing);
+    void setPeersInstalling(const QSet<QnUuid>& targets, bool installing);
     void clearState();
 
 public:

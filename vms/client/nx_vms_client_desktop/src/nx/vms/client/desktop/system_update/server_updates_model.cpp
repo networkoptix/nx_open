@@ -264,7 +264,6 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
     auto left = leftIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
     auto right = rightIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
 
-    /* Security check. */
     if (!left || !right)
         return left < right;
 
@@ -278,7 +277,7 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
     QString rname = rightIndex.data(Qt::DisplayRole).toString();
 
     int result = nx::utils::naturalStringCompare(lname, rname, Qt::CaseInsensitive);
-    if(result != 0)
+    if (result != 0)
         return result < 0;
 
     // We want the order to be defined even for items with the same name.

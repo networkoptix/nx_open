@@ -32,7 +32,7 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 
     addItemForClient();
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
-    for (const QnMediaServerResourcePtr &server : allServers)
+    for (const QnMediaServerResourcePtr& server: allServers)
         atResourceAdded(server);
 
     m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
@@ -43,7 +43,7 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 
 UpdateItemPtr PeerStateTracker::findItemById(QnUuid id)
 {
-    for (auto item: m_items)
+    for (const auto& item: m_items)
     {
         if (item->id == id)
             return item;
@@ -115,7 +115,7 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
     }
 }
 
-void PeerStateTracker::setPeersInstalling(QSet<QnUuid> targets, bool installing)
+void PeerStateTracker::setPeersInstalling(const QSet<QnUuid>& targets, bool installing)
 {
     for (const auto& uid: targets)
     {
@@ -281,7 +281,9 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
-    if (!helpers::serverBelongsToCurrentSystem(server))
+
+    auto item = findItemById(server->getId());
+    if (!item)
         return;
 
     disconnect(server.data(), &QnResource::statusChanged,
@@ -291,9 +293,6 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     disconnect(server.data(), &QnResource::flagsChanged,
         this, &PeerStateTracker::atResourceChanged);
 
-    auto item = findItemById(server->getId());
-    if (!item)
-        return;
     {
         QnMutexLocker locker(&m_dataLock);
         m_activeServers.erase(server->getId());
