@@ -287,9 +287,9 @@ private:
             m_p2pTransport->start();
             m_httpClient->pleaseStopSync();
         }
-        else
+        else if (statusCode == http::StatusCode::forbidden)
         {
-            NX_INFO(this, "Server reported readiness for a http connection");
+            NX_INFO(this, "Server reported forbidden. Trying http mode.");
 
             m_p2pTransport.reset(new P2PHttpClientTransport(
                 std::move(m_httpClient),
@@ -297,6 +297,11 @@ private:
                 websocket::FrameType::text));
             m_p2pTransport->bindToAioThread(m_aioThread);
             m_p2pTransport->start();
+        }
+        else
+        {
+            NX_INFO(this, lm("Server reported %1. Which is unexpected.").args(statusCode));
+            exit(EXIT_FAILURE);
         }
 
         completionHandler();
