@@ -74,7 +74,7 @@ private:
     void readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler);
     QByteArray makeInitialResponse() const;
     QByteArray makeFrameHeader() const;
-    void sendResponse(
+    void sendPostResponse(
         SystemError::ErrorCode error,
         IoCompletionHandler userHandler,
         utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler);

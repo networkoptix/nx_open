@@ -74,8 +74,16 @@ void P2PHttpServerTransport::gotPostConnection(
                 }
                 else
                 {
-                    userReadHandlerPair->first->append(body);
-                    userReadHandlerPair->second(SystemError::noError, body.size());
+                    sendPostResponse(
+                        SystemError::noError,
+                        std::move(userReadHandlerPair->second),
+                        [body, buffer = userReadHandlerPair->first](
+                            SystemError::ErrorCode error,
+                            IoCompletionHandler handler)
+                        {
+                            buffer->append(body);
+                            handler(error, body.size());
+                        });
                 }
             }
             else if (!body.isEmpty())
@@ -95,10 +103,16 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 
             if (!m_providedPostBody.isEmpty())
             {
-                buffer->append(m_providedPostBody);
-                const auto bodySize = m_providedPostBody.size();
-                m_providedPostBody = nx::Buffer();
-                handler(SystemError::noError, bodySize);
+                sendPostResponse(
+                    SystemError::noError,
+                    std::move(handler),
+                    [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
+                    {
+                        buffer->append(m_providedPostBody);
+                        const auto bodySize = m_providedPostBody.size();
+                        m_providedPostBody = nx::Buffer();
+                        handler(SystemError::noError, bodySize);
+                    });
             }
             else
             {
@@ -170,10 +184,10 @@ void P2PHttpServerTransport::onBytesRead(
         {
         case server::ParserState::done:
             buffer->append(m_readContext.parser.fetchMessageBody());
-            sendResponse(SystemError::noError, std::move(handler), std::move(completionHandler));
+            sendPostResponse(SystemError::noError, std::move(handler), std::move(completionHandler));
             return;
         case server::ParserState::failed:
-            sendResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
+            sendPostResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
             return;
         case server::ParserState::readingBody:
         case server::ParserState::readingMessage:
@@ -182,7 +196,7 @@ void P2PHttpServerTransport::onBytesRead(
             break;
         case server::ParserState::init:
             NX_ASSERT(false, "Should never get here");
-            sendResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
+            sendPostResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
             return;
         }
     }
@@ -198,7 +212,7 @@ void P2PHttpServerTransport::addDateHeader(http::HttpHeaders* headers)
     headers->emplace("Date", http::formatDateTime(dateTime));
 }
 
-void P2PHttpServerTransport::sendResponse(
+void P2PHttpServerTransport::sendPostResponse(
     SystemError::ErrorCode error,
     IoCompletionHandler userHandler,
     utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler)
