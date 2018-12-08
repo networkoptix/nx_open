@@ -204,12 +204,14 @@ public:
             });
     }
 
-    void gotIncomingPostConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+    void gotIncomingPostConnection(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        const nx::Buffer& body)
     {
         auto p2pHttpServerConnection =
             dynamic_cast<nx::network::P2PHttpServerTransport*>(m_p2pTransport.get());
 
-        p2pHttpServerConnection->gotPostConnection(std::move(socket));
+        p2pHttpServerConnection->gotPostConnection(std::move(socket), body);
     }
 
     void start()
@@ -398,13 +400,16 @@ public:
                     http::HttpHeaders headers;
                     int iterations = 0;
                     nx::utils::MoveOnlyFunc<void()> apply = nullptr;
+                    nx::Buffer body;
                 };
 
                 auto sharedContext = std::make_shared<CheckForPairConnectionContext>();
                 sharedContext->socket = requestContext.connection->takeSocket();
                 sharedContext->headers = requestContext.request.headers;
+                sharedContext->body = requestContext.request.messageBody;
 
-                auto checkForPairConnection = [sharedContext, this]() mutable
+                auto checkForPairConnection =
+                    [sharedContext, this]() mutable
                     {
                         auto guidHeaderIt = sharedContext->headers.find("X-NX-P2P-GUID");
                         if (guidHeaderIt == sharedContext->headers.cend())
@@ -443,7 +448,9 @@ public:
                         auto p2pConnection =
                             std::dynamic_pointer_cast<P2PConnection>(existingP2PConnection);
 
-                        p2pConnection->gotIncomingPostConnection(std::move(sharedContext->socket));
+                        p2pConnection->gotIncomingPostConnection(
+                            std::move(sharedContext->socket),
+                            sharedContext->body);
                     };
 
                 sharedContext->apply = std::move(checkForPairConnection);

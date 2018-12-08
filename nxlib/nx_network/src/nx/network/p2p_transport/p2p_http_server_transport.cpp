@@ -63,6 +63,8 @@ void P2PHttpServerTransport::gotPostConnection(
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
 
+            qDebug() << "gotPostConnection: has handler:" << (m_userReadHandlerPair != nullptr) << "body is empty" << body.isEmpty();
+
             if (m_userReadHandlerPair)
             {
                 auto userReadHandlerPair = std::move(m_userReadHandlerPair);
@@ -100,6 +102,8 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
         {
             if (m_onGetRequestReceived)
                 return handler(SystemError::connectionAbort, 0);
+
+            qDebug() << "readSomeAsync: has handler:" << (m_userReadHandlerPair != nullptr) << "m_providedPostBody is empty" << m_providedPostBody.isEmpty();
 
             if (!m_providedPostBody.isEmpty())
             {
@@ -228,6 +232,7 @@ void P2PHttpServerTransport::sendPostResponse(
 
     response.serialize(&m_responseBuffer);
 
+    qDebug() << "Sending post response";
     m_readSocket->sendAsync(
         m_responseBuffer,
         [this,
@@ -237,6 +242,7 @@ void P2PHttpServerTransport::sendPostResponse(
             SystemError::ErrorCode error,
             size_t /*transferred*/) mutable
         {
+            qDebug() << "post response sent" << error;
             m_responseBuffer.clear();
             if (readError != SystemError::noError)
                 return completionHandler(readError, std::move(userHandler));
