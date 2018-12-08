@@ -111,7 +111,7 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
                         buffer->append(m_providedPostBody);
                         const auto bodySize = m_providedPostBody.size();
                         m_providedPostBody = nx::Buffer();
-                        handler(SystemError::noError, bodySize);
+                        handler(error, bodySize);
                     });
             }
             else
