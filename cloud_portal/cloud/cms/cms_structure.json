@@ -458,7 +458,10 @@
             "label": "Description",
             "value": "",
             "description": "A short description for the integration tile.",
-            "type": "long_text"
+            "type": "long_text",
+            "mata": {
+              "char_limit": 250
+            }
           },
           {
             "name": "testedVersions",

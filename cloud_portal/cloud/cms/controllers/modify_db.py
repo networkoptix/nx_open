@@ -164,6 +164,13 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 if new_record_value and not re.match(pattern, new_record_value):
                     upload_errors.append((data_structure_name, 'Invalid input'))
                     continue
+            elif 'char_limit' in data_structure.meta_settings:
+                char_limit = int(data_structure.meta_settings['char_limit'])
+                if len(new_record_value) > char_limit:
+                    upload_errors.append(
+                        (data_structure_name,
+                         'Character limit exceeded. Text was {} characters but should not be more than {} characters'.
+                         format(len(new_record_value), char_limit)))
 
         # If the data structure is not option and no record exists and nothing was uploaded try to use the default value
         if not data_structure.optional and not new_record_value:

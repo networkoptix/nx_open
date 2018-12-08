@@ -10,7 +10,8 @@ BYTES_TO_MEGABYTES = 1048576.0
 
 
 def convert_meta_to_description(meta):
-    meta_to_plain = {"format": "Format:  %s",
+    meta_to_plain = {"char_limit": "Character limit is %s",
+                     "format": "Format:  %s",
                      "height": "Height: %spx",
                      "height_le": "Height: not greater than %spx",
                      "height_ge": "Height: not less than %spx",
