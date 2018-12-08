@@ -287,7 +287,7 @@ private:
             m_p2pTransport->start();
             m_httpClient->pleaseStopSync();
         }
-        else if (statusCode == http::StatusCode::forbidden)
+        else if (statusCode == http::StatusCode::forbidden || statusCode == http::StatusCode::ok)
         {
             NX_INFO(this, "Server reported forbidden. Trying http mode.");
 
