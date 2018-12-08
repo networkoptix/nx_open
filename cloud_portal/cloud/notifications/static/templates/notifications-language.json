@@ -19,5 +19,14 @@
   },
   "cloud_invite": {
     "emailSubject": "You have been invited to %PRODUCT_NAME%"
+  },
+  "ipvd_feedback": {
+    "emailSubject": "Camera Page Feedback"
+  },
+  "sales_inquiry": {
+    "emailSubject": "Sales inquiry for {{message.product}}"
+  },
+  "support_request": {
+    "emailSubject": "Support request for {{message.product}}"
   }
 }

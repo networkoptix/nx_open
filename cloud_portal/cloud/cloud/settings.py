@@ -119,7 +119,7 @@ ADMIN_DASHBOARD = ('cms.models.ContentVersion',
                    'cms.models.ExternalFile',
                    'cms.models.Language',
                    'cms.models.ProductType',
-                   'cms.models.UserGroupsToCustomizationPermissions',
+                   'cms.models.UserGroupsToProductPermissions',
                    'django_celery_results.*',
                    'notifications.models.*',
                    'rest_hooks.*',
@@ -433,6 +433,15 @@ NOTIFICATIONS_CONFIG = {
         'queue': 'broadcast-notifications'
     },
     'cloud_invite':{
+        'engine': 'email'
+    },
+    'ipvd_feedback': {
+        'engine': 'email'
+    },
+    'sales_inquiry': {
+        'engine': 'email'
+    },
+    'support_request': {
         'engine': 'email'
     }
 }

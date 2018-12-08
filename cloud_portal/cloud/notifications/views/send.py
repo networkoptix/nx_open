@@ -18,11 +18,13 @@ from notifications.tasks import send_to_all_users
 
 import re
 
+
 # Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
     new_line = re.compile(r'<(\/p|br)>')
     tags = re.compile(r'<[\w\=\'\"\:\;\_\-\,\!\/\ ]+>')
     return tags.sub('', new_line.sub('\n', html))
+
 
 def add_brs(html):
     br = re.compile(r'\n')
@@ -30,7 +32,7 @@ def add_brs(html):
 
 
 def format_message(notification):
-    message = {}
+    message = dict()
     message['subject'] = notification.subject
     message['html_body'] = add_brs(notification.body)
     message['text_body'] = html_to_text(notification.body)
@@ -50,6 +52,12 @@ def update_or_create_notification(data, customizations=[]):
     notification.save()
     return notification.id
 
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated))
+@handle_exceptions
+def send_event(request):
+    pass
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
