@@ -18,10 +18,12 @@ public:
     virtual ~P2PHttpServerTransport() override;
 
     /**
-     * This function should be called before any readSomeAsync(). In case if the readSomeAsync()
-     * fails, a new POST socket might be provided via this function.
+     * Provide a socket for a POST incoming connection with this function. You can optionally
+     * provide a body of already accepted and read POST request.
      */
-    void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
+    void gotPostConnection(
+        std::unique_ptr<AbstractStreamSocket> socket,
+        const nx::Buffer& body = nx::Buffer());
 
     /**
      * This should be called before all other operations. Transport becomes operational only after
@@ -54,6 +56,7 @@ private:
     websocket::FrameType m_messageType;
     nx::Buffer m_sendBuffer;
     nx::Buffer m_responseBuffer;
+    nx::Buffer m_providedPostBody;
     bool m_firstSend = true;
     ReadContext m_readContext;
     aio::Timer m_timer;

@@ -52,10 +52,12 @@ P2PHttpServerTransport::~P2PHttpServerTransport()
     pleaseStopSync();
 }
 
-void P2PHttpServerTransport::gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket)
+void P2PHttpServerTransport::gotPostConnection(
+    std::unique_ptr<AbstractStreamSocket> socket,
+    const nx::Buffer& body)
 {
     post(
-        [this, socket = std::move(socket)]() mutable
+        [this, socket = std::move(socket), body]() mutable
         {
             m_readSocket = std::move(socket);
             m_readSocket->setNonBlockingMode(true);
@@ -64,9 +66,21 @@ void P2PHttpServerTransport::gotPostConnection(std::unique_ptr<AbstractStreamSoc
             if (m_userReadHandlerPair)
             {
                 auto userReadHandlerPair = std::move(m_userReadHandlerPair);
-                readFromSocket(
-                    userReadHandlerPair->first,
-                    std::move(userReadHandlerPair->second));
+                if (body.isEmpty())
+                {
+                    readFromSocket(
+                        userReadHandlerPair->first,
+                        std::move(userReadHandlerPair->second));
+                }
+                else
+                {
+                    userReadHandlerPair->first->append(body);
+                    userReadHandlerPair->second(SystemError::noError, body.size());
+                }
+            }
+            else if (!body.isEmpty())
+            {
+                m_providedPostBody = body;
             }
         });
 }
@@ -79,7 +93,17 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
             if (m_onGetRequestReceived)
                 return handler(SystemError::connectionAbort, 0);
 
-            readFromSocket(buffer, std::move(handler));
+            if (!m_providedPostBody.isEmpty())
+            {
+                buffer->append(m_providedPostBody);
+                const auto bodySize = m_providedPostBody.size();
+                m_providedPostBody = nx::Buffer();
+                handler(SystemError::noError, bodySize);
+            }
+            else
+            {
+                readFromSocket(buffer, std::move(handler));
+            }
         });
 }
 
@@ -154,7 +178,7 @@ void P2PHttpServerTransport::onBytesRead(
         case server::ParserState::readingBody:
         case server::ParserState::readingMessage:
             buffer->append(m_readContext.parser.fetchMessageBody());
-            m_readContext.buffer.remove(0, bytesProcessed);
+            m_readContext.buffer.remove(0, (int) bytesProcessed);
             break;
         case server::ParserState::init:
             NX_ASSERT(false, "Should never get here");
