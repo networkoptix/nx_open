@@ -11,7 +11,7 @@ from django.shortcuts import redirect
 
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
 from api.models import Account
-from cms.models import Customization, UserGroupsToCustomizationPermissions
+from cms.models import Customization, Product, UserGroupsToCustomizationPermissions
 from notifications import api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
@@ -54,10 +54,42 @@ def update_or_create_notification(data, customizations=[]):
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticated))
+@permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def send_event(request):
-    pass
+    try:
+        validation_error = False
+        error_data = {}
+
+        if 'type' not in request.data or not request.data['type']:
+            validation_error = True
+            error_data['type'] = ['This field is required.']
+
+        if 'type' in request.data and request.data['type'] != 'ipvd_feedback' and 'product_id' not in request.data:
+            validation_error = True
+            error_data['product_id'] = ['This field is required.']
+
+        if 'message' not in request.data:
+            validation_error = True
+            error_data['message'] = ['This field is required.']
+
+        if validation_error:
+            raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
+                                      error_data=error_data)
+
+        if request.data['type'] != 'ipvd_feedback':
+            product = Product.objects.filter(id=request.data['product_id'])
+            if product.exists():
+                request.data['message']['product'] = product.first().name
+        user = request.user
+        request.data['message']['sender_email'] = user.email
+        request.data['message']['sender_name'] = user.email
+
+    except ValidationError as error:
+        error_data = error.detail if hasattr(error, 'detail') else None
+        raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error_data)
+    return api_success()
+
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))

@@ -37,6 +37,7 @@ class Event(models.Model):
         subscriptions = subscriptions.filter(Q(enabled=True) | Q(enabled=1))
         # 2. For each subscription create a message and send it
         for user in subscriptions.all():
+            self.data['userFullName'] = user.get_full_name()
             message = Message(
                 message=self.data,
                 user_email=user.user_email,
