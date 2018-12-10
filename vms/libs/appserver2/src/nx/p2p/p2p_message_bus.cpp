@@ -103,7 +103,6 @@ void MessageBus::dropConnections()
 
 void MessageBus::dropConnectionsThreadUnsafe()
 {
-    QnMutexLocker lock(&m_mutex);
     for (const auto& connection: m_connections)
         connection->setState(Connection::State::Error);
     for (const auto& connection: m_outgoingConnections)
@@ -215,9 +214,9 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
 {
     QnMutexLocker lock(&m_mutex);
-    connect(connection.data(), &Connection::stateChanged, this, &MessageBus::at_stateChanged);
-    connect(connection.data(), &Connection::gotMessage, this, &MessageBus::at_gotMessage);
-    connect(connection.data(), &Connection::allDataSent, this, &MessageBus::at_allDataSent);
+    connect(connection.data(), &Connection::stateChanged, this, &MessageBus::at_stateChanged, Qt::QueuedConnection);
+    connect(connection.data(), &Connection::gotMessage, this, &MessageBus::at_gotMessage, Qt::QueuedConnection);
+    connect(connection.data(), &Connection::allDataSent, this, &MessageBus::at_allDataSent, Qt::QueuedConnection);
 }
 
 void MessageBus::createOutgoingConnections(
@@ -1157,7 +1156,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
 
     for (auto& record: result)
         record.previousState = toString(m_lastConnectionState.value(record.remotePeerId));
-    
+
     return result;
 }
 
