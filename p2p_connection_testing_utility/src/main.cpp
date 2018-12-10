@@ -657,15 +657,15 @@ static void prepareConfig(int argc, const char* argv[])
             exit(EXIT_SUCCESS);
         }
 
-        if (strcmp(argv[i], "--url") == 0)
+        if (strcmp(argv[i], "--url") == 0 && i + 1 < argc)
             config.url = argv[++i];
-        else if (strcmp(argv[i], "--username") == 0)
+        else if (strcmp(argv[i], "--username") == 0 && i + 1 < argc)
             config.userName = argv[++i];
-        else if (strcmp(argv[i], "--password") == 0)
+        else if (strcmp(argv[i], "--password") == 0 && i + 1 < argc)
             config.userPassword = argv[++i];
-        else if (strcmp(argv[i], "--server-address") == 0)
+        else if (strcmp(argv[i], "--server-address") == 0 && i + 1 < argc)
             config.serverAddress = argv[++i];
-        else if (strcmp(argv[i], "--server-port") == 0)
+        else if (strcmp(argv[i], "--server-port") == 0 && i + 1 < argc)
             config.serverPort = strtol(argv[++i], nullptr, 10);
         else if (strcmp(argv[i], "--role") == 0 && i + 1 < argc)
         {
