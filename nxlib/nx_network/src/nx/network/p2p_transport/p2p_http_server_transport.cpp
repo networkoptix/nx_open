@@ -63,8 +63,6 @@ void P2PHttpServerTransport::gotPostConnection(
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
 
-            qDebug() << "gotPostConnection: has handler:" << (m_userReadHandlerPair != nullptr) << "body is empty" << body.isEmpty();
-
             if (m_userReadHandlerPair)
             {
                 auto userReadHandlerPair = std::move(m_userReadHandlerPair);
@@ -102,8 +100,6 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
         {
             if (m_onGetRequestReceived)
                 return handler(SystemError::connectionAbort, 0);
-
-            qDebug() << "readSomeAsync: has handler:" << (m_userReadHandlerPair != nullptr) << "m_providedPostBody is empty" << m_providedPostBody.isEmpty();
 
             if (!m_providedPostBody.isEmpty())
             {
@@ -158,9 +154,27 @@ void P2PHttpServerTransport::onBytesRead(
     nx::Buffer* const buffer,
     IoCompletionHandler handler)
 {
-    if (error != SystemError::noError || transferred == 0)
+    if (error != SystemError::noError)
     {
         handler(error, transferred);
+        return;
+    }
+
+    if (transferred == 0)
+    {
+        NX_VERBOSE(this, "onBytesRead: Connection seems to have been closed by a remote peer.");
+        m_readSocket.reset();
+
+        NX_ASSERT(m_userReadHandlerPair == nullptr);
+        if (m_userReadHandlerPair != nullptr)
+        {
+            handler(SystemError::notSupported, 0);
+            return;
+        }
+
+        m_userReadHandlerPair = UserReadHandlerPair(
+            new std::pair<nx::Buffer* const, IoCompletionHandler>(buffer, std::move(handler)));
+
         return;
     }
 
@@ -226,13 +240,14 @@ void P2PHttpServerTransport::sendPostResponse(
         ? http::StatusCode::ok
         : http::StatusCode::internalServerError;
     response.statusLine.version = http::http_1_1;
+    response.statusLine.reasonPhrase = "Ok";
 
     response.headers.emplace("Content-Length", "0");
+    response.headers.emplace("Connection", "keep-alive");
     addDateHeader(&response.headers);
 
     response.serialize(&m_responseBuffer);
 
-    qDebug() << "Sending post response";
     m_readSocket->sendAsync(
         m_responseBuffer,
         [this,
@@ -242,7 +257,6 @@ void P2PHttpServerTransport::sendPostResponse(
             SystemError::ErrorCode error,
             size_t /*transferred*/) mutable
         {
-            qDebug() << "post response sent" << error;
             m_responseBuffer.clear();
             if (readError != SystemError::noError)
                 return completionHandler(readError, std::move(userHandler));
