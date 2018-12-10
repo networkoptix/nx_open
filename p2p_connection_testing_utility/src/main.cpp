@@ -632,7 +632,10 @@ int main(int argc, const char *argv[])
 {
     prepareConfig(argc, argv);
     if (!validateConfig())
-        return -1;
+    {
+        printHelp();
+        exit(EXIT_FAILURE);
+    }
 
     auto sgGuard = std::make_unique<SocketGlobalsHolder>(0);
     ConnectionPool connectionPool;
