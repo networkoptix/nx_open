@@ -247,6 +247,27 @@ QUrl Url::toQUrl() const
     return m_url;
 }
 
+Url Url::fromStringPersistingScheme(const QString &url)
+{
+    Url result;
+
+    // Checking if it is just a hostname.
+    result.setHost(url, QUrl::StrictMode);
+    if (result.isValid())
+        return result;
+
+    // Checing if it hostname with a port (and possibly password and username).
+    result.clear();
+    result.setAuthority(url, QUrl::StrictMode);
+    if (result.isValid() && !result.host().isEmpty())
+        return result;
+
+    // All other cases.
+    result.clear();
+    result.setUrl(url, QUrl::StrictMode);
+    return result;
+}
+
 Url Url::fromQUrl(const QUrl& url)
 {
     return Url(url);
