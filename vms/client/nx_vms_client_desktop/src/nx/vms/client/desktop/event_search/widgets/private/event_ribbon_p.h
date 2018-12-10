@@ -21,7 +21,7 @@
 #include <nx/utils/interval.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 
 class QScrollBar;
 class QVariantAnimation;
@@ -137,7 +137,7 @@ private:
         int position = 0;
         Importance importance = Importance();
         bool animated = false;
-        std::unique_ptr<CameraThumbnailProvider> preview;
+        std::unique_ptr<ResourceThumbnailProvider> preview;
         std::unique_ptr<EventTile> widget;
     };
 

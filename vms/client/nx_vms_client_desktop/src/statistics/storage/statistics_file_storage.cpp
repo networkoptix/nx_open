@@ -22,8 +22,7 @@ namespace
 
         if (!nx::utils::file_system::ensureDir(dir))
         {
-            NX_WARNING(nx::utils::log::Tag(QStringLiteral("Statistics")),
-                lm("Unable to create directory %1").arg(dir));
+            NX_WARNING(typeid(QnStatisticsFileStorage), "Unable to create directory %1", dir);
             return QDir();
         }
 

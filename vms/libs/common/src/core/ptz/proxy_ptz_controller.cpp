@@ -218,22 +218,22 @@ bool QnProxyPtzController::getHomeObject(QnPtzObject* homeObject) const
         : false;
 }
 
-bool QnProxyPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool QnProxyPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const nx::core::ptz::Options& options) const
 {
     return m_controller
-        ? m_controller->getAuxilaryTraits(auxilaryTraits, options)
+        ? m_controller->getAuxiliaryTraits(auxiliaryTraits, options)
         : false;
 }
 
-bool QnProxyPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool QnProxyPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
     return m_controller
-        ? m_controller->runAuxilaryCommand(trait, data, options)
+        ? m_controller->runAuxiliaryCommand(trait, data, options)
         : false;
 }
 

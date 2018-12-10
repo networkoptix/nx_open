@@ -29,7 +29,6 @@
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/activity_listener_instrument.h>
-#include <ui/graphics/instruments/fps_counting_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
@@ -71,6 +70,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/ui/workbench/panels/special_layout_panel.h>
+#include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
 
 #include <utils/common/event_processors.h>
 
@@ -78,7 +78,8 @@
 //#define QN_DEBUG_WIDGET
 #endif
 
-using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::client::desktop;
+using namespace ui;
 
 namespace {
 
@@ -122,8 +123,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Install and configure instruments. */
 
     // In profiler mode calculate fps 10 times more precisely.
-    const int kFpsUpdatePeriod = qnRuntime->isProfilerMode() ? 10000 : 1000;
-    m_fpsCountingInstrument = new FpsCountingInstrument(kFpsUpdatePeriod, this);
+    m_fpsCountingInstrument = new DebugInfoInstrument(this);
 
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
@@ -132,21 +132,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this, &QnWorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this, &QnWorkbenchUi::at_activityStarted);
-    connect(m_fpsCountingInstrument, &FpsCountingInstrument::fpsChanged, this,
-        [this](qreal fps, qint64 frameTimeMs)
+    connect(m_fpsCountingInstrument, &DebugInfoInstrument::debugInfoChanged, this,
+        [this](const QString& text)
         {
-            if (qnRuntime->isProfilerMode())
-            {
-                QString fmt = lit("%1 (%2ms)");
-                m_fpsItem->setText(fmt
-                    .arg(QString::number(fps, 'g', 4))
-                    .arg(frameTimeMs));
-            }
-            else
-            {
-                m_fpsItem->setText(QString::number(fps, 'g', 4));
-            }
-
+            m_fpsItem->setText(text);
             m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
         });
 

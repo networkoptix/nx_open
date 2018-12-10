@@ -7,5 +7,5 @@ if(TARGET festival_libs)
 endif()
 
 if(NOT enable_hanwha)
-    nx_exclude_sources_from_target(nx_vms_server_ut src/nx/mediaserver_core/plugins/hanwha)
+    nx_exclude_sources_from_target(nx_vms_server_ut src/plugins/resource/hanwha)
 endif()

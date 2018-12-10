@@ -197,7 +197,7 @@ void EventSearchWidget::Private::setupTypeSelection()
 }
 
 QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& title,
-    EventType type, const QString& subType, bool dynamicTitle)
+    EventType type, const QString& /*subType*/, bool dynamicTitle)
 {
     auto action = menu->addAction(title);
     QObject::connect(action, &QAction::triggered, q,

@@ -16,7 +16,7 @@
 #include <nx/utils/std/optional.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaPtzController: public QnBasicPtzController
@@ -33,7 +33,7 @@ public:
 
     void setPtzCapabilities(const HanwhaPtzCapabilitiesMap& capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
-    void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
+    void setPtzTraits(const QnPtzAuxiliaryTraitList& traits);
     void setPtzRanges(const HanwhaPtzRangeMap& ranges);
 
     virtual bool continuousMove(
@@ -84,12 +84,12 @@ public:
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool getPresets(QnPtzPresetList* presets) const override;
 
-    virtual bool getAuxilaryTraits(
-        QnPtzAuxilaryTraitList* auxilaryTraits,
+    virtual bool getAuxiliaryTraits(
+        QnPtzAuxiliaryTraitList* auxiliaryTraits,
         const nx::core::ptz::Options& options) const override;
 
-    virtual bool runAuxilaryCommand(
-        const QnPtzAuxilaryTrait& trait,
+    virtual bool runAuxiliaryCommand(
+        const QnPtzAuxiliaryTrait& trait,
         const QString& data,
         const nx::core::ptz::Options& options) override;
 
@@ -113,12 +113,13 @@ private:
 
     bool useNormalizedSpeed() const;
 
+    QString makeWarningMessage(const QString& text) const;
 private:
     mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;
     HanwhaPtzCapabilitiesMap m_ptzCapabilities;
     QnPtzLimits m_ptzLimits;
-    QnPtzAuxilaryTraitList m_ptzTraits;
+    QnPtzAuxiliaryTraitList m_ptzTraits;
     HanwhaPtzRangeMap m_ptzRanges;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
     QMap<QString, float> m_lastParamValue;
@@ -126,5 +127,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

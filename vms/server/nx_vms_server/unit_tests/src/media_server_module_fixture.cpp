@@ -6,7 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <recorder/storage_manager.h>
 #include <platform/platform_abstraction.h>
-#include <nx/mediaserver/command_line_parameters.h>
+#include <nx/vms/server/command_line_parameters.h>
 
 MediaServerModuleFixture::MediaServerModuleFixture():
     nx::utils::test::TestWithTemporaryDirectory("MediaServerModuleTest", QString())
@@ -27,7 +27,7 @@ void MediaServerModuleFixture::SetUp()
     ASSERT_TRUE(iniFile.is_open());
     iniFile << "dataDir = " << testDataDir().toStdString() << std::endl;
     iniFile.close();
-    nx::mediaserver::CmdLineArguments arguments(QCoreApplication::arguments());
+    nx::vms::server::CmdLineArguments arguments(QCoreApplication::arguments());
     arguments.configFilePath = confFilePath;
     m_serverModule = std::make_unique<QnMediaServerModule>(&arguments);
 

@@ -15,7 +15,7 @@
 #include <common/common_module_aware.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 class AuditManagerTest;

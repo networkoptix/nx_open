@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -55,7 +55,7 @@ void HanwhaPtzController::setPtzLimits(const QnPtzLimits& limits)
     m_presetManager->setMaxPresetNumber(limits.maxPresetNumber);
 }
 
-void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
+void HanwhaPtzController::setPtzTraits(const QnPtzAuxiliaryTraitList& traits)
 {
     m_ptzTraits = traits;
 }
@@ -152,11 +152,8 @@ bool HanwhaPtzController::absoluteMove(
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Absolute movement - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Absolute movement"));
+        return false;
     }
 
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -166,7 +163,7 @@ bool HanwhaPtzController::absoluteMove(
     const auto hanwhaPosition = toHanwhaPosition(position);
 
     const auto response = helper.control(
-        lit("ptzcontrol/absolute"),
+        "ptzcontrol/absolute",
         {
             {kHanwhaChannelProperty, channel()},
             {kHanwhaPanProperty, QString::number(hanwhaPosition.pan)},
@@ -183,12 +180,7 @@ bool HanwhaPtzController::relativeMove(
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Relative movement - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
-
+        NX_WARNING(this, makeWarningMessage("Relative movement"));
         return false;
     }
 
@@ -229,11 +221,8 @@ bool HanwhaPtzController::viewportMove(
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Viewport movement - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Viewport movement"));
+        return false;
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
@@ -251,11 +240,8 @@ bool HanwhaPtzController::getPosition(
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Getting current position - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Getting current position"));
+        return false;
     }
 
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -300,11 +286,8 @@ bool HanwhaPtzController::getLimits(
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Getting limits - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Getting limits"));
+        return false;
     }
 
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -320,11 +303,8 @@ bool HanwhaPtzController::getFlip(
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Getting flip - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Getting flip"));
+        return false;
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
@@ -375,44 +355,38 @@ bool HanwhaPtzController::getPresets(QnPtzPresetList* presets) const
     return m_presetManager->presets(presets);
 }
 
-bool HanwhaPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool HanwhaPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const nx::core::ptz::Options& options) const
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Getting auxilary traits - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Getting auxiliary traits"));
+        return false;
     }
 
-    *auxilaryTraits = m_ptzTraits;
+    *auxiliaryTraits = m_ptzTraits;
     return true;
 }
 
-bool HanwhaPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool HanwhaPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Running auxiliary command - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
-                .args(resource()->getName(), resource()->getId()));
+        NX_WARNING(this, makeWarningMessage("Running auxiliary command"));
+        return false;
     }
 
-    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, core::ptz::Type::operational))
+    if (!hasAnyCapability(Ptz::AuxiliaryPtzCapability, core::ptz::Type::operational))
         return false;
 
     if (trait.standardTrait() != Ptz::ManualAutoFocusPtzTrait)
         return false;
 
-    const auto focusMode = m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait))
+    const auto focusMode = m_ptzTraits.contains(QnPtzAuxiliaryTrait(kHanwhaSimpleFocusTrait))
         ? lit("SimpleFocus")
         : lit("AutoFocus");
 
@@ -558,6 +532,7 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
     const QRectF rect) const
 {
     std::map<QString, QString> result;
+    result.emplace(kHanwhaChannelProperty, channel());
 
     if (rect.width() > 1 || rect.height() > 1)
     {
@@ -646,11 +621,18 @@ bool HanwhaPtzController::useNormalizedSpeed() const
     auto resData = m_hanwhaResource->resourceData();
     bool normilizedSpeedDisabled = resData.value<bool>(lit("disableNormalizedSpeed"), false);
 
-    return m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait))
+    return m_ptzTraits.contains(QnPtzAuxiliaryTrait(kHanwhaNormalizedSpeedPtzTrait))
         && ini().allowNormalizedPtzSpeed
         && !normilizedSpeedDisabled;
 }
 
+QString HanwhaPtzController::makeWarningMessage(const QString& text) const
+{
+    static const QString kWarningMessagePattern(
+        "%1 - wrong PTZ type. Only operational PTZ is supported. Resource %2 (%3)");
+    return kWarningMessagePattern.arg(text, resource()->getName(), resource()->getId().toString());
+}
+
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

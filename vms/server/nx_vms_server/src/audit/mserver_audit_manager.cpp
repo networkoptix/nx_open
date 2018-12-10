@@ -32,7 +32,7 @@ QnAuditRecord filteredRecord(QnAuditRecord record)
 
 QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
 :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_internalId(-1)
 {
     const auto maxTime =

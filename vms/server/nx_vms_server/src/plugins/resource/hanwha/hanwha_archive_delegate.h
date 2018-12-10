@@ -4,12 +4,12 @@
 #include <recording/time_period_list.h>
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnMediaServerModule;
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaStreamReader;
@@ -72,5 +72,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

@@ -35,10 +35,10 @@ public:
      *    values in the response depending on the other parameter states. Some cameras also
      *    permit to change some parameters only if their dependencies are in a certain state.
      *    Those parameters can implicitly change their values or implicitly become
-     *    enabled/disabled. Because of that, server has to send all the values of all the
+     *    enabled/disabled. Because of that, the Server has to send all the values of all the
      *    parameters regardless of the parameter requested to change.
      *
-     *    It's a pretty expensive opertaion, so it's enabled only for certain cameras. Packet mode
+     *    It's a pretty expensive operation, so it's enabled only for certain cameras. Packet mode
      *    is quite similar to the `resync` property of QnCameraAdvancedParameter, the difference
      *    is `resync` is applied to particular parameters and requires additional request to the
      *    server while packet mode implies that the server always sends all the parameter values

@@ -30,7 +30,12 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher(
     connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(
         m_commonModule->globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
-        this, &QnConnectToCloudWatcher::at_updateConnection);
+        this, [this]()
+        {
+            if (!m_cloudUrl.isEmpty())
+                m_ec2CloudConnector->stopDataSynchronization(); //< Sop connection with old parameters if exists.
+            at_updateConnection();
+        });
     connect(
         m_commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
         this, &QnConnectToCloudWatcher::at_updateConnection);

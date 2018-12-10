@@ -65,7 +65,7 @@ Engine::SharedResources::SharedResources(
     const QAuthenticator& auth)
     :
     monitor(std::make_unique<MetadataMonitor>(engineManifest, url, auth)),
-    sharedContext(std::make_shared<mediaserver_core::plugins::HanwhaSharedResourceContext>(
+    sharedContext(std::make_shared<vms::server::plugins::HanwhaSharedResourceContext>(
         sharedId))
 {
     sharedContext->setResourceAccess(url, auth);
@@ -170,7 +170,7 @@ void Engine::executeAction(Action* action, Error* outError)
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     const DeviceInfo& deviceInfo)
 {
-    using namespace nx::mediaserver_core::plugins;
+    using namespace nx::vms::server::plugins;
 
     auto sharedRes = sharedResources(deviceInfo);
 
@@ -192,8 +192,8 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
 
 boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
-    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
-    const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
+    const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
+    const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
     int channel) const
 {
     if (!parameters.isValid())

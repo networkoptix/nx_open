@@ -30,7 +30,7 @@
 
 using namespace nx::plugins;
 using namespace nx::plugins::onvif;
-using namespace nx::mediaserver_core::plugins;
+using namespace nx::vms::server::plugins;
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -86,7 +86,7 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
 }
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
 {

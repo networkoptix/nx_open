@@ -7,7 +7,7 @@
 #include <core/dataconsumer/audio_data_transmitter.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class OnvifAudioTransmitter: public QnAbstractAudioTransmitter
@@ -41,5 +41,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

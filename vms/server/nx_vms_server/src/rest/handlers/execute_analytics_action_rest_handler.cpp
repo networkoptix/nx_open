@@ -5,23 +5,23 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/analytics/manager.h>
-#include <nx/mediaserver/resource/analytics_engine_resource.h>
-#include <nx/mediaserver/resource/analytics_plugin_resource.h>
-#include <nx/mediaserver/sdk_support/utils.h>
-#include <nx/mediaserver/sdk_support/pointers.h>
+#include <nx/vms/server/analytics/manager.h>
+#include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/analytics_plugin_resource.h>
+#include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
-#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/settings.h>
 
 #include <plugins/settings.h>
 #include <plugins/plugin_tools.h>
 
-using namespace nx::mediaserver;
+using namespace nx::vms::server;
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -32,7 +32,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    using namespace nx::mediaserver;
+    using namespace nx::vms::server;
     bool success = false;
     const auto actionData =
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
@@ -102,7 +102,7 @@ public:
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
         m_params(
-            nx::mediaserver::sdk_support::toSdkSettings(actionData.params)),
+            nx::vms::server::sdk_support::toSdkSettings(actionData.params)),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
@@ -137,7 +137,7 @@ private:
     nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::mediaserver::sdk_support::UniquePtr<nx::sdk::Settings> m_params;
+    const nx::vms::server::sdk_support::UniquePtr<nx::sdk::Settings> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };

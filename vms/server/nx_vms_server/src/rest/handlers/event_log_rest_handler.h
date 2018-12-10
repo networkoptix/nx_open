@@ -1,11 +1,11 @@
 #pragma once
 
 #include <rest/server/request_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnEventLogRestHandler: 
     public QnRestRequestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

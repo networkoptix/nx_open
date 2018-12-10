@@ -21,7 +21,7 @@
 #include "plugin_api.h"
 
 // TODO: #mshevchenko: Split into GUID tools (e.g. nx::sdk::common::Guid) and ref-counting class
-// (e.g. nx::sdk::common::Object), merging nx/mediaserver/sdk_support/utils.h with the latter.
+// (e.g. nx::sdk::common::Object), merging nx/vms/server/sdk_support/utils.h with the latter.
 namespace nxpt {
 
 /**

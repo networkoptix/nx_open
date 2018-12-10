@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/fusion//model_functions.h>
 
@@ -29,7 +29,7 @@ static QnAbstractMediaDataPtr createMetadataPacket()
 }
 
 CLServerPushStreamReader::CLServerPushStreamReader(
-    const nx::mediaserver::resource::CameraPtr& dev)
+    const nx::vms::server::resource::CameraPtr& dev)
     :
     QnLiveStreamProvider(dev),
     m_camera(dev)

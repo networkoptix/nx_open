@@ -322,7 +322,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( nx::network::rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             nx::streaming::rtp::TimeOffsetPtr timeOffset;
-            if (auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>())
+            if (auto camera = m_resource.dynamicCast<nx::vms::server::resource::Camera>())
                 timeOffset = camera->getTimeOffset();
 
             QnMulticodecRtpReader* rtspStreamReader =

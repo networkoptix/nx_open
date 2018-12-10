@@ -20,7 +20,7 @@
 const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     Qn::directConnect(
         this, &QnResource::propertyChanged,
@@ -40,11 +40,11 @@ QString QnAdamResource::getDriverName() const
     return kManufacture;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
@@ -233,7 +233,7 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString&
         auto ports = ioPortDescriptions();
         setPortDefaultStates();
         setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
-        saveProperties();
+        savePropertiesAsync();
     }
 }
 

@@ -41,7 +41,7 @@ public:
         std::chrono::microseconds currentTime,
         uint32_t rtpTime,
         const RtcpSenderReport& senderReport,
-        std::optional<std::chrono::microseconds> onvifTime,
+        const std::optional<std::chrono::microseconds>& onvifTime,
         int rtpFrequency,
         bool isPrimaryStream);
 
@@ -61,7 +61,7 @@ private:
     std::chrono::microseconds getCameraTimestamp(
         uint32_t rtpTime,
         const RtcpSenderReport& senderReport,
-        std::optional<std::chrono::microseconds> onvifTime,
+        const std::optional<std::chrono::microseconds>& onvifTime,
         int frequency);
 private:
     TimeOffsetPtr m_primaryOffset;

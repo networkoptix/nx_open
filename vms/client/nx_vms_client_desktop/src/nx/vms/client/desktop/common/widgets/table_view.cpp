@@ -15,9 +15,12 @@ TableView::TableView(QWidget* parent):
     base_type(parent),
     m_tracker(new ItemViewHoverTracker(this))
 {
-    /* Make the defaults consistent with QTreeView: */
+    // Make the defaults consistent with QTreeView:
     horizontalHeader()->setHighlightSections(false);
     verticalHeader()->setHighlightSections(false);
+
+    // By default, text in headers should be aligned by the left border
+    horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 }
 
 QSize TableView::viewportSizeHint() const

@@ -67,7 +67,7 @@ OnvifResourceSearcher::OnvifResourceSearcher(QnMediaServerModule* serverModule)
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_informationFetcher(new OnvifResourceInformationFetcher(serverModule)),
     m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {
@@ -188,7 +188,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
     // TODO: Move out to some helper class, to remove direct link to hikvision.
     if (isSearchAction)
     {
-        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
+        nx::vms::server::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
             deviceUrl,
             auth);
     }

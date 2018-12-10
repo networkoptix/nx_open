@@ -9,7 +9,7 @@
 #include "api/app_server_connection.h"
 #include "mutex/distributed_mutex.h"
 #include <common/common_module_aware.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace ec2 {
     class QnMutexCameraDataHandler;
@@ -20,7 +20,7 @@ namespace ec2 {
 class QnAppserverResourceProcessor:
     public QObject,
     public QnResourceProcessor,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

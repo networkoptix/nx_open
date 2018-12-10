@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <gtest/gtest.h>
-#include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
-#include <nx/mediaserver/fs/media_paths/media_paths.h>
+#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
+#include <nx/vms/server/fs/media_paths/media_paths.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace fs {
 namespace media_paths {
 namespace detail {
@@ -261,5 +261,5 @@ TEST_F(Filter, Linux_allAllowed_noMultipleInstances)
 } // namespace detail
 } // namespace media_paths
 } // namespace fs
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

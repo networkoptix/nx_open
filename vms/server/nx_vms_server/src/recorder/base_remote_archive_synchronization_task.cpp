@@ -10,10 +10,10 @@
 #include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 namespace {
@@ -507,5 +507,5 @@ BaseRemoteArchiveSynchronizationTask::remoteArchiveChunkByTimePeriod(
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

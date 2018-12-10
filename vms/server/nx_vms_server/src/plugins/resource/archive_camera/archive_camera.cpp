@@ -5,7 +5,7 @@ const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
     setDiscoveryMode(DiscoveryMode::disabled);
 }
@@ -33,7 +33,7 @@ QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const nx::utils
 }
 
 QnArchiveCamResource::QnArchiveCamResource(QnMediaServerModule* serverModule, const QnResourceParams& params):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setId(params.resID);
     setUrl(params.url);
@@ -63,11 +63,11 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnArchiveCamResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnArchiveCamResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnArchiveCamResource::initializeCameraDriver()

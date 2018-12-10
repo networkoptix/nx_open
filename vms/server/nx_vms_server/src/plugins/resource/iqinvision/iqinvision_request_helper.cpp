@@ -10,7 +10,7 @@
 #include "iqinvision_resource.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -136,5 +136,5 @@ QString IqInvisionResponse::toString() const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

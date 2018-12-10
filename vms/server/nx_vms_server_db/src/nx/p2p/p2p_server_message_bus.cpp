@@ -391,7 +391,21 @@ void ServerMessageBus::stop()
 
 void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
-    auto data = serializeSubscribeAllRequest(m_db->transactionLog()->getTransactionsState());
+    const auto& state = m_db->transactionLog()->getTransactionsState();
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+    {
+        QVector<vms::api::PersistentIdData> data;
+        QVector<qint32> indexes;
+        for (auto itr = state.values.cbegin(); itr != state.values.cend(); ++itr)
+        {
+            data << itr.key();
+            indexes << itr.value();
+        }
+        printSubscribeMessage(
+            connection->remotePeer().id, data, indexes);
+    }
+
+    auto data = serializeSubscribeAllRequest(state);
     data.data()[0] = (quint8)MessageType::subscribeAll;
     connection->sendMessage(data);
     context(connection)->isLocalStarted = true;
@@ -733,8 +747,20 @@ void ServerMessageBus::gotTransaction(
             dbTran->commit();
             m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
             proxyFillerTransaction(tran, transportHeader);
+
+            NX_VERBOSE(this,
+                lit("Skip transaction because of timestamp: %1, seq: %2, timestamp: %3")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(tran.persistentInfo.sequence)
+                    .arg(tran.persistentInfo.timestamp.toString()));
             return;
         case ErrorCode::containsBecauseSequence:
+
+            NX_VERBOSE(this,
+                lit("Skip transaction because of sequence: %1, seq: %2, timestamp: %3")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(tran.persistentInfo.sequence)
+                    .arg(tran.persistentInfo.timestamp.toString()));
             dbTran->commit();
             return; // do not proxy if transaction already exists
         default:

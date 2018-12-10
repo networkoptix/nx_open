@@ -13,7 +13,7 @@ CloudIntegrationManager::CloudIntegrationManager(
     ::ec2::AbstractTransactionMessageBus* transactionMessageBus,
     nx::vms::auth::AbstractNonceProvider* defaultNonceFetcher)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_cloudConnector(transactionMessageBus),
     m_cloudManagerGroup(
         serverModule->commonModule(),

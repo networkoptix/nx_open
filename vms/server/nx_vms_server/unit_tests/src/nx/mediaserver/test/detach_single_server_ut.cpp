@@ -20,7 +20,7 @@
 #include <test_support/utils.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2Process>;
@@ -172,5 +172,5 @@ TEST_F(DetachSingleServerTest, main)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

@@ -95,14 +95,14 @@ struct TasksQueueInfo {
 const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 } // namespace <anonymous>
-class ArchiveScanPosition: public nx::mediaserver::ServerModuleAware
+class ArchiveScanPosition: public nx::vms::server::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
         QnMediaServerModule* serverModule,
         QnServer::StoragePool role)
         :
-        nx::mediaserver::ServerModuleAware(serverModule),
+        nx::vms::server::ServerModuleAware(serverModule),
         m_role(role),
         m_catalog(QnServer::LowQualityCatalog)
     {}
@@ -114,7 +114,7 @@ public:
         QnServer::ChunksCatalog     catalog,
         const QString               &cameraUniqueId)
         :
-        nx::mediaserver::ServerModuleAware(serverModule),
+        nx::vms::server::ServerModuleAware(serverModule),
         m_role(role),
         m_storagePath(storage->getUrl()),
         m_catalog(catalog),
@@ -407,7 +407,7 @@ public:
 class TestStorageThread: public QnLongRunnable
 {
 public:
-    TestStorageThread(QnStorageManager* owner, const nx::mediaserver::Settings* settings):
+    TestStorageThread(QnStorageManager* owner, const nx::vms::server::Settings* settings):
         m_owner(owner),
         m_settings(settings)
     {}
@@ -448,7 +448,7 @@ public:
 
 private:
     QnStorageManager* m_owner = nullptr;
-    const nx::mediaserver::Settings* m_settings = nullptr;
+    const nx::vms::server::Settings* m_settings = nullptr;
 
     QnStorageResourceList storagesToTest()
     {
@@ -485,7 +485,7 @@ QnStorageManager::QnStorageManager(
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
     QnServer::StoragePool role)
 :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_analyticsEventsStorage(analyticsEventsStorage),
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
@@ -1393,7 +1393,7 @@ void QnStorageManager::getRecordedPeriodsInternal(
             QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
             if (!catalogs.contains(catalog))
                 continue;
-            auto serverCamera = camera.dynamicCast<nx::mediaserver::resource::Camera>();
+            auto serverCamera = camera.dynamicCast<nx::vms::server::resource::Camera>();
             if (serverCamera && serverCamera->isDtsBased())
             {
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method

@@ -408,12 +408,8 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     if (!hasPermission && !widget)
         return;
 
-    ExportSettingsDialog dialog(
-            period,
-            QnCameraBookmark(),
-            d->fileNameValidator(),
+    ExportSettingsDialog dialog(period, QnCameraBookmark(), d->fileNameValidator(), watermark(),
             mainWindowWidget());
-    setWatermark(&dialog); //< This should go right after constructor.
 
     if (!hasPermission)
     {
@@ -472,8 +468,8 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
         return;
 
     const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
-    ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), mainWindowWidget());
-    setWatermark(&dialog); //< This should go right after constructor.
+    ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), watermark(),
+        mainWindowWidget());
 
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
     dialog.setMediaParams(camera, itemData, context());
@@ -499,8 +495,8 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
 
     const auto boundingPeriod = periods.boundingPeriod();
 
-    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), mainWindowWidget());
-    setWatermark(&dialog); //< This should go right after constructor.
+    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), watermark(),
+        mainWindowWidget());
 
     static const QString reason =
         tr("Several bookmarks can be exported as layout only.");
@@ -612,19 +608,6 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     }
 
     return std::make_pair(exportId, std::move(tool));
-}
-
-void WorkbenchExportHandler::setWatermark(nx::vms::client::desktop::ExportSettingsDialog* dialog)
-{
-    if (ini().enableWatermark)
-    {
-        if (globalSettings()->watermarkSettings().useWatermark
-            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
-            && context()->user() && !context()->user()->getName().isEmpty())
-        {
-            dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});
-        }
-    }
 }
 
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()

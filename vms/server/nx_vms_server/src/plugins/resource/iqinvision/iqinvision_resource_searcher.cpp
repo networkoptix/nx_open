@@ -86,7 +86,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.
 
-    using namespace nx::mediaserver_core;
+    using namespace nx::vms::server;
 
     nx::utils::Url iqEyeUrl(url);
     iqEyeUrl.setScheme(QString::fromLatin1(nx::network::http::kUrlSchemeName));

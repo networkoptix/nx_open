@@ -4,7 +4,7 @@
 #include <nx/utils/log/assert.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 bool HanwhaCgiParameter::isValid() const
@@ -211,5 +211,5 @@ bool HanwhaCgiParameter::isValueSupported(const QString& parameterValue) const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

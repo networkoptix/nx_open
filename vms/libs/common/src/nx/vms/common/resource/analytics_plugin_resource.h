@@ -10,6 +10,10 @@
 
 namespace nx::vms::common {
 
+/**
+ * VMS Resource corresponding to an Analytics Plugin which has been loaded at least once by any
+ * Server in the System.
+ */
 class AnalyticsPluginResource: public QnResource
 {
     using base_type = QnResource;
