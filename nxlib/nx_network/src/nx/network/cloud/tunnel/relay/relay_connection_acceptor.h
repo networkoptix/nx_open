@@ -86,6 +86,8 @@ private:
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
 
+    void updateAcceptorConfiguration(const detail::ReverseConnection& newConnection);
+
     std::unique_ptr<detail::ReverseConnection> reverseConnectionFactoryFunc();
 
     std::unique_ptr<AbstractStreamSocket> toStreamSocket(

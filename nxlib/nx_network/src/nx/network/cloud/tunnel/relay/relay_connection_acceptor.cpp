@@ -174,6 +174,9 @@ ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
     m_acceptor([this](auto&&... args) { return reverseConnectionFactoryFunc(std::move(args)...); })
 {
     bindToAioThread(getAioThread());
+
+    m_acceptor.setOnConnectionEstablished(
+        [this](auto&&... args) { updateAcceptorConfiguration(std::move(args)...); });
 }
 
 void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -227,6 +230,13 @@ std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::getNextSocketIfAny()
 void ConnectionAcceptor::stopWhileInAioThread()
 {
     m_acceptor.pleaseStopSync();
+}
+
+void ConnectionAcceptor::updateAcceptorConfiguration(
+    const detail::ReverseConnection& newConnection)
+{
+    m_acceptor.setPreemptiveConnectionCount(
+        newConnection.beginListeningResponse().preemptiveConnectionCount);
 }
 
 std::unique_ptr<detail::ReverseConnection>

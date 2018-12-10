@@ -62,6 +62,11 @@ protected:
         m_relayServerUrl.setUserName("server1.system1");
     }
 
+    void setRelayToReportPreemptiveConnectionCount(int count)
+    {
+        m_beginListeningResponse.preemptiveConnectionCount = count;
+    }
+
     nx::utils::Url relayServerUrl() const
     {
         return m_relayServerUrl;
@@ -438,11 +443,27 @@ protected:
             [this](auto&&... args) { onAccepted(std::move(args)...); });
     }
 
+    void whenRelayClosesConnectionsNumberOf(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_listeningPeerConnectionsToRelay.pop();
+    }
+
     void thenAcceptorIsRegisteredOnRelay()
     {
         auto connection = m_listeningPeerConnectionsToRelay.pop();
         ASSERT_NE(nullptr, connection.get());
         connection->pleaseStopSync();
+    }
+
+    void thenAcceptorKeepsEstablishedConnectionCountOf(int count)
+    {
+        while (m_listeningPeerConnectionsToRelay.size() < count)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+        // Ensuring peer does not establish more connections.
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_EQ(count, m_listeningPeerConnectionsToRelay.size());
     }
 
 private:
@@ -459,6 +480,19 @@ TEST_F(RelayConnectionAcceptor, registers_on_relay)
 {
     whenStartedAccepting();
     thenAcceptorIsRegisteredOnRelay();
+}
+
+TEST_F(RelayConnectionAcceptor, takes_into_account_preemptive_connection_count)
+{
+    constexpr int kPreemptiveConnectionCount = 2;
+
+    setRelayToReportPreemptiveConnectionCount(kPreemptiveConnectionCount);
+
+    whenStartedAccepting();
+    whenRelayClosesConnectionsNumberOf(
+        api::BeginListeningResponse().preemptiveConnectionCount);
+
+    thenAcceptorKeepsEstablishedConnectionCountOf(kPreemptiveConnectionCount);
 }
 
 } // namespace nx::network::cloud::relay::test
