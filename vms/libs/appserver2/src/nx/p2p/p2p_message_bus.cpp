@@ -352,11 +352,6 @@ bool MessageBus::needStartConnection(
     auto result = currentDistance > m_miscData.maxDistanceToUseProxy
         || (subscribedVia && context(subscribedVia)->localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
 
-    if (!result && peer.id == ::ec2::kCloudPeerId)
-    {
-        NX_WARNING(this, "Skip outgoing connection to the cloud peer because it is already subscribed via another peer. "
-            "Current distance %1, subscribedVia %2", currentDistance, subscribedVia);
-    }
     return result;
 }
 
