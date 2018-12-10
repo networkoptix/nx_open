@@ -45,8 +45,8 @@ private:
 
 private:
     AnalyticsSearchListModel* const m_model;
-    SelectableTextButton* const m_areaSelectionButton;
     SelectableTextButton* const m_typeSelectionButton;
+    SelectableTextButton* const m_areaSelectionButton;
     QMenu* const m_objectTypeMenu;
     QPointer<QAction> m_defaultAction;
     bool m_areaSelectionEnabled = false;
@@ -123,8 +123,8 @@ void AnalyticsSearchWidget::resetFilters()
 AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     q(q),
     m_model(qobject_cast<AnalyticsSearchListModel*>(q->model())),
-    m_areaSelectionButton(q->createCustomFilterButton()),
     m_typeSelectionButton(q->createCustomFilterButton()),
+    m_areaSelectionButton(q->createCustomFilterButton()),
     m_objectTypeMenu(q->createDropdownMenu())
 {
     NX_CRITICAL(m_model);
