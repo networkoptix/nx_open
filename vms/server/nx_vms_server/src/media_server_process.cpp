@@ -1525,11 +1525,14 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
     /**%apidoc GET /api/manualCamera/search
-     * Start searching for the cameras in manual mode.
-     * %param:string start_ip First IP address in the range to scan.
-     * %param[opt]:string end_ip Last IP address in the range to scan.
-     * %param[opt]:integer port Camera(s) IP port to check. Port is auto-detected if this
-     *     parameter is omitted.
+     * Start searching for the cameras in manual mode. There are two ways to call this method:
+     * IP range search and single host search. To scan an IP range "start_ip" and "end_ip" must be
+     * specified. To run a single host search "url" must be specified.
+     * %param[opt]:string url A valid URL, hostname or hostname:port are accepted.
+     * %param[opt]:string start_ip First IP address in the range to scan. Conflicts with 'url'.
+     * %param[opt]:string end_ip Last IP address in the range to scan. Conflicts with 'url'.
+     * %param[opt]:integer port Cameras IP port to check. Port is auto-detected if this
+     *     parameter is omitted. Conflicts with 'url'.
      * %param[opt]:string user Camera(s) username.
      * %param[opt]:string password Camera(s) password.
      * %return:object JSON object with the initial status of camera search process, including

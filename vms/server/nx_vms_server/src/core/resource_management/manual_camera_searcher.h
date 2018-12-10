@@ -23,8 +23,20 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
-    // TODO: Add docs
+    /**
+     * @brief startSearch Tries to find a camera on a host specified by URL.
+     * @param callback Will be called when the search done.
+     * @param url Must contain a host field, other URL fields are optional.
+     */
     void startSearch(SearchDoneCallback callback, nx::utils::Url url);
+
+    /**
+     * @brief startRangeSearch Scans a range of IPv4 addresses and tries to find cameras on online hosts.
+     * @param callback Will be called when the search done.
+     * @param startAddr The begining of the IP range to check. startAddr is checked too.
+     * @param endAddr The end of the IP range to check. endAddr is checked too.
+     * @param baseUrl The URL where host will be substitute by the IP address of the found online hosts.
+     */
     void startRangeSearch(SearchDoneCallback callback,
         nx::network::HostAddress startAddr,
         nx::network::HostAddress endAddr,
