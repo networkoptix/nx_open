@@ -223,7 +223,7 @@ void P2PHttpClientTransport::startReading()
              m_failed = true;
          });
 
-    //m_readHttpClient->doGet(m_url ? *m_url : m_readHttpClient->url());
+    m_readHttpClient->doGet(m_url ? *m_url : m_readHttpClient->url());
 }
 
 P2PHttpClientTransport::PostBodySource::PostBodySource(
