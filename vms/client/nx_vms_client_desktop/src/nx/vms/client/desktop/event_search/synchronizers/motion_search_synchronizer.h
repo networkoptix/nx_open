@@ -20,6 +20,7 @@ public:
 
 private:
     void updateAreaSelection();
+    virtual bool isMediaAccepted(QnMediaResourceWidget* widget) const override;
 
 private:
     const QPointer<SimpleMotionSearchWidget> m_motionSearchWidget;

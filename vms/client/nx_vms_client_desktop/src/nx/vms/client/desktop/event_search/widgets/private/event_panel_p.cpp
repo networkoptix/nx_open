@@ -108,9 +108,6 @@ EventPanel::Private::Private(EventPanel* q):
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &Private::rebuildTabs);
 
-    connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this, &Private::rebuildTabs);
-
     rebuildTabs();
 
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
@@ -188,7 +185,7 @@ void EventPanel::Private::rebuildTabs()
         tr("Notifications", "Notifications tab title"));
 
     updateTab(m_motionTab,
-        resource && resource->hasFlags(Qn::motion),
+        true,
         qnSkin->icon(lit("events/tabs/motion.png")),
         tr("Motion", "Motion tab title"));
 

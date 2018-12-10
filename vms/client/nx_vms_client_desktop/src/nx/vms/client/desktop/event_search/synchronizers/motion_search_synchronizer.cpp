@@ -32,11 +32,8 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
         [this](QnMediaResourceWidget* mediaWidget)
         {
             updateAreaSelection();
-            if (!mediaWidget || !mediaWidget->resource()->toResource()->hasFlags(Qn::motion))
-            {
-                setActive(false);
+            if (!mediaWidget)
                 return;
-            }
 
             mediaWidget->setMotionSearchModeEnabled(active());
 
@@ -71,6 +68,13 @@ void MotionSearchSynchronizer::updateAreaSelection()
     const auto mediaWidget = this->mediaWidget();
     if (mediaWidget && m_motionSearchWidget && active())
         m_motionSearchWidget->setFilterRegions(mediaWidget->motionSelection());
+}
+
+bool MotionSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const
+{
+    return widget && widget->resource()
+        ? widget->resource()->toResource()->hasFlags(Qn::motion)
+        : false;
 }
 
 } // namespace nx::vms::client::desktop
