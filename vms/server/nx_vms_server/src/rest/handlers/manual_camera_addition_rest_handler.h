@@ -39,6 +39,7 @@ private:
         const QnRestConnectionProcessor* owner);
 
     int extractSearchStartParams(
+        QnJsonRestResult& result,
         const QnRequestParams& params,
         nx::utils::Url& url,
         std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>& ipRange);

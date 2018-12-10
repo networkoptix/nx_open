@@ -45,8 +45,8 @@ QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
     }
 }
 
-// TODO: Should return error strings in response instead of printing to log.
 int QnManualCameraAdditionRestHandler::extractSearchStartParams(
+    QnJsonRestResult& result,
     const QnRequestParams& params,
     nx::utils::Url& url,
     std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>& ipRange)
@@ -66,14 +66,16 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
         url = nx::utils::Url::fromText(urlStr);
         if (!url.isValid() || url.host().isEmpty())
         {
-            NX_DEBUG(this, "Invalid value '%1' for parameter '%2'", urlStr, kUrlParam);
+            result.setError(QnRestResult::InvalidParameter,
+                lm("Invalid value '%1' for parameter '%2'").args(urlStr, kUrlParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
         if (!startIpStr.isEmpty() || !endIpStr.isEmpty())
         {
-            NX_DEBUG(this, "Parameter '%1' conflicts with '%2' and '%3' parameters",
-                kUrlParam, kStartIpParam, kEndIpParam);
+            result.setError(QnRestResult::InvalidParameter,
+                lm("Parameter '%1' conflicts with '%2' and '%3' parameters")
+                    .args(kUrlParam, kStartIpParam, kEndIpParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
@@ -88,7 +90,9 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
     {
         if (startIpValue->s_addr >= endIpValue->s_addr)
         {
-            NX_DEBUG(this, lm("Invalid ip range, 'end_ip' must be greater than 'start_ip'"));
+            result.setError(QnRestResult::InvalidParameter,
+                lm("Invalid ip range, '%1' must be greater than '%2'")
+                    .args(kEndIpParam, kStartIpParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
@@ -105,13 +109,14 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
         url = nx::utils::Url::fromText(startIpStr);
         if (!url.isValid() || url.host().isEmpty())
         {
-            NX_DEBUG(this, "Invalid value '%1' for parameter '%2'", startIpStr, kStartIpParam);
+            result.setError(QnRestResult::InvalidParameter,
+                lm("Invalid value '%1' for parameter '%2'").args(startIpStr, kStartIpParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
     }
     else
     {
-        NX_DEBUG(this, "Invalid parameters");
+        result.setError(QnRestResult::InvalidParameter);
         return nx::network::http::StatusCode::unprocessableEntity;
     }
 
@@ -121,7 +126,8 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
         int port = portStr.toUShort(&ok);
         if (!ok)
         {
-            NX_WARNING(this, "Invalid value for parameter '%1'", kPortParam);
+            result.setError(QnRestResult::InvalidParameter, lm("Invalid value for parameter '%1'")
+                .args(kPortParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
         url.setPort(port);
@@ -147,7 +153,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     nx::utils::Url url;
     std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>> ipRange;
 
-    const auto returnCode = extractSearchStartParams(params, url, ipRange);
+    const auto returnCode = extractSearchStartParams(result, params, url, ipRange);
     if (returnCode != nx::network::http::StatusCode::ok)
         return returnCode;
 
@@ -270,14 +276,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     std::vector<QnManualCameraInfo> cameraList;
     for (const auto& camera: data.cameras)
     {
-        nx::utils::Url url(camera.url);
-        if (url.host().isEmpty() && !url.path().isEmpty())
-        {
-            // camera.url is just an IP address or a hostname; QUrl parsed it as path, fixing it.
-            url.setHost(url.path());
-            url.setPath(QByteArray());
-        }
-
+        const auto url = nx::utils::Url::fromText(camera.url);
         QnManualCameraInfo info(url, auth, camera.manufacturer, camera.uniqueId);
         if (info.resType.isNull())
         {

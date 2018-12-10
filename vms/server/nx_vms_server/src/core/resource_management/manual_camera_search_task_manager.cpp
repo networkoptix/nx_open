@@ -52,7 +52,7 @@ void QnManualSearchTaskManager::pleaseStop(nx::utils::MoveOnlyFunc<void()> compl
 
 void QnManualSearchTaskManager::addTask(
     nx::utils::Url url,
-    std::vector<QnAbstractNetworkResourceSearcher *> searchers,
+    std::vector<QnAbstractNetworkResourceSearcher*> searchers,
     bool isSequential)
 {
     using namespace std::placeholders;

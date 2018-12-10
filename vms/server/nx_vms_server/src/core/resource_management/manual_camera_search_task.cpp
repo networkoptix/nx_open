@@ -132,7 +132,7 @@ void QnSearchTask::start()
     QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
-        // Extracting auth data from URL as checkHostAddr handle it separately.
+        // Extracting auth data from URL as checkHostAddr handles it separately.
         QAuthenticator auth;
         auth.setUser(m_url.userName());
         auth.setPassword(m_url.password());
