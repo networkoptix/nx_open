@@ -70,10 +70,10 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
-        if (!startIpStr.isEmpty() || !endIpStr.isEmpty() || !portStr.isEmpty())
+        if (!startIpStr.isEmpty() || !endIpStr.isEmpty())
         {
-            NX_DEBUG(this, "Parameter '%1' conflicts with '%2', '%3' and '%4' parameters",
-                kUrlParam, kStartIpParam, kEndIpParam, kPortParam);
+            NX_DEBUG(this, "Parameter '%1' conflicts with '%2' and '%3' parameters",
+                kUrlParam, kStartIpParam, kEndIpParam);
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
