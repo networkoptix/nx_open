@@ -54,10 +54,11 @@ class ReverseConnectionAcceptor:
     using base_type = aio::BasicPollable;
 
 public:
-    using AcceptCompletionHandler =
-        nx::utils::MoveOnlyFunc<
-            void(SystemError::ErrorCode,
-                std::unique_ptr<AcceptableReverseConnection>)>;
+    using AcceptCompletionHandler = nx::utils::MoveOnlyFunc<
+        void(SystemError::ErrorCode, std::unique_ptr<AcceptableReverseConnection>)>;
+
+    using OnConnectionEstablished = nx::utils::MoveOnlyFunc<
+        void(const AcceptableReverseConnection& connection)>;
 
     using ConnectionFactoryFunc =
         nx::utils::MoveOnlyFunc<std::unique_ptr<AcceptableReverseConnection>()>;
@@ -134,21 +135,7 @@ public:
 
     void cancelIOSync()
     {
-        if (isInSelfAioThread())
-        {
-            cancelIoWhileInOwnAioThread();
-        }
-        else
-        {
-            nx::utils::promise<void> done;
-            post(
-                [this, &done]()
-                {
-                    cancelIoWhileInOwnAioThread();
-                    done.set_value();
-                });
-            done.get_future().wait();
-        }
+        executeInAioThreadSync([this]() { cancelIoWhileInOwnAioThread(); });
     }
 
     /**
@@ -169,6 +156,12 @@ public:
 
         startAcceptingAnotherConnectionIfAppropriate();
         return connectionToReturn;
+    }
+
+    void setOnConnectionEstablished(
+        OnConnectionEstablished handler)
+    {
+        m_onConnectionEstablished = std::move(handler);
     }
 
 protected:
@@ -209,6 +202,7 @@ private:
     ConnectionFactoryFunc m_connectionFactory;
     Connections m_connections;
     AcceptCompletionHandler m_acceptHandler;
+    OnConnectionEstablished m_onConnectionEstablished;
     std::deque<std::unique_ptr<AcceptableReverseConnection>> m_acceptedConnections;
     std::size_t m_preemptiveConnectionCount = kDefaultPreemptiveConnectionCount;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
@@ -246,6 +240,9 @@ private:
         }
 
         connectionIter->state = ConnectionState::connected;
+
+        if (m_onConnectionEstablished)
+            m_onConnectionEstablished(*connectionIter->connection);
 
         if (m_acceptedConnections.size() + connectionsBeingAcceptedCount() >=
             m_maxReadyConnectionCount)
