@@ -284,12 +284,7 @@ static ConnectionPool* connectionPoolInstance;
 class P2PConnectionAcceptor
 {
 public:
-    P2PConnectionAcceptor(
-        aio::AbstractAioThread* aioThread,
-        std::function<void(P2PConnectionPtr)> userCompletionHandler)
-        :
-        m_userCompletionHandler(userCompletionHandler),
-        m_aioThread(aioThread)
+    P2PConnectionAcceptor(aio::AbstractAioThread* aioThread): m_aioThread(aioThread)
     {
         m_httpServer.bindToAioThread(aioThread);
         m_httpServer.registerRequestProcessorFunc(
@@ -312,7 +307,7 @@ public:
                     std::unique_ptr<AbstractStreamSocket> socket;
                     http::HttpHeaders headers;
                     int iterations = 0;
-                    nx::utils::MoveOnlyFunc<void()> apply = nullptr;
+                    nx::utils::MoveOnlyFunc<void()> checkForPairFunc = nullptr;
                     nx::Buffer body;
                 };
 
@@ -350,7 +345,7 @@ public:
                                     std::chrono::milliseconds(100),
                                     [sharedContext, this]
                                     {
-                                        sharedContext->apply();
+                                        sharedContext->checkForPairFunc();
                                     });
                                 return;
                             }
@@ -366,20 +361,22 @@ public:
                             sharedContext->body);
                     };
 
-                sharedContext->apply = std::move(checkForPairConnection);
+                sharedContext->checkForPairFunc = std::move(checkForPairConnection);
 
                 config.aioTimer->start(
                     std::chrono::milliseconds(100),
                     [sharedContext, this]
                     {
-                        sharedContext->apply();
+                        sharedContext->checkForPairFunc();
                     });
 
             }, http::Method::post);
     }
 
-    bool startListening()
+    bool startAccepting(std::function<void(P2PConnectionPtr)> userCompletionHandler)
     {
+        m_userCompletionHandler = userCompletionHandler;
+
         SocketAddress serverSocketAddress(
             QString::fromLatin1(config.serverAddress),
             config.serverPort);
@@ -499,29 +496,7 @@ private:
     }
 };
 
-static void connectAndListen()
-{
-    auto p2pConnection = std::make_shared<P2PConnection>(config.aioThread);
-    connectionPoolInstance->addConnection(p2pConnection);
-    p2pConnection->connectAsync([p2pConnection]() { p2pConnection->start(); });
-}
-
-static void startAccepting()
-{
-    auto acceptor = std::make_shared<P2PConnectionAcceptor>(
-        config.aioThread,
-        [](P2PConnectionPtr p2pConnection)
-        {
-            if (!p2pConnection)
-                return;
-            connectionPoolInstance->addConnection(p2pConnection);
-            NX_INFO(typeid(P2PConnectionAcceptor), "Accepted connection and added to the Pool");
-            p2pConnection->start();
-        });
-
-    if (!acceptor->startListening())
-        return;
-}
+using P2PConnectionAcceptorPtr = std::shared_ptr<P2PConnectionAcceptor>;
 
 static void printHelp()
 {
@@ -647,14 +622,45 @@ int main(int argc, const char *argv[])
     config.aioThread = timer.getAioThread();
     config.aioTimer = &timer;
 
+    P2PConnectionPtr p2pConnection;
+    P2PConnectionAcceptorPtr p2pConnectionAcceptor;
+
     switch (config.role)
     {
         case Role::server:
-            startAccepting();
+            p2pConnectionAcceptor = std::make_shared<P2PConnectionAcceptor>(config.aioThread);
+
+            if (!p2pConnectionAcceptor->startAccepting(
+                    [](P2PConnectionPtr p2pConnection)
+                    {
+                        if (!p2pConnection)
+                            return;
+
+                        connectionPoolInstance->addConnection(p2pConnection);
+                        NX_INFO(
+                            typeid(P2PConnectionAcceptor),
+                            "Accepted connection and added to the Pool");
+
+                        p2pConnection->start();
+                    }))
+                {
+                    NX_INFO(
+                        typeid(P2PConnectionAcceptor),
+                        "Failed to start P2P connection acceptor");
+
+                    exit(EXIT_FAILURE);
+                }
+
             break;
+
         case Role::client:
-            connectAndListen();
+            p2pConnection = std::make_shared<P2PConnection>(config.aioThread);
+            p2pConnection->connectAsync([p2pConnection]() { p2pConnection->start(); });
             break;
+
+        default:
+            NX_ASSERT(false);
+            exit(EXIT_FAILURE);
     }
 
     while (1)
