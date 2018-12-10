@@ -200,9 +200,6 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
             if (state == SelectableTextButton::State::deactivated && m_defaultAction)
                 m_defaultAction->trigger();
         });
-
-    if (NX_ASSERT(m_defaultAction))
-        m_defaultAction->trigger();
 }
 
 void AnalyticsSearchWidget::Private::updateTypeMenu()
