@@ -63,7 +63,7 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
 
     if (!urlStr.isEmpty()) //< Single host search.
     {
-        url = nx::utils::Url::fromStringPersistingScheme(urlStr);
+        url = nx::utils::Url::fromText(urlStr);
         if (!url.isValid() || url.host().isEmpty())
         {
             NX_DEBUG(this, "Invalid value '%1' for parameter '%2'", urlStr, kUrlParam);
@@ -102,7 +102,7 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(
         // NOTE: This branch of condition should be removed when the support of the deprecated API
         // is ended.
         NX_INFO(this, "Warning: got request using deprecated API");
-        url = nx::utils::Url::fromStringPersistingScheme(startIpStr);
+        url = nx::utils::Url::fromText(startIpStr);
         if (!url.isValid() || url.host().isEmpty())
         {
             NX_DEBUG(this, "Invalid value '%1' for parameter '%2'", startIpStr, kStartIpParam);

@@ -62,7 +62,7 @@ public:
     * strings like `hostname:port` and using QUrl parser for other cases.
     * @return URL which may not ba valid one, so it should be checked after the call.
     */
-    static Url fromStringPersistingScheme(const QString& url);
+    static Url fromText(const QString& url);
     static Url fromQUrl(const QUrl& url);
     static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
     static Url fromUserInput(const QString &userInput);

@@ -247,7 +247,7 @@ QUrl Url::toQUrl() const
     return m_url;
 }
 
-Url Url::fromStringPersistingScheme(const QString &url)
+Url Url::fromText(const QString &url)
 {
     Url result;
 
