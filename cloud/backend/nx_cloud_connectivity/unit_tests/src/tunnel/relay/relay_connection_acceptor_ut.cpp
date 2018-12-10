@@ -456,7 +456,7 @@ protected:
         connection->pleaseStopSync();
     }
 
-    void thenAcceptorKeepsEstablishedConnectionCountOf(int count)
+    void thenAcceptorKeepsEstablishedConnectionCountOf(std::size_t count)
     {
         while (m_listeningPeerConnectionsToRelay.size() < count)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
