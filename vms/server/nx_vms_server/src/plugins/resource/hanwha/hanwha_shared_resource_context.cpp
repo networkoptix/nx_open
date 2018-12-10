@@ -57,6 +57,7 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
     videoCodecInfo([this]() { return loadVideoCodecInfo(); }, kCacheDataTimeout),
     isBypassSupported([this]() { return checkBypassSupport(); }, kCacheDataTimeout),
+    ptzCalibratedChannels([this]() { return loadPtzCalibratedChannels(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
     m_requestLock(kMaxConcurrentRequestNumber)
 {
@@ -459,6 +460,31 @@ HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
 
     const auto bypassParameter = parameters.parameter(lit("bypass/bypass/control/BypassURI"));
     return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
+}
+
+HanwhaResult<std::set<int>> HanwhaSharedResourceContext::loadPtzCalibratedChannels()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    //helper.setGroupBy(kHanwhaChannelProperty);
+
+    auto response = helper.view(lit("eventrules/internalhandovercalibration"), {});
+    if (!response.isSuccessful())
+        return {CameraDiagnostics::RequestFailedResult(response.requestUrl(), lit("Failed"))};
+
+    std::set<int> calibratedChannels;
+    for (const auto& [key, value]: response.response())
+    {
+        const auto record = key.split(".");
+        if (record.size() < 2)
+            continue;
+
+        bool isSuccess = false;
+        const auto number = record[1].toInt(&isSuccess);
+        if (isSuccess)
+            calibratedChannels.insert(number);
+    }
+
+    return {CameraDiagnostics::NoErrorResult(), calibratedChannels};
 }
 
 qint64 SessionContext::currentPositionUsec() const

@@ -698,7 +698,7 @@ bool HanwhaResource::setOutputPortState(
     if (autoResetTimeoutMs > 0)
     {
         m_timerHolder.addTimer(
-            outputId,
+            lm("%1 output %2").args(this, outputId),
             resetHandler,
             std::chrono::milliseconds(autoResetTimeoutMs));
     }
@@ -1371,22 +1371,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         capabilities |= Ptz::AuxiliaryPtzCapability;
 
-    const auto ptzTargetChannel = resourceData().value<int>(ResourceDataKey::kPtzTargetChannel, -1);
-    NX_VERBOSE(this, "PTZ target channel: %1", ptzTargetChannel);
-    if (ptzTargetChannel != -1 && ptzTargetChannel != getChannel())
-    {
-        const auto id = physicalIdForChannel(ptzTargetChannel);
-        NX_DEBUG(this, "Set PTZ target channel id: %1", id);
-        setProperty(ResourcePropertyKey::kPtzTargetId, id);
-
-        // This is a workaround until client fixes a bug.
-        // capabilities |= Ptz::ContinuousPanTiltCapabilities;
-    }
-    else
-    {
-        if (hasProperty(ResourcePropertyKey::kPtzTargetId))
-            setProperty(ResourcePropertyKey::kPtzTargetId, QString());
-    }
+    initRedirectedAreaZoomPtz();
 
     NX_DEBUG(this, "Supported PTZ capabilities: %1", ptzCapabilityBits(capabilities));
     if (isAnalogEncoder())
@@ -1444,6 +1429,36 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
         .args(getPhysicalId(), ptzCapabilityBits(configurationalCapabilities)));
     return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
+{
+    const auto ptzTargetChannel = resourceData().value<int>(ResourceDataKey::kPtzTargetChannel, -1);
+    if (ptzTargetChannel == -1 || ptzTargetChannel == getChannel())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
+    const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
+    if (isCalibrated)
+    {
+        const auto id = physicalIdForChannel(ptzTargetChannel);
+        NX_DEBUG(this, "Set PTZ target id: %1", id);
+        setProperty(ResourcePropertyKey::kPtzTargetId, id);
+
+        // TODO: Remove this workaround when client fixes a bug:
+        //     Absolute move and viewport is not accessible if continious move is not supportd.
+        //
+        // m_ptzCapabilities[core::ptz::Type::operational] |= Ptz::ContinuousPanTiltCapabilities;
+    }
+    else
+    {
+        NX_DEBUG(this, "Remove PTZ target id");
+        setProperty(ResourcePropertyKey::kPtzTargetId, QString());
+        m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
+    }
+
+    setPtzCalibarionTimer();
+    return calibratedChannels.diagnostics;
 }
 
 HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
@@ -3924,6 +3939,35 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
         return Ptz::NoPtzCapabilities;
 
     return itr->second;
+}
+
+void HanwhaResource::setPtzCalibarionTimer()
+{
+    NX_VERBOSE(this, "Set PTZ calibration timer");
+    m_timerHolder.addTimer(
+        lm("%1 PTZ calibration").args(this),
+        [this]()
+        {
+            if (getStatus() != Qn::Online && getStatus() != Qn::Recording)
+            {
+                NX_DEBUG(this, "PTZ calibration timer is not needed any more");
+                return;
+            }
+
+            if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
+            {
+                const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+                const bool isCalibrated = calibratedChannels->count(getChannel());
+                if (isRedirected != isCalibrated)
+                {
+                    NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
+                    return setStatus(Qn::Offline);
+                }
+            }
+
+            setPtzCalibarionTimer();
+        },
+        std::chrono::seconds(10));
 }
 
 } // namespace plugins
