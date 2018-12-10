@@ -336,21 +336,40 @@ Handle ServerConnection::addCamera(
 }
 
 Handle ServerConnection::searchCameraStart(
-    const QString& startAddress,
-    const QString& endAddress,
+    const QString& cameraUrl,
     const QString& userName,
     const QString& password,
-    int port,
+    std::optional<int> port,
     GetCallback callback,
     QThread* targetThread)
 {
     auto parameters = QnRequestParamList{
+        {lit("url"), cameraUrl},
+        {lit("user"), userName},
+        {lit("password"), password}};
+    if (port.has_value())
+        parameters << QnRequestParam("port", *port);
+
+    return executeGet(lit("/api/manualCamera/search"), parameters, callback, targetThread);
+}
+
+Handle ServerConnection::searchCameraRangeStart(
+    const QString& startAddress,
+    const QString& endAddress,
+    const QString& userName,
+    const QString& password,
+    std::optional<int> port,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    NX_ASSERT(!endAddress.isEmpty());
+    auto parameters = QnRequestParamList{
         {lit("start_ip"), startAddress},
         {lit("user"), userName},
         {lit("password"), password},
-        {lit("port"), QString::number(port)}};
-    if (!endAddress.isEmpty())
-        parameters << QnRequestParam("end_ip", endAddress);
+        {lit("end_ip"), endAddress}};
+    if (port.has_value())
+        parameters << QnRequestParam("port", *port);
 
     return executeGet(lit("/api/manualCamera/search"), parameters, callback, targetThread);
 }

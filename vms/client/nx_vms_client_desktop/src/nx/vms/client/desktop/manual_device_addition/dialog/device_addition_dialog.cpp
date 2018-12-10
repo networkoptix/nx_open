@@ -344,7 +344,7 @@ void DeviceAdditionDialog::setServer(const QnMediaServerResourcePtr& value)
         stopSearch();
 }
 
-int DeviceAdditionDialog::port() const
+std::optional<int> DeviceAdditionDialog::port() const
 {
     const bool isKnownAddressTabPage = isKnownAddressPage(ui->tabWidget);
     const auto portSpinBox = isKnownAddressTabPage
@@ -354,9 +354,8 @@ int DeviceAdditionDialog::port() const
         ? ui->knownAddressAutoPortCheckBox
         : ui->subnetScanAutoPortCheckBox;
 
-    static constexpr auto kAutoPortValue = 0;
     return autoPortSpinBox->isChecked()
-        ? kAutoPortValue
+        ? std::optional<int>()
         : portSpinBox->value();
 }
 
