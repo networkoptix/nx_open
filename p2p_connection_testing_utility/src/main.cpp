@@ -49,15 +49,13 @@ struct
     nx::Buffer serverAddress = "0.0.0.0";
     int serverPort;
     aio::AbstractAioThread* aioThread = nullptr;
-    aio::Timer* aioTimer = nullptr;
     Mode mode = Mode::automatic;
 } config;
 
 class P2PConnection;
 using P2PConnectionPtr = std::shared_ptr<P2PConnection>;
 
-class P2PConnection:
-    public std::enable_shared_from_this<P2PConnection>
+class P2PConnection: public std::enable_shared_from_this<P2PConnection>
 {
 public:
     P2PConnection(aio::AbstractAioThread* aioThread): m_aioThread(aioThread)
@@ -286,7 +284,9 @@ class P2PConnectionAcceptor
 public:
     P2PConnectionAcceptor(aio::AbstractAioThread* aioThread): m_aioThread(aioThread)
     {
+        m_aioTimer.bindToAioThread(aioThread);
         m_httpServer.bindToAioThread(aioThread);
+
         m_httpServer.registerRequestProcessorFunc(
             kHandlerPath,
             [this](
@@ -341,7 +341,7 @@ public:
                             }
                             else
                             {
-                                config.aioTimer->start(
+                                m_aioTimer.start(
                                     std::chrono::milliseconds(100),
                                     [sharedContext, this]
                                     {
@@ -363,7 +363,7 @@ public:
 
                 sharedContext->checkForPairFunc = std::move(checkForPairConnection);
 
-                config.aioTimer->start(
+                m_aioTimer.start(
                     std::chrono::milliseconds(100),
                     [sharedContext, this]
                     {
@@ -396,6 +396,7 @@ public:
 private:
     http::TestHttpServer m_httpServer;
     aio::AbstractAioThread* m_aioThread = nullptr;
+    aio::Timer m_aioTimer;
 
     void onAccept(
         http::RequestContext requestContext,
@@ -621,7 +622,6 @@ int main(int argc, const char *argv[])
 
     aio::Timer timer;
     config.aioThread = timer.getAioThread();
-    config.aioTimer = &timer;
 
     P2PConnectionPtr p2pConnection;
     P2PConnectionAcceptorPtr p2pConnectionAcceptor;
