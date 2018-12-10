@@ -244,6 +244,20 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
     m_filterText = value;
 }
 
+QString AnalyticsSearchListModel::Private::selectedObjectType() const
+{
+    return m_selectedObjectType;
+}
+
+void AnalyticsSearchListModel::Private::setSelectedObjectType(const QString& value)
+{
+    if (m_selectedObjectType == value)
+        return;
+
+    q->clear();
+    m_selectedObjectType = value;
+}
+
 void AnalyticsSearchListModel::Private::clearData()
 {
     ScopedReset reset(q, !m_data.empty());
@@ -397,6 +411,9 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.timePeriod = period;
     request.maxObjectsToSelect = limit;
     request.freeText = m_filterText;
+
+    if (!m_selectedObjectType.isEmpty())
+        request.objectTypeId = {m_selectedObjectType};
 
     request.boundingBox = q->cameraSet()->type() == ManagedCameraSet::Type::single
         ? m_filterRect
