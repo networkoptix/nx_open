@@ -197,8 +197,8 @@ endif()
 
 add_subdirectory(vms)
 
-if(withWebsocketUtility)
-    add_subdirectory(websocket_utility)
+if(withP2PConnectionTestingUtility)
+    add_subdirectory(p2p_connection_testing_utility)
 endif()
 
 if(withTests)

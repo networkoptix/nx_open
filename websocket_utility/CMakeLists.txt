@@ -1,1 +1,0 @@
-nx_add_target(websocket_utility EXECUTABLE PUBLIC_LIBS nx_network)
