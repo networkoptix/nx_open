@@ -123,7 +123,6 @@ public:
         Qn::ConnectionRole role,
         const HanwhaVideoProfile& profile);
 
-    QString physicalIdForChannel(int value);
     void updateToChannel(int value);
 
     bool isNvr() const;

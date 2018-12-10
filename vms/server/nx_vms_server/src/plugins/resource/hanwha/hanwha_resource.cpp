@@ -51,7 +51,7 @@ namespace {
 
 static const QString kBypassPrefix("Bypass");
 
-bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
+static bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
 {
     return param && param->possibleValues().contains(kHanwhaTrue);
 }
@@ -207,7 +207,7 @@ static const std::map<QString, PtzTraitDescriptor> kHanwhaPtzTraitDescriptors = 
     }
 };
 
-Ptz::Capabilities calculateSupportedPtzCapabilities(
+static Ptz::Capabilities calculateSupportedPtzCapabilities(
     const std::map<QString, PtzDescriptor>& descriptors,
     const HanwhaAttributes& attributes,
     int channel)
@@ -241,7 +241,7 @@ Ptz::Capabilities calculateSupportedPtzCapabilities(
     return supportedPtzCapabilities;
 };
 
-QnPtzLimits calculatePtzLimits(
+static QnPtzLimits calculatePtzLimits(
     const HanwhaAttributes& attributes,
     const HanwhaCgiParameters& parameters,
     int channel)
@@ -437,6 +437,15 @@ struct GroupParameterInfo
     QString groupLead;
     QString groupIncludeCondition;
 };
+
+static QString physicalIdForChannel(const QString& groupId, int value)
+{
+    auto id = groupId;
+    if (value > 0)
+        id += lit("_channel=%1").arg(value + 1);
+
+    return id;
+}
 
 } // namespace
 
@@ -1441,7 +1450,7 @@ CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
     const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
     if (isCalibrated)
     {
-        const auto id = physicalIdForChannel(ptzTargetChannel);
+        const auto id = physicalIdForChannel(getGroupId(), ptzTargetChannel);
         NX_DEBUG(this, "Set PTZ target id: %1", id);
         setProperty(ResourcePropertyKey::kPtzTargetId, id);
 
@@ -3071,15 +3080,6 @@ boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterI
     return itr->second;
 }
 
-QString HanwhaResource::physicalIdForChannel(int value)
-{
-    auto id = getGroupId();
-    if (value > 0)
-        id += lit("_channel=%1").arg(value + 1);
-
-    return id;
-}
-
 void HanwhaResource::updateToChannel(int value)
 {
     QUrl url(getUrl());
@@ -3090,10 +3090,9 @@ void HanwhaResource::updateToChannel(int value)
     url.setQuery(query);
     setUrl(url.toString());
 
-    QString physicalId = getPhysicalId().split('_')[0];
     setDefaultGroupName(getModel());
-    setGroupId(physicalId);
-    setPhysicalId(physicalIdForChannel(value));
+    setGroupId(getPhysicalId().split('_')[0]);
+    setPhysicalId(physicalIdForChannel(getGroupId(), value));
 
     const auto suffix = lit("-channel %1").arg(value + 1);
     if (value > 0 && !getName().endsWith(suffix))
