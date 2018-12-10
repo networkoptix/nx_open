@@ -36,8 +36,8 @@ enum class Mode
 };
 
 static const nx::Buffer kHandlerPath = "/testP2P";
-static const nx::Buffer kTestMessage = "Hello! Your connection seems to work";
-static const nx::utils::log::Tag kWebsocketUtilityTag{QString("P2PUtility")};
+static const nx::Buffer kTestMessage = "Hello! Your connection seems to be working";
+static const nx::utils::log::Tag kP2PConnectionTestingUtilityTag{QString("P2PUtility")};
 
 struct
 {
@@ -53,128 +53,21 @@ struct
     Mode mode = Mode::automatic;
 } config;
 
-class Waitable
-{
-public:
-    Waitable(aio::AbstractAioThread* aioThread): m_aioThread(aioThread) {}
-    virtual ~Waitable() = default;
-
-    void stop()
-    {
-        m_aioThread->post(nullptr, [this]() { stopInAioThread(); });
-    }
-
-    void waitForDone()
-    {
-        m_readyFuture.wait();
-    }
-
-    QByteArray guid() const { return m_guid; }
-    void setGuid(const nx::Buffer& guid) { m_guid = guid; }
-
-protected:
-    aio::AbstractAioThread* m_aioThread = nullptr;
-    bool m_stopped = false;
-
-    void stopInAioThread()
-    {
-        if (m_stopped)
-            return;
-
-        NX_VERBOSE(this, "connection: stop requested, shutting down");
-        m_stopped = true;
-        m_readyPromise.set_value();
-    }
-
-private:
-    nx::utils::promise<void> m_readyPromise;
-    nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
-    QByteArray m_guid;
-};
-
-using WaitablePtr = std::shared_ptr<Waitable>;
-
-class WaitablePool
-{
-public:
-    void addWaitable(const WaitablePtr waitable)
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_stopped)
-        {
-            waitable->stop();
-            return;
-        }
-
-        m_waitables.insert(waitable);
-    }
-
-    void stopAll()
-    {
-        NX_VERBOSE(this, "stopping all waitables");
-
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_stopped)
-            return;
-
-        m_stopped = true;
-        for (const auto& waitable: m_waitables)
-            waitable->stop();
-    }
-
-    void waitAll()
-    {
-        std::set<WaitablePtr> waitables;
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            waitables = m_waitables;
-        }
-
-        for (const auto& waitable: waitables)
-            waitable->waitForDone();
-    }
-
-    WaitablePtr findByGuid(const QByteArray& guid)
-    {
-        std::set<WaitablePtr> waitables;
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            waitables = m_waitables;
-        }
-
-        for (const auto& waitable : waitables)
-        {
-            if (waitable->guid() == guid)
-                return waitable;
-        }
-
-        return WaitablePtr();
-    }
-
-private:
-    std::mutex m_mutex;
-    bool m_stopped = false;
-    std::set<WaitablePtr> m_waitables;
-};
-
-static WaitablePool* waitablePoolInstance;
-
 class P2PConnection;
 using P2PConnectionPtr = std::shared_ptr<P2PConnection>;
 
 class P2PConnection:
-    public Waitable,
     public std::enable_shared_from_this<P2PConnection>
 {
 public:
-    P2PConnection(aio::AbstractAioThread* aioThread): Waitable(aioThread)
+    P2PConnection(aio::AbstractAioThread* aioThread): m_aioThread(aioThread)
     {
         m_httpClient->bindToAioThread(aioThread);
     }
 
     P2PConnection(
         aio::AbstractAioThread *aioThread,
-        P2pTransportPtr p2pTransport): Waitable(aioThread)
+        P2pTransportPtr p2pTransport): m_aioThread(aioThread)
     {
         m_p2pTransport = std::move(p2pTransport);
         m_timer.bindToAioThread(aioThread);
@@ -233,22 +126,21 @@ public:
             });
     }
 
+    void setGuid(const QByteArray& guid) { m_guid = guid; }
+    QByteArray guid() const { return m_guid; }
+
 private:
     std::unique_ptr<http::AsyncClient> m_httpClient = std::make_unique<http::AsyncClient>();
     P2pTransportPtr m_p2pTransport;
     nx::Buffer m_readBuffer;
     aio::Timer m_timer;
+    QByteArray m_guid;
+    aio::AbstractAioThread* m_aioThread = nullptr;
 
     void onConnect(
         nx::utils::MoveOnlyFunc<void()> completionHandler,
         const QByteArray& connectionGuid)
     {
-        if (m_stopped)
-        {
-            NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
-            return;
-        }
-
         if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed
             || !m_httpClient->response())
         {
@@ -309,12 +201,6 @@ private:
 
     void onRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
-        if (m_stopped)
-        {
-            NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
-            return;
-        }
-
         if (errorCode != SystemError::noError)
         {
             NX_INFO(this, lm("read failed with error code: %1").args(errorCode));
@@ -339,17 +225,10 @@ private:
 
     void onSend(SystemError::ErrorCode errorCode, size_t /*bytesSent*/)
     {
-        if (m_stopped)
-        {
-            NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
-            return;
-        }
-
         if (errorCode != SystemError::noError)
         {
             NX_INFO(this, lm("send failed with error code: %1").args(errorCode));
-            stopInAioThread();
-            return;
+            exit(EXIT_FAILURE);
         }
 
         NX_INFO(this, "message sent");
@@ -357,11 +236,6 @@ private:
             std::chrono::seconds(1),
             [self = shared_from_this(), this]()
             {
-                if (m_stopped)
-                {
-                    NX_VERBOSE(this, "seems like connection has been destroyed, exiting");
-                    return;
-                }
                 m_p2pTransport->sendAsync(
                     kTestMessage,
                     [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
@@ -373,15 +247,49 @@ private:
     }
 };
 
-class P2PConnectionAcceptor: public Waitable
+class ConnectionPool
+{
+public:
+    void addConnection(const P2PConnectionPtr waitable)
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_waitables.insert(waitable);
+    }
+
+    P2PConnectionPtr findByGuid(const QByteArray& guid)
+    {
+        std::set<P2PConnectionPtr> connections;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            connections = m_waitables;
+        }
+
+        for (const auto& connection : connections)
+        {
+            if (connection->guid() == guid)
+                return connection;
+        }
+
+        return P2PConnectionPtr();
+    }
+
+private:
+    std::mutex m_mutex;
+    bool m_stopped = false;
+    std::set<P2PConnectionPtr> m_waitables;
+};
+
+static ConnectionPool* connectionPoolInstance;
+
+class P2PConnectionAcceptor
 {
 public:
     P2PConnectionAcceptor(
         aio::AbstractAioThread* aioThread,
         std::function<void(P2PConnectionPtr)> userCompletionHandler)
         :
-        Waitable(aioThread),
-        m_userCompletionHandler(userCompletionHandler)
+        m_userCompletionHandler(userCompletionHandler),
+        m_aioThread(aioThread)
     {
         m_httpServer.bindToAioThread(aioThread);
         m_httpServer.registerRequestProcessorFunc(
@@ -426,7 +334,7 @@ public:
                         }
 
                         auto existingP2PConnection =
-                            waitablePoolInstance->findByGuid(guidHeaderIt->second);
+                            connectionPoolInstance->findByGuid(guidHeaderIt->second);
                         if (!existingP2PConnection)
                         {
                             if (++sharedContext->iterations > 30)
@@ -493,17 +401,12 @@ public:
 private:
     http::TestHttpServer m_httpServer;
     std::function<void(P2PConnectionPtr)> m_userCompletionHandler;
+    aio::AbstractAioThread* m_aioThread = nullptr;
 
     void onAccept(
         http::RequestContext requestContext,
         http::RequestProcessedHandler requestCompletionHandler)
     {
-        if (m_stopped)
-        {
-            NX_VERBOSE(this, "accepted request while in stopped state, exiting");
-            return;
-        }
-
         auto error = websocket::validateRequest(requestContext.request, requestContext.response);
         if (error != websocket::Error::noError || config.mode == Mode::http)
         {
@@ -522,8 +425,8 @@ private:
                         NX_INFO(
                             this,
                             "onAccept: Failed to respond to the incoming connection request");
-                        stopInAioThread();
-                        return;
+
+                        exit(EXIT_FAILURE);
                     }
 
                     auto p2pTransport = new P2PHttpServerTransport(
@@ -538,8 +441,7 @@ private:
                             if (error != SystemError::noError)
                             {
                                 NX_INFO(this, "onAccept: Failed to start Http server connection");
-                                stopInAioThread();
-                                return;
+                                exit(EXIT_FAILURE);
                             }
 
                             auto p2pConnection = std::make_shared<P2PConnection>(
@@ -574,8 +476,7 @@ private:
                     if (ecode != SystemError::noError)
                     {
                         NX_INFO(this, "Failed to respond to the incoming connection");
-                        stopInAioThread();
-                        return;
+                        exit(EXIT_FAILURE);
                     }
 
                     auto p2pTransport = P2pTransportPtr(
@@ -601,7 +502,7 @@ private:
 static void connectAndListen()
 {
     auto p2pConnection = std::make_shared<P2PConnection>(config.aioThread);
-    waitablePoolInstance->addWaitable(p2pConnection);
+    connectionPoolInstance->addConnection(p2pConnection);
     p2pConnection->connectAsync([p2pConnection]() { p2pConnection->start(); });
 }
 
@@ -609,19 +510,17 @@ static void startAccepting()
 {
     auto acceptor = std::make_shared<P2PConnectionAcceptor>(
         config.aioThread,
-        [](P2PConnectionPtr P2PConnection)
+        [](P2PConnectionPtr p2pConnection)
         {
-            if (!P2PConnection)
+            if (!p2pConnection)
                 return;
-            waitablePoolInstance->addWaitable(P2PConnection);
+            connectionPoolInstance->addConnection(p2pConnection);
             NX_INFO(typeid(P2PConnectionAcceptor), "Accepted connection and added to the Pool");
-            P2PConnection->start();
+            p2pConnection->start();
         });
 
     if (!acceptor->startListening())
         return;
-
-    waitablePoolInstance->addWaitable(acceptor);
 }
 
 static void printHelp()
@@ -651,10 +550,10 @@ static void prepareConfig(int argc, const char* argv[])
             exit(EXIT_SUCCESS);
         }
 
-        if (argv[i][0] != '-' || i == argc - 1)
+        if (argv[i][0] != '-')
         {
-            NX_INFO(kWebsocketUtilityTag, "invalid options, run with --help");
-            exit(EXIT_SUCCESS);
+            NX_INFO(kP2PConnectionTestingUtilityTag, "invalid options, run with --help");
+            exit(EXIT_FAILURE);
         }
 
         if (strcmp(argv[i], "--url") == 0 && i + 1 < argc)
@@ -710,7 +609,7 @@ static bool validateConfig()
         case Role::client:
             if (config.url.isEmpty())
             {
-                NX_INFO(kWebsocketUtilityTag, "invalid options, run with --help");
+                NX_INFO(kP2PConnectionTestingUtilityTag, "invalid options, run with --help");
                 return false;
             }
         return true;
@@ -718,7 +617,7 @@ static bool validateConfig()
         if (config.serverAddress.isEmpty() || config.serverPort <= 0
             || config.protocolName.isEmpty())
         {
-            NX_INFO(kWebsocketUtilityTag, "invalid options, run with --help");
+            NX_INFO(kP2PConnectionTestingUtilityTag, "invalid options, run with --help");
             return false;
         }
         return true;
@@ -729,25 +628,6 @@ static bool validateConfig()
     return true;
 }
 
-#if defined(_WIN32)
-
-static BOOL sigHandler(DWORD fdwCtrlType)
-{
-    NX_INFO(kWebsocketUtilityTag, "received SIGINT, shutting down connections..");
-    std::thread([]() { waitablePoolInstance->stopAll(); }).detach();
-    return true;
-}
-
-#elif defined(__linux__)
-
-static void sigHandler(int /*signo*/)
-{
-    NX_INFO(kWebsocketUtilityTag, "received SIGINT, shutting down connections..");
-    std::thread([]() { waitablePoolInstance->stopAll(); }).detach();
-}
-
-#endif // _WIN32
-
 int main(int argc, const char *argv[])
 {
     prepareConfig(argc, argv);
@@ -755,26 +635,13 @@ int main(int argc, const char *argv[])
         return -1;
 
     auto sgGuard = std::make_unique<SocketGlobalsHolder>(0);
-    WaitablePool waitablePool;
-    waitablePoolInstance = &waitablePool;
-
-    #if defined(_WIN32)
-        if (!SetConsoleCtrlHandler(sigHandler, true))
-        {
-            NX_INFO(kWebsocketUtilityTag, "failed to install Ctrl-C handler");
-            return -1;
-        }
-    #elif defined(__linux__)
-        if (signal(SIGINT, sigHandler) == SIG_ERR)
-        {
-            NX_INFO(kWebsocketUtilityTag, "failed to install Ctrl-C handler");
-            return -1;
-        }
-    #endif
+    ConnectionPool connectionPool;
+    connectionPoolInstance = &connectionPool;
 
     aio::Timer timer;
     config.aioThread = timer.getAioThread();
     config.aioTimer = &timer;
+
     switch (config.role)
     {
         case Role::server:
@@ -785,8 +652,8 @@ int main(int argc, const char *argv[])
             break;
     }
 
-    waitablePool.waitAll();
-    NX_VERBOSE(kWebsocketUtilityTag, "Exiting...");
+    while (1)
+        std::this_thread::sleep_for(std::chrono::minutes(1));
 
     return 0;
 }
