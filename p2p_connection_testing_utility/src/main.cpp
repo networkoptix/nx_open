@@ -525,17 +525,18 @@ static void startAccepting()
 
 static void printHelp()
 {
-    printf("Usage:\n CLIENT MODE: p2p_utility --role client --url <url> [--username <username> " \
-           "--password <password>]\n");
-    printf(" SERVER MODE: p2p_utility --role server --server-port <server-port> " \
+    printf("Usage:\n CLIENT MODE: p2p_connection_testing_utility --role client --url <url> " \
+        "[--username <username> --password <password>]\n");
+    printf(" SERVER MODE: p2p_connection_testing_utility --role server " \
+           "--server-port <server-port> " \
            "[--server-address <server-address> (default: 0.0.0.0)]\n");
     printf("Additional options:\n" \
            " --verbose\n" \
            " --mode <'auto'(default) OR 'http' OR 'websocket'>\n" \
            " --help\n");
     printf("Note:\n");
-    printf(" In case if you want to connect to the p2p utility run in a server mode, client"
-           " url path must be '/testP2P'.\n");
+    printf(" In case if you want to connect to the p2p_connection_testing_utility run in the "
+           "server mode, the client url path must be '/testP2P'.\n");
 }
 
 static void prepareConfig(int argc, const char* argv[])
