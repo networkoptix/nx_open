@@ -62,6 +62,9 @@ public:
     std::chrono::microseconds highlightedTimestamp() const;
     void setHighlightedTimestamp(std::chrono::microseconds value);
 
+    QSet<QnResourcePtr> highlightedResources() const;
+    void setHighlightedResources(const QSet<QnResourcePtr>& value);
+
     bool live() const;
     void setLive(bool value);
 
@@ -182,6 +185,7 @@ private:
     bool m_updating = false;
 
     std::chrono::microseconds m_highlightedTimestamp{0};
+    QSet<QnResourcePtr> m_highlightedResources;
 
     int m_topMargin = style::Metrics::kStandardPadding;
     int m_bottomMargin = style::Metrics::kStandardPadding;

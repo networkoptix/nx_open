@@ -198,13 +198,6 @@ void AbstractSearchWidget::Private::setupRibbon()
 
     connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
 
-    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
-        [this]()
-        {
-            ui->ribbon->setHighlightedTimestamp(
-                microseconds(navigator()->positionUsec()));
-        });
-
     TileInteractionHandler::install(ui->ribbon);
 }
 

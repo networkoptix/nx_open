@@ -876,7 +876,7 @@ void EventRibbon::Private::updateHighlightedTiles()
     const auto shouldHighlightTile =
         [this](int index) -> bool
         {
-            if (m_highlightedTimestamp <= 0ms)
+            if (m_highlightedTimestamp <= 0ms || m_highlightedResources.empty())
                 return false;
 
             const auto modelIndex = m_model->index(index);
@@ -886,6 +886,13 @@ void EventRibbon::Private::updateHighlightedTiles()
 
             const auto duration = modelIndex.data(Qn::DurationRole).value<microseconds>();
             if (duration <= 0us)
+                return false;
+
+            const auto isHighlightedResource =
+                [this](const QnResourcePtr& res) { return m_highlightedResources.contains(res); };
+
+            const auto resources = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>();
+            if (std::none_of(resources.cbegin(), resources.cend(), isHighlightedResource))
                 return false;
 
             return m_highlightedTimestamp >= timestamp
@@ -927,6 +934,20 @@ void EventRibbon::Private::setHighlightedTimestamp(microseconds value)
         return;
 
     m_highlightedTimestamp = value;
+    updateHighlightedTiles();
+}
+
+QSet<QnResourcePtr> EventRibbon::Private::highlightedResources() const
+{
+    return m_highlightedResources;
+}
+
+void EventRibbon::Private::setHighlightedResources(const QSet<QnResourcePtr>& value)
+{
+    if (m_highlightedResources == value)
+        return;
+
+    m_highlightedResources = value;
     updateHighlightedTiles();
 }
 
