@@ -144,7 +144,7 @@ private:
         if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed
             || !m_httpClient->response())
         {
-            NX_INFO(this, "http client failed to connect to host");
+            NX_ERROR(this, "http client failed to connect to host");
             exit(EXIT_FAILURE);
         }
 
@@ -162,7 +162,7 @@ private:
 
             if (validationError != websocket::Error::noError)
             {
-                NX_INFO(
+                NX_ERROR(
                     this,
                     lm("websocket handshake validation error: %1").args((int) validationError));
                 exit(EXIT_FAILURE);
@@ -192,7 +192,7 @@ private:
         }
         else
         {
-            NX_INFO(this, lm("Server reported %1. Which is unexpected.").args(statusCode));
+            NX_ERROR(this, lm("Server reported %1. Which is unexpected.").args(statusCode));
             exit(EXIT_FAILURE);
         }
 
@@ -203,13 +203,13 @@ private:
     {
         if (errorCode != SystemError::noError)
         {
-            NX_INFO(this, lm("read failed with error code: %1").args(errorCode));
+            NX_ERROR(this, lm("read failed with error code: %1").args(errorCode));
             exit(EXIT_FAILURE);
         }
 
         if (bytesRead == 0)
         {
-            NX_INFO(this, "connection has been closed by remote peer");
+            NX_ERROR(this, "connection has been closed by remote peer");
             exit(EXIT_FAILURE);
         }
 
@@ -227,7 +227,7 @@ private:
     {
         if (errorCode != SystemError::noError)
         {
-            NX_INFO(this, lm("send failed with error code: %1").args(errorCode));
+            NX_ERROR(this, lm("send failed with error code: %1").args(errorCode));
             exit(EXIT_FAILURE);
         }
 
@@ -322,7 +322,7 @@ public:
                         auto guidHeaderIt = sharedContext->headers.find("X-NX-P2P-GUID");
                         if (guidHeaderIt == sharedContext->headers.cend())
                         {
-                            NX_INFO(
+                            NX_ERROR(
                                 this,
                                 "onPost: No GUID header in the incoming Http request headers");
                             exit(EXIT_FAILURE);
@@ -334,7 +334,7 @@ public:
                         {
                             if (++sharedContext->iterations > 30)
                             {
-                                NX_INFO(
+                                NX_ERROR(
                                     this,
                                     "onPost: Failed to find the matching connection in the pool");
                                 exit(EXIT_FAILURE);
@@ -373,10 +373,8 @@ public:
             }, http::Method::post);
     }
 
-    bool startAccepting(std::function<void(P2PConnectionPtr)> userCompletionHandler)
+    bool startAccepting()
     {
-        m_userCompletionHandler = userCompletionHandler;
-
         SocketAddress serverSocketAddress(
             QString::fromLatin1(config.serverAddress),
             config.serverPort);
@@ -397,7 +395,6 @@ public:
 
 private:
     http::TestHttpServer m_httpServer;
-    std::function<void(P2PConnectionPtr)> m_userCompletionHandler;
     aio::AbstractAioThread* m_aioThread = nullptr;
 
     void onAccept(
@@ -419,7 +416,7 @@ private:
                 {
                     if (ecode != SystemError::noError)
                     {
-                        NX_INFO(
+                        NX_ERROR(
                             this,
                             "onAccept: Failed to respond to the incoming connection request");
 
@@ -437,7 +434,7 @@ private:
                         {
                             if (error != SystemError::noError)
                             {
-                                NX_INFO(this, "onAccept: Failed to start Http server connection");
+                                NX_ERROR(this, "onAccept: Failed to start Http server connection");
                                 exit(EXIT_FAILURE);
                             }
 
@@ -448,14 +445,20 @@ private:
                             auto guidHeaderIt = headers.find("X-NX-P2P-GUID");
                             if (guidHeaderIt == headers.cend())
                             {
-                                NX_INFO(
+                                NX_ERROR(
                                     this,
                                     "onGet: No GUID header in the incoming Http request headers");
                                 exit(EXIT_FAILURE);
                             }
 
                             p2pConnection->setGuid(guidHeaderIt->second);
-                            m_userCompletionHandler(p2pConnection);
+                            connectionPoolInstance->addConnection(p2pConnection);
+
+                            NX_INFO(
+                                typeid(P2PConnectionAcceptor),
+                                "Accepted connection and added to the Pool");
+
+                            p2pConnection->start();
                         });
                 });
 
@@ -472,7 +475,7 @@ private:
                 {
                     if (ecode != SystemError::noError)
                     {
-                        NX_INFO(this, "Failed to respond to the incoming connection");
+                        NX_ERROR(this, "Failed to respond to the incoming connection");
                         exit(EXIT_FAILURE);
                     }
 
@@ -487,8 +490,6 @@ private:
                     auto p2pConnection = std::make_shared<P2PConnection>(
                         config.aioThread,
                         std::move(p2pTransport));
-
-                    m_userCompletionHandler(p2pConnection);
                 });
 
             requestCompletionHandler(nx::network::http::StatusCode::switchingProtocols);
@@ -630,26 +631,14 @@ int main(int argc, const char *argv[])
         case Role::server:
             p2pConnectionAcceptor = std::make_shared<P2PConnectionAcceptor>(config.aioThread);
 
-            if (!p2pConnectionAcceptor->startAccepting(
-                    [](P2PConnectionPtr p2pConnection)
-                    {
-                        if (!p2pConnection)
-                            return;
+            if (!p2pConnectionAcceptor->startAccepting())
+            {
+                NX_ERROR(
+                    typeid(P2PConnectionAcceptor),
+                    "Failed to start P2P connection acceptor");
 
-                        connectionPoolInstance->addConnection(p2pConnection);
-                        NX_INFO(
-                            typeid(P2PConnectionAcceptor),
-                            "Accepted connection and added to the Pool");
-
-                        p2pConnection->start();
-                    }))
-                {
-                    NX_INFO(
-                        typeid(P2PConnectionAcceptor),
-                        "Failed to start P2P connection acceptor");
-
-                    exit(EXIT_FAILURE);
-                }
+                exit(EXIT_FAILURE);
+            }
 
             break;
 
