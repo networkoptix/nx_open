@@ -631,6 +631,7 @@ static bool validateConfig()
 int main(int argc, const char *argv[])
 {
     prepareConfig(argc, argv);
+
     if (!validateConfig())
     {
         printHelp();
