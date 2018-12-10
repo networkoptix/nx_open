@@ -51,16 +51,16 @@ void QnManualSearchTaskManager::pleaseStop(nx::utils::MoveOnlyFunc<void()> compl
 }
 
 void QnManualSearchTaskManager::addTask(
-    nx::network::SocketAddress address,
-    const QAuthenticator& auth,
-    std::vector<QnAbstractNetworkResourceSearcher*> searchers, bool isSequential)
+    nx::utils::Url url,
+    std::vector<QnAbstractNetworkResourceSearcher *> searchers,
+    bool isSequential)
 {
     using namespace std::placeholders;
 
     // Task runs searchers sequentially, so if we want search to be parallel we should not run more
     // than one searcher in a task.
     NX_ASSERT(isSequential == true || searchers.size() == 1);
-    QnSearchTask task(commonModule(), address, auth, /*breakOnGotResult*/ isSequential);
+    QnSearchTask task(commonModule(), url, /*breakOnGotResult*/ isSequential);
 
     task.setSearchers(searchers);
     task.setSearchDoneCallback(
@@ -73,16 +73,18 @@ void QnManualSearchTaskManager::addTask(
     }
 
     m_pollable.dispatch(
-        [this, task = std::move(task), address, isSequential]() mutable
+        [this, task = std::move(task), isSequential]() mutable
         {
-            NX_VERBOSE(this, "Adding task %1 on %2 (sequential: %3)", task, task.url(), isSequential);
+            const auto url = task.url();
+            NX_VERBOSE(this, "Adding task %1 on %2 (sequential: %3)", task, url, isSequential);
             NX_CRITICAL(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
-            m_searchTasksQueues[address.address].push(std::move(task));
-            m_searchQueueContexts[address.address]; //< Create if does not exist.
+            m_searchTasksQueues[url].push(std::move(task));
+            m_searchQueueContexts[url]; //< Create if does not exist.
 
             m_totalTaskCount++;
         });
 }
+
 
 void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
 {
@@ -124,13 +126,12 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
 
     // NOTE: Task may be deleted after call to dispatch.
     m_pollable.dispatch(
-        [this, results = std::move(results), taskInterruptProcessing, taskUrl]()
+        [this, results = std::move(results), taskInterruptProcessing, taskUrl = std::move(taskUrl)]()
         {
             NX_VERBOSE(this, "Remained: %1; Running: %2; Url: %3",
                 m_remainingTaskCount.load(), m_runningTaskCount, taskUrl);
 
-            auto queueName = nx::network::HostAddress(taskUrl.host()).ipV4().get();
-            auto& context = m_searchQueueContexts[queueName];
+            auto& context = m_searchQueueContexts[taskUrl];
 
             context.isBlocked = false;
             context.runningTaskCount--;
@@ -143,7 +144,7 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
 
                 if (taskInterruptProcessing && !results.isEmpty())
                 {
-                    m_remainingTaskCount -= m_searchTasksQueues[queueName].size();
+                    m_remainingTaskCount -= m_searchTasksQueues[taskUrl].size();
                     context.isInterrupted = true;
                 }
 
@@ -179,7 +180,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
         // Take one task from each queue.
         for (auto it = m_searchTasksQueues.begin(); it != m_searchTasksQueues.end();)
         {
-            auto queueName = it->first;
+            const auto queueName = it->first;
             auto& queue = it->second;
             auto& context = m_searchQueueContexts[queueName];
 
