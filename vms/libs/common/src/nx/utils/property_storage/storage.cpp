@@ -17,6 +17,7 @@ void Storage::load()
 
 void Storage::sync()
 {
+    m_backend->sync();
 }
 
 void Storage::registerProperty(BaseProperty* property)
@@ -28,6 +29,11 @@ void Storage::registerProperty(BaseProperty* property)
 void Storage::unregisterProperty(BaseProperty* property)
 {
     m_properties.remove(property->name);
+}
+
+QList<BaseProperty*> Storage::properties() const
+{
+    return m_properties.values();
 }
 
 QString Storage::readValue(const QString& name)

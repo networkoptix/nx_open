@@ -14,7 +14,8 @@ public:
     using Property = nx::utils::property_storage::Property<T>;
     using BaseProperty = nx::utils::property_storage::BaseProperty;
 
-    Storage(AbstractBackend* backend);
+    explicit Storage(AbstractBackend* backend);
+    virtual ~Storage() = default;
 
 protected:
     void load();
@@ -22,6 +23,7 @@ protected:
 
     void registerProperty(BaseProperty* property);
     void unregisterProperty(BaseProperty* property);
+    QList<BaseProperty*> properties() const;
 
     QString readValue(const QString& name);
     void writeValue(const QString& name, const QString& value);

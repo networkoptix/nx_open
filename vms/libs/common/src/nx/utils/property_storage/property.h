@@ -65,20 +65,30 @@ public:
         m_value = value;
         notify();
 
-        const QByteArray& data = QJson::serialized(m_value);
-        save(QString::fromUtf8(data));
+        save(encodeValue(m_value));
     }
 
-    void operator=(const T& value)
+    Property& operator=(const T& value)
     {
         setValue(value);
+        return *this;
     }
 
 protected:
+    virtual T decodeValue(const QString& value, bool* success) const
+    {
+        return QJson::deserialized<T>(value.toUtf8(), {}, success);
+    }
+
+    virtual QString encodeValue(const T& value) const
+    {
+        return QString::fromUtf8(QJson::serialized(value));
+    }
+
     virtual void updateValue(const QString& value) override
     {
         bool ok = false;
-        const auto& newValue = QJson::deserialized<T>(value.toUtf8(), {}, &ok);
+        auto newValue = decodeValue(value, &ok);
         if (!ok || m_value == newValue)
             return;
 
