@@ -28,10 +28,6 @@ describe('NxRibbonComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // it('should be created', inject([NxRibbonService], (service: NxRibbonService) => {
-  //     expect(service).toBeTruthy();
-  // }));
-
   it('should be initialized', () => {
     component.ngOnInit();
     expect(component.showRibbon).toBeFalsy();
