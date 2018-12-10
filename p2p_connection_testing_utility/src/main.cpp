@@ -35,7 +35,7 @@ enum class Mode
     automatic
 };
 
-static const nx::Buffer kHandlerPath = "/testP2PConnection";
+static const nx::Buffer kHandlerPath = "/testP2P";
 static const nx::Buffer kTestMessage = "Hello! Your connection seems to work";
 static const nx::utils::log::Tag kWebsocketUtilityTag{QString("P2PUtility")};
 
@@ -626,22 +626,23 @@ static void startAccepting()
 
 static void printHelp()
 {
-    printf("Usage:\n CLIENT MODE: p2p_utility --url <url> --username <username> " \
-           "--password <password>\n");
-    printf(" SERVER MODE: p2p_utility [--server-address <server-address> (default: 0.0.0.0)] " \
-           "--server-port <server-port>\n");
-    printf("Additional options:\n --log-level <'verbose' OR 'info'(default)>\n" \
-           "--role <'client'(default) OR 'server'>\n" \
-           "--protocol-name <protocol-name(default: 'nxp2p')>\n" \
+    printf("Usage:\n CLIENT MODE: p2p_utility --role client --url <url> [--username <username> " \
+           "--password <password>]\n");
+    printf(" SERVER MODE: p2p_utility --role server --server-port <server-port>" \
+           "[--server-address <server-address> (default: 0.0.0.0)]\n");
+    printf("Additional options:\n " \
+           "--verbose\n" \
            "--mode <'auto'(default) OR 'http' OR 'websocket'>\n" \
            "--help\n");
     printf("Note:\n");
     printf(" In case if you want to connect to the p2p utility run in a server mode, client"
-           " url path must be '/testP2PConnection'.\n");
+           " url path must be '/testP2P'.\n");
 }
 
 static void prepareConfig(int argc, const char* argv[])
 {
+    bool verbose = false;
+
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--help") == 0)
@@ -656,9 +657,7 @@ static void prepareConfig(int argc, const char* argv[])
             exit(EXIT_SUCCESS);
         }
 
-        if (strcmp(argv[i], "--protocol-name") == 0)
-            config.protocolName = argv[++i];
-        else if (strcmp(argv[i], "--url") == 0)
+        if (strcmp(argv[i], "--url") == 0)
             config.url = argv[++i];
         else if (strcmp(argv[i], "--username") == 0)
             config.userName = argv[++i];
@@ -677,20 +676,9 @@ static void prepareConfig(int argc, const char* argv[])
 
             ++i;
         }
-        else if (strcmp(argv[i], "--log-level") == 0 && i + 1 < argc)
+        else if (strcmp(argv[i], "--verbose") == 0)
         {
-            if (strcmp(argv[i + 1], "VERBOSE") == 0)
-            {
-                nx::utils::log::mainLogger()->setLevelFilters(nx::utils::log::LevelFilters{
-                    {QnLog::MAIN_LOG_ID, nx::utils::log::Level::verbose}});
-            }
-            else if (strcmp(argv[i + 1], "INFO") == 0)
-            {
-                nx::utils::log::mainLogger()->setLevelFilters(nx::utils::log::LevelFilters{
-                    {QnLog::MAIN_LOG_ID, nx::utils::log::Level::info}});
-            }
-
-            ++i;
+            verbose = true;
         }
         else if (strcmp(argv[i], "--mode") == 0 && i + 1 < argc)
         {
@@ -702,6 +690,17 @@ static void prepareConfig(int argc, const char* argv[])
             ++i;
         }
     }
+
+    if (verbose)
+    {
+        nx::utils::log::mainLogger()->setLevelFilters(
+            nx::utils::log::LevelFilters{{QnLog::MAIN_LOG_ID, nx::utils::log::Level::verbose}});
+    }
+    else
+    {
+        nx::utils::log::mainLogger()->setLevelFilters(
+            nx::utils::log::LevelFilters{{QnLog::MAIN_LOG_ID, nx::utils::log::Level::info}});
+    }
 }
 
 static bool validateConfig()
@@ -709,7 +708,7 @@ static bool validateConfig()
     switch (config.role)
     {
         case Role::client:
-            if (config.url.isEmpty() || config.userName.isEmpty() || config.userPassword.isEmpty())
+            if (config.url.isEmpty())
             {
                 NX_INFO(kWebsocketUtilityTag, "invalid options, run with --help");
                 return false;

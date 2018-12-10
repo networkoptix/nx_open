@@ -28,6 +28,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
     m_readHttpClient->bindToAioThread(getAioThread());
+    m_readHttpClient->setAdditionalHeaders(http::HttpHeaders());
     m_writeHttpClient->bindToAioThread(getAioThread());
 
     post([this]() { startReading(); });
