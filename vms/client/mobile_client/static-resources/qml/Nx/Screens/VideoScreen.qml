@@ -546,12 +546,12 @@ PageBase
             changingMotionRoi:
             {
                 if (!video.motionController)
-                    return false;
+                    return false
 
                 if (video.motionController.drawingRoi)
-                    return false;
+                    return false
 
-                return video.item.moving && !video.motionController.customRoiExists;
+                return video.item.moving && !video.motionController.customRoiExists
             }
 
             hasCustomRoi: video.motionController && video.motionController.customRoiExists
