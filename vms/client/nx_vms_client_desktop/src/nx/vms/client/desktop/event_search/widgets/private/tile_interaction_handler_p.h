@@ -38,7 +38,7 @@ private:
     void showMessageDelayed(const QString& text, std::chrono::milliseconds delay);
     void hideMessages();
 
-    QPixmap createDragPixmap(const QnVirtualCameraResourceList& cameras, int width) const;
+    QPixmap createDragPixmap(const QnResourceList& resources, int width) const;
 
 private:
     const QPointer<EventRibbon> m_ribbon;

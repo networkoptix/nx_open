@@ -4,13 +4,13 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 
 namespace nx::vms::client::desktop {
 
 MotionSearchSynchronizer::MotionSearchSynchronizer(
     QnWorkbenchContext* context,
-    MotionSearchWidget* motionSearchWidget,
+    SimpleMotionSearchWidget* motionSearchWidget,
     QObject* parent)
     :
     AbstractSearchSynchronizer(context, parent),
@@ -32,11 +32,8 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
         [this](QnMediaResourceWidget* mediaWidget)
         {
             updateAreaSelection();
-            if (!mediaWidget || !mediaWidget->resource()->toResource()->hasFlags(Qn::motion))
-            {
-                setActive(false);
+            if (!mediaWidget)
                 return;
-            }
 
             mediaWidget->setMotionSearchModeEnabled(active());
 
@@ -57,7 +54,7 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
                 mediaWidget->setMotionSearchModeEnabled(isActive);
         });
 
-    connect(m_motionSearchWidget.data(), &MotionSearchWidget::filterRegionsChanged, this,
+    connect(m_motionSearchWidget.data(), &SimpleMotionSearchWidget::filterRegionsChanged, this,
         [this](const QList<QRegion>& value)
         {
             const auto mediaWidget = this->mediaWidget();
@@ -71,6 +68,13 @@ void MotionSearchSynchronizer::updateAreaSelection()
     const auto mediaWidget = this->mediaWidget();
     if (mediaWidget && m_motionSearchWidget && active())
         m_motionSearchWidget->setFilterRegions(mediaWidget->motionSelection());
+}
+
+bool MotionSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const
+{
+    return widget && widget->resource()
+        ? widget->resource()->toResource()->hasFlags(Qn::motion)
+        : false;
 }
 
 } // namespace nx::vms::client::desktop
