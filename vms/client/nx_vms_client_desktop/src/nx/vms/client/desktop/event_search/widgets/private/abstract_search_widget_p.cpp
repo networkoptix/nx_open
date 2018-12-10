@@ -50,7 +50,7 @@ static constexpr milliseconds kTextFilterDelay = 250ms;
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     const auto paintFunction =
-        [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
+        [](QPainter* painter, const QStyleOption* option, const QWidget* /*widget*/) -> bool
         {
             if (option->state.testFlag(QStyle::State_HasFocus))
                 painter->fillRect(option->rect, option->palette.dark());

@@ -75,9 +75,20 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 {
-    return parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later)
-        ? false
-        : canFetch();
+    if (parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later))
+        return false;
+
+    if (!canFetchNow() || !hasAccessRights() || m_relevantTimePeriod.isEmpty())
+        return false;
+
+    if (m_fetchedTimeWindow.isEmpty())
+        return true;
+
+    if (fetchDirection() == FetchDirection::earlier)
+        return m_fetchedTimeWindow.startTimeMs > m_relevantTimePeriod.startTimeMs;
+
+    NX_ASSERT(fetchDirection() == FetchDirection::later);
+    return m_fetchedTimeWindow.endTimeMs() < m_relevantTimePeriod.endTimeMs();
 }
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
@@ -88,7 +99,7 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     if (isFilterDegenerate())
     {
         NX_ASSERT(rowCount() == 0);
-        setFetchedTimeWindow(relevantTimePeriod());
+        setFetchedTimeWindow(m_relevantTimePeriod);
         finishFetch(FetchResult::complete);
     }
     else
@@ -97,9 +108,14 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     }
 }
 
+bool AbstractSearchListModel::canFetchNow() const
+{
+    return true;
+}
+
 bool AbstractSearchListModel::isFilterDegenerate() const
 {
-    return relevantTimePeriod().isEmpty()
+    return m_relevantTimePeriod.isEmpty()
         || (cameraSet()->type() != ManagedCameraSet::Type::all && cameras().empty());
 }
 
@@ -131,6 +147,11 @@ bool AbstractSearchListModel::cancelFetch()
 bool AbstractSearchListModel::isConstrained() const
 {
     return m_relevantTimePeriod != QnTimePeriod::anytime();
+}
+
+bool AbstractSearchListModel::hasAccessRights() const
+{
+    return true;
 }
 
 const QnTimePeriod& AbstractSearchListModel::relevantTimePeriod() const
@@ -226,7 +247,7 @@ bool AbstractSearchListModel::liveSupported() const
 
 bool AbstractSearchListModel::effectiveLiveSupported() const
 {
-    return liveSupported() && relevantTimePeriod().isInfinite();
+    return liveSupported() && m_relevantTimePeriod.isInfinite();
 }
 
 bool AbstractSearchListModel::isLive() const

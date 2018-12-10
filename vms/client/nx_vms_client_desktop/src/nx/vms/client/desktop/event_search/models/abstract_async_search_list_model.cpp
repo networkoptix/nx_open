@@ -33,9 +33,9 @@ void AbstractAsyncSearchListModel::clearData()
     d->clearData();
 }
 
-bool AbstractAsyncSearchListModel::canFetch() const
+bool AbstractAsyncSearchListModel::canFetchNow() const
 {
-    return d->canFetch();
+    return !d->fetchInProgress();
 }
 
 void AbstractAsyncSearchListModel::requestFetch()
