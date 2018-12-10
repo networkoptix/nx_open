@@ -28,7 +28,7 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // EventSearchWidget::Private
 
-class EventSearchWidget::Private
+class EventSearchWidget::Private: public QObject
 {
     EventSearchWidget* const q;
     SelectableTextButton* const m_typeSelectionButton;
@@ -92,10 +92,10 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
                 updateAnalyticsMenu();
         };
 
-    QObject::connect(q->resourcePool(), &QnResourcePool::resourceAdded, q, handleServerChanges);
-    QObject::connect(q->resourcePool(), &QnResourcePool::resourceRemoved, q, handleServerChanges);
+    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerChanges);
+    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerChanges);
 
-    QObject::connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged, q,
+    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged, this,
         [this](bool isOnline)
         {
             if (isOnline)
@@ -106,7 +106,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         updateAnalyticsMenu();
 
     // Disable server event selection when selected cameras differ from "Any camera".
-    QObject::connect(q, &AbstractSearchWidget::cameraSetChanged,
+    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
         [this]()
         {
             NX_ASSERT(m_serverEventsSubmenuAction);
@@ -132,8 +132,6 @@ void EventSearchWidget::Private::setupTypeSelection()
     using namespace nx::vms::event;
 
     m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
-    m_typeSelectionButton->setSelectable(false);
-    m_typeSelectionButton->setDeactivatable(true);
 
     auto eventFilterMenu = q->createDropdownMenu();
     auto deviceIssuesMenu = q->createDropdownMenu();
@@ -185,7 +183,7 @@ void EventSearchWidget::Private::setupTypeSelection()
     auto defaultAction = addMenuAction(
         eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
 
-    QObject::connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, q,
+    connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
         {
             if (state == SelectableTextButton::State::deactivated)
@@ -197,11 +195,11 @@ void EventSearchWidget::Private::setupTypeSelection()
 }
 
 QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& title,
-    EventType type, const QString& /*subType*/, bool dynamicTitle)
+    EventType type, const QString& subType, bool dynamicTitle)
 {
     auto action = menu->addAction(title);
-    QObject::connect(action, &QAction::triggered, q,
-        [this, action, type]()
+    connect(action, &QAction::triggered, this,
+        [this, action, type, subType]()
         {
             m_typeSelectionButton->setText(action->text());
             m_typeSelectionButton->setState(type == EventType::undefinedEvent
@@ -209,15 +207,19 @@ QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& t
                 : SelectableTextButton::State::unselected);
 
             m_eventModel->setSelectedEventType(type);
+            m_eventModel->setSelectedSubType(subType);
         });
 
     if (dynamicTitle)
     {
-        QObject::connect(action, &QAction::changed, q,
-            [this, action, type]()
+        connect(action, &QAction::changed, this,
+            [this, action, type, subType]()
             {
-                if (m_eventModel->selectedEventType() == type)
+                if (m_eventModel->selectedEventType() == type
+                    && m_eventModel->selectedSubType() == subType)
+                {
                     m_typeSelectionButton->setText(action->text());
+                }
             });
     }
 
@@ -271,14 +273,14 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
             {
                 if (severalPlugins)
                 {
-                    currentMenu->setWindowFlags(
-                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
                     const auto pluginName = plugin.name.isEmpty()
                         ? QString("<%1>").arg(tr("unnamed analytics plugin"))
                         : plugin.name;
 
                     currentMenu = analyticsMenu->addMenu(pluginName);
+
+                    currentMenu->setWindowFlags(
+                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
                 }
 
                 for (const auto entry: plugin.eventTypes)
