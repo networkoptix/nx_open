@@ -24,27 +24,32 @@ P2PHttpServerTransport::P2PHttpServerTransport(
 void P2PHttpServerTransport::start(
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived)
 {
-    m_onGetRequestReceived = std::move(onGetRequestReceived);
-
-    m_timer.start(
-        std::chrono::seconds(10),
-        [this]()
+    post(
+        [onGetRequestReceived = std::move(onGetRequestReceived)]()
         {
-            if (m_onGetRequestReceived)
-                m_onGetRequestReceived(SystemError::connectionAbort);
-        });
-
-    m_sendSocket->readSomeAsync(
-        &m_sendBuffer,
-        [this](SystemError::ErrorCode error, size_t transferred)
-        {
-            if (error != SystemError::noError || transferred == 0)
-                return m_onGetRequestReceived(SystemError::connectionAbort);
-
-            auto onGetRequestReceived = std::move(m_onGetRequestReceived);
-            m_onGetRequestReceived = nullptr;
             onGetRequestReceived(SystemError::noError);
         });
+    //m_onGetRequestReceived = std::move(onGetRequestReceived);
+
+    //m_timer.start(
+    //    std::chrono::seconds(10),
+    //    [this]()
+    //    {
+    //        if (m_onGetRequestReceived)
+    //            m_onGetRequestReceived(SystemError::connectionAbort);
+    //    });
+
+    //m_sendSocket->readSomeAsync(
+    //    &m_sendBuffer,
+    //    [this](SystemError::ErrorCode error, size_t transferred)
+    //    {
+    //        if (error != SystemError::noError || transferred == 0)
+    //            return m_onGetRequestReceived(SystemError::connectionAbort);
+
+    //        auto onGetRequestReceived = std::move(m_onGetRequestReceived);
+    //        m_onGetRequestReceived = nullptr;
+    //        onGetRequestReceived(SystemError::noError);
+    //    });
 }
 
 P2PHttpServerTransport::~P2PHttpServerTransport()
@@ -228,6 +233,7 @@ void P2PHttpServerTransport::sendPostResponse(
     response.statusLine.version = http::http_1_1;
 
     response.headers.emplace("Content-Length", "0");
+    response.headers.emplace("Connection", "Keep-Alive");
     addDateHeader(&response.headers);
 
     response.serialize(&m_responseBuffer);

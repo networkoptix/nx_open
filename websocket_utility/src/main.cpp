@@ -217,13 +217,13 @@ public:
     void start()
     {
         NX_VERBOSE(this, "Starting sending test messages to the peer");
-        m_p2pTransport->sendAsync(
-            kTestMessage,
-            [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
-                size_t bytesRead)
-            {
-                onSend(errorCode, bytesRead);
-            });
+        //m_p2pTransport->sendAsync(
+        //    kTestMessage,
+        //    [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
+        //        size_t bytesRead)
+        //    {
+        //        onSend(errorCode, bytesRead);
+        //    });
 
         m_p2pTransport->readSomeAsync(
             &m_readBuffer,
