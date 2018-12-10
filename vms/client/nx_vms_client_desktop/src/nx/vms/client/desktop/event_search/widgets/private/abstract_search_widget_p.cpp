@@ -655,6 +655,7 @@ SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
     result->setFlat(true);
     result->setDeactivatable(true);
     result->setSelectable(false);
+    result->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     ui->filtersLayout->addWidget(result, 0, Qt::AlignLeft);
     return result;
 }
