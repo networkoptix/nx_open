@@ -135,21 +135,7 @@ public:
 
     void cancelIOSync()
     {
-        if (isInSelfAioThread())
-        {
-            cancelIoWhileInOwnAioThread();
-        }
-        else
-        {
-            nx::utils::promise<void> done;
-            post(
-                [this, &done]()
-                {
-                    cancelIoWhileInOwnAioThread();
-                    done.set_value();
-                });
-            done.get_future().wait();
-        }
+        executeInAioThreadSync([this]() { cancelIoWhileInOwnAioThread(); });
     }
 
     /**
