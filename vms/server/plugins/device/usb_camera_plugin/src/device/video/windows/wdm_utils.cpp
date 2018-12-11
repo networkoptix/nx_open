@@ -54,6 +54,18 @@ std::string toString(const std::wstring& wideStr)
     return std::string(&buffer[0]);
 }
 
+static std::wstring toDevicePath(
+    const std::wstring& deviceInstanceId,
+    const std::wstring & classGuid)
+{
+    static const std::wstring kPrefix(L"\\\\?\\");
+
+    std::wstring wstr = deviceInstanceId;
+    std::replace(wstr.begin(), wstr.end(), L'\\', L'#');
+
+    return kPrefix + wstr + L"#{" + classGuid + L"}";
+}
+
 std::wstring getDevicePath(
     HDEVINFO deviceInfoSet,
     SP_DEVINFO_DATA& deviceData,
@@ -78,13 +90,13 @@ std::wstring getDevicePath(
     // SetupDiGetDeviceInterfaceDetail requires space equal to bufferSize returned from
     // the first call for DevicePath + size of the struct + size of an extra TCHAR
     DWORD detailDataSize =
-        (bufferSize * sizeof(WCHAR)) + sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA) + sizeof(TCHAR);
+        (bufferSize * sizeof(WCHAR)) + sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA) + sizeof(TCHAR);    
 
     // Needs to be dynamically allocaed to give enough space to DevicePath member variable.
     PSP_DEVICE_INTERFACE_DETAIL_DATA detailData =
         (PSP_DEVICE_INTERFACE_DETAIL_DATA) alloca(detailDataSize);
 
-    // But cbSize is always the size of the data structure.
+    // cbSize should always the size of the data structure.
     detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
     // Call again to get the actual buffer in detailData->DevicePath.
@@ -140,12 +152,45 @@ static bool findDevice(
     return false;
 }
 
+static bool getParentDevice(
+    HDEVINFO deviceTree,
+    SP_DEVINFO_DATA& childDevice,
+    PSP_DEVINFO_DATA outParentDevice,
+    std::wstring* outParentDeviceInstanceId = nullptr)
+{
+    outParentDevice->cbSize = sizeof(SP_DEVINFO_DATA);
+
+    DEVINST parentDeviceNode = 0;
+    if (CM_Get_Parent(&parentDeviceNode, childDevice.DevInst, 0) != CR_SUCCESS)
+        return false;
+
+    ULONG bufferSize = 0;
+    if (CM_Get_Device_ID_Size(&bufferSize, parentDeviceNode, 0) != CR_SUCCESS)
+        return false;
+
+    // Make room a Unicode string with a NULL character at the end.
+    bufferSize = (bufferSize + 1) * sizeof(WCHAR);
+
+    // Get the parent device's instance id.
+    PWSTR buffer = (PWSTR)alloca(bufferSize);
+    if (CM_Get_Device_ID(parentDeviceNode, buffer, bufferSize, 0) != CR_SUCCESS)
+        return false;
+
+    // Get the actual parent device.
+    if (!SetupDiOpenDeviceInfo(deviceTree, buffer, NULL, 0, outParentDevice))
+        return false;
+
+    if (outParentDeviceInstanceId)
+        *outParentDeviceInstanceId = buffer;
+
+    return true;
+}
+
 static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDevice)
 {
-    static const std::wstring kPortPrefix(L"Port_#");
-    
-    // Call it once to get required buffer size...
     DWORD bufferSize = 0;
+
+    // Call it once to get required buffer size...
     if (!SetupDiGetDeviceRegistryProperty(
         deviceInfoSet,
         &targetUsbDevice, 
@@ -155,16 +200,16 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
         0,
         &bufferSize))
     {
-        // ERROR_INSUFFICIENT_BUFFER is expected, we want the size of buffer. If not, something
+        // ERROR_INSUFFICIENT_BUFFER is expected: we want the size of buffer. If not, something
         // went wrong.
         if(GetLastError() != ERROR_INSUFFICIENT_BUFFER)
             return -1;
     }
 
-    ++bufferSize; //< Make room for NULL terminator.
+    std::vector<BYTE> buffer(++bufferSize); //< ++ in front to make room for NULL terminator.
 
-    // And again to fill the buffer. 
-    std::vector<BYTE> buffer(bufferSize);
+    // And again to fill the buffer.
+    // Note: this returns a unicode string, two bytes per character.
     if (!SetupDiGetDeviceRegistryProperty(
         deviceInfoSet,
         &targetUsbDevice,
@@ -172,14 +217,15 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
         NULL,
         &buffer[0],
         bufferSize,
-        NULL)
-        )
+        NULL))
     {
         return -1;
     }
 
-    // The string is expected to have a string with "Port_#0001.Hub_#0001".
+    // The string is expected to have a string of the form "Port_#0001.Hub_#0001".
     std::wstring registryProperty(reinterpret_cast<wchar_t *>(&buffer[0]));
+
+    static const std::wstring kPortPrefix(L"Port_#");
 
     size_t start = registryProperty.find(kPortPrefix);
     size_t end = registryProperty.find(L".");
@@ -187,7 +233,7 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
     if(start == std::wstring::npos || end == std::wstring::npos || end < start)
         return -1;
 
-    start += kPortPrefix.size(); //< shift backwards by "Port_#" length;
+    start += kPortPrefix.size(); //< Shift backwards by "Port_#" length.
 
     // Dropping "Port_#" and ".Hub_#0001"
     std::wstring portIndex = registryProperty.substr(start, end - start);
@@ -195,52 +241,19 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
     return std::stol(portIndex);
 }
 
-static bool getParentDevice(
-    HDEVINFO deviceTree,
-    SP_DEVINFO_DATA& targetDevice,
-    PSP_DEVINFO_DATA outParentDevice,
-    std::wstring* outParentDeviceInstanceId = nullptr)
-{
-     outParentDevice->cbSize = sizeof(SP_DEVINFO_DATA);
-
-     DEVINST parentDeviceNode = 0;
-     if (CM_Get_Parent(&parentDeviceNode, targetDevice.DevInst, 0) != CR_SUCCESS)
-         return false;
-
-     ULONG bufferSize = 0;
-     if (CM_Get_Device_ID_Size(&bufferSize, parentDeviceNode, 0) != CR_SUCCESS)
-         return false;
-
-     ++bufferSize; //< Make room for NULL character.
-     bufferSize *= sizeof(WCHAR); // Make room for unicode strings.
-
-     PWSTR buffer = (PWSTR) alloca(bufferSize);
-     if (CM_Get_Device_ID(parentDeviceNode, buffer, bufferSize, 0) != CR_SUCCESS)
-         return false;
-
-
-     if (!SetupDiOpenDeviceInfo(deviceTree, buffer, NULL, 0, outParentDevice))
-         return false;
-
-     if (outParentDeviceInstanceId)
-         *outParentDeviceInstanceId = buffer;
-
-     return true;
-}
-
 static std::string getStringDescriptor(HANDLE usbHubHandle, ULONG portIndex, UCHAR descriptorIndex)
 {
     // MAXIMUM_USB_STRING_LENGTH: Allocating additional space for the string inside the request.
     DWORD size = sizeof(PUSB_STRING_DESCRIPTOR) + MAXIMUM_USB_STRING_LENGTH;
-    
-    PUSB_DESCRIPTOR_REQUEST request = (PUSB_DESCRIPTOR_REQUEST) alloca(size);
+
+    PUSB_DESCRIPTOR_REQUEST request = (PUSB_DESCRIPTOR_REQUEST)alloca(size);
     memset(request, 0, size);
 
     request->ConnectionIndex = portIndex;
     request->SetupPacket.wValue = (USB_STRING_DESCRIPTOR_TYPE << 8) | descriptorIndex;
     request->SetupPacket.wIndex = 0; // < default Language id
     request->SetupPacket.wLength = MAXIMUM_USB_STRING_LENGTH;
-    
+
     DWORD bytesReturned = 0;
     if (!DeviceIoControl(
         usbHubHandle,
@@ -258,21 +271,9 @@ static std::string getStringDescriptor(HANDLE usbHubHandle, ULONG portIndex, UCH
     if (!bytesReturned)
         return std::string();
 
-    PUSB_STRING_DESCRIPTOR theString = (PUSB_STRING_DESCRIPTOR) request->Data;
+    PUSB_STRING_DESCRIPTOR theString = (PUSB_STRING_DESCRIPTOR)request->Data;
 
     return toString(theString->bString);
-}
-
-static std::wstring toDevicePath(
-    const std::wstring& usbHubInstanceId, 
-    const std::wstring & classGuid)
-{
-    static const std::wstring kPrefix(L"\\\\?\\");
-    
-    std::wstring wstr = usbHubInstanceId;
-    std::replace(wstr.begin(), wstr.end(), L'\\', L'#');
-
-    return kPrefix + wstr + L"#{" + classGuid + L"}";
 }
 
 static std::string getUsbSerialNumber(HANDLE usbHubHandle, ULONG portIndex)
@@ -362,7 +363,7 @@ std::string getDeviceUniqueId(const std::string& devicePath)
 
     std::wstring usbHubDevicePath = toDevicePath(usbHubInstanceId, kUsbHubClassGuid);
 
-    // 4. Get a handle on the parent usb hubIndex device
+    // 4. Get a handle on the parent usb hub device
     HANDLE usbHubHandle = CreateFile(
         usbHubDevicePath.c_str(),
         GENERIC_WRITE,
@@ -375,8 +376,7 @@ std::string getDeviceUniqueId(const std::string& devicePath)
         return std::string();
 
      // 5. Get the physical port index for the target usb device (not the capture device).
-     // The capture device does not have its physical location as a property, which is why the usb
-     // device needs to be located in steps 2 and 3.
+     // The capture device does not have its physical location as a property.
      LONG portIndex = getUsbPortIndex(deviceTree, targetUsbDevice);
      if (portIndex == -1)
          return std::string();
