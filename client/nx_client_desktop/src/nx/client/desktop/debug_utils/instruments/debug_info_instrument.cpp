@@ -20,7 +20,7 @@ namespace {
 using namespace std::chrono;
 
 static constexpr milliseconds kHandlesInterval = 500ms;
-static constexpr milliseconds kLogInterval = 15s; // 2min;
+static constexpr milliseconds kLogInterval = 1min;
 
 } // namespace
 
@@ -34,7 +34,7 @@ struct DebugInfoInstrument::Private
     QElapsedTimer logTimer;
 
     int frameCount = 0;
-    QString fps;
+    QString fps = "----";
     qint64 frameTimeMs = 0;
     QString handles;
 
@@ -47,7 +47,6 @@ struct DebugInfoInstrument::Private
             handles = QString("\nGDI: %1").arg(gdiHandles);
             handles += QString("\nUser: %1").arg(userHandles);
         #endif
-        handlesTimer.restart();
     }
 
     void updateFps()
@@ -56,7 +55,6 @@ struct DebugInfoInstrument::Private
         frameTimeMs = fpsTimer.elapsed() / frameCount;
         this->fps = QString::number(fps, 'g', 4);
         frameCount = 0;
-        fpsTimer.restart();
     }
 
     QString debugInfoText() const
@@ -105,18 +103,20 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
     if (d->fpsTimer.hasExpired(d->updateIntervalMs))
     {
         d->updateFps();
+        d->fpsTimer.restart();
         changed = true;
     }
 
-    if (d->profilerMode && d->handlesTimer.hasExpired(kHandlesInterval.count()))
+    if (d->handlesTimer.hasExpired(kHandlesInterval.count()))
     {
         d->updateHandles();
+        d->handlesTimer.restart();
         changed = true;
     }
 
-    if (d->profilerMode && d->logTimer.hasExpired(kLogInterval.count()))
+    if (d->logTimer.hasExpired(kLogInterval.count()) && !d->handles.isEmpty())
     {
-        NX_INFO(this, lm("Client profiling info:\n") + d->debugInfoText());
+        NX_INFO(this, lm("Client profiling info:") + d->handles);
         d->logTimer.restart();
     }
 
