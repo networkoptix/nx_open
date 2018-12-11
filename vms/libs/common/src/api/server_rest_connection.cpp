@@ -344,13 +344,13 @@ Handle ServerConnection::searchCameraStart(
     QThread* targetThread)
 {
     auto parameters = QnRequestParamList{
-        {lit("url"), cameraUrl},
-        {lit("user"), userName},
-        {lit("password"), password}};
+        {"url", cameraUrl},
+        {"user", userName},
+        {"password", password}};
     if (port.has_value())
         parameters << QnRequestParam("port", *port);
 
-    return executeGet(lit("/api/manualCamera/search"), parameters, callback, targetThread);
+    return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
 }
 
 Handle ServerConnection::searchCameraRangeStart(
@@ -364,14 +364,14 @@ Handle ServerConnection::searchCameraRangeStart(
 {
     NX_ASSERT(!endAddress.isEmpty());
     auto parameters = QnRequestParamList{
-        {lit("start_ip"), startAddress},
-        {lit("user"), userName},
-        {lit("password"), password},
-        {lit("end_ip"), endAddress}};
+        {"start_ip", startAddress},
+        {"user", userName},
+        {"password", password},
+        {"end_ip", endAddress}};
     if (port.has_value())
         parameters << QnRequestParam("port", *port);
 
-    return executeGet(lit("/api/manualCamera/search"), parameters, callback, targetThread);
+    return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
 }
 
 Handle ServerConnection::searchCameraStatus(
