@@ -27,14 +27,7 @@ Item
     property alias changingMotionRoi: timeline.changingMotionRoi
     property bool hasCustomRoi: false;
 
-    property string warningText//:
-//    {
-//        console.log("mode: ", motionSearchMode, ", loading: ", d.loadingChunks,
-//            ", chunks:", cameraChunkProvider.hasChunks(),
-//            ", motion:", cameraChunkProvider.hasMotionChunks())
-
-//    }
-
+    property string warningText
 
     signal ptzButtonClicked()
     signal switchToNextCamera()
