@@ -47,12 +47,7 @@ Settings::Settings():
         }
     }
 
-    for (auto property: properties())
-    {
-        if (auto secured = dynamic_cast<Secured*>(property))
-            secured->setSecurityKey(key);
-    }
-
+    setSecurityKey(key);
     load();
 }
 

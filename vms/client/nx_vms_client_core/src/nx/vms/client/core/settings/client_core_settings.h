@@ -2,8 +2,6 @@
 
 #include <QtCore/QHash>
 
-#include <nx/vms/client/core/common/utils/encoded_string.h>
-
 #include <utils/common/credentials.h>
 
 #include <nx/fusion/serialization/json_functions.h>
@@ -14,48 +12,7 @@
 
 namespace nx::vms::client::core {
 
-class Secured
-{
-public:
-    QByteArray securityKey() const
-    {
-        return m_securityKey;
-    }
-
-    void setSecurityKey(const QByteArray& key)
-    {
-        m_securityKey = key;
-    }
-
-private:
-    QByteArray m_securityKey;
-};
-
-template<typename T>
-class SecureProperty: public nx::utils::property_storage::Property<T>, public Secured
-{
-    using base_type = nx::utils::property_storage::Property<T>;
-public:
-    using base_type::Property;
-    using base_type::operator=;
-
-protected:
-    virtual T decodeValue(const QString& value, bool* success) const override
-    {
-        const auto converter = EncodedString::fromEncoded(value, securityKey());
-        return base_type::decodeValue(converter.decoded(), success);
-    }
-
-    virtual QString encodeValue(const T& value) const override
-    {
-        const auto converter = EncodedString::fromDecoded(
-            base_type::encodeValue(value), securityKey());
-        return converter.encoded();
-    }
-};
-
 class Settings:
-    public QObject,
     public nx::utils::property_storage::Storage,
     public Singleton<Settings>
 {
@@ -73,6 +30,9 @@ public:
 
     SecureProperty<Credentials> cloudCredentials{
         this, "cloudCredentials"};
+
+private:
+    QByteArray m_securityKey;
 };
 
 inline Settings* settings()

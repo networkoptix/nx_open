@@ -14,22 +14,25 @@ class BaseProperty: public QObject
 
 public:
     BaseProperty(
-        Storage* storage, const QString& name, const QString& description = QString());
+        Storage* storage,
+        const QString& name,
+        const QString& description = QString(),
+        bool secure = false);
+
+    virtual QString serialized() const = 0;
+    virtual void loadSerializedValue(const QString& value) = 0;
 
 signals:
     void changed(BaseProperty* property);
 
 protected:
     void notify();
-    void save(const QString& value);
-    virtual void updateValue(const QString& value) = 0;
 
 public:
     Storage* const storage;
     const QString name;
     const QString description;
-
-    friend class Storage;
+    const bool secure;
 };
 
 template<typename T>
@@ -40,9 +43,10 @@ public:
         Storage* storage,
         const QString& name,
         const T& defaultValue = {},
-        const QString& description = QString())
+        const QString& description = QString(),
+        bool secure = false)
         :
-        BaseProperty(storage, name, description),
+        BaseProperty(storage, name, description, secure),
         m_value(defaultValue)
     {
     }
@@ -64,8 +68,6 @@ public:
 
         m_value = value;
         notify();
-
-        save(encodeValue(m_value));
     }
 
     Property& operator=(const T& value)
@@ -74,21 +76,15 @@ public:
         return *this;
     }
 
-protected:
-    virtual T decodeValue(const QString& value, bool* success) const
+    virtual QString serialized() const override
     {
-        return QJson::deserialized<T>(value.toUtf8(), {}, success);
+        return serializeValue(m_value);
     }
 
-    virtual QString encodeValue(const T& value) const
-    {
-        return QString::fromUtf8(QJson::serialized(value));
-    }
-
-    virtual void updateValue(const QString& value) override
+    virtual void loadSerializedValue(const QString& value) override
     {
         bool ok = false;
-        auto newValue = decodeValue(value, &ok);
+        auto newValue = deserializeValue(value, &ok);
         if (!ok || m_value == newValue)
             return;
 
@@ -96,10 +92,38 @@ protected:
         notify();
     }
 
+protected:
+    virtual T deserializeValue(const QString& value, bool* success) const
+    {
+        return QJson::deserialized<T>(value.toUtf8(), {}, success);
+    }
+
+    virtual QString serializeValue(const T& value) const
+    {
+        return QString::fromUtf8(QJson::serialized(value));
+    }
+
 private:
     T m_value;
+};
 
-    friend class Storage;
+template<typename T>
+class SecureProperty: public Property<T>
+{
+    using base_type = Property<T>;
+
+public:
+    SecureProperty(
+        Storage* storage,
+        const QString& name,
+        const T& defaultValue = {},
+        const QString& description = QString())
+        :
+        base_type(storage, name, defaultValue, description, /*secure*/ true)
+    {
+    }
+
+    using base_type::operator=;
 };
 
 } // namespace nx::utils::property_storage
