@@ -83,6 +83,9 @@
             <nx-section>
                 <div [innerHtml]="plugin.instructions.downloadLinks"></div>
             </nx-section>
+            <nx-section>
+                <div [innerHtml]="plugin.instructions.installationInstructions"></div>
+            </nx-section>
         </nx-block>
 
         <nx-block *ngIf="plugin && plugin.additionalInformation">
