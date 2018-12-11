@@ -135,7 +135,7 @@ ${RENAME SAVE}                        //form[@name='renameForm']//button[text()=
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
 ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
-${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),'${SYSTEM NAME IS REQUIRED TEXT}')]
+${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),"${SYSTEM NAME IS REQUIRED TEXT}")]
 
 ${OWNER NAME}                         //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]
 ${OWNER EMAIL}                        //a[@ng-href="mailto:${EMAIL OWNER}"]
