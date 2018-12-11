@@ -40,13 +40,6 @@ static std::string getMacAddress()
             return iFace.hardwareAddress().replace(":", "-").toStdString();
     }
 
-    // No Wifi? Maybe the loop back interface for Raspberry Pi 0, which has no network interface.
-    for (const auto & iFace : interfaces)
-    {
-        if (iFace.type() == QNetworkInterface::Loopback)
-            return iFace.hardwareAddress().replace(":", "-").toStdString();
-    }
-
     // Give up.
     return std::string();
 }
@@ -205,15 +198,12 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
 
     for (auto & device: devices)
     {
-        std::string nxId;
+        std::string nxId = device.uniqueId;
 
-        // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
-        if (isRpiMmal(device.name))
+        // if something went wrong during unique id parsing on Raspberry Pi,
+        // fall back to ethernet or wifi mac address.
+        if (nxId.empty() && isRpiMmal(device.name))
             nxId = getMacAddress();
-
-        // Fall back to device unique id for normal usb cameras.
-        if (nxId.empty())
-            nxId = device.uniqueId;
 
         // If nxId is still empty, fall back to volatile device path.
         if (nxId.empty())
