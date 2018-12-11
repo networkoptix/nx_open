@@ -57,12 +57,6 @@ public:
     QByteArray toEncoded(QUrl::FormattingOptions options = QUrl::FullyEncoded) const;
     Q_INVOKABLE QUrl toQUrl() const;
 
-    /**
-    * First tries to parse strings like `hostname`, then
-    * strings like `hostname:port` and uses the QUrl parser for other cases.
-    * @return URL which may not be a valid one, so it should be checked after the call.
-    */
-    static Url fromText(const QString& url);
     static Url fromQUrl(const QUrl& url);
     static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
     static Url fromUserInput(const QString &userInput);
@@ -176,6 +170,13 @@ inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 {
     return equal(lhs, rhs, ComparisonFlag::Address);
 }
+
+/**
+* First tries to parse strings like `hostname`, then
+* strings like `hostname:port` and uses the QUrl parser for other cases.
+* @return URL which may not be a valid one, so it should be checked after the call.
+*/
+nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme = "");
 
 } // namespace url
 } // namespace utils
