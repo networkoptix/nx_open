@@ -17,7 +17,7 @@ namespace usb_cam {
 //-------------------------------------------------------------------------------------------------
 // TimeStampedBuffer
 
-template<typename V>
+template<typename Item>
 class TimeStampedBuffer
 {
 public:
@@ -42,7 +42,7 @@ public:
             m_buffer.clear();
     }
 
-    virtual void insert(uint64_t key, const V& item)
+    virtual void insert(uint64_t key, const Item& item)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_buffer.emplace(key, item);
@@ -52,26 +52,26 @@ public:
     /**
      * Peek at the oldest item in the buffer
      */
-    V peekOldest(const std::chrono::milliseconds& timeout)
+    Item peekOldest(const std::chrono::milliseconds& timeout)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (!wait(lock, 0 /*minimumBufferSize*/, timeout))
-            return V();
+            return Item();
         return m_buffer.begin()->second;
     }
 
     /**
      * Pop the oldest item off the buffer
      */
-    virtual V popOldest(const std::chrono::milliseconds& timeout)
+    virtual Item popOldest(const std::chrono::milliseconds& timeout)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (!wait(lock, 0 /*minimumBufferSize*/, timeout))
-            return V();
+            return Item();
         auto it = m_buffer.begin();
-        auto v = it->second;
+        auto item = it->second;
         m_buffer.erase(it);
-        return v;
+        return item;
     }
 
     /**
@@ -128,7 +128,7 @@ public:
 protected:
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
-    std::map<uint64_t, V> m_buffer;
+    std::map<uint64_t, Item> m_buffer;
     bool m_interrupted = false;
 
 protected:
