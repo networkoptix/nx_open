@@ -3597,6 +3597,9 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
     quint64 renewSubscriptionTimerIDBak = 0;
     {
         QnMutexLocker lk(&m_ioPortMutex);
+        if (!m_inputMonitored)
+            return;
+
         m_inputMonitored = false;
         nextPullMessagesTimerIDBak = m_nextPullMessagesTimerID;
         m_nextPullMessagesTimerID = 0;
@@ -3604,7 +3607,6 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
         m_renewSubscriptionTimerID = 0;
     }
 
-    //removing timer
     if (nextPullMessagesTimerIDBak > 0)
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
     if (renewSubscriptionTimerIDBak > 0)
