@@ -317,3 +317,4 @@ Check share email for registered user
     \    check in list    ${expected links}    ${link}
     Delete Email    ${email}
     Close Mailbox
+    Remove User Permissions    ${EMAIL NOPERM}
