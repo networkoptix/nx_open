@@ -7,10 +7,7 @@
 
 #include "api/relay_api_client_factory.h"
 
-namespace nx {
-namespace network {
-namespace cloud {
-namespace relay {
+namespace nx::network::cloud::relay {
 
 using namespace nx::cloud::relay;
 
@@ -64,12 +61,10 @@ void ReverseConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
 void ReverseConnection::connectToOriginator(
     ReverseConnectionCompletionHandler handler)
 {
-    using namespace std::placeholders;
-
     m_connectHandler = std::move(handler);
     m_relayClient->beginListening(
         m_peerName,
-        std::bind(&ReverseConnection::onConnectDone, this, _1, _2, _3));
+        [this](auto&&... args) { onConnectDone(std::move(args)...); });
 }
 
 void ReverseConnection::waitForOriginatorToStartUsingConnection(
@@ -124,8 +119,6 @@ void ReverseConnection::onConnectDone(
     api::BeginListeningResponse response,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
-    using namespace std::placeholders;
-
     if (resultCode == api::ResultCode::ok)
     {
         streamSocket->setRecvTimeout(std::chrono::milliseconds::zero());
@@ -143,9 +136,9 @@ void ReverseConnection::onConnectDone(
         m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             std::move(streamSocket));
         m_httpPipeline->setOnConnectionClosed(
-            [this](auto... args) { onConnectionClosed(args...); });
+            [this](auto&&... args) { onConnectionClosed(std::move(args)...); });
         m_httpPipeline->setMessageHandler(
-            std::bind(&ReverseConnection::relayNotificationReceived, this, _1));
+            [this](auto&&... args) { relayNotificationReceived(std::move(args)...); });
         m_beginListeningResponse = response;
     }
 
@@ -178,9 +171,12 @@ void ReverseConnection::relayNotificationReceived(
 
 ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
     m_relayUrl(relayUrl),
-    m_acceptor(std::bind(&ConnectionAcceptor::reverseConnectionFactoryFunc, this))
+    m_acceptor([this](auto&&... args) { return reverseConnectionFactoryFunc(std::move(args)...); })
 {
     bindToAioThread(getAioThread());
+
+    m_acceptor.setOnConnectionEstablished(
+        [this](auto&&... args) { updateAcceptorConfiguration(std::move(args)...); });
 }
 
 void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -191,8 +187,6 @@ void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
 {
-    using namespace std::placeholders;
-
     if (!m_started)
     {
         m_acceptor.start();
@@ -238,6 +232,13 @@ void ConnectionAcceptor::stopWhileInAioThread()
     m_acceptor.pleaseStopSync();
 }
 
+void ConnectionAcceptor::updateAcceptorConfiguration(
+    const detail::ReverseConnection& newConnection)
+{
+    m_acceptor.setPreemptiveConnectionCount(
+        newConnection.beginListeningResponse().preemptiveConnectionCount);
+}
+
 std::unique_ptr<detail::ReverseConnection>
     ConnectionAcceptor::reverseConnectionFactoryFunc()
 {
@@ -255,8 +256,7 @@ std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::toStreamSocket(
 //-------------------------------------------------------------------------------------------------
 
 ConnectionAcceptorFactory::ConnectionAcceptorFactory():
-    base_type(std::bind(&ConnectionAcceptorFactory::defaultFactoryFunc, this,
-        std::placeholders::_1))
+    base_type([this](auto&&... args) { return defaultFactoryFunc(std::move(args)...); })
 {
 }
 
@@ -272,7 +272,4 @@ std::unique_ptr<AbstractConnectionAcceptor> ConnectionAcceptorFactory::defaultFa
     return std::make_unique<ConnectionAcceptor>(relayUrl);
 }
 
-} // namespace relay
-} // namespace cloud
-} // namespace network
-} // namespace nx
+} // namespace nx::network::cloud::relay

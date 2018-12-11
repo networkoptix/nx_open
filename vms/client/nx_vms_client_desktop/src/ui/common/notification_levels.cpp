@@ -11,15 +11,20 @@ using namespace nx;
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::AbstractActionPtr &businessAction)
+QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::AbstractActionPtr& action)
 {
-    if (businessAction->actionType() == ActionType::playSoundAction)
+    if (action->actionType() == ActionType::playSoundAction)
         return Value::CommonNotification;
 
-    if (businessAction->actionType() == ActionType::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
         return Value::CriticalNotification;
 
-    auto params = businessAction->getRuntimeParams();
+    return valueOf(action->getRuntimeParams());
+}
+
+QnNotificationLevel::Value QnNotificationLevel::valueOf(
+    const nx::vms::event::EventParameters& params)
+{
     EventType eventType = params.eventType;
 
     if (eventType >= EventType::userDefinedEvent)

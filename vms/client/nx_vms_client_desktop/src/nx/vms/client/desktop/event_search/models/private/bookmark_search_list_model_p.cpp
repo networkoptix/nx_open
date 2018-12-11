@@ -133,7 +133,7 @@ void BookmarkSearchListModel::Private::truncateToMaximumCount()
     const auto itemCleanup =
         [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
 
-    this->truncateDataToMaximumCount(m_data,
+    q->truncateDataToMaximumCount(m_data,
         [](const QnCameraBookmark& item) { return item.startTimeMs; },
         itemCleanup);
 }
@@ -143,8 +143,11 @@ void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
     const auto itemCleanup =
         [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
 
-    this->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+    const auto timestampGetter =
+        [](const QnCameraBookmark& bookmark) { return bookmark.startTimeMs; };
+
+    q->truncateDataToTimePeriod(
+        m_data, timestampGetter, q->relevantTimePeriod(), itemCleanup);
 }
 
 rest::Handle BookmarkSearchListModel::Private::getBookmarks(
@@ -244,11 +247,6 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
     NX_ASSERT(!q->liveSupported()); //< We don't handle overlaps as this model is not live-updated.
     NX_ASSERT(currentRequest().direction == FetchDirection::later);
     return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
-}
-
-bool BookmarkSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewBookmarks);
 }
 
 void BookmarkSearchListModel::Private::watchBookmarkChanges()

@@ -115,9 +115,6 @@ protected:
     /** Creates a child menu with dropdown appearance. */
     QMenu* createDropdownMenu();
 
-    /** Make camera selector read-only, locked in current state. */
-    void setCamerasReadOnly(bool value);
-
     /**
      * Adds specified action to the list of device dependent actions.
      * When connection state becomes "Ready" (initial resources are received) all device dependent

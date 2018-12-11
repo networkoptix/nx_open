@@ -15,7 +15,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.1",
+    "version": "1.0.1.2",
     "data": [
         {
             "keys": ["Hanwha|*"],
@@ -188,7 +188,7 @@
         {
             "keys": [
                 "ActiveCam|*",
-                "ACTI|B915", 
+                "ACTI|B915",
                 "*|ACTi-915"
             ],
             "forceONVIF": true
@@ -2031,9 +2031,9 @@
         },
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR", 
-                "DigitalWatchdog|DWC-MD85DiA", 
-                "DigitalWatchdog|DWC-MV85DiA", 
+                "Digital_Watchdog|DWC-PF5M1TIR",
+                "DigitalWatchdog|DWC-MD85DiA",
+                "DigitalWatchdog|DWC-MV85DiA",
                 "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
@@ -2921,7 +2921,7 @@
         {
             "keys": ["UNIVIEW|*"],
             "needToReloadAllAdvancedParametersAfterApply": true
-        },	
+        },
         {
             "keys": [
                 "*|DS-7332HUHI-K4"
@@ -2962,6 +2962,10 @@
                     "ProfileToken032"
                 ]
             }
+        },
+        {
+            "keys": ["Hanwha|PNM-9320VQP"],
+            "ptzTargetChannel": 4
         }
     ]
 }

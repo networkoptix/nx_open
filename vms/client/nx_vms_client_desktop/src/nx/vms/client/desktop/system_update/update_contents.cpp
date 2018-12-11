@@ -132,11 +132,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     bool alreadyInstalled = true;
 
     QString clientVersionRaw = nx::utils::AppInfo::applicationVersion();
-    if (!clientVersionRaw.isEmpty()
-        && (nx::utils::SoftwareVersion(clientVersionRaw) != contents.getVersion()))
-    {
+    if (nx::utils::SoftwareVersion(clientVersionRaw) != contents.getVersion())
         alreadyInstalled = false;
-    }
 
     auto systemInfo = QnAppInfo::currentSystemInformation();
     if (nx::update::findPackage(
@@ -243,7 +240,10 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (!contents.manualPackages.empty())
     {
         QStringList files;
-        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected some servers can not download update packages.", contents.info.version);
+        for (const auto& pkg: contents.manualPackages)
+            files.append(pkg.file);
+
+        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected some servers can not download update packages: %2", contents.info.version, files.join(","));
     }
 
     contents.verified = true;

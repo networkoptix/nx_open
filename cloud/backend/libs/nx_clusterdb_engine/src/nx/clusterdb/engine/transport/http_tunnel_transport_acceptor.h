@@ -14,7 +14,7 @@ namespace nx::clusterdb::engine {
 class ConnectionManager;
 class ProtocolVersionRange;
 class OutgoingCommandFilter;
-class TransactionLog;
+class CommandLog;
 
 } // namespace nx::clusterdb::engine
 
@@ -41,7 +41,7 @@ public:
     HttpTunnelTransportAcceptor(
         const QnUuid& peerId,
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* transactionLog,
+        CommandLog* transactionLog,
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
@@ -52,7 +52,7 @@ public:
 private:
     const QnUuid m_peerId;
     const ProtocolVersionRange& m_protocolVersionRange;
-    TransactionLog* m_transactionLog = nullptr;
+    CommandLog* m_commandLog = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     const vms::api::PeerData m_localPeerData;

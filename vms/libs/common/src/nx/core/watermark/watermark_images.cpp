@@ -17,7 +17,7 @@ using nx::core::Watermark;
 namespace {
 
 const QColor kWatermarkColor = QColor(Qt::white);
-const int kWatermarkFontSize = 42;
+const int kWatermarkFontSize = 84; //< Pure magic. It was 42 * 2 before. No more memes.
 constexpr double kFuzzyEqualDiff = 0.02;
 constexpr double kFuzzyEqualRatio = 1.02;
 
@@ -53,6 +53,7 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
     double aspectRatio = ((double) size.width()) / size.height();
     //^ Ask Misha Sh. about this weird code style ^.
 
+    bool predefinedAspect = false;
     // Setup predefined sizes for a few well-known aspect ratios.
     // These values are arbitrary, but reasonable.
     const auto kWideScreenAspectRatio = 16.0 / 9.0;
@@ -60,19 +61,41 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
     {
         size = QSize(1920, 1080);
         aspectRatio = kWideScreenAspectRatio;
+        predefinedAspect = true;
     }
     const auto kNormalScreenAspectRatio = 4.0 / 3.0;
     if (fabs(aspectRatio / kNormalScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
     {
         size = QSize(1600, 1200);
         aspectRatio = kNormalScreenAspectRatio;
-
+        predefinedAspect = true;
     }
     const auto kSquareScreenAspectRatio = 1.0; //< We will remove all magic consts!
     if (fabs(aspectRatio / kSquareScreenAspectRatio - 1) < kFuzzyEqualDiff)
     {
         size = QSize(1200, 1200);
         aspectRatio = kSquareScreenAspectRatio;
+        predefinedAspect = true;
+    }
+
+    // Sometimes `size` uses logical coordinates that are quite big, ~10000.
+    // We will limit such bitmaps to 1600 px (magical) on bigger side.
+    constexpr int maxSize = 1600;
+    if (!predefinedAspect && (size.width() > maxSize || size.height() > maxSize))
+    {
+        size = size.width() > size.height()
+            ? QSize(maxSize, size.height() * maxSize / size.width())
+            : QSize(size.width() * maxSize / size.height(), maxSize);
+    }
+
+    // We also limit biggest dimension to be at least 1000. This is needed mostly
+    // for small previews during export.
+    constexpr int minSize = 1200;
+    if (!predefinedAspect && (size.width() < minSize && size.height() < minSize))
+    {
+        size = size.width() > size.height()
+            ? QSize(minSize, size.height() * minSize / size.width())
+            : QSize(size.width() * minSize / size.height(), minSize);
     }
 
     // Create new watermark pixmap.
@@ -123,6 +146,7 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     QPainter painter(&pixmap);
     auto color = kWatermarkColor;
     color.setAlphaF(watermark.settings.opacity);
+    painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setPen(color);
     painter.setFont(font);
 

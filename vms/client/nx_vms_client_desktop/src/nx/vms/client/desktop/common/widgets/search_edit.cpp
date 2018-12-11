@@ -22,6 +22,7 @@
 #include <nx/utils/app_info.h>
 #include <utils/math/color_transformations.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -139,7 +140,6 @@ void HoverablePushButton::leaveEvent(QEvent* /*event*/)
 
 } //namespace
 
-#include <utils/common/delayed.h>
 namespace nx::vms::client::desktop {
 
 struct SearchEdit::Private
@@ -154,7 +154,7 @@ struct SearchEdit::Private
 
     bool isMenuEnabled = false;
     QVariant currentTagData;
-    std::function<QMenu*()> tagMenuCreator;
+    MenuCreator tagMenuCreator;
     std::function<QString(const QVariant&)> tagNameProvider;
 };
 
@@ -172,7 +172,6 @@ SearchEdit::SearchEdit(QWidget* parent):
     setAcceptDrops(true);
     setAttribute(Qt::WA_InputMethodEnabled);
 
-    d->lineEdit->setFrame(false);
     d->lineEdit->setFixedHeight(kLineEditHeight);
     d->lineEdit->setFocusProxy(this);
     d->lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
@@ -249,6 +248,9 @@ SearchEdit::SearchEdit(QWidget* parent):
             }
         });
 
+    // Sets empty frame and invalidates geometry of control. Should be called outside constructor
+    // to prevent wrong layout size recalculations.
+    executeLater([this](){ d->lineEdit->setFrame(false); }, this);
 }
 
 SearchEdit::~SearchEdit()
@@ -348,9 +350,7 @@ void SearchEdit::showFilterMenu()
     if (!isMenuEnabled() || !d->tagMenuCreator)
         return;
 
-    auto menu = d->tagMenuCreator();
-    menu->setParent(this, menu->windowFlags());
-
+    const auto menu = d->tagMenuCreator(this);
     connect(menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
     connect(menu, &QMenu::aboutToHide, menu, &QMenu::deleteLater);
 
@@ -367,7 +367,7 @@ void SearchEdit::showFilterMenu()
     QnHiDpiWorkarounds::showMenu(menu, globalPoint);
 }
 
-void SearchEdit::setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
+void SearchEdit::setTagOptionsSource(MenuCreator tagMenuCreator,
     std::function<QString(const QVariant&)> tagNameProvider)
 {
     d->tagMenuCreator = tagMenuCreator;
@@ -427,9 +427,6 @@ void SearchEdit::updateTagButton()
 
 QSize SearchEdit::sizeHint() const
 {
-    const QnScopedTypedPropertyRollback<bool, QLineEdit>
-        frameRollback(d->lineEdit, &QLineEdit::setFrame, &QLineEdit::hasFrame, true);
-
     const auto tagVerticalSize = d->tagButton->isVisible()
         ? QSize(0, d->tagButton->parentWidget()->sizeHint().height())
         : QSize();

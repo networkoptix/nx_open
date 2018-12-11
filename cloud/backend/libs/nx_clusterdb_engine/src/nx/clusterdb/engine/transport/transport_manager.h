@@ -10,7 +10,7 @@
 
 namespace nx::clusterdb::engine {
 
-class TransactionLog;
+class CommandLog;
 class OutgoingCommandFilter;
 
 } // namespace nx::clusterdb::engine
@@ -22,7 +22,7 @@ class TransportManager
 public:
     TransportManager(
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* transactionLog,
+        CommandLog* transactionLog,
         const OutgoingCommandFilter& outgoingCommandFilter,
         const std::string& nodeId);
 
@@ -33,7 +33,7 @@ public:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
-    TransactionLog* m_transactionLog = nullptr;
+    CommandLog* m_commandLog = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     const std::string m_nodeId;
 };

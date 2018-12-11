@@ -5,13 +5,13 @@
 
 namespace nx::clusterdb::engine {
 
-TransactionLogReader::TransactionLogReader(
-    TransactionLog* const transactionLog,
+CommandLogReader::CommandLogReader(
+    CommandLog* const commandLog,
     const std::string& systemId,
     Qn::SerializationFormat dataFormat,
     const OutgoingCommandFilter& outgoingCommandFilter)
     :
-    m_transactionLog(transactionLog),
+    m_commandLog(commandLog),
     m_systemId(systemId),
     m_dataFormat(dataFormat),
     m_outgoingCommandFilter(outgoingCommandFilter),
@@ -19,12 +19,12 @@ TransactionLogReader::TransactionLogReader(
 {
 }
 
-TransactionLogReader::~TransactionLogReader()
+CommandLogReader::~CommandLogReader()
 {
     stopWhileInAioThread();
 }
 
-void TransactionLogReader::stopWhileInAioThread()
+void CommandLogReader::stopWhileInAioThread()
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -33,14 +33,14 @@ void TransactionLogReader::stopWhileInAioThread()
     m_asyncOperationGuard.reset();
 }
 
-void TransactionLogReader::readTransactions(
+void CommandLogReader::readTransactions(
     const ReadCommandsFilter& readFilter,
     TransactionsReadHandler completionHandler)
 {
     ReadCommandsFilter effectiveReadFilter = readFilter;
     m_outgoingCommandFilter.updateReadFilter(&effectiveReadFilter);
 
-    m_transactionLog->readTransactions(
+    m_commandLog->readTransactions(
         m_systemId,
         effectiveReadFilter,
         [this,
@@ -72,7 +72,7 @@ void TransactionLogReader::readTransactions(
         });
 }
 
-void TransactionLogReader::onTransactionsRead(
+void CommandLogReader::onTransactionsRead(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
     vms::api::TranState readedUpTo,
@@ -87,12 +87,12 @@ void TransactionLogReader::onTransactionsRead(
         std::move(readedUpTo));
 }
 
-vms::api::TranState TransactionLogReader::getCurrentState() const
+vms::api::TranState CommandLogReader::getCurrentState() const
 {
-    return m_transactionLog->getTransactionState(m_systemId);
+    return m_commandLog->getTransactionState(m_systemId);
 }
 
-std::string TransactionLogReader::systemId() const
+std::string CommandLogReader::systemId() const
 {
     return m_systemId;
 }

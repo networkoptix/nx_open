@@ -375,12 +375,12 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         DeviceSoapWrapper& deviceSoapWrapper,
-        CapabilitiesResp* outCapabilitiesResponse);
-    virtual CameraDiagnostics::Result initializeMedia(const CapabilitiesResp& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializePtz(const CapabilitiesResp& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializeIo(const CapabilitiesResp& onvifCapabilities);
+        _onvifDevice__GetCapabilitiesResponse* outCapabilitiesResponse);
+    virtual CameraDiagnostics::Result initializeMedia(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializePtz(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeIo(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
     virtual CameraDiagnostics::Result initializeAdvancedParameters(
-        const CapabilitiesResp& onvifCapabilities);
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
@@ -398,7 +398,7 @@ protected:
         const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
 
     virtual CameraDiagnostics::Result customInitialization(
-        const CapabilitiesResp& /*capabilitiesResponse*/)
+        const _onvifDevice__GetCapabilitiesResponse& /*capabilitiesResponse*/)
     {
         return CameraDiagnostics::NoErrorResult();
     }
@@ -623,7 +623,7 @@ private:
     //!Reads relay output list from resource
     bool fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList);
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
-    bool fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse );
+    bool fetchRelayInputInfo( const _onvifDevice__GetCapabilitiesResponse& capabilitiesResponse );
     bool fetchPtzInfo();
     bool setRelayOutputInfo( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
@@ -637,15 +637,56 @@ private:
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper& soapWrapper,
-        CapabilitiesResp* response );
+        _onvifDevice__GetCapabilitiesResponse* response );
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
-    void fillFullUrlInfo( const CapabilitiesResp& response );
-    bool getVideoEncoderTokens(
+    void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
+    bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
         QStringList* tokenList);
     QString getInputPortNumberFromString(const QString& portName);
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
+protected:
+    // Logging functions
+    //** SOAP request failed. */
+    QString makeSoapFailMessage(BaseSoapWrapper& soapWrapper,
+        const QString& caller, const QString& requestCommand,
+        int soapError, const QString& text = QString()) const;
+
+    //** SOAP request succeeded. */
+    QString makeSoapSuccessMessage(BaseSoapWrapper& soapWrapper,
+        const QString& caller, const QString& requestCommand,
+        const QString& text = QString()) const;
+
+    //** SOAP response has no desired parameter. */
+    QString makeSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
+        const QString& missedParameter, const QString& caller, const QString& requestCommand,
+        const QString& text = QString()) const;
+
+    //** SOAP response has no desired parameter. */
+    QString makeSoapNoRangeParameterMessage(BaseSoapWrapper& soapWrapper,
+        const QString& rangeParameter, int index, const QString& caller,
+        const QString& requestCommand, const QString& text = QString()) const;
+
+    //** SOAP response has a range (e.g. vector) of parameters of no enough size. */
+    QString makeSoapSmallRangeMessage(BaseSoapWrapper& soapWrapper,
+        const QString& rangeParameter, int rangeSize, int desiredSize,
+        const QString& caller, const QString& requestCommand,
+        const QString& text = QString()) const;
+
+    //* SOAP request failed - static analogue for makeSoapFailMessage. */
+    static QString makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
+        const QString& caller, const QString& requestCommand,
+        int soapError, const QString& text = QString());
+
+    //** SOAP response is incomplete - static analogue for makeSoapNoParameterMessage. */
+    static QString makeStaticSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
+        const QString& missedParameter, const QString& caller, const QString& requestCommand,
+        const QString& text = QString());
+
+    QString makeFailMessage(const QString& text) const;
+
+private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;

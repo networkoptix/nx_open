@@ -40,12 +40,12 @@ private:
 CommonHttpAcceptor::CommonHttpAcceptor(
     const QnUuid& peerId,
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* transactionLog,
+    CommandLog* transactionLog,
     ConnectionManager* connectionManager,
     const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_transactionLog(transactionLog),
+    m_commandLog(transactionLog),
     m_connectionManager(connectionManager),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
@@ -117,7 +117,7 @@ void CommonHttpAcceptor::createConnection(
 
     auto newTransport = std::make_unique<GenericTransport>(
         m_protocolVersionRange,
-        m_transactionLog,
+        m_commandLog,
         m_outgoingCommandFilter,
         systemId,
         connectionRequestAttributes,

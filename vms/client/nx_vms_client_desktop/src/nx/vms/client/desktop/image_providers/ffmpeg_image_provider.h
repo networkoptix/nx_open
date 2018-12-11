@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <core/resource/resource_fwd.h>
 
 #include "image_provider.h"
@@ -14,24 +16,29 @@ class FfmpegImageProvider: public ImageProvider
 
 public:
     // This one retrives screenshot in the middle of the file.
-    explicit FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent = nullptr);
-    explicit FfmpegImageProvider(const QnResourcePtr& resource, qint64 positionUsec,  QObject* parent = nullptr);
+    explicit FfmpegImageProvider(const QnResourcePtr& resource, const QSize& maximumSize = QSize(),
+        QObject* parent = nullptr);
+
+    explicit FfmpegImageProvider(const QnResourcePtr& resource, std::chrono::microseconds position,
+        const QSize& maximumSize = QSize(), QObject* parent = nullptr);
+
     virtual ~FfmpegImageProvider() override;
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
     virtual Qn::ThumbnailStatus status() const override;
 
-signals:
-    void loadDelayed(const QImage& image);
+    void loadSync() { load(true); }
 
 protected:
-    virtual void doLoadAsync() override;
+    virtual void doLoadAsync() override { load(false); }
+
+private:
+    void load(bool sync);
 
 private:
     struct Private;
     QScopedPointer<Private> d;
-    qint64 m_positionUsec;
 };
 
 } // namespace nx::vms::client::desktop

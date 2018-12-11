@@ -117,6 +117,14 @@ ListeningPeerPool::~ListeningPeerPool()
         QnMutexLocker lock(&m_mutex);
         m_peers.swap(peers);
     }
+
+    for (const auto& peer: peers)
+    {
+        // TODO: #ak Get rid of std::shared_ptr here.
+        if (peer.second.peerConnection.use_count() == 1)
+            peer.second.peerConnection->pleaseStopSync();
+    }
+
     peers.clear();
     m_asyncOperationGuard->terminate();
 }

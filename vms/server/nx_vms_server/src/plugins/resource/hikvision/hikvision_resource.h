@@ -40,7 +40,7 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
-        const CapabilitiesResp& onvifCapabilities) override;
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities) override;
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;

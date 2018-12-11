@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <core/resource/security_cam_resource.h>
@@ -9,17 +10,14 @@
 #include <media_server/media_server_module.h>
 
 #include "streaming/streaming_chunk_cache_key.h"
-#include <nx/fusion/serialization/lexical.h>
 
-namespace nx {
-namespace vms::server {
-namespace hls {
+namespace nx::vms::server::hls {
 
-//!Such a huge GOP is possible in case of low fps stream
-static const qint64 MAX_GOP_LENGTH_SEC = 100;
-static const qint64 USEC_IN_MSEC = 1000;
-static const qint64 MSEC_IN_SEC = 1000;
-static const qint64 kDefaultNextIFrameLoopSize = 5;
+/** Such a huge GOP is possible in case of low fps stream. */
+static constexpr qint64 kMaxGopLengthSec = 100;
+static constexpr qint64 kUsecPerMs = 1000;
+static constexpr qint64 kMillisPerSec = 1000;
+static constexpr qint64 kDefaultNextIFrameLoopSize = 5;
 
 ArchivePlaylistManager::ArchivePlaylistManager(
     QnMediaServerModule* serverModule,
@@ -46,7 +44,7 @@ ArchivePlaylistManager::ArchivePlaylistManager(
 {
     NX_ASSERT(m_maxChunkNumberInPlaylist > 0);
     m_getNextIFrameLoopMaxSize = std::max<qint64>(
-        (MAX_GOP_LENGTH_SEC * USEC_IN_MSEC * MSEC_IN_SEC) / m_targetDuration.count(),
+        (kMaxGopLengthSec * kUsecPerMs * kMillisPerSec) / m_targetDuration.count(),
         kDefaultNextIFrameLoopSize);
 }
 
@@ -134,7 +132,7 @@ void ArchivePlaylistManager::generateChunksIfNeeded()
     }
     else
     {
-        if ((m_playlistUpdateTimer.elapsed() * USEC_IN_MSEC - m_timerCorrection) > m_prevGeneratedChunkDuration)
+        if ((m_playlistUpdateTimer.elapsed() * kUsecPerMs - m_timerCorrection) > m_prevGeneratedChunkDuration)
         {
             if (addOneMoreChunk())
                 m_timerCorrection += m_prevGeneratedChunkDuration;
@@ -210,10 +208,8 @@ bool ArchivePlaylistManager::addOneMoreChunk()
 
 qint64 ArchivePlaylistManager::endTimestamp() const
 {
-    //returning max archive timestamp
+    // Returning max archive timestamp.
     return m_delegate->endTime();
 }
 
-} // namespace hls
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::hls

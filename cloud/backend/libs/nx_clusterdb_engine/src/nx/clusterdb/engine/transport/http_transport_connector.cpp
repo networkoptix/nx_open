@@ -137,14 +137,14 @@ void HttpCommandPipelineConnector::processConnectFailure()
 
 HttpTransportConnector::HttpTransportConnector(
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* transactionLog,
+    CommandLog* transactionLog,
     const OutgoingCommandFilter& outgoingCommandFilter,
     const nx::utils::Url& nodeUrl,
     const std::string& systemId,
     const std::string& nodeId)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_transactionLog(transactionLog),
+    m_commandLog(transactionLog),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_systemId(systemId),
     m_pipelineConnector(
@@ -202,7 +202,7 @@ void HttpTransportConnector::onPipelineConnectCompleted(
 
     auto newTransport = std::make_unique<GenericTransport>(
         m_protocolVersionRange,
-        m_transactionLog,
+        m_commandLog,
         m_outgoingCommandFilter,
         m_systemId,
         connectionRequestAttributes,

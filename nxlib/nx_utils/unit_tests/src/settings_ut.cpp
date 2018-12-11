@@ -56,7 +56,7 @@ TEST(Settings, loadSave)
     ASSERT_FALSE(qSettings->contains("option1"));
     ASSERT_FALSE(qSettings->contains("option2"));
 
-    QString stringWithCommas = "info,debug[nx::network],verbose[nx::utils , nx::mediaserver]";
+    QString stringWithCommas = "info,debug[nx::network],verbose[nx::utils , nx::vms::server]";
     qSettings->setValue("option1", stringWithCommas);
     settings.attach(qSettings);
     ASSERT_EQ(settings.option1(), stringWithCommas);

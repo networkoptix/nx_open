@@ -8,17 +8,17 @@
 
 namespace nx::clusterdb::engine {
 
-class TransactionTransportHeader
+class CommandTransportHeader
 {
 public:
     std::string systemId;
     std::string peerId;
     network::SocketAddress endpoint;
     std::string connectionId;
-    CommandTransportHeader vmsTransportHeader;
+    VmsTransportHeader vmsTransportHeader;
     int transactionFormatVersion;
 
-    TransactionTransportHeader(int transactionVersion):
+    CommandTransportHeader(int transactionVersion):
         transactionFormatVersion(transactionVersion)
     {
     }

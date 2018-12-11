@@ -903,6 +903,7 @@ QnBookmarksViewer::QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
     : QGraphicsWidget(parent)
     , m_impl(new Impl(getBookmarksFunc, getPosFunc, this))
 {
+    setGeometry({});
 }
 
 QnBookmarksViewer::~QnBookmarksViewer()

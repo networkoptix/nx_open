@@ -48,6 +48,7 @@ public:
     ExportSettingsDialog(const QnTimePeriod& timePeriod,
         const QnCameraBookmark& bookmark,
         FileNameValidator isFileNameValid,
+        const nx::core::Watermark& watermark,
         QWidget* parent = nullptr);
 
     virtual ~ExportSettingsDialog() override;
@@ -56,8 +57,6 @@ public:
 
     ExportMediaSettings exportMediaSettings() const;
     ExportLayoutSettings exportLayoutSettings() const;
-
-    void setWatermark(const nx::core::Watermark& watermark);
 
     virtual void accept() override;
 

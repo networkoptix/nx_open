@@ -112,7 +112,7 @@ QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
-    const CapabilitiesResp& onvifCapabilities)
+    const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities)
 {
     bool hevcIsDisabled = resourceData().value<bool>(ResourceDataKey::kDisableHevc, false);
 

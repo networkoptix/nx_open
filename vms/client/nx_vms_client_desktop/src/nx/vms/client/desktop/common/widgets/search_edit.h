@@ -49,7 +49,8 @@ public:
     * @param tagNameProvider Functor that provides descriptive name for tag badge based on value
     *     returned by currentTagData method.
     */
-    void setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
+    using MenuCreator = std::function<QMenu*(QWidget* parent)>;
+    void setTagOptionsSource(MenuCreator tagMenuCreator,
         std::function<QString(const QVariant&)> tagNameProvider);
 
     bool focused() const;

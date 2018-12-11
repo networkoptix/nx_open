@@ -22,6 +22,7 @@ public:
     void setFilterText(const QString& value);
 
     virtual bool isConstrained() const override;
+    virtual bool hasAccessRights() const override;
 
 protected:
     virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const override;

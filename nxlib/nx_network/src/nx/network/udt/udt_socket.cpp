@@ -33,45 +33,6 @@ namespace nx {
 namespace network {
 namespace detail {
 
-// TODO: #ak we have UdtSocketImpl and UDTSocketImpl! refactor!
-class UdtSocketImpl:
-    public UDTSocketImpl
-{
-public:
-    UdtSocketImpl() = default;
-    UdtSocketImpl(const UdtSocketImpl&) = delete;
-    UdtSocketImpl& operator=(const UdtSocketImpl&) = delete;
-
-    UdtSocketImpl(UDTSOCKET socket):
-        UDTSocketImpl(socket)
-    {
-    }
-};
-
-struct UdtEpollHandlerHelper
-{
-    UdtEpollHandlerHelper(int fd, UDTSOCKET udt_handler):
-        epoll_fd(fd)
-    {
-#ifndef TRACE_UDT_SOCKET
-        Q_UNUSED(udt_handler);
-#endif
-    }
-    ~UdtEpollHandlerHelper()
-    {
-        if (epoll_fd >= 0)
-        {
-            int ret = UDT::epoll_release(epoll_fd);
-#ifndef TRACE_UDT_SOCKET
-            Q_UNUSED(ret);
-#endif
-        }
-    }
-
-    int epoll_fd;
-    UDTSOCKET udt_handler;
-};
-
 static SystemError::ErrorCode getLastUdtErrorAsSystemErrorCode()
 {
     const auto systemErrorCode =
@@ -96,7 +57,7 @@ template<typename InterfaceToImplement>
 UdtSocket<InterfaceToImplement>::UdtSocket(int ipVersion):
     UdtSocket(
         ipVersion,
-        new detail::UdtSocketImpl(),
+        std::make_unique<UdtSocketImpl>(),
         detail::SocketState::closed)
 {
 }
@@ -120,16 +81,16 @@ UdtSocket<InterfaceToImplement>::~UdtSocket()
 template<typename InterfaceToImplement>
 UdtSocket<InterfaceToImplement>::UdtSocket(
     int ipVersion,
-    detail::UdtSocketImpl* impl,
+    std::unique_ptr<UdtSocketImpl> impl,
     detail::SocketState state)
     :
-    Pollable(-1, std::unique_ptr<detail::UdtSocketImpl>(impl)),
+    Pollable(-1, std::move(impl)),
     m_state(state),
     m_ipVersion(ipVersion)
 {
     NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
 
-    this->m_impl = static_cast<detail::UdtSocketImpl*>(this->Pollable::m_impl.get());
+    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::m_impl.get());
 }
 
 template<typename InterfaceToImplement>
@@ -541,10 +502,10 @@ UdtStreamSocket::UdtStreamSocket(int ipVersion):
 
 UdtStreamSocket::UdtStreamSocket(
     int ipVersion,
-    detail::UdtSocketImpl* impl,
+    std::unique_ptr<UdtSocketImpl> impl,
     detail::SocketState state)
     :
-    base_type(ipVersion, impl, state),
+    base_type(ipVersion, std::move(impl), state),
     m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion))
 {
     if (state == detail::SocketState::connected)
@@ -1035,7 +996,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
 #endif
     auto acceptedSocket = std::make_unique<UdtStreamSocket>(
         m_ipVersion,
-        new detail::UdtSocketImpl(ret),
+        std::make_unique<UdtSocketImpl>(ret),
         detail::SocketState::connected);
     acceptedSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
