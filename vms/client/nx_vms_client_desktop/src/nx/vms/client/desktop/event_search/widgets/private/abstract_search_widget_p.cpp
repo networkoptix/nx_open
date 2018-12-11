@@ -820,6 +820,7 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
         ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
 
     ui->placeholder->setVisible(placeholderVisible);
+    ui->ribbon->viewportHeader()->setVisible(!placeholderVisible);
 
     static constexpr int kThreshold = 99;
     if (itemCount > kThreshold)
