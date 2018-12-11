@@ -74,6 +74,8 @@ def process_context_structure(product, context, content, language,
                     # Process language JSON file
                     replace_in(content, datastructure.name, content_value)
                 else:
+                    if datastructure.type == DataStructure.DATA_TYPES.check_box:
+                        content_value = str(content_value)
                     content = content.replace(datastructure.name, content_value)
 
             elif content_value or datastructure.optional:

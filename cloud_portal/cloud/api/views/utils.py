@@ -18,15 +18,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_public_downloads_status():
-    res = DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
+    return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
         find_actual_value(product=get_cloud_portal_product())
-    return res == 'on'
 
 
 def get_public_release_history_status():
-    res = DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
+    return DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
         find_actual_value(product=get_cloud_portal_product())
-    return res == 'on'
 
 
 @api_view(['GET', 'POST'])
