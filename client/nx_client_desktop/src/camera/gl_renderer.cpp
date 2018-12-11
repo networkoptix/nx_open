@@ -134,9 +134,6 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
 
     m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
-
-    NX_INFO(this, lm("OpenGL max texture size: %1.").arg(
-        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)));
 }
 
 QnGLRenderer::~QnGLRenderer()
@@ -184,7 +181,6 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
     if (!picLock.get())
     {
-        NX_LOG(lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2);
         return Qn::NothingRendered;
     }
 
@@ -382,7 +378,6 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
     {
-        NX_LOG( lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2 );
         return Qn::NothingRendered;
     }
 
@@ -477,8 +472,6 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
         result = Qn::NothingRendered;
     }
 
-    NX_LOG( lit("Exiting QnGLRenderer::paint (2)"), cl_logDEBUG2 );
-
     return result;
 }
 
@@ -488,8 +481,6 @@ void QnGLRenderer::drawVideoTextureDirectly(
     const float* v_array,
     qreal opacity)
 {
-    NX_VERBOSE(this, lit("drawVideoTextureDirectly. texture %1").arg(tex0ID));
-
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),
@@ -540,9 +531,6 @@ void QnGLRenderer::drawYV12VideoTexture(
         (float)tex0Coords.right(), (float)tex0Coords.bottom(),
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
-
-    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
-        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
@@ -703,9 +691,6 @@ void QnGLRenderer::drawYVA12VideoTexture(
         (float)tex0Coords.right(), (float)tex0Coords.bottom(),
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
-
-    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
-        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     m_shaders->yv12ToRgba->bind();
     m_shaders->yv12ToRgba->setYTexture( 0 );
