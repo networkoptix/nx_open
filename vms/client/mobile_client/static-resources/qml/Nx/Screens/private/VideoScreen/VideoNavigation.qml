@@ -105,7 +105,7 @@ Item
                 videoNavigation.warningText = ""
             else if (!cameraChunkProvider.hasChunks())
                 videoNavigation.warningText = qsTr("No motion data for this camera")
-            else if (hasCustomRoi)
+            else if (videoNavigation.hasCustomRoi)
                 videoNavigation.warningText = qsTr("No motion found in the selected area")
             else
                 videoNavigation.warningText = qsTr("No motion found in the visible area")
@@ -784,6 +784,4 @@ Item
         d.updateNavigatorPosition()
         liveModeButton.opacity = 0
     }
-
-
 }
