@@ -9,7 +9,6 @@
 #include "plugin.h"
 #include "camera_manager.h"
 #include "device/video/utils.h"
-#include "device/video/rpi/rpi_utils.h"
 #include "device/audio/utils.h"
 
 namespace nx {
@@ -18,36 +17,6 @@ namespace usb_cam {
 namespace {
 
 static constexpr const char kVendorName[] = "usb_cam";
-
-static std::string getMacAddress()
-{
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-
-    for (const auto & iFace : interfaces)
-    {
-        if(iFace.type() == QNetworkInterface::Ethernet)
-        {
-            // The media server modifies the mac address delimiter from ":" to "-",
-            // so do it preemptively to avoid adding the unique id with the wrong delimiter.
-            return iFace.hardwareAddress().replace(":", "-").toStdString();
-        }
-    }
-
-    // Raspberry Pi 3A+ doesn't have an ethernet port, so fall back to wifi.
-    for (const auto & iFace : interfaces)
-    {
-        if (iFace.type() == QNetworkInterface::Wifi)
-            return iFace.hardwareAddress().replace(":", "-").toStdString();
-    }
-
-    // Give up.
-    return std::string();
-}
-
-bool isRpiMmal(const std::string& deviceName)
-{
-   return device::video::rpi::isRpi() && device::video::rpi::isMmalCamera(deviceName);
-}
 
 }
 
@@ -199,11 +168,6 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     for (auto & device: devices)
     {
         std::string nxId = device.uniqueId;
-
-        // if something went wrong during unique id parsing on Raspberry Pi,
-        // fall back to ethernet or wifi mac address.
-        if (nxId.empty() && isRpiMmal(device.name))
-            nxId = getMacAddress();
 
         // If nxId is still empty, fall back to volatile device path.
         if (nxId.empty())

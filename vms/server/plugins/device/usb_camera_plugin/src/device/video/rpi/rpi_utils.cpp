@@ -1,3 +1,5 @@
+#ifdef __linux__
+
 #include "rpi_utils.h"
 
 #include <stdio.h>
@@ -142,3 +144,5 @@ bool isRpi()
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
+
+#endif // __linux__
