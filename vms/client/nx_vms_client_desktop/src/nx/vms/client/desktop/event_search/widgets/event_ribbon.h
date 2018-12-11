@@ -57,6 +57,9 @@ public:
 
     void setViewportMargins(int top, int bottom);
 
+    QWidget* viewportHeader() const;
+    void setViewportHeader(QWidget* value); //< Takes ownership.
+
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;

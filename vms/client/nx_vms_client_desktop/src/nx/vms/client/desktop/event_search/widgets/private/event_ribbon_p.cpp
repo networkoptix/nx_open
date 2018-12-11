@@ -980,6 +980,25 @@ void EventRibbon::Private::setViewportMargins(int top, int bottom)
     updateView();
 }
 
+QWidget* EventRibbon::Private::viewportHeader() const
+{
+    return m_viewportHeader.data();
+}
+
+void EventRibbon::Private::setViewportHeader(QWidget* value)
+{
+    if (m_viewportHeader == value)
+        return;
+
+    delete m_viewportHeader;
+    m_viewportHeader = value;
+
+    if (m_viewportHeader)
+        m_viewportHeader->setParent(m_viewport.get());
+
+    updateView();
+}
+
 void EventRibbon::Private::updateView()
 {
     const auto unreadCountGuard = makeUnreadCountGuard();
@@ -1027,6 +1046,17 @@ void EventRibbon::Private::doUpdateView()
         firstIndexToUpdate = qMin(firstIndexToUpdate, m_currentShifts.begin().key());
 
     int currentPosition = m_topMargin;
+    if (m_viewportHeader)
+    {
+        const int headerWidth = m_viewport->width();
+        const int headerHeight = m_viewportHeader->hasHeightForWidth()
+            ? m_viewportHeader->heightForWidth(headerWidth)
+            : m_viewportHeader->sizeHint().height();
+
+        m_viewportHeader->setGeometry(0, m_topMargin, headerWidth, headerHeight);
+        currentPosition += m_viewportHeader->height();
+    }
+
     if (firstIndexToUpdate > 0)
     {
         const auto& prevTile = m_tiles[firstIndexToUpdate - 1];

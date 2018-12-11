@@ -70,6 +70,9 @@ public:
 
     void setViewportMargins(int top, int bottom);
 
+    QWidget* viewportHeader() const;
+    void setViewportHeader(QWidget* value); //< Takes ownership.
+
     int count() const;
 
     int unreadCount() const;
@@ -183,6 +186,8 @@ private:
     bool m_scrollBarRelevant = true;
     bool m_live = true;
     bool m_updating = false;
+
+    QPointer<QWidget> m_viewportHeader;
 
     std::chrono::microseconds m_highlightedTimestamp{0};
     QSet<QnResourcePtr> m_highlightedResources;
