@@ -9,7 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 
 from api.models import Account
-from notifications import api
+from notifications import notifications_api
 from util.helpers import get_language_for_email
 
 import traceback
@@ -92,7 +92,7 @@ def send_to_all_users(notification_id, message, customizations, force=False):
 
     for user in users:
         message['userFullName'] = user.get_full_name()
-        api.send(user.email, 'cloud_notification', message, user.customization)
+        notifications_api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
 

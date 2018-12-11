@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from notifications.api import send
+from notifications.notifications_api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 

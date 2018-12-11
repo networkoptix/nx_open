@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
 from api.models import Account
 from cms.models import Customization, Product, UserGroupsToCustomizationPermissions
-from notifications import api
+from notifications import notifications_api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
 
@@ -65,9 +65,9 @@ def send_event(request):
             validation_error = True
             error_data['type'] = ['This field is required.']
 
-        if 'type' in request.data and request.data['type'] != 'ipvd_feedback' and 'product_id' not in request.data:
+        if 'type' in request.data and request.data['type'] != 'ipvd_feedback' and 'productId' not in request.data:
             validation_error = True
-            error_data['product_id'] = ['This field is required.']
+            error_data['productId'] = ['This field is required.']
 
         if 'message' not in request.data:
             validation_error = True
@@ -77,13 +77,18 @@ def send_event(request):
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
 
+        product_id = ''
         if request.data['type'] != 'ipvd_feedback':
-            product = Product.objects.filter(id=request.data['product_id'])
+            product = Product.objects.filter(id=request.data['productId'])
             if product.exists():
-                request.data['message']['product'] = product.first().name
+                request.data['product'] = product.first().name
+                product_id = product.first().id
+
         user = request.user
-        request.data['message']['sender_email'] = user.email
-        request.data['message']['sender_name'] = user.email
+        request.data['sender_email'] = user.email
+        request.data['sender_name'] = user.get_full_name()
+
+        notifications_api.notify(request.data['type'], product_id, request.data)
 
     except ValidationError as error:
         error_data = error.detail if hasattr(error, 'detail') else None
@@ -102,7 +107,7 @@ def send_notification(request):
         external_id = None
         if 'id' in request.data:  # external service generated an id for this message to track it
             external_id = request.data['id']
-            msg = api.find_message(external_id)
+            msg = notifications_api.find_message(external_id)
             if msg:
                 # there is already a message with this id - do not send the message, respond with status
                 serializer = models.MessageStatusSerializer(msg, many=False)
@@ -133,7 +138,7 @@ def send_notification(request):
             if user_account.exists():
                 request.data['message']['userFullName'] = user_account[0].get_full_name()
 
-        api.send(request.data['user_email'],
+        notifications_api.send(request.data['user_email'],
                  request.data['type'],
                  request.data['message'],
                  request.data['customization'],
@@ -170,7 +175,7 @@ def cloud_notification_action(request):
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['userFullName'] = request.user.get_full_name()
 
-        api.send(request.user.email, 'cloud_notification', message, request.user.customization)
+        notifications_api.send(request.user.email, 'cloud_notification', message, request.user.customization)
         messages.success(request._request, "Preview has been sent")
 
     elif can_send and 'Send' in request.data and notification_id:
