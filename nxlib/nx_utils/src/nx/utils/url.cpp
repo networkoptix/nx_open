@@ -568,17 +568,22 @@ bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags
 nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
 {
     Url result;
-    result.setScheme(std::move(scheme));
 
     // Checking if it is just a hostname.
     result.setHost(urlStr, QUrl::StrictMode);
     if (result.isValid())
+    {
+        result.setScheme(std::move(scheme));
         return result;
+    }
 
     // Checking if it is just an authority.
     result.setAuthority(urlStr, QUrl::StrictMode);
     if (result.isValid() && !result.host().isEmpty())
+    {
+        result.setScheme(std::move(scheme));
         return result;
+    }
 
     // All other cases.
     result.clear();
