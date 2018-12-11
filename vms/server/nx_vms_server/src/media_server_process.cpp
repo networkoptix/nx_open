@@ -2050,7 +2050,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
 
-    /**%apidoc GET /api/restart
+    /**%apidoc POST /api/restart
      * Restarts the server.
      * %permissions Administrator.
      * %return:object JSON object with error message and error code (0 means OK).
