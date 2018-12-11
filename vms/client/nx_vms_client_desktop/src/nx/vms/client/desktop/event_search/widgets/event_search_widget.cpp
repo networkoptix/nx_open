@@ -62,15 +62,10 @@ private:
 
         bool operator<(const PluginInfo& other) const
         {
-            if (name.isEmpty() != other.name.isEmpty())
-                return other.name.isEmpty();
-
-            const auto result = utils::naturalStringCompare(
-                name, other.name, Qt::CaseInsensitive) < 0;
-
-            return result == 0
-                ? (intptr_t)this < (intptr_t)&other //< Both names are the same, e.g. empty.
-                : result;
+            QCollator collator;
+            collator.setNumericMode(true);
+            collator.setCaseSensitivity(Qt::CaseInsensitive);
+            return collator.compare(name, other.name) < 0;
         }
     };
 };
