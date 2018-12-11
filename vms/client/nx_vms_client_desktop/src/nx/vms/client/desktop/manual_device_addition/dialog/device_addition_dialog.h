@@ -74,7 +74,7 @@ private:
     void setDeviceAdded(const QString& uniqueId);
     void handleDeviceRemoved(const QString& uniqueId);
 
-    int port() const;
+    std::optional<int> port() const;
     QString password() const;
     QString login() const;
     QString progressMessage() const;

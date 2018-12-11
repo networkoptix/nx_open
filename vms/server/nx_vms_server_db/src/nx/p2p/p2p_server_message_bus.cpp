@@ -826,7 +826,7 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
                 stop();
                 commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
             },
-            0, m_thread);
+            0, qApp->thread());
 
         return false;
     }

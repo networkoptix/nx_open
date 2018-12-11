@@ -38,6 +38,12 @@ private:
     int addCamerasAction(const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner);
 
+    int extractSearchStartParams(
+        QnJsonRestResult& result,
+        const QnRequestParams& params,
+        nx::utils::Url& url,
+        std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>& ipRange);
+
     /**
      * Get status of the manual camera search process. Thread-safe.
      * @param searchProcessUuid Uuid of the process.

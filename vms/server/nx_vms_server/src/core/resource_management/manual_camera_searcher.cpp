@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <functional>
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
 #include <core/resource_management/camera_driver_restriction_list.h>
@@ -75,27 +76,34 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     return result;
 }
 
-void QnManualCameraSearcher::run(
-    SearchDoneCallback callback,
-    nx::network::HostAddress startAddr,
-    std::optional<nx::network::HostAddress> endAddr,
-    QAuthenticator auth,
-    int port)
+void QnManualCameraSearcher::startSearch(SearchDoneCallback callback, nx::utils::Url url)
 {
-    NX_ASSERT(startAddr.isIpAddress());
+    NX_ASSERT(url.isValid());
 
     m_pollable.dispatch(
-        [this, callback = std::move(callback), startAddr, endAddr, auth = std::move(auth), port]() mutable
+        [this, callback = std::move(callback), url = std::move(url)]() mutable
         {
             NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
             m_searchDoneCallback = std::move(callback);
+            onOnlineHostsScanDone(url, {nx::network::HostAddress(url.host())});
+        });
+}
 
-            if (!endAddr.has_value())
-                onOnlineHostsScanDone({std::move(startAddr)}, port, std::move(auth));
-            else
-                startOnlineHostsScan(std::move(startAddr), std::move(*endAddr), std::move(auth), port);
+void QnManualCameraSearcher::startRangeSearch(
+    SearchDoneCallback callback,
+    nx::network::HostAddress startAddr,
+    nx::network::HostAddress endAddr,
+    nx::utils::Url baseUrl)
+{
+    NX_ASSERT(startAddr.isIpAddress());
+    NX_ASSERT(endAddr.isIpAddress());
 
-            return;
+    m_pollable.dispatch(
+        [this, callback = std::move(callback), startAddr, endAddr, url = std::move(baseUrl)]() mutable
+        {
+            NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
+            m_searchDoneCallback = std::move(callback);
+            startOnlineHostsScan(std::move(startAddr), std::move(endAddr), std::move(url));
         });
 }
 
@@ -149,26 +157,26 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 void QnManualCameraSearcher::startOnlineHostsScan(
     nx::network::HostAddress startAddr,
     nx::network::HostAddress endAddr,
-    QAuthenticator auth,
-    int port)
+    nx::utils::Url baseUrl)
 {
     NX_VERBOSE(this, "Getting online hosts in range [%1, %2]", startAddr, endAddr);
-    auto oldState = changeState(QnManualResourceSearchStatus::CheckingOnline);
+    const auto oldState = changeState(QnManualResourceSearchStatus::CheckingOnline);
     NX_ASSERT(oldState == QnManualResourceSearchStatus::Init);
 
     m_hostRangeSize = ntohl(endAddr.ipV4().get().s_addr) - ntohl(startAddr.ipV4().get().s_addr) + 1;
     NX_ASSERT(m_hostRangeSize > 0);
 
+    int port = baseUrl.port(nx::network::http::DEFAULT_HTTP_PORT);
     m_ipScanner.scanOnlineHosts(
-        [this, port, auth = std::move(auth)](auto results)
+        [this, baseUrl = std::move(baseUrl)](auto results)
         {
-            onOnlineHostsScanDone(std::move(results), port, auth);
+            onOnlineHostsScanDone(baseUrl, std::move(results));
         },
         std::move(startAddr), std::move(endAddr), port);
 }
 
 void QnManualCameraSearcher::onOnlineHostsScanDone(
-    std::vector<nx::network::HostAddress> onlineHosts, int port, QAuthenticator auth)
+    nx::utils::Url baseUrl, std::vector<nx::network::HostAddress> onlineHosts)
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(m_state == QnManualResourceSearchStatus::Init
@@ -190,14 +198,11 @@ void QnManualCameraSearcher::onOnlineHostsScanDone(
 
     for (const auto& host: onlineHosts)
     {
-        m_taskManager.addTask(nx::network::SocketAddress(host, port),
-            auth, sequentialSearchers, /*isSequential*/ true);
+        const auto url = nx::network::url::Builder(baseUrl).setHost(host.toString()).toUrl();
+        m_taskManager.addTask(url, sequentialSearchers, /*isSequential*/ true);
 
         for (const auto& searcher: parallelSearchers)
-        {
-            m_taskManager.addTask(nx::network::SocketAddress(host, port),
-                auth, {searcher}, /*isSequential*/ false);
-        }
+            m_taskManager.addTask(url, {searcher}, /*isSequential*/ false);
     }
 
     changeState(QnManualResourceSearchStatus::CheckingHost);

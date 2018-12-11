@@ -160,6 +160,7 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
     HanwhaCachedData<HanwhaCodecInfo> videoCodecInfo;
     HanwhaCachedData<bool> isBypassSupported;
+    HanwhaCachedData<std::set<int>> ptzCalibratedChannels;
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
@@ -168,6 +169,7 @@ private:
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
     HanwhaResult<HanwhaCodecInfo> loadVideoCodecInfo();
     HanwhaResult<bool> checkBypassSupport();
+    HanwhaResult<std::set<int>> loadPtzCalibratedChannels();
 
     void cleanupUnsafe();
     int totalAmountOfSessions(bool isLive) const;
