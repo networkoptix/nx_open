@@ -2,7 +2,6 @@
 
 #include <QtCore/QObject>
 #include <QtWidgets/QGraphicsItem>
-#include <QtWidgets/QGraphicsScene>
 #include <QtQml/QtQml>
 
 #include <utils/common/warnings.h>
@@ -183,4 +182,9 @@ nx::vms::client::desktop::MainWindow* QnWorkbenchContextAware::mainWindow() cons
 QWidget* QnWorkbenchContextAware::mainWindowWidget() const
 {
     return mainWindow();
+}
+
+nx::core::Watermark QnWorkbenchContextAware::watermark() const
+{
+    return context()->watermark();
 }

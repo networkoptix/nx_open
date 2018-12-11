@@ -4,10 +4,8 @@
 
 namespace nx::clusterdb::engine {
 
-// TODO: ak Remove it from here!
-static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
-
-OutgoingCommandFilter::OutgoingCommandFilter()
+OutgoingCommandFilter::OutgoingCommandFilter(const QnUuid& selfPeerId):
+    m_selfPeerId(selfPeerId)
 {
 }
 
@@ -19,7 +17,7 @@ void OutgoingCommandFilter::configure(
 
 bool OutgoingCommandFilter::satisfies(const CommandHeader& commandHeader) const
 {
-    if (m_configuration.sendOnlyOwnCommands && commandHeader.peerID != kCdbGuid)
+    if (m_configuration.sendOnlyOwnCommands && commandHeader.peerID != m_selfPeerId)
         return false;
 
     return true;
@@ -28,7 +26,7 @@ bool OutgoingCommandFilter::satisfies(const CommandHeader& commandHeader) const
 void OutgoingCommandFilter::updateReadFilter(ReadCommandsFilter* readFilter) const
 {
     if (m_configuration.sendOnlyOwnCommands)
-        readFilter->sources = {kCdbGuid};
+        readFilter->sources = {m_selfPeerId};
 }
 
 } // namespace nx::clusterdb::engine

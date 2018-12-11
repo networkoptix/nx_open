@@ -46,7 +46,7 @@ ViewNodeData getGroupNodeData(
     const QString& extraText,
     bool checkable)
 {
-    QIcon icon = cameraResource->isMultiSensorCamera()
+    const QIcon icon = cameraResource->isMultiSensorCamera()
         ? qnResIconCache->icon(QnResourceIconCache::MultisensorCamera)
         : qnResIconCache->icon(QnResourceIconCache::Recorder);
 

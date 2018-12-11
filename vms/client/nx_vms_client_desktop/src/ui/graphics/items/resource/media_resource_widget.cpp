@@ -3041,8 +3041,11 @@ void QnMediaResourceWidget::updateWatermark()
         return;
 
     // First create normal watermark according to current client state.
-    nx::core::Watermark watermark{ settings,
-        context()->user() ? context()->user()->getName() : QString() };
+    auto watermark = context()->watermark();
+
+    // Do not show watermark for local AVI resources.
+    if (resource().dynamicCast<QnAviResource>())
+        watermark = {};
 
     // Force using layout watermark if it exists and is visible.
     bool useLayoutWatermark = false;

@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/utils/system_uri.h>
+#include <nx/core/watermark/watermark.h>
 
 struct QnStartupParameters;
 
@@ -54,6 +55,8 @@ public:
 
     nx::vms::client::desktop::MainWindow* mainWindow() const;
     void setMainWindow(nx::vms::client::desktop::MainWindow* mainWindow);
+
+    nx::core::Watermark watermark() const;
 
     QAction *action(const nx::vms::client::desktop::ui::action::IDType id) const;
 

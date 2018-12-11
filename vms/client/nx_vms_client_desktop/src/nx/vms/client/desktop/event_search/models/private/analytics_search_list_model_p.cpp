@@ -148,7 +148,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qt::DisplayRole:
         {
             const auto fallbackTitle =
-                [this, typeId = object.objectTypeId]()
+                [typeId = object.objectTypeId]()
                 {
                     return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
                 };
@@ -260,7 +260,7 @@ void AnalyticsSearchListModel::Private::truncateToMaximumCount()
             m_objectIdToTimestamp.remove(object.objectAppearanceId);
         };
 
-    this->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
+    q->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
 }
 
 void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
@@ -271,8 +271,8 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
             m_objectIdToTimestamp.remove(object.objectAppearanceId);
         };
 
-    this->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+    q->truncateDataToTimePeriod(
+        m_data, &startTime, q->relevantTimePeriod(), itemCleanup);
 }
 
 bool AnalyticsSearchListModel::Private::isCameraApplicable(
@@ -281,11 +281,6 @@ bool AnalyticsSearchListModel::Private::isCameraApplicable(
     // TODO: #vkutin Implement it when it's possible!
     NX_ASSERT(camera);
     return true;
-}
-
-bool AnalyticsSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -481,7 +476,7 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
 void AnalyticsSearchListModel::Private::processMetadata()
 {
     // Don't start receiving live data until first archive fetch is finished.
-    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || canFetch()))
+    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || q->canFetchMore()))
         return;
 
     // Completely stop metadata reception if paused.

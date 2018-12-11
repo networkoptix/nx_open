@@ -6,8 +6,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource/resource_fwd.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/resource.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
@@ -36,6 +35,11 @@ namespace {
 milliseconds doubleClickInterval()
 {
     return milliseconds(QApplication::doubleClickInterval());
+}
+
+bool isMediaResource(const QnResourcePtr& resource)
+{
+    return resource->hasFlags(Qn::media);
 }
 
 } // namespace
@@ -113,35 +117,35 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         return;
 
     // Obtain requested camera list.
-    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
-        .filtered<QnVirtualCameraResource>();
+    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered(&isMediaResource);
 
-    QnVirtualCameraResourceList openCameras;
+    QnResourceList openResources;
 
     // Find which cameras are opened on current layout.
     if (auto layout = workbench()->currentLayout())
     {
-        openCameras = cameraList.filtered(
-            [layout](const QnVirtualCameraResourcePtr& camera)
+        openResources = resourceList.filtered(
+            [layout](const QnResourcePtr& resource)
             {
-                return !layout->items(camera).empty();
+                return !layout->items(resource).empty();
             });
     }
 
     // If not all cameras are opened, show proper message after double click delay.
-    if (openCameras.size() != cameraList.size())
+    if (openResources.size() != resourceList.size())
     {
         const auto message = tr("Double click to add camera(s) to current layout "
-            "or ctrl+click to open in a new tab.", "", cameraList.size());
+            "or ctrl+click to open in a new tab.", "", resourceList.size());
 
         showMessageDelayed(message, doubleClickInterval());
     }
 
     // Single-select first of opened requested cameras.
-    const auto camera = openCameras.empty() ? QnVirtualCameraResourcePtr() : openCameras.front();
-    if (camera)
+    const auto resource = openResources.empty() ? QnResourcePtr() : openResources.front();
+    if (resource)
     {
-        menu()->trigger(GoToLayoutItemAction, Parameters(camera)
+        menu()->trigger(GoToLayoutItemAction, Parameters(resource)
             .withArgument(Qn::RaiseSelectionRole, ini().raiseCameraFromClickedTile));
     }
 
@@ -160,8 +164,12 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     }
 
     // In case of requested time within the last minute, navigate to live instead.
-    if (const bool lastMinute = navigationTime > (timelineRange.endTime() - 1min))
+    if (const bool lastMinute = navigationTime > (timelineRange.endTime() - 1min);
+        lastMinute && std::all_of(resourceList.cbegin(), resourceList.cend(),
+            [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::network); }))
+    {
         navigationTime = microseconds(DATETIME_NOW);
+    }
 
     // Perform navigation.
     menu()->triggerIfPossible(JumpToTimeAction,
@@ -170,13 +178,13 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
 
 void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
 {
-    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
-        .filtered<QnVirtualCameraResource>();
+    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered(&isMediaResource);
 
-    if (cameraList.empty())
+    if (resourceList.empty())
         return;
 
-    Parameters parameters(cameraList);
+    Parameters parameters(resourceList);
     parameters.setArgument(Qn::SelectOnOpeningRole, true);
 
     const auto timestamp = index.data(Qn::TimestampRole);
@@ -195,10 +203,10 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
 void TileInteractionHandler::performDragAndDrop(
     const QModelIndex& index, const QPoint& pos, const QSize& size)
 {
-    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
-        .filtered<QnVirtualCameraResource>();
+    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered(&isMediaResource);
 
-    if (cameraList.empty())
+    if (resourceList.empty())
         return;
 
     QScopedPointer<QMimeData> baseMimeData(index.model()->mimeData({index}));
@@ -214,21 +222,20 @@ void TileInteractionHandler::performDragAndDrop(
         : milliseconds(DATETIME_NOW).count());
 
     MimeData data(baseMimeData.get(), nullptr);
-    data.setResources(cameraList);
+    data.setResources(resourceList);
     data.setArguments(arguments);
 
     QScopedPointer<QDrag> drag(new QDrag(this));
     drag->setMimeData(data.createMimeData());
-    drag->setPixmap(createDragPixmap(cameraList, size.width()));
+    drag->setPixmap(createDragPixmap(resourceList, size.width()));
     drag->setHotSpot({pos.x(), 0});
 
     drag->exec(Qt::CopyAction);
 }
 
-QPixmap TileInteractionHandler::createDragPixmap(
-    const QnVirtualCameraResourceList& cameras, int width) const
+QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources, int width) const
 {
-    if (cameras.empty())
+    if (resources.empty())
         return {};
 
     static constexpr int kMaximumRows = 10;
@@ -240,9 +247,9 @@ QPixmap TileInteractionHandler::createDragPixmap(
 
     const auto iconSize = qnSkin->maximumSize(qnResIconCache->icon(QnResourceIconCache::Camera));
 
-    const int overflow = qMax(cameras.size() - kMaximumRows, 0);
-    const int cameraRows = cameras.size() - overflow;
-    const int totalRows = overflow ? (cameraRows + 1) : cameraRows;
+    const int overflow = qMax(resources.size() - kMaximumRows, 0);
+    const int resourceRows = resources.size() - overflow;
+    const int totalRows = overflow ? (resourceRows + 1) : resourceRows;
 
     const int height = totalRows * iconSize.height();
 
@@ -266,12 +273,12 @@ QPixmap TileInteractionHandler::createDragPixmap(
     painter.fillRect(QRect(0, 0, width, height), background);
 
     QRect rect(style::Metrics::kStandardPadding, 0, width, iconSize.height());
-    for (int i = 0; i < cameraRows; ++i)
+    for (int i = 0; i < resourceRows; ++i)
     {
-        const auto icon = qnResIconCache->icon(cameras[i]);
+        const auto icon = qnResIconCache->icon(resources[i]);
         icon.paint(&painter, rect, {Qt::AlignLeft | Qt::AlignVCenter}, QIcon::Selected);
 
-        const auto text = QnResourceDisplayInfo(cameras[i]).name();
+        const auto text = QnResourceDisplayInfo(resources[i]).name();
         const auto textRect = rect.adjusted(iconSize.width() + kTextIndent, 0, 0, 0);
         painter.drawText(textRect,
             kTextFlags,

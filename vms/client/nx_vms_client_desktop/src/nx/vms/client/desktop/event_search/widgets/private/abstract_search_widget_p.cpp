@@ -13,7 +13,6 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/palette.h>
-#include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -50,7 +49,7 @@ static constexpr milliseconds kTextFilterDelay = 250ms;
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     const auto paintFunction =
-        [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
+        [](QPainter* painter, const QStyleOption* option, const QWidget* /*widget*/) -> bool
         {
             if (option->state.testFlag(QStyle::State_HasFocus))
                 painter->fillRect(option->rect, option->palette.dark());
@@ -495,12 +494,6 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
-void AbstractSearchWidget::Private::setCamerasReadOnly(bool value)
-{
-    ui->cameraSelectionButton->setDeactivatable(!value);
-    setReadOnly(ui->cameraSelectionButton, value);
-}
-
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
@@ -662,6 +655,7 @@ SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
     result->setFlat(true);
     result->setDeactivatable(true);
     result->setSelectable(false);
+    result->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     ui->filtersLayout->addWidget(result, 0, Qt::AlignLeft);
     return result;
 }

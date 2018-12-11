@@ -40,7 +40,6 @@ public:
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
-    virtual bool hasAccessRights() const override;
 
     using GetCallback = std::function<void(bool, const QnCameraBookmarkList&, rest::Handle)>;
     rest::Handle getBookmarks(

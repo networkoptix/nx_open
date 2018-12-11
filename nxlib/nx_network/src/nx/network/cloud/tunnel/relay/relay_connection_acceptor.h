@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include <QtCore/QUrl>
-
 #include <nx/network/abstract_stream_socket_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
@@ -15,10 +13,7 @@
 #include "api/relay_api_client.h"
 #include "../../cloud_abstract_connection_acceptor.h"
 
-namespace nx {
-namespace network {
-namespace cloud {
-namespace relay {
+namespace nx::network::cloud::relay {
 
 namespace detail {
 
@@ -91,6 +86,8 @@ private:
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
 
+    void updateAcceptorConfiguration(const detail::ReverseConnection& newConnection);
+
     std::unique_ptr<detail::ReverseConnection> reverseConnectionFactoryFunc();
 
     std::unique_ptr<AbstractStreamSocket> toStreamSocket(
@@ -115,7 +112,4 @@ private:
     std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const utils::Url &relayUrl);
 };
 
-} // namespace relay
-} // namespace cloud
-} // namespace network
-} // namespace nx
+} // namespace nx::network::cloud::relay

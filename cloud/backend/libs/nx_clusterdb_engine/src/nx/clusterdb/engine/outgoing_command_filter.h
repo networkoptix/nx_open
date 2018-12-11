@@ -16,7 +16,7 @@ struct OutgoingCommandFilterConfiguration
 class OutgoingCommandFilter
 {
 public:
-    OutgoingCommandFilter();
+    OutgoingCommandFilter(const QnUuid& selfPeerId);
 
     void configure(const OutgoingCommandFilterConfiguration& configuration);
 
@@ -26,6 +26,7 @@ public:
 
 private:
     OutgoingCommandFilterConfiguration m_configuration;
+    const QnUuid m_selfPeerId;
 };
 
 } // namespace nx::clusterdb::engine
