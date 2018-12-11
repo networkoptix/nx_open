@@ -44,6 +44,7 @@ private:
     void runSomePendingTasks();
 
     void searchTaskDoneHandler(QnManualResourceSearchList results, QnSearchTask* const task);
+    void searchFinishedHandler();
 
     QnManualResourceSearchList m_foundResources;
     TasksFinishedCallback m_tasksFinishedCallback;
