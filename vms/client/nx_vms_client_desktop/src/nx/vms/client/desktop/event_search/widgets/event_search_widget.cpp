@@ -2,10 +2,11 @@
 
 #include <algorithm>
 
+#include <QtCore/QPointer>
+#include <QtCore/QVector>
+#include <QtCore/QHash>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QVBoxLayout>
 
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
@@ -61,12 +62,15 @@ private:
 
         bool operator<(const PluginInfo& other) const
         {
-            if (name.isEmpty())
-                return false;
+            if (name.isEmpty() != other.name.isEmpty())
+                return other.name.isEmpty();
 
-            return other.name.isEmpty()
-                ? true
-                : utils::naturalStringCompare(name, other.name, Qt::CaseInsensitive) < 0;
+            const auto result = utils::naturalStringCompare(
+                name, other.name, Qt::CaseInsensitive) < 0;
+
+            return result == 0
+                ? (intptr_t)this < (intptr_t)&other //< Both names are the same, e.g. empty.
+                : result;
         }
     };
 };
@@ -261,7 +265,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                     pluginsById[path.pluginId].eventTypes.insert(entry);
             }
 
-            QList<PluginInfo> plugins;
+            QVector<PluginInfo> plugins;
             for (const auto& pluginInfo: pluginsById)
                 plugins.push_back(pluginInfo);
 

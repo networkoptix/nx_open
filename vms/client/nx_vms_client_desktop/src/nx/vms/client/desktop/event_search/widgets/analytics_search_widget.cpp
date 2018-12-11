@@ -1,6 +1,11 @@
 #include "analytics_search_widget.h"
 
+#include <algorithm>
+
 #include <QtCore/QPointer>
+#include <QtCore/QVector>
+#include <QtCore/QHash>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
 #include <core/resource/camera_resource.h>
@@ -59,12 +64,15 @@ private:
 
         bool operator<(const PluginInfo& other) const
         {
-            if (name.isEmpty())
-                return false;
+            if (name.isEmpty() != other.name.isEmpty())
+                return other.name.isEmpty();
 
-            return other.name.isEmpty()
-                ? true
-                : utils::naturalStringCompare(name, other.name, Qt::CaseInsensitive) < 0;
+            const auto result = utils::naturalStringCompare(
+                name, other.name, Qt::CaseInsensitive) < 0;
+
+            return result == 0
+                ? (intptr_t)this < (intptr_t)&other //< Both names are the same, e.g. empty.
+                : result;
         }
     };
 };
@@ -220,7 +228,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
         ->allDescriptorsInTheSystem<nx::vms::api::analytics::PluginDescriptor>();
 
     QHash<QString, PluginInfo> pluginsById;
-    for (const auto&[pluginId, descriptor] : allAnalyticsPlugins)
+    for (const auto& [pluginId, descriptor]: allAnalyticsPlugins)
         pluginsById[pluginId].name = descriptor.name;
 
     for (const auto& entry: allObjectTypes)
@@ -229,7 +237,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
             pluginsById[path.pluginId].objectTypes.insert(entry);
     }
 
-    QList<PluginInfo> plugins;
+    QVector<PluginInfo> plugins;
     for (const auto& pluginInfo: pluginsById)
         plugins.push_back(pluginInfo);
 
