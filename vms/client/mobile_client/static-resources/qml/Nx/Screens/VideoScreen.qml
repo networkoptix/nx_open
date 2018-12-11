@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.2
 
 import Nx 1.0
 import Nx.Media 1.0
@@ -138,76 +139,73 @@ PageBase
 
     sideNavigationEnabled: false
 
-    header: Column
+    header: ToolBar
     {
+        id: toolBar
+
         y: deviceStatusBarHeight
         opacity: d.uiOpacity
         visible: opacity > 0
 
-        ToolBar
+        title: videoScreenController.resourceHelper.resourceName
+        leftButtonIcon.source: lp("/images/arrow_back.png")
+        onLeftButtonClicked: Workflow.popCurrentScreen()
+        background: Image
         {
-            id: toolBar
-
-            title: videoScreenController.resourceHelper.resourceName
-            leftButtonIcon.source: lp("/images/arrow_back.png")
-            onLeftButtonClicked: Workflow.popCurrentScreen()
-            background: Image
-            {
-                y: -toolBar.statusBarHeight
-                x: -mainWindow.leftPadding
-                width: mainWindow.width
-                height: 96
-                source: lp("/images/toolbar_gradient.png")
-            }
-
-            titleOpacity: d.cameraUiOpacity
-
-            controls:
-            [
-                MotionAreaButton
-                {
-                    visible: video.motionController && video.motionController.customRoiExists
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("Area")
-                    icon.source: lp("/images/close.png")
-
-                    onClicked:
-                    {
-                        if (video.motionController)
-                            video.motionController.clearCustomRoi()
-                    }
-                },
-
-                IconButton
-                {
-                    icon.source: lp("/images/more_vert.png")
-                    onClicked:
-                    {
-                        menu.open()
-                    }
-                }
-            ]
+            y: -toolBar.statusBarHeight
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
+            height: 96
+            source: lp("/images/toolbar_gradient.png")
         }
 
-        Rectangle
-        {
-            visible: banner.text.length
-            width: parent.width
-            height: 30
+        titleOpacity: d.cameraUiOpacity
 
-            Text
+        controls:
+        [
+            MotionAreaButton
             {
-                id: banner
+                visible: video.motionController && video.motionController.customRoiExists
+                anchors.verticalCenter: parent.verticalCenter
 
-                anchors.centerIn: parent
+                text: qsTr("Area")
+                icon.source: lp("/images/close.png")
 
-                text: videoNavigation.warningText
+                onClicked:
+                {
+                    if (video.motionController)
+                        video.motionController.clearCustomRoi()
+                }
+            },
 
-                onTextChanged: console.log("++++++++++++++++++++++++++++++", text)
+            IconButton
+            {
+                icon.source: lp("/images/more_vert.png")
+                onClicked:
+                {
+                    menu.open()
+                }
             }
+        ]
+
+        contentItem.clip: false
+
+        Banner
+        {
+            id: banner
+
+            property bool portraitOrientation:
+                Screen.orientation === Qt.PortraitOrientation
+                || Screen.orientation === Qt.InvertedPortraitOrientation
+                || videoScreen.width < videoScreen.height //< TODO: remove me some day before merge.
+
+            y: portraitOrientation? parent.height : 8
+            x: (parent.width - width) / 2
+            maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
+            text: videoNavigation.warningText
         }
     }
+
     Menu
     {
         id: menu
