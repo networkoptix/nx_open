@@ -105,7 +105,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 buffer));
 
             http::HttpHeaders additionalHeaders;
-            additionalHeaders.emplace("X-NX-P2P-GUID", m_connectionGuid);
+            additionalHeaders.emplace(kP2PConnectionGUIDHeaderKey, m_connectionGuid);
             m_writeHttpClient->setAdditionalHeaders(additionalHeaders);
 
             m_writeHttpClient->doPost(

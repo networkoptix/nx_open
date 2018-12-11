@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <nx/network/aio/abstract_async_channel.h>
+#include <nx/network/http/http_types.h>
 
 namespace nx::network {
 
@@ -14,5 +15,6 @@ public:
 };
 
 using P2pTransportPtr = std::unique_ptr<IP2PTransport>;
+static const http::StringType kP2PConnectionGUIDHeaderKey = "X-NX-P2P-GUID";
 
 } // namespace nx::network
