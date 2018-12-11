@@ -176,7 +176,7 @@ inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 * strings like `hostname:port` and uses the QUrl parser for other cases.
 * @return URL which may not be a valid one, so it should be checked after the call.
 */
-nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme = "");
+NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme = "");
 
 } // namespace url
 } // namespace utils
