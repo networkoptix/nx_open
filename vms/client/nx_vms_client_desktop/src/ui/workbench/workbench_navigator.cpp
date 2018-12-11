@@ -851,6 +851,11 @@ QnResourceWidget* QnWorkbenchNavigator::currentWidget() const
     return m_currentWidget;
 }
 
+QnMediaResourceWidget* QnWorkbenchNavigator::currentMediaWidget() const
+{
+    return m_currentMediaWidget;
+}
+
 QnResourcePtr QnWorkbenchNavigator::currentResource() const
 {
     return m_currentWidget ? m_currentWidget->resource() : QnResourcePtr();
@@ -1126,7 +1131,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     if (m_currentWidget == widget)
         return;
 
-    QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
+    QnMediaResourceWidget* mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
 
     const auto previousResource = currentResource();
 
