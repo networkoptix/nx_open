@@ -18,7 +18,7 @@ public:
     QnSearchTask() = delete;
     QnSearchTask(
         QnCommonModule* commonModule,
-        const nx::utils::Url& url,
+        nx::utils::Url url,
         bool breakOnGotResult = false);
 
     void setSearchers(const SearcherList& searchers);

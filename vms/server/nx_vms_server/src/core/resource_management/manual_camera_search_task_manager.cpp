@@ -60,7 +60,7 @@ void QnManualSearchTaskManager::addTask(
     // Task runs searchers sequentially, so if we want search to be parallel we should not run more
     // than one searcher in a task.
     NX_ASSERT(isSequential == true || searchers.size() == 1);
-    QnSearchTask task(commonModule(), url, /*breakOnGotResult*/ isSequential);
+    QnSearchTask task(commonModule(), std::move(url), /*breakOnGotResult*/ isSequential);
 
     task.setSearchers(searchers);
     task.setSearchDoneCallback(
