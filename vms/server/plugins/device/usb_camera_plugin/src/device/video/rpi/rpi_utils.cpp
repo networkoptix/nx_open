@@ -1,6 +1,6 @@
 #include "rpi_utils.h"
 
-#include <vector>
+#include <stdio.h>
 
 #include <nx/utils/app_info.h>
 
@@ -11,6 +11,9 @@ namespace video {
 namespace rpi {
 
 namespace {
+
+static std::string kMmalUniqueId;
+static bool kGotUniqueId = false;
 
 // Maximum bits per second, taken from v4l2-ctl --list-ctrls.
 static int constexpr kMmalMaxBitrate=10000000;
@@ -57,16 +60,71 @@ static const std::vector<ResolutionData> kMmalResolutionList =
     {480, 270, 5} 
 };
 
+static std::string getUniqueId()
+{
+    std::string serialNumber;
+
+    FILE * file = fopen("/proc/cpuinfo", "r");
+    if (!file)
+        return std::string();
+
+    // Not making this static because this function is only called once.
+    constexpr char serialKey[] = "Serial";
+    const std::string delimitter(": ");
+
+    char * line = NULL;
+    size_t length = 0;
+    while (getline(&line, &length, file) != -1)
+    {
+        // Expecting to find a line of the form: "Serial		: 000000001de09d4f",
+        // where "000000001de09d4f" is the serial number for the Raspberry Pi.
+        if (!strstr(line, serialKey))
+            continue;
+
+        std::string keyValuePair(line);
+        size_t position = keyValuePair.find(delimitter);
+        if (position == std::string::npos)
+            break;
+
+        position += delimitter.size(); //< Advance past ": ".
+        if (position >= keyValuePair.size())
+            return std::string();
+
+        // Drop everything before ": " and "\n" at the end, if it has one.
+        if (keyValuePair[keyValuePair.size() - 1] == '\n')
+            serialNumber = keyValuePair.substr(position, keyValuePair.size() - 1);
+        else
+            serialNumber = keyValuePair.substr(position);
+
+        break;
+    }
+
+    free(line);
+    fclose(file);
+
+    return serialNumber;
+}
+
 } //namespace
 
-int getMmalMaxBitrate()
+std::string getMmalUniqueId()
 {
-    return kMmalMaxBitrate;
+    if (!kGotUniqueId)
+    {
+        kGotUniqueId = true;
+        kMmalUniqueId = getUniqueId();
+    }
+    return kMmalUniqueId;
 }
 
 std::vector<device::video::ResolutionData> getMmalResolutionList()
 {
     return kMmalResolutionList;
+}
+
+int getMmalMaxBitrate()
+{
+    return kMmalMaxBitrate;
 }
 
 bool isMmalCamera(const std::string& deviceName)

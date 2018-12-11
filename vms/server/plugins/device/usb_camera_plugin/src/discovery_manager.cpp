@@ -34,7 +34,16 @@ static std::string getEthernetMacAddress()
                 kNxMacAddressDelimiter).toStdString();
         }
     }
-    return {};
+
+    // Raspberry Pi 3A+ doesn't have an ethernet port, so fall back to wifi.
+    for (const auto & iFace : interfaces)
+    {
+        if (iFace.type() == QNetworkInterface::Wifi)
+            return iFace.hardwareAddress().replace(":", "-").toStdString();
+    }
+
+    // Give up.
+    return std::string();
 }
 
 bool isRpiMmal(const std::string& deviceName)
@@ -192,20 +201,21 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
 
     for (auto & device: devices)
     {
-        std::string nxId;
+        std::string nxId = device.uniqueId;
 
-        // Convert camera uniqueId to one guaranteed to work with the media server.
-        // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
-        if (isRpiMmal(device.name))
-        {
-            nxId = getEthernetMacAddress();
-        }
-        else
-        {
-            nxId = QCryptographicHash::hash(
-                device.uniqueId.c_str(),
-                QCryptographicHash::Md5).toHex().constData();
-        }
+        // if something went wrong during unique id parsing on Raspberry Pi,
+        // fall back to ethernet or wifi mac address.
+        if (nxId.empty() && isRpiMmal(device.name))
+            nxId = getMacAddress();
+
+        // If nxId is still empty, fall back to volatile device path.
+        if (nxId.empty())
+            nxId = device.path;
+
+        // Convert the id to one guaranteed to work with the media server - no special characters.
+        nxId = QCryptographicHash::hash(
+            nxId.c_str(),
+            QCryptographicHash::Md5).toHex().constData();
 
         DeviceDataWithNxId nxDevice(device, nxId);
         nxDevices.push_back(nxDevice);
