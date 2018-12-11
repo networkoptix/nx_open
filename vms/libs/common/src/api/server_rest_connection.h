@@ -375,11 +375,18 @@ public:
         QThread* thread = nullptr);
 
     Handle searchCameraStart(
-        const QString& startAddress,
+        const QString& cameraUrl,
+        const QString& userName,
+        const QString& password,
+        std::optional<int> port,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle searchCameraRangeStart(const QString& startAddress,
         const QString& endAddress,
         const QString& userName,
         const QString& password,
-        int port,
+        std::optional<int> port,
         GetCallback callback,
         QThread* targetThread = nullptr);
 

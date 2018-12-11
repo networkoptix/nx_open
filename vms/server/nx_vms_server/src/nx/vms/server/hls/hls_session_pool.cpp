@@ -8,9 +8,7 @@
 #include "core/resource/resource.h"
 #include <media_server/media_server_module.h>
 
-namespace nx {
-namespace vms::server {
-namespace hls {
+namespace nx::vms::server::hls {
 
 Session::Session(
     QnMediaServerModule* serverModule,
@@ -48,6 +46,7 @@ void Session::updateAuditInfo(qint64 timeUsec)
             m_cameraId,
             m_live ? DATETIME_NOW : timeUsec);
     }
+
     if (m_auditHandle)
         serverModule()->auditManager()->notifyPlaybackInProgress(m_auditHandle, timeUsec);
 }
@@ -118,7 +117,9 @@ void Session::saveChunkAlias(
     quint64 duration)
 {
     QnMutexLocker lk(&m_mutex);
-    m_chunksByAlias[std::make_pair(streamQuality, alias)] = std::make_pair(startTimestamp, duration);
+
+    m_chunksByAlias[std::make_pair(streamQuality, alias)] =
+        std::make_pair(startTimestamp, duration);
 }
 
 bool Session::getChunkByAlias(
@@ -128,6 +129,7 @@ bool Session::getChunkByAlias(
     quint64* const duration) const
 {
     QnMutexLocker lk(&m_mutex);
+
     auto iter = m_chunksByAlias.find(std::make_pair(streamQuality, alias));
     if (iter == m_chunksByAlias.end())
         return false;
@@ -161,65 +163,68 @@ QPair<QString, QString> Session::chunkAuthenticationQueryItem() const
 //-------------------------------------------------------------------------------------------------
 // class SessionPool.
 
-SessionPool::SessionContext::SessionContext():
-    session(NULL),
-    keepAliveTimeoutMS(0),
-    removeTaskID(0)
-{
-}
-
 SessionPool::SessionContext::SessionContext(
-    Session* const _session,
-    unsigned int _keepAliveTimeoutMS)
+    std::unique_ptr<Session> session,
+    std::chrono::milliseconds keepAliveTimeout)
     :
-    session(_session),
-    keepAliveTimeoutMS(_keepAliveTimeoutMS),
-    removeTaskID(0)
-{
-}
-
-SessionPool::SessionPool()
+    session(std::move(session)),
+    keepAliveTimeout(keepAliveTimeout)
 {
 }
 
 SessionPool::~SessionPool()
 {
-    while (!m_sessionByID.empty())
+    while (!m_sessionById.empty())
     {
         SessionContext sessionCtx;
         {
             QnMutexLocker lk(&m_mutex);
-            if (m_sessionByID.empty())
+            if (m_sessionById.empty())
                 break;
-            sessionCtx = m_sessionByID.begin()->second;
-            m_taskToSessionID.erase(sessionCtx.removeTaskID);
-            m_sessionByID.erase(m_sessionByID.begin());
+            sessionCtx = std::move(m_sessionById.begin()->second);
+            m_taskToSessionId.erase(sessionCtx.removeTaskId);
+            m_sessionById.erase(m_sessionById.begin());
         }
 
-        delete sessionCtx.session;
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(sessionCtx.removeTaskID);
+        sessionCtx.session.reset();
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(sessionCtx.removeTaskId);
     }
 }
 
-bool SessionPool::add(Session* session, unsigned int keepAliveTimeoutMS)
+bool SessionPool::add(
+    std::unique_ptr<Session> session,
+    std::chrono::milliseconds keepAliveTimeout)
 {
     QnMutexLocker lk(&m_mutex);
-    if (!m_sessionByID.emplace(session->id(), SessionContext(session, keepAliveTimeoutMS)).second)
+
+    const auto sessionId = session->id();
+    if (!m_sessionById.emplace(
+            sessionId,
+            SessionContext(std::move(session), keepAliveTimeout)).second)
+    {
         return false;
+    }
+
     // Session with keep-alive timeout can only be accessed under lock.
-    NX_ASSERT((keepAliveTimeoutMS == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()));
+    NX_ASSERT(
+        (keepAliveTimeout == std::chrono::milliseconds::zero()) ||
+        (m_lockedIDs.find(sessionId) != m_lockedIDs.end()));
     return true;
 }
 
 Session* SessionPool::find(const QString& id) const
 {
     QnMutexLocker lk(&m_mutex);
-    auto it = m_sessionByID.find(id);
-    if (it == m_sessionByID.end())
+
+    auto it = m_sessionById.find(id);
+    if (it == m_sessionById.end())
         return NULL;
+
     // Session with keep-alive timeout can only be accessed under lock.
-    NX_ASSERT((it->second.keepAliveTimeoutMS == 0) || (m_lockedIDs.find(id) != m_lockedIDs.end()));
-    return it->second.session;
+    NX_ASSERT(
+        (it->second.keepAliveTimeout == std::chrono::milliseconds::zero()) ||
+        (m_lockedIDs.find(id) != m_lockedIDs.end()));
+    return it->second.session.get();
 }
 
 void SessionPool::remove(const QString& id)
@@ -242,50 +247,51 @@ void SessionPool::lockSessionID(const QString& id)
     while (!m_lockedIDs.insert(id).second)
         m_cond.wait(lk.mutex());
 
-    //removing session remove task (if any)
-    std::map<QString, SessionContext>::iterator it = m_sessionByID.find(id);
-    if (it == m_sessionByID.end() || it->second.removeTaskID == 0)
+    // Removing session remove task (if any).
+    auto it = m_sessionById.find(id);
+    if (it == m_sessionById.end() || it->second.removeTaskId == 0)
         return;
-    m_taskToSessionID.erase(it->second.removeTaskID);
-    it->second.removeTaskID = 0;
+    m_taskToSessionId.erase(it->second.removeTaskId);
+    it->second.removeTaskId = 0;
 }
 
 void SessionPool::unlockSessionID(const QString& id)
 {
     QnMutexLocker lk(&m_mutex);
+
     m_lockedIDs.erase(id);
     m_cond.wakeAll();
 
     //creating session remove task
-    std::map<QString, SessionContext>::iterator it = m_sessionByID.find(id);
-    if (it == m_sessionByID.end() || it->second.keepAliveTimeoutMS == 0)
+    auto it = m_sessionById.find(id);
+    if (it == m_sessionById.end() || (it->second.keepAliveTimeout == std::chrono::milliseconds::zero()))
         return;
-    it->second.removeTaskID = nx::utils::TimerManager::instance()->addTimer(
-        this, std::chrono::milliseconds(it->second.keepAliveTimeoutMS));
-    m_taskToSessionID.insert(std::make_pair(it->second.removeTaskID, id));
+
+    it->second.removeTaskId = nx::utils::TimerManager::instance()->addTimer(
+        this, it->second.keepAliveTimeout);
+    m_taskToSessionId.emplace(it->second.removeTaskId, id);
 }
 
-void SessionPool::onTimer(const quint64& timerID)
+void SessionPool::onTimer(const quint64& timerId)
 {
     QnMutexLocker lk(&m_mutex);
-    auto timerIter = m_taskToSessionID.find(timerID);
-    if (timerIter == m_taskToSessionID.end())
+
+    auto timerIter = m_taskToSessionId.find(timerId);
+    if (timerIter == m_taskToSessionId.end())
         return; //it is possible just after lockSessionID call
+
     removeNonSafe(timerIter->second);    //removes timerIter also
 }
 
 void SessionPool::removeNonSafe(const QString& id)
 {
-    auto it = m_sessionByID.find(id);
-    if (it == m_sessionByID.end())
+    auto it = m_sessionById.find(id);
+    if (it == m_sessionById.end())
         return;
-    if (it->second.removeTaskID != 0)
-        m_taskToSessionID.erase(it->second.removeTaskID);
-    delete it->second.session;
-    m_sessionByID.erase(it);
+
+    if (it->second.removeTaskId != 0)
+        m_taskToSessionId.erase(it->second.removeTaskId);
+    m_sessionById.erase(it);
 }
 
-} // namespace hls
-} // namespace vms::server
-} // namespace nx
-
+} // namespace nx::vms::server::hls

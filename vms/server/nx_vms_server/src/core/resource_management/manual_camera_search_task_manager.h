@@ -28,8 +28,7 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
-    void addTask(nx::network::SocketAddress address,
-        const QAuthenticator& auth,
+    void addTask(nx::utils::Url url,
         std::vector<QnAbstractNetworkResourceSearcher *> searchers,
         bool isSequential); //< Otherwise it is parallel.
 
@@ -56,6 +55,6 @@ private:
 
     mutable nx::network::aio::BasicPollable m_pollable;
 
-    std::map<nx::network::HostAddress, std::queue<QnSearchTask>> m_searchTasksQueues;
-    std::map<nx::network::HostAddress, SearchTaskQueueContext> m_searchQueueContexts;
+    std::map<nx::utils::Url, std::queue<QnSearchTask>> m_searchTasksQueues;
+    std::map<nx::utils::Url, SearchTaskQueueContext> m_searchQueueContexts;
 };

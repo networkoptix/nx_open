@@ -23,11 +23,24 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
-    void run(SearchDoneCallback callback,
+    /**
+     * Tries to find a camera on a host specified by URL.
+     * @param callback Will be called when the search is done.
+     * @param url Must contain a host field, other URL fields are optional.
+     */
+    void startSearch(SearchDoneCallback callback, nx::utils::Url url);
+
+    /**
+     * Scans a range of IPv4 addresses and tries to find cameras on online hosts.
+     * @param callback Will be called when the search is done.
+     * @param startAddr The begining of the IP range to check. startAddr is checked too.
+     * @param endAddr The end of the IP range to check. endAddr is checked too.
+     * @param baseUrl The URL where host will be substitute by the IP address of the found online hosts.
+     */
+    void startRangeSearch(SearchDoneCallback callback,
         nx::network::HostAddress startAddr,
-        std::optional<nx::network::HostAddress> endAddr,
-        QAuthenticator auth,
-        int port);
+        nx::network::HostAddress endAddr,
+        nx::utils::Url baseUrl);
 
     QnManualCameraSearchProcessStatus status() const;
 
@@ -35,13 +48,10 @@ private:
     void startOnlineHostsScan(
         nx::network::HostAddress startAddr,
         nx::network::HostAddress endAddr,
-        QAuthenticator auth,
-        int port = nx::network::http::DEFAULT_HTTP_PORT);
+        nx::utils::Url baseUrl);
 
     void onOnlineHostsScanDone(
-        std::vector<nx::network::HostAddress> onlineHosts,
-        int port,
-        QAuthenticator auth);
+        nx::utils::Url baseUrl, std::vector<nx::network::HostAddress> onlineHosts = {});
     void onManualSearchDone(QnManualResourceSearchList results);
 
     QnManualResourceSearchStatus::State changeState(QnManualResourceSearchStatus::State newState);

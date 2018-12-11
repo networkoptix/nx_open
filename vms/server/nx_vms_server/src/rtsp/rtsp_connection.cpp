@@ -1619,7 +1619,11 @@ void QnRtspConnectionProcessor::run()
     initSystemThreadId();
 
     //d->socket->setNoDelay(true);
-    d->socket->setSendBufferSize(16*1024);
+
+    // NOTE: Sending data bigger than socket's send buffer size causes unexpected delays in some
+    // scenarios. E.g., when streaming within a single Linux PC (VMS-11880).
+    // Also, send buffer size cannot be set to a value less than 32K in Linux.
+    d->socket->setSendBufferSize(64*1024);
     //d->socket->setRecvTimeout(1000*1000);
     //d->socket->setSendTimeout(1000*1000);
 

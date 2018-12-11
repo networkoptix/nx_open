@@ -41,11 +41,17 @@ QString toString(const QnRequestParams& params)
 }
 
 bool checkUserAccess(
-    const Qn::UserAccessData& accessRights,
-    const QnSecurityCamResourcePtr& camera,
-    Qn::PtzCommand command)
+    const Qn::UserAccessData& accessRights, QnResourcePtr camera, Qn::PtzCommand command)
 {
-    const auto& accessManager = camera->commonModule()->resourceAccessManager();
+    const auto accessManager = camera->commonModule()->resourceAccessManager();
+    if (const auto id = camera->getProperty(ResourcePropertyKey::kPtzTargetId); !id.isEmpty())
+    {
+        if (auto target = camera->resourcePool()->getResourceByUniqueId(id))
+            camera = target;
+        else
+            return false;
+    }
+
     switch (command)
     {
         case Qn::ContinuousMovePtzCommand:

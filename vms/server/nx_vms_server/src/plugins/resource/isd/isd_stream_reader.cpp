@@ -122,7 +122,10 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     if (statusCode == nx::network::http::StatusCode::unauthorized)
         return CameraDiagnostics::NotAuthorisedResult(requestUrl.toString());
 
-    QString rtspUrl = getValueFromString(httpClient.response()->messageBody);
+    auto messageBody = httpClient.fetchEntireMessageBody();
+    QString rtspUrl;
+    if (messageBody)
+        rtspUrl = getValueFromString(*messageBody);
 
     QStringList urlLst = rtspUrl.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
