@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #pragma once
 
 #include <string>
@@ -15,3 +17,5 @@ std::string getDeviceUniqueId(const std::string& devicePath);
 } //namespace device
 } //namespace usb_cam
 } //namespace nx
+
+#endif _WIN32

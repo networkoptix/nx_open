@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #include "wdm_utils.h"
 
 #include <vector>
@@ -98,42 +100,6 @@ std::wstring getDevicePath(
     }
 
     return std::wstring(detailData->DevicePath);
-}
-
-static bool deviceHasGuid(
-    HDEVINFO deviceInfoSet,
-    SP_DEVINFO_DATA& device,
-    const GUID * guid,
-    const std::wstring& guidString)
-{
-    SP_DEVICE_INTERFACE_DATA interfaceData = { 0 };
-    interfaceData.cbSize = sizeof(interfaceData);
-
-    for (int deviceIndex = 0;
-        SetupDiEnumDeviceInfo(deviceInfoSet, deviceIndex, &device);
-        ++deviceIndex)
-    {
-        for (int interfaceIndex = 0;
-            SetupDiEnumDeviceInterfaces(
-                deviceInfoSet,
-                &device,
-                guid,
-                interfaceIndex,
-                &interfaceData);
-            ++interfaceIndex)
-        {
-            std::wstring currentDevicePath = getDevicePath(
-                deviceInfoSet,
-                device,
-                interfaceData);
-
-            size_t size = std::min(currentDevicePath.size(), guidString.size());
-            if (_wcsnicmp(currentDevicePath.c_str(), guidString.c_str(), size) == 0)
-                return true;
-        }
-    }
-
-    return false;
 }
 
 static bool findDevice(
@@ -430,3 +396,5 @@ std::string getDeviceUniqueId(const std::string& devicePath)
 } //namespace device
 } //namespace usb_cam
 } //namespace nx
+
+#endif // _WIN32
