@@ -82,10 +82,10 @@
     "PATCHES TEXT": "Poprawki",
     "BETAS TEXT": "Bety",
     "CLIENT ONLY TEXT": "Tylko klient",
-    "PASSWORD TOO SHORT BADGE TEXT": "zbty krótkie",
+    "PASSWORD TOO SHORT BADGE TEXT": "za krótkie",
     "PASSWORD TOO COMMON BADGE TEXT": "zbyt popularne",
     "PASSWORD IS WEAK BADGE TEXT": "słabe",
     "PASSWORD IS FAIR BADGE TEXT": "średnie",
-    "PASSWORD IS GOOD BADGE TEXT": "dobry",
+    "PASSWORD IS GOOD BADGE TEXT": "dobre",
     "PASSWORD INCORRECT BADGE TEXT": "nieprawidłowe"
 }
