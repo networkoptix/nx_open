@@ -57,8 +57,12 @@ public:
 
     void setViewportMargins(int top, int bottom);
 
+    /**
+     * Allows to insert a custom widget at the top of the viewport, above the topmost tile.
+     * NOTE: takes ownership of the widget.
+     */
     QWidget* viewportHeader() const;
-    void setViewportHeader(QWidget* value); //< Takes ownership.
+    void setViewportHeader(QWidget* value);
 
     virtual QSize sizeHint() const override;
 
