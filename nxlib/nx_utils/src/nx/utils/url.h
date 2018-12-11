@@ -58,9 +58,9 @@ public:
     Q_INVOKABLE QUrl toQUrl() const;
 
     /**
-    * @brief fromStringPersistingScheme First tries to parse strings like `hostname`, then
-    * strings like `hostname:port` and using QUrl parser for other cases.
-    * @return URL which may not ba valid one, so it should be checked after the call.
+    * First tries to parse strings like `hostname`, then
+    * strings like `hostname:port` and uses the QUrl parser for other cases.
+    * @return URL which may not be a valid one, so it should be checked after the call.
     */
     static Url fromText(const QString& url);
     static Url fromQUrl(const QUrl& url);
