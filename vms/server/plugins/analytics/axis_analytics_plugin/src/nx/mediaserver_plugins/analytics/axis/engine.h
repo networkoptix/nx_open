@@ -9,9 +9,9 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/engine.h>
-#include <nx/sdk/analytics/common_plugin.h>
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/common/plugin.h>
 #include <nx/network/socket_global.h>
 
 #include "common.h"
@@ -21,20 +21,20 @@ namespace mediaserver_plugins {
 namespace analytics {
 namespace axis {
 
-class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::Engine>
+class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::CommonPlugin* plugin);
+    Engine(nx::sdk::analytics::common::Plugin* plugin);
 
-    virtual nx::sdk::analytics::CommonPlugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
-    virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
+    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo,
         nx::sdk::Error* outError) override;
 
@@ -43,14 +43,14 @@ public:
     virtual void executeAction(
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
 
-    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
 private:
     EngineManifest fetchSupportedEvents(
         const nx::sdk::DeviceInfo& deviceInfo);
 
 private:
-    nx::sdk::analytics::CommonPlugin* const m_plugin;
+    nx::sdk::analytics::common::Plugin* const m_plugin;
     EngineManifest m_typedManifest;
     QByteArray m_manifest;
 };

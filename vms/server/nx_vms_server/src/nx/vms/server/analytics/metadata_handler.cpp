@@ -46,7 +46,7 @@ nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
     return nx::vms::api::analytics::EventType();
 }
 
-void MetadataHandler::handleMetadata(MetadataPacket* metadata)
+void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
 {
     if (metadata == nullptr)
     {
@@ -55,16 +55,16 @@ void MetadataHandler::handleMetadata(MetadataPacket* metadata)
     }
 
     bool handled = false;
-    nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
-        metadata->queryInterface(IID_EventsMetadataPacket));
+    nxpt::ScopedRef<IEventMetadataPacket> eventsPacket(
+        metadata->queryInterface(IID_EventMetadataPacket));
     if (eventsPacket)
     {
         handleEventsPacket(std::move(eventsPacket));
         handled = true;
     }
 
-    nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
-        metadata->queryInterface(IID_ObjectsMetadataPacket));
+    nxpt::ScopedRef<IObjectMetadataPacket> objectsPacket(
+        metadata->queryInterface(IID_ObjectMetadataPacket));
     if (objectsPacket)
     {
         handleObjectsPacket(std::move(objectsPacket));
@@ -73,27 +73,27 @@ void MetadataHandler::handleMetadata(MetadataPacket* metadata)
 
     if (!handled)
     {
-        NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUsec "
-            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec()
+        NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUs "
+            << metadata->timestampUs() << ", durationUs " << metadata->durationUs()
             << "; ignoring";
     }
 }
 
-void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> packet)
+void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> packet)
 {
     int eventsCount = 0;
     while (true)
     {
-        nxpt::ScopedRef<MetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
+        nxpt::ScopedRef<IMetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
 
         ++eventsCount;
 
-        nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
+        nxpt::ScopedRef<IEvent> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
-            const int64_t timestampUsec = packet->timestampUsec();
+            const int64_t timestampUsec = packet->timestampUs();
             handleMetadataEvent(std::move(eventData), timestampUsec);
         }
         else
@@ -106,13 +106,13 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
-void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket> packet)
+void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket> packet)
 {
     using namespace nx::mediaserver_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<Object> item(packet->nextItem(), /*increaseRef*/ false);
+        nxpt::ScopedRef<IObject> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
@@ -137,8 +137,8 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
     }
     if (data.objects.empty())
         NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
-    data.timestampUsec = packet->timestampUsec();
-    data.durationUsec = packet->durationUsec();
+    data.timestampUsec = packet->timestampUs();
+    data.durationUsec = packet->durationUs();
     data.deviceId = m_resource->getId();
 
     if (data.timestampUsec <= 0)
@@ -152,7 +152,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
 }
 
 void MetadataHandler::handleMetadataEvent(
-    nxpt::ScopedRef<Event> eventData,
+    nxpt::ScopedRef<IEvent> eventData,
     qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;

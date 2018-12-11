@@ -17,9 +17,9 @@ extern "C" {
 #define NX_PRINT_PREFIX "deepstream::defaultCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/common_object.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/common/object.h>
+#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx{
 namespace mediaserver_plugins {
@@ -92,9 +92,9 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
     if (!bboxes)
         return true;
 
-    auto packet = new nx::sdk::analytics::CommonObjectsMetadataPacket();
-    packet->setTimestampUsec(GST_BUFFER_PTS(buffer));
-    packet->setDurationUsec(30000); //< TODO: #dmishin calculate duration or take it from buffer.
+    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    packet->setTimestampUs(GST_BUFFER_PTS(buffer));
+    packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
 
     auto pipeline = (deepstream::DefaultPipeline*) userData;
     auto trackingMapper = pipeline->trackingMapper();
@@ -119,8 +119,8 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::CommonObject();
-        nx::sdk::analytics::Rect rectangle;
+        auto detectedObject = new nx::sdk::analytics::common::Object();
+        nx::sdk::analytics::IObject::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
@@ -135,7 +135,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
             << "height: " << rectangle.height;
 
         nxpl::NX_GUID guid;
-        std::deque<nx::sdk::analytics::CommonAttribute> attributes;
+        std::deque<nx::sdk::analytics::common::Attribute> attributes;
 
         attributes = trackingMapper->attributes(roiMeta);
         guid = trackingMapper->getMapping(roiMeta.tracking_id);
@@ -156,7 +156,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
         {
             detectedObject->setTypeId(objectClassDescriptions[objectClassId].typeId);
             attributes.emplace_front(
-                nx::sdk::AttributeType::string,
+                nx::sdk::IAttribute::Type::string,
                 "Type",
                 objectClassDescriptions[objectClassId].name);
         }
@@ -168,13 +168,13 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
         if (ini().showGuids)
         {
             attributes.emplace_front(
-                nx::sdk::AttributeType::string,
+                nx::sdk::IAttribute::Type::string,
                 "GUID",
                 nxpt::toStdString(guid));
         }
 
         detectedObject->setAttributes(
-            std::vector<nx::sdk::analytics::CommonAttribute>(
+            std::vector<nx::sdk::analytics::common::Attribute>(
                 attributes.begin(),
                 attributes.end()));
 

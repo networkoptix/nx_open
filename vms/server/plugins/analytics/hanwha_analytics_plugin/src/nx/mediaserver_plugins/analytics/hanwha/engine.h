@@ -1,14 +1,15 @@
 #pragma once
 
+#include <QtCore/QMap>
+#include <QtCore/QString>
 #include <QtCore/QByteArray>
-#include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
 #include <boost/optional/optional.hpp>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common_plugin.h>
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/i_engine.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
@@ -21,20 +22,20 @@ namespace mediaserver_plugins {
 namespace analytics {
 namespace hanwha {
 
-class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::Engine>
+class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::CommonPlugin* plugin);
+    Engine(nx::sdk::analytics::common::Plugin* plugin);
 
-    virtual nx::sdk::analytics::CommonPlugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
-    virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
+    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo,
         nx::sdk::Error* outError) override;
 
@@ -55,7 +56,7 @@ public:
 
     void deviceAgentIsAboutToBeDestroyed(const QString& sharedId);
 
-    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
 private:
     struct SharedResources
@@ -88,7 +89,7 @@ private:
         const nx::sdk::DeviceInfo& deviceInfo);
 
 private:
-    nx::sdk::analytics::CommonPlugin* const m_plugin;
+    nx::sdk::analytics::common::Plugin* const m_plugin;
 
     mutable QnMutex m_mutex;
     QByteArray m_manifest;

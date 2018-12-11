@@ -9,9 +9,9 @@
 #include <nx/utils/std/optional.h>
 #include <nx/streaming/abstract_data_consumer.h>
 
-#include <nx/sdk/analytics/engine.h>
-#include <nx/sdk/analytics/device_agent.h>
-#include <nx/sdk/analytics/common_metadata_types.h>
+#include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/common/metadata_types.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -31,8 +31,8 @@ class DeviceAnalyticsBinding:
 
 {
     using base_type = QnAbstractDataConsumer;
-    using Engine = nx::sdk::analytics::Engine;
-    using DeviceAgent = nx::sdk::analytics::DeviceAgent;
+    using Engine = nx::sdk::analytics::IEngine;
+    using DeviceAgent = nx::sdk::analytics::IDeviceAgent;
 public:
     DeviceAnalyticsBinding(
         QnMediaServerModule* serverModule,
@@ -71,7 +71,7 @@ private:
     bool updateDescriptorsWithManifest(
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    sdk_support::UniquePtr<nx::sdk::analytics::CommonMetadataTypes> neededMetadataTypes() const;
+    sdk_support::UniquePtr<nx::sdk::analytics::common::MetadataTypes> neededMetadataTypes() const;
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
         const QString& manifestTypes) const;
 

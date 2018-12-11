@@ -5,7 +5,7 @@
 #include <memory>
 #include <condition_variable>
 
-#include <nx/sdk/analytics/common_video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/common/video_frame_processing_device_agent.h>
 
 #include "engine.h"
 
@@ -14,7 +14,7 @@ namespace mediaserver_plugins {
 namespace analytics {
 namespace stub {
 
-class DeviceAgent: public nx::sdk::analytics::CommonVideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::common::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine);
@@ -23,7 +23,7 @@ public:
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 protected:
     virtual std::string manifest() const override;
@@ -34,20 +34,20 @@ protected:
         const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;
 
     virtual bool pushUncompressedVideoFrame(
-        const nx::sdk::analytics::UncompressedVideoFrame* videoFrame) override;
+        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
 
     virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets) override;
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
     virtual Engine* engine() const override { return engineCasted<Engine>(); }
 
-    nx::sdk::analytics::MetadataPacket* cookSomeEvents();
-    nx::sdk::analytics::MetadataPacket* cookSomeObjects();
+    nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
+    nx::sdk::analytics::IMetadataPacket* cookSomeObjects();
 
     int64_t usSinceEpoch() const;
 
-    bool checkFrame(const nx::sdk::analytics::UncompressedVideoFrame* videoFrame) const;
+    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) const;
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);

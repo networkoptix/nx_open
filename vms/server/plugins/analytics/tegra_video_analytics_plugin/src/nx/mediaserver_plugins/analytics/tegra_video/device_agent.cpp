@@ -3,11 +3,11 @@
 #include <iostream>
 #include <chrono>
 
-#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/common_metadata_packet.h>
-#include <nx/sdk/analytics/common_object.h>
+#include <nx/sdk/analytics/common/object.h>
+#include <nx/sdk/analytics/common/object_metadata_packet.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
@@ -22,7 +22,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine):
-    CommonVideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT)
+    VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;
 
@@ -94,7 +94,7 @@ bool DeviceAgent::pushCompressedFrame(const CompressedVideoPacket* videoPacket)
     TegraVideo::CompressedFrame compressedFrame;
     compressedFrame.dataSize = videoPacket->dataSize();
     compressedFrame.data = (const uint8_t*) videoPacket->data();
-    compressedFrame.ptsUs = videoPacket->timestampUsec();
+    compressedFrame.ptsUs = videoPacket->timestampUs();
 
     NX_OUTPUT << "Pushing frame to net: PTS " << compressedFrame.ptsUs;
     if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
@@ -127,11 +127,11 @@ bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFra
 {
     if (!pushCompressedFrame(videoFrame))
         return false;
-    m_lastFramePtsUs = videoFrame->timestampUsec();
+    m_lastFramePtsUs = videoFrame->timestampUs();
     return true;
 }
 
-bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
+bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
 {
     while (m_tegraVideo->hasMetadata())
     {
@@ -169,7 +169,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPack
 // private
 
 bool DeviceAgent::makeMetadataPacketsFromRects(
-    std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -189,26 +189,26 @@ bool DeviceAgent::makeMetadataPacketsFromRects(
 }
 
 bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
-    std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
     // Create metadata Objects directly from the rects; create no events.
 
-    auto objectPacket = new CommonObjectsMetadataPacket();
-    objectPacket->setTimestampUsec(ptsUs);
-    objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
+    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    objectPacket->setTimestampUs(ptsUs);
+    objectPacket->setDurationUs(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
 
     for (const auto& rect: rects)
     {
-        auto commonObject = new CommonObject();
+        auto object = new nx::sdk::analytics::common::Object();
         const auto objectId =
             nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(QnUuid::createUuid());
-        commonObject->setId(objectId);
-        commonObject->setTypeId(m_objectTypeId);
+        object->setId(objectId);
+        object->setTypeId(m_objectTypeId);
 
-        commonObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
-        objectPacket->addItem(commonObject);
+        object->setBoundingBox(IObject::Rect(rect.x, rect.y, rect.w, rect.h));
+        objectPacket->addItem(object);
     }
     metadataPackets->push_back(objectPacket);
 
@@ -217,7 +217,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
 }
 
 bool DeviceAgent::makeMetadataPacketsFromRectsPostprocPed(
-    std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -226,13 +226,13 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocPed(
 }
 
 bool DeviceAgent::makeMetadataPacketsFromRectsPostprocCar(
-    std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
-    auto objectPacket = new CommonObjectsMetadataPacket();
-    objectPacket->setTimestampUsec(ptsUs);
-    objectPacket->setDurationUsec(0);
+    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    objectPacket->setTimestampUs(ptsUs);
+    objectPacket->setDurationUs(0);
 
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
 

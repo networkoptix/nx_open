@@ -9,7 +9,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 
 #include "common.h"
 #include "monitor.h"
@@ -22,7 +22,7 @@ namespace axis {
 
 class MetadataHandler;
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
+class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(
@@ -37,7 +37,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
@@ -49,9 +49,9 @@ public:
         return m_typedManifest;
     }
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
     /** @return Null if not found. */
     const EventType* eventTypeById(const QString& id) const noexcept;
@@ -76,7 +76,7 @@ private:
      */
     mutable QList<QByteArray> m_givenManifests;
 
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 };
 
 } // namespace axis

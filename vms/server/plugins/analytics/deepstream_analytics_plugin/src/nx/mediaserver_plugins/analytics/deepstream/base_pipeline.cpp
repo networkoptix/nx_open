@@ -1,8 +1,8 @@
 #include "base_pipeline.h"
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/data_packet.h>
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/i_data_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include <nx/mediaserver_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
 #define NX_PRINT_PREFIX "deepstream::BasePipeline::"
@@ -26,7 +26,7 @@ void BasePipeline::setMetadataCallback(nx::gstreamer::MetadataCallback metadataC
     m_metadataCallback = std::move(metadataCallback);
 }
 
-bool BasePipeline::pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket)
+bool BasePipeline::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
 {
     if (!dataPacket)
         return true;
@@ -39,7 +39,7 @@ bool BasePipeline::pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket)
 
     if (video)
     {
-        m_lastFrameTimestampUs = video->timestampUsec();
+        m_lastFrameTimestampUs = video->timestampUs();
         m_currentFrameWidth = video->width();
         m_currentFrameHeight = video->height();
     }
@@ -51,7 +51,7 @@ bool BasePipeline::pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket)
     return true;
 }
 
-nx::sdk::analytics::DataPacket* BasePipeline::nextDataPacket()
+nx::sdk::analytics::IDataPacket* BasePipeline::nextDataPacket()
 {
     NX_OUTPUT << __func__ << " Fetching next data packet...";
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -68,7 +68,7 @@ nx::sdk::analytics::DataPacket* BasePipeline::nextDataPacket()
     return packet;
 }
 
-void BasePipeline::handleMetadata(nx::sdk::analytics::MetadataPacket* packet)
+void BasePipeline::handleMetadata(nx::sdk::analytics::IMetadataPacket* packet)
 {
     NX_OUTPUT << __func__ << " Calling metadata handler";
     m_metadataCallback(packet);

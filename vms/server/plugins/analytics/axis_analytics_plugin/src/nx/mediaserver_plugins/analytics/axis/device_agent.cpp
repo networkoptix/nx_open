@@ -4,8 +4,6 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/sdk/analytics/common_event.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/serialization/json.h>
 
@@ -59,7 +57,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
     return nx::sdk::Error::noError;
@@ -77,12 +75,12 @@ nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
+void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

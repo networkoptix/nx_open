@@ -7,8 +7,7 @@
 
 #include <nx/utils/uuid.h>
 
-#include <nx/sdk/analytics/metadata_packet.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
+#include <nx/sdk/analytics/common/object_metadata_packet.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -20,7 +19,7 @@ class NaiveObjectTracker
 
 public:
     void filterAndTrack(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* outMetadataPackets,
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* outMetadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs);
 
@@ -54,7 +53,7 @@ private:
     void removeExpiredObjectsFromCache();
 
     void addNonExpiredObjectsFromCache(
-        nx::sdk::analytics::CommonObjectsMetadataPacket* outPacket);
+        nx::sdk::analytics::common::ObjectMetadataPacket* outPacket);
 
     TegraVideo::Rect applySpeedToRectangle(
         const TegraVideo::Rect& rectangle,
@@ -82,7 +81,7 @@ private:
     static bool isTooSmall(const TegraVideo::Rect& rectangle);
     static float bottomRightX(const TegraVideo::Rect& rectangle);
     static float bottomRightY(const TegraVideo::Rect& rectangle);
-    static nx::sdk::analytics::Rect toSdkRect(const TegraVideo::Rect& rectangle);
+    static nx::sdk::analytics::IObject::Rect toSdkRect(const TegraVideo::Rect& rectangle);
     static nxpl::NX_GUID toSdkGuid(const QnUuid& id);
 
 private:

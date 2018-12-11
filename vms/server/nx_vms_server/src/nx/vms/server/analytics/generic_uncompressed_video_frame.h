@@ -4,18 +4,16 @@
 
 #include <nx/utils/log/assert.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
 namespace vms::server {
 namespace analytics {
 
 class GenericUncompressedVideoFrame:
-    public nxpt::CommonRefCounter<nx::sdk::analytics::UncompressedVideoFrame>
+    public nxpt::CommonRefCounter<nx::sdk::analytics::IUncompressedVideoFrame>
 {
 public:
-    using Ratio = nx::sdk::Ratio;
-
     GenericUncompressedVideoFrame(
         int64_t timestampUsec,
         int width,
@@ -24,7 +22,7 @@ public:
         std::vector<std::vector<char>>&& data,
         std::vector<int>&& lineSizes)
         :
-        m_timestampUsec(timestampUsec),
+        m_timestampUs(timestampUsec),
         m_width(width),
         m_height(height),
         m_pixelFormat(pixelFormat),
@@ -37,10 +35,10 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual int64_t timestampUsec() const override { return m_timestampUsec; }
+    virtual int64_t timestampUs() const override { return m_timestampUs; }
     virtual int width() const override { return m_width; }
     virtual int height() const override { return m_height; }
-    virtual Ratio sampleAspectRatio() const override { return {1, 1}; }
+    virtual PixelAspectRatio pixelAspectRatio() const override { return {1, 1}; }
     virtual PixelFormat pixelFormat() const override { return m_pixelFormat; }
     virtual Handle handleType() const override { return Handle::none; }
     virtual int handle() const override { return 0; }
@@ -55,7 +53,7 @@ private:
     bool validatePlane(int plane) const;
 
 private:
-    const int64_t m_timestampUsec = 0;
+    const int64_t m_timestampUs = 0;
     const int m_width = 0;
     const int m_height = 0;
     const PixelFormat m_pixelFormat = PixelFormat::yuv420;

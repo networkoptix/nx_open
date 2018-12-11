@@ -6,23 +6,23 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <nx/sdk/analytics/common_engine.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/common/engine.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
 namespace stub {
 
-using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
-
-class Engine: public nx::sdk::analytics::CommonEngine
+class Engine: public nx::sdk::analytics::common::Engine
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
+
+    Engine(nx::sdk::analytics::IPlugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
+    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     // Capabilities.

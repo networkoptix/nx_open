@@ -16,9 +16,9 @@ extern "C" {
 #include <nx/mediaserver_plugins/analytics/deepstream/openalpr/openalpr_pipeline.h>
 #include <nx/mediaserver_plugins/analytics/deepstream/openalpr_common.h>
 
-#include <nx/sdk/analytics/common_object.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/common/object.h>
+#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -48,9 +48,9 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (bboxes->gie_type != 3)
         return true;
 
-    auto packet = new nx::sdk::analytics::CommonObjectsMetadataPacket();
-    packet->setTimestampUsec(GST_BUFFER_PTS(buffer));
-    packet->setDurationUsec(30000); //< TODO: #dmishin calculate duration or take it from buffer.
+    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    packet->setTimestampUs(GST_BUFFER_PTS(buffer));
+    packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
 
     auto pipeline = (deepstream::OpenAlprPipeline*) userData;
     auto licensePlateTracker = pipeline->licensePlateTracker();
@@ -75,8 +75,8 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::CommonObject();
-        nx::sdk::analytics::Rect rectangle;
+        auto detectedObject = new nx::sdk::analytics::common::Object();
+        nx::sdk::analytics::IObject::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
@@ -91,7 +91,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "height: " << rectangle.height;
 
         nxpl::NX_GUID guid;
-        std::deque<nx::sdk::analytics::CommonAttribute> attributes;
+        std::deque<nx::sdk::analytics::common::Attribute> attributes;
 
         auto info = licensePlateTracker->licensePlateInfo(displayText);
         guid = info.guid;
@@ -104,7 +104,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 0:
                 {
                     attributes.emplace_back(
-                        nx::sdk::AttributeType::string,
+                        nx::sdk::IAttribute::Type::string,
                         "Number",
                         encodedAttributes[i]);
                     break;
@@ -112,7 +112,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 1:
                 {
                     attributes.emplace_back(
-                        nx::sdk::AttributeType::string,
+                        nx::sdk::IAttribute::Type::string,
                         "Country",
                         encodedAttributes[i]);
                     break;
@@ -120,7 +120,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 2:
                 {
                     attributes.emplace_back(
-                        nx::sdk::AttributeType::string,
+                        nx::sdk::IAttribute::Type::string,
                         "Region",
                         encodedAttributes[i]);
                     break;
@@ -142,13 +142,13 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         if (ini().showGuids)
         {
             attributes.emplace_front(
-                nx::sdk::AttributeType::string,
+                nx::sdk::IAttribute::Type::string,
                 "GUID",
                 nxpt::toStdString(guid));
         }
 
         detectedObject->setAttributes(
-            std::vector<nx::sdk::analytics::CommonAttribute>(
+            std::vector<nx::sdk::analytics::common::Attribute>(
                 attributes.begin(),
                 attributes.end()));
 

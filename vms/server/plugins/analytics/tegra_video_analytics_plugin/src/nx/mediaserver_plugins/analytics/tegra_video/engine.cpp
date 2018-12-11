@@ -4,7 +4,7 @@
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common_plugin.h>
+#include <nx/sdk/analytics/common/plugin.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
 #include "device_agent.h"
@@ -17,11 +17,11 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Plugin* plugin): CommonEngine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(IPlugin* plugin): nx::sdk::analytics::common::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
 }
 
-nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
+nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* /*deviceInfo*/, Error* /*outError*/)
 {
     return new DeviceAgent(this);
@@ -76,10 +76,10 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin(
+    return new nx::sdk::analytics::common::Plugin(
         kLibName,
         kPluginManifest,
-        [](nx::sdk::analytics::Plugin* plugin)
+        [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::tegra_video::Engine(plugin);
         });

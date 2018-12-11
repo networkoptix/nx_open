@@ -3,8 +3,8 @@
 #include <nx/mediaserver_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/data_packet.h>
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/i_data_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 #define NX_PRINT_PREFIX "deepstream::DefaultPipeline::"
 #include <nx/kit/debug.h>
 

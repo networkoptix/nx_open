@@ -3,6 +3,8 @@
 #include <chrono>
 #include <algorithm>
 
+#include <nx/sdk/analytics/common/event.h>
+#include <nx/sdk/analytics/common/event_metadata_packet.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
@@ -24,10 +26,10 @@ static const std::string kRuleNamePrefix("NX_RULE_");
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
-nx::sdk::analytics::CommonEvent* createCommonEvent(
+nx::sdk::analytics::common::Event* createCommonEvent(
     const EventType& eventType, bool active)
 {
-    auto commonEvent = new nx::sdk::analytics::CommonEvent();
+    auto commonEvent = new nx::sdk::analytics::common::Event();
     commonEvent->setTypeId(eventType.eventTypeIdExternal.toStdString());
     commonEvent->setDescription(eventType.name.toStdString());
     commonEvent->setIsActive(active);
@@ -36,16 +38,16 @@ nx::sdk::analytics::CommonEvent* createCommonEvent(
     return commonEvent;
 }
 
-nx::sdk::analytics::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
+nx::sdk::analytics::common::EventMetadataPacket* createCommonEventsMetadataPacket(
     const EventType& event, bool active)
 {
     using namespace std::chrono;
-    auto packet = new nx::sdk::analytics::CommonEventsMetadataPacket();
+    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
     auto commonEvent = createCommonEvent(event, active);
     packet->addItem(commonEvent);
-    packet->setTimestampUsec(
+    packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-    packet->setDurationUsec(-1);
+    packet->setDurationUs(-1);
     return packet;
 }
 
@@ -103,7 +105,7 @@ Monitor::Monitor(
     DeviceAgent* deviceAgent,
     const QUrl& url,
     const QAuthenticator& auth,
-    nx::sdk::analytics::DeviceAgent::IHandler* handler)
+    nx::sdk::analytics::IDeviceAgent::IHandler* handler)
     :
     m_deviceAgent(deviceAgent),
     m_url(url),

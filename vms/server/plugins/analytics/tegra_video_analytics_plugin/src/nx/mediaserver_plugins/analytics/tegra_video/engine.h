@@ -1,18 +1,18 @@
 #pragma once
 
-#include <nx/sdk/analytics/common_engine.h>
+#include <nx/sdk/analytics/common/engine.h>
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
 namespace tegra_video {
 
-class Engine: public nx::sdk::analytics::CommonEngine
+class Engine: public nx::sdk::analytics::common::Engine
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    Engine(nx::sdk::analytics::IPlugin* plugin);
 
-    virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
+    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
 protected:

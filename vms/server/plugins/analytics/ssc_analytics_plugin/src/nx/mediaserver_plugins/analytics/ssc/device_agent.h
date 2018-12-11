@@ -7,7 +7,7 @@
 
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 
 #include "common.h"
 #include "engine.h"
@@ -17,7 +17,7 @@ namespace mediaserver_plugins {
 namespace analytics {
 namespace ssc {
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
+class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(
@@ -36,14 +36,14 @@ public:
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual sdk::Error setHandler(
-        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     virtual sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
     nx::sdk::Error startFetchingMetadata(
@@ -56,7 +56,7 @@ private:
     const QUrl m_url;
     const int m_cameraLogicalId;
     QByteArray m_deviceAgentManifest;
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
 };
 

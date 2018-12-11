@@ -8,8 +8,8 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/sdk/analytics/common_event.h>
-#include <nx/sdk/analytics/common_event_metadata_packet.h>
+#include <nx/sdk/analytics/common/event.h>
+#include <nx/sdk/analytics/common/event_metadata_packet.h>
 
 #include <nx/mediaserver_plugins/utils/uuid.h>
 
@@ -24,21 +24,21 @@ namespace ssc {
 
 namespace {
 
-nx::sdk::analytics::CommonEventMetadataPacket* createCommonEventMetadataPacket(
+nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket(
     const EventType& eventType, int logicalId)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::analytics::CommonEventMetadataPacket();
-    auto commonEvent = new nx::sdk::analytics::CommonEvent();
-    commonEvent->setTypeId(eventType.id.toStdString());
-    commonEvent->setDescription(eventType.name.toStdString());
-    commonEvent->setAuxiliaryData(std::to_string(logicalId));
+    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+    auto event = new nx::sdk::analytics::common::Event();
+    event->setTypeId(eventType.id.toStdString());
+    event->setDescription(eventType.name.toStdString());
+    event->setAuxiliaryData(std::to_string(logicalId));
 
-    packet->addEvent(commonEvent);
-    packet->setTimestampUsec(
+    packet->addItem(event);
+    packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-    packet->setDurationUsec(-1);
+    packet->setDurationUs(-1);
     return packet;
 }
 
@@ -109,7 +109,7 @@ const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
     return new nx::sdk::common::String(m_deviceAgentManifest);
 }
 
-sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
+sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
     return sdk::Error::noError;
@@ -127,12 +127,12 @@ sdk::Error DeviceAgent::setNeededMetadataTypes(
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
+void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

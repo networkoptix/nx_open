@@ -12,9 +12,9 @@
 #include <nx/utils/uuid.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common_object.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
-#include <nx/sdk/analytics/common_attribute.h>
+#include <nx/sdk/analytics/common/object.h>
+#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/common/attribute.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
 #include <nx/mediaserver_plugins/utils/uuid.h>
@@ -24,10 +24,8 @@ namespace mediaserver_plugins {
 namespace analytics {
 namespace tegra_video {
 
-namespace sdk = nx::sdk::analytics;
-
 void NaiveObjectTracker::filterAndTrack(
-    std::vector<nx::sdk::analytics::MetadataPacket*>* outMetadataPackets,
+    std::vector<nx::sdk::analytics::IMetadataPacket*>* outMetadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs)
 {
@@ -42,9 +40,9 @@ void NaiveObjectTracker::filterAndTrack(
             addObjectToCache(QnUuid::createUuid(), rect);
     }
 
-    auto packet = new sdk::CommonObjectsMetadataPacket();
-    packet->setTimestampUsec(ptsUs);
-    packet->setDurationUsec(1000000LL * 10);
+    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    packet->setTimestampUs(ptsUs);
+    packet->setDurationUs(1000000LL * 10);
 
     removeExpiredObjectsFromCache();
     addNonExpiredObjectsFromCache(packet);
@@ -180,11 +178,11 @@ void NaiveObjectTracker::removeExpiredObjectsFromCache()
 }
 
 void NaiveObjectTracker::addNonExpiredObjectsFromCache(
-    nx::sdk::analytics::CommonObjectsMetadataPacket* outPacket)
+    nx::sdk::analytics::common::ObjectMetadataPacket* outPacket)
 {
     for (auto& item: m_cachedObjects)
     {
-        auto object = new nx::sdk::analytics::CommonObject();
+        auto object = new nx::sdk::analytics::common::Object();
         auto& cached = item.second;
 
         bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles
@@ -212,14 +210,14 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         object->setConfidence(1);
         object->setTypeId(m_objectTypeId.toStdString());
 
-        std::vector<sdk::CommonAttribute> attributes;
+        std::vector<nx::sdk::analytics::common::Attribute> attributes;
         for (const auto& entry: cached.attributes)
         {
             const auto attributeName = entry.first;
             const auto attributeValue = entry.second;
 
-            sdk::CommonAttribute attribute(
-                nx::sdk::AttributeType::string,
+            nx::sdk::analytics::common::Attribute attribute(
+                nx::sdk::IAttribute::Type::string,
                 attributeName.toStdString(),
                 attributeValue.toStdString());
 
@@ -432,9 +430,9 @@ float NaiveObjectTracker::bottomRightY(const TegraVideo::Rect& rectangle)
     return rectangle.y + rectangle.h;
 }
 
-sdk::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
+nx::sdk::analytics::IObject::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
 {
-    return sdk::Rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
+    return nx::sdk::analytics::IObject::Rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
 }
 
 nxpl::NX_GUID NaiveObjectTracker::toSdkGuid(const QnUuid& id)

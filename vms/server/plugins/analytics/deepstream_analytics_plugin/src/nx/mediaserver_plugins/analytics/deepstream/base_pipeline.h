@@ -6,7 +6,8 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <nx/sdk/analytics/data_packet.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/analytics/i_data_packet.h>
 #include <nx/gstreamer/pipeline.h>
 #include <nx/mediaserver_plugins/analytics/deepstream/engine.h>
 
@@ -28,9 +29,9 @@ public:
 
     virtual void setMetadataCallback(nx::gstreamer::MetadataCallback metadataCallback) override;
 
-    virtual bool pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket) override;
+    virtual bool pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket) override;
 
-    virtual nx::sdk::analytics::DataPacket* nextDataPacket();
+    virtual nx::sdk::analytics::IDataPacket* nextDataPacket();
 
     virtual bool start() override;
 
@@ -40,7 +41,7 @@ public:
 
     virtual GstState state() const override;
 
-    virtual void handleMetadata(nx::sdk::analytics::MetadataPacket* packet);
+    virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* packet);
 
     virtual GMainLoop* mainLoop();
 
@@ -55,7 +56,7 @@ public:
 protected:
     Engine* m_engine;
     nx::gstreamer::MetadataCallback m_metadataCallback;
-    std::queue<nx::sdk::analytics::DataPacket*> m_packetQueue;
+    std::queue<nx::sdk::analytics::IDataPacket*> m_packetQueue;
     LoopPtr m_mainLoop;
 
     int m_currentFrameWidth = 0;

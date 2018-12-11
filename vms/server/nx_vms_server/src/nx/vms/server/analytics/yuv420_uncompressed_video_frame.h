@@ -1,7 +1,7 @@
 #pragma once
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 
 namespace nx {
@@ -9,7 +9,7 @@ namespace vms::server {
 namespace analytics {
 
 class Yuv420UncompressedVideoFrame:
-    public nxpt::CommonRefCounter<nx::sdk::analytics::UncompressedVideoFrame>
+    public nxpt::CommonRefCounter<nx::sdk::analytics::IUncompressedVideoFrame>
 {
 public:
     Yuv420UncompressedVideoFrame(CLConstVideoDecoderOutputPtr uncompressedFrame):
@@ -19,10 +19,10 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual int64_t timestampUsec() const override { return m_frame->pkt_dts; }
+    virtual int64_t timestampUs() const override { return m_frame->pkt_dts; }
     virtual int width() const override { return m_frame->width; }
     virtual int height() const override { return m_frame->height; }
-    virtual nx::sdk::Ratio sampleAspectRatio() const override { return {1, 1}; }
+    virtual PixelAspectRatio pixelAspectRatio() const override { return {1, 1}; }
     virtual PixelFormat pixelFormat() const override { return PixelFormat::yuv420; }
     virtual Handle handleType() const override { return Handle::none; }
     virtual int handle() const override { return 0; }

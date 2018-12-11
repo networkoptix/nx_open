@@ -10,8 +10,8 @@
 #include <nx/fusion/serialization/json.h>
 
 #include <nx/sdk/common/string.h>
-#include <nx/sdk/analytics/common_event.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
+#include <nx/sdk/analytics/common/event.h>
+#include <nx/sdk/analytics/common/event_metadata_packet.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -42,10 +42,10 @@ struct EventMessage
     std::map<QByteArray, QByteArray> parameters;
 };
 
-nx::sdk::analytics::CommonEvent* createCommonEvent(
+nx::sdk::analytics::common::Event* createCommonEvent(
     const EventType& eventType, bool active)
 {
-    auto commonEvent = new nx::sdk::analytics::CommonEvent();
+    auto commonEvent = new nx::sdk::analytics::common::Event();
     commonEvent->setTypeId(eventType.id.toStdString());
     commonEvent->setDescription(eventType.name.toStdString());
     commonEvent->setIsActive(active);
@@ -54,17 +54,17 @@ nx::sdk::analytics::CommonEvent* createCommonEvent(
     return commonEvent;
 }
 
-nx::sdk::analytics::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
+nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket(
     const EventType& event, bool active = true)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::analytics::CommonEventsMetadataPacket();
+    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
     const auto commonEvent = createCommonEvent(event, active);
     packet->addItem(commonEvent);
-    packet->setTimestampUsec(
+    packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-    packet->setDurationUsec(-1);
+    packet->setDurationUs(-1);
     return packet;
 }
 
@@ -349,7 +349,7 @@ std::chrono::milliseconds DeviceAgent::timeTillCheck() const
 
 void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 {
-    auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
+    auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
     m_handler->handleMetadata(packet);
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
@@ -359,7 +359,7 @@ void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 
 void DeviceAgent::sendEventStoppedPacket(const EventType& event) const
 {
-    auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
+    auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
     m_handler->handleMetadata(packet);
     NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
         << " sent to server.";
@@ -438,7 +438,7 @@ void DeviceAgent::reconnectSocket()
 }
 
 nx::sdk::Error DeviceAgent::setHandler(
-    nx::sdk::analytics::DeviceAgent::IHandler* handler)
+    nx::sdk::analytics::IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
     return nx::sdk::Error::noError;
@@ -537,12 +537,12 @@ const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
     return new nx::sdk::common::String();
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
+void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

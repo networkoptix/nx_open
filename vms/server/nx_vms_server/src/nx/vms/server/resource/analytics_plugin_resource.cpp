@@ -1,6 +1,6 @@
 #include "analytics_plugin_resource.h"
 
-#include <nx/sdk/analytics/plugin.h>
+#include <nx/sdk/analytics/i_plugin.h>
 
 #include <media_server/media_server_module.h>
 
@@ -35,12 +35,12 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 }
 
 void AnalyticsPluginResource::setSdkPlugin(
-    sdk_support::SharedPtr<nx::sdk::analytics::Plugin> plugin)
+    sdk_support::SharedPtr<nx::sdk::analytics::IPlugin> plugin)
 {
     m_sdkPlugin = std::move(plugin);
 }
 
-sdk_support::SharedPtr<nx::sdk::analytics::Plugin> AnalyticsPluginResource::sdkPlugin() const
+sdk_support::SharedPtr<nx::sdk::analytics::IPlugin> AnalyticsPluginResource::sdkPlugin() const
 {
     return m_sdkPlugin;
 }

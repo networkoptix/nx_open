@@ -4,15 +4,11 @@
 #include <vector>
 #include <shared_mutex>
 
-#include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
-#include <nx/sdk/analytics/device_agent.h>
-#include <nx/sdk/analytics/common_event.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/network/http/http_async_client.h>
-#include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
 
@@ -67,7 +63,7 @@ public:
         DeviceAgent* deviceAgent,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
-        nx::sdk::analytics::DeviceAgent::IHandler* handler);
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler);
     virtual ~Monitor();
 
     void addRules(
@@ -98,7 +94,7 @@ public:
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
     ElapsedEvents m_eventsToCatch; //< The monitor treats events from this list.
     nx::network::http::TestHttpServer* m_httpServer;
     nx::network::aio::Timer m_aioTimer;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include "generic_compressed_media_packet.h"
 

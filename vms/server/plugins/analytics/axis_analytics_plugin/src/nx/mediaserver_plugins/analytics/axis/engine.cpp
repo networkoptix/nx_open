@@ -33,7 +33,7 @@ const QString kSoapPath("/vapix/services");
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
+Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
 {
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -66,17 +66,17 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::Settings* settings)
+void Engine::setSettings(const nx::sdk::IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::pluginSideSettings() const
+nx::sdk::IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
+nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo,
     Error* outError)
 {
@@ -96,7 +96,7 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new common::String(m_manifest);
+    return new nx::sdk::common::String(m_manifest);
 }
 
 EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
@@ -136,7 +136,7 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
     // Do nothing.
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
     return nx::sdk::Error::noError;
@@ -164,13 +164,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin(
+    return new nx::sdk::analytics::common::Plugin(
         kLibName,
         kPluginManifest,
-        [](nx::sdk::analytics::Plugin* plugin)
+        [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::axis::Engine(
-                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
         });
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/i_engine.h>
 
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
@@ -12,7 +12,7 @@ namespace nx::vms::server::analytics {
 class EngineHandler:
     public QObject,
     public nx::vms::server::ServerModuleAware,
-    public nx::sdk::analytics::Engine::IHandler
+    public nx::sdk::analytics::IEngine::IHandler
 {
     Q_OBJECT
 

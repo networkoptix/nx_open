@@ -6,12 +6,13 @@
 #include <cmath>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
-#include <nx/sdk/analytics/common_event.h>
-#include <nx/sdk/analytics/common_object.h>
-#include <nx/sdk/common_settings.h>
+#include <nx/sdk/analytics/common/event.h>
+#include <nx/sdk/analytics/common/event_metadata_packet.h>
+#include <nx/sdk/analytics/common/object.h>
+#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/common/string_map.h>
 
-#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include "stub_analytics_plugin_ini.h"
@@ -25,7 +26,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine):
-    CommonVideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
+    VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
     m_objectId{{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}}
 {
     // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
@@ -93,13 +94,13 @@ bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFra
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
+    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
+    m_lastVideoFrameTimestampUsec = videoFrame->timestampUs();
     return true;
 }
 
-bool DeviceAgent::pushUncompressedVideoFrame(const UncompressedVideoFrame* videoFrame)
+bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
 {
     if (!engine()->needUncompressedVideoFrames())
     {
@@ -107,22 +108,22 @@ bool DeviceAgent::pushUncompressedVideoFrame(const UncompressedVideoFrame* video
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
+    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
 
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
+    m_lastVideoFrameTimestampUsec = videoFrame->timestampUs();
 
     return checkFrame(videoFrame);
 }
 
-bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
+bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
     const char* logMessage = "";
     if (ini().generateObjects)
     {
-        MetadataPacket* const metadataPacket = cookSomeObjects();
+        IMetadataPacket* const metadataPacket = cookSomeObjects();
         if (metadataPacket)
         {
             metadataPackets->push_back(metadataPacket);
@@ -235,10 +236,10 @@ void DeviceAgent::processPluginEvents()
     }
 }
 
-nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 {
-    auto settings = new nx::sdk::CommonSettings();
-    settings->addSetting("plugin_side_number", "100");
+    auto settings = new nx::sdk::common::StringMap();
+    settings->addItem("plugin_side_number", "100");
 
     return settings;
 }
@@ -246,7 +247,7 @@ nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
-MetadataPacket* DeviceAgent::cookSomeEvents()
+IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
     ++m_counter;
     if (m_counter > 1)
@@ -259,17 +260,17 @@ MetadataPacket* DeviceAgent::cookSomeEvents()
         m_counter = 0;
     }
 
-    auto commonEvent = new CommonEvent();
-    commonEvent->setCaption("Line crossing (caption)");
-    commonEvent->setDescription("Line crossing (description)");
-    commonEvent->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    commonEvent->setIsActive(m_counter == 1);
-    commonEvent->setTypeId(m_eventTypeId);
+    auto event = new nx::sdk::analytics::common::Event();
+    event->setCaption("Line crossing (caption)");
+    event->setDescription("Line crossing (description)");
+    event->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
+    event->setIsActive(m_counter == 1);
+    event->setTypeId(m_eventTypeId);
 
-    auto eventPacket = new CommonEventsMetadataPacket();
-    eventPacket->setTimestampUsec(usSinceEpoch());
-    eventPacket->setDurationUsec(0);
-    eventPacket->addItem(commonEvent);
+    auto eventPacket = new nx::sdk::analytics::common::EventMetadataPacket();
+    eventPacket->setTimestampUs(usSinceEpoch());
+    eventPacket->setDurationUs(0);
+    eventPacket->addItem(event);
 
     NX_OUTPUT << "Firing event: "
         << "type: " << m_eventTypeId << ", isActive: " << ((m_counter == 1) ? "true" : "false");
@@ -277,7 +278,7 @@ MetadataPacket* DeviceAgent::cookSomeEvents()
     return eventPacket;
 }
 
-MetadataPacket* DeviceAgent::cookSomeObjects()
+IMetadataPacket* DeviceAgent::cookSomeObjects()
 {
     if (m_lastVideoFrameTimestampUsec == 0)
         return nullptr;
@@ -285,10 +286,10 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
 
-    auto commonObject = new CommonObject();
+    auto object = new nx::sdk::analytics::common::Object();
 
-    commonObject->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    commonObject->setTypeId(kCarObjectType);
+    object->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
+    object->setTypeId(kCarObjectType);
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -303,8 +304,8 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
         m_currentObjectIndex = sequentialNumber;
     }
 
-    commonObject->setId(m_objectId);
-    commonObject->setBoundingBox(Rect((float) dt, (float) dt, 0.25F, 0.25F));
+    object->setId(m_objectId);
+    object->setBoundingBox(IObject::Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     if (dt < 0.5)
     {
@@ -315,21 +316,21 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
         m_previewAttributesGenerated = true;
 
         // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        commonObject->setAttributes({
-            {AttributeType::number, "nx.sys.preview.timestampUs",
+        object->setAttributes({
+            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
                 std::to_string(m_lastVideoFrameTimestampUsec)},
-            {AttributeType::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
-            {AttributeType::number, "nx.sys.preview.boundingBox.y", std::to_string(dt)},
-            {AttributeType::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {AttributeType::number, "nx.sys.preview.boundingBox.height", "0.1"}
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"}
         });
     }
 
-    auto objectPacket = new CommonObjectsMetadataPacket();
+    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
 
-    objectPacket->setTimestampUsec(m_lastVideoFrameTimestampUsec);
-    objectPacket->setDurationUsec(0);
-    objectPacket->addItem(commonObject);
+    objectPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
+    objectPacket->setDurationUs(0);
+    objectPacket->addItem(object);
     return objectPacket;
 }
 
@@ -340,17 +341,19 @@ int64_t DeviceAgent::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool DeviceAgent::checkFrame(const UncompressedVideoFrame* frame) const
+bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
 {
     if (frame->pixelFormat() != engine()->pixelFormat())
     {
         NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
-            << pixelFormatToStdString(frame->pixelFormat()) << " instead of "
-            << pixelFormatToStdString(engine()->pixelFormat());
+            << nx::sdk::analytics::common::pixelFormatToStdString(frame->pixelFormat())
+            << " instead of "
+            << nx::sdk::analytics::common::pixelFormatToStdString(engine()->pixelFormat());
         return false;
     }
 
-    const auto* const pixelFormatDescriptor = getPixelFormatDescriptor(frame->pixelFormat());
+    const auto* const pixelFormatDescriptor =
+        nx::sdk::analytics::common::getPixelFormatDescriptor(frame->pixelFormat());
     if (!pixelFormatDescriptor)
         return false; //< Error is already logged.
 

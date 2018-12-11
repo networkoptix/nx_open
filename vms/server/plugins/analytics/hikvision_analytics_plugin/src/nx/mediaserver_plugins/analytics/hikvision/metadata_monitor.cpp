@@ -4,13 +4,11 @@
 #include <QtCore/QUrlQuery>
 
 #include <chrono>
-#include <iostream>
 
 #include "attributes_parser.h"
 #include "string_helper.h"
 #include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/sdk/analytics/events_metadata_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/std/cpp14.h>
 

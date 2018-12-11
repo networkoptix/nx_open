@@ -4,8 +4,8 @@
 
 #include <chrono>
 
-#include <nx/sdk/analytics/common_event.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
+#include <nx/sdk/analytics/common/event.h>
+#include <nx/sdk/analytics/common/event_metadata_packet.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
@@ -46,17 +46,17 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
+void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
     return nx::sdk::Error::noError;
@@ -81,14 +81,14 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
         [this](const HikvisionEventList& events)
         {
             using namespace std::chrono;
-            auto packet = new CommonEventsMetadataPacket();
+            auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
 
             for (const auto& hikvisionEvent: events)
             {
                 if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
                     return;
 
-                auto event = new CommonEvent();
+                auto event = new nx::sdk::analytics::common::Event();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
@@ -99,10 +99,10 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
                 event->setConfidence(1.0);
                 //event->setAuxiliaryData(hikvisionEvent.fullEventName.toStdString());
 
-                packet->setTimestampUsec(
+                packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
-                packet->setDurationUsec(-1);
+                packet->setDurationUs(-1);
                 packet->addItem(event);
             }
 
@@ -150,7 +150,7 @@ const IString* DeviceAgent::manifest(Error* error) const
     }
 
     *error = Error::noError;
-    return new common::String(m_deviceAgentManifest);
+    return new nx::sdk::common::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)

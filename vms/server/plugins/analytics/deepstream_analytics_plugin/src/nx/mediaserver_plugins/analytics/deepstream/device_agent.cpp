@@ -4,8 +4,8 @@
 
 #include <nx/sdk/common/string.h>
 
-#include <nx/sdk/analytics/compressed_video_packet.h>
-#include <nx/sdk/analytics/common_metadata_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
 
 #include <nx/mediaserver_plugins/analytics/deepstream/deepstream_common.h>
 #include <nx/mediaserver_plugins/analytics/deepstream/openalpr_common.h>
@@ -44,13 +44,13 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
     {
         addRef();
-        return static_cast<nx::sdk::analytics::DeviceAgent*>(this);
+        return static_cast<nx::sdk::analytics::IDeviceAgent*>(this);
     }
 
     if (interfaceId == nx::sdk::analytics::IID_ConsumingDeviceAgent)
     {
         addRef();
-        return static_cast<nx::sdk::analytics::ConsumingDeviceAgent*>(this);
+        return static_cast<nx::sdk::analytics::IConsumingDeviceAgent*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -61,7 +61,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
+void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";
@@ -76,18 +76,18 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
     NX_OUTPUT << "}";
 }
 
-nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     m_pipeline->setMetadataCallback(
-        [this](MetadataPacket* packet)
+        [this](IMetadataPacket* packet)
         {
             NX_OUTPUT << __func__ << " Calling metadata handler";
             m_handler->handleMetadata(packet);
@@ -97,7 +97,7 @@ nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler
     return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket)
+nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
 {
 #if 0
     nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> compressedVideo(
@@ -106,7 +106,7 @@ nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::DataPacket* dataP
     if (!compressedVideo)
         return nx::sdk::Error::noError;
 
-    NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUsec();
+    NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();
 #endif
 
     NX_OUTPUT

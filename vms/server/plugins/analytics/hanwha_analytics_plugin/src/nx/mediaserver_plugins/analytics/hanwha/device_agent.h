@@ -5,7 +5,7 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 
 #include "engine.h"
 #include "metadata_monitor.h"
@@ -17,7 +17,7 @@ namespace hanwha {
 
 class DeviceAgent:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
+    public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
     Q_OBJECT
 
@@ -30,7 +30,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::DeviceAgent::IHandler* IHandler) override;
+        nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
@@ -43,9 +43,9 @@ public:
 
     void setMonitor(MetadataMonitor* monitor);
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
     nx::sdk::Error startFetchingMetadata(
@@ -68,7 +68,7 @@ private:
     int m_channel = 0;
 
     MetadataMonitor* m_monitor = nullptr;
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 };
 
 } // namespace hanwha

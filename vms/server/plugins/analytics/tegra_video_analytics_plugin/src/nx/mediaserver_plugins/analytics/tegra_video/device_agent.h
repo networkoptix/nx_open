@@ -4,21 +4,21 @@
 #include <mutex>
 #include <vector>
 
-#include <nx/sdk/analytics/common_video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/common/video_frame_processing_device_agent.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics for Tegra; the lib is a stub on a PC.
 
 #include "engine.h"
 
 #include <nx/mediaserver_plugins/analytics/tegra_video/naive_object_tracker.h>
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
 namespace tegra_video {
 
-class DeviceAgent: public nx::sdk::analytics::CommonVideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::common::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine);
@@ -34,7 +34,7 @@ protected:
         const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets) override;
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
     bool pushCompressedFrame(
@@ -43,22 +43,22 @@ private:
     bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 
     bool makeMetadataPacketsFromRects(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
     bool makeMetadataPacketsFromRectsPostprocNone(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
     bool makeMetadataPacketsFromRectsPostprocPed(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
     bool makeMetadataPacketsFromRectsPostprocCar(
-        std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 

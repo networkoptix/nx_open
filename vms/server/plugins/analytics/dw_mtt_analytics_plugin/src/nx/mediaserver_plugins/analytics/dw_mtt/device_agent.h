@@ -16,7 +16,7 @@
 
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 
 #include "nx/dw_mtt/camera_controller.h"
 #include "common.h"
@@ -43,7 +43,7 @@ public:
 };
 using ElapsedEvents = std::list<ElapsedEvent>;
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
+class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(Engine* engine,
@@ -66,16 +66,16 @@ public:
     void onReceive(SystemError::ErrorCode, size_t);
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
     QDomDocument createDomFromRequest(const QByteArray& request);
 
@@ -101,7 +101,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
     nx::network::aio::Timer m_reconnectTimer;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
     nx::dw_mtt::CameraController m_cameraController;

@@ -13,7 +13,8 @@
 
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_metadata_types.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/system_socket.h>
@@ -39,7 +40,7 @@ public:
 };
 using ElapsedEvents = std::list<ElapsedEvent>;
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
+class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(
@@ -67,7 +68,7 @@ public:
     nx::sdk::Error stopFetchingMetadata();
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     bool isTimerNeeded() const;
 
@@ -84,9 +85,9 @@ public:
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
     Engine* const m_engine;
@@ -96,7 +97,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 
     std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::network::aio::Timer m_stopEventTimer;

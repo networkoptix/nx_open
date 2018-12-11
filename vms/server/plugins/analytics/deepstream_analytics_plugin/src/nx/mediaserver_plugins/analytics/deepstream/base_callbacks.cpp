@@ -5,7 +5,7 @@
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx{
 namespace mediaserver_plugins {
@@ -16,7 +16,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    nxpt::ScopedRef<nx::sdk::analytics::DataPacket> frame(pipeline->nextDataPacket(), false);
+    nxpt::ScopedRef<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket(), false);
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
@@ -36,8 +36,8 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
     NX_OUTPUT << __func__ << " Allocating buffer of size " << video->dataSize();
     auto buffer = gst_buffer_new_allocate(NULL, video->dataSize(), NULL);
 
-    NX_OUTPUT << __func__ << " Setting biffer PTS to " << video->timestampUsec();
-    GST_BUFFER_PTS(buffer) = video->timestampUsec();
+    NX_OUTPUT << __func__ << " Setting biffer PTS to " << video->timestampUs();
+    GST_BUFFER_PTS(buffer) = video->timestampUs();
 
     GstMapInfo info;
     auto memory = gst_buffer_peek_memory(buffer, 0);
