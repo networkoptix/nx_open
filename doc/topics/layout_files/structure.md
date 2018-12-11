@@ -1,6 +1,7 @@
 # Layout Files Structure {#layout_file_structure}
 
 Both Nov Files and Executable Layouts have similar structure being discussed below.  
+You may use [Nov Browser](#nov_browser) to display and export an actual Layout File.
 
 ## Nov File structure 
 

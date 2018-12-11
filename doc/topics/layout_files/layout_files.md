@@ -9,9 +9,12 @@ Both Nov Files and Executable Layouts may use optional password to protect the c
 
 This document focuses on technical implementation of saved layout files in NX Witness client. 
 
+@subpage nov_browser
+
 @subpage layout_file_structure
 
 @subpage layout_classes
+
 
 ## Things you should know when working with Layout Files
 There are some things important to know if you work with Layout files:
