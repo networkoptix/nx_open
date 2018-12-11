@@ -2,6 +2,10 @@
 
 #include "dshow_utils.h"
 
+#include <map>
+
+#include "wdm_utils.h"
+
 namespace nx {
 namespace usb_cam {
 namespace device {
@@ -13,7 +17,8 @@ namespace {
 //-------------------------------------------------------------------------------------------------
 // DShowCompressionTypeDescriptor
 
-class DShowCompressionTypeDescriptor : public AbstractCompressionTypeDescriptor{
+class DShowCompressionTypeDescriptor : public AbstractCompressionTypeDescriptor
+{
 public:
     DShowCompressionTypeDescriptor(AM_MEDIA_TYPE * mediaType);
     ~DShowCompressionTypeDescriptor();
@@ -61,25 +66,6 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
 
 } // namespace
 
-std::string getDeviceUniqueId(const std::string& devicePath)
-{
-    // devicePath expexted to be of form:
-    //
-    // \\?\usb#vid_0c45&pid_6340&mi_00#6&37859d1e&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
-    //
-    // where uniqueId is contained between { and }. Example above has unique id of:
-    //
-    // 65e8773d-8f56-11d0-a3b9-00a0c9223196
-
-    int start = devicePath.find("{");
-    int end = devicePath.find("}");
-
-    if (start == std::string::npos || end == std::string::npos)
-        return std::string();
-
-    return devicePath.substr(start + 1, end - start - 1);
-}
-
 std::string getDeviceName(const std::string& devicePath)
 {
     DShowInitializer init;
@@ -101,12 +87,26 @@ std::vector<DeviceData> getDeviceList()
     if (FAILED(result))
         return {};
 
+    std::map<std::string, int> duplicateCameras;
+
     IMoniker *pMoniker = NULL;
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
         std::string name = getDeviceName(pMoniker);
+
+        int nameIndex = 0;
+        auto it = duplicateCameras.find(name);
+        if (it == duplicateCameras.end())
+            duplicateCameras.emplace(name, 0);
+        else
+            nameIndex = ++it->second;
+
         std::string path = getDevicePath(pMoniker);
+
         std::string uniqueId = getDeviceUniqueId(path);
+        if (uniqueId.empty())
+            uniqueId = std::to_string(nameIndex) + "-" + name;
+
         devices.push_back(DeviceData(name, path, uniqueId));
         pMoniker->Release();
     }
