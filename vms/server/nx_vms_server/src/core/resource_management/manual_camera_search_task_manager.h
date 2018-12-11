@@ -43,8 +43,8 @@ private:
     bool canRunTask(QThreadPool* threadPool);
     void runSomePendingTasks();
 
-    void searchTaskDoneHandler(QnManualResourceSearchList results, QnSearchTask* const task);
-    void searchFinishedHandler();
+    void onSearchTaskDone(QnManualResourceSearchList results, QnSearchTask* const task);
+    void onSearchFinished();
 
     QnManualResourceSearchList m_foundResources;
     TasksFinishedCallback m_tasksFinishedCallback;
