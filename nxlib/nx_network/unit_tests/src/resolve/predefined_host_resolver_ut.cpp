@@ -15,8 +15,13 @@ protected:
     void mapMultipleEntriesUnderSingleName()
     {
         m_hostname = "example.com";
+        auto entry = generateRandomEntry();
         for (int i = 0; i < 3; ++i)
-            m_mappedEntries.push_back(generateRandomEntry());
+        {
+            ++entry.attributes[0].value;
+            m_mappedEntries.push_back(entry);
+        }
+
         m_predefinedHostResolver.replaceMapping(m_hostname, m_mappedEntries);
     }
 
