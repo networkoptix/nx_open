@@ -1981,6 +1981,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith("/99_20181102_remove_sync_with_internet_option.sql"))
         return resyncIfNeeded(ResyncGlobalSettings);
 
+    if (updateName.endsWith(lit("/99_20181211_add_default_plugin_event_rules.sql")))
+    {
+        updateDefaultRules(
+            vms::event::Rule::getPluginEventUpdateRules()) && resyncIfNeeded(ResyncRules);
+    }
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
 }
