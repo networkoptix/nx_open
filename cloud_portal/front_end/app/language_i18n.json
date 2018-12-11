@@ -1,5 +1,6 @@
 {
 	"&nbsp;": "&nbsp;",
+	"A message is required": "A message is required",
 	"Account Settings": "Account Settings",
 	"Account not activated": "Account not activated",
 	"Account not found": "Account not found",
@@ -19,6 +20,7 @@
 	"Choose which properties should be visible to customers:": "Choose which properties should be visible to customers:",
 	"Close": "Close",
 	"Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.",
+	"Contact": "Contact",
 	"Create account": "Create account",
 	"Disconnect": "Disconnect",
 	"Disconnect System from %PRODUCT_NAME%?": "Disconnect System from %PRODUCT_NAME%?",
@@ -27,6 +29,7 @@
 	"Download Chrome": "Download Chrome",
 	"Download Firefox": "Download Firefox",
 	"Download Links:": "Download Links:",
+	"Downloads": "Downloads",
 	"Email": "Email",
 	"Embed": "Embed",
 	"Enter \"Public User\" credentials:": "Enter \"Public User\" credentials:",
@@ -54,6 +57,7 @@
 	"Remember me": "Remember me",
 	"Resend activation email": "Resend activation email",
 	"Save": "Save",
+	"Send": "Send",
 	"Settings": "Settings",
 	"Share": "Share",
 	"Support": "Support",
@@ -75,5 +79,6 @@
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Your browser is not supported": "Your browser is not supported",
 	"is incompatible.": "is incompatible.",
-	"is offline.": "is offline."
+	"is offline.": "is offline.",
+	"{{ messageType }}": "{{ messageType }}"
 }

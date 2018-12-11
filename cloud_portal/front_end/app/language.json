@@ -10,7 +10,15 @@
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue",
-    "logoutAuthorisedLogoutButton": "Log Out"
+    "logoutAuthorisedLogoutButton": "Log Out",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "IPVD Feedback",
+    "sales_inquiry": "Product Inquiry",
+    "request_support": "Request Product Support",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
