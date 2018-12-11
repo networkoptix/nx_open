@@ -16,18 +16,18 @@ class OutgoingCommandFilter;
  * Asynchronously reads transactions of specified system from log.
  * Returns data in specified format.
  */
-class TransactionLogReader:
+class CommandLogReader:
     public network::aio::BasicPollable
 {
 public:
-    typedef TransactionLog::TransactionsReadHandler TransactionsReadHandler;
+    typedef CommandLog::TransactionsReadHandler TransactionsReadHandler;
 
-    TransactionLogReader(
-        TransactionLog* const transactionLog,
+    CommandLogReader(
+        CommandLog* const commandLog,
         const std::string& systemId,
         Qn::SerializationFormat dataFormat,
         const OutgoingCommandFilter& outgoingCommandFilter);
-    ~TransactionLogReader();
+    ~CommandLogReader();
 
     virtual void stopWhileInAioThread() override;
 
@@ -40,7 +40,7 @@ public:
     std::string systemId() const;
 
 private:
-    TransactionLog* const m_transactionLog;
+    CommandLog* const m_commandLog;
     const std::string m_systemId;
     const Qn::SerializationFormat m_dataFormat;
     const OutgoingCommandFilter& m_outgoingCommandFilter;

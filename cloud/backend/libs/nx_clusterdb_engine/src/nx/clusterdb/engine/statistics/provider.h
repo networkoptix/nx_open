@@ -6,8 +6,8 @@
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::clusterdb::engine { class ConnectionManager; }
-namespace nx::clusterdb::engine { class IncomingTransactionDispatcher; }
-namespace nx::clusterdb::engine { class OutgoingTransactionDispatcher; }
+namespace nx::clusterdb::engine { class IncomingCommandDispatcher; }
+namespace nx::clusterdb::engine { class OutgoingCommandDispatcher; }
 
 namespace nx::clusterdb::engine::statistics {
 
@@ -46,8 +46,8 @@ class NX_DATA_SYNC_ENGINE_API Provider
 public:
     Provider(
         const ConnectionManager& connectionManager,
-        IncomingTransactionDispatcher* incomingTransactionDispatcher,
-        OutgoingTransactionDispatcher* outgoingTransactionDispatcher);
+        IncomingCommandDispatcher* incomingCommandDispatcher,
+        OutgoingCommandDispatcher* outgoingTransactionDispatcher);
     ~Provider();
 
     Statistics statistics() const;
@@ -56,11 +56,11 @@ private:
     const ConnectionManager& m_connectionManager;
     mutable QnMutex m_mutex;
 
-    IncomingTransactionDispatcher* m_incomingTransactionDispatcher;
+    IncomingCommandDispatcher* m_incomingTransactionDispatcher;
     nx::utils::SubscriptionId m_incomingTransactionSubscriptionId =
         nx::utils::kInvalidSubscriptionId;
 
-    OutgoingTransactionDispatcher* m_outgoingTransactionDispatcher;
+    OutgoingCommandDispatcher* m_outgoingTransactionDispatcher;
     nx::utils::SubscriptionId m_outgoingTransactionSubscriptionId =
         nx::utils::kInvalidSubscriptionId;
 

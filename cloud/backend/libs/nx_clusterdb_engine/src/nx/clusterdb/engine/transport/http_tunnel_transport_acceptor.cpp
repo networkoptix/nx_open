@@ -11,13 +11,13 @@ namespace nx::clusterdb::engine::transport {
 HttpTunnelTransportAcceptor::HttpTunnelTransportAcceptor(
     const QnUuid& peerId,
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* transactionLog,
+    CommandLog* transactionLog,
     ConnectionManager* connectionManager,
     const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_peerId(peerId),
     m_protocolVersionRange(protocolVersionRange),
-    m_transactionLog(transactionLog),
+    m_commandLog(transactionLog),
     m_connectionManager(connectionManager),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
@@ -76,7 +76,7 @@ void HttpTunnelTransportAcceptor::saveCreatedTunnel(
 
     auto newTransport = std::make_unique<GenericTransport>(
         m_protocolVersionRange,
-        m_transactionLog,
+        m_commandLog,
         m_outgoingCommandFilter,
         requestContext.systemId,
         requestContext.attributes,

@@ -11,7 +11,7 @@ namespace test {
 
 void TestOutgoingTransactionDispatcher::dispatchTransaction(
     const std::string& systemId,
-    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
+    std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
     const auto delayMillis = nx::utils::random::number<int>(
         m_delayBeforeSavingTransaction.first.count(),
@@ -59,7 +59,7 @@ void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeade
         m_outgoingTransactions.cbegin(),
         m_outgoingTransactions.cend(),
         [&transactionHeader](
-            const std::shared_ptr<const SerializableAbstractTransaction>& transactionSent)
+            const std::shared_ptr<const SerializableAbstractCommand>& transactionSent)
         {
             return transactionHeader == transactionSent->header();
         });

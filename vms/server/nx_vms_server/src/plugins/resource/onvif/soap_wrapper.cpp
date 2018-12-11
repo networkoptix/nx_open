@@ -31,6 +31,18 @@ static PasswordHelper passwordHelper;
 // ------------------------------------------------------------------------------------------------
 // SoapTimeouts
 // ------------------------------------------------------------------------------------------------
+
+SoapTimeouts SoapTimeouts::minivalValue()
+{
+    using namespace std::chrono;
+    SoapTimeouts result;
+    result.sendTimeout = 1s;
+    result.recvTimeout = 1s;
+    result.connectTimeout = 1s;
+    result.acceptTimeout = 1s;
+    return result;
+}
+
 SoapTimeouts::SoapTimeouts(const QString& serialized)
 {
     if (serialized.isEmpty())
@@ -329,7 +341,7 @@ int DeviceSoapWrapper::setRelayOutputSettings(_onvifDevice__SetRelayOutputSettin
     return invokeMethod(&DeviceBindingProxy::SetRelayOutputSettings, &request, response);
 }
 
-int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
+int DeviceSoapWrapper::getCapabilities(_onvifDevice__GetCapabilities& request, _onvifDevice__GetCapabilitiesResponse& response)
 {
     return invokeMethod(&DeviceBindingProxy::GetCapabilities, &request, response);
 }

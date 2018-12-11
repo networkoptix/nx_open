@@ -1343,9 +1343,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_attributes,
         getChannel());
 
-    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
-
+    NX_VERBOSE(this, "Supported PTZ capabilities direct: %1", ptzCapabilityBits(capabilities));
     if (isBypassSupported())
     {
         const auto bypassPtzCapabilities = calculateSupportedPtzCapabilities(
@@ -1353,14 +1351,12 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
 
-        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(bypassPtzCapabilities)));
+        NX_VERBOSE(this, "Supported PTZ capabilities bypass: %1",
+            ptzCapabilityBits(bypassPtzCapabilities));
 
         // We consider capability is true if it's supported both by a NVR and a camera.
         capabilities &= bypassPtzCapabilities;
-
-        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+        NX_VERBOSE(this, "Supported PTZ capabilities both: %1", ptzCapabilityBits(capabilities));
     }
 
     if ((capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
@@ -1375,15 +1371,27 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         capabilities |= Ptz::AuxiliaryPtzCapability;
 
-    NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
-
+    NX_DEBUG(this, "Supported PTZ capabilities: %1", ptzCapabilityBits(capabilities));
     if (isAnalogEncoder())
     {
         // Encoder PTZ capabilities are being overriden from 'Expert' tab
         // and are empty by default.
         m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
+    }
+
+    const auto ptzTargetChannel = resourceData().value<int>(ResourcePropertyKey::kPtzTargetChannel, -1);
+    NX_VERBOSE(this, "PTZ target channel: %1", ptzTargetChannel);
+    if (ptzTargetChannel != -1 && ptzTargetChannel != getChannel())
+    {
+        const auto id = physicalIdForChannel(ptzTargetChannel);
+        NX_DEBUG(this, "Set PTZ target channel id: %1", id);
+        setProperty(ResourcePropertyKey::kPtzTargetChannel, id);
+    }
+    else
+    {
+        if (hasProperty(ResourcePropertyKey::kPtzTargetChannel))
+            setProperty(ResourcePropertyKey::kPtzTargetChannel, QString());
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -3045,6 +3053,15 @@ boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterI
     return itr->second;
 }
 
+QString HanwhaResource::physicalIdForChannel(int value)
+{
+    auto id = getGroupId();
+    if (value > 0)
+        id += lit("_channel=%1").arg(value + 1);
+
+    return id;
+}
+
 void HanwhaResource::updateToChannel(int value)
 {
     QUrl url(getUrl());
@@ -3058,13 +3075,9 @@ void HanwhaResource::updateToChannel(int value)
     QString physicalId = getPhysicalId().split('_')[0];
     setDefaultGroupName(getModel());
     setGroupId(physicalId);
+    setPhysicalId(physicalIdForChannel(value));
 
-    QString suffix = lit("_channel=%1").arg(value + 1);
-    if (value > 0)
-        physicalId += suffix;
-    setPhysicalId(physicalId);
-
-    suffix = lit("-channel %1").arg(value + 1);
+    const auto suffix = lit("-channel %1").arg(value + 1);
     if (value > 0 && !getName().endsWith(suffix))
         setName(getName() + suffix);
 }

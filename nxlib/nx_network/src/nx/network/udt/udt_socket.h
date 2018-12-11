@@ -21,7 +21,6 @@ template<class SocketType> class AsyncServerSocketHelper;
 
 namespace detail {
 
-class UdtSocketImpl;
 enum class SocketState
 {
     closed,
@@ -30,6 +29,8 @@ enum class SocketState
 };
 
 } // namespace detail
+
+class UdtSocketImpl;
 
 template<class InterfaceToImplement>
 class UdtSocket:
@@ -83,12 +84,12 @@ protected:
     friend class UdtPollSet;
 
     detail::SocketState m_state;
-    detail::UdtSocketImpl* m_impl;
+    UdtSocketImpl* m_impl = nullptr;
     const int m_ipVersion;
 
     UdtSocket(
         int ipVersion,
-        detail::UdtSocketImpl* impl,
+        std::unique_ptr<UdtSocketImpl> impl,
         detail::SocketState state);
 
     bool open();
@@ -108,7 +109,7 @@ public:
     explicit UdtStreamSocket(int ipVersion = AF_INET);
     UdtStreamSocket(
         int ipVersion,
-        detail::UdtSocketImpl* impl,
+        std::unique_ptr<UdtSocketImpl> impl,
         detail::SocketState state);
     virtual ~UdtStreamSocket();
 

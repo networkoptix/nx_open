@@ -12,9 +12,7 @@
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <nx/vms/server/server_module_aware.h>
 
-namespace nx {
-namespace vms::server {
-namespace hls {
+namespace nx::vms::server::hls {
 
 /**
  * Generates sliding chunk list for archive playback.
@@ -41,6 +39,7 @@ public:
     virtual size_t generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached) const override;
+
     virtual int getMaxBitrate() const override;
 
     CameraDiagnostics::Result lastError() const;
@@ -64,7 +63,7 @@ private:
     bool m_initialPlaylistCreated;
     qint64 m_prevGeneratedChunkDuration;
     bool m_discontinuityDetected;
-    //!archive chunk, that holds last found position
+    /** Archive chunk, that holds last found position. */
     QnAbstractArchiveDelegate::ArchiveChunkInfo m_currentArchiveChunk;
 
     void generateChunksIfNeeded();
@@ -72,9 +71,7 @@ private:
     qint64 endTimestamp() const;
 };
 
-//!Using std::shared_ptr for \a std::shared_ptr::unique()
-typedef std::shared_ptr<ArchivePlaylistManager> ArchivePlaylistManagerPtr;
+/** Using std::shared_ptr for std::shared_ptr::unique(). */
+using ArchivePlaylistManagerPtr = std::shared_ptr<ArchivePlaylistManager>;
 
-} // namespace hls
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::hls

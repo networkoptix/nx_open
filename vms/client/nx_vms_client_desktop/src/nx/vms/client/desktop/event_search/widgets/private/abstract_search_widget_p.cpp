@@ -5,7 +5,9 @@
 #include <chrono>
 
 #include <QtCore/QTimer>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QScrollBar>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -13,7 +15,6 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/palette.h>
-#include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -28,6 +29,7 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
+#include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -43,6 +45,8 @@ using namespace std::chrono;
 namespace {
 
 static constexpr int kPlaceholderFontPixelSize = 15;
+static constexpr int kCounterPanelHeight = 32;
+
 static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
 static constexpr milliseconds kTimeSelectionDelay = 250ms;
 static constexpr milliseconds kTextFilterDelay = 250ms;
@@ -50,7 +54,7 @@ static constexpr milliseconds kTextFilterDelay = 250ms;
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     const auto paintFunction =
-        [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
+        [](QPainter* painter, const QStyleOption* option, const QWidget* /*widget*/) -> bool
         {
             if (option->state.testFlag(QStyle::State_HasFocus))
                 painter->fillRect(option->rect, option->palette.dark());
@@ -86,6 +90,9 @@ AbstractSearchWidget::Private::Private(
     m_headIndicatorModel(new BusyIndicatorModel()),
     m_tailIndicatorModel(new BusyIndicatorModel()),
     m_visualModel(new ConcatenationListModel()),
+    m_togglePreviewsButton(new ToolButton(q)),
+    m_toggleFootersButton(new ToolButton(q)),
+    m_itemCounterLabel(new QLabel(q)),
     m_textFilterEdit(createSearchLineEdit(q)),
     m_dayChangeTimer(new QTimer()),
     m_fetchMoreOperation(new utils::PendingOperation())
@@ -102,12 +109,8 @@ AbstractSearchWidget::Private::Private(
     connect(m_textFilterEdit, &SearchLineEdit::textChanged,
         q, &AbstractSearchWidget::textFilterChanged);
 
-    ui->itemCounterLabel->setForegroundRole(QPalette::Mid);
-    ui->itemCounterLabel->setText({});
-
     setupModels();
     setupRibbon();
-    setupToolbar();
     setupPlaceholder();
     setupTimeSelection();
     setupCameraSelection();
@@ -194,61 +197,82 @@ void AbstractSearchWidget::Private::setupRibbon()
     setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
         colorTheme()->color("dark5"));
 
+    setupViewportHeader();
+
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
     connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
 
-    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
-        [this]()
-        {
-            ui->ribbon->setHighlightedTimestamp(
-                microseconds(navigator()->positionUsec()));
-        });
-
     TileInteractionHandler::install(ui->ribbon);
 }
 
-void AbstractSearchWidget::Private::setupToolbar()
+void AbstractSearchWidget::Private::setupViewportHeader()
 {
-    ui->toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
-    ui->toggleFootersButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->toggleFootersButton->setIcon(qnSkin->icon(
+    const auto toolbar = new QWidget(q);
+    toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    const auto toolbarLayout = new QHBoxLayout(toolbar);
+    toolbarLayout->setSpacing(style::Metrics::kStandardPadding);
+    toolbarLayout->setContentsMargins(0, 2, 0, 0); //< Fine-tuned.
+    toolbarLayout->addWidget(m_toggleFootersButton);
+    toolbarLayout->addWidget(m_togglePreviewsButton);
+
+    const auto viewportHeader = new QWidget(q);
+    viewportHeader->setFixedHeight(kCounterPanelHeight);
+
+    const auto headerLayout = new QHBoxLayout(viewportHeader);
+    headerLayout->setSpacing(style::Metrics::kStandardPadding);
+    headerLayout->setContentsMargins({});
+
+    headerLayout->addWidget(m_itemCounterLabel);
+    headerLayout->addWidget(toolbar);
+
+    ui->ribbon->setViewportHeader(viewportHeader);
+
+    m_itemCounterLabel->setForegroundRole(QPalette::Mid);
+    m_itemCounterLabel->setText({});
+
+    m_toggleFootersButton->setCheckable(true);
+    m_toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
+    m_toggleFootersButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    m_toggleFootersButton->setIcon(qnSkin->icon(
         "text_buttons/text.png", "text_buttons/text_selected.png"));
 
     const auto updateInformationToolTip =
         [this]()
         {
-            ui->toggleFootersButton->setToolTip(ui->toggleFootersButton->isChecked()
+            m_toggleFootersButton->setToolTip(m_toggleFootersButton->isChecked()
                 ? tr("Hide information")
                 : tr("Show information"));
         };
 
-    connect(ui->toggleFootersButton, &QToolButton::toggled,
+    connect(m_toggleFootersButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);
 
-    connect(ui->toggleFootersButton, &QToolButton::toggled,
+    connect(m_toggleFootersButton, &QToolButton::toggled,
         this, updateInformationToolTip);
 
     updateInformationToolTip();
 
-    ui->togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    ui->togglePreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->togglePreviewsButton->setIcon(qnSkin->icon(
+    m_togglePreviewsButton->setCheckable(true);
+    m_togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
+    m_togglePreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    m_togglePreviewsButton->setIcon(qnSkin->icon(
         "text_buttons/image.png", "text_buttons/image_selected.png"));
 
     const auto updateThumbnailsToolTip =
         [this]()
         {
-            ui->togglePreviewsButton->setToolTip(ui->togglePreviewsButton->isChecked()
+            m_togglePreviewsButton->setToolTip(m_togglePreviewsButton->isChecked()
                 ? tr("Hide thumbnails")
                 : tr("Show thumbnails"));
         };
 
-    connect(ui->togglePreviewsButton, &QToolButton::toggled,
+    connect(m_togglePreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
 
-    connect(ui->togglePreviewsButton, &QToolButton::toggled,
+    connect(m_togglePreviewsButton, &QToolButton::toggled,
         this, updateThumbnailsToolTip);
 
     updateThumbnailsToolTip();
@@ -495,12 +519,6 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
-void AbstractSearchWidget::Private::setCamerasReadOnly(bool value)
-{
-    ui->cameraSelectionButton->setDeactivatable(!value);
-    setReadOnly(ui->cameraSelectionButton, value);
-}
-
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
@@ -525,8 +543,8 @@ AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls()
     result.setFlag(Control::cameraSelector, !ui->cameraSelectionButton->isHidden());
     result.setFlag(Control::timeSelector, !ui->timeSelectionButton->isHidden());
     result.setFlag(Control::freeTextFilter, !m_textFilterEdit->isHidden());
-    result.setFlag(Control::footersToggler, !ui->toggleFootersButton->isHidden());
-    result.setFlag(Control::previewsToggler, !ui->togglePreviewsButton->isHidden());
+    result.setFlag(Control::footersToggler, !m_toggleFootersButton->isHidden());
+    result.setFlag(Control::previewsToggler, !m_togglePreviewsButton->isHidden());
     return result;
 }
 
@@ -535,8 +553,8 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
     ui->cameraSelectionButton->setVisible(value.testFlag(Control::cameraSelector));
     ui->timeSelectionButton->setVisible(value.testFlag(Control::timeSelector));
     m_textFilterEdit->setVisible(value.testFlag(Control::freeTextFilter));
-    ui->toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
-    ui->togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
+    m_toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
+    m_togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
 }
 
 AbstractSearchWidget::Period AbstractSearchWidget::Private::selectedPeriod() const
@@ -662,6 +680,7 @@ SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
     result->setFlat(true);
     result->setDeactivatable(true);
     result->setSelectable(false);
+    result->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     ui->filtersLayout->addWidget(result, 0, Qt::AlignLeft);
     return result;
 }
@@ -801,13 +820,13 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
         ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
 
     ui->placeholder->setVisible(placeholderVisible);
-    ui->counterContainer->setVisible(!placeholderVisible);
+    ui->ribbon->viewportHeader()->setVisible(!placeholderVisible);
 
     static constexpr int kThreshold = 99;
     if (itemCount > kThreshold)
-        ui->itemCounterLabel->setText(QString(">") + q->itemCounterText(kThreshold));
+        m_itemCounterLabel->setText(QString(">") + q->itemCounterText(kThreshold));
     else
-        ui->itemCounterLabel->setText(q->itemCounterText(itemCount));
+        m_itemCounterLabel->setText(q->itemCounterText(itemCount));
 }
 
 } // namespace nx::vms::client::desktop

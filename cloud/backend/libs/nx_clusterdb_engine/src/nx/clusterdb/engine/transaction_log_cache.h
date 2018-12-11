@@ -27,7 +27,7 @@ struct UpdateHistoryData
  * @note Calls with same tran id are expected to be serialized by caller.
  *     Otherwise, behavior is undefined.
  */
-class NX_DATA_SYNC_ENGINE_API VmsTransactionLogCache
+class NX_DATA_SYNC_ENGINE_API CommandLogCache
 {
 public:
     using TranId = int;
@@ -42,7 +42,7 @@ public:
 
     static const TranId InvalidTranId = -1;
 
-    VmsTransactionLogCache();
+    CommandLogCache();
 
     bool isShouldBeIgnored(
         const std::string& systemId,
@@ -87,7 +87,7 @@ private:
     std::map<TranId, TranContext> m_tranIdToContext;
     mutable QnMutex m_mutex;
     TranId m_tranIdSequence;
-    TransactionTimestampCalculator m_timestampCalculator;
+    CommandTimestampCalculator m_timestampCalculator;
     VmsDataState m_committedData;
 
     std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;

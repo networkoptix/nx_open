@@ -8,10 +8,10 @@ namespace nx::clusterdb::engine {
  * Holds transaction inside and is able to serialize it to a requested format.
  * Can add transport header optionally.
  */
-class TransactionSerializer
+class CommandSerializer
 {
 public:
-    virtual ~TransactionSerializer() = default;
+    virtual ~CommandSerializer() = default;
 
     /**
      * Serialize transaction into targetFormat.
@@ -26,7 +26,7 @@ public:
      */
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader,
+        const CommandTransportHeader& transportHeader,
         int transactionFormatVersion) const = 0;
 };
 

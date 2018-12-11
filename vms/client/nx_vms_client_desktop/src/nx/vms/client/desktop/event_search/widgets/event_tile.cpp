@@ -564,6 +564,12 @@ bool EventTile::event(QEvent* event)
         return result;
     }
 
+    const auto closeToStart =
+        [this](const QPoint& point)
+        {
+            return (point - d->clickPoint).manhattanLength() < qApp->startDragDistance();
+        };
+
     switch (event->type())
     {
         case QEvent::Enter:
@@ -595,7 +601,7 @@ bool EventTile::event(QEvent* event)
         case QEvent::MouseButtonRelease:
         {
             const auto mouseEvent = static_cast<QMouseEvent*>(event);
-            if (mouseEvent->button() == d->clickButton)
+            if ((mouseEvent->button() == d->clickButton) && closeToStart(mouseEvent->pos()))
                 emit clicked(d->clickButton, mouseEvent->modifiers() & d->clickModifiers);
             d->clickButton = Qt::NoButton;
             break;
@@ -607,14 +613,15 @@ bool EventTile::event(QEvent* event)
                 emit doubleClicked();
             break;
 
-        case QEvent::MouseMove:
+        // Child widgets can capture mouse, so drag is handled in HoverMove instead of MouseMove.
+        case QEvent::HoverMove:
         {
-            const auto mouseEvent = static_cast<QMouseEvent*>(event);
-            if ((mouseEvent->pos() - d->clickPoint).manhattanLength() < qApp->startDragDistance())
+            const auto hoverEvent = static_cast<QHoverEvent*>(event);
+            if ((d->clickButton == Qt::NoButton) || closeToStart(hoverEvent->pos()))
                 break;
-            d->clickButton = Qt::NoButton;
-            if (mouseEvent->buttons().testFlag(Qt::LeftButton))
+            if (d->clickButton == Qt::LeftButton)
                 emit dragStarted(d->clickPoint, size());
+            d->clickButton = Qt::NoButton;
             break;
         }
 

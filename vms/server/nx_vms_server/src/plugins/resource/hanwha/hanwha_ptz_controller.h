@@ -113,6 +113,7 @@ private:
 
     bool useNormalizedSpeed() const;
 
+    QString makeWarningMessage(const QString& text) const;
 private:
     mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;

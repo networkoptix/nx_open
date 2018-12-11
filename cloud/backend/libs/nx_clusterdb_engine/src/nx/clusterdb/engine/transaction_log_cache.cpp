@@ -5,32 +5,32 @@
 
 namespace nx::clusterdb::engine {
 
-using VmsDataState = VmsTransactionLogCache::VmsDataState;
+using VmsDataState = CommandLogCache::VmsDataState;
 
-VmsTransactionLogCache::VmsTransactionLogCache():
+CommandLogCache::CommandLogCache():
     m_tranIdSequence(0)
 {
     m_committedData.timestampSequence = 0;
 }
 
-bool VmsTransactionLogCache::isShouldBeIgnored(
+bool CommandLogCache::isShouldBeIgnored(
     const std::string& systemId,
-    const CommandHeader& tran,
+    const CommandHeader& commandHeader,
     const QByteArray& hash) const
 {
     using namespace ::ec2;
 
     QnMutexLocker lock(&m_mutex);
 
-    vms::api::PersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
-    NX_ASSERT(tran.persistentInfo.sequence != 0);
+    vms::api::PersistentIdData key(commandHeader.peerID, commandHeader.persistentInfo.dbID);
+    NX_ASSERT(commandHeader.persistentInfo.sequence != 0);
     const auto currentSequence = m_committedData.transactionState.values.value(key);
-    if (currentSequence >= tran.persistentInfo.sequence)
+    if (currentSequence >= commandHeader.persistentInfo.sequence)
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4) "
             "because of persistent sequence: %5 <= %6")
-            .args(systemId, ApiCommand::toString(tran.command), tran,
-                hash, tran.persistentInfo.sequence, currentSequence));
+            .args(systemId, ApiCommand::toString(commandHeader.command), commandHeader,
+                hash, commandHeader.persistentInfo.sequence, currentSequence));
         return true;    //< Transaction should be ignored.
     }
 
@@ -39,21 +39,21 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
         return false;   //< Transaction should be processed.
 
     const auto lastTime = itr->second.timestamp;
-    bool rez = lastTime > tran.persistentInfo.timestamp;
-    if (lastTime == tran.persistentInfo.timestamp)
+    bool rez = lastTime > commandHeader.persistentInfo.timestamp;
+    if (lastTime == commandHeader.persistentInfo.timestamp)
         rez = key < itr->second.updatedBy;
     if (rez)
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4) "
-            "because of timestamp: %5 <= %6").args(systemId, ApiCommand::toString(tran.command),
-                tran, hash, tran.persistentInfo.timestamp, lastTime));
+            "because of timestamp: %5 <= %6").args(systemId, ApiCommand::toString(commandHeader.command),
+                commandHeader, hash, commandHeader.persistentInfo.timestamp, lastTime));
         return true;    //< Transaction should be ignored.
     }
 
     return false;   //< Transaction should be processed.
 }
 
-void VmsTransactionLogCache::restoreTransaction(
+void CommandLogCache::restoreTransaction(
     vms::api::PersistentIdData tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
@@ -84,7 +84,7 @@ void VmsTransactionLogCache::restoreTransaction(
     }
 }
 
-VmsTransactionLogCache::TranId VmsTransactionLogCache::beginTran()
+CommandLogCache::TranId CommandLogCache::beginTran()
 {
     QnMutexLocker lock(&m_mutex);
     const auto newTranId = ++m_tranIdSequence;
@@ -95,7 +95,7 @@ VmsTransactionLogCache::TranId VmsTransactionLogCache::beginTran()
     return newTranId;
 }
 
-void VmsTransactionLogCache::commit(TranId tranId)
+void CommandLogCache::commit(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -127,13 +127,13 @@ void VmsTransactionLogCache::commit(TranId tranId)
     m_tranIdToContext.erase(tranId);
 }
 
-void VmsTransactionLogCache::rollback(TranId tranId)
+void CommandLogCache::rollback(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
     m_tranIdToContext.erase(tranId);
 }
 
-void VmsTransactionLogCache::updateTimestampSequence(TranId tranId, quint64 newValue)
+void CommandLogCache::updateTimestampSequence(TranId tranId, quint64 newValue)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -141,7 +141,7 @@ void VmsTransactionLogCache::updateTimestampSequence(TranId tranId, quint64 newV
     tranContext.data.timestampSequence = newValue;
 }
 
-void VmsTransactionLogCache::insertOrReplaceTransaction(
+void CommandLogCache::insertOrReplaceTransaction(
     TranId tranId,
     const CommandHeader& transaction,
     const QByteArray& transactionHash)
@@ -164,13 +164,13 @@ void VmsTransactionLogCache::insertOrReplaceTransaction(
         transaction.persistentInfo.sequence;
 }
 
-const VmsDataState* VmsTransactionLogCache::state(TranId tranId) const
+const VmsDataState* CommandLogCache::state(TranId tranId) const
 {
     const auto tranContext = findTranContext(tranId);
     return tranContext ? &tranContext->data : nullptr;
 }
 
-vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
+vms::api::Timestamp CommandLogCache::generateTransactionTimestamp(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
     vms::api::Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
@@ -180,7 +180,7 @@ vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId 
     return timestamp;
 }
 
-int VmsTransactionLogCache::generateTransactionSequence(
+int CommandLogCache::generateTransactionSequence(
     const vms::api::PersistentIdData& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
@@ -189,7 +189,7 @@ int VmsTransactionLogCache::generateTransactionSequence(
     return currentSequence;
 }
 
-void VmsTransactionLogCache::shiftTransactionSequence(
+void CommandLogCache::shiftTransactionSequence(
     const vms::api::PersistentIdData& tranStateKey,
     int delta)
 {
@@ -198,25 +198,25 @@ void VmsTransactionLogCache::shiftTransactionSequence(
     currentSequence += delta;
 }
 
-vms::api::TranState VmsTransactionLogCache::committedTransactionState() const
+vms::api::TranState CommandLogCache::committedTransactionState() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_committedData.transactionState;
 }
 
-std::uint64_t VmsTransactionLogCache::committedTimestampSequence() const
+std::uint64_t CommandLogCache::committedTimestampSequence() const
 {
     QnMutexLocker lock(&m_mutex);
     return *m_committedData.timestampSequence;
 }
 
-int VmsTransactionLogCache::activeTransactionCount() const
+int CommandLogCache::activeTransactionCount() const
 {
     QnMutexLocker lock(&m_mutex);
     return (int) m_tranIdToContext.size();
 }
 
-std::uint64_t VmsTransactionLogCache::timestampSequence(
+std::uint64_t CommandLogCache::timestampSequence(
     const QnMutexLockerBase& lock, TranId tranId) const
 {
     if (tranId == InvalidTranId)
@@ -229,27 +229,27 @@ std::uint64_t VmsTransactionLogCache::timestampSequence(
         : *m_committedData.timestampSequence;
 }
 
-VmsTransactionLogCache::TranContext&
-    VmsTransactionLogCache::findTranContext(TranId tranId)
+CommandLogCache::TranContext&
+    CommandLogCache::findTranContext(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
     return findTranContext(lock, tranId);
 }
 
-VmsTransactionLogCache::TranContext&
-    VmsTransactionLogCache::findTranContext(const QnMutexLockerBase& /*lock*/, TranId tranId)
+CommandLogCache::TranContext&
+    CommandLogCache::findTranContext(const QnMutexLockerBase& /*lock*/, TranId tranId)
 {
     return m_tranIdToContext[tranId];
 }
 
-const VmsTransactionLogCache::TranContext*
-    VmsTransactionLogCache::findTranContext(TranId tranId) const
+const CommandLogCache::TranContext*
+    CommandLogCache::findTranContext(TranId tranId) const
 {
     QnMutexLocker lock(&m_mutex);
     return findTranContext(lock, tranId);
 }
 
-const VmsTransactionLogCache::TranContext* VmsTransactionLogCache::findTranContext(
+const CommandLogCache::TranContext* CommandLogCache::findTranContext(
     const QnMutexLockerBase& /*lock*/,
     TranId tranId) const
 {

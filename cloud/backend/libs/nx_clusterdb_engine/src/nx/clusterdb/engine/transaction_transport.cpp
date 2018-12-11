@@ -138,8 +138,8 @@ std::string CommonHttpConnection::connectionGuid() const
 }
 
 void CommonHttpConnection::sendTransaction(
-    TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const TransactionSerializer>& transactionSerializer)
+    CommandTransportHeader transportHeader,
+    const std::shared_ptr<const CommandSerializer>& transactionSerializer)
 {
     transportHeader.vmsTransportHeader.fillSequence(
         m_baseTransactionTransport->localPeer().id,
@@ -201,7 +201,7 @@ int CommonHttpConnection::highestProtocolVersionCompatibleWithRemotePeer() const
 void CommonHttpConnection::onGotTransaction(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
-    CommandTransportHeader transportHeader)
+    VmsTransportHeader transportHeader)
 {
     NX_CRITICAL(isInSelfAioThread());
 
@@ -224,7 +224,7 @@ void CommonHttpConnection::onGotTransaction(
 void CommonHttpConnection::forwardTransactionToProcessor(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
-    CommandTransportHeader transportHeader)
+    VmsTransportHeader transportHeader)
 {
     NX_CRITICAL(isInSelfAioThread());
 
@@ -238,7 +238,7 @@ void CommonHttpConnection::forwardTransactionToProcessor(
         return;
     }
 
-    TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
+    CommandTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = m_connectionOriginatorEndpoint;
     cdbTransportHeader.systemId = m_systemId;
     cdbTransportHeader.connectionId = m_connectionId;

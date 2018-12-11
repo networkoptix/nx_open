@@ -3,6 +3,9 @@
 #include <QtWidgets/QApplication>
 #include <QtWebKitWidgets/QWebView>
 
+#include <api/global_settings.h>
+#include <core/resource/user_resource.h>
+
 #include <common/common_module.h>
 
 #include <client/client_app_info.h>
@@ -47,6 +50,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/ini.h>
 
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::client::desktop;
@@ -194,6 +198,19 @@ void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
     emit mainWindowChanged();
 }
 
+nx::core::Watermark QnWorkbenchContext::watermark() const
+{
+    if (ini().enableWatermark)
+    {
+        if (globalSettings()->watermarkSettings().useWatermark
+            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+            && user() && !user()->getName().isEmpty())
+        {
+            return {globalSettings()->watermarkSettings(), user()->getName()};
+        }
+    }
+    return {};
+}
 
 QAction *QnWorkbenchContext::action(const action::IDType id) const {
     return m_menu->action(id);

@@ -2,10 +2,11 @@
 
 #include <algorithm>
 
+#include <QtCore/QPointer>
+#include <QtCore/QVector>
+#include <QtCore/QHash>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QVBoxLayout>
 
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
@@ -28,7 +29,7 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // EventSearchWidget::Private
 
-class EventSearchWidget::Private
+class EventSearchWidget::Private: public QObject
 {
     EventSearchWidget* const q;
     SelectableTextButton* const m_typeSelectionButton;
@@ -61,12 +62,15 @@ private:
 
         bool operator<(const PluginInfo& other) const
         {
-            if (name.isEmpty())
-                return false;
+            if (name.isEmpty() != other.name.isEmpty())
+                return other.name.isEmpty();
 
-            return other.name.isEmpty()
-                ? true
-                : utils::naturalStringCompare(name, other.name, Qt::CaseInsensitive) < 0;
+            const auto result = utils::naturalStringCompare(
+                name, other.name, Qt::CaseInsensitive) < 0;
+
+            return result == 0
+                ? (intptr_t)this < (intptr_t)&other //< Both names are the same, e.g. empty.
+                : result;
         }
     };
 };
@@ -92,10 +96,10 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
                 updateAnalyticsMenu();
         };
 
-    QObject::connect(q->resourcePool(), &QnResourcePool::resourceAdded, q, handleServerChanges);
-    QObject::connect(q->resourcePool(), &QnResourcePool::resourceRemoved, q, handleServerChanges);
+    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerChanges);
+    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerChanges);
 
-    QObject::connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged, q,
+    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged, this,
         [this](bool isOnline)
         {
             if (isOnline)
@@ -106,7 +110,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         updateAnalyticsMenu();
 
     // Disable server event selection when selected cameras differ from "Any camera".
-    QObject::connect(q, &AbstractSearchWidget::cameraSetChanged,
+    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
         [this]()
         {
             NX_ASSERT(m_serverEventsSubmenuAction);
@@ -132,8 +136,6 @@ void EventSearchWidget::Private::setupTypeSelection()
     using namespace nx::vms::event;
 
     m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
-    m_typeSelectionButton->setSelectable(false);
-    m_typeSelectionButton->setDeactivatable(true);
 
     auto eventFilterMenu = q->createDropdownMenu();
     auto deviceIssuesMenu = q->createDropdownMenu();
@@ -185,7 +187,7 @@ void EventSearchWidget::Private::setupTypeSelection()
     auto defaultAction = addMenuAction(
         eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
 
-    QObject::connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, q,
+    connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
         {
             if (state == SelectableTextButton::State::deactivated)
@@ -200,8 +202,8 @@ QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& t
     EventType type, const QString& subType, bool dynamicTitle)
 {
     auto action = menu->addAction(title);
-    QObject::connect(action, &QAction::triggered, q,
-        [this, action, type]()
+    connect(action, &QAction::triggered, this,
+        [this, action, type, subType]()
         {
             m_typeSelectionButton->setText(action->text());
             m_typeSelectionButton->setState(type == EventType::undefinedEvent
@@ -209,15 +211,19 @@ QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& t
                 : SelectableTextButton::State::unselected);
 
             m_eventModel->setSelectedEventType(type);
+            m_eventModel->setSelectedSubType(subType);
         });
 
     if (dynamicTitle)
     {
-        QObject::connect(action, &QAction::changed, q,
-            [this, action, type]()
+        connect(action, &QAction::changed, this,
+            [this, action, type, subType]()
             {
-                if (m_eventModel->selectedEventType() == type)
+                if (m_eventModel->selectedEventType() == type
+                    && m_eventModel->selectedSubType() == subType)
+                {
                     m_typeSelectionButton->setText(action->text());
+                }
             });
     }
 
@@ -259,7 +265,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                     pluginsById[path.pluginId].eventTypes.insert(entry);
             }
 
-            QList<PluginInfo> plugins;
+            QVector<PluginInfo> plugins;
             for (const auto& pluginInfo: pluginsById)
                 plugins.push_back(pluginInfo);
 
@@ -271,14 +277,14 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
             {
                 if (severalPlugins)
                 {
-                    currentMenu->setWindowFlags(
-                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
                     const auto pluginName = plugin.name.isEmpty()
                         ? QString("<%1>").arg(tr("unnamed analytics plugin"))
                         : plugin.name;
 
                     currentMenu = analyticsMenu->addMenu(pluginName);
+
+                    currentMenu->setWindowFlags(
+                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
                 }
 
                 for (const auto entry: plugin.eventTypes)

@@ -66,7 +66,7 @@ public:
     virtual QnAspectRatio aspectRatio() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
-    // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::mediaserver.
+    // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
 
     /** @return true if mediaStreamInfo differs from existing and has been saved. */
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );

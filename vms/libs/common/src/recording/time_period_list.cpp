@@ -722,7 +722,9 @@ QnTimePeriodList mergeTimePeriodsDesc(const QVector<QnTimePeriodList>& nonEmptyP
         minIndexes[i] = nonEmptyPeriods[i].crbegin();
         endIndexes[i] = nonEmptyPeriods[i].crend();
     }
-    auto result = mergeTimePeriodsInternal(nonEmptyPeriods, minIndexes, endIndexes, limit);
+    auto result = mergeTimePeriodsInternal(nonEmptyPeriods, minIndexes, endIndexes, std::numeric_limits<int>::max());
+    if (limit > 0 && result.size() > limit)
+        result.erase(result.begin(), result.begin() + (result.size() - limit));
     std::reverse(result.begin(), result.end());
     return result;
 }
