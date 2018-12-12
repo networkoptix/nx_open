@@ -66,7 +66,7 @@ FileInformation Storage::fileInformation(
 
 ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
 {
-    if(updateTouchTime)
+    if (updateTouchTime)
         fileInformation.touchTime = qnSyncTime->currentMSecsSinceEpoch();
 
     if (fileInformation.status == FileInformation::Status::downloaded)
@@ -241,7 +241,7 @@ ResultCode Storage::updateFileInformation(
         updated = true;
     }
 
-    const auto& exitGuard = nx::utils::makeScopeGuard(
+    const auto exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, updated, it, status = it->status]()
         {
             if (updated || status != it->status)
@@ -292,7 +292,7 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
         it->chunkChecksums.resize(chunkCount);
     }
 
-    const auto& exitGuard = nx::utils::makeScopeGuard(
+    const auto exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it]()
         {
             lock.unlock();
@@ -372,7 +372,7 @@ ResultCode Storage::writeFileChunk(
 
     file.close();
 
-    const auto& exitGuard = nx::utils::makeScopeGuard(
+    const auto exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it, status = it->status]()
         {
             lock.unlock();
@@ -481,7 +481,7 @@ ResultCode Storage::setChunkChecksums(
 
     it->chunkChecksums = chunkChecksums;
 
-    const auto& exitGuard = nx::utils::makeScopeGuard(
+    const auto exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it, status = it->status]()
         {
             lock.unlock();
@@ -552,8 +552,7 @@ void Storage::findDownloads()
         {
             findDownloadsRecursively(m_downloadsDirectory);
             cleanupExpiredFiles();
-    }));
-}
+        }));
 
 void Storage::waitForDownloadsToBeFound()
 {
@@ -608,7 +607,7 @@ int Storage::calculateChunkCount(qint64 fileSize, qint64 chunkSize)
     if (chunkSize <= 0 || fileSize < 0)
         return -1;
 
-    return (fileSize + chunkSize - 1) / chunkSize;
+    return (int) ((fileSize + chunkSize - 1) / chunkSize);
 }
 
 QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 chunkSize)
