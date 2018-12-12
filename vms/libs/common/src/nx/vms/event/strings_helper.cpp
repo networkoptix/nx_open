@@ -726,7 +726,7 @@ QString StringsHelper::getSoftwareTriggerName(const EventParameters& params)
 }
 
 QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
-    const QString& locale) const
+    const QString& /*locale*/) const
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
@@ -740,7 +740,7 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
     const auto eventType = analyticsEventType(camera, pluginId, eventTypeId);
-    const auto text = eventType.name.text(locale);
+    const auto text = eventType.name;
 
     return !text.isEmpty()
         ? text

@@ -215,8 +215,6 @@ private:
 
     bool emitDynamicSignal(const char *signal, void **arguments);
 
-    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
-
     bool useLocalProperties() const;
 
     friend class InitAsyncTask;

@@ -10,12 +10,7 @@
 #include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/vms/server/sdk_support/loggers.h>
 
-namespace nx::sdk::analytics {
-
-class Plugin;
-class Engine;
-
-} // namespace nx::sdk::analytics
+namespace nx::sdk::analytics { class IPlugin; }
 
 namespace nx::vms::server::analytics {
 
@@ -44,7 +39,7 @@ private:
         resource::AnalyticsPluginResourcePtr pluginResource) const;
 
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
-        const nx::sdk::analytics::Plugin* plugin) const;
+        const nx::sdk::analytics::IPlugin* plugin) const;
 };
 
 } // namespace nx::vms::server::analytics

@@ -15,24 +15,29 @@ QSettingsBackend::~QSettingsBackend()
 {
 }
 
-QString QSettingsBackend::readValue(const QString& name)
+QString QSettingsBackend::readValue(const QString& name, bool* success)
 {
+    if (success)
+        *success = true;
     return m_settings->value(name).toString();
 }
 
-void QSettingsBackend::writeValue(const QString& name, const QString& value)
+bool QSettingsBackend::writeValue(const QString& name, const QString& value)
 {
     m_settings->setValue(name, value);
+    return true;
 }
 
-void QSettingsBackend::removeValue(const QString& name)
+bool QSettingsBackend::removeValue(const QString& name)
 {
     m_settings->remove(name);
+    return true;
 }
 
-void QSettingsBackend::sync()
+bool QSettingsBackend::sync()
 {
     m_settings->sync();
+    return true;
 }
 
 } // namespace nx::utils::property_storage

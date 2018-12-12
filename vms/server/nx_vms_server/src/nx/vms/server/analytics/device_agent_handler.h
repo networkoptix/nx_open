@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/i_plugin_event.h>
 
 #include <core/resource/resource_fwd.h>
@@ -15,7 +15,7 @@ namespace nx::vms::server::analytics {
 class DeviceAgentHandler:
     public QObject,
     public nx::vms::server::ServerModuleAware,
-    public nx::sdk::analytics::DeviceAgent::IHandler
+    public nx::sdk::analytics::IDeviceAgent::IHandler
 {
     Q_OBJECT
 
@@ -25,7 +25,7 @@ public:
         resource::AnalyticsEngineResourcePtr engineResource,
         QnVirtualCameraResourcePtr device);
 
-    virtual void handleMetadata(nx::sdk::analytics::MetadataPacket* metadataPacket) override;
+    virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket) override;
     virtual void handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent) override;
 
     void setMetadataSink(QnAbstractDataReceptor* metadataSink);

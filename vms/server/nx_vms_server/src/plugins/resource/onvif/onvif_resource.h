@@ -676,8 +676,7 @@ protected:
 
     //* SOAP request failed - static analogue for makeSoapFailMessage. */
     static QString makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
-        const QString& caller, const QString& requestCommand,
-        int soapError, const QString& text = QString());
+        const QString& requestCommand, int soapError, const QString& text = QString());
 
     //** SOAP response is incomplete - static analogue for makeSoapNoParameterMessage. */
     static QString makeStaticSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,

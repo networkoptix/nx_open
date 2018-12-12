@@ -52,13 +52,14 @@ void OnvifAudioTransmitter::prepare()
         return;
     }
 
-    auto tracks = m_rtspConnection->getTrackInfo();
-    if (tracks.empty())
+    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
     {
         close();
         return;
     }
-    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
+
+    auto tracks = m_rtspConnection->getTrackInfo();
+    if (tracks.empty())
     {
         close();
         return;

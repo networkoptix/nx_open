@@ -99,9 +99,29 @@ void EventRibbon::setHighlightedTimestamp(std::chrono::microseconds value)
     d->setHighlightedTimestamp(value);
 }
 
+QSet<QnResourcePtr> EventRibbon::highlightedResources() const
+{
+    return d->highlightedResources();
+}
+
+void EventRibbon::setHighlightedResources(const QSet<QnResourcePtr>& value)
+{
+    d->setHighlightedResources(value);
+}
+
 void EventRibbon::setViewportMargins(int top, int bottom)
 {
     d->setViewportMargins(top, bottom);
+}
+
+QWidget* EventRibbon::viewportHeader() const
+{
+    return d->viewportHeader();
+}
+
+void EventRibbon::setViewportHeader(QWidget* value)
+{
+    d->setViewportHeader(value);
 }
 
 QScrollBar* EventRibbon::scrollBar() const

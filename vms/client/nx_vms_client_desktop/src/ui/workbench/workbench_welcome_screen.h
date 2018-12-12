@@ -7,7 +7,9 @@
 #include <nx/utils/scope_guard.h>
 
 #include <utils/common/connective.h>
-#include <utils/common/encoded_credentials.h>
+
+namespace nx::vms::common { struct Credentials; }
+namespace nx::utils { class Url; }
 
 class QQuickView;
 
@@ -129,7 +131,7 @@ private:
     void connectToSystemInternal(
         const QString& systemId,
         const nx::utils::Url& serverUrl,
-        const QnEncodedCredentials& credentials,
+        const nx::vms::common::Credentials& credentials,
         bool storePassword,
         bool autoLogin,
         const nx::utils::SharedGuardPtr& completionTracker = nullptr);

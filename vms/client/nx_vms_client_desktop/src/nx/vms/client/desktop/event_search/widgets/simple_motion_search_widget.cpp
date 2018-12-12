@@ -31,13 +31,10 @@ public:
         q->view()->setHeadersEnabled(false);
 
         setReadOnly(m_resourceButton, true);
-        m_resourceButton->setSelectable(false);
         m_resourceButton->setDeactivatable(false);
         m_resourceButton->setAccented(true);
 
         setReadOnly(m_areaButton, true); //< Does not affect close button.
-        m_areaButton->setSelectable(false);
-        m_areaButton->setDeactivatable(true);
         m_areaButton->setAccented(true);
         m_areaButton->setDeactivatedText(tr("Select area on the video to filter results"));
         m_areaButton->setText(tr("In selected area"));

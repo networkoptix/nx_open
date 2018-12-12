@@ -12,9 +12,9 @@ namespace mobile_client {
 namespace controllers {
 
 WebAdminController::WebAdminController(QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    m_credentials(qnSettings->startupParameters().url)
 {
-    m_credentials = QnEncodedCredentials(qnSettings->startupParameters().url);
 }
 
 void WebAdminController::setUiController(QnMobileClientUiController* controller)
@@ -30,15 +30,15 @@ void WebAdminController::openUrlInBrowser(const QString& urlString)
 QString WebAdminController::getCredentials() const
 {
     QJsonObject json;
-    json[lit("localLogin")] = m_credentials.user;
-    json[lit("localPassword")] = m_credentials.password.value();
+    json["localLogin"] = m_credentials.user;
+    json["localPassword"] = m_credentials.password;
     return QString::fromUtf8(QJsonDocument(json).toJson(QJsonDocument::Compact));
 }
 
 void WebAdminController::updateCredentials(
     const QString& login, const QString& password, bool /*isCloud*/)
 {
-    m_credentials = QnEncodedCredentials(login, password);
+    m_credentials = {login, password};
 }
 
 void WebAdminController::cancel()

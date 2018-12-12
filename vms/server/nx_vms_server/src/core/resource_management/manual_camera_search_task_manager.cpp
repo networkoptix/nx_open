@@ -60,11 +60,11 @@ void QnManualSearchTaskManager::addTask(
     // Task runs searchers sequentially, so if we want search to be parallel we should not run more
     // than one searcher in a task.
     NX_ASSERT(isSequential == true || searchers.size() == 1);
-    QnSearchTask task(commonModule(), url, /*breakOnGotResult*/ isSequential);
+    QnSearchTask task(commonModule(), std::move(url), /*breakOnGotResult*/ isSequential);
 
     task.setSearchers(searchers);
     task.setSearchDoneCallback(
-        std::bind(&QnManualSearchTaskManager::searchTaskDoneHandler, this, _1, _2));
+        std::bind(&QnManualSearchTaskManager::onSearchTaskDone, this, _1, _2));
 
     if (isSequential)
     {
@@ -98,6 +98,8 @@ void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
             m_runningTaskCount = 0;
             m_tasksFinishedCallback = std::move(callback);
 
+            if (m_remainingTaskCount == 0)
+                return onSearchFinished();
             runSomePendingTasks();
         });
 }
@@ -117,7 +119,7 @@ QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
         [this]() -> QnManualResourceSearchList { return m_foundResources; });
 }
 
-void QnManualSearchTaskManager::searchTaskDoneHandler(
+void QnManualSearchTaskManager::onSearchTaskDone(
     QnManualResourceSearchList results, QnSearchTask* const task)
 {
     NX_VERBOSE(this, "Task %1 done", *task);
@@ -154,18 +156,24 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
             // Should not do anything else if it was not the last task ran.
             if (m_runningTaskCount > 0)
                 return;
+            onSearchFinished();
+    });
+}
 
-            // It is an error if the state is running and there are some pending tasks, but no
-            // tasks are running.
-            NX_ASSERT(m_runningTaskCount == 0);
-            NX_ASSERT((m_state == State::running && m_remainingTaskCount == 0)
-                || m_state == State::canceled);
+void QnManualSearchTaskManager::onSearchFinished()
+{
+    NX_CRITICAL(m_pollable.isInSelfAioThread());
 
-            m_state = State::finished;
-            NX_VERBOSE(this, "Search has finished, found %1 resources", m_foundResources.size());
+    // It is an error if the state is running and there are some pending tasks, but no
+    // tasks are running.
+    NX_ASSERT(m_runningTaskCount == 0);
+    NX_ASSERT((m_state == State::running && m_remainingTaskCount == 0)
+        || m_state == State::canceled);
 
-            m_tasksFinishedCallback(std::move(m_foundResources));
-        });
+    m_state = State::finished;
+    NX_VERBOSE(this, "Search has finished, found %1 resources", m_foundResources.size());
+
+    m_tasksFinishedCallback(std::move(m_foundResources));
 }
 
 void QnManualSearchTaskManager::runSomePendingTasks()

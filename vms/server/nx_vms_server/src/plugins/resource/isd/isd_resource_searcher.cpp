@@ -12,7 +12,7 @@
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <nx/utils/log/log.h>
 
-using nx::common::utils::Credentials;
+using nx::vms::common::Credentials;
 
 extern QString getValueFromString(const QString& line);
 

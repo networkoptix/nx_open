@@ -647,6 +647,11 @@ const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items() const
     return m_items;
 }
 
+QnResourceList QnWorkbenchLayout::itemResources() const
+{
+    return m_itemsByResource.keys();
+}
+
 bool QnWorkbenchLayout::isFreeSlot(const QPointF& gridPos, const QSize& size) const
 {
     QPoint gridCell = (gridPos - Geometry::toPoint(QSizeF(size)) / 2.0).toPoint();

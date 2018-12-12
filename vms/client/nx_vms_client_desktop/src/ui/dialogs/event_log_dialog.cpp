@@ -256,7 +256,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
             const nx::vms::api::analytics::EventTypeDescriptor& descriptor)
         {
             if (!hasDifferentDrivers)
-                return QStringList(descriptor.item.name.value);
+                return QStringList(descriptor.item.name);
 
             QStringList names;
             for (const auto& path: descriptor.paths)
@@ -268,7 +268,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                     continue;
 
                 names.push_back(
-                    lm("%1 - %2").args(pluginDescriptor->name, descriptor.item.name.value));
+                    lm("%1 - %2").args(pluginDescriptor->name, descriptor.item.name));
             }
 
             return names;

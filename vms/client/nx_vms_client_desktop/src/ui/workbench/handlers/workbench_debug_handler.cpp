@@ -369,8 +369,7 @@ public:
                     {
                         nx::vms::api::analytics::EventType eventType;
                         eventType.id = "";
-                        eventType.name.value = lm("Event %1").arg(j);
-                        eventType.name.localization["ru_RU"] = lm("Russian %1").arg(j);
+                        eventType.name = lm("Event %1").arg(j);
                         manifest.eventTypes.push_back(eventType);
                     }
 

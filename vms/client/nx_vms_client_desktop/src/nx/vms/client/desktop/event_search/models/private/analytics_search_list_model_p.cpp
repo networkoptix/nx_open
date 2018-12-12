@@ -166,9 +166,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectTypeDescriptor)
                 return fallbackTitle();
 
-            return objectTypeDescriptor->item.name.value.isEmpty()
+            return objectTypeDescriptor->item.name.isEmpty()
                 ? fallbackTitle()
-                : objectTypeDescriptor->item.name.value;
+                : objectTypeDescriptor->item.name;
         }
 
         case Qt::DecorationRole:
@@ -242,6 +242,20 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 
     q->clear();
     m_filterText = value;
+}
+
+QString AnalyticsSearchListModel::Private::selectedObjectType() const
+{
+    return m_selectedObjectType;
+}
+
+void AnalyticsSearchListModel::Private::setSelectedObjectType(const QString& value)
+{
+    if (m_selectedObjectType == value)
+        return;
+
+    q->clear();
+    m_selectedObjectType = value;
 }
 
 void AnalyticsSearchListModel::Private::clearData()
@@ -397,6 +411,9 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.timePeriod = period;
     request.maxObjectsToSelect = limit;
     request.freeText = m_filterText;
+
+    if (!m_selectedObjectType.isEmpty())
+        request.objectTypeId = {m_selectedObjectType};
 
     request.boundingBox = q->cameraSet()->type() == ManagedCameraSet::Type::single
         ? m_filterRect
@@ -751,7 +768,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
         for (const auto& actionDescriptor: descriptors)
         {
-            const auto name = actionDescriptor.item.name.value;
+            const auto name = actionDescriptor.item.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
                 [this, actionDescriptor, object, pluginId = pluginId]()
                 {

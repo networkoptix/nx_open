@@ -14,7 +14,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -27,7 +27,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/i_engine.h>
 #include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/vms/server/plugins/resource_data_support/hanwha.h>

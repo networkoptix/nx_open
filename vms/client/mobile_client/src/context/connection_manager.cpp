@@ -448,9 +448,9 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                 using namespace nx::vms::client::core::helpers;
                 if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
                 {
-                    const auto credentials = qnSettings->savePasswords()
-                        ? QnEncodedCredentials(url)
-                        : QnEncodedCredentials(url.userName(), QString());
+                    nx::vms::common::Credentials credentials(url.userName(), {});
+                    if (qnSettings->savePasswords())
+                        credentials.password = url.password();
                     storeCredentials(localId, credentials);
                     storeConnection(localId, connectionInfo.systemName, url);
                     updateWeightData(localId);
@@ -460,7 +460,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                 LastConnectionData connectionData{
                     connectionInfo.systemName,
                     url.cleanUrl(),
-                    QnEncodedCredentials(url)};
+                    nx::vms::client::core::EncodedCredentials(url)};
                 qnSettings->setLastUsedConnection(connectionData);
                 qnSettings->save();
             }

@@ -45,100 +45,107 @@ QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
     }
 }
 
-int QnManualCameraAdditionRestHandler::extractSearchStartParams(
-    QnJsonRestResult& result,
+int QnManualCameraAdditionRestHandler::extractSearchStartParams(QnJsonRestResult* const result,
     const QnRequestParams& params,
-    nx::utils::Url& url,
-    std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>& ipRange)
+    nx::utils::Url* const outUrl,
+    std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>* const outIpRange)
 {
-    NX_ASSERT(url.isEmpty());
-    NX_ASSERT(!ipRange.has_value());
+    NX_ASSERT(outUrl->isEmpty());
+    NX_ASSERT(!outIpRange->has_value());
 
     const auto portStr = params.value(kPortParam);
     const auto urlStr = params.value(kUrlParam);
     const auto startIpStr = params.value(kStartIpParam);
     const auto endIpStr = params.value(kEndIpParam);
-    const auto startIpValue = nx::network::HostAddress::ipV4from(params.value(kStartIpParam));
-    const auto endIpValue = nx::network::HostAddress::ipV4from(params.value(kEndIpParam));
 
     if (!urlStr.isEmpty()) //< Single host search.
     {
-        url = nx::utils::Url::fromText(urlStr);
-        if (!url.isValid() || url.host().isEmpty())
+        *outUrl = nx::utils::url::parseUrlFields(urlStr);
+        if (!outUrl->isValid() || outUrl->host().isEmpty())
         {
-            result.setError(QnRestResult::InvalidParameter,
+            result->setError(QnRestResult::InvalidParameter,
                 lm("Invalid value '%1' for parameter '%2'").args(urlStr, kUrlParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
         if (!startIpStr.isEmpty() || !endIpStr.isEmpty())
         {
-            result.setError(QnRestResult::InvalidParameter,
+            result->setError(QnRestResult::InvalidParameter,
                 lm("Parameter '%1' conflicts with '%2' and '%3' parameters")
                     .args(kUrlParam, kStartIpParam, kEndIpParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
-        if (!url.password().isEmpty() || !url.userName().isEmpty())
+        if (!outUrl->password().isEmpty() || !outUrl->userName().isEmpty())
         {
             NX_DEBUG(this,
                 "Credentials passed in '%1' are always overwritten by '%2' and '%3' params",
                 kUrlParam, kPasswordParam, kUserParam);
         }
     }
-    else if (startIpValue && endIpValue) //< IP range search.
+    else if (!startIpStr.isEmpty() && !endIpStr.isEmpty()) //< IP range search.
     {
+        const auto startIpValue = nx::network::HostAddress::ipV4from(startIpStr);
+        const auto endIpValue = nx::network::HostAddress::ipV4from(endIpStr);
+        if (!startIpValue || !endIpValue)
+        {
+            result->setError(QnRestResult::InvalidParameter,
+                lm("Invalid ip range, '%1' and '%2' must be IP addresses")
+                    .args(kEndIpParam, kStartIpParam));
+            return nx::network::http::StatusCode::unprocessableEntity;
+        }
+
         if (startIpValue->s_addr >= endIpValue->s_addr)
         {
-            result.setError(QnRestResult::InvalidParameter,
+            result->setError(QnRestResult::InvalidParameter,
                 lm("Invalid ip range, '%1' must be greater than '%2'")
                     .args(kEndIpParam, kStartIpParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
 
-        ipRange = {nx::network::HostAddress(startIpValue.get()),
+        *outIpRange = {nx::network::HostAddress(startIpValue.get()),
             nx::network::HostAddress(endIpValue.get())};
 
     }
     // Single host search deprecated API call (startIp is URL here and endIp empty).
     else if (!startIpStr.isEmpty() && endIpStr.isEmpty())
     {
-        // NOTE: This branch of condition should be removed when the support of the deprecated API
-        // is ended.
-        NX_INFO(this, "Warning: got request using deprecated API");
-        url = nx::utils::Url::fromText(startIpStr);
-        if (!url.isValid() || url.host().isEmpty())
+        // NOTE: This branch of the condition should be removed when the support of the deprecated
+        // API is ended.
+        NX_WARNING(this, "Got the request using the deprecated API");
+        *outUrl = nx::utils::url::parseUrlFields(startIpStr);
+        if (!outUrl->isValid() || outUrl->host().isEmpty())
         {
-            result.setError(QnRestResult::InvalidParameter,
+            result->setError(QnRestResult::InvalidParameter,
                 lm("Invalid value '%1' for parameter '%2'").args(startIpStr, kStartIpParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
     }
     else
     {
-        result.setError(QnRestResult::InvalidParameter);
+        result->setError(QnRestResult::InvalidParameter);
         return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (!portStr.isEmpty())
     {
         bool ok;
-        int port = portStr.toUShort(&ok);
+        const int port = portStr.toUShort(&ok);
         if (!ok)
         {
-            result.setError(QnRestResult::InvalidParameter, lm("Invalid value for parameter '%1'")
+            result->setError(QnRestResult::InvalidParameter, lm("Invalid value for parameter '%1'")
                 .args(kPortParam));
             return nx::network::http::StatusCode::unprocessableEntity;
         }
-        url.setPort(port);
+        outUrl->setPort(port);
     }
 
     const auto userStr = params.value(kUserParam);
     const auto passwordStr = params.value(kPasswordParam);
     if (!userStr.isEmpty() || !passwordStr.isEmpty())
     {
-        url.setUserName(userStr);
-        url.setPassword(passwordStr);
+        outUrl->setUserName(userStr);
+        outUrl->setPassword(passwordStr);
     }
     return nx::network::http::StatusCode::ok;
 }
@@ -148,12 +155,11 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    NX_DEBUG(this, lm("Start searching new cameras"));
+    NX_DEBUG(this, lm("Start searching for new cameras"));
 
     nx::utils::Url url;
     std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>> ipRange;
-
-    const auto returnCode = extractSearchStartParams(result, params, url, ipRange);
+    const auto returnCode = extractSearchStartParams(&result, params, &url, &ipRange);
     if (returnCode != nx::network::http::StatusCode::ok)
         return returnCode;
 
@@ -276,7 +282,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     std::vector<QnManualCameraInfo> cameraList;
     for (const auto& camera: data.cameras)
     {
-        const auto url = nx::utils::Url::fromText(camera.url);
+        const auto url = nx::utils::url::parseUrlFields(camera.url);
         QnManualCameraInfo info(url, auth, camera.manufacturer, camera.uniqueId);
         if (info.resType.isNull())
         {

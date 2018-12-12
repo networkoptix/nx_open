@@ -876,7 +876,7 @@ void EventRibbon::Private::updateHighlightedTiles()
     const auto shouldHighlightTile =
         [this](int index) -> bool
         {
-            if (m_highlightedTimestamp <= 0ms)
+            if (m_highlightedTimestamp <= 0ms || m_highlightedResources.empty())
                 return false;
 
             const auto modelIndex = m_model->index(index);
@@ -886,6 +886,13 @@ void EventRibbon::Private::updateHighlightedTiles()
 
             const auto duration = modelIndex.data(Qn::DurationRole).value<microseconds>();
             if (duration <= 0us)
+                return false;
+
+            const auto isHighlightedResource =
+                [this](const QnResourcePtr& res) { return m_highlightedResources.contains(res); };
+
+            const auto resources = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>();
+            if (std::none_of(resources.cbegin(), resources.cend(), isHighlightedResource))
                 return false;
 
             return m_highlightedTimestamp >= timestamp
@@ -930,6 +937,20 @@ void EventRibbon::Private::setHighlightedTimestamp(microseconds value)
     updateHighlightedTiles();
 }
 
+QSet<QnResourcePtr> EventRibbon::Private::highlightedResources() const
+{
+    return m_highlightedResources;
+}
+
+void EventRibbon::Private::setHighlightedResources(const QSet<QnResourcePtr>& value)
+{
+    if (m_highlightedResources == value)
+        return;
+
+    m_highlightedResources = value;
+    updateHighlightedTiles();
+}
+
 bool EventRibbon::Private::live() const
 {
     return m_live;
@@ -955,6 +976,25 @@ void EventRibbon::Private::setViewportMargins(int top, int bottom)
 
     m_topMargin = top;
     m_bottomMargin = bottom;
+
+    updateView();
+}
+
+QWidget* EventRibbon::Private::viewportHeader() const
+{
+    return m_viewportHeader.data();
+}
+
+void EventRibbon::Private::setViewportHeader(QWidget* value)
+{
+    if (m_viewportHeader == value)
+        return;
+
+    delete m_viewportHeader;
+    m_viewportHeader = value;
+
+    if (m_viewportHeader)
+        m_viewportHeader->setParent(m_viewport.get());
 
     updateView();
 }
@@ -1006,6 +1046,17 @@ void EventRibbon::Private::doUpdateView()
         firstIndexToUpdate = qMin(firstIndexToUpdate, m_currentShifts.begin().key());
 
     int currentPosition = m_topMargin;
+    if (m_viewportHeader)
+    {
+        const int headerWidth = m_viewport->width();
+        const int headerHeight = m_viewportHeader->hasHeightForWidth()
+            ? m_viewportHeader->heightForWidth(headerWidth)
+            : m_viewportHeader->sizeHint().height();
+
+        m_viewportHeader->setGeometry(0, m_topMargin, headerWidth, headerHeight);
+        currentPosition += m_viewportHeader->height();
+    }
+
     if (firstIndexToUpdate > 0)
     {
         const auto& prevTile = m_tiles[firstIndexToUpdate - 1];

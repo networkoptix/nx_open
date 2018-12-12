@@ -118,28 +118,6 @@ StrictResolution strictResolutionList[] =
 
 } // namespace
 
-/**
- * Serialization for Soap response for future use in SOAP logger (4.1). Example:
- * _onvifDevice__GetCapabilitiesResponse response;
- * QString R = serializeSoapResponse(soap_write__onvifDevice__GetCapabilitiesResponse, response);
- */
-template<class F, class Response>
-QString serializeSoapResponse(F f, const Response& response)
-{
-    soap *soap = soap_new();
-
-    std::stringstream ss;
-    soap->os = &ss;
-    f(soap, &response);
-    soap->os = NULL;
-
-    soap_destroy(soap);
-    soap_end(soap);
-    soap_free(soap);
-
-    return QString::fromStdString(ss.str());
-}
-
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
@@ -1147,14 +1125,14 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     int soapRes = soapWrapper.getDeviceInformation(request, response);
     if (soapRes != SOAP_OK)
     {
-        NX_DEBUG(NX_SCOPE_TAG, QString("%1(): GetDeviceInformation failed. %2 (%3)"), __func__,
-            soapRes, soapWrapper.getLastErrorDescription());
+        NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapFailMessage(
+            soapWrapper, "GetDeviceInformation", soapRes));
 
         if (soapWrapper.lastErrorIsNotAuthenticated())
             return CameraDiagnostics::NotAuthorisedResult(onvifUrl);
 
         return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getDeviceInformation"), soapWrapper.getLastErrorDescription());
+            "getDeviceInformation", soapWrapper.getLastErrorDescription());
     }
     else
     {
@@ -1179,8 +1157,8 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     if (soapRes != SOAP_OK)
     {
         // TODO: debug output should be revised in 4.1.
-        NX_DEBUG(NX_SCOPE_TAG, QString("%1(): GetNetworkInterfaces failed. %2 (%3)"), __func__,
-            soapRes, soapWrapper.getLastErrorDescription());
+        NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapFailMessage(
+            soapWrapper, "GetNetworkInterfaces", soapRes));
     }
     else
     {
@@ -1580,24 +1558,24 @@ int QnPlOnvifResource::calcTimeDrift(
     if (outSoapRes)
         *outSoapRes = soapRes;
 
-    static const QString requestCommand("GetSystemDateAndTime");
+    static const QString kRequestCommand("GetSystemDateAndTime");
     if (soapRes != SOAP_OK)
     {
         NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapFailMessage(
-            soapWrapper, __func__, requestCommand, soapRes));
+            soapWrapper, kRequestCommand, soapRes));
 
         return 0;
     }
     if (!response.SystemDateAndTime)
     {
         NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapNoParameterMessage(
-            soapWrapper, "SystemDateAndTime", __func__, requestCommand));
+            soapWrapper, "SystemDateAndTime", __func__, kRequestCommand));
         return 0;
     }
     if (!response.SystemDateAndTime->UTCDateTime)
     {
         NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapNoParameterMessage(
-            soapWrapper, "SystemDateAndTime->UTCDateTime", __func__, requestCommand));
+            soapWrapper, "SystemDateAndTime->UTCDateTime", __func__, kRequestCommand));
         return 0;
     }
 
@@ -1608,14 +1586,14 @@ int QnPlOnvifResource::calcTimeDrift(
     if (!date)
     {
         NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapNoParameterMessage(
-            soapWrapper, "SystemDateAndTime->UTCDateTime->Date", __func__, requestCommand));
+            soapWrapper, "SystemDateAndTime->UTCDateTime->Date", __func__, kRequestCommand));
         return 0;
     }
     onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
     if (!time)
     {
         NX_DEBUG(NX_SCOPE_TAG, makeStaticSoapNoParameterMessage(
-            soapWrapper, "SystemDateAndTime->UTCDateTime->Time", __func__, requestCommand));
+            soapWrapper, "SystemDateAndTime->UTCDateTime->Time", __func__, kRequestCommand));
         return 0;
     }
 
@@ -2593,8 +2571,8 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
                     break;
                 default:
                     const QString errorMessage =
-                        makeFailMessage("Unknown codec type. Codec type enum number = %1").
-                        arg(QString::number((int) curOpts->Encoding));
+                        makeFailMessage("Unknown codec type. Codec type enum number = %1")
+                        .arg(QString::number((int) curOpts->Encoding));
 
                     NX_DEBUG(this, errorMessage);
                     break;
@@ -2739,25 +2717,25 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
 {
     AudioConfigsReq request;
     AudioConfigsResp response;
-    static const QString requestCommand("GetAudioEncoderConfigurations");
+    static const QString kRequestCommand("GetAudioEncoderConfigurations");
 
     int soapRes = soapWrapper.getAudioEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK)
     {
         NX_DEBUG(this, makeSoapFailMessage(
-            soapWrapper, __func__, requestCommand, soapRes));
+            soapWrapper, __func__, kRequestCommand, soapRes));
         return false;
     }
     else
     {
         NX_VERBOSE(this, makeSoapSuccessMessage(
-            soapWrapper, __func__, requestCommand));
+            soapWrapper, __func__, kRequestCommand));
     }
 
     if (response.Configurations.empty())
     {
         NX_DEBUG(this, makeSoapNoParameterMessage(
-            soapWrapper, "configurations", __func__, requestCommand));
+            soapWrapper, "configurations", __func__, kRequestCommand));
 
         return false;
     }
@@ -2775,7 +2753,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
         else
         {
             NX_DEBUG(this, makeSoapNoRangeParameterMessage(
-                soapWrapper, "configurations", getChannel(), __func__, requestCommand));
+                soapWrapper, "configurations", getChannel(), __func__, kRequestCommand));
             return false;
         }
     }
@@ -2829,12 +2807,12 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEnc
     _onvifMedia__GetVideoSources request;
     _onvifMedia__GetVideoSourcesResponse response;
     int soapRes = soapWrapper.getVideoSources(request, response);
-    static const QString requestCommand("GetVideoSources");
+    static const QString kRequestCommand("GetVideoSources");
 
     if (soapRes != SOAP_OK)
     {
         NX_DEBUG(this, makeSoapFailMessage(
-            soapWrapper, __func__, requestCommand, soapRes));
+            soapWrapper, __func__, kRequestCommand, soapRes));
 
         if (soapWrapper.lastErrorIsNotAuthenticated())
             return CameraDiagnostics::NotAuthorisedResult(getMediaUrl());
@@ -2844,7 +2822,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEnc
     }
     else
     {
-        NX_VERBOSE(this, makeSoapSuccessMessage(soapWrapper, __func__, requestCommand));
+        NX_VERBOSE(this, makeSoapSuccessMessage(soapWrapper, __func__, kRequestCommand));
     }
 
     m_maxChannels = (int) response.VideoSources.size();
@@ -2854,7 +2832,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEnc
     {
         const QString errorMessage = makeSoapSmallRangeMessage(
             soapWrapper, "VideoSources", m_maxChannels, thisChannelNumber + 1,
-            __func__, requestCommand);
+            __func__, kRequestCommand);
         NX_DEBUG(this, errorMessage);
         return CameraDiagnostics::RequestFailedResult("getVideoSources", errorMessage);
     }
@@ -2864,7 +2842,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEnc
     if (!conf)
     {
         const QString errorMessage = makeSoapNoRangeParameterMessage(
-            soapWrapper, "VideoSources", thisChannelNumber, __func__, requestCommand);
+            soapWrapper, "VideoSources", thisChannelNumber, __func__, kRequestCommand);
         NX_DEBUG(this, errorMessage);
         return CameraDiagnostics::RequestFailedResult("getVideoSources", errorMessage);
     }
@@ -3023,20 +3001,20 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     MediaSoapWrapper soapWrapper(this);
     AudioSrcConfigsReq request;
     AudioSrcConfigsResp response;
-    static const QString requestCommand("GetAudioSourceConfigurations");
+    static const QString kRequestCommand("GetAudioSourceConfigurations");
 
     int soapRes = soapWrapper.getAudioSourceConfigurations(request, response);
     if (soapRes != SOAP_OK)
     {
         NX_DEBUG(this, makeSoapFailMessage(
-            soapWrapper, __func__, requestCommand, soapRes));
+            soapWrapper, __func__, kRequestCommand, soapRes));
 
         return CameraDiagnostics::RequestFailedResult(
             QLatin1String("getAudioSourceConfigurations"), soapWrapper.getLastErrorDescription());
     }
     else
     {
-        NX_VERBOSE(this, makeSoapSuccessMessage(soapWrapper, __func__, requestCommand));
+        NX_VERBOSE(this, makeSoapSuccessMessage(soapWrapper, __func__, kRequestCommand));
     }
 
     const int thisChannelNumber = getChannel();
@@ -3046,7 +3024,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     {
         const QString errorMessage = makeSoapSmallRangeMessage(
             soapWrapper, "Configurations", channelCount, thisChannelNumber,
-            __func__, requestCommand);
+            __func__, kRequestCommand);
         NX_DEBUG(this, errorMessage);
 
         return CameraDiagnostics::RequestFailedResult(
@@ -3058,7 +3036,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     {
         const QString errorMessage = makeSoapNoRangeParameterMessage(
             soapWrapper, "Configurations", thisChannelNumber,
-            __func__, requestCommand);
+            __func__, kRequestCommand);
         NX_DEBUG(this, errorMessage);
         return CameraDiagnostics::RequestFailedResult(
             "getAudioSourceConfigurations", errorMessage);
@@ -3619,6 +3597,9 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
     quint64 renewSubscriptionTimerIDBak = 0;
     {
         QnMutexLocker lk(&m_ioPortMutex);
+        if (!m_inputMonitored)
+            return;
+
         m_inputMonitored = false;
         nextPullMessagesTimerIDBak = m_nextPullMessagesTimerID;
         m_nextPullMessagesTimerID = 0;
@@ -3626,7 +3607,6 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
         m_renewSubscriptionTimerID = 0;
     }
 
-    //removing timer
     if (nextPullMessagesTimerIDBak > 0)
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
     if (renewSubscriptionTimerIDBak > 0)
@@ -4433,16 +4413,14 @@ QString QnPlOnvifResource::makeSoapSmallRangeMessage(BaseSoapWrapper& soapWrappe
 }
 
 QString QnPlOnvifResource::makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
-    const QString& caller, const QString& requestCommand,
-    int soapError, const QString& text /*= QString()*/)
+    const QString& requestCommand, int soapError, const QString& text /*= QString()*/)
 {
     static const QString kSoapErrorMessagePattern =
-        "SOAP request failed. %1 Caller = %2(), url = %3, request command = %4"
+        "SOAP request failed. %1 url = %3, request command = %4"
         ", error = %5 (\"%6\")";
 
-    return kSoapErrorMessagePattern.arg(text, caller,
-        soapWrapper.endpoint(), requestCommand, QString::number(soapError),
-        soapWrapper.getLastErrorDescription());
+    return kSoapErrorMessagePattern.arg(text, soapWrapper.endpoint(), requestCommand,
+        QString::number(soapError), soapWrapper.getLastErrorDescription());
 }
 
 QString QnPlOnvifResource::makeStaticSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
@@ -4468,11 +4446,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchOnvifCapabilities(
 {
     _onvifDevice__GetCapabilities request;
     int soapRes = soapWrapper.getCapabilities(request, *response);
-
-    // R is used for test purposes in 4.0.
-    // TODO: make response logging in 4.1.
-    QString R = serializeSoapResponse(soap_write__onvifDevice__GetCapabilitiesResponse, *response);
-    NX_ASSERT(!R.isEmpty());
 
     if (soapRes != SOAP_OK)
     {

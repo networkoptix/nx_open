@@ -7,6 +7,7 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/placeholder_binder.h>
+#include <nx/sdk/common/to_string.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -126,7 +127,7 @@ QString ManifestLogger::buildLogString(const QString& error) const
 
 StartupPluginManifestLogger::StartupPluginManifestLogger(
     nx::utils::log::Tag logTag,
-    const nx::sdk::analytics::Plugin* plugin)
+    const nx::sdk::analytics::IPlugin* plugin)
     :
     m_logTag(std::move(logTag)),
     m_plugin(plugin)
@@ -152,9 +153,8 @@ void StartupPluginManifestLogger::log(
 
     if (error != nx::sdk::Error::noError)
     {
-        NX_WARNING(
-            m_logTag,
-            buildLogString(customError.isEmpty() ? nx::sdk::toString(error) : customError));
+        NX_WARNING(m_logTag, buildLogString(
+            customError.isEmpty() ? nx::sdk::toString(error) : customError));
     }
 }
 

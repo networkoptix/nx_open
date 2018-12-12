@@ -5,17 +5,17 @@
 namespace nx::vms::server::analytics {
 
 /**
- * Wrapper for nx::sdk::analytics::DataPacket into internal VMS data packet.
+ * Wrapper for nx::sdk::analytics::IDataPacket into internal VMS data packet.
  */
 class DataPacketAdapter: public QnAbstractDataPacket
 {
 public:
-    DataPacketAdapter(nx::sdk::analytics::DataPacket* packet): m_packet(packet) {}
-    nx::sdk::analytics::DataPacket* packet() { return m_packet.get(); }
-    const nx::sdk::analytics::DataPacket* packet() const { return m_packet.get(); }
+    DataPacketAdapter(nx::sdk::analytics::IDataPacket* packet): m_packet(packet) {}
+    nx::sdk::analytics::IDataPacket* packet() { return m_packet.get(); }
+    const nx::sdk::analytics::IDataPacket* packet() const { return m_packet.get(); }
 
 private:
-    nxpt::ScopedRef<nx::sdk::analytics::DataPacket> m_packet;
+    nxpt::ScopedRef<nx::sdk::analytics::IDataPacket> m_packet;
 };
 
 } // namespace nx::vms::server::analytics

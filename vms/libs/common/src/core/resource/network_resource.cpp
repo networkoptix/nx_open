@@ -136,6 +136,7 @@ QAuthenticator QnNetworkResource::getAuth() const
     QString value = getProperty(ResourcePropertyKey::kCredentials);
     if (value.isNull())
         value = getProperty(ResourcePropertyKey::kDefaultCredentials);
+
     return getAuthInternal(value);
 }
 

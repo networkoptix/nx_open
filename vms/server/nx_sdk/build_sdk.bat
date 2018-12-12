@@ -2,7 +2,7 @@
 set SDK_NAME=nx_sdk
 set TARGET_DIR=%SDK_NAME%
 set SERVER_PLUGINS_DIR=..\plugins\device
-set NX_SDK_DIR=..\..\..\nxlib\nx_sdk
+set NX_SDK_DIR=..\..\..\libs\nx_sdk
 
 rmdir /S /Q %TARGET_DIR%
 
