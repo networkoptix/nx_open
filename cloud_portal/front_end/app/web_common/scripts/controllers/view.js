@@ -14,6 +14,10 @@
                 const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
                 
+                const ROUTE_CAMERA_ID = $routeParams.cameraId ?
+                    '{' + $routeParams.cameraId + '}' :
+                    undefined;
+                
                 var channels = {
                     Auto: 'lo',
                     High: 'hi',
@@ -37,13 +41,13 @@
                 
                 $scope.canViewArchive = false;
                 $scope.searchCams = '';
-                $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId || null;
+                $scope.storage.cameraId = ROUTE_CAMERA_ID || $scope.storage.cameraId || null;
                 
                 $scope.isWebAdmin = CONFIG.webadminSystemApiCompatibility;
                 $scope.cameraLinks = {enabled: $location.search().cameraLinks};
                 $scope.voiceControls = {enabled: false, showCommands: false};
                 
-                if (!$routeParams.cameraId && $scope.storage.cameraId) {
+                if (!ROUTE_CAMERA_ID && $scope.storage.cameraId) {
                     systemAPI.setCameraPath($scope.storage.cameraId);
                 }
                 
@@ -201,17 +205,8 @@
                 };
                 
                 function updateVideoSource(playingPosition) {
-                    
                     // clear preview for next camera
                     $scope.preview = '';
-                    
-                    if (!$scope.activeCamera ||
-                        $scope.activeCamera.status === 'Unauthorized') {
-                        
-                        $scope.activeVideoSource = {src: ''};
-                        
-                        return;
-                    }
                     
                     var salt = '&' + Math.random(),
                         cameraId = $scope.activeCamera.id,
@@ -614,7 +609,7 @@
                 });
                 
                 $window.resize(updateHeights);
-                window.addEventListener("orientationchange", $timeout(updateHeights, 200));
+                window.addEventListener('orientationchange', $timeout(updateHeights, 200));
                 
                 $scope.mobileAppAlertClose = function () {
                     $scope.session.mobileAppNotified = true;
@@ -624,7 +619,11 @@
                 var killSubscription = $rootScope.$on('$routeChangeStart', function (event, next) {
                     timeFromUrl = $location.search().time;
                     
-                    $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+                    if (next.params.cameraId) {
+                        $scope.storage.cameraId = '{' + next.params.cameraId + '}';
+                        $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+                        $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
+                    }
                 });
                 
                 $('html').addClass('webclient-page');

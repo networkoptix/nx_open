@@ -90,6 +90,7 @@
         "node-sass": "4.9.3",
         "optimize-js-plugin": "0.0.4",
         "postcss-loader": "2.1.6",
+        "prettier": "^1.15.3",
         "raw-loader": "0.5.1",
         "sass-loader": "7.1.0",
         "sass-rem": "2.0.1",
@@ -113,7 +114,20 @@
         "webpack-dev-server": "2.11.2",
         "webpack-hot-middleware": "2.22.3",
         "webpack-inline-manifest-plugin": "4.0.1",
-        "webpack-merge": "4.1.4"
+        "webpack-merge": "4.1.4",
+        "jasmine": "~3.3.0",
+        "jasmine-core": "~3.3.0",
+        "karma-jasmine": "~2.0.1",
+        "karma-coverage": "~1.1.2",
+        "karma-jasmine-html-reporter": "~1.4.0",
+        "karma-chrome-launcher": "~2.2.0",
+        "karma": "~3.1.3",
+        "karma-sourcemap-loader": "~0.3.7",
+        "karma-webpack": "~3.0.5",
+        "istanbul-instrumenter-loader": "~3.0.1",
+        "karma-coverage-istanbul-reporter": "~2.0.4",
+        "karma-mocha-reporter": "~2.2.5",
+        "karma-remap-coverage": "~0.1.5"
     },
     "engines": {
         "node": ">=7.10.0"
@@ -123,11 +137,12 @@
         "setupTestFrameworkScriptFile": "<rootDir>/src/setupJest.ts"
     },
     "scripts": {
-        "serve": "npm run update-lang; webpack-dev-server --config webpack.dev.js --open --hot --inline",
-        "build": "npm run update-lang; webpack --config webpack.prod.js --progress --profile --bail",
+        "serve": "npm run update-lang; webpack-dev-server --config webpack.dev.js --open --hot --inline --compress",
+        "build": "jest || exit 1; npm run update-lang; webpack --config webpack.prod.js --progress --profile --bail",
         "setSkin": "node setSkin.js --skin",
         "update-lang": "ngx-translate-extract -i ./app/src -o ./app/language_i18n.json --clean --sort --format json",
         "test": "jest",
-        "test:watch": "jest --watch"
+        "test:watch": "jest --watch",
+        "test:coverage": "karma start karma.conf.js --single-run"
     }
 }

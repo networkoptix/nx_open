@@ -1,5 +1,5 @@
+#Get the Ubuntu image to install nx witness on
 FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
-MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 COPY stage/mediaserver /opt/networkoptix/mediaserver
 

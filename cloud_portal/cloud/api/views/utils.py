@@ -18,15 +18,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_public_downloads_status():
-    res = DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
+    return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
         find_actual_value(product=get_cloud_portal_product())
-    return res == 'on'
 
 
 def get_public_release_history_status():
-    res = DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
+    return DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
         find_actual_value(product=get_cloud_portal_product())
-    return res == 'on'
 
 
 @api_view(['GET', 'POST'])
@@ -216,6 +214,16 @@ def downloads(request):
         global_cache.set(cache_key, json.dumps(downloads_json))
     else:
         downloads_json = json.loads(downloads_json)
+
+    # Remove platforms that are not marked as available.
+    available_platforms = DataStructure.objects.get(name='%AVAILABLE_DOWNLOADS_PLATFORM%').\
+        find_actual_value(get_cloud_portal_product())
+    platforms = []
+    for platform in downloads_json['platforms']:
+        if platform['name'] in available_platforms:
+            platforms.append(platform)
+
+    downloads_json['platforms'] = platforms
     return Response(downloads_json)
 
 

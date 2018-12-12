@@ -10,7 +10,7 @@ import base64
 from api.account_backend import AccountBackend
 from api.models import Account
 from cms.models import Customization, Product, UserGroupsToProductPermissions
-from notifications import api
+from notifications import notifications_api
 
 User = get_user_model()
 
@@ -107,6 +107,6 @@ class UserInviteFrom(forms.Form):
         user.save()
         # Password in the encoded email doesnt matter its just a place holder.
         encode_email = base64.b64encode("password:{}".format(email))
-        api.send(email, 'cloud_invite', {"message": message, "code": encode_email}, customization)
+        notifications_api.send(email, 'cloud_invite', {"message": message, "code": encode_email}, customization)
 
         return user.id

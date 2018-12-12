@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
 from cms.models import Customization
+from api.models import Account
 
 #When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
 #This allows cloud notifications to run locally without changing settings to use sqs.
@@ -36,10 +37,12 @@ class Event(models.Model):
 
         subscriptions = subscriptions.filter(Q(enabled=True) | Q(enabled=1))
         # 2. For each subscription create a message and send it
-        for user in subscriptions.all():
+        for subscription in subscriptions.all():
+            user = Account.objects.get(email=subscription.user_email)
+            self.data['userFullName'] = user.get_full_name()
             message = Message(
                 message=self.data,
-                user_email=user.user_email,
+                user_email=user.email,
                 type=self.type,
                 event=self
             )

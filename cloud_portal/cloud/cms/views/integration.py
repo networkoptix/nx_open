@@ -69,6 +69,11 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
                 if context_dict:
                     integration_dict[context_name] = context_dict
+                    if context.name == "Download Files":
+                        downloads_order = {}
+                        for datastructure in context.datastructure_set.all():
+                            downloads_order[datastructure.name] = datastructure.order
+                        integration_dict[context_name+'Order'] = downloads_order
 
             if not integration_dict:
                 continue

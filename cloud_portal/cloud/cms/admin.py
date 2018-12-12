@@ -153,7 +153,7 @@ class ProductAdmin(CMSAdmin):
     product_settings.allow_tags = True
 
     def edit_product(self, obj):
-        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit contexts</a>',
+        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit content</a>',
                            reverse('admin:cms_contextproxy_changelist'), obj.id)
 
     edit_product.short_description = 'Edit page'
@@ -179,7 +179,7 @@ class ContextProxyAdmin(CMSAdmin):
         extra_context = extra_context or {}
         if request.method == "POST" and 'product_id' in request.POST:
             extra_context['preview_link'] = page_editor(request)
-            if 'SendReview' in request.POST:
+            if 'SendReview' in request.POST and extra_context['preview_link']:
                 return redirect(extra_context['preview_link'].url)
 
         extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)

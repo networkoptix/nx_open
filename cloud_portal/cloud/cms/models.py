@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import os
 import re
 from datetime import datetime
+from distutils.util import strtobool
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
@@ -114,7 +115,8 @@ class Customization(models.Model):
                                                  help_text="""Any user can view the release history page.""")
     public_downloads = models.BooleanField(default=True, help_text="""Any user can view the downloads page.""")
 
-    parent = models.ForeignKey('Customization', default=None, null=True, related_name='children_customizations',
+    parent = models.ForeignKey('Customization', default=None, null=True, blank=True,
+                               related_name='children_customizations',
                                help_text="""Parent is the customization that the current customization depends on.<br>
                                The main purpose is to control how the integration review process works.
                                <br><br>
@@ -406,8 +408,12 @@ class DataStructure(models.Model):
                                   self.optional and self.type in [DataStructure.DATA_TYPES.file,
                                                                   DataStructure.DATA_TYPES.image,
                                                                   DataStructure.DATA_TYPES.external_file,
-                                                                  DataStructure.DATA_TYPES.external_image]):
+                                                                  DataStructure.DATA_TYPES.external_image,
+                                                                  DataStructure.DATA_TYPES.check_box]):
             content_value = self.default
+
+        if self.type == DataStructure.DATA_TYPES.check_box:
+            content_value = strtobool(content_value) == 1
 
         return content_value
 
@@ -557,7 +563,7 @@ class DataRecord(models.Model):
     product = models.ForeignKey(Product, default=None, null=True)
     language = models.ForeignKey(Language, null=True, blank=True)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, null=True)
+    customization = models.ForeignKey(Customization, default=None, blank=True, null=True)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
@@ -566,7 +572,7 @@ class DataRecord(models.Model):
         blank=True, related_name='created_%(class)s')
 
     value = models.TextField(default='', blank=True)
-    external_file = models.ForeignKey(ExternalFile, default=None, null=True)
+    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True)
 
     def __str__(self):
         return self.value

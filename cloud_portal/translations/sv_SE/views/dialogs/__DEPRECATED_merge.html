@@ -3,10 +3,10 @@
         <div class="modal-body">
             <div>
                 <p class="help-block-no-height">
-                    You can merge cloud Systems, where you are owner.
+                    Du kan sammanfoga cloud system, där du är ägare.
                 </p>
                 <p class="help-block-no-height">
-                    Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.
+                    Anslut system du vill slå samman med denna till %PRODUCT_NAME% eller slå samman lokalt med %VMS_NAME% klient.
                 </p>
             </div>
         </div>
@@ -17,18 +17,18 @@
     <form ng-if="showMergeForm" name="mergeForm" novalidate>
         <div class="modal-body">
             <div class="form-group">
-                <label for="system">Merge current System with</label>
+                <label for="system"> Slå samman aktuellt system med </label>
                 <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>
             <p ng-if="systemMergeable =='offline'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is offline. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">Systemet {{targetSystem.name}} är offline. Kan inte slås samman med den nuvarande.</p>
             <p ng-if="systemMergeable =='cannotMerge'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is incompatible. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">System {{targetSystem.name}} är inkompatibelt. Kan inte slås samman med den nuvarande.</p>
             <p ng-if="systemMergeable == ''"
-               class="help-block-no-height">You can only merge Systems in which you have owner permissions.</p>
+               class="help-block-no-height">Du kan bara slå samman system där du har ägarbehörigheter.</p>
             <div>
-                <div ng-class="{'text-muted': systemStatus != ''}">Took system name and settings from</div>
+                <div ng-class="{'text-muted': systemStatus != ''}">Tog systemnamn och inställningar från</div>
                 <div ng-init="$parent.masterSystemId=system.id">
                     <div>
                         <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id"

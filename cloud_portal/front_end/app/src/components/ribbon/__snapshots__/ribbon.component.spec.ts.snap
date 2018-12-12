@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NxRibbonComponent renders correctly 1`] = `
+<nx-ribbon
+  action={[Function String]}
+  actionUrl={[Function String]}
+  message={[Function String]}
+  ribbonService={[Function NxRibbonService]}
+  showRibbon={[Function Boolean]}
+>
+  <div
+    class="clearfix ribbon"
+  >
+    <div
+      class="message"
+    >
+      Alcohol! Because no great story started with someone eating a salad.
+    </div>
+    <div
+      class="action"
+    >
+      <a
+        href="/admin/cms/product/"
+      >
+        Go back
+      </a>
+    </div>
+  </div>
+</nx-ribbon>
+`;

@@ -9,12 +9,12 @@
                    class="form-control"
                    ng-model="search.value"
                    ng-model-options="{ updateOn: 'default', debounce: 500 }"
-                   placeholder="Search" >
+                   placeholder="Sök" >
         </div>
     </div>
 
     <div ng-if="systems.length" >
-        <h1 class="p-0">{{search.value && filtered.length}}&nbsp;<span translate>Systems</span>&nbsp;{{search.value && 'found'}}</h1>
+        <h1 class="p-0">{{search.value && filtered.length}}&nbsp;<span translate> System </span>&nbsp;{{search.value && 'found'}}</h1>
         <div class="row">
             <div ng-repeat="system in systems | filter:searchSystems as filtered track by system.id" class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-3 mb-lg-0 system-button">
                 <div class="card card-condensed hoverable">

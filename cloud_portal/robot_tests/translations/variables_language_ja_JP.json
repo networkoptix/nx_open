@@ -53,6 +53,7 @@
     "ABOUT": "について",
     "KNOWN LIMITATIONS": "既知の制限事項",
     "SUPPORT": "サポート",
+    "REMOTE CONNECTIVITY": "リモート接続",
     "TERMS": "利用規約",
     "PRIVACY": "プライバシー",
     "COPYRIGHT": "著作権",
@@ -85,6 +86,6 @@
     "PASSWORD TOO COMMON BADGE TEXT": "あまりにも一般的",
     "PASSWORD IS WEAK BADGE TEXT": "弱",
     "PASSWORD IS FAIR BADGE TEXT": "可",
-    "PASSWORD IS GOOD BADGE TEXT": "良好",
+    "PASSWORD IS GOOD BADGE TEXT": "良い",
     "PASSWORD INCORRECT BADGE TEXT": "無効"
 }

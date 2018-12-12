@@ -113,7 +113,7 @@ def context_editor_action(request, product, context_id, language_code):
             if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 preview_link = modify_db.generate_preview_link(context)
 
-    return preview_link
+    return preview_link, upload_errors
 
 
 # Create your views here.
@@ -127,9 +127,9 @@ def page_editor(request):
     if not request.user.has_perm('cms.edit_content'):
         raise PermissionDenied
 
-    preview_link = context_editor_action(request, product, context_id, language_code)
+    preview_link, errors = context_editor_action(request, product, context_id, language_code)
 
-    if 'SendReview' in request.POST:
+    if 'SendReview' in request.POST and not errors:
         customization_review = ProductCustomizationReview.objects.\
             filter(version_id=ContentVersion.objects.latest('created_date'))
 

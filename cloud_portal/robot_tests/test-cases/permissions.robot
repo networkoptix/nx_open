@@ -70,6 +70,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Share button - opens dialog
+    [tags]    C41888
     Log in to Auto Tests System    ${email}
     Wait Until Elements Are Visible    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -96,6 +97,7 @@ Sharing link for anonymous - first ask login, then show share dialog
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 After closing dialog, called by link - clear link
+    [tags]    C41888
     Set Window Size    1920    1080
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
@@ -149,10 +151,10 @@ displays pencil and cross links for each user only on hover
     Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[contains(text(),'${DELETE USER BUTTON TEXT}')]
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[contains(text(),'${DELETE USER BUTTON TEXT}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Remove User Permissions    ${random email}
 
@@ -242,7 +244,7 @@ Delete user works
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
 Share with registered user - sends him notification
-    [tags]    email
+    [tags]    email    C41888
     #log in as noperm to check language and change its language to the current testing language
     #otherwise it may receive the notification in another language and fail the email subject comparison
     Log In    ${EMAIL NOPERM}    ${password}
@@ -262,7 +264,7 @@ Share with registered user - sends him notification
     Remove User Permissions    ${EMAIL NOPERM}
 
 Share with unregistered user - brings them to registration page with code with correct email locked
-    [tags]    email
+    [tags]    email    C41889
     ${random email}    Get Random Email    ${BASE EMAIL}
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
@@ -275,3 +277,43 @@ Share with unregistered user - brings them to registration page with code with c
     Go To    ${link}
     Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
     Validate Log In
+
+Sharing system with a user who is already in the list updates their permissions
+    [tags]    C41892
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Log in to Auto Tests System    ${email}
+    Verify In System    Auto Tests
+    Share To    ${random email}    ${ADMIN TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
+    Share To    ${random email}    ${VIEWER TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${VIEWER TEXT}
+    Remove User Permissions    ${random email}
+
+Check share email for registered user
+    [tags]    C47297
+    #log in as noperm to check language and change its language to the current testing language
+    #otherwise it may receive the notification in another language and fail the email subject comparison
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Sleep    1
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${email}
+    Verify In System    Auto Tests
+    Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
+    ${email text}    Get Email Body    ${email}
+    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
+    ${links}    Get Links From Email    ${email}
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${OWNER EMAIL}
+    : FOR    ${link}  IN  @{links}
+    \    check in list    ${expected links}    ${link}
+    Delete Email    ${email}
+    Close Mailbox

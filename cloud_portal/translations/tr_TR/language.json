@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
     "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked": "Bu hesap geçici olarak kilitlendi.Lütfen bir süre sonra tekrar deneyin.",
+    "accountBlocked": "Bu hesap geçici olarak kilitlendi. Lütfen bir süre sonra tekrar deneyin.",
     "notFound": "Bulunamadı",
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",
@@ -137,13 +137,19 @@
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
     "thisSystem": "sistem",
-    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez."
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez"
   },
   "passwordRequirements": {
+    "good": "iyi",
+    "fair": "idare Eder",
+    "minLength": "çok kısa",
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",
+    "required": "yanlış",
     "requiredMessage": "Sadece alfanümerik ve klavye karakterleri kullanın",
+    "weak": "zayıf",
     "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage": "Güçlü parola!",
+    "common": "çok yaygın",
     "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz",
     "missingMessage": "Parola gerekmektedir"
   },
@@ -273,8 +279,8 @@
       "highStream": "Yüksek çözünürlük",
       "lowStream": "Düşük çözünürlük",
       "transcoding": "Dönüştürme",
-      "unknown": "Belirtilmemiş",
-      "copyToClipboard": "panoya yapıştır",
+      "unknown": "Bilinmeyen",
+      "copyToClipboard": "panoya kopyala",
       "copyDefaultText": "kopyala",
       "copyActiveText": "panoya kopyalandı"
     },
@@ -291,7 +297,7 @@
       "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
       "noFormat": "Bu tarayıcı bu kameradan video oynatmayı desteklemiyor.",
       "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
-      "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+      "ieWin10": "Lütfen Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
       "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
     },
     "searchCamPlaceholder": "Arama",
@@ -300,7 +306,7 @@
       "high": "Yüksek",
       "low": "Düşük"
     },
-    "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
+    "chromeCastWarning": "Chromecast kaynak kullanımını arttırabilir ve sunucunuzda sorunlara neden olabilir.",
     "voiceCommands": {
       "play": "oynat",
       "pause": "duraklat",

@@ -50,7 +50,10 @@ export class NxPermissionsDropdown implements OnInit {
         if (this.roles) {
             this.accessRoles = this.roles.filter((role) => {
                 if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
-                    role.optionLabel = this.language.lang.accessRoles[ role.name ].label || role.name;
+                    role.optionLabel = this.language.lang.accessRoles[ role.name ] ?
+                            this.language.lang.accessRoles[role.name].label :
+                            role.name;
+
                     return role;
                 }
 

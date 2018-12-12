@@ -6,7 +6,7 @@
     "emailSubject": "Resetovat heslo"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} vás zve na %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video systém {{message.system_name}} byl s vámi sdílen ({/ message.sharer_name}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} vás zve na %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video systém {{message.system_name}} byl s vámi sdílen{{/message.sharer_name}}"
   },
   "system_shared": {
     "emailSubject": "Byl s vámi sdílí video systém {{message.system_name}}"
