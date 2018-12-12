@@ -354,9 +354,9 @@ std::optional<int> DeviceAdditionDialog::port() const
         ? ui->knownAddressAutoPortCheckBox
         : ui->subnetScanAutoPortCheckBox;
 
-    return autoPortSpinBox->isChecked()
-        ? std::optional<int>()
-        : portSpinBox->value();
+    if (autoPortSpinBox->isChecked())
+        return std::nullopt;
+    return portSpinBox->value();
 }
 
 QString DeviceAdditionDialog::password() const

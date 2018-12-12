@@ -10,19 +10,13 @@
 #include <utils/common/connective.h>
 #include <nx/utils/collection.h>
 #include <nx/core/ptz/vector.h>
+#include <nx/utils/log/log.h>
 
 #include "threaded_ptz_controller.h"
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "core/resource/security_cam_resource.h"
-
-#define QN_TOUR_PTZ_EXECUTOR_DEBUG
-#ifdef QN_TOUR_PTZ_EXECUTOR_DEBUG
-#   define TRACE(...) qDebug() << "QnTourPtzExecutor:" << __VA_ARGS__;
-#else
-#   define TRACE(...)
-#endif
 
 using namespace nx::core;
 
@@ -185,20 +179,20 @@ void QnTourPtzExecutorPrivate::updateDefaults()
         || baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability);
 }
 
-void QnTourPtzExecutorPrivate::stopTour() {
-    TRACE("STOP TOUR" << data.tour.name);
-
+void QnTourPtzExecutorPrivate::stopTour()
+{
+    NX_VERBOSE(this, "Stop tour: %1", data.tour.name);
     state = Stopped;
 
     moveTimer.stop();
     waitTimer.stop();
 }
 
-void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour) {
+void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour)
+{
     stopTour();
 
-    TRACE("START TOUR" << tour.name);
-
+    NX_VERBOSE(this, "Start tour: %1", tour.name);
     data.tour = tour;
     data.tour.optimize();
     data.space = defaultSpace;
@@ -211,7 +205,8 @@ void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour) {
     startMoving();
 }
 
-void QnTourPtzExecutorPrivate::startMoving() {
+void QnTourPtzExecutorPrivate::startMoving()
+{
     if(state == Stopped) {
         index = 0;
         state = Entering;
@@ -228,8 +223,7 @@ void QnTourPtzExecutorPrivate::startMoving() {
         return; /* Invalid state. */
     }
 
-    TRACE("GO TO SPOT" << index);
-
+    NX_VERBOSE(this, "Go to spot: %1", index);
     spotTimer.restart();
 
     activateCurrentSpot();
@@ -237,8 +231,7 @@ void QnTourPtzExecutorPrivate::startMoving() {
 
     const QnPtzTourSpotData &spotData = currentSpotData();
     if(state == Moving && spotData.moveTime > pingTimeout) {
-        TRACE("ESTIMATED MOVE TIME" << spotData.moveTime << "MS");
-
+        NX_VERBOSE(this, "Estimated move time: %1 ms", spotData.moveTime);
         moveTimer.start(spotData.moveTime - pingTimeout, q);
         usingDefaultMoveTimer = false;
     } else {
@@ -247,7 +240,8 @@ void QnTourPtzExecutorPrivate::startMoving() {
     }
 }
 
-void QnTourPtzExecutorPrivate::processMoving() {
+void QnTourPtzExecutorPrivate::processMoving()
+{
     if(state != Entering && state != Moving)
         return;
 
@@ -268,8 +262,7 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const nx::core::ptz::V
     if(state != Entering && state != Moving)
         return;
 
-    TRACE("GOT POS" << position);
-
+    NX_VERBOSE(this, "Got position: %1", position);
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(lastPosition, position);
 
@@ -306,8 +299,7 @@ void QnTourPtzExecutorPrivate::startWaiting() {
 
     int waitTime = currentSpot().stayTime - qMin(0ll, spotTimer.elapsed() - currentSpotData().moveTime);
     if(waitTime > 0) {
-        TRACE("WAIT FOR" << waitTime << "MS");
-
+        NX_VERBOSE(this, "Wait for: %1 ms", waitTime);
         waitTimer.start(waitTime, q);
     } else {
         processWaiting();

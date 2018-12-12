@@ -4,4 +4,4 @@ get_time_of_servers_version=2
 camera_auth_server_side_encryption=1
 set_camera_param_post=1
 primaryTimeServerDefinesInternetTimeSync=1
-
+restartMethodVersion=2
