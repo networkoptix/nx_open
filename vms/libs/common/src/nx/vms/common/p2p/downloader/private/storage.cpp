@@ -32,13 +32,11 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     const auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
     timer->start(kCleanupPeriod);
-
-    findDownloads();
 }
 
 Storage::~Storage()
 {
-    waitForDownloadsToBeFound();
+    m_findDownloadsWatcher.waitForFinished();
 }
 
 QDir Storage::downloadsDirectory() const
@@ -537,7 +535,7 @@ void Storage::cleanupExpiredFiles()
         emit fileDeleted(fileName);
 }
 
-void Storage::findDownloads()
+void Storage::findDownloads(bool waitForFinished)
 {
     if (!m_downloadsDirectory.exists())
         return;
@@ -554,9 +552,11 @@ void Storage::findDownloads()
             cleanupExpiredFiles();
         }));
 
-void Storage::waitForDownloadsToBeFound()
-{
-    m_findDownloadsWatcher.waitForFinished();
+    if (waitForFinished)
+    {
+        lock.unlock();
+        m_findDownloadsWatcher.waitForFinished();
+    }
 }
 
 void Storage::findDownloadsRecursively(const QDir& dir)
