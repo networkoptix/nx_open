@@ -4,7 +4,7 @@ from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
 from api.account_backend import AccountManager
-from cms.models import Customization, UserGroupsToCustomizationPermissions
+from cms.models import Customization, Product, ProductType, UserGroupsToProductPermissions, get_cloud_portal_product
 from cloud.settings import CUSTOMIZATION
 
 
@@ -54,7 +54,7 @@ class Account(PermissionsMixin):
 
     @property
     def permissions(self):
-        if not UserGroupsToCustomizationPermissions.check_permission(self, CUSTOMIZATION):
+        if not UserGroupsToProductPermissions.check_customization_permission(self, CUSTOMIZATION):
             return []
 
         permissions = []
@@ -66,8 +66,18 @@ class Account(PermissionsMixin):
     def customizations(self):
         if self.is_superuser:
             return Customization.objects.all().values_list('name')
-        return UserGroupsToCustomizationPermissions.objects\
-            .filter(group__id__in=self.groups.all()).values_list('customization__name', flat=True).distinct()
+        cloud_portal_ids = UserGroupsToProductPermissions.objects.\
+            filter(group__in=self.groups.all(), product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
+            values_list('product__id', flat=True)
+
+        customizations = [self.customization]
+
+        for cloud_id in cloud_portal_ids:
+            product = Product.objects.get(id=cloud_id)
+            if UserGroupsToProductPermissions.check_permission(self, product, 'cms.can_view_customization'):
+                customizations.append(product.customizations.first().name)
+
+        return list(set(customizations))
 
     def short_email(self):
         return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)

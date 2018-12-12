@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "crear cuenta",
         "errorNoHDD": "Este dispositivo está diseñado para trabajar con disco duro instalado. <br>Por favor apague el dispositivo e instalar un disco duro.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "Este dispositivo necesita conexión de red para funcionar.<br>Por favor conéctelo a la red local o internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",

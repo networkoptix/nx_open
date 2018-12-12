@@ -1,0 +1,47 @@
+{
+  "cameraLinks": {
+    "highStream": "Högupplöst ström",
+    "lowStream": "Lågupplöst ström",
+    "transcoding": "Omkodning",
+    "unknown": "Okänd",
+    "copyToClipboard": "kopiera till urklipp",
+    "copyDefaultText": "kopiera",
+    "copyActiveText": "kopierat till Urklipp"
+  },
+  "systemOffline": "System Offline",
+  "cameraStates": {
+    "offline": "Frånkopplade",
+    "error": "Fel",
+    "unauthorized": "Autentisering krävs",
+    "noData": "Data saknas",
+    "iosVideoTooLarge": "ios stöder inte video större än fullHD (2MP: 1920x1080).",
+    "flashRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> för att spela upp videor.",
+    "flashOrWebmRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> eller<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för att spela video i Internet Explorer.",
+    "noArmSupport": "Denna webbläsare eller enhet stöder inte videouppspelning från ARM-baserade servrar.",
+    "noFormat": "Den här webbläsaren stöder inte videouppspelning från den här kameran.",
+    "ieNoWebm": "Var god installera <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för Internet Explorer.",
+    "ieWin10": "Vänligen använd Microsoft Edge eller Google Chrome-webbläsare.",
+    "ubuntuNX": "Den här webbläsaren stöder inte video från ARM-baserade servrar. Vänligen använd Chrome-webbläsaren istället."
+  },
+  "searchCamPlaceholder": "Sök",
+  "resolution": {
+    "auto": "Auto",
+    "high": "Hög",
+    "low": "Låg"
+  },
+  "chromeCastWarning": "Chromecast är resursintensiv och kan orsaka problem på din server.",
+  "voiceCommands": {
+    "play": "spela",
+    "pause": "pausa",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "rensa sökningen",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expandera alla servrar",
+    "collapse all servers": "kollapsa alla servrar",
+    "stop listening": "sluta lyssna",
+    "help": "help | show commands"
+  }
+}

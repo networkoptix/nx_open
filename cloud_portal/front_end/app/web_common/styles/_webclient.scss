@@ -435,7 +435,8 @@ table.webclient-window>tbody>tr>td{
   }
 
   &.Unauthorized,
-  &.Offline{
+  &.Offline,
+  &.Online{
     color:$light16 !important;
 
     small{

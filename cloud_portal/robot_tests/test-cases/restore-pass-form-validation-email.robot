@@ -70,9 +70,10 @@ Open Restore Password Dialog
 Test Email Invalid
     [Arguments]   ${email}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
-    Click Button    ${RESET PASSWORD BUTTON}
+    Click Element    //h1
+    Run Keyword If    '${email}'=='${EMAIL UNREGISTERED}'    Click Button    ${RESET PASSWORD BUTTON}
     Run Keyword Unless    '${email}'=='${EMAIL UNREGISTERED}' or '${email}'=='${SPACE}myemail@gmail.com' or '${email}'=='myemail@gmail.com${SPACE}'    Check Email Outline    ${email}
-    Run Keyword If    '${email}'=='${EMAIL UNREGISTERED}' or '${email}'=='${SPACE}myemail@gmail.com' or '${email}'=='myemail@gmail.com${SPACE}'    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
+    Run Keyword If    '${email}'=='${EMAIL UNREGISTERED}'    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
 
 Check Email Outline
     [Arguments]    ${email}

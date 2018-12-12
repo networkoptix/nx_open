@@ -9,8 +9,8 @@
                 请关闭设备然后安装硬盘.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                此设备需要网路连接才能运作.<br>
+                请将它连接到本地网路或互联网
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 此装置之网路设定有误.<br>

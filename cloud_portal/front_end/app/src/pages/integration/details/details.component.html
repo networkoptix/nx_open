@@ -31,9 +31,31 @@
             </nx-section>
         </nx-block>
 
-        <nx-block side-element type="gray" *ngIf="plugin && plugin.downloadFiles.length > 0">
+        <nx-block side-element type="gray">
             <header translate>
-                Download
+                Contact
+            </header>
+            <nx-section>
+                <div class="d-inline-flex flex-wrap align-center justify-content-center w-100">
+                    <button class="btn btn-primary m-1" (click)="sendInquiry()">Business Inquiry</button>
+                    <button class="btn btn-primary m-1" (click)="requestSupport()">Request Support</button>
+                </div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.support">
+            <header translate>
+                Support
+            </header>
+
+            <nx-section *ngIf="plugin.support.supportInformation">
+                <div [innerHtml]="sanitizer.bypassSecurityTrustHtml(plugin.support.supportInformation)"></div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.downloadFiles && plugin.downloadFiles.length > 0">
+            <header translate>
+                Downloads
             </header>
 
             <nx-section>
@@ -61,18 +83,8 @@
             <nx-section>
                 <div [innerHtml]="plugin.instructions.downloadLinks"></div>
             </nx-section>
-        </nx-block>
-
-        <nx-block *ngIf="plugin && plugin.support">
-            <header translate>
-                Support
-            </header>
-            <nx-section *ngIf="plugin.support.supportVideo">
-                <nx-external-video [src]="plugin.support.supportVideo"></nx-external-video>
-            </nx-section>
-
-            <nx-section *ngIf="plugin.support.supportInformation">
-                <div [innerHtml]="sanitizer.bypassSecurityTrustHtml(plugin.support.supportInformation)"></div>
+            <nx-section>
+                <div [innerHtml]="plugin.instructions.installationInstructions"></div>
             </nx-section>
         </nx-block>
 

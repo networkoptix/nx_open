@@ -7,8 +7,8 @@ Suite Teardown    Close Browser
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
-${FIRST NAME IS REQUIRED}      //span[@ng-if='accountForm.firstName.$touched && accountForm.firstName.$error.required' and contains(text(),'${FIRST NAME IS REQUIRED TEXT}')]
-${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && accountForm.lastName.$error.required' and contains(text(),'${LAST NAME IS REQUIRED TEXT}')]
+${FIRST NAME IS REQUIRED}      //span[@ng-if='accountForm.firstName.$touched && accountForm.firstName.$error.required' and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
+${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && accountForm.lastName.$error.required' and contains(text(),"${LAST NAME IS REQUIRED TEXT}")]
 
 *** Keywords ***
 Verify In Account Page
@@ -167,8 +167,15 @@ Should respond to tab and go in the correct order
     Element Should Be Focused    ${ACCOUNT LAST NAME}
     Press Key    ${ACCOUNT LAST NAME}    ${TAB}
     Element Should Be Focused    ${ACCOUNT LANGUAGE DROPDOWN}
+    Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${ENTER}
+    Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
+    Element Should Be Focused    //form[@name="accountForm"]//a//span[text()="English (US)"]/..
+    Press Key    //form[@name="accountForm"]//a//span[text()="English (US)"]/..    ${ENTER}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
     Element Should Be Focused    ${ACCOUNT SAVE}
+    Press Key    ${ACCOUNT SAVE}    ${ENTER}
+    Sleep    2    #wait for the language to change
+    Check For Alert    Your account is successfully saved
 
 Langauge is changeable on the account page
     [tags]    C41574
@@ -204,10 +211,9 @@ Language changed in account is new default
     Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='en_US']/..
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    //h1[text()='Account']
-    Log Out
-    Validate Log Out
+    Close Browser
 
-
+    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    //nx-footer//span[@lang='ru_RU']/..
@@ -215,7 +221,12 @@ Language changed in account is new default
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='ru_RU']    5
     Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
     Go To    ${url}/account
-    Log In    ${EMAIL NOPERM}    ${password}    button=None
-    Validate Log In
-    Verify In Account Page
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
+    Input Text    ${EMAIL INPUT}    ${EMAIL NOPERM}
+    Input Text    ${PASSWORD INPUT}    ${password}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    //h1[text()='Account']
+    Check Language

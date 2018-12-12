@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane"
   },
   "passwordRequirements": {
+    "good": "dobre",
+    "fair": "średnie",
+    "minLength": "za krótkie",
     "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",
+    "required": "nieprawidłowe",
     "requiredMessage": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
+    "weak": "słabe",
     "weakMessage": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
     "strongMessage": "Bezpieczne hasło!",
+    "common": "zbyt popularne",
     "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
     "missingMessage": "Hasło jest wymagane"
   },

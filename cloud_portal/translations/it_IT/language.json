@@ -10,7 +10,7 @@
     "loginButton": "Accesso",
     "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
     "logoutAuthorisedContinueButton": "Continua",
-    "logoutAuthorisedLogoutButton": "Scollegati"
+    "logoutAuthorisedLogoutButton": "Disconnetti"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate"
   },
   "passwordRequirements": {
+    "good": "buono",
+    "fair": "giusta",
+    "minLength": "troppo corto",
     "minLengthMessage": "La password deve contenere almeno 8 caratteri",
+    "required": "errato",
     "requiredMessage": "Usa solo lettere latine, numeri e simboli della tastiera, evita spazi iniziali e finali",
+    "weak": "debole",
     "weakMessage": "Utilizzare numeri, lettere maiuscole e minuscole e caratteri speciali per rendere più sicura la password",
     "strongMessage": "Password sicura!",
+    "common": "troppo comune",
     "commonMessage": "Questa password è nelle migliori e più popolari password utilizzate nel mondo",
     "missingMessage": "È richiesta la password"
   },

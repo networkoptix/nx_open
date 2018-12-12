@@ -140,7 +140,13 @@ Activate
 
 Restore password
     [arguments]    ${email}
-    Open Browser and go to URL    ${url}/restore_password
+    #log in to user to make sure their language is set to the current
+    Open Browser and go to URL    ${url}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Log Out
+    Validate Log Out
+    Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}

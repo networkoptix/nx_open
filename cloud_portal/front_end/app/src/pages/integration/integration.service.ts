@@ -8,6 +8,7 @@ import { NxConfigService }              from '../../services/nx-config';
 interface Platform {
     file: string;
     name: string;
+    order: string;
     url: string;
 }
 
@@ -41,6 +42,9 @@ export class IntegrationService implements OnDestroy {
             section.screenshots = Object.keys(section).filter((element) => {
                 return element.match(/screenshot/i) && section[element];
             }).sort().map((key) => section[key]);
+            if (section.screenshots.length < 1) {
+                delete section.screenshots;
+            }
         }
     }
 
@@ -69,7 +73,7 @@ export class IntegrationService implements OnDestroy {
                         continue;
                     }
 
-                    const platform: Platform = { file: '', name: '', url: '' };
+                    const platform: Platform = { file: '', name: '', order: '', url: '' };
                     // If the platformName is additional file we replace it with the correct name
                     if (platformName.match(/-file-[\d]+/)) {
                         platform.name = downloadPlatforms[`${platformName}-name`];
@@ -79,6 +83,7 @@ export class IntegrationService implements OnDestroy {
 
                     platform.url = downloadPlatforms[platformName];
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
+                    platform.order = plugin.downloadFilesOrder[platformName];
                     if (!platform.file) {
                         platform.file = platform.url;
                     }
@@ -86,16 +91,9 @@ export class IntegrationService implements OnDestroy {
                 }
                 // sort by name and then sort by file name.
                 plugin.downloadFiles = plugin.downloadFiles.sort((a, b) => {
-                    // '~~~' are used to weight downloads
-                    const weight = '~~~';
-                    if (a.name + weight < b.name + weight) {
+                    if (a.order < b.order) {
                         return -1;
-                    } else if (a.name + weight > b.name + weight) {
-                        return 1;
-                    }
-                    if (a.file + weight < b.file + weight) {
-                        return - 1;
-                    } else if (a.file + weight > b.file + weight) {
+                    }  else if (a.order > b.order) {
                         return 1;
                     }
                     return 0;

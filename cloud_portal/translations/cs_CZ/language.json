@@ -4,7 +4,7 @@
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "OK",
+    "okButton": "Ok",
     "cancelButton": "Zrušit",
     "loginTitle": "Přihlaste se k %PRODUCT_NAME%",
     "loginButton": "Přihlásit se",
@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Verze Safari starší než 10 není podporována"
   },
   "passwordRequirements": {
+    "good": "dobré",
+    "fair": "dostatečné",
+    "minLength": "too short",
     "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
+    "required": "nesprávné",
     "requiredMessage": "Používejte pouze latinskou abecedu, číslice a symboly na klávesnici, vyhněte se použití mezery na počátku a konci",
+    "weak": "slabé",
     "weakMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
     "strongMessage": "Silné heslo!",
+    "common": "too common",
     "commonMessage": "Toto heslo je v seznamu nejoblíbenějších heslech na světě",
     "missingMessage": "Heslo je vyžadováno"
   },

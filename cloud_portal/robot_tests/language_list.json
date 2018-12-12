@@ -17,5 +17,7 @@
     "pl_PL"    :    "Polish",
     "vi_VN"    :    "Vietnamese",
     "it_IT"    :    "Italian",
-    "uk_UA"    :    "Ukranian"
+    "uk_UA"    :    "Ukranian",
+    "cs_CZ"    :    "Czech",
+    "sv_SE"    :    "Sweedish"
 }

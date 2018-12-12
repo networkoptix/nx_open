@@ -392,6 +392,24 @@
             "advanced": true,
             "optional": true,
             "type": "check_box"
+          },
+          {
+            "label": "Downloads per platform",
+            "name": "%AVAILABLE_DOWNLOADS_PLATFORM%",
+            "description": "Platforms that are visible on the downloads page.",
+            "advanced": true,
+            "type": "select",
+            "value" : "[\"macos\", \"linux\", \"windows\"]",
+            "meta": {
+              "multi": true,
+              "options": [
+                "arm",
+                "linux",
+                "macos",
+                "sdk",
+                "windows"
+              ]
+            }
           }
         ]
       }
@@ -440,7 +458,10 @@
             "label": "Description",
             "value": "",
             "description": "A short description for the integration tile.",
-            "type": "long_text"
+            "type": "long_text",
+            "mata": {
+              "char_limit": 250
+            }
           },
           {
             "name": "testedVersions",

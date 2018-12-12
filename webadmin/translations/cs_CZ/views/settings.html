@@ -9,8 +9,8 @@
                 Vypněte prosím zařízení a nainstalujte jednotku pevného disku.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                Toto zařízení vyžaduje připojení k síti. <br>
+                Prosím připojte zařízení k místní síti nebo Internetu
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Toto zařízení má nesprávnou konfiguraci sítě. <br>

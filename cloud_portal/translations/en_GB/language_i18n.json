@@ -64,7 +64,7 @@
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.",
 	"What's new?": "What's new?",
 	"Wrong password": "Wrong password",
-	"You can merge cloud Systems, where you are owner.": "You can merge cloud Systems, where you are owner.",
+	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "You can merge only those cloud Systems, where you have the \"Owner\" permissions.",
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Your browser is not supported": "Your browser is not supported",
 	"is incompatible.": "is incompatible.",

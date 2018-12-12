@@ -54,7 +54,7 @@ window.TimelineConfig = {
     },
 
     timelineBgColor: [28,35,39,0.6], //Color for ruler marks and labels  //$dark6
-    font:'Roboto',//'sans-serif',
+    font:'robotoregular',//'sans-serif',
 
     labelPadding: 10,
     lineWidth: 1,
@@ -97,12 +97,12 @@ window.TimelineConfig = {
     markerDateFont:{
         size:13,
         weight:400,
-        face:'Roboto'
+        face:'robotoregular'
     },
     markerTimeFont:{
         size:16,
         weight:700,
-        face:'Roboto'
+        face:'robotobold'
     },
     markerWidth: 140,
     markerHeight: 48/100,
@@ -147,7 +147,7 @@ window.TimelineConfig = {
     topLabelFont:{
         size:13,
         weight:400,
-        face:'Roboto',
+        face:'robotoregular',
         color: [43,56,63] // Color for text for top labels //$dark9
     },
     topLabelMarkerColor: [105,135,150], // Color for mark for top label //$light16
@@ -164,7 +164,7 @@ window.TimelineConfig = {
     labelFont:{
         size:15,
         weight:400,
-        face:'Roboto',
+        face:'robotoregular',
         color: [105,135,150] // Color for text for top labels //$light16
     },
     labelMarkerAttach:'top', // top, bottom

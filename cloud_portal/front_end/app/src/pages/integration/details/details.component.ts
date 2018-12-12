@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, SimpleChanges, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IntegrationService } from '../integration.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NxRibbonService } from '../../../components/ribbon/ribbon.service';
 import { NxConfigService } from '../../../services/nx-config';
 import { TranslateService } from '@ngx-translate/core';
+import { NxModalMessageComponent } from '../../../dialogs/message/message.component';
 
 @Component({
     selector: 'integration-detail-component',
@@ -26,6 +27,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                 private integrationService: IntegrationService,
                 private ribbonService: NxRibbonService,
                 private configService: NxConfigService,
+                private messageDialog: NxModalMessageComponent,
                 private translate: TranslateService) {
 
         this.setupDefaults();
@@ -40,7 +42,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                         this.integrationService.selectedPluginSubject.subscribe(plugin => {
                             this.plugin = plugin;
 
-                            if (this.plugin.pending) {
+                            if (this.plugin && this.plugin.pending) {
                                 this.translate
                                         .get([
                                             'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
@@ -64,6 +66,14 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     }
 
     onSubmit() {
+    }
+
+    requestSupport() {
+        this.messageDialog.open(this.config.messageType.support, this.plugin.id).then(() => {});
+    }
+
+    sendInquiry() {
+        this.messageDialog.open(this.config.messageType.inquiry, this.plugin.id).then(() => {});
     }
 }
 

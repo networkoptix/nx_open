@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません"
   },
   "passwordRequirements": {
+    "good": "良い",
+    "fair": "可",
+    "minLength": "短すぎ",
     "minLengthMessage": "パスワードは8文字以上必要です",
+    "required": "無効",
     "requiredMessage": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
+    "weak": "弱",
     "weakMessage": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
     "strongMessage": "強力なパスワード!",
+    "common": "あまりにも一般的",
     "commonMessage": "このパスワードは、世界で最も人気のあるパスワード",
     "missingMessage": "パスワードが必要"
   },

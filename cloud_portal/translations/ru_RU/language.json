@@ -10,7 +10,7 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются"
   },
   "passwordRequirements": {
+    "good": "хорошее",
+    "fair": "средний",
+    "minLength": "короткий",
     "minLengthMessage": "Пароль должен содержать не менее 8 символов",
+    "required": "некорректный",
     "requiredMessage": "Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
+    "weak": "слабый",
     "weakMessage": "Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
     "strongMessage": "Надежный пароль!",
+    "common": "часто встречающийся",
     "commonMessage": "Этот пароль входит в список самых популярных паролей в мире",
     "missingMessage": "Пароль обязателен для заполнения"
   },

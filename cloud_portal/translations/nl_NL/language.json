@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund"
   },
   "passwordRequirements": {
+    "good": "goed",
+    "fair": "redelijk",
+    "minLength": "te kort",
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",
+    "required": "incorrect",
     "requiredMessage": "Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
+    "weak": "zwak",
     "weakMessage": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "strongMessage": "Sterk wachtwoord!",
+    "common": "te algemeen",
     "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
     "missingMessage": "Wachtwoord is vereist"
   },

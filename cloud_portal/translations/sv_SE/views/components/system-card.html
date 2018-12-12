@@ -1,33 +1,33 @@
 
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
-        <h2 class="mb-3">Your System</h2>
+        <h2 class="mb-3">Ditt system</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Byt namn på systemet</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sammanfoga med ett annat system</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Koppla ifrån
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
     <div class="card-body">
-        <h2>Owner</h2>
+        <h2>Ägare</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>
         <p>
-            Your permissions:
-            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+            Dina behörigheter:
+            <b> {{$root.L.accessRoles[system.accessRole].label || system.accessRole}} </b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button class="btn btn-default" ng-click="rename()">Byt namn på systemet</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
+        <button class="btn btn-default" ng-click="delete()">Koppla bort från mitt konto</button>
     </div>
 </div>
 <div class="mt-3 card card-default" ng-if="currentlyMerging">
@@ -37,23 +37,23 @@
         </div>
         <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+            sammanfogas till detta system</div>
         <hr />
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">Beroende på databasens storlek kan det ta upp till flera timmar</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>This system is being merged to
+        <div>Detta system sammanfogas till
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
+            <p>Beroende på databasens storlek kan det ta upp till flera timmar.</p>
+            <p>Innan sammanslagningen är klar kan du logga in på det här systemet och titta på video, men kan inte ändra några inställningar.</p>
             <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
         </div>
     </div>
 </div>

@@ -77,7 +77,7 @@ allows register, activate, login with +!#$%'*-/=?^_`{|}~ in email field
     Validate Log In
 
 allows register, activate, login with with leading space in email
-    [tags]    C41557    C41864
+    [tags]    C41864
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${SPACE}${email}    ${password}
@@ -86,7 +86,7 @@ allows register, activate, login with with leading space in email
     Validate Log In
 
 allows register, activate, login with with trailing space in email
-    [tags]    C41557    C41864
+    [tags]    C41864
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}${SPACE}    ${password}

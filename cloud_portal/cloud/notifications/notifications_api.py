@@ -1,4 +1,4 @@
-from .models import Message, Event
+from notifications.models import Message, Event
 from django.core.exceptions import ValidationError
 import django
 from django.conf import settings

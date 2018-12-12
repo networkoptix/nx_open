@@ -8,8 +8,7 @@
                 To urządzenie jest przeznaczone do działania z zainstalowanym dyskiem twardym. <br> Proszę wyłączyć urządzenie i zainstalować dysk twardy.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                To urządzenie wymaga połączenia sieciowego. <br> Podłącz je do sieci lokalnej lub do Internetu
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 To urządzenie ma nieprawidłową konfigurację sieci. <br> Proszę prawidłowo podłączyć je do sieci i sprawdzić adres IP.

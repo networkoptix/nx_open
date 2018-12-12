@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "Las versiones de Safari anteriores a 10 no son compatibles"
   },
   "passwordRequirements": {
+    "good": "bueno",
+    "fair": "regular",
+    "minLength": "demasiado corto",
     "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
+    "required": "incorrecto",
     "requiredMessage": "Utilice sólo letras, números y símbolos de teclado, evite los espacios iniciales y finales",
+    "weak": "débil",
     "weakMessage": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
     "strongMessage": "¡Contraseña segura!",
+    "common": "demasiado común",
     "commonMessage": "Esta contraseña se encuentra entre los más populares en el mundo",
     "missingMessage": "Se requiere contraseña"
   },

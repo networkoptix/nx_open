@@ -18,10 +18,10 @@
 
                 <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
                     <li ng-class="{ 'active' :active.view }">
-                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">View</a>
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">Visa</a>
                     </li>
                     <li ng-class="{ 'active' :active.settings}">
-                        <a class="inset" ng-href="/systems/{{activeSystem.id}}">Settings</a>
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}">Inställningar</a>
                     </li>
                 </ul>
             </div>
@@ -30,10 +30,10 @@
                 <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
                     <li>
                         <span>
-                            <a href class="btn btn-default" ng-click="login()">Log In</a>
+                            <a href class="btn btn-default" ng-click="login()"> Logga in </a>
                         </span>
                         <span>
-                            <a href="/register" class="btn btn-primary">Create Account</a>
+                            <a href="/register" class="btn btn-primary"> Skapa konto </a>
                         </span>
                     </li>
                 </ul>

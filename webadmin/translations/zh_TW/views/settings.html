@@ -9,8 +9,8 @@
                 請關閉設備然後安裝硬碟.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                此設備需要網路連接才能運作.<br>
+                請將它連接到本地網路或網際網路
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 此裝置之網路設定有誤.<br>

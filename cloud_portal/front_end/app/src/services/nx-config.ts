@@ -244,6 +244,12 @@ export class NxConfigService {
                 endOfArchiveTime         : 30 * 1000,
                 chunksToCheckFatal       : 30 // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
             },
+            messageType: {
+                ipvd: 'ipvd_feedback',
+                inquiry: 'sales_inquiry',
+                support: 'support_request',
+                unknown: 'unknown'
+            },
             permissions                   : {
                 canViewRelease: 'can_view_release'
             },

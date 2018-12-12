@@ -8,8 +8,7 @@
                 Este dispositivo está diseñado para trabajar con disco duro instalado. <br>Por favor apague el dispositivo e instalar un disco duro.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                Este dispositivo necesita la conexión de red para trabajar. Por favor <br>lo conecte a la red local o Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Este dispositivo tiene configuración de red mal. <br>Por favor conectarse a la red o configurar una dirección IP correcta.

@@ -14,7 +14,7 @@ import * as angular from 'angular';
 
         const CONFIG = nxConfigService.getConfig();
 
-        let apiBase = CONFIG.apiBase;
+        const apiBase = CONFIG.apiBase;
 
         let cachedResults = {};
         let cacheReceived = {};
@@ -212,6 +212,12 @@ import * as angular from 'angular';
                     slave_system_id: slaveSystemId
                 });
             },
+            sendMessage: function(type, productId, message) {
+                return $http.post(apiBase + '/feedback', {
+                    message, productId, type
+                });
+
+            },
             accessRoles: function (systemId) {
                 console.error('This method must not be used');
                 return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
@@ -220,6 +226,6 @@ import * as angular from 'angular';
             visitedKey: function (key) {
                 return $http.get(apiBase + '/utils/visitedKey/?key=' + encodeURIComponent(key));
             }
-        }
+        };
     }
 })();

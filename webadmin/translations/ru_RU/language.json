@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "создать учётную запись",
         "errorNoHDD": "Это устройство предназначено для работы с жестким диском. <br>Пожалуйста, выключите устройство и установите жесткий диск.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "Для работы этого устройство необходимо сетевое подключение. <br>Пожалуйста, подключите его к вашей локальной сети или сети Интернет"
     },
     "passwordRequirements": {
         "minLengthMessage": "Пароль должен быть длиной не меньше 8 символов",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Неверный логин или пароль",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Слишком много попыток. Повторите позже."
     },
     "navigaion": {
         "cannotGetUser": "Ошибка сервера: не удаётся получить данные текущего пользователя"

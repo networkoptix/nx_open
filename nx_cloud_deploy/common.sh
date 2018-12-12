@@ -64,6 +64,9 @@ function pushns()
     echo "Pushing $MODULE:$VERSION to the private registry"
     docker tag $MODULE:$VERSION la.hdw.mx:5000/$MODULE:$VERSION
     docker push la.hdw.mx:5000/$MODULE:$VERSION
+
+    docker tag $MODULE:$VERSION la.hdw.mx:5000/$MODULE:latest
+    docker push la.hdw.mx:5000/$MODULE:latest
 }
 
 function push()
