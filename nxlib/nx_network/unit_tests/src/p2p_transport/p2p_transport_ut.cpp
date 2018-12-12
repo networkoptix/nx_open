@@ -58,6 +58,7 @@ protected:
         m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
         m_client.reset(new P2PHttpClientTransport(
             std::move(clientHttpClient),
+            QnUuid::createUuid().toByteArray(),
             websocket::binary,
             utils::Url("http://" + m_acceptor->getLocalAddress().toString() + kPath)));
 
