@@ -9,7 +9,7 @@ from dal import autocomplete
 import base64
 from api.account_backend import AccountBackend
 from api.models import Account
-from cms.models import Customization, UserGroupsToCustomizationPermissions
+from cms.models import Customization, Product, UserGroupsToProductPermissions
 from notifications import notifications_api
 
 User = get_user_model()
@@ -44,10 +44,10 @@ class GroupAdminForm(forms.ModelForm):
                                                  })
                                             )
 
-    customizations = forms.ModelMultipleChoiceField(
-        queryset=Customization.objects.all(),
+    products = forms.ModelMultipleChoiceField(
+        queryset=Product.objects.all(),
         required=False,
-        widget=FilteredSelectMultiple('customizations', False)
+        widget=FilteredSelectMultiple('products', False)
     )
 
     def __init__(self, *args, **kwargs):
@@ -57,22 +57,22 @@ class GroupAdminForm(forms.ModelForm):
         if self.instance.pk:
             # Populate the users field with the current Group users.
             self.fields['users'].initial = self.instance.user_set.all()
-            self.fields['customizations'].initial = UserGroupsToCustomizationPermissions.objects.filter(group=self.instance).values_list(
-                'customization', flat=True).distinct()
+            self.fields['products'].initial = UserGroupsToProductPermissions.objects.filter(group=self.instance).values_list(
+                'product', flat=True).distinct()
 
     def save_m2m(self):
         # Add the users to the Group.
         self.instance.user_set = self.cleaned_data['users']
-        self.instance.customizations_set = self.cleaned_data['customizations']
+        self.instance.products_set = self.cleaned_data['products']
 
-        for customization in self.cleaned_data['customizations']:
-            if not UserGroupsToCustomizationPermissions.objects.filter(group=self.instance, customization=customization).exists():
-                UserGroupsToCustomizationPermissions(group=self.instance, customization=customization).save()
+        for product in self.cleaned_data['products']:
+            if not UserGroupsToProductPermissions.objects.filter(group=self.instance, product=product).exists():
+                UserGroupsToProductPermissions(group=self.instance, product=product).save()
 
-        remove_permissions = UserGroupsToCustomizationPermissions.objects.filter(group=self.instance)\
-                                                                 .exclude(customization__in=self.cleaned_data['customizations'])
-        for customization_group in remove_permissions:
-            customization_group.delete()
+        remove_permissions = UserGroupsToProductPermissions.objects.filter(group=self.instance).\
+            exclude(product__in=self.cleaned_data['products'])
+        for product_group in remove_permissions:
+            product_group.delete()
 
     def save(self, *args, **kwargs):
         # Default save

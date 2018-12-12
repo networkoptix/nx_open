@@ -28,4 +28,23 @@ class Migration(migrations.Migration):
             name='external_file',
             field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='cms.ExternalFile'),
         ),
+        migrations.RenameModel('UserGroupsToCustomizationPermissions', 'UserGroupsToProductPermissions'),
+        migrations.RemoveField(
+            model_name='usergroupstoproductpermissions',
+            name='customization',
+        ),
+        migrations.AddField(
+            model_name='usergroupstoproductpermissions',
+            name='product',
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    to='cms.Product'),
+        ),
+        migrations.AlterModelOptions(
+            name='customization',
+            options={'permissions': (('can_view_customization', 'Can see customization'),)},
+        ),
+        migrations.AlterModelOptions(
+            name='product',
+            options={'permissions': (('can_access_product', 'Can access product'),)},
+        ),
     ]

@@ -101,6 +101,12 @@ class Language(models.Model):
 
 
 class Customization(models.Model):
+    class Meta:
+        # Used to allow a user to see the customization in list of customizations
+        # Cloud portal(s) are now a product so customization is not necessary for giving access anymore
+        permissions = (
+            ('can_view_customization', 'Can view customization'),
+        )
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
         Language, related_name='default_in_%(class)s')
@@ -167,6 +173,12 @@ class ProductType(models.Model):
 
 
 class Product(models.Model):
+    class Meta:
+        # The can_access_product gives users the ability to see the product in product lists.
+        # In combination with other permission it allows them to edit the product and send reviews for their product
+        permissions = (
+            ('can_access_product', 'Can access product'),
+        )
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -409,22 +421,33 @@ class DataStructure(models.Model):
 
         return content_value
 
+
 # CMS settings. Release engineer can change that
-
-
-class UserGroupsToCustomizationPermissions(models.Model):
+class UserGroupsToProductPermissions(models.Model):
     group = models.ForeignKey(Group)
-    customization = models.ForeignKey(Customization)
+    product = models.ForeignKey(Product, default=None, null=True)
 
     @staticmethod
-    def check_permission(user, customization_name, permission=None):
+    def check_permission(user, product, permission=None):
         if user.is_superuser:
             return True
         if permission and not user.has_perm(permission):
             return False
 
-        return UserGroupsToCustomizationPermissions.objects.filter(group_id__in=user.groups.all(),
-                                                                   customization__name=customization_name).exists()
+        groups = UserGroupsToProductPermissions.objects.filter(product=product,
+                                                               group_id__in=user.groups.values_list('id', flat=True))
+        if permission:
+            codename = permission
+            if permission.find('.') > -1:
+                # need to remove app_label to get codename
+                codename = permission[permission.find('.')+1:]
+            groups = groups.filter(group__permissions__codename=codename)
+        return groups.exists()
+
+    @staticmethod
+    def check_customization_permission(user, customization, permission=None):
+        return UserGroupsToProductPermissions.\
+            check_permission(user, get_cloud_portal_product(customization), permission)
 
 
 # CMS data. Partners can change that

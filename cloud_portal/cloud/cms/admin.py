@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.html import format_html
@@ -52,9 +53,8 @@ class ProductFilter(SimpleListFilter):
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=request.user.customizations)
         # TODO: Get list of available products for non context managers
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                     settings.CUSTOMIZATION,
-                                                                     'cms.publish_version'):
+        if not UserGroupsToProductPermissions.\
+                check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
             products = products.filter(created_by=request.user)
 
         return [(p.id, p.name) for p in products]
@@ -84,7 +84,7 @@ class CMSAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(CMSAdmin, self).get_queryset(request)
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION):
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user, settings.CUSTOMIZATION):
             # return empty dataset, only superuser can watch content in other
             # customizations
             return qs.filter(pk=-1)
@@ -134,7 +134,11 @@ class ProductAdmin(CMSAdmin):
     def get_queryset(self, request):
         queryset = super(ProductAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            return queryset.filter(created_by=request.user)
+            viewable_products = [product.id for product in queryset
+                                 if UserGroupsToProductPermissions.check_permission(request.user,
+                                                                                    product,
+                                                                                    'cms.can_access_product')]
+            queryset = Product.objects.filter(id__in=viewable_products)
         return queryset
 
     def product_settings(self, obj):
@@ -340,17 +344,13 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(customization__name__in=request.user.customizations)
-
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                     settings.CUSTOMIZATION,
-                                                                     'cms.publish_version'):
-            qs = qs.filter(product__created_by=request.user)
-
+            qs = qs.filter(Q(customization__name__in=request.user.customizations) or
+                           Q(version__product__created_by=request.user))
         return qs
 
     def get_readonly_fields(self, request, obj=None):
-        if request.user != obj.version.product.created_by and obj.state != ProductCustomizationReview.REVIEW_STATES.rejected:
+        if request.user != obj.version.product.created_by and\
+                obj.state != ProductCustomizationReview.REVIEW_STATES.rejected:
             return self.readonly_fields
         return list(set(list(self.readonly_fields) +
                         [field.name for field in obj._meta.fields] +
@@ -377,12 +377,12 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
 
 
-class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
-    list_display = ('id', 'group', 'customization',)
-    list_filter = (CustomizationFilter, )
+class UserGroupsToProductPermissionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'group', 'product',)
+    list_filter = ('product', )
 
 
-admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
+admin.site.register(UserGroupsToProductPermissions, UserGroupsToProductPermissionsAdmin)
 
 
 class ExternalFileAdmin(CMSAdmin):

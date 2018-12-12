@@ -6,7 +6,8 @@ from cloud import settings
 from api.helpers.exceptions import api_success, handle_exceptions
 
 from cms.controllers.filldata import process_context_structure
-from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType, UserGroupsToCustomizationPermissions
+from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType,\
+    UserGroupsToProductPermissions, get_cloud_portal_product
 
 CLOUD_PORTAL = ProductType.PRODUCT_TYPES.cloud_portal
 INTEGRATION = ProductType.PRODUCT_TYPES.integration
@@ -105,12 +106,14 @@ def get_integrations(request):
     if not integrations.exists():
         return api_success([])
     integration_list = []
-    drafts = Product.objects.filter(product_type__type=INTEGRATION,
-                                    contentversion__productcustomizationreview__state=PENDING,
-                                    contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
+    drafts = Product.objects.\
+        filter(product_type__type=INTEGRATION,
+               contentversion__productcustomizationreview__state=PENDING,
+               contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
 
     # Users with manager permissions all accepted products and pending drafts
-    if UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
+    if UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
         integration_list = make_integrations_json(drafts, show_pending=True)
     elif drafts.filter(created_by=request.user).exists():
         integration_list = make_integrations_json(drafts.filter(created_by=request.user), show_pending=True)

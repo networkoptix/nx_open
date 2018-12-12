@@ -135,8 +135,10 @@
                            download>Download</a>
                     </button>
                     {% endif %}
+                    {% if perms.cms.publish_version %}
                     <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
+                    {% endif %}
                     <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
                     {% if perms.cms.publish_version %}
