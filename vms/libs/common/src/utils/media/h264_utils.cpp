@@ -6,13 +6,6 @@
 namespace nx {
 namespace media_utils {
 
-bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
-{
-    return data->context &&
-        data->context->getExtradataSize() >= 7 &&
-        data->context->getExtradata()[0] == 1;
-}
-
 //dishonorably stolen from libavcodec source
 #ifndef AV_RB16
 #   define AV_RB16(x)                           \
@@ -94,11 +87,7 @@ namespace h264 {
 
 bool extractSps(const QnConstCompressedVideoDataPtr& videoData, SPSUnit& sps)
 {
-    std::vector<std::pair<const quint8*, size_t>> nalUnits;
-    if (isH264SeqHeaderInExtraData(videoData))
-        readH264NALUsFromExtraData(videoData, &nalUnits);
-    else
-        readNALUsFromAnnexBStream(videoData, &nalUnits);
+    auto nalUnits = decodeNalUnits(videoData);
 
     for (const auto& nalu: nalUnits)
     {
@@ -129,59 +118,6 @@ std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
     else
         readNALUsFromAnnexBStream(videoData, &nalUnits);
     return nalUnits;
-}
-
-void extractSpsPps(
-    const QnConstCompressedVideoDataPtr& videoData,
-    QSize* const newResolution)
-{
-    std::vector<std::pair<const quint8*, size_t>> nalUnits = decodeNalUnits(videoData);
-
-    //generating profile-level-id and sprop-parameter-sets as in rfc6184
-    bool spsFound = false;
-    bool ppsFound = false;
-
-    for (const std::pair<const quint8*, size_t>& nalu : nalUnits)
-    {
-        switch (*nalu.first & 0x1f)
-        {
-            case nuSPS:
-                if (nalu.second < 4)
-                    continue;   //invalid sps
-
-                if (spsFound)
-                    continue;
-                else
-                    spsFound = true;
-
-                if (newResolution)
-                {
-                    //parsing sps to get resolution
-                    SPSUnit sps;
-                    sps.decodeBuffer(nalu.first, nalu.first + nalu.second);
-                    sps.deserialize();
-                    newResolution->setWidth(sps.getWidth());
-                    newResolution->setHeight(sps.pic_height_in_map_units * 16);
-
-                    //reading frame cropping settings
-                    const unsigned int subHeightC = sps.chroma_format_idc == 1 ? 2 : 1;
-                    const unsigned int cropUnitY = (sps.chroma_format_idc == 0)
-                        ? (2 - sps.frame_mbs_only_flag)
-                        : (subHeightC * (2 - sps.frame_mbs_only_flag));
-                    const unsigned int originalFrameCropTop = cropUnitY * sps.frame_crop_top_offset;
-                    const unsigned int originalFrameCropBottom = cropUnitY * sps.frame_crop_bottom_offset;
-                    newResolution->setHeight(newResolution->height() - (originalFrameCropTop + originalFrameCropBottom));
-                }
-                break;
-
-            case nuPPS:
-                if (ppsFound)
-                    continue;
-                else
-                    ppsFound = true;
-                break;
-        }
-    }
 }
 
 } // namespace h264

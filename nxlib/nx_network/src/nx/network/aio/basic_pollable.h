@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/future.h>
 
@@ -148,9 +146,9 @@ public:
      * Otherwise, posts func using BasicPollable::post and waits for completion.
      */
     template<typename Func>
-    std::invoke_result_t<Func> executeInAioThreadSync(Func func)
+    auto executeInAioThreadSync(Func func) -> decltype(func())
     {
-        using Result = std::invoke_result_t<Func>;
+        using Result = decltype(func());
 
         if (isInSelfAioThread())
         {
@@ -195,7 +193,7 @@ private:
     template<typename Func, typename Promise>
     void executeAndSetResultToPromise(Func& func, Promise& promise)
     {
-        using Result = std::invoke_result_t<Func>;
+        using Result = decltype(func());
 
         if constexpr (std::is_void<Result>::value)
         {

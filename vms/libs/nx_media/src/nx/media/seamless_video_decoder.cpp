@@ -9,6 +9,7 @@
 #include "video_decoder_registry.h"
 #include "frame_metadata.h"
 #include <utils/media/utils.h>
+#include <utils/media/h264_utils.h>
 
 namespace nx {
 namespace media {
@@ -20,22 +21,15 @@ namespace {
  */
 struct FrameBasicInfo
 {
-    FrameBasicInfo()
-    :
-        codec(AV_CODEC_ID_NONE)
-    {
-    }
-
+    FrameBasicInfo() = default;
     FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame)
-    :
-        codec(AV_CODEC_ID_NONE)
     {
         codec = frame->compressionType;
         size = getFrameSize(frame);
     }
 
     QSize size;
-    AVCodecID codec;
+    AVCodecID codec = AV_CODEC_ID_NONE;
 };
 
 static QMutex mutex;
@@ -56,6 +50,7 @@ public:
 
     // Store metadata from compressed frame.
     void pushMetadata(const QnConstCompressedVideoDataPtr& frame);
+
 
     const FrameMetadata findMetadata(int frameNum);
     void clearMetadata();
@@ -94,6 +89,20 @@ SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
     decoderFrameOffset(0),
     renderContextSynchronizer(renderContextSynchronizer)
 {
+}
+
+void SeamlessVideoDecoderPrivate::updateSar(const QnConstCompressedVideoDataPtr& frame)
+{
+    switch (frame->context->getCodecId())
+    {
+        case AV_CODEC_ID_H264:
+        {
+            SPSUnit sps;
+            if (!nx::media_utils::h264::extractSps(frame, sps))
+                return;
+            sar = sps.getSar();
+        }
+    }
 }
 
 void SeamlessVideoDecoderPrivate::pushMetadata(const QnConstCompressedVideoDataPtr& frame)
@@ -164,6 +173,7 @@ bool SeamlessVideoDecoder::decode(
     if (result)
         result->reset();
 
+    d->updateSar(frame);
     FrameBasicInfo frameInfo(frame);
     bool isSimilarParams;
     {
@@ -190,12 +200,13 @@ bool SeamlessVideoDecoder::decode(
 
         // Release previous decoder in case the hardware decoder can handle only single instance.
         d->videoDecoder.reset();
-
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
             frame->compressionType, frameInfo.size, d->allowOverlay, d->renderContextSynchronizer);
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;
+        d->sar = 1.0;
+
         {
             QMutexLocker lock(&mutex);
             d->prevFrameInfo = frameInfo;
