@@ -90,7 +90,7 @@ static std::string getUniqueId()
 
         delimitterPosition += delimitter.size(); //< Advance past ": ".
         if (delimitterPosition >= keyValuePair.size())
-            return break;
+            break;
 
         // Drop everything before ": " and "\n" at the end, if it has one.
         size_t newLinePosition = keyValuePair.find("\n");
