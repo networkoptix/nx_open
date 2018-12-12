@@ -168,7 +168,8 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
                 || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
                 || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities)
             {
-                emit ptzConfigurationChanged(toSharedPointer(this));
+                if (isInitialized())
+                    emit ptzConfigurationChanged(toSharedPointer(this));
             }
         });
 
