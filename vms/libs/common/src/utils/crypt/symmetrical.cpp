@@ -1,39 +1,51 @@
-#include <array>
-#include <stdint.h>
-#include <string.h> // CBC mode, for memset
-
 #include "symmetrical.h"
+
+#include <array>
+#include <cstdint>
+#include <cstring> //< CBC mode, for memset
+
+#include <nx/utils/uuid.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
+
 namespace detail {
 
 #ifndef CBC
-#define CBC 1
+    #define CBC 1
 #endif
 
 #if defined(ECB) && ECB
-
-void AES128_ECB_encrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
-void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
-
+    void AES128_ECB_encrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
+    void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
 #endif // #if defined(ECB) && ECB
 
 
 #if defined(CBC) && CBC
+    const uint8_t iv[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+        0x0c, 0x0d, 0x0e, 0x0f};
 
-const uint8_t iv[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    void AES128_CBC_encrypt_buffer(
+        uint8_t* output,
+        uint8_t* input,
+        uint32_t length,
+        const uint8_t* key,
+        const uint8_t* iv);
 
-void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
-void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
-
+    void AES128_CBC_decrypt_buffer(
+        uint8_t* output,
+        uint8_t* input,
+        uint32_t length,
+        const uint8_t* key,
+        const uint8_t* iv);
 #endif // #if defined(CBC) && CBC
 
 QnMutex stateMutex;
-const size_t kKeySize = 16;
-const QByteArray kMask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312"); // generated from guid
+static constexpr size_t kKeySize = 16;
+
+// Hardcoded random key, generated from guid.
+static const QByteArray kMask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312");
 const int kMaskSize = kMask.size();
 
 using KeyType = std::array<uint8_t, kKeySize>;
@@ -41,7 +53,7 @@ using KeyType = std::array<uint8_t, kKeySize>;
 KeyType keyFromByteArray(const QByteArray& data)
 {
     KeyType result;
-    for (int i = 0; i < result.size(); ++i)
+    for (int i = 0; i < (int)result.size(); ++i)
     {
         if (i < data.size())
             result[(size_t)i] = (uint8_t)data[i];
@@ -52,14 +64,12 @@ KeyType keyFromByteArray(const QByteArray& data)
     }
     return result;
 }
-}
 
-QByteArray encodeSimple(const QByteArray& data)
+} // namespace detail
+
+QByteArray generateAesExtraKey()
 {
-    QByteArray result = data;
-    for (int i = 0; i < result.size(); ++i)
-        result.data()[i] ^= detail::kMask.data()[i % detail::kMaskSize];
-    return result;
+    return QnUuid::createUuid().toRfc4122();
 }
 
 QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey)
@@ -68,21 +78,21 @@ QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey)
     for (int i = 0; i < qMin(mask.size(), extraKey.size()); ++i)
         mask[i] = mask[i] ^ extraKey[i];
 
-    static const int maskSize = mask.size();
     QByteArray result = data;
     for (int i = 0; i < result.size(); ++i)
-        result.data()[i] ^= mask.data()[i % maskSize];
+        result.data()[i] ^= mask.data()[i % detail::kMaskSize];
     return result;
 }
 
-QByteArray encodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
+QByteArray encodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>& key)
 {
     if (data.isEmpty())
         return QByteArray();
+
     QnMutexLocker lock(&detail::stateMutex);
     const QByteArray* pdata = &data;
     QByteArray dataCopy;
-    int padSize = 16 - data.size() % 16;
+    const int padSize = 16 - data.size() % 16;
     if (padSize != 0)
     {
         dataCopy = data;
@@ -100,13 +110,15 @@ QByteArray encodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
     return result;
 }
 
-QByteArray decodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
+QByteArray decodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>& key)
 {
     if (data.isEmpty())
         return QByteArray();
+
     QnMutexLocker lock(&detail::stateMutex);
     if (data.size() % 16 != 0)
         return QByteArray();
+
     QByteArray result;
     result.resize(data.size());
     detail::AES128_CBC_decrypt_buffer(
@@ -120,45 +132,31 @@ QByteArray decodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 
 QByteArray encodeAES128CBC(const QByteArray& data, const QByteArray& key)
 {
-    return encodeAES128CBC(data, detail::keyFromByteArray(key));
+    const QByteArray actualKey = key.isEmpty() ? detail::kMask : key;
+    return encodeAES128CBC(data, detail::keyFromByteArray(actualKey));
 }
 
 QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key)
 {
-    return decodeAES128CBC(data, detail::keyFromByteArray(key));
-}
-
-QByteArray encodeAES128CBC(const QByteArray& data)
-{
-    return encodeAES128CBC(data, detail::keyFromByteArray(detail::kMask));
-}
-
-QByteArray decodeAES128CBC(const QByteArray& data)
-{
-    return decodeAES128CBC(data, detail::keyFromByteArray(detail::kMask));
-}
-
-QString encodeHexStringFromStringAES128CBC(const QString& s)
-{
-    return QString::fromLatin1(nx::utils::encodeAES128CBC(s.toUtf8()).toHex());
-}
-
-QString decodeStringFromHexStringAES128CBC(const QString& s)
-{
-    return QString::fromUtf8(nx::utils::decodeAES128CBC(QByteArray::fromHex(s.toLatin1())));
+    const QByteArray actualKey = key.isEmpty() ? detail::kMask : key;
+    return decodeAES128CBC(data, detail::keyFromByteArray(actualKey));
 }
 
 QString encodeHexStringFromStringAES128CBC(const QString& s, const QByteArray& key)
 {
-    return QString::fromLatin1(nx::utils::encodeAES128CBC(s.toUtf8(), key).toHex());
+    return QString::fromLatin1(encodeAES128CBC(s.toUtf8(), key).toHex());
 }
 
 QString decodeStringFromHexStringAES128CBC(const QString& s, const QByteArray& key)
 {
-    return QString::fromUtf8(nx::utils::decodeAES128CBC(QByteArray::fromHex(s.toLatin1()), key));
+    return QString::fromUtf8(decodeAES128CBC(QByteArray::fromHex(s.toLatin1()), key));
 }
 
 namespace detail {
+
+//TODO: #mshevechenko License requirements should be checked here.
+// Algorithm is copied from https://github.com/kokke/tiny-AES-c/blob/master/aes.c
+
 /*
 
 This is an implementation of the AES128 algorithm, specifically ECB and CBC mode.
@@ -192,13 +190,13 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 
 
 // The number of columns comprising a state in AES. This is a constant in AES. Value=4
-#define Nb 4
+static constexpr int Nb = 4;
 // The number of 32 bit words in a key.
-#define Nk 4
+static constexpr int Nk = 4;
 // Key length in bytes [128 bit]
-#define KEYLEN 16
+static constexpr int KEYLEN = 16;
 // The number of rounds in AES Cipher.
-#define Nr 10
+static constexpr int Nr = 10;
 
 #ifndef MULTIPLY_AS_A_FUNCTION
 #define MULTIPLY_AS_A_FUNCTION 0
@@ -302,7 +300,7 @@ static uint8_t getSBoxInvert(uint8_t num)
 // This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states.
 static void KeyExpansion(void)
 {
-    uint32_t i, j, k;
+    uint32_t i;
     uint8_t tempa[4]; // Used for the column/row operations
 
     // The first round key is the key itself.
@@ -317,7 +315,7 @@ static void KeyExpansion(void)
     // All other round keys are found from the previous round keys.
     for (; (i < (Nb * (Nr + 1))); ++i)
     {
-        for (j = 0; j < 4; ++j)
+        for (uint32_t j = 0; j < 4; ++j)
         {
             tempa[j] = RoundKey[(i - 1) * 4 + j];
         }
@@ -328,7 +326,7 @@ static void KeyExpansion(void)
 
             // Function RotWord()
             {
-                k = tempa[0];
+                const auto k = tempa[0];
                 tempa[0] = tempa[1];
                 tempa[1] = tempa[2];
                 tempa[2] = tempa[3];
@@ -348,16 +346,6 @@ static void KeyExpansion(void)
 
             tempa[0] = tempa[0] ^ Rcon[i / Nk];
         }
-        else if (Nk > 6 && i % Nk == 4)
-        {
-            // Function Subword()
-            {
-                tempa[0] = getSBoxValue(tempa[0]);
-                tempa[1] = getSBoxValue(tempa[1]);
-                tempa[2] = getSBoxValue(tempa[2]);
-                tempa[3] = getSBoxValue(tempa[3]);
-            }
-        }
         RoundKey[i * 4 + 0] = RoundKey[(i - Nk) * 4 + 0] ^ tempa[0];
         RoundKey[i * 4 + 1] = RoundKey[(i - Nk) * 4 + 1] ^ tempa[1];
         RoundKey[i * 4 + 2] = RoundKey[(i - Nk) * 4 + 2] ^ tempa[2];
@@ -369,10 +357,9 @@ static void KeyExpansion(void)
 // The round key is added to the state by an XOR function.
 static void AddRoundKey(uint8_t round)
 {
-    uint8_t i, j;
-    for (i = 0; i < 4; ++i)
+    for (uint8_t i = 0; i < 4; ++i)
     {
-        for (j = 0; j < 4; ++j)
+        for (uint8_t j = 0; j < 4; ++j)
         {
             (*state)[i][j] ^= RoundKey[round * Nb * 4 + i * Nb + j];
         }
@@ -383,10 +370,9 @@ static void AddRoundKey(uint8_t round)
 // state matrix with values in an S-box.
 static void SubBytes(void)
 {
-    uint8_t i, j;
-    for (i = 0; i < 4; ++i)
+    for (uint8_t i = 0; i < 4; ++i)
     {
-        for (j = 0; j < 4; ++j)
+        for (uint8_t j = 0; j < 4; ++j)
         {
             (*state)[j][i] = getSBoxValue((*state)[j][i]);
         }
@@ -432,9 +418,8 @@ static uint8_t xtime(uint8_t x)
 // MixColumns function mixes the columns of the state matrix
 static void MixColumns(void)
 {
-    uint8_t i;
     uint8_t Tmp, Tm, t;
-    for (i = 0; i < 4; ++i)
+    for (uint8_t i = 0; i < 4; ++i)
     {
         t = (*state)[i][0];
         Tmp = (*state)[i][0] ^ (*state)[i][1] ^ (*state)[i][2] ^ (*state)[i][3];
@@ -726,5 +711,5 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 #endif // #if defined(CBC) && CBC
 
 }
-}
-}
+
+} // namespace nx::utils

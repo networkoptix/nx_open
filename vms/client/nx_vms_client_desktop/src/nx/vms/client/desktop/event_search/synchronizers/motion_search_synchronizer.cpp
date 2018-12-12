@@ -72,9 +72,7 @@ void MotionSearchSynchronizer::updateAreaSelection()
 
 bool MotionSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const
 {
-    return widget && widget->resource()
-        ? widget->resource()->toResource()->hasFlags(Qn::motion)
-        : false;
+    return widget && widget->resource() && widget->resource()->toResource()->hasFlags(Qn::motion);
 }
 
 } // namespace nx::vms::client::desktop

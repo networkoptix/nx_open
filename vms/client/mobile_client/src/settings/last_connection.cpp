@@ -16,7 +16,7 @@ nx::utils::Url LastConnectionData::urlWithCredentials() const
 
     auto result = url;
     result.setUserName(credentials.user);
-    result.setPassword(credentials.password.value());
+    result.setPassword(credentials.password.decoded());
     return result;
 }
 

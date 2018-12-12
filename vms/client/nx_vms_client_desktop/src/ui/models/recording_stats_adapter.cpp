@@ -71,7 +71,11 @@ QnCameraStatsData QnRecordingStats::transformStatsToModelData(const QnRecordingS
         if (isOwnCamera(cameraResource, server))
             data.cameras << camera;
         else
-            data.foreignCameras.recordedBytes += camera.recordedBytes; //< Hide all cameras which belong to another server
+        {
+            // Hide all cameras which belong to another server.
+            data.foreignCameras.recordedBytes += camera.recordedBytes;
+            data.foreignCameras.averageBitrate += camera.averageBitrate;
+        }
     }
     const auto foreignText = Translate::tr("Cameras from other servers and removed cameras");
     data.foreignCameras.uniqueId = foreignText; //< Use Id for camera name.

@@ -12,9 +12,9 @@
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
-#include <nx/sdk/analytics/engine.h>
-#include <nx/sdk/analytics/device_agent.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>

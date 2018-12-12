@@ -441,12 +441,6 @@ QVariant SearchEdit::inputMethodQuery(Qt::InputMethodQuery property) const
     return d->lineEdit->inputMethodQuery(property);
 }
 
-void SearchEdit::resizeEvent(QResizeEvent *event)
-{
-    base_type::resizeEvent(event);
-    d->lineEdit->setGeometry(rect());
-}
-
 void SearchEdit::focusInEvent(QFocusEvent* event)
 {
     d->lineEdit->event(event);

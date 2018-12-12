@@ -4,7 +4,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <utils/media/frame_info.h>
-#include "nx/sdk/analytics/uncompressed_video_frame.h"
+#include "nx/sdk/analytics/i_uncompressed_video_frame.h"
 
 namespace nx {
 namespace vms::server {
@@ -13,7 +13,7 @@ namespace analytics {
 class VideoDataReceptor
 {
 public:
-    using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
+    using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
 
     /**
      * Accept a video frame.

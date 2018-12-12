@@ -26,7 +26,7 @@ void* GenericCompressedVideoPacket::queryInterface(const nxpl::NX_GUID& interfac
     if (interfaceId == IID_DataPacket)
     {
         addRef();
-        return static_cast<DataPacket*>(this);
+        return static_cast<IDataPacket*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {

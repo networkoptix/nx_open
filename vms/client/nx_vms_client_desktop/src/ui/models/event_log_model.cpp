@@ -413,7 +413,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     descriptorListManager->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(
                         action.eventParams.getAnalyticsEventTypeId());
 
-                QString eventName = descriptor ? descriptor->item.name.value : QString();
+                QString eventName = descriptor ? descriptor->item.name : QString();
 
                 if (!eventName.isEmpty())
                     return eventName;
@@ -628,7 +628,7 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
     const vms::event::ActionData& action = m_index->at(index.row());
     if (action.hasFlags(vms::event::ActionData::VideoLinkExists))
     {
-        QnResourcePtr resource = 
+        QnResourcePtr resource =
             resourcePool()->getResourceById(action.eventParams.eventResourceId);
         if (resource)
             result << resource;

@@ -13,8 +13,8 @@
 #include <plugins/plugins_ini.h>
 
 #include <nx/analytics/descriptor_list_manager.h>
-#include <nx/sdk/analytics/pixel_format.h>
-#include <nx/sdk/common_settings.h>
+#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/common/string_map.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/fusion/model_functions.h>
@@ -88,6 +88,7 @@ bool deviceInfoFromResource(
     nx::sdk::DeviceInfo* outDeviceInfo)
 {
     using namespace nx::sdk;
+
     if (!outDeviceInfo)
     {
         NX_ASSERT(false, "Device info is invalid");
@@ -103,43 +104,43 @@ bool deviceInfoFromResource(
     strncpy(
         outDeviceInfo->vendor,
         device->getVendor().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->model,
         device->getModel().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->firmware,
         device->getFirmware().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->uid,
         device->getId().toByteArray().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->sharedId,
         device->getSharedId().toStdString().c_str(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->url,
         device->getUrl().toUtf8().data(),
-        CameraInfo::kTextParameterMaxLength);
+        DeviceInfo::kTextParameterMaxLength);
 
     auto auth = device->getAuth();
     strncpy(
         outDeviceInfo->login,
         auth.user().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     strncpy(
         outDeviceInfo->password,
         auth.password().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
+        DeviceInfo::kStringParameterMaxLength);
 
     outDeviceInfo->channel = device->getChannel();
     outDeviceInfo->logicalId = device->logicalId();
@@ -156,25 +157,25 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
     return std::make_unique<nx::plugins::SettingsHolder>(settingsMap);
 }
 
-UniquePtr<nx::sdk::Settings> toSdkSettings(const QVariantMap& settings)
+UniquePtr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& settings)
 {
-    auto sdkSettings = new nx::sdk::CommonSettings();
+    auto sdkSettings = new nx::sdk::common::StringMap();
     for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
-        sdkSettings->addSetting(itr.key().toStdString(), itr.value().toString().toStdString());
+        sdkSettings->addItem(itr.key().toStdString(), itr.value().toString().toStdString());
 
-    return UniquePtr<nx::sdk::Settings>(sdkSettings);
+    return UniquePtr<nx::sdk::IStringMap>(sdkSettings);
 }
 
-UniquePtr<nx::sdk::Settings> toSdkSettings(const QMap<QString, QString>& settings)
+UniquePtr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& settings)
 {
-    auto sdkSettings = new nx::sdk::CommonSettings();
+    auto sdkSettings = new nx::sdk::common::StringMap();
     for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
-        sdkSettings->addSetting(itr.key().toStdString(), itr.value().toStdString());
+        sdkSettings->addItem(itr.key().toStdString(), itr.value().toStdString());
 
-    return UniquePtr<nx::sdk::Settings>(sdkSettings);
+    return UniquePtr<nx::sdk::IStringMap>(sdkSettings);
 }
 
-UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson)
+UniquePtr<nx::sdk::IStringMap> toIStringMap(const QString& settingsJson)
 {
     bool isValid = false;
     const auto deserialized = QJson::deserialized<std::vector<SettingInternal>>(
@@ -182,44 +183,44 @@ UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson)
         /*defaultValue*/ {},
         &isValid);
 
-    UniquePtr<nx::sdk::Settings> result;
+    UniquePtr<nx::sdk::IStringMap> result;
     if (!isValid)
         return result;
 
-    auto settings = new nx::sdk::CommonSettings();
+    auto settings = new nx::sdk::common::StringMap();
     for (const auto& setting: deserialized)
-        settings->addSetting(setting.name, setting.value);
+        settings->addItem(setting.name, setting.value);
 
     result.reset(settings);
     return result;
 }
 
-QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings)
+QVariantMap fromIStringMap(const nx::sdk::IStringMap* map)
 {
     QVariantMap result;
-    if (!sdkSettings)
+    if (!map)
         return result;
 
-    const auto count = sdkSettings->count();
+    const auto count = map->count();
     for (auto i = 0; i < count; ++i)
-        result.insert(sdkSettings->key(i), sdkSettings->value(i));
+        result.insert(map->key(i), map->value(i));
 
     return result;
 }
 
-std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel)
 {
-    using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
+    using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
     using Capability = nx::vms::api::analytics::EngineManifest::Capability;
 
     int uncompressedFrameCapabilityCount = 0; //< To check there is 0 or 1 of such capabilities.
     PixelFormat pixelFormat = PixelFormat::yuv420;
 
     // To assert that all pixel formats are tested.
-    auto pixelFormats = nx::sdk::analytics::getAllPixelFormats();
+    auto pixelFormats = nx::sdk::analytics::common::getAllPixelFormats();
 
     auto checkCapability =
         [&](Capability value, PixelFormat correspondingPixelFormat)

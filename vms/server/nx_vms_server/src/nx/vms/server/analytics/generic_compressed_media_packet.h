@@ -7,7 +7,7 @@
 
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/analytics/media_context.h>
+#include <nx/sdk/analytics/i_media_context.h>
 
 namespace nx {
 namespace vms::server {
@@ -17,18 +17,18 @@ template <class T>
 class GenericCompressedMediaPacket: public nxpt::CommonRefCounter<T>
 {
 public:
-    using MediaContext = nx::sdk::analytics::MediaContext;
+    using MediaContext = nx::sdk::analytics::IMediaContext;
     using MediaFlag = nx::sdk::analytics::MediaFlag;
     using MediaFlags = nx::sdk::analytics::MediaFlags;
 
-    virtual const char* codec() const { return m_codec.c_str(); }
+    virtual const char* codec() const override { return m_codec.c_str(); }
 
-    virtual const int dataSize() const
+    virtual int dataSize() const override
     {
         return m_ownedData ? (int) m_ownedData->size() : m_externalDataSize;
     }
 
-    virtual const char* data() const
+    virtual const char* data() const override
     {
         if (m_ownedData && !m_ownedData->empty())
             return &m_ownedData->at(0);
@@ -50,12 +50,12 @@ public:
         m_ownedData.reset();
     }
 
-    virtual const MediaContext* context() const { return nullptr; }
-    virtual int64_t timestampUsec() const { return m_timestampUsec; }
-    virtual MediaFlags flags() const { return m_mediaFlags; }
+    virtual const MediaContext* context() const override { return nullptr; }
+    virtual int64_t timestampUs() const override { return m_timestampUs; }
+    virtual MediaFlags flags() const override { return m_mediaFlags; }
 
     void setCodec(const std::string& value) { m_codec = value; }
-    void setTimestampUsec(int64_t value) { m_timestampUsec = value; }
+    void setTimestampUs(int64_t value) { m_timestampUs = value; }
 
     void setFlags(MediaFlags flags) { m_mediaFlags = flags; }
     void addFlag(MediaFlag flag) { m_mediaFlags |= (MediaFlags) flag; }
@@ -66,7 +66,7 @@ private:
     const char* m_externalData = nullptr;
     int m_externalDataSize = 0;
     std::string m_codec;
-    int64_t m_timestampUsec = 0;
+    int64_t m_timestampUs = 0;
     MediaFlags m_mediaFlags = 0;
 };
 

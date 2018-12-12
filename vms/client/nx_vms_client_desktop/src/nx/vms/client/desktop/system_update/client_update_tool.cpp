@@ -182,6 +182,7 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
         info.url = m_clientPackage.url;
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
+        m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
         QString file =  m_downloader->filePath(m_clientPackage.file);
 

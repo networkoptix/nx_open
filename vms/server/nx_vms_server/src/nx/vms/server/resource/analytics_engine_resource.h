@@ -5,7 +5,7 @@
 #include <nx/vms/api/analytics/plugin_manifest.h>
 #include <nx/vms/server/analytics/engine_handler.h>
 
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/i_engine.h>
 
 #include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/vms/server/sdk_support/loggers.h>
@@ -25,9 +25,9 @@ public:
     AnalyticsEngineResource(QnMediaServerModule* serverModule);
 
     // TODO: #dmishin: Rename sdkEngine to engine.
-    void setSdkEngine(sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine);
+    void setSdkEngine(sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine);
 
-    sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine() const;
+    sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine() const;
 
     virtual QVariantMap settingsValues() const override;
     virtual void setSettingsValues(const QVariantMap& values) override;
@@ -43,7 +43,7 @@ protected:
 
 private:
     std::unique_ptr<analytics::EngineHandler> m_handler;
-    sdk_support::SharedPtr<nx::sdk::analytics::Engine> m_sdkEngine;
+    sdk_support::SharedPtr<nx::sdk::analytics::IEngine> m_sdkEngine;
 };
 
 } // namespace nx::vms::server::resource
