@@ -276,7 +276,7 @@ void ConnectionProcessor::run()
     if (d->request.requestLine.method == "POST")
     {
         d->socket->setNonBlockingMode(true);
-        messageBus->gotPostConnection(remotePeer, std::move(d->socket));
+        messageBus->gotPostConnection(remotePeer, std::move(d->socket), std::move(d->requestBody));
         return;
     }
 

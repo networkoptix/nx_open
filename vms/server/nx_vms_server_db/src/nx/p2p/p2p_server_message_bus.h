@@ -30,8 +30,10 @@ public:
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
 
-    bool gotPostConnection(const vms::api::PeerDataEx& remotePeer,
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket);
+    bool gotPostConnection(
+        const vms::api::PeerDataEx& remotePeer,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        nx::Buffer requestBody);
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) override;
 protected:

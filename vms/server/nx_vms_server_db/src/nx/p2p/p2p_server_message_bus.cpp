@@ -400,14 +400,15 @@ void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection
 
 bool ServerMessageBus::gotPostConnection(
     const vms::api::PeerDataEx& remotePeer,
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    nx::Buffer requestBody)
 {
     {
         QnMutexLocker lock(&m_mutex);
         auto& connection = m_connections.value(remotePeer.id);
         if (connection->remotePeer().connectionGuid == remotePeer.connectionGuid)
         {
-            connection->gotPostConnection(std::move(socket));
+            connection->gotPostConnection(std::move(socket), std::move(requestBody));
             return true;
         }
     }

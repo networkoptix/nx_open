@@ -94,15 +94,16 @@ ConnectionBase::ConnectionBase(
 }
 
 void ConnectionBase::gotPostConnection(
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    nx::Buffer requestBody)
 {
     m_timer.post(
-        [this, socket = std::move(socket)]() mutable
+        [this, socket = std::move(socket), requestBody = std::move(requestBody)]() mutable
         {
             using namespace nx::network;
             if(auto httpTransport = dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get()))
             {
-                httpTransport->gotPostConnection(std::move(socket));
+                httpTransport->gotPostConnection(std::move(socket), std::move(requestBody));
             }
             else
             {
@@ -321,6 +322,7 @@ void ConnectionBase::startConnection()
 {
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
+    headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray());
     m_httpClient->addRequestHeaders(headers);
 
     auto requestUrl = m_remotePeerUrl;
@@ -328,8 +330,6 @@ void ConnectionBase::startConnection()
     for (const auto& param: m_requestQueryParams)
         requestUrlQuery.addQueryItem(param.first, param.second);
     requestUrlQuery.addQueryItem("format", QnLexical::serialized(localPeer().dataFormat));
-    requestUrlQuery.addQueryItem(
-        Qn::EC2_CONNECTION_GUID_HEADER_NAME, QnUuid::createUuid().toSimpleByteArray());
 
     requestUrl.setQuery(requestUrlQuery.toString());
 

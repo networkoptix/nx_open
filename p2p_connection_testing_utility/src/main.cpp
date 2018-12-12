@@ -16,6 +16,7 @@
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log_main.h>
@@ -76,7 +77,7 @@ public:
         m_guid = QnUuid::createUuid().toByteArray();
 
         http::HttpHeaders additionalHeaders;
-        additionalHeaders.emplace(kP2PConnectionGUIDHeaderKey, m_guid);
+        additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_guid);
         websocket::addClientHeaders(&additionalHeaders, config.protocolName);
 
         NX_VERBOSE(this, lm("connectAsync: connecting to %1").args(config.url));
@@ -347,7 +348,9 @@ private:
         auto checkForPairConnection =
             [sharedContext, this]() mutable
             {
-                auto guidHeaderIt = sharedContext->headers.find(kP2PConnectionGUIDHeaderKey);
+                auto guidHeaderIt = sharedContext->headers.find(
+                    Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+
                 if (guidHeaderIt == sharedContext->headers.cend())
                 {
                     NX_ERROR(
@@ -448,7 +451,7 @@ private:
                                 exit(EXIT_FAILURE);
                             }
 
-                            auto guidHeaderIt = headers.find(kP2PConnectionGUIDHeaderKey);
+                            auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
                             if (guidHeaderIt == headers.cend())
                             {
                                 NX_ERROR(

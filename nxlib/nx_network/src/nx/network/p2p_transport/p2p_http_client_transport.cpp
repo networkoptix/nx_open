@@ -3,6 +3,7 @@
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
+#include <nx/network/http/custom_headers.h>
 
 namespace nx::network {
 
@@ -105,7 +106,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 buffer));
 
             http::HttpHeaders additionalHeaders;
-            additionalHeaders.emplace(kP2PConnectionGUIDHeaderKey, m_connectionGuid);
+            additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
             m_writeHttpClient->setAdditionalHeaders(additionalHeaders);
 
             m_writeHttpClient->doPost(

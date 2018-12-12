@@ -15,6 +15,5 @@ public:
 };
 
 using P2pTransportPtr = std::unique_ptr<IP2PTransport>;
-static const http::StringType kP2PConnectionGUIDHeaderKey = "X-NX-P2P-GUID";
 
 } // namespace nx::network

@@ -472,6 +472,10 @@ vms::api::PeerDataEx deserializePeerData(
     else if (dataFormat == Qn::UbjsonFormat)
         peer = QnUbjson::deserialized(peerData, defaultPeerDataEx(), &success);
 
+    const auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+    if (guidHeaderIt != headers.cend())
+        peer.connectionGuid = QnUuid::fromRfc4122(guidHeaderIt->second);
+
     return peer;
 }
 
