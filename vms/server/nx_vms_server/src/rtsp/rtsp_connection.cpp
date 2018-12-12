@@ -41,6 +41,7 @@ extern "C"
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <rtsp/rtp_universal_encoder.h>
+#include <rtsp/rtsp_utils.h>
 #include <utils/common/synctime.h>
 #include <network/tcp_listener.h>
 #include <media_server/settings.h>
@@ -347,15 +348,9 @@ void QnRtspConnectionProcessor::parseRequest()
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        QString codecLower = codec.toLower();
-        if (codecLower == "h264")
-            codecLower = "libopenh264";
-        AVCodec* avCodec = avcodec_find_encoder_by_name(codecLower.toLatin1().data());
-        if (avCodec)
-            d->transcodeParams.codecId = avCodec->id;
-
+        d->transcodeParams.codecId = nx::rtsp::findEncoderCodecId(codec);
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-            NX_WARNING(this) << "Requested codec: " << codec << " not found";
+            NX_WARNING(this, "Requested codec: %1 not found", codec);
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
