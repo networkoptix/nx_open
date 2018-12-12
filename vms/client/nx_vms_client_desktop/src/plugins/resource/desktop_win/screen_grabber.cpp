@@ -28,8 +28,8 @@ static const int LOGO_CORNER_OFFSET = 8;
 
 QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
     m_pD3D(0),
-    m_pd3dDevice(0),
     m_displayNumber(displayNumber),
+    m_pd3dDevice(0),
     m_frameNum(0),
     m_currentIndex(0),
     m_mode(mode),
