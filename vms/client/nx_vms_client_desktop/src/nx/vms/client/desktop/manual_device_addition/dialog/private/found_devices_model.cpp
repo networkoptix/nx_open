@@ -193,7 +193,7 @@ QVariant FoundDevicesModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(device(index));
         case presentedStateRole:
             return m_presentedState[device(index).uniqueId];
-        case Qt::TextColorRole:
+        case Qt::ForegroundRole:
             return QPalette().color(getColorRole(index));
         default:
             return QVariant();
@@ -255,7 +255,7 @@ QVariant FoundDevicesModel::headerData(
         {
             case Qt::FontRole:
                 return selectionColumnFont();
-            case Qt::TextColorRole:
+            case Qt::ForegroundRole:
                 return QPalette().color(QPalette::Light);
             case Qt::TextAlignmentRole:
                 return Qt::AlignRight;
