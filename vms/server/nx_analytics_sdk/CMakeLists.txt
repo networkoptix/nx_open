@@ -25,7 +25,7 @@ set(sdk_src_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
 file(GLOB_RECURSE sdk_src_nx_kit_files ${sdk_src_nx_kit_origin}/*)
 
 # Collect source files for Plugin SDK.
-set(sdk_src_nx_sdk_origin ${CMAKE_SOURCE_DIR}/nxlib/nx_sdk/src)
+set(sdk_src_nx_sdk_origin ${CMAKE_SOURCE_DIR}/libs/nx_sdk/src)
 set(sdk_src_nx_sdk_new_origin ${sdk_src_nx_sdk_origin}/nx)
 set(sdk_src_nx_sdk_common_headers_origin ${sdk_src_nx_sdk_origin}/plugins)
 file(GLOB_RECURSE sdk_src_nx_sdk_new_files ${sdk_src_nx_sdk_new_origin}/*)

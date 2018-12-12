@@ -22,7 +22,7 @@ AbstractSearchSynchronizer::AbstractSearchSynchronizer(
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
         [this]()
         {
-            const auto widget = qobject_cast<QnMediaResourceWidget*>(navigator()->currentWidget());
+            const auto widget = navigator()->currentMediaWidget();
             m_mediaWidget = isMediaAccepted(widget) ? widget : nullptr;
             emit mediaWidgetChanged(m_mediaWidget.data(), {});
         });
@@ -49,7 +49,7 @@ QnMediaResourceWidget* AbstractSearchSynchronizer::mediaWidget() const
 
 bool AbstractSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const
 {
-    return true;
+    return widget != nullptr;
 }
 
 void AbstractSearchSynchronizer::setTimeContentDisplayed(

@@ -127,7 +127,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
         }
         case BytesColumn: return formatBytesString(value.recordedBytes);
         case DurationColumn: return rowType != Normal ? QString() : formatDurationString(value);
-        case BitrateColumn: return rowType == Foreign ? QString() : formatBitrateString(value.averageBitrate);
+        case BitrateColumn: return formatBitrateString(value.averageBitrate);
         default: return QString();
     }
 }

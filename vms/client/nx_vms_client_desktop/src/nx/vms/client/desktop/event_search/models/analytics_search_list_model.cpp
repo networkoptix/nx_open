@@ -32,6 +32,16 @@ void AnalyticsSearchListModel::setFilterText(const QString& value)
     d->setFilterText(value);
 }
 
+QString AnalyticsSearchListModel::selectedObjectType() const
+{
+    return d->selectedObjectType();
+}
+
+void AnalyticsSearchListModel::setSelectedObjectType(const QString& value)
+{
+    d->setSelectedObjectType(value);
+}
+
 bool AnalyticsSearchListModel::isConstrained() const
 {
     return filterRect().isValid() || !filterText().isEmpty() || base_type::isConstrained();

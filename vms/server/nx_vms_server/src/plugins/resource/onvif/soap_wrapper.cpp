@@ -17,7 +17,7 @@
 #include "media_server/settings.h"
 #include <media_server/media_server_module.h>
 
-using nx::common::utils::Credentials;
+using nx::vms::common::Credentials;
 
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
@@ -194,25 +194,25 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(
     return result;
 }
 
-std::list<nx::common::utils::Credentials> DeviceSoapWrapper::getPossibleCredentials(
+std::list<nx::vms::common::Credentials> DeviceSoapWrapper::getPossibleCredentials(
     QnCommonModule* commonModule,
     const QString& manufacturer,
     const QString& model) const
 {
     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
-    auto credentials = resData.value<QList<nx::common::utils::Credentials>>(
+    auto credentials = resData.value<QList<nx::vms::common::Credentials>>(
         ResourceDataKey::kPossibleDefaultCredentials);
 
     return credentials.toStdList();
 }
 
-nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
+nx::vms::common::Credentials DeviceSoapWrapper::getForcedCredentials(
     QnCommonModule* commonModule,
     const QString& manufacturer,
     const QString& model)
 {
     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
-    auto credentials = resData.value<nx::common::utils::Credentials>(
+    auto credentials = resData.value<nx::vms::common::Credentials>(
         ResourceDataKey::kForcedDefaultCredentials);
 
     return credentials;
@@ -256,7 +256,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(
 
     if (possibleCredentials.size() <= 1)
     {
-        nx::common::utils::Credentials credentials;
+        nx::vms::common::Credentials credentials;
         if (!possibleCredentials.isEmpty())
             credentials = possibleCredentials.first();
         setLogin(credentials.user);

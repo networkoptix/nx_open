@@ -34,6 +34,12 @@ auto keyValueRange(KeyValueContainer&& container)
     return rangeAdapter(container.keyValueBegin(), container.keyValueEnd());
 }
 
+template<typename KeyValueContainer>
+auto constKeyValueRange(KeyValueContainer&& container)
+{
+    return rangeAdapter(container.constKeyValueBegin(), container.constKeyValueEnd());
+}
+
 template<typename Range>
 auto reverseRange(const Range& range)
 {

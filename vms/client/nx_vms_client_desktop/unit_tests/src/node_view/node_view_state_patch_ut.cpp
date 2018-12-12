@@ -216,23 +216,20 @@ TEST(NodeViewStatePatchTest, remove_guard)
     NodeViewState state;
     state = createTreePatch.applyTo(std::move(state));
 
-    int removeOperationsCount = 0;
+    int nodesCount = 0;
     details::forEachNode(state.rootNode,
-        [&removeOperationsCount](const NodePtr& /*node*/) { ++removeOperationsCount; });
+        [&nodesCount](const NodePtr& /*node*/) { ++nodesCount; });
 
+    int removeGuardCallCount = 0;
     const auto getRemoveNodeGuard =
-        [&testTree, &removeOperationsCount](const PatchStep& step)
+        [&testTree, &removeGuardCallCount](const PatchStep& step)
         {
             return nx::utils::makeSharedGuard(
-                [&testTree, &removeOperationsCount, step]()
+                [&testTree, &removeGuardCallCount, step]()
                 {
                     ASSERT_TRUE(step.operation == RemoveNodeOperation);
-                    if (step.path.isEmpty())
-                        testTree.reset();
-                    else
-                        testTree->nodeAt(step.path.parentPath())->removeChild(step.path.lastIndex());
-
-                    --removeOperationsCount;
+                    testTree->nodeAt(step.path.parentPath())->removeChild(step.path.lastIndex());
+                    ++removeGuardCallCount;
                 });
         };
 
@@ -240,6 +237,10 @@ TEST(NodeViewStatePatchTest, remove_guard)
     removeNodesPatch.addRemovalStep(ViewNodePath());
     state = removeNodesPatch.applyTo(std::move(state), getRemoveNodeGuard);
 
-    ASSERT_TRUE(removeOperationsCount == 0);
-    ASSERT_TRUE(testTree.isNull());
+    int resultNodesCount = 0;
+    details::forEachNode(state.rootNode,
+        [&resultNodesCount](const NodePtr& /*node*/) { ++resultNodesCount; });
+
+    ASSERT_TRUE(nodesCount == removeGuardCallCount + 1); //< No remove guard call for root node
+    ASSERT_TRUE(resultNodesCount == 0);
 }

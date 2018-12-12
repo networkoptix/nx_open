@@ -228,6 +228,11 @@ public:
      */
     const QSet<QnWorkbenchItem*>& items() const;
 
+    /**
+     * @return All resources of layout items, without duplicates.
+     */
+    QnResourceList itemResources() const;
+
     void addZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
 
     void removeZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);

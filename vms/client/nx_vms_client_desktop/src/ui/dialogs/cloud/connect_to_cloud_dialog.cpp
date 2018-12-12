@@ -14,6 +14,9 @@
 #include <core/resource/param.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+
+#include <nx/vms/client/core/settings/client_core_settings.h>
+
 #include <helpers/cloud_url_helper.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
@@ -24,7 +27,6 @@
 #include <utils/common/html.h>
 #include <watchers/cloud_status_watcher.h>
 
-#include <nx/client/core/settings/secure_settings.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
@@ -369,8 +371,8 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
 
             if (stayLoggedIn)
             {
-                QnEncodedCredentials credentials(cloudLogin, cloudPassword);
-                nx::vms::client::core::secureSettings()->cloudCredentials = credentials;
+                const nx::vms::common::Credentials credentials(cloudLogin, cloudPassword);
+                nx::vms::client::core::settings()->cloudCredentials = credentials;
                 qnCloudStatusWatcher->setCredentials(credentials);
             }
 

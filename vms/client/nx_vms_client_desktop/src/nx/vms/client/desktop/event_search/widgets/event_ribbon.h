@@ -3,7 +3,10 @@
 #include <chrono>
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
 #include <QtWidgets/QWidget>
+
+#include <core/resource/resource_fwd.h>
 
 #include <nx/utils/interval.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
@@ -49,7 +52,17 @@ public:
     std::chrono::microseconds highlightedTimestamp() const;
     void setHighlightedTimestamp(std::chrono::microseconds value);
 
+    QSet<QnResourcePtr> highlightedResources() const;
+    void setHighlightedResources(const QSet<QnResourcePtr>& value);
+
     void setViewportMargins(int top, int bottom);
+
+    /**
+     * Allows to insert a custom widget at the top of the viewport, above the topmost tile.
+     * NOTE: takes ownership of the widget.
+     */
+    QWidget* viewportHeader() const;
+    void setViewportHeader(QWidget* value);
 
     virtual QSize sizeHint() const override;
 

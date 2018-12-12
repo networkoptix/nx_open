@@ -52,8 +52,6 @@ QDir findFolderForFile(QDir root, QString file)
 }
 
 const QString kPackageIndexFile = "packages.json";
-const QString kTempDataDir = "update_temp";
-const QString kFilePrefix = "file://";
 const int kReadBufferSizeBytes = 1024 * 1024;
 
 } // namespace
@@ -212,23 +210,35 @@ void ServerUpdateTool::changeUploadState(OfflineUpdateState newState)
 void ServerUpdateTool::readUpdateManifest(
     const QString& path, UpdateContents& result)
 {
-    result.error = nx::update::InformationError::jsonError;
+    result.error = nx::update::InformationError::brokenPackageError;
     result.sourceType = nx::update::UpdateSourceType::file;
 
     QFile file(path);
 
     if (!file.open(QFile::ReadOnly))
+    {
+        NX_ERROR(typeid(ServerUpdateTool),
+            "readUpdateManifest(%1) - failed to open file for reading", path);
         return;
+    }
 
     QByteArray buf(kReadBufferSizeBytes, 0);
 
     qint64 read = file.read(buf.data(), kReadBufferSizeBytes);
     if (read == -1)
+    {
+        NX_ERROR(typeid(ServerUpdateTool),
+            "readUpdateManifest(%1) - failed to read any data from the file", path);
         return;
+    }
 
     buf.truncate(read);
     if (!QJson::deserialize(buf, &result.info))
+    {
+        NX_ERROR(typeid(ServerUpdateTool),
+            "readUpdateManifest(%1) - failed to deserealize update data", path);
         return;
+    }
 
     result.error = nx::update::InformationError::noError;
 }
@@ -332,6 +342,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         info.url = package.url;
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
+        m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
         QString file =  m_downloader->filePath(package.file);
 
@@ -742,7 +753,7 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     if (m_skippedRequests.contains(handle))
     {
         m_skippedRequests.remove(handle);
-        NX_VERBOSE(this) << "requestRemoteUpdateState handle" << handle << "was skipped";
+        NX_VERBOSE(this) << "atUpdateStatusResponse handle" << handle << "was skipped";
         return;
     }
 

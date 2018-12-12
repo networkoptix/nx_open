@@ -4,7 +4,7 @@
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QPushButton>
 
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/client/core/settings/keychain_property_storage_backend.h>
 
 #include <finders/systems_finder.h>
@@ -34,7 +34,7 @@ struct CredentialsStoreDialog::Private
     void rebuildModel()
     {
         model->clear();
-        const auto& data = core::secureSettings()->systemAuthenticationData();
+        const auto& data = core::settings()->systemAuthenticationData();
         for (const auto& systemId: data.keys())
         {
             const auto system = qnSystemsFinder->getSystem(systemId.toString());
@@ -65,9 +65,9 @@ CredentialsStoreDialog::CredentialsStoreDialog(QWidget *parent):
     connect(addButton, &QAbstractButton::clicked, this,
         [this]()
         {
-            auto data = core::secureSettings()->systemAuthenticationData();
-            data[QnUuid::createUuid()].push_back(QnEncodedCredentials("test", "test"));
-            core::secureSettings()->systemAuthenticationData = data;
+            auto data = core::settings()->systemAuthenticationData();
+            data[QnUuid::createUuid()].push_back({"test", "test"});
+            core::settings()->systemAuthenticationData = data;
             d->rebuildModel();
         });
     ui->buttonBox->addButton(addButton, QDialogButtonBox::ButtonRole::HelpRole);
@@ -80,14 +80,14 @@ CredentialsStoreDialog::CredentialsStoreDialog(QWidget *parent):
             if (!selectionModel->hasSelection())
                 return;
 
-            auto data = core::secureSettings()->systemAuthenticationData();
+            auto data = core::settings()->systemAuthenticationData();
 
             for (const auto& idx: selectionModel->selectedIndexes())
             {
                 const auto systemId = idx.data(SystemIdRole).value<QnUuid>();
                 data.remove(systemId);
             }
-            core::secureSettings()->systemAuthenticationData = data;
+            core::settings()->systemAuthenticationData = data;
             d->rebuildModel();
         });
     ui->buttonBox->addButton(removeButton, QDialogButtonBox::ButtonRole::HelpRole);
