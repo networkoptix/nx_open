@@ -207,7 +207,7 @@ std::vector<DeviceData> getDeviceList()
             nameIndex = ++it->second;
 
         std::string uniqueId;
-        if(rpi::isRpi && rpi::isMmalCamera(name))
+        if(rpi::isRpi() && rpi::isMmalCamera(name))
             uniqueId = rpi::getMmalUniqueId();
         else
             uniqueId = getDeviceUniqueId(devicePath);
