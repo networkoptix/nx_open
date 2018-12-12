@@ -85,17 +85,14 @@ QnManualResourceSearchEntry entryFromResource(const QnResourcePtr& resource)
 
 QnSearchTask::QnSearchTask(
     QnCommonModule* commonModule,
-    const nx::network::SocketAddress& address,
-    const QAuthenticator& auth,
+    const nx::utils::Url& url,
     bool breakOnGotResult)
 :
     m_commonModule(commonModule),
-    m_auth(auth),
+    m_url(url),
     m_breakIfGotResult(breakOnGotResult)
 {
     NX_ASSERT(commonModule);
-    m_url.setAuthority(address.toString());
-
     NX_VERBOSE(this, "Created with URL %1", m_url);
 }
 
@@ -135,7 +132,14 @@ void QnSearchTask::start()
     QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
-        auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
+        // Extracting auth data from URL as checkHostAddr handles it separately.
+        QAuthenticator auth;
+        auth.setUser(m_url.userName());
+        auth.setPassword(m_url.password());
+        nx::utils::Url url(m_url);
+        url.setUserInfo("");
+
+        auto seqResults = checker->checkHostAddr(url, auth, true);
         NX_VERBOSE(this, "Got %1 resources from searcher %2", seqResults.size(), checker);
 
         for (const auto& res: seqResults)

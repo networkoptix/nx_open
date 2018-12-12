@@ -57,6 +57,12 @@ public:
     QByteArray toEncoded(QUrl::FormattingOptions options = QUrl::FullyEncoded) const;
     Q_INVOKABLE QUrl toQUrl() const;
 
+    /**
+    * @brief fromStringPersistingScheme First tries to parse strings like `hostname`, then
+    * strings like `hostname:port` and using QUrl parser for other cases.
+    * @return URL which may not ba valid one, so it should be checked after the call.
+    */
+    static Url fromText(const QString& url);
     static Url fromQUrl(const QUrl& url);
     static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
     static Url fromUserInput(const QString &userInput);

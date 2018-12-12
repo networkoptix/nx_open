@@ -22,23 +22,32 @@ void TimerHolder::addTimer(
         timerContext = timerContextUnsafe(timerOwnerId);
     }
 
-    QnMutexLocker lock(&timerContext->lock);
-    if (m_terminated)
-        return;
-
-    if (timerContext->timerId)
-        TimerManager::instance()->deleteTimer(timerContext->timerId);
-
-    timerContext->timerId = TimerManager::instance()->addTimer(
-        [timerContext, callback](TimerId timerId)
+    const auto setTimer =
+        [&]()
         {
-            QnMutexLocker lock(&timerContext->lock);
-            if (timerContext->timerId != timerId)
+            if (m_terminated)
                 return;
 
-            callback();
-        },
-        delay);
+            if (timerContext->timerId)
+                TimerManager::instance()->deleteTimer(timerContext->timerId);
+
+            timerContext->timerId = TimerManager::instance()->addTimer(
+                [timerContext, callback](TimerId timerId)
+                {
+                    QnMutexLocker lock(&timerContext->lock);
+                    if (timerContext->timerId != timerId)
+                        return;
+
+                    callback();
+                },
+                delay);
+        };
+
+    if (TimerManager::instance() == QThread::currentThread())
+        return setTimer();
+
+    QnMutexLocker lock(&timerContext->lock);
+    setTimer();
 }
 
 void TimerHolder::cancelTimerSync(const TimerOwnerId& timerOwnerId)
