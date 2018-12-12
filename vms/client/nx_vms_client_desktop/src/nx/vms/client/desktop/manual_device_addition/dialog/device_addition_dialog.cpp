@@ -170,9 +170,14 @@ void DeviceAdditionDialog::initializeControls()
             static constexpr int kStartSearchPage = 0;
             const bool enabled = currentPageIndex == kStartSearchPage;
             const QList<QWidget*> widgets =
-                { ui->stackedWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
+                { ui->searchParametersPanel, ui->addDevicesPanel, ui->serverChoosePanel };
             for (const auto widget: widgets)
                 widget->setEnabled(enabled);
+            for (int i = 0; i < ui->tabWidget->count(); ++i)
+            {
+                if (i != ui->tabWidget->currentIndex())
+                    ui->tabWidget->setTabEnabled(i, enabled);
+            }
         });
 
     setupTable();
