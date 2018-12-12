@@ -3196,7 +3196,6 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
     auto logSettings = makeLogSettings(settings);
-
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
     logSettings.loggers.front().logBaseName = "log_file";
@@ -3211,6 +3210,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     else
         roSettings->remove("logFile");
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
@@ -3219,6 +3219,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             logSettings, qApp->applicationName(), binaryPath,
             {QnLog::HTTP_LOG_INDEX}));
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
@@ -3233,6 +3234,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             }),
         /*writeLogHeader*/ false);
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "ec2_tran";
@@ -3243,6 +3245,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             binaryPath,
             {QnLog::EC2_TRAN_LOG}));
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
         settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "permissions";

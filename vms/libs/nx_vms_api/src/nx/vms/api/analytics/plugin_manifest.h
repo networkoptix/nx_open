@@ -4,7 +4,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QJsonObject>
 
-#include <nx/vms/api/analytics/translatable_string.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>

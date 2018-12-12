@@ -10,9 +10,9 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
-#include <nx/sdk/analytics/plugin.h>
+#include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/common/to_string.h>
-#include <nx/sdk/settings.h>
+#include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
 #include <nx/analytics/descriptor_list_manager.h>
 
@@ -20,8 +20,8 @@ namespace nx::vms::server::resource {
 
 namespace {
 
-using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::Plugin>;
-using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::Engine>;
+using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>;
+using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::IEngine>;
 
 } // namespace
 
@@ -32,7 +32,7 @@ AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModu
 }
 
 void AnalyticsEngineResource::setSdkEngine(
-    sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine)
+    sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine)
 {
     m_sdkEngine = std::move(sdkEngine);
 }
@@ -83,7 +83,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
 
     NX_DEBUG(this, "Sending settings to engine %1 (%2)", getName(), getId());
 
-    sdk_support::UniquePtr<nx::sdk::Settings> effectiveSettings;
+    sdk_support::UniquePtr<nx::sdk::IStringMap> effectiveSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
@@ -94,7 +94,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     }
 
     if (!effectiveSettings)
-        effectiveSettings = sdk_support::toSdkSettings(settingsValues());
+        effectiveSettings = sdk_support::toIStringMap(settingsValues());
 
     if (!NX_ASSERT(effectiveSettings, lm("Engine %1 (%2)").args(getName(), getId())))
         return false;
@@ -103,7 +103,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     {
         analytics::debug_helpers::dumpStringToFile(
             this,
-            QString::fromStdString(nx::sdk::common::toString(effectiveSettings.get())),
+            QString::fromStdString(nx::sdk::common::toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
             analytics::debug_helpers::filename(
                 QnVirtualCameraResourcePtr(),

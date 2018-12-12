@@ -17,7 +17,7 @@ public:
     WrappingCompressedVideoPacket(const QnConstCompressedVideoDataPtr& frame):
         m_frame(frame)
     {
-        setTimestampUsec(m_frame->timestamp);
+        setTimestampUs(m_frame->timestamp);
         setWidth(m_frame->width);
         setHeight(m_frame->height);
         setCodec(toString(m_frame->compressionType).toStdString());

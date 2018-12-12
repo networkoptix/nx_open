@@ -5,7 +5,7 @@
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/i_engine.h>
 #include <common/common_module_aware.h>
 #include <core/resource/resource.h>
 

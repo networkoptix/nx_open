@@ -2,8 +2,7 @@
 
 #include <QtCore/QString>
 
-#include <nx/sdk/common.h>
-#include <nx/sdk/analytics/plugin.h>
+#include <nx/sdk/analytics/i_plugin.h>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -69,7 +68,7 @@ class StartupPluginManifestLogger: public AbstractManifestLogger
 public:
     StartupPluginManifestLogger(
         nx::utils::log::Tag logTag,
-        const nx::sdk::analytics::Plugin* plugin);
+        const nx::sdk::analytics::IPlugin* plugin);
 
     virtual void log(
         const QString& manifestStr,
@@ -81,7 +80,7 @@ private:
 
 private:
     nx::utils::log::Tag m_logTag;
-    const nx::sdk::analytics::Plugin* m_plugin = nullptr;
+    const nx::sdk::analytics::IPlugin* m_plugin = nullptr;
 };
 
 } // namespace nx::vms::server::sdk_support

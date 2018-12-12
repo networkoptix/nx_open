@@ -3,14 +3,14 @@
 #include <QtCore/QMap>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/event/events/events_fwd.h>
 
-#include <nx/sdk/analytics/objects_metadata_packet.h>
-#include <nx/sdk/analytics/events_metadata_packet.h>
+#include <nx/sdk/analytics/i_object_metadata_packet.h>
+#include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
@@ -32,7 +32,7 @@ public:
 
     MetadataHandler(QnMediaServerModule* serverModule);
 
-    void handleMetadata(nx::sdk::analytics::MetadataPacket* metadata);
+    void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadata);
 
     void setResource(QnVirtualCameraResourcePtr resource);
     void setPluginId(QString pluginId);
@@ -53,13 +53,13 @@ private:
     nx::vms::api::analytics::EventType eventTypeDescriptor(const QString& eventTypeId) const;
 
     void handleEventsPacket(
-        nxpt::ScopedRef<nx::sdk::analytics::EventsMetadataPacket> packet);
+        nxpt::ScopedRef<nx::sdk::analytics::IEventMetadataPacket> packet);
 
     void handleObjectsPacket(
-        nxpt::ScopedRef<nx::sdk::analytics::ObjectsMetadataPacket> packet);
+        nxpt::ScopedRef<nx::sdk::analytics::IObjectMetadataPacket> packet);
 
     void handleMetadataEvent(
-        nxpt::ScopedRef<nx::sdk::analytics::Event> eventData,
+        nxpt::ScopedRef<nx::sdk::analytics::IEvent> eventData,
         qint64 timestampUsec);
 
 private:

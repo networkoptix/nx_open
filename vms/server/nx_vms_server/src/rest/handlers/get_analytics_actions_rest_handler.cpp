@@ -9,7 +9,7 @@
 #include "api/model/analytics_actions.h"
 #include "media_server/media_server_module.h"
 
-using nx::sdk::analytics::Engine;
+using nx::sdk::analytics::IEngine;
 
 QnGetAnalyticsActionsRestHandler::~QnGetAnalyticsActionsRestHandler()
 {

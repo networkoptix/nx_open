@@ -11,8 +11,7 @@
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/member_detector.h>
 
-#include <nx/sdk/common.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -23,7 +22,7 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
-#include <nx/sdk/settings.h>
+#include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
 #include <plugins/settings.h>
 
@@ -57,7 +56,7 @@ std::optional<ManifestType> manifest(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    sdk_support::UniquePtr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    UniquePtr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](
@@ -112,7 +111,7 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
         return QnSharedResourcePointer<ResourceType>();
     }
 
-    auto resourcePool = serverModule->resourcePool();
+    const auto resourcePool = serverModule->resourcePool();
     if (!resourcePool)
     {
         NX_ASSERT(false, "Can't access resource pool");
@@ -131,13 +130,13 @@ bool deviceInfoFromResource(
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
 
-UniquePtr<nx::sdk::Settings> toSdkSettings(const QVariantMap& settings);
-UniquePtr<nx::sdk::Settings> toSdkSettings(const QMap<QString, QString>& settings);
-UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson);
+UniquePtr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
+UniquePtr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
+UniquePtr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
-QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings);
+QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
 
-std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel);
@@ -161,7 +160,7 @@ std::map<QString, Descriptor> descriptorsFromItemList(
         else
         {
             descriptor.id = item.id;
-            descriptor.name = item.name.value;
+            descriptor.name = item.name;
         }
 
         if constexpr (detail::hasPaths<Descriptor>::value)
