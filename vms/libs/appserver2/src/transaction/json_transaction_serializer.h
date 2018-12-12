@@ -53,7 +53,11 @@ namespace ec2
             //TODO #ak use cache
             QJsonValue jsonTran;
             QJson::serialize(tran, &jsonTran);
+            return serializedTransactionWithHeaderInternal(jsonTran, header);
+        }
 
+        QByteArray serializedTransactionWithHeaderInternal(const QJsonValue& jsonTran, const QnTransactionTransportHeader &header)
+        {
             QJsonValue jsonHeader;
             QJson::serialize(header, &jsonHeader);
 
@@ -62,6 +66,21 @@ namespace ec2
             tranObject[QStringLiteral("header")] = jsonHeader;
 
             return QJson::serialized(tranObject);
+        }
+
+        /*
+         * Serialize Command::Value as int to send transaction
+         * to the old server with version < 4.0.
+         */
+        template <class T>
+        QByteArray serializedLegacyTransactionWithHeader(
+            const QnTransaction<T>& tran, const QnTransactionTransportHeader& header)
+        {
+            QJsonValue jsonTran;
+            QJson::serialize(tran, &jsonTran);
+            auto jsonObject = jsonTran.toObject();
+            jsonObject["command"] = (int) tran.command;
+            return serializedTransactionWithHeaderInternal(jsonObject, header);
         }
 
         QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header);
