@@ -344,6 +344,11 @@ void QnContext::updateCustomMargins()
     emit customMarginsChanged();
 }
 
+void QnContext::makeShortVibration()
+{
+    ::makeShortVibration();
+}
+
 int QnContext::leftCustomMargin() const
 {
     return getCustomMargins().left();

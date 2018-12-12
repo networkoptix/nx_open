@@ -12,7 +12,8 @@ UniformGrid
     readonly property vector2d cellCounts: Qt.vector2d(cellCountX, cellCountY)
 
     fragmentShader: "
-        #version 120
+        #version " + shaderVersion + "
+        " + precisionString + "
 
         uniform vec4 color;
         uniform vec2 cellCounts;

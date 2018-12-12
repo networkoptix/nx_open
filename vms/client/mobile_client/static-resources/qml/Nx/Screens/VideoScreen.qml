@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.2
 
 import Nx 1.0
 import Nx.Media 1.0
@@ -142,12 +143,15 @@ PageBase
     {
         id: toolBar
 
-        y: statusBarHeight
+        y: deviceStatusBarHeight
+        opacity: d.uiOpacity
+        visible: opacity > 0
+
         title: videoScreenController.resourceHelper.resourceName
         leftButtonIcon.source: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
-        {            
+        {
             y: -toolBar.statusBarHeight
             x: -mainWindow.leftPadding
             width: mainWindow.width
@@ -155,12 +159,25 @@ PageBase
             source: lp("/images/toolbar_gradient.png")
         }
 
-        opacity: d.uiOpacity
-        visible: opacity > 0
         titleOpacity: d.cameraUiOpacity
 
         controls:
         [
+            MotionAreaButton
+            {
+                visible: video.motionController && video.motionController.customRoiExists
+                anchors.verticalCenter: parent.verticalCenter
+
+                text: qsTr("Area")
+                icon.source: lp("/images/close.png")
+
+                onClicked:
+                {
+                    if (video.motionController)
+                        video.motionController.clearCustomRoi()
+                }
+            },
+
             IconButton
             {
                 icon.source: lp("/images/more_vert.png")
@@ -170,6 +187,23 @@ PageBase
                 }
             }
         ]
+
+        contentItem.clip: false
+
+        Banner
+        {
+            id: banner
+
+            property bool portraitOrientation:
+                Screen.orientation === Qt.PortraitOrientation
+                || Screen.orientation === Qt.InvertedPortraitOrientation
+                || videoScreen.width < videoScreen.height //< TODO: remove me some day before merge.
+
+            y: portraitOrientation? parent.height : 8
+            x: (parent.width - width) / 2
+            maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
+            text: videoNavigation.warningText
+        }
     }
 
     Menu
@@ -238,6 +272,10 @@ PageBase
     {
         id: video
 
+        property Item motionController: sourceComponent == scalableVideoComponent
+            ? item.motionSearchController
+            : null
+
         y: toolBar.visible ? -header.height : 0
         x: -mainWindow.leftPadding
         width: mainWindow.width
@@ -268,6 +306,8 @@ PageBase
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
             onClicked: toggleUi()
+            motionSearchController.cameraRotation: videoScreenController.resourceHelper.customRotation
+            motionSearchController.motionProvider.mediaPlayer: videoScreenController.mediaPlayer
         }
     }
 
@@ -501,6 +541,18 @@ PageBase
         {
             id: videoNavigation
 
+            changingMotionRoi:
+            {
+                if (!video.motionController)
+                    return false
+
+                if (video.motionController.drawingRoi)
+                    return false
+
+                return video.item.moving && !video.motionController.customRoiExists
+            }
+
+            hasCustomRoi: video.motionController && video.motionController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
@@ -534,6 +586,20 @@ PageBase
                 switchToCamera(
                     camerasModel.nextResourceId(videoScreen.resourceId)
                         || camerasModel.nextResourceId(""))
+            }
+
+            motionFilter: video.sourceComponent == scalableVideoComponent
+                ? video.item.motionSearchController.motionFilter
+                : ""
+
+            motionSearchMode:
+                video.sourceComponent == scalableVideoComponent
+                && video.item.motionSearchController.motionSearchMode
+
+            onMotionSearchModeChanged:
+            {
+                if (video.sourceComponent == scalableVideoComponent)
+                    video.item.motionSearchController.motionSearchMode = motionSearchMode
             }
         }
     }
@@ -638,6 +704,7 @@ PageBase
 
     function switchToCamera(id)
     {
+        videoNavigation.motionSearchMode = false
         cameraSwitchAnimation.stop()
         cameraSwitchAnimation.newResourceId = id
         if (videoScreenController.mediaPlayer.liveMode)

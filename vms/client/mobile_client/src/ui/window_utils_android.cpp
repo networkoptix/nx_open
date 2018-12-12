@@ -87,4 +87,25 @@ void setScreenOrientation(Qt::ScreenOrientation orientation)
         androidOrientationFromQtOrientation(orientation));
 }
 
+void makeShortVibration()
+{
+    const auto activity = QAndroidJniObject::callStaticObjectMethod(
+        "org/qtproject/qt5/android/QtNative", "activity", "()Landroid/app/Activity;");
+    if (!activity.isValid())
+        return;
+
+    const auto serviceField = QAndroidJniObject::getStaticObjectField<jstring>(
+        "android/content/Context", "VIBRATOR_SERVICE");
+    if (!serviceField.isValid())
+        return;
+
+    const auto vibrator = activity.callObjectMethod(
+        "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;", serviceField.object<jobject>());
+    if (!vibrator.isValid())
+        return;
+
+    static constexpr jlong kDuration = 100;
+    vibrator.callMethod<void>("vibrate", "(J)V", kDuration);
+}
+
 #endif
