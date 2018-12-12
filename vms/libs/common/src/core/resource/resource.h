@@ -115,6 +115,7 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
     virtual bool isInitialized() const;
+    virtual bool isInitializationInProgress() const;
 
     bool hasDefaultProperty(const QString &name) const;
 

@@ -737,6 +737,11 @@ bool QnResource::isInitialized() const
     return m_initialized;
 }
 
+bool QnResource::isInitializationInProgress() const
+{
+    return m_initInProgress;
+}
+
 void QnResource::setUniqId(const QString& /*value*/)
 {
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
