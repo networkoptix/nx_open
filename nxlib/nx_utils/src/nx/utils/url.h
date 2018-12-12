@@ -182,6 +182,9 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
 } // namespace utils
 } // namespace nx
 
+//! Used to hide passwords from logs.
+NX_UTILS_API QString toString(const nx::utils::Url& value);
+
 Q_DECLARE_METATYPE(nx::utils::Url)
 
 class QnJsonContext;

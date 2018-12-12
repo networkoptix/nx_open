@@ -596,3 +596,11 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
 } // namespace url
 } // namespace utils
 } // namespace nx
+
+QString toString(const nx::utils::Url &value)
+{
+    if (nx::utils::ini().displayUrlPasswordInLogs)
+        return value.toString(QUrl::PrettyDecoded);
+    else
+         return value.toString(QUrl::RemovePassword);
+}

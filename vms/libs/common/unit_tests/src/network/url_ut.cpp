@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <nx/utils/url.h>
+#include <nx/utils/log/log_message.h>
 
 namespace nx {
 namespace utils {
@@ -48,6 +49,34 @@ TEST(Url, operator_less)
     ASSERT_LT(Url(kTestUrl3), Url(kTestUrl2));
     ASSERT_LT(Url(kTestUrl3), Url(kTestUrl));
 }
+
+TEST(Url, logging)
+{
+    Url url;
+    if (nx::utils::ini().displayUrlPasswordInLogs == 0)
+    {
+        url.setScheme("http");
+        url.setHost("zorz.com");
+        url.setUserName("zorzuser");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+
+        url.setPassword("zorzpassword");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+    }
+    else
+    {
+        url.clear();
+        url.setScheme("http");
+        url.setHost("zorz.com");
+        url.setUserName("zorzuser");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+
+        url.setPassword("zorzpassword");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(),
+            "http://zorzuser:zorzpassword@zorz.com");
+    }
+}
+
 
 } // namespace test
 } // namespace utils
