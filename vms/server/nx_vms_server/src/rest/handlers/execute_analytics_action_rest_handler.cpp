@@ -10,7 +10,7 @@
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/pointers.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
 
@@ -108,8 +108,8 @@ public:
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
-        m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
-        m_deviceId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
+        m_objectId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
+        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
         m_timestampUs = actionData.timestampUs;
     }
 

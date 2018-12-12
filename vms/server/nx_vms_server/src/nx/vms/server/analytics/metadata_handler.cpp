@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
@@ -108,7 +108,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> p
 
 void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket> packet)
 {
-    using namespace nx::mediaserver_plugins::utils;
+    using namespace nx::vms_server_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
