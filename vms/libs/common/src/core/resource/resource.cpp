@@ -344,7 +344,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
 
     if (m_initialized && (newStatus == Qn::Offline || newStatus == Qn::Unauthorized))
     {
-        NX_VERBOSE(this, "Signal uninitialized");
+        NX_VERBOSE(this, "Signal initialized for status %1", newStatus);
         m_initialized = false;
         emit initializedChanged(toSharedPointer(this));
     }
@@ -352,7 +352,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
-        NX_VERBOSE(this, "Signal status change");
+        NX_VERBOSE(this, "Signal status change for %1", newStatus);
         emit statusChanged(sharedThis, reason);
     }
 }
@@ -551,7 +551,7 @@ void QnResource::emitPropertyChanged(const QString& key)
     if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
-    NX_VERBOSE(this, "Set property %1 = '%2'", key, getProperty(key));
+    NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
