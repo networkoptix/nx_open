@@ -28,6 +28,12 @@ auto rangeAdapter(BeginType begin, EndType end)
     return RangeAdapter<BeginType, EndType>(begin, end);
 }
 
+template<typename PairType>
+auto rangeAdapter(const PairType& pair)
+{
+    return rangeAdapter(pair.first, pair.second);
+}
+
 template<typename KeyValueContainer>
 auto keyValueRange(KeyValueContainer&& container)
 {
