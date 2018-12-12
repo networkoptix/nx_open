@@ -259,7 +259,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
         for (const auto entry: plugin.objectTypes)
         {
             const auto& descriptor = entry.second;
-            addMenuAction(currentMenu, descriptor.item.name.value, descriptor.getId());
+            addMenuAction(currentMenu, descriptor.item.name, descriptor.getId());
 
             if (!currentSelectionStillAvailable && currentSelection == descriptor.getId())
                 currentSelectionStillAvailable = true;
