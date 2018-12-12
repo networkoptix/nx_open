@@ -2,6 +2,8 @@
 #include <nx/utils/url.h>
 #include <nx/utils/log/log_message.h>
 
+#include <optional>
+
 namespace nx {
 namespace utils {
 namespace test {
@@ -22,6 +24,14 @@ static void checkUrl(const QString& urlString, const QString& hostString)
     nxUrl.setHost(hostString);
     ASSERT_EQ(hostString, nxUrl.host());
     ASSERT_EQ(urlString, nxUrl.toString());
+}
+
+static void assertUrl(Url url, const QString& scheme, const QString& hostname, std::optional<int> port)
+{
+    ASSERT_EQ(url.scheme(), scheme);
+    ASSERT_EQ(url.host(), hostname);
+    if (port.has_value())
+        ASSERT_EQ(url.port(), *port);
 }
 
 TEST(Url, ipv6_withScopeId)
@@ -48,6 +58,19 @@ TEST(Url, operator_less)
     ASSERT_LT(Url(kTestUrl), Url(kTestUrl2));
     ASSERT_LT(Url(kTestUrl3), Url(kTestUrl2));
     ASSERT_LT(Url(kTestUrl3), Url(kTestUrl));
+}
+
+TEST(Url, parseUrlFields)
+{
+    assertUrl(url::parseUrlFields("hostname"), "", "hostname", std::nullopt);
+    assertUrl(url::parseUrlFields("hostname:1248"), "", "hostname", 1248);
+    assertUrl(url::parseUrlFields("http://hostname"), "http", "hostname", std::nullopt);
+    assertUrl(url::parseUrlFields("http://hostname:1248"), "http", "hostname", 1248);
+
+    assertUrl(url::parseUrlFields("hostname", "zorz"), "zorz", "hostname", std::nullopt);
+    assertUrl(url::parseUrlFields("hostname:1248", "zorz"), "zorz", "hostname", 1248);
+    assertUrl(url::parseUrlFields("http://hostname", "zorz"), "http", "hostname", std::nullopt);
+    assertUrl(url::parseUrlFields("http://hostname:1248", "zorz"), "http", "hostname", 1248);
 }
 
 TEST(Url, logging)
