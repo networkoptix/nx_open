@@ -54,6 +54,7 @@ def determine_package_versions(
 
     if platform == "windows":
         v["ffmpeg"] = "3.1.9"
+        v["openssl"] = "1.0.2q"
 
     if platform == "linux" and box == "none":
         v["festival"] = "2.4-1"
