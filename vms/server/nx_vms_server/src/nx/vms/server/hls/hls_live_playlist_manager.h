@@ -12,14 +12,12 @@
 
 class MediaStreamCache;
 
-namespace nx {
-namespace vms::server {
-namespace hls {
+namespace nx::vms::server::hls {
 
-/*!
-- Provides live playlist for resource
-- Updates playlist in real-time (by registering itself as an MediaStreamCache event receiver)
-- Blocks must-be-available chunks data from removal from MediaStreamCache
+/**
+ * Provides live playlist for resource.
+ * Updates playlist in real-time (by registering itself as an MediaStreamCache event receiver).
+ * Blocks must-be-available chunks data from removal from MediaStreamCache.
 */
 class LivePlaylistManager:
     public AbstractPlaylistManager
@@ -41,20 +39,20 @@ public:
     virtual int getMaxBitrate() const override;
 
     void clear();
-    //!Time (millis) from last usage of this object
+    /** Time (millis) from last usage of this object. */
     qint64 inactivityPeriod() const;
 
 private:
-    MediaStreamCache * const m_mediaStreamCache;
+    MediaStreamCache* const m_mediaStreamCache;
     mutable std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
     const quint64 m_targetDurationUSec;
-    mutable unsigned int m_mediaSequence;
+    mutable unsigned int m_mediaSequence = 0;
     AbstractPlaylistManager::ChunkData m_currentChunk;
     mutable QnMutex m_mutex;
-    quint64 m_totalPlaylistDuration;
+    quint64 m_totalPlaylistDuration = 0;
     //queue<pair<timestamp to block; playlist start timestamp, blocking lives to> >
     std::queue<std::pair<quint64, quint64> > m_timestampToBlock;
-    int m_blockID;
+    int m_blockId = -1;
     const int m_removedChunksToKeepCount;
     mutable QElapsedTimer m_inactivityTimer;
     nx::utils::SubscriptionId m_onKeyFrameSubscriptionId;
@@ -64,9 +62,7 @@ private:
     void onDiscontinue();
 };
 
-//!Using std::shared_ptr for \a std::shared_ptr::unique()
-typedef std::shared_ptr<nx::vms::server::hls::LivePlaylistManager> LivePlaylistManagerPtr;
+/** Using std::shared_ptr because of std::shared_ptr::unique(). */
+using LivePlaylistManagerPtr = std::shared_ptr<nx::vms::server::hls::LivePlaylistManager>;
 
-} // namespace hls
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::hls

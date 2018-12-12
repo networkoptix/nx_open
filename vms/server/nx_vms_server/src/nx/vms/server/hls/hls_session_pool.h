@@ -1,8 +1,9 @@
 #pragma once
 
-#include <map>
-#include <set>
 #include <chrono>
+#include <map>
+#include <memory>
+#include <set>
 
 #include <QSharedPointer>
 #include <QString>
@@ -20,9 +21,7 @@
 #include "hls_playlist_manager.h"
 #include <nx/vms/server/server_module_aware.h>
 
-namespace nx {
-namespace vms::server {
-namespace hls {
+namespace nx::vms::server::hls {
 
 class AbstractPlaylistManager;
 
@@ -55,6 +54,7 @@ public:
         const QString& alias,
         quint64 startTimestamp,
         quint64 duration);
+
     bool getChunkByAlias(
         MediaQuality streamQuality,
         const QString& alias,
@@ -101,6 +101,7 @@ class SessionPool:
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
+
 public:
     /** Locks specified session id for ScopedSessionIDLock lifetime. */
     class ScopedSessionIDLock
@@ -123,7 +124,6 @@ public:
         const QString m_id;
     };
 
-    SessionPool();
     virtual ~SessionPool();
 
     /**
@@ -133,12 +133,13 @@ public:
      * if no one uses it for keepAliveTimeoutSec seconds. 0 is treated as no timeout.
      * @return False, if session with id session->id() already exists. true, otherwise.
      */
-    bool add(Session* session, unsigned int keepAliveTimeoutMS);
+    bool add(std::unique_ptr<Session> session, std::chrono::milliseconds keepAliveTimeout);
     /**
      * @return Null, if session not found.
      * NOTE: Re-launches session deletion timer for keepAliveTimeoutSec.
      */
     Session* find(const QString& id) const;
+    
     /** Removes session. Deallocates Session object. */
     void remove(const QString& id);
 
@@ -155,27 +156,25 @@ private:
     class SessionContext
     {
     public:
-        Session* session;
-        unsigned int keepAliveTimeoutMS;
-        quint64 removeTaskID;
+        std::unique_ptr<Session> session;
+        std::chrono::milliseconds keepAliveTimeout = std::chrono::milliseconds::zero();
+        quint64 removeTaskId = 0;
 
-        SessionContext();
+        SessionContext() = default;
         SessionContext(
-            Session* const _session,
-            unsigned int _keepAliveTimeoutMS);
+            std::unique_ptr<Session> session,
+            std::chrono::milliseconds keepAliveTimeout);
     };
 
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     std::set<QString> m_lockedIDs;
-    std::map<QString, SessionContext> m_sessionByID;
-    std::map<quint64, QString> m_taskToSessionID;
+    std::map<QString, SessionContext> m_sessionById;
+    std::map<quint64, QString> m_taskToSessionId;
 
     /** Implementation of TimerEventHandler::onTimer. */
-    virtual void onTimer(const quint64& timerID);
+    virtual void onTimer(const quint64& timerId);
     void removeNonSafe(const QString& id);
 };
 
-} // namespace hls
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::hls

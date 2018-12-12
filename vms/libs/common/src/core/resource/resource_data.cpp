@@ -22,9 +22,9 @@ public:
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
-        registerKey<QList<nx::common::utils::Credentials>>(
+        registerKey<QList<nx::vms::common::Credentials>>(
             ResourceDataKey::kPossibleDefaultCredentials);
-        registerKey<nx::common::utils::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
+        registerKey<nx::vms::common::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
             ResourceDataKey::kMultiresourceVideoChannelMapping);
         registerKey<QnHttpConfigureRequestList>(ResourceDataKey::kPreStreamConfigureRequests);

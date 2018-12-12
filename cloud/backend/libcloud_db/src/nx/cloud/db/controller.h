@@ -26,6 +26,7 @@
 #include "managers/system_merge_manager.h"
 #include "managers/temporary_account_password_manager.h"
 #include "managers/vms_gateway.h"
+#include "model.h"
 #include "stree/stree_manager.h"
 
 namespace nx::cloud::db {
@@ -38,7 +39,9 @@ extern const int kMaxSupportedProtocolVersion;
 class Controller
 {
 public:
-    Controller(const conf::Settings& settings);
+    Controller(
+        const conf::Settings& settings,
+        Model* model);
     ~Controller();
 
     const StreeManager& streeManager() const;
@@ -102,7 +105,7 @@ private:
     nx::sql::DBResult copyExternalTransaction(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const nx::clusterdb::engine::EditableSerializableTransaction& transaction);
+        const nx::clusterdb::engine::EditableSerializableCommand& transaction);
 
     void initializeSecurity();
 };

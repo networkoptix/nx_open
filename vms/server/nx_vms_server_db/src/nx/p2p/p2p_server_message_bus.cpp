@@ -115,7 +115,7 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
     auto serializeMessage = [this](const P2pConnectionPtr& connection)
     {
-		std::vector<PeerDistanceRecord> records;
+        std::vector<PeerDistanceRecord> records;
         records.reserve(m_peers->allPeerDistances.size());
         const auto localPeer = vms::api::PersistentIdData(this->localPeer());
         for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
@@ -139,15 +139,15 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
                 firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
             records.emplace_back(PeerDistanceRecord{peerNumber, minDistance, firstViaNumber});
         }
-		NX_ASSERT(!records.empty());
+        NX_ASSERT(!records.empty());
 
         std::sort(records.begin(), records.end(),
             [](const PeerDistanceRecord& left, const PeerDistanceRecord& right)
-	        {
-	            if (left.distance != right.distance)
-	                return left.distance < right.distance;
-	            return left.peerNumber < right.peerNumber;
-	        });
+            {
+                if (left.distance != right.distance)
+                    return left.distance < right.distance;
+                return left.peerNumber < right.peerNumber;
+            });
 
         QByteArray data = serializePeersMessage(records, 1);
         data.data()[0] = (quint8)MessageType::alivePeers;
@@ -391,7 +391,21 @@ void ServerMessageBus::stop()
 
 void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
-    auto data = serializeSubscribeAllRequest(m_db->transactionLog()->getTransactionsState());
+    const auto& state = m_db->transactionLog()->getTransactionsState();
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+    {
+        QVector<vms::api::PersistentIdData> data;
+        QVector<qint32> indexes;
+        for (auto itr = state.values.cbegin(); itr != state.values.cend(); ++itr)
+        {
+            data << itr.key();
+            indexes << itr.value();
+        }
+        printSubscribeMessage(
+            connection->remotePeer().id, data, indexes);
+    }
+
+    auto data = serializeSubscribeAllRequest(state);
     data.data()[0] = (quint8)MessageType::subscribeAll;
     connection->sendMessage(data);
     context(connection)->isLocalStarted = true;
@@ -766,7 +780,11 @@ void ServerMessageBus::gotTransaction(
     sendTransaction(tran, transportHeader);
 
     if (m_handler)
-        m_handler->triggerNotification(tran, NotificationSource::Remote);
+    {
+        auto amendedTran = tran;
+        amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+        m_handler->triggerNotification(amendedTran, NotificationSource::Remote);
+    }
 }
 
 bool ServerMessageBus::handlePushTransactionData(
@@ -812,7 +830,7 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
                 stop();
                 commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
             },
-            0, m_thread);
+            0, qApp->thread());
 
         return false;
     }

@@ -14,6 +14,11 @@ details::NodePtr createResourceNode(
     const QString& extraText,
     bool checkable);
 
+details::NodePtr createGroupNode(
+    const QnVirtualCameraResourcePtr& cameraResource,
+    const QString& extraText,
+    bool checkable);
+
 QnResourceList getSelectedResources(const details::NodePtr& root);
 QnResourcePtr getResource(const details::NodePtr& node);
 QnResourcePtr getResource(const QModelIndex& index);

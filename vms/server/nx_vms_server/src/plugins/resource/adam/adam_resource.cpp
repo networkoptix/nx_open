@@ -233,7 +233,7 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString&
         auto ports = ioPortDescriptions();
         setPortDefaultStates();
         setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
-        saveProperties();
+        savePropertiesAsync();
     }
 }
 

@@ -21,6 +21,7 @@ public:
     void dynamicUpdate(const QnTimePeriod& period);
 
     virtual bool isConstrained() const override;
+    virtual bool hasAccessRights() const override;
 
 private:
     class Private;

@@ -51,20 +51,20 @@ void QnManualSearchTaskManager::pleaseStop(nx::utils::MoveOnlyFunc<void()> compl
 }
 
 void QnManualSearchTaskManager::addTask(
-    nx::network::SocketAddress address,
-    const QAuthenticator& auth,
-    std::vector<QnAbstractNetworkResourceSearcher*> searchers, bool isSequential)
+    nx::utils::Url url,
+    std::vector<QnAbstractNetworkResourceSearcher*> searchers,
+    bool isSequential)
 {
     using namespace std::placeholders;
 
     // Task runs searchers sequentially, so if we want search to be parallel we should not run more
     // than one searcher in a task.
     NX_ASSERT(isSequential == true || searchers.size() == 1);
-    QnSearchTask task(commonModule(), address, auth, /*breakOnGotResult*/ isSequential);
+    QnSearchTask task(commonModule(), std::move(url), /*breakOnGotResult*/ isSequential);
 
     task.setSearchers(searchers);
     task.setSearchDoneCallback(
-        std::bind(&QnManualSearchTaskManager::searchTaskDoneHandler, this, _1, _2));
+        std::bind(&QnManualSearchTaskManager::onSearchTaskDone, this, _1, _2));
 
     if (isSequential)
     {
@@ -73,16 +73,18 @@ void QnManualSearchTaskManager::addTask(
     }
 
     m_pollable.dispatch(
-        [this, task = std::move(task), address, isSequential]() mutable
+        [this, task = std::move(task), isSequential]() mutable
         {
-            NX_VERBOSE(this, "Adding task %1 on %2 (sequential: %3)", task, task.url(), isSequential);
+            const auto url = task.url();
+            NX_VERBOSE(this, "Adding task %1 on %2 (sequential: %3)", task, url, isSequential);
             NX_CRITICAL(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
-            m_searchTasksQueues[address.address].push(std::move(task));
-            m_searchQueueContexts[address.address]; //< Create if does not exist.
+            m_searchTasksQueues[url].push(std::move(task));
+            m_searchQueueContexts[url]; //< Create if does not exist.
 
             m_totalTaskCount++;
         });
 }
+
 
 void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
 {
@@ -96,6 +98,8 @@ void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
             m_runningTaskCount = 0;
             m_tasksFinishedCallback = std::move(callback);
 
+            if (m_remainingTaskCount == 0)
+                return onSearchFinished();
             runSomePendingTasks();
         });
 }
@@ -115,7 +119,7 @@ QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
         [this]() -> QnManualResourceSearchList { return m_foundResources; });
 }
 
-void QnManualSearchTaskManager::searchTaskDoneHandler(
+void QnManualSearchTaskManager::onSearchTaskDone(
     QnManualResourceSearchList results, QnSearchTask* const task)
 {
     NX_VERBOSE(this, "Task %1 done", *task);
@@ -124,13 +128,12 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
 
     // NOTE: Task may be deleted after call to dispatch.
     m_pollable.dispatch(
-        [this, results = std::move(results), taskInterruptProcessing, taskUrl]()
+        [this, results = std::move(results), taskInterruptProcessing, taskUrl = std::move(taskUrl)]()
         {
             NX_VERBOSE(this, "Remained: %1; Running: %2; Url: %3",
                 m_remainingTaskCount.load(), m_runningTaskCount, taskUrl);
 
-            auto queueName = nx::network::HostAddress(taskUrl.host()).ipV4().get();
-            auto& context = m_searchQueueContexts[queueName];
+            auto& context = m_searchQueueContexts[taskUrl];
 
             context.isBlocked = false;
             context.runningTaskCount--;
@@ -143,7 +146,7 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
 
                 if (taskInterruptProcessing && !results.isEmpty())
                 {
-                    m_remainingTaskCount -= m_searchTasksQueues[queueName].size();
+                    m_remainingTaskCount -= m_searchTasksQueues[taskUrl].size();
                     context.isInterrupted = true;
                 }
 
@@ -153,18 +156,24 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
             // Should not do anything else if it was not the last task ran.
             if (m_runningTaskCount > 0)
                 return;
+            onSearchFinished();
+    });
+}
 
-            // It is an error if the state is running and there are some pending tasks, but no
-            // tasks are running.
-            NX_ASSERT(m_runningTaskCount == 0);
-            NX_ASSERT((m_state == State::running && m_remainingTaskCount == 0)
-                || m_state == State::canceled);
+void QnManualSearchTaskManager::onSearchFinished()
+{
+    NX_CRITICAL(m_pollable.isInSelfAioThread());
 
-            m_state = State::finished;
-            NX_VERBOSE(this, "Search has finished, found %1 resources", m_foundResources.size());
+    // It is an error if the state is running and there are some pending tasks, but no
+    // tasks are running.
+    NX_ASSERT(m_runningTaskCount == 0);
+    NX_ASSERT((m_state == State::running && m_remainingTaskCount == 0)
+        || m_state == State::canceled);
 
-            m_tasksFinishedCallback(std::move(m_foundResources));
-        });
+    m_state = State::finished;
+    NX_VERBOSE(this, "Search has finished, found %1 resources", m_foundResources.size());
+
+    m_tasksFinishedCallback(std::move(m_foundResources));
 }
 
 void QnManualSearchTaskManager::runSomePendingTasks()
@@ -179,7 +188,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
         // Take one task from each queue.
         for (auto it = m_searchTasksQueues.begin(); it != m_searchTasksQueues.end();)
         {
-            auto queueName = it->first;
+            const auto queueName = it->first;
             auto& queue = it->second;
             auto& context = m_searchQueueContexts[queueName];
 

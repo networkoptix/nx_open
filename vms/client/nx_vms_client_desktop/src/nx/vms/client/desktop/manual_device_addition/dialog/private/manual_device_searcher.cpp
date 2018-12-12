@@ -26,29 +26,28 @@ bool operator==(const QnManualResourceSearchStatus& left, const QnManualResource
 
 ManualDeviceSearcher::ManualDeviceSearcher(
     const QnMediaServerResourcePtr& server,
-    const QString& address,
+    const QString& url,
     const QString& login,
     const QString& password,
-    int port)
+    std::optional<int> port)
     :
     m_server(server),
     m_login(login),
     m_password(password)
 {
-    if (!checkServer() || !checkUrl(address))
+    if (!checkServer() || !checkUrl(url))
         return;
 
     init();
-    searchForDevices(address, QString(), login, password, port);
+    searchForDevices(url, QString(), login, password, port);
 }
 
-ManualDeviceSearcher::ManualDeviceSearcher(
-    const QnMediaServerResourcePtr& server,
+ManualDeviceSearcher::ManualDeviceSearcher(const QnMediaServerResourcePtr& server,
     const QString& startAddress,
     const QString& endAddress,
     const QString& login,
     const QString& password,
-    int port)
+    std::optional<int> port)
     :
     m_server(server),
     m_login(login),
@@ -178,11 +177,11 @@ bool ManualDeviceSearcher::checkAddresses(
 }
 
 void ManualDeviceSearcher::searchForDevices(
-    const QString& startAddress,
+    const QString& urlOrStartAddress,
     const QString& endAddress,
     const QString& login,
     const QString& password,
-    int port)
+    std::optional<int> port)
 {
     const auto startCallback =
         [this, guard = QPointer<ManualDeviceSearcher>(this)](
@@ -208,8 +207,16 @@ void ManualDeviceSearcher::searchForDevices(
         };
 
 
-    m_server->restConnection()->searchCameraStart(
-        startAddress, endAddress, login, password, port, startCallback, QThread::currentThread());
+    if (endAddress.isEmpty())
+    {
+        m_server->restConnection()->searchCameraStart(
+            urlOrStartAddress, login, password, port, startCallback, QThread::currentThread());
+    }
+    else
+    {
+        m_server->restConnection()->searchCameraRangeStart(
+            urlOrStartAddress, endAddress, login, password, port, startCallback, QThread::currentThread());
+    }
 }
 
 bool ManualDeviceSearcher::searching() const

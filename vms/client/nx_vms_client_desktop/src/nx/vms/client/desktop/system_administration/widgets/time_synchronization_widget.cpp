@@ -254,7 +254,6 @@ void TimeSynchronizationWidget::setupUi()
     hHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
     hHeader->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
     hHeader->setSectionsClickable(false);
-    hHeader->setDefaultAlignment(Qt::AlignLeft);
 
     auto vHeader = ui->serversTable->verticalHeader();
     vHeader->setSectionResizeMode(QHeaderView::ResizeToContents);

@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
 
 class QMenu;
+class QLabel;
 class QTimer;
 
 namespace Ui { class AbstractSearchWidget; }
@@ -69,12 +70,10 @@ public:
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
-    void setCamerasReadOnly(bool value);
-
 private:
     void setupModels();
     void setupRibbon();
-    void setupToolbar();
+    void setupViewportHeader();
     void setupPlaceholder();
     void setupTimeSelection();
     void setupCameraSelection();
@@ -102,6 +101,10 @@ private:
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;
     const QScopedPointer<BusyIndicatorModel> m_tailIndicatorModel;
     const QScopedPointer<ConcatenationListModel> m_visualModel;
+
+    ToolButton* const m_togglePreviewsButton;
+    ToolButton* const m_toggleFootersButton;
+    QLabel* const m_itemCounterLabel;
 
     SearchLineEdit* const m_textFilterEdit;
 

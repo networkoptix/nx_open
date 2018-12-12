@@ -11,22 +11,22 @@
 
 namespace nx::clusterdb::engine::transport::test {
 
-template<typename TransportTypeSet>
-class TransportAcceptance:
+template<typename TypeSet>
+class CommandPipelineAcceptance:
     public ::testing::Test
 {
-    using Acceptor = typename TransportTypeSet::Acceptor;
-    using CommandPipeline = typename TransportTypeSet::CommandPipeline;
-    using Connector = typename TransportTypeSet::Connector;
+    using Acceptor = typename TypeSet::Acceptor;
+    using CommandPipeline = typename TypeSet::CommandPipeline;
+    using Connector = typename TypeSet::Connector;
 
 public:
-    TransportAcceptance()
+    CommandPipelineAcceptance()
     {
         m_systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
         m_nodeId = QnUuid::createUuid().toSimpleByteArray().toStdString();
     }
 
-    ~TransportAcceptance()
+    ~CommandPipelineAcceptance()
     {
         for (auto& connector: m_connectors)
             connector->pleaseStopSync();
@@ -133,11 +133,11 @@ private:
     }
 };
 
-TYPED_TEST_CASE_P(TransportAcceptance);
+TYPED_TEST_CASE_P(CommandPipelineAcceptance);
 
 //-------------------------------------------------------------------------------------------------
 
-TYPED_TEST_P(TransportAcceptance, connection_can_be_established)
+TYPED_TEST_P(CommandPipelineAcceptance, connection_can_be_established)
 {
     this->whenConnect();
 
@@ -146,7 +146,7 @@ TYPED_TEST_P(TransportAcceptance, connection_can_be_established)
 }
 
 TYPED_TEST_P(
-    TransportAcceptance,
+    CommandPipelineAcceptance,
     transport_connection_is_removed_before_http_response_has_been_sent)
 {
     constexpr int connectionToEstablishCount = 11;
@@ -158,7 +158,7 @@ TYPED_TEST_P(
     this->waitForEveryConnectToComplete();
 }
 
-REGISTER_TYPED_TEST_CASE_P(TransportAcceptance,
+REGISTER_TYPED_TEST_CASE_P(CommandPipelineAcceptance,
     connection_can_be_established,
     transport_connection_is_removed_before_http_response_has_been_sent
 );

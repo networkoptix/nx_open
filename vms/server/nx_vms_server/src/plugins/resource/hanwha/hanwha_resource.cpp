@@ -51,7 +51,7 @@ namespace {
 
 static const QString kBypassPrefix("Bypass");
 
-bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
+static bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
 {
     return param && param->possibleValues().contains(kHanwhaTrue);
 }
@@ -207,7 +207,7 @@ static const std::map<QString, PtzTraitDescriptor> kHanwhaPtzTraitDescriptors = 
     }
 };
 
-Ptz::Capabilities calculateSupportedPtzCapabilities(
+static Ptz::Capabilities calculateSupportedPtzCapabilities(
     const std::map<QString, PtzDescriptor>& descriptors,
     const HanwhaAttributes& attributes,
     int channel)
@@ -241,7 +241,7 @@ Ptz::Capabilities calculateSupportedPtzCapabilities(
     return supportedPtzCapabilities;
 };
 
-QnPtzLimits calculatePtzLimits(
+static QnPtzLimits calculatePtzLimits(
     const HanwhaAttributes& attributes,
     const HanwhaCgiParameters& parameters,
     int channel)
@@ -437,6 +437,15 @@ struct GroupParameterInfo
     QString groupLead;
     QString groupIncludeCondition;
 };
+
+static QString physicalIdForChannel(const QString& groupId, int value)
+{
+    auto id = groupId;
+    if (value > 0)
+        id += lit("_channel=%1").arg(value + 1);
+
+    return id;
+}
 
 } // namespace
 
@@ -698,7 +707,7 @@ bool HanwhaResource::setOutputPortState(
     if (autoResetTimeoutMs > 0)
     {
         m_timerHolder.addTimer(
-            outputId,
+            lm("%1 output %2").args(this, outputId),
             resetHandler,
             std::chrono::milliseconds(autoResetTimeoutMs));
     }
@@ -1343,9 +1352,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_attributes,
         getChannel());
 
-    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
-
+    NX_VERBOSE(this, "Supported PTZ capabilities direct: %1", ptzCapabilityBits(capabilities));
     if (isBypassSupported())
     {
         const auto bypassPtzCapabilities = calculateSupportedPtzCapabilities(
@@ -1353,14 +1360,12 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
 
-        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(bypassPtzCapabilities)));
+        NX_VERBOSE(this, "Supported PTZ capabilities bypass: %1",
+            ptzCapabilityBits(bypassPtzCapabilities));
 
         // We consider capability is true if it's supported both by a NVR and a camera.
         capabilities &= bypassPtzCapabilities;
-
-        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+        NX_VERBOSE(this, "Supported PTZ capabilities both: %1", ptzCapabilityBits(capabilities));
     }
 
     if ((capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
@@ -1375,9 +1380,9 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         capabilities |= Ptz::AuxiliaryPtzCapability;
 
-    NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+    initRedirectedAreaZoomPtz();
 
+    NX_DEBUG(this, "Supported PTZ capabilities: %1", ptzCapabilityBits(capabilities));
     if (isAnalogEncoder())
     {
         // Encoder PTZ capabilities are being overriden from 'Expert' tab
@@ -1433,6 +1438,36 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
         .args(getPhysicalId(), ptzCapabilityBits(configurationalCapabilities)));
     return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
+{
+    const auto ptzTargetChannel = resourceData().value<int>(ResourceDataKey::kPtzTargetChannel, -1);
+    if (ptzTargetChannel == -1 || ptzTargetChannel == getChannel())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
+    const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
+    if (isCalibrated)
+    {
+        const auto id = physicalIdForChannel(getGroupId(), ptzTargetChannel);
+        NX_DEBUG(this, "Set PTZ target id: %1", id);
+        setProperty(ResourcePropertyKey::kPtzTargetId, id);
+
+        // TODO: Remove this workaround when client fixes a bug:
+        //     Absolute move and viewport is not accessible if continious move is not supportd.
+        //
+        // m_ptzCapabilities[core::ptz::Type::operational] |= Ptz::ContinuousPanTiltCapabilities;
+    }
+    else
+    {
+        NX_DEBUG(this, "Remove PTZ target id");
+        setProperty(ResourcePropertyKey::kPtzTargetId, QString());
+        m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
+    }
+
+    setPtzCalibarionTimer();
+    return calibratedChannels.diagnostics;
 }
 
 HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
@@ -3055,16 +3090,11 @@ void HanwhaResource::updateToChannel(int value)
     url.setQuery(query);
     setUrl(url.toString());
 
-    QString physicalId = getPhysicalId().split('_')[0];
     setDefaultGroupName(getModel());
-    setGroupId(physicalId);
+    setGroupId(getPhysicalId().split('_')[0]);
+    setPhysicalId(physicalIdForChannel(getGroupId(), value));
 
-    QString suffix = lit("_channel=%1").arg(value + 1);
-    if (value > 0)
-        physicalId += suffix;
-    setPhysicalId(physicalId);
-
-    suffix = lit("-channel %1").arg(value + 1);
+    const auto suffix = lit("-channel %1").arg(value + 1);
     if (value > 0 && !getName().endsWith(suffix))
         setName(getName() + suffix);
 }
@@ -3908,6 +3938,35 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
         return Ptz::NoPtzCapabilities;
 
     return itr->second;
+}
+
+void HanwhaResource::setPtzCalibarionTimer()
+{
+    NX_VERBOSE(this, "Set PTZ calibration timer");
+    m_timerHolder.addTimer(
+        lm("%1 PTZ calibration").args(this),
+        [this]()
+        {
+            if (getStatus() != Qn::Online && getStatus() != Qn::Recording)
+            {
+                NX_DEBUG(this, "PTZ calibration timer is not needed any more");
+                return;
+            }
+
+            if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
+            {
+                const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+                const bool isCalibrated = calibratedChannels->count(getChannel());
+                if (isRedirected != isCalibrated)
+                {
+                    NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
+                    return setStatus(Qn::Offline);
+                }
+            }
+
+            setPtzCalibarionTimer();
+        },
+        std::chrono::seconds(10));
 }
 
 } // namespace plugins

@@ -61,9 +61,9 @@ public:
     };
 
     /**
-     * Simple check whether client should install anything from these contents.
+     * Simple check whether client should install anything from the contents.
      * @param contents
-     * @return true if client's update package should o be installed.
+     * @return true if client's update package should be installed.
      */
     bool shouldInstallThis(const UpdateContents& contents) const;
 
@@ -120,7 +120,7 @@ public:
     /**
      * Updates URL of the current mediaserver.
      */
-    void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);
+    void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
     virtual PeerManagerPtr createPeerManager(
         FileInformation::PeerSelectionPolicy peerPolicy,
@@ -152,8 +152,8 @@ protected:
 
 protected:
     void setState(State newState);
-    void setError(QString error);
-    void setApplauncherError(QString error);
+    void setError(const QString& error);
+    void setApplauncherError(const QString& error);
     void clearDownloadFolder();
 
     std::unique_ptr<Downloader> m_downloader;

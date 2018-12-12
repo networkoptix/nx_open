@@ -2,15 +2,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace common {
-namespace utils {
+namespace nx::vms::common {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Credentials, (eq)(json), Credentials_Fields)
-
-Credentials::Credentials()
-{
-}
 
 Credentials::Credentials(const QString& user, const QString& password):
     user(user),
@@ -19,8 +13,12 @@ Credentials::Credentials(const QString& user, const QString& password):
 }
 
 Credentials::Credentials(const QAuthenticator& authenticator):
-    user(authenticator.user()),
-    password(authenticator.password())
+    Credentials(authenticator.user(), authenticator.password())
+{
+}
+
+Credentials::Credentials(const nx::utils::Url& url):
+    Credentials(url.userName(), url.password())
 {
 }
 
@@ -32,6 +30,14 @@ QAuthenticator Credentials::toAuthenticator() const
     return authenticator;
 }
 
-} // namespace utils
-} // namespace common
-} // namespace nx
+bool Credentials::isEmpty() const
+{
+    return user.isEmpty() && password.isEmpty();
+}
+
+bool Credentials::isValid() const
+{
+    return !user.isEmpty() && !password.isEmpty();
+}
+
+} // namespace nx::vms::common

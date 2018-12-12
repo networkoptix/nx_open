@@ -171,6 +171,19 @@ struct UpdateContents
     nx::utils::SoftwareVersion getVersion() const;
     /** Check if we can apply this update. */
     bool isValid() const;
+
+    /**
+     * Check if this update info is completely empty.
+     * Note: it differs a bit from isValid() check. We can remove some servers and make
+     * update contents valid, but we can not do anything with an empty update.
+     */
+    bool isEmpty() const;
+
+    /**
+     * Compares this update info with 'other' and decides whether we should pick other one.
+     * @return True if we need to pick 'other' update.
+     */
+    bool compareUpdate(const UpdateContents& other) const;
 };
 
 } // namespace nx::update

@@ -71,7 +71,11 @@ QnCameraStatsData QnRecordingStats::transformStatsToModelData(const QnRecordingS
         if (isOwnCamera(cameraResource, server))
             data.cameras << camera;
         else
-            data.foreignCameras.recordedBytes += camera.recordedBytes; //< Hide all cameras which belong to another server
+        {
+            // Hide all cameras which belong to another server.
+            data.foreignCameras.recordedBytes += camera.recordedBytes;
+            data.foreignCameras.averageBitrate += camera.averageBitrate;
+        }
     }
     const auto foreignText = Translate::tr("Cameras from other servers and removed cameras");
     data.foreignCameras.uniqueId = foreignText; //< Use Id for camera name.
@@ -119,7 +123,7 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
 {
     using namespace nx::core::storage_forecast;
     QnRecordingStatsReply filteredStats;
-    AllCameraData cameras;
+    CameraRecordingSettingsSet cameras;
 
     // Filter "hidden" cameras.
     for (const auto& cameraStats : stats)
@@ -129,11 +133,11 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
 
         if (isActive(cameraResource, cameraStats))
         {
-            CameraData camera;
+            CameraRecordingSettings camera;
             camera.uniqueId = cameraStats.uniqueId;
             camera.minDays = qMax(0, cameraResource->minDays());
             camera.maxDays = qMax(0, cameraResource->maxDays());
-            camera.averageDensity = qMax(1ll, cameraStats.averageDensity);
+            camera.averageDensity = qMax(0ll, cameraStats.averageDensity);
 
             cameras.push_back(std::move(camera)); //< Add camera for forecast.
 

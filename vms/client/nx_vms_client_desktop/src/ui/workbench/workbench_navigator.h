@@ -129,6 +129,8 @@ public:
     QnResourceWidget* currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
 
+    QnMediaResourceWidget* currentMediaWidget() const;
+
     QnResourcePtr currentResource() const;
 
     Q_SLOT void jumpBackward();

@@ -45,13 +45,13 @@ private:
 
     void updateModuleImformation();
     void send(Connections::iterator socket, nx::Buffer buffer = {});
-    void sendModuleImformation(Connections::iterator socket);
-    void sendKeepAliveByTimer(Connections::iterator socket, bool firstUpdate = true);
+    void sendModuleImformation(Connections::iterator connection);
+    void sendKeepAliveByTimer(Connections::iterator connection, bool firstUpdate = true);
 
 private:
     nx::network::aio::BasicPollable m_pollable;
     QByteArray m_moduleInformatiom;
-    Connections m_connectionsToKeepOpen;
+    Connections m_connectionsToKeepOpened;
     Connections m_connectionsToUpdate;
 
     QnMutex m_mutex;

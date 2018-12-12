@@ -18,7 +18,10 @@ const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-Controller::Controller(const conf::Settings& settings):
+Controller::Controller(
+    const conf::Settings& settings,
+    Model* model)
+    :
     m_settings(settings),
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
@@ -26,7 +29,8 @@ Controller::Controller(const conf::Settings& settings):
     m_tempPasswordManager(
         settings.accountManager(),
         m_streeManager.resourceNameSet(),
-        &m_dbInstanceController.queryExecutor()),
+        &m_dbInstanceController.queryExecutor(),
+        model->temporaryCredentialsDao.get()),
     m_accountManager(
         settings,
         m_streeManager,
@@ -91,7 +95,7 @@ Controller::Controller(const conf::Settings& settings):
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine.incomingCommandDispatcher().removeHandler
         <ec2::command::SaveSystemMergeHistoryRecord>();
 
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
@@ -245,7 +249,7 @@ void Controller::initializeDataSynchronizationEngine()
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine.incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
@@ -265,7 +269,7 @@ void Controller::initializeDataSynchronizationEngine()
 nx::sql::DBResult Controller::copyExternalTransaction(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const nx::clusterdb::engine::EditableSerializableTransaction& transaction)
+    const nx::clusterdb::engine::EditableSerializableCommand& transaction)
 {
     if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
         return nx::sql::DBResult::ok;

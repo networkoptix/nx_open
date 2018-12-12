@@ -12,4 +12,4 @@ void registerSerializers()
         nx::vms::server::plugins::resource_data_support::HanwhaBypassSupportType>();
 }
 
-} // namespace nx::mediaserver
+} // namespace nx::vms::server

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <common/common_globals.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -35,9 +36,11 @@ signals:
 
 protected:
     void setTimeContentDisplayed(Qn::TimePeriodContent content, bool displayed);
+    virtual bool isMediaAccepted(QnMediaResourceWidget* widget) const;
 
 private:
     bool m_active = false;
+    QPointer<QnMediaResourceWidget> m_mediaWidget;
 };
 
 } // namespace nx::vms::client::desktop

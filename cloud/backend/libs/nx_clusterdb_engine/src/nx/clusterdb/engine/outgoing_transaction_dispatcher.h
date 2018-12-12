@@ -11,33 +11,33 @@
 
 namespace nx::clusterdb::engine {
 
-class NX_DATA_SYNC_ENGINE_API AbstractOutgoingTransactionDispatcher
+class NX_DATA_SYNC_ENGINE_API AbstractOutgoingCommandDispatcher
 {
 public:
-    virtual ~AbstractOutgoingTransactionDispatcher() = default;
+    virtual ~AbstractOutgoingCommandDispatcher() = default;
 
     virtual void dispatchTransaction(
         const std::string& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) = 0;
+        std::shared_ptr<const SerializableAbstractCommand> transactionSerializer) = 0;
 };
 
 /**
  * Dispatches transactions that has to be sent to other peers.
  */
-class NX_DATA_SYNC_ENGINE_API OutgoingTransactionDispatcher:
-    public AbstractOutgoingTransactionDispatcher
+class NX_DATA_SYNC_ENGINE_API OutgoingCommandDispatcher:
+    public AbstractOutgoingCommandDispatcher
 {
 public:
     typedef nx::utils::Subscription<
         const std::string&,
-        std::shared_ptr<const SerializableAbstractTransaction>> OnNewTransactionSubscription;
+        std::shared_ptr<const SerializableAbstractCommand>> OnNewTransactionSubscription;
 
-    OutgoingTransactionDispatcher(
+    OutgoingCommandDispatcher(
         const OutgoingCommandFilter& filter);
 
     virtual void dispatchTransaction(
         const std::string& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
+        std::shared_ptr<const SerializableAbstractCommand> transactionSerializer) override;
 
     OnNewTransactionSubscription& onNewTransactionSubscription();
 
