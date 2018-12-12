@@ -351,7 +351,7 @@ import * as Hls from 'hls.js';
                                                 // (switch to another camera)
                                                 return;
                                             }
-                                            $timeout(function () {
+                                            $timeout(() => {
                                                 if (e.target.error.url === undefined) {
                                                     e.target.error.url = e.target.currentSrc;
                                                 }
