@@ -141,7 +141,6 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
-#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/update_status_rest_handler.h>
@@ -2047,8 +2046,6 @@ void MediaServerProcess::registerRestHandlers(
      *         %value "INSTALLATION_ERROR" The server could not execute installation script.
      */
     reg("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
-
-    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
 
     /**%apidoc POST /api/restart
      * Restarts the server.
@@ -4722,12 +4719,6 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     // For inserting in HTML <img src="...">.
     restrictions->allow(webPrefix + "/ec2/cameraThumbnail",
         nx::network::http::AuthMethod::allowWithourCsrf);
-
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
-    // authentication is implemented.
-    // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
-        nx::network::http::AuthMethod::noAuth);
 
     nx::network::http::AuthMethodRestrictionList::Filter filter;
     filter.protocol = nx::network::http::http_1_0.protocol.toStdString();
