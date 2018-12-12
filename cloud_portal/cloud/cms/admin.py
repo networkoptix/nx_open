@@ -53,9 +53,8 @@ class ProductFilter(SimpleListFilter):
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=request.user.customizations)
         # TODO: Get list of available products for non context managers
-        if not UserGroupsToProductPermissions.check_permission(request.user,
-                                                               get_cloud_portal_product(settings.CUSTOMIZATION),
-                                                               'cms.publish_version'):
+        if not UserGroupsToProductPermissions.\
+                check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
             products = products.filter(created_by=request.user)
 
         return [(p.id, p.name) for p in products]
@@ -85,8 +84,7 @@ class CMSAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(CMSAdmin, self).get_queryset(request)
-        if not UserGroupsToProductPermissions.check_permission(request.user,
-                                                               get_cloud_portal_product(settings.CUSTOMIZATION)):
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user, settings.CUSTOMIZATION):
             # return empty dataset, only superuser can watch content in other
             # customizations
             return qs.filter(pk=-1)

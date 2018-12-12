@@ -123,7 +123,6 @@
         {% endblock %}
 
         {% get_review_state original.state as state %}
-        {% if perms.cms.publish_version %}
         {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update %}
             <div class="submit-row">
                 {% if state == 'Accepted' %}
@@ -136,8 +135,10 @@
                            download>Download</a>
                     </button>
                     {% endif %}
+                    {% if perms.cms.publish_version %}
                     <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
+                    {% endif %}
                     <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
                     {% if perms.cms.publish_version %}
@@ -147,7 +148,6 @@
                 {% endif %}
             {% endif %}
             </div>
-        {% endif %}
         {% endif %}
         <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">

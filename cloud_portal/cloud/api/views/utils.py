@@ -91,9 +91,7 @@ def language(request):
 def downloads_history(request):
     # TODO: later we can check specific permissions
     can_view_releases = UserGroupsToProductPermissions.\
-        check_permission(request.user,
-                         get_cloud_portal_product(settings.CUSTOMIZATION),
-                         'api.can_view_release')
+        check_customization_permission(request.user, settings.CUSTOMIZATION, 'api.can_view_release')
     if not get_public_release_history_status() and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
@@ -111,10 +109,8 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not UserGroupsToProductPermissions.check_permission(request.user,
-                                                           get_cloud_portal_product(customization),
-                                                           'api.can_view_release') \
-            and not get_public_release_history_status():
+    if not get_public_release_history_status() and not UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, customization, 'api.can_view_release'):
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):

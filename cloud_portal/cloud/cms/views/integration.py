@@ -112,9 +112,8 @@ def get_integrations(request):
                contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
 
     # Users with manager permissions all accepted products and pending drafts
-    if UserGroupsToProductPermissions.check_permission(request.user,
-                                                       get_cloud_portal_product(settings.CUSTOMIZATION),
-                                                       'cms.publish_version'):
+    if UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
         integration_list = make_integrations_json(drafts, show_pending=True)
     elif drafts.filter(created_by=request.user).exists():
         integration_list = make_integrations_json(drafts.filter(created_by=request.user), show_pending=True)

@@ -54,7 +54,7 @@ class Account(PermissionsMixin):
 
     @property
     def permissions(self):
-        if not UserGroupsToProductPermissions.check_permission(self, get_cloud_portal_product(CUSTOMIZATION)):
+        if not UserGroupsToProductPermissions.check_customization_permission(self, CUSTOMIZATION):
             return []
 
         permissions = []

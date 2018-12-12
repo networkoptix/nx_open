@@ -102,6 +102,8 @@ class Language(models.Model):
 
 class Customization(models.Model):
     class Meta:
+        # Used to allow a user to see the customization in list of customizations
+        # Cloud portal(s) are now a product so customization is not necessary for giving access anymore
         permissions = (
             ('can_view_customization', 'Can view customization'),
         )
@@ -172,6 +174,8 @@ class ProductType(models.Model):
 
 class Product(models.Model):
     class Meta:
+        # The can_access_product gives users the ability to see the product in product lists.
+        # In combination with other permission it allows them to edit the product and send reviews for their product
         permissions = (
             ('can_access_product', 'Can access product'),
         )
@@ -439,6 +443,11 @@ class UserGroupsToProductPermissions(models.Model):
                 codename = permission[permission.find('.')+1:]
             groups = groups.filter(group__permissions__codename=codename)
         return groups.exists()
+
+    @staticmethod
+    def check_customization_permission(user, customization, permission=None):
+        return UserGroupsToProductPermissions.\
+            check_permission(user, get_cloud_portal_product(customization), permission)
 
 
 # CMS data. Partners can change that

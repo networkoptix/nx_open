@@ -162,9 +162,9 @@ def cloud_notification_action(request):
         customizations = request.data.getlist('customizations')
 
     for customization in customizations:
-        if not UserGroupsToProductPermissions.check_permission(request.user,
-                                                               get_cloud_portal_product(customization),
-                                                               'send_cloud_notification'):
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user,
+                                                                             customization,
+                                                                             'send_cloud_notification'):
             raise PermissionDenied
 
     notification_id = str(update_or_create_notification(request.data, customizations))

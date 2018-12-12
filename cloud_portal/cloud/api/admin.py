@@ -49,10 +49,6 @@ class GroupFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         groups = Group.objects.all()
-        if not request.user.is_superuser:
-            groups = groups.\
-                filter(usergroupstoproductpermissions__product=get_cloud_portal_product(settings.CUSTOMIZATION)). \
-                exclude(name__contains="Can See")
         return [(g.id, g.name) for g in groups]
 
     def queryset(self, request, queryset):
