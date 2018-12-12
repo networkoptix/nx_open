@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <plugins/plugin_container_api.h>
 #include <utils/media/frame_type_extractor.h>
@@ -28,6 +29,7 @@ static const char * ffmpegDeviceTypePlatformDependent()
 #endif
 }
 
+#ifdef _WIN32
 static bool isKeyFrame(const ffmpeg::Packet * packet)
 {
     if(!packet)
@@ -39,6 +41,7 @@ static bool isKeyFrame(const ffmpeg::Packet * packet)
 
     return extractor.getFrameType(udata, packet->size()) == FrameTypeExtractor::I_Frame;
 }
+#endif
 
 } // namespace
 
@@ -371,6 +374,17 @@ int VideoStream::initializeInputFormat()
 
 void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
 {
+    if (auto cam = m_camera.lock())
+    {
+        NX_DEBUG(
+            this,
+            "%1: Camera { %2, %3 } attempting to open video stream with params: %4",
+            __func__,
+            cam->info().modelName,
+            cam->info().uid,
+            m_codecParams.toString());
+    }
+
     AVFormatContext * context = inputFormat->formatContext();
     if (m_codecParams.codecId != AV_CODEC_ID_NONE)
         context->video_codec_id = m_codecParams.codecId;
