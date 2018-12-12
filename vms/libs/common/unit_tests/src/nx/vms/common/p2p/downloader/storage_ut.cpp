@@ -60,12 +60,12 @@ protected:
         createTestFile(testFileName, kTestFileSize);
     }
 
+    QnSyncTime syncTime;
     QDir workingDirectory;
     QString testFileName;
     QString testFilePath;
     QByteArray testFileMd5;
     QScopedPointer<Storage> downloaderStorage;
-    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderStorageTest, inexistentFileRequests)
