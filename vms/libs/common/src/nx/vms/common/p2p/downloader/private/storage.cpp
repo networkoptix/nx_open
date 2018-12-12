@@ -572,7 +572,15 @@ void Storage::findDownloadsRecursively(const QDir& dir)
         {
             fileName.truncate(fileName.size() - kMetadataSuffix.size());
             if (entry.isFile())
+            {
+                const auto& name = m_downloadsDirectory.relativeFilePath(fileName);
+                {
+                    NX_MUTEX_LOCKER lock(&m_mutex);
+                    if (m_fileInformationByName.contains(name))
+                        continue;
+                }
                 loadDownload(fileName);
+            }
         }
     }
 }
