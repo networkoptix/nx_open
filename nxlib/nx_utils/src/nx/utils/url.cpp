@@ -247,27 +247,6 @@ QUrl Url::toQUrl() const
     return m_url;
 }
 
-Url Url::fromText(const QString &url)
-{
-    Url result;
-
-    // Checking if it is just a hostname.
-    result.setHost(url, QUrl::StrictMode);
-    if (result.isValid())
-        return result;
-
-    // Checing if it hostname with a port (and possibly password and username).
-    result.clear();
-    result.setAuthority(url, QUrl::StrictMode);
-    if (result.isValid() && !result.host().isEmpty())
-        return result;
-
-    // All other cases.
-    result.clear();
-    result.setUrl(url, QUrl::StrictMode);
-    return result;
-}
-
 Url Url::fromQUrl(const QUrl& url)
 {
     return Url(url);
@@ -584,6 +563,34 @@ bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags
         && (!flags.testFlag(ComparisonFlag::Path) || lhs.path() == rhs.path())
         && (!flags.testFlag(ComparisonFlag::Fragment) || lhs.fragment() == rhs.fragment())
         && (!flags.testFlag(ComparisonFlag::Query) || lhs.query() == rhs.query());
+}
+
+nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
+{
+    Url result;
+
+    // Checking if it is just a hostname.
+    result.setHost(urlStr, QUrl::StrictMode);
+    if (result.isValid())
+    {
+        result.setScheme(std::move(scheme));
+        return result;
+    }
+
+    // Checking if it is just an authority.
+    result.setAuthority(urlStr, QUrl::StrictMode);
+    if (result.isValid() && !result.host().isEmpty())
+    {
+        result.setScheme(std::move(scheme));
+        return result;
+    }
+
+    // All other cases.
+    result.clear();
+    result.setUrl(urlStr, QUrl::StrictMode);
+    if (result.scheme().isEmpty())
+        result.setScheme(std::move(scheme));
+    return result;
 }
 
 } // namespace url

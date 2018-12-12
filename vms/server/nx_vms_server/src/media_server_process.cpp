@@ -1526,13 +1526,13 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/manualCamera/search
      * Start searching for the cameras in manual mode. There are two ways to call this method:
-     * IP range search and single host search. To scan an IP range "start_ip" and "end_ip" must be
-     * specified. To run a single host search "url" must be specified.
+     * IP range search and single host search. To scan an IP range, "start_ip" and "end_ip" must be
+     * specified. To run a single host search, "url" must be specified.
      * %param[opt]:string url A valid URL, hostname or hostname:port are accepted.
      * %param[opt]:string start_ip First IP address in the range to scan. Conflicts with "url".
      * %param[opt]:string end_ip Last IP address in the range to scan. Conflicts with "url".
      * %param[opt]:integer port Cameras IP port to check. Port is auto-detected if this parameter
-     *     is omitted and "url" does not contains one. Overwrites the port in "url" if specified.
+     *     is omitted and "url" does not contain one. Overwrites the port in "url" if specified.
      * %param[opt]:string user Camera(s) username. Overwrites the user in "url" if specified.
      * %param[opt]:string password Camera(s) password. Overwrites the password in "url" if specified.
      * %return:object JSON object with the initial status of camera search process, including
@@ -2050,7 +2050,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
 
-    /**%apidoc GET /api/restart
+    /**%apidoc POST /api/restart
      * Restarts the server.
      * %permissions Administrator.
      * %return:object JSON object with error message and error code (0 means OK).
@@ -4712,6 +4712,8 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow("/crossdomain.xml", nx::network::http::AuthMethod::noAuth);
     restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
+
+    restrictions->allow(webPrefix + "/ec2/getFullInfo", nx::network::http::AuthMethod::noAuth);
 
     // For open in new browser window.
     restrictions->allow(webPrefix + "/api/showLog.*",
