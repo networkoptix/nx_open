@@ -24,14 +24,10 @@ public:
     virtual int height() const override { return m_frame->height; }
     virtual PixelAspectRatio pixelAspectRatio() const override { return {1, 1}; }
     virtual PixelFormat pixelFormat() const override { return PixelFormat::yuv420; }
-    virtual Handle handleType() const override { return Handle::none; }
-    virtual int handle() const override { return 0; }
     virtual int planeCount() const override { return 3; }
     virtual int dataSize(int plane) const override;
     virtual const char* data(int plane) const override;
     virtual int lineSize(int plane) const override;
-    virtual bool map() const override { return false; }
-    virtual void unmap() const override {}
 
 private:
     bool validatePlane(int plane) const;

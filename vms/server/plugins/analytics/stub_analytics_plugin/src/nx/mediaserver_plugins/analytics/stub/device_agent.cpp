@@ -386,23 +386,7 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
         }
 
         // Hex-dump some bytes from raw pixel data.
-        if (frame->handle() != 0)
-        {
-            if (frame->data(0) != nullptr)
-            {
-                NX_PRINT << __func__
-                    << "() ERROR: data() is not null while handle() is not zero";
-                return false;
-            }
-            if (!frame->map())
-            {
-                NX_PRINT << __func__ << "() ERROR: map() failed";
-                return false;
-            }
-            NX_PRINT_HEX_DUMP("First byte of frame data(0)", frame->data(0), 1);
-            frame->unmap();
-        }
-        else if (NX_DEBUG_ENABLE_OUTPUT)
+        if (NX_DEBUG_ENABLE_OUTPUT)
         {
             static const int dumpOffset = 0;
             static const int dumpSize = 12;
