@@ -100,7 +100,7 @@ def determine_package_versions(
         v["festival-vox"] = v["festival"]
 
     if platform == "windows" and debug:
-        for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
+        for package in ("qt", "festival", "openal", "sigar", "icu"):
             v[package] += "-debug"
 
     return v
