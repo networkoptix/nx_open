@@ -491,24 +491,20 @@ void AudioStream::AudioStreamPrivate::tryStart()
 
 void AudioStream::AudioStreamPrivate::start()
 {
-    if (m_terminated)
-    {
-        if (m_runThread.joinable())
-            m_runThread.join();
+    if (m_runThread.joinable())
+        m_runThread.join();
 
-        m_terminated = false;
-        m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
-    }
+    m_terminated = false;
+    m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
 }
 
 void AudioStream::AudioStreamPrivate::stop()
 {
-    if (!m_terminated)
-    {
-        terminate();
-        if (m_runThread.joinable())
-            m_runThread.join();
-    }
+    terminate();
+    m_wait.notify_all();
+
+    if (m_runThread.joinable())
+        m_runThread.join();
 }
 
 void AudioStream::AudioStreamPrivate::run()
@@ -523,7 +519,7 @@ void AudioStream::AudioStreamPrivate::run()
 
         int result = 0;
         auto packet = nextPacket(&result);
-        checkIoError(result); // < Always check if it was an io error to reset m_ioError to false
+        checkIoError(result); // < Always check if it was an io error to reset m_ioError to false.
         if (result < 0)
         {
             setLastError(result);
