@@ -96,7 +96,7 @@ EventRibbon::Private::Private(EventRibbon* q):
 
     connect(m_scrollBar.get(), &QScrollBar::valueChanged, this, &Private::updateView);
 
-    m_autoCloseTimer->setInterval(1000);
+    m_autoCloseTimer->setInterval(1s);
     connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpiredTiles);
 
     NX_ASSERT(Importance() == Importance::NoNotification);
@@ -150,6 +150,13 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         {
             insertNewTiles(first, last - first + 1, UpdateMode::animated);
             NX_ASSERT(m_model->rowCount() == count());
+        });
+
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
+        [this](const QModelIndex& /*parent*/, int first, int last)
+        {
+            for (int index = first; index <= last; ++index)
+                handleItemAboutToBeRemoved(index);
         });
 
     m_modelConnections << connect(m_model, &QAbstractListModel::rowsRemoved, this,
@@ -421,24 +428,12 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     menu->exec(globalPos);
 }
 
-void EventRibbon::Private::cleanupDeletingTile(int index)
+void EventRibbon::Private::handleItemAboutToBeRemoved(int index)
 {
-    const auto& tile = m_tiles[index];
-    if (!NX_ASSERT(tile))
-        return;
-
     m_deadlines.remove(m_model->index(index));
-    reserveWidget(index);
 
     if (m_hoveredIndex.row() == index)
         m_hoveredIndex = QPersistentModelIndex();
-
-    const auto importance = tile->importance;
-    if (importance != Importance())
-    {
-        --m_unreadCounts[int(importance)];
-        --m_totalUnreadCount;
-    }
 }
 
 void EventRibbon::Private::handleWidgetChanged(int index)
@@ -448,7 +443,7 @@ void EventRibbon::Private::handleWidgetChanged(int index)
 
     const auto deadline = m_deadlines.find(m_model->index(index));
     if (deadline != m_deadlines.end())
-        deadline->setRemainingTime(kVisibleAutoCloseDelay.count());
+        deadline->setRemainingTime(kVisibleAutoCloseDelay);
 }
 
 void EventRibbon::Private::closeExpiredTiles()
@@ -526,7 +521,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         tile->animated = shouldAnimateTile(modelIndex);
 
         if (closeable && timeout > 0ms)
-            m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay.count());
+            m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay);
 
         m_tiles.insert(m_tiles.begin() + i, std::move(tile));
         currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
@@ -649,8 +644,15 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     for (int i = first; i < end; ++i)
     {
-        cleanupDeletingTile(i);
+        reserveWidget(i);
         delta += m_tiles[i]->height + kDefaultTileSpacing;
+
+        const auto importance = m_tiles[i]->importance;
+        if (importance != Importance())
+        {
+            --m_unreadCounts[int(importance)];
+            --m_totalUnreadCount;
+        }
     }
 
     m_tiles.erase(m_tiles.begin() + first, m_tiles.begin() + end);
@@ -1248,7 +1250,7 @@ void EventRibbon::Private::updateHover()
             return;
 
         if (m_hoveredIndex.isValid() && m_deadlines.contains(m_hoveredIndex))
-            m_deadlines[m_hoveredIndex].setRemainingTime(kVisibleAutoCloseDelay.count());
+            m_deadlines[m_hoveredIndex].setRemainingTime(kVisibleAutoCloseDelay);
 
         if (index < 0)
         {

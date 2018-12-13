@@ -122,7 +122,7 @@ private:
     void ensureWidget(int index);
     void reserveWidget(int index);
 
-    void cleanupDeletingTile(int index);
+    void handleItemAboutToBeRemoved(int index);
     void handleWidgetChanged(int index);
     void closeExpiredTiles();
 
