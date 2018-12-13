@@ -1,4 +1,5 @@
 #include <nx/utils/log/to_string.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #include <gtest/gtest.h>
 
@@ -60,7 +61,10 @@ TEST(ToString, Qt)
 
     assertToString(QUrl(QLatin1String("http://abc.xyz:8080/path")), "http://abc.xyz:8080/path");
     assertToString(QUrl(QLatin1String("http://xxx-yyy.w/path?param=3")), "http://xxx-yyy.w/path?param=3");
-    assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login@abx-xyz.x");
+    if (nx::utils::ini().displayUrlPasswordInLogs)
+        assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login:password@abx-xyz.x");
+    else
+        assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login@abx-xyz.x");
 
     assertToString(QPoint(123, 456), "QPoint(123,456)");
     assertToString(QPointF(2.5, 3.6), "QPointF(2.5,3.6)");

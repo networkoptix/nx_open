@@ -602,5 +602,5 @@ QString toString(const nx::utils::Url &value)
     if (nx::utils::ini().displayUrlPasswordInLogs)
         return value.toString(QUrl::PrettyDecoded);
     else
-         return value.toString(QUrl::RemovePassword);
+        return value.toDisplayString(QUrl::RemovePassword);
 }
