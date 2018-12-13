@@ -336,7 +336,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
-        oldStatus, newStatus, reason, getName(), getUrl());
+        oldStatus, newStatus, reason, getName(), url());
 
     commonModule()->statusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
@@ -374,12 +374,25 @@ void QnResource::setId(const QnUuid& id)
     m_id = id;
 }
 
+nx::utils::Url QnResource::url() const
+{
+    return nx::utils::Url(getUrl());
+}
+
+void QnResource::setUrl(const nx::utils::Url &url)
+{
+    NX_ASSERT(url.isValid());
+    setUrl(url.toString());
+}
+
+// TODO: Should be made protected instead of public.
 QString QnResource::getUrl() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
     return m_url;
 }
 
+// TODO: Should be made protected instead of public.
 void QnResource::setUrl(const QString &url)
 {
     {
