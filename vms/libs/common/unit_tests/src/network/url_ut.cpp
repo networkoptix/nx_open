@@ -26,14 +26,6 @@ static void checkUrl(const QString& urlString, const QString& hostString)
     ASSERT_EQ(urlString, nxUrl.toString());
 }
 
-static void assertUrl(Url url, const QString& scheme, const QString& hostname, std::optional<int> port)
-{
-    ASSERT_EQ(url.scheme(), scheme);
-    ASSERT_EQ(url.host(), hostname);
-    if (port.has_value())
-        ASSERT_EQ(url.port(), *port);
-}
-
 TEST(Url, ipv6_withScopeId)
 {
     checkUrl("http://[fe80::5be3:f02d:21e7:2450%3]:20431/some/path", kTestIp);
@@ -62,15 +54,24 @@ TEST(Url, operator_less)
 
 TEST(Url, parseUrlFields)
 {
-    assertUrl(url::parseUrlFields("hostname"), "", "hostname", std::nullopt);
-    assertUrl(url::parseUrlFields("hostname:1248"), "", "hostname", 1248);
-    assertUrl(url::parseUrlFields("http://hostname"), "http", "hostname", std::nullopt);
-    assertUrl(url::parseUrlFields("http://hostname:1248"), "http", "hostname", 1248);
+    ASSERT_EQ(url::parseUrlFields("hostname").toStdString(), "//hostname");
+    ASSERT_EQ(url::parseUrlFields("hostname:1248").toStdString(), "//hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("user:pass@hostname:1248").toStdString(),
+        "//user:pass@hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("http://hostname").toStdString(), "http://hostname");
+    ASSERT_EQ(url::parseUrlFields("http://hostname:1248").toStdString(), "http://hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("http://user:pass@hostname:1248/path?query").toStdString(),
+        "http://user:pass@hostname:1248/path?query");
 
-    assertUrl(url::parseUrlFields("hostname", "zorz"), "zorz", "hostname", std::nullopt);
-    assertUrl(url::parseUrlFields("hostname:1248", "zorz"), "zorz", "hostname", 1248);
-    assertUrl(url::parseUrlFields("http://hostname", "zorz"), "http", "hostname", std::nullopt);
-    assertUrl(url::parseUrlFields("http://hostname:1248", "zorz"), "http", "hostname", 1248);
+    ASSERT_EQ(url::parseUrlFields("hostname", "zorz").toStdString(), "zorz://hostname");
+    ASSERT_EQ(url::parseUrlFields("user:pass@hostname:1248", "zorz").toStdString(),
+        "zorz://user:pass@hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("http://hostname:1248", "zorz").toStdString(),
+        "http://hostname:1248");
+
+    ASSERT_EQ(url::parseUrlFields("invalid+hostname").path(), "invalid+hostname");
+    ASSERT_FALSE(url::parseUrlFields("http://invalid+hostname:666").isValid());
+    ASSERT_FALSE(url::parseUrlFields("h*ttp://60/path").isValid());
 }
 
 TEST(Url, logging)
