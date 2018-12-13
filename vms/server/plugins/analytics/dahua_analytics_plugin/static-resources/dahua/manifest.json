@@ -1,0 +1,235 @@
+{
+    "capabilities": "deviceModelDependent",
+    "eventTypes": [
+        {
+            "id": "nx.dahua.VideoMotion", 
+            "name": {
+                "value": "Motion detection", 
+                "localization": {}
+            }, 
+            "internalName": "VideoMotion", 
+            "description": "Video motion %1 %2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1"
+        }, 
+        {
+            "id": "nx.dahua.VideoLoss", 
+            "name": {
+                "value": "Video loss detection", 
+                "localization": {}
+            }, 
+            "internalName": "VideoLoss", 
+            "description": "Video loss %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.VideoBlind", 
+            "name": {
+                "value": "Video blind detection", 
+                "localization": {}
+            }, 
+            "internalName": "VideoBlind", 
+            "description": "Video blind %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.AlarmLocal", 
+            "name": {
+                "value": "Alarm detection", 
+                "localization": {}
+            }, 
+            "internalName": "AlarmLocal", 
+            "description": "Alarm local %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.CrossLineDetection", 
+            "name": {
+                "value": "Tripwire (Cross line) detection", 
+                "localization": {}
+            }, 
+            "internalName": "CrossLineDetection", 
+            "description": "Cross line %1 %2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1"
+        }, 
+        {
+            "id": "nx.dahua.CrossRegionDetection", 
+            "name": {
+                "value": "Intrusion (Cross region) detection", 
+                "localization": {}
+            }, 
+            "internalName": "CrossRegionDetection", 
+            "description": "Intrusion %1 %2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1"
+        }, 
+        {
+            "id": "nx.dahua.LeftDetection", 
+            "name": {
+                "value": "Abandoned object (left) detection", 
+                "localization": {}
+            }, 
+            "internalName": "LeftDetection", 
+            "description": "Abandoned object %1 %2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1"
+        }, 
+        {
+            "id": "nx.dahua.TakenAwayDetection", 
+            "name": {
+                "value": "Missing object (Taken away) detection", 
+                "localization": {}
+            }, 
+            "internalName": "TakenAwayDetection", 
+            "description": "Taken away object %1 %2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1"
+        }, 
+        {
+            "id": "nx.dahua.VideoAbnormalDetection", 
+            "name": {
+                "value": "Scene change (video abnormal) detection", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAbnormalDetection", 
+            "description": "Scene change %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.FaceDetection", 
+            "name": {
+                "value": "Face detection", 
+                "localization": {}
+            }, 
+            "internalName": "FaceDetection", 
+            "description": "Face %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.AudioMutation", 
+            "name": {
+                "value": "Audio intensity change (Audio mutation)", 
+                "localization": {}
+            }, 
+            "internalName": "AudioMutation", 
+            "description": "Audio intensity change %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.AudioAnomaly", 
+            "name": {
+                "value": "Audio anomaly (Audio input abnormal) detection", 
+                "localization": {}
+            }, 
+            "internalName": "AudioAnomaly", 
+            "description": "Audio input abnormal %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.VideoUnFocus", 
+            "name": {
+                "value": "Defocus detection", 
+                "localization": {}
+            }, 
+            "internalName": "VideoUnFocus", 
+            "description": "Defocus %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.WanderDetection", 
+            "name": {
+                "value": "Wander (Loitering) detection", 
+                "localization": {}
+            }, 
+            "internalName": "WanderDetection", 
+            "description": "Loitering %1 %2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "regionDependent | stateDependent", 
+            "regionDescription": "in the region #%1"
+        }, 
+        {
+            "id": "nx.dahua.RioterDetection", 
+            "name": {
+                "value": "Rioter (People gathering) detection", 
+                "localization": {}
+            }, 
+            "internalName": "RioterDetection", 
+            "description": "People gathering %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.ParkingDetection", 
+            "name": {
+                "value": "Parking detection", 
+                "localization": {}
+            }, 
+            "internalName": "ParkingDetection", 
+            "description": "Parking %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.MoveDetection", 
+            "name": {
+                "value": "Fast moving detection", 
+                "localization": {}
+            }, 
+            "internalName": "Fast moving %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }, 
+        {
+            "id": "nx.dahua.CrowdDetection", 
+            "name": {
+                "value": "Crowd (Crowd dencity overrun) detection", 
+                "localization": {}
+            }, 
+            "internalName": "CrowdDetection", 
+            "description": "Crowd dencity overrun %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent"
+        }
+    ], 
+    "groups": [
+        {
+            "id": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}", 
+            "name": {
+                "value": "LPR", 
+                "localization": {}
+            }
+        }
+    ]
+}
