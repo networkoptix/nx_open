@@ -42,10 +42,16 @@
     };
     
     window.NativePlayer.prototype.kill = function () {
+        if (this.video === undefined) {
+            return;
+        }
         this.video.src = '';
     };
     
     window.NativePlayer.prototype.load = function (url, type) {
+        if (this.video === undefined) {
+            return;
+        }
         this.video.setAttribute('type', type);
         this.video.src = url;
     };

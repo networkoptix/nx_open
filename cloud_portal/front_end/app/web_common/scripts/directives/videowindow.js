@@ -257,20 +257,25 @@ import * as Hls from 'hls.js';
                             
                             scope
                                 .playerHandler(error)
-                                .then(function (response) {
+                                .then((response) => {
                                     scope.videoFlags.errorLoading = response;
+    
+                                    if (err.url === '' && err.context === undefined) {
+                                        return;
+                                    }
                                     
                                     if (scope.videoFlags.errorLoading) {
                                         var url = err.url || err.context.url;
+                                        
                                         $http
                                             .get(url)
-                                            .then(function (response) {
+                                            .then((response) => {
                                                 scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                                 scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
                                             });
                                     }
                                     
-                                }, function (error) {
+                                }, (error) => {
                                     scope.videoFlags.errorLoading = error;
                                 });
                             
@@ -346,17 +351,19 @@ import * as Hls from 'hls.js';
                                         
                                         //If the player stalls give it a chance to recover
                                         scope.vgApi.addEventListener('stalled', resetTimeout);
-                                        scope.vgApi.addEventListener('error', function (e) {
-                                            const event = e;
-                                            if(event.target === null){ // this is a special case - interrupted video
+                                        scope.vgApi.addEventListener('error', (e) => {
+                                            if(e.target === null){ // this is a special case - interrupted video
                                                 // (switch to another camera)
                                                 return;
                                             }
+                                            
+                                            var target = e.target;
+                                            if (target.error.url === undefined) {
+                                                target.error.url = target.currentSrc;
+                                            }
+                                            
                                             $timeout(() => {
-                                                if (event.target.error.url === undefined) {
-                                                    event.target.error.url = event.target.currentSrc;
-                                                }
-                                                playerErrorHandler(event.target.error);
+                                                playerErrorHandler(target.error);
                                             });
                                         });
                                     }
