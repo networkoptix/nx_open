@@ -87,6 +87,9 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         m_camera->initialize();
     }
 
+    if (!m_camera->isInitialized())
+        return nxcip::NX_OTHER_ERROR;
+
     switch(encoderIndex)
     {
         case 0:

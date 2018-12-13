@@ -377,10 +377,9 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     {
         NX_DEBUG(
             this,
-            "%1: Camera { %2, %3 } attempting to open video stream with params: %4",
+            "%1: Camera %2 attempting to open video stream with params: %3",
             __func__,
-            cam->info().modelName,
-            cam->info().uid,
+            cam->toString(),
             m_codecParams.toString());
     }
 
