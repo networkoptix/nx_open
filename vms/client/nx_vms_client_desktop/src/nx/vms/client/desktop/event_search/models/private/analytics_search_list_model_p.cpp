@@ -567,11 +567,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
                 }
 
-                if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                if ((!m_selectedObjectType.isEmpty() && m_selectedObjectType != item.objectTypeId)
+                    || (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                    || !acceptedByTextFilter(item, m_filterText))
+                {
                     continue;
-
-                if (!acceptedByTextFilter(item, m_filterText))
-                    continue;
+                }
 
                 DetectedObject newObject;
                 newObject.objectAppearanceId = item.objectId;
