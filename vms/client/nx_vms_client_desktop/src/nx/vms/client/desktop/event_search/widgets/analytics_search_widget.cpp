@@ -234,7 +234,10 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
 
     QVector<PluginInfo> plugins;
     for (const auto& pluginInfo: pluginsById)
-        plugins.push_back(pluginInfo);
+    {
+        if (!pluginInfo.objectTypes.empty())
+            plugins.push_back(pluginInfo);
+    }
 
     std::sort(plugins.begin(), plugins.end());
     const bool severalPlugins = plugins.size() > 1;
