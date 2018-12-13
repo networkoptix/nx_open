@@ -25,6 +25,7 @@ protected:
     virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const override;
 
 private slots:
+    void at_ptzConfigurationChanged(const QnResourcePtr &resource);
     void at_controllerAboutToBeChanged(const QnResourcePtr &resource);
     void at_controllerChanged(const QnResourcePtr &resource);
 

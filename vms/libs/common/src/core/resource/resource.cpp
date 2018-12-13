@@ -41,12 +41,12 @@ QnResource::QnResource(const QnResource& right):
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_initialized(right.m_initialized),
+    m_initialized(right.m_initialized.load()),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_initInProgress(right.m_initInProgress),
+    m_initInProgress(right.m_initInProgress.load()),
     m_commonModule(right.m_commonModule)
 {
 }
@@ -638,24 +638,29 @@ bool QnResource::init()
         m_initInProgress = true;
     }
 
+    NX_DEBUG(this, "Initiatialize...");
     CameraDiagnostics::Result initResult = initInternal();
-    m_initMutex.lock();
-    m_initInProgress = false;
-    m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+    NX_DEBUG(this, "Initialization result: %1",
+        initResult.toString(commonModule()->resourcePool()));
+
+    bool changed = false;
     {
-        QnMutexLocker lk(&m_mutex);
-        m_prevInitializationResult = initResult;
+        QnMutexLocker lock(&m_initMutex);
+        m_initInProgress = false;
+        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_prevInitializationResult = initResult;
+        }
+
+        m_initializationAttemptCount.fetchAndAddOrdered(1);
+
+        changed = m_initialized;
+        if (m_initialized)
+            initializationDone();
+        else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
+            setStatus(Qn::Offline);
     }
-
-    m_initializationAttemptCount.fetchAndAddOrdered(1);
-
-    bool changed = m_initialized;
-    if (m_initialized)
-        initializationDone();
-    else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
-        setStatus(Qn::Offline);
-
-    m_initMutex.unlock();
 
     if (changed)
         emit initializedChanged(toSharedPointer(this));
