@@ -251,7 +251,7 @@ void VideoStream::stop()
 {
     terminate();
     m_wait.notify_all();
-    
+
     if (m_videoThread.joinable())
         m_videoThread.join();
 }
@@ -424,7 +424,7 @@ int VideoStream::initializeDecoder()
         AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
         result = stream
             ? decoder->initializeDecoder(stream->codecpar)
-            : AVERROR_DECODER_NOT_FOUND;//< Using as stream not found
+            : AVERROR_DECODER_NOT_FOUND; //< Using as stream not found.
     }
     if (result < 0)
         return result;
@@ -435,16 +435,6 @@ int VideoStream::initializeDecoder()
 
     m_waitForKeyPacket = true;
     m_decoder = std::move(decoder);
-
-    // Some cameras have infrequent I-frames. Initializing the decoder with the first packet read
-    // from the camera (presumably an I-frame) prevents numerous "non exisiting PPS 0 referenced"
-    // errors on some cameras with h264, on Windows in particular.
-    ffmpeg::Packet packet(m_inputFormat->videoCodecID(), AVMEDIA_TYPE_VIDEO);
-    if (m_inputFormat->readFrame(packet.packet()) == 0)
-    {
-        ffmpeg::Frame frame;
-        decode(&packet, &frame);
-    }
 
     m_decoderPixelFormat = m_decoder->pixelFormat();
 
@@ -460,12 +450,13 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 
     int result = m_inputFormat->readFrame(packet->packet());
 
-    checkIoError(result); // < Need to reset m_ioError if it was successful
+    checkIoError(result); // < Need to reset m_ioError if readFrame was successful.
+
     if (result < 0)
-            terminate();
     {
         setLastError(result);
         if (m_ioError)
+            terminate();
         return nullptr;
     }
 
