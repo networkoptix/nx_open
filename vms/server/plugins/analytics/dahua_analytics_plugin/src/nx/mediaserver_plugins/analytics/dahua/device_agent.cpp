@@ -1,7 +1,3 @@
-#include "device_agent.h"
-
-#include "common.h"
-
 #include <chrono>
 
 #include <nx/sdk/analytics/common_event.h>
@@ -11,6 +7,9 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/common/string.h>
+
+#include "common.h"
+#include "device_agent.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -78,7 +77,7 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
-        [this](const DahuaEventList& events)
+        [this](const EventList& events)
         {
             using namespace std::chrono;
             auto packet = new CommonEventsMetadataPacket();
@@ -170,7 +169,7 @@ void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
     m_deviceAgentManifest = manifest;
 }
 
-void DeviceAgent::setEngineManifest(const Dahua::EngineManifest& manifest)
+void DeviceAgent::setEngineManifest(const EngineManifest& manifest)
 {
     m_engineManifest = manifest;
 }

@@ -3,10 +3,9 @@
 #include "common.h"
 #include "metadata_monitor.h"
 
-#include <vector>
-#include <chrono>
-
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QList>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
@@ -39,7 +38,7 @@ public:
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    const Dahua::EngineManifest& engineManifest() const;
+    const EngineManifest& engineManifest() const;
 
     virtual void executeAction(
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
@@ -55,7 +54,7 @@ private:
 
     mutable QnMutex m_mutex;
     QByteArray m_manifest;
-    Dahua::EngineManifest m_engineManifest;
+    EngineManifest m_engineManifest;
 
     struct DeviceData
     {

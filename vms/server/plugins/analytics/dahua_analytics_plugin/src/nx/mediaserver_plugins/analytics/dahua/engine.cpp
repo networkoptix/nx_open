@@ -3,7 +3,7 @@
 #include "device_agent.h"
 #include "common.h"
 #include "string_helper.h"
-#include "attributes_parser.h"
+#include "parser.h"
 
 #include <chrono>
 
@@ -56,8 +56,8 @@ Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
     }
 
     bool success = false;
-    m_engineManifest = QJson::deserialized<Dahua::EngineManifest>(
-        m_manifest, Dahua::EngineManifest(), &success);
+    m_engineManifest = QJson::deserialized<EngineManifest>(
+        m_manifest, EngineManifest(), &success);
     if (!success)
         NX_WARNING(this, lm("Can't deserialize driver manifest file"));
 }
@@ -122,7 +122,7 @@ const nx::sdk::IString* Engine::manifest(Error* error) const
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
 {
     QList<QString> result;
-    auto supportedEvents = dahua::AttributesParser::parseSupportedEventsMessage(data);
+    auto supportedEvents = dahua::Parser::parseSupportedEventsMessage(data);
     if (!supportedEvents.empty())
     for (const auto& internalName: supportedEvents)
     {
@@ -189,7 +189,7 @@ QList<QString> Engine::fetchSupportedEventTypeIds(const DeviceInfo& deviceInfo)
     return data.supportedEventTypeIds;
 }
 
-const Dahua::EngineManifest& Engine::engineManifest() const
+const EngineManifest& Engine::engineManifest() const
 {
     return m_engineManifest;
 }

@@ -1,20 +1,19 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
-
-#include <map>
-#include <vector>
-
-#include "common.h"
+#include <QtCore/QElapsedTimer>
 
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
-#include <QtCore/QElapsedTimer>
 #include <nx/utils/url.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+
+#include "common.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -23,15 +22,13 @@ namespace dahua {
 
 class MetadataMonitor
 {
-    using MetadataType = QString;
-    using MetadataValue = QString;
     using MultipartContentParserPtr = std::unique_ptr<nx::network::http::MultipartContentParser>;
 
 public:
-    using Handler = std::function<void(const DahuaEventList&)>;
+    using Handler = std::function<void(const EventList&)>;
 
     MetadataMonitor(
-        const Dahua::EngineManifest& manifest,
+        const EngineManifest& manifest,
         const nx::vms::api::analytics::DeviceAgentManifest& deviceManifest,
         const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth,
@@ -45,7 +42,7 @@ public:
     void removeHandler(const QString& handlerId);
     void clearHandlers();
 
-    bool processEvent(const DahuaEvent& event);
+    bool processEvent(const Event& event);
 private:
     nx::utils::Url buildMonitoringUrl(
         const nx::utils::Url& resourceUrl,
@@ -57,13 +54,13 @@ private:
 
     std::chrono::milliseconds reopenDelay() const;
 
-    void addExpiredEvents(std::vector<DahuaEvent>& result);
+    void addExpiredEvents(std::vector<Event>& result);
 private:
     void at_monitorResponseReceived();
     void at_monitorSomeBytesAvailable();
 
 private:
-    const Dahua::EngineManifest& m_engineManifest;
+    const EngineManifest& m_engineManifest;
     nx::vms::api::analytics::DeviceAgentManifest m_deviceManifest;
     const nx::utils::Url m_monitorUrl;
     const QAuthenticator m_auth;
@@ -77,13 +74,13 @@ private:
 
     struct StartedEvent
     {
-        StartedEvent(const DahuaEvent& event = DahuaEvent()) :
+        StartedEvent(const Event& event = Event()) :
             event(event)
         {
             timer.restart();
         }
 
-        DahuaEvent event;
+        Event event;
         nx::utils::ElapsedTimer timer;
     };
 

@@ -16,47 +16,44 @@
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
+namespace dahua {
 
-struct Dahua
+struct EventType: public nx::vms::api::analytics::EventType
 {
-public:
-    struct EventType: public nx::vms::api::analytics::EventType
-    {
-        QString internalName;
-        QString internalMonitoringName;
-        QString description;
-        QString positiveState;
-        QString negativeState;
-        QString regionDescription;
-        QString dependedEvent;
-    };
-    #define DahuaEventType_Fields EventType_Fields (internalName) \
-        (internalMonitoringName) \
-        (description) \
-        (positiveState) \
-        (negativeState) \
-        (regionDescription) \
-        (dependedEvent)
-
-    struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
-    {
-        QList<EventType> eventTypes;
-
-        QString eventTypeByInternalName(const QString& internalEventName) const;
-        const Dahua::EventType& eventTypeDescriptorById(const QString& id) const;
-        Dahua::EventType eventTypeDescriptorByInternalName(
-            const QString& internalName) const;
-
-    private:
-        static QnMutex m_cachedIdMutex;
-        static QMap<QString, QString> m_eventTypeIdByInternalName;
-        static QMap<QString, EventType> m_eventTypeDescriptorById;
-
-    };
-    #define DahuaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
+    QString internalName;
+    QString internalMonitoringName;
+    QString description;
+    QString positiveState;
+    QString negativeState;
+    QString regionDescription;
+    QString dependedEvent;
 };
+#define DahuaEventType_Fields EventType_Fields (internalName) \
+    (internalMonitoringName) \
+    (description) \
+    (positiveState) \
+    (negativeState) \
+    (regionDescription) \
+    (dependedEvent)
 
-struct DahuaEvent
+struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
+{
+    QList<EventType> eventTypes;
+
+    QString eventTypeByInternalName(const QString& internalEventName) const;
+    const EventType& eventTypeDescriptorById(const QString& id) const;
+    EventType eventTypeDescriptorByInternalName(
+        const QString& internalName) const;
+
+private:
+    static QnMutex m_cachedIdMutex;
+    static QMap<QString, QString> m_eventTypeIdByInternalName;
+    static QMap<QString, EventType> m_eventTypeDescriptorById;
+
+};
+#define DahuaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
+
+struct Event
 {
     QString typeId;
     QString caption;
@@ -68,14 +65,12 @@ struct DahuaEvent
     QString picName;
 };
 
-using DahuaEventList = std::vector<DahuaEvent>;
+using EventList = std::vector<Event>;
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Dahua::EventType)
-    (Dahua::EngineManifest),
-    (json)
-)
+QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
+QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))
 
+} // namespace dahua
 } // namespace analytics
 } // namespace mediaserver_plugins
 } // namespace nx

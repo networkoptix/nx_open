@@ -1,24 +1,24 @@
-#include "string_helper.h"
+#include <nx/fusion/serialization/lexical_enum.h>
+#include <plugins/plugin_tools.h>
 
 #include <nx/utils/literal.h>
 #include <nx/utils/std/hashes.h>
-
-#include <plugins/plugin_tools.h>
-#include <nx/fusion/serialization/lexical_enum.h>
 #include <nx/utils/thread/mutex.h>
+
+#include "string_helper.h"
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
 namespace dahua {
 
-QString buildCaption(const Dahua::EngineManifest& manifest, const DahuaEvent& event)
+QString buildCaption(const EngineManifest& manifest, const Event& event)
 {
     const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
     return descriptor.name.value;
 }
 
-QString buildDescription(const Dahua::EngineManifest& manifest, const DahuaEvent& event)
+QString buildDescription(const EngineManifest& manifest, const Event& event)
 {
     using namespace nx::vms::api::analytics;
 

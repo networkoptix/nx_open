@@ -7,12 +7,12 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "metadata_monitor.h"
-#include "engine.h"
-
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/device_agent.h>
 #include <nx/utils/url.h>
+
+#include "engine.h"
+#include "metadata_monitor.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -44,7 +44,7 @@ public:
 
     void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
-    void setEngineManifest(const Dahua::EngineManifest& manifest);
+    void setEngineManifest(const EngineManifest& manifest);
     virtual void setSettings(const nx::sdk::Settings* settings) override;
     virtual nx::sdk::Settings* pluginSideSettings() const override;
 
@@ -57,7 +57,7 @@ private:
 private:
     Engine* const m_engine;
 
-    Dahua::EngineManifest m_engineManifest;
+    EngineManifest m_engineManifest;
     QByteArray m_deviceAgentManifest;
 
     nx::utils::Url m_url;

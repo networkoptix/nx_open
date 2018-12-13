@@ -1,10 +1,9 @@
-#include "bytestream_filter.h"
-#include "common.h"
-#include "string_helper.h"
-
 #include <iostream>
-#include "attributes_parser.h"
 #include <nx/utils/log/log_main.h>
+
+#include "common.h"
+#include "parser.h"
+#include "bytestream_filter.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -12,7 +11,7 @@ namespace analytics {
 namespace dahua {
 
 BytestreamFilter::BytestreamFilter(
-    const Dahua::EngineManifest& manifest,
+    const EngineManifest& manifest,
     MetadataMonitor* monitor)
     :
     m_engineManifest(manifest),
@@ -22,10 +21,10 @@ BytestreamFilter::BytestreamFilter(
 
 bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
-    auto event = AttributesParser::parseEventMessage(buffer, m_engineManifest);
+    auto event = Parser::parseEventMessage(buffer, m_engineManifest);
     if (!event)
         return false;
-    if (AttributesParser::isHartbeatEvent(*event))
+    if (Parser::isHartbeatEvent(*event))
         return true;
 
     return m_monitor->processEvent(*event);

@@ -1,16 +1,21 @@
-#include "common.h"
+#include <QtCore/QString>
+#include <QtCore/QMap>
 
+#include <nx/utils/thread/mutex.h>
 #include <nx/fusion/model_functions.h>
+
+#include "common.h"
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
+namespace dahua {
 
-QnMutex Dahua::EngineManifest::m_cachedIdMutex;
-QMap<QString, QString> Dahua::EngineManifest::m_eventTypeIdByInternalName;
-QMap<QString, Dahua::EventType> Dahua::EngineManifest::m_eventTypeDescriptorById;
+QnMutex EngineManifest::m_cachedIdMutex;
+QMap<QString, QString> EngineManifest::m_eventTypeIdByInternalName;
+QMap<QString, EventType> EngineManifest::m_eventTypeDescriptorById;
 
-QString Dahua::EngineManifest::eventTypeByInternalName(const QString& value) const
+QString EngineManifest::eventTypeByInternalName(const QString& value) const
 {
     const auto internalEventName = value.toLower();
     QnMutexLocker lock(&m_cachedIdMutex);
@@ -34,7 +39,7 @@ QString Dahua::EngineManifest::eventTypeByInternalName(const QString& value) con
     return QString();
 }
 
-const Dahua::EventType& Dahua::EngineManifest::eventTypeDescriptorById(
+const EventType& EngineManifest::eventTypeDescriptorById(
     const QString& id) const
 {
     QnMutexLocker lock(&m_cachedIdMutex);
@@ -50,21 +55,22 @@ const Dahua::EventType& Dahua::EngineManifest::eventTypeDescriptorById(
         }
     }
 
-    static const Dahua::EventType kEmptyDescriptor;
+    static const EventType kEmptyDescriptor;
     return kEmptyDescriptor;
 }
 
-Dahua::EventType Dahua::EngineManifest::eventTypeDescriptorByInternalName(
+EventType EngineManifest::eventTypeDescriptorByInternalName(
     const QString& internalName) const
 {
     return eventTypeDescriptorById(eventTypeByInternalName(internalName));
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Dahua::EventType, (json), \
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json), \
     DahuaEventType_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Dahua::EngineManifest, (json), \
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json), \
     DahuaEngineManifest_Fields)
 
+} // namespace dahua
 } // namespace analytics
 } // namespace mediaserver_plugins
 } // namespace nx

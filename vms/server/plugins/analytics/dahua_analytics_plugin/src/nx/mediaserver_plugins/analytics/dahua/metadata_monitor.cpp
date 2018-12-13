@@ -1,19 +1,17 @@
-#include "bytestream_filter.h"
-#include "metadata_monitor.h"
+#include <chrono>
 
 #include <QtCore/QUrlQuery>
 
-#include <chrono>
-//#include <iostream>
-//#include <fstream>
-
-#include "attributes_parser.h"
-#include "string_helper.h"
 #include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/sdk/analytics/events_metadata_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/std/cpp14.h>
+
+#include "bytestream_filter.h"
+#include "parser.h"
+#include "string_helper.h"
+#include "metadata_monitor.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -28,7 +26,7 @@ static const std::chrono::seconds kMinReopenInterval(10);
 static const std::chrono::seconds kExpiredEventTimeout(5);
 
 MetadataMonitor::MetadataMonitor(
-    const Dahua::EngineManifest& manifest,
+    const EngineManifest& manifest,
     const nx::vms::api::analytics::DeviceAgentManifest& deviceManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth,
@@ -158,16 +156,16 @@ void MetadataMonitor::reopenMonitorConnection()
     m_monitorTimer.start(reopenDelay(), [this]() { initEventMonitor(); });
 }
 
-bool MetadataMonitor::processEvent(const DahuaEvent& event)
+bool MetadataMonitor::processEvent(const Event& event)
 {
     using namespace nx::vms::api::analytics;
 
-    std::vector<DahuaEvent> result;
+    std::vector<Event> result;
     if (!event.typeId.isEmpty())
         result.push_back(event);
 
     auto getEventKey =
-        [](const DahuaEvent& event)
+        [](const Event& event)
         {
             QString result = event.typeId;
             if (event.region)
@@ -192,7 +190,7 @@ bool MetadataMonitor::processEvent(const DahuaEvent& event)
     if (result.empty())
         return true;
 
-    for (const DahuaEvent& e: result)
+    for (const Event& e: result)
         NX_VERBOSE(this, "Got event %1, isActive=%2", e.caption, e.isActive);
 
     QnMutexLocker lock(&m_mutex);
@@ -202,7 +200,7 @@ bool MetadataMonitor::processEvent(const DahuaEvent& event)
     return true;
 }
 
-void MetadataMonitor::addExpiredEvents(std::vector<DahuaEvent>& result)
+void MetadataMonitor::addExpiredEvents(std::vector<Event>& result)
 {
     for (auto itr = m_startedEvents.begin(); itr != m_startedEvents.end();)
     {
