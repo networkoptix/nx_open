@@ -150,20 +150,19 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
                 if (!this.foundPlatform) {
                     this.downloads.groups[0].active = true;
-                    this.platform = this.downloads.groups[0].name;
+                    this.platform = this.downloads.groups[0].os;
                 }
 
                 this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
 
                 setTimeout(() => {
+                    this.tabsVisible = true;
                     if (this.tabs) {
                         this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[0].name);
                     }
                 });
 
                 this.getDownloadsInfo();
-
-                setTimeout(() => this.tabsVisible = true); //
             });
     }
 
