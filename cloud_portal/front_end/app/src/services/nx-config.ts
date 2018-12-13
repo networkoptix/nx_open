@@ -202,7 +202,7 @@ export class NxConfigService {
                         ]
                     },
                     {
-                        name      : 'mac',
+                        name      : 'macos',
                         os        : 'MacOS',
                         installers: [
                             {

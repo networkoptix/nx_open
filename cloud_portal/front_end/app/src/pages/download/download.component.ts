@@ -144,26 +144,27 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     });
                 });
 
-                this.downloads.groups.forEach(platform => {
-                    this.foundPlatform = ((platform.os || platform.name) === this.activeOs) || this.foundPlatform;
+                this.foundPlatform = this.downloads.groups.some(platform => {
+                    return ((platform.os || platform.name) === this.activeOs);
                 });
 
                 if (!this.foundPlatform) {
                     this.downloads.groups[0].active = true;
+                    this.platform = this.downloads.groups[0].name;
                 }
+
+                this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
+
+                setTimeout(() => {
+                    if (this.tabs) {
+                        this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[0].name);
+                    }
+                });
 
                 this.getDownloadsInfo();
 
                 setTimeout(() => this.tabsVisible = true); //
             });
-
-        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
-
-        setTimeout(() => {
-            if (this.tabs) {
-                this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[0].name );
-            }
-        });
     }
 
     ngOnInit(): void {
