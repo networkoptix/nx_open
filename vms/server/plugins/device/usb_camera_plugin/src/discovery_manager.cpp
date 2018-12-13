@@ -135,11 +135,10 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     {
         if (it->second != device)
         {
-            DeviceDataWithNxId old = it->second;
             NX_DEBUG(
                 this,
                 "Device with nxId already found but device changed: old: %1, new: %2",
-                old.toString(),
+                it->second.toString(),
                 device.toString());
 
             it->second = device;
