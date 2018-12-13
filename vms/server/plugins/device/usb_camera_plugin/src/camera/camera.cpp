@@ -63,7 +63,7 @@ Camera::Camera(
 
 bool Camera::initialize()
 {
-    auto codecList = device::video::getSupportedCodecs(url().c_str());
+    auto codecList = device::video::getSupportedCodecs(ffmpegUrl().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
 
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
@@ -114,7 +114,7 @@ std::shared_ptr<VideoStream> Camera::videoStream()
 
 std::vector<device::video::ResolutionData> Camera::resolutionList() const
 {
-    return device::video::getResolutionList(url(), m_compressionTypeDescriptor);
+    return device::video::getResolutionList(ffmpegUrl(), m_compressionTypeDescriptor);
 }
 
 void Camera::setAudioEnabled(bool value)
@@ -160,14 +160,14 @@ const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() 
     return m_compressionTypeDescriptor;
 }
 
-std::string Camera::url() const
-{
-    return m_cameraManager->getFfmpegUrl();
-}
-
 CodecParameters Camera::defaultVideoParameters() const
 {
     return m_defaultVideoParams;
+}
+
+std::string Camera::ffmpegUrl() const
+{
+    return m_cameraManager->ffmpegUrl();
 }
 
 std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
@@ -178,7 +178,7 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
     return ffmpegCodecList;
 }
 
-nxcip::CameraInfo Camera::info() const
+const nxcip::CameraInfo& Camera::info() const
 {
     return m_cameraManager->info();
 }
@@ -206,7 +206,8 @@ CodecParameters Camera::getDefaultVideoParameters()
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = device::video::getMaxBitrate(url().c_str(), m_compressionTypeDescriptor);
+        int maxBitrate = 
+            device::video::getMaxBitrate(ffmpegUrl().c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,
             it->fps,

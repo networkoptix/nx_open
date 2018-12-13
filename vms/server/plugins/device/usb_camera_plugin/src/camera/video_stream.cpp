@@ -63,10 +63,10 @@ VideoStream::~VideoStream()
     m_timeProvider->releaseRef();
 }
 
-std::string VideoStream::url() const
+std::string VideoStream::ffmpegUrl() const
 {
     if (auto cam = m_camera.lock())
-        return cam->url();
+        return cam->ffmpegUrl();
     return {};
 }
 
@@ -171,7 +171,7 @@ bool VideoStream::ioError() const
 
 bool VideoStream::pluggedIn() const
 {
-    return !device::video::getDeviceName(url().c_str()).empty();
+    return !device::video::getDeviceName(ffmpegUrl().c_str()).empty();
 }
 
 void VideoStream::updateActualFps(uint64_t now)
@@ -192,9 +192,9 @@ std::string VideoStream::ffmpegUrlPlatformDependent() const
 {
     return
 #ifdef _WIN32
-        std::string("video=@device_pnp_") + url();
+        std::string("video=@device_pnp_") + ffmpegUrl();
 #else
-        url();
+        ffmpegUrl();
 #endif
 }
 
@@ -402,7 +402,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::video::setBitrate(
-                url(),
+                ffmpegUrl(),
                 m_codecParams.bitrate,
                 cam->compressionTypeDescriptor());
         }

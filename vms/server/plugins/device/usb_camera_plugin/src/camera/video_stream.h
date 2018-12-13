@@ -35,9 +35,9 @@ public:
     virtual ~VideoStream();
 
     /**
-     * Get the url of the video stream.
+     * Get the url used by ffmpeg to open the video stream.
      */
-    std::string url() const;
+    std::string ffmpegUrl() const;
     
     /**
      * The target frames per second the video stream was opened with.
