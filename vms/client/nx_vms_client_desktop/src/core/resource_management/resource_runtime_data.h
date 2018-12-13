@@ -3,6 +3,9 @@
 #include <client/client_globals.h>
 #include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <utils/common/functional.h>
+
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
@@ -34,12 +37,14 @@ public:
     }
 
 signals:
+    void resourceDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
     void layoutItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 
 private:
-    void setDataInternal(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    Qn::Notifier setDataInternal(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 
 private:
+    mutable QnMutex m_mutex;
     using DataHash = QHash<Qn::ItemDataRole, QVariant>;
     QHash<QnUuid, DataHash> m_data;
 };

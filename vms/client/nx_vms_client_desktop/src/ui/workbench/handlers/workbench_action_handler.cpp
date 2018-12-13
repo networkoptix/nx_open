@@ -1215,17 +1215,6 @@ void ActionHandler::at_dropResourcesAction_triggered()
     QnResourceList resources = parameters.resources();
     QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
 
-    if (layouts.size() == 1)
-    {
-        auto &layout = layouts.first();
-        if (layout::requiresPassword(layout))
-        {
-            layout::askAndSetPassword(layout, mainWindowWidget());
-            if (layout::requiresPassword(layout)) //< A correct password was not entered. Do not open.
-                return;
-        }
-    }
-
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 

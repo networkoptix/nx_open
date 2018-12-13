@@ -12,6 +12,7 @@
 #include <nx/fusion/serialization/proto_message.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/core/watermark/watermark.h>
 
@@ -244,21 +245,15 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     const auto fileInfo = nx::core::layout::identifyFile(filename);
     if (!fileInfo.isValid)
         return QnLayoutResourcePtr();
-    if (fileInfo.isCrypted)
-        layout->setData(Qn::LayoutEncryptionRole, true);
 
     nx::vms::api::LayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout))
     {
         QnProto::Message<nx::vms::api::LayoutData> apiLayoutMessage;
         if (!QnProto::deserialize(layoutData, &apiLayoutMessage))
-        {
             return QnLayoutResourcePtr();
-        }
-        else
-        {
-            apiLayout = apiLayoutMessage.data;
-        }
+
+        apiLayout = apiLayoutMessage.data;
     }
 
     ec2::fromApiToResource(apiLayout, layout);
@@ -278,6 +273,13 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             return existingLayout;
     }
     layout->setId(layoutId);
+    layout->setParentId(QnUuid());
+    layout->setName(QFileInfo(layoutUrl).fileName());
+    layout->addFlags(Qn::exported_layout);
+    layout->setUrl(layoutUrl);
+
+    if (fileInfo.isCrypted)
+        nx::vms::client::desktop::layout::markAsEncrypted(layout);
 
     QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
     if (rangeFile)
@@ -332,10 +334,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         watermarkFile.reset();
     }
 
-    layout->setParentId(QnUuid());
-    layout->setName(QFileInfo(layoutUrl).fileName());
-    layout->addFlags(Qn::exported_layout);
-    layout->setUrl(layoutUrl);
+
 
     QnLayoutItemDataMap updatedItems;
 

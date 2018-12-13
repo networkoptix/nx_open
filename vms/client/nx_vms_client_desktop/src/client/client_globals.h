@@ -443,6 +443,7 @@ namespace Qn
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::ItemDataRole);
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

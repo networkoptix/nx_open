@@ -702,7 +702,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     if (!layout || !layout->isFile())
         return;
 
-    if (layout->data(Qn::LayoutEncryptionRole).toBool())
+    if (layout::isEncrypted(layout))
     {
         if (!layout::confirmPassword(layout, mainWindowWidget()))
             return; //< Reconfirm the password from user and exit if it is invalid.
@@ -716,8 +716,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     layoutSettings.mode = ExportLayoutSettings::Mode::LocalSave;
     layoutSettings.period = layout->getLocalRange();
     layoutSettings.readOnly = readOnly;
-    layoutSettings.encryption = {layout->data(Qn::LayoutEncryptionRole).toBool(),
-        layout->data(Qn::LayoutPasswordRole).toString()};
+    layoutSettings.encryption = {layout::isEncrypted(layout), layout::password(layout)};
 
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));
