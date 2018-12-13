@@ -16,8 +16,8 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_list_manager.h>
 
-#include <nx/sdk/analytics/plugin.h>
-#include <nx/sdk/settings.h>
+#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/i_string_map.h>
 #include <plugins/settings.h>
 
 #include <plugins/plugin_manager.h>
@@ -36,8 +36,8 @@ class SdkObjectFactory;
 
 namespace {
 
-using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::Plugin>;
-using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::Engine>;
+using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>;
+using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::IEngine>;
 
 const nx::utils::log::Tag kLogTag{typeid(nx::vms::server::analytics::SdkObjectFactory)};
 
@@ -145,14 +145,14 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
+    auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::IPlugin>(
         nx::sdk::analytics::IID_Plugin);
 
     std::map<QnUuid, PluginPtr> sdkPluginsById;
     for (const auto analyticsPlugin: analyticsPlugins)
     {
         auto analyticsPluginPtr =
-            sdk_support::SharedPtr<nx::sdk::analytics::Plugin>(analyticsPlugin);
+            sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>(analyticsPlugin);
 
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
@@ -264,7 +264,6 @@ bool SdkObjectFactory::initEngineResources()
     std::map<QnUuid, EnginePtr> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
-        const auto& pluginId = entry.first;
         const auto& engineList = entry.second;
         for (const auto& engine : engineList)
         {
@@ -371,7 +370,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
 }
 
 std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
-    const nx::sdk::analytics::Plugin* plugin) const
+    const nx::sdk::analytics::IPlugin* plugin) const
 {
     return std::make_unique<sdk_support::StartupPluginManifestLogger>(
         nx::utils::log::Tag(typeid(this)),

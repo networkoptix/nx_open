@@ -3,28 +3,19 @@
     "eventTypes": [
         {
             "id": "nx.vca.md", 
-            "name": {
-                "value": "motion detected", 
-                "localization": {}
-            }, 
+            "name": "motion detected",
             "flags": "stateDependent", 
             "internalName": "md"
         }, 
         {
             "id": "nx.vca.vca", 
-            "name": {
-                "value": "vca event", 
-                "localization": {}
-            }, 
+            "name": "vca event",
             "flags": "stateDependent", 
             "internalName": "vca"
         }, 
         {
             "id": "nx.vca.fd", 
-            "name": {
-                "value": "face detected", 
-                "localization": {}
-            }, 
+            "name": "face detected",
             "flags": "stateDependent", 
             "internalName": "fd"
         }

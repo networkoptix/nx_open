@@ -42,7 +42,7 @@ DeviceAgentHandler::DeviceAgentHandler(
     m_metadataHandler.setEventTypeDescriptors(eventDescriptors);
 }
 
-void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::MetadataPacket* metadataPacket)
+void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket)
 {
     m_metadataHandler.handleMetadata(metadataPacket);
 }

@@ -38,7 +38,7 @@ Item
                 for (var i = 0; i < analyticsEngines.length; ++i)
                 {
                     const engineInfo = analyticsEngines[i]
-                    if (engineInfo.id == currentEngineId)
+                    if (engineInfo.id === currentEngineId)
                     {
                         settingsView.loadModel(
                             engineInfo.settingsModel,

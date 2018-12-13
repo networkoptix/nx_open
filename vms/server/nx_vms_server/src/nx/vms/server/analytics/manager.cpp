@@ -23,7 +23,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
@@ -39,10 +39,10 @@
 #include <nx/debugging/visual_metadata_debugger_factory.h>
 #include <nx/utils/log/log_main.h>
 
-#include <nx/sdk/analytics/consuming_device_agent.h>
-#include <nx/sdk/analytics/pixel_format.h>
-#include <nx/sdk/analytics/plugin.h>
-#include <nx/sdk/settings.h>
+#include <nx/sdk/analytics/i_consuming_device_agent.h>
+#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/i_string_map.h>
 
 #include "yuv420_uncompressed_video_frame.h"
 #include "generic_uncompressed_video_frame.h"
@@ -57,7 +57,7 @@ using namespace nx::sdk::analytics;
 using namespace nx::debugging;
 using namespace nx::vms::common;
 
-using PixelFormat = UncompressedVideoFrame::PixelFormat;
+using PixelFormat = IUncompressedVideoFrame::PixelFormat;
 
 Manager::Manager(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule),

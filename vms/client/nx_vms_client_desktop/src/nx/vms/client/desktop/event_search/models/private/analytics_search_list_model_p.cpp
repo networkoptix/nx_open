@@ -166,9 +166,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectTypeDescriptor)
                 return fallbackTitle();
 
-            return objectTypeDescriptor->item.name.value.isEmpty()
+            return objectTypeDescriptor->item.name.isEmpty()
                 ? fallbackTitle()
-                : objectTypeDescriptor->item.name.value;
+                : objectTypeDescriptor->item.name;
         }
 
         case Qt::DecorationRole:
@@ -768,7 +768,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
         for (const auto& actionDescriptor: descriptors)
         {
-            const auto name = actionDescriptor.item.name.value;
+            const auto name = actionDescriptor.item.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
                 [this, actionDescriptor, object, pluginId = pluginId]()
                 {

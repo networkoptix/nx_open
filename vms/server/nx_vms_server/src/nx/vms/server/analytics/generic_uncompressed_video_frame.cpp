@@ -11,17 +11,17 @@ void* GenericUncompressedVideoFrame::queryInterface(const nxpl::NX_GUID& interfa
     if (interfaceId == IID_UncompressedVideoFrame)
     {
         addRef();
-        return static_cast<UncompressedVideoFrame*>(this);
+        return static_cast<IUncompressedVideoFrame*>(this);
     }
-    if (interfaceId == IID_MediaFrame)
+    if (interfaceId == IID_UncompressedMediaFrame)
     {
         addRef();
-        return static_cast<MediaFrame*>(this);
+        return static_cast<IUncompressedMediaFrame*>(this);
     }
     if (interfaceId == IID_DataPacket)
     {
         addRef();
-        return static_cast<DataPacket*>(this);
+        return static_cast<IDataPacket*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
