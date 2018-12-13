@@ -208,9 +208,10 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
     if (m_currentLayout == layout)
         return;
 
-    if (auto resource = layout->resource())
+    if (layout) // layout == nullptr is ok in QnWorkbench destructor
     {
-        if (nx::vms::client::desktop::layout::requiresPassword(resource))
+        auto resource = layout->resource();
+        if (resource && nx::vms::client::desktop::layout::requiresPassword(resource))
         {
             // When opening encrypted layout, ask for the password and remove layout if unsuccessful.
             if (!nx::vms::client::desktop::layout::askAndSetPassword(resource, mainWindowWidget()))
