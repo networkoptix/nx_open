@@ -32,8 +32,6 @@ TEST(MediaServerProcess, ApiRestrictions)
 
         {"/static/index.html", AuthMethod::noAuth},
         {"/static/script.js", AuthMethod::noAuth},
-
-        {"/web/proxy/127.0.0.1:7001/api/installUpdateUnauthenticated", AuthMethod::noAuth},
     };
 
     AuthMethodRestrictionList restrictions;
