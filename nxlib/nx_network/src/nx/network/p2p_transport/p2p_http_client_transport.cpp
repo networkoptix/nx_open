@@ -30,7 +30,9 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
     m_readHttpClient->bindToAioThread(getAioThread());
     m_readHttpClient->setAdditionalHeaders(http::HttpHeaders());
+
     m_writeHttpClient->bindToAioThread(getAioThread());
+    m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
 
     post([this]() { startReading(); });
 }
@@ -57,8 +59,10 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            // Don't call readSomeAsync() again, before a previous handler has called back.
-            NX_ASSERT(!m_userReadHandlerPair);
+            NX_ASSERT(
+                !m_userReadHandlerPair,
+                "Don't call readSomeAsync() again, before the previous handler has been invoked.");
+
             if (m_userReadHandlerPair)
                 return handler(SystemError::notSupported, 0);
 
@@ -222,7 +226,34 @@ void P2PHttpClientTransport::startReading()
              NX_VERBOSE(
                  this,
                  "The read (GET) http client emitted 'onDone'. Moving to a failed state.");
+
              m_failed = true;
+
+             if (m_userReadHandlerPair)
+             {
+                 nx::Buffer outBuffer;
+                 SystemError::ErrorCode errorCode = SystemError::noError;
+
+                 if (!m_incomingMessageQueue.empty())
+                 {
+                     outBuffer = m_incomingMessageQueue.front();
+                     m_incomingMessageQueue.pop();
+                     m_userReadHandlerPair->first->append(outBuffer);
+
+                 }
+                 else
+                 {
+                     errorCode = SystemError::connectionAbort;
+                 }
+
+                 utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                 m_userReadHandlerPair->second(errorCode, outBuffer.size());
+                 if (watcher.objectDestroyed())
+                     return;
+
+                 m_userReadHandlerPair.reset();
+             }
+
          });
 
     m_readHttpClient->doGet(m_url ? *m_url : m_readHttpClient->url());

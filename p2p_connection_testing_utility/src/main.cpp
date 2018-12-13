@@ -80,7 +80,9 @@ public:
         additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_guid);
         websocket::addClientHeaders(&additionalHeaders, config.protocolName);
 
-        NX_VERBOSE(this, lm("connectAsync: connecting to %1").args(config.url));
+        NX_VERBOSE(
+            this,
+            lm("connectAsync: connecting to %1, connection GUID: %2").args(config.url, m_guid));
 
         m_httpClient->setUserName(config.userName);
         m_httpClient->setUserPassword(config.userPassword);
@@ -182,7 +184,8 @@ private:
             m_p2pTransport.reset(new P2PHttpClientTransport(
                 std::move(m_httpClient),
                 m_guid,
-                websocket::FrameType::text));
+                websocket::FrameType::text);
+
             m_p2pTransport->bindToAioThread(m_aioThread);
         }
         else

@@ -448,6 +448,16 @@ void AsyncClient::setUserName(const QString& userName)
     m_user.username = userName;
 }
 
+Credentials AsyncClient::credentials() const
+{
+    return m_user;
+}
+
+void AsyncClient::setCredentials(const Credentials& credentials)
+{
+    m_user = credentials;
+}
+
 void AsyncClient::setUserPassword(const QString& userPassword)
 {
     AuthToken authToken;
