@@ -54,7 +54,6 @@ def determine_package_versions(
 
     if platform == "windows":
         v["ffmpeg"] = "3.1.9"
-        v["openssl"] = "1.0.2q"
 
     if platform == "linux" and box == "none":
         v["festival"] = "2.4-1"
@@ -100,7 +99,7 @@ def determine_package_versions(
         v["festival-vox"] = v["festival"]
 
     if platform == "windows" and debug:
-        for package in ("qt", "festival", "openal", "sigar", "icu"):
+        for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
             v[package] += "-debug"
 
     return v
