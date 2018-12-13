@@ -184,7 +184,7 @@ private:
             m_p2pTransport.reset(new P2PHttpClientTransport(
                 std::move(m_httpClient),
                 m_guid,
-                websocket::FrameType::text);
+                websocket::FrameType::text));
 
             m_p2pTransport->bindToAioThread(m_aioThread);
         }
