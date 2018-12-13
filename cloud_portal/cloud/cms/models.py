@@ -263,8 +263,8 @@ class Product(models.Model):
 
 class Context(models.Model):
     class Meta:
-        verbose_name = 'admin page'
-        verbose_name_plural = 'admin pages'
+        verbose_name = 'page'
+        verbose_name_plural = 'pages'
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
@@ -298,14 +298,6 @@ class Context(models.Model):
         # retrieve first available template from the list or return None
         return next((context_template.first().template for context_template in contexts if context_template.exists()),
                     None)
-
-
-# TODO: CLOUD-2388 Remove proxy model
-class ContextProxy(Context):
-    class Meta:
-        proxy = True
-        verbose_name = "page"
-        verbose_name_plural = "pages"
 
 
 class ContextTemplate(models.Model):

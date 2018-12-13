@@ -12,7 +12,7 @@
     </div>
 {% endblock %}
 {% block content %}
-    <div class="results">
+    <div class="results" id="changelist">
         <table>
             <thead>
             <tr>
@@ -26,11 +26,11 @@
             <tbody>
             {% for context in contexts %}
                 <tr class="row{{ forloop.counter0 | modulo:2 | add:1 }}">
-                    <td><a href="{% url 'admin:change_page' product.id context.id %}">{{ context.name }}</a></td>
+                    <th><a href="{% url 'admin:change_page' product.id context.id %}">{{ context.name }}</a></th>
                     <td>{{ context.description }}</td>
                     <td>{{ context.url }}</td>
-                    <td>{{ context.translatable }}</td>
-                    <td>{{ context.is_global }}</td>
+                    <td>{% include 'admin/boolean.html' with value=context.translatable %}</td>
+                    <td>{% include 'admin/boolean.html' with value=context.is_global %}</td>
                 </tr>
             {% endfor %}
             </tbody>
