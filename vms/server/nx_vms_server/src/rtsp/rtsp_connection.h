@@ -113,7 +113,7 @@ private slots:
 private:
     void checkQuality();
     void processRequest();
-    void parseRequest();
+    bool parseRequestParams();
     void initResponse(
         nx::network::rtsp::StatusCodeValue code = nx::network::http::StatusCode::ok,
         const QString& message = "OK");
@@ -138,8 +138,7 @@ private:
     AbstractRtspEncoderPtr createEncoderByMediaData(
         QnConstAbstractMediaDataPtr mediaHigh,
         QnConstAbstractMediaDataPtr mediaLow,
-        MediaQuality quality,
-        QSize resolution);
+        MediaQuality quality);
     QnConstAbstractMediaDataPtr getCameraData(
         QnAbstractMediaData::DataType dataType, MediaQuality quality);
     static int isFullBinaryMessage(const QByteArray& data);
