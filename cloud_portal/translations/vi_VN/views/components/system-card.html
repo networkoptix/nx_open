@@ -9,7 +9,7 @@
             <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Hợp nhất với một hệ thống khác</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Ngắt kết nối với
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -51,8 +51,8 @@
         <div class="merge-info-text">
             <p>Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ.</p>
             <p>Cho đến khi hợp nhất xong bạn có thể đăng nhập vào hệ thống này và xem video, nhưng không thể thay đổi bất kỳ cài đặt.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
+            <p>Khi hợp nhất kết thúc, tất cả người dùng và camera từ hệ thống này sẽ có
+                trong hệ thống  "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", và hệ thống này sẽ bị xóa.</p>
         </div>
     </div>
 </div>

@@ -5,4 +5,4 @@ Olá {{message.userFullName}},
 {{config.portal_url}}/activar/{{message.code}}
 
 Se você não se registou em %PRODUCT_NAME%, ignore este e-mail.
-Não compartilhe esta mensagem ou o link com ninguém.
+Não partilhe esta mensagem ou o link com ninguém.

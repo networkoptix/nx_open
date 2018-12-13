@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "新建帳號",
         "errorNoHDD": "此設備只能在有硬碟狀況下運作. <br>請關閉設備然後安裝硬碟.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "此設備需要網路連接才能運作.<br>請將它連接到本地網路或網際網路"
     },
     "passwordRequirements": {
         "minLengthMessage": "密碼長度必須至少為8個字元",

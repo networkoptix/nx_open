@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "สร้างบัญชี",
         "errorNoHDD": "อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "อุปกรณ์นี้ต้องการการเชื่อมต่อเครือข่ายเพื่อใช้งานได้.<br>กรุณาเชื่อมต่อเครือข่ายกับอินเทอร์เน็ตในระบบเครือข่ายภายใน"
     },
     "passwordRequirements": {
         "minLengthMessage": "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัว",
@@ -116,7 +116,7 @@
         "updateNotificationsEnabled": "เปิดใช้งานการแจ้งเตือนการปรับปรุง",
         "upnpPortMappingEnabled": "เปิดใช้การแมปพอร์ต UPnP",
         "useTextEmailFormat": "ส่งอีเมลแบบธรรมดา",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "ใช้ฟีดบรรทัดของ Windows ในอีเมล",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "เข้าสู่ระบบหรือรหัสผ่านไม่ถูกต้อง",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่"
     },
     "navigaion": {
         "cannotGetUser": "ล้มเหลวของเซิร์ฟเวอร์: ไม่สามารถเรียกข้อมูลผู้ใช้ปัจจุบัน"
