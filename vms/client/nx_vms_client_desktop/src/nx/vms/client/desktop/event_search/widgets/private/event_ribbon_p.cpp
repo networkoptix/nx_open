@@ -1,5 +1,4 @@
 #include "event_ribbon_p.h"
-#include "event_ribbon_p.h"
 
 #include <algorithm>
 #include <chrono>
@@ -16,7 +15,6 @@
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
@@ -32,8 +30,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
-
-#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -100,7 +96,7 @@ EventRibbon::Private::Private(EventRibbon* q):
 
     connect(m_scrollBar.get(), &QScrollBar::valueChanged, this, &Private::updateView);
 
-    m_autoCloseTimer->setInterval(1s);
+    m_autoCloseTimer->setInterval(1000);
     connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpiredTiles);
 
     NX_ASSERT(Importance() == Importance::NoNotification);
@@ -435,7 +431,7 @@ void EventRibbon::Private::cleanupDeletingTile(int index)
     reserveWidget(index);
 
     if (m_hoveredIndex.row() == index)
-        m_hoveredIndex = {};
+        m_hoveredIndex = QPersistentModelIndex();
 
     const auto importance = tile->importance;
     if (importance != Importance())
@@ -452,7 +448,7 @@ void EventRibbon::Private::handleWidgetChanged(int index)
 
     const auto deadline = m_deadlines.find(m_model->index(index));
     if (deadline != m_deadlines.end())
-        deadline->setRemainingTime(kVisibleAutoCloseDelay);
+        deadline->setRemainingTime(kVisibleAutoCloseDelay.count());
 }
 
 void EventRibbon::Private::closeExpiredTiles()
@@ -530,7 +526,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         tile->animated = shouldAnimateTile(modelIndex);
 
         if (closeable && timeout > 0ms)
-            m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay);
+            m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay.count());
 
         m_tiles.insert(m_tiles.begin() + i, std::move(tile));
         currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
@@ -711,7 +707,7 @@ void EventRibbon::Private::clear()
 
     m_tiles.clear();
     m_visible = {};
-    m_hoveredIndex = {};
+    m_hoveredIndex = QPersistentModelIndex();
     m_totalHeight = 0;
     m_live = true;
 
@@ -1237,7 +1233,7 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
 void EventRibbon::Private::updateHover()
 {
     const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
-    if (const bool hovered = q->rect().contains(pos))
+    if (q->rect().contains(pos))
     {
         const int index = indexAtPos(pos);
 
@@ -1252,11 +1248,11 @@ void EventRibbon::Private::updateHover()
             return;
 
         if (m_hoveredIndex.isValid() && m_deadlines.contains(m_hoveredIndex))
-            m_deadlines[m_hoveredIndex].setRemainingTime(kVisibleAutoCloseDelay);
+            m_deadlines[m_hoveredIndex].setRemainingTime(kVisibleAutoCloseDelay.count());
 
         if (index < 0)
         {
-            m_hoveredIndex = {};
+            m_hoveredIndex = QPersistentModelIndex();
             emit q->hovered(QModelIndex(), nullptr);
         }
         else if (NX_ASSERT(m_model))
@@ -1270,7 +1266,7 @@ void EventRibbon::Private::updateHover()
         if (!m_hoveredIndex.isValid())
             return;
 
-        m_hoveredIndex = {};
+        m_hoveredIndex = QPersistentModelIndex();
         emit q->hovered(QModelIndex(), nullptr);
     }
 }
@@ -1294,7 +1290,6 @@ int EventRibbon::Private::indexAtPos(const QPoint& pos) const
         return -1;
 
     const auto viewportPos = m_viewport->mapFrom(q, pos);
-    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
 
     const auto begin = std::make_reverse_iterator(m_tiles.cbegin() + m_visible.upper());
     const auto end = std::make_reverse_iterator(m_tiles.cbegin() + m_visible.lower());

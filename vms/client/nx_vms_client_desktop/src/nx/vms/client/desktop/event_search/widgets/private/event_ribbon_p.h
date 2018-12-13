@@ -157,7 +157,7 @@ private:
 
     QHash<QPersistentModelIndex, QDeadlineTimer> m_deadlines;
 
-    std::array<int, int(Importance::LevelCount)> m_unreadCounts;
+    std::array<int, int(Importance::LevelCount)> m_unreadCounts{};
     int m_totalUnreadCount = 0;
 
     nx::utils::Guard makeUnreadCountGuard();
