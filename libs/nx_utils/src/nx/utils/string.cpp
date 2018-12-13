@@ -11,8 +11,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/optional.h>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement)
 {
@@ -630,5 +629,4 @@ int stricmp(const std::string& left, const std::string& right)
     return qstricmp(left.c_str(), right.c_str());
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

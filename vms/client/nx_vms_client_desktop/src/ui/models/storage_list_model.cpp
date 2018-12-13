@@ -9,7 +9,7 @@
 
 namespace
 {
-    // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+    // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
     const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
     const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
@@ -197,7 +197,7 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                     return tr("Loading...");
                 default:
                 {
-                    // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+                    // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
                     const auto tb = storageData.totalSpace / kBytesInTb;
                     if (tb >= 1.0)
                         return lit("%1 TB").arg(QString::number(tb, 'f', 1));
