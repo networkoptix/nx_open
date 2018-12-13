@@ -142,7 +142,9 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)
         != nx::update::FindPackageResult::ok)
     {
-        NX_ERROR(NX_SCOPE_TAG, "(%1)Error while trying to find client package: %2", contents.info.version, errorMessage);
+        NX_ERROR(typeid(UpdateContents))
+            << "verifyUpdateManifest(" << contents.info.version
+            << ")Error while trying to find client package:" << errorMessage;
     }
 
     QSet<QnUuid> allServers;
@@ -208,32 +210,37 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     if (!contents.missingUpdate.empty())
     {
-        NX_WARNING(NX_SCOPE_TAG, "(%1) - detected missing server packages.", contents.info.version);
+        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
+            << contents.info.version << ") - detected missing server packages.";
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
     if (!contents.clientPackage.isValid())
     {
-        NX_WARNING(NX_SCOPE_TAG, "(%1) - detected missing client package.", contents.info.version);
+        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
+            << contents.info.version << ") - detected missing server packages.";
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
     if (!contents.invalidVersion.empty())
     {
-        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected incompatible version error.", contents.info.version);
+        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
+            << contents.info.version << ") - detected incompatible version error.";
         contents.error = nx::update::InformationError::incompatibleVersion;
     }
 
     // Update package has no packages at all.
     if (contents.info.packages.empty() && !activeServers.empty())
     {
-        NX_WARNING(NX_SCOPE_TAG, "(%1) This update is completely empty.", contents.info.version);
+        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
+            << contents.info.version << ") - this update is completely empty.";
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
     if (!contents.cloudIsCompatible)
     {
-        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected detected incompatible cloud.", contents.info.version);
+        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
+            << contents.info.version << ") - detected detected incompatible cloud.";
         contents.error = nx::update::InformationError::incompatibleCloudHostError;
     }
 
@@ -243,7 +250,10 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         for (const auto& pkg: contents.manualPackages)
             files.append(pkg.file);
 
-        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected some servers can not download update packages: %2", contents.info.version, files.join(","));
+        NX_WARNING(typeid(UpdateContents))
+            << "verifyUpdateManifest(" << contents.info.version
+            << ") - detected some servers can not download update packages:"
+            << contents.info.version, files.join(",");
     }
 
     contents.verified = true;

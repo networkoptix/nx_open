@@ -4,7 +4,6 @@
 
 #include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/sdk/analytics/events_metadata_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -14,7 +13,7 @@
 #include "metadata_monitor.h"
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
@@ -222,5 +221,5 @@ void MetadataMonitor::addExpiredEvents(std::vector<Event>& result)
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx

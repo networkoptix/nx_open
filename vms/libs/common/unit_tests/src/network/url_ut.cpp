@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 #include <nx/utils/url.h>
+#include <nx/utils/log/log_message.h>
+
+#include <optional>
 
 namespace nx {
 namespace utils {
@@ -48,6 +51,56 @@ TEST(Url, operator_less)
     ASSERT_LT(Url(kTestUrl3), Url(kTestUrl2));
     ASSERT_LT(Url(kTestUrl3), Url(kTestUrl));
 }
+
+TEST(Url, parseUrlFields)
+{
+    ASSERT_EQ(url::parseUrlFields("hostname").toStdString(), "//hostname");
+    ASSERT_EQ(url::parseUrlFields("hostname:1248").toStdString(), "//hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("user:pass@hostname:1248").toStdString(),
+        "//user:pass@hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("http://hostname").toStdString(), "http://hostname");
+    ASSERT_EQ(url::parseUrlFields("http://hostname:1248").toStdString(), "http://hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("http://user:pass@hostname:1248/path?query").toStdString(),
+        "http://user:pass@hostname:1248/path?query");
+
+    ASSERT_EQ(url::parseUrlFields("hostname", "zorz").toStdString(), "zorz://hostname");
+    ASSERT_EQ(url::parseUrlFields("user:pass@hostname:1248", "zorz").toStdString(),
+        "zorz://user:pass@hostname:1248");
+    ASSERT_EQ(url::parseUrlFields("http://hostname:1248", "zorz").toStdString(),
+        "http://hostname:1248");
+
+    ASSERT_EQ(url::parseUrlFields("invalid+hostname").path(), "invalid+hostname");
+    ASSERT_FALSE(url::parseUrlFields("http://invalid+hostname:666").isValid());
+    ASSERT_FALSE(url::parseUrlFields("h*ttp://60/path").isValid());
+}
+
+TEST(Url, logging)
+{
+    Url url;
+    if (nx::utils::ini().displayUrlPasswordInLogs == 0)
+    {
+        url.setScheme("http");
+        url.setHost("zorz.com");
+        url.setUserName("zorzuser");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+
+        url.setPassword("zorzpassword");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+    }
+    else
+    {
+        url.clear();
+        url.setScheme("http");
+        url.setHost("zorz.com");
+        url.setUserName("zorzuser");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+
+        url.setPassword("zorzpassword");
+        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(),
+            "http://zorzuser:zorzpassword@zorz.com");
+    }
+}
+
 
 } // namespace test
 } // namespace utils

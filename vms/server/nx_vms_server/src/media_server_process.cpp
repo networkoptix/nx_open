@@ -141,7 +141,6 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
-#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/update_status_rest_handler.h>
@@ -2048,9 +2047,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
 
-    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
-
-    /**%apidoc GET /api/restart
+    /**%apidoc POST /api/restart
      * Restarts the server.
      * %permissions Administrator.
      * %return:object JSON object with error message and error code (0 means OK).
@@ -3196,7 +3193,6 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
     auto logSettings = makeLogSettings(settings);
-
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
     logSettings.loggers.front().logBaseName = "log_file";
@@ -3211,6 +3207,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     else
         roSettings->remove("logFile");
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
@@ -3219,6 +3216,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             logSettings, qApp->applicationName(), binaryPath,
             {QnLog::HTTP_LOG_INDEX}));
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
@@ -3233,6 +3231,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             }),
         /*writeLogHeader*/ false);
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "ec2_tran";
@@ -3243,6 +3242,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             binaryPath,
             {QnLog::EC2_TRAN_LOG}));
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
         settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "permissions";
@@ -4722,12 +4722,6 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     // For inserting in HTML <img src="...">.
     restrictions->allow(webPrefix + "/ec2/cameraThumbnail",
         nx::network::http::AuthMethod::allowWithourCsrf);
-
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
-    // authentication is implemented.
-    // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
-        nx::network::http::AuthMethod::noAuth);
 
     nx::network::http::AuthMethodRestrictionList::Filter filter;
     filter.protocol = nx::network::http::http_1_0.protocol.toStdString();

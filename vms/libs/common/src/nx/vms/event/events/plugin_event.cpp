@@ -32,7 +32,7 @@ bool PluginEvent::checkEventParams(const EventParameters& params) const
         QnLexical::deserialized<nx::vms::api::EventLevels>(params.inputPortId);
 
     return (ruleLevels & m_metadata.level)
-        && (m_resourceId == params.eventResourceId)
+        && ((m_resourceId == params.eventResourceId) || params.eventResourceId.isNull())
         && checkForKeywords(m_caption, params.caption)
         && checkForKeywords(m_description, params.description);
 }

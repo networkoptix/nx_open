@@ -64,7 +64,7 @@ void QnManualSearchTaskManager::addTask(
 
     task.setSearchers(searchers);
     task.setSearchDoneCallback(
-        std::bind(&QnManualSearchTaskManager::searchTaskDoneHandler, this, _1, _2));
+        std::bind(&QnManualSearchTaskManager::onSearchTaskDone, this, _1, _2));
 
     if (isSequential)
     {
@@ -99,7 +99,7 @@ void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
             m_tasksFinishedCallback = std::move(callback);
 
             if (m_remainingTaskCount == 0)
-                return searchFinishedHandler();
+                return onSearchFinished();
             runSomePendingTasks();
         });
 }
@@ -119,7 +119,7 @@ QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
         [this]() -> QnManualResourceSearchList { return m_foundResources; });
 }
 
-void QnManualSearchTaskManager::searchTaskDoneHandler(
+void QnManualSearchTaskManager::onSearchTaskDone(
     QnManualResourceSearchList results, QnSearchTask* const task)
 {
     NX_VERBOSE(this, "Task %1 done", *task);
@@ -156,11 +156,11 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
             // Should not do anything else if it was not the last task ran.
             if (m_runningTaskCount > 0)
                 return;
-            searchFinishedHandler();
+            onSearchFinished();
     });
 }
 
-void QnManualSearchTaskManager::searchFinishedHandler()
+void QnManualSearchTaskManager::onSearchFinished()
 {
     NX_CRITICAL(m_pollable.isInSelfAioThread());
 

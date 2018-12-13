@@ -886,8 +886,8 @@ double SPSUnit::getSar() const
     if (!vui_parameters_present_flag)
         return 1.0;
 
-    uint32_t width;
-    uint32_t height;
+    uint32_t width = 0;
+    uint32_t height = 0;
     if (aspect_ratio_idc == Extended_SAR)
     {
         width = sar_width;
@@ -897,6 +897,10 @@ double SPSUnit::getSar() const
     {
         h264::AspectRatio::decode(aspect_ratio_idc, &width, &height);
     }
+
+    if (width == 0 || height == 0)
+        return 1.0;
+
     return double(width) / height;
 }
 

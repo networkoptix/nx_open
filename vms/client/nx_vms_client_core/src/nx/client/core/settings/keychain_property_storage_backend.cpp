@@ -13,7 +13,7 @@ KeychainBackend::KeychainBackend(const QString& serviceName):
 {
 }
 
-QString KeychainBackend::readValue(const QString& name)
+QString KeychainBackend::readValue(const QString& name, bool* success)
 {
     QKeychain::ReadPasswordJob job(m_serviceName);
     job.setAutoDelete(false);
@@ -27,16 +27,20 @@ QString KeychainBackend::readValue(const QString& name)
     job.start();
     eventLoop.exec();
 
-    if (job.error() != QKeychain::NoError)
+    const bool ok = job.error() == QKeychain::NoError;
+    if (success)
+        *success = ok;
+
+    if (!ok)
     {
-        NX_WARNING(this) << lm("Error while reading value from keychain: %1").arg(job.errorString());
+        NX_WARNING(this, "Error while reading value from keychain: %1", job.errorString());
         return {};
     }
 
     return job.textData();
 }
 
-void KeychainBackend::writeValue(const QString& name, const QString& value)
+bool KeychainBackend::writeValue(const QString& name, const QString& value)
 {
     QKeychain::WritePasswordJob job(m_serviceName);
     job.setAutoDelete(false);
@@ -51,13 +55,14 @@ void KeychainBackend::writeValue(const QString& name, const QString& value)
     job.start();
     eventLoop.exec();
 
-    if (job.error() != QKeychain::NoError)
-    {
-        NX_WARNING(this) << lm("Error while writing value to keychain: %1").arg(job.errorString());
-    }
+    const bool ok = job.error() == QKeychain::NoError;
+    if (!ok)
+        NX_WARNING(this, "Error while writing value to keychain: %1", job.errorString());
+
+    return ok;
 }
 
-void KeychainBackend::removeValue(const QString& name)
+bool KeychainBackend::removeValue(const QString& name)
 {
     QKeychain::DeletePasswordJob job(m_serviceName);
     job.setAutoDelete(false);
@@ -71,11 +76,11 @@ void KeychainBackend::removeValue(const QString& name)
     job.start();
     eventLoop.exec();
 
-    if (job.error() != QKeychain::NoError)
-    {
-        NX_WARNING(this)
-            << lm("Error while deleting value from keychain: %1").arg(job.errorString());
-    }
+    const bool ok = job.error() == QKeychain::NoError;
+    if (!ok)
+        NX_WARNING(this, "Error while deleting value from keychain: %1", job.errorString());
+
+    return ok;
 }
 
 } // namespace nx::vms::client::core

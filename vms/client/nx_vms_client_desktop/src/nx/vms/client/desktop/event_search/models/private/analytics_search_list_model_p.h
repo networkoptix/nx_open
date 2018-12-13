@@ -48,6 +48,9 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
+    QString selectedObjectType() const;
+    void setSelectedObjectType(const QString& value);
+
     virtual void clearData() override;
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
@@ -100,6 +103,7 @@ private:
     AnalyticsSearchListModel* const q;
     QRectF m_filterRect;
     QString m_filterText;
+    QString m_selectedObjectType;
 
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     bool m_liveReceptionActive = false;

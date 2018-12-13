@@ -14,7 +14,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -27,7 +27,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/i_engine.h>
 #include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/vms/server/plugins/resource_data_support/hanwha.h>
@@ -3942,6 +3942,7 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 
 void HanwhaResource::setPtzCalibarionTimer()
 {
+    const auto kUpdateTimeout = sharedContext()->ptzCalibratedChannels.timeout() / 3;
     NX_VERBOSE(this, "Set PTZ calibration timer");
     m_timerHolder.addTimer(
         lm("%1 PTZ calibration").args(this),
@@ -3966,7 +3967,7 @@ void HanwhaResource::setPtzCalibarionTimer()
 
             setPtzCalibarionTimer();
         },
-        std::chrono::seconds(10));
+        kUpdateTimeout);
 }
 
 } // namespace plugins

@@ -8,14 +8,14 @@
 #include "string_helper.h"
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
 QString buildCaption(const EngineManifest& manifest, const Event& event)
 {
     const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
-    return descriptor.name.value;
+    return descriptor.name;
 }
 
 QString buildDescription(const EngineManifest& manifest, const Event& event)
@@ -45,5 +45,5 @@ QString buildDescription(const EngineManifest& manifest, const Event& event)
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx

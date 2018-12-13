@@ -20,7 +20,8 @@ using namespace QKeychain;
 #include <wincred.h>
 
 void ReadPasswordJobPrivate::scheduledStart() {
-    LPCWSTR name = (LPCWSTR)key.utf16();
+    const QString fullKey = q->service() + "/" + key;
+    LPCWSTR name = (LPCWSTR)fullKey.utf16();
     PCREDENTIALW cred;
 
     if (!CredReadW(name, CRED_TYPE_GENERIC, 0, &cred)) {
@@ -48,9 +49,11 @@ void ReadPasswordJobPrivate::scheduledStart() {
 }
 
 void WritePasswordJobPrivate::scheduledStart() {
+    const QString fullKey = q->service() + "/" + key;
+    LPWSTR name = (LPWSTR)fullKey.utf16();
+
     CREDENTIALW cred;
     char *pwd = data.data();
-    LPWSTR name = (LPWSTR)key.utf16();
 
     memset(&cred, 0, sizeof(cred));
     cred.Comment = const_cast<wchar_t*>(L"QtKeychain");
@@ -68,7 +71,8 @@ void WritePasswordJobPrivate::scheduledStart() {
 }
 
 void DeletePasswordJobPrivate::scheduledStart() {
-    LPCWSTR name = (LPCWSTR)key.utf16();
+    const QString fullKey = q->service() + "/" + key;
+    LPCWSTR name = (LPCWSTR)fullKey.utf16();
 
     if (!CredDeleteW(name, CRED_TYPE_GENERIC, 0)) {
         Error error;

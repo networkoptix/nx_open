@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/vms/api/analytics/translatable_string.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
@@ -17,7 +16,7 @@ Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 struct NamedItem
 {
     QString id;
-    TranslatableString name;
+    QString name;
 };
 #define NamedItem_Fields (id)(name)
 
@@ -65,4 +64,3 @@ QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EventTypeFlag, (metatype)(n
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EventTypeFlags, (metatype)(numeric)(lexical),
     NX_VMS_API)
-        

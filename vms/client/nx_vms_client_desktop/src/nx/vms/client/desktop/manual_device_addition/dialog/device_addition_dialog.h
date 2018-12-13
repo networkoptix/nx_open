@@ -95,8 +95,8 @@ private:
     AddingDevicesSet m_addingDevices;
     bool m_addressEditing;
 
-    nx::common::utils::Credentials m_knownAddressCredentials;
-    nx::common::utils::Credentials m_subnetScanCredentials;
+    nx::vms::common::Credentials m_knownAddressCredentials;
+    nx::vms::common::Credentials m_subnetScanCredentials;
 };
 
 } // namespace nx::vms::client::desktop

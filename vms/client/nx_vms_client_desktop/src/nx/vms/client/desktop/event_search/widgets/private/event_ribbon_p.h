@@ -62,10 +62,16 @@ public:
     std::chrono::microseconds highlightedTimestamp() const;
     void setHighlightedTimestamp(std::chrono::microseconds value);
 
+    QSet<QnResourcePtr> highlightedResources() const;
+    void setHighlightedResources(const QSet<QnResourcePtr>& value);
+
     bool live() const;
     void setLive(bool value);
 
     void setViewportMargins(int top, int bottom);
+
+    QWidget* viewportHeader() const;
+    void setViewportHeader(QWidget* value); //< Takes ownership.
 
     int count() const;
 
@@ -181,7 +187,10 @@ private:
     bool m_live = true;
     bool m_updating = false;
 
+    QPointer<QWidget> m_viewportHeader;
+
     std::chrono::microseconds m_highlightedTimestamp{0};
+    QSet<QnResourcePtr> m_highlightedResources;
 
     int m_topMargin = style::Metrics::kStandardPadding;
     int m_bottomMargin = style::Metrics::kStandardPadding;

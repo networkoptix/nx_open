@@ -5,7 +5,7 @@
 #include "common.h"
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
@@ -15,5 +15,5 @@ QString buildDescription(const EngineManifest& manifest, const Event& event);
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx

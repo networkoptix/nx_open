@@ -18,6 +18,7 @@
 #include <utils/common/delayed.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
@@ -107,6 +108,25 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
 
     connect(m_ribbon.data(), &EventRibbon::dragStarted,
         this, &TileInteractionHandler::performDragAndDrop);
+
+    const auto updateHighlightedResources = nx::utils::guarded(m_ribbon,
+        [this]()
+        {
+            m_ribbon->setHighlightedResources(workbench()->currentLayout()
+                ? workbench()->currentLayout()->itemResources().toSet()
+                : QSet<QnResourcePtr>());
+        });
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, updateHighlightedResources);
+    connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this, updateHighlightedResources);
+
+    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
+        nx::utils::guarded(m_ribbon,
+            [this]()
+            {
+                m_ribbon->setHighlightedTimestamp(
+                    microseconds(navigator()->positionUsec()));
+            }));
 }
 
 void TileInteractionHandler::navigateToSource(const QModelIndex& index)

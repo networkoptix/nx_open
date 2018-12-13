@@ -8,13 +8,13 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
-#include <nx/mediaserver_plugins/utils/analytics/engine_manifest_base.h>
+#include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/analytics/events_metadata_packet.h>
+#include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
@@ -36,7 +36,7 @@ struct EventType: public nx::vms::api::analytics::EventType
     (regionDescription) \
     (dependedEvent)
 
-struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
+struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
 {
     QList<EventType> eventTypes;
 
@@ -72,5 +72,5 @@ QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx

@@ -5,8 +5,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/streaming/video_data_packet.h>
 #include <utils/media/frame_info.h>
-#include <nx/sdk/analytics/data_packet.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_data_packet.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/wrapping_compressed_video_packet.h>
 #include <plugins/plugin_tools.h>
 
@@ -16,7 +16,7 @@ namespace analytics {
 
 /**
  * Converts the frame from compressed and yuv-uncompressed internal format to a plugin-consumable
- * form (an object implementing DataPacket), converting yuv to rgb when needed. The resulting
+ * form (an object implementing IDataPacket), converting yuv to rgb when needed. The resulting
  * frames are cached inside the instance of this class.
  */
 class FrameConverter
@@ -35,15 +35,15 @@ public:
      * @param pixelFormat If omitted, compressed frame request is assumed.
      * @return Null if the frame is not available.
      */
-    nx::sdk::analytics::DataPacket* getDataPacket(
-        std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat> pixelFormat);
+    nx::sdk::analytics::IDataPacket* getDataPacket(
+        std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> pixelFormat);
 
 private:
     nx::utils::MoveOnlyFunc<QnConstCompressedVideoDataPtr()> m_getCompressedFrame;
     nx::utils::MoveOnlyFunc<CLConstVideoDecoderOutputPtr()> m_getUncompressedFrame;
 
-    std::map<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat,
-        nxpt::ScopedRef<nx::sdk::analytics::UncompressedVideoFrame>> m_uncompressedFrames;
+    std::map<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat,
+        nxpt::ScopedRef<nx::sdk::analytics::IUncompressedVideoFrame>> m_uncompressedFrames;
 
     nxpt::ScopedRef<WrappingCompressedVideoPacket> m_compressedFrame;
 };

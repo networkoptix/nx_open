@@ -1,7 +1,14 @@
-if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
+if (withMediaServer
+    OR withTestCamera
+    OR withTrayTool
+    OR withDesktopClient
+    OR withMobileClient
+    OR withClouds
+)
     add_subdirectory(common)
     add_subdirectory(appserver2)
     add_subdirectory(nx_vms_api)
+    add_subdirectory(nx_sdk)
     add_subdirectory(nx_update)
     add_subdirectory(nx_system_commands)
 endif()

@@ -117,7 +117,9 @@ public:
         switch (remotePeer().dataFormat)
         {
         case Qn::JsonFormat:
-            if (remotePeer().peerType == nx::vms::api::PeerType::oldMobileClient)
+            if (localPeer().peerType == nx::vms::api::PeerType::mobileClient)
+                addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedLegacyTransactionWithHeader(transaction, header));
+            else if (remotePeer().peerType == nx::vms::api::PeerType::oldMobileClient)
                 addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
             else
                 addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));

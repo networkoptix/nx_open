@@ -60,7 +60,7 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(QnJsonRestResult
 
     if (!urlStr.isEmpty()) //< Single host search.
     {
-        *outUrl = nx::utils::Url::fromText(urlStr);
+        *outUrl = nx::utils::url::parseUrlFields(urlStr);
         if (!outUrl->isValid() || outUrl->host().isEmpty())
         {
             result->setError(QnRestResult::InvalidParameter,
@@ -113,7 +113,7 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(QnJsonRestResult
         // NOTE: This branch of the condition should be removed when the support of the deprecated
         // API is ended.
         NX_WARNING(this, "Got the request using the deprecated API");
-        *outUrl = nx::utils::Url::fromText(startIpStr);
+        *outUrl = nx::utils::url::parseUrlFields(startIpStr);
         if (!outUrl->isValid() || outUrl->host().isEmpty())
         {
             result->setError(QnRestResult::InvalidParameter,
@@ -282,7 +282,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     std::vector<QnManualCameraInfo> cameraList;
     for (const auto& camera: data.cameras)
     {
-        const auto url = nx::utils::Url::fromText(camera.url);
+        const auto url = nx::utils::url::parseUrlFields(camera.url);
         QnManualCameraInfo info(url, auth, camera.manufacturer, camera.uniqueId);
         if (info.resType.isNull())
         {

@@ -8,7 +8,7 @@ DOXYCHECK=`command -v doxygen`
 SDK_NAME=nx_storage_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
-NX_SDK_DIR=../../../nxlib/nx_sdk
+NX_SDK_DIR=../../../libs/nx_sdk
 
 if [ -z "$DOXYCHECK" ]; then
      sudo apt-get install -y doxygen

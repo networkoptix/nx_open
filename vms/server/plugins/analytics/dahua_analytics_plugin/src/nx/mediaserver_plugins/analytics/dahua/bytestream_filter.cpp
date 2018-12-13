@@ -6,7 +6,7 @@
 #include "bytestream_filter.h"
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
@@ -32,5 +32,5 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx

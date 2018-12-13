@@ -8,20 +8,20 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/utils/url.h>
 
 #include "engine.h"
 #include "metadata_monitor.h"
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
 class DeviceAgent:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
+    public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
     Q_OBJECT
 
@@ -35,7 +35,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
@@ -45,8 +45,8 @@ public:
     void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const EngineManifest& manifest);
-    virtual void setSettings(const nx::sdk::Settings* settings) override;
-    virtual nx::sdk::Settings* pluginSideSettings() const override;
+    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
+    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
     nx::sdk::Error startFetchingMetadata(
@@ -69,10 +69,10 @@ private:
     int m_channel = 0;
 
     std::unique_ptr<MetadataMonitor> m_monitor;
-    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 };
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx

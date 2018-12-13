@@ -7,7 +7,7 @@
 #include "common.h"
 
 namespace nx {
-namespace mediaserver_plugins {
+namespace vms_server_plugins {
 namespace analytics {
 namespace dahua {
 
@@ -72,5 +72,5 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json), \
 
 } // namespace dahua
 } // namespace analytics
-} // namespace mediaserver_plugins
+} // namespace vms_server_plugins
 } // namespace nx
