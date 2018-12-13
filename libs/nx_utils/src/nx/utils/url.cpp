@@ -602,6 +602,5 @@ QString toString(const nx::utils::Url &value)
 {
     if (nx::utils::ini().displayUrlPasswordInLogs)
         return value.toString();
-    else
-        return value.toDisplayString();
+    return value.toDisplayString();
 }

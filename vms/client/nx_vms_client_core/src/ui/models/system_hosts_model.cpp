@@ -162,7 +162,7 @@ QVariant QnSystemHostsModel::HostsModel::data(const QModelIndex& index, int role
         case UrlRole:
             return qVariantFromValue(data.second);
         case UrlDisplayRole:
-            return data.second.toString();
+            return data.second.toDisplayString();
         default:
             break;
     }
