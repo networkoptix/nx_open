@@ -57,8 +57,7 @@ public:
 
     void cleanupExpiredFiles();
 
-    void findDownloads();
-    void waitForDownloadsToBeFound();
+    void findDownloads(bool waitForFinished = false);
 
     static qint64 defaultChunkSize();
     static QByteArray calculateMd5(const QString& filePath);

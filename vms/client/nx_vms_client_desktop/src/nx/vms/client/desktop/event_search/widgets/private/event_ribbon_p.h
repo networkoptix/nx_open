@@ -152,18 +152,12 @@ private:
 
     std::deque<TilePtr> m_tiles;
     std::stack<std::unique_ptr<EventTile>> m_reserveWidgets;
-    Tile* m_hoveredTile = nullptr;
+    QPersistentModelIndex m_hoveredIndex;
     Interval m_visible;
 
-    struct Deadline
-    {
-        QDeadlineTimer timer;
-        QPersistentModelIndex index;
-    };
+    QHash<QPersistentModelIndex, QDeadlineTimer> m_deadlines;
 
-    QHash<Tile*, Deadline> m_deadlines;
-
-    std::array<int, int(Importance::LevelCount)> m_unreadCounts;
+    std::array<int, int(Importance::LevelCount)> m_unreadCounts{};
     int m_totalUnreadCount = 0;
 
     nx::utils::Guard makeUnreadCountGuard();

@@ -73,7 +73,7 @@ QVariant FakeResourceListModel::data(const QModelIndex& index, int role) const
         case Columns::addressColumn:
             if (role == Qt::DisplayRole)
                 return data.address;
-            if (role == Qt::TextColorRole)
+            if (role == Qt::ForegroundRole)
                 return QPalette().windowText();
             break;
 

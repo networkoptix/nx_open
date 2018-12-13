@@ -1,5 +1,4 @@
 #include "event_ribbon_p.h"
-#include "event_ribbon_p.h"
 
 #include <algorithm>
 #include <chrono>
@@ -16,7 +15,6 @@
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
@@ -32,8 +30,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
-
-#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -100,7 +96,7 @@ EventRibbon::Private::Private(EventRibbon* q):
 
     connect(m_scrollBar.get(), &QScrollBar::valueChanged, this, &Private::updateView);
 
-    m_autoCloseTimer->setInterval(1s);
+    m_autoCloseTimer->setInterval(1000);
     connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpiredTiles);
 
     NX_ASSERT(Importance() == Importance::NoNotification);
@@ -428,15 +424,14 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 void EventRibbon::Private::cleanupDeletingTile(int index)
 {
     const auto& tile = m_tiles[index];
-    NX_ASSERT(tile);
-    if (!tile)
+    if (!NX_ASSERT(tile))
         return;
 
-    m_deadlines.remove(tile.get());
+    m_deadlines.remove(m_model->index(index));
     reserveWidget(index);
 
-    if (m_hoveredTile == tile.get())
-        m_hoveredTile = nullptr;
+    if (m_hoveredIndex.row() == index)
+        m_hoveredIndex = QPersistentModelIndex();
 
     const auto importance = tile->importance;
     if (importance != Importance())
@@ -451,9 +446,9 @@ void EventRibbon::Private::handleWidgetChanged(int index)
     if (!m_tiles[index]->widget)
         return;
 
-    const auto iter = m_deadlines.find(m_tiles[index].get());
-    if (iter != m_deadlines.end())
-        iter->timer.setRemainingTime(kVisibleAutoCloseDelay);
+    const auto deadline = m_deadlines.find(m_model->index(index));
+    if (deadline != m_deadlines.end())
+        deadline->setRemainingTime(kVisibleAutoCloseDelay.count());
 }
 
 void EventRibbon::Private::closeExpiredTiles()
@@ -461,13 +456,13 @@ void EventRibbon::Private::closeExpiredTiles()
     if (!m_model)
         return;
 
-    QList<Tile*> expired;
+    QList<QPersistentModelIndex> expired;
     const int oldDeadlineCount = m_deadlines.size();
 
-    for (const auto& [tile, deadline]: nx::utils::keyValueRange(m_deadlines))
+    for (const auto& [index, deadline]: nx::utils::keyValueRange(m_deadlines))
     {
-        if (tile != m_hoveredTile && deadline.timer.hasExpired() && deadline.index.isValid())
-            expired.push_back(tile);
+        if (index != m_hoveredIndex && deadline.hasExpired() && index.isValid())
+            expired.push_back(index);
     }
 
     if (expired.empty())
@@ -475,8 +470,8 @@ void EventRibbon::Private::closeExpiredTiles()
 
     const auto unreadCountGuard = makeUnreadCountGuard();
 
-    for (const auto tile: expired)
-        m_model->removeRows(m_deadlines[tile].index.row(), 1);
+    for (const auto index: expired)
+        m_model->removeRows(index.row(), 1);
 
     NX_VERBOSE(q, "Expired %1 tiles", expired.size());
     NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));
@@ -531,7 +526,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         tile->animated = shouldAnimateTile(modelIndex);
 
         if (closeable && timeout > 0ms)
-            m_deadlines[tile.get()] = Deadline{kInvisibleAutoCloseDelay, modelIndex};
+            m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay.count());
 
         m_tiles.insert(m_tiles.begin() + i, std::move(tile));
         currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
@@ -712,7 +707,7 @@ void EventRibbon::Private::clear()
 
     m_tiles.clear();
     m_visible = {};
-    m_hoveredTile = nullptr;
+    m_hoveredIndex = QPersistentModelIndex();
     m_totalHeight = 0;
     m_live = true;
 
@@ -1238,7 +1233,7 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
 void EventRibbon::Private::updateHover()
 {
     const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
-    if (const bool hovered = q->rect().contains(pos))
+    if (q->rect().contains(pos))
     {
         const int index = indexAtPos(pos);
 
@@ -1249,23 +1244,29 @@ void EventRibbon::Private::updateHover()
         if (tile && !widget)
             tile = nullptr;
 
-        if (tile == m_hoveredTile)
+        if ((!m_hoveredIndex.isValid() && index < 0) || m_hoveredIndex.row() == index)
             return;
 
-        if (m_hoveredTile && m_deadlines.contains(m_hoveredTile))
-            m_deadlines[m_hoveredTile].timer.setRemainingTime(kVisibleAutoCloseDelay);
+        if (m_hoveredIndex.isValid() && m_deadlines.contains(m_hoveredIndex))
+            m_deadlines[m_hoveredIndex].setRemainingTime(kVisibleAutoCloseDelay.count());
 
-        m_hoveredTile = tile;
-
-        const auto modelIndex = (m_model && tile) ? m_model->index(index) : QModelIndex();
-        emit q->hovered(modelIndex, widget);
+        if (index < 0)
+        {
+            m_hoveredIndex = QPersistentModelIndex();
+            emit q->hovered(QModelIndex(), nullptr);
+        }
+        else if (NX_ASSERT(m_model))
+        {
+            m_hoveredIndex = m_model->index(index);
+            emit q->hovered(m_hoveredIndex, widget);
+        }
     }
     else
     {
-        if (!m_hoveredTile)
+        if (!m_hoveredIndex.isValid())
             return;
 
-        m_hoveredTile = nullptr;
+        m_hoveredIndex = QPersistentModelIndex();
         emit q->hovered(QModelIndex(), nullptr);
     }
 }
@@ -1289,7 +1290,6 @@ int EventRibbon::Private::indexAtPos(const QPoint& pos) const
         return -1;
 
     const auto viewportPos = m_viewport->mapFrom(q, pos);
-    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
 
     const auto begin = std::make_reverse_iterator(m_tiles.cbegin() + m_visible.upper());
     const auto end = std::make_reverse_iterator(m_tiles.cbegin() + m_visible.lower());
