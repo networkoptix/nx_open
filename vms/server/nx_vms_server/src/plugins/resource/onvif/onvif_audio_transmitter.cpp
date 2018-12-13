@@ -42,7 +42,7 @@ void OnvifAudioTransmitter::prepare()
     // if this attribute is specified.
     if (m_resource->resourceData().value<bool>("sendBackChannelAttribute", true))
         m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
-    m_rtspConnection->setTransport(QnRtspClient::TRANSPORT_TCP);
+    m_rtspConnection->setTransport(RtspTransport::tcp);
 
     const QString url = m_resource->sourceUrl(Qn::CR_LiveVideo);
     const CameraDiagnostics::Result result = m_rtspConnection->open(url);

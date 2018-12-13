@@ -241,7 +241,7 @@ public:
     Option<int> maxConnections{this, "maxConnections", 2000, ""};
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
-    Option<QString> rtspTransport{this, "rtspTransport", RtpTransport::_auto, ""};
+    Option<QString> rtspTransport{this, "rtspTransport", "tcp", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
         true,
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "

@@ -879,11 +879,6 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetup()
         return nx::network::http::StatusCode::notFound;
 
     QByteArray transport = nx::network::http::getHeaderValue(d->request.headers, "Transport");
-    //if (transport.indexOf("TCP") == -1)
-    //    return nx::network::http::StatusCode::notImplemented;
-    //QByteArray lowLevelTransport = transport.split(';').first().split('/').last().toLower();
-    //if (lowLevelTransport != "tcp" && lowLevelTransport != "udp")
-    //    return nx::network::http::StatusCode::notImplemented;
     QByteArray lowLevelTransport = "udp";
     if (transport.toLower().contains("tcp")) {
         lowLevelTransport = "tcp";

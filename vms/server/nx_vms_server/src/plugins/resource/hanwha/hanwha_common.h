@@ -28,13 +28,6 @@ enum class HanwhaStreamingType
     rtpMulticast
 };
 
-enum class HanwhaTransportProtocol
-{
-    undefined,
-    tcp,
-    udp
-};
-
 enum class HanwhaClientType
 {
     undefined,
@@ -115,9 +108,6 @@ static const QString kHanwhaFullMode = lit("Full");
 
 static const QString kHanwhaRtpUnicast = lit("RTPUnicast");
 static const QString kHanwhaRtpMulticast = lit("RTPMulticast");
-
-static const QString kHanwhaTcp = lit("TCP");
-static const QString kHanwhaUdp = lit("UDP");
 
 static const QString kHanwhaPcClient = lit("PC");
 static const QString kHanwhaMobileClient = lit("Mobile");
