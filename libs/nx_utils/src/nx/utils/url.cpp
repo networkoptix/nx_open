@@ -223,7 +223,8 @@ std::string Url::toStdString(QUrl::FormattingOptions options) const
 
 QString Url::toDisplayString(QUrl::FormattingOptions options) const
 {
-    return url(options);
+    // Always removes password from URL like it does QUrl.
+    return url(options | QUrl::RemovePassword);
 }
 
 QByteArray Url::toEncoded(QUrl::FormattingOptions options) const
@@ -600,7 +601,7 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
 QString toString(const nx::utils::Url &value)
 {
     if (nx::utils::ini().displayUrlPasswordInLogs)
-        return value.toString(QUrl::PrettyDecoded);
+        return value.toString();
     else
-        return value.toDisplayString(QUrl::RemovePassword);
+        return value.toDisplayString();
 }
