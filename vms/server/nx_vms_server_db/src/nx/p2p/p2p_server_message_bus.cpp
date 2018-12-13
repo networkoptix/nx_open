@@ -405,13 +405,27 @@ bool ServerMessageBus::gotPostConnection(
 {
     {
         QnMutexLocker lock(&m_mutex);
-        auto& connection = m_connections.value(remotePeer.id);
-        if (connection->remotePeer().connectionGuid == remotePeer.connectionGuid)
+        auto existingConnectionIt = std::find_if(
+            m_connections.cbegin(),
+            m_connections.cend(),
+            [&remotePeer](const auto& connection)
+            {
+                return remotePeer.connectionGuid == connection->remotePeer().connectionGuid;
+            });
+
+        if (existingConnectionIt == m_connections.cend())
         {
-            connection->gotPostConnection(std::move(socket), std::move(requestBody));
-            return true;
+            NX_DEBUG(
+                this,
+                lm("Got an incoming POST connection with guid %1 but failed to find an "
+                    "existing connection with the same guid").args(remotePeer.connectionGuid));
+            return false;
         }
+
+        existingConnectionIt.value()->gotPostConnection(std::move(socket), std::move(requestBody));
+        return true;
     }
+
     return false;
 }
 

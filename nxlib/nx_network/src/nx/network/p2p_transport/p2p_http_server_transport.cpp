@@ -38,12 +38,12 @@ void P2PHttpServerTransport::start(
         &m_sendBuffer,
         [this](SystemError::ErrorCode error, size_t transferred)
         {
-            if (error != SystemError::noError || transferred == 0)
-                return m_onGetRequestReceived(SystemError::connectionAbort);
-
             auto onGetRequestReceived = std::move(m_onGetRequestReceived);
             m_onGetRequestReceived = nullptr;
-            onGetRequestReceived(SystemError::noError);
+            onGetRequestReceived(
+                error != SystemError::noError || transferred == 0
+                    ? SystemError::connectionAbort
+                    : SystemError::noError);
         });
 }
 

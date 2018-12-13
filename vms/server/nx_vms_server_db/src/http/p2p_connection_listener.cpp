@@ -184,31 +184,62 @@ bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remote
     return true;
 }
 
-class ConnectionLocker
+class SameGuidConnectionLocker
 {
 public:
-    ConnectionLocker(const QnUuid& id): m_id(id)
+
+    SameGuidConnectionLocker(const QnUuid& id): m_id(id)
     {
-        QnMutexLocker lock(&m_commonMutex);
-        auto& connectionMutex = m_mutexList[id];
-        if (!connectionMutex)
-            connectionMutex.reset(new QnMutex());
-        connectionMutex->lock();
+        {
+            QnMutexLocker lock(&m_commonMutex);
+
+            if (m_mutexList.find(id) == m_mutexList.cend())
+            {
+                m_mutex = std::make_shared<QnMutex>();
+                m_mutexList[id] = std::weak_ptr<QnMutex>(m_mutex);
+            }
+            else
+            {
+                m_mutex = std::shared_ptr<QnMutex>(m_mutexList[id]);
+            }
+        }
+
+        m_mutex->lock();
     }
-    ~ConnectionLocker()
+
+    SameGuidConnectionLocker(const SameGuidConnectionLocker& other):
+        m_id(other.m_id),
+        m_mutex(other.m_mutex),
+        m_instanceCount(other.m_instanceCount)
     {
-        QnMutexLocker lock(&m_commonMutex);
-        m_mutexList[m_id]->unlock();
-        m_mutexList.erase(m_id);
+        ++*m_instanceCount;
     }
+
+    SameGuidConnectionLocker& operator=(const SameGuidConnectionLocker& other) = delete;
+
+    ~SameGuidConnectionLocker()
+    {
+        if (--*m_instanceCount == 0)
+            m_mutex->unlock();
+
+        QnMutexLocker lock(&m_commonMutex);
+
+        if (m_mutex.use_count() == 1)
+        {
+            m_mutexList.erase(m_id);
+        }
+    }
+
 private:
     QnUuid m_id;
-    static std::map<QnUuid, std::unique_ptr<QnMutex>> m_mutexList;
+    std::shared_ptr<QnMutex> m_mutex;
+    std::shared_ptr<int> m_instanceCount = std::make_shared<int>(1);
+    static std::map<QnUuid, std::weak_ptr<QnMutex>> m_mutexList;
     static QnMutex m_commonMutex;
 };
 
-std::map<QnUuid, std::unique_ptr<QnMutex>> ConnectionLocker::m_mutexList{};
-QnMutex ConnectionLocker::m_commonMutex;
+std::map<QnUuid, std::weak_ptr<QnMutex>> SameGuidConnectionLocker::m_mutexList{};
+QnMutex SameGuidConnectionLocker::m_commonMutex;
 
 bool ConnectionProcessor::tryAcquireConnecting(
     ec2::ConnectionLockGuard& connectionLockGuard,
@@ -271,7 +302,7 @@ void ConnectionProcessor::run()
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
 
     // Lock mutex to prevent processing GET and POST at the same time for the same connection.
-    ConnectionLocker connectionLocker(remotePeer.connectionGuid);
+    SameGuidConnectionLocker sameGuidconnectionLockGuard(remotePeer.connectionGuid);
 
     if (d->request.requestLine.method == "POST")
     {
@@ -281,15 +312,15 @@ void ConnectionProcessor::run()
     }
 
     // Strict ingoing and outgoing connections s1->s2 and s2->s1. Reject one of them.
-    ec2::ConnectionLockGuard connectionLockGuard(
+    ec2::ConnectionLockGuard sameDirectionConnectionLockGuard(
         commonModule()->moduleGUID(),
         messageBus->connectionGuardSharedState(),
         remotePeer.id,
         ec2::ConnectionLockGuard::Direction::Incoming);
 
-    if (remotePeer.isServer() && !tryAcquireConnecting(connectionLockGuard, remotePeer))
+    if (remotePeer.isServer() && !tryAcquireConnecting(sameDirectionConnectionLockGuard, remotePeer))
         return;
-    if (!tryAcquireConnected(connectionLockGuard, remotePeer))
+    if (!tryAcquireConnected(sameDirectionConnectionLockGuard, remotePeer))
         return;
 
     bool useWebSocket = false;
@@ -332,7 +363,7 @@ void ConnectionProcessor::run()
         p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
         messageBus->gotConnectionFromRemotePeer(
             remotePeer,
-            std::move(connectionLockGuard),
+            std::move(sameDirectionConnectionLockGuard),
             std::move(p2pTransport),
             QUrlQuery(d->request.requestLine.url.query()),
             userAccessData(remotePeer),
@@ -348,7 +379,8 @@ void ConnectionProcessor::run()
         auto onGetReceivedCallback =
             [messageBus,
             remotePeer,
-            connectionLockGuard = std::move(connectionLockGuard),
+            sameDirectionConnectionLockGuard = std::move(sameDirectionConnectionLockGuard),
+            sameGuidconnectionLockGuard,
             p2pHttpServerTransport,
             query = QUrlQuery(d->request.requestLine.url.query()),
             accessData = userAccessData(remotePeer),
@@ -359,7 +391,7 @@ void ConnectionProcessor::run()
                 {
                     messageBus->gotConnectionFromRemotePeer(
                         remotePeer,
-                        std::move(connectionLockGuard),
+                        std::move(sameDirectionConnectionLockGuard),
                         P2pTransportPtr(p2pHttpServerTransport),
                         query,
                         accessData,

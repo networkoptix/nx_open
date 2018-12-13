@@ -474,7 +474,7 @@ vms::api::PeerDataEx deserializePeerData(
 
     const auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (guidHeaderIt != headers.cend())
-        peer.connectionGuid = QnUuid::fromRfc4122(guidHeaderIt->second);
+        peer.connectionGuid = QnUuid::fromStringSafe(guidHeaderIt->second);
 
     return peer;
 }
