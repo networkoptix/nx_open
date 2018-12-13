@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <nx/utils/url.h>
+#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/log/log_message.h>
 
 #include <optional>

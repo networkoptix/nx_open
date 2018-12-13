@@ -268,15 +268,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 
 QString HanwhaStreamReader::rtpTransport() const
 {
-    QString transportStr = m_hanwhaResource
-        ->getProperty(QnMediaResource::rtpTransportKey())
-            .toUpper()
-            .trimmed();
-
-    if (transportStr == RtpTransport::udp)
-        return kHanwhaUdp;
-
-    return kHanwhaTcp;
+    return toString(m_rtpReader.getRtpTransport());
 }
 
 void HanwhaStreamReader::setPositionUsec(qint64 value)
