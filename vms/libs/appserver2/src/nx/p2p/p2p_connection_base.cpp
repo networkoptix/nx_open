@@ -183,6 +183,7 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 void ConnectionBase::onHttpClientDone()
 {
     nx::network::http::AsyncClient::State state = m_httpClient->state();
+
     if (state == nx::network::http::AsyncClient::State::sFailed)
     {
         cancelConnecting(State::Error, lm("Http request failed %1").arg(m_httpClient->lastSysErrorCode()));
@@ -278,7 +279,7 @@ void ConnectionBase::onHttpClientDone()
         {
             NX_WARNING(this,
                 lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
-            if (m_remotePeer.transport != P2pTransportMode::websocket)
+            if (m_remotePeer.transport == P2pTransportMode::websocket)
             {
                 setState(State::Error);
                 m_httpClient.reset();
