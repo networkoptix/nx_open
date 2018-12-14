@@ -44,6 +44,8 @@ public:
 
     void addDevices(const QnManualResourceSearchList& devices);
     void removeDevices(QStringList ids);
+    int deviceCount(PresentedState presentedState) const;
+    int deviceCount(PresentedState presentedState, bool isChecked) const;
 
     QModelIndex indexByUniqueId(const QString& uniqueId, int column = 0);
 
@@ -65,33 +67,30 @@ public:
         int role = Qt::DisplayRole) const override;
 
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-signals:
-    void rowCountChanged();
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
-    bool correctIndex(const QModelIndex& index) const;
+    bool isCorrectRow(const QModelIndex& index) const;
 
     QnManualResourceSearchEntry device(const QModelIndex& index) const;
 
-    QVariant displayData(const QModelIndex& index) const;
+    QVariant getDisplayData(const QModelIndex& index) const;
+    QVariant getCheckStateData(const QModelIndex& index) const;
+    QVariant getForegroundColorData(const QModelIndex& index) const;
 
-    QVariant checkedData(const QModelIndex& index) const;
-
-    int newDevicesCount() const;
-
-    QPalette::ColorRole getColorRole(const QModelIndex& index) const;
+    using PresentedStateWithCheckState = QPair<PresentedState, bool>;
+    void incrementDeviceCount(const PresentedStateWithCheckState& deviceState);
+    void decrementDeviceCount(const PresentedStateWithCheckState& deviceState);
 
 private:
     using DeviceCheckedStateHash = QHash<QString, bool>;
     using PresentedStateHash = QHash<QString, PresentedState>;
-    using ColumnDifference = QHash<int, bool>;
-    using FieldsDifferenceHash = QHash<QString, ColumnDifference>;
-
-    DeviceCheckedStateHash m_checked;
-    PresentedStateHash m_presentedState;
+    using DeviceRowStateHash = QHash<QString, PresentedStateWithCheckState>;
+    using DeviceCountHash = QHash<PresentedStateWithCheckState, int>;
 
     QnManualResourceSearchList m_devices;
+    DeviceRowStateHash m_deviceRowState;
+    DeviceCountHash m_deviceCount;
 };
 
 } // namespace nx::vms::client::desktop

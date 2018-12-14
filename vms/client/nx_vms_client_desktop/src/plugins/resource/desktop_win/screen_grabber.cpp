@@ -26,35 +26,25 @@ extern "C" {
 
 static const int LOGO_CORNER_OFFSET = 8;
 
-QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
-    m_pD3D(0),
-    m_pd3dDevice(0),
-    m_displayNumber(displayNumber),
-    m_frameNum(0),
-    m_currentIndex(0),
+QnScreenGrabber::QnScreenGrabber(
+    int displayNumber,
+    int poolSize,
+    Qn::CaptureMode mode,
+    bool captureCursor,
+    const QSize& captureResolution,
+    QWidget* widget)
+    :
+    m_displayNumber(mode == Qn::WindowMode ? 0 : displayNumber),
     m_mode(mode),
     m_poolSize(poolSize+1),
     m_captureCursor(captureCursor),
+    m_cursorDC(CreateCompatibleDC(0)),
     m_captureResolution(captureResolution),
-    m_scaleContext(0),
-    m_tmpFrame(0),
-    m_tmpFrameBuffer(0),
-    m_widget(widget),
-    m_tmpFrameWidth(0),
-    m_tmpFrameHeight(0),
-    m_colorBitsCapacity(0),
-    m_needStop(false)
+    m_needRescale(captureResolution.width() != 0 || mode == Qn::WindowMode),
+    m_widget(widget)
 {
     qRegisterMetaType<CaptureInfoPtr>();
-
-    memset(&m_rect, 0, sizeof(m_rect));
-
-    m_needRescale = captureResolution.width() != 0 || mode == Qn::WindowMode;
-    if (mode == Qn::WindowMode)
-        m_displayNumber = 0;
-
     m_initialized = InitD3D(GetDesktopWindow());
-    m_cursorDC = CreateCompatibleDC(0);
     m_timer.start();
     moveToThread(qApp->thread()); // to allow correct "InvokeMethod" call
 }

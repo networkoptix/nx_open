@@ -262,7 +262,10 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
             QVector<PluginInfo> plugins;
             for (const auto& pluginInfo: pluginsById)
-                plugins.push_back(pluginInfo);
+            {
+                if (!pluginInfo.eventTypes.empty())
+                    plugins.push_back(pluginInfo);
+            }
 
             std::sort(plugins.begin(), plugins.end());
             const bool severalPlugins = plugins.size() > 1;

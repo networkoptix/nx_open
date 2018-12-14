@@ -49,8 +49,6 @@ void QnResourceTreeModelLayoutNode::initialize()
     if (!layout)
         return;
 
-    m_isEncrypted = nx::vms::client::desktop::layout::isEncrypted(layout);
-
     for (const auto& item : layout->getItems())
         addItem(item);
 }
@@ -104,17 +102,6 @@ void QnResourceTreeModelLayoutNode::updateItem(const QnUuid& item)
         (*iter)->update();
     else
         NX_ASSERT(false);
-}
-
-QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
-{
-    /* Check if node is in process of removing. */
-    if (!resource())
-        return QIcon();
-
-    return m_isEncrypted
-        ? qnResIconCache->icon(QnResourceIconCache::EncryptedLayout)
-        : qnResIconCache->icon(QnResourceIconCache::Layouts);
 }
 
 void QnResourceTreeModelLayoutNode::addItem(const QnLayoutItemData& item)

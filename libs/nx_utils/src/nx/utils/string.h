@@ -12,8 +12,7 @@
 #include "literal.h"
 #include "qnbytearrayref.h"
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 template <typename... Args>
 std::string stringFormat(const std::string& format, Args... args)
@@ -87,9 +86,12 @@ NX_UTILS_API QString elideString(
 //!Generates random string containing only letters and digits
 NX_UTILS_API QByteArray generateRandomName(int length);
 
-/** Converts bytes to human-readable string like 10M or 67K.
+/**
+ * Converts bytes to human-readable string like 10M or 67K.
  * Rounds value to floor with the given float precision.
-*/
+ * Should be used only for internal development and/or logs. All user-visible strings must be
+ * generated using HumanReadable class methods (e.g. digitalSize()).
+ */
 NX_UTILS_API QString bytesToString(uint64_t bytes, int precision = 4);
 
 /** Converts bytes number string (e.g., 64K) to integer.
@@ -327,5 +329,4 @@ NX_UTILS_API QByteArray formatJsonString(const QByteArray& data);
 
 NX_UTILS_API int stricmp(const std::string& left, const std::string& right);
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

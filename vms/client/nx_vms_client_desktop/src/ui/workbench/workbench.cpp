@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/ui/workbench/layouts/special_layout.h>
 
 #include <common/common_module.h>
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
 
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::client::desktop::ui::workbench;
@@ -201,11 +202,25 @@ void QnWorkbench::setCurrentLayoutIndex(int index) {
 
 void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
 {
-    if(layout == NULL)
+    if (!layout)
         layout = m_dummyLayout;
 
-    if(m_currentLayout == layout)
+    if (m_currentLayout == layout)
         return;
+
+    if (layout) // layout == nullptr is ok in QnWorkbench destructor
+    {
+        auto resource = layout->resource();
+        if (resource && nx::vms::client::desktop::layout::requiresPassword(resource))
+        {
+            // When opening encrypted layout, ask for the password and remove layout if unsuccessful.
+            if (!nx::vms::client::desktop::layout::askAndSetPassword(resource, mainWindowWidget()))
+            {
+                delete layout;
+                return;
+            }
+        }
+    }
 
     m_inLayoutChangeProcess = true;
     emit layoutChangeProcessStarted();

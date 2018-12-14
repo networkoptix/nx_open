@@ -121,7 +121,10 @@ Downloader::Downloader(
         d->peerManagerFactoryOwner = std::move(factory);
     }
 
-    QMetaObject::invokeMethod(d->storage.data(), &Storage::findDownloads, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(
+        d->storage.data(),
+        [this]() { d->storage->findDownloads(); },
+        Qt::QueuedConnection);
 }
 
 Downloader::~Downloader()

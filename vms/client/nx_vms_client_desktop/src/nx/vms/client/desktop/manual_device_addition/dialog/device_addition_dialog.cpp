@@ -170,9 +170,14 @@ void DeviceAdditionDialog::initializeControls()
             static constexpr int kStartSearchPage = 0;
             const bool enabled = currentPageIndex == kStartSearchPage;
             const QList<QWidget*> widgets =
-                { ui->stackedWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
+                { ui->searchParametersPanel, ui->addDevicesButtonPage, ui->serverChoosePanel };
             for (const auto widget: widgets)
                 widget->setEnabled(enabled);
+            for (int i = 0; i < ui->tabWidget->count(); ++i)
+            {
+                if (i != ui->tabWidget->currentIndex())
+                    ui->tabWidget->setTabEnabled(i, enabled);
+            }
         });
 
     setupTable();
@@ -195,6 +200,7 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->tabWidget->setCurrentIndex(0);
     handleTabClicked(ui->tabWidget->currentIndex());
+    setupSearchResultsPlaceholder();
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -338,6 +344,16 @@ void DeviceAdditionDialog::setupPortStuff(
     handleAutoChecked(autoCheckbox->isChecked());
 }
 
+void DeviceAdditionDialog::setupSearchResultsPlaceholder()
+{
+    QFont font;
+    font.setPixelSize(24);
+    font.setWeight(QFont::Light);
+    ui->placeholderLabel->setFont(font);
+    setPaletteColor(ui->placeholderLabel, QPalette::All, QPalette::WindowText,
+        QPalette().color(QPalette::Midlight));
+}
+
 void DeviceAdditionDialog::setServer(const QnMediaServerResourcePtr& value)
 {
     if (!ui->selectServerMenuButton->setCurrentServer(value))
@@ -409,14 +425,20 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
     connect(m_currentSearch, &ManualDeviceSearcher::statusChanged,
         this, &DeviceAdditionDialog::updateResultsWidgetState);
-    connect(m_model, &FoundDevicesModel::rowCountChanged,
+    connect(m_model, &FoundDevicesModel::rowsInserted,
         this, &DeviceAdditionDialog::updateResultsWidgetState);
+    connect(m_model, &FoundDevicesModel::rowsRemoved,
+        this, &DeviceAdditionDialog::updateResultsWidgetState);
+
     connect(m_model, &FoundDevicesModel::dataChanged,
-        this, &DeviceAdditionDialog::handleModelDataChanged);
+        this, &DeviceAdditionDialog::updateAddDevicesPanel);
+    connect(m_model, &FoundDevicesModel::rowsInserted,
+        this, &DeviceAdditionDialog::updateAddDevicesPanel);
+    connect(m_model, &FoundDevicesModel::rowsRemoved,
+        this, &DeviceAdditionDialog::updateAddDevicesPanel);
 
     ui->foundDevicesTable->setModel(m_model.data());
     setupTableHeader();
-    updateAddDevicesButtonText();
 
     connect(m_currentSearch, &ManualDeviceSearcher::devicesAdded,
         m_model, &FoundDevicesModel::addDevices);
@@ -426,29 +448,8 @@ void DeviceAdditionDialog::handleStartSearchClicked()
     ui->stopSearchButton->setFocus();
 }
 
-void DeviceAdditionDialog::appendAddingDevices(const AddingDevicesSet& value)
-{
-    const int lastCount = m_addingDevices.size();
-    m_addingDevices += value;
-    if (m_addingDevices.size() > lastCount)
-        updateMessageBar();
-}
-
-void DeviceAdditionDialog::updateMessageBar()
-{
-    ui->messageBar->setText(m_addingDevices.isEmpty()
-        ? QString()
-        : tr("%n devices are being added. You can close this dialog or start a new search",
-            nullptr, m_addingDevices.size()));
-}
-
 void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
 {
-    if (!m_addingDevices.remove(uniqueId))
-        return;
-
-    updateMessageBar();
-
     if (!m_model)
         return;
     const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
@@ -457,6 +458,9 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
 
     m_model->setData(
         index, FoundDevicesModel::alreadyAddedState, FoundDevicesModel::presentedStateRole);
+
+    m_model->setData(
+        index.siblingAtColumn(FoundDevicesModel::checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
 }
 
 void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
@@ -483,8 +487,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
     QnManualResourceSearchList devices;
 
-    AddingDevicesSet addingDevices;
-
     const bool checkSelection = ui->foundDevicesTable->getCheckedCount();
     const int rowsCount = m_model->rowCount();
     for (int row = 0; row != rowsCount; ++row)
@@ -506,21 +508,15 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
             FoundDevicesModel::presentedStateRole);
 
         devices.append(device);
-        addingDevices.insert(device.uniqueId);
     }
 
     if (devices.isEmpty())
         return;
 
-    const auto login = m_currentSearch->login();
-    const auto password = m_currentSearch->password();
-    server->restConnection()->addCamera(devices, login, password, nx::utils::guarded(this,
-        [this, addingDevices, devices]
-            (bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
-        {
-            if (success)
-                appendAddingDevices(addingDevices);
-        }), QThread::currentThread());
+    const auto login = QString();
+    const auto password = QString();
+
+    server->restConnection()->addCamera(devices, login, password, {});
 }
 
 void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)
@@ -596,26 +592,6 @@ void DeviceAdditionDialog::handleDialogClosed()
     updateResultsWidgetState();
 }
 
-void DeviceAdditionDialog::handleModelDataChanged(
-    const QModelIndex& /*topLeft*/,
-    const QModelIndex& /*bottomRight*/,
-    const QVector<int>& roles)
-{
-    const bool checkedStateChanged = std::any_of(roles.begin(), roles.end(),
-        [](int role) { return role == Qt::CheckStateRole; });
-
-    if (checkedStateChanged)
-        updateAddDevicesButtonText();
-}
-
-void DeviceAdditionDialog::updateAddDevicesButtonText()
-{
-    const auto checkedCount = ui->foundDevicesTable->getCheckedCount();
-    ui->addDevicesButton->setText(checkedCount
-        ? tr("Add %n Devices", "", checkedCount)
-        : tr("Add all devices"));
-}
-
 QString DeviceAdditionDialog::progressMessage() const
 {
     if (!m_currentSearch)
@@ -687,6 +663,51 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     {
         QnMessageBox::critical(this, tr("Device search failed"));
     }
+}
+
+void DeviceAdditionDialog::updateAddDevicesPanel()
+{
+    if (!m_model || m_model->rowCount() == 0)
+        return;
+
+    const int devicesCount = m_model->rowCount();
+    const int newDevicesCheckedCount = m_model->deviceCount(FoundDevicesModel::notPresentedState,
+        /*isChecked*/ true);
+    const int newDevicesCount = m_model->deviceCount(FoundDevicesModel::notPresentedState);
+    const int addingDevicesCount = m_model->deviceCount(FoundDevicesModel::addingInProgressState);
+    const int addedDevicesCount = m_model->deviceCount(FoundDevicesModel::alreadyAddedState);
+
+    if (devicesCount == addedDevicesCount)
+    {
+        showAddDevicesPlaceholder(tr("All devices are already added"));
+    }
+    else if (addingDevicesCount != 0 && newDevicesCheckedCount == 0)
+    {
+        showAddDevicesPlaceholder(
+            tr("%n devices are being added. You can close this dialog or start a new search",
+                nullptr, addingDevicesCount));
+    }
+    else if (newDevicesCount != 0 &&
+        (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount ))
+    {
+        showAddDevicesButton(tr("Add all Devices"));
+    }
+    else if (newDevicesCount != 0 && newDevicesCheckedCount != 0)
+    {
+        showAddDevicesButton(tr("Add %n Devices", nullptr, newDevicesCheckedCount));
+    }
+}
+
+void DeviceAdditionDialog::showAddDevicesButton(const QString& buttonText)
+{
+    ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesButtonPage);
+    ui->addDevicesButton->setText(buttonText);
+}
+
+void DeviceAdditionDialog::showAddDevicesPlaceholder(const QString& placeholderText)
+{
+    ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesPlaceholderPage);
+    ui->addDevicesPlaceholder->setText(placeholderText);
 }
 
 } // namespace nx::vms::client::desktop
