@@ -513,8 +513,8 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     if (devices.isEmpty())
         return;
 
-    const auto login = QString();
-    const auto password = QString();
+    const auto login = m_currentSearch->login();
+    const auto password = m_currentSearch->password();
 
     server->restConnection()->addCamera(devices, login, password, {});
 }
