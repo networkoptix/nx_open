@@ -53,8 +53,6 @@ struct Sdp
 
     QHostAddress serverAddress;
     std::vector<Media> media;
-private:
-    QHostAddress parseServerAddress(const QString& line) const;
 };
 
 } // namespace nx::streaming

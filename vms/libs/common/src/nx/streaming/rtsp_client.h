@@ -73,7 +73,7 @@ private:
 
     nx::streaming::rtp::RtcpSenderReport m_senderReport;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_mediaSocket;
-    std::unique_ptr < nx::network::AbstractDatagramSocket> m_rtcpSocket;
+    std::unique_ptr< nx::network::AbstractDatagramSocket> m_rtcpSocket;
     quint16 m_remoteMediaPort = 0;
     quint16 m_remoteRtcpPort = 0;
     nx::network::HostAddress m_hostAddress;

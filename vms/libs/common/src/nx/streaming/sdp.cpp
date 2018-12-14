@@ -114,7 +114,7 @@ Sdp::Media parseMedia(QStringList& lines)
     return media;
 }
 
-QHostAddress Sdp::parseServerAddress(const QString& line) const
+static QHostAddress parseServerAddress(const QString& line)
 {
     auto fields = line.split(' ');
     if (fields.size() >= 3 && fields[1].toUpper() == "IP4")
