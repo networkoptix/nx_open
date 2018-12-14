@@ -75,7 +75,7 @@ function(set_distribution_names)
     set(product_distribution_name
         "${prefix}" PARENT_SCOPE)
 
-    if(${dotNetFramework} STREQUAL "v4.0")
+    if("${dotNetFramework}" STREQUAL "v4.0")
         set(net2Version "Net2v5")
     else()
         set(net2Version "Net2v6")
