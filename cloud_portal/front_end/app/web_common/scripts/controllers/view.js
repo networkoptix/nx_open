@@ -500,8 +500,21 @@
                         }
                     }
                     
-                    // record actice camera again as only one camera should be selected per system
+                    // record active camera again as only one camera should be selected per system
                     $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
+                }
+
+                // When a camera is loaded the offset might not be calculated. So we retry every second until its ready.
+                function setServerOffset(activeCameraParentId) {
+                    var serverOffset = $scope.camerasProvider.getServerTimeOffset(activeCameraParentId);
+                    if (serverOffset) {
+                        window.timeManager.setOffset(serverOffset);
+                        updateVideoSource(timeFromUrl);
+                    } else {
+                        $timeout(function(){
+                            setServerOffset(activeCameraParentId);
+                        }, 1000);
+                    }
                 }
                 
                 $scope.$watch('activeCamera', function () {
@@ -533,10 +546,7 @@
                     timeFromUrl = null;
                     
                     //When camera is changed request offset for camera
-                    var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-                    if (serverOffset) {
-                        window.timeManager.setOffset(serverOffset);
-                    }
+                    setServerOffset($scope.activeCamera.parentId);
                 });
                 
                 window.timeManager.init(CONFIG.webclient.useServerTime, CONFIG.webclient.useSystemTime);
