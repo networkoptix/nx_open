@@ -361,6 +361,8 @@ void ConnectionProcessor::run()
     if (useWebSocket)
     {
         p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
+        p2pTransport->start();
+
         messageBus->gotConnectionFromRemotePeer(
             remotePeer,
             std::move(sameDirectionConnectionLockGuard),
@@ -368,7 +370,6 @@ void ConnectionProcessor::run()
             QUrlQuery(d->request.requestLine.url.query()),
             userAccessData(remotePeer),
             onConnectionClosedCallback);
-        p2pTransport->start();
     }
     else
     {
