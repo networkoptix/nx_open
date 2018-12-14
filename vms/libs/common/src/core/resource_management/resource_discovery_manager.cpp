@@ -669,7 +669,7 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurity
 {
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-//    NX_ASSERT(resourceType, lit("Resource type %1 was not found").arg(resourceTypeId.toString()));
+    NX_ASSERT(resourceType, lit("Resource type %1 was not found").arg(resourceTypeId.toString()));
 
     const auto model = resourceType
         ? resourceType->getName()

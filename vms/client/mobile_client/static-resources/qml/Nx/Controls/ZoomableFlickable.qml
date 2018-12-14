@@ -42,7 +42,6 @@ Item
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
     signal movementEnded()
-    signal contentRectChanged()
     property bool moving: false
 
     property var doubleTapStartCheckFuncion
@@ -88,22 +87,8 @@ Item
         }
 
         /* Workaround for qt bug: top and left margins are ignored. */
-        onContentXChanged:
-        {
-            fixContentX()
-            rootItem.contentRectChanged()
-        }
-        onContentYChanged:
-        {
-            fixContentY()
-            rootItem.contentRectChanged()
-        }
-
-        onOriginXChanged: rootItem.contentRectChanged()
-        onOriginYChanged: rootItem.contentRectChanged()
-        onContentHeightChanged: rootItem.contentRectChanged()
-        onContentWidthChanged: rootItem.contentRectChanged()
-
+        onContentXChanged: fixContentX()
+        onContentYChanged: fixContentY()
         onLeftMarginChanged: fixContentX()
         onTopMarginChanged: fixContentY()
 
