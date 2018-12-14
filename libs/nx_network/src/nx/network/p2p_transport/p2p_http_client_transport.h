@@ -58,7 +58,6 @@ private:
     http::MultipartContentParser m_multipartContentParser;
     std::queue<nx::Buffer> m_incomingMessageQueue;
     UserReadHandlerPair m_userReadHandlerPair;
-    bool m_postInProgress = false;
     websocket::FrameType m_messageType;
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
