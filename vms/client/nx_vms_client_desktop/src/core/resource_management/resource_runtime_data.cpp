@@ -4,8 +4,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QObject* parent):
-    base_type(parent)
+QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QnCommonModule* commonModule, QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(commonModule)
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)

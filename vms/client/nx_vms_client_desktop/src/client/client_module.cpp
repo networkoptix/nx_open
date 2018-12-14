@@ -382,7 +382,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     auto commonModule = m_clientCoreModule->commonModule();
 
-    commonModule->store(new QnResourceRuntimeDataManager());
+    commonModule->store(new QnResourceRuntimeDataManager(commonModule));
     commonModule->store(translationManager.release());
     commonModule->store(new QnClientRuntimeSettings());
     commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
