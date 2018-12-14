@@ -165,17 +165,13 @@ PageBase
         [
             MotionAreaButton
             {
-                visible: video.motionController && video.motionController.customRoiExists
+                visible: motionSearchController.customRoiExists
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
 
-                onClicked:
-                {
-                    if (video.motionController)
-                        video.motionController.clearCustomRoi()
-                }
+                onClicked: motionSearchController.clearCustomRoi()
             },
 
             IconButton
@@ -272,10 +268,6 @@ PageBase
     {
         id: video
 
-        property Item motionController: sourceComponent == scalableVideoComponent
-            ? item.motionSearchController
-            : null
-
         y: toolBar.visible ? -header.height : 0
         x: -mainWindow.leftPadding
         width: mainWindow.width
@@ -294,6 +286,42 @@ PageBase
             if (item)
                 item.clear()
         }
+
+        MotionController
+        {
+            id: motionSearchController
+
+            x: video.item.videoRect.x
+            y: video.item.videoRect.y
+            z: 1
+            width: video.item.videoRect.width
+            height: video.item.videoRect.height
+
+            viewport: video.item
+            cameraRotation: videoScreenController.resourceHelper.customRotation
+            motionProvider.mediaPlayer: videoScreenController.mediaPlayer
+
+            Connections
+            {
+                target: video.item
+
+                onPressed: motionSearchController.handlePressed(
+                    target.mapToItem(motionSearchController, mouseX, mouseY))
+                onReleased: motionSearchController.handleReleased()
+                onPositionChanged: motionSearchController.handlePositionChanged(
+                    target.mapToItem(motionSearchController, mouseX, mouseY))
+                onCancelled: motionSearchController.handleCancelled()
+                onDoubleClicked: motionSearchController.handleCancelled()
+
+                onMovementEnded: motionSearchController.updateDefaultRoi()
+            }
+
+            Rectangle
+            {
+                anchors.fill: parent
+                color: "#A000FF00"
+            }
+        }
     }
 
     Component
@@ -306,8 +334,6 @@ PageBase
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
             onClicked: toggleUi()
-            motionSearchController.cameraRotation: videoScreenController.resourceHelper.customRotation
-            motionSearchController.motionProvider.mediaPlayer: videoScreenController.mediaPlayer
         }
     }
 
@@ -543,16 +569,12 @@ PageBase
 
             changingMotionRoi:
             {
-                if (!video.motionController)
-                    return false
-
-                if (video.motionController.drawingRoi)
-                    return false
-
-                return video.item.moving && !video.motionController.customRoiExists
+                return motionSearchController.drawingRoi
+                    ? false
+                    : video.item.moving && !motionSearchController.customRoiExists
             }
 
-            hasCustomRoi: video.motionController && video.motionController.customRoiExists
+            hasCustomRoi: motionSearchController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
@@ -589,17 +611,17 @@ PageBase
             }
 
             motionFilter: video.sourceComponent == scalableVideoComponent
-                ? video.item.motionSearchController.motionFilter
+                ? motionSearchController.motionFilter
                 : ""
 
             motionSearchMode:
                 video.sourceComponent == scalableVideoComponent
-                && video.item.motionSearchController.motionSearchMode
+                && motionSearchController.motionSearchMode
 
             onMotionSearchModeChanged:
             {
                 if (video.sourceComponent == scalableVideoComponent)
-                    video.item.motionSearchController.motionSearchMode = motionSearchMode
+                    motionSearchController.motionSearchMode = motionSearchMode
             }
         }
     }

@@ -4,6 +4,7 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
+import Nx 1.0
 
 ZoomableFlickable
 {
@@ -11,11 +12,13 @@ ZoomableFlickable
 
     property alias mediaPlayer: content.mediaPlayer
     property alias resourceHelper: content.resourceHelper
-    property alias motionSearchController: motionSearchController
+    property MotionController motionSearchController: null
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
     property size fitSize: content.boundedSize(width, height)
+    property rect videoRect
+
     function getMoveViewportData(position)
     {
         var videoItem = content.videoOutput
@@ -29,7 +32,7 @@ ZoomableFlickable
         onResourceIdChanged: to1xScale()
     }
 
-    allowCompositeEvents: !motionSearchController.drawingRoi
+    allowCompositeEvents: !motionSearchController || !motionSearchController.drawingRoi
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
@@ -79,9 +82,39 @@ ZoomableFlickable
         d.toggleScale(zoomIn, mouseX, mouseY)
     }
 
-    QtObject
+    Object
     {
         id: d
+
+        Connections
+        {
+            target: content.videoOutput
+            onXChanged: d.updateVideoRect()
+            onYChanged: d.updateVideoRect()
+            onHeightChanged: d.updateVideoRect()
+            onWidthChanged: d.updateVideoRect()
+        }
+
+        Connections
+        {
+            target: zf
+            onContentRectChanged: d.updateVideoRect()
+        }
+
+        function updateVideoRect()
+        {
+            var output = content.videoOutput
+            var x = output.x
+            var y = output.y
+
+            var topLeft = parent.mapFromItem(content, x, y)
+            var bottomRight = parent.mapFromItem(content, x + output.width, y + output.height)
+            var width = Math.abs(bottomRight.x - topLeft.x)
+            var height = Math.abs(bottomRight.y - topLeft.y)
+
+            videoRect = Qt.rect(topLeft.x, topLeft.y, width, height)
+        }
+
 
         function allowedMargin(targetWidth, targetHeight, size, padding, factor)
         {
@@ -159,30 +192,6 @@ ZoomableFlickable
         height: contentHeight
 
         onSourceSizeChanged: fitToBounds()
-
-        MotionController
-        {
-            id: motionSearchController
-
-            anchors.fill: parent
-            parent: content.videoOutput
-            viewport: zf
-
-            Connections
-            {
-                target: zf
-
-                onPressed: motionSearchController.handlePressed(
-                    zf.mapToItem(motionSearchController, mouseX, mouseY))
-                onReleased: motionSearchController.handleReleased()
-                onPositionChanged: motionSearchController.handlePositionChanged(
-                    zf.mapToItem(motionSearchController, mouseX, mouseY))
-                onCancelled: motionSearchController.handleCancelled()
-                onDoubleClicked: motionSearchController.handleCancelled()
-
-                onMovementEnded: motionSearchController.updateDefaultRoi()
-            }
-        }
     }
 
     onWidthChanged: fitToBounds()
@@ -197,4 +206,6 @@ ZoomableFlickable
     {
         content.videoOutput.clear()
     }
+
+    Component.onCompleted: updateVideoRect()
 }
