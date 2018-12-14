@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/thread/mutex.h>
+
 #include <client_core/connection_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
@@ -25,9 +27,10 @@ class CameraAdvancedSettingsWidget: public Connective<QWidget>, public QnConnect
     Q_OBJECT
 
     using base_type = Connective<QWidget>;
+
 public:
-    CameraAdvancedSettingsWidget(QWidget* parent = 0);
-    virtual ~CameraAdvancedSettingsWidget();
+    CameraAdvancedSettingsWidget(QWidget* parent = nullptr);
+    virtual ~CameraAdvancedSettingsWidget() override;
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
@@ -58,6 +61,7 @@ private:
 
     bool hasManualPage() const;
     bool hasWebPage() const;
+
 private:
     enum Page
     {

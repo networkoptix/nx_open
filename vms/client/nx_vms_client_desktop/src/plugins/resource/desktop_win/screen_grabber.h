@@ -76,7 +76,6 @@ private:
     QVector<IDirect3DSurface9*> m_pSurface;
     QVector<quint8*> m_openGLData;
     RECT m_rect{0, 0, 0, 0};
-    const HRESULT m_initialized;
     D3DDISPLAYMODE m_ddm{};
     QTime m_timer;
     unsigned m_frameNum = 0;
@@ -103,4 +102,6 @@ private:
     static QnMutex m_guiWaitMutex;
     QnWaitCondition m_waitCond;
     bool m_needStop = false;
+
+    HRESULT m_initialized = 0;
 };
