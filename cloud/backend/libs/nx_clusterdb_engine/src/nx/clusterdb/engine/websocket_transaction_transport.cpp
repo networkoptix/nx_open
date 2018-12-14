@@ -16,14 +16,14 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     const std::string& systemId,
     const OutgoingCommandFilter& filter,
     const std::string& connectionId,
-    nx::network::P2pTransportPtr p2pTransport,
+    nx::network::P2pTransportPtr _p2pTransport,
     vms::api::PeerDataEx localPeerData,
     vms::api::PeerDataEx remotePeerData)
     :
     nx::p2p::ConnectionBase(
         remotePeerData,
         localPeerData,
-        std::move(p2pTransport),
+        std::move(_p2pTransport),
         QUrlQuery(),
         std::make_unique<nx::p2p::ConnectionContext>()),
     m_protocolVersionRange(protocolVersionRange),
@@ -36,7 +36,7 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(p2pTransport->getAioThread());
+    bindToAioThread(p2pTransport()->getAioThread());
 
     m_commonTransactionHeader.systemId = systemId;
     m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
