@@ -57,6 +57,7 @@ def get_product_type(product):
         return ProductType.PRODUCT_TYPES[product.product_type.type]
     return product
 
+
 @register.simple_tag
 def get_review_state(state):
     return ProductCustomizationReview.REVIEW_STATES[state]
@@ -65,3 +66,9 @@ def get_review_state(state):
 @register.simple_tag
 def has_permission(user, permission):
     return UserGroupsToProductPermissions.check_customization_permission(user, settings.CUSTOMIZATION, permission)
+
+
+@register.filter
+def modulo(value, arg):
+    return int(value) % int(arg)
+

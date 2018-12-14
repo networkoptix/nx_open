@@ -79,6 +79,5 @@
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Your browser is not supported": "Your browser is not supported",
 	"is incompatible.": "is incompatible.",
-	"is offline.": "is offline.",
-	"{{ messageType }}": "{{ messageType }}"
+	"is offline.": "is offline."
 }

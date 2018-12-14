@@ -27,6 +27,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                 private integrationService: IntegrationService,
                 private ribbonService: NxRibbonService,
                 private configService: NxConfigService,
+                // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
                 private translate: TranslateService) {
 

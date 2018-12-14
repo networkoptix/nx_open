@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
+from django.conf.urls import url
 from django.db.models import Q
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.html import format_html
 from django.http.response import HttpResponse
@@ -100,12 +101,11 @@ admin.site.register(ProductType, ProductTypeAdmin)
 
 # TODO: CLOUD-2388  Add additional views to here link -> http://patrick.arminio.info/additional-admin-views/
 class ProductAdmin(CMSAdmin):
-    list_display = ('product_settings', 'edit_product', 'name', 'product_type', 'customizations_list', )
+    list_display = ('product_settings', 'edit_product_button', 'name', 'product_type', 'customizations_list', )
     list_display_links = ('name',)
     list_filter = ('product_type', )
     form = ProductForm
     change_form_template = 'cms/product_change_form.html'
-    change_list_template = 'cms/product_changelist.html'
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -141,6 +141,16 @@ class ProductAdmin(CMSAdmin):
             queryset = Product.objects.filter(id__in=viewable_products)
         return queryset
 
+    def get_urls(self):
+        urls = super(ProductAdmin, self).get_urls()
+        my_urls = [
+            url(r'^(?P<product_id>.+?)/pages/$', self.admin_site.admin_view(self.page_list_view), name='pages'),
+            url(r'^(?P<product_id>.+?)/pages/(?P<context_id>.+?)/change/$',
+                self.admin_site.admin_view(self.change_page),
+                name='change_page')
+        ]
+        return my_urls + urls
+
     def product_settings(self, obj):
         if obj.product_type and not obj.product_type.single_customization:
             return format_html('')
@@ -150,83 +160,64 @@ class ProductAdmin(CMSAdmin):
     product_settings.short_description = 'Product settings'
     product_settings.allow_tags = True
 
-    def edit_product(self, obj):
-        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit content</a>',
-                           reverse('admin:cms_contextproxy_changelist'), obj.id)
+    def page_list_view(self, request, product_id=None):
+        context = {
+            'title': 'Edit a page',
+            'app_label': self.model._meta.app_label,
+            'opts': self.model._meta
+        }
 
-    edit_product.short_description = 'Edit page'
-    edit_product.allow_tags = True
+        if product_id:
+            context['product'] = Product.objects.get(id=product_id)
+            qs = context['product'].product_type.context_set.all()
+            if not request.user.is_superuser:
+                qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
+            context['contexts'] = qs
+
+        return render(request, 'cms/page_list_view.html', context)
+
+    def change_page(self, request, context_id=None, product_id=None):
+        context = {}
+        if request.method == "POST" and 'product_id' in request.POST:
+            context['preview_link'] = page_editor(request)
+            if 'SendReview' in request.POST and context['preview_link']:
+                return redirect(context['preview_link'].url)
+
+        target_context = Context.objects.get(id=context_id)
+        product = Product.objects.get(id=product_id)
+
+        context['title'] = "Edit {}".format(target_context.name)
+        context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+        context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
+            DataStructure.DATA_TYPES.external_image]
+
+        if 'admin_language' in request.session:
+            context['language_code'] = request.session['admin_language']
+
+        context['product'] = product
+        context['app_label'] = target_context._meta.app_label
+        context['opts'] = target_context._meta
+        context['product_opts'] = product._meta
+        context['original'] = target_context
+
+        form = CustomContextForm(initial={'language': context['language_code'], 'context': context_id})
+        form.add_fields(product, target_context, Language.objects.get(code=context['language_code']), request.user)
+        context['custom_form'] = form
+
+        return render(request, 'cms/context_change_form.html', context)
+
+    def edit_product_button(self, obj):
+        return format_html('<a class="btn btn-sm product" href="{}">Edit content</a>',
+                           reverse('admin:pages', args=[obj.id]))
+
+    edit_product_button.short_description = 'Edit page'
+    edit_product_button.allow_tags = True
 
     def customizations_list(self, obj):
         return ", ".join(obj.customizations.values_list('name', flat=True))
 
 
 admin.site.register(Product, ProductAdmin)
-
-
-# TODO: CLOUD-2388  Remove this context admin. The product should use this logic for an additional view of the product
-class ContextProxyAdmin(CMSAdmin):
-    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
-
-    list_display_links = ('name',)
-    search_fields = ('name', 'description', 'url')
-
-    change_form_template = "cms/context_change_form.html"
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        if request.method == "POST" and 'product_id' in request.POST:
-            extra_context['preview_link'] = page_editor(request)
-            if 'SendReview' in request.POST and extra_context['preview_link']:
-                return redirect(extra_context['preview_link'].url)
-
-        extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
-        extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
-        extra_context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
-            DataStructure.DATA_TYPES.external_image]
-
-        if 'admin_language' in request.session:
-            extra_context['language_code'] = request.session['admin_language']
-        if 'product_id' not in request.session:
-            messages.error(request, "No product was selected!")
-            return redirect(reverse('admin:cms_product_changelist'))
-        extra_context['product'] = Product.objects.get(id=request.session['product_id'])
-
-        form = CustomContextForm(initial={'language': extra_context['language_code'], 'context': object_id})
-        form.add_fields(Product.objects.get(id=request.session['product_id']),
-                        Context.objects.get(id=object_id),
-                        Language.objects.get(code=request.session['language']),
-                        request.user)
-        extra_context['custom_form'] = form
-
-        return super(ContextProxyAdmin, self).change_view(request, object_id, form_url, extra_context)
-
-    def get_model_perms(self, request):
-        if not request.user.is_superuser:
-            return {}
-        return super(ContextProxyAdmin, self).get_model_perms(request)
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        if'product_id' in request.POST:
-            request.session['product_id'] = request.POST['product_id']
-            return HttpResponse(reverse('admin:cms_contextproxy_changelist'))
-
-        if 'product_id' not in request.session:
-            messages.error(request, "No product was selected!")
-            return redirect(reverse('admin:cms_product_changelist'))
-
-        return super(ContextProxyAdmin, self).changelist_view(request, extra_context)
-
-    def get_queryset(self, request):  # show only users for cloud_portal product type
-        qs = super(ContextProxyAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(product_type__product__in=[request.session['product_id']])
-        if not request.user.is_superuser:
-            qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
-        return qs
-
-
-admin.site.register(ContextProxy, ContextProxyAdmin)
 
 
 class ContextAdmin(CMSAdmin):
