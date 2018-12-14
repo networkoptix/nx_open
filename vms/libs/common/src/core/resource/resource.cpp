@@ -639,9 +639,10 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 bool QnResource::init()
 {
+    auto commonModule = this->commonModule();
     {
         QnMutexLocker lock(&m_initMutex);
-        if (commonModule() && commonModule()->isNeedToStop())
+        if (!commonModule || commonModule->isNeedToStop())
             return false;
 
         if (m_initialized)
@@ -654,7 +655,7 @@ bool QnResource::init()
     NX_DEBUG(this, "Initiatialize...");
     CameraDiagnostics::Result initResult = initInternal();
     NX_DEBUG(this, "Initialization result: %1",
-        initResult.toString(commonModule()->resourcePool()));
+        initResult.toString(commonModule->resourcePool()));
 
     bool changed = false;
     {
