@@ -110,8 +110,8 @@ signals:
 protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
-
-private:
+    const nx::network::P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
+  private:
     void cancelConnecting(State state, const QString& reason);
 
     void onHttpClientDone();
