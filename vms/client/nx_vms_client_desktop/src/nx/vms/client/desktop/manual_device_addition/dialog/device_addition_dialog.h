@@ -87,6 +87,8 @@ private:
 
     SearcherPtr m_currentSearch;
     SearchersList m_unfinishedSearches;
+    QString m_lastSearchLogin;
+    QString m_lastSearchPassword;
 
     QScopedPointer<FoundDevicesModel> m_model;
     bool m_addressEditing;
