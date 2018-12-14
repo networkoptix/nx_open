@@ -25,10 +25,16 @@ public:
     void gotConnectionFromRemotePeer(
         const vms::api::PeerDataEx& remotePeer,
         ec2::ConnectionLockGuard connectionLockGuard,
-        nx::network::WebSocketPtr webSocket,
+        nx::network::P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
+
+    bool gotPostConnection(
+        const vms::api::PeerDataEx& remotePeer,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        nx::Buffer requestBody);
+
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) override;
 signals:
     void lazyDataCommtDone();

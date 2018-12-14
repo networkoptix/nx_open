@@ -170,6 +170,11 @@ bool TestHttpServer::registerRedirectHandler(
         method);
 }
 
+void TestHttpServer::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_httpServer->bindToAioThread(aioThread);
+}
+
 //-------------------------------------------------------------------------------------------------
 // class RandomlyFailingHttpConnection
 
