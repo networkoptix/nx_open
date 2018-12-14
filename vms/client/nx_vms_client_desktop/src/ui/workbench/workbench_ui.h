@@ -21,7 +21,6 @@ class QGraphicsLinearLayout;
 
 class InstrumentManager;
 class ActivityListenerInstrument;
-class FpsCountingInstrument;
 class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
