@@ -45,7 +45,8 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
     m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
 
-    auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
+    // #TODO #akulikov Uncomment and make it work
+    //auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     //p2pTransport->setAliveTimeout(keepAliveTimeout);
 
     connect(this, &ConnectionBase::gotMessage, this, &WebsocketCommandTransport::onGotMessage);
