@@ -100,7 +100,7 @@ QVariant ProgressListModel::data(const QModelIndex& index, int role) const
     }
 }
 
-bool ProgressListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool ProgressListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
 {
     if (!index.isValid() || index.model() != this || index.column() != 0
         || index.row() < 0 || index.row() >= rowCount()

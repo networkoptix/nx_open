@@ -10,13 +10,13 @@ QnStartUpdateRestHandler::QnStartUpdateRestHandler(QnMediaServerModule* serverMo
 }
 
 int QnStartUpdateRestHandler::executePost(
-    const QString& path,
-    const QnRequestParamList& params,
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
     const QByteArray& body,
-    const QByteArray& srcBodyContentType,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* processor)
+    const QByteArray& /*srcBodyContentType*/,
+    QByteArray& /*result*/,
+    QByteArray& /*resultContentType*/,
+    const QnRestConnectionProcessor* /*processor*/)
 {
     serverModule()->updateManager()->startUpdate(body);
     return nx::network::http::StatusCode::ok;

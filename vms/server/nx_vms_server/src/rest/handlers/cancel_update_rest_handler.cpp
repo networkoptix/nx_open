@@ -8,13 +8,13 @@ QnCancelUpdateRestHandler::QnCancelUpdateRestHandler(QnMediaServerModule* server
 }
 
 int QnCancelUpdateRestHandler::executePost(
-    const QString& path,
-    const QnRequestParamList& params,
-    const QByteArray& body,
-    const QByteArray& srcBodyContentType,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* processor)
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
+    const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/,
+    QByteArray& /*result*/,
+    QByteArray& /*resultContentType*/,
+    const QnRestConnectionProcessor* /*processor*/)
 {
     serverModule()->updateManager()->cancel();
     return nx::network::http::StatusCode::ok;

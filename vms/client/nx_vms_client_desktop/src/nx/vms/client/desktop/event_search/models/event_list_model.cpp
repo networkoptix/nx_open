@@ -21,7 +21,7 @@ EventListModel::~EventListModel()
 {
 }
 
-int EventListModel::rowCount(const QModelIndex& parent) const
+int EventListModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->count();
 }

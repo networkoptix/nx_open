@@ -278,7 +278,7 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
     const QnLicensePtr& license, bool fullText) const
 {
     auto goodLicense =
-        [this, fullText]() -> QPair<ExpirationState, QString>
+        [fullText]() -> QPair<ExpirationState, QString>
         {
             return { Good, fullText
                 ? tr("License is active")
@@ -286,7 +286,7 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
         };
 
     auto expiredLicense =
-        [this, fullText]() -> QPair<ExpirationState, QString>
+        [fullText]() -> QPair<ExpirationState, QString>
         {
             return { Expired, fullText
                 ? tr("License is expired")

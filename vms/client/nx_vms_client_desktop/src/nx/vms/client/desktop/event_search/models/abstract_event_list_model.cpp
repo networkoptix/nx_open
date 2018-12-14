@@ -78,7 +78,7 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
         return datetime::toString(dateTime.time());
 }
 
-bool AbstractEventListModel::defaultAction(const QModelIndex& index)
+bool AbstractEventListModel::defaultAction(const QModelIndex& /*index*/)
 {
     return false;
 }
