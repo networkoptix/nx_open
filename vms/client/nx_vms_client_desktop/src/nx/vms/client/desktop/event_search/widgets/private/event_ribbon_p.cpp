@@ -1031,10 +1031,10 @@ void EventRibbon::Private::doUpdateView()
 
     updateCurrentShifts();
 
-    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
+    const int scrollPosition = m_scrollBarRelevant ? m_scrollBar->value() : 0;
     const int height = m_viewport->height();
 
-    const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
+    const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), scrollPosition,
         [](int left, const TilePtr& right) { return left < right->position; });
 
     int firstIndexToUpdate = qMax<int>(0, secondInView - m_tiles.cbegin() - 1);
@@ -1050,7 +1050,7 @@ void EventRibbon::Private::doUpdateView()
             ? m_viewportHeader->heightForWidth(headerWidth)
             : m_viewportHeader->sizeHint().height();
 
-        m_viewportHeader->setGeometry(0, m_topMargin, headerWidth, headerHeight);
+        m_viewportHeader->setGeometry(0, m_topMargin - scrollPosition, headerWidth, headerHeight);
         currentPosition += m_viewportHeader->height();
     }
 
@@ -1060,7 +1060,7 @@ void EventRibbon::Private::doUpdateView()
         currentPosition = prevTile->position + prevTile->height + kDefaultTileSpacing;
     }
 
-    const auto positionLimit = base + height;
+    const auto positionLimit = scrollPosition + height;
 
     static constexpr int kWidthThreshold = 400;
     const auto mode = m_viewport->width() > kWidthThreshold
@@ -1079,7 +1079,8 @@ void EventRibbon::Private::doUpdateView()
             updateTile(iter - m_tiles.cbegin());
 
         tile->height = calculateHeight(tile->widget.get());
-        tile->widget->setGeometry(0, currentPosition - base, m_viewport->width(), tile->height);
+        tile->widget->setGeometry(
+            0, currentPosition - scrollPosition, m_viewport->width(), tile->height);
         tile->widget->setMode(mode);
         const auto bottom = currentPosition + tile->height;
         currentPosition = bottom + kDefaultTileSpacing;
