@@ -400,7 +400,6 @@ bool QnRtspConnectionProcessor::parseRequestParams()
     }
     else
     {
-        d->quality = MEDIA_Quality_High;
         const QString& streamIndexStr = urlQuery.queryItemValue("stream");
         if( !streamIndexStr.isEmpty() )
         {
