@@ -10,7 +10,7 @@ namespace p2p {
 class ServerMessageBus: public MessageBus
 {
     using base_type = MessageBus;
-
+    Q_OBJECT;
 public:
     ServerMessageBus(
         vms::api::PeerType peerType,
@@ -30,6 +30,8 @@ public:
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) override;
+signals:
+    void lazyDataCommtDone();
 protected:
     virtual void doPeriodicTasks() override;
     virtual void stop() override;
