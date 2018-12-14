@@ -152,14 +152,14 @@ QVariant FoundDevicesModel::getDisplayData(const QModelIndex& index) const
     const auto& currentDeivce = device(index);
     switch (index.column())
     {
-    case Columns::modelColumn:
-        return currentDeivce.name;
-    case Columns::addressColumn:
-        return currentDeivce.url;
-    case Columns::brandColumn:
-        return currentDeivce.vendor;
-    default:
-        return QVariant();
+        case Columns::modelColumn:
+            return currentDeivce.name;
+        case Columns::addressColumn:
+            return currentDeivce.url;
+        case Columns::brandColumn:
+            return currentDeivce.vendor;
+        default:
+            return QVariant();
     }
 }
 
