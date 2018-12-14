@@ -452,22 +452,59 @@ angular.module('nxCommon')
                 scope.playPause = playPause;
 
                 // 1. Visual buttons
+    
+                const interval = 300; //milliseconds
+                var firstClickTime;
+                var waitingSecondClick = false;
+                var initialClick;
 
+                
+                function onMouseUp() {
+                    if (waitingSecondClick) {
+                        return;
+                    }
+                    
+                    $timeout(() => {
+                        timelineActions.zoomingStop();
+                    }, interval);
+                }
+                
                 element.on('mouseup',      '.zoomOutButton', function(){
-                    timelineActions.zoomingStop();
+                    onMouseUp();
                 });
+                
                 element.on('mouseleave',   '.zoomOutButton', function(){
-                    timelineActions.zoomingStop();
+                    $timeout(() => {
+                        timelineActions.zoomingStop();
+                    }, interval);
                 });
+                
                 element.on('mousedown',    '.zoomOutButton', function(){
-                    timelineActions.zoomingStart(false);
+                    if (!waitingSecondClick) {
+                        firstClickTime = (new Date()).getTime();
+                        waitingSecondClick = true;
+        
+                        initialClick = $timeout(function () {
+                            waitingSecondClick = false;
+                            timelineActions.zoomingStart(false);
+                            onMouseUp();
+                        }, interval);
+                    } else {
+                        $timeout.cancel(initialClick);
+                        timelineActions.fullZoomOut();
+                        
+                        $timeout(() => {
+                            waitingSecondClick = false;
+                        }, interval);
+                    }
+                    
+                    
                 });
-                element.on('dblclick',     '.zoomOutButton', function(){
-                    timelineActions.fullZoomOut();
-                });
-
+                
                 element.on('mouseup',      '.zoomInButton', function(){
-                    timelineActions.zoomingStop();
+                    $timeout(() => {
+                        timelineActions.zoomingStop();
+                    }, 250);
                 });
                 element.on('mouseleave',   '.zoomInButton', function(){
                     timelineActions.zoomingStop();
