@@ -606,7 +606,16 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     }
 #endif // 0
 
-    //m_frameData.write((const char*)curPtr, bytesLeft);
+
+    // Check buffer overflow
+    if (m_frameSize + bytesLeft > (int) MAX_ALLOWED_FRAME_SIZE)
+    {
+        NX_WARNING(this, "RTP parser buffer overflow.");
+        m_chunks.clear();
+        m_frameSize = 0;
+        packetLostDetected(0, 0);
+        return false;
+    }
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
     m_frameSize += bytesLeft;
 
