@@ -145,10 +145,6 @@ signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
-protected slots:
-    void at_resourceDeleted(const QnResourcePtr& resource);
-    void at_resourceAdded(const QnResourcePtr& resource);
-
 protected:
     enum class SearchType
     {
@@ -166,7 +162,6 @@ protected:
 
     friend class QnResourceDiscoveryManagerTimeoutDelegate;
 
-private:
     void updateLocalNetworkInterfaces();
 
     // Returns new resources or updates some in resource pool.
@@ -180,7 +175,7 @@ private:
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 
-private:
+protected:
     QThreadPool m_threadPool;
 
     mutable QnMutex m_searchersListMutex;
