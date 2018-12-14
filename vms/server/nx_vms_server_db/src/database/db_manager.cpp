@@ -1938,9 +1938,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    const auto logTag = nx::utils::log::Tag(typeid(QnDbManager));
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
-        const QString logTag = ::toString(typeid(QnDbManager));
         return ec2::migration::ptz::addRotationToPresets(logTag, m_sdb)
             && resyncIfNeeded(ResyncResourceProperties);
     }
@@ -1948,7 +1948,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
-        return ec2::migration::ptz::addRotationToPresets(m_sdb)
+        return ec2::migration::ptz::addRotationToPresets(logTag, m_sdb)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 

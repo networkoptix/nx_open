@@ -50,7 +50,7 @@ std::optional<QString> convertPresets(const QString& oldSerializedPresets)
 
 } // namespace
 
-bool addRotationToPresets(const QString& logTag, QSqlDatabase& database)
+bool addRotationToPresets(const nx::utils::log::Tag& logTag, QSqlDatabase& database)
 {
     static const QString kPresetQuery = lm("SELECT id, value FROM vms_kvpair WHERE name='%1'")
         .arg(kPresetsPropertyKey);
