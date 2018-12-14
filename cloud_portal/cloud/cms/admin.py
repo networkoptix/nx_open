@@ -23,8 +23,9 @@ class CustomizationFilter(SimpleListFilter):
         # Temporary customization 0 is need for 'All' since we need to keep it,
         # but choose the customization for the current cloud portal as the default value
         self.default_customization = Customization.objects.get(name=settings.CUSTOMIZATION).id
-        customizations = [Customization(id=0, name='All')]
+        customizations = [Customization(id=0, name='All Customizations')]
         customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
+        customizations.extend([Customization(id=1000, name='Other Customizations')])
         return [(c.id, c.name) for c in customizations]
 
     def choices(self, cl):
@@ -36,10 +37,13 @@ class CustomizationFilter(SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        if self.value() and self.value() != '0':
-            return queryset.filter(customization__id=self.value())
+        if self.value():
+            if self.value() == '1000':
+                return queryset.exclude(customization__name__in=request.user.customizations)
+            elif self.value() != '0':
+                return queryset.filter(customization__id=self.value())
 
-        if self.value() is None:
+        else:
             return queryset.filter(customization__id=self.default_customization)
         return queryset
 
@@ -58,7 +62,7 @@ class ProductFilter(SimpleListFilter):
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
             products = products.filter(created_by=request.user)
 
-        return [(p.id, p.name) for p in products]
+        return [(p.id, p.__str__()) for p in products]
 
     def queryset(self, request, queryset):
         if self.value():
@@ -99,7 +103,6 @@ class ProductTypeAdmin(CMSAdmin):
 admin.site.register(ProductType, ProductTypeAdmin)
 
 
-# TODO: CLOUD-2388  Add additional views to here link -> http://patrick.arminio.info/additional-admin-views/
 class ProductAdmin(CMSAdmin):
     list_display = ('product_settings', 'edit_product_button', 'name', 'product_type', 'customizations_list', )
     list_display_links = ('name',)
@@ -126,9 +129,14 @@ class ProductAdmin(CMSAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
+    def get_fields(self, request, obj=None):
+        if not request.user.is_superuser and not obj.product_type.single_customization:
+            return [field for field in self.form.base_fields if field != 'customizations']
+        return self.form.base_fields
+
     def get_list_display(self, request):
         if not request.user.is_superuser:
-            return self.list_display[1:]
+            return self.list_display[1:3]
         return self.list_display
 
     def get_queryset(self, request):
@@ -137,7 +145,8 @@ class ProductAdmin(CMSAdmin):
             viewable_products = [product.id for product in queryset
                                  if UserGroupsToProductPermissions.check_permission(request.user,
                                                                                     product,
-                                                                                    'cms.can_access_product')]
+                                                                                    'cms.can_access_product')
+                                 or product.created_by == request.user]
             queryset = Product.objects.filter(id__in=viewable_products)
         return queryset
 
@@ -335,7 +344,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(Q(customization__name__in=request.user.customizations) or
+            qs = qs.filter(Q(customization__name__in=request.user.customizations) |
                            Q(version__product__created_by=request.user))
         return qs
 

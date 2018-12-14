@@ -207,6 +207,10 @@ class ProductForm(forms.ModelForm):
             used_customizations = [product.customizations.first().name
                                    for product in Product.objects.filter(product_type__type=cloud_portal)
                                    if product.customizations.exists() and product.customizations.first() != cloud_customization]
+
+            # if the form doesnt have the customizations field create it
+            if 'customizations' not in self.fields:
+                self.fields['customizations'] = forms.MultipleChoiceField()
             self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
             self.initial['customizations'] = self.instance.customizations.all()
 
