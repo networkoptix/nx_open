@@ -6,6 +6,8 @@
 #include <QtCore/QJsonValue>
 #include <QtXml/QtXml>
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace utils {
 
@@ -182,8 +184,19 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
 } // namespace utils
 } // namespace nx
 
-/** Used to hide passwords from logs. */
-NX_UTILS_API QString toString(const nx::utils::Url& value);
+/**
+* Used only to hide passwords from logs.
+*
+* NOTE: Implemented as template specialization as there is some unknown circumstances which does
+* not allow to just overload toString().
+*/
+template<>
+inline QString toString<nx::utils::Url>(const nx::utils::Url& value)
+{
+    if (nx::utils::ini().displayUrlPasswordInLogs)
+        return value.toString();
+    return value.toDisplayString();
+}
 
 Q_DECLARE_METATYPE(nx::utils::Url)
 

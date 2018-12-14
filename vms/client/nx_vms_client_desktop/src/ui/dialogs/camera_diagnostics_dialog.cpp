@@ -89,9 +89,9 @@ void QnCameraDiagnosticsDialog::stop() {
     if(!m_started)
         return;
 
-    disconnect(m_tool, NULL, this, NULL);
+    disconnect(m_tool, nullptr, this, nullptr);
     qnDeleteLater(m_tool);
-    m_tool = NULL;
+    m_tool = nullptr;
 
     m_started = false;
     m_finished = false;
