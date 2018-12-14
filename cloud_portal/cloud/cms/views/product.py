@@ -12,6 +12,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 import os
 import json
 from cloud import settings
+from api.helpers.permissions import make_customization_visible_to_user
 from cms.controllers import filldata, generate_structure, modify_db, structure
 from cms.forms import *
 
@@ -81,6 +82,7 @@ def context_editor_action(request, product, context_id, language_code):
 
     preview_link = ""
     saved_msg = "Changes have been saved."
+    upload_errors = []
 
     if not (request.user.is_superuser or request.user.has_perm('cms.edit_advanced'))\
             and advanced_touched_without_permission(request_data, context.datastructure_set.all(), product):
@@ -190,6 +192,9 @@ def review(request):
         message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
         product_review.notes += message
         product_review.save()
+        if 'can_view_customization' in request.POST:
+            make_customization_visible_to_user(get_cloud_portal_product(settings.CUSTOMIZATION),
+                                               product_review.version.created_by)
     elif any(action in request.POST for action in ['publish', 'force_update']):
         raise PermissionDenied
     else:
