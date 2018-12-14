@@ -35,17 +35,16 @@ QnScreenGrabber::QnScreenGrabber(
     QWidget* widget)
     :
     m_displayNumber(mode == Qn::WindowMode ? 0 : displayNumber),
-    m_initialized(InitD3D(GetDesktopWindow())),
+    m_cursorDC(CreateCompatibleDC(0)),
     m_mode(mode),
     m_poolSize(poolSize+1),
     m_captureCursor(captureCursor),
-    m_cursorDC(CreateCompatibleDC(0)),
     m_captureResolution(captureResolution),
     m_needRescale(captureResolution.width() != 0 || mode == Qn::WindowMode),
     m_widget(widget)
 {
     qRegisterMetaType<CaptureInfoPtr>();
-
+    m_initialized = InitD3D(GetDesktopWindow());
     m_timer.start();
     moveToThread(qApp->thread()); // to allow correct "InvokeMethod" call
 }
