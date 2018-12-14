@@ -14,22 +14,22 @@
 
 namespace nx::clusterdb::engine {
 
-class TransactionLog;
+class CommandLog;
 
-typedef nx::utils::MoveOnlyFunc<void(ResultCode)> TransactionProcessedHandler;
+typedef nx::utils::MoveOnlyFunc<void(ResultCode)> CommandProcessedHandler;
 
-class AbstractTransactionProcessor
+class AbstractCommandProcessor
 {
 public:
-    virtual ~AbstractTransactionProcessor() {}
+    virtual ~AbstractCommandProcessor() {}
 
     /**
      * Parse and process UbJson-serialized transaction.
      */
-    virtual void processTransaction(
-        TransactionTransportHeader transportHeader,
+    virtual void process(
+        CommandTransportHeader transportHeader,
         std::unique_ptr<DeserializableCommandData> commandData,
-        TransactionProcessedHandler completionHandler) = 0;
+        CommandProcessedHandler completionHandler) = 0;
 };
 
 /**
@@ -37,21 +37,21 @@ public:
  * Specific transaction logic is implemented by specific manager.
  */
 template<typename CommandDescriptor>
-class BaseTransactionProcessor:
-    public AbstractTransactionProcessor
+class BaseCommandProcessor:
+    public AbstractCommandProcessor
 {
 public:
-    using Ec2Transaction = Command<typename CommandDescriptor::Data>;
+    using SpecificCommand = Command<typename CommandDescriptor::Data>;
 
-    virtual ~BaseTransactionProcessor()
+    virtual ~BaseCommandProcessor()
     {
         m_aioTimer.pleaseStopSync();
     }
 
-    virtual void processTransaction(
-        TransactionTransportHeader transportHeader,
+    virtual void process(
+        CommandTransportHeader transportHeader,
         std::unique_ptr<DeserializableCommandData> commandData,
-        TransactionProcessedHandler completionHandler) override
+        CommandProcessedHandler completionHandler) override
     {
         auto commandWrapper =
             commandData->deserialize<CommandDescriptor>(
@@ -63,7 +63,7 @@ public:
             return;
         }
 
-        this->processTransaction(
+        this->process(
             std::move(transportHeader),
             std::move(*commandWrapper),
             std::move(completionHandler));
@@ -72,20 +72,20 @@ public:
 protected:
     nx::network::aio::Timer m_aioTimer;
 
-    virtual void processTransaction(
-        TransactionTransportHeader transportHeader,
-        SerializableTransaction<CommandDescriptor> transaction,
-        TransactionProcessedHandler handler) = 0;
+    virtual void process(
+        CommandTransportHeader transportHeader,
+        SerializableCommand<CommandDescriptor> transaction,
+        CommandProcessedHandler handler) = 0;
 
 private:
     template<typename DeserializeTransactionDataFunc>
     void processTransactionInternal(
         DeserializeTransactionDataFunc deserializeTransactionDataFunc,
-        TransactionTransportHeader transportHeader,
+        CommandTransportHeader transportHeader,
         CommandHeader transactionHeader,
-        TransactionProcessedHandler completionHandler)
+        CommandProcessedHandler completionHandler)
     {
-        auto transaction = Ec2Transaction(std::move(transactionHeader));
+        auto transaction = SpecificCommand(std::move(transactionHeader));
         if (!deserializeTransactionDataFunc(&transaction.params))
         {
             NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
@@ -99,15 +99,15 @@ private:
             return;
         }
 
-        this->processTransaction(
+        this->process(
             std::move(transportHeader),
             std::move(transaction),
             std::move(completionHandler));
     }
 
     void reportTransactionDeserializationFailure(
-        const TransactionTransportHeader& transportHeader,
-        TransactionProcessedHandler completionHandler)
+        const CommandTransportHeader& transportHeader,
+        CommandProcessedHandler completionHandler)
     {
         NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
             lm("Failed to deserialize transaction %1 received from %2")
@@ -126,16 +126,16 @@ private:
  */
 template<typename CommandDescriptor>
 class SpecialCommandProcessor:
-    public BaseTransactionProcessor<CommandDescriptor>
+    public BaseCommandProcessor<CommandDescriptor>
 {
-    using base_type = BaseTransactionProcessor<CommandDescriptor>;
+    using base_type = BaseCommandProcessor<CommandDescriptor>;
 
 public:
     typedef nx::utils::MoveOnlyFunc<void(
         const std::string& /*systemId*/,
-        TransactionTransportHeader /*transportHeader*/,
+        CommandTransportHeader /*transportHeader*/,
         Command<typename CommandDescriptor::Data> /*data*/,
-        TransactionProcessedHandler /*handler*/)> ProcessorFunc;
+        CommandProcessedHandler /*handler*/)> ProcessorFunc;
 
     SpecialCommandProcessor(ProcessorFunc processorFunc):
         m_processorFunc(std::move(processorFunc))
@@ -145,10 +145,10 @@ public:
 private:
     ProcessorFunc m_processorFunc;
 
-    virtual void processTransaction(
-        TransactionTransportHeader transportHeader,
-        SerializableTransaction<CommandDescriptor> transaction,
-        TransactionProcessedHandler handler) override
+    virtual void process(
+        CommandTransportHeader transportHeader,
+        SerializableCommand<CommandDescriptor> transaction,
+        CommandProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;
         m_processorFunc(
@@ -164,24 +164,24 @@ private:
  * Specific transaction logic is implemented by specific manager
  */
 template<typename CommandDescriptor>
-class TransactionProcessor:
-    public BaseTransactionProcessor<CommandDescriptor>
+class CommandProcessor:
+    public BaseCommandProcessor<CommandDescriptor>
 {
 public:
-    using Ec2Transaction = Command<typename CommandDescriptor::Data>;
+    using SpecificCommand = Command<typename CommandDescriptor::Data>;
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, std::string /*systemId*/, Ec2Transaction)>;
+            nx::sql::QueryContext*, std::string /*systemId*/, SpecificCommand)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
      */
-    TransactionProcessor(
-        TransactionLog* const transactionLog,
+    CommandProcessor(
+        CommandLog* const transactionLog,
         ProcessEc2TransactionFunc processTranFunc)
     :
-        m_transactionLog(transactionLog),
+        m_commandLog(transactionLog),
         m_processTranFunc(std::move(processTranFunc))
     {
     }
@@ -189,18 +189,18 @@ public:
 private:
     struct TransactionContext
     {
-        TransactionTransportHeader transportHeader;
-        SerializableTransaction<CommandDescriptor> transaction;
+        CommandTransportHeader transportHeader;
+        SerializableCommand<CommandDescriptor> transaction;
     };
 
-    TransactionLog* const m_transactionLog;
+    CommandLog* const m_commandLog;
     ProcessEc2TransactionFunc m_processTranFunc;
     nx::network::aio::Timer m_aioTimer;
 
-    virtual void processTransaction(
-        TransactionTransportHeader transportHeader,
-        SerializableTransaction<CommandDescriptor> transaction,
-        TransactionProcessedHandler handler) override
+    virtual void process(
+        CommandTransportHeader transportHeader,
+        SerializableCommand<CommandDescriptor> transaction,
+        CommandProcessedHandler handler) override
     {
         using namespace std::placeholders;
 
@@ -208,7 +208,7 @@ private:
         TransactionContext transactionContext{
             std::move(transportHeader),
             std::move(transaction)};
-        m_transactionLog->startDbTransaction(
+        m_commandLog->startDbTransaction(
             systemId.c_str(),
             [this, transactionContext = std::move(transactionContext)](
                 nx::sql::QueryContext* queryContext) mutable
@@ -233,7 +233,7 @@ private:
         NX_ASSERT(transactionContext.transaction.get().command == CommandDescriptor::code);
 
         auto dbResultCode =
-            m_transactionLog->checkIfNeededAndSaveToLog<CommandDescriptor>(
+            m_commandLog->checkIfNeededAndSaveToLog<CommandDescriptor>(
                 queryContext,
                 transactionContext.transportHeader.systemId.c_str(),
                 transactionContext.transaction);
@@ -272,7 +272,7 @@ private:
 
     void dbProcessingCompleted(
         nx::sql::DBResult dbResult,
-        TransactionProcessedHandler completionHandler)
+        CommandProcessedHandler completionHandler)
     {
         switch (dbResult)
         {

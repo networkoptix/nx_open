@@ -257,29 +257,29 @@ bool TestPtzController::getHomeObject(QnPtzObject* homeObject) const
     return false;
 }
 
-bool TestPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool TestPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const nx::core::ptz::Options& options) const
 {
-    if (m_getAuxilaryTraitsExecutor)
-        return m_getAuxilaryTraitsExecutor(auxilaryTraits, options);
+    if (m_getAuxiliaryTraitsExecutor)
+        return m_getAuxiliaryTraitsExecutor(auxiliaryTraits, options);
 
-    if (m_predefinedAuxilaryTraits != std::nullopt)
+    if (m_predefinedAuxiliaryTraits != std::nullopt)
     {
-        *auxilaryTraits = *m_predefinedAuxilaryTraits;
+        *auxiliaryTraits = *m_predefinedAuxiliaryTraits;
         return true;
     }
 
     return false;
 }
 
-bool TestPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool TestPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
-    if (m_runAuxilaryCommandExecutor)
-        return m_runAuxilaryCommandExecutor(trait, data, options);
+    if (m_runAuxiliaryCommandExecutor)
+        return m_runAuxiliaryCommandExecutor(trait, data, options);
 
     return false;
 }
@@ -341,9 +341,9 @@ void TestPtzController::setHomeObject(std::optional<QnPtzObject> activeObject)
     m_predefinedHomeObject = std::move(activeObject);
 }
 
-void TestPtzController::setAuxilaryTraits(std::optional<QnPtzAuxilaryTraitList> traits)
+void TestPtzController::setAuxiliaryTraits(std::optional<QnPtzAuxiliaryTraitList> traits)
 {
-    m_predefinedAuxilaryTraits = std::move(traits);
+    m_predefinedAuxiliaryTraits = std::move(traits);
 }
 
 void TestPtzController::setData(std::optional<QnPtzData> data)

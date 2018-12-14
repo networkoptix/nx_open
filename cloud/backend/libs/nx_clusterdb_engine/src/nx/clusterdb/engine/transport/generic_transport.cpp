@@ -12,7 +12,7 @@ static constexpr int kMaxTransactionsPerIteration = 17;
 
 GenericTransport::GenericTransport(
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* const transactionLog,
+    CommandLog* const transactionLog,
     const OutgoingCommandFilter& outgoingCommandFilter,
     const std::string& systemId,
     const ConnectionRequestAttributes& connectionRequestAttributes,
@@ -24,7 +24,7 @@ GenericTransport::GenericTransport(
     m_localPeer(localPeer),
     m_remotePeer(connectionRequestAttributes.remotePeer),
     m_commandPipeline(std::move(commandPipeline)),
-    m_transactionLogReader(std::make_unique<TransactionLogReader>(
+    m_transactionLogReader(std::make_unique<CommandLogReader>(
         transactionLog,
         systemId.c_str(),
         connectionRequestAttributes.remotePeer.dataFormat,
@@ -90,15 +90,15 @@ std::string GenericTransport::connectionGuid() const
     return m_commandPipeline->connectionGuid();
 }
 
-const TransactionTransportHeader& 
+const CommandTransportHeader& 
     GenericTransport::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransportHeaderOfRemoteTransaction;
 }
 
 void GenericTransport::sendTransaction(
-    TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
+    CommandTransportHeader transportHeader,
+    const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer)
 {
     transportHeader.vmsTransportHeader.fillSequence(
         m_localPeer.id,
@@ -143,7 +143,7 @@ void GenericTransport::start()
         m_localPeer.id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
 
-    TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+    CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers << m_remotePeer.id;
     transportHeader.vmsTransportHeader.processedPeers << m_localPeer.id;
 
@@ -172,7 +172,7 @@ void GenericTransport::processConnectionClosedEvent(
 void GenericTransport::processCommandData(
     Qn::SerializationFormat dataFormat,
     const QByteArray& serializedCommand,
-    TransactionTransportHeader transportHeader)
+    CommandTransportHeader transportHeader)
 {
     auto commandData = TransactionDeserializer::deserialize(
         dataFormat,
@@ -213,7 +213,7 @@ bool GenericTransport::isHandshakeCommand(int commandType) const
 }
 
 void GenericTransport::processHandshakeCommand(
-    TransactionTransportHeader transportHeader,
+    CommandTransportHeader transportHeader,
     std::unique_ptr<DeserializableCommandData> commandData)
 {
     if (commandData->header().command == command::TranSyncRequest::code)
@@ -235,7 +235,7 @@ void GenericTransport::processHandshakeCommand(
         m_localPeer.id);
     tranSyncResponse.params.result = 0;
 
-    TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+    CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers.insert(
         m_localPeer.id);
 
@@ -283,7 +283,7 @@ void GenericTransport::onTransactionsReadFromLog(
     // Posting transactions to send
     for (auto& tranData: serializedTransactions)
     {
-        TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+        CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
         transportHeader.systemId = m_systemId;
         transportHeader.vmsTransportHeader.distance = 1;
         transportHeader.vmsTransportHeader.processedPeers.insert(
@@ -336,7 +336,7 @@ void GenericTransport::enableOutputChannel()
             m_localPeer.id);
         tranSyncDone.params.result = 0;
 
-        TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+        CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
         transportHeader.vmsTransportHeader.processedPeers.insert(
             m_localPeer.id);
 

@@ -35,7 +35,7 @@ public:
     virtual QString defaultCodec() const override;
 
     virtual CameraDiagnostics::Result initializeMedia(
-        const CapabilitiesResp& onvifCapabilities) override;
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities) override;
 
     virtual CameraDiagnostics::Result customStreamConfiguration(
         Qn::ConnectionRole role) override;

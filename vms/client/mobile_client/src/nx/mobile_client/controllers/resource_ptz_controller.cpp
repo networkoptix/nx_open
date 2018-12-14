@@ -38,7 +38,7 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
         {
             if (fields.testFlag(Qn::CapabilitiesPtzField))
                 emit capabilitiesChanged();
-            if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
+            if (fields.testFlag(Qn::AuxiliaryTraitsPtzField))
                 emit auxTraitsChanged();
             if (fields.testFlag(Qn::PresetsPtzField))
                 emit presetsCountChanged();
@@ -88,8 +88,8 @@ bool ResourcePtzController::available() const
 
 Ptz::Traits ResourcePtzController::auxTraits() const
 {
-    QnPtzAuxilaryTraitList traits;
-    if (!getAuxilaryTraits(&traits, {nx::core::ptz::Type::operational}))
+    QnPtzAuxiliaryTraitList traits;
+    if (!getAuxiliaryTraits(&traits, {nx::core::ptz::Type::operational}))
         return Ptz::NoPtzTraits;
 
     Ptz::Traits result = Ptz::NoPtzTraits;
@@ -182,7 +182,7 @@ int ResourcePtzController::indexOfPreset(const QString& id) const
 bool ResourcePtzController::setAutoFocus()
 {
     return auxTraits().testFlag(Ptz::ManualAutoFocusPtzTrait)
-        && runAuxilaryCommand(
+        && runAuxiliaryCommand(
             Ptz::ManualAutoFocusPtzTrait,
             QString(),
             {nx::core::ptz::Type::operational});

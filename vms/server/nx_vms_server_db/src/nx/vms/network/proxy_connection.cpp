@@ -422,6 +422,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 			return false;
 	}
 
+    if (!dstRoute.id.isNull() && commonModule()->globalSettings()->isTrafficEncriptionForced())
+        dstUrl.setScheme("https");
+
 	if (!dstRoute.addr.isNull())
 	{
 		if (!dstRoute.gatewayId.isNull())

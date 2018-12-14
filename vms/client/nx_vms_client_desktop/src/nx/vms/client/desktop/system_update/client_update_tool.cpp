@@ -39,6 +39,8 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ClientUpdateTool::atDownloadFailed);
+
+    m_downloader->startDownloads();
 }
 
 ClientUpdateTool::~ClientUpdateTool()
@@ -59,14 +61,14 @@ void ClientUpdateTool::setState(State newState)
     emit updateStateChanged((int)m_state, 0);
 }
 
-void ClientUpdateTool::setError(QString error)
+void ClientUpdateTool::setError(const QString& error)
 {
     m_state = State::error;
     m_lastError = error;
     emit updateStateChanged((int)m_state, 0);
 }
 
-void ClientUpdateTool::setApplauncherError(QString error)
+void ClientUpdateTool::setApplauncherError(const QString& error)
 {
     m_state = State::applauncherError;
     m_lastError = error;
@@ -97,7 +99,7 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     return m_remoteUpdateInfoRequest.get_future();
 }
 
-void ClientUpdateTool::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
+void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
     m_peerManager->setServerUrl(serverUrl, serverId);
@@ -180,6 +182,7 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
         info.url = m_clientPackage.url;
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
+        m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
         QString file =  m_downloader->filePath(m_clientPackage.file);
 
@@ -255,7 +258,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
-            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+            NX_VERBOSE(this) << "atDownloaderStatusChanged(" << fileInformation.name
                 << ") - finally downloaded file to" << m_downloader->filePath(fileInformation.name);
             setState(State::readyInstall);
             break;

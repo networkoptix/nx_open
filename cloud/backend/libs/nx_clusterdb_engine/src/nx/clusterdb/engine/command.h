@@ -39,6 +39,7 @@ public:
     }
 };
 
-using CommandTransportHeader = ::ec2::QnTransactionTransportHeader;
+// TODO: #ak Remove this type.
+using VmsTransportHeader = ::ec2::QnTransactionTransportHeader;
 
 } // namespace nx::clusterdb::engine

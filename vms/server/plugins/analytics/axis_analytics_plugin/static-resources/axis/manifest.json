@@ -1,62 +1,47 @@
 {
     "capabilities": "deviceModelDependent",
     "allowedTopics": [
-        "tns1:RuleEngine", 
-        "tns1:VideoSource", 
+        "tns1:RuleEngine",
+        "tns1:VideoSource",
         "tnsaxis:CameraApplicationPlatform"
-    ], 
+    ],
     "forbiddenDescriptions": [
         "xinternal_data"
-    ], 
+    ],
     "eventTypes": [
         {
-            "id": "nx.axis.tns1:VideoSource/tnsaxis:Tampering", 
-            "name": {
-                "value": "Camera tampering", 
-                "localization": {}
-            }, 
-            "internalName": "tns1:VideoSource/tnsaxis:Tampering", 
-            "flags": "noFlags", 
+            "id": "nx.axis.tns1:VideoSource/tnsaxis:Tampering",
+            "name": "Camera tampering",
+            "internalName": "tns1:VideoSource/tnsaxis:Tampering",
+            "flags": "noFlags",
             "source": "Axis P1405-E"
-        }, 
+        },
         {
-            "id": "nx.axis.tns1:VideoSource/GlobalSceneChange/ImagingService", 
-            "name": {
-                "value": "ImagingService", 
-                "localization": {}
-            }, 
-            "flags": "stateDependent", 
-            "internalName": "tns1:VideoSource/GlobalSceneChange/ImagingService", 
+            "id": "nx.axis.tns1:VideoSource/GlobalSceneChange/ImagingService",
+            "name": "ImagingService",
+            "flags": "stateDependent",
+            "internalName": "tns1:VideoSource/GlobalSceneChange/ImagingService",
             "source": "Axis P1405-E"
-        }, 
+        },
         {
-            "id": "nx.axis.tns1:VideoSource/tnsaxis:DayNightVision", 
-            "name": {
-                "value": "Day night vision", 
-                "localization": {}
-            }, 
-            "flags": "noFlags", 
-            "internalName": "tns1:VideoSource/tnsaxis:DayNightVision", 
+            "id": "nx.axis.tns1:VideoSource/tnsaxis:DayNightVision",
+            "name": "Day night vision",
+            "flags": "noFlags",
+            "internalName": "tns1:VideoSource/tnsaxis:DayNightVision",
             "source": "Axis P1405-E"
-        }, 
+        },
         {
-            "id": "nx.axis.tns1:RuleEngine/tnsaxis:CrossLineDetection/timer", 
-            "name": {
-                "value": "timer", 
-                "localization": {}
-            }, 
-            "flags": "noFlags", 
-            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/timer", 
+            "id": "nx.axis.tns1:RuleEngine/tnsaxis:CrossLineDetection/timer",
+            "name": "timer",
+            "flags": "noFlags",
+            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/timer",
             "source": "Axis P1405-E"
-        }, 
+        },
         {
-            "id": "nx.axis.tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched", 
-            "name": {
-                "value": "linetouched", 
-                "localization": {}
-            }, 
-            "flags": "noFlags", 
-            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched", 
+            "id": "nx.axis.tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched",
+            "name": "linetouched",
+            "flags": "noFlags",
+            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched",
             "source": "Axis P1405-E"
         }
     ]

@@ -15,7 +15,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.1",
+    "version": "1.0.1.2",
     "data": [
         {
             "keys": ["Hanwha|*"],
@@ -188,7 +188,7 @@
         {
             "keys": [
                 "ActiveCam|*",
-                "ACTI|B915", 
+                "ACTI|B915",
                 "*|ACTi-915"
             ],
             "forceONVIF": true
@@ -808,7 +808,7 @@
                 "VISTA|VK2-3MPBIR28V12re",
                 "VISTA|VK2-3MPVRDIR28V12re"
             ],
-            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxiliaryPtzCapability"
         },
         {
             "keys": [
@@ -872,7 +872,7 @@
                 "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
-            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxiliaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
@@ -2031,9 +2031,9 @@
         },
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR", 
-                "DigitalWatchdog|DWC-MD85DiA", 
-                "DigitalWatchdog|DWC-MV85DiA", 
+                "Digital_Watchdog|DWC-PF5M1TIR",
+                "DigitalWatchdog|DWC-MD85DiA",
+                "DigitalWatchdog|DWC-MV85DiA",
                 "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
@@ -2921,7 +2921,7 @@
         {
             "keys": ["UNIVIEW|*"],
             "needToReloadAllAdvancedParametersAfterApply": true
-        },	
+        },
         {
             "keys": [
                 "*|DS-7332HUHI-K4"
@@ -2961,6 +2961,88 @@
                     "ProfileToken031",
                     "ProfileToken032"
                 ]
+            }
+        },
+        {
+            "keys": ["Hanwha|PNM-9320VQP"],
+            "ptzTargetChannel": 4
+        },
+        {
+            "keys": [
+                "VIVOTEK|SD9365*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                        "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Videotec S.p.A.|UCHD-30x-VT"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  90, -85]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                        "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+		{
+            "keys": [
+                "VIVOTEK|SD9366*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                        "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
             }
         }
     ]

@@ -173,9 +173,9 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(
-            resource, &QnResource::propertyChanged,
-            this, &ServerPtzControllerPool::at_cameraPropertyChanged,
-            Qt::UniqueConnection);
+            camera.get(), &QnSecurityCamResource::ptzConfigurationChanged,
+            this, &ServerPtzControllerPool::at_ptzConfigurationChanged,
+            (Qt::ConnectionType) (Qt::DirectConnection | Qt::UniqueConnection));
     }
 
     ptz::ControllerWrappingParameters wrappingParameters;
@@ -209,25 +209,17 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     return controller;
 }
 
-void ServerPtzControllerPool::at_cameraPropertyChanged(
-    const QnResourcePtr& resource, const QString& key)
+void ServerPtzControllerPool::at_ptzConfigurationChanged(const QnResourcePtr &resource)
 {
-    const bool isPtzKey = key == ResourcePropertyKey::kUserPreferredPtzPresetType
-        || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
-        || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
-        || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities;
+    if (!resource->isInitialized() || resource->isInitializationInProgress())
+        return;
 
-    if (isPtzKey)
-    {
-        // Camera reinitialization is required.
-        NX_DEBUG(
-            this,
-            lm("Native presets support has been changed for the resource %1 (%2). "
-               "Reinitializing")
-                .args(resource->getName(), resource->getId()));
+    NX_DEBUG(
+        this,
+        lm("PTZ configuration changed for resource %1 (%2), initiate reinitialization")
+            .args(resource->getName(), resource->getId()));
 
-        resource->setStatus(Qn::Offline);
-    }
+    resource->setStatus(Qn::Offline);
 }
 
 void ServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)

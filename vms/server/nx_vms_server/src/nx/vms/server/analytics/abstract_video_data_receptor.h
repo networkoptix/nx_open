@@ -4,7 +4,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <utils/media/frame_info.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx::vms::server::analytics {
 
@@ -13,7 +13,7 @@ namespace nx::vms::server::analytics {
 class AbstractVideoDataReceptor
 {
 public:
-    using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
+    using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
     using NeededUncompressedPixelFormats = std::set<PixelFormat>;
 
     virtual ~AbstractVideoDataReceptor() = default;

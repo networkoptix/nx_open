@@ -6,25 +6,41 @@ namespace nx::media_utils::h263 {
 
 enum class PictureType
 {
-    I,
-    P,
-    B,
+    IPicture,
+    PPicture,
+    PBFrame,
+    BPicture,
+    EIPicture,
+    EPPicture,
+    Reserved,
+    Reserved1,
 };
+
+enum class Format
+{
+    Forbidden = 0,
+    SubQCif = 1,
+    QCif = 2,
+    Cif = 3,
+    Cif4 = 4,
+    Cif16 = 5,
+    Reserved = 6,
+    ExtendedPType = 7,
+};
+
+static bool isKeyFrame(PictureType pictureType)
+{
+    return pictureType == PictureType::IPicture || pictureType == PictureType::Reserved1;
+}
 
 // Implemented 'pictureType' parsing only!
 struct PictureHeader
 {
     bool decode(const uint8_t* data, uint32_t size);
 
-    PictureType pictureType = PictureType::I;
+    PictureType pictureType = PictureType::IPicture;
     uint32_t timestamp = 0;
-    /**
-     * 0  forbidden
-     * 1  sub-QCIF
-     * 10 QCIF
-     * 7  extended PTYPE (PLUSPTYPE)
-     */
-    uint8_t format = 0;
+    Format format = Format::Forbidden;
 };
 
 } // nx::media_utils::h263

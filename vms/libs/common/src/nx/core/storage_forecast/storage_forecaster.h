@@ -6,7 +6,7 @@
 
 namespace nx::core::storage_forecast {
 
-struct CameraData
+struct CameraRecordingSettings
 {
     // These are taken from QnCamRecordingStatsData.
     QString uniqueId;
@@ -17,10 +17,10 @@ struct CameraData
     int maxDays = 0; //< Cached camera 'maxDays' value. maxDays == 0 => record forever.
 };
 
-using AllCameraData = QVector<CameraData>;
+using CameraRecordingSettingsSet = QVector<CameraRecordingSettings>;
 
 // Creates forecast. Sets `archiveDurationSecs` field in forecast structure based
 // on `cameras` and `totalSpace`.
-void doForecast(const AllCameraData& cameras, qint64 totalSpace, QnRecordingStatsReply& forecast);
+void doForecast(const CameraRecordingSettingsSet& cameras, qint64 totalSpace, QnRecordingStatsReply& forecast);
 
 } // namespace nx::core::storage_forecast

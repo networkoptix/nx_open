@@ -17,18 +17,18 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 Provider::Provider(
     const ConnectionManager& connectionManager,
-    IncomingTransactionDispatcher* incomingTransactionDispatcher,
-    OutgoingTransactionDispatcher* outgoingTransactionDispatcher)
+    IncomingCommandDispatcher* incomingCommandDispatcher,
+    OutgoingCommandDispatcher* outgoingTransactionDispatcher)
     :
     m_connectionManager(connectionManager),
-    m_incomingTransactionDispatcher(incomingTransactionDispatcher),
+    m_incomingTransactionDispatcher(incomingCommandDispatcher),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_incomingTransactionPerMinuteCalculator(std::chrono::minutes(1)),
     m_outgoingTransactionPerMinuteCalculator(std::chrono::minutes(1))
 {
     using namespace std::placeholders;
 
-    m_incomingTransactionDispatcher->watchTransactionSubscription().subscribe(
+    m_incomingTransactionDispatcher->watchCommandSubscription().subscribe(
         std::bind(&Provider::updateIncomingTransactionStatistics, this),
         &m_incomingTransactionSubscriptionId);
 
@@ -42,7 +42,7 @@ Provider::~Provider()
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()
         .removeSubscription(m_outgoingTransactionSubscriptionId);
 
-    m_incomingTransactionDispatcher->watchTransactionSubscription()
+    m_incomingTransactionDispatcher->watchCommandSubscription()
         .removeSubscription(m_incomingTransactionSubscriptionId);
 }
 

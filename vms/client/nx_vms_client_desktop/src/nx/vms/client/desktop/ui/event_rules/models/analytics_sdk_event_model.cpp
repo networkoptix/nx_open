@@ -125,7 +125,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             if (!groupId.isEmpty() && pluginNode.groups.contains(groupId))
                 parentItem = pluginNode.groups.value(groupId);
 
-            addItem(parentItem, descriptor.item.name.value, pluginId, descriptor.getId());
+            addItem(parentItem, descriptor.item.name, pluginId, descriptor.getId());
         }
     }
 

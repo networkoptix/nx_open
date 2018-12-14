@@ -68,8 +68,9 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
 
 void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    if (m_connection) {
-        /* Safety check in case connection will not be deleted instantly. */
+    if (m_connection)
+    {
+        // Safety check in case connection will not be deleted instantly.
         m_connection->stopReceivingNotifications();
         qnSyncTime->setTimeNotificationManager(nullptr);
         disconnectFromConnection(m_connection);
@@ -729,9 +730,10 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
     eventRuleManager()->removeRule(id);
 }
 
-void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::AbstractActionPtr& /* businessAction */ )
+void QnCommonMessageProcessor::on_businessActionBroadcasted(
+    const vms::event::AbstractActionPtr& /*businessAction*/)
 {
-    // nothing to do for a while
+    // Nothing to do for a while.
 }
 
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
@@ -758,7 +760,7 @@ void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& re
 
 void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 {
-    /* Store all remote resources id to clean them if they are not in the list anymore. */
+    // Store all remote resources id to clean them if they are not in the list anymore.
     QHash<QnUuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr &resource: resourcePool()->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
@@ -772,7 +774,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
             }
         };
 
-    /* Packet adding. */
+    // Packet adding.
     resourcePool()->beginTran();
 
     updateResources(fullData.users);
@@ -787,7 +789,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 
     resourcePool()->commit();
 
-    /* Remove absent resources. */
+    // Remove absent resources.
     for (const QnResourcePtr& resource: remoteResources)
         resourcePool()->removeResource(resource);
 }
@@ -880,10 +882,10 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList(
 void QnCommonMessageProcessor::resetPropertyList(
     const ResourceParamWithRefDataList& params)
 {
-    /* Store existing parameter keys. */
+    // Store existing parameter keys.
     auto existingProperties = propertyDictionary()->allPropertyNamesByResource();
 
-    /* Update changed values. */
+    // Update changed values.
     for (const auto& param: params)
     {
         on_resourceParamChanged(param);
@@ -891,7 +893,7 @@ void QnCommonMessageProcessor::resetPropertyList(
             existingProperties[param.resourceId].remove(param.name);
     }
 
-    /* Clean values that are not in the list anymore. */
+    // Clean values that are not in the list anymore.
     for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter)
     {
         QnUuid resourceId = iter.key();
@@ -1019,8 +1021,11 @@ void QnCommonMessageProcessor::updateResource(
             nx::vms::api::AnalyticsPluginData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsPluginResource>();
 
-    if (!NX_ASSERT(pluginResource, "Unable to create plugin resource."))
+    if (!pluginResource)
+    {
+        NX_DEBUG(this, "Unable to create plugin resource.");
         return;
+    }
 
     ec2::fromApiToResource(analyticsPluginData, pluginResource);
     updateResource(pluginResource, source);
@@ -1040,8 +1045,11 @@ void QnCommonMessageProcessor::updateResource(
             nx::vms::api::AnalyticsEngineData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsEngineResource>();
 
-    if (!NX_ASSERT(engineResource, "Unable to create engine resource."))
+    if (!engineResource)
+    {
+        NX_DEBUG(this, "Unable to create engine resource.");
         return;
+    }
 
     ec2::fromApiToResource(analyticsEngineData, engineResource);
     updateResource(engineResource, source);

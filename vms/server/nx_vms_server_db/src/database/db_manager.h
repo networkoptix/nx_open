@@ -668,7 +668,6 @@ namespace detail
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const nx::vms::api::UserData& data, qint32 internalId);
-        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
         ErrorCode insertOrReplaceUserRole(const nx::vms::api::UserRoleData& data);
         ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const nx::vms::api::AccessRightsData& data);
@@ -870,6 +869,7 @@ namespace detail
         ec2::database::api::QueryCache m_insertCameraScheduleQuery;
         ec2::database::api::QueryCache m_insertKvPairQuery;
         ec2::database::api::QueryContext m_resourceQueries;
+        ec2::database::api::QueryCache m_changeStatusQuery;
     };
 
     class PersistentStorage : public AbstractPersistentStorage

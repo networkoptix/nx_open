@@ -148,7 +148,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qt::DisplayRole:
         {
             const auto fallbackTitle =
-                [this, typeId = object.objectTypeId]()
+                [typeId = object.objectTypeId]()
                 {
                     return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
                 };
@@ -166,9 +166,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectTypeDescriptor)
                 return fallbackTitle();
 
-            return objectTypeDescriptor->item.name.value.isEmpty()
+            return objectTypeDescriptor->item.name.isEmpty()
                 ? fallbackTitle()
-                : objectTypeDescriptor->item.name.value;
+                : objectTypeDescriptor->item.name;
         }
 
         case Qt::DecorationRole:
@@ -244,6 +244,20 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
     m_filterText = value;
 }
 
+QString AnalyticsSearchListModel::Private::selectedObjectType() const
+{
+    return m_selectedObjectType;
+}
+
+void AnalyticsSearchListModel::Private::setSelectedObjectType(const QString& value)
+{
+    if (m_selectedObjectType == value)
+        return;
+
+    q->clear();
+    m_selectedObjectType = value;
+}
+
 void AnalyticsSearchListModel::Private::clearData()
 {
     ScopedReset reset(q, !m_data.empty());
@@ -260,7 +274,7 @@ void AnalyticsSearchListModel::Private::truncateToMaximumCount()
             m_objectIdToTimestamp.remove(object.objectAppearanceId);
         };
 
-    this->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
+    q->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
 }
 
 void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
@@ -271,8 +285,8 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
             m_objectIdToTimestamp.remove(object.objectAppearanceId);
         };
 
-    this->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+    q->truncateDataToTimePeriod(
+        m_data, &startTime, q->relevantTimePeriod(), itemCleanup);
 }
 
 bool AnalyticsSearchListModel::Private::isCameraApplicable(
@@ -281,11 +295,6 @@ bool AnalyticsSearchListModel::Private::isCameraApplicable(
     // TODO: #vkutin Implement it when it's possible!
     NX_ASSERT(camera);
     return true;
-}
-
-bool AnalyticsSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -403,6 +412,9 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.maxObjectsToSelect = limit;
     request.freeText = m_filterText;
 
+    if (!m_selectedObjectType.isEmpty())
+        request.objectTypeId = {m_selectedObjectType};
+
     request.boundingBox = q->cameraSet()->type() == ManagedCameraSet::Type::single
         ? m_filterRect
         : QRectF();
@@ -481,7 +493,7 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
 void AnalyticsSearchListModel::Private::processMetadata()
 {
     // Don't start receiving live data until first archive fetch is finished.
-    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || canFetch()))
+    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || q->canFetchMore()))
         return;
 
     // Completely stop metadata reception if paused.
@@ -756,7 +768,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
         for (const auto& actionDescriptor: descriptors)
         {
-            const auto name = actionDescriptor.item.name.value;
+            const auto name = actionDescriptor.item.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
                 [this, actionDescriptor, object, pluginId = pluginId]()
                 {

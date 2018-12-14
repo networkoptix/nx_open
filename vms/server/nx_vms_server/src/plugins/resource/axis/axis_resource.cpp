@@ -1640,7 +1640,6 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
     bool& isSuccessful) const
 {
     QMap<QString, QString> result;
-    CLHttpStatus status;
     isSuccessful = true;
 
     for (const auto& query: queries)

@@ -74,7 +74,7 @@ private:
     void setDeviceAdded(const QString& uniqueId);
     void handleDeviceRemoved(const QString& uniqueId);
 
-    int port() const;
+    std::optional<int> port() const;
     QString password() const;
     QString login() const;
     QString progressMessage() const;
@@ -95,8 +95,8 @@ private:
     AddingDevicesSet m_addingDevices;
     bool m_addressEditing;
 
-    nx::common::utils::Credentials m_knownAddressCredentials;
-    nx::common::utils::Credentials m_subnetScanCredentials;
+    nx::vms::common::Credentials m_knownAddressCredentials;
+    nx::vms::common::Credentials m_subnetScanCredentials;
 };
 
 } // namespace nx::vms::client::desktop

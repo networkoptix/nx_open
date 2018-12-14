@@ -1,7 +1,7 @@
 #include "frame_converter.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/sdk/analytics/pixel_format.h>
+#include <nx/sdk/analytics/common/pixel_format.h>
 #include <nx/vms/server/analytics/generic_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/yuv420_uncompressed_video_frame.h>
 
@@ -10,7 +10,7 @@ namespace vms::server {
 namespace analytics {
 
 using namespace nx::sdk::analytics;
-using PixelFormat = UncompressedVideoFrame::PixelFormat;
+using PixelFormat = IUncompressedVideoFrame::PixelFormat;
 
 /**
  * Converts rgb-like pixel formats. Asserts that pixelFormat is a supported RGB-based format.
@@ -28,12 +28,13 @@ static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat)
 
         default:
             NX_ASSERT(false, lm("Unsupported PixelFormat \"%1\" = %2").args(
-                pixelFormatToStdString(pixelFormat), (int) pixelFormat));
+                nx::sdk::analytics::common::pixelFormatToStdString(pixelFormat),
+                (int) pixelFormat));
             return AV_PIX_FMT_NONE;
     }
 }
 
-static UncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutput(
+static IUncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutput(
     const CLConstVideoDecoderOutputPtr& frame,
     PixelFormat pixelFormat)
 {
@@ -61,7 +62,7 @@ static UncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutpu
         std::move(data), std::move(lineSize));
 }
 
-DataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat)
+IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat)
 {
     if (!pixelFormat)
     {
@@ -84,7 +85,7 @@ DataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat
         {
             auto insertResult = m_uncompressedFrames.emplace(
                 *pixelFormat,
-                nxpt::ScopedRef<UncompressedVideoFrame>(
+                nxpt::ScopedRef<IUncompressedVideoFrame>(
                     createUncompressedVideoFrameFromVideoDecoderOutput(
                         uncompressedFrame, *pixelFormat),
                     /*increaseRef*/ false));

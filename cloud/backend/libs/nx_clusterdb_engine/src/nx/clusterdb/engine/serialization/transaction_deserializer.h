@@ -74,7 +74,7 @@ public:
     const CommandHeader& header() const;
 
     template<typename CommandDescriptor>
-    std::unique_ptr<SerializableTransaction<CommandDescriptor>>
+    std::unique_ptr<SerializableCommand<CommandDescriptor>>
         deserialize(int commandFormatVersion) const;
 
 private:
@@ -83,17 +83,17 @@ private:
     std::unique_ptr<TransactionUbjsonDataSource> m_ubjsonData;
 
     template<typename CommandDescriptor>
-    std::unique_ptr<SerializableTransaction<CommandDescriptor>> deserializeJsonData() const;
+    std::unique_ptr<SerializableCommand<CommandDescriptor>> deserializeJsonData() const;
 
     template<typename CommandDescriptor>
-    std::unique_ptr<SerializableTransaction<CommandDescriptor>>
+    std::unique_ptr<SerializableCommand<CommandDescriptor>>
         deserializeUbjsonData(int commandFormatVersion) const;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 template<typename CommandDescriptor>
-std::unique_ptr<SerializableTransaction<CommandDescriptor>>
+std::unique_ptr<SerializableCommand<CommandDescriptor>>
     DeserializableCommandData::deserialize(int commandFormatVersion) const
 {
     NX_ASSERT(m_commandHeader.command == CommandDescriptor::code);
@@ -107,7 +107,7 @@ std::unique_ptr<SerializableTransaction<CommandDescriptor>>
 }
 
 template<typename CommandDescriptor>
-std::unique_ptr<SerializableTransaction<CommandDescriptor>>
+std::unique_ptr<SerializableCommand<CommandDescriptor>>
     DeserializableCommandData::deserializeJsonData() const
 {
     using SpecificCommand = Command<typename CommandDescriptor::Data>;
@@ -116,12 +116,12 @@ std::unique_ptr<SerializableTransaction<CommandDescriptor>>
     if (!QJson::deserialize((*m_jsonData)["params"], &command.params))
         return nullptr;
 
-    return std::make_unique<SerializableTransaction<CommandDescriptor>>(
+    return std::make_unique<SerializableCommand<CommandDescriptor>>(
         std::move(command));
 }
 
 template<typename CommandDescriptor>
-std::unique_ptr<SerializableTransaction<CommandDescriptor>>
+std::unique_ptr<SerializableCommand<CommandDescriptor>>
     DeserializableCommandData::deserializeUbjsonData(int commandFormatVersion) const
 {
     using SpecificCommand = Command<typename CommandDescriptor::Data>;

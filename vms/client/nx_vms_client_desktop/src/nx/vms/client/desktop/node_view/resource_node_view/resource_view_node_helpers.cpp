@@ -8,6 +8,7 @@
 
 #include <common/common_module.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <client_core/client_core_module.h>
 #include <ui/style/resource_icon_cache.h>
@@ -40,6 +41,29 @@ ViewNodeData getResourceNodeData(
     return data;
 }
 
+ViewNodeData getGroupNodeData(
+    const QnVirtualCameraResourcePtr& cameraResource,
+    const QString& extraText,
+    bool checkable)
+{
+    const QIcon icon = cameraResource->isMultiSensorCamera()
+        ? qnResIconCache->icon(QnResourceIconCache::MultisensorCamera)
+        : qnResIconCache->icon(QnResourceIconCache::Recorder);
+
+    auto data = ViewNodeDataBuilder()
+        .withText(resourceNameColumn, cameraResource->getUserDefinedGroupName())
+        .withIcon(resourceNameColumn, icon)
+        .data();
+
+    if (checkable)
+        ViewNodeDataBuilder(data).withCheckedState(resourceCheckColumn, Qt::Unchecked);
+
+    if (!extraText.isEmpty())
+        data.setData(resourceNameColumn, resourceExtraTextRole, extraText);
+
+    return data;
+}
+
 bool isCheckedResourceNode(const NodePtr& node)
 {
     return node->data(resourceCheckColumn, Qt::CheckStateRole)
@@ -58,6 +82,16 @@ NodePtr createResourceNode(
 {
     return resource
         ? ViewNode::create(getResourceNodeData(resource, extraText, checkable))
+        : NodePtr();
+}
+
+NodePtr createGroupNode(
+    const QnVirtualCameraResourcePtr& resource,
+    const QString& extraText,
+    bool checkable)
+{
+    return resource
+        ? ViewNode::create(getGroupNodeData(resource, extraText, checkable))
         : NodePtr();
 }
 

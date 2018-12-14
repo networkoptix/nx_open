@@ -11,7 +11,7 @@
 #include "../transaction_log_reader.h"
 #include "../transaction_transport_header.h"
 
-namespace nx::clusterdb::engine { class TransactionLog; }
+namespace nx::clusterdb::engine { class CommandLog; }
 
 namespace nx::clusterdb::engine::transport {
 
@@ -28,7 +28,7 @@ class GenericTransport:
 public:
     GenericTransport(
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* const transactionLog,
+        CommandLog* const transactionLog,
         const OutgoingCommandFilter& outgoingCommandFilter,
         const std::string& systemId,
         const ConnectionRequestAttributes& connectionRequestAttributes,
@@ -47,11 +47,11 @@ public:
 
     virtual std::string connectionGuid() const override;
 
-    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
+    virtual const CommandTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
 
     virtual void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) override;
 
     virtual void start() override;
 
@@ -76,8 +76,8 @@ private:
      */
     vms::api::TranState m_remotePeerTranState;
     bool m_haveToSendSyncDone = false;
-    std::unique_ptr<TransactionLogReader> m_transactionLogReader;
-    TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
+    std::unique_ptr<CommandLogReader> m_transactionLogReader;
+    CommandTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     ConnectionClosedSubscription m_connectionClosedSubscription;
     CommandHandler m_gotCommandHandler;
 
@@ -86,12 +86,12 @@ private:
     void processCommandData(
         Qn::SerializationFormat serializationFormat,
         const QByteArray& serializedCommand,
-        TransactionTransportHeader transportHeader);
+        CommandTransportHeader transportHeader);
 
     bool isHandshakeCommand(int commandType) const;
 
     void processHandshakeCommand(
-        TransactionTransportHeader transportHeader,
+        CommandTransportHeader transportHeader,
         std::unique_ptr<DeserializableCommandData> commandData);
 
     void processHandshakeCommand(

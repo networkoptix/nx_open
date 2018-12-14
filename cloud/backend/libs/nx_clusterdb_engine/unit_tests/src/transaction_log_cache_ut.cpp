@@ -10,13 +10,13 @@
 namespace nx::clusterdb::engine {
 namespace test {
 
-class TransactionLogCache:
+class CommandLogCache:
     public ::testing::Test
 {
 public:
-    using TranId = VmsTransactionLogCache::TranId;
+    using TranId = engine::CommandLogCache::TranId;
 
-    TransactionLogCache():
+    CommandLogCache():
         m_systemId(QnUuid::createUuid().toSimpleByteArray()),
         m_peerId(QnUuid::createUuid().toSimpleByteArray()),
         m_dbId(QnUuid(m_systemId))
@@ -129,7 +129,7 @@ protected:
         assertEqual(m_committedData, m_cache);
     }
 
-    VmsTransactionLogCache& cache()
+    engine::CommandLogCache& cache()
     {
         return m_cache;
     }
@@ -160,7 +160,7 @@ private:
         }
     };
 
-    VmsTransactionLogCache m_cache;
+    engine::CommandLogCache m_cache;
     const std::string m_systemId;
     const std::string m_peerId;
     const QnUuid m_dbId;
@@ -194,7 +194,7 @@ private:
         m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
     }
 
-    void assertEqual(const CacheState& cacheState, const VmsTransactionLogCache& cache)
+    void assertEqual(const CacheState& cacheState, const engine::CommandLogCache& cache)
     {
         ASSERT_EQ(cacheState.timestampSequence, cache.committedTimestampSequence());
     }
@@ -202,7 +202,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(TransactionLogCache, commit_saves_data)
+TEST_F(CommandLogCache, commit_saves_data)
 {
     auto tranId = beginTran();
     modifyDataUnderTran(tranId);
@@ -211,7 +211,7 @@ TEST_F(TransactionLogCache, commit_saves_data)
     assertCommittedDataIsVisible();
 }
 
-TEST_F(TransactionLogCache, transaction_isolation)
+TEST_F(CommandLogCache, transaction_isolation)
 {
     auto tran1Id = beginTran();
     auto tran2Id = beginTran();
@@ -222,7 +222,7 @@ TEST_F(TransactionLogCache, transaction_isolation)
     assertCommittedDataIsVisible();
 }
 
-TEST_F(TransactionLogCache, rollback)
+TEST_F(CommandLogCache, rollback)
 {
     auto tranId = beginTran();
     modifyDataUnderTran(tranId);
@@ -231,7 +231,7 @@ TEST_F(TransactionLogCache, rollback)
     assertStateHasNotBeenChanged();
 }
 
-TEST_F(TransactionLogCache, transaction_pipelining)
+TEST_F(CommandLogCache, transaction_pipelining)
 {
     beginMultipleTransactions();
 
@@ -242,13 +242,13 @@ TEST_F(TransactionLogCache, transaction_pipelining)
     assertCacheStateIsValid();
 }
 
-TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transaction)
+TEST_F(CommandLogCache, timestamp_sequence_is_updated_by_external_transaction)
 {
     saveTransactionWithGreaterTimestampSequence();
     assertGreaterSequenceIsApplied();
 }
 
-TEST_F(TransactionLogCache, timestamp_is_not_decreasing)
+TEST_F(CommandLogCache, timestamp_is_not_decreasing)
 {
     givenCacheWithNonZeroTimestampSequence();
 

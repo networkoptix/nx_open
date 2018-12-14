@@ -21,6 +21,7 @@ public:
     void setSelectedSubType(const QString& value);
 
     virtual bool isConstrained() const override;
+    virtual bool hasAccessRights() const override;
 
 private:
     class Private;

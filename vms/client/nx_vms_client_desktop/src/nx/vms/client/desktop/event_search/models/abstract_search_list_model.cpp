@@ -75,9 +75,24 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 {
-    return parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later)
-        ? false
-        : canFetch();
+    if (parent.isValid()
+        || (!m_offlineAllowed && !m_isOnline)
+        || (isLive() && fetchDirection() == FetchDirection::later)
+        || m_relevantTimePeriod.isEmpty()
+        || !canFetchNow()
+        || !hasAccessRights())
+    {
+        return false;
+    }
+
+    if (m_fetchedTimeWindow.isEmpty())
+        return true;
+
+    if (fetchDirection() == FetchDirection::earlier)
+        return m_fetchedTimeWindow.startTimeMs > m_relevantTimePeriod.startTimeMs;
+
+    NX_ASSERT(fetchDirection() == FetchDirection::later);
+    return m_fetchedTimeWindow.endTimeMs() < m_relevantTimePeriod.endTimeMs();
 }
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
@@ -88,7 +103,7 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     if (isFilterDegenerate())
     {
         NX_ASSERT(rowCount() == 0);
-        setFetchedTimeWindow(relevantTimePeriod());
+        setFetchedTimeWindow(m_relevantTimePeriod);
         finishFetch(FetchResult::complete);
     }
     else
@@ -97,9 +112,14 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     }
 }
 
+bool AbstractSearchListModel::canFetchNow() const
+{
+    return true;
+}
+
 bool AbstractSearchListModel::isFilterDegenerate() const
 {
-    return relevantTimePeriod().isEmpty()
+    return m_relevantTimePeriod.isEmpty()
         || (cameraSet()->type() != ManagedCameraSet::Type::all && cameras().empty());
 }
 
@@ -131,6 +151,11 @@ bool AbstractSearchListModel::cancelFetch()
 bool AbstractSearchListModel::isConstrained() const
 {
     return m_relevantTimePeriod != QnTimePeriod::anytime();
+}
+
+bool AbstractSearchListModel::hasAccessRights() const
+{
+    return true;
 }
 
 const QnTimePeriod& AbstractSearchListModel::relevantTimePeriod() const
@@ -226,7 +251,18 @@ bool AbstractSearchListModel::liveSupported() const
 
 bool AbstractSearchListModel::effectiveLiveSupported() const
 {
-    return liveSupported() && relevantTimePeriod().isInfinite();
+    return liveSupported() && m_relevantTimePeriod.isInfinite();
+}
+
+void AbstractSearchListModel::setLiveSupported(bool value)
+{
+    if (m_liveSupported == value)
+        return;
+
+    m_liveSupported = value;
+    setLive(m_live && m_liveSupported);
+
+    clear();
 }
 
 bool AbstractSearchListModel::isLive() const
@@ -269,15 +305,18 @@ void AbstractSearchListModel::setLivePaused(bool value)
     emit livePausedChanged(m_livePaused, {});
 }
 
-void AbstractSearchListModel::setLiveSupported(bool value)
+bool AbstractSearchListModel::offlineAllowed() const
 {
-    if (m_liveSupported == value)
+    return m_offlineAllowed;
+}
+
+void AbstractSearchListModel::setOfflineAllowed(bool value)
+{
+    if (m_offlineAllowed == value)
         return;
 
-    m_liveSupported = value;
-    setLive(m_live && m_liveSupported);
-
-    clear();
+    NX_VERBOSE(this, "Setting offline allowed to %1", value);
+    m_offlineAllowed = value;
 }
 
 QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const

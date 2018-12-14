@@ -1,9 +1,12 @@
 #include "system_helpers.h"
 
-#include <nx/utils/log/log.h>
-#include <nx/network/socket_global.h>
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <client_core/client_core_settings.h>
+
+#include <nx/network/socket_global.h>
+
+#include <nx/utils/uuid.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::core {
 namespace helpers {
@@ -27,17 +30,17 @@ void storeConnection(const QnUuid& localSystemId, const QString& systemName, con
 
 void clearSavedPasswords()
 {
-    QnClientCoreSettings::SystemAuthenticationDataHash result;
+    Settings::SystemAuthenticationDataHash result;
 
-    const auto credentialsHash = secureSettings()->systemAuthenticationData();
+    const auto credentialsHash = settings()->systemAuthenticationData();
     for (auto it = credentialsHash.begin(); it != credentialsHash.end(); ++it)
     {
-        QList<QnEncodedCredentials> credentials;
+        QList<nx::vms::common::Credentials> credentials;
         for (const auto& currentCredential: it.value())
-            credentials.append(QnEncodedCredentials(currentCredential.user, QString()));
+            credentials.append({currentCredential.user, QString()});
         result[it.key()] = credentials;
     }
-    secureSettings()->systemAuthenticationData = result;
+    settings()->systemAuthenticationData = result;
 }
 
 void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
@@ -59,20 +62,20 @@ void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
     qnClientCoreSettings->setRecentLocalConnections(connections);
 }
 
-void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials)
+void storeCredentials(const QnUuid& localSystemId, const nx::vms::common::Credentials& credentials)
 {
     NX_DEBUG(kCredentialsLogTag, lm("Saving credentials of %1 to the system %2")
         .args(credentials.user, localSystemId));
 
-    NX_DEBUG(kCredentialsLogTag, credentials.decodedPassword().isEmpty()
+    NX_DEBUG(kCredentialsLogTag, credentials.password.isEmpty()
         ? "Password is empty"
         : "Password is filled");
 
-    auto credentialsHash = secureSettings()->systemAuthenticationData();
+    auto credentialsHash = settings()->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-        [&credentials](const QnEncodedCredentials& other)
+        [&credentials](const auto& other)
         {
             return credentials.user == other.user;
         });
@@ -82,7 +85,7 @@ void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& c
 
     credentialsList.prepend(credentials);
 
-    secureSettings()->systemAuthenticationData = credentialsHash;
+    settings()->systemAuthenticationData = credentialsHash;
 }
 
 void removeCredentials(const QnUuid& localSystemId, const QString& userName)
@@ -90,7 +93,7 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
     NX_DEBUG(kCredentialsLogTag, lm("Removing credentials of %1 to the system %2")
         .args(userName, localSystemId));
 
-    auto credentialsHash = secureSettings()->systemAuthenticationData();
+    auto credentialsHash = settings()->systemAuthenticationData();
 
     if (userName.isEmpty())
     {
@@ -101,7 +104,7 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
         auto& credentialsList = credentialsHash[localSystemId];
 
         auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-            [&userName](const QnEncodedCredentials& other)
+            [&userName](const auto& other)
             {
                 return userName == other.user;
             });
@@ -110,16 +113,16 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
             credentialsList.erase(it);
     }
 
-    secureSettings()->systemAuthenticationData = credentialsHash;
+    settings()->systemAuthenticationData = credentialsHash;
 }
 
-QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName)
+nx::vms::common::Credentials getCredentials(const QnUuid& localSystemId, const QString& userName)
 {
-    auto credentialsHash = secureSettings()->systemAuthenticationData();
+    auto credentialsHash = settings()->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
-    auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-        [&userName](const QnEncodedCredentials& other)
+    const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
+        [&userName](const auto& other)
         {
             return userName == other.user;
         });
@@ -127,12 +130,12 @@ QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& 
     if (it != credentialsList.end())
         return *it;
 
-    return QnEncodedCredentials();
+    return {};
 }
 
 bool hasCredentials(const QnUuid& localSystemId)
 {
-    const auto& credentialsHash = secureSettings()->systemAuthenticationData();
+    const auto& credentialsHash = settings()->systemAuthenticationData();
     return !credentialsHash.value(localSystemId).isEmpty();
 }
 

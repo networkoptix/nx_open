@@ -111,8 +111,6 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     setupTableView(ui->statsTable, m_model);
     setupTableView(ui->forecastTable, m_forecastModel);
 
-    ui->averagingPeriodCombobox->addItem(tr("The last minute"),
-        QVariant::fromValue<qint64>(milliseconds(1min).count()));
     ui->averagingPeriodCombobox->addItem(tr("The last 5 minutes"),
         QVariant::fromValue<qint64>(milliseconds(5min).count()));
     ui->averagingPeriodCombobox->addItem(tr("The last hour"),
@@ -120,7 +118,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->averagingPeriodCombobox->addItem(tr("The last 24 hours"),
         QVariant::fromValue<qint64>(milliseconds(24h).count()));
     ui->averagingPeriodCombobox->addItem(tr("All recorded data"), 0);
-    ui->averagingPeriodCombobox->setCurrentIndex(1); // 5 min.
+    ui->averagingPeriodCombobox->setCurrentIndex(0); // 5 min.
 
     connect(ui->averagingPeriodCombobox, qOverload<int>(&QComboBox::currentIndexChanged),
         this, [this](int) { atAveragingPeriodChanged(); });

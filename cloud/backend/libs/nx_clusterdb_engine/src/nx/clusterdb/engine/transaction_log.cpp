@@ -1,8 +1,6 @@
 #include "transaction_log.h"
 
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
-
+#include <nx/sql/query.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
 
@@ -16,11 +14,11 @@ const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
     std::numeric_limits<int>::max(),
     {}};
 
-TransactionLog::TransactionLog(
+CommandLog::CommandLog(
     const QnUuid& peerId,
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager,
-    AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
+    AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher)
     :
     m_peerId(peerId),
     m_supportedProtocolRange(supportedProtocolRange),
@@ -35,7 +33,7 @@ TransactionLog::TransactionLog(
         throw std::runtime_error("Error loading transaction log from DB");
 }
 
-void TransactionLog::startDbTransaction(
+void CommandLog::startDbTransaction(
     const std::string& systemId,
     nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbOperationsFunc,
     nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> onDbUpdateCompleted)
@@ -55,7 +53,7 @@ void TransactionLog::startDbTransaction(
         std::move(onDbUpdateCompleted));
 }
 
-nx::sql::DBResult TransactionLog::updateTimestampHiForSystem(
+nx::sql::DBResult CommandLog::updateTimestampHiForSystem(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     quint64 newValue)
@@ -70,11 +68,11 @@ nx::sql::DBResult TransactionLog::updateTimestampHiForSystem(
     return nx::sql::DBResult::ok;
 }
 
-nx::sql::DBResult TransactionLog::saveLocalTransaction(
+nx::sql::DBResult CommandLog::saveLocalTransaction(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     const nx::Buffer& transactionHash,
-    std::unique_ptr<SerializableAbstractTransaction> transactionSerializer)
+    std::unique_ptr<SerializableAbstractCommand> transactionSerializer)
 {
     TransactionLogContext* vmsTransactionLogData = nullptr;
 
@@ -110,7 +108,7 @@ nx::sql::DBResult TransactionLog::saveLocalTransaction(
     return nx::sql::DBResult::ok;
 }
 
-CommandHeader TransactionLog::prepareLocalTransactionHeader(
+CommandHeader CommandLog::prepareLocalTransactionHeader(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     int commandCode)
@@ -134,7 +132,7 @@ CommandHeader TransactionLog::prepareLocalTransactionHeader(
     return header;
 }
 
-vms::api::TranState TransactionLog::getTransactionState(
+vms::api::TranState CommandLog::getTransactionState(
     const std::string& systemId) const
 {
     QnMutexLocker lock(&m_mutex);
@@ -144,7 +142,7 @@ vms::api::TranState TransactionLog::getTransactionState(
     return it->second->cache.committedTransactionState();
 }
 
-void TransactionLog::readTransactions(
+void CommandLog::readTransactions(
     const std::string& systemId,
     ReadCommandsFilter filter,
     TransactionsReadHandler completionHandler)
@@ -167,7 +165,7 @@ void TransactionLog::readTransactions(
     auto outputDataPtr = outputData.get();
     m_dbManager->executeSelect(
         std::bind(
-            &TransactionLog::fetchTransactions, this,
+            &CommandLog::fetchTransactions, this,
             _1, systemId, filter, outputDataPtr),
         [completionHandler = std::move(completionHandler), outputData = std::move(outputData)](
             nx::sql::DBResult dbResult)
@@ -181,7 +179,7 @@ void TransactionLog::readTransactions(
         });
 }
 
-void TransactionLog::markSystemForDeletion(const std::string& systemId)
+void CommandLog::markSystemForDeletion(const std::string& systemId)
 {
     NX_VERBOSE(this, lm("Marking system %1 for deletion").arg(systemId));
 
@@ -189,18 +187,18 @@ void TransactionLog::markSystemForDeletion(const std::string& systemId)
     m_systemsMarkedForDeletion.push_back(systemId);
 }
 
-vms::api::Timestamp TransactionLog::generateTransactionTimestamp(
+vms::api::Timestamp CommandLog::generateTransactionTimestamp(
     const std::string& systemId)
 {
     QnMutexLocker lock(&m_mutex);
 
     return generateNewTransactionTimestamp(
         lock,
-        VmsTransactionLogCache::InvalidTranId,
+        CommandLogCache::InvalidTranId,
         systemId);
 }
 
-void TransactionLog::shiftLocalTransactionSequence(
+void CommandLog::shiftLocalTransactionSequence(
     const std::string& systemId,
     int delta)
 {
@@ -210,13 +208,13 @@ void TransactionLog::shiftLocalTransactionSequence(
         delta);
 }
 
-void TransactionLog::setOnTransactionReceived(
+void CommandLog::setOnTransactionReceived(
     OnTransactionReceivedHandler handler)
 {
     m_onTransactionReceivedHandler = std::move(handler);
 }
 
-nx::sql::DBResult TransactionLog::fillCache()
+nx::sql::DBResult CommandLog::fillCache()
 {
     nx::utils::promise<nx::sql::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
@@ -226,7 +224,7 @@ nx::sql::DBResult TransactionLog::fillCache()
     // Starting async operation.
     using namespace std::placeholders;
     m_dbManager->executeSelect(
-        std::bind(&TransactionLog::fetchTransactionState, this, _1),
+        std::bind(&CommandLog::fetchTransactionState, this, _1),
         [&cacheFilledPromise](nx::sql::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
@@ -239,16 +237,15 @@ nx::sql::DBResult TransactionLog::fillCache()
     return future.get();
 }
 
-nx::sql::DBResult TransactionLog::fetchTransactionState(
+nx::sql::DBResult CommandLog::fetchTransactionState(
     nx::sql::QueryContext* queryContext)
 {
     NX_DEBUG(this, lm("Fetching transactions"));
 
     // TODO: #ak move to TransactionDataObject
-    QSqlQuery selectTransactionStateQuery(*queryContext->connection()->qtSqlConnection());
+    nx::sql::SqlQuery selectTransactionStateQuery(queryContext->connection());
     selectTransactionStateQuery.setForwardOnly(true);
-    selectTransactionStateQuery.prepare(
-        R"sql(
+    selectTransactionStateQuery.prepare(R"sql(
         SELECT tl.system_id as system_id,
                tss.timestamp_hi as settings_timestamp_hi,
                peer_guid,
@@ -262,11 +259,15 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
         ORDER BY tl.system_id, timestamp_hi, timestamp DESC
         )sql");
 
-    if (!selectTransactionStateQuery.exec())
+    try
     {
-        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this), lm("Error loading transaction log. %1")
-            .arg(selectTransactionStateQuery.lastError().text()));
-        return nx::sql::DBResult::ioError;
+        selectTransactionStateQuery.exec();
+    }
+    catch (const std::exception& e)
+    {
+        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this),
+            lm("Error loading transaction log. %1").arg(e.what()));
+        throw;
     }
 
     NX_DEBUG(this, lm("Fetched transactions"));
@@ -275,9 +276,9 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     int count = 0;
     while (selectTransactionStateQuery.next())
     {
-        const std::string systemId = selectTransactionStateQuery.value("system_id").toString().toStdString();
-        const nx::String peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toLatin1();
-        const nx::String dbGuid = selectTransactionStateQuery.value("db_guid").toString().toLatin1();
+        const auto systemId = selectTransactionStateQuery.value("system_id").toString().toStdString();
+        const auto peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toStdString();
+        const auto dbGuid = selectTransactionStateQuery.value("db_guid").toString().toStdString();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
         const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
         vms::api::Timestamp timestamp;
@@ -309,7 +310,7 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     return nx::sql::DBResult::ok;
 }
 
-nx::sql::DBResult TransactionLog::fetchTransactions(
+nx::sql::DBResult CommandLog::fetchTransactions(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     const ReadCommandsFilter& filter,
@@ -348,14 +349,15 @@ nx::sql::DBResult TransactionLog::fetchTransactions(
             return dbResult;
     }
 
-    // TODO #ak currentState is not correct here since it can be limited by "to" and "maxTransactionsToReturn"
+    // TODO #ak currentState is not correct here since it can be limited by "to" and 
+    // "maxTransactionsToReturn".
     outputData->state = currentState;
     outputData->resultCode = ResultCode::ok;
 
     return nx::sql::DBResult::ok;
 }
 
-bool TransactionLog::isShouldBeIgnored(
+bool CommandLog::isShouldBeIgnored(
     nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId,
     const CommandHeader& tran,
@@ -370,7 +372,7 @@ bool TransactionLog::isShouldBeIgnored(
     return vmsTransactionLog->cache.isShouldBeIgnored(systemId, tran, hash);
 }
 
-nx::sql::DBResult TransactionLog::saveToDb(
+nx::sql::DBResult CommandLog::saveToDb(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     const CommandHeader& commandHeader,
@@ -397,7 +399,7 @@ nx::sql::DBResult TransactionLog::saveToDb(
     return nx::sql::DBResult::ok;
 }
 
-int TransactionLog::generateNewTransactionSequence(
+int CommandLog::generateNewTransactionSequence(
     const QnMutexLockerBase& lock,
     nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId)
@@ -406,9 +408,9 @@ int TransactionLog::generateNewTransactionSequence(
         vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)));
 }
 
-vms::api::Timestamp TransactionLog::generateNewTransactionTimestamp(
+vms::api::Timestamp CommandLog::generateNewTransactionTimestamp(
     const QnMutexLockerBase& lock,
-    VmsTransactionLogCache::TranId cacheTranId,
+    CommandLogCache::TranId cacheTranId,
     const std::string& systemId)
 {
     using namespace std::chrono;
@@ -417,7 +419,7 @@ vms::api::Timestamp TransactionLog::generateNewTransactionTimestamp(
     return transactionLogData->cache.generateTransactionTimestamp(cacheTranId);
 }
 
-void TransactionLog::onDbTransactionCompleted(
+void CommandLog::onDbTransactionCompleted(
     DbTransactionContextMap::iterator queryIterator,
     const std::string& systemId,
     nx::sql::DBResult dbResult)
@@ -445,7 +447,7 @@ void TransactionLog::onDbTransactionCompleted(
     removeSystemsMarkedForDeletion(lock);
 }
 
-TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
+CommandLog::DbTransactionContext& CommandLog::getDbTransactionContext(
     const QnMutexLockerBase& lock,
     nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
@@ -458,18 +460,18 @@ TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
                 getTransactionLogContext(lock, systemId)->cache.beginTran();
 
             queryContext->transaction()->addOnTransactionCompletionHandler(
-                std::bind(&TransactionLog::onDbTransactionCompleted, this,
+                std::bind(&CommandLog::onDbTransactionCompleted, this,
                     newElementIter, systemId, std::placeholders::_1));
         };
 
     auto newElementIter = m_dbTransactionContexts.emplace(
         std::make_pair(queryContext, systemId),
-        DbTransactionContext{VmsTransactionLogCache::InvalidTranId, queryContext},
+        DbTransactionContext{CommandLogCache::InvalidTranId, queryContext},
         initializeNewElement).first;
     return newElementIter->second;
 }
 
-TransactionLog::TransactionLogContext* TransactionLog::getTransactionLogContext(
+CommandLog::TransactionLogContext* CommandLog::getTransactionLogContext(
     const QnMutexLockerBase& /*lock*/,
     const std::string& systemId)
 {
@@ -484,7 +486,7 @@ TransactionLog::TransactionLogContext* TransactionLog::getTransactionLogContext(
     return insertionPair.first->second.get();
 }
 
-std::tuple<int, vms::api::Timestamp> TransactionLog::generateNewTransactionAttributes(
+std::tuple<int, vms::api::Timestamp> CommandLog::generateNewTransactionAttributes(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId)
 {
@@ -504,7 +506,7 @@ std::tuple<int, vms::api::Timestamp> TransactionLog::generateNewTransactionAttri
     return std::tie(transactionSequence, transactionTimestamp);
 }
 
-void TransactionLog::updateTimestampHiInCache(
+void CommandLog::updateTimestampHiInCache(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     quint64 newValue)
@@ -514,7 +516,7 @@ void TransactionLog::updateTimestampHiInCache(
         getDbTransactionContext(lock, queryContext, systemId).cacheTranId, newValue);
 }
 
-void TransactionLog::removeSystemsMarkedForDeletion(
+void CommandLog::removeSystemsMarkedForDeletion(
     const QnMutexLockerBase& lock)
 {
     for (auto it = m_systemsMarkedForDeletion.begin();
@@ -528,7 +530,7 @@ void TransactionLog::removeSystemsMarkedForDeletion(
     }
 }
 
-bool TransactionLog::clearTransactionLogCacheForSystem(
+bool CommandLog::clearTransactionLogCacheForSystem(
     const QnMutexLockerBase& /*lock*/,
     const std::string& systemId)
 {
@@ -548,7 +550,7 @@ bool TransactionLog::clearTransactionLogCacheForSystem(
     return false;
 }
 
-ResultCode TransactionLog::dbResultToApiResult(
+ResultCode CommandLog::dbResultToApiResult(
     nx::sql::DBResult dbResult)
 {
     switch (dbResult)

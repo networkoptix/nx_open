@@ -16,7 +16,7 @@ TEST(H263, PictureHeaderTest)
         0xfc, 0x69, 0xb1, 0xb1, 0xb1, 0xb1, 0xc0, 0xbf, 0x4d, 0x8d, 0x8d, 0x8d};
 
     ASSERT_TRUE(header.decode(dataP, sizeof(dataP)));
-    ASSERT_EQ(header.pictureType, PictureType::P);
+    ASSERT_FALSE(nx::media_utils::h263::isKeyFrame(header.pictureType));
     ASSERT_TRUE(header.decode(dataI, sizeof(dataI)));
-    ASSERT_EQ(header.pictureType, PictureType::I);
+    ASSERT_TRUE(nx::media_utils::h263::isKeyFrame(header.pictureType));
 }

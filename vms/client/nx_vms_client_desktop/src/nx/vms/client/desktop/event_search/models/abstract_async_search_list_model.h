@@ -38,7 +38,7 @@ public:
     virtual bool cancelFetch() override;
 
 protected:
-    virtual bool canFetch() const override;
+    virtual bool canFetchNow() const override;
     virtual void requestFetch() override;
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;

@@ -217,10 +217,19 @@ void logOpenedHandleCount()
     snprintf(buf, 64, "/proc/%i/fd/", getpid());
 
     DIR *dir = opendir(buf);
+    if (dir == nullptr)
+    {
+        NX_WARNING(
+            typeid(QnGlobalMonitor),
+            lm("Failed to open a directory %1, the error is: %2").args(buf, strerror(errno)));
+        return;
+    }
+
     while ((dp = readdir(dir)) != NULL)
         fdCount++;
+
     closedir(dir);
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Opened: %1").arg(fdCount));
+    NX_WARNING(typeid(QnGlobalMonitor), lm("Opened: %1").args(fdCount));
 }
 #elif defined (Q_OS_WIN)
 void logOpenedHandleCount()

@@ -82,7 +82,8 @@ public:
     TemporaryAccountPasswordManager(
         const conf::AccountManager& settings,
         const nx::utils::stree::ResourceNameSet& attributeNameset,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
+        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        dao::AbstractTemporaryCredentialsDao* const dao) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
     virtual void authenticateByName(
@@ -162,7 +163,7 @@ private:
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
-    std::unique_ptr<dao::AbstractTemporaryCredentialsDao> m_dao;
+    dao::AbstractTemporaryCredentialsDao* m_dao = nullptr;
     nx::network::aio::Timer m_removeExpiredCredentialsTimer;
     bool m_terminated = false;
 
@@ -199,6 +200,9 @@ private:
         const QnMutexLockerBase& lk,
         Index& index,
         Iterator it);
+
+    void updateCredentialsInDbAsync(
+        const data::TemporaryAccountCredentials& tempPasswordData);
 
     void updateCredentialsInCache(
         const data::Credentials& credentials,

@@ -13,16 +13,16 @@ namespace nx::clusterdb::engine {
 namespace test {
 
 class TestOutgoingTransactionDispatcher:
-    public AbstractOutgoingTransactionDispatcher
+    public AbstractOutgoingCommandDispatcher
 {
 public:
     typedef nx::utils::MoveOnlyFunc<
-        void(const std::string&, const SerializableAbstractTransaction&)
+        void(const std::string&, const SerializableAbstractCommand&)
     > OnNewTransactionHandler;
 
     virtual void dispatchTransaction(
         const std::string& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
+        std::shared_ptr<const SerializableAbstractCommand> transactionSerializer) override;
 
     void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler);
     void setDelayBeforeSavingTransaction(
@@ -48,7 +48,7 @@ public:
 private:
     OnNewTransactionHandler m_onNewTransactionHandler;
     QnMutex m_mutex;
-    std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_outgoingTransactions;
+    std::list<std::shared_ptr<const SerializableAbstractCommand>> m_outgoingTransactions;
     std::pair<std::chrono::milliseconds, std::chrono::milliseconds> m_delayBeforeSavingTransaction;
 };
 

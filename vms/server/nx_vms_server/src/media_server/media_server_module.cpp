@@ -252,7 +252,6 @@ QnMediaServerModule::QnMediaServerModule(
         downloadsDirectory(),
         commonModule(),
         nullptr,
-        nx::vms::common::p2p::downloader::Downloader::StartupPolicy::idle,
         this));
 
     m_pluginManager = store(new PluginManager(this, &m_pluginContainer));

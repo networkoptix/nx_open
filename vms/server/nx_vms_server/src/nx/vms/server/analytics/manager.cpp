@@ -23,7 +23,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
@@ -39,10 +39,10 @@
 #include <nx/debugging/visual_metadata_debugger_factory.h>
 #include <nx/utils/log/log_main.h>
 
-#include <nx/sdk/analytics/consuming_device_agent.h>
-#include <nx/sdk/analytics/pixel_format.h>
-#include <nx/sdk/analytics/plugin.h>
-#include <nx/sdk/settings.h>
+#include <nx/sdk/analytics/i_consuming_device_agent.h>
+#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/i_string_map.h>
 
 #include "yuv420_uncompressed_video_frame.h"
 #include "generic_uncompressed_video_frame.h"
@@ -57,7 +57,7 @@ using namespace nx::sdk::analytics;
 using namespace nx::debugging;
 using namespace nx::vms::common;
 
-using PixelFormat = UncompressedVideoFrame::PixelFormat;
+using PixelFormat = IUncompressedVideoFrame::PixelFormat;
 
 Manager::Manager(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule),
@@ -65,7 +65,7 @@ Manager::Manager(QnMediaServerModule* serverModule):
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager))
 {
-    m_thread->setObjectName("analytics::Manager");
+    m_thread->setObjectName(toString(this));
     moveToThread(m_thread);
     m_thread->start();
 }
@@ -322,11 +322,8 @@ void Manager::at_enginePropertyChanged(
     const resource::AnalyticsEngineResourcePtr& engine,
     const QString& propertyName)
 {
-    if (!engine)
-    {
-        NX_WARNING(this, "Got empty analytics engine resource, skipping");
+    if (!NX_ASSERT(engine))
         return;
-    }
 
     if (propertyName == nx::vms::common::AnalyticsEngineResource::kSettingsValuesProperty)
         engine->sendSettingsToSdkEngine();
@@ -373,11 +370,8 @@ void Manager::setSettings(
         analyticsContext = context(QnUuid(deviceId));
     }
 
-    if (!analyticsContext)
-    {
-        NX_WARNING(this, "Can't find analytics context for device with id %1", deviceId);
+    if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
         return;
-    }
 
     return analyticsContext->setSettings(engineId, deviceAgentSettings);
 }
@@ -401,11 +395,8 @@ void Manager::setSettings(const QString& engineId, const QVariantMap& engineSett
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
         serverModule(), engineId);
 
-    if (!engine)
-    {
-        NX_WARNING(this, "Can't find engine resource with id %1", engineId);
+    if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
         return;
-    }
 
     NX_DEBUG(this, "Setting settings for engine %1 (%2)", engine->getName(), engine->getId());
     engine->setSettingsValues(engineSettings);
@@ -416,11 +407,8 @@ QVariantMap Manager::getSettings(const QString& engineId) const
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
         serverModule(), engineId);
 
-    if (!engine)
-    {
-        NX_WARNING(this, "Can't find engine resource with id %1", engineId);
+    if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
         return QVariantMap();
-    }
 
     NX_DEBUG(this, "Getting settings for engine %1 (%2)", engine->getName(), engine->getId());
     return engine->settingsValues();

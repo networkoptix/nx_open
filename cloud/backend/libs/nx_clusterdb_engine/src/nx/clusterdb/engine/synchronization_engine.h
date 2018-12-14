@@ -39,14 +39,14 @@ public:
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
     ~SyncronizationEngine();
 
-    OutgoingTransactionDispatcher& outgoingTransactionDispatcher();
-    const OutgoingTransactionDispatcher& outgoingTransactionDispatcher() const;
+    OutgoingCommandDispatcher& outgoingTransactionDispatcher();
+    const OutgoingCommandDispatcher& outgoingTransactionDispatcher() const;
 
-    TransactionLog& transactionLog();
-    const TransactionLog& transactionLog() const;
+    CommandLog& transactionLog();
+    const CommandLog& transactionLog() const;
 
-    IncomingTransactionDispatcher& incomingTransactionDispatcher();
-    const IncomingTransactionDispatcher& incomingTransactionDispatcher() const;
+    IncomingCommandDispatcher& incomingCommandDispatcher();
+    const IncomingCommandDispatcher& incomingCommandDispatcher() const;
 
     ConnectionManager& connectionManager();
     const ConnectionManager& connectionManager() const;
@@ -73,10 +73,10 @@ private:
     QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
-    OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
+    OutgoingCommandDispatcher m_outgoingTransactionDispatcher;
     dao::rdb::StructureUpdater m_structureUpdater;
-    TransactionLog m_transactionLog;
-    IncomingTransactionDispatcher m_incomingTransactionDispatcher;
+    CommandLog m_commandLog;
+    IncomingCommandDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
     transport::TransportManager m_transportManager;
     Connector m_connector;

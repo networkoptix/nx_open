@@ -135,7 +135,7 @@ private:
     void updateInstantFilter();
     void handleInstantFilterUpdated();
 
-    QMenu* createFilterMenu() const;
+    QMenu* createFilterMenu(QWidget* parent) const;
     QString getFilterName(nx::vms::client::desktop::ResourceTreeNodeType allowedNodeType) const;
 
     void setHintVisible(bool value);

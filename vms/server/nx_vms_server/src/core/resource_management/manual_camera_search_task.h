@@ -18,8 +18,7 @@ public:
     QnSearchTask() = delete;
     QnSearchTask(
         QnCommonModule* commonModule,
-        const nx::network::SocketAddress& address,
-        const QAuthenticator& auth,
+        nx::utils::Url url,
         bool breakOnGotResult = false);
 
     void setSearchers(const SearcherList& searchers);
@@ -38,7 +37,6 @@ public:
 private:
     QnCommonModule * m_commonModule = nullptr;
     nx::utils::Url m_url;
-    QAuthenticator m_auth;
 
     /**
      * If one of the searchers in task found a resource than other searchers in the same task

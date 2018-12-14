@@ -23,7 +23,7 @@ namespace nx::vms::client::desktop {
 class NotificationListWidget;
 class NotificationCounterLabel;
 
-class MotionSearchWidget;
+class SimpleMotionSearchWidget;
 class BookmarkSearchWidget;
 class EventSearchWidget;
 class AnalyticsSearchWidget;
@@ -57,7 +57,7 @@ private:
     NotificationListWidget* const m_notificationsTab;
     NotificationCounterLabel* const m_counterLabel;
 
-    MotionSearchWidget* const m_motionTab;
+    SimpleMotionSearchWidget* const m_motionTab;
     BookmarkSearchWidget* const m_bookmarksTab;
     EventSearchWidget* const m_eventsTab;
     AnalyticsSearchWidget* const m_analyticsTab;

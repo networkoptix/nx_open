@@ -9,6 +9,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <ui/common/notification_levels.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -67,12 +68,12 @@ EventSearchListModel::Private::~Private()
 {
 }
 
-vms::api::EventType EventSearchListModel::Private::selectedEventType() const
+EventType EventSearchListModel::Private::selectedEventType() const
 {
     return m_selectedEventType;
 }
 
-void EventSearchListModel::Private::setSelectedEventType(vms::api::EventType value)
+void EventSearchListModel::Private::setSelectedEventType(EventType value)
 {
     if (m_selectedEventType == value)
         return;
@@ -115,7 +116,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             return QVariant::fromValue(pixmap(eventParams));
 
         case Qt::ForegroundRole:
-            return QVariant::fromValue(color(eventParams.eventType));
+            return QVariant::fromValue(color(eventParams));
 
         case Qn::DescriptionTextRole:
             return description(eventParams);
@@ -169,17 +170,12 @@ void EventSearchListModel::Private::clearData()
 
 void EventSearchListModel::Private::truncateToMaximumCount()
 {
-    this->truncateDataToMaximumCount(m_data, &startTime);
+    q->truncateDataToMaximumCount(m_data, &startTime);
 }
 
 void EventSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    this->truncateDataToTimePeriod(m_data, upperBoundPredicate, q->relevantTimePeriod());
-}
-
-bool EventSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
+    q->truncateDataToTimePeriod(m_data, &startTime, q->relevantTimePeriod());
 }
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -359,7 +355,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
     return server->restConnection()->getEvents(request, internalCallback, thread());
 }
 
-QString EventSearchListModel::Private::title(vms::api::EventType eventType) const
+QString EventSearchListModel::Private::title(EventType eventType) const
 {
     return m_helper->eventName(eventType);
 }
@@ -374,41 +370,54 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
 {
     switch (parameters.eventType)
     {
-        case nx::vms::api::EventType::storageFailureEvent:
+        case EventType::storageFailureEvent:
             return qnSkin->pixmap("events/storage_red.png");
 
-        case nx::vms::api::EventType::backupFinishedEvent:
+        case EventType::backupFinishedEvent:
             return qnSkin->pixmap("events/storage_green.png");
 
-        case nx::vms::api::EventType::serverStartEvent:
+        case EventType::serverStartEvent:
             return qnSkin->pixmap("events/server.png");
 
-        case nx::vms::api::EventType::serverFailureEvent:
+        case EventType::serverFailureEvent:
             return qnSkin->pixmap("events/server_red.png");
 
-        case nx::vms::api::EventType::serverConflictEvent:
+        case EventType::serverConflictEvent:
             return qnSkin->pixmap("events/server_yellow.png");
 
-        case nx::vms::api::EventType::licenseIssueEvent:
+        case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license_red.png");
 
-        case nx::vms::api::EventType::cameraDisconnectEvent:
+        case EventType::cameraDisconnectEvent:
             return qnSkin->pixmap("events/connection_red.png");
 
-        case nx::vms::api::EventType::networkIssueEvent:
-        case nx::vms::api::EventType::cameraIpConflictEvent:
+        case EventType::networkIssueEvent:
+        case EventType::cameraIpConflictEvent:
             return qnSkin->pixmap("events/connection_yellow.png");
 
-        case nx::vms::api::EventType::softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 parameters.description, QPalette().light().color());
 
+        case EventType::pluginEvent:
+        {
+            switch (QnNotificationLevel::valueOf(parameters))
+            {
+                case QnNotificationLevel::Value::CriticalNotification:
+                    return qnSkin->pixmap("events/alert_red.png");
+                case QnNotificationLevel::Value::ImportantNotification:
+                    return qnSkin->pixmap("events/alert_yellow.png");
+                default:
+                    return qnSkin->pixmap("events/alert.png");
+            }
+        }
+
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
-        case nx::vms::api::EventType::cameraMotionEvent:
-        case nx::vms::api::EventType::cameraInputEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
             return qnSkin->pixmap("tree/camera.svg");
 
-        case nx::vms::api::EventType::analyticsSdkEvent:
+        case EventType::analyticsSdkEvent:
             return QPixmap();
 
         default:
@@ -416,30 +425,12 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
     }
 }
 
-QColor EventSearchListModel::Private::color(vms::api::EventType eventType)
+QColor EventSearchListModel::Private::color(const vms::event::EventParameters& parameters)
 {
-    switch (eventType)
-    {
-        case nx::vms::api::EventType::cameraDisconnectEvent:
-        case nx::vms::api::EventType::storageFailureEvent:
-        case nx::vms::api::EventType::serverFailureEvent:
-            return qnGlobals->errorTextColor();
-
-        case nx::vms::api::EventType::networkIssueEvent:
-        case nx::vms::api::EventType::cameraIpConflictEvent:
-        case nx::vms::api::EventType::serverConflictEvent:
-            return qnGlobals->warningTextColor();
-
-        case nx::vms::api::EventType::backupFinishedEvent:
-            return qnGlobals->successTextColor();
-
-        //case nx::vms::api::EventType::licenseIssueEvent: //< TODO: normal or warning?
-        default:
-            return QColor();
-    }
+    return QnNotificationLevel::notificationTextColor(QnNotificationLevel::valueOf(parameters));
 }
 
-bool EventSearchListModel::Private::hasPreview(vms::api::EventType eventType)
+bool EventSearchListModel::Private::hasPreview(EventType eventType)
 {
     switch (eventType)
     {

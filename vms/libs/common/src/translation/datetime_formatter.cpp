@@ -67,7 +67,17 @@ void DateTimeFormats::setFormats()
     formatStrings[Format::dd_MM] = tr("MM/dd"); //< Localizable
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
     formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
-    formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = locale.dateTimeFormat(QLocale::ShortFormat);
+
+    auto shortFormat = locale.dateTimeFormat(QLocale::ShortFormat);
+    // QLocale::ShortFormat probably does not include seconds - add them!
+    if (!shortFormat.contains("ss") && shortFormat.contains("mm"))
+    {
+        const int dividerPos = shortFormat.indexOf("mm") - 1;
+        const auto divider = dividerPos >= 0 ? QChar(shortFormat[dividerPos]) : QChar(':');
+        shortFormat.insert(dividerPos + 3, divider + QString("ss"));
+    }
+    formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = shortFormat;
+
     formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss] = locale.dateTimeFormat(QLocale::LongFormat);
 
     // Fix - we never want timezone in time string.

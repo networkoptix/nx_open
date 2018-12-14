@@ -141,7 +141,6 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
-#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/update_status_rest_handler.h>
@@ -887,7 +886,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     }
     const auto networkIfInfo = networkIfList.join(", ");
     if (m_mediaServer->setProperty(
-        ResourcePropertyKey::MediaServer::Statistics::kNetworkInterfaces, networkIfInfo))
+        ResourcePropertyKey::Server::kNetworkInterfaces, networkIfInfo))
     {
         m_mediaServer->saveProperties();
     }
@@ -1198,16 +1197,17 @@ void MediaServerProcess::updateAddressesList()
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
 {
-    namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
+    namespace Server = ResourcePropertyKey::Server;
     const auto hwInfo = HardwareInformation::instance();
-    server->setProperty(Statistics::kCpuArchitecture, hwInfo.cpuArchitecture);
-    server->setProperty(Statistics::kCpuModelName, hwInfo.cpuModelName);
-    server->setProperty(Statistics::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
-    server->setProperty(Statistics::kProductNameShort, QnAppInfo::productNameShort());
-    server->setProperty(Statistics::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
-    server->setProperty(Statistics::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
-    server->setProperty(Statistics::kPublicIp, m_ipDiscovery->publicIP().toString());
-    server->setProperty(Statistics::kSystemRuntime, nx::vms::api::SystemInformation::currentSystemRuntime());
+    server->setProperty(Server::kCpuArchitecture, hwInfo.cpuArchitecture);
+    server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName);
+    server->setProperty(Server::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
+    server->setProperty(Server::kProductNameShort, QnAppInfo::productNameShort());
+    server->setProperty(Server::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
+    server->setProperty(Server::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Server::kPublicIp, m_ipDiscovery->publicIP().toString());
+    server->setProperty(Server::kSystemRuntime,
+        nx::vms::api::SystemInformation::currentSystemRuntime());
 
     if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
@@ -1223,7 +1223,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
             auto hhds = content.split("\n", QString::SkipEmptyParts);
             for (auto& hdd : hhds)
                 hdd = hdd.trimmed();
-            server->setProperty(Statistics::kHddList, hhds.join(", "),
+            server->setProperty(Server::kHddList, hhds.join(", "),
                                 QnResource::NO_ALLOW_EMPTY);
         }
     }
@@ -1235,7 +1235,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
         qnServerDb->setBookmarkCountController(
             [server](size_t count)
             {
-                server->setProperty(Statistics::kBookmarkCount, QString::number(count));
+                server->setProperty(Server::kBookmarkCount, QString::number(count));
                 server->saveProperties();
             });
     #endif
@@ -1272,7 +1272,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(ResourcePropertyKey::MediaServer::Statistics::kPublicIp,
+        if (server->setProperty(ResourcePropertyKey::Server::kPublicIp,
             publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
             server->saveProperties();
 
@@ -1524,13 +1524,16 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
     /**%apidoc GET /api/manualCamera/search
-     * Start searching for the cameras in manual mode.
-     * %param:string start_ip First IP address in the range to scan.
-     * %param[opt]:string end_ip Last IP address in the range to scan.
-     * %param[opt]:integer port Camera(s) IP port to check. Port is auto-detected if this
-     *     parameter is omitted.
-     * %param[opt]:string user Camera(s) username.
-     * %param[opt]:string password Camera(s) password.
+     * Start searching for the cameras in manual mode. There are two ways to call this method:
+     * IP range search and single host search. To scan an IP range, "start_ip" and "end_ip" must be
+     * specified. To run a single host search, "url" must be specified.
+     * %param[opt]:string url A valid URL, hostname or hostname:port are accepted.
+     * %param[opt]:string start_ip First IP address in the range to scan. Conflicts with "url".
+     * %param[opt]:string end_ip Last IP address in the range to scan. Conflicts with "url".
+     * %param[opt]:integer port Cameras IP port to check. Port is auto-detected if this parameter
+     *     is omitted and "url" does not contain one. Overwrites the port in "url" if specified.
+     * %param[opt]:string user Camera(s) username. Overwrites the user in "url" if specified.
+     * %param[opt]:string password Camera(s) password. Overwrites the password in "url" if specified.
      * %return:object JSON object with the initial status of camera search process, including
      *     processUuid used for other /api/manualCamera calls, and the list of objects describing
      *     cameras found to the moment.
@@ -2044,9 +2047,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
 
-    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
-
-    /**%apidoc GET /api/restart
+    /**%apidoc POST /api/restart
      * Restarts the server.
      * %permissions Administrator.
      * %return:object JSON object with error message and error code (0 means OK).
@@ -3192,7 +3193,6 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
     auto logSettings = makeLogSettings(settings);
-
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
     logSettings.loggers.front().logBaseName = "log_file";
@@ -3207,6 +3207,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     else
         roSettings->remove("logFile");
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
@@ -3215,6 +3216,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             logSettings, qApp->applicationName(), binaryPath,
             {QnLog::HTTP_LOG_INDEX}));
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
@@ -3229,6 +3231,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             }),
         /*writeLogHeader*/ false);
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "ec2_tran";
@@ -3239,6 +3242,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             binaryPath,
             {QnLog::EC2_TRAN_LOG}));
 
+    logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
         settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
     logSettings.loggers.front().logBaseName = "permissions";
@@ -3810,7 +3814,7 @@ void MediaServerProcess::connectSignals()
     using namespace nx::vms::common::p2p::downloader;
     connect(
         this, &MediaServerProcess::started,
-        [this]() {this->serverModule()->findInstance<Downloader>()->startFoundDownloads(); });
+        [this]() {this->serverModule()->findInstance<Downloader>()->startDownloads(); });
 
     connect(commonModule()->resourceDiscoveryManager(),
         &QnResourceDiscoveryManager::CameraIPConflict, this,
@@ -3843,16 +3847,16 @@ void MediaServerProcess::connectSignals()
     connect(m_udtInternetTrafficTimer.get(), &QTimer::timeout,
         [common = commonModule()]()
         {
-            namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
+            namespace Server = ResourcePropertyKey::Server;
             QnResourcePtr server = common->resourcePool()->getResourceById(common->moduleGUID());
-            const auto old = server->getProperty(Statistics::kUdtInternetTraffic_bytes).toULongLong();
+            const auto old = server->getProperty(Server::kUdtInternetTraffic_bytes).toULongLong();
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong)current;
-            if (server->setProperty(Statistics::kUdtInternetTraffic_bytes, QString::number(update))
+            if (server->setProperty(Server::kUdtInternetTraffic_bytes, QString::number(update))
                 && server->saveProperties())
             {
                 NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(
-                    Statistics::kUdtInternetTraffic_bytes, update));
+                    Server::kUdtInternetTraffic_bytes, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });
@@ -4092,7 +4096,7 @@ void MediaServerProcess::writeMutableSettingsData()
 void MediaServerProcess::createTcpListener()
 {
     const int maxConnections = serverModule()->settings().maxConnections();
-    NX_INFO(this, lm("Max TCP connections fomr server= %1").arg(maxConnections));
+    NX_INFO(this, lm("Max TCP connections from server= %1").arg(maxConnections));
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
@@ -4709,6 +4713,8 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
 
+    restrictions->allow(webPrefix + "/ec2/getFullInfo", nx::network::http::AuthMethod::noAuth);
+
     // For open in new browser window.
     restrictions->allow(webPrefix + "/api/showLog.*",
         nx::network::http::AuthMethod::urlQueryDigest | nx::network::http::AuthMethod::allowWithourCsrf);
@@ -4716,12 +4722,6 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     // For inserting in HTML <img src="...">.
     restrictions->allow(webPrefix + "/ec2/cameraThumbnail",
         nx::network::http::AuthMethod::allowWithourCsrf);
-
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
-    // authentication is implemented.
-    // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
-        nx::network::http::AuthMethod::noAuth);
 
     nx::network::http::AuthMethodRestrictionList::Filter filter;
     filter.protocol = nx::network::http::http_1_0.protocol.toStdString();

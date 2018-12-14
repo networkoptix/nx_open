@@ -156,7 +156,7 @@ static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engin
         engineResource->getName(), engineResource->plugin()->manifest().id);
 }
 
-static std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat> pixelFormatForEngine(
+static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> pixelFormatForEngine(
     QnMediaServerModule* serverModule,
     QnUuid engineId,
     const std::shared_ptr<nx::vms::server::analytics::DeviceAnalyticsBinding>& binding,
@@ -207,7 +207,7 @@ void DeviceAnalyticsContext::putFrame(
         if (const auto& dataPacket = frameConverter.getDataPacket(pixelFormat))
         {
             if (binding->canAcceptData()
-                && NX_ASSERT(dataPacket->timestampUsec() >= 0))
+                && NX_ASSERT(dataPacket->timestampUs() >= 0))
             {
                 binding->putData(std::make_shared<DataPacketAdapter>(dataPacket));
             }
