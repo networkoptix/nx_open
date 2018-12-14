@@ -165,13 +165,13 @@ PageBase
         [
             MotionAreaButton
             {
-                visible: motionSearchController.customRoiExists
+                visible: motionController.customRoiExists
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
 
-                onClicked: motionSearchController.clearCustomRoi()
+                onClicked: motionController.clearCustomRoi()
             },
 
             IconButton
@@ -264,7 +264,7 @@ PageBase
         }
     }
 
-    Loader
+    Item
     {
         id: video
 
@@ -276,20 +276,56 @@ PageBase
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
 
-        sourceComponent:
-            videoScreenController.resourceHelper.fisheyeParams.enabled
-                ? fisheyeVideoComponent
-                : scalableVideoComponent
+        property Item item
+        property bool showFisheyeVideo:
+            !motionController.motionSearchMode
+            && videoScreenController.resourceHelper.fisheyeParams.enabled
 
-        function clear()
+        FisheyeVideo
         {
-            if (item)
-                item.clear()
+            id: fisheyeVideo
+
+            anchors.fill: parent
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+            visible: video.item == this
+        }
+
+        ScalableVideo
+        {
+            id: scalableVideo
+
+            anchors.fill: parent
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+            visible: video.item == this
+        }
+
+        onShowFisheyeVideoChanged: updateCurrentVideoItem()
+        Component.onCompleted: updateCurrentVideoItem()
+
+        function updateCurrentVideoItem()
+        {
+            var player = videoScreenController.mediaPlayer
+            if (showFisheyeVideo)
+            {
+                scalableVideo.mediaPlayer = null
+                fisheyeVideo.mediaPlayer = player
+                video.item = fisheyeVideo
+            }
+            else
+            {
+                fisheyeVideo.mediaPlayer = null
+                scalableVideo.mediaPlayer = player
+                video.item = scalableVideo
+            }
         }
 
         MotionController
         {
-            id: motionSearchController
+            id: motionController
 
             x: video.item.videoRect.x
             y: video.item.videoRect.y
@@ -300,52 +336,22 @@ PageBase
             viewport: video.item
             cameraRotation: videoScreenController.resourceHelper.customRotation
             motionProvider.mediaPlayer: videoScreenController.mediaPlayer
+            motionSearchMode: videoNavigation.motionSearchMode
 
             Connections
             {
-                target: video.item
+                target: scalableVideo
 
-                onPressed: motionSearchController.handlePressed(
-                    target.mapToItem(motionSearchController, mouseX, mouseY))
-                onReleased: motionSearchController.handleReleased()
-                onPositionChanged: motionSearchController.handlePositionChanged(
-                    target.mapToItem(motionSearchController, mouseX, mouseY))
-                onCancelled: motionSearchController.handleCancelled()
-                onDoubleClicked: motionSearchController.handleCancelled()
+                onPressed: motionController.handlePressed(
+                    target.mapToItem(motionController, mouseX, mouseY))
+                onReleased: motionController.handleReleased()
+                onPositionChanged: motionController.handlePositionChanged(
+                    target.mapToItem(motionController, mouseX, mouseY))
+                onCancelled: motionController.handleCancelled()
+                onDoubleClicked: motionController.handleCancelled()
 
-                onMovementEnded: motionSearchController.updateDefaultRoi()
+                onMovementEnded: motionController.updateDefaultRoi()
             }
-
-            Rectangle
-            {
-                anchors.fill: parent
-                color: "#A000FF00"
-            }
-        }
-    }
-
-    Component
-    {
-        id: scalableVideoComponent
-
-        ScalableVideo
-        {
-            mediaPlayer: videoScreenController.mediaPlayer
-            resourceHelper: videoScreenController.resourceHelper
-            videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
-        }
-    }
-
-    Component
-    {
-        id: fisheyeVideoComponent
-        FisheyeVideo
-        {
-            mediaPlayer: videoScreenController.mediaPlayer
-            resourceHelper: videoScreenController.resourceHelper
-            videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
         }
     }
 
@@ -569,12 +575,12 @@ PageBase
 
             changingMotionRoi:
             {
-                return motionSearchController.drawingRoi
+                return motionController.drawingRoi
                     ? false
-                    : video.item.moving && !motionSearchController.customRoiExists
+                    : scalableVideo.moving && !motionController.customRoiExists
             }
 
-            hasCustomRoi: motionSearchController.customRoiExists
+            hasCustomRoi: motionController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
@@ -610,19 +616,7 @@ PageBase
                         || camerasModel.nextResourceId(""))
             }
 
-            motionFilter: video.sourceComponent == scalableVideoComponent
-                ? motionSearchController.motionFilter
-                : ""
-
-            motionSearchMode:
-                video.sourceComponent == scalableVideoComponent
-                && motionSearchController.motionSearchMode
-
-            onMotionSearchModeChanged:
-            {
-                if (video.sourceComponent == scalableVideoComponent)
-                    motionSearchController.motionSearchMode = motionSearchMode
-            }
+            motionFilter: video.item == scalableVideo ? motionController.motionFilter : ""
         }
     }
 
@@ -672,7 +666,7 @@ PageBase
                 d.animatePlaybackControls = false
                 videoScreen.resourceId = cameraSwitchAnimation.newResourceId
                 initialScreenshot = cameraSwitchAnimation.thumbnail
-                video.clear()
+                video.item.clear()
                 d.animatePlaybackControls = true
             }
         }

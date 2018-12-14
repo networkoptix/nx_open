@@ -207,5 +207,5 @@ ZoomableFlickable
         content.videoOutput.clear()
     }
 
-    Component.onCompleted: updateVideoRect()
+    Component.onCompleted: d.updateVideoRect()
 }
