@@ -76,7 +76,6 @@ private:
     QVector<IDirect3DSurface9*> m_pSurface;
     QVector<quint8*> m_openGLData;
     RECT m_rect{0, 0, 0, 0};
-    const HDC m_cursorDC;
     D3DDISPLAYMODE m_ddm{};
     QTime m_timer;
     unsigned m_frameNum = 0;
@@ -85,6 +84,7 @@ private:
     const Qn::CaptureMode m_mode;
     const int m_poolSize;
     const bool m_captureCursor;
+    const HDC m_cursorDC;
     const QSize m_captureResolution;
     const bool m_needRescale;
     SwsContext* m_scaleContext = nullptr;
