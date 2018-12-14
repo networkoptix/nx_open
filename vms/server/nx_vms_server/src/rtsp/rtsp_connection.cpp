@@ -342,7 +342,8 @@ bool QnRtspConnectionProcessor::parseRequestParams()
     }
     else
     {
-        d->sessionTimeOut = kDefaultRtspTimeout.count();
+        d->sessionTimeOut =
+            std::chrono::duration_cast<std::chrono::seconds>(kDefaultRtspTimeout).count();
         d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
     }
     const QUrlQuery urlQuery(url.query());
@@ -353,7 +354,7 @@ bool QnRtspConnectionProcessor::parseRequestParams()
         d->transcodeParams.codecId = nx::rtsp::findEncoderCodecId(codec);
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
         {
-            d->response.messageBody = "Requested codec not supported: ";
+            d->response.messageBody = "Requested codec is not supported: ";
             d->response.messageBody.append(codec);
             return false;
         }
@@ -380,7 +381,7 @@ bool QnRtspConnectionProcessor::parseRequestParams()
             videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
             if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
             {
-                d->response.messageBody = "Invalid resolution specified: %1";
+                d->response.messageBody = "Invalid resolution specified: ";
                 d->response.messageBody.append(resolutionStr);
                 return false;
             }
@@ -406,7 +407,7 @@ bool QnRtspConnectionProcessor::parseRequestParams()
             const int streamIndex = streamIndexStr.toInt();
             if (streamIndex > 1)
             {
-                d->response.messageBody = "Invalid stream specified: %1";
+                d->response.messageBody = "Invalid stream specified: ";
                 d->response.messageBody.append(streamIndexStr);
                 return false;
             }
