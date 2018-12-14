@@ -208,6 +208,11 @@
                     // clear preview for next camera
                     $scope.preview = '';
                     
+                    if (!$scope.activeCamera) {
+                        $scope.activeVideoSource = {src: ''};
+                        return;
+                    }
+                    
                     var salt = '&' + Math.random(),
                         cameraId = $scope.activeCamera.id,
                         resolution = $scope.activeResolution,
