@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <QtCore/QByteArray.h>
+#include <QtCore/QByteArray>
 
 #include <nx/utils/literal.h>
 #include <nx/utils/log/log_main.h>
