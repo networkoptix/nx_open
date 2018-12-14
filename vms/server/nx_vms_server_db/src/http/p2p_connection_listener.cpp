@@ -207,7 +207,7 @@ public:
         m_mutex->lock();
     }
 
-    SameGuidConnectionLocker(const SameGuidConnectionLocker&& other):
+    SameGuidConnectionLocker(SameGuidConnectionLocker&& other):
         m_id(other.m_id),
         m_mutex(std::move(other.m_mutex))
     {
@@ -217,6 +217,9 @@ public:
 
     ~SameGuidConnectionLocker()
     {
+        if (!m_mutex)
+            return;
+
         m_mutex->unlock();
 
         QnMutexLocker lock(&m_commonMutex);
