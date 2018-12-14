@@ -41,6 +41,7 @@ public:
 
     struct Command
     {
+        ApiCommand::Value command;
         std::function<void(ErrorCode)> completionHandler;
         std::function<ErrorCode(PostProcessList* const)> execTranFunc;
         ErrorCode result = ErrorCode::notImplemented;
@@ -274,6 +275,7 @@ public:
     {
         m_owner->transactionExecutor()->enqueData(
             TransactionExecutor::Command{
+                tran.command,
                 [completionHandler = std::move(completionHandler)](ErrorCode errorCode)
                 {
                     completionHandler(errorCode);
@@ -906,6 +908,7 @@ public:
     {
         m_owner->transactionExecutor()->enqueData(
             TransactionExecutor::Command{
+                multiTran.command,
                 [completionHandler = std::move(completionHandler)](ErrorCode errorCode)
                 {
                     completionHandler(errorCode);

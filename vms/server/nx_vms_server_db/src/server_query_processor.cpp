@@ -118,16 +118,22 @@ void TransactionExecutor::run()
 
         ErrorCode result = ErrorCode::ok;
         {
-            detail::QnDbManager::QnDbTransactionLocker dbTranLocker(m_db->getTransaction());
+            std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
             for (auto& command: queue)
             {
+                if (!dbTran && ApiCommand::isPersistent(command.command))
+                {
+                    dbTran.reset(
+                        new detail::QnDbManager::QnDbTransactionLocker(m_db->getTransaction()));
+                }
+
                 result = command.result = command.execTranFunc(&command.postProcList);
                 if (result == ErrorCode::dbError)
                     break;
             }
-            if (result != ErrorCode::dbError)
+            if (result != ErrorCode::dbError && dbTran)
             {
-                if (!NX_ASSERT(dbTranLocker.commit()))
+                if (!NX_ASSERT(dbTran->commit()))
                     result = ErrorCode::dbError;
             }
         }
