@@ -50,6 +50,13 @@ public:
             m_left->setHidden(true);
             progressHidden = true;
         }
+        else if (!data->verificationMessage.isEmpty())
+        {
+            m_left->setText(data->verificationMessage);
+            m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
+            m_left->setHidden(false);
+            errorStyle = true;
+        }
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
