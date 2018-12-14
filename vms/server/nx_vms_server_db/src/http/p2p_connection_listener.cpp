@@ -207,33 +207,27 @@ public:
         m_mutex->lock();
     }
 
-    SameGuidConnectionLocker(const SameGuidConnectionLocker& other):
+    SameGuidConnectionLocker(const SameGuidConnectionLocker&& other):
         m_id(other.m_id),
-        m_mutex(other.m_mutex),
-        m_instanceCount(other.m_instanceCount)
+        m_mutex(std::move(other.m_mutex))
     {
-        ++*m_instanceCount;
     }
 
     SameGuidConnectionLocker& operator=(const SameGuidConnectionLocker& other) = delete;
 
     ~SameGuidConnectionLocker()
     {
-        if (--*m_instanceCount == 0)
-            m_mutex->unlock();
+        m_mutex->unlock();
 
         QnMutexLocker lock(&m_commonMutex);
 
         if (m_mutex.use_count() == 1)
-        {
             m_mutexList.erase(m_id);
-        }
     }
 
 private:
     QnUuid m_id;
     std::shared_ptr<QnMutex> m_mutex;
-    std::shared_ptr<int> m_instanceCount = std::make_shared<int>(1);
     static std::map<QnUuid, std::weak_ptr<QnMutex>> m_mutexList;
     static QnMutex m_commonMutex;
 };
@@ -381,7 +375,7 @@ void ConnectionProcessor::run()
             [messageBus,
             remotePeer,
             sameDirectionConnectionLockGuard = std::move(sameDirectionConnectionLockGuard),
-            sameGuidconnectionLockGuard,
+            sameGuidconnectionLockGuard = std::move(sameGuidconnectionLockGuard),
             p2pHttpServerTransport,
             query = QUrlQuery(d->request.requestLine.url.query()),
             accessData = userAccessData(remotePeer),
