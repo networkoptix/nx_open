@@ -406,6 +406,7 @@ table.webclient-window>tbody>tr>td{
   border: 1px solid $additional_light2;
   position:absolute;
   margin-left: -72px;
+  display : none; // Edge bug
 }
 
 .cameras-panel .nav > li.active > a .camera-preview{
