@@ -17,6 +17,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_searcher.h>
@@ -58,11 +59,11 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServ
     connect(commonModule()->globalSettings(),
         &QnGlobalSettings::disabledVendorsChanged, 
         this,
-        &QnResourceDiscoveryManager::updateSearchersUsage);
+        &QnMServerResourceDiscoveryManager::updateSearchersUsage);
     connect(commonModule()->globalSettings(), 
         &QnGlobalSettings::autoDiscoveryChanged, 
         this,
-        &QnResourceDiscoveryManager::updateSearchersUsage);
+        &QnMServerResourceDiscoveryManager::updateSearchersUsage);
 
     connect(
         this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
@@ -388,7 +389,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
         connect(server, 
             &QnMediaServerResource::redundancyChanged, 
             this, 
-            &QnResourceDiscoveryManager::updateSearchersUsage);
+            &QnMServerResourceDiscoveryManager::updateSearchersUsage);
         updateSearchersUsage();
     }
 
