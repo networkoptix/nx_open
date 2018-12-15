@@ -649,7 +649,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
                     m_codecParams.codecId,
                     resolution.fps,
                     m_codecParams.bitrate,
-                    nxcip::Resolution(resolution.width, resolution.width));
+                    nxcip::Resolution(resolution.width, resolution.height));
             }
         }
     }
@@ -665,7 +665,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
                 m_codecParams.codecId,
                 resolution.fps,
                 m_codecParams.bitrate,
-                nxcip::Resolution(resolution.width, resolution.width));
+                nxcip::Resolution(resolution.width, resolution.height));
         }
     }
 
