@@ -20,8 +20,8 @@ module.exports = merge(common, {
             {
                 context: [ '/api/', '/gateway/' ],
                 //target : 'http://cloud-local',
-                target : 'https://cloud-dev2.hdw.mx',
-                //target : 'https://cloud-test.hdw.mx',
+                // target : 'https://cloud-dev2.hdw.mx',
+                target : 'https://cloud-test.hdw.mx',
                 changeOrigin: true,
                 //secure: false
 
