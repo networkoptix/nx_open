@@ -2,9 +2,12 @@
 
 #include <QtCore/QUrl>
 
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
+
 #include <nx/fusion/model_functions_fwd.h>
+
+#include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/encoded_credentials.h>
 
 namespace nx {
 namespace client {
@@ -15,7 +18,7 @@ struct LastConnectionData
 {
     QString systemName;
     nx::utils::Url url;
-    QnEncodedCredentials credentials;
+    nx::vms::client::core::EncodedCredentials credentials;
 
     nx::utils::Url urlWithCredentials() const;
 };

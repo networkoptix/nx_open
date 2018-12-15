@@ -198,7 +198,7 @@ void ServerStatusItemDelegate::setEditorData(QWidget* editor, const QModelIndex&
     if (!statusWidget)
         return;
 
-    auto itemData = index.data(UpdateItem::UpdateItemRole);
+    auto itemData = index.data(ServerUpdatesModel::UpdateItemRole);
     UpdateItemPtr data = itemData.value<UpdateItemPtr>();
     if (!data)
         return;

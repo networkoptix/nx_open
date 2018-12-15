@@ -6,15 +6,15 @@
 #include <nx/gstreamer/bus.h>
 #include <nx/gstreamer/bus_message.h>
 
-#include <nx/sdk/analytics/metadata_packet.h>
-#include <nx/sdk/analytics/data_packet.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/analytics/i_data_packet.h>
 
 namespace nx {
 namespace gstreamer {
 
 class Pipeline;
 
-using ObjectPacketHandler = void(nx::sdk::analytics::MetadataPacket* packet);
+using ObjectPacketHandler = void(nx::sdk::analytics::IMetadataPacket* packet);
 using MetadataCallback = std::function<ObjectPacketHandler>;
 using BusCallback = std::function<bool(Bus* bus, BusMessage* message, Pipeline* pipeline)>;
 
@@ -35,7 +35,7 @@ public:
 
     virtual void setMetadataCallback(MetadataCallback MetadataCallback) = 0;
 
-    virtual bool pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket) = 0;
+    virtual bool pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket) = 0;
 
     virtual bool start() = 0;
 

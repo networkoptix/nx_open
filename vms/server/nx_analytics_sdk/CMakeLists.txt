@@ -17,26 +17,26 @@ set(doxygen_log ${logs_dir}/analytics_sdk_doxygen.log)
 set(zip_log ${logs_dir}/analytics_sdk_zip.log)
 
 # Collect source files for statically prepared files.
-set(sdk_src_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name})
-file(GLOB_RECURSE sdk_src_static_files ${sdk_src_static_origin}/*)
+set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name})
+file(GLOB_RECURSE copied_static_files ${copied_static_origin}/*)
 
 # Collect source files for nx_kit.
-set(sdk_src_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
-file(GLOB_RECURSE sdk_src_nx_kit_files ${sdk_src_nx_kit_origin}/*)
+set(copied_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
+file(GLOB_RECURSE copied_nx_kit_files ${copied_nx_kit_origin}/*)
 
 # Collect source files for Plugin SDK.
-set(sdk_src_nx_sdk_origin ${CMAKE_SOURCE_DIR}/nxlib/nx_sdk/src)
-set(sdk_src_nx_sdk_new_origin ${sdk_src_nx_sdk_origin}/nx)
-set(sdk_src_nx_sdk_common_headers_origin ${sdk_src_nx_sdk_origin}/plugins)
-file(GLOB_RECURSE sdk_src_nx_sdk_new_files ${sdk_src_nx_sdk_new_origin}/*)
-file(GLOB_RECURSE sdk_src_nx_sdk_common_headers ${sdk_src_nx_sdk_common_headers_origin}/*)
+set(copied_nx_sdk_src_dir ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src)
+set(copied_nx_sdk_src_nx_origin ${copied_nx_sdk_src_dir}/nx)
+file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
+set(copied_nx_sdk_old_header_origin ${copied_nx_sdk_src_dir}/plugins)
+file(GLOB_RECURSE copied_nx_sdk_old_header_files ${copied_nx_sdk_old_header_origin}/*)
 
 # Collect source files for the sample - Stub Analytics Plugin.
-set(sdk_src_sample_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin/src)
-file(GLOB_RECURSE sdk_src_sample_files ${sdk_src_sample_origin}/*)
-set(sdk_src_sample_ut_origin
-    ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin/unit_tests/src)
-file(GLOB_RECURSE sdk_src_sample_ut_files ${sdk_src_sample_ut_origin}/*)
+set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin)
+set(copied_sample_origin ${copied_sample_dir}/src)
+file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
+set(copied_sample_ut_origin ${copied_sample_dir}/unit_tests/src)
+file(GLOB_RECURSE copied_sample_ut_files ${copied_sample_ut_origin}/*)
 
 set(create_sdk_script ${CMAKE_CURRENT_BINARY_DIR}/create_sdk.cmake)
 
@@ -84,10 +84,11 @@ add_custom_command(OUTPUT ${zip_file}
     DEPENDS
         ${create_sdk_script}
         ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name}/${sample_build_script}
-        ${sdk_src_static_files}
-        ${sdk_src_nx_kit_files}
-        ${sdk_src_nx_sdk_new_files}
-        ${sdk_src_sample_files}
+        ${copied_static_files}
+        ${copied_nx_kit_files}
+        ${copied_nx_sdk_src_nx_files}
+        ${copied_nx_sdk_old_header_files}
+        ${copied_sample_files}
 )
 
 add_custom_target(nx_analytics_sdk ALL DEPENDS ${zip_file})

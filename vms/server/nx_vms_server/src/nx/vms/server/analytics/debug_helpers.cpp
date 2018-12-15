@@ -31,7 +31,7 @@ static const QString kSettingsFilenamePostfix("_settings.json");
 // DeviceAgent: stub_analytics_plugin_device_a25c01be-f7dc-4600-8b8e-915bf4c0a688_settings.json
 // Engine: stub_analytics_plugin_engine_settings.json
 
-QString pluginLibName(const nx::sdk::analytics::Plugin* plugin)
+QString pluginLibName(const nx::sdk::analytics::IPlugin* plugin)
 {
     if (!NX_ASSERT(plugin))
         return QString();
@@ -122,7 +122,7 @@ QString debugFilesDirectoryPath(const QString& path)
 
 } // namespace
 
-sdk_support::UniquePtr<nx::sdk::Settings> loadSettingsFromFile(
+sdk_support::UniquePtr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename)
 {
@@ -132,7 +132,7 @@ sdk_support::UniquePtr<nx::sdk::Settings> loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, kLogTag) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return sdk_support::UniquePtr<nx::sdk::Settings>();
+            return sdk_support::UniquePtr<nx::sdk::IStringMap>();
         };
 
     if (filename.isEmpty())
@@ -151,14 +151,14 @@ sdk_support::UniquePtr<nx::sdk::Settings> loadSettingsFromFile(
     if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    auto settings = sdk_support::toSdkSettings(settingsJson);
+    auto settings = sdk_support::toIStringMap(settingsJson);
     if (!settings)
         return log(Level::error, lit("Invalid JSON in file"));
 
     return settings;
 }
 
-sdk_support::UniquePtr<nx::sdk::Settings> loadDeviceAgentSettingsFromFile(
+sdk_support::UniquePtr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
@@ -175,7 +175,7 @@ sdk_support::UniquePtr<nx::sdk::Settings> loadDeviceAgentSettingsFromFile(
         dir.absoluteFilePath(settingsFilename));
 }
 
-sdk_support::UniquePtr<nx::sdk::Settings> loadEngineSettingsFromFile(
+sdk_support::UniquePtr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
     const auto settingsFilename = filename(engine, kSettingsFilenamePostfix);
@@ -208,7 +208,7 @@ QString filename(
     return QString();
 }
 
-QString filename(const nx::sdk::analytics::Plugin* plugin, const QString& postfix)
+QString filename(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix)
 {
     if (!NX_ASSERT(plugin))
         return QString();
@@ -241,6 +241,12 @@ void dumpStringToFile(
 
     if (f.write(stringToDump.toUtf8()) < 0)
         return log(Level::error, "Unable to write to file");
+
+    if (!stringToDump.isEmpty() && stringToDump.back() != '\n')
+    {
+        if (f.write("\n") < 0)
+            return log(Level::error, "Unable to write trailing `\n` to file");
+    }
 }
 
 } // namespace nx::vms::server::analytics::debug_helpers

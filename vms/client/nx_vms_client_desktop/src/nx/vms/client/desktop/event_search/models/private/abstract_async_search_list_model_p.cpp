@@ -40,24 +40,9 @@ void AbstractAsyncSearchListModel::Private::cancelPrefetch()
     m_request = {};
 }
 
-bool AbstractAsyncSearchListModel::Private::canFetch() const
-{
-    if (fetchInProgress() || !hasAccessRights())
-        return false;
-
-    if (q->fetchedTimeWindow().isEmpty())
-        return true;
-
-    if (q->fetchDirection() == FetchDirection::earlier)
-        return q->fetchedTimeWindow().startTimeMs > q->relevantTimePeriod().startTimeMs;
-
-    NX_ASSERT(q->fetchDirection() == FetchDirection::later);
-    return q->fetchedTimeWindow().endTimeMs() < q->relevantTimePeriod().endTimeMs();
-}
-
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
 {
-    if (!canFetch() || !completionHandler)
+    if (fetchInProgress() || !completionHandler)
         return false;
 
     m_request.direction = q->fetchDirection();

@@ -1215,17 +1215,6 @@ void ActionHandler::at_dropResourcesAction_triggered()
     QnResourceList resources = parameters.resources();
     QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
 
-    if (layouts.size() == 1)
-    {
-        auto &layout = layouts.first();
-        if (layout::requiresPassword(layout))
-        {
-            layout::askAndSetPassword(layout, mainWindowWidget());
-            if (layout::requiresPassword(layout)) //< A correct password was not entered. Do not open.
-                return;
-        }
-    }
-
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 
@@ -2256,7 +2245,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == ServerFileCache::OperationResult::sizeLimitExceeded)
         {
-            // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+            // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
             //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindowWidget(),

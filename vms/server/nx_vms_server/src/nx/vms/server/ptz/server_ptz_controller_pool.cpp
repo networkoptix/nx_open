@@ -173,8 +173,8 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(
-            resource, &QnResource::propertyChanged,
-            this, &ServerPtzControllerPool::at_cameraPropertyChanged,
+            camera, &QnSecurityCamResource::ptzConfigurationChanged,
+            this, &ServerPtzControllerPool::at_cameraConfigurationChanged,
             Qt::UniqueConnection);
     }
 
@@ -209,25 +209,14 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     return controller;
 }
 
-void ServerPtzControllerPool::at_cameraPropertyChanged(
-    const QnResourcePtr& resource, const QString& key)
+void ServerPtzControllerPool::at_cameraConfigurationChanged(const QnResourcePtr& resource)
 {
-    const bool isPtzKey = key == ResourcePropertyKey::kUserPreferredPtzPresetType
-        || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
-        || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
-        || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities;
+    NX_DEBUG(
+        this,
+        lm("PTZ configuration changed for resource %1 (%2), initiate reinitialization")
+            .args(resource->getName(), resource->getId()));
 
-    if (isPtzKey)
-    {
-        // Camera reinitialization is required.
-        NX_DEBUG(
-            this,
-            lm("Native presets support has been changed for the resource %1 (%2). "
-               "Reinitializing")
-                .args(resource->getName(), resource->getId()));
-
-        resource->setStatus(Qn::Offline);
-    }
+    resource->setStatus(Qn::Offline);
 }
 
 void ServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)

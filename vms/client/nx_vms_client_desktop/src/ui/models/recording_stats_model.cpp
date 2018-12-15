@@ -16,8 +16,7 @@
 
 namespace {
 
-// TODO: #vkutin #common Refactor all this to use some common formatting
-// TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+// TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
 const qreal kBytesInKB = 1024.0;
 
 const qreal kBytesInMB = kBytesInKB * kBytesInKB;
@@ -127,7 +126,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
         }
         case BytesColumn: return formatBytesString(value.recordedBytes);
         case DurationColumn: return rowType != Normal ? QString() : formatDurationString(value);
-        case BitrateColumn: return rowType == Foreign ? QString() : formatBitrateString(value.averageBitrate);
+        case BitrateColumn: return formatBitrateString(value.averageBitrate);
         default: return QString();
     }
 }

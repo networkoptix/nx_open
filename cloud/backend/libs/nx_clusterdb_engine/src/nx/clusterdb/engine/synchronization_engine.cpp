@@ -15,6 +15,7 @@ SyncronizationEngine::SyncronizationEngine(
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
     m_peerId(peerId),
+    m_outgoingCommandFilter(peerId),
     m_supportedProtocolRange(supportedProtocolRange),
     m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),

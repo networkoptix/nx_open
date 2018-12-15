@@ -179,6 +179,7 @@ private:
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
     CameraDiagnostics::Result initConfigurationalPtz();
+    CameraDiagnostics::Result initRedirectedAreaZoomPtz();
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
@@ -342,6 +343,8 @@ private:
     void setBypassProfile(Qn::ConnectionRole role, int profileNumber);
 
     Ptz::Capabilities ptzCapabilities(nx::core::ptz::Type ptzType) const;
+
+    void setPtzCalibarionTimer();
 
 private:
     using AdvancedParameterId = QString;

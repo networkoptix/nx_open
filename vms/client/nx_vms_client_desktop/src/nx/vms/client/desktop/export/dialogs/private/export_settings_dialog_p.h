@@ -39,7 +39,9 @@ class ExportSettingsDialog::Private: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    explicit Private(const QnCameraBookmark& bookmark, const QSize& previewSize,
+    explicit Private(const QnCameraBookmark& bookmark,
+        const QSize& previewSize,
+        const nx::core::Watermark& watermark,
         QObject* parent = nullptr);
     virtual ~Private() override;
 
@@ -55,7 +57,6 @@ public:
     void setServerTimeZoneOffsetMs(qint64 offsetMs);
     void setTimestampOffsetMs(qint64 offsetMs);
     void setApplyFilters(bool value);
-    void setWatermark(const nx::core::Watermark& watermark);
     void setLayoutReadOnly(bool value);
     void setLayoutEncryption(bool on, const QString& password);
     void setBookmarks(const QnCameraBookmarkList& bookmarks);

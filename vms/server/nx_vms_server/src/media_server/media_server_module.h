@@ -4,7 +4,6 @@
 #include <QtCore/QDir>
 
 #include <common/common_module.h>
-#include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
 
 #include "settings.h"

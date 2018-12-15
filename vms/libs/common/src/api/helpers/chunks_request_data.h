@@ -51,7 +51,7 @@ struct QnChunksRequestData
     Qn::SerializationFormat format = Qn::JsonFormat;
     int limit = INT_MAX;
 
-    GroupBy groupBy = GroupBy::cameraId;
+    GroupBy groupBy = GroupBy::serverId;
     Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
 
     boost::optional<nx::analytics::storage::Filter> analyticsStorageFilter;

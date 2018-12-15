@@ -192,6 +192,7 @@ namespace QnXmlTag {
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
     const QString paramDefaultValue     = lit("defaultValue");
+    const QString paramAvailableInOffline = lit("availableInOffline");
     const QString paramShouldKeepInitialValue = lit("keepInitialValue");
     const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
     const QString parameterGroup = lit("group");
@@ -304,10 +305,10 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
     param.keepInitialValue = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramShouldKeepInitialValue));
-
+    param.availableInOffline = parseBooleanXmlValue(
+        elementXml.attribute(QnXmlTag::paramAvailableInOffline));
     param.bindDefaultToMinimum = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramBindDefaultToMinimum));
-
     param.group = elementXml.attribute(QnXmlTag::parameterGroup);
 
     auto childNodes = elementXml.childNodes();

@@ -21,7 +21,7 @@ public:
     explicit CameraAdvancedParamWidgetsManager(
         QTreeWidget* groupWidget,
         QStackedWidget* contentsWidget,
-        QObject* parent = NULL);
+        QObject* parent = nullptr);
 
     void displayParams(const QnCameraAdvancedParams &params);
 
@@ -48,6 +48,15 @@ public:
     void loadValues(const QnCameraAdvancedParamValueList &params, bool packetMode = false);
     std::optional<QString> parameterValue(const QString& parameterId) const;
 
+    enum class ParameterVisibility
+    {
+        showAll,
+        showOfflineOnly
+    };
+
+    void updateParametersVisibility(ParameterVisibility visibility);
+    bool hasItemsAvailableInOffline() const;
+
     void clear();
 
 signals:
@@ -58,10 +67,15 @@ private:
     /** Check if group has at least one valid value. */
     bool hasValidValues(const QnCameraAdvancedParamGroup &group) const;
 
-    void createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem = NULL);
-    QWidget* createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
-    QWidget* createWidgetsForPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
-    void setUpDependenciesForPage(const std::vector<QnCameraAdvancedParameter> &params);
+    void createGroupWidgets(
+        const QnCameraAdvancedParamGroup& group,
+        QTreeWidgetItem* parentItem = nullptr,
+        bool* availableInOffline = nullptr);
+    QWidget* createContentsPage(
+        const QString& name, const std::vector<QnCameraAdvancedParameter>& params);
+    QWidget* createWidgetsForPage(
+        const QString& name, const std::vector<QnCameraAdvancedParameter>& params);
+    void setUpDependenciesForPage(const std::vector<QnCameraAdvancedParameter>& params);
     void runAllHandlerChains();
 
     using DependencyHandler = std::function<bool()>;
@@ -89,6 +103,7 @@ private:
     QHash<QString, QWidget*> m_paramLabelsById;
     QMap<QString, QVector<std::function<void()>>> m_handlerChains;
     QHash<QString, QnCameraAdvancedParameter> m_parametersById;
+    QSet<QTreeWidgetItem*> m_itemsAvailableInOffline;
     nx::utils::ScopedConnections m_handlerChainConnections;
 };
 

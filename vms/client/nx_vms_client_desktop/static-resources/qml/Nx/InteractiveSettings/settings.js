@@ -40,8 +40,7 @@ function createItems(parent, model)
 
 function _processItemsRecursively(item, f)
 {
-    if (item.hasOwnProperty("value"))
-        f(item)
+    f(item)
 
     if (item.childrenItem)
     {
@@ -54,7 +53,14 @@ function getValues(rootItem)
 {
     var result = {}
 
-    _processItemsRecursively(rootItem, function(item) { result[item.name] = item.value })
+    _processItemsRecursively(rootItem,
+        function(item)
+        {
+            if (item.getValue !== undefined)
+                result[item.name] = item.getValue()
+            else if (item.hasOwnProperty("value"))
+                result[item.name] = item.value
+        })
 
     return result
 }
@@ -64,11 +70,18 @@ function setValues(rootItem, values)
     _processItemsRecursively(rootItem,
         function(item)
         {
-            if (item.hasOwnProperty("value"))
+            if (values.hasOwnProperty(item.name))
             {
-                if (values.hasOwnProperty(item.name))
+                if (item.setValue !== undefined)
+                    item.setValue(values[item.name])
+                else if (item.hasOwnProperty("value"))
                     item.value = values[item.name]
-                else
+            }
+            else
+            {
+                if (item.resetValue !== undefined)
+                    item.resetValue()
+                else if (item.hasOwnProperty("value") && item.hasOwnProperty("defaultValue"))
                     item.value = item.defaultValue
             }
         })

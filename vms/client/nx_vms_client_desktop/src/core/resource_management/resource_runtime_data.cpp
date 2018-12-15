@@ -4,12 +4,14 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QObject* parent):
-    base_type(parent)
+QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QnCommonModule* commonModule, QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(commonModule)
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
+            QnMutexLocker lock(&m_mutex);
             m_data.remove(resource->getId());
             if (auto layout = resource.dynamicCast<QnLayoutResource>())
             {
@@ -24,6 +26,8 @@ QVariant QnResourceRuntimeDataManager::resourceData(const QnResourcePtr& resourc
     NX_ASSERT(resource);
     if (!resource)
         return QVariant();
+
+    QnMutexLocker lock(&m_mutex);
     return m_data.value(resource->getId()).value(role);
 }
 
@@ -32,30 +36,40 @@ void QnResourceRuntimeDataManager::setResourceData(
     Qn::ItemDataRole role,
     const QVariant& data)
 {
-    NX_ASSERT(resource);
+    NX_ASSERT(resource && !resource->getId().isNull());
     if (!resource)
         return;
-    setDataInternal(resource->getId(), role, data);
+
+    Qn::Notifier notify;
+    {
+        QnMutexLocker lock(&m_mutex);
+        notify = setDataInternal(resource->getId(), role, data);
+    }
+    if (notify)
+        notify();
 }
 
 void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role)
 {
-    NX_ASSERT(resource);
+    NX_ASSERT(resource && !resource->getId().isNull());
     if (!resource)
         return;
+
     cleanupData(resource->getId(), role);
 }
 
 void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& resource)
 {
-    NX_ASSERT(resource);
+    NX_ASSERT(resource && !resource->getId().isNull());
     if (!resource)
         return;
+
     cleanupData(resource->getId());
 }
 
 QVariant QnResourceRuntimeDataManager::layoutItemData(const QnUuid& id, Qn::ItemDataRole role) const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_data.value(id).value(role);
 }
 
@@ -64,28 +78,50 @@ void QnResourceRuntimeDataManager::setLayoutItemData(
     Qn::ItemDataRole role,
     const QVariant& data)
 {
-    setDataInternal(id, role, data);
+    Qn::Notifier notify;
+    {
+        QnMutexLocker lock(&m_mutex);
+        notify = setDataInternal(id, role, data);
+    }
+    if (notify)
+        notify();
 }
 
 void QnResourceRuntimeDataManager::cleanupData(const QnUuid& id, Qn::ItemDataRole role)
 {
-    setDataInternal(id, role, QVariant());
+    Qn::Notifier notify;
+    {
+        QnMutexLocker lock(&m_mutex);
+        notify = setDataInternal(id, role, QVariant());
+    }
+    if (notify)
+        notify();
 }
 
 void QnResourceRuntimeDataManager::cleanupData(const QnUuid& id)
 {
-    for (auto role: m_data.value(id).keys())
-        setDataInternal(id, role, QVariant());
+    Qn::NotifierList notifiers;
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (auto role: m_data.value(id).keys())
+        {
+            auto notify = setDataInternal(id, role, QVariant());
+            if (notify)
+                notifiers.push_back(notify);
+        }
+    }
+    for (const auto& notify: notifiers)
+        notify();
 }
 
-void QnResourceRuntimeDataManager::setDataInternal(
+Qn::Notifier QnResourceRuntimeDataManager::setDataInternal(
     const QnUuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {
     const QVariant& oldData = m_data.value(id).value(role);
     if (data.isValid() && oldData == data)
-        return;
+        return nullptr;
 
     if (data.isValid())
     {
@@ -94,14 +130,20 @@ void QnResourceRuntimeDataManager::setDataInternal(
     else
     {
         if (!m_data.contains(id))
-            return;
+            return nullptr;
 
         if (!m_data[id].contains(role))
-            return;
+            return nullptr;
 
         m_data[id].remove(role);
         if (m_data[id].isEmpty())
             m_data.remove(id);
     }
-    emit layoutItemDataChanged(id, role, data);
+
+    return
+        [this, id, role, data]()
+        {
+            emit resourceDataChanged(id, role, data);
+            emit layoutItemDataChanged(id, role, data);
+        };
 }

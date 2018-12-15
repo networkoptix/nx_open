@@ -105,7 +105,7 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
         return textData(index);
     case Qt::EditRole:
         return editData(index);
-    case Qt::TextColorRole:
+    case Qt::ForegroundRole:
         break;
     case Qt::BackgroundRole:
         break;

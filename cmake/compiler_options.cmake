@@ -105,6 +105,9 @@ if(WINDOWS)
 
         # 'identifier' : type name first seen using 'objecttype1' now seen using 'objecttype2'
         /we4099
+
+        # Wrong initialization order.
+        /we5038
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)

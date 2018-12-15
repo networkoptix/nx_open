@@ -17,7 +17,7 @@ using nx::core::Watermark;
 namespace {
 
 const QColor kWatermarkColor = QColor(Qt::white);
-const int kWatermarkFontSize = 42 * 2; //< Pure magic.
+const int kWatermarkFontSize = 84; //< Pure magic. It was 42 * 2 before. No more memes.
 constexpr double kFuzzyEqualDiff = 0.02;
 constexpr double kFuzzyEqualRatio = 1.02;
 

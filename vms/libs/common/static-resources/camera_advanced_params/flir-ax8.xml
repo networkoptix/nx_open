@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <plugin
 	name="FLIR-AX8"
-	version="1" 
+	version="1"
 	unique_id="B41F4D-8267-4D56-BF4A-58C1221B9598">
 	<parameters>
         <group name="Imaging">
@@ -71,14 +71,14 @@
                     name="Enable Isotherm"
                     description=""
                     dataType="Bool"
-                    readCmd="bool"/>                              
+                    readCmd="bool"/>
             <param id=".image.sysimg.measureFuncs.isotherm.1.type"
                     name="Isotherm type"
                     description=""
                     dataType="Enumeration"
                     range="Above,Below"
                     internalRange="above,below"
-                    readCmd="ascii"/> 
+                    readCmd="ascii"/>
             <param id="68.01.03"
                     name="Isotherm Level"
                     description=""
@@ -90,7 +90,7 @@
                     description=""
                     range="palette1,palette2,red,green,blue,yellow,cyan,magenta,gray"
                     dataType="Enumeration"
-                    readCmd="ascii"/>                                    
+                    readCmd="ascii"/>
 
         </group>
         <group name="Overlays">
@@ -171,6 +171,7 @@
                 description=""
                 dataType="Button"
                 confirmation="Are you sure you want to reboot the device?"
+                availableInOffline="true"
                 readCmd="reset"
                 writeCmd=""/>
             <param id="01.01-default"
@@ -178,6 +179,7 @@
                 description=""
                 dataType="Button"
                 confirmation="Are you sure you want to reset all settings to default?"
+                availableInOffline="true"
                 readCmd="reset"
                 writeCmd="01"/>
         </group>

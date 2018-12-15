@@ -14,6 +14,7 @@
 #include <nx_ec/access_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
 namespace {
 
@@ -286,6 +287,7 @@ CameraSelectionDialog::CameraSelectionDialog(
 //    ui->filteredResourceSelectionWidget->setDetailsVisible(true);
     const auto view = ui->filteredResourceSelectionWidget->view();
     view->setupHeader();
+    view->sortByColumn(ResourceNodeViewColumn::resourceNameColumn, Qt::AscendingOrder);
     connect(view, &ResourceSelectionNodeView::resourceSelectionChanged,
         d, &Private::handleSelectionChanged);
 

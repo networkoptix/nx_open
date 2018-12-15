@@ -152,13 +152,24 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         [this](const QnResourcePtr& /*resource*/, const QString& key)
         {
             if (key == ResourcePropertyKey::kCameraCapabilities)
+            {
                 emit capabilitiesChanged(toSharedPointer());
-
-            if (key == ResourcePropertyKey::kDts)
+            }
+            else if (key == ResourcePropertyKey::kDts)
+            {
                 emit licenseTypeChanged(toSharedPointer(this));
-
-            if (key == ResourcePropertyKey::kDeviceType)
+            }
+            else if (key == ResourcePropertyKey::kDeviceType)
+            {
                 emit licenseTypeChanged(toSharedPointer(this));
+            }
+            else if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
+                || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
+                || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
+                || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities)
+            {
+                emit ptzConfigurationChanged(toSharedPointer(this));
+            }
         });
 
     QnMediaResource::initMediaResource();

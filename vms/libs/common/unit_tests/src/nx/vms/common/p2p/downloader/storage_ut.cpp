@@ -60,12 +60,12 @@ protected:
         createTestFile(testFileName, kTestFileSize);
     }
 
+    QnSyncTime syncTime;
     QDir workingDirectory;
     QString testFileName;
     QString testFilePath;
     QByteArray testFileMd5;
     QScopedPointer<Storage> downloaderStorage;
-    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderStorageTest, inexistentFileRequests)
@@ -395,7 +395,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForDownloadedFiles)
     }
 
     Storage downloaderStorage(workingDirectory);
-    downloaderStorage.waitForDownloadsToBeFound();
+    downloaderStorage.findDownloads(true);
 
     const auto& fileInfo = downloaderStorage.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, FileInformation::Status::downloaded);
@@ -413,7 +413,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForNewFiles)
         ResultCode::ok);
 
     Storage downloaderStorage(workingDirectory);
-    downloaderStorage.waitForDownloadsToBeFound();
+    downloaderStorage.findDownloads(true);
 
     const auto& fileInfo = downloaderStorage.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, FileInformation::Status::downloading);
@@ -452,7 +452,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForFilesInProgress)
     }
 
     Storage downloaderStorage(workingDirectory);
-    downloaderStorage.waitForDownloadsToBeFound();
+    downloaderStorage.findDownloads(true);
 
     const auto& fileInfo = downloaderStorage.fileInformation(targetFileName);
     ASSERT_EQ(fileInfo.status, FileInformation::Status::downloading);
@@ -478,7 +478,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findCorruptedFiles)
     }
 
     Storage downloaderStorage(workingDirectory);
-    downloaderStorage.waitForDownloadsToBeFound();
+    downloaderStorage.findDownloads(true);
 
     const auto& fileInfo = downloaderStorage.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, FileInformation::Status::corrupted);
@@ -494,7 +494,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findFileAfterDeletion)
         ResultCode::ok);
 
     Storage downloaderStorage(workingDirectory);
-    downloaderStorage.waitForDownloadsToBeFound();
+    downloaderStorage.findDownloads(true);
 
     const auto& fileInfo = downloaderStorage.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, FileInformation::Status::notFound);

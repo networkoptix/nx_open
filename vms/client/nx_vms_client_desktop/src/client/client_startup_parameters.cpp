@@ -2,11 +2,12 @@
 
 #include <QtCore/QFile>
 
+#include <nx/vms/client/core/common/utils/encoded_string.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <utils/common/util.h>
-#include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -137,12 +138,15 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 QString QnStartupParameters::createAuthenticationString(const nx::utils::Url& url,
     const nx::vms::api::SoftwareVersion& version)
 {
+    const auto logonInformation = QString::fromUtf8(url.toEncoded());
+
     // For old clients use compatible format
     if (!version.isNull() && version < kEncodeSupportVersion)
-        return QString::fromUtf8(url.toEncoded());
+        return logonInformation;
 
-    QnEncodedString encoded(QString::fromUtf8(url.toEncoded()));
-    return kEncodeAuthMagic + encoded.encoded();
+    // TODO: #GDM Possibly it's better to add extra key to the logon info as a salt.
+    const auto secure = nx::vms::client::core::EncodedString::fromDecoded(logonInformation);
+    return kEncodeAuthMagic + secure.encoded();
 }
 
 nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
@@ -150,7 +154,7 @@ nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
     if (string.startsWith(kEncodeAuthMagic))
     {
         string = string.mid(kEncodeAuthMagic.length());
-        string = QnEncodedString::fromEncoded(string).value();
+        string = nx::vms::client::core::EncodedString::fromEncoded(string).decoded();
     }
 
     return nx::utils::Url::fromUserInput(string);

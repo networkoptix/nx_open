@@ -10,7 +10,7 @@
 
 struct SOAP_ENV__Fault;
 
-using CredentialsList = QList<nx::common::utils::Credentials>;
+using CredentialsList = QList<nx::vms::common::Credentials>;
 
 class PasswordHelper: public QObject
 {

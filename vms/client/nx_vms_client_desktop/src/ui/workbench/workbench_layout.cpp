@@ -311,8 +311,17 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
             NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
         }
     }
+
     m_rectSet.remove(item->geometry());
-    m_itemsByResource[item->resource()].remove(item);
+
+    if (const auto itemsByResource = m_itemsByResource.find(item->resource());
+        NX_ASSERT(itemsByResource != m_itemsByResource.end()))
+    {
+        itemsByResource->remove(item);
+        if (itemsByResource->empty())
+            m_itemsByResource.erase(itemsByResource);
+    }
+
     m_itemByUuid.remove(item->uuid());
 
     item->m_layout = nullptr;
@@ -645,6 +654,11 @@ const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items(const QnResourcePtr& reso
 const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items() const
 {
     return m_items;
+}
+
+QnResourceList QnWorkbenchLayout::itemResources() const
+{
+    return m_itemsByResource.keys();
 }
 
 bool QnWorkbenchLayout::isFreeSlot(const QPointF& gridPos, const QSize& size) const

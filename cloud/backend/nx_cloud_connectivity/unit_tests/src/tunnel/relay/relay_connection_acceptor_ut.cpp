@@ -12,11 +12,7 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace cloud {
-namespace relay {
-namespace test {
+namespace nx::network::cloud::relay::test {
 
 using namespace nx::cloud::relay;
 
@@ -26,11 +22,9 @@ class RelayTest:
 public:
     RelayTest()
     {
-        using namespace std::placeholders;
-
         m_factoryFunctionBak =
             nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
-                std::bind(&RelayTest::createClient, this, _1));
+                [this](auto&&... args) { return createClient(std::move(args)...); });
 
         setKeepAliveReported(true);
     }
@@ -58,17 +52,19 @@ protected:
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         m_testHttpServer.registerRequestProcessorFunc(
             api::kServerIncomingConnectionsPath,
-            std::bind(&RelayTest::processIncomingConnection, this,
-                _1, _2));
+            [this](auto&&... args) { processIncomingConnection(std::move(args)...); });
 
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
         m_relayServerUrl = nx::utils::Url(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
         m_relayServerUrl.setUserName("server1.system1");
+    }
+
+    void setRelayToReportPreemptiveConnectionCount(int count)
+    {
+        m_beginListeningResponse.preemptiveConnectionCount = count;
     }
 
     nx::utils::Url relayServerUrl() const
@@ -108,8 +104,6 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        using namespace std::placeholders;
-
         if (m_serverType != ServerType::happy)
         {
             requestContext.connection->closeConnection(SystemError::connectionReset);
@@ -126,7 +120,7 @@ private:
         nx::network::http::RequestResult requestResult(
             nx::network::http::StatusCode::switchingProtocols);
         requestResult.connectionEvents.onResponseHasBeenSent =
-            std::bind(&RelayTest::saveConnection, this, _1);
+            [this](auto&&... args) { saveConnection(std::move(args)...); };
         completionHandler(std::move(requestResult));
     }
 
@@ -199,10 +193,8 @@ protected:
 
     void whenWaitingForConnectionActivation()
     {
-        using namespace std::placeholders;
-
         m_connection->waitForOriginatorToStartUsingConnection(
-            std::bind(&RelayReverseConnection::onConnectionActivated, this, _1));
+            [this](auto&&... args) { onConnectionActivated(std::move(args)...); });
     }
 
     void whenRelayActivatesConnection()
@@ -237,10 +229,8 @@ protected:
 
     void whenConnectingToTheRelayServer()
     {
-        using namespace std::placeholders;
-
         m_connection->connectToOriginator(
-            std::bind(&RelayReverseConnection::onConnectionToOriginatorCompletion, this, _1));
+            [this](auto&&... args) { onConnectionToOriginatorCompletion(std::move(args)...); });
     }
 
     void thenConnectionHasBeenEstablished()
@@ -449,10 +439,14 @@ protected:
 
     void whenStartedAccepting()
     {
-        using namespace std::placeholders;
-
         m_acceptor->acceptAsync(
-            std::bind(&RelayConnectionAcceptor::onAccepted, this, _1, _2));
+            [this](auto&&... args) { onAccepted(std::move(args)...); });
+    }
+
+    void whenRelayClosesConnectionsNumberOf(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_listeningPeerConnectionsToRelay.pop();
     }
 
     void thenAcceptorIsRegisteredOnRelay()
@@ -460,6 +454,16 @@ protected:
         auto connection = m_listeningPeerConnectionsToRelay.pop();
         ASSERT_NE(nullptr, connection.get());
         connection->pleaseStopSync();
+    }
+
+    void thenAcceptorKeepsEstablishedConnectionCountOf(std::size_t count)
+    {
+        while (m_listeningPeerConnectionsToRelay.size() < count)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+        // Ensuring peer does not establish more connections.
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_EQ(count, m_listeningPeerConnectionsToRelay.size());
     }
 
 private:
@@ -478,8 +482,17 @@ TEST_F(RelayConnectionAcceptor, registers_on_relay)
     thenAcceptorIsRegisteredOnRelay();
 }
 
-} // namespace test
-} // namespace relay
-} // namespace cloud
-} // namespace network
-} // namespace nx
+TEST_F(RelayConnectionAcceptor, takes_into_account_preemptive_connection_count)
+{
+    constexpr int kPreemptiveConnectionCount = 2;
+
+    setRelayToReportPreemptiveConnectionCount(kPreemptiveConnectionCount);
+
+    whenStartedAccepting();
+    whenRelayClosesConnectionsNumberOf(
+        api::BeginListeningResponse().preemptiveConnectionCount);
+
+    thenAcceptorKeepsEstablishedConnectionCountOf(kPreemptiveConnectionCount);
+}
+
+} // namespace nx::network::cloud::relay::test

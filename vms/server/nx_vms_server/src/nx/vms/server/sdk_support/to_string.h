@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/sdk/common.h>
+#include <nx/sdk/i_device_info.h>
 
 namespace nx::sdk {
 

@@ -82,6 +82,7 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaType<ResourceTreeNodeType>();
     qRegisterMetaType<Qn::ItemRole>();
+    qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QnLicenseWarningState>();
     qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();

@@ -21,7 +21,7 @@
 #include <nx/utils/interval.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 
 class QScrollBar;
 class QVariantAnimation;
@@ -62,10 +62,16 @@ public:
     std::chrono::microseconds highlightedTimestamp() const;
     void setHighlightedTimestamp(std::chrono::microseconds value);
 
+    QSet<QnResourcePtr> highlightedResources() const;
+    void setHighlightedResources(const QSet<QnResourcePtr>& value);
+
     bool live() const;
     void setLive(bool value);
 
     void setViewportMargins(int top, int bottom);
+
+    QWidget* viewportHeader() const;
+    void setViewportHeader(QWidget* value); //< Takes ownership.
 
     int count() const;
 
@@ -116,7 +122,7 @@ private:
     void ensureWidget(int index);
     void reserveWidget(int index);
 
-    void cleanupDeletingTile(int index);
+    void handleItemAboutToBeRemoved(int index);
     void handleWidgetChanged(int index);
     void closeExpiredTiles();
 
@@ -137,7 +143,7 @@ private:
         int position = 0;
         Importance importance = Importance();
         bool animated = false;
-        std::unique_ptr<CameraThumbnailProvider> preview;
+        std::unique_ptr<ResourceThumbnailProvider> preview;
         std::unique_ptr<EventTile> widget;
     };
 
@@ -146,18 +152,12 @@ private:
 
     std::deque<TilePtr> m_tiles;
     std::stack<std::unique_ptr<EventTile>> m_reserveWidgets;
-    Tile* m_hoveredTile = nullptr;
+    QPersistentModelIndex m_hoveredIndex;
     Interval m_visible;
 
-    struct Deadline
-    {
-        QDeadlineTimer timer;
-        QPersistentModelIndex index;
-    };
+    QHash<QPersistentModelIndex, QDeadlineTimer> m_deadlines;
 
-    QHash<Tile*, Deadline> m_deadlines;
-
-    std::array<int, int(Importance::LevelCount)> m_unreadCounts;
+    std::array<int, int(Importance::LevelCount)> m_unreadCounts{};
     int m_totalUnreadCount = 0;
 
     nx::utils::Guard makeUnreadCountGuard();
@@ -181,7 +181,10 @@ private:
     bool m_live = true;
     bool m_updating = false;
 
+    QPointer<QWidget> m_viewportHeader;
+
     std::chrono::microseconds m_highlightedTimestamp{0};
+    QSet<QnResourcePtr> m_highlightedResources;
 
     int m_topMargin = style::Metrics::kStandardPadding;
     int m_bottomMargin = style::Metrics::kStandardPadding;

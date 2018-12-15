@@ -2,6 +2,7 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
+#include <utils/media/frame_info.h>
 #include <nx/core/transcoding/filters/image_to_frame_painter.h>
 
 namespace nx {
@@ -19,12 +20,12 @@ PaintImageFilter::~PaintImageFilter()
 
 CLVideoDecoderOutputPtr PaintImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
+    m_painter->updateSourceSize(QSize(frame->width, frame->height)); //< Does nothing if no size change.
     return m_painter->drawTo(frame);
 }
 
 QSize PaintImageFilter::updatedResolution(const QSize& sourceSize)
 {
-    m_painter->updateSourceSize(sourceSize);
     return sourceSize;
 }
 

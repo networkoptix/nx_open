@@ -170,17 +170,12 @@ void EventSearchListModel::Private::clearData()
 
 void EventSearchListModel::Private::truncateToMaximumCount()
 {
-    this->truncateDataToMaximumCount(m_data, &startTime);
+    q->truncateDataToMaximumCount(m_data, &startTime);
 }
 
 void EventSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    this->truncateDataToTimePeriod(m_data, upperBoundPredicate, q->relevantTimePeriod());
-}
-
-bool EventSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
+    q->truncateDataToTimePeriod(m_data, &startTime, q->relevantTimePeriod());
 }
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
