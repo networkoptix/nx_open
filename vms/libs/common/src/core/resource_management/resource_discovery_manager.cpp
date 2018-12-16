@@ -91,15 +91,6 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
     m_serverOfflineTimeout(QnMediaServerResource::kMinFailoverTimeoutMs)
 {
     m_threadPool.setMaxThreadCount(kThreadCount);
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
-    connect(commonModule()->globalSettings(), &QnGlobalSettings::disabledVendorsChanged, this,
-        &QnResourceDiscoveryManager::updateSearchersUsage);
-    connect(commonModule()->globalSettings(), &QnGlobalSettings::autoDiscoveryChanged, this,
-        &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -711,47 +702,6 @@ QSet<QString> QnResourceDiscoveryManager::registerManualCameras(const std::vecto
         }
     }
     return registeredUniqueIds;
-}
-
-void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
-{
-    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server)
-    {
-        disconnect(server, nullptr, this, nullptr);
-        updateSearchersUsage();
-    }
-
-    QnMutexLocker lock(&m_searchersListMutex);
-    m_manualCameraByUniqueId.remove(resource->getUniqueId());
-    m_recentlyDeleted << resource->getUniqueId();
-
-    NX_DEBUG(this, lm("Manual camera %1 is deleted on %2")
-        .args(resource->getUniqueId(), resource->getUrl()));
-}
-
-void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
-{
-    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server)
-    {
-        connect(server, &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
-        updateSearchersUsage();
-    }
-
-    std::vector<QnManualCameraInfo> newCameras;
-    {
-        QnMutexLocker lock( &m_searchersListMutex );
-        const auto camera = resource.dynamicCast<QnSecurityCamResource>();
-        if (!camera || !camera->isManuallyAdded())
-            return;
-
-        if (!m_manualCameraByUniqueId.contains(camera->getUniqueId()))
-            newCameras.push_back(manualCameraInfo(camera));
-    }
-
-    if (!newCameras.empty())
-        registerManualCameras(newCameras);
 }
 
 bool QnResourceDiscoveryManager::isManuallyAdded(const QnSecurityCamResourcePtr& camera) const

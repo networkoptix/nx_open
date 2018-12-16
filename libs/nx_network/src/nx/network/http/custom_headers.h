@@ -23,6 +23,9 @@ static const QByteArray HA1_DIGEST_HEADER_NAME = "X-Nx-Digest";
 static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
 static const QByteArray RTSP_DATA_FILTER_HEADER_NAME = "x-data-filter";
 
+// Flag is used to preserve compatibility with old servers.
+static const QByteArray RTSP_DATA_SEND_MOTION_HEADER_NAME = "x-send-motion";
+
 /** Guid of peer which initiated request. */
 static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";
 

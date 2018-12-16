@@ -2,6 +2,7 @@
 
 #include <QtCore>
 #include <QString>
+#include <future>
 #include <nx/update/update_information.h>
 #include <nx/vms/api/data/system_information.h>
 #include <common/common_module.h>
@@ -57,6 +58,7 @@ nx::update::Package* findPackage(
     nx::update::Information& updateInfo);
 
 using UpdateCheckCallback = std::function<void (const UpdateContents&)>;
+
 /**
  * Checks update for specific build from the internet. It starts asynchronously.
  * @param updateUrl Url to update server. It should lead directly to updates.json file,

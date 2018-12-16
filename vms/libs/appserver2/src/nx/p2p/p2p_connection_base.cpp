@@ -424,7 +424,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8)getMessageType(m_dataToSend.front(), remotePeer().isClient());
+        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_webSocket->sendAsync(
