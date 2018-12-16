@@ -20,6 +20,7 @@ enum class PeerType;
 enum class DayOfWeek;
 enum class BackupType;
 enum class UserRole;
+enum class P2pTransportMode;
 
 } // namespace api
 } // namespace vms
@@ -41,3 +42,4 @@ NX_VMS_API_DECLARE_TYPE(MotionStreamType)
 NX_VMS_API_DECLARE_TYPE(PeerType)
 NX_VMS_API_DECLARE_TYPE(BackupType)
 NX_VMS_API_DECLARE_TYPE(UserRole)
+NX_VMS_API_DECLARE_TYPE(P2pTransportMode)

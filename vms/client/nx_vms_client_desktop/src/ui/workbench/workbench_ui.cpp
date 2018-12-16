@@ -122,7 +122,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
 
-    // In profiler mode calculate fps 10 times more precisely.
     m_fpsCountingInstrument = new DebugInfoInstrument(this);
 
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
@@ -1424,13 +1423,6 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible)
         return;
 
     m_fpsItem->setVisible(fpsVisible);
-    m_fpsCountingInstrument->setEnabled(fpsVisible);
-
-    if (fpsVisible)
-        m_fpsCountingInstrument->recursiveEnable();
-    else
-        m_fpsCountingInstrument->recursiveDisable();
-
     m_fpsItem->setText(QString());
 
     action(action::ShowFpsAction)->setChecked(fpsVisible);

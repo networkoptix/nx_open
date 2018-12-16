@@ -266,7 +266,7 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
     if (!query->exec())
     {
         qWarning() << Q_FUNC_INFO << query->lastError().text();
-        return ErrorCode::failure;
+        return ErrorCode::dbError;
     }
 
     m_commitData.state.values[key] = sequence;
@@ -309,7 +309,7 @@ ErrorCode QnTransactionLog::saveToDB(
     if (!query->exec())
     {
         qWarning() << Q_FUNC_INFO << query->lastError().text();
-        return ErrorCode::failure;
+        return ErrorCode::dbError;
     }
 
     #ifdef TRANSACTION_LOG_DEBUG
@@ -451,7 +451,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
         query.addBindValue(key.persistentId.toRfc4122());
         query.addBindValue(querySequence);
         if (!query.exec())
-            return ErrorCode::failure;
+            return ErrorCode::dbError;
 
         qint32 lastSelectedSequence = 0;
         while (query.next())
@@ -511,7 +511,7 @@ ErrorCode QnTransactionLog::getExactTransactionsAfter(
         query.addBindValue(key.persistentId.toRfc4122());
         query.addBindValue(querySequence);
         if (!query.exec())
-            return ErrorCode::failure;
+            return ErrorCode::dbError;
 
         qint32 lastSelectedSequence = 0;
         while (query.next())

@@ -60,7 +60,8 @@ private:
         uint8_t** outPayload,
         int* outPayloadLength,
         bool* outIsFatalError,
-        uint32_t* outRtpTimestamp);
+        uint32_t* outRtpTimestamp,
+        uint16_t* sequenceNumber);
 
     int calculateFullRtpHeaderSize(
         const uint8_t* rtpHeaderStart,

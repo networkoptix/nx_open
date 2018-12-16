@@ -26,6 +26,9 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(kDefaultAssertCrash, assertHeavyCondition,
         "Enable assertions for heavy conditions.");
+
+    NX_INI_FLAG(0, displayUrlPasswordInLogs,
+        "Enable displaying of URL password field in the logs");
 };
 
 NX_UTILS_API Ini& ini();

@@ -5,6 +5,7 @@
 
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
+#include <nx/network/p2p_transport/i_p2p_transport.h>
 
 namespace {
 
@@ -374,6 +375,7 @@ void ServerMessageBus::commitLazyData()
         dbTran.commit();
         m_dbCommitTimer.restart();
     }
+    emit lazyDataCommtDone();
 }
 
 void ServerMessageBus::stop()
@@ -411,10 +413,41 @@ void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection
     context(connection)->isLocalStarted = true;
 }
 
+bool ServerMessageBus::gotPostConnection(
+    const vms::api::PeerDataEx& remotePeer,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    nx::Buffer requestBody)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto existingConnectionIt = std::find_if(
+            m_connections.cbegin(),
+            m_connections.cend(),
+            [&remotePeer](const auto& connection)
+            {
+                return remotePeer.connectionGuid == connection->remotePeer().connectionGuid;
+            });
+
+        if (existingConnectionIt == m_connections.cend())
+        {
+            NX_DEBUG(
+                this,
+                lm("Got an incoming POST connection with guid %1 but failed to find an "
+                    "existing connection with the same guid").args(remotePeer.connectionGuid));
+            return false;
+        }
+
+        existingConnectionIt.value()->gotPostConnection(std::move(socket), std::move(requestBody));
+        return true;
+    }
+
+    return false;
+}
+
 void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::WebSocketPtr webSocket,
+    nx::network::P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
@@ -429,7 +462,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         commonModule(),
         remotePeer,
         localPeerEx(),
-        std::move(webSocket),
+        std::move(p2pTransport),
         requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),

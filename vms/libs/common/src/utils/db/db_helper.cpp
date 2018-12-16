@@ -197,7 +197,8 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
         NX_ERROR(this, lit("can't create folder for sqlLite database!\n %1").arg(fileName));
     m_connectionName = dbname;
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
-    m_sdb.setDatabaseName(fileName);
+    bool useMemDb = qApp->arguments().contains("--memDb");
+    m_sdb.setDatabaseName(useMemDb ? ":memory:" : fileName);
 }
 
 void QnDbHelper::removeDatabase()

@@ -3942,6 +3942,7 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 
 void HanwhaResource::setPtzCalibarionTimer()
 {
+    const auto kUpdateTimeout = sharedContext()->ptzCalibratedChannels.timeout() / 3;
     NX_VERBOSE(this, "Set PTZ calibration timer");
     m_timerHolder.addTimer(
         lm("%1 PTZ calibration").args(this),
@@ -3966,7 +3967,7 @@ void HanwhaResource::setPtzCalibarionTimer()
 
             setPtzCalibarionTimer();
         },
-        std::chrono::seconds(10));
+        kUpdateTimeout);
 }
 
 } // namespace plugins

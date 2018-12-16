@@ -1021,8 +1021,11 @@ void QnCommonMessageProcessor::updateResource(
             nx::vms::api::AnalyticsPluginData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsPluginResource>();
 
-    if (!NX_ASSERT(pluginResource, "Unable to create plugin resource."))
+    if (!pluginResource)
+    {
+        NX_DEBUG(this, "Unable to create plugin resource.");
         return;
+    }
 
     ec2::fromApiToResource(analyticsPluginData, pluginResource);
     updateResource(pluginResource, source);
@@ -1042,8 +1045,11 @@ void QnCommonMessageProcessor::updateResource(
             nx::vms::api::AnalyticsEngineData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsEngineResource>();
 
-    if (!NX_ASSERT(engineResource, "Unable to create engine resource."))
+    if (!engineResource)
+    {
+        NX_DEBUG(this, "Unable to create engine resource.");
         return;
+    }
 
     ec2::fromApiToResource(analyticsEngineData, engineResource);
     updateResource(engineResource, source);

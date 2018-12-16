@@ -472,6 +472,10 @@ vms::api::PeerDataEx deserializePeerData(
     else if (dataFormat == Qn::UbjsonFormat)
         peer = QnUbjson::deserialized(peerData, defaultPeerDataEx(), &success);
 
+    const auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+    if (guidHeaderIt != headers.cend())
+        peer.connectionGuid = QnUuid::fromStringSafe(guidHeaderIt->second);
+
     return peer;
 }
 
@@ -491,6 +495,9 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
         if (query.hasQueryItem("runtime-guid"))
             result.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
     }
+    if (query.hasQueryItem(Qn::EC2_CONNECTION_GUID_HEADER_NAME))
+        result.connectionGuid = QnUuid(query.queryItemValue(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
+
 
     if (result.peerType == nx::vms::api::PeerType::notDefined)
     {
@@ -501,7 +508,14 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
+    if (result.connectionGuid.isNull())
+        result.connectionGuid = QnUuid::createUuid();
+
     result.dataFormat = dataFormat;
+
+    if (query.hasQueryItem(QString::fromLatin1("transport")))
+        QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("transport")), &result.transport);
+
     return result;
 }
 

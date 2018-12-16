@@ -31,4 +31,4 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // nx::vms::client::desktop
