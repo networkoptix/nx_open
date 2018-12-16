@@ -35,6 +35,8 @@ public:
 
     bool hasChanges() const;
 
+    bool hasItemsAvailableInOffline() const;
+
 signals:
     void hasChangesChanged();
 
@@ -44,13 +46,14 @@ private:
     void initialize();
     void displayParams();
 
-    void saveSingleValue(const QnCameraAdvancedParamValue& value);
-    void sendCustomParameterCommand(const QnCameraAdvancedParameter& parameter,
-        const QString& value);
+    void saveSingleValue(const QnCameraAdvancedParameter& parameter, const QString& value);
+    void sendCustomParameterCommand(
+        const QnCameraAdvancedParameter& parameter, const QString& value);
 
     bool isCameraAvailable() const;
     void updateCameraAvailability();
     void updateButtonsState();
+    void updateParameretsVisibility();
     QnMediaServerConnectionPtr getServerConnection() const;
 
     // Returns current values of all parameters that belong to the given group set.

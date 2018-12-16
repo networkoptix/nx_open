@@ -4,6 +4,7 @@
 #include <deque>
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
@@ -19,7 +20,6 @@
 #include <utils/media/h264_utils.h>
 #include <utils/media/utils.h>
 #include <nx/utils/log/log.h>
-
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 

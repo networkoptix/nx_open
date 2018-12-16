@@ -123,6 +123,7 @@ struct QnCameraAdvancedParameter
     QString description;
     QString confirmation; //< Confirmation message. Actual only for the buttons now.
     QString tag;
+    bool availableInOffline = false;
     bool readOnly = false;
     QString readCmd; //< Read parameter command line. Isn't used in UI.
     QString writeCmd; //< Write parameter command line. Isn't used in UI.
@@ -183,7 +184,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (keepInitialValue)\
     (bindDefaultToMinimum)\
     (resync)\
-    (group)
+    (group)\
+    (availableInOffline)
 
 struct QnCameraAdvancedParamGroup
 {

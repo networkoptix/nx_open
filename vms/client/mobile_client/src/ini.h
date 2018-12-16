@@ -19,6 +19,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, execAtGlThreadOnBeforeSynchronizing, "Connect lambda execution to the event.");
     NX_INI_FLAG(1, execAtGlThreadOnFrameSwapped, "Connect lambda execution to the event.");
     NX_INI_STRING("", tcpLogAddress, "Write log to specified IP:port as raw TCP stream");
+    NX_INI_FLAG(1, forceSoftwareDecoderForIPhoneXs,
+        "Due to issues with hardware decoding on iPhone XS (and possibly XR) we need to "
+        "enable software-only decoding mode.");
 };
 
 inline Ini& ini()

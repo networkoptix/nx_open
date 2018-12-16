@@ -92,7 +92,7 @@ QStandardItem* newConnectionItem(const QString& text, const nx::utils::Url& url,
     auto result = new QStandardItem(text);
     result->setData(qVariantFromValue(url), Qn::UrlRole);
     if (!isValid)
-        result->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
+        result->setData(QBrush(qnGlobals->errorTextColor()), Qt::ForegroundRole);
 
     return result;
 }

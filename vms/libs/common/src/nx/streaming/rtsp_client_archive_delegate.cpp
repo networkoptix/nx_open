@@ -918,10 +918,17 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
 void QnRtspClientArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
     m_streamDataFilter = filter;
+
     const auto value = QnLexical::serialized(filter).toUtf8();
+    const auto sendMotionValue = filter.testFlag(nx::vms::api::StreamDataFilter::motion) ? "1" : "0";
+
     m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_FILTER_HEADER_NAME, value);
+    m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_SEND_MOTION_HEADER_NAME, sendMotionValue);
     if (m_rtspSession->isOpened())
+    {
         m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME, value);
+        m_rtspSession->sendSetParameter(Qn::RTSP_DATA_SEND_MOTION_HEADER_NAME, sendMotionValue);
+    }
 }
 
 nx::vms::api::StreamDataFilters QnRtspClientArchiveDelegate::streamDataFilter() const

@@ -21,6 +21,7 @@
 
 #include <utils/common/checked_cast.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
@@ -61,6 +62,19 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
                 recalculateAllPermissions();
             else
                 updatePermissions(subject.user());
+        });
+
+    // Capture password setting or dropping for layout.
+    connect(qnResourceRuntimeDataManager,
+        &QnResourceRuntimeDataManager::resourceDataChanged,
+        this,
+        [this](const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
+        {
+            if (role == Qn::LayoutPasswordRole)
+            {
+                if (auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
+                    updatePermissions(layout);
+            }
         });
 
     recalculateAllPermissions();
@@ -337,17 +351,6 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 {
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
-
-    // Capture password setting or dropping for layout.
-    if(auto layout = resource.dynamicCast<QnLayoutResource>())
-    {
-        connect(layout, &QnLayoutResource::dataChanged, this,
-            [this, layout](int role)
-            {
-                if (role == Qn::LayoutPasswordRole)
-                    updatePermissions(layout);
-            });
-    }
 
     // Capture password setting or dropping for exported video.
     if(auto videoFile = resource.dynamicCast<QnAviResource>())

@@ -20,7 +20,8 @@ public:
      */
     static void registerDecoders(
         const QMap<int, QSize>& maxFfmpegResolutions,
-        bool isTranscodingEnabled);
+        bool isTranscodingEnabled,
+        bool enableHardwareDecoderOnIPhone);
 };
 
 } // namespace media

@@ -37,6 +37,9 @@ protected:
         createAnalyticsEngineResource(const QnResourceParams& params) override;
 
 private:
+    void at_resourceAdded(const QnResourcePtr& resource);
+    void at_resourceDeleted(const QnResourcePtr& resource);
+
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
     void updateResourceStatus(const QnNetworkResourcePtr& rpNetRes);

@@ -99,14 +99,19 @@ void SimpleSelectionTableView::handleHeaderCheckedStateChanged(Qt::CheckState st
     for (int row = 0; row != rowCount; ++row)
     {
         const auto index = currentModel->index(row, m_checkboxColumn);
-        currentModel->setData(index, state, Qt::CheckStateRole);
+        if (currentModel->flags(index).testFlag(Qt::ItemIsUserCheckable))
+            currentModel->setData(index, state, Qt::CheckStateRole);
     }
 }
 
 void SimpleSelectionTableView::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Space)
+    {
         handleSpacePressed();
+        event->accept();
+        return;
+    }
 
     base_type::keyPressEvent(event);
 }
@@ -131,8 +136,14 @@ void SimpleSelectionTableView::handleClicked(const QModelIndex& index)
     if (!currentModel || !index.isValid())
         return;
 
-    const auto checkState = isChecked(index) ? Qt::Unchecked : Qt::Checked;
-    currentModel->setData(checkboxIndex(index), checkState, Qt::CheckStateRole);
+    if (index == checkboxIndex(index))
+        return; //< Click will be handled by base class implementation.
+
+    if (!checkboxIndex(index).flags().testFlag(Qt::ItemIsUserCheckable))
+        return;
+
+    const auto newCheckState = isChecked(index) ? Qt::Unchecked : Qt::Checked;
+    currentModel->setData(checkboxIndex(index), newCheckState, Qt::CheckStateRole);
 }
 
 void SimpleSelectionTableView::handleSpacePressed()
@@ -142,12 +153,15 @@ void SimpleSelectionTableView::handleSpacePressed()
         return;
 
     const auto indexes = selectedIndexes();
+    if (indexes.empty())
+        return;
+
     const bool anyUnchecked = std::any_of(indexes.begin(), indexes.end(),
         [this](const QModelIndex& index) { return !isChecked(index); });
 
     const auto newState = anyUnchecked ? Qt::Checked : Qt::Unchecked;
     for (const auto index: indexes)
-        currentModel->setData(checkboxIndex(index), newState);
+        currentModel->setData(checkboxIndex(index), newState, Qt::CheckStateRole);
 }
 
 QModelIndex SimpleSelectionTableView::checkboxIndex(const QModelIndex& index)

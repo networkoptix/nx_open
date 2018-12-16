@@ -33,7 +33,26 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
         READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
+
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
+    Q_PROPERTY(QColor loadingChunkColor
+        READ loadingChunkColor
+        WRITE setLoadingChunkColor
+        NOTIFY loadingChunkColorChanged)
+    Q_PROPERTY(QColor motionModeChunkColor
+        READ motionModeChunkColor
+        WRITE setMotionModeChunkColor
+        NOTIFY motionModeChunkColorChanged)
+
+    Q_PROPERTY(QColor motionColor
+        READ motionColor
+        WRITE setMotionColor
+        NOTIFY motionColorChanged)
+    Q_PROPERTY(QColor motionLoadingColor
+        READ motionLoadingColor
+        WRITE setMotionLoadingColor
+        NOTIFY motionLoadingColorChanged)
+
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
     Q_PROPERTY(QColor activeLiveColorLight READ activeLiveColorLight
@@ -53,6 +72,16 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(QnCameraChunkProvider* chunkProvider
         READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
+    Q_PROPERTY(bool motionSearchMode
+        WRITE setMotionSearchMode
+        READ motionSearchMode
+        NOTIFY motionSearchModeChanged)
+
+    Q_PROPERTY(bool changingMotionRoi
+        READ changingMotionRoi
+        WRITE setChangingMotionRoi
+        NOTIFY changingMotionRoiChanged)
+
 public:
     explicit QnTimeline(QQuickItem* parent = nullptr);
     ~QnTimeline();
@@ -68,6 +97,18 @@ public:
 
     QColor chunkColor() const;
     void setChunkColor(const QColor& color);
+
+    QColor loadingChunkColor() const;
+    void setLoadingChunkColor(const QColor& color);
+
+    QColor motionModeChunkColor() const;
+    void setMotionModeChunkColor(const QColor& color);
+
+    QColor motionColor() const;
+    void setMotionColor(const QColor& color);
+
+    QColor motionLoadingColor() const;
+    void setMotionLoadingColor(const QColor& color);
 
     QColor chunkBarColor() const;
     void setChunkBarColor(const QColor& color);
@@ -108,6 +149,12 @@ public:
     qint64 position() const;
     void setPosition(qint64 position);
     Q_INVOKABLE void setPositionImmediately(qint64 position);
+
+    bool motionSearchMode() const;
+    void setMotionSearchMode(bool value);
+
+    bool changingMotionRoi() const;
+    void setChangingMotionRoi(bool value);
 
     QDateTime positionDate() const;
 
@@ -169,6 +216,10 @@ signals:
 
     void textColorChanged();
     void chunkColorChanged();
+    void loadingChunkColorChanged();
+    void motionModeChunkColorChanged();
+    void motionColorChanged();
+    void motionLoadingColorChanged();
     void chunkBarColorChanged();
     void fontChanged();
 
@@ -183,6 +234,8 @@ signals:
     void chunkProviderChanged();
 
     void moveFinished();
+    void motionSearchModeChanged();
+    void changingMotionRoiChanged();
 
 private:
     QSGNode* updateTextNode(QSGNode* textRootNode);
