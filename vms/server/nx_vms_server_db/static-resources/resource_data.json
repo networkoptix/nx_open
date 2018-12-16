@@ -2393,52 +2393,6 @@
         },
         {
             "keys":[
-            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
-            ],
-            "multiresourceVideoChannelMapping": [
-                {
-                    "resourceChannel": 1,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [0]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 2,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [1]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 3,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [2]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 4,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [3]
-                        }
-                    ]
-                }
-            ],
-            "ignoreMultisensors": true,
-            "shouldAppearAsSingleChannel": true,
-            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },
-        {
-            "keys":[
             "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T", "N9PC-SLAH5|DWC-PZ21M69T"
             ],
             "multiresourceVideoChannelMapping": [
@@ -2886,7 +2840,8 @@
             "Hikvision|DS-2CD6D54*", "HIKVISION|DS-2CD6D54*",
             "NVM3-A16|IP-Camera", "IPNC|NVM3-A16",
             "Hanwha|*", "Hanwha Techwin|*",
-            "Samsung|*", "Samsung Techwin|*"
+            "Samsung|*", "Samsung Techwin|*",
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
             ],
             "canShareLicenseGroup": true
         },
