@@ -33,7 +33,7 @@ QSize HoverButton::sizeHint() const
     return m_normal.size() / m_normal.devicePixelRatio();
 }
 
-void HoverButton::paintEvent(QPaintEvent* event)
+void HoverButton::paintEvent(QPaintEvent* /*event*/)
 {
     QPixmap pixmap;
     if (isDown())

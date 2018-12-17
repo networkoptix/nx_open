@@ -390,6 +390,47 @@ QString elideString(const QString &source, int maxLength, const QString &tail)
     return (elidedText + tail);
 }
 
+QString replaceStrings(
+    const QString& source,
+    const std::vector<std::pair<QString, QString>>& substitutions,
+    Qt::CaseSensitivity caseSensitivity)
+{
+    if (substitutions.empty() || source.isEmpty())
+        return source;
+
+    QHash<QString, QString> replacements;
+    QString pattern;
+    for (const auto& [src, dst]: substitutions)
+    {
+        if (!replacements.contains(src))
+            replacements[src] = dst;
+
+        pattern.append(QRegularExpression::escape(src));
+        pattern.append(L'|');
+    }
+    pattern.chop(1);
+
+    QRegularExpression re(pattern,
+        caseSensitivity == Qt::CaseInsensitive
+            ? QRegularExpression::CaseInsensitiveOption
+            : QRegularExpression::NoPatternOption);
+
+    QString result;
+
+    int lastPos = 0;
+    auto it = re.globalMatch(source);
+    while (it.hasNext())
+    {
+        const QRegularExpressionMatch match = it.next();
+        result += source.mid(lastPos, match.capturedStart() - lastPos);
+        result += replacements.value(match.captured());
+        lastPos = match.capturedEnd();
+    }
+    result += source.mid(lastPos);
+
+    return result;
+}
+
 QByteArray generateRandomName(int length)
 {
     return random::generateName(length);

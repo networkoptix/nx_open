@@ -89,7 +89,7 @@ QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serv
 int QnInstallUpdateRestHandler::executePost(
     const QString& path,
     const QnRequestParamList& params,
-    const QByteArray& body,
+    const QByteArray& /*body*/,
     const QByteArray& srcBodyContentType,
     QByteArray& result,
     QByteArray& resultContentType,
@@ -120,8 +120,8 @@ int QnInstallUpdateRestHandler::executePost(
 }
 
 void QnInstallUpdateRestHandler::afterExecute(
-    const QString& path,
-    const QnRequestParamList& params,
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
     const QByteArray& body,
     const QnRestConnectionProcessor* owner)
 {

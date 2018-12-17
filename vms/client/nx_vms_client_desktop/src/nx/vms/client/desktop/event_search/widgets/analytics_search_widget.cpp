@@ -9,6 +9,9 @@
 #include <QtWidgets/QMenu>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
 
 #include <nx/analytics/descriptor_list_manager.h>
@@ -45,6 +48,8 @@ private:
     void setupAreaSelection();
     void setAreaSelectionEnabled(bool value);
     void updateAreaButtonAppearance();
+
+    void updateAvailableObjectTypes();
 
     QAction* addMenuAction(QMenu* menu, const QString& title, const QString& objectType);
 
@@ -88,6 +93,13 @@ AnalyticsSearchWidget::~AnalyticsSearchWidget()
 {
 }
 
+void AnalyticsSearchWidget::resetFilters()
+{
+    base_type::resetFilters();
+    selectCameras(AbstractSearchWidget::Cameras::layout);
+    d->resetFilters();
+}
+
 void AnalyticsSearchWidget::setFilterRect(const QRectF& value)
 {
     d->setFilterRect(value.intersected({0, 0, 1, 1}));
@@ -113,11 +125,10 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
     return tr("%n objects", "", count);
 }
 
-void AnalyticsSearchWidget::resetFilters()
+bool AnalyticsSearchWidget::calculateIsAllowed() const
 {
-    base_type::resetFilters();
-    selectCameras(AbstractSearchWidget::Cameras::layout);
-    d->resetFilters();
+    return !commonModule()->analyticsDescriptorListManager()
+        ->allDescriptorsInTheSystem<nx::vms::api::analytics::ObjectTypeDescriptor>().empty();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -137,6 +148,36 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 
     connect(q, &AbstractSearchWidget::textFilterChanged,
         m_model, &AnalyticsSearchListModel::setFilterText);
+
+    // Update analytics events submenu when servers are added to or removed from the system.
+    const auto handleServerAddedOrRemoved =
+        [this](const QnResourcePtr& resource)
+        {
+            if (!m_model->isOnline())
+                return;
+
+            const auto flags = resource->flags();
+            if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+                updateAvailableObjectTypes();
+        };
+
+    auto serverChangesListener = new QnResourceChangesListener(q);
+    serverChangesListener->connectToResources<QnMediaServerResource>(
+        &QnMediaServerResource::propertyChanged,
+        this, &Private::updateAvailableObjectTypes);
+
+    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerAddedOrRemoved);
+    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerAddedOrRemoved);
+
+    connect(m_model, &AbstractSearchListModel::isOnlineChanged, this,
+        [this](bool isOnline)
+        {
+            if (isOnline)
+                updateAvailableObjectTypes();
+        });
+
+    if (m_model->isOnline())
+        updateAvailableObjectTypes();
 }
 
 QRectF AnalyticsSearchWidget::Private::filterRect() const
@@ -165,35 +206,16 @@ void AnalyticsSearchWidget::Private::resetFilters()
     m_typeSelectionButton->deactivate();
 }
 
+void AnalyticsSearchWidget::Private::updateAvailableObjectTypes()
+{
+    q->updateIsAllowed();
+    updateTypeMenu();
+}
+
 void AnalyticsSearchWidget::Private::setupTypeSelection()
 {
     m_typeSelectionButton->setDeactivatedText(tr("Any type"));
     m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/analytics.png"));
-
-    // Update analytics events submenu when servers are added to or removed from the system.
-    const auto handleServerChanges =
-        [this](const QnResourcePtr& resource)
-        {
-            if (!m_model->isOnline())
-                return;
-
-            const auto flags = resource->flags();
-            if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
-                updateTypeMenu();
-        };
-
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerChanges);
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerChanges);
-
-    connect(m_model, &AbstractSearchListModel::isOnlineChanged, this,
-        [this](bool isOnline)
-        {
-            if (isOnline)
-                updateTypeMenu();
-        });
-
-    if (m_model->isOnline())
-        updateTypeMenu();
 
     m_typeSelectionButton->setMenu(m_objectTypeMenu);
 

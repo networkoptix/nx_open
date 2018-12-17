@@ -19,7 +19,7 @@
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/utils/log/log_message.h>
 
 namespace nx::vms::client::desktop {

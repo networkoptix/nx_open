@@ -15,6 +15,8 @@ public:
     AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~AnalyticsSearchWidget() override;
 
+    virtual void resetFilters() override;
+
     QRectF filterRect() const;
     void setFilterRect(const QRectF& value);
 
@@ -28,8 +30,7 @@ signals:
 private:
     virtual QString placeholderText(bool constrained) const override;
     virtual QString itemCounterText(int count) const override;
-
-    virtual void resetFilters() override;
+    virtual bool calculateIsAllowed() const override;
 
 private:
     class Private;

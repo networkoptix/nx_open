@@ -43,7 +43,7 @@
 #include <update/low_free_space_warning.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/network/app_info.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -433,12 +433,13 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
 
     bool validUpdate = contents.isValid();
     auto source = contents.sourceType;
+
     QString internalError = nx::update::toString(contents.error);
     // We have different error messages for each update source. So we should check
     // every combination of update source and nx::update::InformationError values.
     if (contents.alreadyInstalled && source != SourceType::internet)
     {
-        report.status = tr("You have already installed this version.");
+        report.statusMessages << tr("You have already installed this version.");
     }
     else if (contents.error == Error::noError)
     {
@@ -455,56 +456,76 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 break;
             case Error::networkError:
                 // Unable to check update from the internet.
-                report.status = tr("Unable to check updates on the internet");
+                report.statusMessages << tr("Unable to check updates on the internet");
                 report.versionError = false;
                 break;
             case Error::httpError:
                 NX_ASSERT(source == SourceType::internet || source == SourceType::internetSpecific);
                 if (source == SourceType::internetSpecific)
-                    report.status = tr("Build not found");
+                    report.statusMessages << tr("Build not found");
                 else
-                    report.status = tr("Unable to check updates on the internet");
+                    report.statusMessages << tr("Unable to check updates on the internet");
                 break;
             case Error::jsonError:
                 if (source == SourceType::file)
-                    report.status = tr("Cannot update from the selected file");
+                    report.statusMessages << tr("Cannot update from the selected file");
                 else
-                    report.status = tr("Invalid update information");
+                    report.statusMessages << tr("Invalid update information");
                 break;
             case Error::incompatibleVersion:
-                report.status = tr("Downgrade to earlier versions is not possible");
-                break;
-            case Error::incompatibleCloudHostError:
-                report.status = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
-                    "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
-                    .arg(nx::network::AppInfo::cloudName());
+                report.statusMessages << tr("Downgrade to earlier versions is not possible");
                 break;
             case Error::notFoundError:
                 // No update
-                report.status = tr("Update file is not found");
+                report.statusMessages << tr("Update file is not found");
                 break;
             case Error::noNewVersion:
                 // We have most recent version for this build.
                 report.hasLatestVersion = true;
                 break;
             case Error::brokenPackageError:
+                report.statusMessages << tr("Upgrade package is broken");
                 break;
             case Error::missingPackageError:
+            {
+                QStringList packageErrors;
+                if (contents.missingClientPackage)
+                    packageErrors << tr("Missing update package for client");
+                if (!contents.missingUpdate.empty())
+                    packageErrors << tr("Missing update package for some servers");
+                if (packageErrors.empty() && !contents.unsupportedSystem.empty())
+                {
+                    if (contents.unsupportedSystem.size() > 1)
+                    {
+                        packageErrors << tr("Detected unsupported OS for some servers");
+                    }
+                    else
+                    {
+                        auto id = contents.unsupportedSystem.firstKey();
+                        auto serverInfo = QnResourceDisplayInfo(m_stateTracker->getServer(id));
+                        QString serverName = serverInfo.toString(qnSettings->extraInfoInTree());
+                        packageErrors << tr("Detected unsupported OS for the server %1").arg(serverName);
+                    }
+                }
+
+                report.statusMessages << packageErrors;
                 break;
+            }
         }
+    }
+
+    if (!contents.cloudIsCompatible)
+    {
+        report.statusMessages << tr("Incompatible %1 instance. To update disconnect System from %1 first.",
+            "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+            .arg(nx::network::AppInfo::cloudName());
     }
 
     QString versionRaw = nx::utils::AppInfo::applicationVersion();
     auto currentVersion = nx::utils::SoftwareVersion(versionRaw);
 
     if (validUpdate && contents.getVersion() < currentVersion)
-    {
-        report.status = tr("Downgrade to earlier versions is not possible");
-    }
-    else if (!contents.missingUpdate.empty())
-    {
-        report.status = tr("This version does not include some necessary Server package");
-    }
+        report.statusMessages << tr("Downgrade to earlier versions is not possible");
 
     return report;
 }
@@ -528,21 +549,28 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             NX_INFO(this) << "atUpdateCurrentState this is the data from /ec2/updateInformation";
         }
 
-        m_serverUpdateTool->verifyUpdateManifest(checkResponse);
+        m_serverUpdateTool->verifyUpdateManifest(checkResponse, m_clientUpdateTool->getInstalledVersions());
         if (m_updateInfo.compareUpdate(checkResponse))
         {
             m_updateInfo = checkResponse;
+
+            if (!m_updateInfo.unsupportedSystem.empty())
+                m_stateTracker->setVerificationError(checkResponse.unsupportedSystem);
+
+            if (!m_updateInfo.missingUpdate.empty())
+                m_stateTracker->setVerificationError(
+                    checkResponse.missingUpdate, tr("No update package available"));
+
+            m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+
+            if (!m_updateInfo.clientPackage.isValid())
+                syncStatusVisibility();
             m_haveValidUpdate = false;
-            m_updateCheckError = "";
             m_targetVersion = nx::utils::SoftwareVersion(checkResponse.info.version);
             m_targetChangeset = m_targetVersion.build();
 
             if (checkResponse.isValid() && !checkResponse.alreadyInstalled)
                 m_haveValidUpdate = true;
-
-            auto report = calculateUpdateVersionReport(m_updateInfo);
-            if (!report.status.isEmpty())
-                m_updateCheckError = report.status;
         }
         else
         {
@@ -585,6 +613,7 @@ void MultiServerUpdatesWidget::clearUpdateInfo()
     m_targetVersion = nx::utils::SoftwareVersion();
     m_updateInfo = nx::update::UpdateContents();
     m_updatesModel->setUpdateTarget(nx::utils::SoftwareVersion());
+    m_stateTracker->clearVerificationErrors();
     m_updateLocalStateChanged = true;
     m_updateCheck = std::future<nx::update::UpdateContents>();
 }
@@ -992,7 +1021,8 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
          *  2. This is 'other' client, that have found that an update process is running.
          *  It should download an update package using p2p downloader
          */
-        if (!m_serverUpdateTool->verifyUpdateManifest(updateInfo)
+        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        if (!m_serverUpdateTool->verifyUpdateManifest(updateInfo, installedVersions)
             || !updateInfo.isValid())
         {
             // We can reach here when we reconnect to the server with complete updates.
@@ -1645,11 +1675,10 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     bool isChecking = m_updateCheck.valid() || m_serverUpdateCheck.valid() || m_widgetState == WidgetUpdateState::initial;
     bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
     bool hasLatestVersion = false;
-    if (!m_updateInfo.isValid() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
+    if (m_updateInfo.isEmpty() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
         hasLatestVersion = true;
     else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
         hasLatestVersion = true;
-
     if (m_updateInfo.isValid() && m_updateInfo.sourceType != UpdateSourceType::internet)
         hasLatestVersion = false;
 
@@ -1720,9 +1749,9 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
             ui->releaseDescriptionLabel->setVisible(!m_updateInfo.info.description.isEmpty());
         }
-        else if (!m_updateCheckError.isEmpty())
+        else if (m_updateReport.statusError)
         {
-            ui->errorLabel->setText(m_updateCheckError);
+            ui->errorLabel->setText(m_updateReport.statusMessages.join("<br>"));
             ui->infoStackedWidget->setCurrentWidget(ui->errorPage);
             ui->downloadButton->setVisible(false);
             ui->releaseDescriptionLabel->setText("");
@@ -1820,10 +1849,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 {
     // This function gathers state status of update from remote servers and changes
     // UI state accordingly.
-
-    bool hideInfo = m_widgetState == WidgetUpdateState::initial
-        || m_widgetState == WidgetUpdateState::ready;
-    hideStatusColumns(hideInfo);
+    syncStatusVisibility();
     // Title to be shown for this UI state.
     QString updateTitle;
 
@@ -2034,10 +2060,17 @@ void MultiServerUpdatesWidget::autoCheckForUpdates()
     checkForInternetUpdates();
 }
 
-void MultiServerUpdatesWidget::hideStatusColumns(bool value)
+void MultiServerUpdatesWidget::syncStatusVisibility()
 {
-    m_statusItemDelegate->setStatusVisible(!value);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, value);
+    bool hideInfo = m_widgetState == WidgetUpdateState::initial
+        || m_widgetState == WidgetUpdateState::ready;
+    if (m_stateTracker->hasVerificationErrors())
+        hideInfo = false;
+    if (m_updateInfo.alreadyInstalled)
+        hideInfo = true;
+
+    m_statusItemDelegate->setStatusVisible(!hideInfo);
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, hideInfo);
 }
 
 void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& /*unused*/)

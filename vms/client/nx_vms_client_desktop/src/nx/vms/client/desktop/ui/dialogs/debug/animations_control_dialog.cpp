@@ -5,7 +5,7 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QBoxLayout>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 

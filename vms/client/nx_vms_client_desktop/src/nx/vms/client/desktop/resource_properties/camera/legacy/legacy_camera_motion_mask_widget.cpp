@@ -26,7 +26,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/globals.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
 namespace nx::vms::client::desktop {
 

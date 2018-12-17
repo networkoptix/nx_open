@@ -45,7 +45,6 @@ public:
 
 private:
     void rebuildTabs();
-    bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
     void showContextMenu(const QPoint& pos);
     void setTabCurrent(QWidget* tab, bool current);
@@ -66,7 +65,6 @@ private:
 
     QWidget* m_previousTab = nullptr;
     QWidget* m_lastTab = nullptr;
-
 };
 
 } // namespace nx::vms::client::desktop

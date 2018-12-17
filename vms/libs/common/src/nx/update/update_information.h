@@ -3,10 +3,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QDir>
+#include <QtCore/QSet>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx::update {
 
@@ -63,7 +65,6 @@ enum class InformationError
     jsonError,
     brokenPackageError,
     missingPackageError,
-    incompatibleCloudHostError,
     incompatibleVersion,
     notFoundError,
     noNewVersion,
@@ -135,6 +136,25 @@ enum class UpdateSourceType
 };
 
 /**
+ * Does comparison for package cache.
+ */
+struct SystemInformationComparator
+{
+    bool operator() (
+        const nx::vms::api::SystemInformation& lhs,
+        const nx::vms::api::SystemInformation& rhs) const
+    {
+        if (lhs.arch != rhs.arch)
+            return lhs.arch < rhs.arch;
+
+        if (lhs.platform != rhs.platform)
+            return lhs.platform < rhs.platform;
+
+        return lhs.modification < rhs.modification;
+    }
+};
+
+/**
  * Wraps up update info and summary for its verification.
  * All update tools inside client work with this structure directly,
  * instead of nx::update::Information.
@@ -148,14 +168,32 @@ struct UpdateContents
     QSet<QnUuid> missingUpdate;
     /** A set of servers that can not accept update version. */
     QSet<QnUuid> invalidVersion;
+    /**
+     * Maps a server id, which OS is no longer supported to error message.
+     * The message is displayed to the user.
+     */
+    QMap<QnUuid, QString> unsupportedSystem;
     /** Path to eula file. */
     QString eulaPath;
     /** A folder with offline update packages. */
     QDir storageDir;
     /** A list of files to be uploaded. */
     QStringList filesToUpload;
+
+    using SystemInformation = nx::vms::api::SystemInformation;
+
+    using PackageCache =
+        std::map<SystemInformation, QList<nx::update::Package>, SystemInformationComparator>;
+    /**
+     * Maps system information to a set of packages. We use this cache to find and check
+     * if specific OS variant is supported.
+     */
+    PackageCache packageCache;
+
     /** Information for the clent update. */
     nx::update::Package clientPackage;
+    /** Flag shows that we need update package for client, but it is missing. */
+    bool missingClientPackage = false;
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
     /**

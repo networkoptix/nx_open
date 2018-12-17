@@ -529,6 +529,21 @@ EventRibbon* AbstractSearchWidget::Private::view() const
     return ui->ribbon;
 }
 
+
+bool AbstractSearchWidget::Private::isAllowed() const
+{
+    return m_isAllowed;
+}
+
+void AbstractSearchWidget::Private::setAllowed(bool value)
+{
+    if (m_isAllowed == value)
+        return;
+
+    m_isAllowed = value;
+    emit q->isAllowedChanged(m_isAllowed);
+}
+
 void AbstractSearchWidget::Private::goToLive()
 {
     if (m_mainModel->liveSupported())

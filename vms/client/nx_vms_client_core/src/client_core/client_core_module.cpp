@@ -35,6 +35,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 {
     m_commonModule = new QnCommonModule(true, nx::core::access::Mode::cached, this);
 
+    Q_INIT_RESOURCE(nx_vms_client_core);
     initializeMetaTypes();
 
     m_commonModule->store(new QnClientCoreSettings());

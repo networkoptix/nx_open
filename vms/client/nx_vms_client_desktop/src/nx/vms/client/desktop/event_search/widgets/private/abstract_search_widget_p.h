@@ -45,6 +45,9 @@ public:
     AbstractSearchListModel* model() const;
     EventRibbon* view() const;
 
+    bool isAllowed() const;
+    void setAllowed(bool value);
+
     void goToLive();
 
     Controls relevantControls() const;
@@ -132,6 +135,8 @@ private:
     };
 
     std::vector<DeviceDependentAction> m_deviceDependentActions;
+
+    bool m_isAllowed = true;
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)

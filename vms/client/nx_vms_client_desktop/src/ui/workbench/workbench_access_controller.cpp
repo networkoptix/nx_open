@@ -260,7 +260,7 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
             | Qn::EditLayoutSettingsPermission
             | Qn::WriteNamePermission;
 
-        if (layout->locked() || layout::isEncrypted(layout))
+        if (layout->locked())
             permissions &= ~Qn::AddRemoveItemsPermission;
 
         return permissions;
@@ -356,7 +356,10 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     if(auto videoFile = resource.dynamicCast<QnAviResource>())
     {
         connect(videoFile, &QnAviResource::storageAccessChanged, this,
-            [this, videoFile]() { updatePermissions(videoFile); });
+            [this, videoFile]()
+            {
+                updatePermissions(videoFile);
+            });
     }
 
     connect(resource, &QnResource::flagsChanged, this,

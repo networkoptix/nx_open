@@ -83,6 +83,18 @@ NX_UTILS_API void trimInPlace( QString* const str, const QString& symbols = QLat
 NX_UTILS_API QString elideString(
     const QString& source, int maxLength, const QString& tail = QLatin1String("..."));
 
+/**
+ * Replace several substrings in the source string at once. Handles situation when one of
+ * substituted values contains source of another substitution. So if source string was 'abc' and
+ * you want to replace 'a->b' and 'b->c', this algorithm will produce 'bcc' string, while
+ * consequent replaces will produce 'ccc'. When several substitutions can be applied, first one
+ * is selected.
+ */
+NX_UTILS_API QString replaceStrings(
+    const QString& source,
+    const std::vector<std::pair<QString, QString>>& substitutions,
+    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+
 //!Generates random string containing only letters and digits
 NX_UTILS_API QByteArray generateRandomName(int length);
 
