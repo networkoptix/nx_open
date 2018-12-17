@@ -7,6 +7,24 @@
 
 namespace nx::utils::data_structures {
 
+namespace detail {
+
+template<template<typename...> typename Template, typename T>
+struct IsSpecializationOf: std::false_type {};
+
+template<template<typename...> typename Template, typename... Args >
+struct IsSpecializationOf<Template, Template<Args...>>: std::true_type {};
+
+template<typename T, typename = void>
+struct hasMappedType: public std::false_type {};
+
+template<typename T>
+struct hasMappedType<
+    T,
+    std::void_t<typename std::remove_reference_t<T>::mapped_type>>: public std::true_type {};
+
+} // namespace detail
+
 namespace MapHelper
 {
     template<typename T>
@@ -16,7 +34,7 @@ namespace MapHelper
     }
 
     template<typename T>
-    constexpr bool isMap(T&& maybeMap)
+    constexpr bool isMap(T&& /*maybeMap*/)
     {
         return data_structures::detail::hasMappedType<T>::value;
     }
@@ -51,20 +69,6 @@ namespace MapHelper
 }
 
 namespace detail {
-
-template<template<typename...> typename Template, typename T>
-struct IsSpecializationOf: std::false_type {};
-
-template<template<typename...> typename Template, typename... Args >
-struct IsSpecializationOf<Template, Template<Args...>>: std::true_type {};
-
-template<typename T, typename = void>
-struct hasMappedType: public std::false_type {};
-
-template<typename T>
-struct hasMappedType<
-    T,
-    std::void_t<typename std::remove_reference_t<T>::mapped_type>>: public std::true_type {};
 
 template<typename NonMap, typename = void>
 struct UnwrappedInternal

@@ -4,6 +4,8 @@
 #include <nx/utils/data_structures/map_helper.h>
 #include <core/resource/resource.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::analytics {
 
 using namespace nx::utils::data_structures;
