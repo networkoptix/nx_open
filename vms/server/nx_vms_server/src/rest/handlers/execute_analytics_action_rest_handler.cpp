@@ -25,6 +25,11 @@ QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
 {
 }
 
+QStringList QnExecuteAnalyticsActionRestHandler::cameraIdUrlParams() const
+{
+    return {"deviceId"};
+}
+
 int QnExecuteAnalyticsActionRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
@@ -43,7 +48,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     }
 
     QString missedField;
-    if (actionData.pluginId.isEmpty())
+    if (actionData.engineId.isNull())
         missedField = "pluginId";
     else if (actionData.actionId.isEmpty())
         missedField = "actionId";
@@ -57,26 +62,26 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    for (auto& engineResource: resourcePool()->getResources<resource::AnalyticsEngineResource>())
-    {
-         if (engineResource->plugin()->manifest().id == actionData.pluginId)
-        {
-            AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(
-                &actionResult, engineResource->sdkEngine().get(), actionData);
+    const auto engineResource =
+        resourcePool()->getResourceById<resource::AnalyticsEngineResource>(actionData.engineId);
 
-            if (!errorMessage.isEmpty())
-            {
-                result.setError(QnJsonRestResult::CantProcessRequest,
-                    lit("Plugin failed to execute action: %1").arg(errorMessage));
-            }
-            result.setReply(actionResult);
-            return nx::network::http::StatusCode::ok;
-        }
+    if (!engineResource)
+    {
+        NX_WARNING(this, "Engine with id %1 not found", actionData.engineId);
+        result.setError(QnJsonRestResult::InvalidParameter, "Engine not found");
+        return nx::network::http::StatusCode::ok;
     }
 
-    result.setError(QnJsonRestResult::CantProcessRequest,
-        lit("Plugin with pluginId \"%1\" not found").arg(actionData.pluginId));
+    AnalyticsActionResult actionResult;
+    QString errorMessage = executeAction(
+        &actionResult, engineResource->sdkEngine().get(), actionData);
+
+    if (!errorMessage.isEmpty())
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest,
+            lit("Plugin failed to execute action: %1").arg(errorMessage));
+    }
+    result.setReply(actionResult);
     return nx::network::http::StatusCode::ok;
 }
 
@@ -101,15 +106,14 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_params(
-            nx::vms::server::sdk_support::toIStringMap(actionData.params)),
+        m_params(nx::vms::server::sdk_support::toIStringMap(actionData.params.toVariantMap())),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
         m_objectId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
-        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
+        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.deviceId);
         m_timestampUs = actionData.timestampUs;
     }
 
@@ -122,8 +126,6 @@ public:
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
     virtual const nx::sdk::IStringMap* params() override { return m_params.get(); }
-
-    virtual int paramCount() override { return m_params->count(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -172,8 +174,8 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     nx::sdk::Error error = nx::sdk::Error::noError;
     engine->executeAction(&action, &error);
 
-    // By this time, engine either already called Action::handleResult(), or is not going to do it.
-
+    // By this time, the Engine either already called Action::handleResult(), or is not going to
+    // do it.
     return errorMessage(error);
 }
 

@@ -14,6 +14,8 @@ class QnExecuteAnalyticsActionRestHandler:
 public:
     QnExecuteAnalyticsActionRestHandler(QnMediaServerModule* serverModule);
 
+    virtual QStringList cameraIdUrlParams() const override;
+
     virtual int executePost(
         const QString &path,
         const QnRequestParams &params,

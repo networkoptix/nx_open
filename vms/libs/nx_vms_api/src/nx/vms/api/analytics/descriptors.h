@@ -163,15 +163,18 @@ struct ActionTypeDescriptor: BaseDescriptor
         BaseDescriptor(
             actionType.id,
             actionType.name),
-        supportedObjectTypeIds(std::move(actionType.supportedObjectTypeIds))
+        supportedObjectTypeIds(std::move(actionType.supportedObjectTypeIds)),
+        parametersModel(std::move(actionType.parametersModel))
     {
     }
 
     QList<QString> supportedObjectTypeIds;
+    QJsonObject parametersModel;
 };
 #define nx_vms_api_analytics_ActionTypeDescriptor_Fields \
     nx_vms_api_analytics_BaseDescriptor_Fields \
-    (supportedObjectTypeIds)
+    (supportedObjectTypeIds) \
+    (parametersModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(DescriptorScope, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(BaseDescriptor, (json)(eq), NX_VMS_API)

@@ -5,6 +5,6 @@
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (AnalyticsActionResult)
     (AnalyticsAction)
-    (AvailableAnalyticsActionsOfPlugin)
+    (AvailableAnalyticsActionsOfEngine)
     (AvailableAnalyticsActions),
     (json), _Fields)

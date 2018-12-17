@@ -125,20 +125,56 @@ std::string Engine::manifest() const
             "supportedObjectTypeIds": [
                 ")json" + kCarObjectType + R"json("
             ],
-            "settings": {
-                "params": [
+            "parametersModel": {
+                "type": "Settings",
+                "items": [
                     {
-                        "id": "paramA",
-                        "dataType": "Number",
-                        "name": "Param A",
-                        "description": "Number A"
+                        "type": "TextField",
+                        "name": "test_text_field",
+                        "caption": "Text Field Parameter",
+                        "description": "A text field",
+                        "defaultValue": "a text"
                     },
                     {
-                        "id": "paramB",
-                        "dataType": "Enumeration",
-                        "range": "b1,b3",
-                        "name": "Param B",
-                        "description": "Enumeration B"
+                        "type": "GroupBox",
+                        "caption": "Parameter Group",
+                        "items": [
+                            {
+                                "type": "SpinBox",
+                                "caption": "SpinBox Parameter",
+                                "name": "test_spin_box",
+                                "defaultValue": 42,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "DoubleSpinBox",
+                                "caption": "DoubleSpinBox Parameter",
+                                "name": "test_double_spin_box",
+                                "defaultValue": 3.1415,
+                                "minValue": 0.0,
+                                "maxValue": 100.0
+                            },
+                            {
+                                "type": "ComboBox",
+                                "name": "test_combo_box",
+                                "caption": "ComboBox Parameter",
+                                "defaultValue": "value2",
+                                "range": ["value1", "value2", "value3"]
+                            },
+                            {
+                                "type": "Row",
+                                "items": [
+                                    {
+                                        "type": "CheckBox",
+                                        "caption": "CheckBox Parameter",
+                                        "name": "test_check_box",
+                                        "defaultValue": true,
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }

@@ -41,9 +41,6 @@ public:
      */
     virtual const nx::sdk::IStringMap* params() = 0;
 
-    /** Number of items in params() array. */
-    virtual int paramCount() = 0;
-
     /**
      * Report action result back to Server. If the action is decided not to have any result, this
      * method can be either called with nulls or not called at all.
