@@ -180,10 +180,9 @@ void OpenLayoutActionWidget::updateLayoutsButton()
     if (!model())
         return;
 
-    const auto icon = [](const QString& path) -> QIcon
+    const auto icon = [](QnResourceIconCache::Key key, QnIcon::Mode mode)
         {
-            static const QnIcon::SuffixesList suffixes{ { QnIcon::Normal, lit("selected") } };
-            return qnSkin->icon(path, QString(), &suffixes);
+            return QnSkin::maximumSizePixmap(qnResIconCache->icon(key), mode);
         };
 
     auto button = ui->selectLayoutButton;
@@ -195,29 +194,19 @@ void OpenLayoutActionWidget::updateLayoutsButton()
 
         const bool isWarning = m_layoutWarning != LayoutWarning::NoWarning;
         setWarningStyleOn(button, isWarning);
-        if (isWarning)
-        {
-            if (layout->isShared())
-                button->setIcon(icon(lit("tree/layout_shared.png")));
-            else if (layout->locked())
-                button->setIcon(icon(lit("tree/layout_locked_error.png")));
-            else
-                button->setIcon(icon(lit("tree/layout_error.png")));
-        }
-        else
-        {
-            if (layout->isShared())
-                button->setIcon(icon(lit("tree/layout_shared.png")));
-            else if (layout->locked())
-                button->setIcon(icon(lit("tree/layout_locked.png")));
-            else
-                button->setIcon(icon(lit("tree/layout.png")));
-        }
+        const QnIcon::Mode iconMode = isWarning ? QnIcon::Error : QnIcon::Selected;
+        QnResourceIconCache::Key iconKey = QnResourceIconCache::Layout;
+
+        if (layout->isShared())
+            iconKey = QnResourceIconCache::SharedLayout;
+        else if (layout->locked())
+            iconKey = QnResourceIconCache::Layout | QnResourceIconCache::Locked;
+        button->setIcon(icon(iconKey, iconMode));
     }
     else
     {
         button->setText(tr("Select layout..."));
-        button->setIcon(icon(lit("tree/layouts.png")));
+        button->setIcon(icon(QnResourceIconCache::Layouts, QnIcon::Selected));
         button->setForegroundRole(QPalette::ButtonText);
         resetStyle(button);
     }
