@@ -1,15 +1,15 @@
 #pragma once
 
-#include <ui/workbench/panels/abstract_workbench_panel.h>
+#include "abstract_workbench_panel.h"
 
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
 class SpecialLayoutPanelPrivate;
-class SpecialLayoutPanel: public NxUi::AbstractWorkbenchPanel
+class SpecialLayoutPanel: public AbstractWorkbenchPanel
 {
-    using base_type = NxUi::AbstractWorkbenchPanel;
+    using base_type = AbstractWorkbenchPanel;
 
 public:
     SpecialLayoutPanel(

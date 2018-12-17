@@ -3,7 +3,7 @@
 #include <client/client_globals.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 
 namespace nx::vms::client::desktop {
 

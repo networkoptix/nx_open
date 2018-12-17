@@ -14,7 +14,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-using namespace nx::vms::client::desktop::ui;
+namespace nx::vms::client::desktop {
+
+using namespace ui;
 
 namespace {
 
@@ -24,8 +26,6 @@ QString alias(action::Action* action)
 }
 
 } //namespace
-
-namespace NxUi {
 
 QnImageButtonWidget* newActionButton(
     QGraphicsItem *parent,
@@ -120,4 +120,4 @@ QnImageButtonWidget* newPinButton(
     return button;
 }
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

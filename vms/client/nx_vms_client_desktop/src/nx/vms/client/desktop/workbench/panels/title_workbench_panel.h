@@ -1,7 +1,8 @@
 #pragma once
 
-#include <ui/workbench/panels/abstract_workbench_panel.h>
 #include <utils/common/connective.h>
+
+#include "abstract_workbench_panel.h"
 
 class QnImageButtonWidget;
 class HoverFocusProcessor;
@@ -9,7 +10,7 @@ class AnimatorGroup;
 class VariantAnimator;
 class QGraphicsProxyWidget;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 class TitleWorkbenchPanel: public Connective<AbstractWorkbenchPanel>
 {
@@ -64,4 +65,4 @@ private:
     QPointer<HoverFocusProcessor> m_opacityProcessor;
 };
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

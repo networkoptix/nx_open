@@ -7,7 +7,7 @@ class QnBlinkingImageButtonWidget;
 class QGraphicsItem;
 class QnWorkbenchContext;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 QnImageButtonWidget* newActionButton(
     QGraphicsItem *parent,
@@ -31,4 +31,4 @@ QnImageButtonWidget* newPinButton(
     nx::vms::client::desktop::ui::action::IDType actionId,
     bool smallIcon = false);
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

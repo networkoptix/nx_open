@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/workbench/panels/abstract_workbench_panel.h>
+#include "abstract_workbench_panel.h"
 
 class QnResourceBrowserWidget;
 class QnResizerWidget;
@@ -11,7 +11,7 @@ class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 class ResourceTreeWorkbenchPanel: public AbstractWorkbenchPanel
 {
@@ -95,4 +95,4 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 };
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

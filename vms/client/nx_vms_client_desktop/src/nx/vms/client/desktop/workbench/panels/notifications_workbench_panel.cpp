@@ -6,7 +6,7 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -34,17 +34,17 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <ui/workbench/panels/buttons.h>
 
 #include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
+#include "buttons.h"
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
+
+using namespace ui;
 
 namespace {
 
@@ -137,7 +137,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     item(new QGraphicsWidget(parentWidget)),
     xAnimator(new VariantAnimator(this)),
 
-    m_showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
+    m_showButton(newBlinkingShowHideButton(parentWidget, context(),
         action::ToggleNotificationsAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
@@ -190,8 +190,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_hidingProcessor->addTargetItem(item);
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_eventPanelContainer);
-    m_hidingProcessor->setHoverLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
-    m_hidingProcessor->setFocusLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
+    m_hidingProcessor->setHoverLeaveDelay(kCloseSidePanelTimeoutMs);
+    m_hidingProcessor->setFocusLeaveDelay(kCloseSidePanelTimeoutMs);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
@@ -200,7 +200,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
         });
 
     m_showingProcessor->addTargetItem(m_showButton);
-    m_showingProcessor->setHoverEnterDelay(NxUi::kOpenPanelTimeoutMs);
+    m_showingProcessor->setHoverEnterDelay(kOpenPanelTimeoutMs);
     connect(m_showingProcessor, &HoverFocusProcessor::hoverEntered, this,
         &NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered);
 
@@ -215,8 +215,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_eventPanelContainer));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, item, Qt::LeftEdge, NxUi::kShadowThickness);
-    shadow->setZValue(NxUi::ShadowItemZOrder);
+    auto shadow = new QnEdgeShadowWidget(item, item, Qt::LeftEdge, kShadowThickness);
+    shadow->setZValue(ShadowItemZOrder);
 
     updateControlsGeometry();
 }
@@ -237,7 +237,7 @@ bool NotificationsWorkbenchPanel::isOpened() const
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::vms::client::desktop::ui::workbench;
+    using namespace ui::workbench;
 
     ensureAnimationAllowed(&animate);
 
@@ -359,7 +359,7 @@ void NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered()
 
         /* So that the click that may follow won't hide it. */
         enableShowButton(false);
-        QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this,
+        QTimer::singleShot(kButtonInactivityTimeoutMs, this,
             [this]
             {
                 enableShowButton(true);
@@ -372,8 +372,6 @@ void NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered()
 
 void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget)
 {
-    using namespace nx::vms::client::desktop;
-
     m_eventPanel.reset(new EventPanel(context()));
 
     // TODO: #vkutin Get rid of proxying.
@@ -416,7 +414,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
 
 void NotificationsWorkbenchPanel::at_eventTileHovered(
     const QModelIndex& index,
-    nx::vms::client::desktop::EventTile* tile)
+    EventTile* tile)
 {
     if (m_eventPanelHoverProcessor)
     {
@@ -500,4 +498,4 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     m_eventPanelHoverProcessor->forceHoverEnter();
 }
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

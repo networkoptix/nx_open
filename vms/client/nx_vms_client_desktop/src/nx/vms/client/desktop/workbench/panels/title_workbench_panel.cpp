@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QAction>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -22,12 +22,12 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <ui/workbench/panels/buttons.h>
 
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
+#include "buttons.h"
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
+
+using namespace ui;
 
 TitleWorkbenchPanel::TitleWorkbenchPanel(
     const QnPaneSettings& settings,
@@ -36,7 +36,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     :
     base_type(settings, parentWidget, parent),
     item(new QnMaskedProxyWidget(parentWidget)),
-    m_showButton(NxUi::newShowHideButton(parentWidget, context(),
+    m_showButton(newShowHideButton(parentWidget, context(),
         action::ToggleTitleBarAction)),
     m_opacityAnimatorGroup(new AnimatorGroup(this)),
     m_yAnimator(new VariantAnimator(this)),
@@ -84,8 +84,8 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::BottomEdge, NxUi::kShadowThickness);
-    shadow->setZValue(NxUi::ShadowItemZOrder);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::BottomEdge, kShadowThickness);
+    shadow->setZValue(ShadowItemZOrder);
 
     updateControlsGeometry();
 }
@@ -102,7 +102,7 @@ bool TitleWorkbenchPanel::isOpened() const
 
 void TitleWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::vms::client::desktop::ui::workbench;
+    using namespace ui::workbench;
 
     ensureAnimationAllowed(&animate);
 
@@ -220,4 +220,4 @@ void TitleWorkbenchPanel::setUsed(bool value)
     item->setVisible(value); //< true visibility on the scene
 }
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

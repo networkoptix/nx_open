@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsWidget>
 
 #include <ui/workbench/workbench.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/special_layout.h>
+#include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
 #include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
@@ -102,7 +102,7 @@ void SpecialLayoutPanelPrivate::setPanelWidget(QGraphicsWidget* widget)
         m_panelWidget->setParentItem(m_parentWidget);
         m_panelWidget->setVisible(true);
         connect(m_panelWidget, &QGraphicsWidget::geometryChanged,
-            q, &NxUi::AbstractWorkbenchPanel::geometryChanged);
+            q, &AbstractWorkbenchPanel::geometryChanged);
     }
 
     emit q->geometryChanged();

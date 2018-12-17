@@ -43,7 +43,7 @@
 
 #include <ui/common/notification_levels.h>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
@@ -63,7 +63,7 @@
 #include <ui/graphics/instruments/widget_layout_instrument.h>
 
 #include <ui/graphics/items/resource/button_ids.h>
-#include <nx/vms/client/desktop/ui/workbench/resource/resource_widget_factory.h>
+#include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>

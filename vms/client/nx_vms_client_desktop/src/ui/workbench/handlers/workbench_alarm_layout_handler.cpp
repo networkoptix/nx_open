@@ -41,7 +41,7 @@
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <utils/common/delayed.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop::ui;

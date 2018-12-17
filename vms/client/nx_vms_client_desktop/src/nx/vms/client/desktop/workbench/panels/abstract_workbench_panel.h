@@ -8,7 +8,7 @@ class AnimationTimer;
 class QGraphicsWidget;
 struct QnPaneSettings;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 class AbstractWorkbenchPanel: public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -68,4 +68,4 @@ protected:
     qreal m_masterOpacity;
 };
 
-}
+} // namespace nx::vms::client::desktop

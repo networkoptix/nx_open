@@ -2,7 +2,7 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <ui/workbench/panels/abstract_workbench_panel.h>
+#include "abstract_workbench_panel.h"
 
 class QnControlBackgroundWidget;
 class QnNotificationToolTipWidget;
@@ -17,10 +17,6 @@ namespace nx::vms::client::desktop {
 class EventPanel;
 class EventTileToolTip;
 class EventTile;
-
-} // namespace nx::vms::client::desktop
-
-namespace NxUi {
 
 class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
 {
@@ -67,7 +63,7 @@ private:
 
     void createEventPanel(QGraphicsWidget* parentWidget);
 
-    void at_eventTileHovered(const QModelIndex& index, nx::vms::client::desktop::EventTile* tile);
+    void at_eventTileHovered(const QModelIndex& index, EventTile* tile);
 
 private:
     bool m_visible = false;
@@ -89,11 +85,11 @@ private:
 
     /** New event panel. */
     QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
-    QScopedPointer<nx::vms::client::desktop::EventPanel> m_eventPanel;
+    QScopedPointer<EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
 
     // Required to correctly display tooltip.
-    const nx::vms::client::desktop::EventTile* m_lastHoveredTile = nullptr;
+    const EventTile* m_lastHoveredTile = nullptr;
 };
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

@@ -4,8 +4,6 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QLineEdit>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -23,14 +21,11 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/workbench_ui_globals.h>
-#include <ui/workbench/panels/buttons.h>
-
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <utils/common/event_processors.h>
 
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
+#include "../workbench_animations.h"
+#include "buttons.h"
 
 namespace {
 
@@ -43,9 +38,11 @@ static const qreal kClosedPositionOffsetY = 20;
 /* Offset of pin button - in calendar header size count o_O */
 static const int kPinOffsetCellsCount = 2;
 
-}
+} // namespace
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
+
+using namespace ui;
 
 CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     const QnPaneSettings& settings,
@@ -385,4 +382,4 @@ void CalendarWorkbenchPanel::at_widget_dateClicked(const QDate &date)
     }
 }
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

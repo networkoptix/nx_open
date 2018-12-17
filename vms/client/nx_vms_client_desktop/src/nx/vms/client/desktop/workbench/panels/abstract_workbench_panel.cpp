@@ -7,7 +7,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_ui_globals.h>
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 AbstractWorkbenchPanel::AbstractWorkbenchPanel(
     const QnPaneSettings& /*settings*/, /*< Possibly will be used later. */
@@ -17,26 +17,26 @@ AbstractWorkbenchPanel::AbstractWorkbenchPanel(
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_parentWidget(parentWidget),
-    m_masterOpacity(NxUi::kOpaque)
+    m_masterOpacity(kOpaque)
 {
     NX_ASSERT(m_parentWidget);
 
     connect(display(), &QnWorkbenchDisplay::viewportGrabbed, this,
         [this]
-    {
-        setProxyUpdatesEnabled(false);
-    });
+        {
+            setProxyUpdatesEnabled(false);
+        });
 
     connect(display(), &QnWorkbenchDisplay::viewportUngrabbed, this,
         [this]
-    {
-        setProxyUpdatesEnabled(true);
-    });
+        {
+            setProxyUpdatesEnabled(true);
+        });
 }
 
 void AbstractWorkbenchPanel::updateOpacity(bool animate)
 {
-    const qreal opacity = isVisible() ? NxUi::kOpaque : NxUi::kHidden;
+    const qreal opacity = isVisible() ? kOpaque : kHidden;
     setOpacity(opacity, animate);
 }
 
@@ -63,7 +63,7 @@ qreal AbstractWorkbenchPanel::masterOpacity() const
 
 void AbstractWorkbenchPanel::setMasterOpacity(qreal value)
 {
-    value = qBound(NxUi::kHidden, value, NxUi::kOpaque);
+    value = qBound(kHidden, value, kOpaque);
     if (qFuzzyIsNull(m_masterOpacity - value))
         return;
 
@@ -71,4 +71,4 @@ void AbstractWorkbenchPanel::setMasterOpacity(qreal value)
     updateOpacity(false);
 }
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

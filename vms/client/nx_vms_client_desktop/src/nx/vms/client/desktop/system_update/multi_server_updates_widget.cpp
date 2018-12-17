@@ -43,7 +43,7 @@
 #include <update/low_free_space_warning.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/network/app_info.h>
 
 #include <nx/vms/client/desktop/ini.h>

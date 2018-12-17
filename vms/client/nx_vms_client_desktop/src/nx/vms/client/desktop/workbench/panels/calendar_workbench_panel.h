@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/workbench/panels/abstract_workbench_panel.h>
+#include "abstract_workbench_panel.h"
 
 class QGraphicsItem;
 class QnMaskedProxyWidget;
@@ -11,7 +11,7 @@ class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 class CalendarWorkbenchPanel: public AbstractWorkbenchPanel
 {
@@ -93,4 +93,4 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 };
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

@@ -52,33 +52,31 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
 
-#include "watchers/workbench_render_watcher.h"
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/workbench_ui_globals.h>
-
-#include "workbench.h"
-#include "workbench_display.h"
-#include "workbench_layout.h"
-#include "workbench_context.h"
-#include "workbench_navigator.h"
-#include "workbench_access_controller.h"
-#include "workbench_pane_settings.h"
-#include <ui/workbench/panels/resources_workbench_panel.h>
-#include <ui/workbench/panels/notifications_workbench_panel.h>
-#include <ui/workbench/panels/timeline_workbench_panel.h>
-#include <ui/workbench/panels/calendar_workbench_panel.h>
-#include <ui/workbench/panels/title_workbench_panel.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_pane_settings.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/client/desktop/ui/workbench/panels/special_layout_panel.h>
+#include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
 
 #include <utils/common/event_processors.h>
+#include <nx/vms/client/desktop/ini.h>
 
-#ifdef _DEBUG
-//#define QN_DEBUG_WIDGET
-#endif
+#include "panels/resources_workbench_panel.h"
+#include "panels/notifications_workbench_panel.h"
+#include "panels/timeline_workbench_panel.h"
+#include "panels/calendar_workbench_panel.h"
+#include "panels/title_workbench_panel.h"
 
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
+
 using namespace ui;
 
 namespace {
@@ -92,11 +90,10 @@ constexpr int kHideControlsTimeoutMs = 2000;
 
 constexpr qreal kZoomedTimelineOpacity = 0.9;
 
-} // anonymous namespace
+} // namespace
 
-#ifdef QN_DEBUG_WIDGET
 static QtMessageHandler previousMsgHandler = 0;
-static QnDebugProxyLabel* debugLabel = 0;
+static QnDebugProxyLabel* debugLabel = nullptr;
 
 static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
@@ -108,30 +105,29 @@ static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
     debugLabel->appendTextQueued(msg);
 }
-#endif
 
-QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
+WorkbenchUi::WorkbenchUi(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_instrumentManager(display()->instrumentManager()),
-    m_flags(0),
-    m_inactive(false),
-    m_inFreespace(false)
+    m_instrumentManager(display()->instrumentManager())
 {
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
 
-    m_fpsCountingInstrument = new DebugInfoInstrument(this);
+    m_debugInfoInstrument = new DebugInfoInstrument(this);
 
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
-    m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    m_instrumentManager->installInstrument(m_debugInfoInstrument, InstallationMode::InstallBefore,
+        display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
-    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this, &QnWorkbenchUi::at_activityStopped);
-    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this, &QnWorkbenchUi::at_activityStarted);
-    connect(m_fpsCountingInstrument, &DebugInfoInstrument::debugInfoChanged, this,
+    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this,
+        &WorkbenchUi::at_activityStopped);
+    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this,
+        &WorkbenchUi::at_activityStarted);
+    connect(m_debugInfoInstrument, &DebugInfoInstrument::debugInfoChanged, this,
         [this](const QString& text)
         {
             m_fpsItem->setText(text);
@@ -170,26 +166,26 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
-        m_controlsWidget, Qt::TopEdge, NxUi::kShadowThickness, QnEdgeShadowWidget::kInner);
-    windowedTitleShadow->setZValue(NxUi::ShadowItemZOrder);
+        m_controlsWidget, Qt::TopEdge, kShadowThickness, QnEdgeShadowWidget::kInner);
+    windowedTitleShadow->setZValue(ShadowItemZOrder);
 
-#ifdef QN_DEBUG_WIDGET
     /* Debug overlay */
-    createDebugWidget();
-#endif
+    if (ini().developerMode && ini().developerGuiPanel)
+        createDebugWidget();
 
     initGraphicsMessageBoxHolder();
 
     /* Connect to display. */
     display()->view()->addAction(action(action::FreespaceAction));
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
-        &QnWorkbenchUi::at_display_widgetChanged);
+        &WorkbenchUi::at_display_widgetChanged);
 
     /* After widget was removed we can possibly increase margins. */
     connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
-        &QnWorkbenchUi::updateViewportMarginsAnimated, Qt::QueuedConnection);
+        &WorkbenchUi::updateViewportMarginsAnimated, Qt::QueuedConnection);
 
-    connect(action(action::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
+    connect(action(action::FreespaceAction), &QAction::triggered, this,
+        &WorkbenchUi::at_freespaceAction_triggered);
     connect(action(action::EffectiveMaximizeAction), &QAction::triggered, this,
         [this, windowedTitleShadow]()
         {
@@ -235,7 +231,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
                 return;
 
             disconnect(layout, &QnWorkbenchLayout::flagsChanged,
-                this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
+                this, &WorkbenchUi::updateControlsVisibilityAnimated);
         });
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
@@ -246,7 +242,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
                 return;
 
             connect(layout, &QnWorkbenchLayout::flagsChanged,
-                this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
+                this, &WorkbenchUi::updateControlsVisibilityAnimated);
             updateControlsVisibilityAnimated();
             updateLayoutPanelGeometry();
 
@@ -272,11 +268,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         });
 }
 
-QnWorkbenchUi::~QnWorkbenchUi()
+WorkbenchUi::~WorkbenchUi()
 {
-#ifdef QN_DEBUG_WIDGET
-    debugLabel = 0;
-#endif // QN_DEBUG_WIDGET
+    debugLabel = nullptr;
 
     /* The disconnect call is needed so that our methods don't get triggered while
      * the ui machinery is shutting down. */
@@ -288,11 +282,12 @@ QnWorkbenchUi::~QnWorkbenchUi()
     delete m_title;
     delete m_layoutPanel;
     delete m_tree;
+    delete m_debugOverlayLabel;
 
     delete m_controlsWidget;
 }
 
-void QnWorkbenchUi::storeSettings()
+void WorkbenchUi::storeSettings()
 {
     QnPaneSettingsMap settings;
     QnPaneSettings& title = settings[Qn::WorkbenchPane::Title];
@@ -322,7 +317,7 @@ void QnWorkbenchUi::storeSettings()
     qnSettings->save();
 }
 
-void QnWorkbenchUi::updateCursor()
+void WorkbenchUi::updateCursor()
 {
 #ifndef Q_OS_MACX
     bool curtained = m_inactive;
@@ -331,7 +326,7 @@ void QnWorkbenchUi::updateCursor()
 #endif
 }
 
-bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
+bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
 {
     if (!widget)
         return false;
@@ -357,7 +352,7 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 
-action::ActionScope QnWorkbenchUi::currentScope() const
+action::ActionScope WorkbenchUi::currentScope() const
 {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if (m_tree && focusItem == m_tree->item)
@@ -376,7 +371,7 @@ action::ActionScope QnWorkbenchUi::currentScope() const
     return action::MainScope;
 }
 
-action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) const
+action::Parameters WorkbenchUi::currentParameters(action::ActionScope scope) const
 {
     /* Get items. */
     switch (scope)
@@ -403,12 +398,12 @@ action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) c
 }
 
 
-QnWorkbenchUi::Flags QnWorkbenchUi::flags() const
+WorkbenchUi::Flags WorkbenchUi::flags() const
 {
     return m_flags;
 }
 
-void QnWorkbenchUi::updateControlsVisibility(bool animate)
+void WorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
 
@@ -459,17 +454,17 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
     updateCalendarVisibility(animate);
 }
 
-void QnWorkbenchUi::updateCalendarVisibilityAnimated()
+void WorkbenchUi::updateCalendarVisibilityAnimated()
 {
     updateCalendarVisibility(true);
 }
 
-void QnWorkbenchUi::updateControlsVisibilityAnimated()
+void WorkbenchUi::updateControlsVisibilityAnimated()
 {
     updateControlsVisibility(true);
 }
 
-QMargins QnWorkbenchUi::calculateViewportMargins(
+QMargins WorkbenchUi::calculateViewportMargins(
     const QRectF& treeGeometry,
     const QRectF& titleGeometry,
     const QRectF& timelineGeometry,
@@ -501,7 +496,7 @@ QMargins QnWorkbenchUi::calculateViewportMargins(
     return result;
 }
 
-void QnWorkbenchUi::setFlags(Flags flags)
+void WorkbenchUi::setFlags(Flags flags)
 {
     if (flags == m_flags)
         return;
@@ -512,16 +507,16 @@ void QnWorkbenchUi::setFlags(Flags flags)
     updateViewportMargins(false);
 }
 
-bool QnWorkbenchUi::isTitleUsed() const
+bool WorkbenchUi::isTitleUsed() const
 {
     return m_title && m_title->isUsed();
 }
 
-void QnWorkbenchUi::updateViewportMargins(bool animate)
+void WorkbenchUi::updateViewportMargins(bool animate)
 {
     using boost::algorithm::any_of;
 
-    auto panelEffectiveGeometry = [](NxUi::AbstractWorkbenchPanel* panel)
+    auto panelEffectiveGeometry = [](AbstractWorkbenchPanel* panel)
         {
             if (panel && panel->isVisible() && panel->isPinned())
                 return panel->effectiveGeometry();
@@ -564,18 +559,18 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
     display()->fitInView(animate);
 }
 
-void QnWorkbenchUi::updateViewportMarginsAnimated()
+void WorkbenchUi::updateViewportMarginsAnimated()
 {
     updateViewportMargins(true);
 }
 
-void QnWorkbenchUi::updateActivityInstrumentState()
+void WorkbenchUi::updateActivityInstrumentState()
 {
     bool zoomed = m_widgetByRole[Qn::ZoomedRole] != nullptr;
     m_controlsActivityInstrument->setEnabled(m_flags & (zoomed ? HideWhenZoomed : HideWhenNormal));
 }
 
-bool QnWorkbenchUi::isHovered() const
+bool WorkbenchUi::isHovered() const
 {
     return
         (m_timeline->isHovered())
@@ -585,7 +580,7 @@ bool QnWorkbenchUi::isHovered() const
         || (m_calendar && m_calendar->isHovered());
 }
 
-QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
+WorkbenchUi::Panels WorkbenchUi::openedPanels() const
 {
     return
         (isTreeOpened() ? TreePanel : NoPanel)
@@ -595,7 +590,7 @@ QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
         ;
 }
 
-void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
+void WorkbenchUi::setOpenedPanels(Panels panels, bool animate)
 {
     ensureAnimationAllowed(animate);
 
@@ -605,7 +600,7 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
     setNotificationsOpened(panels & NotificationsPanel, animate);
 }
 
-void QnWorkbenchUi::initGraphicsMessageBoxHolder()
+void WorkbenchUi::initGraphicsMessageBoxHolder()
 {
     auto overlayWidget = new QnGuiElementsWidget();
     overlayWidget->setAcceptedMouseButtons(0);
@@ -631,7 +626,7 @@ void QnWorkbenchUi::initGraphicsMessageBoxHolder()
     messageBoxVLayout->addStretch();
 }
 
-void QnWorkbenchUi::tick(int deltaMSecs)
+void WorkbenchUi::tick(int deltaMSecs)
 {
     if (!m_timeline->zoomingIn && !m_timeline->zoomingOut)
         return;
@@ -654,7 +649,7 @@ void QnWorkbenchUi::tick(int deltaMSecs)
     display()->scene()->sendEvent(slider, &event);
 }
 
-void QnWorkbenchUi::at_freespaceAction_triggered()
+void WorkbenchUi::at_freespaceAction_triggered()
 {
     NX_ASSERT(!qnRuntime->isAcsMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
     if (qnRuntime->isAcsMode())
@@ -699,7 +694,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
     }
 }
 
-void QnWorkbenchUi::at_activityStopped()
+void WorkbenchUi::at_activityStopped()
 {
     m_inactive = true;
 
@@ -715,7 +710,7 @@ void QnWorkbenchUi::at_activityStopped()
     updateCursor();
 }
 
-void QnWorkbenchUi::at_activityStarted()
+void WorkbenchUi::at_activityStarted()
 {
     m_inactive = false;
 
@@ -731,7 +726,7 @@ void QnWorkbenchUi::at_activityStarted()
     updateCursor();
 }
 
-void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
+void WorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
 {
     bool alreadyZoomed = m_widgetByRole[Qn::ZoomedRole] != nullptr;
 
@@ -763,7 +758,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             display()->fitInView(display()->animationAllowed());
         }
 
-        qreal masterOpacity = newWidget ? kZoomedTimelineOpacity : NxUi::kOpaque;
+        qreal masterOpacity = newWidget ? kZoomedTimelineOpacity : kOpaque;
         if (m_timeline)
             m_timeline->setMasterOpacity(masterOpacity);
         if (m_calendar)
@@ -788,7 +783,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
     }
 }
 
-void QnWorkbenchUi::ensureAnimationAllowed(bool &animate)
+void WorkbenchUi::ensureAnimationAllowed(bool &animate)
 {
     if (animate && (qnSettings->lightMode() & Qn::LightModeNoAnimation))
         animate = false;
@@ -796,7 +791,7 @@ void QnWorkbenchUi::ensureAnimationAllowed(bool &animate)
 
 #pragma region ControlsWidget
 
-void QnWorkbenchUi::at_controlsWidget_geometryChanged()
+void WorkbenchUi::at_controlsWidget_geometryChanged()
 {
     QGraphicsWidget *controlsWidget = m_controlsWidget;
     QRectF rect = controlsWidget->rect();
@@ -842,7 +837,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
     updateViewportMargins(false);
 }
 
-void QnWorkbenchUi::createControlsWidget()
+void WorkbenchUi::createControlsWidget()
 {
     m_controlsWidget = new QnGuiElementsWidget();
     m_controlsWidget->setAcceptedMouseButtons(0);
@@ -852,42 +847,42 @@ void QnWorkbenchUi::createControlsWidget()
     installEventHandler(m_controlsWidget, QEvent::WindowDeactivate, this,
         [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
 
-    connect(m_controlsWidget, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::at_controlsWidget_geometryChanged);
+    connect(m_controlsWidget, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::at_controlsWidget_geometryChanged);
 }
 
 #pragma endregion Main controls widget methods
 
 #pragma region TreeWidget
 
-void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
+void WorkbenchUi::setTreeVisible(bool visible, bool animate)
 {
     if (m_tree)
         m_tree->setVisible(visible, animate);
 }
 
-bool QnWorkbenchUi::isTreePinned() const
+bool WorkbenchUi::isTreePinned() const
 {
     return m_tree && m_tree->isPinned();
 }
 
-bool QnWorkbenchUi::isTreeVisible() const
+bool WorkbenchUi::isTreeVisible() const
 {
     return m_tree && m_tree->isVisible();
 }
 
-bool QnWorkbenchUi::isTreeOpened() const
+bool WorkbenchUi::isTreeOpened() const
 {
     return m_tree && m_tree->isOpened();
 }
 
-void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
+void WorkbenchUi::setTreeOpened(bool opened, bool animate)
 {
     if (!m_tree)
         return;
     m_tree->setOpened(opened, animate);
 }
 
-QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
+QRectF WorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
 {
     QPointF pos(treeGeometry.x(), qMax(titleGeometry.bottom(), 0.0));
     qreal bottom = isTimelineVisible()
@@ -899,7 +894,7 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
     return QRectF(pos, size);
 }
 
-void QnWorkbenchUi::updateTreeGeometry()
+void WorkbenchUi::updateTreeGeometry()
 {
     if (!m_tree)
         return;
@@ -950,40 +945,40 @@ void QnWorkbenchUi::updateTreeGeometry()
     m_tree->item->resize(geometry.size());
 }
 
-void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
+void WorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 {
-    m_tree = new NxUi::ResourceTreeWorkbenchPanel(settings, m_controlsWidget, this);
+    m_tree = new ResourceTreeWorkbenchPanel(settings, m_controlsWidget, this);
 
-    connect(m_tree, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+    connect(m_tree, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
             if (opened && m_tree->isPinned())
                 m_inFreespace = false;
         });
-    connect(m_tree, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        &QnWorkbenchUi::updateTreeGeometry);
+    connect(m_tree, &AbstractWorkbenchPanel::visibleChanged, this,
+        &WorkbenchUi::updateTreeGeometry);
 
-    connect(m_tree, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_tree, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_tree, &AbstractWorkbenchPanel::hoverEntered, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_tree, &AbstractWorkbenchPanel::hoverLeft, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateViewportMarginsAnimated);
-    connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateLayoutPanelGeometry);
+    connect(m_tree, &AbstractWorkbenchPanel::geometryChanged, this,
+        &WorkbenchUi::updateViewportMarginsAnimated);
+    connect(m_tree, &AbstractWorkbenchPanel::geometryChanged, this,
+        &WorkbenchUi::updateLayoutPanelGeometry);
 }
 
 #pragma endregion Tree widget methods
 
 #pragma region TitleWidget
 
-bool QnWorkbenchUi::isTitleVisible() const
+bool WorkbenchUi::isTitleVisible() const
 {
     return m_title && m_title->isVisible();
 }
 
-void QnWorkbenchUi::setTitleUsed(bool used)
+void WorkbenchUi::setTitleUsed(bool used)
 {
     if (!m_title)
         return;
@@ -995,39 +990,39 @@ void QnWorkbenchUi::setTitleUsed(bool used)
     updateControlsVisibility(false);
 }
 
-void QnWorkbenchUi::setTitleOpened(bool opened, bool animate)
+void WorkbenchUi::setTitleOpened(bool opened, bool animate)
 {
     if (m_title)
         m_title->setOpened(opened, animate);
 }
 
-void QnWorkbenchUi::setTitleVisible(bool visible, bool animate)
+void WorkbenchUi::setTitleVisible(bool visible, bool animate)
 {
     if (m_title)
         m_title->setVisible(visible, animate);
 }
 
-bool QnWorkbenchUi::isTitleOpened() const
+bool WorkbenchUi::isTitleOpened() const
 {
     return m_title && m_title->isOpened();
 }
 
-void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
+void WorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_title = new NxUi::TitleWorkbenchPanel(settings, m_controlsWidget, this);
-    connect(m_title, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+    m_title = new TitleWorkbenchPanel(settings, m_controlsWidget, this);
+    connect(m_title, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
             if (opened)
                 m_inFreespace = false;
         });
 
-    connect(m_title, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_title, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_title, &AbstractWorkbenchPanel::hoverEntered, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_title, &AbstractWorkbenchPanel::hoverLeft, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_title, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
+    connect(m_title, &AbstractWorkbenchPanel::visibleChanged, this,
         [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
@@ -1037,7 +1032,7 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
             updateViewportMargins(animated);
         });
 
-    connect(m_title, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+    connect(m_title, &AbstractWorkbenchPanel::geometryChanged, this,
         [this]
         {
             updateTreeGeometry();
@@ -1048,47 +1043,47 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         });
 }
 
-void QnWorkbenchUi::createLayoutPanelWidget(const QnPaneSettings& settings)
+void WorkbenchUi::createLayoutPanelWidget(const QnPaneSettings& settings)
 {
     m_layoutPanel = new nx::vms::client::desktop::ui::workbench::SpecialLayoutPanel(
         settings, m_controlsWidget, this);
 
-    connect(m_layoutPanel, &NxUi::AbstractWorkbenchPanel::geometryChanged,
-        this, &QnWorkbenchUi::updateViewportMarginsAnimated);
+    connect(m_layoutPanel, &AbstractWorkbenchPanel::geometryChanged,
+        this, &WorkbenchUi::updateViewportMarginsAnimated);
 }
 
 #pragma endregion Title methods
 
 #pragma region NotificationsWidget
 
-bool QnWorkbenchUi::isNotificationsVisible() const
+bool WorkbenchUi::isNotificationsVisible() const
 {
     return m_notifications && m_notifications->isVisible();
 }
 
-bool QnWorkbenchUi::isNotificationsOpened() const
+bool WorkbenchUi::isNotificationsOpened() const
 {
     return m_notifications && m_notifications->isOpened();
 }
 
-bool QnWorkbenchUi::isNotificationsPinned() const
+bool WorkbenchUi::isNotificationsPinned() const
 {
     return m_notifications && m_notifications->isPinned();
 }
 
-void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate)
+void WorkbenchUi::setNotificationsOpened(bool opened, bool animate)
 {
     if (m_notifications)
         m_notifications->setOpened(opened, animate);
 }
 
-void QnWorkbenchUi::setNotificationsVisible(bool visible, bool animate)
+void WorkbenchUi::setNotificationsVisible(bool visible, bool animate)
 {
     if (m_notifications)
         m_notifications->setVisible(visible, animate);
 }
 
-QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry)
+QRectF WorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry)
 {
     QPointF pos(notificationsGeometry.x(), qMax(titleGeometry.bottom(), 0.0));
 
@@ -1104,7 +1099,7 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
     return QRectF(pos, size);
 }
 
-void QnWorkbenchUi::updateLayoutPanelGeometry()
+void WorkbenchUi::updateLayoutPanelGeometry()
 {
     if (!m_layoutPanel || !m_layoutPanel->widget())
         return;
@@ -1126,7 +1121,7 @@ void QnWorkbenchUi::updateLayoutPanelGeometry()
     m_layoutPanel->widget()->setGeometry(QRectF(topLeft, size));
 }
 
-void QnWorkbenchUi::updateNotificationsGeometry()
+void WorkbenchUi::updateNotificationsGeometry()
 {
     if (!m_notifications)
         return;
@@ -1189,59 +1184,59 @@ void QnWorkbenchUi::updateNotificationsGeometry()
         m_notifications->item, tooltipsEnclosingRect);
 }
 
-void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
+void WorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 {
-    m_notifications = new NxUi::NotificationsWorkbenchPanel(settings, m_controlsWidget, this);
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+    m_notifications = new NotificationsWorkbenchPanel(settings, m_controlsWidget, this);
+    connect(m_notifications, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
             if (opened && m_notifications->isPinned())
                 m_inFreespace = false;
         });
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        &QnWorkbenchUi::updateNotificationsGeometry);
+    connect(m_notifications, &AbstractWorkbenchPanel::visibleChanged, this,
+        &WorkbenchUi::updateNotificationsGeometry);
     connect(m_notifications->item, &QGraphicsWidget::widthChanged, this,
-        &QnWorkbenchUi::updateNotificationsGeometry);
+        &WorkbenchUi::updateNotificationsGeometry);
 
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_notifications, &AbstractWorkbenchPanel::hoverEntered, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_notifications, &AbstractWorkbenchPanel::hoverLeft, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateViewportMarginsAnimated);
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateFpsGeometry);
-    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateLayoutPanelGeometry);
+    connect(m_notifications, &AbstractWorkbenchPanel::geometryChanged, this,
+        &WorkbenchUi::updateViewportMarginsAnimated);
+    connect(m_notifications, &AbstractWorkbenchPanel::geometryChanged, this,
+        &WorkbenchUi::updateFpsGeometry);
+    connect(m_notifications, &AbstractWorkbenchPanel::geometryChanged, this,
+        &WorkbenchUi::updateLayoutPanelGeometry);
 }
 
 #pragma endregion Notifications widget methods
 
 #pragma region CalendarWidget
 
-bool QnWorkbenchUi::isCalendarPinned() const
+bool WorkbenchUi::isCalendarPinned() const
 {
     return m_calendar && m_calendar->isPinned();
 }
 
-bool QnWorkbenchUi::isCalendarOpened() const
+bool WorkbenchUi::isCalendarOpened() const
 {
     return m_calendar && m_calendar->isOpened();
 }
 
-bool QnWorkbenchUi::isCalendarVisible() const
+bool WorkbenchUi::isCalendarVisible() const
 {
     return m_calendar && m_calendar->isVisible();
 }
 
-void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
+void WorkbenchUi::setCalendarOpened(bool opened, bool animate)
 {
     if (m_calendar)
         m_calendar->setOpened(opened, animate);
 }
 
-void QnWorkbenchUi::updateCalendarVisibility(bool animate)
+void WorkbenchUi::updateCalendarVisibility(bool animate)
 {
     if (!m_calendar)
         return;
@@ -1265,7 +1260,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate)
     updateNotificationsGeometry();
 }
 
-void QnWorkbenchUi::updateCalendarGeometry()
+void WorkbenchUi::updateCalendarGeometry()
 {
     QRectF geometry = m_calendar->item->geometry();
     geometry.moveRight(m_controlsWidgetRect.right());
@@ -1273,48 +1268,48 @@ void QnWorkbenchUi::updateCalendarGeometry()
     m_calendar->setOrigin(geometry.topLeft());
 }
 
-void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
+void WorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 {
-    m_calendar = new NxUi::CalendarWorkbenchPanel(settings, m_controlsWidget, this);
+    m_calendar = new CalendarWorkbenchPanel(settings, m_controlsWidget, this);
 
-    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        &QnWorkbenchUi::updateNotificationsGeometry);
+    connect(m_calendar, &AbstractWorkbenchPanel::visibleChanged, this,
+        &WorkbenchUi::updateNotificationsGeometry);
 
-    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateNotificationsGeometry);
+    connect(m_calendar, &AbstractWorkbenchPanel::geometryChanged, this,
+        &WorkbenchUi::updateNotificationsGeometry);
 
     // TODO: #GDM refactor indirect dependency
     connect(navigator()->calendar(), &QnCalendarWidget::emptyChanged, this,
-        &QnWorkbenchUi::updateCalendarVisibilityAnimated);
+        &WorkbenchUi::updateCalendarVisibilityAnimated);
 
-    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_calendar, &AbstractWorkbenchPanel::hoverEntered, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_calendar, &AbstractWorkbenchPanel::hoverLeft, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
 }
 
 #pragma endregion Calendar and DayTime widget methods
 
 #pragma region TimelineWidget
 
-bool QnWorkbenchUi::isTimelineVisible() const
+bool WorkbenchUi::isTimelineVisible() const
 {
     return m_timeline->isVisible();
 }
 
-bool QnWorkbenchUi::isTimelineOpened() const
+bool WorkbenchUi::isTimelineOpened() const
 {
     return m_timeline->isOpened();
 }
 
-bool QnWorkbenchUi::isTimelinePinned() const
+bool WorkbenchUi::isTimelinePinned() const
 {
     /* Auto-hide slider when some item is zoomed, otherwise - don't. */
     return m_timeline->isPinned() ||
         m_widgetByRole[Qn::ZoomedRole] == nullptr;
 }
 
-void QnWorkbenchUi::setTimelineOpened(bool opened, bool animate)
+void WorkbenchUi::setTimelineOpened(bool opened, bool animate)
 {
     if (qnRuntime->isVideoWallMode())
         opened = true;
@@ -1322,16 +1317,16 @@ void QnWorkbenchUi::setTimelineOpened(bool opened, bool animate)
     m_timeline->setOpened(opened, animate);
 }
 
-void QnWorkbenchUi::setTimelineVisible(bool visible, bool animate)
+void WorkbenchUi::setTimelineVisible(bool visible, bool animate)
 {
     m_timeline->setVisible(visible, animate);
 }
 
-void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
+void WorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
 {
-    m_timeline = new NxUi::TimelineWorkbenchPanel(settings, m_controlsWidget, this);
+    m_timeline = new TimelineWorkbenchPanel(settings, m_controlsWidget, this);
 
-    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+    connect(m_timeline, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened, bool animated)
         {
             if (opened && m_timeline->isPinned())
@@ -1339,7 +1334,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateCalendarVisibility(animated);
         });
 
-    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
+    connect(m_timeline, &AbstractWorkbenchPanel::visibleChanged, this,
         [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
@@ -1348,12 +1343,12 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateViewportMargins(animated);
         });
 
-    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_timeline, &AbstractWorkbenchPanel::hoverEntered, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_timeline, &AbstractWorkbenchPanel::hoverLeft, this,
+        &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+    connect(m_timeline, &AbstractWorkbenchPanel::geometryChanged, this,
         [this]
         {
             updateTreeGeometry();
@@ -1363,7 +1358,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         });
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+        &WorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
@@ -1382,42 +1377,52 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
 
 #pragma region DebugWidget
 
-#ifdef QN_DEBUG_WIDGET
-void QnWorkbenchUi::createDebugWidget()
+void WorkbenchUi::createDebugWidget()
 {
     m_debugOverlayLabel = new QnDebugProxyLabel(m_controlsWidget);
-    m_debugOverlayLabel->setAcceptedMouseButtons(0);
+    m_debugOverlayLabel->setAcceptedMouseButtons(Qt::NoButton);
     m_debugOverlayLabel->setAcceptHoverEvents(false);
     m_debugOverlayLabel->setMessagesLimit(40);
     setPaletteColor(m_debugOverlayLabel, QPalette::Window, QColor(127, 127, 127, 60));
     setPaletteColor(m_debugOverlayLabel, QPalette::WindowText, QColor(63, 255, 216));
-    auto updateDebugGeometry = [&]()
+    auto updateDebugGeometry =
+        [&]()
+        {
+            QRectF titleEffectiveGeometry = (m_title && m_title->isVisible())
+            ? m_title->effectiveGeometry()
+            : QRectF();
+
+            QPointF pos = QPointF(titleEffectiveGeometry.bottomLeft());
+            if (qFuzzyEquals(pos, m_debugOverlayLabel->pos()))
+                return;
+
+            m_debugOverlayLabel->setPos(pos);
+        };
+    m_debugOverlayLabel->setVisible(true);
+
+    if (m_title)
     {
-        QPointF pos = QPointF(m_titleItem->geometry().bottomLeft());
-        if (qFuzzyEquals(pos, m_debugOverlayLabel->pos()))
-            return;
-        m_debugOverlayLabel->setPos(pos);
-    };
-    m_debugOverlayLabel->setVisible(false);
-    connect(m_titleItem, &QGraphicsWidget::geometryChanged, this, updateDebugGeometry);
-    debugLabel = m_debugOverlayLabel;
-    previousMsgHandler = qInstallMessageHandler(uiMsgHandler);
+        connect(m_title, &AbstractWorkbenchPanel::geometryChanged, this, updateDebugGeometry);
+        debugLabel = m_debugOverlayLabel;
+        previousMsgHandler = qInstallMessageHandler(uiMsgHandler);
+    }
+    updateDebugGeometry();
 
     display()->view()->addAction(action(action::ShowDebugOverlayAction));
-    connect(action(action::ShowDebugOverlayAction), &QAction::toggled, this, [&](bool toggled) { m_debugOverlayLabel->setVisible(toggled); });
+    connect(action(action::ShowDebugOverlayAction), &QAction::toggled, this,
+        [&](bool toggled) { m_debugOverlayLabel->setVisible(toggled); });
 }
-#endif
 
 #pragma endregion Debug overlay methods
 
 #pragma region FpsWidget
 
-bool QnWorkbenchUi::isFpsVisible() const
+bool WorkbenchUi::isFpsVisible() const
 {
     return m_fpsItem->isVisible();
 }
 
-void QnWorkbenchUi::setFpsVisible(bool fpsVisible)
+void WorkbenchUi::setFpsVisible(bool fpsVisible)
 {
     if (fpsVisible == isFpsVisible())
         return;
@@ -1428,7 +1433,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible)
     action(action::ShowFpsAction)->setChecked(fpsVisible);
 }
 
-void QnWorkbenchUi::updateFpsGeometry()
+void WorkbenchUi::updateFpsGeometry()
 {
     qreal right = m_notifications
         ? m_notifications->backgroundItem->geometry().left()
@@ -1448,7 +1453,7 @@ void QnWorkbenchUi::updateFpsGeometry()
     m_fpsItem->setPos(pos);
 }
 
-void QnWorkbenchUi::createFpsWidget()
+void WorkbenchUi::createFpsWidget()
 {
     m_fpsItem = new QnProxyLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
@@ -1459,9 +1464,11 @@ void QnWorkbenchUi::createFpsWidget()
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
     display()->setLayer(m_fpsItem, QnWorkbenchDisplay::MessageBoxLayer);
 
-    connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
-    connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
+    connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
+    connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
     setFpsVisible(qnRuntime->isProfilerMode());
 }
 
 #pragma endregion Fps widget methods
+
+} // namespace nx::vms::client::desktop

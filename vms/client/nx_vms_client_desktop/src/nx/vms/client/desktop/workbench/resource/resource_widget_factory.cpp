@@ -10,7 +10,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
-#include <nx/vms/client/desktop/ui/workbench/resource/layout_tour_item_widget.h>
+#include <nx/vms/client/desktop/workbench/resource/layout_tour_item_widget.h>
 #include <nx/vms/client/desktop/c2p_integration/c2p_resource_widget.h>
 
 #include <ui/workbench/workbench_access_controller.h>

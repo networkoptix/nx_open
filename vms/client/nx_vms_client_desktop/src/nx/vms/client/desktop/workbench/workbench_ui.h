@@ -14,7 +14,7 @@
 
 #include <client/client_globals.h>
 
-#include "workbench_context_aware.h"
+#include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsWidget;
 class QGraphicsLinearLayout;
@@ -37,33 +37,21 @@ class QnFramedWidget;
 class QnDayTimeWidget;
 struct QnPaneSettings;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
+class DebugInfoInstrument;
 class ResourceTreeWorkbenchPanel;
 class NotificationsWorkbenchPanel;
 class TimelineWorkbenchPanel;
 class CalendarWorkbenchPanel;
 class TitleWorkbenchPanel;
 
-}
+namespace ui::workbench { class SpecialLayoutPanel; }
 
-namespace nx::vms::client::desktop {
-
-class DebugInfoInstrument;
-
-namespace ui {
-namespace workbench {
-
-class SpecialLayoutPanel;
-
-} // namespace workbench
-} // namespace ui
-} // namespace nx::vms::client::desktop
-
-class QnWorkbenchUi:
+class WorkbenchUi:
     public Disconnective<QObject>,
     public QnWorkbenchContextAware,
-    public nx::vms::client::desktop::ui::action::TargetProvider,
+    public ui::action::TargetProvider,
     public AnimationTimerListener
 {
     Q_OBJECT
@@ -95,13 +83,12 @@ public:
     };
     Q_DECLARE_FLAGS(Panels, Panel)
 
-    QnWorkbenchUi(QObject *parent = nullptr);
+    WorkbenchUi(QObject *parent = nullptr);
+    virtual ~WorkbenchUi() override;
 
-    virtual ~QnWorkbenchUi();
-
-    virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
-    virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(
-        nx::vms::client::desktop::ui::action::ActionScope scope) const override;
+    virtual ui::action::ActionScope currentScope() const override;
+    virtual ui::action::Parameters currentParameters(
+        ui::action::ActionScope scope) const override;
 
     Flags flags() const;
 
@@ -193,10 +180,7 @@ private:
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
     void createTimelineWidget(const QnPaneSettings& settings);
-
-#ifdef _DEBUG
     void createDebugWidget();
-#endif
 
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true);
@@ -212,7 +196,6 @@ private:
 
     bool calculateTimelineVisible(QnResourceWidget* widget) const;
 
-private slots:
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
@@ -234,13 +217,13 @@ private:
     QPointer<InstrumentManager> m_instrumentManager;
 
     /** Fps counting instrument. */
-    QPointer<nx::vms::client::desktop::DebugInfoInstrument> m_fpsCountingInstrument;
+    QPointer<DebugInfoInstrument> m_debugInfoInstrument;
 
     /** Activity listener instrument. */
     QPointer<ActivityListenerInstrument> m_controlsActivityInstrument;
 
     /** Current flags. */
-    Flags m_flags;
+    Flags m_flags = 0;
 
     /** Widgets by role. */
     std::array<QPointer<QnResourceWidget>, Qn::ItemRoleCount> m_widgetByRole;
@@ -251,35 +234,37 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
-    bool m_inactive;
+    bool m_inactive = false;
 
     QPointer<QnProxyLabel> m_fpsItem;
     QPointer<QnDebugProxyLabel> m_debugOverlayLabel;
 
     /* In freespace mode? */
-    bool m_inFreespace;
+    bool m_inFreespace = false;
 
     Panels m_unzoomedOpenedPanels;
 
     /* Timeline-related state. */
 
     /** Timeline. */
-    QPointer<NxUi::TimelineWorkbenchPanel> m_timeline;
+    QPointer<TimelineWorkbenchPanel> m_timeline;
 
     /* Resources tree. */
-    QPointer<NxUi::ResourceTreeWorkbenchPanel> m_tree;
+    QPointer<ResourceTreeWorkbenchPanel> m_tree;
 
     /* Title-related state. */
-    QPointer<NxUi::TitleWorkbenchPanel> m_title;
+    QPointer<TitleWorkbenchPanel> m_title;
 
-    QPointer<nx::vms::client::desktop::ui::workbench::SpecialLayoutPanel> m_layoutPanel;
+    QPointer<ui::workbench::SpecialLayoutPanel> m_layoutPanel;
 
     /* Notifications window-related state. */
-    QPointer<NxUi::NotificationsWorkbenchPanel> m_notifications;
+    QPointer<NotificationsWorkbenchPanel> m_notifications;
 
     /* Calendar window-related state. */
-    QPointer<NxUi::CalendarWorkbenchPanel> m_calendar;
+    QPointer<CalendarWorkbenchPanel> m_calendar;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Panels)
+Q_DECLARE_OPERATORS_FOR_FLAGS(WorkbenchUi::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(WorkbenchUi::Panels)
+
+} // namespace nx::vms::client::desktop

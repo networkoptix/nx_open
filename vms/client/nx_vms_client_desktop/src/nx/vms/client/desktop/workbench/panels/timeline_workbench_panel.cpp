@@ -33,14 +33,11 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <ui/workbench/panels/buttons.h>
-#include <ui/workbench/panels/calendar_workbench_panel.h>
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
-
 #include <utils/common/event_processors.h>
 
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
+#include "../workbench_animations.h"
+#include "buttons.h"
+#include "calendar_workbench_panel.h"
 
 namespace {
 
@@ -58,11 +55,12 @@ static const int kResizerHeight = 8;
 static const int kShowWidgetHeight = 50;
 static const int kShowWidgetHiddenHeight = 12;
 
-}
+} // namespace
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
-using namespace nx::vms::client::desktop::ui::workbench;
+using namespace ui;
+using namespace ui::workbench;
 
 TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     const QnPaneSettings& settings,
@@ -79,7 +77,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_resizing(false),
     m_updateResizerGeometryLater(false),
     m_autoHideHeight(0),
-    m_showButton(NxUi::newShowHideButton(parentWidget, context(),
+    m_showButton(newShowHideButton(parentWidget, context(),
         action::ToggleTimelineAction)),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_showWidget(new GraphicsWidget(parentWidget)),
@@ -150,7 +148,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
 
                 /* So that the click that may follow won't hide it. */
                 setShowButtonUsed(false);
-                QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this,
+                QTimer::singleShot(kButtonInactivityTimeoutMs, this,
                     [this]
                     {
                         setShowButtonUsed(true);
@@ -203,14 +201,14 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
 
     item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->timeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
-    item->timeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
-    item->timeSlider()->screenshotCursor()->setZValue(NxUi::CursorTooltipItemZOrder);
+    item->timeSlider()->toolTipItem()->setZValue(TooltipItemZOrder);
+    item->timeSlider()->screenshotCursor()->setZValue(CursorTooltipItemZOrder);
     item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->speedSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
-    item->speedSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+    item->speedSlider()->toolTipItem()->setZValue(TooltipItemZOrder);
     item->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->volumeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
-    item->volumeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+    item->volumeSlider()->toolTipItem()->setZValue(TooltipItemZOrder);
 
     auto sliderZoomOutButton = new QnImageButtonWidget();
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
@@ -230,7 +228,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
 
     m_zoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
     m_zoomButtonsWidget->setOpacity(0.0);
-    m_zoomButtonsWidget->setZValue(NxUi::ControlItemZOrder);
+    m_zoomButtonsWidget->setZValue(ControlItemZOrder);
 
     m_zoomButtonsWidget->setVisible(navigator()->isTimelineRelevant());
     connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
@@ -296,8 +294,8 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::TopEdge, NxUi::kShadowThickness);
-    shadow->setZValue(NxUi::ShadowItemZOrder);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::TopEdge, kShadowThickness);
+    shadow->setZValue(ShadowItemZOrder);
 
     updateGeometry();
 }
@@ -344,8 +342,8 @@ void TimelineWorkbenchPanel::setCalendarPanel(CalendarWorkbenchPanel* calendar)
     if (!m_calendar)
         return;
 
-    connect(m_calendar.data(), &NxUi::AbstractWorkbenchPanel::visibleChanged, this, updateAutoHideHeight);
-    connect(m_calendar.data(), &NxUi::AbstractWorkbenchPanel::geometryChanged, this, updateAutoHideHeight);
+    connect(m_calendar.data(), &AbstractWorkbenchPanel::visibleChanged, this, updateAutoHideHeight);
+    connect(m_calendar.data(), &AbstractWorkbenchPanel::geometryChanged, this, updateAutoHideHeight);
 
     m_calendar->hidingProcessor->addTargetItem(item->calendarButton());
 
@@ -490,7 +488,7 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
     base_type::updateOpacity(animate);
 
     bool buttonsVisible = m_visible && m_opacityProcessor->isHovered();
-    const qreal buttonsOpacity = buttonsVisible ? NxUi::kOpaque : NxUi::kHidden;
+    const qreal buttonsOpacity = buttonsVisible ? kOpaque : kHidden;
 
     ensureAnimationAllowed(&animate);
     if (animate)
@@ -702,4 +700,4 @@ void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target
     display()->scene()->sendEvent(item->timeSlider(), &newEvent);
 }
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

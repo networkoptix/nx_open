@@ -20,8 +20,8 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/special_layout.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
 
 #include <common/common_module.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>

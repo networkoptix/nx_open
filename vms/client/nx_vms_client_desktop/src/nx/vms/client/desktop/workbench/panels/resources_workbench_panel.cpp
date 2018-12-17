@@ -9,8 +9,6 @@
 
 #include <core/resource/resource.h>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
@@ -30,21 +28,22 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <ui/workbench/panels/buttons.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
+#include "../workbench_animations.h"
+#include "buttons.h"
 
 namespace {
 
 static const int kResizerWidth = 8;
 
-}
+} // namespace
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
+
+using namespace ui;
 
 ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     const QnPaneSettings& settings,
@@ -155,9 +154,9 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_hidingProcessor->addTargetItem(item);
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_resizerWidget);
-    m_hidingProcessor->setHoverLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
-    m_hidingProcessor->setFocusLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
-    connect(menu(), &nx::vms::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
+    m_hidingProcessor->setHoverLeaveDelay(kCloseSidePanelTimeoutMs);
+    m_hidingProcessor->setFocusLeaveDelay(kCloseSidePanelTimeoutMs);
+    connect(menu(), &ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
@@ -168,7 +167,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         });
 
     m_showingProcessor->addTargetItem(m_showButton);
-    m_showingProcessor->setHoverEnterDelay(NxUi::kOpenPanelTimeoutMs);
+    m_showingProcessor->setHoverEnterDelay(kOpenPanelTimeoutMs);
     connect(m_showingProcessor, &HoverFocusProcessor::hoverEntered, this,
         &ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered);
 
@@ -182,8 +181,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, item, Qt::RightEdge, NxUi::kShadowThickness);
-    shadow->setZValue(NxUi::ShadowItemZOrder);
+    auto shadow = new QnEdgeShadowWidget(item, item, Qt::RightEdge, kShadowThickness);
+    shadow->setZValue(ShadowItemZOrder);
 }
 
 bool ResourceTreeWorkbenchPanel::isPinned() const
@@ -198,7 +197,7 @@ bool ResourceTreeWorkbenchPanel::isOpened() const
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::vms::client::desktop::ui::workbench;
+    using namespace ui::workbench;
 
     ensureAnimationAllowed(&animate);
 
@@ -391,7 +390,7 @@ void ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered()
 
         /* So that the click that may follow won't hide it. */
         setShowButtonUsed(false);
-        QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this,
+        QTimer::singleShot(kButtonInactivityTimeoutMs, this,
             [this]
             {
                 setShowButtonUsed(true);
@@ -446,4 +445,4 @@ void ResourceTreeWorkbenchPanel::updateControlsGeometry()
     emit geometryChanged();
 }
 
-}
+} // namespace nx::vms::client::desktop

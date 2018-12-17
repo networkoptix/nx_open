@@ -1,6 +1,6 @@
 #pragma once
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 /** Default panel shadow */
 static const qreal kShadowThickness = 2.0;
@@ -40,4 +40,4 @@ enum ItemZOrder
     CursorTooltipItemZOrder,
 };
 
-} // namespace NxUi
+} // namespace nx::vms::client::desktop

@@ -22,8 +22,8 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_layout_tour_executor.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_layout_tour_review_controller.h>
 
 #include <nx/utils/string.h>
 

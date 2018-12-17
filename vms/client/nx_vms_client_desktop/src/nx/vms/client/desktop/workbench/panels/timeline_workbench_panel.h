@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/workbench/panels/abstract_workbench_panel.h>
+#include "abstract_workbench_panel.h"
 
 class QnNavigationItem;
 class QnResizerWidget;
@@ -10,7 +10,7 @@ class VariantAnimator;
 class QnImageButtonWidget;
 class AnimatorGroup;
 
-namespace NxUi {
+namespace nx::vms::client::desktop {
 
 class CalendarWorkbenchPanel;
 
@@ -110,4 +110,4 @@ private:
     VariantAnimator* m_yAnimator;
 };
 
-} //namespace NxUi
+} //namespace nx::vms::client::desktop

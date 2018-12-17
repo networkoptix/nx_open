@@ -20,7 +20,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
 #include <utils/math/math.h>
 
