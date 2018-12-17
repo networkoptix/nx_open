@@ -362,13 +362,13 @@ void FoundDevicesModel::incrementDeviceCount(const PresentedStateWithCheckState&
     if (!m_deviceCount.contains(deviceState))
         m_deviceCount.insert(deviceState, 1);
     else
-        m_deviceCount[deviceState]++;
+        ++m_deviceCount[deviceState];
 }
 
 void FoundDevicesModel::decrementDeviceCount(const PresentedStateWithCheckState& deviceState)
 {
     NX_ASSERT(m_deviceCount.contains(deviceState));
-    m_deviceCount[deviceState]--;
+    --m_deviceCount[deviceState];
 }
 
 } // namespace nx::vms::client::desktop
