@@ -81,7 +81,7 @@ void P2PHttpServerTransport::gotPostConnection(
                             SystemError::ErrorCode error,
                             IoCompletionHandler handler)
                         {
-                            buffer->append(body);
+                            buffer->append(QByteArray::fromBase64(body));
                             handler(error, body.size());
                         });
                 }
@@ -108,7 +108,7 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
                     std::move(handler),
                     [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
                     {
-                        buffer->append(m_providedPostBody);
+                        buffer->append(QByteArray::fromBase64(m_providedPostBody));
                         const auto bodySize = m_providedPostBody.size();
                         m_providedPostBody = nx::Buffer();
                         handler(error, bodySize);
@@ -179,8 +179,11 @@ void P2PHttpServerTransport::onBytesRead(
     }
 
     auto completionHandler =
-        [this](SystemError::ErrorCode error, IoCompletionHandler handler)
+        [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
         {
+            m_readContext.buffer = QByteArray::fromBase64(*buffer);
+            *buffer = m_readContext.buffer;
+
             utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
             handler(error, m_readContext.bytesParsed);
             if (watcher.objectDestroyed())
@@ -282,7 +285,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 m_firstSend = false;
             }
 
-            m_sendBuffer += buffer + "\r\n" + makeFrameHeader();
+            m_sendBuffer += buffer.toBase64() + "\r\n" + makeFrameHeader();
             m_sendSocket->sendAsync(
                 m_sendBuffer,
                 [this, handler = std::move(handler)](

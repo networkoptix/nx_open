@@ -78,7 +78,7 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 
                 const auto queueBuffer = m_incomingMessageQueue.front();
                 m_incomingMessageQueue.pop();
-                buffer->append(queueBuffer);
+                buffer->append(QByteArray::fromBase64(queueBuffer));
                 handler(SystemError::noError, queueBuffer.size());
                 return;
             }
@@ -107,7 +107,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
 
             m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
                 m_messageType,
-                buffer));
+                buffer.toBase64()));
 
             http::HttpHeaders additionalHeaders;
             additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
@@ -180,7 +180,7 @@ void P2PHttpClientTransport::startReading()
                         }
                         else
                         {
-                            m_userReadHandlerPair->first->append(data);
+                            m_userReadHandlerPair->first->append(QByteArray::fromBase64(data));
 
                             utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
                             m_userReadHandlerPair->second(SystemError::noError, data.size());
@@ -238,7 +238,7 @@ void P2PHttpClientTransport::startReading()
                  {
                      outBuffer = m_incomingMessageQueue.front();
                      m_incomingMessageQueue.pop();
-                     m_userReadHandlerPair->first->append(outBuffer);
+                     m_userReadHandlerPair->first->append(QByteArray::fromBase64(outBuffer));
 
                  }
                  else

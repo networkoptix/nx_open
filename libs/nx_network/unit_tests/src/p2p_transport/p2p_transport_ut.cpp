@@ -188,7 +188,7 @@ private:
         size_t transferred)
     {
         ASSERT_EQ(error, SystemError::noError);
-        ASSERT_EQ(m_serverSendBuffer.size(), transferred);
+        ASSERT_LE(m_serverSendBuffer.size(), transferred);
         ASSERT_EQ(m_clientReadBuffer, m_serverSendBuffer);
 
         if (++connectionContext->readCount == 1000)

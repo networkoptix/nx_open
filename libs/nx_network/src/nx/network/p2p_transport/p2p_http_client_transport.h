@@ -48,7 +48,7 @@ private:
 
     private:
         websocket::FrameType m_messageType;
-        const nx::Buffer& m_data;
+        const nx::Buffer m_data;
     };
 
     using UserReadHandlerPair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
