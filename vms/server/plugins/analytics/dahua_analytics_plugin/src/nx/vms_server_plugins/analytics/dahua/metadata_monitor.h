@@ -28,11 +28,11 @@ public:
     using Handler = std::function<void(const EventList&)>;
 
     MetadataMonitor(
-        const EngineManifest& manifest,
-        const nx::vms::api::analytics::DeviceAgentManifest& deviceManifest,
+        const EngineManifest& parsedEngineManifest,
+        const nx::vms::api::analytics::DeviceAgentManifest& parsedDeviceAgentManifest,
         const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth,
-        const std::vector<QString>& eventTypes);
+        const std::vector<QString>& eventTypeIdList);
     virtual ~MetadataMonitor();
 
     void startMonitoring();
@@ -60,8 +60,8 @@ private:
     void at_monitorSomeBytesAvailable();
 
 private:
-    const EngineManifest& m_engineManifest;
-    nx::vms::api::analytics::DeviceAgentManifest m_deviceManifest;
+    const EngineManifest& m_parsedEngineManifest;
+    const nx::vms::api::analytics::DeviceAgentManifest& m_parsedDeviceAgentManifest;
     const nx::utils::Url m_monitorUrl;
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_monitorTimer;

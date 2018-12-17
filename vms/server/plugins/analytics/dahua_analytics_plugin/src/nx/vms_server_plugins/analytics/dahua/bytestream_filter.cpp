@@ -11,11 +11,11 @@ namespace analytics {
 namespace dahua {
 
 BytestreamFilter::BytestreamFilter(
-    const EngineManifest& manifest,
-    MetadataMonitor* monitor)
+    const EngineManifest& engineManifest,
+    MetadataMonitor* metadataMonitor)
     :
-    m_engineManifest(manifest),
-    m_monitor(monitor)
+    m_engineManifest(engineManifest),
+    m_metadataMonitor(metadataMonitor)
 {
 }
 
@@ -27,7 +27,7 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     if (Parser::isHartbeatEvent(*event))
         return true;
 
-    return m_monitor->processEvent(*event);
+    return m_metadataMonitor->processEvent(*event);
 }
 
 } // namespace dahua
