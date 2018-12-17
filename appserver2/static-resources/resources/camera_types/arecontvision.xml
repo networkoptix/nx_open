@@ -252,5 +252,6 @@
             </params>
         </resource>
         <resource name = "08ZMV-300" public = "08ZMD-400"/>
+        <resource name = "12ZMV" public = "12ZMD-401"/>
     </oem>
 </resources>
