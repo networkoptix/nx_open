@@ -67,6 +67,14 @@ TEST(replaceStrings, emptySubstitutionsLeaveIntact)
         QString("abc"));
 }
 
+TEST(replaceStrings, noMatch)
+{
+    ASSERT_EQ(replaceStrings(
+        "def",
+        {{"a", "b"}}),
+        QString("def"));
+}
+
 TEST(replaceStrings, independentSubstitutions)
 {
     ASSERT_EQ(replaceStrings(
@@ -99,12 +107,28 @@ TEST(replaceStrings, sequentiveSubstitutionsWithOverriding)
         QString("bc"));
 }
 
+TEST(replaceStrings, substitutionStartsWithSubstringOfAnotherSubstitution)
+{
+    ASSERT_EQ(replaceStrings(
+        "abac",
+        {{"ab", "b"}, {"a", "c"}}),
+        QString("bcc"));
+}
+
 TEST(replaceStrings, orderDoesMatter)
 {
     ASSERT_EQ(replaceStrings(
         "abc",
         {{"a", "b"}, {"a", "c"}}),
         QString("bbc"));
+}
+
+TEST(replaceStrings, specialCharacters)
+{
+    ASSERT_EQ(replaceStrings(
+        "|.*",
+        {{".", "*"}, {"|", "*"}}),
+        QString("***"));
 }
 
 } // namespace test

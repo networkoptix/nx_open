@@ -391,40 +391,44 @@ QString elideString(const QString &source, int maxLength, const QString &tail)
 }
 
 QString replaceStrings(
-    QString source,
+    const QString& source,
     const std::vector<std::pair<QString, QString>>& substitutions,
     Qt::CaseSensitivity caseSensitivity)
 {
     if (substitutions.empty() || source.isEmpty())
         return source;
 
-    // Initializing indices list.
-    std::vector<int> indices{};
-    indices.resize(substitutions.size());
-
-    const auto normalizeIndex =
-        [](int idx) { return idx < 0 ? std::numeric_limits<int>::max() : idx; };
-
-    int currentIndex = 0;
-
-    while (currentIndex < source.length())
+    QHash<QString, QString> replacements;
+    QString pattern;
+    for (const auto& [src, dst]: substitutions)
     {
-        for (int i = 0; i < (int) substitutions.size(); ++i)
-            indices[i] = source.indexOf(substitutions[i].first, currentIndex, caseSensitivity);
-        std::transform(indices.begin(), indices.end(), indices.begin(), normalizeIndex);
+        if (!replacements.contains(src))
+            replacements[src] = dst;
 
-        auto selectedReplacement = std::min_element(indices.cbegin(), indices.cend());
-        const auto substitutionIndex = std::distance(indices.cbegin(), selectedReplacement);
-        currentIndex = *selectedReplacement;
-        if (currentIndex >= source.length())
-            break;
-
-        auto [before, after] = substitutions[substitutionIndex];
-        source.replace(currentIndex, before.length(), after);
-        currentIndex += after.length();
+        pattern.append(QRegularExpression::escape(src));
+        pattern.append(L'|');
     }
+    pattern.chop(1);
 
-    return source;
+    QRegularExpression re(pattern,
+        caseSensitivity == Qt::CaseInsensitive
+            ? QRegularExpression::CaseInsensitiveOption
+            : QRegularExpression::NoPatternOption);
+
+    QString result;
+
+    int lastPos = 0;
+    auto it = re.globalMatch(source);
+    while (it.hasNext())
+    {
+        const QRegularExpressionMatch match = it.next();
+        result += source.mid(lastPos, match.capturedStart() - lastPos);
+        result += replacements.value(match.captured());
+        lastPos = match.capturedEnd();
+    }
+    result += source.mid(lastPos);
+
+    return result;
 }
 
 QByteArray generateRandomName(int length)

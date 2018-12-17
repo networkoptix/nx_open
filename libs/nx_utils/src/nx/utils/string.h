@@ -91,7 +91,7 @@ NX_UTILS_API QString elideString(
  * is selected.
  */
 NX_UTILS_API QString replaceStrings(
-    QString source,
+    const QString& source,
     const std::vector<std::pair<QString, QString>>& substitutions,
     Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
