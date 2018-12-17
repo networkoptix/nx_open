@@ -57,11 +57,13 @@ private:
     nx::Buffer m_sendBuffer;
     nx::Buffer m_responseBuffer;
     nx::Buffer m_providedPostBody;
+    nx::Buffer m_sendChannelReadBuffer;
     bool m_firstSend = true;
     ReadContext m_readContext;
     aio::Timer m_timer;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
         [](SystemError::ErrorCode) {};
+    bool m_failed = false;
     utils::ObjectDestructionFlag m_destructionFlag;
     UserReadHandlerPair m_userReadHandlerPair;
 
@@ -78,6 +80,8 @@ private:
         SystemError::ErrorCode error,
         IoCompletionHandler userHandler,
         utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler);
+    void onReadFromSendSocket(SystemError::ErrorCode error, size_t transferred);
+
     static void addDateHeader(http::HttpHeaders* headers);
 
     virtual void stopWhileInAioThread() override;

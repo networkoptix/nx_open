@@ -168,7 +168,7 @@ void MessageBus::stop()
 }
 
 void MessageBus::addOutgoingConnectionToPeer(
-    const QnUuid& peer, 
+    const QnUuid& peer,
     nx::vms::api::PeerType peerType,
     const utils::Url &_url)
 {
