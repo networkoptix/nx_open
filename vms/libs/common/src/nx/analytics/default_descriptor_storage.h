@@ -42,6 +42,7 @@ public:
         m_resource->setProperty(
             m_propertyName,
             QString::fromUtf8(QJson::serialized(container)));
+        m_resource->saveProperties();
     }
 
 private:
