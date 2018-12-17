@@ -560,7 +560,6 @@ class ProductCustomizationReview(models.Model):
         return notes
 
 
-
 class ExternalFile(models.Model):
     data_structure = models.ForeignKey(DataStructure, default=None, null=True)
     file = models.FileField(upload_to=rename_file, storage=MediaStorage())
