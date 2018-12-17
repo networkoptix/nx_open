@@ -403,13 +403,13 @@ QString replaceStrings(
     indices.resize(substitutions.size());
 
     const auto normalizeIndex =
-        [](int idx) { return idx < 0 ? std::numeric_limits<int>::max() : idx ; };
+        [](int idx) { return idx < 0 ? std::numeric_limits<int>::max() : idx; };
 
     int currentIndex = 0;
 
     while (currentIndex < source.length())
     {
-        for (int i = 0; i < (int)substitutions.size(); ++i)
+        for (int i = 0; i < (int) substitutions.size(); ++i)
             indices[i] = source.indexOf(substitutions[i].first, currentIndex, caseSensitivity);
         std::transform(indices.begin(), indices.end(), indices.begin(), normalizeIndex);
 
