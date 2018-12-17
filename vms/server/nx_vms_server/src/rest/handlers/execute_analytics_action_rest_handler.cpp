@@ -49,7 +49,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
 
     QString missedField;
     if (actionData.engineId.isNull())
-        missedField = "pluginId";
+        missedField = "engineId";
     else if (actionData.actionId.isEmpty())
         missedField = "actionId";
     else if (actionData.objectId.isNull())
