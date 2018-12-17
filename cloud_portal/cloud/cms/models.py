@@ -552,6 +552,14 @@ class ProductCustomizationReview(models.Model):
         self.save()
         self.update_children_reviews()
 
+    @staticmethod
+    def anon_notes(notes):
+        if notes:
+            for i, email in enumerate(list(set(re.findall('(.*@*):', notes)))):
+                notes = notes.replace(email, 'User {}'.format(i+1))
+        return notes
+
+
 
 class ExternalFile(models.Model):
     data_structure = models.ForeignKey(DataStructure, default=None, null=True)

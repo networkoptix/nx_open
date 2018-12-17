@@ -340,6 +340,14 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
+    def get_object(self, request, object_id, from_field=None):
+        review = self.get_queryset(request).get(id=object_id)
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user,
+                                                                             review.customization.name,
+                                                                             'cms.can_view_customization'):
+            review.notes = review.anon_notes(review.notes)
+        return review
+
     # TODO: filter visible reviews
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
