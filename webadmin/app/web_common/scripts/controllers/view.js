@@ -427,9 +427,9 @@ angular.module('nxCommon').controller('ViewCtrl',
                 window.timeManager.setOffset(serverOffset);
                 updateVideoSource(timeFromUrl);
             } else {
-                $timeout(function(){
+                $scope.camerasProvider.getServerTimes().then(() => {
                     setServerOffset(activeCameraParentId);
-                }, 1000);
+                });
             }
         }
 
