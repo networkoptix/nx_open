@@ -81,11 +81,6 @@ struct BaseScopedDescriptor: BaseDescriptor
     }
 
     std::set<DescriptorScope> scopes;
-
-    bool belongsToGroup(const QString& groupId) const;
-    bool belongsToEngine(const QnUuid& engineId) const;
-    bool belongsToScope(const DescriptorScope& scope) const;
-
 };
 #define nx_vms_api_analytics_BaseScopedDescriptor_Fields \
     nx_vms_api_analytics_BaseDescriptor_Fields \
