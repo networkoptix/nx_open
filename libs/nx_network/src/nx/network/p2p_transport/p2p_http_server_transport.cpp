@@ -5,6 +5,18 @@
 
 namespace nx::network {
 
+namespace {
+
+const int kBufferSize = 4096;
+
+static void resetBuffer(nx::Buffer* buffer)
+{
+    buffer->clear();
+    buffer->reserve(kBufferSize);
+}
+
+} // namespace
+
 P2PHttpServerTransport::P2PHttpServerTransport(
     std::unique_ptr<AbstractStreamSocket> socket,
     websocket::FrameType messageType)
@@ -18,9 +30,9 @@ P2PHttpServerTransport::P2PHttpServerTransport(
     m_sendSocket->bindToAioThread(getAioThread());
     m_sendSocket->setRecvTimeout(0);
     m_timer.bindToAioThread(getAioThread());
-    m_sendBuffer.reserve(4096);
-    m_readContext.buffer.reserve(4096);
-    m_sendChannelReadBuffer.reserve(4096);
+    m_sendBuffer.reserve(kBufferSize);
+    m_readContext.buffer.reserve(kBufferSize);
+    m_sendChannelReadBuffer.reserve(kBufferSize);
 }
 
 void P2PHttpServerTransport::start(
@@ -80,7 +92,7 @@ void P2PHttpServerTransport::onReadFromSendSocket(
     }
     else
     {
-        m_sendChannelReadBuffer.resize(0);
+        resetBuffer(&m_sendChannelReadBuffer);
         m_sendSocket->readSomeAsync(
             &m_sendChannelReadBuffer,
             [this](SystemError::ErrorCode error, size_t transferred)
@@ -339,7 +351,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                     NX_VERBOSE(
                         this,
                         lm("Send completed. error: %1, transferred: %2").args(error, transferred));
-                    m_sendBuffer.resize(0);
+                    resetBuffer(&m_sendBuffer);
                     handler(error, transferred);
                 });
         });
@@ -417,7 +429,7 @@ void P2PHttpServerTransport::ReadContext::reset()
 {
     message = http::Message();
     parser.reset();
-    buffer.resize(0);
+    resetBuffer(&buffer);
     bytesParsed = 0;
 }
 
