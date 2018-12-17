@@ -422,8 +422,18 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 			return false;
 	}
 
-    if (!dstRoute.id.isNull() && commonModule()->globalSettings()->isTrafficEncriptionForced())
-        dstUrl.setScheme("https");
+    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
+    {
+        const auto settings = commonModule()->globalSettings();
+        namespace http = nx::network::http;
+        namespace rtsp = nx::network::rtsp;
+
+        if (settings->isTrafficEncriptionForced() && dstUrl.scheme() == http::kUrlSchemeName)
+            dstUrl.setScheme(http::kSecureUrlSchemeName);
+        else
+        if (settings->isVideoTrafficEncriptionForced() && dstUrl.scheme() == rtsp::kUrlSchemeName)
+            dstUrl.setScheme(rtsp::kSecureUrlSchemeName);
+    }
 
 	if (!dstRoute.addr.isNull())
 	{
