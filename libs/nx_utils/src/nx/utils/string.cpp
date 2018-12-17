@@ -390,6 +390,43 @@ QString elideString(const QString &source, int maxLength, const QString &tail)
     return (elidedText + tail);
 }
 
+QString replaceStrings(
+    QString source,
+    const std::vector<std::pair<QString, QString>>& substitutions,
+    Qt::CaseSensitivity caseSensitivity)
+{
+    if (substitutions.empty() || source.isEmpty())
+        return source;
+
+    // Initializing indices list.
+    std::vector<int> indices{};
+    indices.resize(substitutions.size());
+
+    const auto normalizeIndex =
+        [](int idx) { return idx < 0 ? std::numeric_limits<int>::max() : idx ; };
+
+    int currentIndex = 0;
+
+    while (currentIndex < source.length())
+    {
+        for (int i = 0; i < (int)substitutions.size(); ++i)
+            indices[i] = source.indexOf(substitutions[i].first, currentIndex, caseSensitivity);
+        std::transform(indices.begin(), indices.end(), indices.begin(), normalizeIndex);
+
+        auto selectedReplacement = std::min_element(indices.cbegin(), indices.cend());
+        const auto substitutionIndex = std::distance(indices.cbegin(), selectedReplacement);
+        currentIndex = *selectedReplacement;
+        if (currentIndex >= source.length())
+            break;
+
+        auto [before, after] = substitutions[substitutionIndex];
+        source.replace(currentIndex, before.length(), after);
+        currentIndex += after.length();
+    }
+
+    return source;
+}
+
 QByteArray generateRandomName(int length)
 {
     return random::generateName(length);
