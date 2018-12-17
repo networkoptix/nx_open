@@ -56,14 +56,14 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     const auto groupDescriptors = helper.parentEventTypeGroups(eventTypeDescriptors);
 
     const bool useEngineName = engineDescriptors.size() > 1;
-    struct PluginNode
+    struct EngineNode
     {
         QStandardItem* item = nullptr;
         QMap<QString, QStandardItem*> groups;
     };
 
-    PluginNode defaultPluginNode;
-    QMap<QnUuid, PluginNode> items;
+    EngineNode defaultPluginNode;
+    QMap<QnUuid, EngineNode> items;
     for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
     {
         for (const auto& scope: eventTypeDescriptor.scopes)
@@ -91,8 +91,8 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             if (items.contains(engineId))
                 parentItem = items.value(engineId).item;
 
-            auto& pluginNode = useEngineName ? items[engineId] : defaultPluginNode;
-            if (!groupId.isEmpty() && !pluginNode.groups.contains(groupId))
+            auto& engineNode = useEngineName ? items[engineId] : defaultPluginNode;
+            if (!groupId.isEmpty() && !engineNode.groups.contains(groupId))
             {
                 auto itr = groupDescriptors.find(groupId);
                 if (itr == groupDescriptors.cend())
@@ -100,18 +100,18 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
 
                 const auto& groupDescriptor = itr->second;
                 auto item = addItem(
-                    pluginNode.item,
+                    engineNode.item,
                     groupDescriptor.name,
                     engineId.toString(),
                     groupDescriptor.id);
 
                 item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
-                pluginNode.groups.insert(groupId, item);
+                engineNode.groups.insert(groupId, item);
                 parentItem = item;
             }
 
-            if (!groupId.isEmpty() && pluginNode.groups.contains(groupId))
-                parentItem = pluginNode.groups.value(groupId);
+            if (!groupId.isEmpty() && engineNode.groups.contains(groupId))
+                parentItem = engineNode.groups.value(groupId);
 
             addItem(
                 parentItem,
