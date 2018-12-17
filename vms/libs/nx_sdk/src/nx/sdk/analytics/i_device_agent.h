@@ -84,7 +84,7 @@ public:
 
     /**
      * Sets a list of metadata types that are needed by the Server. Empty list means that the
-     * Server doesn't need any metadata from this DeviceAgent.
+     * Server does not need any metadata from this DeviceAgent.
      * @param neededMetadataTypes Lists of type ids of events and objects.
      */
     virtual Error setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;

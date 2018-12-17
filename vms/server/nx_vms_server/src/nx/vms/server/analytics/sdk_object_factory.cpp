@@ -36,9 +36,6 @@ class SdkObjectFactory;
 
 namespace {
 
-using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>;
-using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::IEngine>;
-
 const nx::utils::log::Tag kLogTag{typeid(nx::vms::server::analytics::SdkObjectFactory)};
 
 PluginManager* getPluginManager(QnMediaServerModule* serverModule)
@@ -148,7 +145,7 @@ bool SdkObjectFactory::initPluginResources()
     auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::IPlugin>(
         nx::sdk::analytics::IID_Plugin);
 
-    std::map<QnUuid, PluginPtr> sdkPluginsById;
+    std::map<QnUuid, sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
     for (const auto analyticsPlugin: analyticsPlugins)
     {
         auto analyticsPluginPtr =
@@ -261,7 +258,7 @@ bool SdkObjectFactory::initEngineResources()
             pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
-    std::map<QnUuid, EnginePtr> sdkEnginesById;
+    std::map<QnUuid, sdk_support::SharedPtr<nx::sdk::analytics::IEngine>> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
         const auto& engineList = entry.second;
@@ -304,7 +301,8 @@ bool SdkObjectFactory::initEngineResources()
             }
 
             nx::sdk::Error error = nx::sdk::Error::noError;
-            EnginePtr sdkEngine(sdkPlugin->createEngine(&error));
+            sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine(
+                sdkPlugin->createEngine(&error));
 
             if (!sdkEngine)
             {
