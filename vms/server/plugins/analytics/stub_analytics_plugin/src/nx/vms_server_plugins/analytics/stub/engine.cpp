@@ -105,6 +105,11 @@ std::string Engine::manifest() const
             "id": ")json" + kObjectInTheAreaEventType + R"json(",
             "name": "Object in the area",
             "flags": "stateDependent|regionDependent"
+        },
+        {
+            "id": ")json" + kSuspiciousNoiseEventType + R"json(",
+            "name": "Suspicious noise",
+            "groupId": ")json" + kSoundRelatedEventGroup + R"json("
         }
     ],
     "objectTypes": [
@@ -115,6 +120,12 @@ std::string Engine::manifest() const
         {
             "id": ")json" + kHumanFaceObjectType + R"json(",
             "name": "Human face"
+        }
+    ],
+    "groups": [
+        {
+            "id": ")json" + kSoundRelatedEventGroup + R"json(",
+            "name": "Sound related events"
         }
     ],
     "capabilities": ")json" + m_capabilities + R"json(",

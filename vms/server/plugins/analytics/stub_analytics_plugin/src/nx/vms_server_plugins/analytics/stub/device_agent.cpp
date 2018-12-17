@@ -53,20 +53,26 @@ std::string DeviceAgent::manifest() const
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
-        ")json" + kObjectInTheAreaEventType + R"json("
+        ")json" + kObjectInTheAreaEventType + R"json(",
+        ")json" + kSuspiciousNoiseEventType + R"json("
     ],
     "supportedObjectTypeIds": [
         ")json" + kCarObjectType + R"json("
     ],
     "eventTypes": [
         {
-            "id": ")json" + kLineCrossingEventType + R"json(",
-            "name": "Line crossing"
+            "id": "nx.stub.loitering",
+            "name": "Loitering"
         },
         {
-            "id": ")json" + kObjectInTheAreaEventType + R"json(",
-            "name": "Object in the area",
+            "id": "nx.stub.intrusion",
+            "name": "Intrusion",
             "flags": "stateDependent|regionDependent"
+        },
+        {
+            "id": "nx.stub.gunshot",
+            "name": "Gunshot",
+            "groupId": ")json" + kSoundRelatedEventGroup + R"json("
         }
     ]
 }

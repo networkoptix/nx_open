@@ -79,6 +79,8 @@ private:
 
 const std::string kLineCrossingEventType = "nx.stub.lineCrossing";
 const std::string kObjectInTheAreaEventType = "nx.stub.objectInTheArea";
+const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
+const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEventGroup";
 const std::string kCarObjectType = "nx.stub.car";
 const std::string kHumanFaceObjectType = "nx.stub.humanFace";
 
