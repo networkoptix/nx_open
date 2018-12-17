@@ -14,7 +14,7 @@
 #include <nx/sdk/common/to_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/helper.h>
 
 namespace nx::vms::server::resource {
 
@@ -157,31 +157,14 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     if (!sendSettingsToSdkEngine())
         return CameraDiagnostics::InternalServerErrorResult("Unable to send settings to Engine");
 
-    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
-    if (!NX_ASSERT(analyticsDescriptorListManager))
-        return CameraDiagnostics::InternalServerErrorResult("No analyticsDescriptorListManager");
-
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
         return CameraDiagnostics::PluginErrorResult("Can't find parent plugin");
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::GroupDescriptor>(
-            pluginManifest.id, manifest->groups));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::EventTypeDescriptor>(
-            pluginManifest.id, manifest->eventTypes));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::ObjectTypeDescriptor>(
-            pluginManifest.id, manifest->objectTypes));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::ActionTypeDescriptor>(
-            pluginManifest.id, manifest->objectActions));
+    nx::analytics::Helper helper(commonModule());
+    helper.updateFromManifest(pluginManifest.id, getId(), getName(), *manifest);
 
     setManifest(*manifest);
     saveProperties();

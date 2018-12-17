@@ -10,7 +10,7 @@
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/helper.h>
 
 namespace nx::vms::server::resource {
 
@@ -70,14 +70,9 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
-    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
-    if (!analyticsDescriptorListManager)
-    {
-        return CameraDiagnostics::InternalServerErrorResult(
-            "Can't access analytics descriptor list manager");
-    }
+    nx::analytics::Helper helper(commonModule());
+    helper.updateFromManifest(*manifest);
 
-    analyticsDescriptorListManager->addDescriptor(descriptorFromManifest(*manifest));
     setManifest(*manifest);
     saveProperties();
 

@@ -27,33 +27,7 @@
 
 #include <nx/utils/log/assert.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
-
-namespace {
-
-static nx::vms::api::analytics::EventType analyticsEventType(
-    const QnVirtualCameraResourcePtr& camera,
-    const QString& pluginId,
-    const QString& eventTypeId)
-{
-    NX_ASSERT(camera);
-    if (!camera)
-        return {};
-
-    if (pluginId.isNull())
-        return {};
-
-    const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
-    auto descriptor = descriptorListManager
-        ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(eventTypeId);
-
-    if (!descriptor)
-        return {};
-
-    return descriptor->item;
-}
-
-} // namespace
+#include <nx/analytics/helper.h>
 
 namespace nx {
 namespace vms {
@@ -739,12 +713,9 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventType = analyticsEventType(camera, pluginId, eventTypeId);
-    const auto text = eventType.name;
-
-    return !text.isEmpty()
-        ? text
-        : tr("Analytics Event");
+    nx::analytics::Helper helper(camera->commonModule());
+    const auto eventTypeDescriptor = helper.eventType(eventTypeId);
+    return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }
 
 QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const

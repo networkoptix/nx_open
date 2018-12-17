@@ -35,7 +35,7 @@
 #include <nx/utils/range_adapters.h>
 
 #include <common/common_module.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/helper.h>
 
 namespace nx::vms::client::desktop {
 
@@ -157,18 +157,15 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            const auto descriptorListManager =
-                objectCamera->commonModule()->analyticsDescriptorListManager();
-
-            auto objectTypeDescriptor = descriptorListManager
-                ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
+            nx::analytics::Helper helper(objectCamera->commonModule());
+            const auto objectTypeDescriptor = helper.objectType(object.objectTypeId);
 
             if (!objectTypeDescriptor)
                 return fallbackTitle();
 
-            return objectTypeDescriptor->item.name.isEmpty()
+            return objectTypeDescriptor->name.isEmpty()
                 ? fallbackTitle()
-                : objectTypeDescriptor->item.name;
+                : objectTypeDescriptor->name;
         }
 
         case Qt::DecorationRole:
@@ -731,49 +728,26 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     const analytics::storage::DetectedObject& object) const
 {
     using nx::vms::api::analytics::ActionTypeDescriptor;
-
     const auto camera = this->camera(object);
     if (!camera)
         return {};
 
-    // TODO: #vkutin Is this a correct way of choosing servers for analytics actions?
-    auto servers = q->cameraHistoryPool()->getCameraFootageData(camera, true);
-    servers.push_back(camera->getParentServer());
-
-    const auto descriptorListManager = camera
-        ->commonModule()
-        ->analyticsDescriptorListManager();
-
-    const auto allActions = descriptorListManager->descriptors<ActionTypeDescriptor>(servers);
-    if (allActions.empty())
-        return {};
-
-    QMap<QString, QList<ActionTypeDescriptor>> actionsByPlugin;
-    for (const auto& [actionId, descriptor]: allActions)
-    {
-        if (!descriptor.item.supportedObjectTypeIds.contains(object.objectTypeId))
-            continue;
-
-        for (const auto& path: descriptor.paths)
-            actionsByPlugin[path.pluginId].push_back(descriptor);
-    }
-
-    if (actionsByPlugin.isEmpty())
-        return {};
+    nx::analytics::Helper helper(q->commonModule());
+    auto actionByEngine = helper.availableObjectActions(object.objectTypeId, camera);
 
     QSharedPointer<QMenu> menu(new QMenu());
-    for (const auto& [pluginId, descriptors]: nx::utils::keyValueRange(actionsByPlugin))
+    for (const auto& [engineId, actionById]: actionByEngine)
     {
         if (!menu->isEmpty())
             menu->addSeparator();
 
-        for (const auto& actionDescriptor: descriptors)
+        for (const auto&[actionId, actionDescriptor]: actionById)
         {
-            const auto name = actionDescriptor.item.name;
+            const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, actionDescriptor, object, pluginId = pluginId]()
+                [this, actionDescriptor, object, engineId]()
                 {
-                    executePluginAction(pluginId, actionDescriptor, object);
+                    executePluginAction(engineId, actionDescriptor, object);
                 }));
         }
     }
@@ -782,11 +756,10 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 }
 
 void AnalyticsSearchListModel::Private::executePluginAction(
-    const QString& pluginId,
+    const QnUuid& engineId,
     const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
     const analytics::storage::DetectedObject& object) const
 {
-    const auto& actionType = actionDescriptor.item;
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());
     if (!server || !server->restConnection())
@@ -814,8 +787,8 @@ void AnalyticsSearchListModel::Private::executePluginAction(
         };
 
     AnalyticsAction actionData;
-    actionData.pluginId = pluginId;
-    actionData.actionId = actionType.id;
+    actionData.engineId = engineId;
+    actionData.actionId = actionDescriptor.id;
     actionData.objectId = object.objectAppearanceId;
 
     server->restConnection()->executeAnalyticsAction(

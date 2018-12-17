@@ -128,14 +128,6 @@ public:
         return m_params.get();
     }
 
-    virtual int paramCount() override
-    {
-        if (!m_params)
-            return 0;
-
-        return (int) m_params->count();
-    }
-
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
         m_handleResultCalled = true;

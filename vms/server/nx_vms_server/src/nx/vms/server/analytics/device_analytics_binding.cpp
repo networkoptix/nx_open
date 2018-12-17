@@ -7,7 +7,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/i_engine.h>
@@ -15,6 +14,8 @@
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/common/metadata_types.h>
+
+#include <nx/analytics/helper.h>
 #include <nx/sdk/common/to_string.h>
 
 #include <nx/vms/server/analytics/data_packet_adapter.h>
@@ -384,13 +385,6 @@ std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
     if (!NX_ASSERT(m_engine, "No analytics engine is set"))
         return nullptr;
 
-    const auto descriptorListManager = serverModule()
-        ->commonModule()
-        ->analyticsDescriptorListManager();
-
-    auto eventDescriptors = descriptorListManager
-        ->deviceDescriptors<EventTypeDescriptor>(m_device);
-
     auto handler = std::make_unique<DeviceAgentHandler>(serverModule(), m_engine, m_device);
     handler->setMetadataSink(m_metadataSink.get());
 
@@ -430,14 +424,6 @@ bool DeviceAnalyticsBinding::updateDeviceWithManifest(
 bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
-    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
-    if (!analyticsDescriptorListManager)
-    {
-        NX_ERROR(this, "Can't access analytics descriptor list manager, device %1 (%2)",
-            m_device->getUserDefinedGroupName(), m_device->getId());
-        return false;
-    }
-
     const auto parentPlugin = m_engine->plugin();
     if (!parentPlugin)
     {
@@ -448,18 +434,10 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<EventTypeDescriptor>(
-            pluginManifest.id, manifest.eventTypes));
+    nx::analytics::Helper helper(serverModule()->commonModule());
+    helper.updateFromManifest(m_device->getId(), m_engine->getId(), manifest);
 
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<ObjectTypeDescriptor>(
-            pluginManifest.id, manifest.objectTypes));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<GroupDescriptor>(
-            pluginManifest.id, manifest.groups));
-
+    // TODO: #dmishin make analytics helper handle supported event/object types.
     m_device->setSupportedAnalyticsEventTypeIds(m_engine->getId(), supportedEventTypes(manifest));
     m_device->setSupportedAnalyticsObjectTypeIds(
         m_engine->getId(),

@@ -12,7 +12,6 @@
 
 #include <plugins/plugins_ini.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
 #include <nx/sdk/analytics/common/pixel_format.h>
 #include <nx/sdk/common/string_map.h>
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -56,31 +55,6 @@ analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModu
     }
 
     return sdkObjectFactory;
-}
-
-nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule)
-{
-    if (!serverModule)
-    {
-        NX_ASSERT(false, "Can't access server module");
-        return nullptr;
-    }
-
-    auto commonModule = serverModule->commonModule();
-    if (!commonModule)
-    {
-        NX_ASSERT(false, "Can't access common module");
-        return nullptr;
-    }
-
-    auto descriptorListManager = commonModule->analyticsDescriptorListManager();
-    if (!descriptorListManager)
-    {
-        NX_ASSERT(false, "Can't access descriptor list manager");
-        return nullptr;
-    }
-
-    return descriptorListManager;
 }
 
 bool deviceInfoFromResource(

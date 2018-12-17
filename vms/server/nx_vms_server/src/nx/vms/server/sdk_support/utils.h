@@ -28,12 +28,6 @@
 
 class QnMediaServerModule;
 
-namespace nx::analytics {
-
-class DescriptorListManager;
-
-} // namespace nx::analytics
-
 namespace nx::vms::server::analytics {
 
 class SdkObjectFactory;
@@ -45,7 +39,7 @@ namespace nx::vms::server::sdk_support {
 namespace detail {
 
 NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::DescriptorScope>);
 NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace detail
@@ -122,7 +116,6 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
 }
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule);
-nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(
     const QnVirtualCameraResourcePtr& device,
@@ -143,42 +136,6 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
 
 resource::AnalyticsEngineResourceList toServerEngineList(
     const nx::vms::common::AnalyticsEngineResourceList engineList);
-
-template <typename Descriptor, typename Item>
-std::map<QString, Descriptor> descriptorsFromItemList(
-    const QString& pluginId,
-    const QList<Item>& itemList)
-{
-    std::map<QString, Descriptor> result;
-    for (const auto& item: itemList)
-    {
-        Descriptor descriptor;
-        if constexpr(detail::hasItem<Descriptor>::value)
-        {
-            descriptor.item = item;
-        }
-        else
-        {
-            descriptor.id = item.id;
-            descriptor.name = item.name;
-        }
-
-        if constexpr (detail::hasPaths<Descriptor>::value)
-        {
-            nx::vms::api::analytics::HierarchyPath path;
-            path.pluginId = pluginId;
-
-            if constexpr (detail::hasGroupId<Item>::value)
-                path.groupId = item.groupId;
-
-            descriptor.paths.insert(path);
-        }
-
-        result[item.id] = std::move(descriptor);
-    }
-
-    return result;
-}
 
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 

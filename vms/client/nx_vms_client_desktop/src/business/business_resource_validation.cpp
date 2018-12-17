@@ -22,7 +22,7 @@
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/helper.h>
 
 #include <utils/email/email.h>
 
@@ -239,11 +239,8 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
-    const auto descriptors = descriptorListManager
-        ->deviceDescriptors<nx::vms::api::analytics::EventTypeDescriptor>(camera);
-
-    return !descriptors.empty();
+    // TODO: #dmishin implement this when IEngine::isCompatible is added to the SDK.
+    return true;
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)

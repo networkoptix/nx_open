@@ -85,7 +85,7 @@ private:
     QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
 
     void executePluginAction(
-        const QString& pluginId,
+        const QnUuid& engineId,
         const nx::vms::api::analytics::ActionTypeDescriptor& action,
         const analytics::storage::DetectedObject& object) const;
 

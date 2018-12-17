@@ -33,7 +33,7 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
+nx::vms::api::analytics::EventTypeDescriptor MetadataHandler::eventTypeDescriptor(
     const QString& eventTypeId) const
 {
     for (const auto& entry: m_eventTypeDescriptors)
@@ -41,9 +41,9 @@ nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
         const auto& id = entry.first;
         const auto& descriptor = entry.second;
         if (id == eventTypeId)
-            return descriptor.item;
+            return descriptor;
     }
-    return nx::vms::api::analytics::EventType();
+    return nx::vms::api::analytics::EventTypeDescriptor();
 }
 
 void MetadataHandler::handleMetadata(IMetadataPacket* metadata)

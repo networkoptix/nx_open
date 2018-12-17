@@ -50,7 +50,8 @@ private:
 
     void setLastEventState(const QString& eventTypeId, nx::vms::api::EventState eventState);
 
-    nx::vms::api::analytics::EventType eventTypeDescriptor(const QString& eventTypeId) const;
+    nx::vms::api::analytics::EventTypeDescriptor eventTypeDescriptor(
+        const QString& eventTypeId) const;
 
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::analytics::IEventMetadataPacket> packet);

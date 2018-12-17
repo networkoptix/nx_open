@@ -1,6 +1,7 @@
 #include "device_agent_handler.h"
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 
 #include <nx/vms/event/events/plugin_event.h>
@@ -9,7 +10,7 @@
 
 #include <nx/vms/server/event/event_connector.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/helper.h>
 
 #include <utils/common/synctime.h>
 
@@ -32,14 +33,8 @@ DeviceAgentHandler::DeviceAgentHandler(
     m_metadataHandler.setResource(m_device);
     m_metadataHandler.setPluginId(m_engineResource->plugin()->manifest().id);
 
-    const auto descriptorListManager = serverModule
-        ->commonModule()
-        ->analyticsDescriptorListManager();
-
-    auto eventDescriptors = descriptorListManager
-        ->deviceDescriptors<nx::vms::api::analytics::EventTypeDescriptor>(m_device);
-
-    m_metadataHandler.setEventTypeDescriptors(eventDescriptors);
+    nx::analytics::Helper helper(serverModule->commonModule());
+    m_metadataHandler.setEventTypeDescriptors(helper.supportedEventTypes(m_device));
 }
 
 void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket)

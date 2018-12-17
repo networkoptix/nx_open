@@ -20,7 +20,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/helper.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
 
@@ -55,12 +55,12 @@ private:
     QAction* m_analyticsEventsSingleAction = nullptr;
 
     using EventTypeDescriptors = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
-    struct PluginInfo
+    struct EngineInfo
     {
         QString name;
         EventTypeDescriptors eventTypes;
 
-        bool operator<(const PluginInfo& other) const
+        bool operator<(const EngineInfo& other) const
         {
             QCollator collator;
             collator.setNumericMode(true);
@@ -239,61 +239,58 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     {
         using namespace nx::vms::event;
 
-        const auto descriptorListManager = q->commonModule()->analyticsDescriptorListManager();
-        const auto allAnalyticsEvents = descriptorListManager
-            ->allDescriptorsInTheSystem<nx::vms::api::analytics::EventTypeDescriptor>();
-
-        const auto allAnalyticsPlugins = descriptorListManager
-            ->allDescriptorsInTheSystem<nx::vms::api::analytics::PluginDescriptor>();
-
+        nx::analytics::Helper helper(q->commonModule());
+        const auto eventTypeDescriptors = helper.eventTypes();
+        const auto engineDescriptors = helper.engines();
         analyticsMenu->clear();
 
-        if (!allAnalyticsEvents.empty())
+        if (!eventTypeDescriptors.empty())
         {
-            QHash<QString, PluginInfo> pluginsById;
-            for (const auto& [pluginId, descriptor]: allAnalyticsPlugins)
-                pluginsById[pluginId].name = descriptor.name;
+            QHash<QnUuid, EngineInfo> engineById;
+            for (const auto& [engineId, engineDescriptor]: engineDescriptors)
+                engineById[engineId].name = engineDescriptor.name;
 
-            for (const auto& entry: allAnalyticsEvents)
+            for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
             {
-                for (const auto& path: entry.second.paths)
-                    pluginsById[path.pluginId].eventTypes.insert(entry);
+                for (const auto& scope: eventTypeDescriptor.scopes)
+                {
+                    engineById[scope.engineId].eventTypes
+                        .emplace(eventTypeId, eventTypeDescriptor);
+                }
             }
 
-            QVector<PluginInfo> plugins;
-            for (const auto& pluginInfo: pluginsById)
-            {
-                if (!pluginInfo.eventTypes.empty())
-                    plugins.push_back(pluginInfo);
-            }
+            QList<EngineInfo> engines;
+            for (const auto& engineInfo: engineById)
+                engines.push_back(engineInfo);
 
-            std::sort(plugins.begin(), plugins.end());
-            const bool severalPlugins = plugins.size() > 1;
+            std::sort(engines.begin(), engines.end());
+            const bool multipleEnginesArePresent = engines.size() > 1;
 
             QMenu* currentMenu = analyticsMenu;
-            for (const auto& plugin: plugins)
+            for (const auto& engine: engines)
             {
-                if (severalPlugins)
+                if (multipleEnginesArePresent)
                 {
-                    const auto pluginName = plugin.name.isEmpty()
-                        ? QString("<%1>").arg(tr("unnamed analytics plugin"))
-                        : plugin.name;
-
-                    currentMenu = analyticsMenu->addMenu(pluginName);
+                    const auto engineName = engine.name.isEmpty()
+                        ? QString("<%1>").arg(tr("unnamed analytics engine"))
+                        : engine.name;
 
                     currentMenu->setWindowFlags(
                         currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+                    currentMenu = analyticsMenu->addMenu(engineName);
                 }
 
-                for (const auto entry: plugin.eventTypes)
+                for (const auto& [eventTypeId, eventTypeDescriptor]: engine.eventTypes)
                 {
-                    const auto& descriptor = entry.second;
                     addMenuAction(currentMenu,
-                        descriptor.item.name,
-                        EventType::analyticsSdkEvent, descriptor.getId());
+                        eventTypeDescriptor.name,
+                        EventType::analyticsSdkEvent, eventTypeDescriptor.id);
 
-                    if (!currentSelectionStillAvailable && currentSelection == descriptor.getId())
+                    if (!currentSelectionStillAvailable
+                        && currentSelection == eventTypeDescriptor.getId())
+                    {
                         currentSelectionStillAvailable = true;
+                    }
                 }
             }
 
