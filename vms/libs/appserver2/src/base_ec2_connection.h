@@ -91,7 +91,10 @@ public:
         const nx::vms::api::DatabaseDumpData& data,
         impl::SimpleHandlerPtr handler) override;
 
-    virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& url) override;
+    virtual void addRemotePeer(
+        const QnUuid& id,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& url) override;
     virtual void deleteRemotePeer(const QnUuid& id) override;
 
     QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
@@ -508,12 +511,15 @@ return reqID;
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const nx::utils::Url &_url)
+void BaseEc2Connection<QueryProcessorType>::addRemotePeer(
+    const QnUuid& id,
+    nx::vms::api::PeerType peerType,
+    const nx::utils::Url &_url)
 {
     nx::utils::Url url(_url);
     QUrlQuery q;
     url.setQuery(q);
-    m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, url);
+    m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, peerType, url);
 }
 
 template<class QueryProcessorType>

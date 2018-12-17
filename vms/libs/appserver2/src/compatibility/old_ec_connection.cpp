@@ -217,7 +217,10 @@ int OldEcConnection::restoreDatabaseAsync(
     return reqID;
 }
 
-    void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const nx::utils::Url & /*url*/)
+    void OldEcConnection::addRemotePeer(
+        const QnUuid& /*id*/,
+        nx::vms::api::PeerType /*peerType*/,
+        const nx::utils::Url & /*url*/)
     {
     }
 

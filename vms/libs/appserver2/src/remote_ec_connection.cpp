@@ -54,11 +54,11 @@ namespace ec2
 
         nx::utils::Url url(m_queryProcessor->getUrl());
         url.setScheme(nx::network::http::urlSheme(m_connectionInfo.allowSslConnections));
-        //url.setPath("ec2/events");
-        url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
+        url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ));
         QUrlQuery q;
         url.setQuery(q);
-        m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(m_remotePeerId, url);
+        m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(
+            m_remotePeerId, nx::vms::api::PeerType::server, url);
     }
 
     void RemoteEC2Connection::stopReceivingNotifications()

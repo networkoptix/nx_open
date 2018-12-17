@@ -113,7 +113,8 @@ TEST(SympleSyncTest, main)
         const auto addr = servers[i]->moduleInstance()->endpoint();
         const auto id = servers[i]->moduleInstance()->commonModule()->moduleGUID();
         nx::utils::Url url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
-        servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addOutgoingConnectionToPeer(id, url);
+        servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addOutgoingConnectionToPeer(
+            id, nx::vms::api::PeerType::server, url);
     }
 
     // wait for data sync

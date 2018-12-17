@@ -190,7 +190,8 @@ nx::utils::Url Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 
 void Ec2MserverCloudSynchronization::establishConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(
+        ::ec2::kCloudPeerId, nx::vms::api::PeerType::cloudServer, cdbEc2TransactionUrl());
 }
 
 void Ec2MserverCloudSynchronization::breakConnectionBetweenVmsAndCloud()
@@ -580,7 +581,7 @@ void Ec2MserverCloudSynchronization::compareUsers(
     {
         ASSERT_EQ(vmsUsers.size(), cloudUsers.size());
     }
-    
+
     if (vmsUsers.size() != cloudUsers.size())
         return;
 

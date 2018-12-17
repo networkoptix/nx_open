@@ -11,7 +11,8 @@ CloudConnector::CloudConnector(AbstractTransactionMessageBus* messageBus):
 
 void CloudConnector::startDataSynchronization(const nx::utils::Url &cloudUrl)
 {
-    m_messageBus->addOutgoingConnectionToPeer(::ec2::kCloudPeerId, cloudUrl);
+    m_messageBus->addOutgoingConnectionToPeer(
+        ::ec2::kCloudPeerId, nx::vms::api::PeerType::cloudServer, cloudUrl);
 }
 
 void CloudConnector::stopDataSynchronization()

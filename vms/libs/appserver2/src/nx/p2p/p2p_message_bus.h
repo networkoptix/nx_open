@@ -57,7 +57,10 @@ public:
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
     ~MessageBus() override;
 
-    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
+    virtual void addOutgoingConnectionToPeer(
+        const QnUuid& id,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
     QMap<QnUuid, P2pConnectionPtr> connections() const;
