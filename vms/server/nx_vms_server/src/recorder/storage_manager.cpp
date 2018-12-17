@@ -1480,7 +1480,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs);
 
     const auto archiveEndTimeMs = qMax(
-        catalogHi->m_chunks.back().startTimeMs, catalogHi->m_chunks.back().startTimeMs);
+        catalogLow->m_chunks.back().startTimeMs, catalogHi->m_chunks.back().startTimeMs);
     qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
         ? archiveEndTimeMs - bitrateAnalyzePeriodMs
         : 0;
