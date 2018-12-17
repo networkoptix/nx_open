@@ -35,8 +35,8 @@ public:
         const QnCommonModule* commonModule);
 
     static bool isCompatibleCustomization(
-        const QString& first,
-        const QString& second,
+        const QString& serverCustomization,
+        const QString& clientCustomization,
         bool isMobile);
 
 protected:

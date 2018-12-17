@@ -18,7 +18,6 @@
 
 #include <cloud/cloud_connection.h>
 #include <network/cloud_system_data.h>
-#include <utils/common/app_info.h>
 #include <network/connection_validator.h>
 #include <utils/common/delayed.h>
 #include <utils/common/id.h>
@@ -28,6 +27,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 
 using namespace nx::cloud::db;
@@ -47,7 +47,7 @@ const int kUpdateIntervalMs = 5 * 1000;
 
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, bool isMobile)
 {
-    const auto currentCustomization = QnAppInfo::customizationName();
+    const auto currentCustomization = nx::utils::AppInfo::customizationName();
     QnCloudSystemList result;
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
@@ -57,9 +57,9 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
 
         const auto customization = QString::fromStdString(systemData.customization);
 
-        const bool wrongCusomization = !QnConnectionValidator::isCompatibleCustomization(
-            customization, currentCustomization,isMobile);
-        if (wrongCusomization)
+        const bool compatibleCustomization = QnConnectionValidator::isCompatibleCustomization(
+            customization, currentCustomization, isMobile);
+        if (!compatibleCustomization)
             continue;
 
         auto data = QJson::deserialized<nx::vms::api::CloudSystemData>(

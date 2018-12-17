@@ -109,24 +109,22 @@ bool QnConnectionValidator::isCompatibleToCurrentSystem(const nx::vms::api::Modu
 // 'default' should connect to 'default_cn' and 'default_zh_CN'. The same applied to brands
 // comparing, e.g. 'hdwitness' is compatible with 'hdwitness_cn' on mobile clients.
 bool QnConnectionValidator::isCompatibleCustomization(
-    const QString& first,
-    const QString& second,
+    const QString& serverCustomization,
+    const QString& clientCustomization,
     bool isMobile)
 {
-    if (first.isEmpty() || second.isEmpty())
+    // In developer mode customization is empty.
+    if (serverCustomization.isEmpty() || clientCustomization.isEmpty())
         return true;
 
     if (!isMobile)
-        return first == second;
+        return serverCustomization == clientCustomization;
 
-    if ((isDefaultCustomization(first) && isMetaCustomization(second))
-        || (isDefaultCustomization(second) && isMetaCustomization(first)))
-    {
+    if (isDefaultCustomization(clientCustomization) && isMetaCustomization(serverCustomization))
         return true;
-    }
 
     const QChar kSeparator = L'_';
-    return first.left(first.indexOf(kSeparator)) == second.left(second.indexOf(kSeparator));
+    return serverCustomization.left(serverCustomization.indexOf(kSeparator)) == clientCustomization.left(clientCustomization.indexOf(kSeparator));
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
