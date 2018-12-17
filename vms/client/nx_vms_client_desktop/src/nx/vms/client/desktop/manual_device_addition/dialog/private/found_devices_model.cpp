@@ -61,8 +61,8 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
                 const bool isChecked = false;
 
                 m_devices.append(device);
-                m_deviceRowState.insert(id, { presentedState, isChecked });
-                incrementDeviceCount({ presentedState, isChecked });
+                m_deviceRowState.insert(id, {presentedState, isChecked});
+                incrementDeviceCount({presentedState, isChecked});
             }
         }
     }
@@ -103,7 +103,7 @@ int FoundDevicesModel::deviceCount(PresentedState presentedState) const
 
 int FoundDevicesModel::deviceCount(PresentedState presentedState, bool isChecked) const
 {
-    return m_deviceCount[{ presentedState, isChecked }];
+    return m_deviceCount[{presentedState, isChecked}];
 }
 
 QModelIndex FoundDevicesModel::indexByUniqueId(const QString& uniqueId, int column)
@@ -259,7 +259,7 @@ bool FoundDevicesModel::setData(
             decrementDeviceCount(deviceRowState);
             incrementDeviceCount(newDeviceRowState);
             deviceRowState = newDeviceRowState;
-            emit dataChanged(index, index, { Qt::CheckStateRole });
+            emit dataChanged(index, index, {Qt::CheckStateRole});
             emit headerDataChanged(Qt::Horizontal,
                 FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
         }
@@ -278,7 +278,7 @@ bool FoundDevicesModel::setData(
             decrementDeviceCount(deviceRowState);
             incrementDeviceCount(newDeviceRowState);
             deviceRowState = newDeviceRowState;
-            emit dataChanged(index, index, { presentedStateRole });
+            emit dataChanged(index, index, {presentedStateRole});
             emit headerDataChanged(Qt::Horizontal,
                 FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
         }
