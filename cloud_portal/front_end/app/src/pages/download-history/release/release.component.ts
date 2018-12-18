@@ -6,16 +6,15 @@ import {
 } from '@angular/core';
 
 @Component({
-    selector: 'nx-release',
+    selector   : 'nx-release',
     templateUrl: 'release.component.html',
-    styleUrls: ['release.component.scss']
+    styleUrls  : ['release.component.scss']
 })
 export class ReleaseComponent implements OnInit {
     @Input() release: any;
     @Input() linkbase: any;
 
-    constructor(@Inject('languageService') private language: any,
-                @Inject('configService') private configService: any) {
+    constructor(@Inject('languageService') private language: any) {
     }
 
     ngOnInit(): void {

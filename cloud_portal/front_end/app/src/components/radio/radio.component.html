@@ -1,13 +1,12 @@
 <label class="nx-radio">
     <input type="radio"
-           [name]="name"
-           id="{{compId}}"
+           [id]="componentId"
            [value]="value"
-           [attr.disabled]="disabled ? '' : null">
+           [attr.disabled]="disabled ? '' : null"
+           (click)="changeState($event)">
 
     <span class="check"
-          [ngClass]="state"
-          (click)="changeState($event)">
+          [ngClass]="state">
 
         <svg viewBox="0 0 20 16">
             <path class="circle"

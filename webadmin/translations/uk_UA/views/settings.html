@@ -8,8 +8,7 @@
                 Цей пристрій призначений для роботи з жорстким диском. <br> Будь ласка, вимкніть пристрій та встановіть жорсткий диск.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                Для роботи цього пристрою необхідно встановити з'єднання з мережею. <br> Будь ласка, підключіть його до вашої локальної мережі або мережі Інтернет
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 У цього пристрою некоректна мережева конфігурація. <br> Потрібно підключити його до мережі або налаштувати правильну IP-адресу.

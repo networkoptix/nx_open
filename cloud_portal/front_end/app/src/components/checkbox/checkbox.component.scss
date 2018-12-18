@@ -19,8 +19,12 @@ nx-checkbox {
         }
     }
 
-    & + label + div.input-error {
-        display : none;
+    & + label {
+        cursor : pointer;
+        
+        & + div.input-error {
+            display : none;
+        }
     }
 
     &.ng-invalid:not(.ng-untouched) {

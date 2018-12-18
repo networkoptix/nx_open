@@ -30,6 +30,8 @@ export class DownloadComponent implements OnInit, OnDestroy {
     downloadsData: any;
     platformMatch: {};
     canSeeHistory: boolean;
+    tabsVisible: boolean;
+    foundPlatform: boolean;
 
     location: Location;
 
@@ -40,7 +42,9 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
         this.config = this.configService.getConfig();
 
+        this.foundPlatform = false;
         this.canViewDownloads = false;
+        this.tabsVisible = false;
         this.downloads = this.config.downloads;
 
         this.downloadsData = {
@@ -127,37 +131,39 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     break;
                 }
             }
-
-            let foundPlatform = false;
-            this.downloads.groups.forEach(platform => {
-                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
-            });
-
-            if (this.platform && !foundPlatform) {
-                this.location.go('404');
-
-                return;
-            }
-
-            if (!foundPlatform) {
-                this.downloads.groups[ 0 ].active = true;
-            }
         });
 
         this.cloudApi
             .getDownloads()
             .then(data => {
                 this.downloadsData = data.data;
+
+                this.downloads.groups = this.downloads.groups.filter(platform => {
+                    return !this.downloadsData.platforms.every(avail => {
+                        return avail.name !== platform.name;
+                    });
+                });
+
+                this.foundPlatform = this.downloads.groups.some(platform => {
+                    return ((platform.os || platform.name) === this.activeOs);
+                });
+
+                if (!this.foundPlatform) {
+                    this.downloads.groups[0].active = true;
+                    this.platform = this.downloads.groups[0].os;
+                }
+
+                this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
+
+                setTimeout(() => {
+                    this.tabsVisible = true;
+                    if (this.tabs) {
+                        this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[0].name);
+                    }
+                });
+
                 this.getDownloadsInfo();
             });
-
-        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
-
-        setTimeout(() => {
-            if (this.tabs) {
-                this.tabs.select(this.activeOs);
-            }
-        });
     }
 
     ngOnInit(): void {

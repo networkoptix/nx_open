@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import os
 import re
 from datetime import datetime
+from distutils.util import strtobool
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
@@ -100,6 +101,12 @@ class Language(models.Model):
 
 
 class Customization(models.Model):
+    class Meta:
+        # Used to allow a user to see the customization in list of customizations
+        # Cloud portal(s) are now a product so customization is not necessary for giving access anymore
+        permissions = (
+            ('can_view_customization', 'Can view customization'),
+        )
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
         Language, related_name='default_in_%(class)s')
@@ -110,13 +117,15 @@ class Customization(models.Model):
                                                  help_text="""Any user can view the release history page.""")
     public_downloads = models.BooleanField(default=True, help_text="""Any user can view the downloads page.""")
 
-    parent = models.ForeignKey('Customization', default=None, null=True, related_name='children_customizations',
+    parent = models.ForeignKey('Customization', default=None, null=True, blank=True,
+                               related_name='children_customizations',
                                help_text="""Parent is the customization that the current customization depends on.<br>
                                The main purpose is to control how the integration review process works.
                                <br><br>
                                If there is a parent:<br>
                                - A review will be locked until the parent accepts that review.<br>
-                               - If the parent rejects a review it will automatically be rejected for this customization.<br><br>
+                               - If the parent rejects a review it will automatically be rejected for this
+                               customization.<br><br>
                                If there is no parent selected or the parent is not in the review an integration
                                can be reviewed whenever.""")
     trust_parent = models.BooleanField(default=False, help_text="""Automatically accepts integrations the parent
@@ -164,6 +173,12 @@ class ProductType(models.Model):
 
 
 class Product(models.Model):
+    class Meta:
+        # The can_access_product gives users the ability to see the product in product lists.
+        # In combination with other permission it allows them to edit the product and send reviews for their product
+        permissions = (
+            ('can_access_product', 'Can access product'),
+        )
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -248,8 +263,8 @@ class Product(models.Model):
 
 class Context(models.Model):
     class Meta:
-        verbose_name = 'admin page'
-        verbose_name_plural = 'admin pages'
+        verbose_name = 'page'
+        verbose_name_plural = 'pages'
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
@@ -281,15 +296,8 @@ class Context(models.Model):
         contexts = (self.contexttemplate_set.filter(language=item[0], skin=item[1]) for item in priorities)
 
         # retrieve first available template from the list or return None
-        return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
-
-
-# TODO: CLOUD-2388 Remove proxy model
-class ContextProxy(Context):
-    class Meta:
-        proxy = True
-        verbose_name = "page"
-        verbose_name_plural = "pages"
+        return next((context_template.first().template for context_template in contexts if context_template.exists()),
+                    None)
 
 
 class ContextTemplate(models.Model):
@@ -334,12 +342,15 @@ class DataStructure(models.Model):
                          (5, 'guid', 'GUID'),
                          (6, 'select', 'Select'),
                          (7, 'external_file', 'External File'),
-                         (8, 'external_image', 'External Image'))
+                         (8, 'external_image', 'External Image'),
+                         (9, 'check_box', 'Check Box'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)
     translatable = models.BooleanField(default=True)
-    meta_settings = JSONField(default=dict(), blank=True, help_text="For the regex field \\ needs to be escaped with another '\\'")
+    meta_settings = JSONField(default=dict(),
+                              blank=True,
+                              help_text="For the regex field \\ needs to be escaped with another '\\'")
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)
@@ -382,36 +393,58 @@ class DataStructure(models.Model):
                 # filter only accepted content_records
                 content_record = content_record.filter(version_id__lte=version_id)
                 if not draft:
-                    content_record = content_record.\
-                        filter(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.accepted)
+                    new_review_records = content_record.\
+                        filter(version__productcustomizationreview__state=ProductCustomizationReview.
+                               REVIEW_STATES.accepted)
+                    # If new versions or records dont exist use old vay of getting records
+                    if new_review_records.exists():
+                        content_record = new_review_records
+                    else:
+                        content_record = content_record.filter(version__accepted_by__isnull=False)
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
         # if no value or optional and type file - use default value from structure
-        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file,
-                                                                                       DataStructure.DATA_TYPES.image,
-                                                                                       DataStructure.DATA_TYPES.external_file,
-                                                                                       DataStructure.DATA_TYPES.external_image]):
+        if not content_value and (not self.optional or
+                                  self.optional and self.type in [DataStructure.DATA_TYPES.file,
+                                                                  DataStructure.DATA_TYPES.image,
+                                                                  DataStructure.DATA_TYPES.external_file,
+                                                                  DataStructure.DATA_TYPES.external_image,
+                                                                  DataStructure.DATA_TYPES.check_box]):
             content_value = self.default
+
+        if self.type == DataStructure.DATA_TYPES.check_box:
+            content_value = strtobool(content_value) == 1
 
         return content_value
 
+
 # CMS settings. Release engineer can change that
-
-
-class UserGroupsToCustomizationPermissions(models.Model):
+class UserGroupsToProductPermissions(models.Model):
     group = models.ForeignKey(Group)
-    customization = models.ForeignKey(Customization)
+    product = models.ForeignKey(Product, default=None, null=True)
 
     @staticmethod
-    def check_permission(user, customization_name, permission=None):
+    def check_permission(user, product, permission=None):
         if user.is_superuser:
             return True
         if permission and not user.has_perm(permission):
             return False
 
-        return UserGroupsToCustomizationPermissions.objects.filter(group_id__in=user.groups.all(),
-                                                                   customization__name=customization_name).exists()
+        groups = UserGroupsToProductPermissions.objects.filter(product=product,
+                                                               group_id__in=user.groups.values_list('id', flat=True))
+        if permission:
+            codename = permission
+            if permission.find('.') > -1:
+                # need to remove app_label to get codename
+                codename = permission[permission.find('.')+1:]
+            groups = groups.filter(group__permissions__codename=codename)
+        return groups.exists()
+
+    @staticmethod
+    def check_customization_permission(user, customization, permission=None):
+        return UserGroupsToProductPermissions.\
+            check_permission(user, get_cloud_portal_product(customization), permission)
 
 
 # CMS data. Partners can change that
@@ -450,7 +483,6 @@ class ContentVersion(models.Model):
             else:
                 ProductCustomizationReview(customization=customization, version=self, state=pending).save()
 
-
     @property
     def state(self):
         if not self.accepted_by:
@@ -473,7 +505,10 @@ class ProductCustomizationReview(models.Model):
             ("force_update", "Can forcibly update content"),
         )
 
-    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (2, "rejected", "Rejected"), (3, "blocked", "Blocked"))
+    REVIEW_STATES = Choices((0, "pending", "Pending"),
+                            (1, "accepted", "Accepted"),
+                            (2, "rejected", "Rejected"),
+                            (3, "blocked", "Blocked"))
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
@@ -517,6 +552,13 @@ class ProductCustomizationReview(models.Model):
         self.save()
         self.update_children_reviews()
 
+    @staticmethod
+    def anon_notes(notes):
+        if notes:
+            for i, email in enumerate(list(set(re.findall('(.*@*):', notes)))):
+                notes = notes.replace(email, 'User {}'.format(i+1))
+        return notes
+
 
 class ExternalFile(models.Model):
     data_structure = models.ForeignKey(DataStructure, default=None, null=True)
@@ -534,7 +576,7 @@ class DataRecord(models.Model):
     product = models.ForeignKey(Product, default=None, null=True)
     language = models.ForeignKey(Language, null=True, blank=True)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, null=True)
+    customization = models.ForeignKey(Customization, default=None, blank=True, null=True)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
@@ -543,7 +585,7 @@ class DataRecord(models.Model):
         blank=True, related_name='created_%(class)s')
 
     value = models.TextField(default='', blank=True)
-    external_file = models.ForeignKey(ExternalFile, default=None, null=True)
+    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True)
 
     def __str__(self):
         return self.value

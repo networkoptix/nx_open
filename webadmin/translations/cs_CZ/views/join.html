@@ -58,8 +58,8 @@
             <p>Aktuální systém <b>{{systems.systemName}}</b> se chystá sloučit se systémem <b>{{systems.joinSystemName}}</b></p>
             <p>
                 Nový systém bude mít heslo a jméno z následujícího systému: <0 />
-                <label><2 /> {{systems.systemName}} (aktuální)</label> <0 />
-                <label ng-if="!systems.remoteSystemIsNew"><4 /> {{systems.joinSystemName}}</label>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (aktuální)</label> <br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

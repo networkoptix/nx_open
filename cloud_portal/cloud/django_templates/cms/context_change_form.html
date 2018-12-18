@@ -6,7 +6,16 @@
     {{ block.super }}
     <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
 {% endblock %}
-
+<{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url 'admin:cms_product_changelist' %}">{{ product_opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; <a href="{% url 'admin:cms_product_change' product.id %}"> {{ product.name }}</a>
+        &rsaquo; <a href="{% url 'admin:pages' product.id %}"> Pages </a>
+        &rsaquo; {% trans 'Edit'%} <span>{{ original.name }}</span>
+    </div>
+{% endblock %}
 {% block content %}
 <form id="context_form" class="aligned" action="" enctype="multipart/form-data" method="post" novalidate>
     {% csrf_token %}

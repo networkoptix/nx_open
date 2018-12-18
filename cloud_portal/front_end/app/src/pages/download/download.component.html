@@ -2,10 +2,10 @@
     <h1 translate>Download</h1>
 
     <div class="p-0">
-        <ngb-tabset (tabChange)="beforeChange($event)" #tabs>
+        <ngb-tabset (tabChange)="beforeChange($event)" #tabs [style.visibility]="tabsVisible ? 'visible' : 'hidden'">
 
             <ngb-tab *ngFor="let platform of downloads.groups"
-                     [id]="platform.os || platform.name">
+                     [id]="platform.os || platform.name" >
 
                 <ng-template ngbTabTitle>
                     <span class="tab-heading">{{language.lang.downloads.groups[platform.name].label}}</span>

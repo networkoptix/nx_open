@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
-from django.shortcuts import redirect
+from django.conf.urls import url
+from django.db.models import Q
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.html import format_html
 from django.http.response import HttpResponse
@@ -10,6 +12,40 @@ from cloud import settings
 from cms.forms import *
 from cms.controllers.modify_db import get_records_for_version
 from cms.views.product import page_editor, review
+
+
+class CustomizationFilter(SimpleListFilter):
+    title = 'Customization'
+    parameter_name = 'customization'
+    default_customization = None
+
+    def lookups(self, request, model_admin):
+        # Temporary customization 0 is need for 'All' since we need to keep it,
+        # but choose the customization for the current cloud portal as the default value
+        self.default_customization = Customization.objects.get(name=settings.CUSTOMIZATION).id
+        customizations = [Customization(id=0, name='All Customizations')]
+        customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
+        customizations.extend([Customization(id=1000, name='Other Customizations')])
+        return [(c.id, c.name) for c in customizations]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup if self.value() else lookup == self.default_customization,
+                'query_string': cl.get_query_string({self.parameter_name: lookup}, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        if self.value():
+            if self.value() == '1000':
+                return queryset.exclude(customization__name__in=request.user.customizations)
+            elif self.value() != '0':
+                return queryset.filter(customization__id=self.value())
+
+        else:
+            return queryset.filter(customization__id=self.default_customization)
+        return queryset
 
 
 class ProductFilter(SimpleListFilter):
@@ -22,12 +58,11 @@ class ProductFilter(SimpleListFilter):
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=request.user.customizations)
         # TODO: Get list of available products for non context managers
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                     settings.CUSTOMIZATION,
-                                                                     'cms.publish_version'):
+        if not UserGroupsToProductPermissions.\
+                check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
             products = products.filter(created_by=request.user)
 
-        return [(p.id, p.name) for p in products]
+        return [(p.id, p.__str__()) for p in products]
 
     def queryset(self, request, queryset):
         if self.value():
@@ -54,7 +89,7 @@ class CMSAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(CMSAdmin, self).get_queryset(request)
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION):
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user, settings.CUSTOMIZATION):
             # return empty dataset, only superuser can watch content in other
             # customizations
             return qs.filter(pk=-1)
@@ -68,14 +103,12 @@ class ProductTypeAdmin(CMSAdmin):
 admin.site.register(ProductType, ProductTypeAdmin)
 
 
-# TODO: CLOUD-2388  Add additional views to here link -> http://patrick.arminio.info/additional-admin-views/
 class ProductAdmin(CMSAdmin):
-    list_display = ('product_settings', 'edit_product', 'name', 'product_type', 'customizations_list', )
+    list_display = ('product_settings', 'edit_product_button', 'name', 'product_type', 'customizations_list', )
     list_display_links = ('name',)
     list_filter = ('product_type', )
     form = ProductForm
     change_form_template = 'cms/product_change_form.html'
-    change_list_template = 'cms/product_changelist.html'
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -96,16 +129,36 @@ class ProductAdmin(CMSAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
+    def get_fields(self, request, obj=None):
+        if not request.user.is_superuser and not obj.product_type.single_customization:
+            return [field for field in self.form.base_fields if field != 'customizations']
+        return self.form.base_fields
+
     def get_list_display(self, request):
         if not request.user.is_superuser:
-            return self.list_display[1:]
+            return self.list_display[1:3]
         return self.list_display
 
     def get_queryset(self, request):
         queryset = super(ProductAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            return queryset.filter(created_by=request.user)
+            viewable_products = [product.id for product in queryset
+                                 if UserGroupsToProductPermissions.check_permission(request.user,
+                                                                                    product,
+                                                                                    'cms.can_access_product')
+                                 or product.created_by == request.user]
+            queryset = Product.objects.filter(id__in=viewable_products)
         return queryset
+
+    def get_urls(self):
+        urls = super(ProductAdmin, self).get_urls()
+        my_urls = [
+            url(r'^(?P<product_id>.+?)/pages/$', self.admin_site.admin_view(self.page_list_view), name='pages'),
+            url(r'^(?P<product_id>.+?)/pages/(?P<context_id>.+?)/change/$',
+                self.admin_site.admin_view(self.change_page),
+                name='change_page')
+        ]
+        return my_urls + urls
 
     def product_settings(self, obj):
         if obj.product_type and not obj.product_type.single_customization:
@@ -116,83 +169,64 @@ class ProductAdmin(CMSAdmin):
     product_settings.short_description = 'Product settings'
     product_settings.allow_tags = True
 
-    def edit_product(self, obj):
-        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit contexts</a>',
-                           reverse('admin:cms_contextproxy_changelist'), obj.id)
+    def page_list_view(self, request, product_id=None):
+        context = {
+            'title': 'Edit a page',
+            'app_label': self.model._meta.app_label,
+            'opts': self.model._meta
+        }
 
-    edit_product.short_description = 'Edit page'
-    edit_product.allow_tags = True
+        if product_id:
+            context['product'] = Product.objects.get(id=product_id)
+            qs = context['product'].product_type.context_set.all()
+            if not request.user.is_superuser:
+                qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
+            context['contexts'] = qs
+
+        return render(request, 'cms/page_list_view.html', context)
+
+    def change_page(self, request, context_id=None, product_id=None):
+        context = {}
+        if request.method == "POST" and 'product_id' in request.POST:
+            context['preview_link'] = page_editor(request)
+            if 'SendReview' in request.POST and context['preview_link']:
+                return redirect(context['preview_link'].url)
+
+        target_context = Context.objects.get(id=context_id)
+        product = Product.objects.get(id=product_id)
+
+        context['title'] = "Edit {}".format(target_context.name)
+        context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+        context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
+            DataStructure.DATA_TYPES.external_image]
+
+        if 'admin_language' in request.session:
+            context['language_code'] = request.session['admin_language']
+
+        context['product'] = product
+        context['app_label'] = target_context._meta.app_label
+        context['opts'] = target_context._meta
+        context['product_opts'] = product._meta
+        context['original'] = target_context
+
+        form = CustomContextForm(initial={'language': context['language_code'], 'context': context_id})
+        form.add_fields(product, target_context, Language.objects.get(code=context['language_code']), request.user)
+        context['custom_form'] = form
+
+        return render(request, 'cms/context_change_form.html', context)
+
+    def edit_product_button(self, obj):
+        return format_html('<a class="btn btn-sm product" href="{}">Edit content</a>',
+                           reverse('admin:pages', args=[obj.id]))
+
+    edit_product_button.short_description = 'Edit page'
+    edit_product_button.allow_tags = True
 
     def customizations_list(self, obj):
         return ", ".join(obj.customizations.values_list('name', flat=True))
 
 
 admin.site.register(Product, ProductAdmin)
-
-
-# TODO: CLOUD-2388  Remove this context admin. The product should use this logic for an additional view of the product
-class ContextProxyAdmin(CMSAdmin):
-    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
-
-    list_display_links = ('name',)
-    search_fields = ('name', 'description', 'url')
-
-    change_form_template = "cms/context_change_form.html"
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        if request.method == "POST" and 'product_id' in request.POST:
-            extra_context['preview_link'] = page_editor(request)
-            if 'SendReview' in request.POST:
-                return redirect(extra_context['preview_link'].url)
-
-        extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
-        extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
-        extra_context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
-            DataStructure.DATA_TYPES.external_image]
-
-        if 'admin_language' in request.session:
-            extra_context['language_code'] = request.session['admin_language']
-        if 'product_id' not in request.session:
-            messages.error(request, "No product was selected!")
-            return redirect(reverse('admin:cms_product_changelist'))
-        extra_context['product'] = Product.objects.get(id=request.session['product_id'])
-
-        form = CustomContextForm(initial={'language': extra_context['language_code'], 'context': object_id})
-        form.add_fields(Product.objects.get(id=request.session['product_id']),
-                        Context.objects.get(id=object_id),
-                        Language.objects.get(code=request.session['language']),
-                        request.user)
-        extra_context['custom_form'] = form
-
-        return super(ContextProxyAdmin, self).change_view(request, object_id, form_url, extra_context)
-
-    def get_model_perms(self, request):
-        if not request.user.is_superuser:
-            return {}
-        return super(ContextProxyAdmin, self).get_model_perms(request)
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        if'product_id' in request.POST:
-            request.session['product_id'] = request.POST['product_id']
-            return HttpResponse(reverse('admin:cms_contextproxy_changelist'))
-
-        if 'product_id' not in request.session:
-            messages.error(request, "No product was selected!")
-            return redirect(reverse('admin:cms_product_changelist'))
-
-        return super(ContextProxyAdmin, self).changelist_view(request, extra_context)
-
-    def get_queryset(self, request):  # show only users for cloud_portal product type
-        qs = super(ContextProxyAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(product_type__product__in=[request.session['product_id']])
-        if not request.user.is_superuser:
-            qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
-        return qs
-
-
-admin.site.register(ContextProxy, ContextProxyAdmin)
 
 
 class ContextAdmin(CMSAdmin):
@@ -252,7 +286,7 @@ class ContentVersionAdmin(CMSAdmin):
     list_display = ('id', 'product', 'created_date', 'created_by', 'state')
 
     list_display_links = ('id', )
-    list_filter = (ProductFilter,)
+    list_filter = (ProductFilter, CustomizationFilter,)
     search_fields = ('created_by__email',)
     readonly_fields = ('created_by',)
     exclude = ('accepted_by', 'accepted_date')
@@ -276,7 +310,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     list_display = ('product', 'version', 'customization', 'reviewed_by', 'reviewed_date', 'state')
     readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by', 'notes',)
 
-    list_filter = ('version__product__product_type', ProductFilter)
+    list_filter = ('version__product__product_type', ProductFilter, CustomizationFilter)
 
     change_form_template = 'cms/product_customization_review_change_form.html'
     fieldsets = (
@@ -306,21 +340,25 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
+    def get_object(self, request, object_id, from_field=None):
+        review = self.get_queryset(request).get(id=object_id)
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user,
+                                                                             review.customization.name,
+                                                                             'cms.can_view_customization'):
+            review.notes = review.anon_notes(review.notes)
+        return review
+
     # TODO: filter visible reviews
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(customization__name__in=request.user.customizations)
-
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                     settings.CUSTOMIZATION,
-                                                                     'cms.publish_version'):
-            qs = qs.filter(product__created_by=request.user)
-
+            qs = qs.filter(Q(customization__name__in=request.user.customizations) |
+                           Q(version__product__created_by=request.user))
         return qs
 
     def get_readonly_fields(self, request, obj=None):
-        if request.user != obj.version.product.created_by and obj.state != ProductCustomizationReview.REVIEW_STATES.rejected:
+        if request.user != obj.version.product.created_by and\
+                obj.state != ProductCustomizationReview.REVIEW_STATES.rejected:
             return self.readonly_fields
         return list(set(list(self.readonly_fields) +
                         [field.name for field in obj._meta.fields] +
@@ -347,15 +385,16 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
 
 
-class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
-    list_display = ('id', 'group', 'customization',)
+class UserGroupsToProductPermissionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'group', 'product',)
+    list_filter = ('product', )
 
 
-admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
+admin.site.register(UserGroupsToProductPermissions, UserGroupsToProductPermissionsAdmin)
 
 
 class ExternalFileAdmin(CMSAdmin):
-    list_filter = ('id', 'file', 'size',)
+    list_display = ('id', 'file', 'size',)
 
 
 admin.site.register(ExternalFile, ExternalFileAdmin)

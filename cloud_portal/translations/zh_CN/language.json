@@ -140,10 +140,16 @@
     "oldSafariNotSupported": "不支持10岁以上的Safari版本"
   },
   "passwordRequirements": {
+    "good": "良好",
+    "fair": "一般",
+    "minLength": "太短",
     "minLengthMessage": "密码必须包含至少 8 个字符",
+    "required": "不正确",
     "requiredMessage": "使用只有拉丁文字母、 数字和符号键盘，避免前导和尾随空格",
+    "weak": "弱",
     "weakMessage": "使用数字、 上层和小写字母和特殊字符，使您更强的密码",
     "strongMessage": "强密码 ！",
+    "common": "太常见",
     "commonMessage": "此密码是在世界顶级最受欢迎的密码",
     "missingMessage": "密码为必填项"
   },

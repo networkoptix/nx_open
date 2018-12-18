@@ -24,8 +24,7 @@
                 <table class="table table-condensed">
                     <thead>
                         <tr>
-                            {% if product.product_type.single_customization %}<td><strong>Customization</strong></td>{% endif %}
-                            <td><strong>Customization</strong></td>
+                            <td><strong>Customization{% if not product.product_type.single_customization %}s{% endif %}</strong></td>
                             <td><strong>Status</strong></td>
                             <td><strong>Reviewed by</strong></td>
                             <td><strong>Reviewed on</strong></td>
@@ -35,13 +34,17 @@
                     <tbody>
                     {% for review in customization_reviews %}
                         {% get_review_state review.state as state %}
+                        {% has_permission user 'cms.can_view_customization' review.customization.name as can_view_customization %}
                         <tr>
-                            {% if product.product_type.single_customization %}<td> {{ review.customization }} </td>{% endif %}
                             <td> {{ review.customization }}</td>
                             <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
                             <td> {{ review.reviewed_by }}</td>
                             <td> {{ review.reviewed_date }}</td>
-                            <td> {{ review.notes|linebreaks }} </td>
+                            {% if can_view_customization %}
+                            <td> {{ review.notes | linebreaks }}</td>
+                            {% else %}
+                            <td> {{ review.notes | anon_notes | linebreaks }} </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -135,8 +138,10 @@
                            download>Download</a>
                     </button>
                     {% endif %}
+                    {% if perms.cms.publish_version %}
                     <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
+                    {% endif %}
                     <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
                             data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
                     {% if perms.cms.publish_version %}
@@ -160,7 +165,11 @@
                             <div>
                                 <label for="id_add">Note</label>
                                 <div id="add">
-                                    <input id="id_add" style="width:100%" name="addedNote" type="text" required>
+                                    <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
+                                </div>
+                                <label for="can_view_customization">Can View Customization (If selected the user will be able to see this customization)</label>
+                                <div>
+                                    <input id="can_view_customization" name="can_view_customization" type="checkbox">
                                 </div>
                             </div>
                         </div>

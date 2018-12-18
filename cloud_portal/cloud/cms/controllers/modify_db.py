@@ -1,11 +1,15 @@
 from datetime import datetime
 
-from notifications.api import send
+from notifications.notifications_api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from PIL import Image
-import base64, json, re, uuid, hashlib
+import base64
+import json
+import re
+import uuid
+import hashlib
 
 from .filldata import fill_content
 from api.models import Account
@@ -150,6 +154,9 @@ def save_unrevisioned_records(product, context, language, data_structures,
             elif 'delete_' + data_structure_name in request_data and request_data['delete_' + data_structure_name]:
                 delete_file = True
 
+        elif data_structure.type == DataStructure.DATA_TYPES.check_box:
+            new_record_value = data_structure_name in request_data
+
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
@@ -157,6 +164,13 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 if new_record_value and not re.match(pattern, new_record_value):
                     upload_errors.append((data_structure_name, 'Invalid input'))
                     continue
+            elif 'char_limit' in data_structure.meta_settings:
+                char_limit = int(data_structure.meta_settings['char_limit'])
+                if len(new_record_value) > char_limit:
+                    upload_errors.append(
+                        (data_structure_name,
+                         'Character limit exceeded. Text was {} characters but should not be more than {} characters'.
+                         format(len(new_record_value), char_limit)))
 
         # If the data structure is not option and no record exists and nothing was uploaded try to use the default value
         if not data_structure.optional and not new_record_value:
@@ -372,7 +386,7 @@ def check_meta_settings(data_structure, new_file):
 def upload_file(data_structure, new_file):
     encoded_file = base64.b64encode(new_file.read())
     if new_file.size >= settings.CMS_MAX_FILE_SIZE:
-        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'. \
+        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'.
                        format(new_file.size/BYTES_TO_MEGABYTES, settings.CMS_MAX_FILE_SIZE/BYTES_TO_MEGABYTES))]
 
     file_errors = check_meta_settings(data_structure, new_file)

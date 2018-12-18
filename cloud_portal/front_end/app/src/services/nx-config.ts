@@ -1,5 +1,5 @@
-import { Injectable }          from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable }                from '@angular/core';
+import { downgradeInjectable }       from '@angular/upgrade/static';
 
 @Injectable({
     providedIn: 'root'
@@ -202,7 +202,7 @@ export class NxConfigService {
                         ]
                     },
                     {
-                        name      : 'mac',
+                        name      : 'macos',
                         os        : 'MacOS',
                         installers: [
                             {
@@ -243,6 +243,12 @@ export class NxConfigService {
                 playerReadyTimeout       : 100,
                 endOfArchiveTime         : 30 * 1000,
                 chunksToCheckFatal       : 30 // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+            },
+            messageType: {
+                ipvd: 'ipvd_feedback',
+                inquiry: 'sales_inquiry',
+                support: 'support_request',
+                unknown: 'unknown'
             },
             permissions                   : {
                 canViewRelease: 'can_view_release'
@@ -286,8 +292,3 @@ export class NxConfigService {
         return this.config;
     }
 }
-
-declare var angular: angular.IAngularStatic;
-angular
-    .module('cloudApp.services')
-    .service('nxConfigService', downgradeInjectable(NxConfigService));

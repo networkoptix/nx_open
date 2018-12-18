@@ -17,11 +17,11 @@ ${fair password}               qweasd1234
 
 ${FORM WITH ERROR}             //form[@name='restorePasswordWithCode']//input[@type='password' and contains(@class,'ng-invalid')]
 
-${PASSWORD IS REQUIRED}        //span[@ng-if='form.passwordNew.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
-${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
-${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
-${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
-${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
+${PASSWORD IS REQUIRED}        //span[@ng-if='form[id].$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
+${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form[id].$error.pattern &&') and contains(@ng-if,'!form[id].$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
+${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form[id].$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
+${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form[id].$error.common &&') and contains(@ng-if,'!form[id].$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
+${PASSWORD IS WEAK}            //span[contains(@ng-if,'form[id].$error.weak &&') and contains(@ng-if,'!form[id].$error.common &&') and contains(@ng-if,'!form[id].$error.minlength') and contains(@ng-if,'!form[id].$error.pattern &&') and contains(@ng-if,'!form[id].$error.required &&') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 
 *** Test Cases ***                                    NEW PW
 Password Too Short asdfghj                            ${7char password}

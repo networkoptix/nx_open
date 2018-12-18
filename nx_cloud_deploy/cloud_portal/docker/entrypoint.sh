@@ -100,7 +100,7 @@ do
             rm -f /tmp/*.pid
 
             echo $'\n'Notifications started: Version $VERSION$'\n'
-            exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
+            exec celery worker -A notifications -l debug --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         broadcast_notifications)
             write_my_cnf

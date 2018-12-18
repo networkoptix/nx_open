@@ -18,7 +18,7 @@
 
         <ul class="dropdown-menu--header" *ngIf="canSelectAll">
             <li class="dropdown-item-container">
-                <a class="dropdown-item inset" (click)="selectAll();"
+                <a class="dropdown-item inset" (click)="selectAll(); show = false;"
                    href translate>All</a>
             </li>
             <li role="separator" class="dropdown-divider"></li>
@@ -28,7 +28,7 @@
             <li class="dropdown-item-container" *ngFor="let item of items">
                 <div class="dropdown-item inset">
                     <nx-checkbox
-                            [compId]="item.id"
+                            [componentId]="item.id"
                             [checked]="item.selected"
                             (click)="change($event, item)">
                     </nx-checkbox>

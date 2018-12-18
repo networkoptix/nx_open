@@ -68,6 +68,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
+    [tags]    C41884
     Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
@@ -114,7 +115,7 @@ correct items are shown for advanced viewer and below
     :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
     \    Log in to Auto Tests System    ${user}
     \    Log     ${text}
-    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[text()="${text}"]
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text()="${text}")]
     \    Element Should Not Be Visible    ${RENAME SYSTEM}
     \    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \    Element Should Not Be Visible    ${USERS LIST}
@@ -125,8 +126,8 @@ does not display edit and remove for owner row
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
 
 always displays owner on the top of the table
     Log in to Auto Tests System    ${EMAIL OWNER}

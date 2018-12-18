@@ -7,11 +7,12 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import admin
-from django.http.response import HttpResponse, HttpResponseBadRequest, Http404
+from django.http.response import HttpResponse, HttpResponseBadRequest
 
 import os
 import json
 from cloud import settings
+from api.helpers.permissions import make_customization_visible_to_user
 from cms.controllers import filldata, generate_structure, modify_db, structure
 from cms.forms import *
 
@@ -81,6 +82,7 @@ def context_editor_action(request, product, context_id, language_code):
 
     preview_link = ""
     saved_msg = "Changes have been saved."
+    upload_errors = []
 
     if not (request.user.is_superuser or request.user.has_perm('cms.edit_advanced'))\
             and advanced_touched_without_permission(request_data, context.datastructure_set.all(), product):
@@ -113,7 +115,7 @@ def context_editor_action(request, product, context_id, language_code):
             if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 preview_link = modify_db.generate_preview_link(context)
 
-    return preview_link
+    return preview_link, upload_errors
 
 
 # Create your views here.
@@ -127,9 +129,9 @@ def page_editor(request):
     if not request.user.has_perm('cms.edit_content'):
         raise PermissionDenied
 
-    preview_link = context_editor_action(request, product, context_id, language_code)
+    preview_link, errors = context_editor_action(request, product, context_id, language_code)
 
-    if 'SendReview' in request.POST:
+    if 'SendReview' in request.POST and not errors:
         customization_review = ProductCustomizationReview.objects.\
             filter(version_id=ContentVersion.objects.latest('created_date'))
 
@@ -157,9 +159,8 @@ def review(request):
     product_review = ProductCustomizationReview.objects.get(id=review_id)
     product = product_review.version.product
 
-    if 'force_update' in request.POST and UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                                                settings.CUSTOMIZATION,
-                                                                                                'cms.force_update'):
+    if 'force_update' in request.POST and UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.force_update'):
         if product.product_type.can_preview:
             filldata.init_skin(product, preview=False)
             filldata.init_skin(product, preview=True)
@@ -167,9 +168,8 @@ def review(request):
         else:
             messages.error(request, "You cannot force update this product")
 
-    elif 'publish' in request.POST and UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                                             settings.CUSTOMIZATION,
-                                                                                             'cms.publish_version'):
+    elif 'publish' in request.POST and UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
         if product.product_type.can_preview:
             publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
             if publishing_errors:
@@ -181,15 +181,22 @@ def review(request):
             messages.success(request, "Version {} has been accepted".format(product_review.version.id))
 
     elif any(action in request.POST for action in ['reject', 'ask_question']):
-        if 'reject' in request.POST:
+        if 'reject' in request.POST and UserGroupsToProductPermissions.\
+                check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
             modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.rejected, request.user)
             messages.success(request, "Version {} has been rejected".format(product_review.version.id))
             product_review = ProductCustomizationReview.objects.get(id=review_id)
+        elif 'reject' in request.POST:
+            raise PermissionDenied
 
         message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
         product_review.notes += message
         product_review.save()
-
+        if 'can_view_customization' in request.POST:
+            make_customization_visible_to_user(get_cloud_portal_product(settings.CUSTOMIZATION),
+                                               product_review.version.created_by)
+    elif any(action in request.POST for action in ['publish', 'force_update']):
+        raise PermissionDenied
     else:
         messages.error(request, "Invalid option selected")
 

@@ -12,14 +12,43 @@ from api.models import *
 from django_csv_exports.admin import CSVExportAdmin
 
 
+class CustomizationFilter(SimpleListFilter):
+    title = 'Customization'
+    parameter_name = 'customization'
+    default_customization = None
+
+    def lookups(self, request, model_admin):
+        # Temporary customization 0 is need for 'All' since we need to keep it,
+        # but choose the customization for the current cloud portal as the default value
+        self.default_customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+        customizations = [Customization(id=0, name="All")]
+        customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
+        return [(c.id, c.name) for c in customizations]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup if self.value() else lookup == self.default_customization.id,
+                'query_string': cl.get_query_string({self.parameter_name: lookup}, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        customization_name = Customization.objects.filter(id=self.value())
+        if self.value() and customization_name.exists():
+            return queryset.filter(customization=customization_name[0].name)
+
+        if self.value() is None:
+            return queryset.filter(customization=self.default_customization.name)
+        return queryset
+
+
 class GroupFilter(SimpleListFilter):
     title = 'Group'
     parameter_name = 'group'
 
     def lookups(self, request, model_admin):
         groups = Group.objects.all()
-        if not request.user.is_superuser:
-            groups = groups.filter(usergroupstocustomizationpermissions__customization__name=settings.CUSTOMIZATION)
         return [(g.id, g.name) for g in groups]
 
     def queryset(self, request, queryset):
@@ -38,7 +67,7 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
     exclude = ("user_permissions",)
 
-    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', 'customization', GroupFilter, )
+    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', CustomizationFilter, GroupFilter, )
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language', 'groups__name')
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
@@ -138,3 +167,10 @@ class GroupAdmin(admin.ModelAdmin):
     form = GroupAdminForm
     # Filter permissions horizontal as well.
     filter_horizontal = ['permissions']
+    list_display = ('name', 'list_permissions', )
+
+    def list_permissions(self, obj):
+        return [permission.name for permission in obj.permissions.all()]
+
+    list_permissions.short_description = 'Group of permissions'
+    list_permissions.allow_tags = True
