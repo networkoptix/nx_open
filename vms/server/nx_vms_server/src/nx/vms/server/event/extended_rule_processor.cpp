@@ -791,7 +791,6 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
             aggregationPeriod);
     }
 
-    ++aggregatedData.eventCount;
     auto aggregationInfo = aggregatedData.action->aggregationInfo();
     aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo());
     aggregatedData.action->setAggregationInfo(aggregationInfo);
@@ -807,12 +806,16 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     if (aggregatedActionIter == m_aggregatedEmails.end())
         return;
 
-    if (sendMailInternal(aggregatedActionIter->action, aggregatedActionIter->eventCount))
+    const int eventCount = aggregatedActionIter->action->aggregationInfo().totalCount();
+    if (sendMailInternal(aggregatedActionIter->action, eventCount))
     {
         auto actionCopy(aggregatedActionIter->action);
         actionCopy->getRuntimeParams().eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-        actionCopy->getRuntimeParams().eventResourceId = QnUuid();
-        actionCopy->setAggregationCount(aggregatedActionIter->eventCount);
+        if (eventCount > 0)
+        {
+            actionCopy->getRuntimeParams().eventResourceId = QnUuid();
+            actionCopy->setAggregationCount(eventCount);
+        }
         serverModule()->serverDb()->saveActionToDB(actionCopy);
     }
     else

@@ -49,7 +49,6 @@ private:
     public:
         vms::event::SendMailActionPtr action;
         quint64 periodicTaskID = 0;
-        int eventCount = 0;
         nx::utils::ElapsedTimer lastMailTime;
     };
 
