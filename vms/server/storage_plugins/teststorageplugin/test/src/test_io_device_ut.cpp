@@ -2,7 +2,6 @@
 #include <algorithm>
 #include "test_common.h"
 
-
 TEST_F(TestStorageTest, IODevice_open_Read)
 {
     int ecode;
@@ -11,7 +10,7 @@ TEST_F(TestStorageTest, IODevice_open_Read)
             storage->open(
                 "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
                 nx_spl::io::ReadOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_NE(ioDevice1.get(), nullptr);
@@ -29,7 +28,7 @@ TEST_F(TestStorageTest, IODevice_open_Read_NotExisting)
             storage->open(
                 "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/not_existing.mkv",
                 nx_spl::io::ReadOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_NE(ecode, nx_spl::error::NoError);
     ASSERT_EQ(ioDevice1.get(), nullptr);
@@ -43,7 +42,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_Existing)
             storage->open(
                 "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
                 nx_spl::io::WriteOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_NE(ioDevice1.get(), nullptr);
@@ -61,7 +60,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_NotExisting)
             storage->open(
                 "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/not_existing.mkv",
                 nx_spl::io::WriteOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_NE(ioDevice1.get(), nullptr);
@@ -80,7 +79,7 @@ TEST_F(TestStorageTest, IODevice_MediaFile_Read_Seek)
             storage->open(
                 "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
                 nx_spl::io::ReadOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
 
     ASSERT_TRUE(ioDevice1);
@@ -110,7 +109,7 @@ TEST_F(TestStorageTest, IODevice_DbFile_Write)
             storage->open(
                 "test://storage/some/path/db.nxdb",
                 nx_spl::io::WriteOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_TRUE((bool)ioDevice1);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
@@ -129,7 +128,7 @@ TEST_F(TestStorageTest, IODevice_DbFile_Read)
             storage->open(
                 "test://storage/some/path/db.nxdb",
                 nx_spl::io::ReadOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_FALSE((bool)ioDevice1);
     ASSERT_NE(ecode, nx_spl::error::NoError);
@@ -144,7 +143,7 @@ TEST_F(TestStorageTest, IODevice_InfoTxt_Read)
             storage->open(
                 "test://storage/some/path/info.txt",
                 nx_spl::io::ReadOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_TRUE((bool)ioDevice1);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
@@ -161,7 +160,7 @@ TEST_F(TestStorageTest, IODevice_InfoTxt_Write)
             storage->open(
                 "test://storage/some/path/info.txt",
                 nx_spl::io::WriteOnly,
-                &ecode)), 
+                &ecode)),
         ioDeviceDeleter);
     ASSERT_TRUE((bool)ioDevice1);
     ASSERT_EQ(ecode, nx_spl::error::NoError);

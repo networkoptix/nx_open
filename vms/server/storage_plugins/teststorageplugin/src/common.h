@@ -2,6 +2,11 @@
 
 #include <atomic>
 
+// TODO: Used to link the unit test with the plugin. Rewrite.
+#if defined(_WIN32)
+    #define NX_TEST_STORAGE_PLUGIN_API __declspec(dllexport)
+#endif
+
 template <typename P>
 class PluginRefCounter
 {
@@ -15,7 +20,7 @@ public:
     int pReleaseRef()
     {
         int new_count = --m_count;
-        if (new_count <= 0) 
+        if (new_count <= 0)
             delete static_cast<P*>(this);
 
         return new_count;

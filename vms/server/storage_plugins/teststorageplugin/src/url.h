@@ -5,12 +5,13 @@
 #include <memory>
 #include <unordered_map>
 #include <algorithm>
+#include <common.h>
 
 namespace utils {
 
 using ParamsMap = std::unordered_map<std::string, std::string>;
 
-class Url
+class NX_TEST_STORAGE_PLUGIN_API Url
 {
     enum class ParseState
     {

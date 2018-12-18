@@ -7,12 +7,12 @@
 
 struct FsStubNode;
 
-class TestStorage : 
-    public nx_spl::Storage, 
+class NX_TEST_STORAGE_PLUGIN_API TestStorage :
+    public nx_spl::Storage,
     public PluginRefCounter<TestStorage>
 {
 public:
-    TestStorage(const utils::VfsPair& vfsPair, 
+    TestStorage(const utils::VfsPair& vfsPair,
                 const std::string& prefix,
                 std::function<void()> onDestroyCb);
     virtual ~TestStorage();

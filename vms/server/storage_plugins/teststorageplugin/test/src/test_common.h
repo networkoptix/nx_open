@@ -29,7 +29,7 @@
                 {
                     "durationMs": "60000",
                     "startTimeMs": "1453550461077"
-                } 
+                }
             ]
         }
         ,
@@ -45,9 +45,9 @@
                 {
                     "durationMs": "60000",
                     "startTimeMs": "1453550461079"
-                } 
+                }
             ]
-        }        
+        }
     ]
 }
 )JSON";
@@ -89,10 +89,10 @@ private:
     mutable uint32_t m_pos = 0;
 };
 
-auto ioDeviceDeleter = [](nx_spl::IODevice* ioDevice) 
-{ 
+const auto ioDeviceDeleter = [](nx_spl::IODevice* ioDevice)
+{
     if (ioDevice)
-        ioDevice->releaseRef(); 
+        ioDevice->releaseRef();
 };
 using IODeviceUniquePtr = std::unique_ptr<TestIODeviceHelper, decltype(ioDeviceDeleter)>;
 
@@ -103,9 +103,9 @@ public:
     using TestStorage::TestStorage;
 
     virtual nx_spl::IODevice* createIODevice(
-        const std::string& name, 
-        int category, 
-        int flags, 
+        const std::string& name,
+        int category,
+        int flags,
         int64_t size,
         int* ecode) const override
     {
@@ -139,12 +139,12 @@ private:
 
     virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair, const utils::Url& url) override
     {
-        return new TestStorageHelper(vfsPair, 
-                                     url.scheme() + "://" + url.host(), 
-                                     [this, url]() 
-                                     { 
-                                        std::lock_guard<std::mutex> lock(m_storageHostsMutex); 
-                                        m_storageHosts.erase(url.host()); 
+        return new TestStorageHelper(vfsPair,
+                                     url.scheme() + "://" + url.host(),
+                                     [this, url]()
+                                     {
+                                        std::lock_guard<std::mutex> lock(m_storageHostsMutex);
+                                        m_storageHosts.erase(url.host());
                                      });
     }
 

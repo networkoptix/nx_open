@@ -13,12 +13,12 @@ enum class FileCategory
     infoTxt
 };
 
-class TestIODevice :
+class NX_TEST_STORAGE_PLUGIN_API TestIODevice :
     public nx_spl::IODevice,
     public PluginRefCounter<TestIODevice>
 {
 public:
-    TestIODevice(const std::string& name, FileCategory category, 
+    TestIODevice(const std::string& name, FileCategory category,
                  int mode, int64_t size = 0, FILE* f = nullptr);
     ~TestIODevice();
 public:
@@ -39,7 +39,7 @@ public:
     virtual uint32_t STORAGE_METHOD_CALL size(int* ecode) const override;
 
     virtual int STORAGE_METHOD_CALL seek(
-        uint64_t    pos, 
+        uint64_t    pos,
         int*        ecode
     ) override;
 
