@@ -135,6 +135,9 @@ angular.module('nxCommon')
                 }
                 function initTimeline(){
                     var now = timeManager.nowToDisplay();
+                    if (!scope.scaleManager) {
+                        debugger;
+                    }
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd();
                     timelineActions.updateZoomLevels(1); // Force update zoom levels

@@ -260,7 +260,7 @@ import * as Hls from 'hls.js';
                                 .then((response) => {
                                     scope.videoFlags.errorLoading = response;
     
-                                    if (err.url === '' && err.context === undefined) {
+                                    if ((err.url === undefined || err.url === '') && err.context === undefined) {
                                         return;
                                     }
                                     
@@ -475,7 +475,7 @@ import * as Hls from 'hls.js';
                         function srcChanged() {
                             scope.loading = true; // source changed - start loading
                             scope.videoFlags.errorLoading = false;
-                            
+                            console.log('scope.vgSrc ->', scope.vgSrc);
                             if (scope.vgSrc) {
                                 scope.preview = getFormatSrc('jpeg');
                                 scope.player = detectBestFormat();

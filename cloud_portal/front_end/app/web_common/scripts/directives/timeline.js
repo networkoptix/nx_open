@@ -84,7 +84,7 @@
                         return 1;
                     }();
                     
-                    var timelineConfig = TimelineConfig;
+                    var timelineConfig = window.TimelineConfig;
                     
                     scope.scaleManager = new ScaleManager(timelineConfig.minMsPerPixel,
                         timelineConfig.maxMsPerPixel,
@@ -150,7 +150,7 @@
                     }
                     
                     function initTimeline() {
-                        var now = timeManager.nowToDisplay();
+                        var now = window.timeManager.nowToDisplay();
                         scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                         scope.scaleManager.setEnd();
                         timelineActions.updateZoomLevels(1); // Force update zoom levels
