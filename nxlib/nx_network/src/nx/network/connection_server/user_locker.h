@@ -42,15 +42,18 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+template<typename UpdateHistoryParams>
 using UserAccessBlockerPool = AccessBlockerPool<
     std::tuple<nx::network::HostAddress /*source*/, std::string /*userName*/>,
     UserLocker,
-    UserLockerSettings>;
+    UserLockerSettings,
+    UpdateHistoryParams>;
 
+template<typename UpdateHistoryParams = void>
 class UserLockerPool:
-    public UserAccessBlockerPool
+    public UserAccessBlockerPool<UpdateHistoryParams>
 {
-    using base_type = UserAccessBlockerPool;
+    using base_type = UserAccessBlockerPool<UpdateHistoryParams>;
 
 public:
     UserLockerPool(const UserLockerSettings& settings):

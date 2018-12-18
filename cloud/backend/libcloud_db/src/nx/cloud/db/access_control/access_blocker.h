@@ -39,30 +39,40 @@ public:
     void onAuthenticationFailure(
         AuthenticationType authenticationType,
         const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request request,
         const std::string& login);
 
 private:
-    using LoginEnumerationProtectorPool = 
+    using LoginEnumerationProtectorPool =
         nx::network::server::AccessBlockerPool<
             nx::network::HostAddress,
             LoginEnumerationProtector,
-            LoginEnumerationProtectionSettings>;
+            LoginEnumerationProtectionSettings,
+            std::string /*request name*/>;
+
+    using CloudUserLockerPool =
+        network::server::UserLockerPool<std::string /*request name*/>;
 
     const conf::Settings& m_settings;
     LoginEnumerationProtectorPool m_hostLockerPool;
-    std::unique_ptr<network::server::UserLockerPool> m_userLocker;
+    std::unique_ptr<CloudUserLockerPool> m_userLocker;
 
     std::string tryFetchLoginFromRequest(const nx::network::http::Request& request);
 
     void updateUserLockoutState(
         network::server::AuthResult authResult,
         const nx::network::HostAddress& host,
+        const nx::network::http::Request& request,
         const std::string& login);
 
     void updateHostLockoutState(
         const nx::network::HostAddress& host,
+        const nx::network::http::Request request,
         nx::network::server::AuthResult authenticationResult,
         const std::string& login);
+
+    template<typename Blocker, typename Key>
+    void printLockReason(const Blocker& blocker, const Key& key);
 };
 
 } // namespace nx::cloud::db

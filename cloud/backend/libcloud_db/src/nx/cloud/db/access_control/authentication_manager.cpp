@@ -59,6 +59,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::other,
+            request,
             api::ResultCode::accountBlocked);
     }
 
@@ -70,6 +71,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::other,
+            request,
             api::ResultCode::notAuthorized,
             prepareWwwAuthenticateHeader());
     }
@@ -89,6 +91,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::credentials,
+            request,
             authResultCode);
     }
 }
@@ -191,12 +194,14 @@ void AuthenticationHelper::reportSuccess(
 
 void AuthenticationHelper::reportFailure(
     AuthenticationType authenticationType,
+    const nx::network::http::Request request,
     api::ResultCode resultCode,
     std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate)
 {
     m_transportSecurityManager->onAuthenticationFailure(
         authenticationType,
         m_connection,
+        request,
         m_username);
 
     nx::utils::swapAndCall(
