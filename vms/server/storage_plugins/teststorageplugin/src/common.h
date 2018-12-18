@@ -5,6 +5,8 @@
 // TODO: Used to link the unit test with the plugin. Rewrite.
 #if defined(_WIN32)
     #define NX_TEST_STORAGE_PLUGIN_API __declspec(dllexport)
+#else
+    #define NX_TEST_STORAGE_PLUGIN_API /*empty*/
 #endif
 
 template <typename P>
