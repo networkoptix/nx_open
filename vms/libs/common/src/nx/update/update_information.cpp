@@ -45,7 +45,7 @@ nx::utils::SoftwareVersion UpdateContents::getVersion() const
 bool UpdateContents::isValid() const
 {
     return missingUpdate.empty()
-        && unsupportedSystem.empty()
+        && unsuportedSystemsReport.empty()
         && !info.version.isEmpty()
         && invalidVersion.empty()
         && clientPackage.isValid()

@@ -71,8 +71,10 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
             std::set<nx::utils::SoftwareVersion> output;
             QList<nx::utils::SoftwareVersion> versions;
             if (requestInstalledVersions(&versions))
+            {
                 for (const auto& version: versions)
                     output.insert(version);
+            }
             return output;
         });
 }

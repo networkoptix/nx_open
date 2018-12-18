@@ -1,9 +1,11 @@
 #pragma once
 
-#include <QtCore/QDir>
-#include <QtCore/QStringList>
 #include <future>
 #include <set>
+
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
+#include <QtCore/QStringList>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/update/update_information.h>
@@ -13,6 +15,14 @@
 class QnCommonModule;
 
 namespace nx::vms::client::desktop {
+
+struct UpdateStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(UpdateStrings);
+
+public:
+    static QString getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info);
+};
 
 /**
  * Tries to find update package for the specified server.

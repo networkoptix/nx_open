@@ -72,9 +72,7 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
 
 QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
 {
-    if (auto item = findItemById(id))
-        return getServer(item);
-    return QnMediaServerResourcePtr();
+    return getServer(findItemById(id));
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -118,8 +116,10 @@ void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const Q
 void PeerStateTracker::setVerificationError(const QMap<QnUuid, QString>& errors)
 {
     for (auto& item: m_items)
+    {
         if (auto it = errors.find(item->id); it != errors.end())
             item->verificationMessage = it.value();
+    }
 }
 
 void PeerStateTracker::clearVerificationErrors()
@@ -131,8 +131,10 @@ void PeerStateTracker::clearVerificationErrors()
 bool PeerStateTracker::hasVerificationErrors() const
 {
     for (auto& item: m_items)
+    {
         if (!item->verificationMessage.isEmpty())
             return true;
+    }
     return false;
 }
 
