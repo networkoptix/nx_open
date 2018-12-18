@@ -1,6 +1,7 @@
 #include "mutex_delegate_factory.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/unused.h>
 
 #include "mutex_delegates_debug.h"

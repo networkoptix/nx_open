@@ -4,6 +4,7 @@
 #include <QtCore/QRegExp>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #include "url.h"
 
