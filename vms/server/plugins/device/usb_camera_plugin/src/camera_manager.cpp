@@ -164,7 +164,7 @@ nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 
 void CameraManager::getLastErrorString( char* errorString ) const
 {
-    const auto errorToString = 
+    const auto errorToString =
         [&errorString](int ffmpegError) -> bool
         {
             bool error = ffmpegError < 0;

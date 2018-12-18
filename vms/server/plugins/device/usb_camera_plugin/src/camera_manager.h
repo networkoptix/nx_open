@@ -73,4 +73,4 @@ protected:
 };
 
 } // namespace usb_cam
-} // namespace nx 
+} // namespace nx

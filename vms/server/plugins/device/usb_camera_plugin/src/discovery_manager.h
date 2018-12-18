@@ -29,10 +29,10 @@ private:
 
         bool operator==(const DeviceDataWithNxId& rhs) const
         {
-            return 
-                nxId == rhs.nxId 
-                && device.name == rhs.device.name 
-                && device.path == rhs.device.path 
+            return
+                nxId == rhs.nxId
+                && device.name == rhs.device.name
+                && device.path == rhs.device.path
                 && device.uniqueId == rhs.device.uniqueId;
         }
 
@@ -92,5 +92,5 @@ private:
     std::vector<DeviceDataWithNxId> findCamerasInternal();
 };
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx
+} // namespace usb_cam

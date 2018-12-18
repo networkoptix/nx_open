@@ -204,7 +204,7 @@ int CameraDiscoveryManager::fromMDNSData(
 #endif
 }
 
-//!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
+//!Partial parser for SSDP descrition xml (UPnP Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler

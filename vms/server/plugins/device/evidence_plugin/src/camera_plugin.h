@@ -45,7 +45,7 @@
     - \a nxcip::CameraRelayIOManager to receive relay input port change state events and change relay output port state
 
     \par Object life-time management:
-    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
+    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor)
         to factory class instance (e.g., \a CameraManager is a factory for \a RelayIOManager, \a MediaEncoder, etc.)
     - all factory classes (except for \a CameraDiscoveryManager) hold pointer to child class object (e.g., \a RelayIOManager is a child for \a CameraManager)
         and delete all children on destruction

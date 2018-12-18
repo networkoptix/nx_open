@@ -168,7 +168,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_OTHER_ERROR;
     }
 
-    //reading file into 
+    //reading file into
     std::ifstream f( fileName.c_str(), std::ios_base::in | std::ios_base::binary );
     if( !f.is_open() )
         return nxcip::NX_OTHER_ERROR;

@@ -67,7 +67,7 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     /*!
-        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
+        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
     nxpt::ScopedRef<ImageLibraryPlugin> m_pluginRef;

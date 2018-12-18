@@ -19,8 +19,8 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_refManager( this ),
     m_pluginRef( ImageLibraryPlugin::instance() ),
     m_info( info ),
-    m_capabilities( 
-        nxcip::BaseCameraManager::dtsArchiveCapability | 
+    m_capabilities(
+        nxcip::BaseCameraManager::dtsArchiveCapability |
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::hardwareMotionCapability |
         nxcip::BaseCameraManager::fixedQualityCapability ),

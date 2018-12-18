@@ -147,7 +147,7 @@ private:
 
     nxpt::CommonRefManager m_refManager;
     /*!
-        Holding reference to \a CameraPlugin, but not \a CameraDiscoveryManager, 
+        Holding reference to \a CameraPlugin, but not \a CameraDiscoveryManager,
         since \a CameraDiscoveryManager instance is not required for \a CameraManager object
     */
     nxpt::ScopedRef<CameraPlugin> m_pluginRef;
