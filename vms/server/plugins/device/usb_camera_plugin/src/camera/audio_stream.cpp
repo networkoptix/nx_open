@@ -32,7 +32,6 @@ static const char * ffmpegDeviceTypePlatformDependent()
 
 } // namespace
 
-
 //-------------------------------------------------------------------------------------------------
 // AudioStreamPrivate
 
@@ -48,7 +47,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_packetCount(std::make_shared<std::atomic_int>())
 {
     if (!m_packetConsumerManager->empty())
-        tryStart();
+        tryToStartIfNotStarted();
 }
 
 AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
@@ -71,19 +70,21 @@ void AudioStream::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
         m_packetConsumerManager->addConsumer(consumer);
     }
-    m_wait.notify_all();
-
-    tryStart();
+    m_consumerWaitCondition.notify_all();
+    tryToStartIfNotStarted();
 }
 
 void AudioStream::AudioStreamPrivate::removePacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager->removeConsumer(consumer);
+    {
+        std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
+        m_packetConsumerManager->removeConsumer(consumer);
+    }
+    m_consumerWaitCondition.notify_all();
 }
 
 std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
@@ -109,17 +110,19 @@ bool AudioStream::AudioStreamPrivate::waitForConsumers()
 {
     bool wait;
     {
-        std::lock_guard<std::mutex> lockGuard(m_mutex);
+        std::lock_guard<std::mutex> lockGuard(m_consumerManagerMutex);
         wait = m_packetConsumerManager->empty();
     }
     if (wait)
-        uninitialize(); // < Don't stream the camera if there are no consumers
+        uninitialize(); //< Don't stream the camera if there are no consumers.
     
-    // Check again if there are no consumers because they could have been added during unitialize.
-    std::unique_lock<std::mutex> lock(m_mutex);
+    // Check again if there are no consumers. They could have been added during uninitialize().
+    std::unique_lock<std::mutex> lock(m_consumerManagerMutex);
     if(m_packetConsumerManager->empty())
     {
-        m_wait.wait(lock, [&]() { return m_terminated || !m_packetConsumerManager->empty(); });
+        m_consumerWaitCondition.wait(
+            lock, 
+            [&]() { return m_terminated || !m_packetConsumerManager->empty(); });
         return !m_terminated;
     }
 
@@ -157,7 +160,7 @@ int AudioStream::AudioStreamPrivate::initialize()
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
         m_packetConsumerManager->flush();
     }
 
@@ -217,13 +220,14 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     // Dshow audio input format does not recognize io errors, so we set this flag to treat a
     // long timeout as an io error.
     inputFormat->formatContext()->flags |= AVFMT_FLAG_NONBLOCK;
-#endif
+#endif // _WIN32
 
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;
 
     m_inputFormat = std::move(inputFormat);
+
     return 0;
 }
 
@@ -335,7 +339,8 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
         // Assume if there was a timeout that there was an io error.
         if (result == AVERROR(EAGAIN))
             result = AVERROR(EIO);
-#endif
+#endif _WIN32
+
         if (result < 0)
             return result;
 
@@ -482,8 +487,9 @@ void AudioStream::AudioStreamPrivate::terminate()
     m_wait.notify_all();
 }
 
-void AudioStream::AudioStreamPrivate::tryStart()
+void AudioStream::AudioStreamPrivate::tryToStartIfNotStarted()
 {
+    std::lock_guard<std::mutex> lock(m_threadMutex);
     if (m_terminated)
     {
         if (pluggedIn())
@@ -493,20 +499,22 @@ void AudioStream::AudioStreamPrivate::tryStart()
 
 void AudioStream::AudioStreamPrivate::start()
 {
-    if (m_runThread.joinable())
-        m_runThread.join();
+    if (m_audioThread.joinable())
+        m_audioThread.join();
 
     m_terminated = false;
-    m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
+    m_audioThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
 }
 
 void AudioStream::AudioStreamPrivate::stop()
 {
-    terminate();
-    m_wait.notify_all();
+    std::lock_guard<std::mutex>lock(m_threadMutex);
 
-    if (m_runThread.joinable())
-        m_runThread.join();
+    terminate();
+
+    m_consumerWaitCondition.notify_all();
+    if (m_audioThread.joinable())
+        m_audioThread.join();
 }
 
 void AudioStream::AudioStreamPrivate::run()
@@ -534,7 +542,7 @@ void AudioStream::AudioStreamPrivate::run()
         // In that case, packet is nullptr.
         if (packet)
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
             m_packetConsumerManager->givePacket(packet);
         }
     }
