@@ -1,10 +1,13 @@
 #include "log_settings.h"
 
+#include <QtCore/QSettings>
+
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/string.h>
 #include <nx/utils/std/filesystem.h>
 
 #include "log_message.h"
+#include "assert.h"
 
 namespace nx {
 namespace utils {
@@ -61,6 +64,39 @@ bool LoggerSettings::operator==(const LoggerSettings& right) const
 }
 
 //-------------------------------------------------------------------------------------------------
+
+Settings::Settings(QSettings* settings)
+{
+    NX_ASSERT(settings);
+    if (!settings)
+        return;
+
+    const auto maxBackupCount = settings->value("logArchiveSize", 10).toUInt();
+    const auto maxFileSize = settings->value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
+
+    for (const auto& group: settings->childGroups())
+    {
+        LoggerSettings logger;
+        logger.logBaseName = group;
+        logger.maxBackupCount = maxBackupCount;
+        logger.maxFileSize = maxFileSize;
+        logger.level.primary = Level::none;
+
+        settings->beginGroup(group);
+        for (const auto& levelKey: settings->childKeys())
+        {
+            const auto level = levelFromString(levelKey);
+            const auto value = settings->value(levelKey).toString();
+            if (value == '*')
+                logger.level.primary = level;
+            else
+                logger.level.filters[Tag(value)] = level;
+        }
+        settings->endGroup();
+
+        loggers.push_back(std::move(logger));
+    }
+}
 
 void Settings::load(const QnSettings& settings, const QString& prefix)
 {

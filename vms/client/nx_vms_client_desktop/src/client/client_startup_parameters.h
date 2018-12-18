@@ -61,7 +61,6 @@ struct QnStartupParameters
     QString layoutRef;
     QString logLevel;
     QString logFile;
-    QString ec2TranLogLevel;
     QString lightMode;
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;

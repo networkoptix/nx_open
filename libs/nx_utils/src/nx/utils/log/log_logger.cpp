@@ -73,10 +73,7 @@ bool Logger::isToBeLogged(Level level, const Tag& tag)
             return level <= filter.second;
     }
 
-    if (level <= m_defaultLevel)
-        return true;
-
-    return false;
+    return level <= m_defaultLevel;
 }
 
 Level Logger::defaultLevel() const
