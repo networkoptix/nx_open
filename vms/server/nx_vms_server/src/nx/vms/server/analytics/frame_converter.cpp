@@ -87,8 +87,7 @@ IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelForma
                 *pixelFormat,
                 nxpt::ScopedRef<IUncompressedVideoFrame>(
                     createUncompressedVideoFrameFromVideoDecoderOutput(
-                        uncompressedFrame, *pixelFormat),
-                    /*increaseRef*/ false));
+                        uncompressedFrame, *pixelFormat)));
             it = insertResult.first;
         }
         return it->second.get();

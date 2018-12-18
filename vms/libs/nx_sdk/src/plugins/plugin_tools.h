@@ -22,6 +22,7 @@
 
 // TODO: #mshevchenko: Split into GUID tools (e.g. nx::sdk::common::Guid) and ref-counting class
 // (e.g. nx::sdk::common::Object), merging nx/vms/server/sdk_support/utils.h with the latter.
+
 namespace nxpt {
 
 /**
@@ -38,16 +39,14 @@ template<class T>
 class ScopedRef
 {
 public:
-    /** Intended to be applied to queryInterface(). */
-    explicit ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
+    explicit ScopedRef(std::nullptr_t* ptr = nullptr) {}
 
-    /** Calls ptr->addRef() if ptr is not null and increaseRef is true. */
-    explicit ScopedRef(T* ptr = nullptr, bool increaseRef = true):
+    /** Intended to be applied to queryInterface(). */
+    explicit ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr)) {}
+
+    explicit ScopedRef(T* ptr):
         m_ptr(ptr)
     {
-        // TODO: #dmishin get rid of this const mess when releaseRef becomes const
-        if (m_ptr && increaseRef)
-            const_cast<std::remove_const_t<T>*>(m_ptr)->addRef();
     }
 
     ScopedRef(ScopedRef<T>&& right)
@@ -88,7 +87,7 @@ public:
 
     /**
      * Calls nxpl::PluginInterface::releaseRef() on protected pointer (if any) and takes the new
-     * pointer ptr (calling nxpl::PluginInterface::addRef()).
+     * pointer ptr (without calling nxpl::PluginInterface::addRef()).
      */
     void reset(T* ptr = nullptr)
     {
@@ -96,24 +95,12 @@ public:
         {
             // TODO: #dmishin get rid of this const mess when releaseRef becomes const
             const_cast<std::remove_const_t<T>*>(m_ptr)->releaseRef();
-            m_ptr = nullptr;
         }
-
-        take(ptr);
+        m_ptr = ptr;
     }
 
 private:
-    T* m_ptr;
-
-    void take(T* ptr)
-    {
-        m_ptr = ptr;
-        if(m_ptr)
-        {
-            // TODO: #dmishin get rid of this const mess when releaseRef becomes const
-            const_cast<std::remove_const_t<T>*>(m_ptr)->addRef();
-        }
-    }
+    T* m_ptr = nullptr;
 };
 
 namespace atomic {

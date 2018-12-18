@@ -49,8 +49,7 @@ namespace nxcip_qt
         const QByteArray& localInterfaceIPAddrUtf8 = localInterfaceIPAddr.toUtf8();
 
         nxpt::ScopedRef<nxcip::CameraDiscoveryManager2> discoveryManager2(
-            (nxcip::CameraDiscoveryManager2*)m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2),
-            false);
+            m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2));
         int result = 0;
         if (discoveryManager2.get())
         {
@@ -82,8 +81,7 @@ namespace nxcip_qt
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 
         nxpt::ScopedRef<nxcip::CameraDiscoveryManager2> discoveryManager2(
-            (nxcip::CameraDiscoveryManager2*)m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2),
-            false);
+            m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2));
 
         int result = 0;
         if (discoveryManager2.get())

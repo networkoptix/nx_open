@@ -41,7 +41,7 @@ static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
     nxpt::ScopedRef<const nx::sdk::IString> manifest(
-        engine->manifest(&error), false);
+        engine->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -63,7 +63,7 @@ static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgen
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
     nxpt::ScopedRef<const nx::sdk::IString> manifest(
-        deviceAgent->manifest(&error), false);
+        deviceAgent->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();

@@ -181,8 +181,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
             nxpt::ScopedRef<nxcip::CameraMediaEncoder4> mediaEncoder4(
-                (nxcip::CameraMediaEncoder4*)intf->queryInterface(nxcip::IID_CameraMediaEncoder4),
-                false);
+                intf->queryInterface(nxcip::IID_CameraMediaEncoder4));
             if (mediaEncoder4.get())
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
         }
@@ -195,8 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
 
     nxpt::ScopedRef<nxcip::CameraMediaEncoder3> mediaEncoder3(
-        (nxcip::CameraMediaEncoder3*)intf->queryInterface( nxcip::IID_CameraMediaEncoder3 ),
-        false );
+        intf->queryInterface(nxcip::IID_CameraMediaEncoder3));
 
     if (mediaEncoder3.get()) // one-call config
     {
@@ -636,7 +634,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
-    nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
+    nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet );
 
     QnAbstractMediaDataPtr mediaPacket;
 

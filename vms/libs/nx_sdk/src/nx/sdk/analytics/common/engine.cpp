@@ -70,8 +70,7 @@ void Engine::pushPluginEvent(
     }
 
     nxpt::ScopedRef<IPluginEvent> event(
-        new nx::sdk::common::PluginEvent(level, std::move(caption), std::move(description)),
-        /*increaseRef*/ false);
+        new nx::sdk::common::PluginEvent(level, std::move(caption), std::move(description)));
 
     m_handler->handlePluginEvent(event.get());
 }

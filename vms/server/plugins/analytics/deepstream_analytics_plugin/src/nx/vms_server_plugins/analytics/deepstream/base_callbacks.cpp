@@ -16,7 +16,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    nxpt::ScopedRef<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket(), false);
+    nxpt::ScopedRef<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket());
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";

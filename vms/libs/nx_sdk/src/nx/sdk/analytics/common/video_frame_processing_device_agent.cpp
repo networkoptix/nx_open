@@ -229,8 +229,7 @@ void VideoFrameProcessingDeviceAgent::pushPluginEvent(
     }
 
     nxpt::ScopedRef<IPluginEvent> event(
-        new nx::sdk::common::PluginEvent(level, caption, description),
-        /*increaseRef*/ false);
+        new nx::sdk::common::PluginEvent(level, caption, description));
 
     m_handler->handlePluginEvent(event.get());
 }

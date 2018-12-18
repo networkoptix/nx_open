@@ -109,6 +109,7 @@ nxpt::CommonRefManager* HttpLinkPlugin::refManager()
 
 HttpLinkPlugin* HttpLinkPlugin::instance()
 {
+    httpLinkPluginInstance->addRef();
     return httpLinkPluginInstance;
 }
 

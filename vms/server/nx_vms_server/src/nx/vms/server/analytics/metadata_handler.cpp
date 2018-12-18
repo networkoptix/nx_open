@@ -84,7 +84,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> p
     int eventsCount = 0;
     while (true)
     {
-        nxpt::ScopedRef<IMetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
+        nxpt::ScopedRef<IMetadataItem> item(packet->nextItem());
         if (!item)
             break;
 
@@ -112,7 +112,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket>
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<IObject> item(packet->nextItem(), /*increaseRef*/ false);
+        nxpt::ScopedRef<IObject> item(packet->nextItem());
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
