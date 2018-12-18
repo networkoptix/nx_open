@@ -118,7 +118,7 @@ public:
         if (authResult == AuthResult::success)
             return result;
 
-        LockUpdateHistoryRecord lockUpdateHistoryRecord;
+        typename base_type::LockUpdateHistoryRecord lockUpdateHistoryRecord;
         lockUpdateHistoryRecord.timestamp = nx::utils::utcTime();
         lockUpdateHistoryRecord.key = key;
         lockUpdateHistoryRecord.params = std::move(updateHistoryParams);
@@ -153,7 +153,7 @@ public:
         if (authResult == AuthResult::success)
             return result;
 
-        LockUpdateHistoryRecord lockUpdateHistoryRecord;
+        typename base_type::LockUpdateHistoryRecord lockUpdateHistoryRecord;
         lockUpdateHistoryRecord.timestamp = nx::utils::utcTime();
         lockUpdateHistoryRecord.key = key;
         this->saveLockUpdateHistoryRecord(lock, std::move(lockUpdateHistoryRecord));
