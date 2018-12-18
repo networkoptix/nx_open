@@ -17,7 +17,7 @@ namespace nx::clusterdb::engine::transport {
 
 /**
  * Synchronizes two pees over command pipeline.
- * Serialization / deserialization and network transport details 
+ * Serialization / deserialization and network transport details
  * are out of scope of this class and encapsulated by commandPipeline.
  */
 class GenericTransport:
@@ -103,6 +103,8 @@ private:
         vms::api::TranState readedUpTo);
 
     void enableOutputChannel();
+
+    std::string stateToString(const vms::api::TranState& tranState);
 };
 
 } // namespace nx::clusterdb::engine::transport
