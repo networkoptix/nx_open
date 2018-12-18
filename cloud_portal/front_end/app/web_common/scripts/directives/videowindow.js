@@ -259,7 +259,7 @@ import * as Hls from 'hls.js';
                                 .playerHandler(error)
                                 .then((response) => {
                                     scope.videoFlags.errorLoading = response;
-    
+                                    
                                     if ((err.url === undefined || err.url === '') && err.context === undefined) {
                                         return;
                                     }
@@ -312,7 +312,7 @@ import * as Hls from 'hls.js';
                             scope.jsHls = false;
                             
                             $timeout(function () {
-                                var nativePlayer = new $window.NativePlayer();
+                                var nativePlayer = new window.NativePlayer();
                                 nativePlayer.init(element.find('.videoplayer'), function (api) {
                                     makingPlayer = false;
                                     scope.vgApi = api;
@@ -475,7 +475,7 @@ import * as Hls from 'hls.js';
                         function srcChanged() {
                             scope.loading = true; // source changed - start loading
                             scope.videoFlags.errorLoading = false;
-                            console.log('scope.vgSrc ->', scope.vgSrc);
+                            
                             if (scope.vgSrc) {
                                 scope.preview = getFormatSrc('jpeg');
                                 scope.player = detectBestFormat();

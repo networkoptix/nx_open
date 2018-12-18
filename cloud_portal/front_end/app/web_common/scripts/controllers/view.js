@@ -305,7 +305,6 @@
                     if ($scope.activeCamera) {
                         $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.id], systemAPI);
                         $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.id], systemAPI, 640);
-                        console.log('updateVideoSource(position) ->', position);
                         updateVideoSource(position);
                         $scope.switchPlaying(true);
                     }
@@ -367,7 +366,6 @@
                     
                     //if(playing === false) {
                     $scope.crashCount = 0;
-                    console.log('updateVideoSource(switch) ->', val);
                     updateVideoSource(val);//We have nothing more to do with it.
                     /*}else{
                         $scope.playerAPI.seekTime(playing); // Jump to buffered video
@@ -380,7 +378,6 @@
                 function handleVideoError(forceLive) {
                     var showError = $scope.crashCount < CONFIG.webclient.maxCrashCount;
                     if (showError) {
-                        console.log('updateVideoSource(handleError) ->', $scope.crashCount);
                         updateVideoSource($scope.positionProvider.liveMode ||
                         forceLive ? null : $scope.positionProvider.playedPosition);
                         $scope.crashCount += 1;
@@ -407,7 +404,6 @@
                 $scope.selectFormat = function (format) {
                     $scope.showSettings = false;
                     $scope.activeFormat = format;
-                    console.log('updateVideoSource(selectFormat) ->');
                     updateVideoSource($scope.positionProvider.liveMode ? null : $scope.positionProvider.playedPosition);
                 };
                 
@@ -432,7 +428,6 @@
                         return;
                     }
                     $scope.activeResolution = resolution;
-                    console.log('updateVideoSource(resolution) ->', resolution);
                     updateVideoSource($scope.positionProvider.liveMode ? null : $scope.positionProvider.playedPosition);
                 };
                 
@@ -489,7 +484,6 @@
                     }
                     
                     if ((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status === 'Offline' || status === 'Unauthorized')) {
-                        console.log('updateVideoSource(status) ->', status);
                         updateVideoSource();
                     }
                 });
@@ -520,7 +514,6 @@
                     var serverOffset = $scope.camerasProvider.getServerTimeOffset(activeCameraParentId);
                     if (serverOffset) {
                         window.timeManager.setOffset(serverOffset);
-                        console.log('updateVideoSource(serverOffset) ->', timeFromUrl);
                         updateVideoSource(timeFromUrl);
                     } else {
                         $scope.camerasProvider.getServerTimes().then(() => {
@@ -530,7 +523,6 @@
                 }
                 
                 $scope.$watch('activeCamera', function () {
-                    console.log('$scope.activeCamera ->', $scope.activeCamera);
                     if (!$scope.activeCamera) {
                         if (Object.keys($scope.camerasProvider.cameras).length !== 0) {
                             $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
@@ -666,7 +658,6 @@
                         return;
                     }
                     $scope.crashCount = 0;
-                    console.log('$watch(player) ->', $scope.crashCount, $scope.player);
                     updateVideoSource($scope.positionProvider.liveMode ? null : $scope.positionProvider.playedPosition);
                 }, true);
                 
