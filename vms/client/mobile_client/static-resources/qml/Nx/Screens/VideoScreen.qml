@@ -165,13 +165,13 @@ PageBase
         [
             MotionAreaButton
             {
-                visible: motionController.customRoiExists
+                visible: video.motionController.customRoiExists
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
 
-                onClicked: motionController.clearCustomRoi()
+                onClicked: video.motionController.clearCustomRoi()
             },
 
             IconButton
@@ -264,7 +264,7 @@ PageBase
         }
     }
 
-    Item
+    ScalableVideo
     {
         id: video
 
@@ -276,81 +276,20 @@ PageBase
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
 
-        property Item item
-        property bool showFisheyeVideo:
-            !motionController.motionSearchMode
-            && videoScreenController.resourceHelper.fisheyeParams.enabled
+        resourceHelper: videoScreenController.resourceHelper
+        mediaPlayer: videoScreenController.mediaPlayer
+        videoCenterHeightOffsetFactor: 1 / 3
+        motionController.motionSearchMode: videoNavigation.motionSearchMode
 
-        FisheyeVideo
+        onClicked: toggleUi()
+
+        Connections
         {
-            id: fisheyeVideo
-
-            anchors.fill: parent
-            resourceHelper: videoScreenController.resourceHelper
-            videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
-            visible: video.item == this
-        }
-
-        ScalableVideo
-        {
-            id: scalableVideo
-
-            anchors.fill: parent
-            resourceHelper: videoScreenController.resourceHelper
-            videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
-            visible: video.item == this
-        }
-
-        onShowFisheyeVideoChanged: updateCurrentVideoItem()
-        Component.onCompleted: updateCurrentVideoItem()
-
-        function updateCurrentVideoItem()
-        {
-            var player = videoScreenController.mediaPlayer
-            if (showFisheyeVideo)
+            target: video.motionController
+            onDrawingRoiChanged:
             {
-                scalableVideo.mediaPlayer = null
-                fisheyeVideo.mediaPlayer = player
-                video.item = fisheyeVideo
-            }
-            else
-            {
-                fisheyeVideo.mediaPlayer = null
-                scalableVideo.mediaPlayer = player
-                video.item = scalableVideo
-            }
-        }
-
-        MotionController
-        {
-            id: motionController
-
-            x: video.item.videoRect.x
-            y: video.item.videoRect.y
-            z: 1
-            width: video.item.videoRect.width
-            height: video.item.videoRect.height
-
-            viewport: video.item
-            cameraRotation: videoScreenController.resourceHelper.customRotation
-            motionProvider.mediaPlayer: videoScreenController.mediaPlayer
-            motionSearchMode: videoNavigation.motionSearchMode
-
-            Connections
-            {
-                target: scalableVideo
-
-                onPressed: motionController.handlePressed(
-                    target.mapToItem(motionController, mouseX, mouseY))
-                onReleased: motionController.handleReleased()
-                onPositionChanged: motionController.handlePositionChanged(
-                    target.mapToItem(motionController, mouseX, mouseY))
-                onCancelled: motionController.handleCancelled()
-                onDoubleClicked: motionController.handleCancelled()
-
-                onMovementEnded: motionController.updateDefaultRoi()
+                if (target.drawingRoi)
+                    videoNavigation.motionSearchMode = true
             }
         }
     }
@@ -383,9 +322,8 @@ PageBase
 
         readonly property size boundingSize:
         {
-            var isFisheye = videoScreenController.resourceHelper.fisheyeParams.enabled
             var windowSize = Qt.size(mainWindow.width, mainWindow.height)
-            return isFisheye
+            return video.fisheyeMode
                 ? fillBounds(sourceSize, windowSize)
                 : fitToBounds(sourceSize, windowSize)
         }
@@ -491,10 +429,10 @@ PageBase
         {
             id: ptzPanel
 
-            preloaders.parent: video.item
-            preloaders.height: video.item.fitSize ? video.item.fitSize.height : 0
-            preloaders.x: (video.item.width - preloaders.width) / 2
-            preloaders.y: (video.item.height - preloaders.height) / 3
+            preloaders.parent: video
+            preloaders.height: video.fitSize ? video.fitSize.height : 0
+            preloaders.x: (video.width - preloaders.width) / 2
+            preloaders.y: (video.height - preloaders.height) / 3
 
             width: parent.width
             anchors.bottom: parent.bottom
@@ -513,11 +451,11 @@ PageBase
                 {
                     hideUi()
                     moveOnTapOverlay.open()
-                    video.item.fitToBounds()
+                    video.fitToBounds()
 
                     // Workaround. Overwise it moves content to wrong place.
                     // TODO: investigate and get rid of this workaround
-                    video.item.fitToBounds()
+                    video.fitToBounds()
                 }
                 else
                 {
@@ -546,11 +484,11 @@ PageBase
 
             onClicked:
             {
-                if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
+                if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video)
                     return
 
-                var mapped = contentItem.mapToItem(video.item, pos.x, pos.y)
-                var data = video.item.getMoveViewportData(mapped)
+                var mapped = contentItem.mapToItem(video, pos.x, pos.y)
+                var data = video.getMoveViewportData(mapped)
                 if (!data)
                     return
 
@@ -575,12 +513,12 @@ PageBase
 
             changingMotionRoi:
             {
-                return motionController.drawingRoi
+                return video.motionController.drawingRoi
                     ? false
-                    : scalableVideo.moving && !motionController.customRoiExists
+                    : video.moving && !video.motionController.customRoiExists
             }
 
-            hasCustomRoi: motionController.customRoiExists
+            hasCustomRoi: video.motionController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
@@ -588,7 +526,7 @@ PageBase
             onPtzButtonClicked:
             {
                 d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                video.item.to1xScale()
+                video.to1xScale()
             }
 
             anchors.bottom: parent.bottom
@@ -616,7 +554,7 @@ PageBase
                         || camerasModel.nextResourceId(""))
             }
 
-            motionFilter: video.item == scalableVideo ? motionController.motionFilter : ""
+            motionFilter: video.fisheyeMode ? "" : video.motionController.motionFilter
         }
     }
 
@@ -666,7 +604,7 @@ PageBase
                 d.animatePlaybackControls = false
                 videoScreen.resourceId = cameraSwitchAnimation.newResourceId
                 initialScreenshot = cameraSwitchAnimation.thumbnail
-                video.item.clear()
+                video.clear()
                 d.animatePlaybackControls = true
             }
         }
