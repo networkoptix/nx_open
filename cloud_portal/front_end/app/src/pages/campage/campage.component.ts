@@ -1,6 +1,8 @@
 import { Component, OnInit, DoCheck, KeyValueDiffers, ViewEncapsulation } from '@angular/core';
 import { CamerasService } from '../../services/cameras.service';
 import { CampageSearchService } from '../../services/campage-search.service';
+import { NxModalMessageComponent } from '../../dialogs/message/message.component';
+import { NxConfigService } from '../../services/nx-config';
 
 @Component({
   selector: 'campage',
@@ -9,8 +11,9 @@ import { CampageSearchService } from '../../services/campage-search.service';
     encapsulation: ViewEncapsulation.None
 })
 
+// TODO: what is company used for? Its never assigned.
 export class NxCampageComponent implements OnInit, DoCheck {
-
+    config: any;
     data: any;
     company: any;
     vendorGroups: number;
@@ -40,12 +43,13 @@ export class NxCampageComponent implements OnInit, DoCheck {
     multiselectOptions: any;
 
   private setupDefaults() {
+      this.config = this.configService.getConfig();
       this.cameraHeaders = ['Manufacturer', 'Model', 'Type', 'Max Resolution', 'Max FPS', 'Codec', 'Audio', 'PTZ', 'Fisheye', 'Motion', 'I/O'];
       this.camerasTable = [];
       this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isTwAudioSupported', 'isAptzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 
-      this.data = null;
-      this.company = null;
+      this.data = undefined;
+      this.company = undefined;
 
       this.vendorGroups = 4;
       this.resolution = '0';
@@ -95,7 +99,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.multiselectOptions = {
           resolutions: this.resolutions,
           hardwareTypes: this.hardwareTypes
-      }
+      };
       this.emptyFilter = {
             query: '',
             minResolution: this.resolutions[0],
@@ -117,8 +121,11 @@ export class NxCampageComponent implements OnInit, DoCheck {
       });
   }
 
-  constructor(private cameraService: CamerasService,
+  constructor(private configService: NxConfigService,
+              private cameraService: CamerasService,
               private camSearch: CampageSearchService,
+              // TODO: Use dialog service when it is not being downgraded
+              private messageDialog: NxModalMessageComponent,
               private differs: KeyValueDiffers) {
       this.setupDefaults();
       this.differ = this.differs.find({}).create();
@@ -155,7 +162,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
   camerasSuccessFn() {
        const response = this.data;
 
-       const vendor_model_count = {};
+       const vendorModelCount = {};
        const vendors = new Set();
        const camerasWithAliases = [];
 
@@ -169,8 +176,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
            const res = c.maxResolution.split('x');
            if (res.length === 2) {
                c.resolutionArea = res[0] * res[1];
-           }
-           else {
+           } else {
                c.resolutionArea = 0;
            }
 
@@ -181,24 +187,24 @@ export class NxCampageComponent implements OnInit, DoCheck {
            }
 
            const vm = c.vendor + c.model;
-           const existing = vendor_model_count[vm];
-           if (existing != undefined) {
+           const existing = vendorModelCount[vm];
+           if (existing !== undefined) {
                if (c.count > existing.count) {
-                   vendor_model_count[vm] = c;
+                   vendorModelCount[vm] = c;
                }
            } else {
-               vendor_model_count[vm] = c;
+               vendorModelCount[vm] = c;
            }
        });
 
-       this.allCameras = Object.keys(vendor_model_count);
+       this.allCameras = Object.keys(vendorModelCount);
 
        camerasWithAliases.forEach(c => {
            c.aliases.split(',').forEach(alias => {
                alias = alias.trim();
 
                const va = c.vendor + alias;
-               if (vendor_model_count[va] === undefined) {
+               if (vendorModelCount[va] === undefined) {
                    const aliasedCamera = {...c};
                    aliasedCamera.model = alias;
 
@@ -209,7 +215,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
        this.totalCameras = this.allCameras.length;
 
-       this.vendors = Array.from(vendors).sort(function (a, b) {
+       this.vendors = Array.from(vendors).sort((a, b) => {
            return a.toLowerCase().localeCompare(b.toLowerCase());
        });
 
@@ -258,7 +264,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   vendorGroup (n) {
       function nstart(m) {
-          if (m == 0) {
+          if (m === 0) {
               return 0;
           }
 
@@ -279,15 +285,15 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   activateCamera(elementSelected: any): void {
-      if (this.activeCamera == this.cameras[elementSelected.key]) {
+      if (this.activeCamera === this.cameras[elementSelected.key]) {
           return;
       }
       this.activeCamera = this.cameras[elementSelected.key];
       this.showAll = false;
 
       if (typeof this.activeCamera.firmwares === 'string') {
-          let firmwares = JSON.parse(this.activeCamera.firmwares),
-              firmwaresArray = [];
+          const firmwares = JSON.parse(this.activeCamera.firmwares);
+          let firmwaresArray = [];
 
           let maxFirmwareCount = 0,
               totalCameraCount = 0;
@@ -315,8 +321,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.toggleCamview = 'on';
   }
 
-  open(activecamera) {
-      //TO DO : open modal: feedback with the name of the active camera
+  open(activeCamera) {
+      this.messageDialog.open(this.config.messageType.ipvd, activeCamera).then(() => {});
       return false;
   }
 
