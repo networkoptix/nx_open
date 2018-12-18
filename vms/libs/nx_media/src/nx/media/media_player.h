@@ -11,6 +11,7 @@
 #include <nx/media/media_fwd.h>
 
 class QAbstractVideoSurface;
+class QnTimePeriodList;
 
 // for tests
 class QnArchiveStreamReader;
@@ -188,6 +189,8 @@ public:
 
     bool reconnectOnPlay() const;
     void setReconnectOnPlay(bool reconnectOnPlay);
+
+    void setPlaybackMask(const QnTimePeriodList& periods);
 
     /**
      * @return True if current playback position is 'now' time (live video from a camera).

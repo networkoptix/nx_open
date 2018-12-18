@@ -4,7 +4,9 @@
 
 #include <utils/crypt/symmetrical.h>
 
-#include <nx/client/core/settings/keychain_property_storage_backend.h>
+#if defined(USE_QT_KEYCHAIN)
+	#include <nx/client/core/settings/keychain_property_storage_backend.h>
+#endif
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -33,21 +35,23 @@ using nx::utils::AppInfo;
 Settings::Settings():
     Storage(new utils::property_storage::QSettingsBackend(createSettings(), kGroupName))
 {
-    const QString serviceName = AppInfo::organizationName() + " " + AppInfo::productNameLong();
-    KeychainBackend keychain(serviceName);
+	#if defined(USE_QT_KEYCHAIN)
+	    const QString serviceName = AppInfo::organizationName() + " " + AppInfo::productNameLong();
+	    KeychainBackend keychain(serviceName);
 
-    QByteArray key = keychain.readValue(kSecureKeyPropertyName).toUtf8();
-    if (key.isEmpty())
-    {
-        key = nx::utils::generateAesExtraKey();
-        if (!keychain.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key)))
-        {
-            NX_WARNING(this, "Keychain is not available, using predefined key");
-            key = {};
-        }
-    }
+	    QByteArray key = keychain.readValue(kSecureKeyPropertyName).toUtf8();
+	    if (key.isEmpty())
+	    {
+	        key = nx::utils::generateAesExtraKey();
+	        if (!keychain.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key)))
+	        {
+	            NX_WARNING(this, "Keychain is not available, using predefined key");
+	            key = {};
+	        }
+	    }
 
-    setSecurityKey(key);
+	    setSecurityKey(key);
+	#endif
     load();
 }
 

@@ -1,6 +1,9 @@
-if(WIN32)
-    set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
+if(WIN32 OR BUILD_SHARED_LIBS)
+    set(nxKitLibraryType "SHARED")
+else()
+    set(nxKitLibraryType "STATIC")
 endif()
+set(nxKitLibraryType ${nxKitLibraryType} CACHE STRING "" FORCE)
 
 set(nxKitWithTests ${withTests} CACHE STRING "" FORCE)
 

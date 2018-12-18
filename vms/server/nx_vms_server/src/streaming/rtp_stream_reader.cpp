@@ -14,7 +14,7 @@ QnRtpStreamReader::QnRtpStreamReader(
     CLServerPushStreamReader(res),
     m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
-    m_rtpTransport(RtpTransport::_auto),
+    m_rtpTransport(RtspTransport::autoDetect),
     m_camera(res)
 {
 }
@@ -24,7 +24,7 @@ QnRtpStreamReader::~QnRtpStreamReader()
     stop();
 }
 
-void QnRtpStreamReader::setRtpTransport(const RtpTransport::Value& transport)
+void QnRtpStreamReader::setRtpTransport(const RtspTransport& transport)
 {
     m_rtpTransport = transport;
 }

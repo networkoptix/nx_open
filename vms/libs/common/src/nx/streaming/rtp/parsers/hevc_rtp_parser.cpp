@@ -44,10 +44,11 @@ bool HevcParser::processData(
 
     bool isFatalError = false;
     uint32_t rtpTimestamp = 0;
+    uint16_t sequenceNumber = 0;
     int payloadLength = bytesRead;
     auto payload = rtpBufferBase + rtpBufferOffset;
 
-    if (!processRtpHeader(&payload, &payloadLength, &isFatalError, &rtpTimestamp))
+    if (!processRtpHeader(&payload, &payloadLength, &isFatalError, &rtpTimestamp, &sequenceNumber))
     {
         if (isFatalError)
             reset();
@@ -86,6 +87,14 @@ bool HevcParser::processData(
         createVideoDataIfNeeded(&gotData, rtpTimestamp);
 
     m_lastRtpTimestamp = rtpTimestamp;
+
+    // Check buffer overflow
+    if (!gotData && m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
+    {
+        NX_WARNING(this, "RTP parser buffer overflow.");
+        handlePacketLoss(m_previousPacketSequenceNumber, sequenceNumber);
+        return reset();
+    }
     return true;
 }
 
@@ -143,7 +152,8 @@ bool HevcParser::processRtpHeader(
     uint8_t** outPayload,
     int* outPayloadLength,
     bool* outIsFatalError,
-    uint32_t* outRtpTimestamp)
+    uint32_t* outRtpTimestamp,
+    uint16_t* sequenceNumber)
 {
     NX_ASSERT(outPayload && *outPayload, "Incorrect payload.");
     if (!outPayload || !*outPayload)
@@ -174,11 +184,12 @@ bool HevcParser::processRtpHeader(
         return false;
     }
 
+    *sequenceNumber = ntohs(rtpHeader->sequence);
     if (detectPacketLoss(rtpHeader))
     {
         return handlePacketLoss(
             m_previousPacketSequenceNumber,
-            ntohs(rtpHeader->sequence));
+            *sequenceNumber);
     }
 
     if (rtpHeader->padding)

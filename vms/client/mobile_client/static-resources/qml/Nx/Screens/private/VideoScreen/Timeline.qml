@@ -20,6 +20,8 @@ Item
     property alias autoPlay: timeline.autoPlay
     property alias autoReturnToBounds: timeline.autoReturnToBounds
     property alias serverTimeZoneShift: timeline.serverTimeZoneShift
+    property alias motionSearchMode: timeline.motionSearchMode
+    property alias changingMotionRoi: timeline.changingMotionRoi
 
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
@@ -61,8 +63,13 @@ Item
         property bool dragging: false
 
         textColor: ColorTheme.transparent(ColorTheme.contrast4, 0.4)
-        chunkColor: ColorTheme.green_main
+
         chunkBarColor: ColorTheme.transparent(ColorTheme.green_d2, 0.4)
+        chunkColor: ColorTheme.green_main
+        loadingChunkColor: ColorTheme.transparent(chunkColor, 0.6)
+        motionModeChunkColor: ColorTheme.transparent(ColorTheme.green_d2, 0.6)
+        motionColor: ColorTheme.red_l2
+        motionLoadingColor: ColorTheme.transparent(motionColor, 0.6)
 
         timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
 

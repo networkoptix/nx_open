@@ -16,14 +16,14 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     const std::string& systemId,
     const OutgoingCommandFilter& filter,
     const std::string& connectionId,
-    std::unique_ptr<network::websocket::WebSocket> webSocket,
+    nx::network::P2pTransportPtr _p2pTransport,
     vms::api::PeerDataEx localPeerData,
     vms::api::PeerDataEx remotePeerData)
     :
     nx::p2p::ConnectionBase(
         remotePeerData,
         localPeerData,
-        std::move(webSocket),
+        std::move(_p2pTransport),
         QUrlQuery(),
         std::make_unique<nx::p2p::ConnectionContext>()),
     m_protocolVersionRange(protocolVersionRange),
@@ -36,7 +36,7 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(this->webSocket()->getAioThread());
+    bindToAioThread(p2pTransport()->getAioThread());
 
     m_commonTransactionHeader.systemId = systemId;
     m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
@@ -45,8 +45,9 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
     m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
 
-    auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
-    this->webSocket()->setAliveTimeout(keepAliveTimeout);
+    // #TODO #akulikov Uncomment and make it work
+    //auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
+    //p2pTransport->setAliveTimeout(keepAliveTimeout);
 
     connect(this, &ConnectionBase::gotMessage, this, &WebsocketCommandTransport::onGotMessage);
     connect(this, &ConnectionBase::allDataSent,
@@ -148,7 +149,7 @@ void WebsocketCommandTransport::readTransactions()
     NX_CRITICAL(m_remoteSubscription);
 
     m_tranLogRequestInProgress = true;
-    
+
     ReadCommandsFilter filter;
     filter.from = *m_remoteSubscription;
     filter.maxTransactionsToReturn = kMaxTransactionsPerIteration;
@@ -190,7 +191,7 @@ void WebsocketCommandTransport::onTransactionsReadFromLog(
 
 network::SocketAddress WebsocketCommandTransport::remotePeerEndpoint() const
 {
-    return webSocket()->socket()->getForeignAddress();
+    return p2pTransport()->getForeignAddress();
 }
 
 ConnectionClosedSubscription& WebsocketCommandTransport::connectionClosedSubscription()
@@ -202,8 +203,9 @@ void WebsocketCommandTransport::setState(State state)
 {
     if (state == State::Error)
     {
-        SystemError::ErrorCode errorCode = SystemError::noError;
-        webSocket()->socket()->getLastError(&errorCode);
+        SystemError::ErrorCode errorCode = SystemError::connectionAbort;
+        // TODO: pass correct error code here
+        //p2pTransport()->socket()->getLastError(&errorCode);
         m_connectionClosedSubscription.notify(errorCode);
     }
     nx::p2p::ConnectionBase::setState(state);

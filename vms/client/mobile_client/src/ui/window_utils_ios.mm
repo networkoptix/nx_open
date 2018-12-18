@@ -5,6 +5,8 @@
 #include <QtGui/QScreen>
 #include <QtGui/QGuiApplication>
 
+#include <AudioToolbox/AudioToolbox.h>
+
 void prepareWindow()
 {
     if (QWindow *window = getMainWindow())
@@ -13,7 +15,6 @@ void prepareWindow()
         window->showMaximized();
     }
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
-
 }
 
 void hideSystemUi() {
@@ -72,4 +73,10 @@ bool isPhone() {
 
 void setKeepScreenOn(bool keepScreenOn) {
     [[UIApplication sharedApplication] setIdleTimerDisabled:(keepScreenOn ? YES : NO)];
+}
+
+void makeShortVibration()
+{
+    static constexpr int kShortVibrationId = 1520;
+    AudioServicesPlaySystemSound(kShortVibrationId);
 }

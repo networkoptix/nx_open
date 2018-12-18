@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.2
 
 import Nx 1.0
 import Nx.Media 1.0
@@ -142,12 +143,15 @@ PageBase
     {
         id: toolBar
 
-        y: statusBarHeight
+        y: deviceStatusBarHeight
+        opacity: d.uiOpacity
+        visible: opacity > 0
+
         title: videoScreenController.resourceHelper.resourceName
         leftButtonIcon.source: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
-        {            
+        {
             y: -toolBar.statusBarHeight
             x: -mainWindow.leftPadding
             width: mainWindow.width
@@ -155,12 +159,21 @@ PageBase
             source: lp("/images/toolbar_gradient.png")
         }
 
-        opacity: d.uiOpacity
-        visible: opacity > 0
         titleOpacity: d.cameraUiOpacity
 
         controls:
         [
+            MotionAreaButton
+            {
+                visible: motionController.customRoiExists
+                anchors.verticalCenter: parent.verticalCenter
+
+                text: qsTr("Area")
+                icon.source: lp("/images/close.png")
+
+                onClicked: motionController.clearCustomRoi()
+            },
+
             IconButton
             {
                 icon.source: lp("/images/more_vert.png")
@@ -170,6 +183,23 @@ PageBase
                 }
             }
         ]
+
+        contentItem.clip: false
+
+        Banner
+        {
+            id: banner
+
+            property bool portraitOrientation:
+                Screen.orientation === Qt.PortraitOrientation
+                || Screen.orientation === Qt.InvertedPortraitOrientation
+                || videoScreen.width < videoScreen.height //< TODO: remove me some day before merge.
+
+            y: portraitOrientation? parent.height : 8
+            x: (parent.width - width) / 2
+            maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
+            text: videoNavigation.warningText
+        }
     }
 
     Menu
@@ -234,11 +264,11 @@ PageBase
         }
     }
 
-    Loader
+    Item
     {
         id: video
 
-        y: -header.height
+        y: toolBar.visible ? -header.height : 0
         x: -mainWindow.leftPadding
         width: mainWindow.width
         height: mainWindow.height
@@ -246,40 +276,82 @@ PageBase
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
 
-        sourceComponent:
-            videoScreenController.resourceHelper.fisheyeParams.enabled
-                ? fisheyeVideoComponent
-                : scalableVideoComponent
+        property Item item
+        property bool showFisheyeVideo:
+            !motionController.motionSearchMode
+            && videoScreenController.resourceHelper.fisheyeParams.enabled
 
-        function clear()
+        FisheyeVideo
         {
-            if (item)
-                item.clear()
-        }
-    }
+            id: fisheyeVideo
 
-    Component
-    {
-        id: scalableVideoComponent
+            anchors.fill: parent
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+            visible: video.item == this
+        }
 
         ScalableVideo
         {
-            mediaPlayer: videoScreenController.mediaPlayer
-            resourceHelper: videoScreenController.resourceHelper
-            videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
-        }
-    }
+            id: scalableVideo
 
-    Component
-    {
-        id: fisheyeVideoComponent
-        FisheyeVideo
-        {
-            mediaPlayer: videoScreenController.mediaPlayer
+            anchors.fill: parent
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
             onClicked: toggleUi()
+            visible: video.item == this
+        }
+
+        onShowFisheyeVideoChanged: updateCurrentVideoItem()
+        Component.onCompleted: updateCurrentVideoItem()
+
+        function updateCurrentVideoItem()
+        {
+            var player = videoScreenController.mediaPlayer
+            if (showFisheyeVideo)
+            {
+                scalableVideo.mediaPlayer = null
+                fisheyeVideo.mediaPlayer = player
+                video.item = fisheyeVideo
+            }
+            else
+            {
+                fisheyeVideo.mediaPlayer = null
+                scalableVideo.mediaPlayer = player
+                video.item = scalableVideo
+            }
+        }
+
+        MotionController
+        {
+            id: motionController
+
+            x: video.item.videoRect.x
+            y: video.item.videoRect.y
+            z: 1
+            width: video.item.videoRect.width
+            height: video.item.videoRect.height
+
+            viewport: video.item
+            cameraRotation: videoScreenController.resourceHelper.customRotation
+            motionProvider.mediaPlayer: videoScreenController.mediaPlayer
+            motionSearchMode: videoNavigation.motionSearchMode
+
+            Connections
+            {
+                target: scalableVideo
+
+                onPressed: motionController.handlePressed(
+                    target.mapToItem(motionController, mouseX, mouseY))
+                onReleased: motionController.handleReleased()
+                onPositionChanged: motionController.handlePositionChanged(
+                    target.mapToItem(motionController, mouseX, mouseY))
+                onCancelled: motionController.handleCancelled()
+                onDoubleClicked: motionController.handleCancelled()
+
+                onMovementEnded: motionController.updateDefaultRoi()
+            }
         }
     }
 
@@ -501,6 +573,14 @@ PageBase
         {
             id: videoNavigation
 
+            changingMotionRoi:
+            {
+                return motionController.drawingRoi
+                    ? false
+                    : scalableVideo.moving && !motionController.customRoiExists
+            }
+
+            hasCustomRoi: motionController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller
@@ -535,6 +615,8 @@ PageBase
                     camerasModel.nextResourceId(videoScreen.resourceId)
                         || camerasModel.nextResourceId(""))
             }
+
+            motionFilter: video.item == scalableVideo ? motionController.motionFilter : ""
         }
     }
 
@@ -584,7 +666,7 @@ PageBase
                 d.animatePlaybackControls = false
                 videoScreen.resourceId = cameraSwitchAnimation.newResourceId
                 initialScreenshot = cameraSwitchAnimation.thumbnail
-                video.clear()
+                video.item.clear()
                 d.animatePlaybackControls = true
             }
         }
@@ -638,6 +720,7 @@ PageBase
 
     function switchToCamera(id)
     {
+        videoNavigation.motionSearchMode = false
         cameraSwitchAnimation.stop()
         cameraSwitchAnimation.newResourceId = id
         if (videoScreenController.mediaPlayer.liveMode)

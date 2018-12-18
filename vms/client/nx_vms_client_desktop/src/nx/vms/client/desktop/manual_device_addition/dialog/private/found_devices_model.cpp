@@ -152,14 +152,14 @@ QVariant FoundDevicesModel::getDisplayData(const QModelIndex& index) const
     const auto& currentDeivce = device(index);
     switch (index.column())
     {
-    case Columns::modelColumn:
-        return currentDeivce.name;
-    case Columns::addressColumn:
-        return currentDeivce.url;
-    case Columns::brandColumn:
-        return currentDeivce.vendor;
-    default:
-        return QVariant();
+        case Columns::modelColumn:
+            return currentDeivce.name;
+        case Columns::addressColumn:
+            return currentDeivce.url;
+        case Columns::brandColumn:
+            return currentDeivce.vendor;
+        default:
+            return QVariant();
     }
 }
 
@@ -190,26 +190,26 @@ QVariant FoundDevicesModel::getForegroundColorData(const QModelIndex& index) con
 
     switch (index.column())
     {
-    case brandColumn:
-    case modelColumn:
-    case addressColumn:
-    {
-        if (isAddedDevice)
-            return kAddedDeviceTextColor;
-        else if (isChecked)
-            return kCheckedColor;
-        return kRegularTextColor;
-    }
-    case presentedStateColumn:
-    {
-        return kPresentedStateColor;
-    }
-    case checkboxColumn:
-    {
-        if (isChecked)
-            return kCheckedColor;
-        return kRegularCheckboxColor;
-    }
+        case brandColumn:
+        case modelColumn:
+        case addressColumn:
+        {
+            if (isAddedDevice)
+                return kAddedDeviceTextColor;
+            else if (isChecked)
+                return kCheckedColor;
+            return kRegularTextColor;
+        }
+        case presentedStateColumn:
+        {
+            return kPresentedStateColor;
+        }
+        case checkboxColumn:
+        {
+            if (isChecked)
+                return kCheckedColor;
+            return kRegularCheckboxColor;
+        }
     }
 
     NX_ASSERT(false, "Unexpected column");

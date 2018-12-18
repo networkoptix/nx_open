@@ -298,6 +298,10 @@ public:
     void setAdditionalHeaders(HttpHeaders additionalHeaders);
     void setAuthType(AuthType value);
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
+
+    Credentials credentials() const;
+    void setCredentials(const Credentials& credentials);
+
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
      * NOTE: May be invoked within someMessageBodyAvailable handler only.

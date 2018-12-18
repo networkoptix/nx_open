@@ -256,7 +256,7 @@ void QnCalendarModelPrivate::updateArchiveInfo() {
         return;
     }
 
-    QnTimePeriodList timePeriods = chunkProvider->timePeriods();
+    QnTimePeriodList timePeriods = chunkProvider->timePeriods(Qn::RecordingContent);
 
     int i = indexOf(QDate(year, month, 1));
     while (i < days.size()) {

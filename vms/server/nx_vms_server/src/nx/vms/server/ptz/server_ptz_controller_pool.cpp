@@ -173,9 +173,9 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(
-            camera, &QnSecurityCamResource::ptzConfigurationChanged,
-            this, &ServerPtzControllerPool::at_cameraConfigurationChanged,
-            Qt::UniqueConnection);
+            camera.get(), &QnSecurityCamResource::ptzConfigurationChanged,
+            this, &ServerPtzControllerPool::at_ptzConfigurationChanged,
+            (Qt::ConnectionType) (Qt::DirectConnection | Qt::UniqueConnection));
     }
 
     ptz::ControllerWrappingParameters wrappingParameters;
@@ -209,8 +209,11 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     return controller;
 }
 
-void ServerPtzControllerPool::at_cameraConfigurationChanged(const QnResourcePtr& resource)
+void ServerPtzControllerPool::at_ptzConfigurationChanged(const QnResourcePtr &resource)
 {
+    if (!resource->isInitialized() || resource->isInitializationInProgress())
+        return;
+
     NX_DEBUG(
         this,
         lm("PTZ configuration changed for resource %1 (%2), initiate reinitialization")

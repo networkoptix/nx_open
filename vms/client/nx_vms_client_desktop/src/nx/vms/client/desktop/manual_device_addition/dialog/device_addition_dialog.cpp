@@ -398,12 +398,15 @@ void DeviceAdditionDialog::handleStartSearchClicked()
             ui->addressEdit->validate();
             return;
         }
-
+        m_lastSearchLogin = login();
+        m_lastSearchPassword = password();
         m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
             ui->addressEdit->text().simplified(), login(), password(), port()));
     }
     else
     {
+        m_lastSearchLogin = login();
+        m_lastSearchPassword = password();
         m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
             ui->startAddressEdit->text().trimmed(), ui->endAddressEdit->text().trimmed(),
             login(), password(), port()));
@@ -482,7 +485,7 @@ void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
 void DeviceAdditionDialog::handleAddDevicesClicked()
 {
     const auto server = ui->selectServerMenuButton->currentServer();
-    if (!server || server->getStatus() != Qn::Online || !m_currentSearch || !m_model)
+    if (!server || server->getStatus() != Qn::Online || !m_model)
         return;
 
     QnManualResourceSearchList devices;
@@ -513,10 +516,7 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     if (devices.isEmpty())
         return;
 
-    const auto login = QString();
-    const auto password = QString();
-
-    server->restConnection()->addCamera(devices, login, password, {});
+    server->restConnection()->addCamera(devices, m_lastSearchLogin, m_lastSearchPassword, {});
 }
 
 void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)

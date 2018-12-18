@@ -58,7 +58,7 @@ endif()
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 18.1)
+set(mobileClientVersion 18.5)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -196,6 +196,10 @@ endif()
 #add_subdirectory(_dw_mtt_controller)
 
 add_subdirectory(vms)
+
+if(withP2PConnectionTestingUtility)
+    add_subdirectory(p2p_connection_testing_utility)
+endif()
 
 if(withTests)
     add_subdirectory(tests)

@@ -103,16 +103,29 @@ public:
     QnTimeline* parent = nullptr;
 
     QColor textColor = QColor("#727272");
-    QColor chunkBarColor = QColor("#223925");
-    QColor chunkColor = QColor("#3a911e");
+    QColor chunkBarColor = toTransparent(QColor("#2A551E"), 0.4);
+
+    QColor chunkColor = QColor("#3A911E");
+    QColor loadingChunkColor = toTransparent(chunkColor, 0.6);
+    QColor motionModeChunkColor = toTransparent(QColor("#2A551E"), 0.6);
 
     QColor activeLiveColorLight = QColor("#358815");
     QColor activeLiveColorDark = QColor("#398f16");
     QColor inactiveLiveColorLight = toTransparent(QColor("#3d6228"), 0.4);
     QColor inactiveLiveColorDark = toTransparent(QColor("#2f4623"), 0.4);
+    QColor motionLoadingLiveColorLight = toTransparent(QColor("#358815"), 0.6);
+    QColor motionLoadingLiveColorDark = toTransparent(QColor("#398f16"), 0.6);
+
+    QColor motionColor = QColor("#F02C2C");
+    QColor motionLoadingColor = toTransparent(QColor("#F02C2C"), 0.6);
 
     int chunkBarHeight = 48;
     int textY = -1;
+
+    bool motionSearchMode = false;
+    bool changingMotionRoi = false;
+    bool loadingMotion = false;
+    bool loadingState = false;
 
     QSGTexture* stripesDarkTexture = nullptr;
     QSGTexture* stripesLightTexture = nullptr;
@@ -292,6 +305,20 @@ public:
     qint64 stickPoint() const
     {
         return windowStart;
+    }
+
+    void setLoadingState(bool value)
+    {
+        if (loadingState == value)
+            return;
+
+        loadingState = value;
+        updateStripesTextures();
+        parent->update();
+    }
+    void updateLoadingState()
+    {
+        setLoadingState(motionSearchMode && (loadingMotion || changingMotionRoi));
     }
 
     int maxSiblingLevel(int zoomLevel) const
@@ -503,6 +530,39 @@ void QnTimeline::setPositionImmediately(qint64 position)
     const auto newWindowEnd = position + windowSize / 2;
     setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
+
+bool QnTimeline::motionSearchMode() const
+{
+    return d->motionSearchMode;
+}
+
+void QnTimeline::setMotionSearchMode(bool value)
+{
+    if (d->motionSearchMode == value)
+        return;
+
+    d->motionSearchMode = value;
+    emit motionSearchModeChanged();
+
+    d->updateLoadingState();
+}
+
+bool QnTimeline::changingMotionRoi() const
+{
+    return d->changingMotionRoi;
+}
+
+void QnTimeline::setChangingMotionRoi(bool value)
+{
+    if (d->changingMotionRoi == value)
+        return;
+
+    d->changingMotionRoi = value;
+    emit changingMotionRoiChanged();
+
+    d->updateLoadingState();
+}
+
 
 QDateTime QnTimeline::positionDate() const
 {
@@ -749,12 +809,26 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
         auto handleTimePeriodsUpdated =
             [this]()
             {
-                d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
+                for (const auto contentType: {Qn::RecordingContent, Qn::MotionContent})
+                {
+                    auto& periods = d->timePeriods[contentType];
+                    periods = d->chunkProvider->timePeriods(contentType);
+                    periods.detach();
+                }
                 update();
             };
 
         connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
             this, handleTimePeriodsUpdated);
+
+        const auto handleLoadingMotionChanged =
+            [this, chunkProvider]()
+            {
+                d->loadingMotion = chunkProvider->isLoadingMotion();
+                d->updateLoadingState();
+            };
+        connect(d->chunkProvider, &QnCameraChunkProvider::loadingMotionChanged,
+            this, handleLoadingMotionChanged);
 
         handleTimePeriodsUpdated();
     }
@@ -907,6 +981,62 @@ void QnTimeline::setChunkColor(const QColor& color)
 
     emit chunkColorChanged();
     update();
+}
+
+QColor QnTimeline::loadingChunkColor() const
+{
+    return d->loadingChunkColor;
+}
+
+void QnTimeline::setLoadingChunkColor(const QColor& color)
+{
+    if (d->loadingChunkColor == color)
+        return;
+
+    d->loadingChunkColor = color;
+    emit loadingChunkColorChanged();
+}
+
+QColor QnTimeline::motionModeChunkColor() const
+{
+    return d->motionModeChunkColor;
+}
+
+void QnTimeline::setMotionModeChunkColor(const QColor& color)
+{
+    if (d->motionModeChunkColor == color)
+        return;
+
+    d->motionModeChunkColor = color;
+    emit motionModeChunkColorChanged();
+}
+
+QColor QnTimeline::motionColor() const
+{
+    return d->motionColor;
+}
+
+void QnTimeline::setMotionColor(const QColor& color)
+{
+    if (d->motionColor == color)
+        return;
+
+    d->motionColor = color;
+    emit motionColorChanged();
+}
+
+QColor QnTimeline::motionLoadingColor() const
+{
+    return d->motionLoadingColor;
+}
+
+void QnTimeline::setMotionLoadingColor(const QColor& color)
+{
+    if (d->motionLoadingColor == color)
+        return;
+
+    d->motionLoadingColor = color;
+    emit motionLoadingColor();
 }
 
 QColor QnTimeline::chunkBarColor() const
@@ -1134,10 +1264,44 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 {
     QSGGeometry* geometry;
     QSGGeometry* stripesGeometry;
+
+    QSGNode* stripesNode;
     QSGOpacityNode* stripesOpacityNode;
-    QSGOpacityNode* lightStripesOpacityNode;
-    QSGGeometryNode* stripesNode;
+
     QSGGeometryNode* lightStripesNode;
+    QSGOpacityNode* lightStripesOpacityNode;
+
+    QSGGeometryNode* darkStripesNode;
+    QSGOpacityNode* darkStripesOpacityNode;
+
+    const auto createStripesNode =
+        [](QSGGeometry* geometry, QSGTexture* texture, bool ownsGeometry = false)
+        {
+            const auto material = new QSGTextureMaterial();
+            material->setTexture(texture);
+            material->setHorizontalWrapMode(QSGTexture::Repeat);
+
+            const auto node = new QSGGeometryNode();
+            node->setGeometry(geometry);
+            if (ownsGeometry)
+                node->setFlag(QSGNode::OwnsGeometry);
+            node->setMaterial(material);
+            node->setFlag(QSGNode::OwnsMaterial);
+
+            return node;
+        };
+
+    const auto tryUpdateMaterial =
+        [](QSGGeometryNode* node, QSGTexture* texture)
+        {
+            const auto material = static_cast<QSGTextureMaterial*>(node->material());
+            const auto lastTexture = material->texture();
+            if (lastTexture == texture)
+                return;
+
+            delete lastTexture;
+            material->setTexture(texture);
+        };
 
     if (!chunksNode)
     {
@@ -1155,33 +1319,22 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
         stripesGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4);
         stripesGeometry->setDrawingMode(GL_TRIANGLE_STRIP);
 
-        const auto stripesDarkMaterial = new QSGTextureMaterial();
-        stripesDarkMaterial->setTexture(d->stripesDarkTexture);
-        stripesDarkMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
-
-        const auto stripesLightMaterial = new QSGTextureMaterial();
-        stripesLightMaterial->setTexture(d->stripesLightTexture);
-        stripesLightMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
-
         stripesOpacityNode = new QSGOpacityNode();
 
-        stripesNode = new QSGGeometryNode();
-        stripesNode->setGeometry(stripesGeometry);
-        stripesNode->setFlag(QSGNode::OwnsGeometry);
-        stripesNode->setMaterial(stripesDarkMaterial);
-        stripesNode->setFlag(QSGNode::OwnsMaterial);
-
-        lightStripesNode = new QSGGeometryNode();
-        lightStripesNode->setGeometry(stripesGeometry);
-        lightStripesNode->setMaterial(stripesLightMaterial);
-        lightStripesNode->setFlag(QSGNode::OwnsMaterial);
+        stripesNode = new QSGNode();
 
         lightStripesOpacityNode = new QSGOpacityNode();
+        lightStripesNode = createStripesNode(stripesGeometry, d->stripesLightTexture, true);
+        lightStripesOpacityNode->appendChildNode(lightStripesNode);
+
+        darkStripesOpacityNode = new QSGOpacityNode();
+        darkStripesNode = createStripesNode(stripesGeometry, d->stripesDarkTexture);
+        darkStripesOpacityNode->appendChildNode(darkStripesNode);
 
         chunksNode->appendChildNode(stripesOpacityNode);
         stripesOpacityNode->appendChildNode(stripesNode);
+        stripesNode->appendChildNode(darkStripesOpacityNode);
         stripesNode->appendChildNode(lightStripesOpacityNode);
-        lightStripesOpacityNode->appendChildNode(lightStripesNode);
     }
     else
     {
@@ -1189,19 +1342,16 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
         stripesOpacityNode = static_cast<QSGOpacityNode*>(chunksNode->childAtIndex(0));
         stripesNode = static_cast<QSGGeometryNode*>(stripesOpacityNode->childAtIndex(0));
-        lightStripesOpacityNode = static_cast<QSGOpacityNode*>(stripesNode->childAtIndex(0));
-        lightStripesNode = static_cast<QSGGeometryNode*>(lightStripesOpacityNode->childAtIndex(0));
-        stripesGeometry = stripesNode->geometry();
 
-        auto material = static_cast<QSGTextureMaterial*>(stripesNode->material());
-        if (material->texture() != d->stripesDarkTexture)
-        {
-            delete material->texture();
-            material->setTexture(d->stripesDarkTexture);
-            material = static_cast<QSGTextureMaterial*>(lightStripesNode->material());
-            delete material->texture();
-            material->setTexture(d->stripesLightTexture);
-        }
+        darkStripesOpacityNode = static_cast<QSGOpacityNode*>(stripesNode->childAtIndex(0));
+        darkStripesNode = static_cast<QSGGeometryNode*>(darkStripesOpacityNode->childAtIndex(0));
+        lightStripesOpacityNode = static_cast<QSGOpacityNode*>(stripesNode->childAtIndex(1));
+        lightStripesNode = static_cast<QSGGeometryNode*>(lightStripesOpacityNode->childAtIndex(0));
+
+        stripesGeometry = lightStripesNode->geometry();
+
+        tryUpdateMaterial(darkStripesNode, d->stripesDarkTexture);
+        tryUpdateMaterial(lightStripesNode, d->stripesLightTexture);
     }
 
     qint64 liveMs = QDateTime::currentMSecsSinceEpoch();
@@ -1238,8 +1388,22 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
-    colors[Qn::RecordingContent] = d->chunkColor;
+
+    const auto archiveContentColor = !d->motionSearchMode
+        ? d->chunkColor
+        : (d->loadingState ? d->loadingChunkColor : d->motionModeChunkColor);
+    colors[Qn::RecordingContent] = archiveContentColor;
+
+    colors[Qn::MotionContent] =
+        [this, archiveContentColor]
+        {
+            if (d->motionSearchMode)
+                return d->loadingState ? d->motionLoadingColor : d->motionColor;
+            return archiveContentColor;
+        }();
+
     colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
+
     chunkPainter.setColors(colors);
     chunkPainter.start(
         value, QRectF(0, y, liveX - 1, height() - y),
@@ -1316,6 +1480,7 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     stripesOpacityNode->setOpacity(d->liveOpacity);
     lightStripesOpacityNode->setOpacity(d->activeLiveOpacity);
+    darkStripesOpacityNode->setOpacity(d->activeLiveOpacity ? 0 : 1);
 
     qreal textureX = (width() - liveX) / d->chunkBarHeight;
     const auto stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
@@ -1324,8 +1489,8 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     stripesPoints[2].set(liveX, height(), d->stripesPosition, 1.0);
     stripesPoints[3].set(width(), height(), textureX + d->stripesPosition, 1.0);
 
-    stripesNode->markDirty(QSGNode::DirtyGeometry);
     lightStripesNode->markDirty(QSGNode::DirtyGeometry);
+    darkStripesNode->markDirty(QSGNode::DirtyGeometry);
 
     return chunksNode;
 }
@@ -1368,11 +1533,16 @@ void QnTimelinePrivate::updateStripesTextures()
     if (!window)
         return;
 
-    static constexpr int kTintAmount = 106;
     const auto stripesDark = makeStripesImage(
         chunkBarHeight, inactiveLiveColorLight, inactiveLiveColorDark);
-    const auto stripesLight = makeStripesImage(
-        chunkBarHeight, activeLiveColorLight, activeLiveColorDark);
+
+    const auto activeLightColor = loadingState
+        ? motionLoadingLiveColorLight
+        : activeLiveColorLight;
+    const auto activeDarkColor = loadingState
+        ? motionLoadingLiveColorDark
+        : activeLiveColorDark;
+    const auto stripesLight = makeStripesImage(chunkBarHeight, activeLightColor, activeDarkColor);
 
     const auto flags = QQuickWindow::TextureHasAlphaChannel;
     stripesDarkTexture = window->createTextureFromImage(stripesDark, flags);
