@@ -1,4 +1,4 @@
-#include "device_agent.h"
+﻿#include "device_agent.h"
 
 #include <iostream>
 #include <chrono>
@@ -53,7 +53,6 @@ std::string DeviceAgent::manifest() const
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
-        ")json" + kObjectInTheAreaEventType + R"json(",
         ")json" + kSuspiciousNoiseEventType + R"json("
     ],
     "supportedObjectTypeIds": [
@@ -61,16 +60,16 @@ std::string DeviceAgent::manifest() const
     ],
     "eventTypes": [
         {
-            "id": "nx.stub.loitering",
+            "id": ")json" + kLoiteringEventType + R"json(",
             "name": "Loitering"
         },
         {
-            "id": "nx.stub.intrusion",
+            "id": ")json" + kIntrusionEventType + R"json(",
             "name": "Intrusion",
             "flags": "stateDependent|regionDependent"
         },
         {
-            "id": "nx.stub.gunshot",
+            "id": ")json" + kGunshotEventType + R"json(",
             "name": "Gunshot",
             "groupId": ")json" + kSoundRelatedEventGroup + R"json("
         }
