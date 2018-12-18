@@ -506,6 +506,8 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(Qn::StreamIndex streamIndex)
 
 void QnVideoCamera::beforeStop()
 {
+    QnMutexLocker lock(&m_getReaderMutex);
+
     if (m_primaryGopKeeper)
         m_primaryGopKeeper->beforeDisconnectFromResource();
     if (m_secondaryGopKeeper)
