@@ -393,9 +393,14 @@ class DataStructure(models.Model):
                 # filter only accepted content_records
                 content_record = content_record.filter(version_id__lte=version_id)
                 if not draft:
-                    content_record = content_record.\
+                    new_review_records = content_record.\
                         filter(version__productcustomizationreview__state=ProductCustomizationReview.
                                REVIEW_STATES.accepted)
+                    # If new versions or records dont exist use old vay of getting records
+                    if new_review_records.exists():
+                        content_record = new_review_records
+                    else:
+                        content_record = content_record.filter(version__accepted_by__isnull=False)
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
@@ -546,6 +551,13 @@ class ProductCustomizationReview(models.Model):
         self.state = state
         self.save()
         self.update_children_reviews()
+
+    @staticmethod
+    def anon_notes(notes):
+        if notes:
+            for i, email in enumerate(list(set(re.findall('(.*@*):', notes)))):
+                notes = notes.replace(email, 'User {}'.format(i+1))
+        return notes
 
 
 class ExternalFile(models.Model):

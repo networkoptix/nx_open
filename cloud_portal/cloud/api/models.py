@@ -4,7 +4,7 @@ from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
 from api.account_backend import AccountManager
-from cms.models import Customization, Product, ProductType, UserGroupsToProductPermissions, get_cloud_portal_product
+from cms.models import Customization, Product, ProductType, UserGroupsToProductPermissions
 from cloud.settings import CUSTOMIZATION
 
 

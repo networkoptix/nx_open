@@ -64,11 +64,16 @@ def get_review_state(state):
 
 
 @register.simple_tag
-def has_permission(user, permission):
-    return UserGroupsToProductPermissions.check_customization_permission(user, settings.CUSTOMIZATION, permission)
+def has_permission(user, permission, customization=settings.CUSTOMIZATION):
+    return UserGroupsToProductPermissions.check_customization_permission(user, customization, permission)
 
 
 @register.filter
 def modulo(value, arg):
     return int(value) % int(arg)
+
+
+@register.filter
+def anon_notes(notes):
+    return ProductCustomizationReview.anon_notes(notes)
 
