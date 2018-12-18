@@ -170,6 +170,6 @@ private:
  */
 #define NX_ASSERT_HEAVY_CONDITION(...) do \
 { \
-    if (::nx::utils::ini().assertHeavyCondition) \
+    if (::nx::utils::isAssertHeavyConditionEnabled()) \
         NX_ASSERT(__VA_ARGS__); \
 } while (0)

@@ -595,6 +595,11 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
     return result;
 }
 
+bool displayPasswordInLogs()
+{
+    return nx::utils::ini().displayUrlPasswordInLogs;
+}
+
 } // namespace url
 } // namespace utils
 } // namespace nx

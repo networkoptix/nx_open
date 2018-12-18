@@ -180,6 +180,8 @@ inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 */
 NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme = "");
 
+NX_UTILS_API bool displayPasswordInLogs();
+
 } // namespace url
 } // namespace utils
 } // namespace nx
@@ -193,8 +195,9 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
 template<>
 inline QString toString<nx::utils::Url>(const nx::utils::Url& value)
 {
-    if (nx::utils::ini().displayUrlPasswordInLogs)
+    if (nx::utils::url::displayPasswordInLogs())
         return value.toString();
+
     return value.toDisplayString();
 }
 
