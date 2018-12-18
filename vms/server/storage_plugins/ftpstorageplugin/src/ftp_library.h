@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <mutex>
-#include "plugins/storage/third_party/third_party_storage.h"
+#include "storage/third_party_storage.h"
 #include "impl/ftplib.h"
 
 /*! \mainpage
