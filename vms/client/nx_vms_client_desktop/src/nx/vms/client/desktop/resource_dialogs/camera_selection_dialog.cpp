@@ -91,7 +91,7 @@ NodePtr createServerNode(
     const auto extraInfoText =
         showExtraInfo ? QnResourceDisplayInfo(serverResource).extraInfo() : QString();
 
-    const auto extraText = lit("%1 - %2").arg(extraInfoText).arg(
+    const auto extraText = lit("%1 - %2").arg(extraInfoText,
         CameraSelectionDialog::tr("%n cameras", nullptr, children.size())).trimmed();
 
     return createResourceNode(serverResource, extraText, true);

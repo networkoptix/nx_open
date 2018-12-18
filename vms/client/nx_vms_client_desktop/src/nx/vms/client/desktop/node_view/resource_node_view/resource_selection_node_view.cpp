@@ -9,6 +9,7 @@
 #include "../details/node_view_model.h"
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node_helpers.h"
+#include "../node_view/sorting/node_view_numeric_sort_model.h"
 
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
@@ -76,6 +77,10 @@ ResourceSelectionNodeView::ResourceSelectionNodeView(QWidget* parent):
     d(new Private(this, kSelectionColumns))
 {
     setItemDelegate(&d->itemDelegate);
+
+    auto numericSortProxyModel = new NodeViewNumericSortModel(this);
+    numericSortProxyModel->setNumericMode(NodeViewNumericSortModel::Alphanumeric);
+    setProxyModel(numericSortProxyModel);
 
     // We have to emit data changed signals for each checked state change to
     // correct repaint items in resource view.
