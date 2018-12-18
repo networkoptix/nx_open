@@ -99,7 +99,7 @@ private:
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
     std::atomic_int m_decoderPixelFormat = -1;
-    bool m_waitForKeyPacket = true;
+    bool m_skipUntilNextKeyPacket = true;
 
     std::atomic_int m_updatingFps = 0;
     std::atomic_int m_actualFps = 0;
@@ -121,15 +121,15 @@ private:
 
     TimestampMapper m_timestamps;    
 
+    mutable std::mutex m_ConsumerManagerMutex;
+    std::condition_variable m_consumerWaitCondition;
     FrameConsumerManager m_frameConsumerManager;
     PacketConsumerManager m_packetConsumerManager;
 
+    mutable std::mutex m_threadMutex;
     std::thread m_videoThread;
-    mutable std::mutex m_mutex;
     std::atomic_bool m_terminated = true;
     std::atomic_bool m_ioError = false;
-    std::atomic_bool m_isStopping = false;
-    std::condition_variable m_wait;
     int m_initCode = 0;
 
 private:
@@ -141,7 +141,7 @@ private:
     bool waitForConsumers();
     bool noConsumers() const;
     void terminate();
-    void tryStart();
+    void tryToStartIfNotStarted();
     void start();
     void stop();
     void run();
