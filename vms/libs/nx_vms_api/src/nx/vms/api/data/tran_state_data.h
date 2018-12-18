@@ -14,7 +14,7 @@ struct NX_VMS_API TranState
     /** @returns \a true if \a left represents more transactions then \a right. */
     bool operator<(const TranState& right) const;
 
-    bool operator>(const TranState& right) const { return !operator<(right); }
+    bool operator>(const TranState& right) const { return right < *this; }
 };
 #define TranState_Fields (values)
 
