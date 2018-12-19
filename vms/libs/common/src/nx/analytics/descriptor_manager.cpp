@@ -135,7 +135,7 @@ void DescriptorManager::updateFromPluginManifest(
     const nx::vms::api::analytics::PluginManifest& manifest)
 {
     PluginDescriptor descriptor{manifest.id, manifest.name};
-    m_pluginDescriptorContainer->addDescriptors(std::move(descriptor), manifest.id);
+    m_pluginDescriptorContainer->mergeWithDescriptors(std::move(descriptor), manifest.id);
 }
 
 void DescriptorManager::updateFromEngineManifest(
@@ -144,17 +144,17 @@ void DescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const nx::vms::api::analytics::EngineManifest& manifest)
 {
-    m_engineDescriptorContainer->addDescriptors(
+    m_engineDescriptorContainer->mergeWithDescriptors(
         EngineDescriptor(engineId, engineName, pluginId), engineId);
 
-    m_actionTypeDescriptorContainer->addDescriptors(
+    m_actionTypeDescriptorContainer->mergeWithDescriptors(
         toMap<ActionTypeDescriptor>(engineId, manifest.objectActions),
         engineId);
 
-    m_groupDescriptorContainer->addDescriptors(toMap<GroupDescriptor>(engineId, manifest.groups));
-    m_objectTypeDescriptorContainer->addDescriptors(
+    m_groupDescriptorContainer->mergeWithDescriptors(toMap<GroupDescriptor>(engineId, manifest.groups));
+    m_objectTypeDescriptorContainer->mergeWithDescriptors(
         toMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
-    m_eventTypeDescriptorContainer->addDescriptors(
+    m_eventTypeDescriptorContainer->mergeWithDescriptors(
         toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
@@ -163,11 +163,11 @@ void DescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
-    m_groupDescriptorContainer->addDescriptors(
+    m_groupDescriptorContainer->mergeWithDescriptors(
         toMap<GroupDescriptor>(engineId, manifest.groups));
-    m_objectTypeDescriptorContainer->addDescriptors(
+    m_objectTypeDescriptorContainer->mergeWithDescriptors(
         toMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
-    m_eventTypeDescriptorContainer->addDescriptors(
+    m_eventTypeDescriptorContainer->mergeWithDescriptors(
         toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 

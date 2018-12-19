@@ -116,13 +116,13 @@ public:
     }
 
     template<typename Descriptors, typename... Scopes>
-    void addDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
+    void mergeWithDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
     {
         auto container = ownResourceContainer();
         if (!NX_ASSERT(container))
             return;
 
-        container->addDescriptors(std::forward<Descriptors>(descriptors), scopes...);
+        container->mergeWithDescriptors(std::forward<Descriptors>(descriptors), scopes...);
     }
 
 private:

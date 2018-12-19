@@ -100,14 +100,14 @@ TEST_F(DescriptorContainerTest, setDescriptors)
     ASSERT_EQ(expectedResult1, *m_descriptorContainer->descriptors());
 }
 
-TEST_F(DescriptorContainerTest, addDescriptors)
+TEST_F(DescriptorContainerTest, mergeWithDescriptors)
 {
     Storage::Container expectedResult0;
     initMap(&expectedResult0);
     auto& descriptor = MapHelper::get(expectedResult0, "group0", "subgroup1", "id1");
     descriptor.mergeCounter += 1;
 
-    m_descriptorContainer->addDescriptors(
+    m_descriptorContainer->mergeWithDescriptors(
         TestDescriptor("id1", "descriptor0-1-1"), "group0", "subgroup1", "id1");
 
     ASSERT_EQ(expectedResult0, *m_descriptorContainer->descriptors());

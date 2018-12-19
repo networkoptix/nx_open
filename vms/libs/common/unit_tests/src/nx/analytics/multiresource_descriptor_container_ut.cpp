@@ -169,7 +169,7 @@ TEST_F(MultiresourceDescriptorContainerTest, settingDescriptors)
 TEST_F(MultiresourceDescriptorContainerTest, addingDescriptors)
 {
     Map testMap = makeBasicMap();
-    m_container->addDescriptors(testMap);
+    m_container->mergeWithDescriptors(testMap);
     ASSERT_EQ(fromProperty(m_ownResource), testMap);
     for (const auto& resource: m_resourceList)
         ASSERT_EQ(fromProperty(resource), Map());
@@ -190,7 +190,7 @@ TEST_F(MultiresourceDescriptorContainerTest, addingDescriptors)
     MapHelper::set(
         &expectedResult2, "group1", "subgroup1", TestDescriptor("1-1", "descriptor2-0-0", 1));
 
-    m_container->addDescriptors(testMap2);
+    m_container->mergeWithDescriptors(testMap2);
     ASSERT_EQ(fromProperty(m_ownResource), expectedResult2);
     for (const auto& resource: m_resourceList)
         ASSERT_EQ(fromProperty(resource), Map());
@@ -208,7 +208,7 @@ TEST_F(MultiresourceDescriptorContainerTest, addingDescriptors)
     MapHelper::set(
         &expectedResult3, "group1", "subgroup1", TestDescriptor("1-1", "descriptor2-0-0", 2));
 
-    m_container->addDescriptors(testMap3);
+    m_container->mergeWithDescriptors(testMap3);
     ASSERT_EQ(fromProperty(m_ownResource), expectedResult3);
     for (const auto& resource: m_resourceList)
         ASSERT_EQ(fromProperty(resource), Map());

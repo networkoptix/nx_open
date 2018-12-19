@@ -62,7 +62,7 @@ public:
     }
 
     template<typename Descriptors, typename... Scopes>
-    void addDescriptors(const Descriptors& descriptors, const Scopes&... scopes)
+    void mergeWithDescriptors(const Descriptors& descriptors, const Scopes&... scopes)
     {
         auto allDescriptors = m_descriptorStorage->fetch();
         const auto currentDescriptors = MapHelper::get(allDescriptors, scopes...);
@@ -80,7 +80,6 @@ public:
             MapHelper::set(&allDescriptors, scopes..., merged);
         }
 
-        // TODO: #dmishin Test this stuff.
         m_descriptorStorage->save(std::move(allDescriptors));
     }
 
