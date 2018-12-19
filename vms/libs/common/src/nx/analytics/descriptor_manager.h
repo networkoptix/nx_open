@@ -55,12 +55,12 @@ using ActionTypeDescriptorMap = MapHelper::NestedMap<
     QString,
     nx::vms::api::analytics::ActionTypeDescriptor>;
 
-class Helper: public QnCommonModuleAware
+class DescriptorManager: public QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 
 public:
-    Helper(QnCommonModule* commonModule);
+    DescriptorManager(QnCommonModule* commonModule);
 
     static const QString kPluginDescriptorsProperty;
     static const QString kEngineDescriptorsProperty;

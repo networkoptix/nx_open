@@ -52,7 +52,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 using namespace nx;
@@ -238,7 +238,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    const nx::analytics::Helper helper(commonModule());
+    const nx::analytics::DescriptorManager helper(commonModule());
     // We don't filter by cameras since we don't know if an event was supported by some device
     // before.
     const auto allEventTypes = helper.eventTypes();

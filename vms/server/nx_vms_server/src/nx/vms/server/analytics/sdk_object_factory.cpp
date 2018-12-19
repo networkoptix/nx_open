@@ -14,7 +14,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/i_string_map.h>
@@ -115,7 +115,7 @@ bool SdkObjectFactory::init()
 
 bool SdkObjectFactory::clearActionDescriptorList()
 {
-    nx::analytics::Helper helper(serverModule()->commonModule());
+    nx::analytics::DescriptorManager helper(serverModule()->commonModule());
     helper.clearRuntimeInfo();
     return true;
 }

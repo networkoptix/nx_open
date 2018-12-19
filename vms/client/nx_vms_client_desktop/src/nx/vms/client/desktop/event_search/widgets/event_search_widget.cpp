@@ -20,7 +20,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
 
@@ -239,7 +239,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     {
         using namespace nx::vms::event;
 
-        nx::analytics::Helper helper(q->commonModule());
+        nx::analytics::DescriptorManager helper(q->commonModule());
         const auto eventTypeDescriptors = helper.eventTypes();
         const auto engineDescriptors = helper.engines();
         analyticsMenu->clear();

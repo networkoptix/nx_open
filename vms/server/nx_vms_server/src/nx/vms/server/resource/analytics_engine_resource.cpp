@@ -13,7 +13,7 @@
 #include <nx/sdk/common/to_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx::vms::server::resource {
 
@@ -155,7 +155,7 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    nx::analytics::Helper helper(commonModule());
+    nx::analytics::DescriptorManager helper(commonModule());
     helper.updateFromManifest(pluginManifest.id, getId(), getName(), *manifest);
 
     setManifest(*manifest);

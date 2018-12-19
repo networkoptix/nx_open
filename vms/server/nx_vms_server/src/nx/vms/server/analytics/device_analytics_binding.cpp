@@ -16,7 +16,7 @@
 #include <nx/sdk/analytics/common/metadata_types.h>
 #include <nx/sdk/common/ptr.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/sdk/common/to_string.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 
@@ -435,7 +435,7 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    nx::analytics::Helper helper(serverModule()->commonModule());
+    nx::analytics::DescriptorManager helper(serverModule()->commonModule());
     helper.updateFromManifest(m_device->getId(), m_engine->getId(), manifest);
 
     // TODO: #dmishin make analytics helper handle supported event/object types.

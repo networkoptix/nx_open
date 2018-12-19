@@ -8,7 +8,7 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx {
 namespace vms {
@@ -140,7 +140,7 @@ bool hasToggleState(
         if (runtimeParams.getAnalyticsEventTypeId().isNull())
             return true;
 
-        nx::analytics::Helper helper(commonModule);
+        nx::analytics::DescriptorManager helper(commonModule);
         const auto descriptor = helper.eventType(runtimeParams.getAnalyticsEventTypeId());
 
         if (!descriptor)

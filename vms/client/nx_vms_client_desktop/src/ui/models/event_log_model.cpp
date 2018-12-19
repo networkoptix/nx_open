@@ -41,7 +41,7 @@
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
 
@@ -408,7 +408,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     action.eventParams.eventResourceId).
                     dynamicCast<QnVirtualCameraResource>();
 
-                nx::analytics::Helper helper(commonModule());
+                nx::analytics::DescriptorManager helper(commonModule());
                 const auto descriptor = helper.eventType(
                     action.eventParams.getAnalyticsEventTypeId());
                 QString eventName = descriptor ? descriptor->name : QString();

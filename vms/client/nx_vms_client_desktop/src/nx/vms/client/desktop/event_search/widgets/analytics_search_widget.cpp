@@ -11,7 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -215,7 +215,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    nx::analytics::Helper helper(q->commonModule());
+    nx::analytics::DescriptorManager helper(q->commonModule());
     const auto objectTypeDescriptors = helper.objectTypes();
     const auto engineDescriptors = helper.engines();
     m_objectTypeMenu->clear();

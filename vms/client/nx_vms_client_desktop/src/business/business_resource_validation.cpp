@@ -22,7 +22,7 @@
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 #include <utils/email/email.h>
 

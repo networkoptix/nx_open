@@ -1,4 +1,4 @@
-#include "helper.h"
+#include "descriptor_manager.h"
 
 #include <algorithm>
 
@@ -12,12 +12,12 @@ namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 
-const QString Helper::kPluginDescriptorsProperty("pluginDescriptors");
-const QString Helper::kEngineDescriptorsProperty("engineDescriptors");
-const QString Helper::kGroupDescriptorsProperty("groupDescriptors");
-const QString Helper::kEventTypeDescriptorsProperty("eventTypeDescriptors");
-const QString Helper::kObjectTypeDescriptorsProperty("objectTypeDescriptors");
-const QString Helper::kActionTypeDescriptorsProperty("actionTypeDescriptors");
+const QString DescriptorManager::kPluginDescriptorsProperty("pluginDescriptors");
+const QString DescriptorManager::kEngineDescriptorsProperty("engineDescriptors");
+const QString DescriptorManager::kGroupDescriptorsProperty("groupDescriptors");
+const QString DescriptorManager::kEventTypeDescriptorsProperty("eventTypeDescriptors");
+const QString DescriptorManager::kObjectTypeDescriptorsProperty("objectTypeDescriptors");
+const QString DescriptorManager::kActionTypeDescriptorsProperty("actionTypeDescriptors");
 
 namespace {
 
@@ -89,7 +89,7 @@ void filterByIds(std::map<Key, Value>* inOutMapToFilter, const std::set<Key>& ke
 
 using namespace nx::vms::api::analytics;
 
-Helper::Helper(QnCommonModule* commonModule):
+DescriptorManager::DescriptorManager(QnCommonModule* commonModule):
     base_type(commonModule),
     m_pluginDescriptorContainer(
         makeContainer<
@@ -124,18 +124,18 @@ Helper::Helper(QnCommonModule* commonModule):
 {
 }
 
-void Helper::clearRuntimeInfo()
+void DescriptorManager::clearRuntimeInfo()
 {
     m_actionTypeDescriptorContainer->removeDescriptors();
 }
 
-void Helper::updateFromManifest(const nx::vms::api::analytics::PluginManifest& manifest)
+void DescriptorManager::updateFromManifest(const nx::vms::api::analytics::PluginManifest& manifest)
 {
     PluginDescriptor descriptor{manifest.id, manifest.name};
     m_pluginDescriptorContainer->addDescriptors(std::move(descriptor), manifest.id);
 }
 
-void Helper::updateFromManifest(
+void DescriptorManager::updateFromManifest(
     const QString& pluginId,
     const QnUuid& engineId,
     const QString& engineName,
@@ -155,7 +155,7 @@ void Helper::updateFromManifest(
         toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
-void Helper::updateFromManifest(
+void DescriptorManager::updateFromManifest(
     const QnUuid& /*deviceId*/,
     const QnUuid& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
@@ -184,7 +184,7 @@ auto descriptors(
     auto typeDescriptors = container->mergedDescriptors();
     if (!typeDescriptors)
     {
-        NX_WARNING(typeid(Helper), "Unable to fetch %1 descriptor map", descriptorTypeName);
+        NX_WARNING(typeid(DescriptorManager), "Unable to fetch %1 descriptor map", descriptorTypeName);
         return ReturnType();
     }
 
@@ -196,32 +196,32 @@ auto descriptors(
     return descriptorMap;
 }
 
-std::optional<nx::vms::api::analytics::PluginDescriptor> Helper::plugin(const QString& id) const
+std::optional<nx::vms::api::analytics::PluginDescriptor> DescriptorManager::plugin(const QString& id) const
 {
     return descriptor(m_pluginDescriptorContainer, id);
 }
 
-PluginDescriptorMap Helper::plugins(const std::set<QString>& pluginIds) const
+PluginDescriptorMap DescriptorManager::plugins(const std::set<QString>& pluginIds) const
 {
     return descriptors(m_pluginDescriptorContainer, pluginIds, "Plugin");
 }
 
-std::optional<nx::vms::api::analytics::EngineDescriptor> Helper::engine(const QnUuid& id) const
+std::optional<nx::vms::api::analytics::EngineDescriptor> DescriptorManager::engine(const QnUuid& id) const
 {
     return descriptor(m_engineDescriptorContainer, id);
 }
 
-EngineDescriptorMap Helper::engines(const std::set<QnUuid>& engineIds) const
+EngineDescriptorMap DescriptorManager::engines(const std::set<QnUuid>& engineIds) const
 {
     return descriptors(m_engineDescriptorContainer, engineIds, "Plugin");
 }
 
-std::optional <nx::vms::api::analytics::GroupDescriptor> Helper::group(const QString& id) const
+std::optional<nx::vms::api::analytics::GroupDescriptor> DescriptorManager::group(const QString& id) const
 {
     return descriptor(m_groupDescriptorContainer, id);
 }
 
-GroupDescriptorMap Helper::groups(const std::set<QString>& groupIds) const
+GroupDescriptorMap DescriptorManager::groups(const std::set<QString>& groupIds) const
 {
     return descriptors(m_groupDescriptorContainer, groupIds, "Group");
 }
@@ -293,7 +293,7 @@ auto supportedTypesIntersection(
 }
 
 template<typename DescriptorMap>
-EngineDescriptorMap Helper::parentEngines(const DescriptorMap& descriptorMap) const
+EngineDescriptorMap DescriptorManager::parentEngines(const DescriptorMap& descriptorMap) const
 {
     std::set<QnUuid> engineIds;
     for (const auto&[typeDescriptorId, typeDescriptor] : descriptorMap)
@@ -306,7 +306,7 @@ EngineDescriptorMap Helper::parentEngines(const DescriptorMap& descriptorMap) co
 }
 
 template<typename DescriptorMap>
-GroupDescriptorMap Helper::parentGroups(const DescriptorMap& descriptorMap) const
+GroupDescriptorMap DescriptorManager::parentGroups(const DescriptorMap& descriptorMap) const
 {
     std::set<QString> groupIds;
     for (const auto&[typeDescriptorId, typeDescriptor] : descriptorMap)
@@ -318,17 +318,17 @@ GroupDescriptorMap Helper::parentGroups(const DescriptorMap& descriptorMap) cons
     return groups(groupIds);
 }
 
-std::optional<EventTypeDescriptor> Helper::eventType(const QString& id) const
+std::optional<EventTypeDescriptor> DescriptorManager::eventType(const QString& id) const
 {
     return descriptor(m_eventTypeDescriptorContainer, id);
 }
 
-EventTypeDescriptorMap Helper::eventTypes(const std::set<QString>& eventTypeIds) const
+EventTypeDescriptorMap DescriptorManager::eventTypes(const std::set<QString>& eventTypeIds) const
 {
     return descriptors(m_eventTypeDescriptorContainer, eventTypeIds, "EventType");
 }
 
-EventTypeDescriptorMap Helper::supportedEventTypes(
+EventTypeDescriptorMap DescriptorManager::supportedEventTypes(
     const QnVirtualCameraResourcePtr& device) const
 {
     return supportedByDeviceDescriptors(
@@ -338,7 +338,7 @@ EventTypeDescriptorMap Helper::supportedEventTypes(
         "EventType");
 }
 
-EventTypeDescriptorMap Helper::supportedEventTypesUnion(
+EventTypeDescriptorMap DescriptorManager::supportedEventTypesUnion(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesUnion(
@@ -348,7 +348,7 @@ EventTypeDescriptorMap Helper::supportedEventTypesUnion(
         "EventType");
 }
 
-EventTypeDescriptorMap Helper::supportedEventTypesIntersection(
+EventTypeDescriptorMap DescriptorManager::supportedEventTypesIntersection(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesIntersection(
@@ -358,30 +358,30 @@ EventTypeDescriptorMap Helper::supportedEventTypesIntersection(
         "EventType");
 }
 
-EngineDescriptorMap Helper::parentEventTypeEngines(
+EngineDescriptorMap DescriptorManager::parentEventTypeEngines(
     const EventTypeDescriptorMap& eventTypeDescriptors) const
 {
     return parentEngines(eventTypeDescriptors);
 }
 
-GroupDescriptorMap Helper::parentEventTypeGroups(
+GroupDescriptorMap DescriptorManager::parentEventTypeGroups(
     const EventTypeDescriptorMap& eventTypeDescriptors) const
 {
     return parentGroups(eventTypeDescriptors);
 }
 
-std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> Helper::objectType(
+std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> DescriptorManager::objectType(
     const QString& id) const
 {
     return descriptor(m_objectTypeDescriptorContainer, id);
 }
 
-ObjectTypeDescriptorMap Helper::objectTypes(const std::set<QString>& objectTypeIds) const
+ObjectTypeDescriptorMap DescriptorManager::objectTypes(const std::set<QString>& objectTypeIds) const
 {
     return descriptors(m_objectTypeDescriptorContainer, objectTypeIds, "EventType");
 }
 
-ObjectTypeDescriptorMap Helper::supportedObjectTypes(
+ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypes(
     const QnVirtualCameraResourcePtr& device) const
 {
     return supportedByDeviceDescriptors(
@@ -391,7 +391,7 @@ ObjectTypeDescriptorMap Helper::supportedObjectTypes(
         "ObjectType");
 }
 
-ObjectTypeDescriptorMap Helper::supportedObjectTypesUnion(
+ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypesUnion(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesUnion(
@@ -401,7 +401,7 @@ ObjectTypeDescriptorMap Helper::supportedObjectTypesUnion(
         "ObjectType");
 }
 
-ObjectTypeDescriptorMap Helper::supportedObjectTypesIntersection(
+ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypesIntersection(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesIntersection(
@@ -411,25 +411,25 @@ ObjectTypeDescriptorMap Helper::supportedObjectTypesIntersection(
         "ObjectType");
 }
 
-EngineDescriptorMap Helper::parentObjectTypeEngines(
+EngineDescriptorMap DescriptorManager::parentObjectTypeEngines(
     const ObjectTypeDescriptorMap& objectTypeDescriptors) const
 {
     return parentEngines(objectTypeDescriptors);
 }
 
-GroupDescriptorMap Helper::parentObjectTypeGroups(
+GroupDescriptorMap DescriptorManager::parentObjectTypeGroups(
     const ObjectTypeDescriptorMap& objectTypeDescriptors) const
 {
     return parentGroups(objectTypeDescriptors);
 }
 
-ActionTypeDescriptorMap Helper::actionTypes() const
+ActionTypeDescriptorMap DescriptorManager::actionTypes() const
 {
     auto descriptors = m_actionTypeDescriptorContainer->mergedDescriptors();
     return descriptors ? *descriptors : ActionTypeDescriptorMap();
 }
 
-ActionTypeDescriptorMap Helper::availableObjectActions(
+ActionTypeDescriptorMap DescriptorManager::availableObjectActions(
     const QString& objectTypeId,
     const QnVirtualCameraResourcePtr& device)
 {

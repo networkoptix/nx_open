@@ -7,7 +7,7 @@
 
 #include <nx/vms/api/analytics/manifest_items.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
 
@@ -47,7 +47,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     using namespace nx::vms::event;
     clear();
 
-    nx::analytics::Helper helper(commonModule());
+    nx::analytics::DescriptorManager helper(commonModule());
 
     // TODO: #dmishin show all 'potentially' supported event types. Return to this code when
     // `isCompatible` method is added to the SDK IEngine interface.

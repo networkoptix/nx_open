@@ -3,7 +3,7 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx {
@@ -78,7 +78,7 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
     if (!getResource() || m_pluginId != params.getAnalyticsPluginId())
         return false;
 
-    nx::analytics::Helper helper(getResource()->commonModule());
+    nx::analytics::DescriptorManager helper(getResource()->commonModule());
     const auto descriptor = helper.eventType(m_eventTypeId);
 
     if (!descriptor)

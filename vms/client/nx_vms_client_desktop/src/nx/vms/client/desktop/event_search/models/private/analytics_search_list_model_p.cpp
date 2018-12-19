@@ -35,7 +35,7 @@
 #include <nx/utils/range_adapters.h>
 
 #include <common/common_module.h>
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -157,7 +157,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            nx::analytics::Helper helper(objectCamera->commonModule());
+            nx::analytics::DescriptorManager helper(objectCamera->commonModule());
             const auto objectTypeDescriptor = helper.objectType(object.objectTypeId);
 
             if (!objectTypeDescriptor)
@@ -732,7 +732,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     if (!camera)
         return {};
 
-    nx::analytics::Helper helper(q->commonModule());
+    nx::analytics::DescriptorManager helper(q->commonModule());
     auto actionByEngine = helper.availableObjectActions(object.objectTypeId, camera);
 
     QSharedPointer<QMenu> menu(new QMenu());

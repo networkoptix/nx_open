@@ -27,7 +27,7 @@
 
 #include <nx/utils/log/assert.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx {
 namespace vms {
@@ -713,7 +713,7 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    nx::analytics::Helper helper(camera->commonModule());
+    nx::analytics::DescriptorManager helper(camera->commonModule());
     const auto eventTypeDescriptor = helper.eventType(eventTypeId);
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }

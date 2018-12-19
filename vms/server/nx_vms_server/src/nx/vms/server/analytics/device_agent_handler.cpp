@@ -10,7 +10,7 @@
 
 #include <nx/vms/server/event/event_connector.h>
 
-#include <nx/analytics/helper.h>
+#include <nx/analytics/descriptor_manager.h>
 
 #include <utils/common/synctime.h>
 
@@ -33,7 +33,7 @@ DeviceAgentHandler::DeviceAgentHandler(
     m_metadataHandler.setResource(m_device);
     m_metadataHandler.setPluginId(m_engineResource->plugin()->manifest().id);
 
-    nx::analytics::Helper helper(serverModule->commonModule());
+    nx::analytics::DescriptorManager helper(serverModule->commonModule());
     m_metadataHandler.setEventTypeDescriptors(helper.supportedEventTypes(m_device));
 }
 
