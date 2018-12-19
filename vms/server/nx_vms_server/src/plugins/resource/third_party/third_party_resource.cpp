@@ -383,13 +383,13 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::NXPluginInterface::queryInterface
-unsigned int QnThirdPartyResource::addRef()
+int QnThirdPartyResource::addRef() const
 {
     return m_refCounter.fetchAndAddOrdered(1) + 1;
 }
 
 //!Implementation of nxpl::NXPluginInterface::queryInterface
-unsigned int QnThirdPartyResource::releaseRef()
+int QnThirdPartyResource::releaseRef() const
 {
     return m_refCounter.fetchAndAddOrdered(-1) - 1;
 }

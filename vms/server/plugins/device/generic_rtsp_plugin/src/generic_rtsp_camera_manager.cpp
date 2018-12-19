@@ -72,12 +72,12 @@ void* GenericRTSPCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID
     return NULL;
 }
 
-unsigned int GenericRTSPCameraManager::addRef()
+int GenericRTSPCameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericRTSPCameraManager::releaseRef()
+int GenericRTSPCameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

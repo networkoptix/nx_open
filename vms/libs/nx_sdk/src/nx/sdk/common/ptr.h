@@ -87,9 +87,8 @@ public:
 
     ~Ptr()
     {
-        // TODO: #mshevchenko: Get rid of const_cast when addRef() and releaseRef() are made const.
         if (m_ptr)
-            const_cast<std::remove_const_t<RefCountable>*>(m_ptr)->releaseRef();
+            m_ptr->releaseRef();
     }
 
 	template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>

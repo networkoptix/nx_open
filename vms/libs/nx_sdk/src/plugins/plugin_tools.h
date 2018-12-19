@@ -169,7 +169,7 @@ public:
     }
 
     /** Implementaion of nxpl::PluginInterface::addRef(). */
-    unsigned int addRef()
+    int addRef() const
     {
         return m_refCountingDelegate
             ? m_refCountingDelegate->addRef()
@@ -180,18 +180,18 @@ public:
      * Implementaion of nxpl::PluginInterface::releaseRef(). Deletes the monitored object if the
      * reference counter drops to zero.
      */
-    unsigned int releaseRef()
+    int releaseRef() const
     {
         if (m_refCountingDelegate)
             return m_refCountingDelegate->releaseRef();
 
-        unsigned int newRefCounter = atomic::dec(&m_refCount);
+        const int newRefCounter = atomic::dec(&m_refCount);
         if (newRefCounter == 0)
             delete m_objToWatch;
         return newRefCounter;
     }
 
-	unsigned int refCount() const
+	int refCount() const
 	{
 		if (m_refCountingDelegate)
 			return m_refCountingDelegate->refCount();
@@ -199,7 +199,7 @@ public:
 	}
 
 private:
-    atomic::AtomicLong m_refCount;
+    mutable atomic::AtomicLong m_refCount;
     nxpl::PluginInterface* m_objToWatch;
     CommonRefManager* m_refCountingDelegate;
 };
@@ -214,10 +214,10 @@ public:
     CommonRefCounter& operator=(CommonRefCounter&&) = delete;
     virtual ~CommonRefCounter() = default;
 
-    virtual unsigned int addRef() override { return m_refManager.addRef(); }
-    virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
+    virtual int addRef() const override { return m_refManager.addRef(); }
+    virtual int releaseRef() const override { return m_refManager.releaseRef(); }
 
-	unsigned int refCount() const { return m_refManager.refCount(); }
+	int refCount() const { return m_refManager.refCount(); }
 
 protected:
     CommonRefManager m_refManager;
@@ -231,7 +231,7 @@ protected:
  * @return Reference counter, or 0 if object is null.
  */
 template<typename Interface>
-unsigned int refCount(Interface* object)
+int refCount(Interface* object)
 {
 	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
 		return commonRefCounter->refCount();

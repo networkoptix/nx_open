@@ -68,12 +68,12 @@ void* GenericMulticastCameraManager::queryInterface(const nxpl::NX_GUID& interfa
     return nullptr;
 }
 
-unsigned int GenericMulticastCameraManager::addRef()
+int GenericMulticastCameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastCameraManager::releaseRef()
+int GenericMulticastCameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

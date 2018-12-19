@@ -137,8 +137,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
 
     private:
         // synchronize localfile with remote one
@@ -184,8 +184,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
 
     private:
         // In response to MLSD request list of structured file dsecription lines is returned.
@@ -272,8 +272,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
 
     private:
         // destroy only via releaseRef()
@@ -310,8 +310,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
     }; // class FtpStorageFactory
 } // namespace Qn
 

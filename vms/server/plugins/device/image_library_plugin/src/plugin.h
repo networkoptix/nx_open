@@ -61,9 +61,9 @@ public:
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementation of nxpl::PluginInterface::addRef
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementation of nxpl::PluginInterface::releaseRef
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     nxpt::CommonRefManager* refManager();
 

@@ -111,8 +111,8 @@ public:
         return nullptr;
     }
 
-    virtual unsigned int addRef() override { ASSERT_TRUE(false); return -1; }
-    virtual unsigned int releaseRef() override { ASSERT_TRUE(false); return -1; }
+    virtual int addRef() const override { ASSERT_TRUE(false); return -1; }
+    virtual int releaseRef() const override { ASSERT_TRUE(false); return -1; }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
     virtual nxpl::NX_GUID objectId() override { return m_objectId; }
@@ -268,13 +268,18 @@ public:
         return nullptr;
     }
 
-    virtual unsigned int addRef() { return ++m_refCounter; }
-    virtual unsigned int releaseRef() { ASSERT_TRUE(m_refCounter > 1); return --m_refCounter; }
+    virtual int addRef() const override { return ++m_refCounter; }
+
+    virtual int releaseRef() const override
+    {
+        ASSERT_TRUE(m_refCounter > 1);
+        return --m_refCounter;
+    }
 
     virtual int64_t timestampUs() const override { return /*dummy*/ 42; }
 
 private:
-    int m_refCounter = 1;
+    mutable int m_refCounter = 1;
 };
 
 TEST(stub_analytics_plugin, test)

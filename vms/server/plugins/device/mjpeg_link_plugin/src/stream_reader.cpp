@@ -90,13 +90,13 @@ void* StreamReader::queryInterface(const nxpl::NX_GUID& interfaceID)
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int StreamReader::addRef()
+int StreamReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int StreamReader::releaseRef()
+int StreamReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

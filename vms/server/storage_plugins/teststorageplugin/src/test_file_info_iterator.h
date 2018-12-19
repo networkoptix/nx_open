@@ -17,8 +17,8 @@ public:
 public: // plugin interface implementation
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
 private:
     mutable nx_spl::FileInfo m_fInfo;

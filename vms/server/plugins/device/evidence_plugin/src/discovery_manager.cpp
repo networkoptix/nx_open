@@ -44,12 +44,12 @@ void* CameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraDiscoveryManager::addRef()
+int CameraDiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraDiscoveryManager::releaseRef()
+int CameraDiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

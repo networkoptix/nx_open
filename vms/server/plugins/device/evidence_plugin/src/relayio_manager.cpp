@@ -123,12 +123,12 @@ void* RelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int RelayIOManager::addRef()
+int RelayIOManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int RelayIOManager::releaseRef()
+int RelayIOManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

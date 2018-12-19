@@ -30,7 +30,7 @@ static std::string getEthernetMacAddress()
             // The media server modifies the mac address delimiter from ":" to "-",
             // so do it preemptively to avoid adding the unique id with the wrong delimiter.
             return iFace.hardwareAddress().replace(
-                kQtMacAddressDelimiter, 
+                kQtMacAddressDelimiter,
                 kNxMacAddressDelimiter).toStdString();
         }
     }
@@ -72,12 +72,12 @@ void* DiscoveryManager::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
-unsigned int DiscoveryManager::addRef()
+int DiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int DiscoveryManager::releaseRef()
+int DiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -110,7 +110,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
 int DiscoveryManager::checkHostAddress(
     nxcip::CameraInfo* /*cameras*/,
     const char* /*address*/,
-    const char* /*login*/, 
+    const char* /*login*/,
     const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam
@@ -208,7 +208,7 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
         }
 
         DeviceDataWithNxId nxDevice(device, nxId);
-        
+
         nxDevices.push_back(nxDevice);
         addOrUpdateCamera(nxDevice);
     }
@@ -216,5 +216,5 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     return nxDevices;
 }
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx
+} // namespace usb_cam

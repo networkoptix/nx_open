@@ -25,7 +25,7 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
     const std::shared_ptr<Camera>& camera)
     :
-    m_refManager(parentRefManager), 
+    m_refManager(parentRefManager),
     m_encoderIndex(encoderIndex),
     m_camera(camera),
     m_codecParams(camera->defaultVideoParameters())
@@ -56,12 +56,12 @@ void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
-unsigned int MediaEncoder::addRef() 
+int MediaEncoder::addRef() const
 {
-    return m_refManager.addRef(); 
+    return m_refManager.addRef();
 }
 
-unsigned int MediaEncoder::releaseRef()
+int MediaEncoder::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -78,7 +78,7 @@ int MediaEncoder::getMaxBitrate(int* maxBitrate) const
         return nxcip::NX_IO_ERROR;
 
     *maxBitrate = device::video::getMaxBitrate(
-        m_camera->url(), 
+        m_camera->url(),
         m_camera->compressionTypeDescriptor()) / kBytesInOneKilobyte;
     return nxcip::NX_NO_ERROR;
 }
@@ -166,8 +166,8 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 #ifdef _WIN32
     audioFormat->byteOrder = nxcip::AudioFormat::boLittleEndian;
 #else
-    audioFormat->byteOrder = __BYTE_ORDER == BIG_ENDIAN 
-        ? nxcip::AudioFormat::boBigEndian 
+    audioFormat->byteOrder = __BYTE_ORDER == BIG_ENDIAN
+        ? nxcip::AudioFormat::boBigEndian
         : nxcip::AudioFormat::boLittleEndian;
 #endif
     audioFormat->channels = context->channels;

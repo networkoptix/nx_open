@@ -52,14 +52,14 @@ namespace nxpl
             \return new reference count
             \note \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef
         */
-        virtual unsigned int addRef() = 0;
+        virtual int addRef() const = 0;
         //!Decrement reference counter
         /*!
             When zero, object MUST be removed
             \return new reference count
             \note \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef
         */
-        virtual unsigned int releaseRef() = 0;
+        virtual int releaseRef() const = 0;
     };
 
     struct Setting

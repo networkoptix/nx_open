@@ -24,13 +24,13 @@ void* TimePeriods::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int TimePeriods::addRef()
+int TimePeriods::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int TimePeriods::releaseRef()
+int TimePeriods::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

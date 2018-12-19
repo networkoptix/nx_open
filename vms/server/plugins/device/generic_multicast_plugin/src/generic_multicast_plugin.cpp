@@ -53,12 +53,12 @@ void* GenericMulticastPlugin::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int GenericMulticastPlugin::addRef()
+int GenericMulticastPlugin::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastPlugin::releaseRef()
+int GenericMulticastPlugin::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

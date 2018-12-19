@@ -73,9 +73,9 @@ public:
     //!Implementation of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementation of nxpl::NXPluginInterface::queryInterface
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementation of nxpl::NXPluginInterface::queryInterface
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     //!Implementation of nxcip::CameraInputEventHandler::inputPortStateChanged
     virtual void inputPortStateChanged(
@@ -115,7 +115,7 @@ private:
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;
     QVector<EncoderData> m_encoderData;
     std::unique_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
-    QAtomicInt m_refCounter;
+    mutable QAtomicInt m_refCounter;
     QString m_defaultOutputID;
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
