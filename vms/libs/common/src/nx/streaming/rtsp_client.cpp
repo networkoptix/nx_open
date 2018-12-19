@@ -62,7 +62,8 @@ QString toString(const RtspTransport& value)
         case RtspTransport::multicast:
             return "MULTICAST";
         default:
-            return "";
+            NX_ASSERT(false, lm("Snsupported value: %1").arg(static_cast<int>(value)));
+            return "TCP";
     }
 }
 
