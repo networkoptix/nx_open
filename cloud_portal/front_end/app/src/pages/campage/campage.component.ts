@@ -322,7 +322,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   open(activeCamera) {
-      this.messageDialog.open(this.config.messageType.ipvd, activeCamera).then(() => {});
+      this.messageDialog.open(this.config.messageType.ipvd, activeCamera.model, activeCamera.model).then(() => {});
       return false;
   }
 

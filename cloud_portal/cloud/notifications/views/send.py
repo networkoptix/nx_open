@@ -83,6 +83,8 @@ def send_event(request):
             if product.exists():
                 request.data['product'] = product.first().name
                 product_id = product.first().id
+        else:
+            request.data['product'] = request.data['productId']
 
         user = request.user
         request.data['sender_email'] = user.email
