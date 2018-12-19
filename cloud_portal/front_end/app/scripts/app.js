@@ -124,6 +124,8 @@ window.L = {};
                         // TODO: Causes IOS to not load sometimes but not sure why
                         if (PRODUCTION && error.status > 500) {
                             window.location.href = '/static/503.html';
+                        } else if (PRODUCTION) {
+                            window.location.href = '/';
                         }
 
                         $.ajax({
