@@ -68,6 +68,7 @@ target_include_directories(qtkeychain
         ${qtkeychain_dir}
         ${CMAKE_CURRENT_BINARY_DIR}
 )
+target_compile_definitions(qtkeychain INTERFACE USE_QT_KEYCHAIN)
 
 generate_export_header(qtkeychain
     EXPORT_FILE_NAME qkeychain_export.h
