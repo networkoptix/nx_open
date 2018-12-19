@@ -3,7 +3,7 @@
 #include <nx/analytics/test_descriptor_merger.h>
 #include <nx/analytics/test_descriptor_storage_factory.h>
 
-#include <nx/analytics/default_descriptor_storage_factory.h>
+#include <nx/analytics/property_descriptor_storage_factory.h>
 #include <nx/analytics/multiresource_descriptor_container.h>
 #include <nx/utils/data_structures/map_helper.h>
 #include <nx/fusion/model_functions.h>
@@ -93,7 +93,7 @@ auto makeUniqueDescriptorsForResource(const QnResourcePtr& resource)
 class MultiresourceDescriptorContainerTest: public ::testing::Test
 {
 protected:
-    using Factory = DefaultDescriptorStorageFactory<TestDescriptor, QString, QString>;
+    using Factory = PropertyDescriptorStorageFactory<TestDescriptor, QString, QString>;
     using Container = MultiresourceDescriptorContainer<Factory, TestDescriptorMerger>;
 
 protected:

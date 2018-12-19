@@ -32,7 +32,9 @@ std::unique_ptr<Container<Descriptor, Scopes...>> makeContainer(
     const auto moduleGuid = commonModule->moduleGUID();
     auto ownResource = resourcePool->getResourceById<QnMediaServerResource>(moduleGuid);
 
-    auto factory = DefaultDescriptorStorageFactory<Descriptor, Scopes...>(std::move(propertyName));
+    auto factory = PropertyDescriptorStorageFactory<Descriptor, Scopes...>(
+        std::move(propertyName));
+
     return std::make_unique<Container<Descriptor, Scopes...>>(
         std::move(factory),
         servers,

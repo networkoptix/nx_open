@@ -6,7 +6,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/model_functions.h>
 
-#include <nx/analytics/default_descriptor_storage.h>
+#include <nx/analytics/property_descriptor_storage.h>
 #include <nx/analytics/default_descriptor_merger.h>
 
 namespace nx::analytics {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/analytics/descriptor_container.h>
-#include <nx/analytics/default_descriptor_storage.h>
+#include <nx/analytics/property_descriptor_storage.h>
 
 namespace nx::analytics {
 

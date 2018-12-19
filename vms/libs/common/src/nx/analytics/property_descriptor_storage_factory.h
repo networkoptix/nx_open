@@ -1,15 +1,15 @@
 #pragma once
 
-#include <nx/analytics/default_descriptor_storage.h>
+#include <nx/analytics/property_descriptor_storage.h>
 
 namespace nx::analytics {
 
 template<typename Descriptor, typename... Scopes>
-class DefaultDescriptorStorageFactory
+class PropertyDescriptorStorageFactory
 {
-    using Storage = DefaultDescriptorStorage<Descriptor, Scopes...>;
+    using Storage = PropertyDescriptorStorage<Descriptor, Scopes...>;
 public:
-    DefaultDescriptorStorageFactory(QString propertyName):
+    PropertyDescriptorStorageFactory(QString propertyName):
         m_propertyName(std::move(propertyName))
     {
     }

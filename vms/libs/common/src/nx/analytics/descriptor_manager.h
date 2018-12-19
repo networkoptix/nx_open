@@ -10,9 +10,8 @@
 #include <analytics/detected_objects_storage/analytics_events_storage_types.h>
 
 #include <nx/analytics/multiresource_descriptor_container.h>
-#include <nx/analytics/default_descriptor_storage.h>
 #include <nx/analytics/default_descriptor_merger.h>
-#include <nx/analytics/default_descriptor_storage_factory.h>
+#include <nx/analytics/property_descriptor_storage_factory.h>
 #include <nx/analytics/multiresource_descriptor_container.h>
 #include <nx/analytics/scoped_descriptor_merger.h>
 #include <nx/analytics/types.h>
@@ -28,12 +27,12 @@ namespace detail {
 
 template<typename Descriptor, typename... Scopes>
 using Container = MultiresourceDescriptorContainer<
-    DefaultDescriptorStorageFactory<Descriptor, Scopes...>,
+    PropertyDescriptorStorageFactory<Descriptor, Scopes...>,
     DefaultDescriptorMerger<Descriptor>>;
 
 template<typename Descriptor, typename... Scopes>
 using ScopedContainer = MultiresourceDescriptorContainer<
-    DefaultDescriptorStorageFactory<Descriptor, Scopes...>,
+    PropertyDescriptorStorageFactory<Descriptor, Scopes...>,
     ScopedDescriptorMerger<Descriptor>>;
 
 template<typename Descriptor, typename... Scopes>
