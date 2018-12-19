@@ -221,17 +221,21 @@ ZoomableFlickable
 
             Connections
             {
+                target: control.mouseArea
+
+                onPressed: motionSearchController.handlePressed(
+                    control.mapToItem(motionSearchController, mouse.x, mouse.y))
+                onReleased: motionSearchController.handleReleased()
+                onPositionChanged: motionSearchController.handlePositionChanged(
+                    control.mapToItem(motionSearchController, mouse.x, mouse.y))
+                onCanceled: motionSearchController.handleCancelled()
+                onDoubleClicked: motionSearchController.handleCancelled()
+            }
+
+            Connections
+            {
                 target: control
-
-//                onPressed: motionSearchController.handlePressed(
-//                    target.mapToItem(motionSearchController, mouseX, mouseY))
-//                onReleased: motionSearchController.handleReleased()
-//                onPositionChanged: motionSearchController.handlePositionChanged(
-//                    target.mapToItem(motionSearchController, mouseX, mouseY))
-//                onCancelled: motionSearchController.handleCancelled()
-//                onDoubleClicked: motionSearchController.handleCancelled()
-
-//                onMovementEnded: motionSearchController.updateDefaultRoi()
+                onMovementEnded: motionSearchController.updateDefaultRoi()
             }
         }
     }
