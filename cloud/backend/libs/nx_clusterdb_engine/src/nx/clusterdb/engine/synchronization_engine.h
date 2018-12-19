@@ -11,6 +11,7 @@
 #include "connector.h"
 #include "dao/rdb/structure_updater.h"
 #include "http/sync_connection_request_handler.h"
+#include "http_server.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
 #include "outgoing_command_filter.h"
@@ -85,6 +86,7 @@ private:
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
+    HttpServer m_httpServer;
 
     template<typename ManagerType>
     void registerHttpHandler(
