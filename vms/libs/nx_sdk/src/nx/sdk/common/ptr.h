@@ -10,7 +10,7 @@ namespace common {
 /**
  * Smart pointer to objects that implement IRefCountable.
  *
- * Supports dynamicCast, and is assignment-compatible with smart pointers to derived classes.
+ * Supports dynamic-cast, and is assignment-compatible with smart pointers to derived classes.
  */
 template<typename RefCountable>
 class Ptr final
