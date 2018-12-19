@@ -7,6 +7,7 @@ Item
 {
     id: controller
 
+    property bool allowDrawing: true
     property int cameraRotation: 0
     property Item viewport: null
 
@@ -15,8 +16,19 @@ Item
     property string motionFilter
 
     readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingRoi
-    readonly property bool drawingRoi: d.toBool(
+    readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.nearPositions(d.customInitialPoint, d.customFirstPoint))
+
+    signal requestDrawing()
+
+    onAllowDrawingChanged:
+    {
+        if (!allowDrawing || !d.customInitialPoint)
+            return
+
+        d.selectionRoi.start()
+        handleLongPressed()
+    }
 
     function clearCustomRoi()
     {
@@ -64,6 +76,12 @@ Item
 
     function handleLongPressed()
     {
+        if (!controller.allowDrawing)
+        {
+            controller.requestDrawing()
+            return
+        }
+
         d.customFirstPoint = d.customInitialPoint
         d.customSecondPoint = d.customInitialPoint
         d.selectionRoi.show()
@@ -90,7 +108,8 @@ Item
         d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.singlePoint = true
-        d.selectionRoi.start()
+        if (allowDrawing)
+            d.selectionRoi.start()
     }
 
     function handleReleased()

@@ -291,6 +291,8 @@ PageBase
                 if (target.drawingRoi)
                     videoNavigation.motionSearchMode = true
             }
+
+            onRequestDrawing: videoNavigation.motionSearchMode = true
         }
     }
 

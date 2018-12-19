@@ -271,6 +271,7 @@ ZoomableFlickable
 
             anchors.fill: parent
             viewport: control
+            allowDrawing: !control.fisheyeMode
             cameraRotation: control.resourceHelper.customRotation
             motionProvider.mediaPlayer: content.mediaPlayer
 
