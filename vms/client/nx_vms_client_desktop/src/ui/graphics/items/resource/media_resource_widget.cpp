@@ -38,7 +38,7 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -216,13 +216,21 @@ bool tourIsRunning(QnWorkbenchContext* context)
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
     base_type(context, item, parent),
-    d(new MediaResourceWidgetPrivate(base_type::resource())),
+    d(new MediaResourceWidgetPrivate(base_type::resource(), accessController())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
+    d->isExportedLayout = item
+        && item->layout()
+        && item->layout()->resource()
+        && item->layout()->resource()->isFile();
+
+    d->isPreviewSearchLayout = item
+        && item->layout()
+        && item->layout()->isSearchLayout();
 
     initRenderer();
     initDisplay();
@@ -479,7 +487,7 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (!display()->camDisplay()->isRealTimeSource())
         return;
 
-    if (item()->layout()->isSearchLayout())
+    if (d->isPreviewSearchLayout)
         return;
 
     static const auto kUpdateTriggersInterval = 1000;
@@ -2212,25 +2220,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result |= Qn::MotionSearchButton;
     }
 
-    bool isExportedLayout = item()
-        && item()->layout()
-        && item()->layout()->resource()
-        && item()->layout()->resource()->isFile();
-
-    bool isPreviewSearchLayout = item()
-        && item()->layout()
-        && item()->layout()->isSearchLayout();
-
-    if (d->camera
-        && d->camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities)
-        && !d->camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability)
-        && accessController()->hasPermissions(d->resource, Qn::WritePtzPermission)
-        && !isExportedLayout
-        && !isPreviewSearchLayout
-        )
-    {
+    if (d->canControlPtz())
         result |= Qn::PtzButton;
-    }
 
     if (m_dewarpingParams.enabled)
     {
@@ -2495,8 +2486,7 @@ void QnMediaResourceWidget::at_screenshotButton_clicked()
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 {
-    bool ptzEnabled =
-        checked && (d->camera && (d->camera->getPtzCapabilities() & Ptz::ContinuousPtzCapabilities));
+    bool ptzEnabled = checked && d->canControlPtz();
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

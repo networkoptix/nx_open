@@ -13,6 +13,13 @@
  * but don't need the definitions of the actual resource classes.
  */
 
+namespace nx::vms::client::core {
+
+class Camera;
+using CameraPtr = QnSharedResourcePointer<Camera>;
+
+} // namespace nx::vms::client::core
+
 class QnClientStorageResource;
 typedef QnSharedResourcePointer<QnClientStorageResource> QnClientStorageResourcePtr;
 typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageResourceList;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/client_resource_fwd.h>
 
 #include <licensing/license_fwd.h>
 
@@ -12,6 +12,7 @@
 #include <utils/common/connective.h>
 
 class QnSingleCamLicenseStatusHelper;
+class QnWorkbenchAccessController;
 
 namespace nx::vms::client::desktop {
 
@@ -32,9 +33,11 @@ class MediaResourceWidgetPrivate: public Connective<QObject>
 public:
     const QnResourcePtr resource;
     const QnMediaResourcePtr mediaResource;
-    const QnVirtualCameraResourcePtr camera;
+    const QnClientCameraResourcePtr camera;
     const bool hasVideo;
     const bool isIoModule;
+    bool isExportedLayout = false;
+    bool isPreviewSearchLayout = false;
 
     QScopedPointer<nx::vms::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
@@ -42,7 +45,10 @@ public:
     QScopedPointer<WidgetAnalyticsController> analyticsController;
 
 public:
-    explicit MediaResourceWidgetPrivate(const QnResourcePtr& resource, QObject* parent = nullptr);
+    explicit MediaResourceWidgetPrivate(
+        const QnResourcePtr& resource,
+        QnWorkbenchAccessController* accessController,
+        QObject* parent = nullptr);
     virtual ~MediaResourceWidgetPrivate();
 
     QnResourceDisplayPtr display() const;
@@ -51,6 +57,7 @@ public:
     bool isPlayingLive() const;
     bool isOffline() const;
     bool isUnauthorized() const;
+    bool canControlPtz() const;
 
     QnLicenseUsageStatus licenseStatus() const;
 
@@ -74,6 +81,7 @@ private:
 private:
     QnResourceDisplayPtr m_display;
     QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
+    QPointer<QnWorkbenchAccessController> m_accessController;
 
     bool m_isPlayingLive = false;
     bool m_isOffline = false;

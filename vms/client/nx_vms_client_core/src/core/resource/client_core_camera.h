@@ -2,6 +2,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include "client_core_resource_fwd.h"
+
 namespace nx::vms::client::core {
 
 class Camera: public QnVirtualCameraResource
@@ -28,6 +30,10 @@ public:
 
     virtual Qn::ResourceFlags flags() const override;
     virtual void setParentId(const QnUuid& parent) override;
+
+    bool isPtzSupported() const;
+    bool isPtzRedirected() const;
+    CameraPtr ptzRedirectedTo() const;
 
 protected:
     virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;

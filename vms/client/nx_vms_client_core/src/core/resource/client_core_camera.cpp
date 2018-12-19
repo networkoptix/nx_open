@@ -15,7 +15,8 @@ Camera::Camera(const QnUuid& resourceTypeId):
     addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
 }
 
-QString Camera::getName() const {
+QString Camera::getName() const
+{
     return getUserDefinedName();
 }
 
@@ -49,9 +50,8 @@ Qn::ResourceFlags Camera::flags() const {
     return result;
 }
 
-void Camera::setIframeDistance(int frames, int timems) {
-    Q_UNUSED(frames)
-    Q_UNUSED(timems)
+void Camera::setIframeDistance(int /*frames*/, int /*timems*/)
+{
 }
 
 Qn::ResourceStatus Camera::getStatus() const
@@ -66,19 +66,48 @@ Qn::ResourceStatus Camera::getStatus() const
     return QnResource::getStatus();
 }
 
-void Camera::setParentId(const QnUuid& parent) {
+void Camera::setParentId(const QnUuid& parent)
+{
     QnUuid oldValue = getParentId();
-    if (oldValue != parent) {
+    if (oldValue != parent)
+    {
         base_type::setParentId(parent);
         if (!oldValue.isNull())
             emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
     }
 }
 
-void Camera::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
+bool Camera::isPtzSupported() const
+{
+    // Camera must have at least one ptz control capability but fisheye must be disabled.
+    return hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities | Ptz::ViewportPtzCapability)
+        && !hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability);
+}
+
+bool Camera::isPtzRedirected() const
+{
+    return !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+}
+
+CameraPtr Camera::ptzRedirectedTo() const
+{
+    const auto redirectId = getProperty(ResourcePropertyKey::kPtzTargetId);
+    if (redirectId.isEmpty() || !resourcePool())
+        return {};
+
+    return resourcePool()->getResourceByUniqueId<Camera>(redirectId);
+}
+
+void Camera::updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers)
 {
     if (other->getParentId() != m_parentId)
-        notifiers << [r = toSharedPointer(this)]{emit r->statusChanged(r, Qn::StatusChangeReason::Local);};
+    {
+        notifiers <<
+            [r = toSharedPointer(this)]
+            {
+                emit r->statusChanged(r, Qn::StatusChangeReason::Local);
+            };
+    }
     base_type::updateInternal(other, notifiers);
 }
 

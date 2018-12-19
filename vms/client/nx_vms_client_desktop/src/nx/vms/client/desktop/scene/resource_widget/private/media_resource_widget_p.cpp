@@ -1,16 +1,21 @@
 #include "media_resource_widget_p.h"
 
-#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <core/resource/client_camera.h>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <nx/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/license_usage_helper.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
 
 template<typename T>
 nx::media::AbstractMetadataConsumerPtr getMetadataConsumer(T* provider)
@@ -23,18 +28,23 @@ nx::media::AbstractMetadataConsumerPtr getMetadataConsumer(T* provider)
         : nx::media::AbstractMetadataConsumerPtr();
 }
 
-MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& resource,
+}  // namespace
+
+MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
+    const QnResourcePtr& resource,
+    QnWorkbenchAccessController* accessController,
     QObject* parent)
     :
     base_type(parent),
     resource(resource),
     mediaResource(resource.dynamicCast<QnMediaResource>()),
-    camera(resource.dynamicCast<QnVirtualCameraResource>()),
+    camera(resource.dynamicCast<QnClientCameraResource>()),
     hasVideo(mediaResource->hasVideo(nullptr)),
     isIoModule(camera && camera->hasFlags(Qn::io_module)),
     motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider()),
     analyticsMetadataProvider(
-        AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource))
+        AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
+    m_accessController(accessController)
 {
     QSignalBlocker blocker(this);
 
@@ -108,6 +118,41 @@ bool MediaResourceWidgetPrivate::isOffline() const
 bool MediaResourceWidgetPrivate::isUnauthorized() const
 {
     return m_isUnauthorized;
+}
+
+bool MediaResourceWidgetPrivate::canControlPtz() const
+{
+    // Ptz is not available for the local files.
+    if (!camera)
+        return false;
+
+    // Ptz is forbidden in exported files or on search layouts.
+    if (isExportedLayout || isPreviewSearchLayout)
+        return false;
+
+    // Check if we can control at least something on the current camera and fisheye is disabled.
+    if (!camera->isPtzSupported())
+        return false;
+
+    // Check permissions on the current camera.
+    if (!m_accessController->hasPermissions(camera, Qn::WritePtzPermission))
+        return false;
+
+    // Check ptz redirect.
+    if (!camera->isPtzRedirected())
+        return true;
+
+    const auto actualPtzTarget = camera->ptzRedirectedTo();
+
+    // Ptz is redirected nowhere.
+    if (!actualPtzTarget)
+        return false;
+
+    // Ptz is redirected to non-ptz camera.
+    if (!actualPtzTarget->isPtzSupported())
+        return false;
+
+    return m_accessController->hasPermissions(actualPtzTarget, Qn::WritePtzPermission);
 }
 
 QnLicenseUsageStatus MediaResourceWidgetPrivate::licenseStatus() const

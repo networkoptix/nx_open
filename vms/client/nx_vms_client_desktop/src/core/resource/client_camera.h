@@ -2,6 +2,8 @@
 
 #include <core/resource/client_core_camera.h>
 
+#include "client_resource_fwd.h"
+
 class QnArchiveStreamReader;
 
 class QnClientCameraResource: public nx::vms::client::core::Camera
