@@ -176,16 +176,13 @@ Item
     onDrawingRoiChanged:
     {
         if (drawingRoi)
-        {
-            controller.motionSearchMode = true
-        }
-        else
-        {
-            d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
-            d.customRoi = d.selectionRoi
-            d.selectionRoi = null
-        }
+            return
+
+        d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+        d.customRoi = d.selectionRoi
+        d.selectionRoi = null
     }
+
     onCameraRotationChanged: updateDefaultRoi()
 
     QtObject
