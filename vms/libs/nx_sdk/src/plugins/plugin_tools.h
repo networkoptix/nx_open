@@ -92,10 +92,7 @@ public:
     void reset(T* ptr = nullptr)
     {
         if (m_ptr)
-        {
-            // TODO: #dmishin get rid of this const mess when releaseRef becomes const
-            const_cast<std::remove_const_t<T>*>(m_ptr)->releaseRef();
-        }
+            m_ptr->releaseRef();
         m_ptr = ptr;
     }
 
