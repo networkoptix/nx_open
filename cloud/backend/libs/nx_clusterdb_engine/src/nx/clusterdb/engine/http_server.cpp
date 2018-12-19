@@ -25,7 +25,7 @@ void HttpServer::registerHandlers(
 }
 
 void HttpServer::processInfoRequest(
-    nx::network::http::RequestContext requestContext,
+    nx::network::http::RequestContext /*requestContext*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     api::PeerInfo peerInfo;
