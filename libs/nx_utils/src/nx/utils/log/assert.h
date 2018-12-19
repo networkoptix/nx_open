@@ -135,7 +135,7 @@ private:
  *     nx_utils.ini assertCrash = 0.
  * - Release: Writes log in case of assertion failure, if not enabled via
  *     nx_utils.ini assertCrash = 0.
- * - Usage: Recoveroble situations, application must keep going after such failure.
+ * - Usage: Recoverable situations, application must keep going after such failure.
  *     ```
  *         if (!NX_ASSERT(objectPointer))
  *             return false;
