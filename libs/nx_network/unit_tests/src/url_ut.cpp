@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/nx_utils_ini.h>
 
 namespace nx {
 namespace network {
