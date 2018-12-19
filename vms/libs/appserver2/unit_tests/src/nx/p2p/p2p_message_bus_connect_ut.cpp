@@ -216,7 +216,9 @@ protected:
 
         using namespace std::chrono;
         std::chrono::microseconds sleepInterval = 1s;
-        if (transactionsPerServerInSecond != boost::none)
+        const bool generateTransactions = transactionsPerServerInSecond != boost::none
+            && *transactionsPerServerInSecond > 0;
+        if (generateTransactions)
             sleepInterval = microseconds(int(1000000.0 / transactionsPerServerInSecond->toFloat()));
 
         auto cameras = m_servers[0]->moduleInstance()
@@ -225,7 +227,7 @@ protected:
 
         while (args.get<QString>(kStandaloneModeParamName))
         {
-            if (!cameras.isEmpty() && transactionsPerServerInSecond != boost::none)
+            if (!cameras.isEmpty() && generateTransactions)
             {
 
                 for (auto& server: m_servers)
