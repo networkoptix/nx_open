@@ -35,7 +35,7 @@ public:
         -> std::optional<MapHelper::MappedTypeOnLevel<Container, sizeof...(Scopes)>>
     {
         const auto allDescriptors = m_descriptorStorage->fetch();
-        return MapHelper::getOrNullopt(allDescriptors, scopes...);
+        return MapHelper::getOptional(allDescriptors, scopes...);
     }
 
     void removeDescriptors()

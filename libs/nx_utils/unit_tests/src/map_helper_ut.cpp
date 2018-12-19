@@ -79,18 +79,18 @@ TEST_F(MapHelperTest, getPointer)
     ASSERT_EQ(MapHelper::getPointer(m_flatMap, "flatMapKey2"), nullptr);
 }
 
-TEST_F(MapHelperTest, getOrNullopt)
+TEST_F(MapHelperTest, getOptional)
 {
-    ASSERT_EQ(*MapHelper::getOrNullopt(m_nestedMap, "setting", "some"), kInternalMap);
-    ASSERT_EQ(*MapHelper::getOrNullopt(m_nestedMap, "setting", "some", "value"), 5);
-    ASSERT_EQ(*MapHelper::getOrNullopt(m_nestedMap, "setting", "some", "otherValue"), 7);
+    ASSERT_EQ(*MapHelper::getOptional(m_nestedMap, "setting", "some"), kInternalMap);
+    ASSERT_EQ(*MapHelper::getOptional(m_nestedMap, "setting", "some", "value"), 5);
+    ASSERT_EQ(*MapHelper::getOptional(m_nestedMap, "setting", "some", "otherValue"), 7);
 
-    ASSERT_EQ(*MapHelper::getOrNullopt(m_flatMap, "flatMapKey0"), 1);
-    ASSERT_EQ(*MapHelper::getOrNullopt(m_flatMap, "flatMapKey1"), 2);
+    ASSERT_EQ(*MapHelper::getOptional(m_flatMap, "flatMapKey0"), 1);
+    ASSERT_EQ(*MapHelper::getOptional(m_flatMap, "flatMapKey1"), 2);
 
-    ASSERT_EQ(MapHelper::getOrNullopt(m_nestedMap, "getting", "some", "value"), std::nullopt);
-    ASSERT_EQ(MapHelper::getOrNullopt(m_nestedMap, "getting", "some"), std::nullopt);
-    ASSERT_EQ(MapHelper::getOrNullopt(m_flatMap, "flatMapKey2"), std::nullopt);
+    ASSERT_EQ(MapHelper::getOptional(m_nestedMap, "getting", "some", "value"), std::nullopt);
+    ASSERT_EQ(MapHelper::getOptional(m_nestedMap, "getting", "some"), std::nullopt);
+    ASSERT_EQ(MapHelper::getOptional(m_flatMap, "flatMapKey2"), std::nullopt);
 }
 
 TEST_F(MapHelperTest, contains)
