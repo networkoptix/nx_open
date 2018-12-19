@@ -19,6 +19,13 @@ const nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process() const
     return m_process;
 }
 
+nx::utils::Url Peer::baseApiUrl() const
+{
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setEndpoint(m_process.moduleInstance()->httpEndpoints().front());
+}
+
 nx::utils::Url Peer::syncronizationUrl() const
 {
     return nx::network::url::Builder()
@@ -44,7 +51,7 @@ void Peer::addRandomData()
     customer.id = QnUuid::createUuid().toSimpleByteArray().toStdString();
     customer.fullName = nx::utils::generateRandomName(7).toStdString();
     customer.address = nx::utils::generateRandomName(7).toStdString();
-    
+
     std::promise<ResultCode> done;
     process().moduleInstance()->customerManager().saveCustomer(
         customer,

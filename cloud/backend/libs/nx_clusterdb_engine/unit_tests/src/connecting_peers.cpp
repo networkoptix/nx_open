@@ -1,6 +1,6 @@
-#include "cluster_test_fixture.h"
-
 #include <nx/utils/random.h>
+
+#include "cluster_test_fixture.h"
 
 namespace nx::clusterdb::engine::test {
 

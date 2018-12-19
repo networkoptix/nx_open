@@ -55,7 +55,8 @@ SyncronizationEngine::SyncronizationEngine(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
-    m_systemDeletedSubscriptionId(nx::utils::kInvalidSubscriptionId)
+    m_systemDeletedSubscriptionId(nx::utils::kInvalidSubscriptionId),
+    m_httpServer(peerId)
 {
 }
 
@@ -149,6 +150,9 @@ void SyncronizationEngine::registerHttpApi(
     const std::string& pathPrefix,
     nx::network::http::server::rest::MessageDispatcher* dispatcher)
 {
+    m_httpServer.registerHandlers(pathPrefix, dispatcher);
+
+    // TODO: #ak Move folowing to m_httpServer.registerHandlers.
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2TransactionConnectionPath),
         &transport::CommonHttpAcceptor::createConnection,
