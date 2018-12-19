@@ -140,6 +140,7 @@
                 <param name = "MaxSensorWidth" default_value = "3840"/>
                 <param name = "MaxSensorHeight" default_value = "2160"/>
                 <param name = "MaxFPS" default_value = "30"/>
+                <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource> 
         <resource name = "ArecontVision_Duo">
@@ -207,6 +208,7 @@
                 <param name = "MaxSensorWidth" default_value = "1920"/>
                 <param name = "MaxSensorHeight" default_value = "1080"/>
                 <param name = "MaxFPS" default_value = "30"/>
+                <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource>   
         <resource name = "05CLD-100" public = "ArecontVision_Abstract,ArecontVision_H264">
@@ -214,6 +216,7 @@
                 <param name = "MaxSensorWidth" default_value = "2592"/>
                 <param name = "MaxSensorHeight" default_value = "1944"/>
                 <param name = "MaxFPS" default_value = "30"/>
+                <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource> 
         <resource name = "02CLB-100" public = "02CLD-100"/>
@@ -228,6 +231,7 @@
                 <param name = "MaxSensorHeight" default_value = "1080"/>
                 <param name = "MaxFPS" default_value = "30"/>
                 <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
+                <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource>
         <resource name = "20CPD-118" public = "8365">
@@ -236,6 +240,7 @@
                 <param name = "MaxSensorHeight" default_value = "1944"/>
                 <param name = "MaxFPS" default_value = "30"/>
                 <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
+                <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource>
         <resource name = "40185" public = "20185"> 
@@ -249,6 +254,7 @@
                 <param name = "MaxSensorWidth" default_value = "3968"/>
                 <param name = "MaxSensorHeight" default_value = "2992"/>
                 <param name = "MaxFPS" default_value = "20"/>
+                <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource>
         <resource name = "08ZMV-300" public = "08ZMD-400"/>
