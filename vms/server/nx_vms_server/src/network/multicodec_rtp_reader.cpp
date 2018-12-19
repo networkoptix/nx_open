@@ -729,11 +729,16 @@ void QnMulticodecRtpReader::pleaseStop()
     m_RtpSession.shutdown();
 }
 
-void QnMulticodecRtpReader::setDefaultTransport(const QString& value )
+void QnMulticodecRtpReader::setDefaultTransport(const QString& value)
 {
+    const auto transport = rtspTransportFromString(value);
+    if (!NX_ASSERT(transport != RtspTransport::autoDetect))
+        return;
+
+    NX_INFO(typeid(QnMulticodecRtpReader), "Set default transport: %1", transport);
+
     NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
-    s_defaultTransportToUse = rtspTransportFromString(value);
-    NX_INFO(typeid(QnMulticodecRtpReader), "Set default transport: %1", s_defaultTransportToUse);
+    s_defaultTransportToUse = transport;
 }
 
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
