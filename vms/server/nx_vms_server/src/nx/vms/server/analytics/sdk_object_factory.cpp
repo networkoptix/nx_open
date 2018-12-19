@@ -5,7 +5,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <nx/vms/server/sdk_support/pointers.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/vms/server/interactive_settings/json_engine.h>
@@ -142,11 +142,11 @@ bool SdkObjectFactory::initPluginResources()
     auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::IPlugin>(
         nx::sdk::analytics::IID_Plugin);
 
-    std::map<QnUuid, sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
+    std::map<QnUuid, nx::sdk::common::Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
     for (const auto analyticsPlugin: analyticsPlugins)
     {
         auto analyticsPluginPtr =
-            sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>(analyticsPlugin);
+            nx::sdk::common::Ptr<nx::sdk::analytics::IPlugin>(analyticsPlugin);
 
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
@@ -255,7 +255,7 @@ bool SdkObjectFactory::initEngineResources()
             pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
-    std::map<QnUuid, sdk_support::SharedPtr<nx::sdk::analytics::IEngine>> sdkEnginesById;
+    std::map<QnUuid, nx::sdk::common::Ptr<nx::sdk::analytics::IEngine>> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
         const auto& engineList = entry.second;
@@ -298,7 +298,7 @@ bool SdkObjectFactory::initEngineResources()
             }
 
             nx::sdk::Error error = nx::sdk::Error::noError;
-            sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine(
+            nx::sdk::common::Ptr<nx::sdk::analytics::IEngine> sdkEngine(
                 sdkPlugin->createEngine(&error));
 
             if (!sdkEngine)

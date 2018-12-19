@@ -39,7 +39,8 @@ namespace nx::vms::server::sdk_support {
 namespace detail {
 
 NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::DescriptorScope>);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths,
+    std::set<nx::vms::api::analytics::DescriptorScope>);
 NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace detail
@@ -50,7 +51,7 @@ std::optional<ManifestType> manifest(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    UniquePtr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    const nx::sdk::common::Ptr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](
@@ -123,9 +124,9 @@ bool deviceInfoFromResource(
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
 
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
+nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
+nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
+nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
 

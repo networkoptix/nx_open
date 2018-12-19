@@ -4,7 +4,6 @@
 #include <plugins/plugins_ini.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
@@ -18,13 +17,6 @@
 
 namespace nx::vms::server::resource {
 
-namespace {
-
-using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>;
-using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::IEngine>;
-
-} // namespace
-
 AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModule):
     base_type(),
     ServerModuleAware(serverModule)
@@ -32,12 +24,12 @@ AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModu
 }
 
 void AnalyticsEngineResource::setSdkEngine(
-    sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine)
+    nx::sdk::common::Ptr<nx::sdk::analytics::IEngine> sdkEngine)
 {
     m_sdkEngine = std::move(sdkEngine);
 }
 
-EnginePtr AnalyticsEngineResource::sdkEngine() const
+nx::sdk::common::Ptr<nx::sdk::analytics::IEngine> AnalyticsEngineResource::sdkEngine() const
 {
     return m_sdkEngine;
 }
@@ -83,7 +75,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
 
     NX_DEBUG(this, "Sending settings to engine %1 (%2)", getName(), getId());
 
-    sdk_support::UniquePtr<nx::sdk::IStringMap> effectiveSettings;
+    nx::sdk::common::Ptr<nx::sdk::IStringMap> effectiveSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",

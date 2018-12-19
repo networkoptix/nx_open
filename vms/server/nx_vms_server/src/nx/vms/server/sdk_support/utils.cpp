@@ -13,6 +13,7 @@
 #include <plugins/plugins_ini.h>
 
 #include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/common/string_map.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
@@ -22,18 +23,12 @@ namespace nx::vms::server::sdk_support {
 
 namespace {
 
-struct SettingInternal
+struct StringMapItem
 {
     std::string name;
     std::string value;
 };
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    SettingInternal,
-    (json),
-    (name)(value),
-    (optional, false)
-);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StringMapItem, (json), (name)(value), (optional, false));
 
 nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 
@@ -131,55 +126,51 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
     return std::make_unique<nx::plugins::SettingsHolder>(settingsMap);
 }
 
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& settings)
+nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map)
 {
-    auto sdkSettings = new nx::sdk::common::StringMap();
-    for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
-        sdkSettings->addItem(itr.key().toStdString(), itr.value().toString().toStdString());
+    auto stringMap = new nx::sdk::common::StringMap();
+    for (auto it = map.cbegin(); it != map.cend(); ++it)
+        stringMap->addItem(it.key().toStdString(), it.value().toString().toStdString());
 
-    return UniquePtr<nx::sdk::IStringMap>(sdkSettings);
+    return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
 }
 
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& settings)
+nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map)
 {
-    auto sdkSettings = new nx::sdk::common::StringMap();
-    for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
-        sdkSettings->addItem(itr.key().toStdString(), itr.value().toStdString());
+    auto stringMap = new nx::sdk::common::StringMap();
+    for (auto it = map.cbegin(); it != map.cend(); ++it)
+        stringMap->addItem(it.key().toStdString(), it.value().toStdString());
 
-    return UniquePtr<nx::sdk::IStringMap>(sdkSettings);
+    return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
 }
 
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QString& settingsJson)
+nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
 {
     bool isValid = false;
-    const auto deserialized = QJson::deserialized<std::vector<SettingInternal>>(
-        settingsJson.toUtf8(),
-        /*defaultValue*/ {},
-        &isValid);
+    const auto deserialized = QJson::deserialized<std::vector<StringMapItem>>(
+        mapJson.toUtf8(), /*defaultValue*/ {}, &isValid);
 
-    UniquePtr<nx::sdk::IStringMap> result;
     if (!isValid)
-        return result;
+        return nullptr;
 
-    auto settings = new nx::sdk::common::StringMap();
+    auto stringMap = new nx::sdk::common::StringMap();
     for (const auto& setting: deserialized)
-        settings->addItem(setting.name, setting.value);
+        stringMap->addItem(setting.name, setting.value);
 
-    result.reset(settings);
-    return result;
+    return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
 }
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map)
 {
-    QVariantMap result;
+    QVariantMap variantMap;
     if (!map)
-        return result;
+        return variantMap;
 
     const auto count = map->count();
     for (auto i = 0; i < count; ++i)
-        result.insert(map->key(i), map->value(i));
+        variantMap.insert(map->key(i), map->value(i));
 
-    return result;
+    return variantMap;
 }
 
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>

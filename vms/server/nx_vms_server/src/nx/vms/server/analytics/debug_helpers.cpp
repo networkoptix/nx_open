@@ -15,6 +15,8 @@
 
 #include <nx/vms/server/sdk_support/utils.h>
 
+#include <nx/sdk/common/ptr.h>
+
 namespace nx::vms::server::analytics::debug_helpers {
 
 namespace {
@@ -122,7 +124,7 @@ QString debugFilesDirectoryPath(const QString& path)
 
 } // namespace
 
-sdk_support::UniquePtr<nx::sdk::IStringMap> loadSettingsFromFile(
+nx::sdk::common::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename)
 {
@@ -132,7 +134,7 @@ sdk_support::UniquePtr<nx::sdk::IStringMap> loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, kLogTag) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return sdk_support::UniquePtr<nx::sdk::IStringMap>();
+            return nullptr;
         };
 
     if (filename.isEmpty())
@@ -158,7 +160,7 @@ sdk_support::UniquePtr<nx::sdk::IStringMap> loadSettingsFromFile(
     return settings;
 }
 
-sdk_support::UniquePtr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
+nx::sdk::common::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
@@ -175,7 +177,7 @@ sdk_support::UniquePtr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
         dir.absoluteFilePath(settingsFilename));
 }
 
-sdk_support::UniquePtr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
+nx::sdk::common::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
     const auto settingsFilename = filename(engine, kSettingsFilenamePostfix);

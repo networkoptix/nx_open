@@ -9,13 +9,13 @@
 #include <nx/utils/std/optional.h>
 #include <nx/streaming/abstract_data_consumer.h>
 
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/common/metadata_types.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/server_module_aware.h>
@@ -62,16 +62,16 @@ private:
     bool startAnalyticsUnsafe(const QVariantMap& settings);
     void stopAnalyticsUnsafe();
 
-    sdk_support::SharedPtr<DeviceAgent> createDeviceAgent();
+    nx::sdk::common::Ptr<DeviceAgent> createDeviceAgent();
     std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadDeviceAgentManifest(
-        const sdk_support::SharedPtr<DeviceAgent>& deviceAgent);
+        const nx::sdk::common::Ptr<DeviceAgent>& deviceAgent);
 
     bool updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
     bool updateDescriptorsWithManifest(
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    sdk_support::UniquePtr<nx::sdk::analytics::common::MetadataTypes> neededMetadataTypes() const;
+    nx::sdk::common::Ptr<nx::sdk::analytics::common::MetadataTypes> neededMetadataTypes() const;
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
         const QString& manifestTypes) const;
 
@@ -89,7 +89,7 @@ private:
     std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
 
     // TODO: #dmishin: Rename to m_deviceAgent.
-    sdk_support::SharedPtr<DeviceAgent> m_sdkDeviceAgent;
+    nx::sdk::common::Ptr<DeviceAgent> m_sdkDeviceAgent;
 
     QnAbstractDataReceptorPtr m_metadataSink;
 
