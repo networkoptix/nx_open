@@ -50,10 +50,6 @@ Qn::ResourceFlags Camera::flags() const {
     return result;
 }
 
-void Camera::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-}
-
 Qn::ResourceStatus Camera::getStatus() const
 {
     if (auto context = commonModule())

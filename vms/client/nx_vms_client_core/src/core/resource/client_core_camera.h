@@ -14,8 +14,6 @@ class Camera: public QnVirtualCameraResource
 public:
     explicit Camera(const QnUuid& resourceTypeId);
 
-    virtual void setIframeDistance(int frames, int timems) override;
-
     /**
      * @return User-defined camera name if it is present, default name otherwise.
      */

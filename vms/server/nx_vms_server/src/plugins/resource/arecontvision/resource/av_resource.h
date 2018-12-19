@@ -46,9 +46,6 @@ public:
 
     virtual QImage getImage(int channnel, QDateTime time, Qn::StreamQuality quality) const override;
 
-
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
     virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,

@@ -62,9 +62,6 @@ public:
 
     virtual int reservedSecondStreamFps() const;
 
-    /** sets the distance between I frames */
-    virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
-
     QList<QnMotionRegion> getMotionRegionList() const;
     void setMotionRegionList(const QList<QnMotionRegion>& maskList);
 

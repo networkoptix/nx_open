@@ -10,11 +10,6 @@ DataOnlyCameraResource::DataOnlyCameraResource( const QnUuid& resourceTypeId )
     setTypeId( resourceTypeId );
 }
 
-void DataOnlyCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-    //TODO
-}
-
 QnAbstractStreamDataProvider* DataOnlyCameraResource::createLiveDataProvider()
 {
     return nullptr;

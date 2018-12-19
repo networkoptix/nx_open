@@ -25,8 +25,6 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-
     virtual bool setOutputPortState(const QString& outputID, bool activate,
         unsigned int autoResetTimeoutMS = 0) override;
 

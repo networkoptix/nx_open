@@ -47,8 +47,6 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
     float getResolutionAspectRatio(const AxisResolution& resolution) const;
 
     QRect getMotionWindow(int num) const;
