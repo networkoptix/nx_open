@@ -185,11 +185,15 @@ Item
                 x = w - width + allowedRightMargin
             if (-x > allowedLeftMargin)
                 x = -allowedLeftMargin
+            if (w <= width)
+                x = 0
 
             if (-y + h < rootItem.height - allowedBottomMargin)
                 y = h - rootItem.height + allowedBottomMargin
             if (-y > allowedTopMargin)
                 y = -allowedTopMargin
+            if (h <= height)
+                y = 0
 
             if (animate)
             {

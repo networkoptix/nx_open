@@ -10,9 +10,7 @@ ZoomableFlickable
 {
     id: control
 
-    readonly property bool fisheyeMode:
-        !motionController.motionSearchMode
-        && resourceHelper.fisheyeParams.enabled
+    readonly property bool fisheyeMode: fisheyeModeController.fisheyeMode
 
     property alias mediaPlayer: content.mediaPlayer
     property alias resourceHelper: content.resourceHelper
@@ -89,6 +87,63 @@ ZoomableFlickable
 
     Object
     {
+        id: fisheyeModeController
+
+        property bool fisheyeModeInternal:
+            !motionController.motionSearchMode
+            && resourceHelper.fisheyeParams.enabled
+
+        property bool fisheyeMode: false
+        Component.onCompleted: fisheyeMode = fisheyeModeInternal
+
+        Connections
+        {
+            target: control
+            onMovingChanged:
+            {
+                if (!moving && fisheyeModeController.fisheyeModeInternal)
+                    fisheyeModeController.fisheyeMode = true
+            }
+        }
+
+        Connections
+        {
+            target: interactor
+            onAnimatingChanged:
+            {
+                if (!interactor.animating && !fisheyeModeController.fisheyeModeInternal)
+                    fisheyeModeController.fisheyeMode = false
+            }
+        }
+
+        onFisheyeModeInternalChanged:
+        {
+            if (fisheyeModeInternal)
+            {
+                // Try to rollback scalable video picture
+                if (control.contentWidth > control.width || control.contentHeight > control.height)
+                    control.fitToBounds(true)
+                else
+                    fisheyeMode = true
+            }
+            else
+            {
+                // Rollback fisheye video picture
+                if (interactor.scalePower != 0 || interactor.unconstrainedRotation != Qt.vector2d(0, 0))
+                {
+                    interactor.scalePower = 0
+                    interactor.unconstrainedRotation = Qt.vector2d(0, 0)
+                }
+                else
+                {
+                    fisheyeMode = false
+                }
+            }
+        }
+    }
+
+    Object
+    {
         id: d
 
         function allowedMargin(targetWidth, targetHeight, size, padding, factor)
@@ -161,9 +216,9 @@ ZoomableFlickable
 
     onHeightChanged: fitToBounds()
 
-    function fitToBounds()
+    function fitToBounds(animated)
     {
-        resizeContent(width, height, false, true)
+        resizeContent(width, height, animated, true)
     }
 
     function clear()

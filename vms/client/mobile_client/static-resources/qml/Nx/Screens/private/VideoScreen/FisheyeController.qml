@@ -56,7 +56,7 @@ Object
         Connections
         {
             target: pinchArea
-            enabled: pinchArea && controller.enabled
+            enabled: target && controller.enabled
             onPinchStarted:
             {
                 interactor.startZoom(pinch.startCenter.x, pinch.startCenter.y)
@@ -77,7 +77,6 @@ Object
         }
     }
 
-
     Object
     {
         id: mouseAreaHandler
@@ -94,7 +93,7 @@ Object
         Connections
         {
             target: controller.mouseArea
-            enabled: controller.mouseArea
+            enabled: target && controller.enabled
 
             onPressed:
             {

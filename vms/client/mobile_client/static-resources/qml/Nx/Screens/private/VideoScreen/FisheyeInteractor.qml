@@ -21,6 +21,11 @@ Object
     readonly property vector2d currentRotation: constrainRotation(
         Qt.vector2d(unconstrainedRotation.x, unconstrainedRotation.y), currentScale)
 
+    readonly property bool animating:
+        scaleAnimation.running
+        || xRotationAnimation.running
+        || yRotationAnimation.running
+
     readonly property matrix4x4 animatedRotationMatrix: rotationMatrix(animatedRotation)
     readonly property matrix4x4 currentRotationMatrix: rotationMatrix(currentRotation)
     readonly property var viewMode: fisheyeShader && fisheyeShader.helper
@@ -90,7 +95,11 @@ Object
     Behavior on animatedScalePower
     {
         id: scalePowerAnimationBehavior
-        NumberAnimation { duration: interactor.kAnimationDurationMs }
+        NumberAnimation
+        {
+            id: scaleAnimation
+            duration: interactor.kAnimationDurationMs
+        }
     }
 
     property real animatedRotationX: unconstrainedRotation.x
@@ -100,6 +109,7 @@ Object
 
         RotationAnimation
         {
+            id: xRotationAnimation
             direction: RotationAnimation.Shortest
             duration: interactor.kAnimationDurationMs
         }
@@ -112,6 +122,7 @@ Object
 
         RotationAnimation
         {
+            id: yRotationAnimation
             direction: RotationAnimation.Shortest
             duration: interactor.kAnimationDurationMs
         }
