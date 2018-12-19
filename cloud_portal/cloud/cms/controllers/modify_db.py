@@ -272,6 +272,17 @@ def publish_latest_version(product, review_id, user):
     return publish_errors
 
 
+def integration_has_required_data(product):
+    errors = []
+    for datastructure in DataStructure.objects.filter(context__product_type__product=product):
+        if not datastructure.optional and not datastructure.datarecord_set.exists():
+            ds_name = datastructure.label if datastructure.label else datastructure.name
+            errors.append((ds_name,
+                           "This field cannot be blank. Go to the {} page and fill in {}.".
+                           format(datastructure.context.name, ds_name)))
+    return errors
+
+
 def send_version_for_review(product, user):
     old_versions = ContentVersion.objects.filter(product=product, accepted_date=None)
 
@@ -279,6 +290,12 @@ def send_version_for_review(product, user):
         old_version = old_versions.latest('created_date')
         strip_version_from_records(old_version, product)
         old_version.delete()
+
+    # We only check for integrations because its the only product type that non staff have access to.
+    if product.product_type.type == ProductType.PRODUCT_TYPES.integration:
+        errors = integration_has_required_data(product)
+        if len(errors) > 0:
+            return errors
 
     version = ContentVersion(product=product, created_by=user)
     version.save()
@@ -288,6 +305,7 @@ def send_version_for_review(product, user):
     update_records_to_version(product, Context.objects.filter(product_type=product.product_type), version)
 
     notify_version_ready(product, version.id, user)
+    return []
 
 
 def get_records_for_version(version):
