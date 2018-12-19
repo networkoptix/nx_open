@@ -1,4 +1,5 @@
 #pragma once
+
 #include "node_view_base_sort_model.h"
 
 namespace nx::vms::client::desktop {
@@ -11,7 +12,7 @@ class NodeViewNumericSortModel: public NodeViewBaseSortModel
 
 public:
     NodeViewNumericSortModel(QObject* parent = nullptr);
-    virtual ~NodeViewNumericSortModel() override = default;
+    virtual ~NodeViewNumericSortModel() override;
 
 public:
     enum NumericMode
@@ -29,8 +30,7 @@ protected:
         const QModelIndex& sourceRight) const override;
 
 private:
-    struct Private;
-    QScopedPointer<Private> d;
+    NumericMode m_numericMode = Lexicographic;
 };
 
 } // namespace node_view

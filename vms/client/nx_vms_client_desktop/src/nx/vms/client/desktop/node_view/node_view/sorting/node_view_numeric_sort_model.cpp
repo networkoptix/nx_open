@@ -4,14 +4,12 @@
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-struct NodeViewNumericSortModel::Private
-{
-    NodeViewNumericSortModel::NumericMode numericMode = Lexicographic;
-};
-
 NodeViewNumericSortModel::NodeViewNumericSortModel(QObject* parent):
-    base_type(parent),
-    d(new Private())
+    base_type(parent)
+{
+}
+
+NodeViewNumericSortModel::~NodeViewNumericSortModel()
 {
 }
 
@@ -25,7 +23,7 @@ bool NodeViewNumericSortModel::lessThan(
     {
         QCollator collator;
         collator.setCaseSensitivity(sortCaseSensitivity());
-        switch (d->numericMode)
+        switch (m_numericMode)
         {
             case Lexicographic:
                 collator.setNumericMode(false);
@@ -44,16 +42,16 @@ bool NodeViewNumericSortModel::lessThan(
 
 void NodeViewNumericSortModel::setNumericMode(NumericMode mode)
 {
-    if (d->numericMode == mode)
+    if (m_numericMode == mode)
         return;
 
-    d->numericMode = mode;
+    m_numericMode = mode;
     sort(sortColumn(), sortOrder());
 }
 
 NodeViewNumericSortModel::NumericMode NodeViewNumericSortModel::getNumericMode() const
 {
-    return d->numericMode;
+    return m_numericMode;
 }
 
 } // namespace node_view
