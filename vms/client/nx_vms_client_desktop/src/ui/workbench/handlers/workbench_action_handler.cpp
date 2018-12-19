@@ -400,7 +400,10 @@ ActionHandler::~ActionHandler()
     deleteDialogs();
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QnResourcePtr& resource,
+    const AddToLayoutParams& params)
 {
     if (!layout)
         return;
@@ -411,7 +414,14 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
     }
 
     if (layout->getItems().size() >= qnRuntime->maxSceneItems())
+    {
+        if (workbench()->currentLayout()->resource() == layout)
+        {
+            if (!m_layoutIsFullMessage)
+                m_layoutIsFullMessage = QnGraphicsMessageBox::information(tr("Layout is full."));
+        }
         return;
+    }
 
     if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
@@ -459,17 +469,29 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
     layout->addItem(data);
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const {
-    foreach(const QnResourcePtr &resource, resources)
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QnResourceList& resources,
+    const AddToLayoutParams& params)
+{
+    for (const QnResourcePtr& resource: resources)
         addToLayout(layout, resource, params);
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QnMediaResourcePtr>& resources, const AddToLayoutParams &params) const {
-    foreach(const QnMediaResourcePtr &resource, resources)
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QList<QnMediaResourcePtr>& resources,
+    const AddToLayoutParams& params)
+{
+    for (const QnMediaResourcePtr& resource: resources)
         addToLayout(layout, resource->toResourcePtr(), params);
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const {
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QList<QString>& files,
+    const AddToLayoutParams& params)
+{
     addToLayout(layout, addToResourcePool(files), params);
 }
 
