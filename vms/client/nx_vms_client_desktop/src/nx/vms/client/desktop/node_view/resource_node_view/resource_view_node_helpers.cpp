@@ -46,7 +46,7 @@ ViewNodeData getGroupNodeData(
     const QString& extraText,
     bool checkable)
 {
-    static const int kGroupedDeviceSiblingGroup = 1; //< Multisensor cameras and recorders on top of the list
+    static const int kGroupedDeviceSortOrder = -1; //< Multisensor cameras and recorders on top of the list
     const QIcon icon = cameraResource->isMultiSensorCamera()
         ? qnResIconCache->icon(QnResourceIconCache::MultisensorCamera)
         : qnResIconCache->icon(QnResourceIconCache::Recorder);
@@ -54,7 +54,7 @@ ViewNodeData getGroupNodeData(
     auto data = ViewNodeDataBuilder()
         .withText(resourceNameColumn, cameraResource->getUserDefinedGroupName())
         .withIcon(resourceNameColumn, icon)
-        .withSiblingGroup(kGroupedDeviceSiblingGroup)
+        .withGroupSortOrder(kGroupedDeviceSortOrder)
         .data();
 
     if (checkable)

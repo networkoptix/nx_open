@@ -76,9 +76,9 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withIcon(int column, const QIcon& valu
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withSiblingGroup(int value)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withGroupSortOrder(int value)
 {
-    m_data->setProperty(siblingGroupProperty, value);
+    m_data->setProperty(groupSortOrderProperty, value);
     return *this;
 }
 

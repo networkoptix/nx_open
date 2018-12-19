@@ -16,11 +16,11 @@ bool NodeViewGroupSortingModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const int leftGroup = siblingGroup(sourceLeft);
-    const int rightGroup = siblingGroup(sourceRight);
-    return leftGroup == rightGroup
+    const int leftGroupOrder = groupSortOrder(sourceLeft);
+    const int rightGroupOrder = groupSortOrder(sourceRight);
+    return leftGroupOrder == rightGroupOrder
         ? nextLessThan(sourceLeft, sourceRight)
-        : leftGroup > rightGroup;
+        : leftGroupOrder < rightGroupOrder;
 }
 
 } // namespace node_view

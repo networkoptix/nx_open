@@ -8,7 +8,7 @@ enum ViewDataProperty
 {
     isSeparatorProperty,
     isExpandedProperty,
-    siblingGroupProperty,
+    groupSortOrderProperty,
 
     lastNodeViewProperty = 128 //< All other properties should start at least from this value.
 };

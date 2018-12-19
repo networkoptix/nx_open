@@ -114,10 +114,10 @@ bool isSeparator(const QModelIndex& index)
     return isSeparator(nodeFromIndex(index));
 }
 
-int siblingGroup(const QModelIndex& index)
+int groupSortOrder(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
-    return node ? node->property(siblingGroupProperty).toInt() : 0;
+    return node ? node->property(groupSortOrderProperty).toInt() : 0;
 }
 
 QString text(const NodePtr& node, int column)
@@ -150,21 +150,21 @@ Qt::CheckState checkedState(const QModelIndex& index)
     return index.data(Qt::CheckStateRole).value<Qt::CheckState>();
 }
 
-NodePtr createSeparatorNode(int siblingGroup)
+NodePtr createSeparatorNode(int groupSortOrder)
 {
-    return ViewNode::create(ViewNodeDataBuilder().separator().withSiblingGroup(siblingGroup));
+    return ViewNode::create(ViewNodeDataBuilder().separator().withGroupSortOrder(groupSortOrder));
 }
 
 NodePtr createSimpleNode(
     const QString& caption,
     const NodeList& children,
     int checkableColumn,
-    int siblingGroup)
+    int groupSortOrder)
 {
     static const auto kTextDefaultColumn = 0;
     auto data = ViewNodeDataBuilder()
         .withText(kTextDefaultColumn, caption)
-        .withSiblingGroup(siblingGroup)
+        .withGroupSortOrder(groupSortOrder)
         .data();
     if (checkableColumn != -1)
         ViewNodeDataBuilder(data).withCheckedState(checkableColumn, Qt::Unchecked);
@@ -175,9 +175,9 @@ NodePtr createSimpleNode(
 NodePtr createSimpleNode(
     const QString& caption,
     int checkableColumn,
-    int siblingGroup)
+    int groupSortOrder)
 {
-    return createSimpleNode(caption, NodeList(), checkableColumn, siblingGroup);
+    return createSimpleNode(caption, NodeList(), checkableColumn, groupSortOrder);
 }
 
 } // namespace details

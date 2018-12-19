@@ -20,13 +20,13 @@ NodePtr createCheckAllNode(
     int mainColumn,
     const QString& text,
     const QIcon& icon,
-    int siblingGroup)
+    int groupSortOrder)
 {
     auto data = ViewNodeDataBuilder()
         .withText(mainColumn, text)
         .withIcon(mainColumn, icon)
         .withCheckedState(selectionColumns, Qt::Unchecked)
-        .withSiblingGroup(siblingGroup)
+        .withGroupSortOrder(groupSortOrder)
         .data();
     data.setProperty(checkAllNodeProperty, true);
     return ViewNode::create(data);
