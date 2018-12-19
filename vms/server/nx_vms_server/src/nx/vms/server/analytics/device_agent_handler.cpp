@@ -33,8 +33,9 @@ DeviceAgentHandler::DeviceAgentHandler(
     m_metadataHandler.setResource(m_device);
     m_metadataHandler.setPluginId(m_engineResource->plugin()->manifest().id);
 
-    nx::analytics::DescriptorManager helper(serverModule->commonModule());
-    m_metadataHandler.setEventTypeDescriptors(helper.supportedEventTypes(m_device));
+    nx::analytics::DescriptorManager descriptorManager(serverModule->commonModule());
+    m_metadataHandler.setEventTypeDescriptors(
+        descriptorManager.supportedEventTypeDescriptors(m_device));
 }
 
 void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket)

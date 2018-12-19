@@ -238,14 +238,14 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    const nx::analytics::DescriptorManager helper(commonModule());
+    const nx::analytics::DescriptorManager descriptorManager(commonModule());
     // We don't filter by cameras since we don't know if an event was supported by some device
     // before.
-    const auto allEventTypes = helper.eventTypes();
+    const auto allEventTypes = descriptorManager.eventTypeDescriptors();
     if (allEventTypes.empty())
         return;
 
-    const auto engineDescriptors = helper.parentEventTypeEngines(allEventTypes);
+    const auto engineDescriptors = descriptorManager.eventTypesParentEngineDescriptors(allEventTypes);
     auto buildEventTypeName =
         [this, &engineDescriptors](const QnUuid& engineId, const QString& eventTypeName)
         {

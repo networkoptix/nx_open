@@ -310,11 +310,8 @@ bool DeviceAnalyticsBinding::isStreamConsumer() const
 std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_engine)
-    {
-        NX_ASSERT(this, lm("Can't access engine"));
+    if (!NX_ASSERT(m_engine))
         return std::nullopt;
-    }
 
     return m_engine->manifest();
 }
@@ -435,8 +432,11 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    nx::analytics::DescriptorManager helper(serverModule()->commonModule());
-    helper.updateFromManifest(m_device->getId(), m_engine->getId(), manifest);
+    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    descriptorManager.updateFromDeviceAgentManifest(
+        m_device->getId(),
+        m_engine->getId(),
+        manifest);
 
     // TODO: #dmishin make analytics helper handle supported event/object types.
     m_device->setSupportedAnalyticsEventTypeIds(m_engine->getId(), supportedEventTypes(manifest));

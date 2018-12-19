@@ -239,9 +239,9 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     {
         using namespace nx::vms::event;
 
-        nx::analytics::DescriptorManager helper(q->commonModule());
-        const auto eventTypeDescriptors = helper.eventTypes();
-        const auto engineDescriptors = helper.engines();
+        nx::analytics::DescriptorManager descriptorManager(q->commonModule());
+        const auto eventTypeDescriptors = descriptorManager.eventTypeDescriptors();
+        const auto engineDescriptors = descriptorManager.engineDescriptors();
         analyticsMenu->clear();
 
         if (!eventTypeDescriptors.empty())

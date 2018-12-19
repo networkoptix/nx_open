@@ -70,8 +70,8 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
-    nx::analytics::DescriptorManager helper(commonModule());
-    helper.updateFromManifest(*manifest);
+    nx::analytics::DescriptorManager descriptorManager(commonModule());
+    descriptorManager.updateFromPluginManifest(*manifest);
 
     setManifest(*manifest);
     saveProperties();

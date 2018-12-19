@@ -129,13 +129,13 @@ void DescriptorManager::clearRuntimeInfo()
     m_actionTypeDescriptorContainer->removeDescriptors();
 }
 
-void DescriptorManager::updateFromManifest(const nx::vms::api::analytics::PluginManifest& manifest)
+void DescriptorManager::updateFromPluginManifest(const nx::vms::api::analytics::PluginManifest& manifest)
 {
     PluginDescriptor descriptor{manifest.id, manifest.name};
     m_pluginDescriptorContainer->addDescriptors(std::move(descriptor), manifest.id);
 }
 
-void DescriptorManager::updateFromManifest(
+void DescriptorManager::updateFromEngineManifest(
     const QString& pluginId,
     const QnUuid& engineId,
     const QString& engineName,
@@ -155,7 +155,7 @@ void DescriptorManager::updateFromManifest(
         toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
-void DescriptorManager::updateFromManifest(
+void DescriptorManager::updateFromDeviceAgentManifest(
     const QnUuid& /*deviceId*/,
     const QnUuid& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
@@ -196,32 +196,32 @@ auto descriptors(
     return descriptorMap;
 }
 
-std::optional<nx::vms::api::analytics::PluginDescriptor> DescriptorManager::plugin(const QString& id) const
+std::optional<nx::vms::api::analytics::PluginDescriptor> DescriptorManager::pluginDescriptor(const QString& id) const
 {
     return descriptor(m_pluginDescriptorContainer, id);
 }
 
-PluginDescriptorMap DescriptorManager::plugins(const std::set<QString>& pluginIds) const
+PluginDescriptorMap DescriptorManager::pluginDescriptors(const std::set<QString>& pluginIds) const
 {
     return descriptors(m_pluginDescriptorContainer, pluginIds, "Plugin");
 }
 
-std::optional<nx::vms::api::analytics::EngineDescriptor> DescriptorManager::engine(const QnUuid& id) const
+std::optional<nx::vms::api::analytics::EngineDescriptor> DescriptorManager::engineDescriptor(const QnUuid& id) const
 {
     return descriptor(m_engineDescriptorContainer, id);
 }
 
-EngineDescriptorMap DescriptorManager::engines(const std::set<QnUuid>& engineIds) const
+EngineDescriptorMap DescriptorManager::engineDescriptors(const std::set<QnUuid>& engineIds) const
 {
     return descriptors(m_engineDescriptorContainer, engineIds, "Plugin");
 }
 
-std::optional<nx::vms::api::analytics::GroupDescriptor> DescriptorManager::group(const QString& id) const
+std::optional<nx::vms::api::analytics::GroupDescriptor> DescriptorManager::groupDescriptor(const QString& id) const
 {
     return descriptor(m_groupDescriptorContainer, id);
 }
 
-GroupDescriptorMap DescriptorManager::groups(const std::set<QString>& groupIds) const
+GroupDescriptorMap DescriptorManager::groupDescriptors(const std::set<QString>& groupIds) const
 {
     return descriptors(m_groupDescriptorContainer, groupIds, "Group");
 }
@@ -293,7 +293,7 @@ auto supportedTypesIntersection(
 }
 
 template<typename DescriptorMap>
-EngineDescriptorMap DescriptorManager::parentEngines(const DescriptorMap& descriptorMap) const
+EngineDescriptorMap DescriptorManager::parentEngineDescriptors(const DescriptorMap& descriptorMap) const
 {
     std::set<QnUuid> engineIds;
     for (const auto&[typeDescriptorId, typeDescriptor] : descriptorMap)
@@ -302,11 +302,11 @@ EngineDescriptorMap DescriptorManager::parentEngines(const DescriptorMap& descri
             engineIds.insert(scope.engineId);
     }
 
-    return engines(engineIds);
+    return engineDescriptors(engineIds);
 }
 
 template<typename DescriptorMap>
-GroupDescriptorMap DescriptorManager::parentGroups(const DescriptorMap& descriptorMap) const
+GroupDescriptorMap DescriptorManager::parentGroupDescriptors(const DescriptorMap& descriptorMap) const
 {
     std::set<QString> groupIds;
     for (const auto&[typeDescriptorId, typeDescriptor] : descriptorMap)
@@ -315,20 +315,20 @@ GroupDescriptorMap DescriptorManager::parentGroups(const DescriptorMap& descript
             groupIds.insert(scope.groupId);
     }
 
-    return groups(groupIds);
+    return groupDescriptors(groupIds);
 }
 
-std::optional<EventTypeDescriptor> DescriptorManager::eventType(const QString& id) const
+std::optional<EventTypeDescriptor> DescriptorManager::eventTypeDescriptor(const QString& id) const
 {
     return descriptor(m_eventTypeDescriptorContainer, id);
 }
 
-EventTypeDescriptorMap DescriptorManager::eventTypes(const std::set<QString>& eventTypeIds) const
+EventTypeDescriptorMap DescriptorManager::eventTypeDescriptors(const std::set<QString>& eventTypeIds) const
 {
     return descriptors(m_eventTypeDescriptorContainer, eventTypeIds, "EventType");
 }
 
-EventTypeDescriptorMap DescriptorManager::supportedEventTypes(
+EventTypeDescriptorMap DescriptorManager::supportedEventTypeDescriptors(
     const QnVirtualCameraResourcePtr& device) const
 {
     return supportedByDeviceDescriptors(
@@ -338,7 +338,7 @@ EventTypeDescriptorMap DescriptorManager::supportedEventTypes(
         "EventType");
 }
 
-EventTypeDescriptorMap DescriptorManager::supportedEventTypesUnion(
+EventTypeDescriptorMap DescriptorManager::supportedEventTypeDescriptorsUnion(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesUnion(
@@ -348,7 +348,7 @@ EventTypeDescriptorMap DescriptorManager::supportedEventTypesUnion(
         "EventType");
 }
 
-EventTypeDescriptorMap DescriptorManager::supportedEventTypesIntersection(
+EventTypeDescriptorMap DescriptorManager::supportedEventTypeDescriptorsIntersection(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesIntersection(
@@ -358,30 +358,30 @@ EventTypeDescriptorMap DescriptorManager::supportedEventTypesIntersection(
         "EventType");
 }
 
-EngineDescriptorMap DescriptorManager::parentEventTypeEngines(
+EngineDescriptorMap DescriptorManager::eventTypesParentEngineDescriptors(
     const EventTypeDescriptorMap& eventTypeDescriptors) const
 {
-    return parentEngines(eventTypeDescriptors);
+    return parentEngineDescriptors(eventTypeDescriptors);
 }
 
-GroupDescriptorMap DescriptorManager::parentEventTypeGroups(
+GroupDescriptorMap DescriptorManager::eventTypesParentGroupDescriptors(
     const EventTypeDescriptorMap& eventTypeDescriptors) const
 {
-    return parentGroups(eventTypeDescriptors);
+    return parentGroupDescriptors(eventTypeDescriptors);
 }
 
-std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> DescriptorManager::objectType(
+std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> DescriptorManager::objectTypeDescriptor(
     const QString& id) const
 {
     return descriptor(m_objectTypeDescriptorContainer, id);
 }
 
-ObjectTypeDescriptorMap DescriptorManager::objectTypes(const std::set<QString>& objectTypeIds) const
+ObjectTypeDescriptorMap DescriptorManager::objectTypeDescriptors(const std::set<QString>& objectTypeIds) const
 {
     return descriptors(m_objectTypeDescriptorContainer, objectTypeIds, "EventType");
 }
 
-ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypes(
+ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypeDescriptors(
     const QnVirtualCameraResourcePtr& device) const
 {
     return supportedByDeviceDescriptors(
@@ -391,7 +391,7 @@ ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypes(
         "ObjectType");
 }
 
-ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypesUnion(
+ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypeDescriptorsUnion(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesUnion(
@@ -401,7 +401,7 @@ ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypesUnion(
         "ObjectType");
 }
 
-ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypesIntersection(
+ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypeDescriptorsIntersection(
     const QnVirtualCameraResourceList& deviceList) const
 {
     return supportedTypesIntersection(
@@ -411,25 +411,25 @@ ObjectTypeDescriptorMap DescriptorManager::supportedObjectTypesIntersection(
         "ObjectType");
 }
 
-EngineDescriptorMap DescriptorManager::parentObjectTypeEngines(
+EngineDescriptorMap DescriptorManager::objectTypeParentEngineDescriptors(
     const ObjectTypeDescriptorMap& objectTypeDescriptors) const
 {
-    return parentEngines(objectTypeDescriptors);
+    return parentEngineDescriptors(objectTypeDescriptors);
 }
 
-GroupDescriptorMap DescriptorManager::parentObjectTypeGroups(
+GroupDescriptorMap DescriptorManager::objectTypeParentGroupDescriptors(
     const ObjectTypeDescriptorMap& objectTypeDescriptors) const
 {
-    return parentGroups(objectTypeDescriptors);
+    return parentGroupDescriptors(objectTypeDescriptors);
 }
 
-ActionTypeDescriptorMap DescriptorManager::actionTypes() const
+ActionTypeDescriptorMap DescriptorManager::objectActionTypeDescriptors() const
 {
     auto descriptors = m_actionTypeDescriptorContainer->mergedDescriptors();
     return descriptors ? *descriptors : ActionTypeDescriptorMap();
 }
 
-ActionTypeDescriptorMap DescriptorManager::availableObjectActions(
+ActionTypeDescriptorMap DescriptorManager::availableObjectActionTypeDescriptors(
     const QString& objectTypeId,
     const QnVirtualCameraResourcePtr& device)
 {

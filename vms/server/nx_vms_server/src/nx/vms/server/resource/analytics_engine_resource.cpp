@@ -155,8 +155,8 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    nx::analytics::DescriptorManager helper(commonModule());
-    helper.updateFromManifest(pluginManifest.id, getId(), getName(), *manifest);
+    nx::analytics::DescriptorManager descriptorManager(commonModule());
+    descriptorManager.updateFromEngineManifest(pluginManifest.id, getId(), getName(), *manifest);
 
     setManifest(*manifest);
     saveProperties();

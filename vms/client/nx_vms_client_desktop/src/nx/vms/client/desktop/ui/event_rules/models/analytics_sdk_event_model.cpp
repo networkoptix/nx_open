@@ -47,13 +47,13 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     using namespace nx::vms::event;
     clear();
 
-    nx::analytics::DescriptorManager helper(commonModule());
+    nx::analytics::DescriptorManager descriptorManager(commonModule());
 
     // TODO: #dmishin show all 'potentially' supported event types. Return to this code when
     // `isCompatible` method is added to the SDK IEngine interface.
-    const auto eventTypeDescriptors = helper.supportedEventTypesIntersection(cameras);
-    const auto engineDescriptors = helper.parentEventTypeEngines(eventTypeDescriptors);
-    const auto groupDescriptors = helper.parentEventTypeGroups(eventTypeDescriptors);
+    const auto eventTypeDescriptors = descriptorManager.supportedEventTypeDescriptorsIntersection(cameras);
+    const auto engineDescriptors = descriptorManager.eventTypesParentEngineDescriptors(eventTypeDescriptors);
+    const auto groupDescriptors = descriptorManager.eventTypesParentGroupDescriptors(eventTypeDescriptors);
 
     const bool useEngineName = engineDescriptors.size() > 1;
     struct EngineNode

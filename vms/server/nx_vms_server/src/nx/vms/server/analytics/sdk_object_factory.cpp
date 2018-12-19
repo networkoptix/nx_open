@@ -115,8 +115,8 @@ bool SdkObjectFactory::init()
 
 bool SdkObjectFactory::clearActionDescriptorList()
 {
-    nx::analytics::DescriptorManager helper(serverModule()->commonModule());
-    helper.clearRuntimeInfo();
+    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    descriptorManager.clearRuntimeInfo();
     return true;
 }
 

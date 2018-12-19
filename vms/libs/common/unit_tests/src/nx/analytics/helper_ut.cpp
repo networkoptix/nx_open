@@ -362,9 +362,9 @@ protected:
 
     ManifestSet givenPlugin(const QString& pluginId)
     {
-        DescriptorManager helper(m_commonModule.get());
+        DescriptorManager descriptorManager(m_commonModule.get());
         const auto pluginManifest = givenManifestForPlugin("pluginId");
-        helper.updateFromManifest(pluginManifest);
+        descriptorManager.updateFromPluginManifest(pluginManifest);
 
         ManifestSet manifestSet;
         manifestSet.pluginManifest = pluginManifest;
@@ -382,8 +382,12 @@ protected:
         EngineInfo engineInfo{ engineId, engineManifest };
         inOutManifestSet->engineInfos.push_back(engineInfo);
 
-        DescriptorManager helper(m_commonModule.get());
-        helper.updateFromManifest(pluginId, engineId, kEngineName, engineManifest);
+        DescriptorManager descriptorManager(m_commonModule.get());
+        descriptorManager.updateFromEngineManifest(
+            pluginId,
+            engineId,
+            kEngineName,
+            engineManifest);
 
         return &inOutManifestSet->engineInfos.back();
     }
@@ -395,8 +399,8 @@ protected:
 
         inOutEngineInfo->deviceAgentInfos.push_back({deviceId, deviceAgentManifest});
 
-        DescriptorManager helper(m_commonModule.get());
-        helper.updateFromManifest(deviceId, engineId, deviceAgentManifest);
+        DescriptorManager descriptorManager(m_commonModule.get());
+        descriptorManager.updateFromDeviceAgentManifest(deviceId, engineId, deviceAgentManifest);
     }
 
     void makeSureDescriptorsAreCorrectForManifests(const std::vector<ManifestSet>& manifestSets)
@@ -606,8 +610,8 @@ TEST_F(HelperTest, clearRuntimeInfo)
     const auto engineId2 = makeEngineId(pluginId, 1);
     EngineInfo* engineInfo2 = givenEngine(pluginId, engineId2, &manifestSet);
 
-    DescriptorManager helper(m_commonModule.get());
-    helper.clearRuntimeInfo();
+    DescriptorManager descriptorManager(m_commonModule.get());
+    descriptorManager.clearRuntimeInfo();
 
     makeSureActionDescriptorsAreCleared();
 }
@@ -622,8 +626,8 @@ TEST_F(HelperTest, eventTypes)
     givenServerWithEventDescriptors(m_servers[1], kEngineId0, "group", 1, 3, &expectedResult);
     givenServerWithEventDescriptors(m_servers[2], kEngineId1, "group", 3, 4, &expectedResult);
 
-    DescriptorManager helper(m_commonModule.get());
-    ASSERT_EQ(expectedResult, helper.eventTypes());
+    DescriptorManager descriptorManager(m_commonModule.get());
+    ASSERT_EQ(expectedResult, descriptorManager.eventTypeDescriptors());
 }
 
 TEST_F(HelperTest, supportedEventTypes)
@@ -639,9 +643,9 @@ TEST_F(HelperTest, supportedEventTypes)
     static const auto eventTypeIds = makeEventIds({2, 4});
     const auto device = givenDeviceWhichSupportsEventTypes(eventTypeIds);
 
-    const DescriptorManager helper(m_commonModule.get());
+    const DescriptorManager descriptorManager(m_commonModule.get());
     ASSERT_EQ(
-        helper.supportedEventTypes(device),
+        descriptorManager.supportedEventTypeDescriptors(device),
         pickDescriptors(allEventDescriptors, eventTypeIds));
 }
 
@@ -660,9 +664,9 @@ TEST_F(HelperTest, supportedEventTypesUnion)
     const auto device0 = givenDeviceWhichSupportsEventTypes(eventTypeIds0);
     const auto device1 = givenDeviceWhichSupportsEventTypes(eventTypeIds1);
 
-    const DescriptorManager helper(m_commonModule.get());
+    const DescriptorManager descriptorManager(m_commonModule.get());
     ASSERT_EQ(
-        helper.supportedEventTypesUnion({device0, device1}),
+        descriptorManager.supportedEventTypeDescriptorsUnion({device0, device1}),
         pickDescriptors(allEventDescriptors, eventTypeIds0.unite(eventTypeIds1)));
 }
 
@@ -681,9 +685,9 @@ TEST_F(HelperTest, supportedEventTypesIntersection)
     const auto device0 = givenDeviceWhichSupportsEventTypes(eventTypeIds0);
     const auto device1 = givenDeviceWhichSupportsEventTypes(eventTypeIds1);
 
-    const DescriptorManager helper(m_commonModule.get());
+    const DescriptorManager descriptorManager(m_commonModule.get());
     ASSERT_EQ(
-        helper.supportedEventTypesIntersection({ device0, device1 }),
+        descriptorManager.supportedEventTypeDescriptorsIntersection({ device0, device1 }),
         pickDescriptors(allEventDescriptors, eventTypeIds0.intersect(eventTypeIds1)));
 }
 

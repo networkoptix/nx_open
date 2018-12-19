@@ -215,9 +215,9 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    nx::analytics::DescriptorManager helper(q->commonModule());
-    const auto objectTypeDescriptors = helper.objectTypes();
-    const auto engineDescriptors = helper.engines();
+    nx::analytics::DescriptorManager descriptorManager(q->commonModule());
+    const auto objectTypeDescriptors = descriptorManager.objectTypeDescriptors();
+    const auto engineDescriptors = descriptorManager.engineDescriptors();
     m_objectTypeMenu->clear();
 
     if (!objectTypeDescriptors.empty())

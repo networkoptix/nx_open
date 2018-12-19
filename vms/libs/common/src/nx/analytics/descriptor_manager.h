@@ -71,70 +71,77 @@ public:
 
     void clearRuntimeInfo();
 
-    void updateFromManifest(
+    void updateFromPluginManifest(
         const nx::vms::api::analytics::PluginManifest& manifest);
 
-    void updateFromManifest(
+    void updateFromEngineManifest(
         const QString& pluginId,
         const QnUuid& engineId,
         const QString& engineName,
         const nx::vms::api::analytics::EngineManifest& manifest);
 
-    void updateFromManifest(
+    void updateFromDeviceAgentManifest(
         const QnUuid& deviceId,
         const QnUuid& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    std::optional<nx::vms::api::analytics::PluginDescriptor> plugin(const QString& id) const;
-    PluginDescriptorMap plugins(const std::set<QString>& pluginIds = {}) const;
-
-    std::optional<nx::vms::api::analytics::EngineDescriptor> engine(const QnUuid& id) const;
-    EngineDescriptorMap engines(const std::set<QnUuid>& engineIds = {}) const;
-
-    std::optional <nx::vms::api::analytics::GroupDescriptor> group(const QString& id) const;
-    GroupDescriptorMap groups(const std::set<QString>& groupIds = {}) const;
-
-    std::optional<nx::vms::api::analytics::EventTypeDescriptor> eventType(const QString& id) const;
-    EventTypeDescriptorMap eventTypes(const std::set<QString>& eventTypeIds = {}) const;
-    EventTypeDescriptorMap supportedEventTypes(const QnVirtualCameraResourcePtr& device) const;
-    EventTypeDescriptorMap supportedEventTypesUnion(
-        const QnVirtualCameraResourceList& deviceList) const;
-    EventTypeDescriptorMap supportedEventTypesIntersection(
-        const QnVirtualCameraResourceList& deviceList) const;
-
-    EngineDescriptorMap parentEventTypeEngines(
-        const EventTypeDescriptorMap& eventTypeDescriptors) const;
-
-    GroupDescriptorMap parentEventTypeGroups(
-        const EventTypeDescriptorMap& eventTypeDescriptors) const;
-
-    std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> objectType(
+    std::optional<nx::vms::api::analytics::PluginDescriptor> pluginDescriptor(
         const QString& id) const;
-    ObjectTypeDescriptorMap objectTypes(const std::set<QString>& objectTypeIds = {}) const;
-    ObjectTypeDescriptorMap supportedObjectTypes(const QnVirtualCameraResourcePtr& device) const;
-    ObjectTypeDescriptorMap supportedObjectTypesUnion(
+    PluginDescriptorMap pluginDescriptors(const std::set<QString>& pluginIds = {}) const;
+
+    std::optional<nx::vms::api::analytics::EngineDescriptor> engineDescriptor(
+        const QnUuid& id) const;
+    EngineDescriptorMap engineDescriptors(const std::set<QnUuid>& engineIds = {}) const;
+
+    std::optional <nx::vms::api::analytics::GroupDescriptor> groupDescriptor(
+        const QString& id) const;
+    GroupDescriptorMap groupDescriptors(const std::set<QString>& groupIds = {}) const;
+
+    std::optional<nx::vms::api::analytics::EventTypeDescriptor> eventTypeDescriptor(
+        const QString& id) const;
+    EventTypeDescriptorMap eventTypeDescriptors(const std::set<QString>& eventTypeIds = {}) const;
+    EventTypeDescriptorMap supportedEventTypeDescriptors(
+        const QnVirtualCameraResourcePtr& device) const;
+    EventTypeDescriptorMap supportedEventTypeDescriptorsUnion(
         const QnVirtualCameraResourceList& deviceList) const;
-    ObjectTypeDescriptorMap supportedObjectTypesIntersection(
+    EventTypeDescriptorMap supportedEventTypeDescriptorsIntersection(
         const QnVirtualCameraResourceList& deviceList) const;
 
-    EngineDescriptorMap parentObjectTypeEngines(
+    EngineDescriptorMap eventTypesParentEngineDescriptors(
+        const EventTypeDescriptorMap& eventTypeDescriptors) const;
+
+    GroupDescriptorMap eventTypesParentGroupDescriptors(
+        const EventTypeDescriptorMap& eventTypeDescriptors) const;
+
+    std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> objectTypeDescriptor(
+        const QString& id) const;
+    ObjectTypeDescriptorMap objectTypeDescriptors(
+        const std::set<QString>& objectTypeIds = {}) const;
+    ObjectTypeDescriptorMap supportedObjectTypeDescriptors(
+        const QnVirtualCameraResourcePtr& device) const;
+    ObjectTypeDescriptorMap supportedObjectTypeDescriptorsUnion(
+        const QnVirtualCameraResourceList& deviceList) const;
+    ObjectTypeDescriptorMap supportedObjectTypeDescriptorsIntersection(
+        const QnVirtualCameraResourceList& deviceList) const;
+
+    EngineDescriptorMap objectTypeParentEngineDescriptors(
         const ObjectTypeDescriptorMap& objectTypeDescriptors) const;
 
-    GroupDescriptorMap parentObjectTypeGroups(
+    GroupDescriptorMap objectTypeParentGroupDescriptors(
         const ObjectTypeDescriptorMap& objectTypeDescriptors) const;
 
-    ActionTypeDescriptorMap actionTypes() const;
+    ActionTypeDescriptorMap objectActionTypeDescriptors() const;
 
-    ActionTypeDescriptorMap availableObjectActions(
+    ActionTypeDescriptorMap availableObjectActionTypeDescriptors(
         const QString& objectTypeId,
         const QnVirtualCameraResourcePtr& device);
 
 private:
     template<typename DescriptorMap>
-    EngineDescriptorMap parentEngines(const DescriptorMap& descriptorMap) const;
+    EngineDescriptorMap parentEngineDescriptors(const DescriptorMap& descriptorMap) const;
 
     template<typename DescriptorMap>
-    GroupDescriptorMap parentGroups(const DescriptorMap& descriptorMap) const;
+    GroupDescriptorMap parentGroupDescriptors(const DescriptorMap& descriptorMap) const;
 
 private:
     detail::ContainerPtr<
