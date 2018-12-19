@@ -16,8 +16,8 @@
   },
   "messageType": {
     "ipvd_feedback": "IPVD Feedback",
-    "sales_inquiry": "Product Inquiry",
-    "request_support": "Request Product Support",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"
   },
   "pageTitles": {
