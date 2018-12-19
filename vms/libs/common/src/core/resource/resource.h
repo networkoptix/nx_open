@@ -8,7 +8,6 @@
 
 #include <api/model/kvpair.h>
 
-#include <nx/utils/url.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
 
@@ -107,11 +106,8 @@ public:
 
     // ==================================================
 
-    nx::utils::Url url() const;
-    void setUrl(const nx::utils::Url& url);
-
-    virtual QString getUrl() const; //< Unsafe, deprecated. url() should be used instead.
-    virtual void setUrl(const QString &url); //< Unsafe, deprecated. setUrl() should be used instead.
+    virtual QString getUrl() const;
+    virtual void setUrl(const QString &url);
 
     virtual int logicalId() const;
     virtual void setLogicalId(int value);
