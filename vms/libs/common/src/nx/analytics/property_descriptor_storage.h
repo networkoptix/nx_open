@@ -8,14 +8,16 @@
 
 namespace nx::analytics {
 
-using namespace nx::utils::data_structures;
-
 template<typename DescriptorType, typename... Scopes>
 class PropertyDescriptorStorage
 {
+
 public:
     using Descriptor = DescriptorType;
-    using Container = MapHelper::NestedMap<std::map, Scopes..., DescriptorType>;
+    using Container = nx::utils::data_structures::MapHelper::NestedMap<
+        std::map,
+        Scopes...,
+        DescriptorType>;
 
 public:
     PropertyDescriptorStorage(QnResourcePtr serverResource, QString propertyName):
