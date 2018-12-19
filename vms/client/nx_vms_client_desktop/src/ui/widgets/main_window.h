@@ -21,7 +21,6 @@ class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchController;
-class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
@@ -29,6 +28,8 @@ class QnMainWindowTitleBarWidget;
 class QnWorkbenchWelcomeScreen;
 
 namespace nx::vms::client::desktop {
+
+class WorkbenchUi;
 
 class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
 {
@@ -108,7 +109,7 @@ private:
     QScopedPointer<QnGraphicsView> m_view;
     QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
-    QScopedPointer<QnWorkbenchUi> m_ui;
+    QScopedPointer<WorkbenchUi> m_ui;
     QnWorkbenchWelcomeScreen* m_welcomeScreen = nullptr;
 
     QnMainWindowTitleBarWidget* m_titleBar = nullptr;

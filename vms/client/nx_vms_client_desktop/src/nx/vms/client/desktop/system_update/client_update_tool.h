@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <QtCore>
 
 #include <client_core/connection_context_aware.h>
@@ -131,6 +132,13 @@ public:
     /** Get cached update information from the mediaservers. */
     UpdateContents getRemoteUpdateInfo() const;
 
+    /**
+     * Get installed versions. It can block up to 500ms until applauncher check it complete.
+     * The check is initiated when ClientUpdateTool is created, so there will be no block
+     * most of the time.
+     */
+    std::set<nx::utils::SoftwareVersion> getInstalledVersions() const;
+
     static QString toString(State state);
 
 signals:
@@ -177,6 +185,9 @@ protected:
     std::promise<UpdateContents> m_remoteUpdateInfoRequest;
     UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
+
+    mutable std::future<std::set<nx::utils::SoftwareVersion>> m_installedVersionsFuture;
+    mutable std::set<nx::utils::SoftwareVersion> m_installedVersions;
 };
 
 } // namespace nx::vms::client::desktop

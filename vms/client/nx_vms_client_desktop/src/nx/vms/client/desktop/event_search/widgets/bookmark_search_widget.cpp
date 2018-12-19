@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
@@ -108,6 +109,9 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
 
     connect(view(), &EventRibbon::visibleRangeChanged, this,
         [this]() { d->sinceViewUpdated.restart(); });
+
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+        this, &BookmarkSearchWidget::updateIsAllowed);
 }
 
 BookmarkSearchWidget::~BookmarkSearchWidget()
@@ -129,6 +133,11 @@ QString BookmarkSearchWidget::placeholderText(bool constrained) const
 QString BookmarkSearchWidget::itemCounterText(int count) const
 {
     return tr("%n bookmarks", "", count);
+}
+
+bool BookmarkSearchWidget::calculateIsAllowed() const
+{
+    return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
 }
 
 } // namespace nx::vms::client::desktop

@@ -40,6 +40,9 @@ public:
 
     AbstractSearchListModel* model() const;
 
+    /** Whether the search widget should be visible. */
+    bool isAllowed() const;
+
     /** Rewind to live. Discards loaded archive if neccessary. */
     virtual void goToLive();
 
@@ -105,6 +108,8 @@ signals:
     void textFilterChanged(const QString& value);
     void timePeriodChanged(const QnTimePeriod& value);
 
+    bool isAllowedChanged(bool value);
+
 protected:
     /** Sets an icon for no data placeholder. */
     void setPlaceholderPixmap(const QPixmap& value);
@@ -127,18 +132,24 @@ protected:
     /** Internal access to tiles view. */
     EventRibbon* view() const;
 
+    /** Should be called from descendants when isAllowed should be recalculated. */
+    void updateIsAllowed();
+
 private:
     /**
-     * Derived classes should override this method and return localized string for
+     * Derived classes must override this method and return localized string for
      * no data placeholder. When constrained is true it means there's no data matching
      * search criteria, when constrained is false it means there's no data in the system at all.
      */
     virtual QString placeholderText(bool constrained) const = 0;
 
     /**
-     * Derived classes should override this method and return localized string for item counter.
+     * Derived classes must override this method and return localized string for item counter.
      */
     virtual QString itemCounterText(int count) const = 0;
+
+    /** Derived classes should override this method if the widget is not always allowed. */
+    virtual bool calculateIsAllowed() const { return true; }
 
 private:
     class Private;

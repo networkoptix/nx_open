@@ -74,10 +74,15 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
         fileOpenMode = ReadWrite;
 
     // Ask Misha S. and Sergey I. about why not to use exceptions here - I just don't know.
-    auto exceptionAvoider = [this](const QString& str) { setErrorString(str); return false; };
+    auto handleError =
+        [this](const QString& str) //< Expanded to several strings for setting breakpoints.
+        {
+            setErrorString(str);
+            return false;
+        };
 
     if (!m_file.open(fileOpenMode))
-        return exceptionAvoider(m_file.errorString());
+        return handleError(m_file.errorString());
 
     m_openMode = openMode;
 
@@ -85,7 +90,7 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
 
     // Check for probably truncated file or damaged stream.
     if (m_enclosure.size != 0 && (m_enclosure.size - kHeaderSize) % kCryptoBlockSize != 0)
-        return exceptionAvoider(tr("Wrong crypted stream size."));
+        return handleError(tr("Wrong crypted stream size."));
 
     if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
         m_enclosure.size = m_file.size();
@@ -95,7 +100,7 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
     else
     {
         if (!readHeader())
-            return exceptionAvoider(tr("Damaged crypted stream header."));
+            return handleError(tr("Damaged crypted stream header."));
     }
 
     m_openMode = openMode;

@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <ui/animation/variant_animator.h>
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>

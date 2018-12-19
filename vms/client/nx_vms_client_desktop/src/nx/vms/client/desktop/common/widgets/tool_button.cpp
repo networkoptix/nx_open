@@ -34,7 +34,7 @@ void ToolButton::mousePressEvent(QMouseEvent* event)
     executeDelayedParented(emitJustPressed, 0, this);
 }
 
-void ToolButton::paintEvent(QPaintEvent* event)
+void ToolButton::paintEvent(QPaintEvent* /*event*/)
 {
     QStylePainter p(this);
     QStyleOptionToolButton option;
