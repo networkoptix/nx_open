@@ -12,8 +12,8 @@
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QPointer>
 #include <QtCore/QTimer>
+#include <QtCore/QVariantAnimation>
 #include <QtCore/QHash>
-#include <QtCore/QMap>
 
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
@@ -103,9 +103,6 @@ private:
     void clear();
 
     void highlightAppearance(EventTile* tile);
-    void addAnimatedShift(int index, int shift); //< Animates from shift to zero.
-    void updateCurrentShifts(); //< Updates m_currentShifts from m_itemShiftAnimations.
-    void clearShiftAnimations();
 
     void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
 
@@ -126,6 +123,16 @@ private:
     void handleWidgetChanged(int index);
     void closeExpiredTiles();
 
+    int scrollValue() const;
+    int totalTopMargin() const; //< Top margin and viewport header.
+
+    // Top of the viewport in tile position coordinates.
+    int viewportTopPosition() const { return scrollValue() - totalTopMargin(); }
+
+    // Calculate specified tile position without animated shift, based on previous tile position
+    // and animated height.
+    int calculatePosition(int index) const;
+
 private:
     EventRibbon* const q = nullptr;
     QAbstractListModel* m_model = nullptr;
@@ -137,14 +144,31 @@ private:
     using Importance = QnNotificationLevel::Value;
     static constexpr int kApproximateTileHeight = 48;
 
+    using AnimationPtr = std::unique_ptr<QVariantAnimation>;
+
     struct Tile
     {
         int height = kApproximateTileHeight;
-        int position = 0;
+        int position = 0; //< Positions start from 0, without top margin & viewport header.
         Importance importance = Importance();
         bool animated = false;
         std::unique_ptr<ResourceThumbnailProvider> preview;
         std::unique_ptr<EventTile> widget;
+
+        AnimationPtr insertAnimation;
+        AnimationPtr removeAnimation;
+
+        int animatedHeight() const
+        {
+            return insertAnimation
+                ? int(insertAnimation->currentValue().toReal() * height)
+                : height;
+        }
+
+        int animatedShift() const
+        {
+            return removeAnimation ? removeAnimation->currentValue().toInt() : 0;
+        }
     };
 
     using TilePtr = std::unique_ptr<Tile>;
@@ -157,19 +181,14 @@ private:
 
     QHash<QPersistentModelIndex, QDeadlineTimer> m_deadlines;
 
+    QHash<QVariantAnimation*, QPersistentModelIndex> m_animations;
+
     std::array<int, int(Importance::LevelCount)> m_unreadCounts{};
     int m_totalUnreadCount = 0;
 
     nx::utils::Guard makeUnreadCountGuard();
 
-    int m_totalHeight = 0;
-
-    // Maps animation object to item index. Duplicate indices are allowed.
-    // Animation objects are owned by EventRibbon::Private object.
-    // When stopped/finished they are destroyed and pointers removed from this hash.
-    QHash<QVariantAnimation*, int> m_itemShiftAnimations;
-
-    QMap<int, int> m_currentShifts; //< Maps item index to shift value. Sorted (!).
+    int m_endPosition = 0;
 
     Qt::ScrollBarPolicy m_scrollBarPolicy = Qt::ScrollBarAlwaysOn;
 
