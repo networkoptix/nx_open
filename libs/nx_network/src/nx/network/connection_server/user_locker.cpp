@@ -17,7 +17,7 @@ UserLocker::UserLocker(
 LockUpdateResult UserLocker::updateLockoutState(AuthResult authResult)
 {
     const auto now = nx::utils::monotonicTime();
-    
+
     LockUpdateResult result = LockUpdateResult::noChange;
 
     // If there is an expired lock, resetting.
