@@ -9,7 +9,7 @@ namespace nx::utils::data_structures::test {
 
 static const std::map<std::string, int> kInternalMap = {
     {"value", 5},
-    {"otherValue", 7}
+    {"otherValue", 7},
 };
 
 class MapHelperTest: public ::testing::Test
@@ -136,18 +136,18 @@ TEST_F(MapHelperTest, merge)
 {
     MapHelper::NestedMap<std::map, std::string, int> first = {
         {"first", 1},
-        {"second", 2}
+        {"second", 2},
     };
 
     MapHelper::NestedMap<std::map, std::string, int> second = {
         {"first", 1},
-        {"third", 3}
+        {"third", 3},
     };
 
     MapHelper::NestedMap<std::map, std::string, int> expectedResult = {
         {"first", 1},
         {"second", 2},
-        {"third", 3}
+        {"third", 3},
     };
 
     const auto result = MapHelper::merge(first, second);
@@ -158,18 +158,18 @@ TEST_F(MapHelperTest, mergeInPlace)
 {
     MapHelper::NestedMap<std::map, std::string, int> first = {
         {"first", 1},
-        {"second", 2}
+        {"second", 2},
     };
 
     MapHelper::NestedMap<std::map, std::string, int> second = {
         {"first", 1},
-        {"third", 3}
+        {"third", 3},
     };
 
     MapHelper::NestedMap<std::map, std::string, int> expectedResult = {
         {"first", 1},
         {"second", 2},
-        {"third", 3}
+        {"third", 3},
     };
 
     MapHelper::merge(&first, second);
@@ -191,12 +191,12 @@ TEST_F(MapHelperTest, keys)
 {
     const std::set<std::tuple<std::string, std::string, std::string>> kNestedResult = {
         {"setting", "some", "value"},
-        {"setting", "some", "otherValue"}
+        {"setting", "some", "otherValue"},
     };
 
     const std::set<std::tuple<std::string>> kFlatResult = {
         {"flatMapKey0"},
-        {"flatMapKey1"}
+        {"flatMapKey1"},
     };
 
     ASSERT_EQ(kNestedResult, MapHelper::keys(m_nestedMap));

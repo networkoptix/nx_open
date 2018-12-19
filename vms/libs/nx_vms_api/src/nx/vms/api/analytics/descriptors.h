@@ -20,7 +20,7 @@ struct DescriptorScope
     {
         // Two paths with the same pluginId and different groupId are not allowed because
         // only single Engine per Plugin is supported. In the future, when we support multiple
-        // Engines per Plugin this have to change.
+        // Engines per Plugin, this have to change.
         return engineId < other.engineId;
     }
 };

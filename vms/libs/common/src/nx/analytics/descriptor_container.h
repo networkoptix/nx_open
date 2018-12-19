@@ -15,11 +15,13 @@ using namespace nx::utils::data_structures;
 
 template<
     typename DescriptorStorage,
-    typename DescriptorMerger = DefaultDescriptorMerger<typename DescriptorStorage::Descriptor>>
+    typename DescriptorMerger = DefaultDescriptorMerger<typename DescriptorStorage::Descriptor>
+>
 class DescriptorContainer
 {
     using Descriptor = typename DescriptorStorage::Descriptor;
     using Container = typename DescriptorStorage::Container;
+
 public:
     DescriptorContainer(
         std::unique_ptr<DescriptorStorage> descriptorStorage,

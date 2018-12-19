@@ -16,7 +16,7 @@ namespace {
 
 bool belongsToGroup(const EventTypeDescriptor& descriptor, const QString& groupId)
 {
-    for (const auto& scope : descriptor.scopes)
+    for (const auto& scope: descriptor.scopes)
     {
         if (scope.groupId == groupId)
             return true;
