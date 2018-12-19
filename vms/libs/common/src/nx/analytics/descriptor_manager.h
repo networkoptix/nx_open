@@ -15,6 +15,7 @@
 #include <nx/analytics/default_descriptor_storage_factory.h>
 #include <nx/analytics/multiresource_descriptor_container.h>
 #include <nx/analytics/scoped_descriptor_merger.h>
+#include <nx/analytics/types.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
@@ -43,18 +44,6 @@ using ScopedContainerPtr = std::unique_ptr<ScopedContainer<Descriptor, Scopes...
 
 } // namespace detail
 
-using PluginDescriptorMap = std::map<QString, nx::vms::api::analytics::PluginDescriptor>;
-using EngineDescriptorMap = std::map<QnUuid, nx::vms::api::analytics::EngineDescriptor>;
-using GroupDescriptorMap = std::map<QString, nx::vms::api::analytics::GroupDescriptor>;
-using EventTypeDescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
-using ObjectTypeDescriptorMap = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
-
-using ActionTypeDescriptorMap = MapHelper::NestedMap<
-    std::map,
-    QnUuid,
-    QString,
-    nx::vms::api::analytics::ActionTypeDescriptor>;
-
 class DescriptorManager: public QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
@@ -75,31 +64,32 @@ public:
         const nx::vms::api::analytics::PluginManifest& manifest);
 
     void updateFromEngineManifest(
-        const QString& pluginId,
-        const QnUuid& engineId,
+        const PluginId& pluginId,
+        const EngineId& engineId,
         const QString& engineName,
         const nx::vms::api::analytics::EngineManifest& manifest);
 
     void updateFromDeviceAgentManifest(
         const QnUuid& deviceId,
-        const QnUuid& engineId,
+        const EngineId& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
     std::optional<nx::vms::api::analytics::PluginDescriptor> pluginDescriptor(
-        const QString& id) const;
-    PluginDescriptorMap pluginDescriptors(const std::set<QString>& pluginIds = {}) const;
+        const PluginId& id) const;
+    PluginDescriptorMap pluginDescriptors(const std::set<PluginId>& pluginIds = {}) const;
 
     std::optional<nx::vms::api::analytics::EngineDescriptor> engineDescriptor(
-        const QnUuid& id) const;
-    EngineDescriptorMap engineDescriptors(const std::set<QnUuid>& engineIds = {}) const;
+        const EngineId& id) const;
+    EngineDescriptorMap engineDescriptors(const std::set<EngineId>& engineIds = {}) const;
 
     std::optional <nx::vms::api::analytics::GroupDescriptor> groupDescriptor(
-        const QString& id) const;
-    GroupDescriptorMap groupDescriptors(const std::set<QString>& groupIds = {}) const;
+        const GroupId& id) const;
+    GroupDescriptorMap groupDescriptors(const std::set<GroupId>& groupIds = {}) const;
 
     std::optional<nx::vms::api::analytics::EventTypeDescriptor> eventTypeDescriptor(
-        const QString& id) const;
-    EventTypeDescriptorMap eventTypeDescriptors(const std::set<QString>& eventTypeIds = {}) const;
+        const EventTypeId& id) const;
+    EventTypeDescriptorMap eventTypeDescriptors(
+        const std::set<EventTypeId>& eventTypeIds = {}) const;
     EventTypeDescriptorMap supportedEventTypeDescriptors(
         const QnVirtualCameraResourcePtr& device) const;
     EventTypeDescriptorMap supportedEventTypeDescriptorsUnion(
@@ -114,9 +104,9 @@ public:
         const EventTypeDescriptorMap& eventTypeDescriptors) const;
 
     std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> objectTypeDescriptor(
-        const QString& id) const;
+        const ObjectTypeId& id) const;
     ObjectTypeDescriptorMap objectTypeDescriptors(
-        const std::set<QString>& objectTypeIds = {}) const;
+        const std::set<ObjectTypeId>& objectTypeIds = {}) const;
     ObjectTypeDescriptorMap supportedObjectTypeDescriptors(
         const QnVirtualCameraResourcePtr& device) const;
     ObjectTypeDescriptorMap supportedObjectTypeDescriptorsUnion(
@@ -133,7 +123,7 @@ public:
     ActionTypeDescriptorMap objectActionTypeDescriptors() const;
 
     ActionTypeDescriptorMap availableObjectActionTypeDescriptors(
-        const QString& objectTypeId,
+        const ObjectTypeId& objectTypeId,
         const QnVirtualCameraResourcePtr& device);
 
 private:
@@ -146,27 +136,27 @@ private:
 private:
     detail::ContainerPtr<
         nx::vms::api::analytics::PluginDescriptor,
-        QString> m_pluginDescriptorContainer;
+        PluginId> m_pluginDescriptorContainer;
 
     detail::ContainerPtr<
         nx::vms::api::analytics::EngineDescriptor,
-        QnUuid> m_engineDescriptorContainer;
+        EngineId> m_engineDescriptorContainer;
 
     detail::ScopedContainerPtr<
         nx::vms::api::analytics::GroupDescriptor,
-        QString> m_groupDescriptorContainer;
+        GroupId> m_groupDescriptorContainer;
 
     detail::ScopedContainerPtr<
         nx::vms::api::analytics::EventTypeDescriptor,
-        QString> m_eventTypeDescriptorContainer;
+        EventTypeId> m_eventTypeDescriptorContainer;
 
     detail::ScopedContainerPtr<
         nx::vms::api::analytics::ObjectTypeDescriptor,
-        QString> m_objectTypeDescriptorContainer;
+        ObjectTypeId> m_objectTypeDescriptorContainer;
 
     detail::ContainerPtr<
         nx::vms::api::analytics::ActionTypeDescriptor,
-        QnUuid, QString> m_actionTypeDescriptorContainer;
+        EngineId, ActionTypeId> m_actionTypeDescriptorContainer;
 };
 
 } // namespace nx::analytics
