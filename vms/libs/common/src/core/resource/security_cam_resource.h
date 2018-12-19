@@ -435,17 +435,3 @@ private slots:
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
 Q_DECLARE_METATYPE(QnSecurityCamResourceList)
-
-class QnC2pCameraResource: public QnSecurityCamResource
-{
-public:
-    QnC2pCameraResource(QnCommonModule* commonModule = nullptr):
-        QnSecurityCamResource(commonModule)
-    {
-    }
-    virtual QString getDriverName() const override {return QnResourceTypePool::kC2pCameraTypeId;}
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override {return nullptr;}
-};
-
-Q_DECLARE_METATYPE(QnC2pCameraResourcePtr)
-Q_DECLARE_METATYPE(QnC2pCameraResourceList)
