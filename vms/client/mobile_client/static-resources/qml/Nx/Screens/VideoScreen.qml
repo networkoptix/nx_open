@@ -454,10 +454,6 @@ PageBase
                     hideUi()
                     moveOnTapOverlay.open()
                     video.fitToBounds()
-
-                    // Workaround. Overwise it moves content to wrong place.
-                    // TODO: investigate and get rid of this workaround
-                    video.fitToBounds()
                 }
                 else
                 {
