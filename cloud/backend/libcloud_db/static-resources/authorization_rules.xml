@@ -33,6 +33,7 @@
                 <condition value="/cdb/maintenance/statistics" resName="secureSource">
                     <set value="true" resName="authenticated" resValue="true"/>
                 </condition>
+                <set value="/cdb/ec2/info" resName="authenticated" resValue="true"/>
             </condition>
         </sequence>
 
