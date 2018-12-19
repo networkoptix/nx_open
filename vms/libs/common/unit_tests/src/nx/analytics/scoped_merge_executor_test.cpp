@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/scoped_descriptor_merger.h>
+#include <nx/analytics/scoped_merge_executor.h>
 
 namespace nx::analytics {
 
@@ -108,7 +108,7 @@ std::vector<TestCase<Descriptor>> makeTestCases()
 template<typename Descriptor>
 void runTest()
 {
-    const ScopedDescriptorMerger<Descriptor> merger;
+    const ScopedMergeExecutor<Descriptor> merger;
     for (const auto testCase : makeTestCases<Descriptor>())
     {
         auto merged = merger(
@@ -119,12 +119,12 @@ void runTest()
     }
 }
 
-TEST(ScopedDescriptorMergerTest, eventTypeDescriptor)
+TEST(ScopedMergeExecutorTest, eventTypeDescriptor)
 {
     runTest<EventTypeDescriptor>();
 }
 
-TEST(ScopedDescriptorMergerTest, objectTypeDescriptor)
+TEST(ScopedMergeExecutorTest, objectTypeDescriptor)
 {
     runTest<ObjectTypeDescriptor>();
 }

@@ -10,10 +10,10 @@
 #include <analytics/detected_objects_storage/analytics_events_storage_types.h>
 
 #include <nx/analytics/multiresource_descriptor_container.h>
-#include <nx/analytics/default_descriptor_merger.h>
+#include <nx/analytics/replacement_merge_executor.h>
 #include <nx/analytics/property_descriptor_storage_factory.h>
 #include <nx/analytics/multiresource_descriptor_container.h>
-#include <nx/analytics/scoped_descriptor_merger.h>
+#include <nx/analytics/scoped_merge_executor.h>
 #include <nx/analytics/types.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -28,12 +28,12 @@ namespace detail {
 template<typename Descriptor, typename... Scopes>
 using Container = MultiresourceDescriptorContainer<
     PropertyDescriptorStorageFactory<Descriptor, Scopes...>,
-    DefaultDescriptorMerger<Descriptor>>;
+    ReplacementMergeExecutor<Descriptor>>;
 
 template<typename Descriptor, typename... Scopes>
 using ScopedContainer = MultiresourceDescriptorContainer<
     PropertyDescriptorStorageFactory<Descriptor, Scopes...>,
-    ScopedDescriptorMerger<Descriptor>>;
+    ScopedMergeExecutor<Descriptor>>;
 
 template<typename Descriptor, typename... Scopes>
 using ContainerPtr = std::unique_ptr<Container<Descriptor, Scopes...>>;

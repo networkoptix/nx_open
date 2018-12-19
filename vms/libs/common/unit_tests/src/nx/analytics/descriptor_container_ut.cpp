@@ -6,14 +6,14 @@
 
 #include <nx/analytics/test_descriptor.h>
 #include <nx/analytics/test_descriptor_storage.h>
-#include <nx/analytics/test_descriptor_merger.h>
+#include <nx/analytics/test_merge_executor.h>
 
 namespace nx::analytics::test{
 
 using namespace nx::utils::data_structures;
 
 using Storage = TestDescriptorStorage<TestDescriptor, std::string, std::string, std::string>;
-using Merger = TestDescriptorMerger;
+using MergeExecutor = TestMergeExecutor;
 
 void initMap(Storage::Container* map)
 {
@@ -36,11 +36,11 @@ protected:
         storage->save(std::move(descriptors));
 
         m_descriptorContainer =
-            std::make_unique<DescriptorContainer<Storage, Merger>>(std::move(storage));
+            std::make_unique<DescriptorContainer<Storage, MergeExecutor>>(std::move(storage));
     }
 
 protected:
-    std::unique_ptr<DescriptorContainer<Storage, Merger>> m_descriptorContainer;
+    std::unique_ptr<DescriptorContainer<Storage, MergeExecutor>> m_descriptorContainer;
 };
 
 TEST_F(DescriptorContainerTest, getDescriptors)

@@ -259,9 +259,9 @@ const char* kBasicDeviceAgentManifest = R"json(
 )json";
 
 template<typename T>
-void merge (T& target, const T& descriptor)
+void merge(T& target, const T& descriptor)
 {
-    ScopedDescriptorMerger<T> merger;
+    ScopedMergeExecutor<T> merger;
     auto merged = merger(&target, &descriptor);
     if (merged)
         target = *merged;
@@ -539,7 +539,7 @@ protected:
         MapHelper::merge(
             expectedResult,
             descriptorMap,
-            ScopedDescriptorMerger<EventTypeDescriptor>());
+            ScopedMergeExecutor<EventTypeDescriptor>());
     }
 
     QnVirtualCameraResourcePtr makeDevice()

@@ -5,7 +5,7 @@
 namespace nx::analytics {
 
 template<typename Descriptor>
-class DefaultDescriptorMerger
+class ReplacementMergeExecutor
 {
 public:
     std::optional<Descriptor> operator()(

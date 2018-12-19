@@ -5,7 +5,7 @@
 
 namespace nx::analytics {
 
-class TestDescriptorMerger
+class TestMergeExecutor
 {
 public:
     std::optional<TestDescriptor> operator()(

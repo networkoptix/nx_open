@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/analytics/test_descriptor_merger.h>
+#include <nx/analytics/test_merge_executor.h>
 #include <nx/analytics/test_descriptor_storage_factory.h>
 
 #include <nx/analytics/property_descriptor_storage_factory.h>
@@ -94,7 +94,7 @@ class MultiresourceDescriptorContainerTest: public ::testing::Test
 {
 protected:
     using Factory = PropertyDescriptorStorageFactory<TestDescriptor, QString, QString>;
-    using Container = MultiresourceDescriptorContainer<Factory, TestDescriptorMerger>;
+    using Container = MultiresourceDescriptorContainer<Factory, TestMergeExecutor>;
 
 protected:
     virtual void SetUp() override
@@ -296,13 +296,13 @@ TEST_F(MultiresourceDescriptorContainerTest, gettingMergedDescriptors)
     auto descriptors = makeUniqueDescriptorsForResource(m_ownResource);
     auto expectedResult = descriptors;
 
-    MapHelper::merge(&expectedResult, descriptors, DefaultDescriptorMerger<TestDescriptor>());
+    MapHelper::merge(&expectedResult, descriptors, ReplacementMergeExecutor<TestDescriptor>());
     m_ownResource->setProperty(kPropertyName, QString::fromUtf8(QJson::serialized(descriptors)));
 
     for (auto& resource: m_resourceList)
     {
         descriptors = makeUniqueDescriptorsForResource(resource);
-        MapHelper::merge(&expectedResult, descriptors, DefaultDescriptorMerger<TestDescriptor>());
+        MapHelper::merge(&expectedResult, descriptors, ReplacementMergeExecutor<TestDescriptor>());
         resource->setProperty(kPropertyName, QString::fromUtf8(QJson::serialized(descriptors)));
     }
 

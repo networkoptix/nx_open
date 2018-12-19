@@ -7,7 +7,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/analytics/property_descriptor_storage.h>
-#include <nx/analytics/default_descriptor_merger.h>
+#include <nx/analytics/replacement_merge_executor.h>
 
 namespace nx::analytics {
 
@@ -15,7 +15,7 @@ using namespace nx::utils::data_structures;
 
 template<
     typename DescriptorStorage,
-    typename DescriptorMerger = DefaultDescriptorMerger<typename DescriptorStorage::Descriptor>
+    typename MergeExecutor = ReplacementMergeExecutor<typename DescriptorStorage::Descriptor>
 >
 class DescriptorContainer
 {
@@ -25,10 +25,10 @@ class DescriptorContainer
 public:
     DescriptorContainer(
         std::unique_ptr<DescriptorStorage> descriptorStorage,
-        DescriptorMerger descriptorMerger = DescriptorMerger())
+        MergeExecutor mergeExecutor = MergeExecutor())
         :
         m_descriptorStorage(std::move(descriptorStorage)),
-        m_descriptorMerger(std::move(descriptorMerger))
+        m_mergeExecutor(std::move(mergeExecutor))
     {
     }
 
@@ -69,14 +69,14 @@ public:
 
         if constexpr (MapHelper::mapDepth<Container>() == sizeof...(Scopes))
         {
-            const auto merged = m_descriptorMerger(&currentDescriptors, &descriptors);
+            const auto merged = m_mergeExecutor(&currentDescriptors, &descriptors);
             if (merged)
                 MapHelper::set(&allDescriptors, scopes..., *merged);
         }
         else
         {
             const auto merged = MapHelper::merge(
-                currentDescriptors, descriptors, m_descriptorMerger);
+                currentDescriptors, descriptors, m_mergeExecutor);
             MapHelper::set(&allDescriptors, scopes..., merged);
         }
 
@@ -86,7 +86,7 @@ public:
 
 private:
     std::unique_ptr<DescriptorStorage> m_descriptorStorage;
-    DescriptorMerger m_descriptorMerger;
+    MergeExecutor m_mergeExecutor;
 };
 
 } // namespace nx::analytics

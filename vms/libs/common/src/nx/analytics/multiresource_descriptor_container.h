@@ -5,12 +5,12 @@
 
 namespace nx::analytics {
 
-template<typename StorageFactory, typename Merger>
+template<typename StorageFactory, typename MergeExecutor>
 class MultiresourceDescriptorContainer
 {
     using Container = DescriptorContainer<
         typename decltype(std::declval<StorageFactory>()(QnResourcePtr()))::element_type,
-        Merger>;
+        MergeExecutor>;
 
     using DescriptorMap = typename decltype(std::declval<Container>().descriptors())::value_type;
     using TopLevelMap = typename MapHelper::Wrapper<DescriptorMap>::template wrap<QnUuid>;
@@ -68,7 +68,7 @@ public:
     auto mergedDescriptors(const Scopes&... scopes)
         ->std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
     {
-        Merger merger;
+        MergeExecutor mergeExecutor;
         std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>> result;
         for (const auto& [resourceId, container]: m_containers)
         {
@@ -83,9 +83,9 @@ public:
             }
 
             if constexpr (MapHelper::isMap(*descriptors))
-                MapHelper::merge(&*result, *descriptors, merger);
+                MapHelper::merge(&*result, *descriptors, mergeExecutor);
             else
-                result = merger(&*result, &*descriptors);
+                result = mergeExecutor(&*result, &*descriptors);
         }
 
         if (!result)

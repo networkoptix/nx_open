@@ -3,7 +3,7 @@
 namespace nx::analytics {
 
 template<typename Descriptor>
-class ScopedDescriptorMerger
+class ScopedMergeExecutor
 {
 public:
     std::optional<Descriptor> operator()(const Descriptor* first, const Descriptor* second) const
