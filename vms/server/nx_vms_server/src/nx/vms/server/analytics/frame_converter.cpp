@@ -69,10 +69,8 @@ IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelForma
         if (const auto compressedFrame = m_getCompressedFrame())
         {
             if (!m_compressedFrame)
-            {
                 m_compressedFrame.reset(new WrappingCompressedVideoPacket(compressedFrame));
-                m_compressedFrame->releaseRef(); //< Make refCount = 1.
-            }
+
             return m_compressedFrame.get();
         }
         return nullptr;
