@@ -190,11 +190,6 @@ QString FcResource::getDriverName() const
     return kDriverName;
 }
 
-void FcResource::setIframeDistance(int, int)
-{
-    // Do nothing.
-}
-
 bool FcResource::hasDualStreamingInternal() const
 {
     return false;

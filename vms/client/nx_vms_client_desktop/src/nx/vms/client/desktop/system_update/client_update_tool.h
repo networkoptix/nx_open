@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+
 #include <QtCore>
 
 #include <client_core/connection_context_aware.h>

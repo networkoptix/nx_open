@@ -70,9 +70,6 @@ signals:
     void finished();
 
 private:
-    void at_animationIn_finished();
-
-private:
     GraphicsLabel *m_label;
     int m_timeout;
     QnGraphicsMessageBoxColors m_colors;

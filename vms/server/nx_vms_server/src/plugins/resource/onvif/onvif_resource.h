@@ -205,8 +205,6 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
     virtual int getMaxOnvifRequestTries() const { return 1; }

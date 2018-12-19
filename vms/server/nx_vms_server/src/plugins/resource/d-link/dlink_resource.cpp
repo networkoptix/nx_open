@@ -204,11 +204,6 @@ QString QnPlDlinkResource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnPlDlinkResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
-}
-
 QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
 {
     //return new MJPEGStreamReader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");

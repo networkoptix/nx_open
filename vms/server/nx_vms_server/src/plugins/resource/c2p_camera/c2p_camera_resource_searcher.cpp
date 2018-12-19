@@ -1,19 +1,51 @@
 #include "c2p_camera_resource_searcher.h"
 
+#include <common/common_module.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/common_module.h>
 
-namespace
-{
+#include <nx/vms/server/resource/camera.h>
+
+namespace {
+
 static const QString kC2pScheme("c2p");
 static const QString kManufacture("C2P");
-}
 
-QnPlC2pCameraResourceSearcher::QnPlC2pCameraResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+class QnC2pCameraResource: public nx::vms::server::resource::Camera
+{
+public:
+    QnC2pCameraResource(QnMediaServerModule* serverModule):
+        nx::vms::server::resource::Camera(serverModule)
+    {
+    }
+
+    virtual QString getDriverName() const override {return QnResourceTypePool::kC2pCameraTypeId;}
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override {return nullptr;}
+
+protected:
+    virtual CameraDiagnostics::Result initializeCameraDriver() override
+    {
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex)
+    {
+        return {};
+    }
+
+};
+
+using QnC2pCameraResourcePtr = QnSharedResourcePointer<QnC2pCameraResource>;
+
+} // namespace
+
+QnPlC2pCameraResourceSearcher::QnPlC2pCameraResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -39,7 +71,7 @@ QList<QnResourcePtr> QnPlC2pCameraResourceSearcher::checkHostAddr(
     QList<QnResourcePtr> result;
     if (url.scheme().toLower() == kC2pScheme && url.isValid())
     {
-        QnC2pCameraResourcePtr resource(new QnC2pCameraResource(commonModule()));
+        QnC2pCameraResourcePtr resource(new QnC2pCameraResource(serverModule()));
         QnUuid resourceTypeId = qnResTypePool->getResourceTypeId(
             kManufacture /*manufacture*/,
             QnResourceTypePool::kC2pCameraTypeId /*name*/);

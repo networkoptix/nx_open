@@ -20,12 +20,11 @@ nx_add_target(nx_vms_client_core LIBRARY
         Qt5::Quick ${Qt5MultimediaQuick_LIBRARY}
         appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_update)
 
-if(ANDROID OR IOS)
+if(TARGET qtkeychain)
+    target_link_libraries(nx_vms_client_core PRIVATE qtkeychain)
+else()
     nx_exclude_sources_from_target(nx_vms_client_core
         src/nx/client/core/settings/keychain_property_storage_backend)
-else()
-    target_compile_definitions(nx_vms_client_core PRIVATE USE_QTKEYCHAIN)
-    target_link_libraries(nx_vms_client_core PRIVATE qtkeychain)
 endif()
 
 target_include_directories(nx_vms_client_core

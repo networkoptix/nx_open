@@ -13,7 +13,7 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
-#include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 
 #include <core/ptz/item_dewarping_params.h>
@@ -30,10 +30,13 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <ui/workbench/workbench_layout.h>
 
 using nx::vms::client::core::Geometry;
 
 using namespace nx::core;
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -469,8 +472,24 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos)
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
 {
-    qreal aspectRatio = Geometry::aspectRatio(widget->size());
-    QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
+    // If ptz is redirected to another camera...
+    if (const auto camera = widget->resource().dynamicCast<QnClientCameraResource>();
+        camera->isPtzRedirected())
+    {
+        // And target camera is not on the current layout already...
+        if (const auto ptzTarget = camera->ptzRedirectedTo();
+            workbench()->currentLayout()->items(ptzTarget).empty())
+        {
+            // Drop it as near to source camera as possible.
+            ui::action::Parameters parameters(ptzTarget);
+            parameters.setArgument(Qn::ItemPositionRole,
+                qVariantFromValue(QRectF(widget->item()->geometry()).center()));
+            menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+        }
+    }
+
+    const qreal aspectRatio = Geometry::aspectRatio(widget->size());
+    const QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
     widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
 }
 

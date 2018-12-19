@@ -228,8 +228,6 @@ public:
         m_videoLayout->setChannelCount(channelCount);
     }
 
-    virtual QString getDriverName() const override { return lit("MockCamera"); }
-    virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
 
 protected:
