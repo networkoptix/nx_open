@@ -23,7 +23,7 @@ struct NX_VMS_API PersistentIdData: IdData
     bool isNull() const { return id.isNull(); }
 
     bool operator<(const PersistentIdData& other) const;
-    bool operator>(const PersistentIdData& other) const { return !(*this < other); }
+    bool operator>(const PersistentIdData& other) const { return other < *this; }
 };
 #define PersistentIdData_Fields \
     IdData_Fields \

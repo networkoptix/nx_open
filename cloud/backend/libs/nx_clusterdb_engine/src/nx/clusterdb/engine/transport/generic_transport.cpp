@@ -90,7 +90,7 @@ std::string GenericTransport::connectionGuid() const
     return m_commandPipeline->connectionGuid();
 }
 
-const CommandTransportHeader& 
+const CommandTransportHeader&
     GenericTransport::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransportHeaderOfRemoteTransaction;
@@ -296,6 +296,9 @@ void GenericTransport::onTransactionsReadFromLog(
 
     m_remotePeerTranState = readedUpTo;
 
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Synchronize to %1, already synchronized to %2")
+        .args(stateToString(m_tranStateToSynchronizeTo), stateToString(m_remotePeerTranState)));
+
     if (resultCode == ResultCode::partialContent
         || m_tranStateToSynchronizeTo > m_remotePeerTranState)
     {
@@ -344,6 +347,22 @@ void GenericTransport::enableOutputChannel()
             std::move(transportHeader),
             makeSerializer<command::TranSyncDone>(std::move(tranSyncDone)));
     }
+}
+
+std::string GenericTransport::stateToString(const vms::api::TranState& tranState)
+{
+    std::string str;
+    for (auto it = tranState.values.begin(); it != tranState.values.end(); ++it)
+    {
+        if (!str.empty())
+            str += ", ";
+
+        str += it.key().id.toSimpleString().toStdString();
+        str += ": ";
+        str += std::to_string(it.value());
+    }
+
+    return str;
 }
 
 } // namespace nx::clusterdb::engine::transport

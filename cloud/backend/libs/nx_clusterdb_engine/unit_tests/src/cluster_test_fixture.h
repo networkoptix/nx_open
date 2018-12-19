@@ -19,6 +19,7 @@ public:
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
+    nx::utils::Url baseApiUrl() const;
     nx::utils::Url syncronizationUrl() const;
 
     void connectTo(const Peer& other);
