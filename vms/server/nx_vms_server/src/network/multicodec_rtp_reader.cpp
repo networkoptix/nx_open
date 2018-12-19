@@ -733,6 +733,7 @@ void QnMulticodecRtpReader::setDefaultTransport(const QString& value )
 {
     NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
     s_defaultTransportToUse = rtspTransportFromString(value);
+    NX_INFO(typeid(QnMulticodecRtpReader), "Set default transport: %1", s_defaultTransportToUse);
 }
 
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)

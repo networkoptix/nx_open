@@ -43,12 +43,15 @@ RtspTransport rtspTransportFromString(const QString& value)
     auto upperValue = value.toUpper().trimmed();
     if (upperValue == "TCP")
         return RtspTransport::tcp;
-    else if (upperValue == "UDP")
+    if (upperValue == "UDP")
         return RtspTransport::udp;
-    else if (upperValue == "MULTICAST")
+    if (upperValue == "MULTICAST")
         return RtspTransport::multicast;
-    else
+    if (upperValue == "" || upperValue == "AUTO_DETECT")
         return RtspTransport::autoDetect;
+
+    NX_ASSERT(false, lm("Unsupported value: %1").arg(value));
+    return RtspTransport::autoDetect;
 }
 
 QString toString(const RtspTransport& value)
@@ -61,10 +64,13 @@ QString toString(const RtspTransport& value)
             return "TCP";
         case RtspTransport::multicast:
             return "MULTICAST";
-        default:
-            NX_ASSERT(false, lm("Snsupported value: %1").arg(static_cast<int>(value)));
-            return "TCP";
+        case RtspTransport::autoDetect:
+            return "AUTO_DETECT";
     }
+
+    const auto s = lm("TRANSPORT_%1").arg(static_cast<int>(value));
+    NX_ASSERT(false, lm("Unsupported value: %1").arg(s));
+    return s;
 }
 
 //-------------------------------------------------------------------------------------------------
