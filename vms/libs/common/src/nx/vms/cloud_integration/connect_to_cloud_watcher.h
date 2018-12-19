@@ -7,6 +7,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
 
@@ -23,7 +24,10 @@ class AbstractEc2CloudConnector
 public:
     virtual ~AbstractEc2CloudConnector() = default;
 
-    virtual void startDataSynchronization(const nx::utils::Url& cloudUrl) = 0;
+    virtual void startDataSynchronization(
+        const std::string& peerId,
+        const nx::utils::Url& cloudUrl) = 0;
+
     virtual void stopDataSynchronization() = 0;
 };
 
@@ -43,19 +47,28 @@ public:
 
     void setCloudDbUrl(const nx::utils::Url &cloudDbUrl);
     std::optional<nx::utils::Url> cloudDbUrl() const;
+
 private slots:
     void at_updateConnection();
     void restartTimer();
-    void addCloudPeer(nx::utils::Url url);
+    void addCloudPeer(const nx::utils::Url& url);
 
 private:
     QnCommonModule* m_commonModule;
     AbstractEc2CloudConnector* m_ec2CloudConnector;
+    nx::utils::Url m_cloudPeerCandidateUrl;
     nx::utils::Url m_cloudUrl;
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudDbUrlFetcher> m_cdbEndPointFetcher;
+    std::unique_ptr<nx::network::http::AsyncClient> m_fetchPeerIdRequest;
     std::optional<nx::utils::Url> m_cloudDbUrl;
     mutable QnMutex m_mutex;
+
+    void fetchCloudPeerIdAsync(const nx::utils::Url& url);
+    void processFetchPeerIdResponse();
+    void connectToCloudPeer(
+        const std::string& peerId,
+        const nx::utils::Url& url);
 };
 
 } // namespace cloud_integration
