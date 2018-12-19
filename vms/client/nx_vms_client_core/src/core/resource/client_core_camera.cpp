@@ -6,22 +6,20 @@
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
-QnClientCoreCamera::QnClientCoreCamera(const QnUuid& resourceTypeId):
+namespace nx::vms::client::core {
+
+Camera::Camera(const QnUuid& resourceTypeId):
     base_type()
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
 }
 
-QString QnClientCoreCamera::getDriverName() const {
-    return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
-}
-
-QString QnClientCoreCamera::getName() const {
+QString Camera::getName() const {
     return getUserDefinedName();
 }
 
-void QnClientCoreCamera::setName(const QString& name)
+void Camera::setName(const QString& name)
 {
     if (getId().isNull())
     {
@@ -44,19 +42,19 @@ void QnClientCoreCamera::setName(const QString& name)
 }
 
 
-Qn::ResourceFlags QnClientCoreCamera::flags() const {
+Qn::ResourceFlags Camera::flags() const {
     Qn::ResourceFlags result = base_type::flags();
     if (isIOModule())
         result |= Qn::io_module;
     return result;
 }
 
-void QnClientCoreCamera::setIframeDistance(int frames, int timems) {
+void Camera::setIframeDistance(int frames, int timems) {
     Q_UNUSED(frames)
     Q_UNUSED(timems)
 }
 
-Qn::ResourceStatus QnClientCoreCamera::getStatus() const
+Qn::ResourceStatus Camera::getStatus() const
 {
     if (auto context = commonModule())
     {
@@ -68,7 +66,7 @@ Qn::ResourceStatus QnClientCoreCamera::getStatus() const
     return QnResource::getStatus();
 }
 
-void QnClientCoreCamera::setParentId(const QnUuid& parent) {
+void Camera::setParentId(const QnUuid& parent) {
     QnUuid oldValue = getParentId();
     if (oldValue != parent) {
         base_type::setParentId(parent);
@@ -77,10 +75,11 @@ void QnClientCoreCamera::setParentId(const QnUuid& parent) {
     }
 }
 
-void QnClientCoreCamera::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
+void Camera::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     if (other->getParentId() != m_parentId)
         notifiers << [r = toSharedPointer(this)]{emit r->statusChanged(r, Qn::StatusChangeReason::Local);};
     base_type::updateInternal(other, notifiers);
 }
 
+} // namespace nx::vms::client::core

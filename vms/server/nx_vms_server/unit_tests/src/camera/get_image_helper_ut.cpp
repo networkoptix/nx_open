@@ -23,7 +23,6 @@ namespace nx::test {
 class MockCameraResource: public QnVirtualCameraResource
 {
 public:
-    MOCK_CONST_METHOD0(getDriverName, QString());
     MOCK_CONST_METHOD0(aspectRatio, QnAspectRatio());
 
 protected:

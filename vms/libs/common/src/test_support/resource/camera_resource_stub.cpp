@@ -9,11 +9,6 @@ CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
     addFlags(Qn::server_live_cam);
 }
 
-QString CameraResourceStub::getDriverName() const
-{
-    return lit("CameraResourceStub");
-}
-
 QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
 {
     NX_ASSERT(false);

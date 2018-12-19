@@ -74,6 +74,12 @@ public:
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
 
+    /**
+     * @return Driver (built-in or external) name, used to manage camera. This can be "axis",
+     * "dlink", "onvif", etc.
+    */
+    virtual QString getDriverName() const = 0;
+
     QnAbstractPtzController* createPtzController() const;
 
     /** Returns id-value pairs. */

@@ -7,12 +7,13 @@
 
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 
-QnClientCameraResource::QnClientCameraResource(const QnUuid &resourceTypeId)
-    : base_type(resourceTypeId)
+QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
+    base_type(resourceTypeId)
 {
 }
 
-Qn::ResourceFlags QnClientCameraResource::flags() const {
+Qn::ResourceFlags QnClientCameraResource::flags() const
+{
     Qn::ResourceFlags result = base_type::flags();
     if (!isDtsBased() && supportedMotionType() != Qn::MotionType::MT_NoMotion)
         result |= Qn::motion;
@@ -61,16 +62,19 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
      return result;
 }
 
-QnConstResourceVideoLayoutPtr QnClientCameraResource::getVideoLayout(const QnAbstractStreamDataProvider *dataProvider) const {
+QnConstResourceVideoLayoutPtr QnClientCameraResource::getVideoLayout(
+    const QnAbstractStreamDataProvider* dataProvider) const
+{
     return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }
 
-QnConstResourceAudioLayoutPtr QnClientCameraResource::getAudioLayout(const QnAbstractStreamDataProvider *dataProvider) const {
-    const QnArchiveStreamReader *archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
-    if (archive)
+QnConstResourceAudioLayoutPtr QnClientCameraResource::getAudioLayout(
+    const QnAbstractStreamDataProvider* dataProvider) const
+{
+    if (const auto archive = dynamic_cast<const QnArchiveStreamReader*>(dataProvider))
         return archive->getDPAudioLayout();
-    else
-        return QnMediaResource::getAudioLayout();
+
+    return QnMediaResource::getAudioLayout();
 }
 
 QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()

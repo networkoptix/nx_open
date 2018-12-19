@@ -56,12 +56,6 @@ public:
     virtual Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
 
-    //!Returns driver (built-in or external) name, used to manage camera
-    /*!
-        This can be "axis", "dlink", "onvif", etc.
-    */
-    virtual QString getDriverName() const = 0;
-
     virtual int getMaxFps() const;
 
     virtual void setMaxFps(int fps);

@@ -2,21 +2,26 @@
 
 #include <core/resource/camera_resource.h>
 
-class QnClientCoreCamera: public QnVirtualCameraResource {
-    Q_OBJECT
+namespace nx::vms::client::core {
 
-    typedef QnVirtualCameraResource base_type;
+class Camera: public QnVirtualCameraResource
+{
+    Q_OBJECT
+    using base_type = QnVirtualCameraResource;
 
 public:
-    QnClientCoreCamera(const QnUuid& resourceTypeId);
+    explicit Camera(const QnUuid& resourceTypeId);
 
-    virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override;
 
-    //! Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes)
+    /**
+     * @return User-defined camera name if it is present, default name otherwise.
+     */
     virtual QString getName() const override;
 
-    //! Overrides \a QnResource::setName. Writes target name to \a QnCameraUserAttributes instead of resource field.
+    /**
+     * Set user-defined camera name.
+     */
     virtual void setName(const QString& name) override;
 
     virtual Qn::ResourceStatus getStatus() const override;
@@ -25,5 +30,7 @@ public:
     virtual void setParentId(const QnUuid& parent) override;
 
 protected:
-    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
+    virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
 };
+
+} // namespace nx::vms::client::core
