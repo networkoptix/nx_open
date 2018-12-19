@@ -94,7 +94,22 @@ struct TasksQueueInfo {
 
 const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
+/**
+ * Hides password if the string is a valid url with password. Otherwise returns original string.
+ * Note: the function MUST be used for any string which may contain URL when printing to logs.
+ */
+QString hideUrlPassword(QString urlStr)
+{
+    nx::utils::Url url(urlStr);
+    if (url.isValid())
+        url.toDisplayString();
+
+    return urlStr;
+}
+
 } // namespace <anonymous>
+
+
 class ArchiveScanPosition: public nx::vms::server::ServerModuleAware
 {
 public:
