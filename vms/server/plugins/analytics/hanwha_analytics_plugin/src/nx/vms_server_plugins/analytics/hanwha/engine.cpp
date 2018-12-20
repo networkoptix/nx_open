@@ -117,9 +117,7 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
 {
     *outError = Error::noError;
 
-    const QString vendor = QString(deviceInfo->vendor).toLower();
-
-    if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
+    if (!isCompatible(deviceInfo))
         return nullptr;
 
     auto sharedRes = sharedResources(*deviceInfo);
@@ -330,6 +328,12 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 {
     // TODO: Use the handler for error reporting.
     return nx::sdk::Error::noError;
+}
+
+bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+{
+    const QString vendor = QString(deviceInfo->vendor).toLower();
+    return vendor.startsWith(kHanwhaTechwinVendor) || vendor.startsWith(kSamsungTechwinVendor);
 }
 
 } // namespace hanwha

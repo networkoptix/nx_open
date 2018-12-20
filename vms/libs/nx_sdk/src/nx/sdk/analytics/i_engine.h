@@ -80,6 +80,12 @@ public:
     virtual const IString* manifest(Error* outError) const = 0;
 
     /**
+     * @return True if the Engine is able to create DeviceAgents for the provided device, false
+     *     otherwise.
+     */
+    virtual bool isCompatible(const DeviceInfo* deviceInfo) const = 0;
+
+    /**
      * Creates, or returns an already existing, a DeviceAgent instance intended to work with the
      * given device.
      *

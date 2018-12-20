@@ -279,6 +279,11 @@ Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* handler)
     return Error::noError;
 }
 
+bool Engine::isCompatible(const nx::sdk::DeviceInfo* /*deviceInfo*/) const
+{
+    return true;
+}
+
 } // namespace deepstream
 } // namespace analytics
 } // namespace vms_server_plugins

@@ -168,6 +168,11 @@ Error Engine::setHandler(IEngine::IHandler* handler)
     return Error::noError;
 }
 
+bool Engine::isCompatible(const DeviceInfo* /*deviceInfo*/) const
+{
+    return true;
+}
+
 void Engine::assertPluginCasted(void* plugin) const
 {
     NX_KIT_ASSERT(plugin,

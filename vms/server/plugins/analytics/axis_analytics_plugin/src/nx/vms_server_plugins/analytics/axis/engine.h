@@ -45,6 +45,8 @@ public:
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
+    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
+
 private:
     EngineManifest fetchSupportedEvents(
         const nx::sdk::DeviceInfo& deviceInfo);

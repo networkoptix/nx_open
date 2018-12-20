@@ -82,8 +82,7 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(deviceInfo->vendor).toLower();
-    if (!vendor.startsWith(kAxisVendor))
+    if (!isCompatible(deviceInfo))
         return nullptr;
 
     EngineManifest events = fetchSupportedEvents(*deviceInfo);
@@ -140,6 +139,12 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 {
     // TODO: Use the handler for error reporting.
     return nx::sdk::Error::noError;
+}
+
+bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+{
+    const auto vendor = QString(deviceInfo->vendor).toLower();
+    return vendor.startsWith(kAxisVendor);
 }
 
 } // namespace axis

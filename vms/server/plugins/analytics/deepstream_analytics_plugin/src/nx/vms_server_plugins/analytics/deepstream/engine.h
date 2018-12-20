@@ -45,6 +45,8 @@ public:
     std::chrono::microseconds currentTimeUs() const;
 
     nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
+    
+    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;

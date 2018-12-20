@@ -369,7 +369,7 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo, Error* outError)
 {
     // We should invent more accurate test.
-    if (deviceInfo->logicalId != 0)
+    if (isCompatible(deviceInfo))
         return new DeviceAgent(this, *deviceInfo, m_typedManifest);
     else
         return nullptr;
@@ -390,6 +390,11 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 {
     // TODO: Use the handler for error reporting.
     return nx::sdk::Error::noError;
+}
+
+bool Engine::isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const
+{
+    return deviceInfo->logicalId != 0;
 }
 
 } // namespace ssc

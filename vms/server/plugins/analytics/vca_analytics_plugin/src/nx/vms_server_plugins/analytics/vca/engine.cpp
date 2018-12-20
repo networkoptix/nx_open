@@ -77,11 +77,10 @@ nx::sdk::IStringMap* Engine::pluginSideSettings() const
 nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo, Error* outError)
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
-    if (vendor.startsWith(kVcaVendor))
+    if (isCompatible(deviceInfo))
         return new DeviceAgent(this, *deviceInfo, m_typedManifest);
-    else
-        return nullptr;
+
+    return nullptr;
 }
 
 const nx::sdk::IString* Engine::manifest(Error* error) const
@@ -108,6 +107,12 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 {
     // TODO: Use the handler for error reporting.
     return nx::sdk::Error::noError;
+}
+
+bool Engine::isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const
+{
+    const auto vendor = QString(deviceInfo->vendor).toLower();
+    return vendor.startsWith(kVcaVendor);
 }
 
 } // namespace vca

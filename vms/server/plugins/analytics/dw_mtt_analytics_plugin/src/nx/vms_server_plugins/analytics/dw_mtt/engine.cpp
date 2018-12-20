@@ -87,20 +87,8 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo, Error* outError)
 {
     *outError = Error::noError;
-    auto vendor = normalize(QString(deviceInfo->vendor));
-    auto model = normalize(QString(deviceInfo->model));
-
-    if (!vendor.startsWith(kDwMttVendor))
-    {
-        NX_PRINT << "Unsupported camera vendor: " << nx::kit::debug::toString(deviceInfo->vendor);
+    if (!isCompatible(deviceInfo))
         return nullptr;
-    }
-
-    if (!m_typedManifest.supportsModel(model))
-    {
-        NX_PRINT << "Unsupported camera model: " << nx::kit::debug::toString(deviceInfo->model);
-        return nullptr;
-    }
 
     return new DeviceAgent(this, *deviceInfo, m_typedManifest);
 }
@@ -130,6 +118,26 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 {
     // TODO: Use the handler for error reporting.
     return nx::sdk::Error::noError;
+}
+
+bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+{
+    const auto vendor = normalize(QString(deviceInfo->vendor));
+    const auto model = normalize(QString(deviceInfo->model));
+
+    if (!vendor.startsWith(kDwMttVendor))
+    {
+        NX_PRINT << "Unsupported camera vendor: " << nx::kit::debug::toString(deviceInfo->vendor);
+        return false;
+    }
+
+    if (!m_typedManifest.supportsModel(model))
+    {
+        NX_PRINT << "Unsupported camera model: " << nx::kit::debug::toString(deviceInfo->model);
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace dw_mtt
