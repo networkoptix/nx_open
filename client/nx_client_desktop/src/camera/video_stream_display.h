@@ -95,7 +95,13 @@ private:
     }
 private:
     mutable QnMutex m_mtx;
-    QMap<AVCodecID, QnAbstractVideoDecoder*> m_decoder;
+
+    struct Decoder
+    {
+        AVCodecID compressionType = AVCodecID::AV_CODEC_ID_NONE;
+        std::unique_ptr<QnAbstractVideoDecoder> decoder;
+    };
+    Decoder m_decoderData;
 
     QSet<QnAbstractRenderer*> m_newList;
     QSet<QnAbstractRenderer*> m_renderList;
