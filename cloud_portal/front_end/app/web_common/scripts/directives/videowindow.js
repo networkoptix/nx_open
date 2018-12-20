@@ -352,7 +352,8 @@ import * as Hls from 'hls.js';
                                         //If the player stalls give it a chance to recover
                                         scope.vgApi.addEventListener('stalled', resetTimeout);
                                         scope.vgApi.addEventListener('error', (e) => {
-                                            if(e.target === null){ // this is a special case - interrupted video
+                                            $timeout(() => {
+                                                if(e.target === null){ // this is a special case - interrupted video
                                                 // (switch to another camera)
                                                 return;
                                             }
@@ -362,7 +363,7 @@ import * as Hls from 'hls.js';
                                                 target.error.url = target.currentSrc;
                                             }
                                             
-                                            $timeout(() => {
+                                            
                                                 playerErrorHandler(target.error);
                                             });
                                         });
