@@ -58,4 +58,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx_vms_api_analytics_ActionTypeDescriptor_Fields,
     (brief, true))
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    DeviceDescriptor,
+    (json)(eq),
+    nx_vms_api_analytics_DeviceDescriptor_Fields,
+    (brief, true))
+
 } // namespace nx::vms::api::analytics

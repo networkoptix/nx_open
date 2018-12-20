@@ -171,6 +171,15 @@ struct ActionTypeDescriptor: BaseDescriptor
     (supportedObjectTypeIds) \
     (parametersModel)
 
+struct DeviceDescriptor
+{
+    QnUuid id; //< Device id.
+    std::set<QnUuid> compatibleEngines;
+
+    QnUuid getId() const { return id; };
+};
+#define nx_vms_api_analytics_DeviceDescriptor_Fields (id) (compatibleEngines)
+
 QN_FUSION_DECLARE_FUNCTIONS(DescriptorScope, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(BaseDescriptor, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(BaseScopedDescriptor, (json)(eq), NX_VMS_API)
@@ -180,5 +189,6 @@ QN_FUSION_DECLARE_FUNCTIONS(GroupDescriptor, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EventTypeDescriptor, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTypeDescriptor, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ActionTypeDescriptor, (json)(eq), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceDescriptor, (json)(eq), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics

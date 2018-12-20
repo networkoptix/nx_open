@@ -5,9 +5,13 @@
 
 namespace nx::analytics {
 
-template<typename StorageFactory, typename MergeExecutor>
+template<typename StorageFactoryType, typename MergeExecutorType>
 class MultiresourceDescriptorContainer
 {
+public:
+    using StorageFactory = StorageFactoryType;
+    using MergeExecutor = MergeExecutorType;
+
     using Container = DescriptorContainer<
         typename decltype(std::declval<StorageFactory>()(QnResourcePtr()))::element_type,
         MergeExecutor>;

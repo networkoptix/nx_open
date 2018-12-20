@@ -10,6 +10,7 @@ using GroupId = QString;
 using EventTypeId = QString;
 using ObjectTypeId = QString;
 using ActionTypeId = QString;
+using DeviceId = QnUuid;
 
 using PluginDescriptorMap = std::map<PluginId, nx::vms::api::analytics::PluginDescriptor>;
 using EngineDescriptorMap = std::map<EngineId, nx::vms::api::analytics::EngineDescriptor>;
@@ -24,5 +25,7 @@ using ActionTypeDescriptorMap = MapHelper::NestedMap<
     EngineId,
     ActionTypeId,
     nx::vms::api::analytics::ActionTypeDescriptor>;
+
+using DeviceDescriptorMap = std::map<DeviceId, nx::vms::api::analytics::DeviceDescriptor>;
 
 } // namespace nx::analytics

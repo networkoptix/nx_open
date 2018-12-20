@@ -18,13 +18,12 @@ const QString DescriptorManager::kGroupDescriptorsProperty("groupDescriptors");
 const QString DescriptorManager::kEventTypeDescriptorsProperty("eventTypeDescriptors");
 const QString DescriptorManager::kObjectTypeDescriptorsProperty("objectTypeDescriptors");
 const QString DescriptorManager::kActionTypeDescriptorsProperty("actionTypeDescriptors");
+const QString DescriptorManager::kDeviceDescriptorsProperty("deviceDescriptors");
 
 namespace {
 
-template<template<typename...> typename Container, typename Descriptor, typename... Scopes>
-std::unique_ptr<Container<Descriptor, Scopes...>> makeContainer(
-    QnCommonModule* commonModule,
-    QString propertyName)
+template <typename Container>
+std::unique_ptr<Container> makeContainer(QnCommonModule* commonModule, QString propertyName)
 {
     const auto resourcePool = commonModule->resourcePool();
     auto servers = resourcePool->getAllServers(Qn::AnyStatus);
@@ -32,13 +31,9 @@ std::unique_ptr<Container<Descriptor, Scopes...>> makeContainer(
     const auto moduleGuid = commonModule->moduleGUID();
     auto ownResource = resourcePool->getResourceById<QnMediaServerResource>(moduleGuid);
 
-    auto factory = PropertyDescriptorStorageFactory<Descriptor, Scopes...>(
-        std::move(propertyName));
+    auto factory = typename Container::StorageFactory(std::move(propertyName));
 
-    return std::make_unique<Container<Descriptor, Scopes...>>(
-        std::move(factory),
-        servers,
-        ownResource);
+    return std::make_unique<Container>(std::move(factory), servers, ownResource);
 }
 
 template<typename Descriptor, typename Item>
@@ -94,41 +89,33 @@ using namespace nx::vms::api::analytics;
 DescriptorManager::DescriptorManager(QnCommonModule* commonModule):
     base_type(commonModule),
     m_pluginDescriptorContainer(
-        makeContainer<
-            detail::Container,
-            PluginDescriptor,
-            PluginId>(commonModule, kPluginDescriptorsProperty)),
+        makeContainer<detail::Container<PluginDescriptor, PluginId>>(
+            commonModule, kPluginDescriptorsProperty)),
     m_engineDescriptorContainer(
-        makeContainer<
-            detail::Container,
-            EngineDescriptor,
-            EngineId>(commonModule, kEngineDescriptorsProperty)),
+        makeContainer<detail::Container<EngineDescriptor, EngineId>>(
+            commonModule, kEngineDescriptorsProperty)),
     m_groupDescriptorContainer(
-        makeContainer<
-            detail::ScopedContainer,
-            GroupDescriptor,
-            GroupId>(commonModule, kGroupDescriptorsProperty)),
+        makeContainer<detail::ScopedContainer<GroupDescriptor, GroupId>>(
+            commonModule, kGroupDescriptorsProperty)),
     m_eventTypeDescriptorContainer(
-        makeContainer<
-            detail::ScopedContainer,
-            EventTypeDescriptor,
-            EventTypeId>(commonModule, kEventTypeDescriptorsProperty)),
+        makeContainer<detail::ScopedContainer<EventTypeDescriptor, EventTypeId>>(
+            commonModule, kEventTypeDescriptorsProperty)),
     m_objectTypeDescriptorContainer(
-        makeContainer<
-            detail::ScopedContainer,
-            ObjectTypeDescriptor,
-            ObjectTypeId>(commonModule, kObjectTypeDescriptorsProperty)),
+        makeContainer<detail::ScopedContainer<ObjectTypeDescriptor, ObjectTypeId>>(
+            commonModule, kObjectTypeDescriptorsProperty)),
     m_actionTypeDescriptorContainer(
-        makeContainer<
-            detail::Container,
-            ActionTypeDescriptor,
-            EngineId, ActionTypeId>(commonModule, kActionTypeDescriptorsProperty))
+        makeContainer<detail::Container<ActionTypeDescriptor, EngineId, ActionTypeId>>(
+            commonModule, kActionTypeDescriptorsProperty)),
+    m_deviceDescriptorContainer(
+        makeContainer<detail::DeviceDescriptorContainer>(
+            commonModule, kDeviceDescriptorsProperty))
 {
 }
 
 void DescriptorManager::clearRuntimeInfo()
 {
     m_actionTypeDescriptorContainer->removeDescriptors();
+    m_deviceDescriptorContainer->removeDescriptors();
 }
 
 void DescriptorManager::updateFromPluginManifest(
@@ -159,7 +146,7 @@ void DescriptorManager::updateFromEngineManifest(
 }
 
 void DescriptorManager::updateFromDeviceAgentManifest(
-    const QnUuid& /*deviceId*/,
+    const DeviceId& /*deviceId*/,
     const EngineId& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
@@ -169,6 +156,39 @@ void DescriptorManager::updateFromDeviceAgentManifest(
         toMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
     m_eventTypeDescriptorContainer->mergeWithDescriptors(
         toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
+}
+
+void DescriptorManager::addCompatibleAnalyticsEngines(
+    const DeviceId& deviceId,
+    std::set<EngineId> compatibleEngineIds)
+{
+    m_deviceDescriptorContainer->mergeWithDescriptors(
+        DeviceDescriptor{deviceId, std::move(compatibleEngineIds)}, deviceId);
+}
+
+void DescriptorManager::removeCompatibleAnalyticsEngines(
+    const DeviceId& deviceId,
+    std::set<EngineId> engineIdsToRemove)
+{
+    if (engineIdsToRemove.empty())
+        return;
+
+    auto descriptor = m_deviceDescriptorContainer->mergedDescriptors(deviceId);
+    if (!descriptor)
+        return;
+
+    for (const auto& engineId: engineIdsToRemove)
+        descriptor->compatibleEngines.erase(engineId);
+
+    m_deviceDescriptorContainer->setDescriptors(*descriptor, deviceId);
+}
+
+void DescriptorManager::setCompatibleAnalyticsEngines(
+    const DeviceId& deviceId,
+    std::set<EngineId> engineIds)
+{
+    m_deviceDescriptorContainer->setDescriptors(
+        DeviceDescriptor{deviceId, std::move(engineIds)}, deviceId);
 }
 
 template<typename Container, typename Key>
@@ -445,7 +465,7 @@ ActionTypeDescriptorMap DescriptorManager::objectActionTypeDescriptors() const
 
 ActionTypeDescriptorMap DescriptorManager::availableObjectActionTypeDescriptors(
     const ObjectTypeId& objectTypeId,
-    const QnVirtualCameraResourcePtr& device)
+    const QnVirtualCameraResourcePtr& device) const
 {
     const auto resourcePool = commonModule()->resourcePool();
     const auto deviceParentServer = resourcePool->getResourceById<QnMediaServerResource>(
@@ -487,6 +507,17 @@ ActionTypeDescriptorMap DescriptorManager::availableObjectActionTypeDescriptors(
         {
             return descriptor.supportedObjectTypeIds.contains(objectTypeId);
         });
+}
+
+std::optional<nx::vms::api::analytics::DeviceDescriptor> DescriptorManager::deviceDescriptor(
+    const DeviceId& deviceId) const
+{
+    return descriptor(m_deviceDescriptorContainer, deviceId);
+}
+
+DeviceDescriptorMap DescriptorManager::deviceDescriptors(const std::set<DeviceId>& deviceIds) const
+{
+    return descriptors(m_deviceDescriptorContainer, deviceIds, "Device");
 }
 
 } // namespace nx::analytics

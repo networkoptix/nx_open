@@ -14,6 +14,7 @@
 #include <nx/analytics/property_descriptor_storage_factory.h>
 #include <nx/analytics/multiresource_descriptor_container.h>
 #include <nx/analytics/scoped_merge_executor.h>
+#include <nx/analytics/device_descriptor_merge_executor.h>
 #include <nx/analytics/types.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -35,11 +36,17 @@ using ScopedContainer = MultiresourceDescriptorContainer<
     PropertyDescriptorStorageFactory<Descriptor, Scopes...>,
     ScopedMergeExecutor<Descriptor>>;
 
+using DeviceDescriptorContainer = MultiresourceDescriptorContainer<
+    PropertyDescriptorStorageFactory<nx::vms::api::analytics::DeviceDescriptor, DeviceId>,
+    DeviceDescriptorMergeExecutor>;
+
 template<typename Descriptor, typename... Scopes>
 using ContainerPtr = std::unique_ptr<Container<Descriptor, Scopes...>>;
 
 template<typename Descriptor, typename... Scopes>
 using ScopedContainerPtr = std::unique_ptr<ScopedContainer<Descriptor, Scopes...>>;
+
+using DeviceDescriptorContainerPtr = std::unique_ptr<DeviceDescriptorContainer>;
 
 } // namespace detail
 
@@ -56,6 +63,7 @@ public:
     static const QString kEventTypeDescriptorsProperty;
     static const QString kObjectTypeDescriptorsProperty;
     static const QString kActionTypeDescriptorsProperty;
+    static const QString kDeviceDescriptorsProperty;
 
     void clearRuntimeInfo();
 
@@ -69,9 +77,21 @@ public:
         const nx::vms::api::analytics::EngineManifest& manifest);
 
     void updateFromDeviceAgentManifest(
-        const QnUuid& deviceId,
+        const DeviceId& deviceId,
         const EngineId& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
+
+    void addCompatibleAnalyticsEngines(
+        const DeviceId& deviceId,
+        std::set<EngineId> compatibleEngineIds);
+
+    void removeCompatibleAnalyticsEngines(
+        const DeviceId& deviceId,
+        std::set<EngineId> engineIdsToRemove);
+
+    void setCompatibleAnalyticsEngines(
+        const DeviceId& deviceId,
+        std::set<EngineId> engineIdsToRemove);
 
     std::optional<nx::vms::api::analytics::PluginDescriptor> pluginDescriptor(
         const PluginId& id) const;
@@ -123,7 +143,12 @@ public:
 
     ActionTypeDescriptorMap availableObjectActionTypeDescriptors(
         const ObjectTypeId& objectTypeId,
-        const QnVirtualCameraResourcePtr& device);
+        const QnVirtualCameraResourcePtr& device) const;
+
+    std::optional<nx::vms::api::analytics::DeviceDescriptor> deviceDescriptor(
+        const DeviceId& deviceId) const;
+
+    DeviceDescriptorMap deviceDescriptors(const std::set<DeviceId>& deviceIds) const;
 
 private:
     template<typename DescriptorMap>
@@ -156,6 +181,8 @@ private:
     detail::ContainerPtr<
         nx::vms::api::analytics::ActionTypeDescriptor,
         EngineId, ActionTypeId> m_actionTypeDescriptorContainer;
+
+    detail::DeviceDescriptorContainerPtr m_deviceDescriptorContainer;
 };
 
 } // namespace nx::analytics
