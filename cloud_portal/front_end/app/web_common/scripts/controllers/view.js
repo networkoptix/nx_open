@@ -4,11 +4,11 @@
     
     angular.module('nxCommon').controller('ViewCtrl',
         ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
-            'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'voiceControl',
+            'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', '$filter', 'systemAPI', 'voiceControl',
             'dialogs', 'configService', 'languageService',
             
             function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
-                      camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl,
+                      camerasProvider, $sessionStorage, $localStorage, $timeout, $filter, systemAPI, voiceControl,
                       dialogs, configService, languageService) {
                 
                 const CONFIG = configService.config;
@@ -245,7 +245,8 @@
                     $scope.resolution = resolutionHls;
                     
                     $scope.currentResolution = $scope.player === 'webm' ? resolution : resolutionHls;
-                    $scope.activeVideoSource = _.filter([
+                    
+                    let videoSources = [
                         {
                             src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt,
                             type: mimeTypes.hls,
@@ -261,8 +262,10 @@
                             type: mimeTypes.jpeg,
                             transport: 'preview'
                         }
-                    ], function (src) {
-                        return cameraSupports(src.transport) !== null;
+                    ];
+                    
+                    $scope.activeVideoSource = videoSources.filter((src) => {
+                        return cameraSupports(src.transport);
                     });
                     
                     $scope.preview = _.find($scope.activeVideoSource, function (src) {
