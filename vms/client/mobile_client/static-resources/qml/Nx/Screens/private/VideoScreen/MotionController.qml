@@ -122,7 +122,7 @@ Item
         d.handleMouseReleased()
     }
 
-    MaskedUniformGrid
+    RoundedMask
     {
         // TODO: turn off motion area data gethering when not visible.
         visible: controller.motionSearchMode
@@ -132,7 +132,8 @@ Item
         opacity: 1
         cellCountX: 44
         cellCountY: 32
-        color: "red"
+        fillColor: ColorTheme.transparent(ColorTheme.red_l2, 0.15)
+        lineColor: ColorTheme.transparent(ColorTheme.red_l2, 0.5)
 
         MediaPlayerMotionProvider
         {
