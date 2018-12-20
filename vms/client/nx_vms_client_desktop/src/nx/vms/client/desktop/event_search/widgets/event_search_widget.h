@@ -22,7 +22,7 @@ public:
 private:
     virtual QString placeholderText(bool constrained) const override;
     virtual QString itemCounterText(int count) const override;
-    virtual bool calculateIsAllowed() const override;
+    virtual bool calculateAllowance() const override;
 
 private:
     class Private;

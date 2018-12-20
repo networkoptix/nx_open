@@ -106,8 +106,8 @@ AbstractSearchWidget::Private::Private(
 
     ui->headerWidget->setAutoFillBackground(true);
     ui->headerLayout->insertWidget(0, m_textFilterEdit);
-    connect(m_textFilterEdit, &SearchLineEdit::textChanged,
-        q, &AbstractSearchWidget::textFilterChanged);
+    connect(m_textFilterEdit, &SearchLineEdit::textChanged, this,
+        [this](const QString& value) { emit this->q->textFilterChanged(value, {}); });
 
     setupModels();
     setupRibbon();
@@ -157,7 +157,7 @@ void AbstractSearchWidget::Private::setupModels()
         });
 
     connect(m_mainModel.data(), &AbstractSearchListModel::camerasChanged, this,
-        [this]() { emit q->cameraSetChanged(m_mainModel->cameras()); });
+        [this]() { emit q->cameraSetChanged(m_mainModel->cameras(), {}); });
 
     connect(m_mainModel.data(), &AbstractSearchListModel::isOnlineChanged, this,
         [this](bool isOnline)
@@ -202,7 +202,8 @@ void AbstractSearchWidget::Private::setupRibbon()
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
-    connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
+    connect(ui->ribbon, &EventRibbon::hovered, this,
+        [this](const QModelIndex& idx, EventTile* tile) { emit q->tileHovered(idx, tile, {}); });
 
     TileInteractionHandler::install(ui->ribbon);
 }
@@ -541,7 +542,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
         return;
 
     m_isAllowed = value;
-    emit q->isAllowedChanged(m_isAllowed);
+    emit q->allowanceChanged(m_isAllowed, {});
 }
 
 void AbstractSearchWidget::Private::goToLive()
@@ -606,7 +607,7 @@ void AbstractSearchWidget::Private::updateCurrentTimePeriod()
     m_currentTimePeriod = newTimePeriod;
     m_mainModel->setRelevantTimePeriod(m_currentTimePeriod);
 
-    emit q->timePeriodChanged(m_currentTimePeriod);
+    emit q->timePeriodChanged(m_currentTimePeriod, {});
 }
 
 QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
