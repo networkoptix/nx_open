@@ -609,21 +609,6 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
     m_rtpToTrack[rtcpNum].isRtcp = true;
 }
 
-QString hostAddressToInterfaceAddress(const nx::network::HostAddress& addressStr)
-{
-    QHostAddress address(addressStr.toString());
-    using namespace nx::network;
-    const auto interfaceList =
-        getAllIPv4Interfaces(InterfaceListPolicy::keepAllAddressesPerInterface);
-    for (const auto& netInterface: interfaceList)
-    {
-        if (netInterface.isHostBelongToIpv4Network(address))
-            return netInterface.address.toString();
-    }
-
-    return QString();
-}
-
 bool QnRtspClient::sendSetup()
 {
     int audioNum = 0;
@@ -670,7 +655,7 @@ bool QnRtspClient::sendSetup()
             if (m_prefferedTransport == RtspTransport::multicast)
             {
                 track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
-                    hostAddressToInterfaceAddress(m_tcpSock->getForeignAddress().address));
+                    m_tcpSock->getLocalAddress().address.toString());
             }
 
             if (m_prefferedTransport != RtspTransport::tcp)
