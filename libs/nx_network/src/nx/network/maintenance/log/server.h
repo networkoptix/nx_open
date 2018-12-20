@@ -5,7 +5,7 @@
 namespace nx::network::maintenance::log {
 
 /**
- * Serves HTTP requests that can are used to access/modify logging configuration.
+ * Serves HTTP requests that can be used to access/modify logging configuration.
  */
 class NX_NETWORK_API Server
 {
