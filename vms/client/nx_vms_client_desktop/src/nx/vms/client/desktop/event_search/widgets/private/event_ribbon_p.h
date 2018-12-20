@@ -119,7 +119,6 @@ private:
     void ensureWidget(int index);
     void reserveWidget(int index);
 
-    void handleItemAboutToBeRemoved(int index);
     void handleWidgetChanged(int index);
     void closeExpiredTiles();
 
@@ -177,6 +176,7 @@ private:
     std::deque<TilePtr> m_tiles;
     std::stack<std::unique_ptr<EventTile>> m_reserveWidgets;
     QPersistentModelIndex m_hoveredIndex;
+    bool m_tileHovered = false;
     Interval m_visible;
 
     QHash<QPersistentModelIndex, QDeadlineTimer> m_deadlines;

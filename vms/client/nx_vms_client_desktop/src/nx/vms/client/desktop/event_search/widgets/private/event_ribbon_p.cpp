@@ -156,7 +156,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             for (int index = first; index <= last; ++index)
-                handleItemAboutToBeRemoved(index);
+                m_deadlines.remove(m_model->index(index));
         });
 
     m_modelConnections << connect(m_model, &QAbstractListModel::rowsRemoved, this,
@@ -419,14 +419,6 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
     menu->exec(globalPos);
-}
-
-void EventRibbon::Private::handleItemAboutToBeRemoved(int index)
-{
-    m_deadlines.remove(m_model->index(index));
-
-    if (m_hoveredIndex.row() == index)
-        m_hoveredIndex = QPersistentModelIndex();
 }
 
 void EventRibbon::Private::handleWidgetChanged(int index)
@@ -752,6 +744,7 @@ void EventRibbon::Private::clear()
     m_tiles.clear();
     m_visible = {};
     m_hoveredIndex = QPersistentModelIndex();
+    m_tileHovered = false;
     m_endPosition = 0;
     m_live = true;
 
@@ -1243,36 +1236,33 @@ void EventRibbon::Private::updateHover()
     if (q->rect().contains(pos))
     {
         const int index = indexAtPos(pos);
-
-        auto tile = index >= 0 ? m_tiles[index].get() : nullptr;
-        const auto widget = tile ? tile->widget.get() : nullptr;
-
-        NX_ASSERT(!tile || widget);
-        if (tile && !widget)
-            tile = nullptr;
-
-        if ((!m_hoveredIndex.isValid() && index < 0) || m_hoveredIndex.row() == index)
+        if ((index < 0 && !m_tileHovered) || (index >= 0 && m_hoveredIndex.row() == index))
             return;
 
         if (m_hoveredIndex.isValid() && m_deadlines.contains(m_hoveredIndex))
             m_deadlines[m_hoveredIndex].setRemainingTime(kVisibleAutoCloseDelay);
 
-        if (index < 0)
+        m_tileHovered = index >= 0 && NX_ASSERT(m_model);
+        if (m_tileHovered)
+        {
+            const auto widget = m_tiles[index]->widget.get();
+            NX_ASSERT(widget);
+
+            m_hoveredIndex = m_model->index(index);
+            emit q->hovered(m_hoveredIndex, widget);
+        }
+        else
         {
             m_hoveredIndex = QPersistentModelIndex();
             emit q->hovered(QModelIndex(), nullptr);
         }
-        else if (NX_ASSERT(m_model))
-        {
-            m_hoveredIndex = m_model->index(index);
-            emit q->hovered(m_hoveredIndex, widget);
-        }
     }
     else
     {
-        if (!m_hoveredIndex.isValid())
+        if (!m_tileHovered)
             return;
 
+        m_tileHovered = false;
         m_hoveredIndex = QPersistentModelIndex();
         emit q->hovered(QModelIndex(), nullptr);
     }
