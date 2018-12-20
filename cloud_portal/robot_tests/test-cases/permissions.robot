@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -11,6 +10,9 @@ Force Tags        System
 ${email}           ${EMAIL OWNER}
 ${password}        ${BASE PASSWORD}
 ${url}             ${ENV}
+${DELETE USER BUTTON ADMIN}               //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+${EDIT USER BUTTON ADMIN}                 //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+${ADMIN USER IN LIST}                     //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
 ${share dialogue}
 
 *** Keywords ***
@@ -43,12 +45,16 @@ Check Log In
 
 Check Special Hint
     [arguments]    ${type}
-        Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
     ${type}    Convert To Uppercase    ${type}
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ${type}}
+    Run Keyword If    "${type}"=="${ADMIN TEXT}"          Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMINISTRATOR}
+    ...    ELSE IF    "${type}"=="${ADV VIEWER TEXT}"     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADVANCED VIEWER}
+    ...    ELSE IF    "${type}"=="${VIEWER TEXT}"         Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
+    ...    ELSE IF    "${type}"=="${LIVE VIEWER TEXT}"    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
+    ...    ELSE IF    "${type}"=="${CUSTOM TEXT}"         Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
 
 Restart
     Register Keyword To Run On Failure    NONE
@@ -150,7 +156,52 @@ displays pencil and cross links for each user only on hover
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Remove User Permissions    ${random email}
 
+admin cannot delete or edit self
+    [tags]    C41904
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
+    Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
+    Wait Until Element Is Visible    ${ADMIN USER IN LIST}
+    Mouse Over    ${ADMIN USER IN LIST}
+    Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
+    Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
+
+admin cannot delete or edit other admins
+    [tags]    C41905
+    Go To    ${url}/register
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Register    mark    harmill    ${random email}    ${password}
+    Activate    ${random email}
+    Log in to Auto Tests System    ${email}
+    Share To    ${random email}    ${ADMIN TEXT}
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${random email}
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${email}
+    Remove User Permissions    ${random email}
+
+admin cannot invite another admin
+    [tags]    C41905
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Sleep    2
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
+    Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT']
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE CANCEL}
+
 Edit permission works
+    [tags]    C41900
     ${random email}    Get Random Email    ${BASE EMAIL}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
@@ -163,7 +214,7 @@ Edit permission works
     Remove User Permissions    ${random email}
 
 Delete user works
-    [tags]    email
+    [tags]    email    C41903
     Go To    ${url}/register
     ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    harmill    ${random email}    ${password}
@@ -178,6 +229,12 @@ Delete user works
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${email}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    ${DELETE USER CANCEL BUTTON}
+    Click Button    ${DELETE USER CANCEL BUTTON}
     Remove User Permissions    ${random email}
     Log Out
     Validate Log Out
@@ -190,6 +247,7 @@ Share with registered user - sends him notification
     #otherwise it may receive the notification in another language and fail the email subject comparison
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
+    Sleep    1
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${email}

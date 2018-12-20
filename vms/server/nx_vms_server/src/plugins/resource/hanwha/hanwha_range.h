@@ -7,7 +7,7 @@
 #include <nx/utils/std/optional.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 template<typename NumericType>
@@ -53,5 +53,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

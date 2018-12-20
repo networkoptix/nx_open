@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/data_sync_engine/statistics/provider.h>
+#include <nx/clusterdb/engine/statistics/provider.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/connection_server/server_statistics.h>
 
@@ -9,7 +9,7 @@ namespace nx::cloud::db::statistics {
 struct Statistics
 {
     network::server::Statistics http;
-    data_sync_engine::statistics::Statistics dataSync;
+    clusterdb::engine::statistics::Statistics dataSync;
 };
 
 #define Statistics_cdb_Fields (http)(dataSync)
@@ -25,13 +25,13 @@ class Provider
 public:
     Provider(
         const network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-        const data_sync_engine::statistics::Provider& dataSyncEngineStatisticsProvider);
+        const clusterdb::engine::statistics::Provider& dataSyncEngineStatisticsProvider);
 
     Statistics statistics() const;
 
 private:
     const network::server::AbstractStatisticsProvider& m_httpServerStatisticsProvider;
-    const data_sync_engine::statistics::Provider& m_dataSyncEngineStatisticsProvider;
+    const clusterdb::engine::statistics::Provider& m_dataSyncEngineStatisticsProvider;
 };
 
 } // namespace nx::cloud::db::statistics

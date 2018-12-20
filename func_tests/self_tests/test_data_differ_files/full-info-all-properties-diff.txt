@@ -1,5 +1,0 @@
-/allProperties property removed "resource_4|name_4" null
-/allProperties property added null "resource_4|name_4_new"
-/allProperties property added null "resource_4_new|name_4"
-/allProperties/resource_2|name_2 dict removed "value" null
-/allProperties/resource_6|name_6/value unicode changed "Value_6" "Value_6_new"

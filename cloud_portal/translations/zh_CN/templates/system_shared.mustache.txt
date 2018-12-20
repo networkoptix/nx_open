@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+你好，{{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}}（{{message.sharer_email}}）与您共享视频管理系统“{{message.system_name}}”。

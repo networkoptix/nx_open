@@ -23,6 +23,7 @@
 #include <api/global_settings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
@@ -507,7 +508,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case NodeType::sharedLayouts:
         case NodeType::webPages:
         case NodeType::roleUsers:
-        case NodeType::analyticsEngines:
         case NodeType::sharedResource:
         case NodeType::role:
         case NodeType::layoutTour:
@@ -549,6 +549,10 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         /* Only admins can see edge nodes. */
         return !isAdmin;
+
+    case NodeType::analyticsEngines:
+    case NodeType::filteredAnalyticsEngines:
+        return !ini().displayAnalyticsEnginesInResourceTree;
 
     case NodeType::resource:
         /* Hide resource nodes without resource. */

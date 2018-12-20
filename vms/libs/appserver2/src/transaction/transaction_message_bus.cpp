@@ -862,8 +862,10 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
         connectToPeerLost(id);
 }
 
-void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
-    const QnTransactionTransportHeader& transportHeader, const api::TranState& runtimeState)
+void QnTransactionMessageBus::sendRuntimeInfo(
+    QnTransactionTransport* transport,
+    const QnTransactionTransportHeader& transportHeader,
+    const api::TranState& runtimeState)
 {
     QList<QnTransaction<api::RuntimeData>> result;
     m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
@@ -875,11 +877,12 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     }
 }
 
-bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& connectionGuid)
+bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(
+    const std::string& connectionGuid)
 {
     QnMutexLocker lock(&m_mutex);
 
-    for (auto connection : m_connectingConnections)
+    for (auto connection: m_connectingConnections)
     {
         if (connection->connectionGuid() == connectionGuid)
         {
@@ -910,7 +913,8 @@ nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
     return url;
 }
 
-void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url &_url)
+void QnTransactionMessageBus::addOutgoingConnectionToPeer(
+    const QnUuid& id, const nx::utils::Url &_url)
 {
     removeOutgoingConnectionFromPeer(id);
     nx::utils::Url url = updateOutgoingUrl(id, _url);
@@ -971,7 +975,8 @@ QVector<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() co
     return connections;
 }
 
-void QnTransactionMessageBus::waitForNewTransactionsReady(const QnUuid& connectionGuid)
+void QnTransactionMessageBus::waitForNewTransactionsReady(
+    const std::string& connectionGuid)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -1004,7 +1009,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady(const QnUuid& connecti
     }
 }
 
-void QnTransactionMessageBus::connectionFailure(const QnUuid& connectionGuid)
+void QnTransactionMessageBus::connectionFailure(const std::string& connectionGuid)
 {
     QnMutexLocker lock(&m_mutex);
     for (QnTransactionTransport* transport : m_connections)

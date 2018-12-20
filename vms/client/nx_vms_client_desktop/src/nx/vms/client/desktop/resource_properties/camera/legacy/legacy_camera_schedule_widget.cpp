@@ -436,8 +436,8 @@ void LegacyCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &c
         connect(camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& propertyName)
             {
-                if (propertyName == nx::media::kCameraMediaCapabilityParamName
-                    || propertyName == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+                if (propertyName == ResourcePropertyKey::kMediaCapabilities
+                    || propertyName == ResourcePropertyKey::kMediaStreams)
                 {
                     syncBitrateWithFps();
                 }
@@ -1039,7 +1039,7 @@ void LegacyCameraScheduleWidget::updateRecordingParamsAvailable()
         {
             return camera->hasVideo(0)
                 && camera->getVendor() != lit("GENERIC_RTSP")
-                && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
+                && !camera->hasDefaultProperty(ResourcePropertyKey::kNoRecordingParams);
         });
 
     if (m_recordingParamsAvailable == available)

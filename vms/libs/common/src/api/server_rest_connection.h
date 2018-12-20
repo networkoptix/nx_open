@@ -87,24 +87,22 @@ class ServerConnection:
 
 public:
     /**
-     * @brief ServerConnection
-     *
-     * It has two modes of authentication:
+     * Used to send REST requests to the mediaserver. It has two modes of authentication:
      *  - directUrl is empty. It will use ec2Connection and MediaServerResource to get
-     *    authentication data.
+     *     authentication data.
      *  - directUrl has some valid data. ServerConnection will use this url for authentication.
      *
      * Second mode is used in cases, when we stil do not have proper resource pool and
      * ec2Conenction instance, but need to send requests to the server.
      *
-     * @param commonModule - ServerConnection takes a lot of objects from it.
-     * @param serverId - resource Id of the mediaserver.
-     * @param directUrl - direct Url to mediaserver.
+     * @param commonModule ServerConnection takes a lot of objects from it.
+     * @param serverId resource Id of the mediaserver.
+     * @param directUrl direct Url to mediaserver.
      */
     ServerConnection(
         QnCommonModule* commonModule,
         const QnUuid& serverId,
-        nx::utils::Url directUrl = nx::utils::Url());
+        const nx::utils::Url& directUrl = nx::utils::Url());
     virtual ~ServerConnection();
 
     struct EmptyResponseType {};
@@ -218,12 +216,6 @@ public:
         const QByteArray& md5,
         qint64 ttl,
         AddUploadCallback callback,
-        QThread* targetThread = nullptr);
-
-    Handle validateFileInformation(
-        const QString& url,
-        int expectedSize,
-        GetCallback callback,
         QThread* targetThread = nullptr);
 
     Handle removeFileDownload(
@@ -383,11 +375,18 @@ public:
         QThread* thread = nullptr);
 
     Handle searchCameraStart(
-        const QString& startAddress,
+        const QString& cameraUrl,
+        const QString& userName,
+        const QString& password,
+        std::optional<int> port,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle searchCameraRangeStart(const QString& startAddress,
         const QString& endAddress,
         const QString& userName,
         const QString& password,
-        int port,
+        std::optional<int> port,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
@@ -488,7 +487,7 @@ private:
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 
     /**
-     * prepareRequest fills in http request header with parameters like authentication or proxy.
+     * Fills in http request header with parameters like authentication or proxy.
      * It will fall back to prepareDirectRequest if directUrl is not empty.
      *
      * @param method HTTP method, like {GET, PUT, POST, ...}

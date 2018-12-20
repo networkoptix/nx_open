@@ -14,6 +14,7 @@
 #include <nx_ec/access_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
 namespace {
 
@@ -24,8 +25,13 @@ using namespace details;
 
 struct Data
 {
-    QHash<QnUuid, QnVirtualCameraResourcePtr> cameras;
-    QHash<QnUuid, QnUuidSet> serverCameraHash;
+    QHash<QnUuid, QnVirtualCameraResourcePtr> allCameras;
+    QnUuidSet serverIds;
+
+    QHash<QnUuid, QnUuidSet> singleCamerasByServerId;
+    QHash<QnUuid, QSet<QString>> cameraGroupsByServerId;
+    QHash<QString, QnUuidSet> singleCamerasByGroupId;
+
     QnUuidSet invalidCameras;
     QnUuidSet selectedInvalidCameras;
 };
@@ -43,12 +49,26 @@ Data createCamerasData(
     const auto accessProvider = commonModule->resourceAccessProvider();
     const auto accessibleCameras = getAccessibleResources(
         currentUser, pool->getAllCameras(QnResourcePtr(), true), accessProvider);
+
     for (const auto camera: accessibleCameras)
     {
-        const auto parentServer = camera->getParentServer();
+        const auto parentServerId = camera->getParentServer()->getId();
         const auto cameraId = camera->getId();
-        result.serverCameraHash[parentServer->getId()].insert(cameraId);
-        result.cameras.insert(cameraId, camera);
+
+        if (!camera->getGroupId().isNull())
+        {
+            const auto cameraGroupId = camera->getGroupId();
+            result.cameraGroupsByServerId[parentServerId].insert(cameraGroupId);
+            result.singleCamerasByGroupId[cameraGroupId].insert(cameraId);
+        }
+        else
+        {
+            result.singleCamerasByServerId[parentServerId].insert(cameraId);
+        }
+
+        result.serverIds.insert(parentServerId);
+        result.allCameras.insert(cameraId, camera);
+
         if (!validCheck || validCheck(camera))
             continue;
 
@@ -77,10 +97,36 @@ NodePtr createCameraNodes(
     QnResourcePool* pool)
 {
     const NodePtr root = ViewNode::create();
-    for (auto it = data.serverCameraHash.begin(); it != data.serverCameraHash.end(); ++it)
+
+    for (auto serverId: data.serverIds)
     {
         NodeList children;
-        for (const auto cameraId: it.value())
+
+        if (data.cameraGroupsByServerId.contains(serverId))
+        {
+            QSet<QString> groupIds = data.cameraGroupsByServerId.value(serverId);
+            for (const QString& groupId: groupIds)
+            {
+                NodeList groupChildren;
+                for (const auto cameraId: data.singleCamerasByGroupId.value(groupId))
+                {
+                    const auto cameraNode =
+                        createResourceNode(pool->getResourceById(cameraId), QString(), true);
+                    groupChildren.append(cameraNode);
+                }
+                auto cameraResource =
+                    data.allCameras.value(pool->getResourcesBySharedId(groupId).first()->getId());
+
+                const auto groupNode =
+                    createGroupNode(cameraResource, QString(), true);
+                groupNode->addChildren(groupChildren);
+
+                children.append(groupNode);
+            }
+        }
+
+        auto singleCameraIds = data.singleCamerasByServerId.value(serverId);
+        for (const auto cameraId: singleCameraIds)
         {
             const auto invalidCamera = data.invalidCameras.contains(cameraId);
             if (invalidCamera && !showInvalidCameras)
@@ -96,7 +142,7 @@ NodePtr createCameraNodes(
         if (children.isEmpty())
             continue;
 
-        const NodePtr targetNode = adminMode ? createServerNode(it.key(), pool, children) : root;
+        const NodePtr targetNode = adminMode ? createServerNode(serverId, pool, children) : root;
         targetNode->addChildren(children);
         if (adminMode)
             root->addChild(targetNode);
@@ -121,7 +167,7 @@ struct CameraSelectionDialog::Private: public QObject
     void reloadViewData();
 
     /**
-     * Allows to show invalid cameras depending on specfied value.
+     * Allows to show invalid cameras depending on specified value.
      * @return True if nodes were updated, otherwise false.
      */
     bool setShowInvalidCameras(bool value);
@@ -156,7 +202,7 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
     const QnUuid& resourceId,
     Qt::CheckState checkedState)
 {
-    if (!data.cameras.contains(resourceId))
+    if (!data.allCameras.contains(resourceId))
         return;
 
     switch(checkedState)
@@ -171,7 +217,7 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
                 {
                     QnResourceList selectedResources;
                     for (const auto cameraId: selectedCameras)
-                        selectedResources.append(data.cameras.value(cameraId));
+                        selectedResources.append(data.allCameras.value(cameraId));
 
                     q->ui->filteredResourceSelectionWidget->setInvalidMessage(
                         getText(selectedResources, true));
@@ -206,7 +252,7 @@ void CameraSelectionDialog::Private::reloadViewData()
     view->applyPatch(NodeViewStatePatch::fromRootNode(root));
     view->setLeafResourcesSelected(selectedCameras, true);
 
-    view->expandAll();
+    view->expandToDepth(0);
 }
 
 bool CameraSelectionDialog::Private::setShowInvalidCameras(bool value)
@@ -241,6 +287,7 @@ CameraSelectionDialog::CameraSelectionDialog(
 //    ui->filteredResourceSelectionWidget->setDetailsVisible(true);
     const auto view = ui->filteredResourceSelectionWidget->view();
     view->setupHeader();
+    view->sortByColumn(ResourceNodeViewColumn::resourceNameColumn, Qt::AscendingOrder);
     connect(view, &ResourceSelectionNodeView::resourceSelectionChanged,
         d, &Private::handleSelectionChanged);
 
@@ -265,7 +312,7 @@ bool CameraSelectionDialog::selectCamerasInternal(
 {
     CameraSelectionDialog dialog(validResourceCheck, getText, selectedCameras, parent);
 
-    if (dialog.d->data.serverCameraHash.isEmpty())
+    if (dialog.d->data.allCameras.isEmpty())
     {
         QnMessageBox::warning(parent, tr("You do not have any cameras"));
         return false;

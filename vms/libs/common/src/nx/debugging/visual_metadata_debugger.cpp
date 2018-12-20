@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <QtCore/QDir>
 #include <QtGui/QPainter>
 
 #include <utils/common/sleep.h>

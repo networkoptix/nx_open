@@ -9,6 +9,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 AbstractEventListModel::AbstractEventListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(context)
@@ -24,7 +26,7 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qn::TimestampTextRole:
-            return timestampText(index.data(Qn::TimestampRole).value<std::chrono::microseconds>());
+            return timestampText(index.data(Qn::TimestampRole).value<microseconds>());
 
         case Qt::AccessibleTextRole:
         case Qt::StatusTipRole:
@@ -33,9 +35,6 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
 
         case Qt::AccessibleDescriptionRole:
             return index.data(Qn::DescriptionTextRole);
-
-        case Qn::AnimatedRole:
-            return true;
 
         default:
             return QVariant();
@@ -66,11 +65,8 @@ bool AbstractEventListModel::isValid(const QModelIndex& index) const
         && index.row() >= 0 && index.row() < rowCount();
 }
 
-QString AbstractEventListModel::timestampText(std::chrono::microseconds timestamp) const
+QString AbstractEventListModel::timestampText(microseconds timestamp) const
 {
-    using namespace std::chrono;
-    using namespace std::literals::chrono_literals;
-
     if (timestamp <= 0ms)
         return QString();
 

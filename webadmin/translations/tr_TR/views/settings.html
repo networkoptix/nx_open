@@ -4,22 +4,22 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Bu cihaz dahili bir disk ile çalışabilir.<br>Lütfen cihazı kapatıp bir disk ekleyin.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Cihazın çalışabilmesi için ağ bağlantısına ihtiyacı var.<br>
 Lütfen cihazı yerel ağa bağlayın
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Cihaz yanlış ağ ayarına sahip.<br>
 Lütfen ağa bağlanın veya doğru IP Adresini yazın.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -72,7 +72,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Ad</h3>
+                        <h3>İsim</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -103,12 +103,12 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Bu sistem {{Config.cloud.productName}} ile bağlı.
+                            <uib-alert type="warning">Bu sistem {{Config.cloud.productName}} ile bağlı.
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Daha fazla bilgi</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} ayarlamak için sunucuyu internete bağlayın</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} bağlanmak için internet gereklidir</alert>
+                                   target="_blank">Daha fazla bilgi</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} ayarlamak için sunucuyu internete bağlayın</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} bağlanmak için internet gereklidir</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Bağlan {{Config.cloud.productName}}</button>
@@ -120,21 +120,23 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
 
                     <div>
-                        <h3>Traffic encription</h3>
+                        <h3>Traffic encryption</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encription
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Force Video Traffic Encription
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
+                                           ng-checked="checkTrafficEncryption()">
+                                    Force Video Traffic Encryption
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Kaydet</button>
                         </form>
                     </div>
                 </uib-tab>

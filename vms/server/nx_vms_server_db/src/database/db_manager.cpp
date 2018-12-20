@@ -38,6 +38,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -129,27 +130,6 @@ static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D8
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
 using std::nullptr_t;
-
-static bool removeDirRecursive(const QString & dirName)
-{
-    bool result = true;
-    QDir dir(dirName);
-
-    if (dir.exists(dirName)) {
-        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-                result = removeDir(info.absoluteFilePath());
-            else
-                result = QFile::remove(info.absoluteFilePath());
-
-            if (!result)
-                return result;
-        }
-        result = dir.rmdir(dirName);
-    }
-    return result;
-}
 
 template <class T>
 void assertSorted(std::vector<T> &data) {
@@ -294,7 +274,8 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_insertCameraUserAttrQuery(&m_queryCachePool),
     m_insertCameraScheduleQuery(&m_queryCachePool),
     m_insertKvPairQuery(&m_queryCachePool),
-    m_resourceQueries(m_sdb, &m_queryCachePool)
+    m_resourceQueries(m_sdb, &m_queryCachePool),
+    m_changeStatusQuery(&m_queryCachePool)
 {
 }
 
@@ -393,6 +374,47 @@ bool QnDbManager::setMediaServersStatus(Qn::ResourceStatus status)
 QString QnDbManager::ecsDbFileName(const QString& basePath)
 {
     return closeDirPath(basePath) + QString::fromLatin1("ecs.sqlite");
+}
+
+int QnDbManager::currentBuildNumber(const QString& basePath)
+{
+    const QString dbFileName = ecsDbFileName(basePath);
+    if (!QFile(dbFileName).exists())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: File %1 does not exist").arg(dbFileName));
+        return 0;
+    }
+
+    const static QString buildNumberConnectionName = "GetBuildNumberDB";
+    auto sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
+    sdb.setDatabaseName(dbFileName);
+    if (!sdb.open())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: Failed to open db %1").arg(dbFileName));
+        return 0;
+    }
+
+    auto dbCloseGuard = nx::utils::makeScopeGuard(
+        [&]()
+        {
+            sdb.close();
+            sdb = QSqlDatabase();
+            QSqlDatabase::removeDatabase(buildNumberConnectionName);
+        });
+
+    QSqlQuery getVersionQuery(sdb);
+    const QString queryString = "SELECT data FROM misc_data WHERE key = 'VERSION'";
+    if (!getVersionQuery.prepare(queryString) || !getVersionQuery.exec()
+        || !getVersionQuery.next())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: Failed to prepare or execute query %1").arg(queryString));
+        return 0;
+    }
+
+    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString()).build();
 }
 
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
@@ -513,7 +535,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         if (addedStoredFilesCnt > 0)
             m_resyncFlags |= ResyncFiles;
 
-        removeDirRecursive(storedFilesDir);
+        QDir(storedFilesDir).removeRecursively();
 
         // updateDBVersion();
         QSqlQuery insVersionQuery(m_sdb);
@@ -1142,18 +1164,18 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     }
 
-    if (!fillTransactionLogInternal <
+    if (!fillTransactionLogInternal<
         QnUuid,
         AnalyticsPluginData,
-        AnalyticsPluginDataList > (ApiCommand::saveAnalyticsPlugin))
+        AnalyticsPluginDataList>(ApiCommand::saveAnalyticsPlugin))
     {
         return false;
     }
 
-    if (!fillTransactionLogInternal <
+    if (!fillTransactionLogInternal<
         QnUuid,
         AnalyticsEngineData,
-        AnalyticsEngineDataList > (ApiCommand::saveAnalyticsEngine))
+        AnalyticsEngineDataList>(ApiCommand::saveAnalyticsEngine))
     {
         return false;
     }
@@ -1916,16 +1938,17 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    const auto logTag = nx::utils::log::Tag(typeid(QnDbManager));
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
-        return ec2::migration::ptz::addRotationToPresets(m_sdb)
+        return ec2::migration::ptz::addRotationToPresets(logTag, m_sdb)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
 
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
-        return ec2::migration::ptz::addRotationToPresets(m_sdb)
+        return ec2::migration::ptz::addRotationToPresets(logTag, m_sdb)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
@@ -1956,6 +1979,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith("/99_20181031_rename_smptPassword_parameter.sql"))
         return resyncIfNeeded(ResyncGlobalSettings);
+
+    if (updateName.endsWith("/99_20181102_remove_sync_with_internet_option.sql"))
+        return resyncIfNeeded(ResyncGlobalSettings);
+
+    if (updateName.endsWith(lit("/99_20181211_add_default_plugin_event_rules.sql")))
+    {
+        updateDefaultRules(
+            vms::event::Rule::getPluginEventUpdateRules()) && resyncIfNeeded(ResyncRules);
+    }
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
@@ -2491,7 +2523,7 @@ ErrorCode QnDbManager::executeTransactionInternal(
 {
     QFile f(m_sdb.databaseName() + QString(lit(".backup")));
     if (!f.open(QFile::WriteOnly))
-        return ErrorCode::failure;
+        return ErrorCode::dbError;
     f.write(tran.params.data);
     f.close();
 
@@ -2516,31 +2548,15 @@ ErrorCode QnDbManager::executeTransactionInternal(
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ResourceStatusData>& tran)
 {
-    QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_resource_status values (?, ?)");
-    query.addBindValue(tran.params.id.toRfc4122());
-    query.addBindValue((int)tran.params.status);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    const auto query = m_changeStatusQuery.get(m_sdb, R"sql(
+        INSERT OR REPLACE INTO vms_resource_status values (?, ?)
+        )sql");
+    query->addBindValue(tran.params.id.toRfc4122());
+    query->addBindValue((int) tran.params.status);
+    if (!execSQLQuery(query.get(), Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
     return ErrorCode::ok;
 }
-
-/*
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetResourceDisabledData>& tran)
-{
-    QSqlQuery query(m_sdb);
-    query.prepare("UPDATE vms_resource set disabled = :disabled where guid = :guid");
-    query.bindValue(":disabled", tran.params.disabled);
-    query.bindValue(":guid", tran.params.id.toRfc4122());
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    return ErrorCode::ok;
-}
-*/
 
 ErrorCode QnDbManager::saveCamera(const CameraData& params)
 {
@@ -3144,28 +3160,6 @@ ErrorCode QnDbManager::executeTransactionInternal(
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
-    }
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId) {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT r.id\
-                  FROM vms_resource r \
-                  JOIN vms_userprofile p on p.resource_ptr_id = r.id \
-                  WHERE p.resource_ptr_id != :id and r.name = :name");
-
-    query.bindValue(":id", internalId);
-    query.bindValue(":name", name);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    if(query.next())
-    {
-        qWarning() << Q_FUNC_INFO << "Duplicate user with name "<<name<<" found";
-        return ErrorCode::failure;  // another user with same name already exists
     }
     return ErrorCode::ok;
 }
@@ -5241,7 +5235,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseOve
     query.addBindValue(QByteArray::number(tran.params.time));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::failure;
+        return ErrorCode::dbError;
     }
 
     return ErrorCode::ok;
@@ -5251,13 +5245,13 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CleanupDat
 {
     ErrorCode result = ErrorCode::ok;
     if (tran.params.cleanupDbObjects)
-        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::failure;
+        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::dbError;
 
     if (result != ErrorCode::ok)
         return result;
 
     if (tran.params.cleanupTransactionLog)
-        result = m_tranLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+        result = m_tranLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::dbError;
 
     return result;
 }

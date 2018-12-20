@@ -30,7 +30,12 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher(
     connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(
         m_commonModule->globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
-        this, &QnConnectToCloudWatcher::at_updateConnection);
+        this, [this]()
+        {
+            if (!m_cloudUrl.isEmpty())
+                m_ec2CloudConnector->stopDataSynchronization(); //< Sop connection with old parameters if exists.
+            at_updateConnection();
+        });
     connect(
         m_commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
         this, &QnConnectToCloudWatcher::at_updateConnection);
@@ -49,7 +54,14 @@ QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
 
 void QnConnectToCloudWatcher::setCloudDbUrl(const nx::utils::Url& cloudDbUrl)
 {
+    QnMutexLocker lock(&m_mutex);
     m_cloudDbUrl = cloudDbUrl;
+}
+
+std::optional<nx::utils::Url> QnConnectToCloudWatcher::cloudDbUrl() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_cloudDbUrl;
 }
 
 void QnConnectToCloudWatcher::restartTimer()
@@ -66,7 +78,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
         !m_commonModule->globalSettings()->cloudSystemId().isEmpty() &&
         !m_commonModule->globalSettings()->cloudAuthKey().isEmpty();
 
-    NX_DEBUG(this, "Update needCloudConnect. Value=%1", needCloudConnect);
+    NX_DEBUG(this, "Update needCloudConnect. Value=%1, cloudSystemId=%2, cloudAuthKey empty=%3",
+        needCloudConnect,
+        m_commonModule->globalSettings()->cloudSystemId(),
+        m_commonModule->globalSettings()->cloudAuthKey().isEmpty());
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
@@ -74,9 +89,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
         return;
     }
 
-    if (m_cloudDbUrl)
+    auto cloudDbUrl = this->cloudDbUrl();
+    if (cloudDbUrl)
     {
-        addCloudPeer(*m_cloudDbUrl);
+        addCloudPeer(*cloudDbUrl);
     }
     else
     {
@@ -89,11 +105,11 @@ void QnConnectToCloudWatcher::at_updateConnection()
                     NX_WARNING(this, lm("Error fetching cloud_db endpoint. HTTP result: %1")
                         .arg(statusCode));
                     // try once more later
-                    metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
+                    metaObject()->invokeMethod(this, &QnConnectToCloudWatcher::restartTimer, Qt::QueuedConnection);
                     return;
                 }
-
-                addCloudPeer(url);
+                setCloudDbUrl(url);
+                metaObject()->invokeMethod(this, &QnConnectToCloudWatcher::at_updateConnection, Qt::QueuedConnection);
             });
     }
 }

@@ -22,7 +22,7 @@ public:
 
 signals:
     void unreadCountChanged(int count, QnNotificationLevel::Value importance);
-    void tileHovered(const QModelIndex& index, const EventTile* tile);
+    void tileHovered(const QModelIndex& index, EventTile* tile);
 
 private:
     class Private;

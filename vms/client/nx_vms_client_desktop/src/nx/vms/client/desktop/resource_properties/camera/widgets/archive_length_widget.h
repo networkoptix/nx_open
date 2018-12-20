@@ -2,8 +2,9 @@
 
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/scoped_connections.h>
+
 namespace Ui { class ArchiveLengthWidget; }
-class QnDisconnectHelper;
 
 namespace nx::vms::client::desktop {
 
@@ -29,7 +30,7 @@ private:
 
 private:
     const QScopedPointer<Ui::ArchiveLengthWidget> ui;
-    QScopedPointer<QnDisconnectHelper> m_storeConnections;
+    nx::utils::ScopedConnections m_storeConnections;
     Aligner* const m_aligner = nullptr;
 };
 

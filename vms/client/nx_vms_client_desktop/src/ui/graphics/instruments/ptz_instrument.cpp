@@ -380,7 +380,7 @@ void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
         {
             if (fields.testFlag(Qn::CapabilitiesPtzField))
                 updateCapabilities(widget);
-            if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
+            if (fields.testFlag(Qn::AuxiliaryTraitsPtzField))
                 updateTraits(widget);
         });
     updateCapabilities(widget);
@@ -442,7 +442,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget* widget)
     if (data.capabilities == capabilities)
         return;
 
-    if ((data.capabilities ^ capabilities) & Ptz::AuxilaryPtzCapability)
+    if ((data.capabilities ^ capabilities) & Ptz::AuxiliaryPtzCapability)
         updateTraits(widget);
 
     data.capabilities = capabilities;
@@ -453,8 +453,8 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
 {
     PtzData& data = m_dataByWidget[widget];
 
-    QnPtzAuxilaryTraitList traits;
-    widget->ptzController()->getAuxilaryTraits(&traits);
+    QnPtzAuxiliaryTraitList traits;
+    widget->ptzController()->getAuxiliaryTraits(&traits);
     if (data.traits == traits)
         return;
 
@@ -513,7 +513,7 @@ void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 
 void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
 {
-    widget->ptzController()->runAuxilaryCommand(
+    widget->ptzController()->runAuxiliaryCommand(
         Ptz::ManualAutoFocusPtzTrait,
         QString());
 }

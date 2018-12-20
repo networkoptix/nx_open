@@ -32,6 +32,7 @@ protected:
     static void sequenceConnect(std::vector<Appserver2Ptr>& servers);
     static void circleConnect(std::vector<Appserver2Ptr>& servers);
     static void fullConnect(std::vector<Appserver2Ptr>& servers);
+    static void emptyConnect(std::vector<Appserver2Ptr>& servers);
 
     void startServers(
         int count,

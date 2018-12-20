@@ -4,15 +4,14 @@
 #include <QtCore/QDir>
 
 #include <common/common_module.h>
-#include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
 
 #include "settings.h"
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
-#include <nx/mediaserver/analytics/event_rule_watcher.h>
-#include <nx/mediaserver/analytics/manager.h>
+#include <nx/vms/server/analytics/event_rule_watcher.h>
+#include <nx/vms/server/analytics/manager.h>
 
 class QnCommonModule;
 class StreamingChunkCache;
@@ -51,58 +50,31 @@ class QnServerConnector;
 class QnResourceStatusWatcher;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
-namespace nx::mediaserver::hls { class SessionPool; }
+namespace nx::vms::server::hls { class SessionPool; }
+namespace nx::vms::server { class CmdLineArguments; }
+namespace nx::vms::server::analytics { class SdkObjectFactory; }
 
-namespace nx {
-namespace mediaserver {
-class CmdLineArguments;
-namespace analytics {
-class SdkObjectFactory;
-} // namespace analytics
-} // namespace mediaserver
+namespace nx::vms::server::event {
+    class ExtendedRuleProcessor;
+    class EventConnector;
+    class EventMessageBus;
+}
 
-namespace mediaserver::event {
-class ExtendedRuleProcessor;
-class EventConnector;
-class EventMessageBus;
-} // namespace mediaserver::event
+namespace nx::analytics::storage { class AbstractEventsStorage; }
+namespace nx::vms::server::time_sync { class TimeSyncManager; }
 
-namespace analytics {
-namespace storage {
-class AbstractEventsStorage;
-} // namespace storage
-} // namespace analytics
+namespace nx::vms::server {
+    class UnusedWallpapersWatcher;
+    class LicenseWatcher;
+    class RootFileSystem;
+    class Settings;
+    class ServerTimeSyncManager;
+    class ServerUpdateManager;
+}
 
-namespace time_sync {
-class TimeSyncManager;
-} // namespace time_sync
-
-namespace mediaserver {
-
-class UnusedWallpapersWatcher;
-class LicenseWatcher;
-class RootFileSystem;
-class Settings;
-class ServerTimeSyncManager;
-class ServerUpdateManager;
-
-namespace resource {
-
-class SharedContextPool;
-
-} // namespace resource
-
-namespace camera {
-
-class ErrorProcessor;
-
-} // namespace camera
-
-} // namespace mediaserver
-
-class CommonUpdateManager;
-
-} // namespace nx
+namespace nx::vms::server::resource { class SharedContextPool; }
+namespace nx::vms::server::camera { class ErrorProcessor; }
+namespace nx { class CommonUpdateManager; }
 
 class QnMediaServerModule : public QObject, public QnInstanceStorage
 {
@@ -110,7 +82,7 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
 
 public:
     QnMediaServerModule(
-        const nx::mediaserver::CmdLineArguments* arguments = nullptr,
+        const nx::vms::server::CmdLineArguments* arguments = nullptr,
         std::unique_ptr<MSSettings> serverSettings = nullptr,
         QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
@@ -129,19 +101,19 @@ public:
     std::chrono::milliseconds lastRunningTimeBeforeRestart() const;
     void setLastRunningTime(std::chrono::milliseconds value) const;
 
-    const nx::mediaserver::Settings& settings() const { return m_settings->settings(); }
-    nx::mediaserver::Settings* mutableSettings() { return m_settings->mutableSettings(); }
+    const nx::vms::server::Settings& settings() const { return m_settings->settings(); }
+    nx::vms::server::Settings* mutableSettings() { return m_settings->mutableSettings(); }
 
     void syncRoSettings() const;
-    nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
-    nx::mediaserver::LicenseWatcher* licenseWatcher() const;
-    nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
+    nx::vms::server::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
+    nx::vms::server::LicenseWatcher* licenseWatcher() const;
+    nx::vms::server::event::EventMessageBus* eventMessageBus() const;
     PluginManager* pluginManager() const;
-    nx::mediaserver::analytics::Manager* analyticsManager() const;
-    nx::mediaserver::analytics::EventRuleWatcher* analyticsEventRuleWatcher() const;
-    nx::mediaserver::analytics::SdkObjectFactory* sdkObjectFactory() const;
+    nx::vms::server::analytics::Manager* analyticsManager() const;
+    nx::vms::server::analytics::EventRuleWatcher* analyticsEventRuleWatcher() const;
+    nx::vms::server::analytics::SdkObjectFactory* sdkObjectFactory() const;
 
-    nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
+    nx::vms::server::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
     nx::CommonUpdateManager* updateManager() const;
@@ -152,12 +124,12 @@ public:
     QnResourcePropertyDictionary* propertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
-    nx::mediaserver::RootFileSystem* rootFileSystem() const;
+    nx::vms::server::RootFileSystem* rootFileSystem() const;
 
     QnStorageManager* normalStorageManager() const;
     QnStorageManager* backupStorageManager() const;
-    nx::mediaserver::event::EventConnector* eventConnector() const;
-    nx::mediaserver::event::ExtendedRuleProcessor* eventRuleProcessor() const;
+    nx::vms::server::event::EventConnector* eventConnector() const;
+    nx::vms::server::event::ExtendedRuleProcessor* eventRuleProcessor() const;
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
     QnGlobalSettings* globalSettings() const;
     QnServerUpdateTool* serverUpdateTool() const;
@@ -176,7 +148,7 @@ public:
     QnResourceAccessManager* resourceAccessManager() const;
     QnAuditManager* auditManager() const;
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
-    nx::mediaserver::camera::ErrorProcessor* cameraErrorProcessor() const;
+    nx::vms::server::camera::ErrorProcessor* cameraErrorProcessor() const;
     QnMediaServerResourceSearchers* resourceSearchers() const;
     QnPlatformAbstraction* platform() const;
     void setPlatform(QnPlatformAbstraction* platform);
@@ -184,7 +156,7 @@ public:
     QnResourceStatusWatcher* statusWatcher() const;
     QnMdnsListener* mdnsListener() const;
     nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
-    nx::mediaserver::hls::SessionPool* hlsSessionPool() const;
+    nx::vms::server::hls::SessionPool* hlsSessionPool() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -204,19 +176,19 @@ private:
 
     CommonPluginContainer m_pluginContainer;
     PluginManager* m_pluginManager = nullptr;
-    nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
-    nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
-    nx::mediaserver::event::EventMessageBus* m_eventMessageBus = nullptr;
-    nx::mediaserver::analytics::Manager* m_analyticsManager = nullptr;
+    nx::vms::server::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
+    nx::vms::server::LicenseWatcher* m_licenseWatcher = nullptr;
+    nx::vms::server::event::EventMessageBus* m_eventMessageBus = nullptr;
+    nx::vms::server::analytics::Manager* m_analyticsManager = nullptr;
 
-    nx::mediaserver::event::ExtendedRuleProcessor* m_eventRuleProcessor = nullptr;
-    nx::mediaserver::event::EventConnector* m_eventConnector = nullptr;
-    nx::mediaserver::analytics::EventRuleWatcher* m_analyticsEventRuleWatcher = nullptr;
-    nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
+    nx::vms::server::event::ExtendedRuleProcessor* m_eventRuleProcessor = nullptr;
+    nx::vms::server::event::EventConnector* m_eventConnector = nullptr;
+    nx::vms::server::analytics::EventRuleWatcher* m_analyticsEventRuleWatcher = nullptr;
+    nx::vms::server::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
-    std::unique_ptr<nx::mediaserver::RootFileSystem> m_rootFileSystem;
+    std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
     nx::CommonUpdateManager* m_updateManager = nullptr;
     QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
@@ -230,7 +202,7 @@ private:
     HostSystemPasswordSynchronizer* m_hostSystemPasswordSynchronizer = nullptr;
     QnPtzControllerPool* m_ptzControllerPool = nullptr;
     QnFileDeletor* m_fileDeletor = nullptr;
-    nx::mediaserver::camera::ErrorProcessor* m_cameraErrorProcessor = nullptr;
+    nx::vms::server::camera::ErrorProcessor* m_cameraErrorProcessor = nullptr;
     QnServerConnector* m_serverConnector = nullptr;
     QnResourceStatusWatcher* m_statusWatcher = nullptr;
 
@@ -238,6 +210,6 @@ private:
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
-    nx::mediaserver::analytics::SdkObjectFactory* m_sdkObjectFactory;
-    nx::mediaserver::hls::SessionPool* m_hlsSessionPool = nullptr;
+    nx::vms::server::analytics::SdkObjectFactory* m_sdkObjectFactory;
+    nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
 };

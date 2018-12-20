@@ -1,7 +1,10 @@
 <label class="nx-radio">
     <input type="radio"
-           [name]="name" id="{{compId}}"
-           [value]="value">
+           [name]="name"
+           id="{{compId}}"
+           [value]="value"
+           [attr.disabled]="disabled ? '' : null">
+
     <span class="check"
           [ngClass]="state"
           (click)="changeState($event)">

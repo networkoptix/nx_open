@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 /**
  * Sets host system password to admin password if appropriate.
@@ -13,7 +13,7 @@
  */
 class HostSystemPasswordSynchronizer:
     public QObject,
-    public nx::mediaserver::ServerModuleAware,
+    public nx::vms::server::ServerModuleAware,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT

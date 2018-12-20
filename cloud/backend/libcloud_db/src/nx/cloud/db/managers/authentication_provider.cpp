@@ -12,7 +12,7 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/db/client/data/auth_data.h>
-#include <nx/data_sync_engine/transaction_log.h>
+#include <nx/clusterdb/engine/transaction_log.h>
 
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"

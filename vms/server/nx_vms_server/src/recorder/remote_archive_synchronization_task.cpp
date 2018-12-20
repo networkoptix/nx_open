@@ -9,7 +9,7 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
@@ -19,7 +19,7 @@
 #include <media_server/media_server_module.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 namespace {
@@ -52,7 +52,7 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
     storage->registerResourceData(temporaryFilePath, ioDevice);
     storage->setIsIoDeviceOwner(false);
 
-    using namespace nx::mediaserver_core::plugins;
+    using namespace nx::vms::server::plugins;
     auto aviDelegate = std::make_unique<QnAviArchiveDelegate>();
     aviDelegate->setStorage(storage);
     aviDelegate->setAudioChannel(0);
@@ -152,5 +152,5 @@ bool RemoteArchiveSynchronizationTask::prepareDataSource(
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

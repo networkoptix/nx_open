@@ -1,6 +1,6 @@
 import * as angular from 'angular';
 
-(function () {
+(() => {
 
     'use strict';
 
@@ -129,18 +129,20 @@ import * as angular from 'angular';
                 };
 
                 // config phaze accessible functions **************
-                this.setLanguage = function (language) {
+                this.setLanguage = (language) => {
                     lang = language;
                     // lang.language = lang.language.replace('-', '_');
+                    // const nxLanguage = nxLanguageService.$get();
+                    // nxLanguage.use(lang);
                 };
                 // ************************************************
 
-                this.$get = function () {
+                this.$get = () => {
                     return {
                         // runtime accessible
-                        lang: lang
-                    }
-                }
+                        lang
+                    };
+                };
 
             }]);
 })();

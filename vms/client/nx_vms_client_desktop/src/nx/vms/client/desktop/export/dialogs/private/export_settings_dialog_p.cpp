@@ -64,7 +64,12 @@ void copyOverlaySettingsWithoutPosition(Settings& dest, Settings src)
 
 namespace nx::vms::client::desktop {
 
-ExportSettingsDialog::Private::Private(const QnCameraBookmark& bookmark, const QSize& previewSize, QObject* parent):
+ExportSettingsDialog::Private::Private(
+    const QnCameraBookmark& bookmark,
+    const QSize& previewSize,
+    const nx::core::Watermark& watermark,
+    QObject* parent)
+    :
     base_type(parent),
     m_previewSize(previewSize),
     m_bookmarkName(bookmark.name),
@@ -72,6 +77,8 @@ ExportSettingsDialog::Private::Private(const QnCameraBookmark& bookmark, const Q
     m_mediaPreviewProcessor(new TranscodingImageProcessor())
 {
     m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
+    m_exportMediaSettings.transcodingSettings.watermark = watermark;
+    m_exportLayoutSettings.watermark = watermark;
 }
 
 ExportSettingsDialog::Private::~Private()
@@ -274,12 +281,6 @@ bool ExportSettingsDialog::Private::hasVideo() const
     return m_exportMediaSettings.mediaResource != nullptr && m_exportMediaSettings.mediaResource->hasVideo();
 }
 
-void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& watermark)
-{
-    m_exportMediaSettings.transcodingSettings.watermark = watermark;
-    m_exportLayoutSettings.watermark = watermark;
-}
-
 void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
 {
     m_exportLayoutPersistentSettings.readOnly = value;
@@ -312,7 +313,6 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
 
 void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
 {
-    qDebug() << "ExportSettingsDialog::Private::setFrameSize(" << size << ")";
     if (m_fullFrameSize == size)
         return;
 

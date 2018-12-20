@@ -23,7 +23,7 @@
 
 QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(QnMediaServerModule* serverModule):
     QnJsonRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {}
 
 int QnMergeSystemsRestHandler::executeGet(
@@ -100,7 +100,7 @@ void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
             commonModule->moduleGUID());
     NX_ASSERT(server);
     // TODO: #ak Following call better be made on event "current server data changed".
-    nx::mediaserver::SettingsHelper helper(serverModule());
+    nx::vms::server::SettingsHelper helper(serverModule());
     helper.setAuthKey(server->getAuthKey().toUtf8());
 }
 

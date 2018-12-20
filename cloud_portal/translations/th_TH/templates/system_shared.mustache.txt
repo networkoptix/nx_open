@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+สวัสดี {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) แชร์การเข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}" กับคุณ

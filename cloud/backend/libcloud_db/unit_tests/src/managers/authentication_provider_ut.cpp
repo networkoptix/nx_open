@@ -10,7 +10,7 @@
 #include <nx/utils/time.h>
 #include <nx/utils/test_support/settings_loader.h>
 
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/cloud/db/api/cloud_nonce.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/cloud/db/dao/user_authentication_data_object_factory.h>

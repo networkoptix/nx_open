@@ -358,8 +358,7 @@
         <resource name = "AXISA9161" public = "AXIS_COMMON">
             <params>
                 <param name = "ioConfigCapability" default_value ="1"/>
-                <param name = "ioDisplayName" default_value ="I/O 1,I/O 2,I/O 3,I/O 4,I/O 5,I/O 6,Relay 1"/>  
-                <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "ioDisplayName" default_value ="I/O 1,I/O 2,I/O 3,I/O 4,I/O 5,I/O 6,Relay 1"/>
                 <param name = "hasDualStreaming" default_value ="0"/>
             </params>
         </resource> 

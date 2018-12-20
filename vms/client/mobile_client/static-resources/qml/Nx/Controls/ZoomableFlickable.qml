@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import nx.client.core 1.0
+import Nx 1.0
 
 Item
 {
@@ -28,12 +29,21 @@ Item
     property real allowedTopMargin: 0
     property real allowedBottomMargin: 0
 
+    property bool allowCompositeEvents: true
+
     readonly property alias flickable: flick
     readonly property real contentScale: Geometry.scaleFactor(
         Qt.size(width, height), Qt.size(contentWidth, contentHeight))
 
+    signal pressed(int mouseX, int mouseY)
+    signal released()
+    signal positionChanged(int mouseX, int mouseY)
+    signal cancelled()
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
+    signal movementEnded()
+    signal contentRectChanged()
+    property bool moving: false
 
     property var doubleTapStartCheckFuncion
 
@@ -63,7 +73,12 @@ Item
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
 
-        interactive: !mouseArea.doubleTapScaleMode
+        onMovementEnded: rootItem.movementEnded()
+
+        interactive:
+            !mouseArea.doubleTapScaleMode
+            && (mouseArea.doubleTapDownPos ? false : true)
+            && rootItem.allowCompositeEvents
 
         Item
         {
@@ -73,8 +88,22 @@ Item
         }
 
         /* Workaround for qt bug: top and left margins are ignored. */
-        onContentXChanged: fixContentX()
-        onContentYChanged: fixContentY()
+        onContentXChanged:
+        {
+            fixContentX()
+            rootItem.contentRectChanged()
+        }
+        onContentYChanged:
+        {
+            fixContentY()
+            rootItem.contentRectChanged()
+        }
+
+        onOriginXChanged: rootItem.contentRectChanged()
+        onOriginYChanged: rootItem.contentRectChanged()
+        onContentHeightChanged: rootItem.contentRectChanged()
+        onContentWidthChanged: rootItem.contentRectChanged()
+
         onLeftMarginChanged: fixContentX()
         onTopMarginChanged: fixContentY()
 
@@ -204,6 +233,7 @@ Item
                 flick.animating = false
 
                 bindMargins()
+                rootItem.movementEnded()
             }
         }
 
@@ -266,10 +296,13 @@ Item
                 property: "contentY"
                 duration: boundsAnimation.duration
             }
+
             onStopped:
             {
                 flick.animating = false
                 flick.bindMargins()
+
+                rootItem.movementEnded()
             }
         }
 
@@ -351,16 +384,11 @@ Item
 
             property var doubleTapDownPos: undefined
             property bool doubleTapScaleMode: false
+            property point downPos
 
             anchors.fill: parent
 
             propagateComposedEvents: true
-
-            onDoubleTapDownPosChanged:
-            {
-                // doubleTapDownPos can be "undefined".
-                flick.interactive = doubleTapDownPos ? false : true
-            }
 
             onDoubleTapScaleModeChanged:
             {
@@ -377,6 +405,8 @@ Item
 
             onPositionChanged:
             {
+                rootItem.positionChanged(mouse.x, mouse.y)
+
                 if (!doubleTapDownPos)
                     return
 
@@ -388,7 +418,8 @@ Item
                 {
                     var minDoubleTapStartLength = 15
                     if (currentVector.length() > minDoubleTapStartLength)
-                        doubleTapScaleMode = true
+                        doubleTapScaleMode = rootItem.allowCompositeEvents
+
                 }
 
                 if (!doubleTapScaleMode)
@@ -402,8 +433,8 @@ Item
 
             onDoubleClicked:
             {
-                clickFilterTimer.stop()
-                doubleClickFilter.restart();
+                delayedClickTimer.stop()
+                doubleClickFilterTimer.restart();
 
                 var mousePosition = Qt.point(mouseX, mouseY)
                 if (rootItem.doubleTapStartCheckFuncion
@@ -413,38 +444,66 @@ Item
                 }
             }
 
+            onPressed:
+            {
+                downPos = Qt.point(mouse.x, mouse.y)
+                rootItem.pressed(mouse.x, mouse.y)
+                clickFilterTimer.restart()
+            }
+
             onCanceled:
             {
+                delayedClickTimer.stop()
+                rootItem.cancelled()
+
                 doubleTapScaleMode = false
                 doubleTapDownPos = undefined
             }
 
             onReleased:
             {
+                if (clickFilterTimer.running
+                    && !doubleClickFilterTimer.running
+                    && downPos.x == mouse.x && downPos.y == mouse.y)
+                {
+
+                    delayedClickTimer.restart()
+                }
+                else
+                {
+                    delayedClickTimer.stop()
+                }
+
+                rootItem.released()
                 doubleTapScaleMode = false
                 doubleTapDownPos = undefined
-                if (!doubleClickFilter.running)
+                if (!doubleClickFilterTimer.running)
                     return
 
-                doubleClickFilter.stop()
+                doubleClickFilterTimer.stop()
                 rootItem.doubleClicked(mouse.x, mouse.y)
             }
 
-            onClicked: clickFilterTimer.restart()
+            onClicked: mouse.accepted = true
 
             Timer
             {
-                id: clickFilterTimer
+                id: delayedClickTimer
 
-                interval: 200
-
+                interval: 300
                 onTriggered: rootItem.clicked()
             }
 
             Timer
             {
-                id: doubleClickFilter
-                interval: 200
+                id: clickFilterTimer
+                interval: 400
+            }
+
+            Timer
+            {
+                id: doubleClickFilterTimer
+                interval: 300
             }
 
             onWheel:
@@ -466,6 +525,36 @@ Item
                 flick.resizeContent(flick.contentWidth * scale, flick.contentHeight * scale, Qt.point(cx, cy))
                 flick.animateToBounds()
             }
+        }
+    }
+
+    Object
+    {
+        id: d
+
+        readonly property bool movingInternal:
+            flick.flicking
+            || flick.animating
+            || flick.dragging
+            || pinchArea.pinch.active
+            || boundsAnimation.running
+
+        Timer
+        {
+            id: movingFilterTimer
+
+            property bool value: false
+            interval: 100
+            onTriggered: rootItem.moving = value
+        }
+
+        onMovingInternalChanged:
+        {
+            if (movingFilterTimer.value == movingInternal && movingFilterTimer.running)
+                return
+
+            movingFilterTimer.value = movingInternal
+            movingFilterTimer.restart()
         }
     }
 }

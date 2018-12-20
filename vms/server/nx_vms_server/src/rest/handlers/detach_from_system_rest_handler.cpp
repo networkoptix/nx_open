@@ -1,21 +1,19 @@
 #include "detach_from_system_rest_handler.h"
 
-#include <nx/cloud/db/api/connection.h>
-#include <nx/network/http/http_types.h>
-#include <nx/utils/log/log.h>
-
-#include <nx/vms/utils/vms_utils.h>
-
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <rest/server/rest_connection_processor.h>
-#include <rest/helpers/permissions_helper.h>
-
 #include <media_server/serverutil.h>
+#include <network/universal_tcp_listener.h>
+#include <nx/cloud/db/api/connection.h>
+#include <nx/network/http/http_types.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include <nx/vms/utils/detach_server_processor.h>
+#include <nx/vms/utils/vms_utils.h>
+#include <rest/helpers/permissions_helper.h>
+#include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
@@ -24,7 +22,7 @@ QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
     ec2::AbstractTransactionMessageBus* messageBus)
     :
     QnJsonRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_cloudConnectionManager(cloudConnectionManager),
     m_messageBus(messageBus)
 {
@@ -36,7 +34,7 @@ int QnDetachFromSystemRestHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    return execute(std::move(PasswordData(params)), owner, result);
+    return execute(CurrentPasswordData(params), owner, result);
 }
 
 int QnDetachFromSystemRestHandler::executePost(
@@ -46,16 +44,21 @@ int QnDetachFromSystemRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    PasswordData passwordData = QJson::deserialized<PasswordData>(body);
-    return execute(std::move(passwordData), owner, result);
+    return execute(QJson::deserialized<CurrentPasswordData>(body), owner, result);
 }
 
 int QnDetachFromSystemRestHandler::execute(
-    PasswordData data, const QnRestConnectionProcessor* owner, QnJsonRestResult& result)
+    CurrentPasswordData data, const QnRestConnectionProcessor* owner, QnJsonRestResult& result)
 {
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+    if (!authenticator->isPasswordCorrect(owner->accessRights(), data.currentPassword))
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
+        return nx::network::http::StatusCode::ok;
+    }
+
     using namespace nx::cloud::db;
     const Qn::UserAccessData& accessRights = owner->accessRights();
-
     NX_DEBUG(this, lm("Detaching server from system started."));
 
     if (QnPermissionsHelper::isSafeMode(serverModule()))
@@ -69,22 +72,12 @@ int QnDetachFromSystemRestHandler::execute(
         return QnPermissionsHelper::notOwnerError(result);
     }
 
-    QString errStr;
-    if (!nx::vms::utils::validatePasswordData(data, &errStr))
-    {
-        NX_DEBUG(this, lm("Cannot detach from system. Password check failed.")
-            );
-        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx::network::http::StatusCode::ok;
-    }
-
-    nx::mediaserver::Utils::dropConnectionsToRemotePeers(m_messageBus);
-
+    nx::vms::server::Utils::dropConnectionsToRemotePeers(m_messageBus);
     nx::vms::utils::DetachServerProcessor detachServerProcessor(
         owner->commonModule(),
         m_cloudConnectionManager);
-    const auto resultCode = detachServerProcessor.detachServer(&result);
 
-    nx::mediaserver::Utils::resumeConnectionsToRemotePeers(m_messageBus);
+    const auto resultCode = detachServerProcessor.detachServer(&result);
+    nx::vms::server::Utils::resumeConnectionsToRemotePeers(m_messageBus);
     return resultCode;
 }

@@ -12,27 +12,31 @@ import { DisconnectModalContent, NxModalDisconnectComponent } from './disconnect
 import { RenameModalContent, NxModalRenameComponent }         from './rename/rename.component';
 import { ShareModalContent, NxModalShareComponent }           from './share/share.component';
 import { MergeModalContent, NxModalMergeComponent }           from './merge/merge.component';
+import { EmbedModalContent, NxModalEmbedComponent }           from './embed/embed.component';
 import { downgradeInjectable }                                from '@angular/upgrade/static';
 import { FormsModule, EmailValidator }                        from '@angular/forms';
 import { TranslateModule }                                    from '@ngx-translate/core';
+import { ClipboardModule }                                    from 'ngx-clipboard';
 
 
 @NgModule({
-    imports: [
+    imports        : [
         CommonModule,
         FormsModule,
         TranslateModule,
+        ClipboardModule,
         ComponentsModule,
         DirectivesModule,
         DropdownsModule
     ],
-    declarations: [
+    declarations   : [
         LoginModalContent, NxModalLoginComponent,
         GenericModalContent, NxModalGenericComponent,
         DisconnectModalContent, NxModalDisconnectComponent,
         RenameModalContent, NxModalRenameComponent,
         ShareModalContent, NxModalShareComponent,
         MergeModalContent, NxModalMergeComponent,
+        EmbedModalContent, NxModalEmbedComponent,
     ],
     entryComponents: [
         LoginModalContent, NxModalLoginComponent,
@@ -40,9 +44,10 @@ import { TranslateModule }                                    from '@ngx-transla
         DisconnectModalContent, NxModalDisconnectComponent,
         RenameModalContent, NxModalRenameComponent,
         ShareModalContent, NxModalShareComponent,
-        MergeModalContent, NxModalMergeComponent
+        MergeModalContent, NxModalMergeComponent,
+        EmbedModalContent, NxModalEmbedComponent,
     ],
-    providers: [
+    providers      : [
         NxDialogsService,
         NxModalLoginComponent,
         NxModalGenericComponent,
@@ -50,8 +55,9 @@ import { TranslateModule }                                    from '@ngx-transla
         NxModalRenameComponent,
         NxModalShareComponent,
         NxModalMergeComponent,
+        NxModalEmbedComponent,
     ],
-    exports: []
+    exports        : []
 })
 export class DialogsModule {
 }

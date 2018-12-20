@@ -15,7 +15,7 @@ public:
     virtual bool isNonceValid(const QByteArray& nonce) const override;
 
     /**
-     * Generate time based nonce. Function uses current system (synchronized) time
+     * Generate time based nonce. Function uses current VMS (synchronized) time
      * if nonce time is not provided.
      */
     static QByteArray generateTimeBasedNonce(

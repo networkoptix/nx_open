@@ -14,7 +14,7 @@
 
 #include "media_server_module.h"
 
-using namespace nx::mediaserver_core::recorder;
+using namespace nx::vms::server::recorder;
 using namespace nx::vms::common::p2p::downloader;
 
 struct QnWearableUploadManager::Private
@@ -24,7 +24,7 @@ struct QnWearableUploadManager::Private
 };
 
 QnWearableUploadManager::QnWearableUploadManager(QObject* parent):
-    nx::mediaserver::ServerModuleAware(parent),
+    nx::vms::server::ServerModuleAware(parent),
     d(new Private())
 {
 }

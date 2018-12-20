@@ -112,13 +112,6 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
 
             NX_VERBOSE(this, lm("peer %1 is add").arg(resource->getId()));
 
-            QnUuid id = resource->getId();
-            int idx = nx::utils::algorithm::index_of(m_items,
-                [id](const Item& item)
-                {
-                    return item.peerId == id;
-                });
-
             ScopedInsertRows insertRows(this, QModelIndex(), m_items.size(), m_items.size());
             addItem(server);
             updateFirstItemCheckbox();
@@ -298,6 +291,8 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
                             return dateTime.timeZoneAbbreviation();
                         case Columns::TimeColumn:
                             return datetime::toString(dateTime.time());
+                        default:
+                            break;
                     }
                 }
 
@@ -378,7 +373,6 @@ Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex& index) const
         return 0;
 
     Columns column = static_cast<Columns>(index.column());
-    Item item = m_items[index.row()];
 
     if (column == Columns::CheckboxColumn)
     {
@@ -529,6 +523,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
 void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
+    Q_UNUSED(currentSyncTime);
     updateTimeOffset();
 
     /* Fill table with current data. */

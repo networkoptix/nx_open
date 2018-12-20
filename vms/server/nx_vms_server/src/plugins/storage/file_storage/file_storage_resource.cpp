@@ -15,7 +15,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <media_server/media_server_module.h>
 #include <nx/system_commands.h>
-#include <nx/mediaserver/root_fs.h>
+#include <nx/vms/server/root_fs.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -198,7 +198,7 @@ QIODevice* QnFileStorageResource::open(
     return nullptr;
 }
 
-nx::mediaserver::RootFileSystem* QnFileStorageResource::rootTool() const
+nx::vms::server::RootFileSystem* QnFileStorageResource::rootTool() const
 {
     return m_serverModule->rootFileSystem();
 }

@@ -45,10 +45,10 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
 
 } // namespace
 
-using namespace nx::mediaserver_core::recorder;
+using namespace nx::vms::server::recorder;
 
 QnWearableCameraRestHandler::QnWearableCameraRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

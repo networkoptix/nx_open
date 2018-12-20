@@ -6,13 +6,13 @@
 
 #include <nx/utils/move_only_func.h>
 
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnTimePeriodList;
 class AbstractArchiveIntegrityWatcher;
 class AbstractMediaDataFilter;
 
-class QnAbstractArchiveStreamReader: 
-    public QnAbstractMediaStreamDataProvider, 
+class QnAbstractArchiveStreamReader:
+    public QnAbstractMediaStreamDataProvider,
     public QnAbstractNavigator
 {
     Q_OBJECT

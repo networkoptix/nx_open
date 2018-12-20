@@ -2,6 +2,7 @@ set(nx_enable_werror ON)
 
 add_subdirectory(libs)
 add_subdirectory(cloud_db_client)
+add_subdirectory(nx_cloud_connectivity)
 
 if(withClouds OR withDesktopClient)
     add_subdirectory(libvms_gateway_core)

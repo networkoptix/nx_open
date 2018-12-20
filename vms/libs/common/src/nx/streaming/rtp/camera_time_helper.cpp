@@ -26,7 +26,7 @@ CameraTimeHelper::CameraTimeHelper(
 std::chrono::microseconds CameraTimeHelper::getCameraTimestamp(
     uint32_t rtpTime,
     const RtcpSenderReport& senderReport,
-    std::optional<std::chrono::microseconds> onvifTime,
+    const std::optional<std::chrono::microseconds>& onvifTime,
     int frequency)
 {
     // onvif
@@ -49,7 +49,7 @@ std::chrono::microseconds CameraTimeHelper::getTime(
     std::chrono::microseconds currentTime,
     uint32_t rtpTime,
     const RtcpSenderReport& senderReport,
-    std::optional<std::chrono::microseconds> onvifTime,
+    const std::optional<std::chrono::microseconds>& onvifTime,
     int rtpFrequency,
     bool isPrimaryStream)
 {

@@ -264,18 +264,6 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(const QnUuid& peerId,
         });
 }
 
-rest::Handle TestPeerManager::validateFileInformation(
-    const QnUuid& /*peerId*/,
-    const downloader::FileInformation& /*fileInformation*/,
-    AbstractPeerManager::ValidateCallback callback)
-{
-    return enqueueRequest(selfId(), kDefaultRequestTime,
-        [this, callback](rest::Handle handle)
-        {
-            callback(!m_validateShouldFail, handle);
-        });
-}
-
 void TestPeerManager::setValidateShouldFail()
 {
     m_validateShouldFail = true;
@@ -514,14 +502,6 @@ rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(const QnUuid& peerI
     return m_peerManager->downloadChunkFromInternet(
         peerId, fileName, url, chunkIndex, chunkSize, callback);
 }
-
-rest::Handle ProxyTestPeerManager::validateFileInformation(
-    const QnUuid& peerId, const FileInformation& fileInformation, ValidateCallback callback)
-{
-    m_requestCounter.incrementCounters(selfId(), RequestCounter::DownloadChunkFromInternetRequest);
-    return m_peerManager->validateFileInformation(peerId, fileInformation, callback);
-}
-
 
 void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {

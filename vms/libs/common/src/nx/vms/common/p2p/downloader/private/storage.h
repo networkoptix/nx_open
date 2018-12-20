@@ -3,17 +3,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QDir>
+#include <QtCore/QFutureWatcher>
 
 #include <nx/utils/thread/mutex.h>
 
 #include "../result_code.h"
 #include "../file_information.h"
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 struct FileMetadata: FileInformation
 {
@@ -35,6 +32,7 @@ class Storage: public QObject
 
 public:
     Storage(const QDir& m_downloadsDirectory, QObject* parent = nullptr);
+    virtual ~Storage() override;
 
     QDir downloadsDirectory() const;
 
@@ -59,7 +57,7 @@ public:
 
     void cleanupExpiredFiles();
 
-    void findDownloads();
+    void findDownloads(bool waitForFinished = false);
 
     static qint64 defaultChunkSize();
     static QByteArray calculateMd5(const QString& filePath);
@@ -86,7 +84,7 @@ private:
     FileMetadata fileMetadata(const QString& fileName) const;
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
-    void findDownloadsImpl(const QDir& dir);
+    void findDownloadsRecursively(const QDir& dir);
 
     static ResultCode reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);
@@ -95,12 +93,9 @@ private:
 private:
     const QDir m_downloadsDirectory;
     QHash<QString, FileMetadata> m_fileInformationByName;
+    QFutureWatcher<void> m_findDownloadsWatcher;
 
     mutable QnMutex m_mutex;
 };
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // nx::vms::common::p2p::downloader

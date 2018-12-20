@@ -10,7 +10,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -230,5 +230,5 @@ std::optional<nx::utils::Url> HanwhaPtzExecutor::makePtrUrl(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

@@ -1,4 +1,0 @@
-/users user removed "User_4" null
-/users user added null "User_100"
-/users/User_2/isAdmin bool changed false true
-/users/User_3 dict added null "unexpected_one"

@@ -505,7 +505,7 @@ void QnProgressiveDownloadingConsumer::run()
             --metrics->tcpConnections().progressiveDownloading();
         });
 
-    if (newValue > commonModule()->globalSettings()->maxProgressiveDownloaders())
+    if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
     {
         sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
         return;

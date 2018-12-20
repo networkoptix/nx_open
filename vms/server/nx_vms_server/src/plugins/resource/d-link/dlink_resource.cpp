@@ -143,7 +143,7 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 // =======================================================================================
 
 QnPlDlinkResource::QnPlDlinkResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setVendor(lit("Dlink"));
 }
@@ -153,12 +153,12 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     QAuthenticator auth = getAuth();
 
     nx::utils::Url apiUrl;
-    apiUrl.setScheme( lit("http") );
+    apiUrl.setScheme( nx::network::http::kUrlSchemeName );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
     apiUrl.setUserName( auth.user() );
     apiUrl.setPassword( auth.password() );
-    apiUrl.setPath( lit("/common/info.cgi") );
+    apiUrl.setPath( "/common/info.cgi" );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
@@ -228,11 +228,11 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
@@ -361,7 +361,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
             ++it;
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 

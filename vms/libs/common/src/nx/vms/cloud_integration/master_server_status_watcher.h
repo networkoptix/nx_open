@@ -38,7 +38,8 @@ private slots:
 
 private:
     QnCommonModule* m_commonModule;
-    QTimer m_timer;
+    QTimer m_checkIfMasterFlagCanBeTakenTimer;
+    QTimer m_takeMasterFlagTimer;
     std::chrono::milliseconds m_delayBeforeSettingMasterFlag;
 
     void setMasterFlag(bool value);

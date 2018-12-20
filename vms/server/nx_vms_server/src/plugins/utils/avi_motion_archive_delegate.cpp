@@ -1,7 +1,7 @@
 #include "avi_motion_archive_delegate.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 
@@ -64,5 +64,5 @@ QnMetaDataV1Ptr AviMotionArchiveDelegate::analyzeMotion(const QnAbstractMediaDat
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

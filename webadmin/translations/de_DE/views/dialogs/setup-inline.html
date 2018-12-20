@@ -259,9 +259,11 @@ Benötigt eine Internetverbindung
         </div>
 
         <div class="form-group has-error"
-             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+             ng-if="forms.localForm.passwordInput.$valid &&
+                    (forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.localPasswordConfirmation.$touched &&
+                    forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
                 Alle Felder werden benötigt
             </div>

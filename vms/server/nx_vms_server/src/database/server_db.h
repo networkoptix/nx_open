@@ -9,9 +9,9 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/event/event_fwd.h>
 #include <common/common_module_aware.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
-class QnTimePeriod;
+struct QnTimePeriod;
 struct QnEventLogFilterData;
 struct QnEventLogRequestData;
 
@@ -22,7 +22,7 @@ namespace pb {
 /** Per-server database. Stores event log, audit data and bookmarks. */
 class QnServerDb:
     public QObject,
-    public nx::mediaserver::ServerModuleAware,
+    public nx::vms::server::ServerModuleAware,
     public QnDbHelper
 {
     Q_OBJECT

@@ -28,8 +28,8 @@ public:
         const QString &value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    virtual bool saveParams() override;
-    virtual int saveParamsAsync() override;
+    virtual bool saveProperties() override;
+    virtual int savePropertiesAsync() override;
     virtual int saveAsync() override;
 
 private:

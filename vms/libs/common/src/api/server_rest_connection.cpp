@@ -61,7 +61,7 @@ namespace rest
 ServerConnection::ServerConnection(
     QnCommonModule* commonModule,
     const QnUuid& serverId,
-    nx::utils::Url directUrl)
+    const nx::utils::Url& directUrl)
     :
     QObject(),
     QnCommonModuleAware(commonModule),
@@ -336,23 +336,42 @@ Handle ServerConnection::addCamera(
 }
 
 Handle ServerConnection::searchCameraStart(
-    const QString& startAddress,
-    const QString& endAddress,
+    const QString& cameraUrl,
     const QString& userName,
     const QString& password,
-    int port,
+    std::optional<int> port,
     GetCallback callback,
     QThread* targetThread)
 {
     auto parameters = QnRequestParamList{
-        {lit("start_ip"), startAddress},
-        {lit("user"), userName},
-        {lit("password"), password},
-        {lit("port"), QString::number(port)}};
-    if (!endAddress.isEmpty())
-        parameters << QnRequestParam("end_ip", endAddress);
+        {"url", cameraUrl},
+        {"user", userName},
+        {"password", password}};
+    if (port.has_value())
+        parameters << QnRequestParam("port", *port);
 
-    return executeGet(lit("/api/manualCamera/search"), parameters, callback, targetThread);
+    return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
+}
+
+Handle ServerConnection::searchCameraRangeStart(
+    const QString& startAddress,
+    const QString& endAddress,
+    const QString& userName,
+    const QString& password,
+    std::optional<int> port,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    NX_ASSERT(!endAddress.isEmpty());
+    auto parameters = QnRequestParamList{
+        {"start_ip", startAddress},
+        {"user", userName},
+        {"password", password},
+        {"end_ip", endAddress}};
+    if (port.has_value())
+        parameters << QnRequestParam("port", *port);
+
+    return executeGet("/api/manualCamera/search", parameters, callback, targetThread);
 }
 
 Handle ServerConnection::searchCameraStatus(
@@ -408,19 +427,6 @@ Handle ServerConnection::addFileUpload(
     };
     QString path = lit("/api/downloads/%1").arg(fileName);
     return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
-}
-
-Handle ServerConnection::validateFileInformation(
-    const QString& url,
-    int expectedSize,
-    GetCallback callback,
-    QThread* targetThread)
-{
-    return executeGet(
-        lit("/api/downloads/%1/validate").arg(url),
-        QnRequestParamList{{lit("expected"), QString::number(expectedSize)}},
-        callback,
-        targetThread);
 }
 
 Handle ServerConnection::removeFileDownload(
@@ -796,7 +802,8 @@ Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& c
 {
     auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
-            callback(handle, success);
+            if (callback)
+                callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>(lit("/ec2/cancelUpdate"),
@@ -812,7 +819,8 @@ Handle ServerConnection::updateActionInstall(
     auto internalCallback =
         [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
-            callback(handle, success);
+            if (callback)
+                callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>(lit("/api/installUpdate"),

@@ -22,7 +22,7 @@
 #include <media_server/media_server_module.h>
 
 QnSetupLocalSystemRestHandler::QnSetupLocalSystemRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

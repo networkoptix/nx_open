@@ -5,11 +5,11 @@
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <cloud_integration/cloud_connector.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace ec2 { class AbstractTransactionMessageBus; } // namespace ec2
 
-class CloudIntegrationManager: public QObject, public nx::mediaserver::ServerModuleAware
+class CloudIntegrationManager: public QObject, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

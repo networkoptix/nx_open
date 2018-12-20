@@ -11,7 +11,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <api/model/configure_system_data.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnCommonModule;
 
@@ -21,7 +21,7 @@ namespace ec2 {
 }
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 
 // Config based system name
 class SystemName: public ServerModuleAware
@@ -97,9 +97,17 @@ public:
     static void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);
 
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
-    bool backupDatabase(const boost::optional<QString>& dbFilePath = boost::none);
+
+    bool backupDatabase(
+        const boost::optional<QString>& dbFilePath = boost::none,
+        const boost::optional<int>& buildNumber = boost::none);
+    /**
+     * Returns none if no backup file has been found.
+     */
+    boost::optional<int64_t> lastDbBackupTimestamp() const;
     bool timeToMakeDbBackup() const;
 };
 
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx
+

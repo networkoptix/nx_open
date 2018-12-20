@@ -10,10 +10,10 @@
 #include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 namespace {
@@ -157,7 +157,7 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
 
     auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId])
         .intersected(
-            QnTimePeriod(QnTimePeriod::minTimeValue(), qnSyncTime->currentMSecsSinceEpoch()));
+            QnTimePeriod(QnTimePeriod::kMinTimeValue, qnSyncTime->currentMSecsSinceEpoch()));
 
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device time periods: %2. Device: %3.")
         .args(overlappedId, deviceTimePeriods, m_resource->getUserDefinedName()));
@@ -507,5 +507,5 @@ BaseRemoteArchiveSynchronizationTask::remoteArchiveChunkByTimePeriod(
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

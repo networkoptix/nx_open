@@ -17,6 +17,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     settings.dewarping = legacy.itemDewarpingParams;
     settings.enhancement = legacy.contrastParams;
     settings.zoomWindow = legacy.zoomWindow;
+    settings.watermark = legacy.watermark;
 
     nx::core::transcoding::FilterChain result(settings);
     if (legacy.timestampParams.enabled)

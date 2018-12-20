@@ -490,6 +490,9 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license.png");
 
+        case EventType::pluginEvent:
+            return qnSkin->pixmap("events/alert.png");
+
         default:
             return QPixmap();
     }

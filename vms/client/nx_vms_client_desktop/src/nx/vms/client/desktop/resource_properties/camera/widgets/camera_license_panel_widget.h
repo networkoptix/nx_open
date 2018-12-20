@@ -4,8 +4,8 @@
 
 #include <nx/vms/client/desktop/common/widgets/panel.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/utils/scoped_connections.h>
 
-class QnDisconnectHelper;
 namespace Ui { class CameraLicensePanelWidget; }
 
 namespace nx::vms::client::desktop {
@@ -35,7 +35,7 @@ private:
 private:
     const QScopedPointer<Ui::CameraLicensePanelWidget> ui;
     const QScopedPointer<ProvidedTextDisplay> m_licenseUsageDisplay;
-    QScopedPointer<QnDisconnectHelper> m_storeConnections;
+    nx::utils::ScopedConnections m_storeConnections;
 };
 
 } // namespace nx::vms::client::desktop

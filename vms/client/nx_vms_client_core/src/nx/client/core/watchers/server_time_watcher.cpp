@@ -164,7 +164,7 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
             if (server->utcOffset() == offset)
                 return;
 
-            server->setProperty(Qn::kTimezoneUtcOffset, offset);
+            server->setProperty(ResourcePropertyKey::Server::kTimezoneUtcOffset, offset);
             emit displayOffsetsChanged();
         },
         this->thread());

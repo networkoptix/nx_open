@@ -1,9 +1,16 @@
-<h1>
-    <b>{{release.version}}</b>
-    <small class="ml-3">{{release.productDescription}}</small>
-    <br>
-    <small>PUBLISHED {{release.date}}</small>
-</h1>
+<div class="clearfix d-flex align-baseline mb-1 mt-3">
+    <h1 class="float-left m-0 title">
+        {{release.version}}
+    </h1>
+    <h4 class="m-0 ml-3 subtitle">
+        {{release.productDescription}}
+    </h4>
+</div>
+
+<h4 class="mb-3 subtitle">
+    PUBLISHED {{release.date}}
+</h4>
+
 <div *ngIf="release.releaseNotes">
     <h4 translate>Release Notes</h4>
     <div [innerHTML]="release.releaseNotes"></div>
@@ -23,13 +30,11 @@
     </tr>
 </table>
 
-<h4 translate>Download Links:</h4>
+<h4 class="mt-3" translate>Download Links:</h4>
 <div *ngFor="let platform of release.platforms" #card>
-    <h4>
-        <a href (click)="card.expanded = !card.expanded; false">
-            {{language.lang.downloads.groups[platform.name].label || platform.name}}
-        </a>
-    </h4>
+    <a href class="ml-3" (click)="card.expanded = !card.expanded; false">
+        {{language.lang.downloads.groups[platform.name].label || platform.name}}
+    </a>
 
     <ul [ngbCollapse]="!card.expanded">
         <li *ngFor="let file of platform.files">

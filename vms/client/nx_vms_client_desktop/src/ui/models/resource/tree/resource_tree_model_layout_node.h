@@ -22,7 +22,6 @@ public:
     bool itemsLoaded() const;
 
 protected:
-    virtual QIcon calculateIcon() const override;
     virtual QnResourceTreeModelNodeManager* manager() const override;
 
 private:
@@ -42,5 +41,4 @@ private:
     ItemHash m_items;
     int m_loadedItems = 0;
     bool m_loaded = true;
-    bool m_isEncrypted = false; 
 };

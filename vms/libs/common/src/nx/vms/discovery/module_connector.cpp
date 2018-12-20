@@ -14,10 +14,10 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const nx::utils::Url kUrl(lit(
-    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream"));
+static const QString kUrl(
+    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream=%1");
 
-std::chrono::seconds kDefaultDisconnectTimeout(10);
+static const std::chrono::seconds kDefaultDisconnectTimeout(15);
 static const network::RetryPolicy kDefaultRetryPolicy(
     network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
 
@@ -62,6 +62,12 @@ static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
         else
             it = endpoints->erase(it);
     }
+}
+
+void ModuleConnector::forgetModule(const QnUuid& id)
+{
+    dispatch(
+        [this, id]() { m_modules.erase(id); });
 }
 
 void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
@@ -157,7 +163,10 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
 
     QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived, handler);
     QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, handler);
-    m_httpClient->doGet(nx::network::url::Builder(kUrl).setEndpoint(endpoint));
+
+    const auto keepAlive = m_parent->m_disconnectTimeout * 2 / 3;
+    const auto keepAliveSec = std::chrono::duration_cast<std::chrono::seconds>(keepAlive).count();
+    m_httpClient->doGet(nx::network::url::Builder(kUrl.arg(keepAliveSec)).setEndpoint(endpoint));
 }
 
 static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
@@ -239,7 +248,11 @@ ModuleConnector::Module::~Module()
     NX_DEBUG(this) << "Delete";
     NX_ASSERT(m_reconnectTimer.isInSelfAioThread());
     m_attemptingReaders.clear();
+    if (!m_connectedReader)
+        return;
+
     m_connectedReader.reset();
+    m_parent->m_disconnectedHandler(m_id);
 }
 
 void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> endpoints)
@@ -366,6 +379,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
+            m_reconnectTimer.cancelSync();
             m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
             NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);

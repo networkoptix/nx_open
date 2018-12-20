@@ -26,9 +26,6 @@ class AuthMethodRestrictionList;
 
 namespace nx::cloud::db {
 
-class AccountManager;
-class SystemManager;
-class TemporaryAccountPasswordManager;
 class StreeManager;
 class AbstractAuthenticationDataProvider;
 
@@ -89,6 +86,7 @@ public:
 
     void reportFailure(
         AuthenticationType authenticationType,
+        const nx::network::http::Request request,
         api::ResultCode resultCode,
         std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate = std::nullopt);
 

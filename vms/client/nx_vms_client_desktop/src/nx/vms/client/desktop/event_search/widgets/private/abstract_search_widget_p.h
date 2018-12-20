@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
 
 class QMenu;
+class QLabel;
 class QTimer;
 
 namespace Ui { class AbstractSearchWidget; }
@@ -42,6 +43,7 @@ public:
     virtual ~Private() override;
 
     AbstractSearchListModel* model() const;
+    EventRibbon* view() const;
 
     void goToLive();
 
@@ -53,12 +55,11 @@ public:
 
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
-    void setSingleCameraMode(bool value);
+
+    void selectCameras(Cameras value);
+    Cameras previousCameras() const;
 
     QString textFilter() const;
-
-    bool wholeArea() const;
-    void setWholeArea(bool value);
 
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
@@ -72,11 +73,10 @@ public:
 private:
     void setupModels();
     void setupRibbon();
-    void setupToolbar();
+    void setupViewportHeader();
     void setupPlaceholder();
     void setupTimeSelection();
     void setupCameraSelection();
-    void setupAreaSelection();
 
     void updateCurrentTimePeriod();
     void setSelectedPeriod(Period value);
@@ -102,6 +102,10 @@ private:
     const QScopedPointer<BusyIndicatorModel> m_tailIndicatorModel;
     const QScopedPointer<ConcatenationListModel> m_visualModel;
 
+    ToolButton* const m_togglePreviewsButton;
+    ToolButton* const m_toggleFootersButton;
+    QLabel* const m_itemCounterLabel;
+
     SearchLineEdit* const m_textFilterEdit;
 
     const QScopedPointer<QTimer> m_dayChangeTimer;
@@ -112,7 +116,6 @@ private:
     Cameras m_cameras = Cameras::all;
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QnVirtualCameraResourceSet m_currentCameras;
-    bool m_wholeArea = true;
 
     Period m_previousPeriod = Period::all;
     QHash<Period, QAction*> m_timeSelectionActions;

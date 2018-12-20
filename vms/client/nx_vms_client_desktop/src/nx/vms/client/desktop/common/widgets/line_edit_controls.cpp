@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <utils/common/event_processors.h>
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/log/assert.h>
 
 namespace {
@@ -42,7 +42,6 @@ struct LineEditControls::Private
 
     ~Private()
     {
-        disconnectHelper.clear();
     }
 
     void setEmpty()
@@ -205,7 +204,7 @@ struct LineEditControls::Private
             controls << control;
 
             // Remove if deleted.
-            *disconnectHelper << QObject::connect(control, &QWidget::destroyed,
+            connections << QObject::connect(control, &QWidget::destroyed,
                 [this](QObject* what)
                 {
                     removeControl(static_cast<QWidget*>(what), true);
@@ -230,7 +229,7 @@ struct LineEditControls::Private
     const QScopedPointer<QWidget> contents;
     const QMargins initialMargins; //< Initial contents margins of line edit.
     QList<QWidget*> controls;
-    QnDisconnectHelperPtr disconnectHelper = QnDisconnectHelper::create();
+    nx::utils::ScopedConnections connections;
 };
 
 //-------------------------------------------------------------------------------------------------

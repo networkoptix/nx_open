@@ -1,19 +1,29 @@
 #include "hidpi_workarounds.h"
 
+#include <cmath>
+
 #include <QtCore/QPointer>
 
-#include <QtGui/QContextMenuEvent>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QEnterEvent>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QContextMenuEvent>
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+#include <QtWidgets/QGraphicsSceneContextMenuEvent>
+#include <QtWidgets/QGraphicsSceneDragDropEvent>
 
 #include <nx/utils/scope_guard.h>
 
@@ -259,6 +269,28 @@ public:
     }
 };
 
+QPoint fixupScreenPos(QWidget* viewport, const QPointF& scenePos, const QPoint& fallbackScreenPos)
+{
+    if (!viewport)
+        return fallbackScreenPos;
+
+    const auto view = qobject_cast<QGraphicsView*>(viewport->parent());
+    if (!view || !view->scene())
+        return fallbackScreenPos;
+
+    return view->mapToGlobal(view->mapFromScene(scenePos));
+}
+
+qreal frac(qreal source)
+{
+    return source - std::trunc(source);
+}
+
+QPointF frac(const QPointF& source)
+{
+    return QPointF(frac(source.x()), frac(source.y()));
+}
+
 static bool initializedWorkarounds = false;
 static bool isWindowsEnvironment =
     #if defined(Q_OS_WIN)
@@ -318,4 +350,152 @@ void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
 
     const auto fixedSize = pixmap.size() / pixmap.devicePixelRatio();
     label->setFixedSize(fixedSize);
+}
+
+bool QnHiDpiWorkarounds::fixupGraphicsSceneEvent(QEvent* event)
+{
+    if (!event)
+        return false;
+
+    switch (event->type())
+    {
+        case QEvent::GraphicsSceneMouseMove:
+        case QEvent::GraphicsSceneMousePress:
+        case QEvent::GraphicsSceneMouseRelease:
+        case QEvent::GraphicsSceneMouseDoubleClick:
+        {
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            mouseEvent->setScreenPos(fixupScreenPos(
+                mouseEvent->widget(), mouseEvent->scenePos(), mouseEvent->screenPos()));
+            mouseEvent->setLastScreenPos(fixupScreenPos(
+                mouseEvent->widget(), mouseEvent->lastScenePos(), mouseEvent->lastScreenPos()));
+            return true;
+        }
+
+        case QEvent::GraphicsSceneHoverEnter:
+        case QEvent::GraphicsSceneHoverLeave:
+        case QEvent::GraphicsSceneHoverMove:
+        {
+            auto hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            hoverEvent->setScreenPos(fixupScreenPos(
+                hoverEvent->widget(), hoverEvent->scenePos(), hoverEvent->screenPos()));
+            hoverEvent->setLastScreenPos(fixupScreenPos(
+                hoverEvent->widget(), hoverEvent->lastScenePos(), hoverEvent->lastScreenPos()));
+            return true;
+        }
+
+        case QEvent::GraphicsSceneContextMenu:
+        {
+            auto menuEvent = static_cast<QGraphicsSceneContextMenuEvent*>(event);
+            menuEvent->setScreenPos(fixupScreenPos(
+                menuEvent->widget(), menuEvent->scenePos(), menuEvent->screenPos()));
+            return true;
+        }
+
+        case QEvent::GraphicsSceneDragEnter:
+        case QEvent::GraphicsSceneDragLeave:
+        case QEvent::GraphicsSceneDragMove:
+        case QEvent::GraphicsSceneDrop:
+        {
+            auto dndEvent = static_cast<QGraphicsSceneDragDropEvent*>(event);
+            dndEvent->setScreenPos(fixupScreenPos(
+                dndEvent->widget(), dndEvent->scenePos(), dndEvent->screenPos()));
+            return true;
+        }
+
+        case QEvent::GraphicsSceneWheel:
+        {
+            auto wheelEvent = static_cast<QGraphicsSceneWheelEvent*>(event);
+            wheelEvent->setScreenPos(fixupScreenPos(
+                wheelEvent->widget(), wheelEvent->scenePos(), wheelEvent->screenPos()));
+            return true;
+        }
+
+        default:
+            return false;
+    }
+}
+
+QEvent* QnHiDpiWorkarounds::fixupEvent(
+    QWidget* widget, QEvent* source, std::unique_ptr<QEvent>& target)
+{
+    if (!source)
+        return nullptr;
+
+    // First, handle Graphics Scene events. They are fixed up in place, without making a copy.
+
+    if (fixupGraphicsSceneEvent(source))
+        return source;
+
+    // Second, handle other events. They are fixed as a copy, but losing spontaneous flag.
+
+    if (!widget)
+        return source;
+
+    switch (source->type())
+    {
+        case QEvent::MouseMove:
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+        case QEvent::MouseButtonDblClick:
+        {
+            const auto& mouseEvent = *static_cast<QMouseEvent*>(source);
+            target.reset(new QMouseEvent(
+                source->type(),
+                mouseEvent.localPos(),
+                mouseEvent.windowPos(),
+                widget->mapToGlobal(mouseEvent.pos()) + frac(mouseEvent.screenPos()),
+                mouseEvent.button(),
+                mouseEvent.buttons(),
+                mouseEvent.modifiers(),
+                mouseEvent.source()));
+            target->setAccepted(source->isAccepted());
+            return target.get();
+        }
+
+        case QEvent::Enter:
+        {
+            const auto& enterEvent = *static_cast<QEnterEvent*>(source);
+            target.reset(new QEnterEvent(
+                enterEvent.localPos(),
+                enterEvent.windowPos(),
+                widget->mapToGlobal(enterEvent.pos()) + frac(enterEvent.screenPos())));
+            target->setAccepted(source->isAccepted());
+            return target.get();
+        }
+
+        case QEvent::Wheel:
+        {
+            const auto& wheelEvent = *static_cast<QWheelEvent*>(source);
+            target.reset(new QWheelEvent(
+                wheelEvent.posF(),
+                widget->mapToGlobal(wheelEvent.pos()) + frac(wheelEvent.globalPosF()),
+                wheelEvent.pixelDelta(),
+                wheelEvent.angleDelta(),
+                wheelEvent.delta(),
+                wheelEvent.orientation(),
+                wheelEvent.buttons(),
+                wheelEvent.modifiers(),
+                wheelEvent.phase(),
+                wheelEvent.source(),
+                wheelEvent.inverted()));
+            target->setAccepted(source->isAccepted());
+            return target.get();
+        }
+
+        case QEvent::ContextMenu:
+        {
+            const auto& menuEvent = *static_cast<QContextMenuEvent*>(source);
+            target.reset(new QContextMenuEvent(
+                menuEvent.reason(),
+                menuEvent.pos(),
+                widget->mapToGlobal(menuEvent.pos()),
+                menuEvent.modifiers()));
+            target->setAccepted(source->isAccepted());
+            return target.get();
+        }
+
+        default:
+            return source;
+    }
 }

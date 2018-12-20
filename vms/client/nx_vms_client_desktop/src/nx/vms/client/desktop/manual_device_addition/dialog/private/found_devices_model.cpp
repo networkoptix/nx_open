@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -48,7 +49,6 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
 
     const int first = rowCount();
     const int last = rowCount() + addedIds.size() - 1;
-    bool hasNewDevices = false;
     {
         const ScopedInsertRows guard(this, QModelIndex(), first, last);
         for (const auto& device: devices)
@@ -56,28 +56,21 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
             const auto& id = device.uniqueId;
             if (addedIds.contains(id))
             {
-                hasNewDevices = true;
+                const PresentedState presentedState =
+                    device.existsInPool ? alreadyAddedState : notPresentedState;
+                const bool isChecked = false;
+
                 m_devices.append(device);
-                m_checked.insert(id, false);
-                m_presentedState.insert(id,
-                    device.existsInPool ? alreadyAddedState : notPresentedState);
+                m_deviceRowState.insert(id, { presentedState, isChecked });
+                incrementDeviceCount({ presentedState, isChecked });
             }
         }
-    }
-
-    // Update numbers in header
-    if (hasNewDevices)
-    {
-        headerDataChanged(Qt::Horizontal,
-            FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
-        emit rowCountChanged();
     }
 }
 
 void FoundDevicesModel::removeDevices(QStringList ids)
 {
-    bool someDevicesRemoved = false;
-    while(!ids.isEmpty())
+    while (!ids.isEmpty())
     {
         const auto id = ids.back();
         ids.removeLast();
@@ -96,19 +89,21 @@ void FoundDevicesModel::removeDevices(QStringList ids)
 
         const int index = it - m_devices.begin();
         const ScopedRemoveRows guard(this, QModelIndex(), index, index);
-        m_checked.remove(id);
-        m_presentedState.remove(id);
-        m_devices.erase(it);
-        someDevicesRemoved = true;
-    }
 
-    // Update numbers in header
-    if (someDevicesRemoved)
-    {
-        headerDataChanged(Qt::Horizontal,
-            FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
-        emit rowCountChanged();
+        decrementDeviceCount(m_deviceRowState[id]);
+        m_deviceRowState.remove(id);
+        m_devices.erase(it);
     }
+}
+
+int FoundDevicesModel::deviceCount(PresentedState presentedState) const
+{
+    return deviceCount(presentedState, true) + deviceCount(presentedState, false);
+}
+
+int FoundDevicesModel::deviceCount(PresentedState presentedState, bool isChecked) const
+{
+    return m_deviceCount[{ presentedState, isChecked }];
 }
 
 QModelIndex FoundDevicesModel::indexByUniqueId(const QString& uniqueId, int column)
@@ -133,7 +128,7 @@ int FoundDevicesModel::rowCount(const QModelIndex &parent) const
     return 0;
 }
 
-bool FoundDevicesModel::correctIndex(const QModelIndex& index) const
+bool FoundDevicesModel::isCorrectRow(const QModelIndex& index) const
 {
     const bool correct = index.isValid() && index.row() >= 0 && index.row() < rowCount();
     if (!correct)
@@ -142,13 +137,20 @@ bool FoundDevicesModel::correctIndex(const QModelIndex& index) const
     return correct;
 }
 
-QVariant FoundDevicesModel::displayData(const QModelIndex& index) const
+QnManualResourceSearchEntry FoundDevicesModel::device(const QModelIndex& index) const
 {
-    if (!correctIndex(index))
+    return isCorrectRow(index)
+        ? m_devices[index.row()]
+        : QnManualResourceSearchEntry();
+}
+
+QVariant FoundDevicesModel::getDisplayData(const QModelIndex& index) const
+{
+    if (!isCorrectRow(index))
         return QVariant();
 
     const auto& currentDeivce = device(index);
-    switch(index.column())
+    switch (index.column())
     {
         case Columns::modelColumn:
             return currentDeivce.name;
@@ -161,58 +163,79 @@ QVariant FoundDevicesModel::displayData(const QModelIndex& index) const
     }
 }
 
-QnManualResourceSearchEntry FoundDevicesModel::device(const QModelIndex& index) const
+QVariant FoundDevicesModel::getCheckStateData(const QModelIndex& index) const
 {
-    return correctIndex(index)
-        ? m_devices[index.row()]
-        : QnManualResourceSearchEntry();
-}
-
-QVariant FoundDevicesModel::checkedData(const QModelIndex& index) const
-{
-    if (!correctIndex(index) || index.column() != FoundDevicesModel::checkboxColumn)
+    if (!isCorrectRow(index) || index.column() != FoundDevicesModel::checkboxColumn)
         return QVariant();
 
-    return m_checked[device(index).uniqueId]
+    return m_deviceRowState[device(index).uniqueId].second
         ? Qt::Checked
         : Qt::Unchecked;
 }
 
-QVariant FoundDevicesModel::data(const QModelIndex& index, int role) const
+QVariant FoundDevicesModel::getForegroundColorData(const QModelIndex& index) const
 {
-    if (!correctIndex(index))
+    if (!isCorrectRow(index))
         return QVariant();
 
-    switch(role)
+    static const auto kCheckedColor = QPalette().color(QPalette::Text);
+    static const auto kRegularTextColor = QPalette().color(QPalette::Light);
+    static const auto kRegularCheckboxColor = QPalette().color(QPalette::WindowText);
+    static const auto kAddedDeviceTextColor = QPalette().color(QPalette::Midlight);
+    static const auto kPresentedStateColor = QPalette().color(QPalette::WindowText);
+
+    const auto deviceRowState = m_deviceRowState[m_devices.at(index.row()).uniqueId];
+    const bool isAddedDevice = deviceRowState.first == alreadyAddedState;
+    const bool isChecked = deviceRowState.second;
+
+    switch (index.column())
+    {
+        case brandColumn:
+        case modelColumn:
+        case addressColumn:
+        {
+            if (isAddedDevice)
+                return kAddedDeviceTextColor;
+            else if (isChecked)
+                return kCheckedColor;
+            return kRegularTextColor;
+        }
+        case presentedStateColumn:
+        {
+            return kPresentedStateColor;
+        }
+        case checkboxColumn:
+        {
+            if (isChecked)
+                return kCheckedColor;
+            return kRegularCheckboxColor;
+        }
+    }
+
+    NX_ASSERT(false, "Unexpected column");
+    return QVariant();
+}
+
+QVariant FoundDevicesModel::data(const QModelIndex& index, int role) const
+{
+    if (!isCorrectRow(index))
+        return QVariant();
+
+    switch (role)
     {
         case Qt::DisplayRole:
-            return displayData(index);
+            return getDisplayData(index);
         case Qt::CheckStateRole:
-            return checkedData(index);
+            return getCheckStateData(index);
         case dataRole:
             return QVariant::fromValue(device(index));
         case presentedStateRole:
-            return m_presentedState[device(index).uniqueId];
-        case Qt::TextColorRole:
-            return QPalette().color(getColorRole(index));
+            return m_deviceRowState[device(index).uniqueId].first;
+        case Qt::ForegroundRole:
+            return getForegroundColorData(index);
         default:
             return QVariant();
     }
-}
-
-QPalette::ColorRole FoundDevicesModel::getColorRole(const QModelIndex& index) const
-{
-    static const auto kUsualColor = QPalette::WindowText;
-    static const auto kHighlightedColor = QPalette::Light;
-
-    const auto column = index.column();
-    if (column == presentedStateColumn || column == checkboxColumn)
-        return kUsualColor;
-
-    const auto deviceId = device(index).uniqueId;
-    return m_presentedState[deviceId] == alreadyAddedState
-        ? kUsualColor
-        : kHighlightedColor;
 }
 
 bool FoundDevicesModel::setData(
@@ -226,18 +249,39 @@ bool FoundDevicesModel::setData(
     if (index.column() == checkboxColumn && role == Qt::CheckStateRole)
     {
         const auto uniqueId = m_devices[index.row()].uniqueId;
-        m_checked[uniqueId] = value.value<Qt::CheckState>() != Qt::Unchecked;
-        emit dataChanged(index, index, {Qt::CheckStateRole});
+        const bool newCheckState = value.value<Qt::CheckState>() != Qt::Unchecked;
+
+        auto& deviceRowState = m_deviceRowState[uniqueId];
+        auto newDeviceRowState = PresentedStateWithCheckState(deviceRowState.first, newCheckState);
+
+        if (deviceRowState != newDeviceRowState)
+        {
+            decrementDeviceCount(deviceRowState);
+            incrementDeviceCount(newDeviceRowState);
+            deviceRowState = newDeviceRowState;
+            emit dataChanged(index, index, { Qt::CheckStateRole });
+            emit headerDataChanged(Qt::Horizontal,
+                FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
+        }
         return true;
     }
     else if (index.column() == presentedStateColumn && role == presentedStateRole)
     {
         const auto uniqueId = device(index).uniqueId;
-        m_presentedState[uniqueId] = value.value<PresentedState>();
+        const PresentedState newPresentedState = value.value<PresentedState>();
 
-        emit dataChanged(index, index, {presentedStateRole});
-        emit headerDataChanged(Qt::Horizontal,
-            FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
+        auto& deviceRowState = m_deviceRowState[uniqueId];
+        auto newDeviceRowState = PresentedStateWithCheckState(newPresentedState, deviceRowState.second);
+
+        if (deviceRowState != newDeviceRowState)
+        {
+            decrementDeviceCount(deviceRowState);
+            incrementDeviceCount(newDeviceRowState);
+            deviceRowState = newDeviceRowState;
+            emit dataChanged(index, index, { presentedStateRole });
+            emit headerDataChanged(Qt::Horizontal,
+                FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
+        }
         return true;
     }
 
@@ -255,7 +299,7 @@ QVariant FoundDevicesModel::headerData(
         {
             case Qt::FontRole:
                 return selectionColumnFont();
-            case Qt::TextColorRole:
+            case Qt::ForegroundRole:
                 return QPalette().color(QPalette::Light);
             case Qt::TextAlignmentRole:
                 return Qt::AlignRight;
@@ -267,7 +311,7 @@ QVariant FoundDevicesModel::headerData(
     if (role != Qt::DisplayRole)
         return base_type::headerData(section, orientation, role);
 
-    switch(section)
+    switch (section)
     {
         case Columns::brandColumn:
             return tr("Brand");
@@ -276,7 +320,8 @@ QVariant FoundDevicesModel::headerData(
         case Columns::addressColumn:
             return tr("Address");
         case Columns::presentedStateColumn:
-            return tr("%1 devices total, %2 new").arg(rowCount()).arg(newDevicesCount());
+            return QString("%1, %2").arg(tr("%n device(s) total", nullptr, rowCount()))
+                .arg(tr("%n new", nullptr, rowCount() - deviceCount(alreadyAddedState)));
         default:
             return QVariant();
     }
@@ -291,12 +336,39 @@ int FoundDevicesModel::columnCount(const QModelIndex& parent) const
     return 0;
 }
 
-int FoundDevicesModel::newDevicesCount() const
+Qt::ItemFlags FoundDevicesModel::flags(const QModelIndex& index) const
 {
-    const auto addedDevicesCount = std::count_if(m_presentedState.begin(), m_presentedState.end(),
-        [](PresentedState state) { return state == alreadyAddedState; });
+    auto result = base_type::flags(index);
 
-    return rowCount() - addedDevicesCount;
+    if (!isCorrectRow(index))
+        return result;
+
+    if (index.column() == checkboxColumn)
+    {
+        const auto presentedStateIndex = index.siblingAtColumn(presentedStateColumn);
+        const auto presentedStateData = presentedStateIndex.data(presentedStateRole);
+        if (!presentedStateData.isNull())
+        {
+            const auto presentedState = presentedStateData.value<PresentedState>();
+            if (presentedState == notPresentedState)
+                result.setFlag(Qt::ItemIsUserCheckable, true);
+        }
+    }
+    return result;
+}
+
+void FoundDevicesModel::incrementDeviceCount(const PresentedStateWithCheckState& deviceState)
+{
+    if (!m_deviceCount.contains(deviceState))
+        m_deviceCount.insert(deviceState, 1);
+    else
+        m_deviceCount[deviceState]++;
+}
+
+void FoundDevicesModel::decrementDeviceCount(const PresentedStateWithCheckState& deviceState)
+{
+    NX_ASSERT(m_deviceCount.contains(deviceState));
+    m_deviceCount[deviceState]--;
 }
 
 } // namespace nx::vms::client::desktop

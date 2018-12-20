@@ -20,12 +20,12 @@
 #include "utils/media_db/media_db.h"
 
 #include "device_file_catalog.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 
 class QnStorageDb: 
     public nx::media_db::DbHelperHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;

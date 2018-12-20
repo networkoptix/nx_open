@@ -87,7 +87,7 @@ struct QnCameraAdvancedParameterDependency
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
 
-    /** Auto fill id field as a hash of depended ids and values */
+    /** Auto fill id field as a hash of dependency ids and values */
     void autoFillId(const QString& prefix = QString());
 };
 
@@ -123,6 +123,7 @@ struct QnCameraAdvancedParameter
     QString description;
     QString confirmation; //< Confirmation message. Actual only for the buttons now.
     QString tag;
+    bool availableInOffline = false;
     bool readOnly = false;
     QString readCmd; //< Read parameter command line. Isn't used in UI.
     QString writeCmd; //< Write parameter command line. Isn't used in UI.
@@ -134,7 +135,7 @@ struct QnCameraAdvancedParameter
     bool compact = false;
     QString unit;
     QString notes;
-    // If parameter with resync flag is changed then all parameters in a set should be reloaded.
+    // If a parameter with resync flag is changed then all parameters in a set should be reloaded.
     bool resync = false;
     bool keepInitialValue = false;
     bool bindDefaultToMinimum = false;
@@ -183,7 +184,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (keepInitialValue)\
     (bindDefaultToMinimum)\
     (resync)\
-    (group)
+    (group)\
+    (availableInOffline)
 
 struct QnCameraAdvancedParamGroup
 {
@@ -215,8 +217,8 @@ struct QnCameraAdvancedParams
     QString name;
     QString version;
     QString unique_id;
-    // If packet_mode is set to true then value of all parameters should be reloaded
-    // on every parameter change. May be considered as group 'QnCameraAdvancedParam::resync'
+    // If packet_mode is set to true then the value of all parameters should be reloaded
+    // on every parameter change. May be considered as a group `QnCameraAdvancedParam::resync`
     bool packet_mode = false;
     std::vector<QnCameraAdvancedParamGroup> groups;
 

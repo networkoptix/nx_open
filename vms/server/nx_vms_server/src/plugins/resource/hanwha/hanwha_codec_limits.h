@@ -15,7 +15,7 @@ extern "C" {
 } // extern "C"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 struct HanwhaCodecLimits
@@ -102,5 +102,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

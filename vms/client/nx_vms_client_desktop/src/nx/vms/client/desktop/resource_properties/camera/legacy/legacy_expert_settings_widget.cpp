@@ -159,7 +159,6 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
         ui->generateLogicalIdButton, &QPushButton::clicked,
         this, &LegacyExpertSettingsWidget::at_generateLogicalId);
 
-
     setHelpTopic(ui->secondStreamGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
@@ -488,7 +487,7 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
         if (ui->checkBoxPrimaryRecorder->checkState() != Qt::PartiallyChecked)
             camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), ui->checkBoxPrimaryRecorder->isChecked() ? lit("1") : lit("0"));
         if (ui->bitratePerGopCheckBox->checkState() != Qt::PartiallyChecked)
-            camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, ui->bitratePerGopCheckBox->isChecked() ? lit("1") : lit("0"));
+            camera->setProperty(ResourcePropertyKey::kBitratePerGOP, ui->bitratePerGopCheckBox->isChecked() ? lit("1") : lit("0"));
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreamingInternal())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
@@ -547,7 +546,6 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
         }
     }
 }
-
 
 bool LegacyExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
     QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
@@ -719,4 +717,3 @@ void LegacyExpertSettingsWidget::setReadOnly(bool readOnly)
 }
 
 } // namespace nx::vms::client::desktop
-

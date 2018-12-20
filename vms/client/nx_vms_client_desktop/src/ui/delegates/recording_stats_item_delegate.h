@@ -29,16 +29,6 @@ protected:
     virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
 
 private:
-    enum class RowType
-    {
-        normal,
-        foreign,
-        total
-    };
-
-    RowType rowType(const QModelIndex& index) const;
-
-private:
     QScopedPointer<QnResourceItemDelegate> m_resourceDelegate;
     QnRecordingStatsColors m_colors;
 };

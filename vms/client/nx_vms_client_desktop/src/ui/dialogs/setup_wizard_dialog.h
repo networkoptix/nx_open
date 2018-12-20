@@ -3,8 +3,7 @@
 #include <client_core/connection_context_aware.h>
 
 #include <ui/dialogs/common/dialog.h>
-
-#include <utils/common/encoded_credentials.h>
+#include <utils/common/credentials.h>
 
 class QnSetupWizardDialogPrivate;
 class QnSetupWizardDialog: public QnDialog, public QnConnectionContextAware
@@ -24,9 +23,9 @@ public:
 
     void loadPage();
 
-    QnEncodedCredentials localCredentials() const;
-    QnEncodedCredentials cloudCredentials() const;
-    void setCloudCredentials(const QnEncodedCredentials& value);
+    nx::vms::common::Credentials localCredentials() const;
+    nx::vms::common::Credentials cloudCredentials() const;
+    void setCloudCredentials(const nx::vms::common::Credentials& value);
 
     bool savePassword() const;
 

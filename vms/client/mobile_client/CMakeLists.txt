@@ -116,7 +116,7 @@ if(IOS)
             ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
         set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
     else()
-        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
+        nx_configure_file(maven/filter-resources/mobile_client-release.entitlements
             ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
         set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
     endif()
@@ -186,7 +186,7 @@ if(IOS)
         "-framework AVFoundation"
     )
 
-    if(NOT ios.skip.sign)
+    if(codeSigning)
         prepare_mac_keychain(mobile_client)
     endif()
 

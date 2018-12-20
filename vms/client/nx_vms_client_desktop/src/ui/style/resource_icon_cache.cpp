@@ -16,11 +16,15 @@
 #include <core/resource/webpage_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
+
 #include <ui/style/skin.h>
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
 
 #include <nx/fusion/model_functions.h>
+
+using namespace nx::vms::client::desktop;
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -36,6 +40,34 @@ QIcon loadIcon(const QString& name)
 
     return qnSkin->icon(name, QString(), &kResourceIconSuffixes);
 }
+
+using Key = QnResourceIconCache::Key;
+Key calculateStatus(Key key, const QnResourcePtr& resource)
+{
+    using Key = QnResourceIconCache::KeyPart;
+    using Status = QnResourceIconCache::KeyPart;
+
+    switch (resource->getStatus())
+    {
+        case Qn::Online:
+            if (key == Key::Server && resource->getId() == resource->commonModule()->remoteGUID())
+                return Status::Control;
+            return Status::Online;
+
+        case Qn::Offline:
+            return Status::Offline;
+
+        case Qn::Unauthorized:
+            return Status::Unauthorized;
+
+        case Qn::Incompatible:
+            return Status::Incompatible;
+
+        default:
+            break;
+    };
+    return Status::Unknown;
+};
 
 } //namespace
 
@@ -65,13 +97,15 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(HealthMonitor | Offline, loadIcon("tree/health_monitor_offline.png"));
 
     // Layouts.
-    m_cache.insert(Layouts, loadIcon("tree/layouts.png"));
-    m_cache.insert(Layout, loadIcon("tree/layout.png"));
-    m_cache.insert(Layout | Locked, loadIcon("tree/layout_locked.png"));
-    m_cache.insert(EncryptedLayout, loadIcon("tree/layout_encrypted.png"));	
-    m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.png"));
-    m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.png"));
-    m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.png"));
+    m_cache.insert(Layouts, loadIcon("tree/layouts.svg"));
+    m_cache.insert(Layout, loadIcon("tree/layout.svg"));
+    m_cache.insert(Layout | Locked, loadIcon("tree/layout_locked.svg"));
+    m_cache.insert(ExportedLayout, loadIcon("tree/layout_exported.svg"));
+    m_cache.insert(ExportedLayout | Locked, loadIcon("tree/layout_exported_locked.svg"));
+    m_cache.insert(ExportedEncryptedLayout, loadIcon("tree/layout_exported_encrypted.svg"));
+    m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
+    m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.svg"));
+    m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.svg"));
     m_cache.insert(LayoutTour, loadIcon("tree/layout_tour.png"));
     m_cache.insert(LayoutTours, loadIcon("tree/layout_tours.png"));
 
@@ -202,12 +236,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         key = Server;
     }
-    else if (flags.testFlag(Qn::layout))
-    {
-        key = resource.dynamicCast<QnLayoutResource>()->data(Qn::LayoutEncryptionRole).toBool()
-            ? EncryptedLayout
-            : Layout;
-    }
     else if (flags.testFlag(Qn::io_module))
     {
         key = IOModule;
@@ -230,7 +258,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (flags.testFlag(Qn::server_archive))
     {
-        // What's that actually?
+        NX_ASSERT(false, "What's that actually?");
         key = Media;
     }
     else if (flags.testFlag(Qn::user))
@@ -254,36 +282,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             return Key(C2P);
     }
 
-    Key status = Unknown;
-
-    const auto updateStatus =
-        [&status, key, resource]()
-        {
-            switch (resource->getStatus())
-            {
-                case Qn::Online:
-                    if (key == Server && resource->getId() == resource->commonModule()->remoteGUID())
-                        status = Control;
-                    else
-                        status = Online;
-                    break;
-
-                case Qn::Offline:
-                    status = Offline;
-                    break;
-
-                case Qn::Unauthorized:
-                    status = Unauthorized;
-                    break;
-
-                case Qn::Incompatible:
-                    status = Incompatible;
-                    break;
-
-                default:
-                    break;
-            };
-        };
+    Key status = calculateStatus(key, resource);
 
     // Fake servers
     if (flags.testFlag(Qn::fake))
@@ -303,6 +302,12 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             key = VideoWall;
         else if (layout->isShared())
             key = SharedLayout;
+        else if (layout::isEncrypted(layout))
+            key = ExportedEncryptedLayout;
+        else if (layout->isFile())
+            key = ExportedLayout;
+        else
+            key = Layout;
 
         status = (layout->locked() && !videowall)
             ? Locked
@@ -314,13 +319,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (const auto camera = resource.dynamicCast<QnSecurityCamResource>())
     {
-        updateStatus();
         if (status == Online && camera->needsToChangeDefaultPassword())
             status = Incompatible;
-    }
-    else
-    {
-        updateStatus();
     }
 
     if (flags.testFlag(Qn::read_only))

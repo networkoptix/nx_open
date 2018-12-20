@@ -268,7 +268,7 @@ void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64
 
 int QnVMax480ArchiveDelegate::getChannel() const
 {
-    return m_res.dynamicCast<nx::mediaserver::resource::Camera>()->getChannel();
+    return m_res.dynamicCast<nx::vms::server::resource::Camera>()->getChannel();
 }
 
 void QnVMax480ArchiveDelegate::setPlaybackMode(PlaybackMode mode)

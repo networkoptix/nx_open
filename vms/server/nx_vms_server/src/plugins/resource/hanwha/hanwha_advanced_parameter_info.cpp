@@ -4,7 +4,7 @@
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -360,5 +360,5 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

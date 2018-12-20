@@ -7,14 +7,14 @@
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <nx/utils/url.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnMediaServerModule;
 
 class QnPlISDResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 
 public:

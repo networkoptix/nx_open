@@ -207,25 +207,25 @@ bool OverridenCapabilitiesPtzController::getHomeObject(QnPtzObject* homeObject) 
     return base_type::getHomeObject(homeObject);
 }
 
-bool OverridenCapabilitiesPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool OverridenCapabilitiesPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const Options& options) const
 {
-    if (!m_overridenCapabilities.testFlag(Ptz::AuxilaryPtzCapability))
+    if (!m_overridenCapabilities.testFlag(Ptz::AuxiliaryPtzCapability))
         return false;
 
-    return base_type::getAuxilaryTraits(auxilaryTraits, options);
+    return base_type::getAuxiliaryTraits(auxiliaryTraits, options);
 }
 
-bool OverridenCapabilitiesPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool OverridenCapabilitiesPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const Options& options)
 {
-    if (!m_overridenCapabilities.testFlag(Ptz::AuxilaryPtzCapability))
+    if (!m_overridenCapabilities.testFlag(Ptz::AuxiliaryPtzCapability))
         return false;
 
-    return base_type::runAuxilaryCommand(trait, data, options);
+    return base_type::runAuxiliaryCommand(trait, data, options);
 }
 
 bool OverridenCapabilitiesPtzController::getData(

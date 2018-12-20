@@ -12,7 +12,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <core/resource_management/resource_searcher.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace nx {
 namespace plugins {
@@ -20,7 +20,7 @@ namespace flir {
 
 class FcResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     using DeviceInfo = nx::plugins::flir::fc_private::DeviceInfo;
 

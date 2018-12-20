@@ -2,9 +2,9 @@
 
 #ifdef ENABLE_TEST_CAMERA
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
-class QnTestCameraResource: public nx::mediaserver::resource::Camera
+class QnTestCameraResource: public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 
@@ -23,7 +23,7 @@ public:
     virtual void setHostAddress(const QString &ip) override;
     virtual bool needCheckIpConflicts() const override { return false; }
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

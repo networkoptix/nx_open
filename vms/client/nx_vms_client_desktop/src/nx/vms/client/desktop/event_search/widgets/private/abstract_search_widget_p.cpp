@@ -1,10 +1,13 @@
 #include "abstract_search_widget_p.h"
+#include "tile_interaction_handler_p.h"
 #include "ui_abstract_search_widget.h"
 
 #include <chrono>
 
 #include <QtCore/QTimer>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QScrollBar>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -12,7 +15,6 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/palette.h>
-#include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -27,6 +29,7 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
+#include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -37,12 +40,13 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-using namespace std::literals::chrono_literals;
 using namespace std::chrono;
 
+namespace {
+
 static constexpr int kPlaceholderFontPixelSize = 15;
+static constexpr int kCounterPanelHeight = 32;
+
 static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
 static constexpr milliseconds kTimeSelectionDelay = 250ms;
 static constexpr milliseconds kTextFilterDelay = 250ms;
@@ -50,7 +54,7 @@ static constexpr milliseconds kTextFilterDelay = 250ms;
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     const auto paintFunction =
-        [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
+        [](QPainter* painter, const QStyleOption* option, const QWidget* /*widget*/) -> bool
         {
             if (option->state.testFlag(QStyle::State_HasFocus))
                 painter->fillRect(option->rect, option->palette.dark());
@@ -86,6 +90,9 @@ AbstractSearchWidget::Private::Private(
     m_headIndicatorModel(new BusyIndicatorModel()),
     m_tailIndicatorModel(new BusyIndicatorModel()),
     m_visualModel(new ConcatenationListModel()),
+    m_togglePreviewsButton(new ToolButton(q)),
+    m_toggleFootersButton(new ToolButton(q)),
+    m_itemCounterLabel(new QLabel(q)),
     m_textFilterEdit(createSearchLineEdit(q)),
     m_dayChangeTimer(new QTimer()),
     m_fetchMoreOperation(new utils::PendingOperation())
@@ -102,16 +109,11 @@ AbstractSearchWidget::Private::Private(
     connect(m_textFilterEdit, &SearchLineEdit::textChanged,
         q, &AbstractSearchWidget::textFilterChanged);
 
-    ui->itemCounterLabel->setForegroundRole(QPalette::Mid);
-    ui->itemCounterLabel->setText({});
-
     setupModels();
     setupRibbon();
-    setupToolbar();
     setupPlaceholder();
     setupTimeSelection();
     setupCameraSelection();
-    setupAreaSelection();
 
     installEventHandler(q, QEvent::Show, this, &Private::requestFetchIfNeeded);
 
@@ -195,59 +197,82 @@ void AbstractSearchWidget::Private::setupRibbon()
     setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
         colorTheme()->color("dark5"));
 
+    setupViewportHeader();
+
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
-    connect(ui->ribbon, &EventRibbon::tileHovered, q, &AbstractSearchWidget::tileHovered);
+    connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
 
-    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
-        [this]()
-        {
-            ui->ribbon->setHighlightedTimestamp(
-                std::chrono::microseconds(navigator()->positionUsec()));
-        });
+    TileInteractionHandler::install(ui->ribbon);
 }
 
-void AbstractSearchWidget::Private::setupToolbar()
+void AbstractSearchWidget::Private::setupViewportHeader()
 {
-    ui->toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
-    ui->toggleFootersButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->toggleFootersButton->setIcon(qnSkin->icon(
+    const auto toolbar = new QWidget(q);
+    toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    const auto toolbarLayout = new QHBoxLayout(toolbar);
+    toolbarLayout->setSpacing(style::Metrics::kStandardPadding);
+    toolbarLayout->setContentsMargins(0, 2, 0, 0); //< Fine-tuned.
+    toolbarLayout->addWidget(m_toggleFootersButton);
+    toolbarLayout->addWidget(m_togglePreviewsButton);
+
+    const auto viewportHeader = new QWidget(q);
+    viewportHeader->setFixedHeight(kCounterPanelHeight);
+
+    const auto headerLayout = new QHBoxLayout(viewportHeader);
+    headerLayout->setSpacing(style::Metrics::kStandardPadding);
+    headerLayout->setContentsMargins({});
+
+    headerLayout->addWidget(m_itemCounterLabel);
+    headerLayout->addWidget(toolbar);
+
+    ui->ribbon->setViewportHeader(viewportHeader);
+
+    m_itemCounterLabel->setForegroundRole(QPalette::Mid);
+    m_itemCounterLabel->setText({});
+
+    m_toggleFootersButton->setCheckable(true);
+    m_toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
+    m_toggleFootersButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    m_toggleFootersButton->setIcon(qnSkin->icon(
         "text_buttons/text.png", "text_buttons/text_selected.png"));
 
     const auto updateInformationToolTip =
         [this]()
         {
-            ui->toggleFootersButton->setToolTip(ui->toggleFootersButton->isChecked()
+            m_toggleFootersButton->setToolTip(m_toggleFootersButton->isChecked()
                 ? tr("Hide information")
                 : tr("Show information"));
         };
 
-    connect(ui->toggleFootersButton, &QToolButton::toggled,
+    connect(m_toggleFootersButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);
 
-    connect(ui->toggleFootersButton, &QToolButton::toggled,
+    connect(m_toggleFootersButton, &QToolButton::toggled,
         this, updateInformationToolTip);
 
     updateInformationToolTip();
 
-    ui->togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    ui->togglePreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->togglePreviewsButton->setIcon(qnSkin->icon(
+    m_togglePreviewsButton->setCheckable(true);
+    m_togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
+    m_togglePreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    m_togglePreviewsButton->setIcon(qnSkin->icon(
         "text_buttons/image.png", "text_buttons/image_selected.png"));
 
     const auto updateThumbnailsToolTip =
         [this]()
         {
-            ui->togglePreviewsButton->setToolTip(ui->togglePreviewsButton->isChecked()
+            m_togglePreviewsButton->setToolTip(m_togglePreviewsButton->isChecked()
                 ? tr("Hide thumbnails")
                 : tr("Show thumbnails"));
         };
 
-    connect(ui->togglePreviewsButton, &QToolButton::toggled,
+    connect(m_togglePreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
 
-    connect(ui->togglePreviewsButton, &QToolButton::toggled,
+    connect(m_togglePreviewsButton, &QToolButton::toggled,
         this, updateThumbnailsToolTip);
 
     updateThumbnailsToolTip();
@@ -326,7 +351,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         {
             if (ini().automaticFilterByTimelineSelection)
             {
-                const bool selectionExists = !m_timelineSelection.isEmpty();
+                const bool selectionExists = !m_timelineSelection.isNull();
                 const bool selectionFilter = m_period == Period::selection;
 
                 if (selectionExists != selectionFilter)
@@ -353,7 +378,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                 return;
 
             // If selection was cleared, update immediately, otherwise update after small delay.
-            if (m_timelineSelection.isEmpty())
+            if (m_timelineSelection.isNull())
                 applyTimePeriod->fire();
             else
                 applyTimePeriod->requestOperation();
@@ -361,8 +386,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    using namespace std::chrono;
-    m_dayChangeTimer->setInterval(milliseconds(seconds(1)).count());
+    m_dayChangeTimer->setInterval(1s);
 
     connect(m_dayChangeTimer.data(), &QTimer::timeout,
         this, &Private::updateCurrentTimePeriod);
@@ -495,50 +519,14 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
-void AbstractSearchWidget::Private::setupAreaSelection()
-{
-    ui->areaSelectionButton->setSelectable(false);
-    ui->areaSelectionButton->setDeactivatable(true);
-    ui->areaSelectionButton->setAccented(true);
-    ui->areaSelectionButton->setText(tr("In selected area"));
-    ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
-    ui->areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
-    setReadOnly(ui->areaSelectionButton, true);
-
-    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
-        [this]()
-        {
-            const auto cameras = q->cameras();
-            ui->areaSelectionButton->setEnabled(
-                cameras.size() == 1 && (*cameras.cbegin())->hasVideo());
-
-            ui->areaSelectionButton->deactivate();
-        });
-
-    const auto handleStateChanged =
-        [this](SelectableTextButton::State state)
-        {
-            setWholeArea(state == SelectableTextButton::State::deactivated);
-            ui->areaSelectionButton->setToolTip(m_wholeArea
-                ? tr("Select some area on video to use it as a filter")
-                : QString());
-        };
-
-    connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this, handleStateChanged);
-    handleStateChanged(ui->areaSelectionButton->state());
-
-    connect(q, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
-        {
-            ui->areaSelectionButton->setState(wholeArea
-                ? SelectableTextButton::State::deactivated
-                : SelectableTextButton::State::unselected);
-        });
-}
-
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
+}
+
+EventRibbon* AbstractSearchWidget::Private::view() const
+{
+    return ui->ribbon;
 }
 
 void AbstractSearchWidget::Private::goToLive()
@@ -554,10 +542,9 @@ AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls()
     Controls result;
     result.setFlag(Control::cameraSelector, !ui->cameraSelectionButton->isHidden());
     result.setFlag(Control::timeSelector, !ui->timeSelectionButton->isHidden());
-    result.setFlag(Control::areaSelector, !ui->areaSelectionHolder->isHidden());
     result.setFlag(Control::freeTextFilter, !m_textFilterEdit->isHidden());
-    result.setFlag(Control::footersToggler, !ui->toggleFootersButton->isHidden());
-    result.setFlag(Control::previewsToggler, !ui->togglePreviewsButton->isHidden());
+    result.setFlag(Control::footersToggler, !m_toggleFootersButton->isHidden());
+    result.setFlag(Control::previewsToggler, !m_togglePreviewsButton->isHidden());
     return result;
 }
 
@@ -565,10 +552,9 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 {
     ui->cameraSelectionButton->setVisible(value.testFlag(Control::cameraSelector));
     ui->timeSelectionButton->setVisible(value.testFlag(Control::timeSelector));
-    ui->areaSelectionHolder->setVisible(value.testFlag(Control::areaSelector));
     m_textFilterEdit->setVisible(value.testFlag(Control::freeTextFilter));
-    ui->toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
-    ui->togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
+    m_toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
+    m_togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
 }
 
 AbstractSearchWidget::Period AbstractSearchWidget::Private::selectedPeriod() const
@@ -639,7 +625,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
     auto current = qnSyncTime->currentDateTime();
     current.setTime(QTime(0, 0, 0, 0));
     return QnTimePeriod(current.addDays(1 - days).toMSecsSinceEpoch(),
-        QnTimePeriod::infiniteDuration());
+        QnTimePeriod::kInfiniteDuration);
 }
 
 AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() const
@@ -647,16 +633,20 @@ AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() c
     return m_cameras;
 }
 
-void AbstractSearchWidget::Private::setSingleCameraMode(bool value)
+void AbstractSearchWidget::Private::selectCameras(Cameras value)
 {
-    const bool currentlyEnabled = m_cameras == Cameras::current;
-    if (currentlyEnabled == value)
+    if (m_cameras == value)
         return;
 
-    const auto action = m_cameraSelectionActions.value(value ? Cameras::current : m_previousCameras);
+    const auto action = m_cameraSelectionActions.value(value);
     NX_ASSERT(action);
     if (action)
         action->trigger();
+}
+
+AbstractSearchWidget::Cameras AbstractSearchWidget::Private::previousCameras() const
+{
+    return m_previousCameras;
 }
 
 void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
@@ -667,20 +657,6 @@ void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
     m_previousCameras = m_cameras;
     m_cameras = value;
     updateCurrentCameras();
-}
-
-bool AbstractSearchWidget::Private::wholeArea() const
-{
-    return ui->areaSelectionButton->state() == SelectableTextButton::State::deactivated;
-}
-
-void AbstractSearchWidget::Private::setWholeArea(bool value)
-{
-    if (m_wholeArea == value)
-        return;
-
-    m_wholeArea = value;
-    emit q->selectedAreaChanged(m_wholeArea);
 }
 
 QnVirtualCameraResourceSet AbstractSearchWidget::Private::cameras() const
@@ -704,6 +680,7 @@ SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
     result->setFlat(true);
     result->setDeactivatable(true);
     result->setSelectable(false);
+    result->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     ui->filtersLayout->addWidget(result, 0, Qt::AlignLeft);
     return result;
 }
@@ -712,8 +689,6 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
 {
     if (!m_mainModel->isOnline())
         return;
-
-    ui->areaSelectionButton->setVisible(m_cameras == Cameras::current);
 
     switch (m_cameras)
     {
@@ -766,9 +741,8 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
 
 void AbstractSearchWidget::Private::resetFilters()
 {
-    ui->cameraSelectionButton->deactivate();
+    ui->cameraSelectionButton->deactivate(); //< Will do nothing if selector is set to read-only.
     ui->timeSelectionButton->deactivate();
-    ui->areaSelectionButton->deactivate();
     m_textFilterEdit->clear();
 }
 
@@ -846,13 +820,13 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
         ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
 
     ui->placeholder->setVisible(placeholderVisible);
-    ui->counterContainer->setVisible(!placeholderVisible);
+    ui->ribbon->viewportHeader()->setVisible(!placeholderVisible);
 
     static constexpr int kThreshold = 99;
     if (itemCount > kThreshold)
-        ui->itemCounterLabel->setText(QString(">") + q->itemCounterText(kThreshold));
+        m_itemCounterLabel->setText(QString(">") + q->itemCounterText(kThreshold));
     else
-        ui->itemCounterLabel->setText(q->itemCounterText(itemCount));
+        m_itemCounterLabel->setText(q->itemCounterText(itemCount));
 }
 
 } // namespace nx::vms::client::desktop

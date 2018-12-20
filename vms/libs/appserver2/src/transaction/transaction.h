@@ -10,6 +10,10 @@
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/fusion/serialization/xml.h>
 #include <nx/vms/api/data/timestamp.h>
+#include <utils/crypt/symmetrical.h>
+#include <nx/vms/api/data/full_info_data.h>
+#include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/resource_type_data.h>
 
 /**
  * This class describes all possible transactions and defines various access righs check for them.
@@ -1305,6 +1309,19 @@ APPLY(9010, dumpDatabaseToFile, nx::vms::api::DatabaseDumpToFileData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(9011, runtimeInfoRemoved, nx::vms::api::IdData, false, true,                                                \
+                        InvalidGetHashHelper(),                                                                   \
+                        [](const QnTransaction<nx::vms::api::IdData>& tran,                                       \
+                            const NotificationParams& notificationParams) {                                       \
+                            NX_ASSERT(tran.command == ApiCommand::runtimeInfoRemoved);                            \
+                            emit notificationParams.ecConnection->runtimeInfoRemoved(tran.params);                \
+                        },                                                                                        \
+                        AllowForAllAccess(),      /* save permission checker */                                   \
+                        AllowForAllAccess(),      /* read permission checker */                                   \
+                        InvalidFilterFunc(),      /* Filter save func */                                          \
+                        InvalidFilterFunc(),      /* Filter read func */                                          \
+                        AllowForAllAccessOut(),   /* Check remote peer rights for outgoing transaction */         \
+                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        false, \
                        false, \
@@ -1683,6 +1700,8 @@ APPLY(10402, removeAnalyticsEngine, nx::vms::api::IdData, \
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
     int generateRequestID();
+
+
 } /* namespace ec2*/
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value)(ec2::TransactionType::Value), (lexical))

@@ -243,6 +243,14 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);
 
+        case EventType::pluginEvent:
+        {
+            const QString caption = params.caption.isEmpty()
+                ? tr("Unknown plugin event")
+                : params.caption;
+
+            return lm("%1 - %2").args(resourceName, caption);
+        }
         default:
             return tr("An unknown event has occurred");
     }
@@ -370,6 +378,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
 
         case EventType::analyticsSdkEvent:
         case EventType::userDefinedEvent:
+        case EventType::pluginEvent:
             if (!params.description.isEmpty())
                 result << params.description;
             break;
@@ -634,7 +643,9 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
         appServerUrl = server->getApiUrl();
         if (isPublic)
         {
-            const auto publicIP = server->getProperty(Qn::PUBLIC_IP);
+            const auto publicIP = server->getProperty(
+                ResourcePropertyKey::Server::kPublicIp);
+
             if (publicIP.isEmpty())
                 return QString();
 
@@ -715,7 +726,7 @@ QString StringsHelper::getSoftwareTriggerName(const EventParameters& params)
 }
 
 QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
-    const QString& locale) const
+    const QString& /*locale*/) const
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
@@ -729,7 +740,7 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
     const auto eventType = analyticsEventType(camera, pluginId, eventTypeId);
-    const auto text = eventType.name.text(locale);
+    const auto text = eventType.name;
 
     return !text.isEmpty()
         ? text

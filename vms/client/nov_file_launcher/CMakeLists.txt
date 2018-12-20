@@ -13,4 +13,7 @@ nx_add_target(nov_file_launcher EXECUTABLE SIGNED
         boost
 )
 
-set_target_properties(nov_file_launcher PROPERTIES OUTPUT_NAME "launcher")
+set_target_properties(nov_file_launcher PROPERTIES
+    OUTPUT_NAME "launcher"
+    WIN32_EXECUTABLE ON
+)

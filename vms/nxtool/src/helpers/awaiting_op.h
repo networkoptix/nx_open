@@ -9,7 +9,7 @@
 
 #include <base/types.h>
 
-namespace nx { namespace mediaserver { namespace api {
+namespace nx { namespace vms::server { namespace api {
     struct BaseServerInfo;
 }}}
 
@@ -18,7 +18,7 @@ namespace rtu
     class AwaitingOp
     {
     public:
-        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+        typedef nx::vms::server::api::BaseServerInfo BaseServerInfo;
 
         typedef std::shared_ptr<AwaitingOp> Holder;
         typedef std::weak_ptr<AwaitingOp> WeakPtr;

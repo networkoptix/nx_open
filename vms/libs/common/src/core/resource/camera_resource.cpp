@@ -67,8 +67,9 @@ QString QnVirtualCameraResource::getUniqueId() const
     return getPhysicalId();
 }
 
-bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
+bool QnVirtualCameraResource::isForcedAudioSupported() const
+{
+    QString val = getProperty(ResourcePropertyKey::kForcedIsAudioSupported);
     return val.toUInt() > 0;
 }
 
@@ -76,27 +77,26 @@ void QnVirtualCameraResource::forceEnableAudio()
 {
     if (isForcedAudioSupported())
         return;
-    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
-    saveParams();
+    setProperty(ResourcePropertyKey::kForcedIsAudioSupported, 1);
+    saveProperties();
 }
 
 void QnVirtualCameraResource::forceDisableAudio()
 {
     if (!isForcedAudioSupported())
         return;
-    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
-    saveParams();
+    setProperty(ResourcePropertyKey::kForcedIsAudioSupported, QString(lit("0")));
+    saveProperties();
 }
 
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
-    auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(
-        getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
+    auto credentials = getProperty(ResourcePropertyKey::kDefaultCredentials);
 
-    if (decodedCredentials.isEmpty() || decodedCredentials == lit(":"))
+    if (credentials.isEmpty() || credentials == ":")
     {
         setDefaultAuth(login, password);
-        saveParams();
+        saveProperties();
     }
 }
 
@@ -105,7 +105,8 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     if (!storeUrlForRole(role))
         return QString();
 
-    QJsonObject streamUrls = QJsonDocument::fromJson(getProperty(Qn::CAMERA_STREAM_URLS).toUtf8()).object();
+    QJsonObject streamUrls =
+        QJsonDocument::fromJson(getProperty(ResourcePropertyKey::kStreamUrls).toUtf8()).object();
     const auto roleStr = QString::number(role);
     return streamUrls[roleStr].toString();
 }
@@ -136,11 +137,11 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
         };
 
     NX_DEBUG(this, lm("Save %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
-    if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
+    if (updateProperty(ResourcePropertyKey::kStreamUrls, urlUpdater))
     {
         //TODO: #rvasilenko Setter and saving must be split.
         if (save)
-            saveParams();
+            saveProperties();
     }
 }
 
@@ -188,7 +189,7 @@ int QnVirtualCameraResource::issuesTimeoutMs() {
 
 CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 {
-    const QString& mediaStreamsStr = getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+    const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
     CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
     return supportedMediaStreams;
 }
@@ -272,7 +273,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
     QnMutexLocker lk( &m_mediaStreamsMutex );
 
     //get saved stream info with index encoderIndex
-    const QString& mediaStreamsStr = getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME );
+    const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
     CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>( mediaStreamsStr.toLatin1() );
 
     const bool isTranscodingAllowedByCurrentMediaStreamsParam = std::find_if(
@@ -380,7 +381,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
 bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo )
 {
     auto bitrateInfos = QJson::deserialized<CameraBitrates>(
-        getProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME).toLatin1() );
+        getProperty(ResourcePropertyKey::kBitrateInfos).toLatin1() );
 
     auto it = std::find_if(bitrateInfos.streams.begin(), bitrateInfos.streams.end(),
                            [&](const CameraBitrateInfo& info)
@@ -413,7 +414,7 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
         bitrateInfos.streams.push_back(std::move(bitrateInfo));
     }
 
-    setProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME,
+    setProperty(ResourcePropertyKey::kBitrateInfos,
                 QString::fromUtf8(QJson::serialized(bitrateInfos)));
 
     return true;
@@ -421,7 +422,7 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
 
 void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
 {
-    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+    if (key == ResourcePropertyKey::kPtzCapabilities)
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
     base_type::emitPropertyChanged(key);
 }
@@ -480,7 +481,7 @@ void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supp
 
     //saving fullStreamList;
     QByteArray serializedStreams = QJson::serialized( fullStreamList );
-    setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
+    setProperty(ResourcePropertyKey::kMediaStreams, QString::fromUtf8(serializedStreams));
 }
 
 QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
@@ -501,18 +502,14 @@ const nx::vms::common::AnalyticsEngineResourceList
         return AnalyticsEngineResourceList();
 
     auto common = commonModule();
-    if (!common)
-    {
-        NX_ASSERT(false, "Can't access common module");
+    if (!NX_ASSERT(common, "Can't access common module"))
         return AnalyticsEngineResourceList();
-    }
 
-    return common->resourcePool()
-        ->getResources<nx::vms::common::AnalyticsEngineResource>(
-            [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
-    {
-        return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
-    });
+    return common->resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>(
+        [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
+        {
+            return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
+        });
 }
 
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
@@ -545,6 +542,7 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
         result.insert(it.key(), QJsonObject::fromVariantMap(it.value()));
 
     setProperty(kDeviceAgentsSettingsValuesProperty, QString::fromUtf8(QJson::serialized(result)));
+    saveProperties();
 }
 
 QVariantMap QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
@@ -594,6 +592,7 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(QJson::serialized(manifests)));
+    saveProperties();
 }
 
 void QnVirtualCameraResource::setSupportedAnalyticsEventTypeIds(
@@ -647,6 +646,7 @@ void QnVirtualCameraResource::setSupportedAnalyticsItemTypeIds(
 
     serialized = QString::fromUtf8(QJson::serialized(supportedItemMap));
     setProperty(propertyName, serialized);
+    saveProperties();
 }
 
 QMap<QnUuid, QSet<QString>> QnVirtualCameraResource::supportedAnalyticsItemTypeIds(

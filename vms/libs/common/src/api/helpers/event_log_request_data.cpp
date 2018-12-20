@@ -43,7 +43,7 @@ void QnEventLogFilterData::loadFromParams(QnResourcePool* resourcePool,
 
     const auto endTimeUs = params.value(kEndPeriodParam);
     period.durationMs = endTimeUs.isEmpty()
-        ? QnTimePeriod::infiniteDuration()
+        ? QnTimePeriod::kInfiniteDuration
         : nx::utils::parseDateTimeMsec(endTimeUs) - period.startTimeMs;
 
     eventType = QnLexical::deserialized<nx::vms::api::EventType>(

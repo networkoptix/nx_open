@@ -69,11 +69,15 @@ void handleRemoveOperation(
         handleRemoveOperation(childRemoveStep, state, getOperationGuard);
     }
 
-    const auto dataChangedGuard = getOperationGuard(step);
     if (const auto parent = node->parent())
+    {
+        const auto dataChangedGuard = getOperationGuard(step);
         parent->removeChild(node);
+    }
     else
+    {
         state.rootNode = NodePtr();
+    }
 }
 
 } // namespace

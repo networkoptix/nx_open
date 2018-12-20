@@ -6,13 +6,13 @@
 
 namespace ec2 {
 
-template<typename QueryProcessorType>
+template<typename QueryProcessor>
 class AnalyticsManager: public AbstractAnalyticsManager
 {
 
 public:
     AnalyticsManager(
-        QueryProcessorType* const queryProcessor,
+        QueryProcessor* queryProcessor,
         const Qn::UserAccessData& userAccessData);
 
 protected:
@@ -36,14 +36,14 @@ protected:
         impl::SimpleHandlerPtr handler) override;
 
 private:
-    QueryProcessorType* const m_queryProcessor;
+    QueryProcessor* m_queryProcessor;
     Qn::UserAccessData m_userAccessData;
 
 };
 
-template<typename QueryProcessorType>
-AnalyticsManager<QueryProcessorType>::AnalyticsManager(
-    QueryProcessorType* const queryProcessor,
+template<typename QueryProcessor>
+AnalyticsManager<QueryProcessor>::AnalyticsManager(
+    QueryProcessor* queryProcessor,
     const Qn::UserAccessData& userAccessData)
     :
     m_queryProcessor(queryProcessor),
@@ -51,18 +51,17 @@ AnalyticsManager<QueryProcessorType>::AnalyticsManager(
 {
 }
 
-
-template<typename QueryProcessorType>
-int AnalyticsManager<QueryProcessorType>::getAnalyticsPlugins(
+template<typename QueryProcessor>
+int AnalyticsManager<QueryProcessor>::getAnalyticsPlugins(
     impl::GetAnalyticsPluginsHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int requestId = generateRequestID();
     auto queryDoneHandler =
-        [reqID, handler](
+        [requestId, handler](
             ErrorCode errorCode,
             const nx::vms::api::AnalyticsPluginDataList& analyticsPlugins)
         {
-            handler->done(reqID, errorCode, analyticsPlugins);
+            handler->done(requestId, errorCode, analyticsPlugins);
         };
 
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
@@ -71,20 +70,20 @@ int AnalyticsManager<QueryProcessorType>::getAnalyticsPlugins(
             QnUuid(),
             queryDoneHandler);
 
-    return reqID;
+    return requestId;
 }
 
-template<typename QueryProcessorType>
-int AnalyticsManager<QueryProcessorType>::getAnalyticsEngines(
+template<typename QueryProcessor>
+int AnalyticsManager<QueryProcessor>::getAnalyticsEngines(
     impl::GetAnalyticsEnginesHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int requestId = generateRequestID();
     auto queryDoneHandler =
-        [reqID, handler](
+        [requestId, handler](
             ErrorCode errorCode,
             const nx::vms::api::AnalyticsEngineDataList& analyticsEngines)
         {
-            handler->done(reqID, errorCode, analyticsEngines);
+            handler->done(requestId, errorCode, analyticsEngines);
         };
 
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
@@ -93,71 +92,71 @@ int AnalyticsManager<QueryProcessorType>::getAnalyticsEngines(
             QnUuid(),
             queryDoneHandler);
 
-    return reqID;
+    return requestId;
 }
 
-template<typename QueryProcessorType>
-int AnalyticsManager<QueryProcessorType>::save(
+template<typename QueryProcessor>
+int AnalyticsManager<QueryProcessor>::save(
     const nx::vms::api::AnalyticsPluginData& analyticsPlugin,
     impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int requestId = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::saveAnalyticsPlugin,
         analyticsPlugin,
-        [handler, reqID](ec2::ErrorCode errorCode)
+        [handler, requestId](ec2::ErrorCode errorCode)
         {
-            handler->done(reqID, errorCode);
+            handler->done(requestId, errorCode);
         });
-    return reqID;
+    return requestId;
 }
 
-template<typename QueryProcessorType>
-int AnalyticsManager<QueryProcessorType>::save(
+template<typename QueryProcessor>
+int AnalyticsManager<QueryProcessor>::save(
     const nx::vms::api::AnalyticsEngineData& analyticsEngine,
     impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int requestId = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::saveAnalyticsEngine,
         analyticsEngine,
-        [handler, reqID](ec2::ErrorCode errorCode)
+        [handler, requestId](ec2::ErrorCode errorCode)
         {
-            handler->done(reqID, errorCode);
+            handler->done(requestId, errorCode);
         });
-    return reqID;
+    return requestId;
 }
 
-template<typename QueryProcessorType>
-int AnalyticsManager<QueryProcessorType>::removeAnalyticsPlugin(
+template<typename QueryProcessor>
+int AnalyticsManager<QueryProcessor>::removeAnalyticsPlugin(
     const QnUuid& id,
     impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int requestId = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::removeAnalyticsPlugin,
         nx::vms::api::IdData(id),
-        [handler, reqID](ec2::ErrorCode errorCode)
+        [handler, requestId](ec2::ErrorCode errorCode)
         {
-            handler->done(reqID, errorCode);
+            handler->done(requestId, errorCode);
         });
-    return reqID;
+    return requestId;
 }
 
-template<typename QueryProcessorType>
-int AnalyticsManager<QueryProcessorType>::removeAnalyticsEngine(
+template<typename QueryProcessor>
+int AnalyticsManager<QueryProcessor>::removeAnalyticsEngine(
     const QnUuid& id,
     impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int requestId = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::removeAnalyticsEngine,
         nx::vms::api::IdData(id),
-        [handler, reqID](ec2::ErrorCode errorCode)
+        [handler, requestId](ec2::ErrorCode errorCode)
         {
-            handler->done(reqID, errorCode);
+            handler->done(requestId, errorCode);
         });
-    return reqID;
+    return requestId;
 }
 
 } // namespace ec2

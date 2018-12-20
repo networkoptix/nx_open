@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 #include <base/types.h>
 
 namespace rtu
@@ -22,7 +22,7 @@ namespace rtu
         Q_PROPERTY(bool isSuccessChangesModel READ isSuccessChangesModel NOTIFY isSuccessChangesModelChanged)
         
     public:
-        typedef nx::mediaserver::api::ServerInfo ServerInfo;
+        typedef nx::vms::server::api::ServerInfo ServerInfo;
 
         void addRequestResult(const ServerInfo &info
             , const QString &request

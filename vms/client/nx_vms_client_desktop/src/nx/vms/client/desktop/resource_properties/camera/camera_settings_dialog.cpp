@@ -23,7 +23,7 @@
 #include "redux/camera_settings_dialog_store.h"
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include "utils/license_usage_provider.h"
-#include "utils/device_agent_settings_adaptor.h"
+#include "utils/device_agent_settings_adapter.h"
 #include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_analytics_engines_watcher.h"
@@ -58,7 +58,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
     QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
-    QPointer<DeviceAgentSettingsAdaptor> deviceAgentSettingsAdaptor;
+    QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdaptor;
 
     Private(CameraSettingsDialog* q): q(q) {}
 
@@ -92,7 +92,6 @@ struct CameraSettingsDialog::Private: public QObject
     void handleCamerasChanged()
     {
         const bool advancedSettingsAreVisible = cameras.size() == 1;
-        q->setPageVisible(int(CameraSettingsTab::advanced), true);
         if (advancedSettingsAreVisible)
         {
             advancedSettingsWidget->setCamera(cameras.first());
@@ -235,7 +234,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    d->deviceAgentSettingsAdaptor = new DeviceAgentSettingsAdaptor(d->store, this);
+    d->deviceAgentSettingsAdaptor = new DeviceAgentSettingsAdapter(d->store, this);
 
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
@@ -288,18 +287,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         new CameraWebPageWidget(d->store, ui->tabWidget),
         tr("Web Page"));
 
-    const auto analyticsSettingsWidget = new CameraAnalyticsSettingsWidget(
-        d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget);
     addPage(
         int(CameraSettingsTab::analytics),
-        analyticsSettingsWidget,
+        new CameraAnalyticsSettingsWidget(
+            d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
         tr("Analytics"));
-    connect(analyticsSettingsWidget, &CameraAnalyticsSettingsWidget::currentEngineIdChanged, this,
-        [this](const QnUuid& engineId)
-        {
-            if (!engineId.isNull())
-                d->deviceAgentSettingsAdaptor->refreshSettings(engineId);
-        });
 
     addPage(
         int(CameraSettingsTab::expert),
@@ -502,26 +494,36 @@ void CameraSettingsDialog::updateState()
     // Legacy code has more complicated conditions.
 
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
-    const bool hasWearableCameras = state.devicesDescription.isWearable != CombinedValue::None;
 
-    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera() && !hasWearableCameras
-        && state.devicesDescription.hasMotion == CombinedValue::All);
+    setPageVisible(int(CameraSettingsTab::motion),
+        state.isSingleCamera()
+            && state.devicesDescription.isWearable == CombinedValue::None
+            && state.devicesDescription.isDtsBased == CombinedValue::None
+            && state.devicesDescription.supportsVideo == CombinedValue::All
+            && state.devicesDescription.hasMotion == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::recording), !hasWearableCameras);
+    setPageVisible(int(CameraSettingsTab::recording), state.supportsSchedule());
 
-    setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera()
-        && state.singleCameraProperties.hasVideo);
+    setPageVisible(int(CameraSettingsTab::fisheye),
+        state.isSingleCamera()
+            && state.singleCameraProperties.hasVideo);
 
-    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && !hasWearableCameras
-        && state.devicesDescription.isIoModule == CombinedValue::All);
+    setPageVisible(int(CameraSettingsTab::io),
+        state.isSingleCamera()
+            && state.devicesDescription.isWearable == CombinedValue::None
+            && state.devicesDescription.isIoModule == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::web), state.isSingleCamera()
-        && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+    setPageVisible(int(CameraSettingsTab::web),
+        state.isSingleCamera()
+            && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+
+    setPageVisible(int(CameraSettingsTab::advanced), state.isSingleCamera());
 
     setPageVisible(int(CameraSettingsTab::analytics), state.isSingleCamera());
 
-    setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
-        && state.devicesDescription.isIoModule == CombinedValue::None);
+    // Always displaying for single camera as it contains Logical Id setup.
+    setPageVisible(int(CameraSettingsTab::expert),
+        state.supportsVideoStreamControl() || state.isSingleCamera());
 }
 
 } // namespace nx::vms::client::desktop

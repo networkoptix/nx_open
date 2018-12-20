@@ -58,7 +58,7 @@ void LegacyIoPortSettingsWidget::updateFromResource(const QnVirtualCameraResourc
     {
         ports = camera->ioPortDescriptions();
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
-            camera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {});
+            camera->getProperty(ResourcePropertyKey::kIoOverlayStyle), {});
     }
 
     m_model->setModelData(ports);
@@ -77,7 +77,7 @@ void LegacyIoPortSettingsWidget::submitToResource(const QnVirtualCameraResourceP
         : QnIoModuleOverlayWidget::Style::form;
 
     /* First, change style: */
-    camera->setProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME, QnLexical::serialized(style));
+    camera->setProperty(ResourcePropertyKey::kIoOverlayStyle, QnLexical::serialized(style));
 
     /* Second, change ports: */
     auto portList = m_model->modelData();

@@ -2,7 +2,7 @@ FROM golang:1.10.3-alpine3.7 as builder
 RUN apk add --no-cache git \
         && go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login
 
-FROM python:3.6-alpine3.7
+FROM python:3.7-alpine3.7
 
 COPY --from=builder /go/bin/docker-credential-ecr-login /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf

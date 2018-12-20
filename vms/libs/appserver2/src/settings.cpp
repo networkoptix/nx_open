@@ -13,12 +13,12 @@ namespace ec2 {
 
 namespace params
 {
-    static const QString dbReadOnly(lit("ecDbReadOnly"));
+    static const QString dbReadOnly("ecDbReadOnly");
     static const bool dbReadOnlyDefault = false;
 
     //time_sync params
-    static const QString internetSyncTimePeriodSec(lit("ecInternetSyncTimePeriodSec"));
-    static const QString maxInternetTimeSyncRetryPeriodSec(lit("ecMaxInternetTimeSyncRetryPeriodSec"));
+    static const QString internetSyncTimePeriodSec("ecInternetSyncTimePeriodSec");
+    static const QString maxInternetTimeSyncRetryPeriodSec("ecMaxInternetTimeSyncRetryPeriodSec");
 }
 
 

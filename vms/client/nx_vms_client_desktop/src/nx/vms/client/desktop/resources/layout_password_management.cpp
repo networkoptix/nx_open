@@ -3,6 +3,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_runtime_data.h>
 #include <nx/core/layout/layout_file_info.h>
 
 #include <client/client_globals.h>
@@ -11,10 +12,11 @@
 
 namespace {
 
-QString tr(const char* sourceText, const char* disambiguation = 0)
+class EncryptedLayoutStrings
 {
-    return QCoreApplication::translate("EncryptedLayouts", sourceText, disambiguation);
-}
+    Q_DECLARE_TR_FUNCTIONS(EncryptedLayoutStrings)
+};
+
 
 } // namespace
 
@@ -30,10 +32,10 @@ auto passwordValidator(const QnLayoutResourcePtr& layout)
         [fileInfo](const QString& value) -> ValidationResult
     {
         if (value.isEmpty())
-            return ValidationResult(tr("Please enter a valid password"));
+            return ValidationResult(EncryptedLayoutStrings::tr("Please enter a valid password"));
 
         if (!checkPassword(value.trimmed(), fileInfo)) //< Trimming password!
-            return ValidationResult(tr("The password is not valid."));
+            return ValidationResult(EncryptedLayoutStrings::tr("The password is not valid."));
 
         return ValidationResult(QValidator::Acceptable);
     };
@@ -43,7 +45,7 @@ QnInputDialog* createPasswordDialog(const QString message, QWidget* parent)
 {
     auto dialog = new QnInputDialog(parent);
     dialog->setButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    dialog->setWindowTitle(tr("Encrypted layout"));
+    dialog->setWindowTitle(EncryptedLayoutStrings::tr("Encrypted layout"));
     dialog->setCaption(message);
     dialog->useForPassword();
     return dialog;
@@ -51,34 +53,47 @@ QnInputDialog* createPasswordDialog(const QString message, QWidget* parent)
 
 } // namespace
 
+void markAsEncrypted(const QnLayoutResourcePtr& layout, bool value)
+{
+    NX_ASSERT(layout->isFile());
+    qnResourceRuntimeDataManager->setResourceData(layout, Qn::LayoutEncryptionRole, value);
+}
+
 bool isEncrypted(const QnLayoutResourcePtr& layout)
 {
-    return layout->data(Qn::LayoutEncryptionRole).toBool();
+    return layout->isFile()
+        && qnResourceRuntimeDataManager->resourceData(layout, Qn::LayoutEncryptionRole).toBool();
+}
+
+QString password(const QnLayoutResourcePtr& layout)
+{
+    return qnResourceRuntimeDataManager->resourceData(layout, Qn::LayoutPasswordRole).toString();
 }
 
 bool requiresPassword(const QnLayoutResourcePtr& layout)
 {
-    return layout->data(Qn::LayoutEncryptionRole).toBool()
-        && layout->data(Qn::LayoutPasswordRole).toString().isEmpty();
+    return isEncrypted(layout)
+        && password(layout).isEmpty();
 }
 
 void usePasswordToOpen(const QnLayoutResourcePtr& layout, const QString& password)
 {
-    NX_ASSERT(layout->data(Qn::LayoutEncryptionRole).toBool());
-    layout->setData(Qn::LayoutPasswordRole, password);
+    NX_ASSERT(isEncrypted(layout));
+    qnResourceRuntimeDataManager->setResourceData(layout, Qn::LayoutPasswordRole, password);
     layout->usePasswordForRecordings(password);
 }
 
 void forgetPassword(const QnLayoutResourcePtr& layout)
 {
-    NX_ASSERT(layout->data(Qn::LayoutEncryptionRole).toBool());
-    layout->setData(Qn::LayoutPasswordRole, QVariant());
+    NX_ASSERT(isEncrypted(layout));
+    qnResourceRuntimeDataManager->cleanupResourceData(layout, Qn::LayoutPasswordRole);
     layout->forgetPasswordForRecordings();
 }
 
 bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
-    auto dialog = createPasswordDialog(tr("This file is encrypted. Please enter the password:"),
+    auto dialog = createPasswordDialog(
+        EncryptedLayoutStrings::tr("This file is encrypted. Please enter the password:"),
         parent);
     dialog->setValidator(passwordValidator(layout));
 
@@ -93,7 +108,9 @@ bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 
 bool confirmPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
-    auto dialog = createPasswordDialog(tr("Please re-enter password for this layout:"), parent);
+    auto dialog = createPasswordDialog(
+        EncryptedLayoutStrings::tr("Please re-enter password for this layout:"),
+        parent);
     dialog->setValidator(passwordValidator(layout));
 
     return dialog->exec() == QDialog::Accepted; //< The dialog checks the password itself.

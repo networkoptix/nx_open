@@ -10,7 +10,7 @@ class MJPEGStreamReader: public CLServerPushStreamReader
 {
 public:
     MJPEGStreamReader(
-        const nx::mediaserver::resource::CameraPtr& res,
+        const nx::vms::server::resource::CameraPtr& res,
         const QString& streamHttpPath);
     virtual ~MJPEGStreamReader();
 
@@ -30,7 +30,7 @@ private:
     std::unique_ptr<CLSimpleHTTPClient> mHttpClient;
 
     QString m_request;
-    nx::mediaserver::resource::CameraPtr m_camera;
+    nx::vms::server::resource::CameraPtr m_camera;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

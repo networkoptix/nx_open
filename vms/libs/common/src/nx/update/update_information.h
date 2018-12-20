@@ -2,12 +2,13 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QDir>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/software_version.h>
 
-namespace nx {
-namespace update {
+namespace nx::update {
 
 struct Package
 {
@@ -21,6 +22,9 @@ struct Package
     QString md5;
     qint64 size = 0;
 
+    /** List of targets that should receive this package. */
+    QList<QnUuid> targets;
+
     bool isValid() const { return !file.isEmpty(); }
 };
 
@@ -32,21 +36,23 @@ struct Information
     QString version;
     QString cloudHost;
     QString eulaLink;
-    // This is EULA text for offline update package.
-    // We need to be able to show this data without internet.
-    QString eulaContents;
     int eulaVersion = 0;
     QString releaseNotesUrl;
-    // This is release notes for offline update package.
-    // We need to be able to show this data without internet.
-    QString releaseNotesContents;
+    /** This is release notes for offline update package. */
+    /** We need to be able to show this data without internet. */
+    QString description;
     QList<Package> packages;
+
+    /** Release date - in msecs since epoch. */
+    qint64 releaseDateMs = 0;
+    /** Maximum days for release delivery. */
+    int releaseDeliveryDays = 0;
 
     bool isValid() const { return !version.isNull(); }
     bool isEmpty() const { return packages.isEmpty(); }
 };
 
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaContents)(eulaVersion)(releaseNotesUrl)(releaseNotesContents)(packages)
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(description)(packages)
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError
@@ -76,11 +82,11 @@ public:
     enum class Code
     {
         idle,
-        // Server is downloading an update package.
+        /** Server is downloading an update package. */
         downloading,
-        // Server is verifying an update package after downloading has finished successfully.
+        /** Server is verifying an update package after downloading has finished successfully. */
         preparing,
-        // Update package has been downloaded and verified.
+        /** Update package has been downloaded and verified. */
         readyToInstall,
         latestUpdateInstalled,
         offline,
@@ -113,6 +119,74 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::Code)
 QN_FUSION_DECLARE_FUNCTIONS(Status::Code, (lexical))
 QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
 
-} // namespace update
-} // namespace nx
+/**
+ * Source type for update information.
+ */
+enum class UpdateSourceType
+{
+    /** Got update info from the internet. */
+    internet,
+    /** Got update info from the internet for specific build. */
+    internetSpecific,
+    /** Got update info from offline update package. */
+    file,
+    /** Got update info from mediaserver swarm. */
+    mediaservers,
+};
 
+/**
+ * Wraps up update info and summary for its verification.
+ * All update tools inside client work with this structure directly,
+ * instead of nx::update::Information.
+ */
+struct UpdateContents
+{
+    UpdateSourceType sourceType = UpdateSourceType::internet;
+    QString source;
+
+    /** A set of servers without proper update file. */
+    QSet<QnUuid> missingUpdate;
+    /** A set of servers that can not accept update version. */
+    QSet<QnUuid> invalidVersion;
+    /** Path to eula file. */
+    QString eulaPath;
+    /** A folder with offline update packages. */
+    QDir storageDir;
+    /** A list of files to be uploaded. */
+    QStringList filesToUpload;
+    /** Information for the clent update. */
+    nx::update::Package clientPackage;
+    nx::update::Information info;
+    nx::update::InformationError error = nx::update::InformationError::noError;
+    /**
+     * Packages for manual download. These packages should be downloaded by the client and
+     * pushed to mediaservers without internet.
+     */
+    QList<Package> manualPackages;
+    bool cloudIsCompatible = true;
+    bool verified = false;
+    /** We have already installed this version. Widget will show appropriate status.*/
+    bool alreadyInstalled = false;
+
+    nx::utils::SoftwareVersion getVersion() const;
+    /** Check if we can apply this update. */
+    bool isValid() const;
+
+    /**
+     * Check if this update info is completely empty.
+     * Note: it differs a bit from isValid() check. We can remove some servers and make
+     * update contents valid, but we can not do anything with an empty update.
+     */
+    bool isEmpty() const;
+
+    /**
+     * Compares this update info with 'other' and decides whether we should pick other one.
+     * @return True if we need to pick 'other' update.
+     */
+    bool compareUpdate(const UpdateContents& other) const;
+};
+
+} // namespace nx::update
+
+Q_DECLARE_METATYPE(nx::update::Information);
+Q_DECLARE_METATYPE(nx::update::UpdateContents);

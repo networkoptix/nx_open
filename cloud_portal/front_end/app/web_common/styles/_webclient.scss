@@ -460,6 +460,7 @@ table.webclient-window>tbody>tr>td{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 9;
 }
 
 .cameras-panel .nav > li{
@@ -614,11 +615,11 @@ table.webclient-window>tbody>tr>td{
 }
 
 .view-panel{
-
   overflow:hidden;
   position:relative;
   width:100%;
   height:100%;
+  z-index : 9;
 
   padding-bottom:100px;
   background-color: $dark1;
@@ -626,6 +627,10 @@ table.webclient-window>tbody>tr>td{
   &.no-archive{
     padding-bottom: 40px !important;
   }
+
+    &.no-controls {
+        padding-bottom : 0 !important;
+    }
 
   .stick-to-top{
     position:absolute;
@@ -949,17 +954,23 @@ table.webclient-window>tbody>tr>td{
   cursor: pointer;
 }
 
+.cameras-panel-wrapper {
+  @media (max-width : 767px) {
+    position : absolute;
+    width    : 100% !important;
+    height   : 100% !important;
+  }
+  
+  &.on-top {
+    z-index : 99; /* Keeps the cameras-panel above the video player and preloads for mobile. */
+  }
+}
+
 @media (max-width: 767px){
   .visible-xs.back-button{
     display: inline-block !important;
   }
-
-  .cameras-panel-wrapper{
-    z-index: 3; /* Keeps the cameras-panel above the video player and preloads for mobile. */
-    position: absolute;
-    width: 100% !important;
-  }
-
+  
   .cameras-panel{
     width: 100% !important;
     min-width: 0px !important;

@@ -25,7 +25,7 @@ const QString kDriverName = lit("FlirFC");
 
 FcResource::FcResource(QnMediaServerModule* serverModule)
     :
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_ioManager(nullptr),
     m_callbackIsInProgress(false)
 {
@@ -48,11 +48,11 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result FcResource::initializeCameraDriver()
@@ -114,7 +114,7 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
     setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
-    saveParams();
+    saveProperties();
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -180,7 +180,7 @@ void FcResource::stopInputPortStatesMonitoring()
 QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
 {
     auto reader = new QnRtpStreamReader(toSharedPointer(this), "ch0");
-    reader->setRtpTransport(RtpTransport::udp);
+    reader->setRtpTransport(RtspTransport::udp);
 
     return reader;
 }

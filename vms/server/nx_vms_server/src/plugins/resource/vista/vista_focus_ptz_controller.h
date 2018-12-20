@@ -4,7 +4,7 @@
 #ifdef ENABLE_ONVIF
 
 #include <core/ptz/proxy_ptz_controller.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class CLSimpleHTTPClient;
 class QnIniSection;
@@ -24,12 +24,12 @@ public:
 
     virtual bool continuousFocus(qreal speed, const nx::core::ptz::Options& options) override;
 
-    virtual bool getAuxilaryTraits(
-        QnPtzAuxilaryTraitList *auxilaryTraits,
+    virtual bool getAuxiliaryTraits(
+        QnPtzAuxiliaryTraitList *auxiliaryTraits,
         const nx::core::ptz::Options& options) const;
 
-    virtual bool runAuxilaryCommand(
-        const QnPtzAuxilaryTrait &trait,
+    virtual bool runAuxiliaryCommand(
+        const QnPtzAuxiliaryTrait &trait,
         const QString &data,
         const nx::core::ptz::Options& options);
 
@@ -44,7 +44,7 @@ private:
 private:
     QnVistaResourcePtr m_resource;
     Ptz::Capabilities m_capabilities;
-    QnPtzAuxilaryTraitList m_traits;
+    QnPtzAuxiliaryTraitList m_traits;
     bool m_isMotor;
 
     QnMutex m_mutex;

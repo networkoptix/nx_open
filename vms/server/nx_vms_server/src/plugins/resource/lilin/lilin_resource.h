@@ -6,7 +6,7 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class LilinResource: public QnPlOnvifResource
@@ -27,7 +27,7 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE_ONVIF

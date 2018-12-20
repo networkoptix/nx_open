@@ -1,7 +1,10 @@
 #pragma once
+
 #include <core/ptz/proxy_ptz_controller.h>
 
 #include <nx/utils/thread/mutex.h>
+
+class QThreadPool;
 
 template<class T>
 class QnResourcePropertyAdaptor;

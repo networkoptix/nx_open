@@ -54,8 +54,15 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(
             bool success = false;
             if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
             {
-                remoteData = QnCompressedTime::deserialized(
-                    msgBody, MultiServerPeriodDataList(), &success);
+                if (ctx->request().groupBy == QnChunksRequestData::GroupBy::none)
+                {
+                    remoteData.push_back(MultiServerPeriodData());
+                    remoteData.back().periods = QnCompressedTime::deserialized(msgBody, QnTimePeriodList(), &success);
+                }
+                else
+                {
+                    remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
+                }
             }
 
             NX_VERBOSE(this)
@@ -133,7 +140,7 @@ QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(
     QnMediaServerModule* serverModule)
     :
     QnFusionRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -202,15 +209,19 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     return outputData;
 }
 
-MultiServerPeriodDataList mergeDataWithSameId(
+MultiServerPeriodDataList QnMultiserverChunksRestHandler::mergeDataWithSameId(
     const MultiServerPeriodDataList& periodList,
     int limit,
     Qt::SortOrder sortOrder)
 {
     MultiServerPeriodDataList result;
+    QSet<QnUuid> processedId;
     for (int i = 0; i < periodList.size(); ++i)
     {
         const auto guid = periodList[i].guid;
+        if (processedId.contains(guid))
+            continue;
+        processedId << guid;
         std::vector<QnTimePeriodList> periodsToMerge;
         periodsToMerge.push_back(periodList[i].periods);
         for (int j = i + 1; j < periodList.size(); ++j)

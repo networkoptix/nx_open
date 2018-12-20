@@ -3,7 +3,7 @@
 
 #include <QStringListModel>
 
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 
 namespace rtu
 {
@@ -18,7 +18,7 @@ namespace rtu
 
     public:
         explicit TimeZonesModel(
-            const nx::mediaserver::api::ServerInfoPtrContainer &selectedServers
+            const nx::vms::server::api::ServerInfoPtrContainer &selectedServers
             , QObject *parent = nullptr);
         
         virtual ~TimeZonesModel();

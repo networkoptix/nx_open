@@ -40,7 +40,7 @@ QString Nx1::getMac()
 
 QString Nx1::getSerial()
 {
-    return readFile(lit("/tmp/serial"));
+    return readFile("/tmp/serial");
 }
 
 bool Nx1::isBootedFromSD()
@@ -53,10 +53,10 @@ bool Nx1::isBootedFromSD()
 
     for (const auto& partitionInfo: partitionInfoList)
     {
-        if (partitionInfo.path == lit("/"))
+        if (partitionInfo.path == "/")
         {
-            if (partitionInfo.devName.indexOf(lit("rootfs")) != -1 ||
-                partitionInfo.devName == lit("/dev/root"))
+            if (partitionInfo.devName.indexOf("rootfs") != -1 ||
+                partitionInfo.devName == "/dev/root")
             {
                 struct stat st;
                 memset(&st, 0, sizeof(st));
@@ -78,7 +78,7 @@ bool Nx1::isBootedFromSD()
                     return false;
                 }
 
-                if (QString::fromLocal8Bit(realPath.data(), realPathLen).indexOf(lit("sd")) != -1)
+                if (QString::fromLocal8Bit(realPath.data(), realPathLen).indexOf("sd") != -1)
                     return false;  //OS is on regular drive. Can change root password
 
                 return true; //OS is on SD card or some internal memory

@@ -334,15 +334,11 @@ MjpegParser::MjpegParser()
     m_frameSize = 0;
 }
 
-MjpegParser::~MjpegParser()
-{
-}
-
 void MjpegParser::setSdpInfo(const Sdp::Media& sdp)
 {
     for (int i = 0; i < sdp.sdpAttributes.size(); ++i)
     {
-        QString line = sdp.sdpAttributes[i].trimmed();
+        QString line = sdp.sdpAttributes[i].trimmed().toLower();
         if (line.startsWith("a=framesize:"))
         {
             const QStringList& values = line.split(' ');
@@ -465,7 +461,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     }
 
     if (rtpHeader->padding != 0)
-        bytesLeft -= ntohl(rtpHeader->padding);
+        bytesLeft -= qFromBigEndian(rtpHeader->padding);
 
     if (bytesLeft < 8)
         return false;
@@ -610,7 +606,16 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     }
 #endif // 0
 
-    //m_frameData.write((const char*)curPtr, bytesLeft);
+
+    // Check buffer overflow
+    if (m_frameSize + bytesLeft > (int) MAX_ALLOWED_FRAME_SIZE)
+    {
+        NX_WARNING(this, "RTP parser buffer overflow.");
+        m_chunks.clear();
+        m_frameSize = 0;
+        packetLostDetected(0, 0);
+        return false;
+    }
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
     m_frameSize += bytesLeft;
 
@@ -646,7 +651,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
         videoData->width = width * 8;
         videoData->height = height * 8;
 
-        videoData->timestamp = ntohl(rtpHeader->timestamp);
+        videoData->timestamp = qFromBigEndian(rtpHeader->timestamp);
         gotData = true;
     }
     return true;

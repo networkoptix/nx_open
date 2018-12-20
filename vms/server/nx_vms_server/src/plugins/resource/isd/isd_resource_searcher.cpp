@@ -12,7 +12,7 @@
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <nx/utils/log/log.h>
 
-using nx::common::utils::Credentials;
+using nx::vms::common::Credentials;
 
 extern QString getValueFromString(const QString& line);
 
@@ -45,7 +45,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnMediaServerModule* serverModu
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     SearchAutoHandler(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
     NX_DEBUG(this, "Constructed");
     serverModule->mdnsListener()->registerConsumer((std::uintptr_t) this);
@@ -103,7 +103,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         QList<QnResourcePtr> resList;
         auto resData = dataPool()->data(manufacture(), lit("*"));
         auto possibleCreds = resData.value<DefaultCredentialsList>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
 
         possibleCreds << Credentials(kDefaultIsdUsername, kDefaultIsdPassword);
 
@@ -126,13 +126,13 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
 QnResourceList QnPlISDResourceSearcher::findResources(void)
 {
 
-	QnResourceList upnpResults;
-	{
-		QnMutexLocker lock(&m_mutex);
-		upnpResults = m_foundUpnpResources;
-		m_foundUpnpResources.clear();
-		m_alreadyFoundMacAddresses.clear();
-	}
+    QnResourceList upnpResults;
+    {
+        QnMutexLocker lock(&m_mutex);
+        upnpResults = m_foundUpnpResources;
+        m_foundUpnpResources.clear();
+        m_alreadyFoundMacAddresses.clear();
+    }
 
     QnResourceList mdnsResults;
     auto consumerData = serverModule()->mdnsListener()->getData((std::uintptr_t) this);
@@ -228,14 +228,14 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
         return QList<QnResourcePtr>();
     }
 
     QnPlIsdResourcePtr resource (new QnPlIsdResource(serverModule()));
-    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
+    auto isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
 
     vendor = isDW ? kDwFullVendorName : vendor;
     name = vendor == kIsdFullVendorName ?
@@ -282,7 +282,7 @@ bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString
         vendorName.toLower().trimmed() == lit("digitalwatchdog"))
     {
         QnResourceData resourceData = dataPool()->data("DW", model);
-        if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
+        if (resourceData.value<bool>(ResourceDataKey::kIsdDwCam))
             return true;
     }
 
@@ -382,7 +382,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
         return QnResourcePtr();
@@ -413,7 +413,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     {
         auto resData = dataPool()->data(manufacture(), name);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
 
         for (const auto& creds: possibleCreds)
         {
@@ -460,7 +460,7 @@ bool QnPlISDResourceSearcher::processPacket(
     {
         auto resData = dataPool()->data(manufacture(), model);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
 
         cameraAuth.setUser(kDefaultIsdUsername);
         cameraAuth.setPassword(kDefaultIsdPassword);
@@ -477,22 +477,22 @@ bool QnPlISDResourceSearcher::processPacket(
         }
     }
 
-	{
-		QnMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock(&m_mutex);
 
-		if (m_alreadyFoundMacAddresses.find(cameraMAC.toString()) == m_alreadyFoundMacAddresses.end())
-		{
-			m_alreadyFoundMacAddresses.insert(cameraMAC.toString());
-			createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
-		}
+        if (m_alreadyFoundMacAddresses.find(cameraMAC.toString()) == m_alreadyFoundMacAddresses.end())
+        {
+            m_alreadyFoundMacAddresses.insert(cameraMAC.toString());
+            createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
+        }
         else
         {
             NX_VERBOSE(this, lm("UPnP from %1 vendor: %2, model: %3, MAC: %4 is known")
                 .args(deviceEndpoint, devInfo.manufacturer, devInfo.modelName, cameraMAC));
         }
-	}
+    }
 
-	return true;
+    return true;
 }
 
 void QnPlISDResourceSearcher::createResource(
@@ -514,14 +514,14 @@ void QnPlISDResourceSearcher::createResource(
     }
 
     QnResourceData resourceData = dataPool()->data(devInfo.manufacturer, devInfo.modelName);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(
             devInfo.manufacturer, devInfo.modelName));
         return;
     }
 
-    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
+    auto isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
     auto vendor = isDW ? kDwFullVendorName :
         (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
             manufacture() :

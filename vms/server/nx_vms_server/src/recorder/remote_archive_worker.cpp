@@ -1,7 +1,7 @@
 #include "remote_archive_worker.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 RemoteArchiveWorker::RemoteArchiveWorker(RemoteArchiveTaskPtr task):
@@ -35,5 +35,5 @@ void RemoteArchiveWorker::setTaskDoneHandler(RemoteArchiveTaskDoneHandler taskDo
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

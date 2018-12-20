@@ -9,6 +9,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <ui/common/notification_levels.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -29,7 +30,6 @@ using nx::vms::event::ActionData;
 using nx::vms::event::ActionDataList;
 
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
 
 namespace {
 
@@ -68,12 +68,12 @@ EventSearchListModel::Private::~Private()
 {
 }
 
-vms::api::EventType EventSearchListModel::Private::selectedEventType() const
+EventType EventSearchListModel::Private::selectedEventType() const
 {
     return m_selectedEventType;
 }
 
-void EventSearchListModel::Private::setSelectedEventType(vms::api::EventType value)
+void EventSearchListModel::Private::setSelectedEventType(EventType value)
 {
     if (m_selectedEventType == value)
         return;
@@ -116,7 +116,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             return QVariant::fromValue(pixmap(eventParams));
 
         case Qt::ForegroundRole:
-            return QVariant::fromValue(color(eventParams.eventType));
+            return QVariant::fromValue(color(eventParams));
 
         case Qn::DescriptionTextRole:
             return description(eventParams);
@@ -126,7 +126,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             [[fallthrough]];
         case Qn::TimestampRole:
-            return QVariant::fromValue(std::chrono::microseconds(eventParams.eventTimestampUsec));
+            return QVariant::fromValue(microseconds(eventParams.eventTimestampUsec));
 
         case Qn::ResourceListRole:
         {
@@ -170,17 +170,12 @@ void EventSearchListModel::Private::clearData()
 
 void EventSearchListModel::Private::truncateToMaximumCount()
 {
-    this->truncateDataToMaximumCount(m_data, &startTime);
+    q->truncateDataToMaximumCount(m_data, &startTime);
 }
 
 void EventSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    this->truncateDataToTimePeriod(m_data, upperBoundPredicate, q->relevantTimePeriod());
-}
-
-bool EventSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
+    q->truncateDataToTimePeriod(m_data, &startTime, q->relevantTimePeriod());
 }
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -247,13 +242,13 @@ bool EventSearchListModel::Private::commitInternal(const QnTimePeriod& periodToC
     const auto count = std::distance(begin, end);
     if (count <= 0)
     {
-        NX_VERBOSE(q) << "Committing no events";
+        NX_VERBOSE(q, "Committing no events");
         return false;
     }
 
-    NX_VERBOSE(q) << "Committing" << count << "events from"
-        << utils::timestampToDebugString(startTime(*(end - 1)).count()) << "to"
-        << utils::timestampToDebugString(startTime(*begin).count());
+    NX_VERBOSE(q, "Committing %1 events:\n    from: %2\n    to: %3", count,
+        utils::timestampToDebugString(startTime(*(end - 1)).count()),
+        utils::timestampToDebugString(startTime(*begin).count()));
 
     ScopedInsertRows insertRows(q, position, position + count - 1);
     m_data.insert(m_data.begin() + position,
@@ -276,14 +271,14 @@ bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToC
 
 void EventSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
     if (m_data.empty() && fetchInProgress())
         return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : startTime(m_data.front()));
-    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());
+    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::kInfiniteDuration);
     m_liveFetch.direction = FetchDirection::later;
     m_liveFetch.batchSize = q->fetchBatchSize();
 
@@ -306,28 +301,27 @@ void EventSearchListModel::Private::fetchLive()
 
             q->addToFetchedTimeWindow(periodToCommit);
 
-            NX_VERBOSE(q) << "Live update commit";
+            NX_VERBOSE(q, "Live update commit");
             commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
 
             if (count() > q->maximumCount())
             {
-                NX_VERBOSE(q) << "Truncating to maximum count";
+                NX_VERBOSE(q, "Truncating to maximum count");
                 truncateToMaximumCount();
             }
         };
 
-    NX_VERBOSE(q) << "Live update request";
+    NX_VERBOSE(q, "Live update request");
 
     m_liveFetch.id = getEvents(m_liveFetch.period, liveEventsReceived, Qt::DescendingOrder,
         m_liveFetch.batchSize);
 }
 
 rest::Handle EventSearchListModel::Private::getEvents(
-    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
+    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    if (!NX_ASSERT(callback && server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnEventLogMultiserverRequestData request;
@@ -341,14 +335,17 @@ rest::Handle EventSearchListModel::Private::getEvents(
     request.limit = limit;
     request.order = order;
 
-    NX_VERBOSE(q) << "Requesting events from"
-        << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.order).toString()
-        << "maximum count" << request.limit;
+    NX_VERBOSE(q, "Requesting events:\n"
+        "    from: %1\n    to: %2\n    type: %3\n    subtype: %4\n    sort: %5\n    limit: %6",
+        utils::timestampToDebugString(period.startTimeMs),
+        utils::timestampToDebugString(period.endTimeMs()),
+        request.filter.eventType,
+        request.filter.eventSubtype,
+        QVariant::fromValue(request.order).toString(),
+        request.limit);
 
     const auto internalCallback =
-        [callback, guard = QPointer<Private>(this)](
+        [callback, guard = QPointer<const Private>(this)](
             bool success, rest::Handle handle, rest::EventLogData data)
         {
             if (guard)
@@ -358,7 +355,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
     return server->restConnection()->getEvents(request, internalCallback, thread());
 }
 
-QString EventSearchListModel::Private::title(vms::api::EventType eventType) const
+QString EventSearchListModel::Private::title(EventType eventType) const
 {
     return m_helper->eventName(eventType);
 }
@@ -373,41 +370,54 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
 {
     switch (parameters.eventType)
     {
-        case nx::vms::api::EventType::storageFailureEvent:
+        case EventType::storageFailureEvent:
             return qnSkin->pixmap("events/storage_red.png");
 
-        case nx::vms::api::EventType::backupFinishedEvent:
+        case EventType::backupFinishedEvent:
             return qnSkin->pixmap("events/storage_green.png");
 
-        case nx::vms::api::EventType::serverStartEvent:
+        case EventType::serverStartEvent:
             return qnSkin->pixmap("events/server.png");
 
-        case nx::vms::api::EventType::serverFailureEvent:
+        case EventType::serverFailureEvent:
             return qnSkin->pixmap("events/server_red.png");
 
-        case nx::vms::api::EventType::serverConflictEvent:
+        case EventType::serverConflictEvent:
             return qnSkin->pixmap("events/server_yellow.png");
 
-        case nx::vms::api::EventType::licenseIssueEvent:
+        case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license_red.png");
 
-        case nx::vms::api::EventType::cameraDisconnectEvent:
+        case EventType::cameraDisconnectEvent:
             return qnSkin->pixmap("events/connection_red.png");
 
-        case nx::vms::api::EventType::networkIssueEvent:
-        case nx::vms::api::EventType::cameraIpConflictEvent:
+        case EventType::networkIssueEvent:
+        case EventType::cameraIpConflictEvent:
             return qnSkin->pixmap("events/connection_yellow.png");
 
-        case nx::vms::api::EventType::softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 parameters.description, QPalette().light().color());
 
+        case EventType::pluginEvent:
+        {
+            switch (QnNotificationLevel::valueOf(parameters))
+            {
+                case QnNotificationLevel::Value::CriticalNotification:
+                    return qnSkin->pixmap("events/alert_red.png");
+                case QnNotificationLevel::Value::ImportantNotification:
+                    return qnSkin->pixmap("events/alert_yellow.png");
+                default:
+                    return qnSkin->pixmap("events/alert.png");
+            }
+        }
+
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
-        case nx::vms::api::EventType::cameraMotionEvent:
-        case nx::vms::api::EventType::cameraInputEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
             return qnSkin->pixmap("tree/camera.svg");
 
-        case nx::vms::api::EventType::analyticsSdkEvent:
+        case EventType::analyticsSdkEvent:
             return QPixmap();
 
         default:
@@ -415,30 +425,12 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
     }
 }
 
-QColor EventSearchListModel::Private::color(vms::api::EventType eventType)
+QColor EventSearchListModel::Private::color(const vms::event::EventParameters& parameters)
 {
-    switch (eventType)
-    {
-        case nx::vms::api::EventType::cameraDisconnectEvent:
-        case nx::vms::api::EventType::storageFailureEvent:
-        case nx::vms::api::EventType::serverFailureEvent:
-            return qnGlobals->errorTextColor();
-
-        case nx::vms::api::EventType::networkIssueEvent:
-        case nx::vms::api::EventType::cameraIpConflictEvent:
-        case nx::vms::api::EventType::serverConflictEvent:
-            return qnGlobals->warningTextColor();
-
-        case nx::vms::api::EventType::backupFinishedEvent:
-            return qnGlobals->successTextColor();
-
-        //case nx::vms::api::EventType::licenseIssueEvent: //< TODO: normal or warning?
-        default:
-            return QColor();
-    }
+    return QnNotificationLevel::notificationTextColor(QnNotificationLevel::valueOf(parameters));
 }
 
-bool EventSearchListModel::Private::hasPreview(vms::api::EventType eventType)
+bool EventSearchListModel::Private::hasPreview(EventType eventType)
 {
     switch (eventType)
     {

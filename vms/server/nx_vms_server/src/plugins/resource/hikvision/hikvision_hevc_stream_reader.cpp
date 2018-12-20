@@ -13,10 +13,10 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
-using namespace nx::mediaserver_core::plugins::hikvision;
+using namespace nx::vms::server::plugins::hikvision;
 
 HikvisionHevcStreamReader::HikvisionHevcStreamReader(const HikvisionResourcePtr& resource):
     QnRtpStreamReader(resource),
@@ -114,15 +114,15 @@ QSize HikvisionHevcStreamReader::chooseResolution(
     const int maxArea = SECONDARY_STREAM_MAX_RESOLUTION.width()
         * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
-    auto secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
+    auto secondaryResolution = nx::vms::server::resource::Camera::getNearestResolution(
         SECONDARY_STREAM_DEFAULT_RESOLUTION,
-        nx::mediaserver::resource::Camera::getResolutionAspectRatio(primaryResolution),
+        nx::vms::server::resource::Camera::getResolutionAspectRatio(primaryResolution),
         maxArea,
         QList<QSize>::fromVector(QVector<QSize>::fromStdVector(resolutions)));
 
     if (secondaryResolution.isEmpty())
     {
-        secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
+        secondaryResolution = nx::vms::server::resource::Camera::getNearestResolution(
             SECONDARY_STREAM_DEFAULT_RESOLUTION,
             0.0,
             maxArea,
@@ -475,7 +475,7 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE_ONVIF

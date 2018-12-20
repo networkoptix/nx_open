@@ -21,7 +21,6 @@ class QGraphicsLinearLayout;
 
 class InstrumentManager;
 class ActivityListenerInstrument;
-class FpsCountingInstrument;
 class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
@@ -49,6 +48,9 @@ class TitleWorkbenchPanel;
 }
 
 namespace nx::vms::client::desktop {
+
+class DebugInfoInstrument;
+
 namespace ui {
 namespace workbench {
 
@@ -232,7 +234,7 @@ private:
     QPointer<InstrumentManager> m_instrumentManager;
 
     /** Fps counting instrument. */
-    QPointer<FpsCountingInstrument> m_fpsCountingInstrument;
+    QPointer<nx::vms::client::desktop::DebugInfoInstrument> m_fpsCountingInstrument;
 
     /** Activity listener instrument. */
     QPointer<ActivityListenerInstrument> m_controlsActivityInstrument;

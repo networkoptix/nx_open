@@ -125,7 +125,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
 }
 
 CameraDiagnostics::Result QnPlSonyResource::customInitialization(
-    const CapabilitiesResp& /*capabilitiesResponse*/)
+    const _onvifDevice__GetCapabilitiesResponse& /*capabilitiesResponse*/)
 {
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
 

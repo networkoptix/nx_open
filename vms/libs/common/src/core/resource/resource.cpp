@@ -41,12 +41,12 @@ QnResource::QnResource(const QnResource& right):
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_initialized(right.m_initialized),
+    m_initialized(right.m_initialized.load()),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_initInProgress(right.m_initInProgress),
+    m_initInProgress(right.m_initInProgress.load()),
     m_commonModule(right.m_commonModule)
 {
 }
@@ -279,7 +279,7 @@ QnResourcePtr QnResource::getParentResource() const
     return QnResourcePtr();
 }
 
-bool QnResource::hasParam(const QString &name) const
+bool QnResource::hasDefaultProperty(const QString &name) const
 {
     QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
     if (!resType)
@@ -319,35 +319,6 @@ Qn::ResourceStatus QnResource::getStatus() const
         : Qn::NotDefined;
 }
 
-void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
-{
-    if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
-        commonModule()->metrics()->offlineStatus()++;
-
-    NX_VERBOSE(this, "Change status. oldValue=%1,  new value=%2, name=%3, id=%4", oldStatus, newStatus, getName(), m_id);
-
-    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
-    {
-        if (m_initialized)
-        {
-            m_initialized = false;
-            emit initializedChanged(toSharedPointer(this));
-        }
-    }
-
-    // Null pointer if we are changing status in constructor. Signal is not needed in this case.
-    if (auto sharedThis = toSharedPointer(this))
-    {
-        NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
-                .arg(QString::fromLatin1(Q_FUNC_INFO))
-                .arg(sharedThis->getId().toString())
-                .arg(sharedThis->getName())
-                .arg(sharedThis->getUrl()));
-
-        emit statusChanged(sharedThis, reason);
-    }
-}
-
 void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (newStatus == Qn::NotDefined)
@@ -364,9 +335,26 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (oldStatus == newStatus)
         return;
 
-    NX_DEBUG(this, "Status changed to %1: %2", newStatus, reason);
+    NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
+        oldStatus, newStatus, reason, getName(), url());
+
     commonModule()->statusDictionary()->setValue(id, newStatus);
-    doStatusChanged(oldStatus, newStatus, reason);
+    if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
+        commonModule()->metrics()->offlineStatus()++;
+
+    if (m_initialized && (newStatus == Qn::Offline || newStatus == Qn::Unauthorized))
+    {
+        NX_VERBOSE(this, "Signal initialized for status %1", newStatus);
+        m_initialized = false;
+        emit initializedChanged(toSharedPointer(this));
+    }
+
+    // Null pointer if we are changing status in constructor. Signal is not needed in this case.
+    if (auto sharedThis = toSharedPointer(this))
+    {
+        NX_VERBOSE(this, "Signal status change for %1", newStatus);
+        emit statusChanged(sharedThis, reason);
+    }
 }
 
 QnUuid QnResource::getId() const
@@ -386,12 +374,25 @@ void QnResource::setId(const QnUuid& id)
     m_id = id;
 }
 
+nx::utils::Url QnResource::url() const
+{
+    return nx::utils::Url(getUrl());
+}
+
+void QnResource::setUrl(const nx::utils::Url &url)
+{
+    NX_ASSERT(url.isValid());
+    setUrl(url.toString());
+}
+
+// TODO: Should be made protected instead of public.
 QString QnResource::getUrl() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
     return m_url;
 }
 
+// TODO: Should be made protected instead of public.
 void QnResource::setUrl(const QString &url)
 {
     {
@@ -504,7 +505,7 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceTypeId)
 {
     // TODO: #GDM think about code duplication
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is required.");
 
     NX_ASSERT(commonModule);
     QString value = commonModule
@@ -513,7 +514,6 @@ QString QnResource::getResourceProperty(
 
     if (value.isNull())
     {
-        // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(resourceTypeId);
         if (resType)
             return resType->defaultValue(key);
@@ -533,10 +533,11 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
         QnMutexLocker lk(&m_mutex);
         if (useLocalProperties())
         {
-            //saving property to some internal dictionary. Will apply to global dictionary when id is known
+            // Saving property to some internal dictionary.
+            // Will apply to global dictionary when id is known.
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary()->saveParams(...) does not make any sense
+            //calling propertyDictionary()->saveProperties(...) does not make any sense
             return false;
         }
     }
@@ -560,9 +561,10 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
 
 void QnResource::emitPropertyChanged(const QString& key)
 {
-    if (key == Qn::VIDEO_LAYOUT_PARAM_NAME)
+    if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
+    NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
@@ -589,13 +591,13 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
     if (const auto module = commonModule())
         runtimeProperties = module->propertyDictionary()->allProperties(getId());
 
-    ParamTypeMap staticDefaultProperties;
+    ParamTypeMap defaultProperties;
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (resType)
-        staticDefaultProperties = resType->paramTypeList();
+        defaultProperties = resType->paramTypeList();
 
-    for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
+    for (auto it = defaultProperties.cbegin(); it != defaultProperties.cend(); ++it)
     {
         auto runtimeIt = std::find_if(runtimeProperties.cbegin(), runtimeProperties.cend(),
             [it](const auto& param) { return it.key() == param.name; });
@@ -605,6 +607,22 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
 
     std::copy(runtimeProperties.cbegin(), runtimeProperties.cend(), std::back_inserter(result));
     return result;
+}
+
+bool QnResource::saveProperties()
+{
+    NX_ASSERT(commonModule() && !getId().isNull());
+    if (auto module = commonModule())
+        return module->propertyDictionary()->saveParams(getId());
+    return false;
+}
+
+int QnResource::savePropertiesAsync()
+{
+    NX_ASSERT(commonModule() && !getId().isNull());
+    if (auto module = commonModule())
+        return module->propertyDictionary()->saveParamsAsync(getId());
+    return false;
 }
 
 void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
@@ -621,9 +639,10 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 bool QnResource::init()
 {
+    auto commonModule = this->commonModule();
     {
         QnMutexLocker lock(&m_initMutex);
-        if (commonModule() && commonModule()->isNeedToStop())
+        if (!commonModule || commonModule->isNeedToStop())
             return false;
 
         if (m_initialized)
@@ -633,24 +652,29 @@ bool QnResource::init()
         m_initInProgress = true;
     }
 
+    NX_DEBUG(this, "Initiatialize...");
     CameraDiagnostics::Result initResult = initInternal();
-    m_initMutex.lock();
-    m_initInProgress = false;
-    m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+    NX_DEBUG(this, "Initialization result: %1",
+        initResult.toString(commonModule->resourcePool()));
+
+    bool changed = false;
     {
-        QnMutexLocker lk(&m_mutex);
-        m_prevInitializationResult = initResult;
+        QnMutexLocker lock(&m_initMutex);
+        m_initInProgress = false;
+        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_prevInitializationResult = initResult;
+        }
+
+        m_initializationAttemptCount.fetchAndAddOrdered(1);
+
+        changed = m_initialized;
+        if (m_initialized)
+            initializationDone();
+        else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
+            setStatus(Qn::Offline);
     }
-
-    m_initializationAttemptCount.fetchAndAddOrdered(1);
-
-    bool changed = m_initialized;
-    if (m_initialized)
-        initializationDone();
-    else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
-        setStatus(Qn::Offline);
-
-    m_initMutex.unlock();
 
     if (changed)
         emit initializedChanged(toSharedPointer(this));
@@ -732,6 +756,11 @@ bool QnResource::isInitialized() const
     return m_initialized;
 }
 
+bool QnResource::isInitializationInProgress() const
+{
+    return m_initInProgress;
+}
+
 void QnResource::setUniqId(const QString& /*value*/)
 {
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
@@ -760,20 +789,4 @@ QnCommonModule* QnResource::commonModule() const
 QString QnResource::idForToStringFromPtr() const
 {
     return getId().toSimpleString();
-}
-
-bool QnResource::saveParams()
-{
-    NX_ASSERT(commonModule() && !getId().isNull());
-    if (auto module = commonModule())
-        return module->propertyDictionary()->saveParams(getId());
-    return false;
-}
-
-int QnResource::saveParamsAsync()
-{
-    NX_ASSERT(commonModule() && !getId().isNull());
-    if (auto module = commonModule())
-        return module->propertyDictionary()->saveParamsAsync(getId());
-    return false;
 }

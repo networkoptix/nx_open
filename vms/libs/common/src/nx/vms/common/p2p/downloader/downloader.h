@@ -9,33 +9,57 @@
 #include "result_code.h"
 #include "file_information.h"
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 class AbstractPeerManagerFactory;
 
-class AbstractDownloader: public QObject
+class Downloader: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    AbstractDownloader(QObject* parent);
+    Downloader(
+        const QDir& downloadsDirectory,
+        QnCommonModule* commonModule,
+        AbstractPeerManagerFactory* peerManagerFactory = nullptr,
+        QObject* parent = nullptr);
 
-    virtual QStringList files() const = 0;
-    virtual QString filePath(const QString& fileName) const = 0;
-    virtual FileInformation fileInformation(const QString& fileName) const = 0;
-    virtual ResultCode addFile(const FileInformation& fileInformation) = 0;
-    virtual ResultCode updateFileInformation(
-        const QString& fileName, int size, const QByteArray& md5) = 0;
-    virtual ResultCode readFileChunk(
-        const QString& fileName, int chunkIndex, QByteArray& buffer) = 0;
-    virtual ResultCode writeFileChunk(
-        const QString& fileName, int chunkIndex, const QByteArray& buffer) = 0;
-    virtual ResultCode deleteFile(const QString& fileName, bool deleteData = true) = 0;
-    virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) = 0;
+    virtual ~Downloader() override;
+
+    QStringList files() const;
+
+    QString filePath(const QString& fileName) const;
+
+    FileInformation fileInformation(const QString& fileName) const;
+
+    ResultCode addFile(const FileInformation& fileInformation);
+
+    ResultCode updateFileInformation(
+        const QString& fileName,
+        int size,
+        const QByteArray& md5);
+
+    ResultCode readFileChunk(
+        const QString& fileName,
+        int chunkIndex,
+        QByteArray& buffer);
+
+    ResultCode writeFileChunk(
+        const QString& fileName,
+        int chunkIndex,
+        const QByteArray& buffer);
+
+    ResultCode deleteFile(const QString& fileName, bool deleteData = true);
+
+    QVector<QByteArray> getChunkChecksums(const QString& fileName);
+
+    void startDownloads();
+    void stopDownloads();
+
+    static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
+        std::function<void(bool)> callback);
+
+    static bool validate(const QString& url, bool onlyConnectionCheck, int expectedSize);
 
 signals:
     void downloadFinished(const QString& fileName);
@@ -48,62 +72,10 @@ signals:
     void fileStatusChanged(
         const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void chunkDownloadFailed(const QString& fileName);
-};
-
-class DownloaderPrivate;
-class Downloader: public AbstractDownloader, public QnCommonModuleAware
-{
-    Q_OBJECT
-
-public:
-    Downloader(
-        const QDir& downloadsDirectory,
-        QnCommonModule* commonModule,
-        AbstractPeerManagerFactory* peerManagerFactory = nullptr,
-        QObject* parent = nullptr);
-
-    ~Downloader();
-
-    virtual QStringList files() const override;
-
-    virtual QString filePath(const QString& fileName) const override;
-
-    virtual FileInformation fileInformation(const QString& fileName) const override;
-
-    virtual ResultCode addFile(const FileInformation& fileInformation) override;
-
-    virtual ResultCode updateFileInformation(
-        const QString& fileName,
-        int size,
-        const QByteArray& md5) override;
-
-    virtual ResultCode readFileChunk(
-        const QString& fileName,
-        int chunkIndex,
-        QByteArray& buffer) override;
-
-    virtual ResultCode writeFileChunk(
-        const QString& fileName,
-        int chunkIndex,
-        const QByteArray& buffer) override;
-
-    virtual ResultCode deleteFile(const QString& fileName, bool deleteData = true) override;
-
-    virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) override;
-    void atServerStart();
-
-    static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
-        std::function<void(bool)> callback);
-
-    static bool validate(const QString& url, bool onlyConnectionCheck, int expectedSize);
 
 private:
-    QScopedPointer<DownloaderPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(Downloader)
+    class Private;
+    const QScopedPointer<Private> d;
 };
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // nx::vms::common::p2p::downloader

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <rest/server/fusion_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnUpdateStatusRestHandler:
-    public QnFusionRestHandler, public nx::mediaserver::ServerModuleAware
+    public QnFusionRestHandler, public nx::vms::server::ServerModuleAware
 {
 public:
     QnUpdateStatusRestHandler(QnMediaServerModule* serverModule);

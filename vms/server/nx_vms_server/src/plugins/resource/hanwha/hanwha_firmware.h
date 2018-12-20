@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaFirmware
@@ -39,5 +39,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

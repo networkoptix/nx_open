@@ -122,11 +122,6 @@ public:
         int chunkSize,
         ChunkCallback callback) override;
 
-    virtual rest::Handle validateFileInformation(
-        const QnUuid& peerId,
-        const downloader::FileInformation& fileInformation,
-        ValidateCallback callback) override;
-
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }
 
@@ -225,11 +220,6 @@ public:
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;
-
-    virtual rest::Handle validateFileInformation(
-        const QnUuid& peerId,
-        const FileInformation& fileInformation,
-        ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }

@@ -7,7 +7,8 @@
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
-#include <utils/common/encoded_credentials.h>
+#include <utils/common/credentials.h>
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 
 class QSettings;
 
@@ -22,25 +23,24 @@ public:
     enum PropertyIdentifier
     {
         RecentLocalConnections,
-        SystemAuthenticationData,
         LocalSystemWeightsData,
         CdbEndpoint,
-        CloudLogin,
-        CloudPassword,
         RecentCloudSystems,
         ForgottenSystems,
         SkipStartupTilesManagement,
         StartupDiscoveryPeriodMs,
         KnownServerConnections,
+        CloudCredentials,
+        SystemAuthenticationData,
 
         // Obsolete values.
-
+        CloudLogin,
+        CloudPassword,
         KnownServerUrls,
 
         PropertiesCount
     };
 
-    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
     using RecentLocalConnectionsHash = QHash<QnUuid, nx::vms::client::core::LocalConnectionData>;
     using WeightDataList = QList<nx::vms::client::core::WeightData>;
     using KnownServerConnection = nx::vms::client::core::watchers::KnownServerConnections::Connection;
@@ -91,6 +91,8 @@ private:
 
         // Obsolete values.
 
+        using SystemAuthenticationDataHash =
+            QHash<QnUuid, QList<nx::vms::client::core::EncodedCredentials>>;
         QN_DECLARE_RW_PROPERTY(QList<nx::utils::Url>,
             knownServerUrls, setKnownServerUrls,
             KnownServerUrls, QList<nx::utils::Url>())

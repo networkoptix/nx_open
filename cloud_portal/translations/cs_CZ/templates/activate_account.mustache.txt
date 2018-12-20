@@ -5,4 +5,4 @@ Hello {{message.userFullName}},
 {{config.portal_url}}/activate/{{message.code}}
 
 Pokud jste se nezaregistrovali v %PRODUCT_NAME%, prosím ignorujte tento email.
-Nesdílejte s nikým zprávu nebo odkaz.
+Nesdílejte s nikým tuto zprávu nebo odkaz.

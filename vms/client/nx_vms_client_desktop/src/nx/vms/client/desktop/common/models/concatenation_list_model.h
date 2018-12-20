@@ -7,7 +7,7 @@
 
 #include <nx/vms/client/desktop/common/models/abstract_mapping_model.h>
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -69,7 +69,7 @@ private:
 
 private:
     QList<QAbstractListModel*> m_models;
-    QScopedPointer<QnDisconnectHelper> m_modelConnections;
+    nx::utils::ScopedConnections m_modelConnections;
     QVector<PersistentIndexPair> m_changingIndices;
     QAbstractListModel* m_ignoredModel = nullptr;
 };

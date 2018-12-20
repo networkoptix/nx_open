@@ -5,23 +5,23 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/analytics/manager.h>
-#include <nx/mediaserver/resource/analytics_engine_resource.h>
-#include <nx/mediaserver/resource/analytics_plugin_resource.h>
-#include <nx/mediaserver/sdk_support/utils.h>
-#include <nx/mediaserver/sdk_support/pointers.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
-#include <nx/mediaserver/sdk_support/utils.h>
-#include <nx/sdk/settings.h>
+#include <nx/vms/server/analytics/manager.h>
+#include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/analytics_plugin_resource.h>
+#include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/pointers.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/vms/server/sdk_support/utils.h>
+#include <nx/sdk/i_string_map.h>
 
 #include <plugins/settings.h>
 #include <plugins/plugin_tools.h>
 
-using namespace nx::mediaserver;
+using namespace nx::vms::server;
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -32,7 +32,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    using namespace nx::mediaserver;
+    using namespace nx::vms::server;
     bool success = false;
     const auto actionData =
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
@@ -102,14 +102,14 @@ public:
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
         m_params(
-            nx::mediaserver::sdk_support::toSdkSettings(actionData.params)),
+            nx::vms::server::sdk_support::toIStringMap(actionData.params)),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
-        m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
-        m_deviceId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
+        m_objectId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
+        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
         m_timestampUs = actionData.timestampUs;
     }
 
@@ -121,7 +121,7 @@ public:
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nx::sdk::Settings* params() override { return m_params.get(); }
+    virtual const nx::sdk::IStringMap* params() override { return m_params.get(); }
 
     virtual int paramCount() override { return m_params->count(); }
 
@@ -137,7 +137,7 @@ private:
     nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::mediaserver::sdk_support::UniquePtr<nx::sdk::Settings> m_params;
+    const nx::vms::server::sdk_support::UniquePtr<nx::sdk::IStringMap> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };
@@ -164,7 +164,7 @@ QString errorMessage(nx::sdk::Error error)
  */
 QString QnExecuteAnalyticsActionRestHandler::executeAction(
     AnalyticsActionResult* outActionResult,
-    nx::sdk::analytics::Engine* engine,
+    nx::sdk::analytics::IEngine* engine,
     const AnalyticsAction& actionData)
 {
     Action action(actionData, outActionResult);
@@ -185,7 +185,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger>
         "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
 
     return std::make_unique<sdk_support::ManifestLogger>(
-        nx::utils::log::Tag(typeid(this)),
+        typeid(this), //< Using the same tag for all instances.
         messageTemplate,
         std::move(engineResource));
 }

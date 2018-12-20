@@ -46,8 +46,6 @@ function(set_distribution_names)
         "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
-    set(paxton_plugin_distribution_name
-        "${prefix}-paxton_plugin_${dotNetFramework}-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(cdb_distribution_name
         "${prefix}-cdb-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(hpm_distribution_name
@@ -76,6 +74,15 @@ function(set_distribution_names)
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name
         "${prefix}" PARENT_SCOPE)
+
+    if("${dotNetFramework}" STREQUAL "v4.0")
+        set(net2Version "Net2v5")
+    else()
+        set(net2Version "Net2v6")
+    endif()
+    set(paxton_plugin_distribution_name
+        "${prefix}-paxton_plugin-${releaseVersion.full}-${net2Version}" PARENT_SCOPE)
+
 endfunction()
 
 set_distribution_names()

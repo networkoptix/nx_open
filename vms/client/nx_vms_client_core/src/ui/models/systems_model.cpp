@@ -7,7 +7,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <network/system_description.h>
 #include <network/connection_validator.h>
 #include <finders/systems_finder.h>
@@ -58,7 +58,7 @@ public:
     struct InternalSystemData
     {
         QnSystemDescriptionPtr system;
-        QnDisconnectHelper connections;
+        nx::utils::ScopedConnections connections;
     };
     using InternalSystemDataPtr = QSharedPointer<InternalSystemData>;
     using InternalList = QVector<InternalSystemDataPtr>;
@@ -85,39 +85,40 @@ public:
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     bool isCompatibleInternal(const QnSystemDescriptionPtr& systemDescription) const;
 
-    QnDisconnectHelper disconnectHelper;
+    nx::utils::ScopedConnections connections;
     InternalList internalData;
     nx::vms::api::SoftwareVersion minimalVersion;
 };
 
-QnSystemsModel::QnSystemsModel(QObject *parent)
-    : base_type(parent)
-    , d_ptr(new QnSystemsModelPrivate(this))
+QnSystemsModel::QnSystemsModel(QObject* parent):
+    base_type(parent),
+    d_ptr(new QnSystemsModelPrivate(this))
 {
     NX_ASSERT(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
 
     Q_D(QnSystemsModel);
 
-    d->disconnectHelper <<
-        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
-                d, &QnSystemsModelPrivate::addSystem);
+    d->connections << connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
+        d, &QnSystemsModelPrivate::addSystem);
 
-    d->disconnectHelper <<
-        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
-                d, &QnSystemsModelPrivate::removeSystem);
+    d->connections << connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
+        d, &QnSystemsModelPrivate::removeSystem);
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
-            d, &QnSystemsModelPrivate::updateOwnerDescription);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged,
+    d->connections << connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         d, &QnSystemsModelPrivate::updateOwnerDescription);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
-            d, &QnSystemsModelPrivate::updateOwnerDescription);
+
+    d->connections << connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged,
+        d, &QnSystemsModelPrivate::updateOwnerDescription);
+
+    d->connections << connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
+        d, &QnSystemsModelPrivate::updateOwnerDescription);
 
     d->resetModel();
 }
 
 QnSystemsModel::~QnSystemsModel()
-{}
+{
+}
 
 int QnSystemsModel::getRowIndex(const QString& systemId) const
 {
@@ -281,8 +282,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
 {
     Q_Q(QnSystemsModel);
 
-    const auto data = InternalSystemDataPtr(new InternalSystemData(
-        { systemDescription, QnDisconnectHelper() }));
+    const auto data = InternalSystemDataPtr(new InternalSystemData({systemDescription}));
 
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::serverChanged, this,
@@ -317,6 +317,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
 
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::serverAdded, this, serverAction);
+
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::serverRemoved, this, serverAction);
 

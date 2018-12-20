@@ -54,7 +54,7 @@ float QnAspectRatio::toFloat() const
 
 QString QnAspectRatio::toString() const
 {
-    return toString(lit("%1:%2"));
+    return toString(QStringLiteral("%1:%2"));
 }
 
 QString QnAspectRatio::toString(const QString &format) const

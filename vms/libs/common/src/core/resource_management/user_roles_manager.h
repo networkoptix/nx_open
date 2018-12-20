@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/common_globals.h>
 #include <common/common_module_aware.h>
 
 #include <core/resource/resource_fwd.h>

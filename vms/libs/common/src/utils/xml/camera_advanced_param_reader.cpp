@@ -11,11 +11,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
 
-namespace {
+namespace
+{
     const QUrl validatorSchemaUrl = lit("qrc:/camera_advanced_params/schema.xsd");
 
     //!Prints XML validation errors to log
-    class QnXMLValidationMessageHandler: public QAbstractMessageHandler {
+    class QnXMLValidationMessageHandler: public QAbstractMessageHandler
+    {
     public:
         //!Implementation of QAbstractMessageHandler::handleMessage
         virtual void handleMessage(
@@ -30,11 +32,13 @@ namespace {
         }
     };
 
-    bool parseBooleanXmlValue(const QString &value) {
+    bool parseBooleanXmlValue(const QString &value)
+    {
         return (value == lit("true")) || (value == lit("1"));
     }
 
-    class QnIODeviceRAAI {
+    class QnIODeviceRAAI
+    {
     public:
         QnIODeviceRAAI(QIODevice *device):
             m_device(device)
@@ -56,8 +60,6 @@ namespace {
         QIODevice* m_device;
         bool m_valid;
     };
-
-    const QString advancedParametersKey(Qn::CAMERA_ADVANCED_PARAMETERS);
 
     QStringList splitAndTrim(const QString& str, const QChar& separator)
     {
@@ -98,13 +100,13 @@ void QnCameraAdvancedParamsReader::setParamsToResource(
 QString QnCameraAdvancedParamsReader::encodedParamsFromResource(const QnResourcePtr &resource)
 {
     NX_ASSERT(resource);
-    return resource->getProperty(advancedParametersKey);
+    return resource->getProperty(ResourcePropertyKey::kCameraAdvancedParams);
 }
 
 void QnCameraAdvancedParamsReader::setEncodedParamsToResource(const QnResourcePtr &resource, const QString &params)
 {
     NX_ASSERT(resource);
-    resource->setProperty(advancedParametersKey, params);
+    resource->setProperty(ResourcePropertyKey::kCameraAdvancedParams, params);
 }
 
 QnCachingCameraAdvancedParamsReader::QnCachingCameraAdvancedParamsReader(QObject* parent):
@@ -121,7 +123,7 @@ QnCameraAdvancedParams QnCachingCameraAdvancedParamsReader::params(const QnResou
         m_paramsByCameraId[id] = result;
 
         connect(resource, &QnResource::propertyChanged, this, [this](const QnResourcePtr &res, const QString &key) {
-            if (key != advancedParametersKey)
+            if (key != ResourcePropertyKey::kCameraAdvancedParams)
                 return;
             m_paramsByCameraId.remove(res->getId());
         });
@@ -190,6 +192,7 @@ namespace QnXmlTag {
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
     const QString paramDefaultValue     = lit("defaultValue");
+    const QString paramAvailableInOffline = lit("availableInOffline");
     const QString paramShouldKeepInitialValue = lit("keepInitialValue");
     const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
     const QString parameterGroup = lit("group");
@@ -302,10 +305,10 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
     param.keepInitialValue = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramShouldKeepInitialValue));
-
+    param.availableInOffline = parseBooleanXmlValue(
+        elementXml.attribute(QnXmlTag::paramAvailableInOffline));
     param.bindDefaultToMinimum = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramBindDefaultToMinimum));
-
     param.group = elementXml.attribute(QnXmlTag::parameterGroup);
 
     auto childNodes = elementXml.childNodes();

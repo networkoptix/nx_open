@@ -100,9 +100,16 @@ buildDistribution()
         "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" "$QT_DIR" \
         "$QT_VERSION"
 
-    if [[ $MAC_SKIP_SIGN = false ]]
+    if [[ $CODE_SIGNING = true ]]
     then
-        codesign -f -v --deep -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
+        local KEYCHAIN_ARGS=""
+
+        if [ ! -z "$KEYCHAIN" ]
+        then
+            KEYCHAIN_ARGS="--keychain $KEYCHAIN"
+        fi
+
+        codesign -f -v --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
     fi
 
     SetFile -c icnC "$SRC/.VolumeIcon.icns"

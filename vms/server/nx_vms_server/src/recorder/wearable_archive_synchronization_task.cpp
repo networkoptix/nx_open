@@ -16,7 +16,7 @@
 #include <media_server/media_server_module.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 using namespace plugins;
@@ -117,7 +117,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs,
     storage->registerResourceData(temporaryFilePath, m_file.data());
     storage->setIsIoDeviceOwner(false);
 
-    using namespace nx::mediaserver_core::plugins;
+    using namespace nx::vms::server::plugins;
     std::unique_ptr<QnAviArchiveDelegate> delegate(createArchiveDelegate());
     delegate->setStorage(storage);
     delegate->setAudioChannel(0);
@@ -193,5 +193,5 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

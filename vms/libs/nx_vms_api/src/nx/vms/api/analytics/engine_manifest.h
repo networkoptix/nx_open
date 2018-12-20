@@ -4,7 +4,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QJsonObject>
 
-#include <nx/vms/api/analytics/translatable_string.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
@@ -25,7 +24,7 @@ struct NX_VMS_API EngineManifest
     struct ObjectAction
     {
         QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
-        TranslatableString name; /**< Name to be shown to the user; in English. */
+        QString name; /**< Action name to be shown to the user. */
         QList<QString> supportedObjectTypeIds;
         // TODO: Add params (settings).
     };
@@ -59,8 +58,6 @@ struct NX_VMS_API EngineManifest
     QList<ObjectAction> objectActions;
 
     QJsonObject deviceAgentSettingsModel;
-
-    // TODO: Add Engine dynamic settings.
 };
 #define EngineManifest_Fields \
     (capabilities)(eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)

@@ -25,20 +25,31 @@
 namespace nx::cloud::db {
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
+    const conf::AccountManager& settings,
     const nx::utils::stree::ResourceNameSet& attributeNameset,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
+    nx::sql::AsyncSqlQueryExecutor* const dbManager,
+    dao::AbstractTemporaryCredentialsDao* const dao) noexcept(false)
 :
+    m_settings(settings),
     m_attributeNameset(attributeNameset),
     m_dbManager(dbManager),
-    m_dao(dao::TemporaryCredentialsDaoFactory::instance().create())
+    m_dao(dao)
 {
     deleteExpiredCredentials();
 
     fillCache();
+
+    schedulePeriodicRemovalOfExpiredCredentials();
 }
 
 TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+    m_removeExpiredCredentialsTimer.pleaseStopSync();
+
     // Waiting for async calls to complete.
     m_startedAsyncCallsCounter.wait();
 }
@@ -260,6 +271,34 @@ void TemporaryAccountPasswordManager::fillCache()
         .args(m_temporaryCredentials.size()));
 }
 
+void TemporaryAccountPasswordManager::schedulePeriodicRemovalOfExpiredCredentials()
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_terminated)
+        return;
+
+    m_removeExpiredCredentialsTimer.start(
+        m_settings.removeExpiredTemporaryCredentialsPeriod,
+        [this]() { doPeriodicRemovalOfExpiredCredentials(); });
+}
+
+void TemporaryAccountPasswordManager::doPeriodicRemovalOfExpiredCredentials()
+{
+    NX_VERBOSE(this, "Periodic removal of expired credentials");
+
+    m_dbManager->executeUpdate(
+        [this](auto&&... args)
+        {
+            m_dao->deleteExpiredCredentials(std::move(args)...);
+            return nx::sql::DBResult::ok;
+        },
+        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](auto...)
+        {
+            schedulePeriodicRemovalOfExpiredCredentials();
+        });
+}
+
 nx::sql::DBResult TemporaryAccountPasswordManager::insertTempPassword(
     nx::sql::QueryContext* const queryContext,
     data::TemporaryAccountCredentialsEx tempPasswordData)
@@ -349,11 +388,44 @@ void TemporaryAccountPasswordManager::updateExpirationRulesAfterSuccessfulLogin(
     Index& index,
     Iterator it)
 {
+    using namespace std::chrono;
+
     index.modify(
         it,
-        [](data::TemporaryAccountCredentialsEx& value) { ++value.useCount; });
+        [](data::TemporaryAccountCredentialsEx& value)
+        {
+            ++value.useCount;
 
-    // TODO: #ak prolonging expiration period if present.
+            // Prolonging expiration period if present.
+            const auto currentTime = duration_cast<seconds>(nx::utils::timeSinceEpoch());
+            if (value.prolongationPeriodSec > 0 && 
+                value.expirationTimestampUtc - currentTime.count() < value.prolongationPeriodSec)
+            {
+                value.expirationTimestampUtc =
+                    value.expirationTimestampUtc + value.prolongationPeriodSec;
+            }
+        });
+
+    updateCredentialsInDbAsync(*it);
+}
+
+void TemporaryAccountPasswordManager::updateCredentialsInDbAsync(
+    const data::TemporaryAccountCredentials& tempPasswordData)
+{
+    m_dbManager->executeUpdate(
+        [this, tempPasswordData](
+            nx::sql::QueryContext* queryContext)
+        {
+            m_dao->update(
+                queryContext,
+                m_attributeNameset,
+                data::Credentials{tempPasswordData.login, tempPasswordData.password},
+                tempPasswordData);
+            return nx::sql::DBResult::ok;
+        },
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement()](auto...)
+        {
+        });
 }
 
 void TemporaryAccountPasswordManager::updateCredentialsInCache(

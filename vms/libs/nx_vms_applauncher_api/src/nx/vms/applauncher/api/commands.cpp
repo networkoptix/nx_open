@@ -7,12 +7,6 @@
 namespace applauncher {
 namespace api {
 
-namespace {
-
-static const auto kLogTag = nx::utils::log::Tag(QString("applauncher::api"));
-
-} // namespace
-
 ResultType::Value sendCommandToApplauncher(
     const BaseTask& commandToSend,
     Response* const response,
@@ -23,7 +17,7 @@ ResultType::Value sendCommandToApplauncher(
     SystemError::ErrorCode resultCode = sock.connectToServerSync(pipeName);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(kLogTag, lm("Failed to connect to local server %1. %2").args(
+        NX_WARNING(NX_SCOPE_TAG, lm("Failed to connect to local server %1. %2").args(
             pipeName,
             SystemError::toString(resultCode)));
         return ResultType::connectError;
@@ -34,7 +28,7 @@ ResultType::Value sendCommandToApplauncher(
     resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(kLogTag, lm("Failed to send launch task to local server %1. %2").args(
+        NX_WARNING(NX_SCOPE_TAG, lm("Failed to send launch task to local server %1. %2").args(
             launcherPipeName(),
             SystemError::toString(resultCode)));
         return ResultType::connectError;
@@ -45,7 +39,7 @@ ResultType::Value sendCommandToApplauncher(
     resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(kLogTag, lm("Failed to read response from local server %1. %2").args(
+        NX_WARNING(NX_SCOPE_TAG, lm("Failed to read response from local server %1. %2").args(
             launcherPipeName(),
             SystemError::toString(resultCode)));
         return ResultType::connectError;

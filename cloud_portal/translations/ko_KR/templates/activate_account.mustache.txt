@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+안녕하세요 {{message.userFullName}},
 
   아래 버튼을 클릭하여 이메일 주소를 확인하고 계정을 활성화하십시오.
 

@@ -4,7 +4,7 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 QnTimePeriodList toTimePeriodList(
@@ -25,5 +25,5 @@ QnTimePeriodList mergeOverlappedChunks(
     const nx::core::resource::OverlappedRemoteChunks& chunks);
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

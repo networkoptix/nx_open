@@ -35,7 +35,6 @@ bool QnAbstractVideoDecoder::isHardwareAccelerationEnabled() const
     return m_hardwareAccelerationEnabled;
 }
 
-
 DecoderConfig DecoderConfig::fromMediaResource(QnMediaResourcePtr resource)
 {
     return fromResource(resource->toResource()->toSharedPointer());
@@ -46,8 +45,8 @@ DecoderConfig DecoderConfig::fromResource(QnResourcePtr resource)
     DecoderConfig config;
     if (auto cameraResource = resource.dynamicCast<QnSecurityCamResource>())
     {
-        config.disabledCodecsForMtDecoding =
-            cameraResource->resourceData().value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
+        config.disabledCodecsForMtDecoding = cameraResource->resourceData().value<QList<QString>>(
+            ResourceDataKey::kDisableMultiThreadDecoding);
     }
     return config;
 }

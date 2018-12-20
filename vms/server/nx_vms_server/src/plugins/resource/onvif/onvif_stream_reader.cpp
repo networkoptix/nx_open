@@ -94,10 +94,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     postStreamConfigureHook();
 
     auto resData = m_onvifRes->resourceData();
-    if (resData.contains(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME))
+    if (resData.contains(ResourceDataKey::kPreferredAuthScheme))
     {
         auto authScheme = nx::network::http::header::AuthScheme::fromString(
-            resData.value<QString>(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME)
+            resData.value<QString>(ResourceDataKey::kPreferredAuthScheme)
                 .toLatin1()
                 .constData());
 
@@ -307,7 +307,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     auto resData = m_onvifRes->resourceData();
 
     auto requests = resData.value<QnHttpConfigureRequestList>(
-        Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
+        ResourceDataKey::kPreStreamConfigureRequests);
 
     if (requests.empty())
         return true;
@@ -534,8 +534,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
         return CameraDiagnostics::ServerTerminatedResult();
 
     auto resData = m_onvifRes->resourceData();
-    bool useExistingProfiles = resData.value<bool>(
-        Qn::USE_EXISTING_ONVIF_PROFILES_PARAM_NAME);
+    auto useExistingProfiles = resData.value<bool>(
+        ResourceDataKey::kUseExistingOnvifProfiles);
 
     Media::Profiles profiles(m_onvifRes);
     profiles.receiveBySoap();

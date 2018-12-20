@@ -2,6 +2,7 @@
 #include "ptz_rotation_migration_structs.h"
 
 #include <nx/utils/std/optional.h>
+#include <nx/utils/log/log.h>
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -49,7 +50,7 @@ std::optional<QString> convertPresets(const QString& oldSerializedPresets)
 
 } // namespace
 
-bool addRotationToPresets(QSqlDatabase& database)
+bool addRotationToPresets(const nx::utils::log::Tag& logTag, QSqlDatabase& database)
 {
     static const QString kPresetQuery = lm("SELECT id, value FROM vms_kvpair WHERE name='%1'")
         .arg(kPresetsPropertyKey);
@@ -64,11 +65,20 @@ bool addRotationToPresets(QSqlDatabase& database)
         const auto id = presetQuery.value(0).toString();
         auto serializedPresets = presetQuery.value(1).toString();
 
-        const auto convertedPresets = convertPresets(serializedPresets);
-        if (convertedPresets == std::nullopt)
-            return false;
-
-        presetRecords[id] = *convertedPresets;
+        if (const auto convertedPresets = convertPresets(serializedPresets))
+        {
+            presetRecords[id] = *convertedPresets;
+        }
+        else
+        {
+            const auto defaultValue = QJson::serialized(QnPtzPresetRecordHash());
+            presetRecords[id] = defaultValue;
+            NX_WARNING(
+                logTag,
+                lm("Unable to deserialize a preset record while executing migration, "
+                    "setting a default value (%1) to the property %2. The old value: %3")
+                    .args(defaultValue, kPresetsPropertyKey, serializedPresets));
+        }
     }
 
     QSqlQuery updatePresetsQuery(database);

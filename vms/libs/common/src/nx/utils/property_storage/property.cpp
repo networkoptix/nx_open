@@ -7,11 +7,13 @@ namespace nx::utils::property_storage {
 BaseProperty::BaseProperty(
     Storage* storage,
     const QString& name,
-    const QString& description)
+    const QString& description,
+    bool secure)
     :
     storage(storage),
     name(name),
-    description(description)
+    description(description),
+    secure(secure)
 {
     storage->registerProperty(this);
 }
@@ -19,11 +21,6 @@ BaseProperty::BaseProperty(
 void BaseProperty::notify()
 {
     emit changed(this);
-}
-
-void BaseProperty::save(const QString& value)
-{
-    storage->writeValue(name, value);
 }
 
 } // namespace nx::utils::property_storage

@@ -2,7 +2,7 @@ import nx.mediaserver.interactive_settings 1.0
 
 Settings
 {
-    readonly property var _serialized:
+    readonly property var _serializedModel:
     {
         "type": "Settings",
         "items": [
@@ -12,7 +12,6 @@ Settings
                 "caption": "Text Field",
                 "description": "A text field",
                 "defaultValue": "a text",
-                "value": "a text"
             },
             {
                 "type": "GroupBox",
@@ -22,7 +21,6 @@ Settings
                         "type": "SpinBox",
                         "name": "number",
                         "defaultValue": 42,
-                        "value": 42,
                         "minValue": 0,
                         "maxValue": 100
                     },
@@ -30,7 +28,6 @@ Settings
                         "type": "DoubleSpinBox",
                         "name": "double",
                         "defaultValue": 3.1415,
-                        "value": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
@@ -38,7 +35,6 @@ Settings
                         "type": "ComboBox",
                         "name": "combobox",
                         "defaultValue": "value2",
-                        "value": "value2",
                         "range": ["value1", "value2", "value3"]
                     },
                     {
@@ -52,8 +48,7 @@ Settings
                             {
                                 "type": "CheckBox",
                                 "name": "checkbox",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             }
                         ]
                     }

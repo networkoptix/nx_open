@@ -274,8 +274,9 @@ void BasicTestFixture::startExchangingFixedData()
     QnMutexLocker lock(&m_mutex);
 
     m_httpClients.push_back(std::make_unique<nx::network::http::AsyncClient>());
-    m_httpClients.back()->setSendTimeout(std::chrono::seconds::zero());
-    m_httpClients.back()->setResponseReadTimeout(std::chrono::seconds::zero());
+    m_httpClients.back()->setSendTimeout(kNoTimeout);
+    m_httpClients.back()->setResponseReadTimeout(kNoTimeout);
+    m_httpClients.back()->setMessageBodyReadTimeout(kNoTimeout);
 
     ++m_unfinishedRequestsLeft;
 

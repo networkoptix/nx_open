@@ -66,7 +66,7 @@ public:
     virtual QnAspectRatio aspectRatio() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
-    // nx::mediaserver::resource::Camera, as soon as QnLiveStreamProvider moved into nx::mediaserver.
+    // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
 
     /** @return true if mediaStreamInfo differs from existing and has been saved. */
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
@@ -75,7 +75,7 @@ public:
     /** @return true if bitrateInfo.encoderIndex is not already saved. */
     bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
 
-    // TODO: Move to nx::mediaserver::resource::Camera, it should be used only on server cameras!
+    // TODO: Move to nx::vms::server::resource::Camera, it should be used only on server cameras!
     /**
      * Returns advanced live stream parameters. These parameters are configured on advanced tab.
      * For primary stream this parameters are merged with parameters on record schedule.

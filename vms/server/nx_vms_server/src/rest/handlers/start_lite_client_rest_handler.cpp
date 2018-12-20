@@ -23,7 +23,7 @@ static const char* const kScriptName = "start_lite_client";
 } // namespace
 
 QnStartLiteClientRestHandler::QnStartLiteClientRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

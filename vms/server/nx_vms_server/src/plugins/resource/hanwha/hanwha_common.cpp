@@ -2,18 +2,12 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_core::plugins, HanwhaDeviceType,
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::unknown, "Unknown")
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::nwc, "NWC")
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::nvr, "NVR")
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::dvr, "DVR")
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::encoder, "Encoder")
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::decoder, "Decoder")
-    (nx::mediaserver_core::plugins::HanwhaDeviceType::hybrid, "Hybrid")
-);
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_core::plugins, HanwhaBypassSupportType,
-    (nx::mediaserver_core::plugins::HanwhaBypassSupportType::normal, "normal")
-    (nx::mediaserver_core::plugins::HanwhaBypassSupportType::forced, "forced")
-    (nx::mediaserver_core::plugins::HanwhaBypassSupportType::disabled, "disabled")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::plugins, HanwhaDeviceType,
+    (nx::vms::server::plugins::HanwhaDeviceType::unknown, "Unknown")
+    (nx::vms::server::plugins::HanwhaDeviceType::nwc, "NWC")
+    (nx::vms::server::plugins::HanwhaDeviceType::nvr, "NVR")
+    (nx::vms::server::plugins::HanwhaDeviceType::dvr, "DVR")
+    (nx::vms::server::plugins::HanwhaDeviceType::encoder, "Encoder")
+    (nx::vms::server::plugins::HanwhaDeviceType::decoder, "Decoder")
+    (nx::vms::server::plugins::HanwhaDeviceType::hybrid, "Hybrid")
 );

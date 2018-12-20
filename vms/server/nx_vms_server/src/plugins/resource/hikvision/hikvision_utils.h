@@ -16,7 +16,7 @@ extern "C" {
 #include <common/common_globals.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
@@ -198,5 +198,5 @@ bool responseIsOk(const boost::optional<CommonResponse>& response);
 
 } // namespace hikvision
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

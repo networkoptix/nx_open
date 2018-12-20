@@ -11,7 +11,7 @@
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_math.h>
 #include <core/ptz/ptz_object.h>
-#include <core/ptz/ptz_auxilary_trait.h>
+#include <core/ptz/ptz_auxiliary_trait.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
@@ -374,12 +374,12 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool getHomeObject(QnPtzObject* homeObject) const = 0;
 
-    virtual bool getAuxilaryTraits(
-        QnPtzAuxilaryTraitList* auxilaryTraits,
+    virtual bool getAuxiliaryTraits(
+        QnPtzAuxiliaryTraitList* auxiliaryTraits,
         const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const = 0;
 
-    virtual bool runAuxilaryCommand(
-        const QnPtzAuxilaryTrait& trait,
+    virtual bool runAuxiliaryCommand(
+        const QnPtzAuxiliaryTrait& trait,
         const QString& data,
         const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 

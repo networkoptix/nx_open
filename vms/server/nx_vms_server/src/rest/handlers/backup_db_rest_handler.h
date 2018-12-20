@@ -1,9 +1,9 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
-class QnBackupDbRestHandler: public QnJsonRestHandler, public nx::mediaserver::ServerModuleAware
+class QnBackupDbRestHandler: public QnJsonRestHandler, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

@@ -322,7 +322,12 @@ QByteArray QnTCPConnectionProcessor::createResponse(
         copyAndReplaceHeader(&d->request.headers, &d->response.headers, "CSeq");
 
     // this header required to perform new HTTP requests if server port has been on the fly changed
-    nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
+    if (d->response.headers.find("Access-Control-Allow-Origin") == d->response.headers.end())
+    {
+        nx::network::http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx::network::http::HttpHeader("Access-Control-Allow-Origin", "*"));
+    }
 
     if (d->chunkedMode)
         nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Transfer-Encoding", "chunked" ) );

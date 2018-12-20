@@ -354,24 +354,24 @@ bool QnThreadedPtzController::getHomeObject(
         &result);
 }
 
-bool QnThreadedPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* /*traits*/,
+bool QnThreadedPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* /*traits*/,
     const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QnPtzAuxilaryTraitList,
-        result, getAuxilaryTraits, options, &result, options);
+    RUN_COMMAND(Qn::GetAuxiliaryTraitsPtzCommand, QnPtzAuxiliaryTraitList,
+        result, getAuxiliaryTraits, options, &result, options);
 }
 
-bool QnThreadedPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool QnThreadedPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
     RUN_COMMAND(
-        Qn::RunAuxilaryCommandPtzCommand,
+        Qn::RunAuxiliaryCommandPtzCommand,
         void*,
         trait,
-        runAuxilaryCommand,
+        runAuxiliaryCommand,
         options,
         trait,
         data,

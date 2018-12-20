@@ -1,6 +1,8 @@
 #include "event_search_list_model.h"
 #include "private/event_search_list_model_p.h"
 
+#include <ui/workbench/workbench_access_controller.h>
+
 namespace nx::vms::client::desktop {
 
 EventSearchListModel::EventSearchListModel(QnWorkbenchContext* context, QObject* parent):
@@ -35,6 +37,11 @@ bool EventSearchListModel::isConstrained() const
 {
     return selectedEventType() != vms::api::undefinedEvent
         || base_type::isConstrained();
+}
+
+bool EventSearchListModel::hasAccessRights() const
+{
+    return accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 } // namespace nx::vms::client::desktop

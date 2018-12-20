@@ -26,7 +26,7 @@ enum class Parameter
     roleName,
 };
 
-using Matches = std::map<Parameter, QString>;
+using Matches = QMap<QString, QList<Parameter>>;
 
 /**
  * Check if search string allows to make a search.
@@ -39,8 +39,13 @@ bool isSearchStringValid(const QString& searchString);
 bool matches(const QString& searchString, const QnResourcePtr& resource);
 
 /**
- * Map of resource parameters, matching given search string, to their actual value.
+ * List of unique words from given string (case insensitive).
  */
-Matches matchValues(const QString& searchString,const QnResourcePtr& resource);
+QStringList uniqueSearchWords(const QString& searchString);
+
+/**
+ * Map that contains list of matching resource parameters for each search word (case insensitive).
+ */
+Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& resource);
 
 } // namespace nx::vms::client::desktop::resources::search_helper

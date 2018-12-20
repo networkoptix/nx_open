@@ -5,8 +5,9 @@
 #include <core/resource/resource_fwd.h>
 
 #include <core/ptz/item_dewarping_params.h>
-
 #include <transcoding/timestamp_params.h>
+
+#include <nx/core/watermark/watermark.h>
 
 #include <utils/common/aspect_ratio.h>
 #include <utils/color_space/image_correction.h>
@@ -25,6 +26,7 @@ struct LegacyTranscodingSettings
     QnItemDewarpingParams itemDewarpingParams;
     ImageCorrectionParams contrastParams;
     QnTimeStampParams timestampParams;
+    Watermark watermark;
 
     bool isEmpty() const;
 };

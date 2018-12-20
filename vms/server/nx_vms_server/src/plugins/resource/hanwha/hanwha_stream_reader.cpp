@@ -16,7 +16,7 @@
 #include <utils/common/util.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -138,6 +138,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
         return CameraDiagnostics::NoErrorResult();
 
     m_hanwhaResource->beforeConfigureStream(getRole());
+
     auto response = helper.update(lit("media/videoprofile"), profileParameters);
     if (!response.isSuccessful() && response.errorCode() == kHanwhaInvalidParameterHttpCode)
     {
@@ -267,15 +268,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 
 QString HanwhaStreamReader::rtpTransport() const
 {
-    QString transportStr = m_hanwhaResource
-        ->getProperty(QnMediaResource::rtpTransportKey())
-            .toUpper()
-            .trimmed();
-
-    if (transportStr == RtpTransport::udp)
-        return kHanwhaUdp;
-
-    return kHanwhaTcp;
+    return toString(m_rtpReader.getRtpTransport());
 }
 
 void HanwhaStreamReader::setPositionUsec(qint64 value)
@@ -435,5 +428,5 @@ QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

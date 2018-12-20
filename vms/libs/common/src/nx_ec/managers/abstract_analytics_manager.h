@@ -29,9 +29,9 @@ signals:
 using AbstractAnalyticsNotificationManagerPtr =
     std::shared_ptr<AbstractAnalyticsNotificationManager>;
 
-/*!
-\note All methods are asynchronous if other not specified
-*/
+/**
+ * NOTE: All methods are asynchronous, unless specified otherwise.
+ */
 class AbstractAnalyticsManager
 {
 public:
@@ -135,8 +135,6 @@ public:
                 this->save(engine, handler);
             });
     }
-
-    // TODO: #dmishin add methods to save and remove lists of pluigns and engines.
 
     /**
      * @param handler Functor with params: (ErrorCode)

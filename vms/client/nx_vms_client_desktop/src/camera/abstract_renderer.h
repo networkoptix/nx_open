@@ -94,8 +94,8 @@ public:
 
     //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
     virtual std::chrono::microseconds getTimestampOfNextFrameToRender(int channelNumber) const = 0;
-    virtual void blockTimeValue(int channelNumber, std::chrono::microseconds timestamp) const = 0;
-    virtual void unblockTimeValue(int channelNumber) const = 0;
+    virtual void blockTimeValue(int channelNumber, std::chrono::microseconds timestamp) = 0;
+    virtual void unblockTimeValue(int channelNumber) = 0;
     virtual bool isTimeBlocked(int channelNumber) const = 0;
     virtual bool isDisplaying(const QSharedPointer<CLVideoDecoderOutput>& image) const = 0;
 

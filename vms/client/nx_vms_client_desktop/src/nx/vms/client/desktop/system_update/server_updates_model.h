@@ -11,42 +11,14 @@
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <update/updates_common.h>
-
 #include <nx/update/common_update_manager.h>
+#include "peer_state_tracker.h"
 
 namespace nx::vms::client::desktop {
 
-using StatusCode = nx::update::Status::Code;
-
-// This structure keeps all the information necessary to display current state of the server.
-struct UpdateItem
-{
-    enum Roles
-    {
-        UpdateItemRole = Qn::RoleCount,
-    };
-
-    QnMediaServerResourcePtr server;
-    StatusCode state = StatusCode::offline;
-    int progress = -1;
-    QString statusMessage;
-
-    // Flag for servers, that can be updated using legacy 3.2 system
-    bool onlyLegacyUpdate = false;
-    bool legacyUpdateUsed = false;
-    bool offline = false;
-    bool skipped = false;
-    bool installed = false;
-    bool changedProtocol = false;
-    bool installing = false;
-    bool storeUpdates = true;
-    // Row in the table
-    int row = -1;
-};
-
-using UpdateItemPtr = std::shared_ptr<UpdateItem>;
-
-// Model class to represent update states of the server
+/**
+ * Represents current update status of the servers. Used to display servers table widget.
+ */
 class ServerUpdatesModel : public Customized<QAbstractTableModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -66,58 +38,65 @@ public:
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject* parent);
+    enum Roles
+    {
+        UpdateItemRole = Qn::RoleCount,
+    };
+
+    explicit ServerUpdatesModel(
+        std::shared_ptr<PeerStateTracker> tracker,
+        QObject* parent);
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);
 
-    UpdateItemPtr findItemById(QnUuid id);
-    UpdateItemPtr findItemByRow(int row) const;
-
-    void setServersInstalling(QSet<QnUuid> targets, bool installing = true);
-
     // Overrides for QAbstractTableModel
-    int columnCount(const QModelIndex& parent) const override;
-    int rowCount(const QModelIndex& parent) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    QVariant data(const QModelIndex& index, int role) const override;
+    virtual int columnCount(const QModelIndex& parent) const override;
+    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
     // Need this to allow delegate to spawn editor
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
 
-    nx::utils::SoftwareVersion lowestInstalledVersion();
-
     // Clears internal state back to initial state
     void clearState();
 
-    // Called by rest api handler
-    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
-
-    // Set resource pool to be used as a source.
-    void setResourceFeed(QnResourcePool* pool);
-
-    const QList<UpdateItemPtr>& getServerData() const;
-
 private:
-    void resetResourses(QnResourcePool* pool);
     void updateVersionColumn();
-    void updateContentsIndex();
-    void addItemForServer(QnMediaServerResourcePtr server);
 
 private:
-    void at_resourceAdded(const QnResourcePtr& resource);
-    void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void atItemChanged(UpdateItemPtr item);
+    void atItemAdded(UpdateItemPtr item);
+    void atItemRemoved(UpdateItemPtr item);
 
     // Reads data from resource to UpdateItem
     void updateServerData(QnMediaServerResourcePtr server, UpdateItem& item);
+    void updateClientData();
 
 private:
-    QList<UpdateItemPtr> m_items;
+    std::shared_ptr<PeerStateTracker> m_tracker;
     // The version we want to update to
     nx::utils::SoftwareVersion m_targetVersion;
     QnServerUpdatesColors m_versionColors;
+};
+
+class SortedPeerUpdatesModel:
+    public QSortFilterProxyModel
+{
+    Q_OBJECT
+
+public:
+    explicit SortedPeerUpdatesModel(QObject* parent = 0);
+    void setShowClients(bool show);
+
+protected:
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+
+private:
+    bool m_showClients = false;
 };
 
 } // namespace nx::vms::client::desktop

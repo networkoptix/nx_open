@@ -41,20 +41,24 @@ std::unique_ptr<QCommandLineParser> fillConfig(QCoreApplication& app)
 
 int main(int argc, char** argv)
 {
-#ifndef ENABLE_CLOUD_TEST
-    QCoreApplication app(argc, argv);
-    auto parser = fillConfig(app);
-#else
-    QStringList arguments;
-    for (int i = 0; i < argc; ++i)
-        arguments.push_back(QString::fromUtf8(argv[i]));
-    auto parser = fillConfig(arguments);
-#endif
-    QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
+    #ifndef ENABLE_CLOUD_TEST
+        QCoreApplication app(argc, argv);
+        auto parser = fillConfig(app);
+    #else
+        QStringList arguments;
+        for (int i = 0; i < argc; ++i)
+            arguments.push_back(QString::fromUtf8(argv[i]));
+        auto parser = fillConfig(arguments);
+    #endif
+
+    std::unique_ptr<QnStaticCommonModule> staticCommonModule;
     int result = nx::network::test::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser& /*args*/)
+        [&staticCommonModule](const nx::utils::ArgumentParser& /*args*/)
         {
+            staticCommonModule = std::make_unique<QnStaticCommonModule>(
+                nx::vms::api::PeerType::server);
+
             return nx::utils::test::DeinitFunctions();
         });
     if (parser->isSet("help"))

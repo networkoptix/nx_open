@@ -16,6 +16,8 @@ Item
         ? resourceHelper.fisheyeParams.viewMode
         : MediaDewarpingParams.Horizontal
 
+    readonly property rect videoRect: Qt.rect(video.x, video.y, video.width, video.height)
+
     signal clicked()
 
     function clear()

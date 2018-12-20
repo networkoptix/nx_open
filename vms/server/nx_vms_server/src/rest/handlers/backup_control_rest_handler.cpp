@@ -6,7 +6,7 @@
 #include "recorder/storage_manager.h"
 
 QnBackupControlRestHandler::QnBackupControlRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

@@ -133,18 +133,18 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject* homeObject) const
     return true;
 }
 
-bool QnCachingPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool QnCachingPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const nx::core::ptz::Options& options) const
 {
-    if (!base_type::getAuxilaryTraits(auxilaryTraits, options))
+    if (!base_type::getAuxiliaryTraits(auxiliaryTraits, options))
         return false;
 
     const QnMutexLocker locker(&m_mutex);
-    if (!m_data.fields.testFlag(Qn::AuxilaryTraitsPtzField))
+    if (!m_data.fields.testFlag(Qn::AuxiliaryTraitsPtzField))
         return false;
 
-    *auxilaryTraits = m_data.auxilaryTraits;
+    *auxiliaryTraits = m_data.auxiliaryTraits;
     return true;
 }
 
@@ -255,8 +255,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::GetHomeObjectPtzCommand:
             changedFields |= updateCacheLocked(Qn::HomeObjectPtzField, &QnPtzData::homeObject, data);
             break;
-        case Qn::GetAuxilaryTraitsPtzCommand:
-            changedFields |= updateCacheLocked(Qn::AuxilaryTraitsPtzField, &QnPtzData::auxilaryTraits, data);
+        case Qn::GetAuxiliaryTraitsPtzCommand:
+            changedFields |= updateCacheLocked(Qn::AuxiliaryTraitsPtzField, &QnPtzData::auxiliaryTraits, data);
             break;
         case Qn::GetDataPtzCommand:
             changedFields |= updateCacheLocked(data.value<QnPtzData>());
@@ -336,7 +336,7 @@ Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(const QnPtzData &dat
     if (fields & Qn::ToursPtzField)          changedFields |= updateCacheLocked(Qn::ToursPtzField,           &QnPtzData::tours,          data.tours);
     if (fields & Qn::ActiveObjectPtzField)   changedFields |= updateCacheLocked(Qn::ActiveObjectPtzField,    &QnPtzData::activeObject,   data.activeObject);
     if (fields & Qn::HomeObjectPtzField)     changedFields |= updateCacheLocked(Qn::HomeObjectPtzField,      &QnPtzData::homeObject,     data.homeObject);
-    if (fields & Qn::AuxilaryTraitsPtzField) changedFields |= updateCacheLocked(Qn::AuxilaryTraitsPtzField,  &QnPtzData::auxilaryTraits, data.auxilaryTraits);
+    if (fields & Qn::AuxiliaryTraitsPtzField) changedFields |= updateCacheLocked(Qn::AuxiliaryTraitsPtzField,  &QnPtzData::auxiliaryTraits, data.auxiliaryTraits);
 
     return changedFields;
 }

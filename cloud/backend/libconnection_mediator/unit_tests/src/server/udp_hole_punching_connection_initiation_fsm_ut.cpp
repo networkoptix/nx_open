@@ -57,6 +57,8 @@ private:
 
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
+
 using TestServerConnection = TestTcpConnection;
 
 class UDPHolePunchingConnectionInitiationFsm:
@@ -85,8 +87,6 @@ public:
 
     void initializeConnectSessionFsm()
     {
-        using namespace std::placeholders;
-
         if (!m_programArguments.args().empty())
             m_settings.load(m_programArguments.argc(), (const char**) m_programArguments.argv());
 
@@ -99,7 +99,7 @@ public:
         m_connectSessionFsm = std::make_unique<hpm::UDPHolePunchingConnectionInitiationFsm>(
             m_connectSessionId,
             listeningPeerData,
-            std::bind(&UDPHolePunchingConnectionInitiationFsm::connectFsmFinished, this, _1),
+            [this](auto&&... args) { connectFsmFinished(std::move(args)...); },
             m_settings,
             m_relayClusterClient.get());
     }
@@ -111,6 +111,14 @@ protected:
             std::make_shared<TestConnection<nx::network::UDPSocket>>();
 
         whenIssueConnectRequest();
+    }
+
+    void givenSessionConnectedThroughTcp()
+    {
+        whenIssueConnectRequestOverTcp();
+
+        thenConnectResultIsReported();
+        andConnectionResultIsSuccess();
     }
 
     void whenIssueConnectRequestOverTcp()
@@ -174,6 +182,14 @@ protected:
         static_cast<TestRelayClusterClient*>(m_relayClusterClient.get())->reportFailure();
     }
 
+    void whenConnectSessionResultIsReceived()
+    {
+        m_connectResultRequest.resultCode = api::NatTraversalResultCode::endpointVerificationFailure;
+        m_connectSessionFsm->onConnectionResultRequest(
+            m_connectResultRequest,
+            [this](auto&&... args) { saveConnectResultResponse(std::move(args)...); });
+    }
+
     void thenConnectSessionFsmShouldBeTerminatedProperly()
     {
         m_fsmFinishedPromise.get_future().wait();
@@ -210,6 +226,18 @@ protected:
         // TODO
     }
 
+    void thenConnectSessionResultResponseIsSuccess()
+    {
+        ASSERT_EQ(api::ResultCode::ok, m_saveConnectResultResponseQueue.pop());
+    }
+
+    void andConnectSessionResultCodeIsAvailableInSessionStatistics()
+    {
+        ASSERT_EQ(
+            m_connectResultRequest.resultCode,
+            m_connectSessionFsm->statisticsInfo().resultCode);
+    }
+
     void setSetting(const char* name, std::chrono::milliseconds timeout)
     {
         m_programArguments.addArg(
@@ -244,6 +272,8 @@ private:
     nx::utils::promise<void> m_fsmFinishedPromise;
     nx::utils::SyncQueue<ConnectResult> m_connectResponseQueue;
     boost::optional<ConnectResult> m_prevConnectResult;
+    api::ConnectionResultRequest m_connectResultRequest;
+    nx::utils::SyncQueue<api::ResultCode> m_saveConnectResultResponseQueue;
     QString m_listeningPeerFullName;
     std::vector<const char*> m_args;
     nx::utils::test::ProgramArguments m_programArguments;
@@ -257,6 +287,11 @@ private:
     void saveConnectResponse(api::ResultCode result, api::ConnectResponse response)
     {
         m_connectResponseQueue.push(std::make_tuple(result, std::move(response)));
+    }
+
+    void saveConnectResultResponse(api::ResultCode resultCode)
+    {
+        m_saveConnectResultResponseQueue.push(resultCode);
     }
 };
 
@@ -315,6 +350,18 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
     thenConnectResultIsReported();
     andConnectionResultIsSuccess();
     andResponseContainsRelayInfo();
+}
+
+TEST_F(
+    UDPHolePunchingConnectionInitiationFsm,
+    connect_session_result_is_properly_recorded_for_session_connected_through_tcp)
+{
+    givenSessionConnectedThroughTcp();
+
+    whenConnectSessionResultIsReceived();
+
+    thenConnectSessionResultResponseIsSuccess();
+    andConnectSessionResultCodeIsAvailableInSessionStatistics();
 }
 
 } // namespace test

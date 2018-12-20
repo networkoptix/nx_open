@@ -23,16 +23,19 @@
 
 namespace nx::vms::client::desktop {
 
-namespace
-{
-    static const QMargins kMinIndicationMargins(4, 2, 4, 2);
+namespace {
 
-    // Default size must be big enough to avoid layout flickering.
-    static const QSize kDefaultThumbnailSize(1920, 1080);
-}
+static const QMargins kMinIndicationMargins(4, 2, 4, 2);
 
-/* BusyIndicatorWidget draws dots snapped to the pixel grid.
- * This descendant when it is downscaled draws dots generally not snapped. */
+// Default size must be big enough to avoid layout flickering.
+static constexpr QSize kDefaultThumbnailSize(1920, 1080);
+
+static constexpr bool kShowBusyIndicatorInInitialState = true;
+
+} // namespace
+
+// BusyIndicatorWidget draws dots snapped to the pixel grid.
+// This descendant when it is downscaled draws dots generally not snapped.
 class QnAutoscaledBusyIndicatorWidget: public BusyIndicatorWidget
 {
     using base_type = BusyIndicatorWidget;
@@ -401,7 +404,15 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
                 }
                 break;
 
-            default:
+            case Qn::ThumbnailStatus::Refreshing:
+                break;
+
+            case Qn::ThumbnailStatus::Invalid:
+                m_placeholder->hide();
+                m_indicator->setVisible(kShowBusyIndicatorInInitialState);
+                break;
+
+            case Qn::ThumbnailStatus::NoData:
                 m_placeholder->show();
                 m_indicator->hide();
                 break;

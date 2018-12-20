@@ -110,7 +110,7 @@ void HttpView::registerApiHandlers(
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine,
+    clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine,
     MaintenanceManager* const maintenanceManager,
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)

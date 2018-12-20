@@ -4,7 +4,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QJsonObject>
 
-#include <nx/vms/api/analytics/translatable_string.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
@@ -14,6 +13,7 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API PluginManifest
 {
     Q_GADGET
+
 public: //< Required for Qt MOC run.
     QString id;
     QString name;

@@ -1,6 +1,6 @@
 #pragma once
 
-class QString;
+#include <QtCore/QString>
 
 namespace Nx1 {
 

@@ -18,7 +18,7 @@ class Ping:
     public FiniteMsgBodyHttpHandler<void, api::ModuleInfo>
 {
 public:
-    static const QString kHandlerPath;
+    static const char* kHandlerPath;
 
     Ping(const SecurityManager& securityManager):
         FiniteMsgBodyHttpHandler<void, api::ModuleInfo>(

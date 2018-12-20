@@ -275,12 +275,13 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTex
         UpdateStatus status = updateValue(id, value);
         if(status == Failed) {
             if(errorStream) {
-                QString message = lit("Invalid value for '%1' argument - expected %2, provided '%3'.").
-                    arg(name).
-                    arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::UnknownType)))).
-                    arg(value.toString());
+                *errorStream
+                    << lm("Invalid value for '%1' argument - expected %2, provided '%3'.").args(
+                        name,
+                        QMetaType::typeName(m_typeById.value(id, QMetaType::UnknownType)),
+                        value.toString())
+                    << endl;
 
-                *errorStream << message << endl;
             }
             result = false;
         }

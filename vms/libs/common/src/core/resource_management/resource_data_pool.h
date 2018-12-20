@@ -6,6 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/software_version.h>
 
 class QnResourceDataPool: public QObject
 {
@@ -29,6 +30,7 @@ public:
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
+    static nx::utils::SoftwareVersion getVersion(const QByteArray& data);
     bool validateData(const QByteArray& data) const;
     bool loadFile(const QString &fileName);
     bool loadData(const QByteArray& data);

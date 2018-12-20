@@ -7,15 +7,14 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/common_settings.h>
-#include <nx/sdk/analytics/common_metadata_types.h>
+#include <nx/sdk/common/string_map.h>
+#include <nx/sdk/analytics/common/metadata_types.h>
 
-#include <nx/sdk/analytics/engine.h>
-#include <nx/sdk/analytics/consuming_device_agent.h>
-#include <nx/sdk/analytics/uncompressed_video_frame.h>
-#include <nx/sdk/analytics/compressed_video_packet.h>
-#include <nx/sdk/analytics/engine.h>
-#include <nx/sdk/analytics/plugin.h>
+#include <nx/sdk/analytics/i_consuming_device_agent.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/analytics/i_plugin.h>
 
 extern "C" {
 
@@ -38,7 +37,7 @@ static std::string trimString(const std::string& s)
 
 static const int noError = (int) nx::sdk::Error::noError;
 
-static void testEngineManifest(nx::sdk::analytics::Engine* engine)
+static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
     nxpt::ScopedRef<const nx::sdk::IString> manifest(
@@ -60,7 +59,7 @@ static void testEngineManifest(nx::sdk::analytics::Engine* engine)
     ASSERT_EQ(std::string::npos, std::string(manifestStr).find("needUncompressedVideoFrames"));
 }
 
-static void testDeviceAgentManifest(nx::sdk::analytics::DeviceAgent* deviceAgent)
+static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
     nxpt::ScopedRef<const nx::sdk::IString> manifest(
@@ -78,21 +77,21 @@ static void testDeviceAgentManifest(nx::sdk::analytics::DeviceAgent* deviceAgent
     ASSERT_EQ('}', trimmedDeviceAgentManifest.back());
 }
 
-static void testEngineSettings(nx::sdk::analytics::Engine* plugin)
+static void testEngineSettings(nx::sdk::analytics::IEngine* plugin)
 {
-    const auto settings = new nx::sdk::CommonSettings();
-    settings->addSetting("setting1", "value1");
-    settings->addSetting("setting2", "value2");
+    const auto settings = new nx::sdk::common::StringMap();
+    settings->addItem("setting1", "value1");
+    settings->addItem("setting2", "value2");
 
     plugin->setSettings(nullptr); //< Test assigning empty settings.
     plugin->setSettings(settings); //< Test assigning some settings.
 }
 
-static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent)
+static void testDeviceAgentSettings(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
-    const auto settings = new nx::sdk::CommonSettings();
-    settings->addSetting("setting1", "value1");
-    settings->addSetting("setting2", "value2");
+    const auto settings = new nx::sdk::common::StringMap();
+    settings->addItem("setting1", "value1");
+    settings->addItem("setting2", "value2");
 
     deviceAgent->setSettings(nullptr); //< Test assigning empty settings.
     deviceAgent->setSettings(settings); //< Test assigning some settings.
@@ -102,7 +101,7 @@ class Action: public nx::sdk::analytics::Action
 {
 public:
     Action():
-        m_params(new nx::sdk::CommonSettings())
+        m_params(new nx::sdk::common::StringMap())
     {
     }
 
@@ -120,7 +119,7 @@ public:
     virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nx::sdk::Settings* params() override
+    virtual const nx::sdk::IStringMap* params() override
     {
         if (!m_params)
             return nullptr;
@@ -174,9 +173,9 @@ public:
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
-        m_params.reset(new nx::sdk::CommonSettings());
+        m_params.reset(new nx::sdk::common::StringMap());
         for (const auto& param: params)
-            m_params->addSetting(param.first, param.second);
+            m_params->addItem(param.first, param.second);
     }
 
 public:
@@ -189,10 +188,10 @@ public:
     bool m_expectedNonNullMessageToUser = false;
 
 private:
-    nxpt::ScopedRef<nx::sdk::CommonSettings> m_params;
+    nxpt::ScopedRef<nx::sdk::common::StringMap> m_params;
 };
 
-static void testExecuteActionNonExisting(nx::sdk::analytics::Engine* plugin)
+static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
 {
     Action action;
     action.m_actionId = "non_existing_actionId";
@@ -203,7 +202,7 @@ static void testExecuteActionNonExisting(nx::sdk::analytics::Engine* plugin)
     action.assertExpectedState();
 }
 
-static void testExecuteActionAddToList(nx::sdk::analytics::Engine* plugin)
+static void testExecuteActionAddToList(nx::sdk::analytics::IEngine* plugin)
 {
     Action action;
     action.m_actionId = "nx.stub.addToList";
@@ -216,7 +215,7 @@ static void testExecuteActionAddToList(nx::sdk::analytics::Engine* plugin)
     action.assertExpectedState();
 }
 
-static void testExecuteActionAddPerson(nx::sdk::analytics::Engine* plugin)
+static void testExecuteActionAddPerson(nx::sdk::analytics::IEngine* plugin)
 {
     Action action;
     action.m_actionId = "nx.stub.addPerson";
@@ -229,23 +228,42 @@ static void testExecuteActionAddPerson(nx::sdk::analytics::Engine* plugin)
     action.assertExpectedState();
 }
 
-class MetadataHandler: public nx::sdk::analytics::MetadataHandler
+class DeviceAgentHandler: public nx::sdk::analytics::IDeviceAgent::IHandler
 {
 public:
-    void handleMetadata(nx::sdk::Error error, nx::sdk::analytics::MetadataPacket* metadata) override
+    virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadata) override
     {
-        ASSERT_EQ(noError, (int) error);
         ASSERT_TRUE(metadata != nullptr);
 
-        NX_PRINT << "MetadataHandler: Received metadata packet with timestamp "
-            << metadata->timestampUsec() << " us, duration " << metadata->durationUsec() << " us";
+        NX_PRINT << "DeviceAgentHandler: Received metadata packet with timestamp "
+            << metadata->timestampUs() << " us, duration " << metadata->durationUs() << " us";
 
-        ASSERT_TRUE(metadata->durationUsec() >= 0);
-        ASSERT_TRUE(metadata->timestampUsec() >= 0);
+        ASSERT_TRUE(metadata->durationUs() >= 0);
+        ASSERT_TRUE(metadata->timestampUs() >= 0);
+    }
+
+    virtual void handlePluginEvent(nx::sdk::IPluginEvent* event) override
+    {
+        NX_PRINT << "DeviceAgentHandler: Received plugin event: "
+            << "level " << (int) event->level() << ", "
+            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
+            << "description " << nx::kit::debug::toString(event->description());
     }
 };
 
-class CompressedVideoFrame: public nx::sdk::analytics::DataPacket
+class EngineHandler: public nx::sdk::analytics::IEngine::IHandler
+{
+public:
+    virtual void handlePluginEvent(nx::sdk::IPluginEvent* event) override
+    {
+        NX_PRINT << "EngineHandler: Received plugin event: "
+            << "level " << (int) event->level() << ", "
+            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
+            << "description " << nx::kit::debug::toString(event->description());
+    }
+};
+
+class CompressedVideoFrame: public nx::sdk::analytics::IDataPacket
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -261,7 +279,7 @@ public:
     virtual unsigned int addRef() { return ++m_refCounter; }
     virtual unsigned int releaseRef() { ASSERT_TRUE(m_refCounter > 1); return --m_refCounter; }
 
-    virtual int64_t timestampUsec() const override { return /*dummy*/ 42; }
+    virtual int64_t timestampUs() const override { return /*dummy*/ 42; }
 
 private:
     int m_refCounter = 1;
@@ -275,7 +293,7 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin2) != nullptr);
     pluginObject->releaseRef();
 
-    const auto plugin = static_cast<nx::sdk::analytics::Plugin*>(
+    const auto plugin = static_cast<nx::sdk::analytics::IPlugin*>(
         pluginObject->queryInterface(nx::sdk::analytics::IID_Plugin));
     ASSERT_TRUE(plugin != nullptr);
 
@@ -283,11 +301,14 @@ TEST(stub_analytics_plugin, test)
     nxpl::PluginInterface* const engineObject = plugin->createEngine(&error);
     ASSERT_EQ(noError, (int) error);
 
-    const auto engine = static_cast<nx::sdk::analytics::Engine*>(
+    const auto engine = static_cast<nx::sdk::analytics::IEngine*>(
         engineObject->queryInterface(nx::sdk::analytics::IID_Engine));
     ASSERT_TRUE(engine != nullptr);
 
     ASSERT_EQ(plugin, engine->plugin());
+
+    EngineHandler engineHandler;
+    ASSERT_EQ(noError, (int) engine->setHandler(&engineHandler));
 
     const std::string pluginName = engine->plugin()->name();
     ASSERT_TRUE(!pluginName.empty());
@@ -307,18 +328,18 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(baseDeviceAgent != nullptr);
     ASSERT_TRUE(
         baseDeviceAgent->queryInterface(nx::sdk::analytics::IID_DeviceAgent) != nullptr);
-    auto deviceAgent = static_cast<nx::sdk::analytics::ConsumingDeviceAgent*>(
+    auto deviceAgent = static_cast<nx::sdk::analytics::IConsumingDeviceAgent*>(
         baseDeviceAgent->queryInterface(nx::sdk::analytics::IID_ConsumingDeviceAgent));
     ASSERT_TRUE(deviceAgent != nullptr);
 
     testDeviceAgentManifest(deviceAgent);
     testDeviceAgentSettings(deviceAgent);
 
-    MetadataHandler metadataHandler;
-    ASSERT_EQ(noError, (int) deviceAgent->setMetadataHandler(&metadataHandler));
+    DeviceAgentHandler deviceAgentHandler;
+    ASSERT_EQ(noError, (int) deviceAgent->setHandler(&deviceAgentHandler));
 
-    nxpt::ScopedRef<nx::sdk::analytics::CommonMetadataTypes> metadataTypes(
-        new nx::sdk::analytics::CommonMetadataTypes());
+    nxpt::ScopedRef<nx::sdk::analytics::common::MetadataTypes> metadataTypes(
+        new nx::sdk::analytics::common::MetadataTypes());
 
     ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 

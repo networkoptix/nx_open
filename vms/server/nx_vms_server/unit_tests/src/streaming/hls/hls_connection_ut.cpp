@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/mediaserver/hls/hls_server.h>
+#include <nx/vms/server/hls/hls_server.h>
 #include <network/tcp_listener.h>
 #include <nx/core/access/access_types.h>
 #include <common/common_module.h>
@@ -8,7 +8,7 @@
 #include <media_server/media_server_module.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace hls {
 namespace test {
 
@@ -162,13 +162,13 @@ TEST(HLSMimeTypes, main)
     QnMediaServerModule mediaServerModule;
     TcpListenerStub tcpListener(mediaServerModule.commonModule());
 
-    class HlsServerTest : public nx::mediaserver::hls::HttpLiveStreamingProcessor
+    class HlsServerTest : public nx::vms::server::hls::HttpLiveStreamingProcessor
     {
     public:
-        using nx::mediaserver::hls::HttpLiveStreamingProcessor::HttpLiveStreamingProcessor;
+        using nx::vms::server::hls::HttpLiveStreamingProcessor::HttpLiveStreamingProcessor;
         const char *mimeTypeByExtension(const QString& extension) const
         {
-            return nx::mediaserver::hls::HttpLiveStreamingProcessor::mimeTypeByExtension(extension);
+            return nx::vms::server::hls::HttpLiveStreamingProcessor::mimeTypeByExtension(extension);
         }
     } hlsServerTest(&mediaServerModule, std::unique_ptr<nx::network::AbstractStreamSocket>(), &tcpListener);
 
@@ -181,5 +181,5 @@ TEST(HLSMimeTypes, main)
 
 } // namespace test
 } // namespace hls
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

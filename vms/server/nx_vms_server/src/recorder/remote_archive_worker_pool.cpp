@@ -3,7 +3,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 namespace {
@@ -175,5 +175,5 @@ void RemoteArchiveWorkerPool::cleanUpUnsafe()
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

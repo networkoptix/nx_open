@@ -18,7 +18,7 @@ function(nx_target_enable_werror target werror_condition)
     endif()
 
     if(${werror_condition})
-        target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
+        target_compile_options(${target} PRIVATE -Werror)
     endif()
 endfunction()
 
@@ -166,7 +166,7 @@ function(nx_add_target name type)
                 ${CMAKE_CURRENT_SOURCE_DIR}/src
                 # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
                 # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
-                ${CMAKE_SOURCE_DIR}/nxlib/nx_fusion/src
+                ${CMAKE_SOURCE_DIR}/libs/nx_fusion/src
         )
     endif()
 

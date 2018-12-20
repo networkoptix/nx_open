@@ -20,7 +20,7 @@
 const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     Qn::directConnect(
         this, &QnResource::propertyChanged,
@@ -40,11 +40,11 @@ QString QnAdamResource::getDriverName() const
     return kManufacture;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
@@ -84,10 +84,9 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
     setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 
     setFlags(flags() | Qn::io_module);
-    setProperty(Qn::VIDEO_DISABLED_PARAM_NAME, 1);
-    setProperty(Qn::IO_CONFIG_PARAM_NAME, 1);
+    setProperty(ResourcePropertyKey::kIoConfigCapability, 1);
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -155,7 +154,7 @@ void QnAdamResource::setPortDefaultStates()
         return;
 
     auto ports = QJson::deserialized<QnIOPortDataList>(
-        getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+        getProperty(ResourcePropertyKey::kIoSettings).toUtf8());
 
     for (const auto& port: ports)
     {
@@ -229,12 +228,12 @@ bool QnAdamResource::setOutputPortState(
 
 void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
-    if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
+    if (key == ResourcePropertyKey::kIoSettings && res && !res->hasFlags(Qn::foreigner))
     {
         auto ports = ioPortDescriptions();
         setPortDefaultStates();
         setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
-        saveParams();
+        savePropertiesAsync();
     }
 }
 

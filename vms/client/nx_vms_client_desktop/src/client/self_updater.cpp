@@ -63,6 +63,27 @@ bool runMinilaucherInternal(const QStringList& args)
     return false;
 }
 
+/**
+ * Developer builds cannot be run without predefined environment on windows. We must not use these
+ * builds as url handlers or copy applauncher from them.
+ */
+bool canBeRunFromTheCurrentDirectory()
+{
+    if (!nx::utils::AppInfo::isWindows())
+        return true;
+
+    const QString binaryPath = qApp->applicationDirPath();
+    const QString qt5LibFile =
+        #if defined(_DEBUG)
+            "Qt5Cored.dll";
+        #else
+            "Qt5Core.dll";
+        #endif
+
+    // Detecting by checking if Qt5Core exists. It will give us 99% correctness.
+    return QFileInfo::exists(QDir(binaryPath).absoluteFilePath(qt5LibFile));
+}
+
 } // namespace
 
 
@@ -97,20 +118,17 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
 bool SelfUpdater::registerUriHandler()
 {
-    #if defined(Q_OS_MACX)
-        // Mac version registers itself through the Info.plist.
+    // Mac version registers itself through the Info.plist.
+    if (nx::utils::AppInfo::isMacOsX())
         return true;
-    #endif
+
+    if (!canBeRunFromTheCurrentDirectory())
+        return true;
 
     QString binaryPath = qApp->applicationFilePath();
 
     #if defined(Q_OS_LINUX)
         binaryPath = qApp->applicationDirPath() + lit("/client");
-    #endif
-
-    #if defined(_DEBUG)
-        if (m_clientVersion.build() == 0)
-            return true;
     #endif
 
     return nx::vms::utils::registerSystemUriProtocolHandler(
@@ -186,6 +204,9 @@ bool SelfUpdater::updateApplauncher()
 {
     using namespace applauncher::api;
     using namespace nx::utils::file_system;
+
+    if (!canBeRunFromTheCurrentDirectory())
+        return true;
 
     /* Check if applauncher binary exists in our installation. */
 

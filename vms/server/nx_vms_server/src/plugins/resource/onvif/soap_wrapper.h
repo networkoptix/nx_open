@@ -39,6 +39,8 @@ struct SoapTimeouts
     static constexpr int kDefaultConnectTimeoutSeconds = 10;
     static constexpr int kDefaultAcceptTimeoutSeconds = 10;
 
+    static SoapTimeouts minivalValue();
+
     SoapTimeouts() = default;
     SoapTimeouts(const QString& serialized);
     QString serialize() const;
@@ -85,7 +87,52 @@ enum class OnvifWebService { Media, Media2, Ptz, Imaging, DeviceIO };
  */
 class BaseSoapWrapper
 {
-    // TODO: move members (that are independent of BindingProxy type) here from SoapWrapper.
+public:
+    BaseSoapWrapper(
+        std::string endpoint,
+        QString login,
+        QString passwd,
+        int timeDrift)
+        :
+        m_endpointHolder(std::move(endpoint)),
+        m_endpoint(m_endpointHolder.c_str()),
+        m_login(std::move(login)),
+        m_passwd(std::move(passwd)),
+        m_timeDrift(timeDrift)
+    {
+    }
+
+    //BaseSoapWrapper(SoapParams soapParams) :
+    //    m_endpointHolder(std::move(soapParams.endpoint)),
+    //    m_endpoint(m_endpointHolder.c_str()),
+    //    m_timeDrift(soapParams.timeDrift),
+    //    m_login(std::move(soapParams.login)),
+    //    m_passwd(std::move(soapParams.passwd))
+    //{
+    //}
+
+    virtual ~BaseSoapWrapper() = default;
+
+    const char* endpoint() const { return m_endpoint; }
+    QString login() const { return m_login; }
+    QString password() const { return m_passwd; }
+    int timeDrift() const { return m_timeDrift; }
+    void setLogin(const QString& login) { m_login = login; }
+    void setPassword(const QString& password) { m_passwd = password; }
+    bool invoked() const { return m_invoked; }
+    operator bool() const { return !m_endpointHolder.empty(); }
+
+    virtual QString getLastErrorDescription() = 0;
+    virtual bool lastErrorIsNotAuthenticated() = 0;
+    virtual bool lastErrorIsConflict() = 0;
+
+protected:
+    const std::string m_endpointHolder;
+    const char* const m_endpoint; //< points to m_endpointHolder data
+    QString m_login;
+    QString m_passwd;
+    int m_timeDrift;
+    bool m_invoked = false;
 };
 
 template <class BindingProxyT>
@@ -103,14 +150,12 @@ public:
 
     SoapWrapper(SoapParams soapParams);
 
-    virtual ~SoapWrapper();
+    virtual ~SoapWrapper() override;
 
     SoapWrapper(const SoapWrapper&) = delete;
     SoapWrapper(SoapWrapper&&) = delete;
     SoapWrapper& operator=(const SoapWrapper&) = delete;
     SoapWrapper& operator=(SoapWrapper&&) = delete;
-
-    operator bool() const { return !m_endpointHolder.empty(); }
 
     BindingProxy& bindingProxy() { return m_bindingProxy; }
     const BindingProxy& bindingProxy() const { return m_bindingProxy; }
@@ -118,22 +163,15 @@ public:
     struct soap* soap() { return m_bindingProxy.soap; }
     const struct soap* soap() const { return m_bindingProxy.soap; }
 
-    const char* endpoint() const { return m_endpoint; }
-    QString login() const { return m_login; }
-    QString password() const { return m_passwd; }
-    int timeDrift() const { return m_timeDrift; }
-    void setLogin(const QString& login) { m_login = login; }
-    void setPassword(const QString& password) { m_passwd = password; }
-    bool invoked() const { return m_invoked; }
-    const QString getLastErrorDescription()
+    virtual QString getLastErrorDescription() override
     {
         return SoapErrorHelper::fetchDescription(m_bindingProxy.soap_fault());
     }
-    bool lastErrorIsNotAuthenticated()
+    virtual bool lastErrorIsNotAuthenticated() override
     {
         return PasswordHelper::isNotAuthenticated(m_bindingProxy.soap_fault());
     }
-    bool lastErrorIsConflict()
+    virtual bool lastErrorIsConflict() override
     {
         return PasswordHelper::isConflict(m_bindingProxy.soap_fault());
     }
@@ -153,7 +191,7 @@ public:
     template<typename Request>
     void beforeMethodInvocation()
     {
-        //using namespace nx::mediaserver_core::plugins;
+        //using namespace nx::vms::server::plugins;
         if (m_invoked)
         {
             soap_destroy(m_bindingProxy.soap);
@@ -164,14 +202,14 @@ public:
             m_invoked = true;
         }
 
-        const auto namespaces = nx::mediaserver_core::plugins::onvif::requestNamespaces<Request>();
+        const auto namespaces = nx::vms::server::plugins::onvif::requestNamespaces<Request>();
         //########################################################
         if (namespaces != nullptr)
             soap_set_namespaces(m_bindingProxy.soap, namespaces);
 
         if (!m_login.isEmpty())
         {
-            nx::mediaserver_core::plugins::onvif::soapWsseAddUsernameTokenDigest(
+            nx::vms::server::plugins::onvif::soapWsseAddUsernameTokenDigest(
                 m_bindingProxy.soap,
                 NULL,
                 m_login.toUtf8().constData(),
@@ -181,12 +219,6 @@ public:
     }
 
 protected:
-    const std::string m_endpointHolder;
-    const char* const m_endpoint; //< points to m_endpointHolder data
-    int m_timeDrift;
-    QString m_login;
-    QString m_passwd;
-    bool m_invoked = false;
 
     BindingProxy m_bindingProxy;
 };
@@ -200,11 +232,7 @@ SoapWrapper<BindingProxyT>::SoapWrapper(
     int timeDrift,
     bool tcpKeepAlive)
     :
-    m_endpointHolder(std::move(endpoint)),
-    m_endpoint(m_endpointHolder.c_str()),
-    m_timeDrift(timeDrift),
-    m_login(std::move(login)),
-    m_passwd(std::move(passwd))
+    BaseSoapWrapper(std::move(endpoint), std::move(login), std::move(passwd), timeDrift)
 {
     NX_ASSERT(!m_endpointHolder.empty());
     if (tcpKeepAlive)
@@ -220,11 +248,12 @@ SoapWrapper<BindingProxyT>::SoapWrapper(
 
 template <class BindingProxyT>
 SoapWrapper<BindingProxyT>::SoapWrapper(SoapParams soapParams):
-    m_endpointHolder(std::move(soapParams.endpoint)),
-    m_endpoint(m_endpointHolder.c_str()),
-    m_timeDrift(soapParams.timeDrift),
-    m_login(std::move(soapParams.login)),
-    m_passwd(std::move(soapParams.passwd))
+    BaseSoapWrapper(
+        std::move(soapParams.endpoint),
+        std::move(soapParams.login),
+        std::move(soapParams.passwd),
+        std::move(soapParams.timeDrift))
+
 {
     if (soapParams.tcpKeepAlive)
     {
@@ -608,7 +637,7 @@ public:
     int setRelayOutputState(_onvifDevice__SetRelayOutputState& request, _onvifDevice__SetRelayOutputStateResponse& response);
     int setRelayOutputSettings(_onvifDevice__SetRelayOutputSettings& request, _onvifDevice__SetRelayOutputSettingsResponse& response);
 
-    int getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response);
+    int getCapabilities(_onvifDevice__GetCapabilities& request, _onvifDevice__GetCapabilitiesResponse& response);
     int getServices(GetServicesReq& request, GetServicesResp& response);
     int getDeviceInformation(DeviceInfoReq& request, DeviceInfoResp& response);
     int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
@@ -626,10 +655,10 @@ private:
     QAuthenticator getDefaultPassword(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model) const;
-    std::list<nx::common::utils::Credentials> getPossibleCredentials(
+    std::list<nx::vms::common::Credentials> getPossibleCredentials(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model) const;
-    nx::common::utils::Credentials getForcedCredentials(
+    nx::vms::common::Credentials getForcedCredentials(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model);
     void calcTimeDrift();

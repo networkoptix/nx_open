@@ -58,7 +58,7 @@ endif()
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 18.1)
+set(mobileClientVersion 18.5)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -73,10 +73,7 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
+nx_option(codeSigning "Enable code signing" OFF)
 
 include(target_detection)
 include(utils)
@@ -190,7 +187,7 @@ list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
 add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
-    add_subdirectory(nxlib)
+    add_subdirectory(libs)
     add_subdirectory(cloud)
 endif()
 
@@ -199,6 +196,10 @@ endif()
 #add_subdirectory(_dw_mtt_controller)
 
 add_subdirectory(vms)
+
+if(withP2PConnectionTestingUtility)
+    add_subdirectory(p2p_connection_testing_utility)
+endif()
 
 if(withTests)
     add_subdirectory(tests)

@@ -7,7 +7,7 @@
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
 #include "core/resource/resource_fwd.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <api/helpers/chunks_request_data.h>
 
 class QnTimePeriodList;

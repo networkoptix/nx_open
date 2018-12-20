@@ -99,7 +99,8 @@ def send_notification(request):
                  request.data['customization'],
                  external_id)
     except ValidationError as error:
-        raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error.detail)
+        error_data = error.detail if hasattr(error, 'detail') else None
+        raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error_data)
     return api_success()
 
 

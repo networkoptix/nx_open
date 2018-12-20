@@ -82,7 +82,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
     {
         request.groupBy = QnLexical::deserialized<QnChunksRequestData::GroupBy>(
             params.value(kGroupByParamName),
-            QnChunksRequestData::GroupBy::cameraId);
+            QnChunksRequestData::GroupBy::serverId);
     }
     request.sortOrder = params.contains(kDescendingOrderParam)
         ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;

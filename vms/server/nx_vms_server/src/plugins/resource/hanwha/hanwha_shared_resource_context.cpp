@@ -11,7 +11,7 @@
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -34,7 +34,7 @@ static const nx::utils::Url cleanUrl(nx::utils::Url url)
 } // namespace
 
 using namespace nx::core::resource;
-using namespace nx::mediaserver::resource;
+using namespace nx::vms::server::resource;
 
 SeekPosition::SeekPosition(qint64 value) : position(value)
 {
@@ -57,6 +57,7 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
     videoCodecInfo([this]() { return loadVideoCodecInfo(); }, kCacheDataTimeout),
     isBypassSupported([this]() { return checkBypassSupport(); }, kCacheDataTimeout),
+    ptzCalibratedChannels([this]() { return loadPtzCalibratedChannels(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
     m_requestLock(kMaxConcurrentRequestNumber)
 {
@@ -71,9 +72,7 @@ void HanwhaSharedResourceContext::setResourceAccess(
         if (m_resourceUrl == sharedUrl && m_resourceAuthenticator == authenticator)
             return;
 
-        NX_DEBUG(this, lm("Update resource access (%1:%2) %3").args(
-            authenticator.user(), authenticator.password(), sharedUrl));
-
+        NX_DEBUG(this, "Update resource access: %1 @ %2", authenticator.user(), sharedUrl);
         m_resourceUrl = sharedUrl;
         m_resourceAuthenticator = authenticator;
         m_lastSuccessfulUrlTimer.invalidate();
@@ -463,6 +462,31 @@ HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
     return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
 }
 
+HanwhaResult<std::set<int>> HanwhaSharedResourceContext::loadPtzCalibratedChannels()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    //helper.setGroupBy(kHanwhaChannelProperty);
+
+    auto response = helper.view(lit("eventrules/internalhandovercalibration"), {});
+    if (!response.isSuccessful())
+        return {CameraDiagnostics::RequestFailedResult(response.requestUrl(), lit("Failed"))};
+
+    std::set<int> calibratedChannels;
+    for (const auto& [key, value]: response.response())
+    {
+        const auto record = key.split(".");
+        if (record.size() < 2)
+            continue;
+
+        bool isSuccess = false;
+        const auto number = record[1].toInt(&isSuccess);
+        if (isSuccess)
+            calibratedChannels.insert(number);
+    }
+
+    return {CameraDiagnostics::NoErrorResult(), calibratedChannels};
+}
+
 qint64 SessionContext::currentPositionUsec() const
 {
     QnMutexLocker lock(&m_mutex);
@@ -484,5 +508,5 @@ void SessionContext::updateCurrentPositionUsec(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

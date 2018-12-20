@@ -46,7 +46,7 @@ struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     base_type(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

@@ -1,123 +1,72 @@
-#ifndef MANUAL_CAMERA_SEARCHER_H
-#define MANUAL_CAMERA_SEARCHER_H
+#pragma once
 
 #include <memory>
 #include <atomic>
 
-#include <QtCore/QFuture>
 #include <QtNetwork/QAuthenticator>
 
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_searcher.h>
-#include <nx/utils/concurrent.h>
-#include <utils/common/threadqueue.h>
-#include <nx/network/ip_range_checker_async.h>
+#include <nx/network/ip_range_scanner.h>
 #include <common/common_module_aware.h>
 
-class QnSearchTask
+#include "manual_camera_search_task_manager.h"
+
+//! Scans different addresses simultaneously (using aio or concurrent operations).
+class QnManualCameraSearcher: public QnCommonModuleAware, public nx::network::QnStoppableAsync
 {
-
-public:
-    typedef QList<QnAbstractNetworkResourceSearcher*> SearcherList;
-    typedef std::function<void(
-        const QnManualResourceSearchList& results, QnSearchTask* const task)> SearchDoneCallback;
-
-    QnSearchTask(){};
-
-    QnSearchTask(
-        QnCommonModule* commonModule,
-        const QString& addr,
-        int port,
-        const QAuthenticator& auth,
-        bool breakOnGotResult = false);
-
-    void setSearchers(const SearcherList& searchers);
-    void setSearchDoneCallback(const SearchDoneCallback& callback);
-    void setBlocking(bool isBlocking);
-    void setInterruptTaskProcessing(bool interrupt);
-
-    bool isBlocking() const;
-    bool doesInterruptTaskProcessing() const;
-
-    void doSearch();
-
-    nx::utils::Url url();
-    QString toString();
-
-private:
-    QnCommonModule * m_commonModule = nullptr;
-    nx::utils::Url m_url;
-    QAuthenticator m_auth;
-
-    /**
-     * If one of the searchers in task found a resource than other searchers in the same task
-     * won't be launched.
-     */
-    bool m_breakIfGotResult;
-
-    // Need to wait while task will be done before launching next task in queue.
-    bool m_blocking;
-
-    // If we got some results from this task then other tasks in queue shouldn't be launched.
-    bool m_interruptTaskProcesing;
-    SearchDoneCallback m_callback;
-    SearcherList m_searchers;
-};
-
-//!Scans different addresses simultaneously (using aio or concurrent operations)
-class QnManualCameraSearcher: public QnCommonModuleAware
-{
-
-    struct SearchTaskQueueContext
-    {
-        SearchTaskQueueContext() :
-            isBlocked(false),
-            isInterrupted(false),
-            runningTaskCount(0) {};
-
-        bool isBlocked;
-        bool isInterrupted;
-        int runningTaskCount;
-    };
+    using SearchDoneCallback = nx::utils::MoveOnlyFunc<void(QnManualCameraSearcher*)>;
 
 public:
     QnManualCameraSearcher(QnCommonModule* commonModule);
-    ~QnManualCameraSearcher();
+    virtual ~QnManualCameraSearcher() override;
 
-    /*!
-        \param pool Thread pool to use for running concurrent operations
-    */
-    bool run(QThreadPool* pool, const QString& startAddr, const QString& endAddr,
-        const QAuthenticator& auth, int port);
-    void cancel();
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+    /**
+     * Tries to find a camera on the host specified by the URL.
+     * @param callback Will be called when the search is done.
+     * @param url Must contain a host field, other URL fields are optional.
+     */
+    void startSearch(SearchDoneCallback callback, nx::utils::Url url);
+
+    /**
+     * Scans a range of IPv4 addresses and tries to find cameras on online hosts.
+     * @param callback Will be called when the search is done.
+     * @param startAddr The begining of the IP range to check. startAddr is checked too.
+     * @param endAddr The end of the IP range to check. endAddr is checked too.
+     * @param baseUrl The URL where the host will be substituted by the IP address of the found
+     *     online hosts.
+     */
+    void startRangeSearch(SearchDoneCallback callback,
+        nx::network::HostAddress startAddr,
+        nx::network::HostAddress endAddr,
+        nx::utils::Url baseUrl);
+
     QnManualCameraSearchProcessStatus status() const;
 
 private:
-    QStringList getOnlineHosts(
-        const QString& startAddr,
-        const QString& endAddr,
-        int port = nx::network::http::DEFAULT_HTTP_PORT);
+    void startOnlineHostsScan(
+        nx::network::HostAddress startAddr,
+        nx::network::HostAddress endAddr,
+        nx::utils::Url baseUrl);
 
-    void runTasksUnsafe(QThreadPool* threadPool);
+    void onOnlineHostsScanDone(
+        nx::utils::Url baseUrl, std::vector<nx::network::HostAddress> onlineHosts = {});
+    void onManualSearchDone(QnManualResourceSearchList results);
+
+    QnManualResourceSearchStatus::State changeState(QnManualResourceSearchStatus::State newState);
+    void runTasks();
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
+
 private:
-    mutable QnMutex m_mutex;
     QnManualResourceSearchList m_results;
-    QnManualResourceSearchStatus::State m_state;
-    std::atomic<bool> m_cancelled;
+    std::atomic<QnManualResourceSearchStatus::State> m_state;
 
-    QnIpRangeCheckerAsync m_ipChecker;
+    mutable nx::network::aio::BasicPollable m_pollable;
     int m_hostRangeSize;
+    nx::network::IpRangeScanner m_ipScanner;
+    QnManualSearchTaskManager m_taskManager;
 
-    QnWaitCondition m_waitCondition;
-
-    int m_totalTaskCount;
-    int m_remainingTaskCount;
-
-    QMap<QString, QQueue<QnSearchTask>> m_urlSearchTaskQueues;
-    QMap<QString, SearchTaskQueueContext> m_searchQueueContexts;
-
+    SearchDoneCallback m_searchDoneCallback;
 };
-
-#endif // MANUAL_CAMERA_SEARCHER_H

@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include <base/types.h>
-#include <nx/mediaserver/api/client.h>
+#include <nx/vms/server/api/client.h>
 #include <helpers/time_helper.h>
 
 namespace rtu
@@ -19,7 +19,7 @@ namespace rtu
         ~Changeset();
 
     public:
-        typedef nx::mediaserver::api::Client Client;
+        typedef nx::vms::server::api::Client Client;
 
         /// Getters
         const IntPointer &port() const;

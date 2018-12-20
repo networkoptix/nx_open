@@ -48,6 +48,9 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
+    QString selectedObjectType() const;
+    void setSelectedObjectType(const QString& value);
+
     virtual void clearData() override;
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
@@ -57,7 +60,6 @@ public:
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
-    virtual bool hasAccessRights() const override;
 
 private:
     void updateMetadataReceivers();
@@ -74,7 +76,7 @@ private:
         analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
-    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit);
+    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit) const;
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
@@ -101,6 +103,7 @@ private:
     AnalyticsSearchListModel* const q;
     QRectF m_filterRect;
     QString m_filterText;
+    QString m_selectedObjectType;
 
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     bool m_liveReceptionActive = false;

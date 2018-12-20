@@ -5,11 +5,11 @@
 #include <recording/time_period_list.h>
 
 #include <nx_ec/data/api_fwd.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnCameraHistoryRestHandler: 
     public QnFusionRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     QnCameraHistoryRestHandler(QnMediaServerModule * serverModule);

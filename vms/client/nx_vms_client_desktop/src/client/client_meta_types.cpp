@@ -1,5 +1,7 @@
 #include "client_meta_types.h"
 
+#include <atomic>
+
 #include <QtQml/QtQml>
 
 #include <common/common_meta_types.h>
@@ -24,6 +26,7 @@
 
 #include <update/updates_common.h>
 #include <update/update_info.h>
+#include <nx/vms/client/desktop/system_update/update_contents.h>
 
 #include <utils/color_space/image_correction.h>
 #include <nx/fusion/model_functions.h>
@@ -48,12 +51,6 @@
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 
-namespace {
-
-volatile bool qn_clientMetaTypes_initialized = false;
-
-} // namespace
-
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
 Q_DECLARE_METATYPE(nx::cloud::db::api::ResultCode)
@@ -65,13 +62,15 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, DateFormat)
 
 using namespace nx::vms::client::desktop;
 
-void QnClientMetaTypes::initialize() {
-    /* Note that running the code twice is perfectly OK,
-     * so we don't need heavyweight synchronization here. */
-    if(qn_clientMetaTypes_initialized)
+void QnClientMetaTypes::initialize()
+{
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
         return;
 
-    QnCommonMetaTypes::initialize();
+    initialized = true;
+
     nx::vms::client::core::initializeMetaTypes();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
@@ -83,6 +82,7 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaType<ResourceTreeNodeType>();
     qRegisterMetaType<Qn::ItemRole>();
+    qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QnLicenseWarningState>();
     qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();
@@ -151,6 +151,9 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaType<QnNotificationLevel::Value>();
 
+    qRegisterMetaType<nx::update::Information>();
+    qRegisterMetaType<nx::update::UpdateContents>();
+
     QMetaType::registerComparators<QnUuid>();
 
     QnJsonSerializer::registerSerializer<QnBookmarkColors>();
@@ -182,8 +185,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
     registerQmlTypes();
-
-    qn_clientMetaTypes_initialized = true;
 }
 
 void QnClientMetaTypes::registerQmlTypes()

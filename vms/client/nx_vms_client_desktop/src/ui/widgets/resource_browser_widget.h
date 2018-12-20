@@ -12,7 +12,7 @@
 
 #include <client/client_globals.h>
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 class QComboBox;
 class QLineEdit;
@@ -135,8 +135,8 @@ private:
     void updateInstantFilter();
     void handleInstantFilterUpdated();
 
-    using FilterTagWithNodeType = QPair<QString, nx::vms::client::desktop::ResourceTreeNodeType>;
-    QList<FilterTagWithNodeType> filterTagsWithNodeTypes() const;
+    QMenu* createFilterMenu(QWidget* parent) const;
+    QString getFilterName(nx::vms::client::desktop::ResourceTreeNodeType allowedNodeType) const;
 
     void setHintVisible(bool value);
 
@@ -180,7 +180,7 @@ private:
     HoverFocusProcessor* m_hoverProcessor;
 
     QMap<nx::vms::client::desktop::ui::action::IDType, QAction*> m_renameActions;
-    QnDisconnectHelperPtr m_disconnectHelper;
+    nx::utils::ScopedConnections m_connections;
 
     QScopedPointer<nx::vms::client::desktop::CameraThumbnailManager> m_thumbnailManager;
     QnResourcePtr m_tooltipResource;

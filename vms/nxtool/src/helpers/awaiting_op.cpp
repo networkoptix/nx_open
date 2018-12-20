@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
-namespace api = nx::mediaserver::api;
+namespace api = nx::vms::server::api;
 
 namespace
 {

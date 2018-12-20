@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",
     "successRename": "Rendszer neve mentve",
-    "confirmDisconnectTitle": "Lekapcsolódik innen: %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
     "confirmDisconnectAction": "Szétkapcsolás",
     "confirmUnshareFromMe": "A rendszer leválasztására készül fiókjáról. Többé nem fog tudni kapcsolódni a rendszerhez. Folytatja?",
     "confirmUnshareFromMeTitle": "Leválasztja a rendszert?",

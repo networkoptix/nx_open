@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "英语_美国",
   "language_name": "简体中文",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "高级操作员",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "可以查看实时视频，浏览存档，控制云台等"
     },
     "Administrator": {
       "label": "管理员",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "系统名称",
     "confirmRenameAction": "保存",
     "successRename": "保存的系统名称",
-    "confirmDisconnectTitle": "系统断开 %PRODUCT_NAME% 吗？",
+    "confirmDisconnectTitle": "系统断开 %PRODUCT_NAME%?",
     "confirmDisconnectAction": "断开连接",
     "confirmUnshareFromMe": "您将要断开此系统从您的帐户。你将无法再访问该系统。是否确定？",
     "confirmUnshareFromMeTitle": "断开系统吗？",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "删除",
     "successDisconnected": "系统成功地断开 %PRODUCT_NAME%",
     "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "系统 {{systemName}} 已与 {{systemName}} 合并",
     "permissionsRemoved": "权限从 {{email}} 被刪除"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "已复制到剪贴板"
     },
     "systemOffline": "系统处于离线状态",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "无摄像机",
     "cameraStates": {
       "offline": "离线",
       "error": "错误",

@@ -168,7 +168,11 @@ public:
                 {
                     auto commonModule = m_appserver->moduleInstance()->commonModule();
                     auto globalSettings = commonModule->globalSettings();
-                    globalSettings->setSynchronizingTimeWithInternet(m_syncWithInternetEnabled);
+                    if (m_syncWithInternetEnabled)
+                        globalSettings->setPrimaryTimeServer(QnUuid());
+                    else if (globalSettings->primaryTimeServer().isNull())
+                        globalSettings->setPrimaryTimeServer(commonModule->moduleGUID());
+
 
                     auto timeSyncManager = dynamic_cast<nx::vms::time_sync::ServerTimeSyncManager*>
                         (m_appserver->moduleInstance()->ecConnection()->timeSyncManager());

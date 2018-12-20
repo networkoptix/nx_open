@@ -2,6 +2,7 @@
 
 #include <functional>
 
+class QObject;
 class QThread;
 class QTimer;
 

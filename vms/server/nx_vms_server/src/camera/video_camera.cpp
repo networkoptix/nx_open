@@ -419,7 +419,13 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
         if (m_lastKeyFrame[0])
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
-    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
+
+    const QnSecurityCamResource* cameraResource =
+        dynamic_cast<QnSecurityCamResource*>(m_resource.data());
+    bool canUseProvider = m_catalog == QnServer::HiQualityCatalog
+        || !cameraResource || cameraResource->hasDualStreaming();
+
+    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() && canUseProvider &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
         m_resource->commonModule()->globalSettings()->isAutoUpdateThumbnailsEnabled())
     {
@@ -465,7 +471,7 @@ void QnVideoCameraGopKeeper::clearVideoData()
 //  QnVideoCamera 
 
 QnVideoCamera::QnVideoCamera(
-    const nx::mediaserver::Settings& settings,
+    const nx::vms::server::Settings& settings,
     QnDataProviderFactory* dataProviderFactory,
     const QnResourcePtr& resource)
     :
@@ -836,11 +842,11 @@ MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
         : nullptr;
 }
 
-nx::mediaserver::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
+nx::vms::server::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
     return streamQuality < m_hlsLivePlaylistManager.size()
         ? m_hlsLivePlaylistManager[streamQuality]
-        : nx::mediaserver::hls::LivePlaylistManagerPtr();
+        : nx::vms::server::hls::LivePlaylistManagerPtr();
 }
 
 QnResourcePtr QnVideoCamera::resource() const
@@ -931,7 +937,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
 
         int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
         m_hlsLivePlaylistManager[streamQuality] =
-            std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(
+            std::make_shared<nx::vms::server::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
                 targetDurationUSec,
                 removedChunksToKeepCount);

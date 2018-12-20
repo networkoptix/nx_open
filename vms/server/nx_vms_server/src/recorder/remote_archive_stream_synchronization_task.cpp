@@ -9,13 +9,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 namespace {
@@ -87,5 +87,5 @@ void RemoteArchiveStreamSynchronizationTask::createArchiveReaderThreadUnsafe(
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

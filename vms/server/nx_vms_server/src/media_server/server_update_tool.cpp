@@ -24,7 +24,7 @@
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>
 
-#include <nx/mediaserver/root_fs.h>
+#include <nx/vms/server/root_fs.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -41,7 +41,7 @@ constexpr std::chrono::milliseconds kInstallationDelay = 15s;
 
 QnServerUpdateTool::QnServerUpdateTool(QnMediaServerModule* serverModule)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive)
 {}
 

@@ -33,6 +33,6 @@ nx::utils::Url QnConnectionInfo::effectiveUrl() const
         return ecUrl;
 
     nx::utils::Url secure(ecUrl);
-    secure.setScheme(lit("https"));
+    secure.setScheme("https");
     return secure;
 }

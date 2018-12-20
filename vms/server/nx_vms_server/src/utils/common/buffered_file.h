@@ -84,9 +84,9 @@ public:
         const QnUuid& writerPoolId);
     virtual ~QBufferedFile();
 
-    /*
-    * Addition system depended io flags
-    */
+    /**
+     * Addition system-dependent io flags.
+     */
     void setSystemFlags(int setSystemFlags);
 
     virtual bool open(QIODevice::OpenMode mode) override;

@@ -31,8 +31,10 @@ AnimatedTabWidget::AnimatedTabWidget(QTabBar* tabBar, QWidget* parent) :
 void AnimatedTabWidget::handleCurrentChanged()
 {
     const auto newTab = currentWidget();
-    if (!newTab && !m_currentTab)
-        return; //< Just to be safe.
+
+    // Current index can change due to tab removal, in that case current widget can remain the same.
+    if (!newTab && !m_currentTab || newTab == m_currentTab)
+        return;
 
     if (!isVisible())
     {

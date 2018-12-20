@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Include>
-    <?ifndef includeGuard?>
-        <?define includeGuard="BuildWars.wxi"?>
+    <?ifndef buildVars_includeGuard?>
+        <?define buildVars_includeGuard="BuildWars.wxi"?>
 
         <?define installerLanguage="${installerLanguage}"?>
         <?define companyName="${company.name}"?>
@@ -37,6 +38,7 @@
         <?define trayToolName = "${traytool.name}"?>
         <?define productName = "${display.product.name}"?>
         <?define applauncherName = "${applauncher.name}"?>
+        <?define applauncherBinaryName = "${applauncher.binary.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
         <?define clientName = "${product.name}"?>
         <?define clientDisplayName = "${client.display.name}"?>
@@ -46,7 +48,6 @@
         <?define clientExeName = "${display.product.name}"?>
         <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 
-        <?define quicksync = "${quicksync}"?>
         <?define defaultTranslation = "${defaultTranslation}"?>
         <?define companyInstallPath = "${windowsInstallPath}"?>
 
@@ -102,5 +103,6 @@
         <?define enable_hanwha = "${enable_hanwha}"?>
 
         <?define eulaVersion = "${eulaVersion}"?>
+        <?define developerBuild = "${developerBuild}"?>
      <?endif?>
 </Include>

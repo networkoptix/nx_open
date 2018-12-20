@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -48,6 +47,8 @@ should open register page from register success page by clicking Register button
     Location Should Be    ${url}/register
 
 should open register page in anonymous state by clicking Register button on homepage
+    Close Browser
+    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${CREATE ACCOUNT BODY}
     Click Link    ${CREATE ACCOUNT BODY}
     Location Should Be    ${url}/register
@@ -85,7 +86,7 @@ with valid inputs no errors are displayed
     ${email}    Get Random Email    ${BASE EMAIL}
     Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Click Element    ${TERMS AND CONDITIONS CHECKBOX VISIBLE}
     Click Element    ${REGISTER FORM}
     @{list}    Set Variable    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO SHORT}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${EMAIL INVALID}
     : FOR    ${element}    IN    @{list}
@@ -114,7 +115,7 @@ should respond to Enter key and save data
     Input Text    ${REGISTER LAST NAME INPUT}    hamil
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Click Element    ${TERMS AND CONDITIONS CHECKBOX VISIBLE}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
     Validate Register Success
 
@@ -131,14 +132,14 @@ should respond to Tab key
     Press Key    ${REGISTER EMAIL INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER PASSWORD INPUT}
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
-    Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}/../input
+    Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX REAL}
 
-    Press Key    ${TERMS AND CONDITIONS CHECKBOX}/../input    ${SPACEBAR}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX REAL}    ${SPACEBAR}
     Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-not-empty") and @ng-model='account.accept']
-    Press Key    ${TERMS AND CONDITIONS CHECKBOX}/../input    ${SPACEBAR}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX REAL}    ${SPACEBAR}
     Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-empty") and @ng-model='account.accept']
 
-    Press Key    ${TERMS AND CONDITIONS CHECKBOX}/../input    ${TAB}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX REAL}    ${TAB}
     Press Key    ${TERMS AND CONDITIONS LINK}    ${ENTER}
     Element Should Be Focused    ${TERMS AND CONDITIONS LINK}
     ${tabs}    Get Window Handles

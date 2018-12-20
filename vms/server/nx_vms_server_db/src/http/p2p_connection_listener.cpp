@@ -21,9 +21,14 @@
 #include <nx/network/socket_delegate.h>
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_server_message_bus.h>
+#include <nx/network/p2p_transport/p2p_http_server_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_transport.h>
 
 namespace nx {
 namespace p2p {
+
+using namespace nx::vms::api;
+using namespace nx::network;
 
 // -------------------------- ConnectionProcessor ---------------------
 
@@ -140,6 +145,143 @@ Qn::UserAccessData ConnectionProcessor::userAccessData(const vms::api::PeerDataE
     return access;
 }
 
+bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remotePeer)
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    if (commonModule()->isStandAloneMode())
+    {
+        NX_DEBUG(this,
+            "Incoming messageBus connections are temporary disabled. Ignore new incoming "
+            "connection.");
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "The media server is running in standalone mode");
+        return false;
+    }
+
+    if (!isPeerCompatible(remotePeer))
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden, "Peer is not compatible");
+        return false;
+    }
+
+    const auto commonModule = d->owner->commonModule();
+    const auto connection = commonModule->ec2Connection();
+    auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
+    if (!messageBus)
+    {
+        sendResponse(
+            nx::network::http::StatusCode::forbidden, "The media server is not is in P2p mode");
+        return false;
+    }
+
+    if (!messageBus->validateRemotePeerData(remotePeer))
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "The media server is going to restart to replace its database");
+        return false;
+    }
+    return true;
+}
+
+class SameGuidConnectionLocker
+{
+public:
+
+    SameGuidConnectionLocker(const QnUuid& id): m_id(id)
+    {
+        {
+            QnMutexLocker lock(&m_commonMutex);
+
+            if (m_mutexList.find(id) == m_mutexList.cend())
+            {
+                m_mutex = std::make_shared<QnMutex>();
+                m_mutexList[id] = std::weak_ptr<QnMutex>(m_mutex);
+            }
+            else
+            {
+                m_mutex = std::shared_ptr<QnMutex>(m_mutexList[id]);
+            }
+        }
+
+        m_mutex->lock();
+    }
+
+    SameGuidConnectionLocker(SameGuidConnectionLocker&& other):
+        m_id(other.m_id),
+        m_mutex(std::move(other.m_mutex))
+    {
+    }
+
+    SameGuidConnectionLocker& operator=(const SameGuidConnectionLocker& other) = delete;
+
+    ~SameGuidConnectionLocker()
+    {
+        if (!m_mutex)
+            return;
+
+        m_mutex->unlock();
+
+        QnMutexLocker lock(&m_commonMutex);
+
+        if (m_mutex.use_count() == 1)
+            m_mutexList.erase(m_id);
+    }
+
+private:
+    QnUuid m_id;
+    std::shared_ptr<QnMutex> m_mutex;
+    static std::map<QnUuid, std::weak_ptr<QnMutex>> m_mutexList;
+    static QnMutex m_commonMutex;
+};
+
+std::map<QnUuid, std::weak_ptr<QnMutex>> SameGuidConnectionLocker::m_mutexList{};
+QnMutex SameGuidConnectionLocker::m_commonMutex;
+
+bool ConnectionProcessor::tryAcquireConnecting(
+    ec2::ConnectionLockGuard& connectionLockGuard,
+    const vms::api::PeerDataEx& remotePeer)
+{
+    Q_D(QnTCPConnectionProcessor);
+    // addition checking to prevent two connections (ingoing and outgoing) at once
+    // 1-st stage
+    bool lockOK = connectionLockGuard.tryAcquireConnecting();
+
+    d->response.headers.insert(
+        nx::network::http::HttpHeader(Qn::EC2_CONNECT_STAGE_1, nx::network::http::StringType()));
+
+    if (!lockOK)
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
+        return false;
+    }
+    sendResponse(nx::network::http::StatusCode::noContent, nx::network::http::StringType());
+
+    // 2-nd stage
+    if (!readRequest())
+        return false;
+    parseRequest();
+    return true;
+}
+
+bool ConnectionProcessor::tryAcquireConnected(
+    ec2::ConnectionLockGuard& connectionLockGuard,
+    const vms::api::PeerDataEx& remotePeer)
+{
+    if (!connectionLockGuard.tryAcquireConnected() ||    //< lock failed
+        remotePeer.id == commonModule()->moduleGUID() || //< can't connect to itself
+        isDisabledPeer(remotePeer))                      //< allowed peers are strict
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            lm("The connection from the peer %1 is already established")
+                .arg(remotePeer.id)
+                .toUtf8());
+        return false;
+    }
+    return true;
+}
+
 void ConnectionProcessor::run()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -149,122 +291,119 @@ void ConnectionProcessor::run()
         return;
     parseRequest();
 
-    if (commonModule()->isStandAloneMode())
-    {
-        NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is running in standalone mode");
-        return;
-    }
-
     vms::api::PeerDataEx remotePeer = deserializePeerData(d->request);
-    if (!isPeerCompatible(remotePeer))
-    {
-        sendResponse(nx::network::http::StatusCode::forbidden, "Peer is not compatible");
+    if (!canAcceptConnection(remotePeer))
         return;
-    }
 
-    const auto commonModule = d->owner->commonModule();
-    const auto connection = commonModule->ec2Connection();
+    auto connection = commonModule()->ec2Connection();
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
-    if (!messageBus)
+
+    // Lock mutex to prevent processing GET and POST at the same time for the same connection.
+    SameGuidConnectionLocker sameGuidconnectionLockGuard(remotePeer.connectionGuid);
+
+    if (d->request.requestLine.method == "POST")
     {
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is not is in P2p mode");
+        d->socket->setNonBlockingMode(true);
+        messageBus->gotPostConnection(remotePeer, std::move(d->socket), std::move(d->requestBody));
         return;
     }
 
-    if (!messageBus->validateRemotePeerData(remotePeer))
-    {
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is going to restart to replace its database");
-        return;
-    }
-
-    ec2::ConnectionLockGuard connectionLockGuard(
-        commonModule->moduleGUID(),
+    // Strict ingoing and outgoing connections s1->s2 and s2->s1. Reject one of them.
+    ec2::ConnectionLockGuard sameDirectionConnectionLockGuard(
+        commonModule()->moduleGUID(),
         messageBus->connectionGuardSharedState(),
         remotePeer.id,
         ec2::ConnectionLockGuard::Direction::Incoming);
 
-    if (remotePeer.peerType == vms::api::PeerType::server)
+    if (remotePeer.isServer() && !tryAcquireConnecting(sameDirectionConnectionLockGuard, remotePeer))
+        return;
+    if (!tryAcquireConnected(sameDirectionConnectionLockGuard, remotePeer))
+        return;
+
+    bool useWebSocket = false;
+    if (remotePeer.transport != P2pTransportMode::http)
     {
-        // addition checking to prevent two connections (ingoing and outgoing) at once
-        // 1-st stage
-        bool lockOK = connectionLockGuard.tryAcquireConnecting();
-
-        d->response.headers.insert(nx::network::http::HttpHeader(
-            Qn::EC2_CONNECT_STAGE_1,
-            nx::network::http::StringType()));
-
-        if (!lockOK)
+        auto error = websocket::validateRequest(d->request, &d->response);
+        if (error != websocket::Error::noError && remotePeer.transport == P2pTransportMode::websocket)
         {
-            sendResponse(nx::network::http::StatusCode::forbidden,
-                lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
+            auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
+            sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
+            NX_ERROR(this, errorMessage);
             return;
         }
-        sendResponse(
-            nx::network::http::StatusCode::noContent, nx::network::http::StringType());
-
-        // 2-nd stage
-        if (!readRequest())
-            return;
-        parseRequest();
-    }
-
-    if(!connectionLockGuard.tryAcquireConnected() || //< lock failed
-        remotePeer.id == commonModule->moduleGUID() || //< can't connect to itself
-        isDisabledPeer(remotePeer)) //< allowed peers are strict
-    {
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            lm("The connection from the peer %1 is already established").arg(remotePeer.id).toUtf8());
-        return;
-    }
-
-    using namespace nx::network;
-    auto error = websocket::validateRequest(d->request, &d->response);
-    if (error != websocket::Error::noError)
-    {
-        auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
-        sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
-        NX_ERROR(this, errorMessage);
-        d->socket->close();
-        return;
+        useWebSocket = (error == websocket::Error::noError);
     }
 
     serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
-
     sendResponse(
-        nx::network::http::StatusCode::switchingProtocols,
+        useWebSocket ? http::StatusCode::switchingProtocols : http::StatusCode::ok,
         nx::network::http::StringType());
-
 
     std::function<void()> onConnectionClosedCallback;
     if (remotePeer.isClient())
     {
         auto session = authSession();
-        commonModule->auditManager()->at_connectionOpened(session);
-        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule->auditManager(), session);
+        commonModule()->auditManager()->at_connectionOpened(session);
+        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed,
+            commonModule()->auditManager(), session);
     }
 
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
-    WebSocketPtr webSocket(new websocket::WebSocket(
-        std::move(d->socket),
-        remotePeer.dataFormat == Qn::JsonFormat
-            ? websocket::FrameType::text
-            : websocket::FrameType::binary));
-    if (keepAliveTimeout > std::chrono::milliseconds::zero())
-        webSocket->setAliveTimeout(keepAliveTimeout);
-    webSocket->start();
 
-    messageBus->gotConnectionFromRemotePeer(
-        remotePeer,
-        std::move(connectionLockGuard),
-        std::move(webSocket),
-        QUrlQuery(d->request.requestLine.url.query()),
-        userAccessData(remotePeer),
-        onConnectionClosedCallback);
+    P2pTransportPtr p2pTransport;
+    const auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
+        ? websocket::FrameType::text : websocket::FrameType::binary;
+
+    if (useWebSocket)
+    {
+        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
+        p2pTransport->start();
+
+        messageBus->gotConnectionFromRemotePeer(
+            remotePeer,
+            std::move(sameDirectionConnectionLockGuard),
+            std::move(p2pTransport),
+            QUrlQuery(d->request.requestLine.url.query()),
+            userAccessData(remotePeer),
+            onConnectionClosedCallback);
+    }
+    else
+    {
+        auto p2pHttpServerTransport = new P2PHttpServerTransport(
+            std::move(d->socket),
+            dataFormat);
+
+        auto onGetReceivedCallback =
+            [messageBus,
+            remotePeer,
+            sameDirectionConnectionLockGuard = std::move(sameDirectionConnectionLockGuard),
+            sameGuidconnectionLockGuard = std::move(sameGuidconnectionLockGuard),
+            p2pHttpServerTransport,
+            query = QUrlQuery(d->request.requestLine.url.query()),
+            accessData = userAccessData(remotePeer),
+            onConnectionClosedCallback](
+                SystemError::ErrorCode error) mutable
+            {
+                if (error == SystemError::noError)
+                {
+                    messageBus->gotConnectionFromRemotePeer(
+                        remotePeer,
+                        std::move(sameDirectionConnectionLockGuard),
+                        P2pTransportPtr(p2pHttpServerTransport),
+                        query,
+                        accessData,
+                        onConnectionClosedCallback);
+                }
+                else
+                {
+                    delete p2pHttpServerTransport;
+                    // #TODO: #rvasilenko Implement this.
+                }
+            };
+
+        p2pHttpServerTransport->start(std::move(onGetReceivedCallback));
+    }
 }
 
 } // namespace p2p

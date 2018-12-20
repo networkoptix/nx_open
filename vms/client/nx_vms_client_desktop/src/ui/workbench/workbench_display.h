@@ -457,6 +457,8 @@ private:
     /** Whether we are changing layout now. */
     bool m_inChangeLayout;
 
+    bool m_inChangeSelection = false;
+
     QSet<QnWorkbenchItem*> m_draggedItems;
 
 

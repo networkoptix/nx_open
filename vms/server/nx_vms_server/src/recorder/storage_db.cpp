@@ -74,7 +74,7 @@ QnStorageDb::QnStorageDb(
     QnMediaServerModule* serverModule,
     const QnStorageResourcePtr& s, int storageIndex)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_storage(s),
     m_storageIndex(storageIndex),
     m_dbHelper(this),

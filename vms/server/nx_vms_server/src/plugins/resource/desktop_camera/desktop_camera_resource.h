@@ -5,14 +5,14 @@
 #include <QMap>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 class QnDesktopCameraResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 
-    typedef nx::mediaserver::resource::Camera base_type;
+    typedef nx::vms::server::resource::Camera base_type;
 
 public:
     static const QString MANUFACTURE;
@@ -36,7 +36,7 @@ public:
 
     virtual bool isReadyToDetach() const override;
 
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual bool isInitialized() const override { return true; }
     virtual CameraDiagnostics::Result initializeCameraDriver() override;

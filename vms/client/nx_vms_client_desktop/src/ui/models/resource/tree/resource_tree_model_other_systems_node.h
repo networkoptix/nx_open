@@ -4,7 +4,7 @@
 
 #include <network/base_system_description.h>
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 #include <core/resource/client_resource_fwd.h>
 
@@ -53,7 +53,7 @@ private:
     void clean();
 
 private:
-    QHash<QString, QnDisconnectHelper> m_disconnectHelpers;
+    QHash<QString, nx::utils::ScopedConnectionsPtr> m_connections;
     QHash<QString, QnResourceTreeModelNodePtr> m_cloudNodes;
     QHash<QString, QnResourceTreeModelNodePtr> m_localNodes;
     ResourceHash m_fakeServers;

@@ -77,9 +77,9 @@ protected:
         m_vmsSystem->peer(index).stop();
     }
 
-    void givenTwoServerCloudSystem()
+    void givenCloudSystemWithServerCount(int count)
     {
-        m_vmsSystem = createVmsSystem(2);
+        m_vmsSystem = createVmsSystem(count);
         ASSERT_NE(nullptr, m_vmsSystem);
 
         ASSERT_TRUE(m_vmsSystem->connectToCloud(&cloud(), m_ownerAccount));
@@ -120,8 +120,19 @@ protected:
         ASSERT_EQ(::ec2::ErrorCode::ok, client->ec2SaveUser(userData));
     }
 
+    void addCloudUserOnCloud()
+    {
+        const auto account = cloud().registerCloudAccount();
+        ASSERT_EQ(
+            nx::cloud::db::api::ResultCode::ok,
+            cloud().cdb().shareSystem(
+                m_ownerAccount,
+                m_vmsSystem->cloudSystemId(),
+                account.email,
+                nx::cloud::db::api::SystemAccessRole::viewer));
+    }
+
 private:
-    Cloud m_cloud;
     std::unique_ptr<VmsSystem> m_vmsSystem;
     nx::cloud::db::AccountWithPassword m_ownerAccount;
     std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
@@ -133,9 +144,26 @@ std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommo
 
 TEST_F(
     VmsCloudDataSynchronization,
+    data_added_while_mediaserver_is_offline_is_synchronized_when_back_online)
+{
+    givenCloudSystemWithServerCount(1);
+    
+    addCloudUserOnServer(0);
+    addCloudUserOnCloud();
+    waitForDataSynchronized(cloud(), server(0));
+
+    stopServer(0);
+    addCloudUserOnCloud();
+    startServer(0);
+
+    waitForDataSynchronized(cloud(), server(0));
+}
+
+TEST_F(
+    VmsCloudDataSynchronization,
     another_mediaserver_synchronizes_data_to_cloud)
 {
-    givenTwoServerCloudSystem();
+    givenCloudSystemWithServerCount(2);
     stopServer(1);
 
     addRandomNonCloudDataToServer(0);
@@ -145,7 +173,7 @@ TEST_F(
 
 TEST_F(VmsCloudDataSynchronization, using_cloud_does_not_trim_data)
 {
-    givenTwoServerCloudSystem();
+    givenCloudSystemWithServerCount(2);
     stopServer(1);
 
     addRandomNonCloudDataToServer(0);

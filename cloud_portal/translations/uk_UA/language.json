@@ -4,10 +4,10 @@
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Гаразд",
-    "cancelButton": "Відмінити",
+    "okButton": "Ок",
+    "cancelButton": "Відміна",
     "loginTitle": "Увійдіть до %PRODUCT_NAME%",
-    "loginButton": "Увійти",
+    "loginButton": "Вхід",
     "logoutAuthorisedTitle": "Ви вже увійшли",
     "logoutAuthorisedContinueButton": "Продовжити",
     "logoutAuthorisedLogoutButton": "Вийти"
@@ -15,15 +15,15 @@
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
     "default": "%PRODUCT_NAME%",
-    "registerSuccess": "Вітаємо в",
+    "registerSuccess": "Ласкаво просимо на",
     "register": "Створити обліковий запис",
     "changePassword": "Змінити пароль -",
     "account": "Параметри облікового запису",
     "systems": "Системи -",
-    "system": "Система",
+    "system": "Система -",
     "systemShare": "Загальний доступ -",
     "activate": "Активувати обліковий запис -",
-    "activateSent": "Активувати обліковий запис",
+    "activateSent": "Активувати обліковий запис -",
     "activateSuccess": "Обліковий запис активований",
     "activateCode": "Активувати обліковий запис -",
     "restorePassword": "Відновити пароль -",
@@ -31,7 +31,7 @@
     "restorePasswordCode": "Відновити пароль -",
     "view": "Переглянути камери - ",
     "debug": "Відладка",
-    "login": "Увійти -",
+    "login": "Вхід -",
     "download": "Завантажити %VMS_NAME%",
     "downloadPlatform": "Завантажити %VMS_NAME% для ",
     "pageNotFound": "Сторінку не знайдено"
@@ -40,12 +40,12 @@
     "notActivated": "не активовано",
     "activated": "активовано",
     "online": "oнлайн",
-    "offline": "офлайн",
+    "offline": "поза мережею",
     "unavailable": "недоступний"
   },
   "accessRoles": {
     "disabled": {
-      "label": "Вимкнений",
+      "label": "Вимкнено",
       "description": "Користувач вимкнений і не може ввійти в систему"
     },
     "Owner": {
@@ -57,12 +57,12 @@
       "description": "Можна переглядати відео в реальному часі та переглядати архів"
     },
     "Live Viewer": {
-      "label": "Відео з камер",
+      "label": "Відео в реальному часі",
       "description": "Можна переглядати лише відео в реальному часі"
     },
     "Advanced Viewer": {
       "label": "Перегляд і налаштування",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Може дивитися живе відео, архів, управляти PTZ і т. Д"
     },
     "Administrator": {
       "label": "Адміністратор",
@@ -102,7 +102,7 @@
     }
   },
   "errorCodes": {
-    "ok": "гаразд",
+    "ok": "ок",
     "cantSendActivationPrefix": "Не вдається надіслати підтвердження електронною поштою",
     "cantDisconnectSystemPrefix": "Невдається видалити систему",
     "cantUnshareWithMeSystemPrefix": "Невдається видалити систему",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Система {{systemName}} була об’єднана з {{systemName}}",
     "permissionsRemoved": "{{email}} був позбавлений повноважень"
   },
   "account": {
@@ -256,7 +256,7 @@
   },
   "activeActions": {
     "sendConfirm": "Відправити посилання активації ще раз",
-    "resetPassword": "Скидання пароля",
+    "resetPassword": "Відновити пароль",
     "setNewPassword": "Зберегти пароль",
     "setNewPasswordLabel": "Новий пароль"
   },
@@ -279,7 +279,7 @@
       "copyActiveText": "скопійовано до буфера обміну"
     },
     "systemOffline": "Система знаходиться поза мережею",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "НЕМАЄ КАМЕР",
     "cameraStates": {
       "offline": "Поза мережею",
       "error": "Помилка",

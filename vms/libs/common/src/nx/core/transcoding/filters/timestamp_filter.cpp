@@ -116,11 +116,14 @@ QString TimestampFilter::timestampTextUtc(
     int displayOffsetMs,
     Qt::DateFormat format)
 {
-    const auto secondsFromUtc = QDateTime::currentDateTime().offsetFromUtc()
-        + (displayOffsetMs / 1000);
+    // TODO: Here was this code, which was not consistent with other places.
+    // However, sometime datetime::toString should be expanded to accept different zones.
+    // const auto secondsFromUtc = QDateTime::currentDateTime().offsetFromUtc()
+    //     + (displayOffsetMs / 1000);
+    // const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+    //     sinceEpochMs + (displayOffsetMs % 1000), Qt::OffsetFromUTC, secondsFromUtc);
 
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(
-        sinceEpochMs + (displayOffsetMs % 1000), Qt::OffsetFromUTC, secondsFromUtc);
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(sinceEpochMs + displayOffsetMs);
 
     switch (format)
     {

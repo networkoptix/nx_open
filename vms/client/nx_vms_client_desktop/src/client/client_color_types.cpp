@@ -19,6 +19,8 @@ QnTimeSliderColors::QnTimeSliderColors():
     futureRecording(64, 255, 64, 64),
     pastMotion(255, 0, 0, 128),
     futureMotion(255, 0, 0, 64),
+    pastAnalytics(255, 255, 0, 128),
+    futureAnalytics(255, 255, 0, 64),
     pastBookmark("#b21083dc"),
     futureBookmark("#b21083dc"),
     pastBookmarkHover("#1c8fe7e6"),

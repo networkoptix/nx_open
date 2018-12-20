@@ -8,8 +8,6 @@
 namespace nx {
 namespace media {
 
-static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
-
 struct CameraStreamCapability
 {
     int minBitrateKbps = 0;

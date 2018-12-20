@@ -6,7 +6,7 @@
 #include <nx/utils/math/arithmetic.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -325,5 +325,5 @@ bool HanwhaRange::calculateEnumerationRangeMap()
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

@@ -17,7 +17,7 @@
 
 namespace nx {
 namespace vms {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 class StreamingChunkTranscoder: public ::testing::Test
@@ -85,6 +85,6 @@ TEST_F(StreamingChunkTranscoder, transcode_fails_if_desired_quality_is_not_avail
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace vms
 } // namespace nx

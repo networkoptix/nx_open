@@ -7,7 +7,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
@@ -555,5 +555,5 @@ int ChannelCapabilities::realMaxFps() const
 
 } // namespace hikvision
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

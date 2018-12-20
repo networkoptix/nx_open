@@ -2,13 +2,13 @@
 
 #include <api/model/api_model_fwd.h>
 #include <rest/server/json_rest_handler.h>
-#include "nx/mediaserver/server_module_aware.h"
+#include "nx/vms/server/server_module_aware.h"
 
 class QnPlatformMonitor;
 class QnCommonModule;
 class QnMediaServerModule;
 
-class QnStorageSpaceRestHandler: public QnJsonRestHandler, public nx::mediaserver::ServerModuleAware
+class QnStorageSpaceRestHandler: public QnJsonRestHandler, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

@@ -8,7 +8,7 @@
 #include <nx/utils/literal.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 enum class HanwhaCgiParameterType
@@ -104,5 +104,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

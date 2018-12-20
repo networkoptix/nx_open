@@ -3,6 +3,6 @@ if(withClouds OR withDesktopClient)
 endif()
 
 if(withClouds)
-    add_subdirectory(nx_data_sync_engine)
-    add_subdirectory(nx_key_value_db)
+    add_subdirectory(nx_clusterdb_engine)
+    add_subdirectory(nx_clusterdb_map)
 endif()

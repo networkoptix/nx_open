@@ -1,5 +1,7 @@
 #include "win_audio_device_info.h"
 
+#include <vector>
+
 #include <Windows.h>
 #include <InitGuid.h>
 #include <Ks.h>
@@ -14,7 +16,7 @@
 #include <FunctionDiscoveryKeys_devpkey.h>
 #include <Propvarutil.h>
 
-#include "utils/common/util.h"
+#include <nx/utils/std/algorithm.h>
 
 #pragma comment(lib, "ole32.lib")
 
@@ -24,82 +26,103 @@ extern QPixmap qt_pixmapFromWinHICON(HICON icon); // TODO: #Elric use QtWin::fro
 // -------------------------------------------------------------------------- //
 // QnWinAudioDeviceInfoPrivate
 // -------------------------------------------------------------------------- //
-class QnWinAudioDeviceInfoPrivate {
+class QnWinAudioDeviceInfoPrivate
+{
 public:
-    QnWinAudioDeviceInfoPrivate(): iconGroupIndex(0), iconGroupNum(0), deviceEnumerator(NULL) {}
-    virtual ~QnWinAudioDeviceInfoPrivate() {}
+    QnWinAudioDeviceInfoPrivate()
+    {
+    }
 
-    void init(const QString &deviceName);
+    virtual ~QnWinAudioDeviceInfoPrivate()
+    {
+    }
+
+    void init(const QString& deviceName);
     void deinit();
 
-    bool getDeviceInfo(IMMDevice *pMMDevice, bool isDefault);
+    bool getDeviceInfo(IMMDevice* pMMDevice, bool isDefault);
     QPixmap getDeviceIcon();
 
-    bool getIsMicrophone() const;
+    bool isMicrophone() const;
 
 public:
-    int iconGroupIndex;
-    int iconGroupNum;
+    int iconGroupIndex = 0;
+    int iconGroupNum = 0;
     QString deviceName;
     QString fullName;
-    GUID jackSubType;
+    GUID jackSubType = {};
     QString iconPath;
-    IMMDeviceEnumerator *deviceEnumerator;
+    IMMDeviceEnumerator* deviceEnumerator = nullptr;
 
-    friend BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam);
+    friend BOOL CALLBACK enumFunc(
+        HMODULE hModule,
+        LPCTSTR lpszType,
+        LPTSTR lpszName,
+        LONG_PTR lParam);
 };
 
-void QnWinAudioDeviceInfoPrivate::init(const QString &deviceName) {
+void QnWinAudioDeviceInfoPrivate::init(const QString& deviceName)
+{
     this->deviceName = deviceName;
-    
-    IMMDeviceCollection *ppDevices;
+
+    IMMDeviceCollection* ppDevices;
     HRESULT hr;
-    IMMDevice *pMMDevice;
+    IMMDevice* pMMDevice;
 
     CoInitialize(0);
 
     const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
     const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-    hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
-        IID_IMMDeviceEnumerator, (void**)&deviceEnumerator);
-    if (hr != S_OK) return;
+    hr = CoCreateInstance(
+        CLSID_MMDeviceEnumerator,
+        NULL,
+        CLSCTX_ALL,
+        IID_IMMDeviceEnumerator,
+        (void**)&deviceEnumerator);
+    if (hr != S_OK)
+        return;
 
-    if (deviceName.toLower() == QLatin1String("default"))
+    if (deviceName.toLower() == "default")
     {
         deviceEnumerator->GetDefaultAudioEndpoint(eCapture, eMultimedia, &pMMDevice);
         getDeviceInfo(pMMDevice, true);
     }
 
-
     hr = deviceEnumerator->EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE, &ppDevices);
-    if (hr != S_OK) return;
+    if (hr != S_OK)
+        return;
 
     UINT count;
     hr = ppDevices->GetCount(&count);
-    if (hr != S_OK) return;
+    if (hr != S_OK)
+        return;
     for (UINT i = 0; i < count; i++)
     {
         hr = ppDevices->Item(i, &pMMDevice);
-        if (hr != S_OK) return;
+        if (hr != S_OK)
+            return;
         if (getDeviceInfo(pMMDevice, false))
             break;
     }
 }
 
-void QnWinAudioDeviceInfoPrivate::deinit() {
+void QnWinAudioDeviceInfoPrivate::deinit()
+{
     if (deviceEnumerator)
         deviceEnumerator->Release();
 
     CoUninitialize();
 }
 
-bool QnWinAudioDeviceInfoPrivate::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault) {
-    IPropertyStore *pPropertyStore;
+bool QnWinAudioDeviceInfoPrivate::getDeviceInfo(IMMDevice* pMMDevice, bool isDefault)
+{
+    IPropertyStore* pPropertyStore;
     HRESULT hr = pMMDevice->OpenPropertyStore(STGM_READ, &pPropertyStore);
     if (hr != S_OK)
         return false;
 
-    PROPVARIANT pv; PropVariantInit(&pv);
+    PROPVARIANT pv;
+    PropVariantInit(&pv);
     hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
     if (hr != S_OK)
         return false;
@@ -118,14 +141,24 @@ bool QnWinAudioDeviceInfoPrivate::getDeviceInfo(IMMDevice *pMMDevice, bool isDef
         return false;
 
     //PropVariantToGUID(pv, &m_jackSubType);
-    const ushort* guidData16 = (const ushort*) pv.pbVal;
+    const ushort* guidData16 = (const ushort*)pv.pbVal;
     QByteArray arr = QString::fromUtf16(guidData16).toLatin1();
     const char* data8 = arr.constData();
     char guidBuffer[24];
-    sscanf( data8,
+    sscanf(
+        data8,
         "{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
-        &guidBuffer[0], &guidBuffer[4], &guidBuffer[6],
-        &guidBuffer[8],&guidBuffer[9],&guidBuffer[10],&guidBuffer[11],&guidBuffer[12],&guidBuffer[13],&guidBuffer[14],&guidBuffer[15]);
+        &guidBuffer[0],
+        &guidBuffer[4],
+        &guidBuffer[6],
+        &guidBuffer[8],
+        &guidBuffer[9],
+        &guidBuffer[10],
+        &guidBuffer[11],
+        &guidBuffer[12],
+        &guidBuffer[13],
+        &guidBuffer[14],
+        &guidBuffer[15]);
     memcpy(&jackSubType, guidBuffer, 16);
 
     hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
@@ -136,33 +169,41 @@ bool QnWinAudioDeviceInfoPrivate::getDeviceInfo(IMMDevice *pMMDevice, bool isDef
     return true;
 }
 
-QPixmap QnWinAudioDeviceInfoPrivate::getDeviceIcon() {
-    QStringList params = iconPath.split(QLatin1Char(','));
+QPixmap QnWinAudioDeviceInfoPrivate::getDeviceIcon()
+{
+    static const QChar kPercent('%');
+    QStringList params = iconPath.split(',');
     if (params.size() < 2)
         return QPixmap();
 
-    int percent1 = params[0].indexOf(QLatin1Char('%'));
-    while (percent1 >= 0) {
-        int percent2 = params[0].indexOf(QLatin1Char('%'), percent1+1);
-        if (percent2 > percent1) {
-            QString metaVal = params[0].mid(percent1, percent2-percent1+1);
-            QString val = QString::fromLocal8Bit(qgetenv(metaVal.mid(1, metaVal.length()-2).toLatin1().constData()));
+    int percent1 = params[0].indexOf(kPercent);
+    while (percent1 >= 0)
+    {
+        const int percent2 = params[0].indexOf(kPercent, percent1 + 1);
+        if (percent2 > percent1)
+        {
+            QString metaVal = params[0].mid(percent1, percent2 - percent1 + 1);
+            QString val = QString::fromLocal8Bit(
+                qgetenv(metaVal.mid(1, metaVal.length() - 2).toLatin1().constData()));
             params[0].replace(metaVal, val);
         }
-        percent1 = params[0].indexOf(QLatin1Char('%'));
+        percent1 = params[0].indexOf(kPercent);
     }
 
-    HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
+    const HMODULE library = LoadLibrary((LPCWSTR)params[0].constData());
     if (!library)
         return QPixmap();
 
     int resNumber = params[1].toInt();
-    if (resNumber < 0) {
+    if (resNumber < 0)
+    {
         resNumber = -resNumber;
-    } else {
+    }
+    else
+    {
         iconGroupIndex = resNumber;
         iconGroupNum = 0;
-        EnumResourceNames(library, RT_GROUP_ICON, enumFunc, (LONG_PTR) this);
+        EnumResourceNames(library, RT_GROUP_ICON, enumFunc, (LONG_PTR)this);
         resNumber = iconGroupNum;
     }
 
@@ -174,20 +215,21 @@ QPixmap QnWinAudioDeviceInfoPrivate::getDeviceIcon() {
     return result;
 }
 
-BOOL CALLBACK enumFunc(HMODULE /*hModule*/, LPCTSTR /*lpszType*/, LPTSTR lpszName,LONG_PTR lParam)
+BOOL CALLBACK enumFunc(HMODULE /*hModule*/, LPCTSTR /*lpszType*/, LPTSTR lpszName, LONG_PTR lParam)
 {
-    QnWinAudioDeviceInfoPrivate* info = (QnWinAudioDeviceInfoPrivate *) lParam;
+    const auto info = (QnWinAudioDeviceInfoPrivate*)lParam;
     if (info->iconGroupIndex == 0)
     {
-        info->iconGroupNum = (short) lpszName;
+        info->iconGroupNum = (short)lpszName;
         return false;
     }
     info->iconGroupIndex--;
     return true;
 }
 
-bool QnWinAudioDeviceInfoPrivate::getIsMicrophone() const {
-    const GUID MicrophoneGUIDS[] = {
+bool QnWinAudioDeviceInfoPrivate::isMicrophone() const
+{
+    static const std::vector<GUID> kMicrophoneGuids{
         KSNODETYPE_MICROPHONE,
         KSNODETYPE_DESKTOP_MICROPHONE,
         KSNODETYPE_PERSONAL_MICROPHONE,
@@ -197,41 +239,42 @@ bool QnWinAudioDeviceInfoPrivate::getIsMicrophone() const {
         KSNODETYPE_HEADSET_MICROPHONE,
         KSAUDFNAME_ALTERNATE_MICROPHONE,
         KSNODETYPE_PROCESSING_MICROPHONE_ARRAY,
-
         KSAUDFNAME_LINE_IN_VOLUME,
         KSAUDFNAME_LINE_IN
     };
 
-    for (int i = 0; i < arraysize(MicrophoneGUIDS); ++i)
-        if (MicrophoneGUIDS[i] == jackSubType)
-            return true;
+    if (nx::utils::contains(kMicrophoneGuids, jackSubType))
+        return true;
 
-    // device type unknown. try to check device name
-    return fullName.toLower().contains(lit("microphone"));
+    // Device type unknown. try to check device name.
+    return fullName.toLower().contains("microphone");
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnWinAudioDeviceInfo
 // -------------------------------------------------------------------------- //
-QnWinAudioDeviceInfo::QnWinAudioDeviceInfo(const QString &deviceName):
+QnWinAudioDeviceInfo::QnWinAudioDeviceInfo(const QString& deviceName):
     d(new QnWinAudioDeviceInfoPrivate())
 {
     d->init(deviceName);
 }
 
-QnWinAudioDeviceInfo::~QnWinAudioDeviceInfo() {
+QnWinAudioDeviceInfo::~QnWinAudioDeviceInfo()
+{
     d->deinit();
 }
 
-QString QnWinAudioDeviceInfo::fullName() const {
+QString QnWinAudioDeviceInfo::fullName() const
+{
     return d->fullName;
 }
 
-QPixmap QnWinAudioDeviceInfo::deviceIcon() const {
+QPixmap QnWinAudioDeviceInfo::deviceIcon() const
+{
     return d->getDeviceIcon();
 }
 
-bool QnWinAudioDeviceInfo::isMicrophone() const {
-    return d->getIsMicrophone();
+bool QnWinAudioDeviceInfo::isMicrophone() const
+{
+    return d->isMicrophone();
 }

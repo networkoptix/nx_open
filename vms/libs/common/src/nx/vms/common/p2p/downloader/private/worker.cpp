@@ -834,9 +834,9 @@ void Worker::fail()
 
 void Worker::updateLogTag()
 {
-    auto tag = lit(" [%1]").arg(m_fileName);
+    auto tag = QStringLiteral(" [%1]").arg(m_fileName);
     if (m_printSelfPeerInLogs)
-        tag.prepend(lit("Worker [%1]").arg(m_peerManager->peerString(m_peerManager->selfId())));
+        tag.prepend(lm("Worker [%1]").arg(m_peerManager->peerString(m_peerManager->selfId())));
     else
         tag.prepend(::toString(this));
 

@@ -1,5 +1,5 @@
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/vms/server/resource/shared_context_pool.h>
 #include <utils/common/util.h>
 
 #include "hanwha_archive_delegate.h"
@@ -8,10 +8,10 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_chunk_reader.h"
 #include <nx/utils/scope_guard.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -320,5 +320,5 @@ CameraDiagnostics::Result HanwhaArchiveDelegate::lastError() const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

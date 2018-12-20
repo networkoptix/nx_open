@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <QtCore/QObject>
+
 namespace nx {
 namespace vms {
 namespace time_sync {

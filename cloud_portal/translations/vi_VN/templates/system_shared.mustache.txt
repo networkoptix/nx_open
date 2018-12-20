@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+Xin chào, {{message.userFullName}}
 
 {{#message.sharer_name}}
 <a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> đã chia sẻ quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}" với bạn.

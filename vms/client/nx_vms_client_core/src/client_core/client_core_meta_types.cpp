@@ -1,5 +1,7 @@
 #include "client_core_meta_types.h"
 
+#include <atomic>
+
 #include <QtQml/QtQml>
 
 #include <core/ptz/media_dewarping_params.h>
@@ -17,8 +19,10 @@
 #include <client/forgotten_systems_manager.h>
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
+#include <common/common_meta_types.h>
 
 #include <nx/client/core/animation/kinetic_animation.h>
+#include <nx/vms/client/core/common/utils/encoded_credentials.h>
 #include <nx/client/core/media/media_player.h>
 #include <nx/client/core/resource/resource_helper.h>
 #include <nx/client/core/resource/media_resource_helper.h>
@@ -32,6 +36,8 @@
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/data/system_information.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::client::core {
 
@@ -51,6 +57,17 @@ static QObject* createAppInfo(QQmlEngine*, QJSEngine*)
 
 void initializeMetaTypes()
 {
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
+        return;
+
+    initialized = true;
+
+    QnCommonMetaTypes::initialize();
+
+    QnJsonSerializer::registerSerializer<EncodedCredentials>();
+
     qRegisterMetaType<QnStringSet>();
     qRegisterMetaTypeStreamOperators<QnStringSet>();
 

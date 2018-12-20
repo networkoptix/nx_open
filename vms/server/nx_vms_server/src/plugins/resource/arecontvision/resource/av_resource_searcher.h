@@ -4,14 +4,14 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/resource/arecontvision/resource/av_resource.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <array>
 
 class QnCommonModule;
 
 class QnPlArecontResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     typedef std::array<unsigned char, 6> MacArray;
     using base_type = QnAbstractNetworkResourceSearcher;

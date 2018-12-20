@@ -289,6 +289,7 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
     /* Let the style calculate text rect so we can determine side paddings dictated by it: */
+    // TODO: #vkutin This doesn't work anymore.
     option.rect.setSize(QSize(10000, 20)); // some really big width and any nonzero height
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
 

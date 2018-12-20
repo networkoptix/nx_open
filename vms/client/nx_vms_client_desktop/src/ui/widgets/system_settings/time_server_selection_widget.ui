@@ -62,7 +62,7 @@
          <item>
           <widget class="QLabel" name="timeDescLabel">
            <property name="text">
-            <string>System Time</string>
+            <string>VMS Time</string>
            </property>
           </widget>
          </item>

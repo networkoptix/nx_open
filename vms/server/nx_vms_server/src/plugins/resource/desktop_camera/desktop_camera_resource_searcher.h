@@ -6,7 +6,7 @@
 
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 #include <nx/network/deprecated/simple_http_client.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 #include <nx/utils/url.h>
 
@@ -14,7 +14,7 @@ class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:

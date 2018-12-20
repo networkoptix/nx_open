@@ -2,6 +2,8 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <nx/vms/client/desktop/common/redux/private_redux_store.h>
+
 #include "layout_settings_dialog_state.h"
 #include "layout_settings_dialog_state_reducer.h"
 
@@ -10,27 +12,10 @@ namespace nx::vms::client::desktop {
 using State = LayoutSettingsDialogState;
 using Reducer = LayoutSettingsDialogStateReducer;
 
-struct LayoutSettingsDialogStore::Private
+struct LayoutSettingsDialogStore::Private:
+    PrivateReduxStore<LayoutSettingsDialogStore, State>
 {
-    LayoutSettingsDialogStore* const q;
-    bool actionInProgress = false;
-    State state;
-
-    explicit Private(LayoutSettingsDialogStore* owner):
-        q(owner)
-    {
-    }
-
-    void executeAction(std::function<State(State&&)> reduce)
-    {
-        // Chained actions are forbidden.
-        if (actionInProgress)
-            return;
-
-        QScopedValueRollback<bool> guard(actionInProgress, true);
-        state = reduce(std::move(state));
-        emit q->stateChanged(state);
-    }
+    using PrivateReduxStore::PrivateReduxStore;
 };
 
 LayoutSettingsDialogStore::LayoutSettingsDialogStore(QObject* parent):

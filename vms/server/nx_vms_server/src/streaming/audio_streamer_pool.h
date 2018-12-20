@@ -5,14 +5,14 @@
 #include <utils/common/request_param.h>
 #include <common/common_module_aware.h>
 #include <camera/video_camera.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnAbstractAudioTransmitter;
-namespace nx { namespace mediaserver { namespace resource { class Camera; } }}
+namespace nx { namespace vms::server { namespace resource { class Camera; } }}
 
 class QnAudioStreamerPool:
     public QObject,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -41,7 +41,7 @@ private:
     QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
     QnVideoCameraPtr getTransmitSource(const QString& sourceId) const;
-    nx::mediaserver::resource::CameraPtr getTransmitDestination(const QnUuid& resourceId) const;
+    nx::vms::server::resource::CameraPtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;
     QMap<QString, QnAbstractStreamDataProviderPtr> m_actionDataProviders;

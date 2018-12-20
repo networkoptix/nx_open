@@ -537,11 +537,8 @@ QnFfmpegAudioHelper::~QnFfmpegAudioHelper()
 
 void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src)
 {
-    quint8* tmpData[4];
-    tmpData[0] = dst;
-    swr_convert(m_swr,
-        tmpData, src->nb_samples,
-        (const quint8**) src->data, src->nb_samples);
+    quint8* tmpData[4] = {dst};
+    swr_convert(m_swr,tmpData, src->nb_samples, (const quint8**) src->data, src->nb_samples);
 }
 
 QnFfmpegAvPacket::QnFfmpegAvPacket(uint8_t* data, int size)

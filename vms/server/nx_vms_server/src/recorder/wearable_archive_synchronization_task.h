@@ -3,7 +3,7 @@
 #include <QtCore/QPointer>
 
 #include <utils/common/connective.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
 
 #include "abstract_remote_archive_synchronization_task.h"
@@ -16,7 +16,7 @@ class QnServerEdgeStreamRecorder;
 class QnAviArchiveDelegate;
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 /**
@@ -70,5 +70,5 @@ private:
 using WearableArchiveTaskPtr = std::shared_ptr<WearableArchiveSynchronizationTask>;
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

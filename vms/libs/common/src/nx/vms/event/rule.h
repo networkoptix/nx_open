@@ -83,6 +83,7 @@ public:
     static RuleList getRulesUpd43();
     static RuleList getRulesUpd48();
     static RuleList getDisabledRulesUpd43();
+    static RuleList getPluginEventUpdateRules();
 
     Rule* clone();
     void removeResource(const QnUuid& resId);

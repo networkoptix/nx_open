@@ -794,7 +794,7 @@ INPUT                  = . \
     ../vms/client/nx_vms_client_core \
     ../vms/client/nx_vms_client_desktop \
     ../vms/libs/common \
-    ../nxlib/nx_utils \
+    ../libs/nx_utils \
     ../func_tests \
 
 # Uncomment this line for fast experiments with new doc topics

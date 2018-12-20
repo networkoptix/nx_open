@@ -137,6 +137,8 @@ void QnInstallUpdatesPeerTask::queryNextGroup()
 
         if (server->getVersion() >= kUnauthenticatedUpdateMinVersion)
         {
+            // NOTE: This method is being removed from mediaservers
+            NX_ASSERT(false);
             handle = server->apiConnection()->installUpdateUnauthenticated(
                 m_updateId, true,
                 this, SLOT(at_installUpdateResponse(int,QnUploadUpdateReply,int)));

@@ -81,4 +81,79 @@ detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
     return detail::ServerQueryProcessor(this, userAccessData);
 }
 
+namespace detail {
+
+void TransactionExecutor::stop()
+{
+    pleaseStop();
+    m_waitCondition.wakeOne();
+    QnLongRunnable::stop();
+}
+
+void TransactionExecutor::enqueData(Command command)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_commandQueue.size() >= kMaxQueueSize)
+    {
+        command.completionHandler(ErrorCode::failure);
+        return;
+    }
+    m_commandQueue.push_back(command);
+    m_waitCondition.wakeOne();
+}
+
+void TransactionExecutor::run()
+{
+    while (!needToStop())
+    {
+        std::vector<Command> queue;
+        {
+            QnMutexLocker lock(&m_mutex);
+            while (m_commandQueue.empty() && !needToStop())
+                m_waitCondition.wait(&m_mutex);
+            std::swap(m_commandQueue, queue);
+        }
+        QElapsedTimer timer;
+        timer.restart();
+
+        ErrorCode result = ErrorCode::ok;
+        {
+            std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
+            for (auto& command: queue)
+            {
+                if (!dbTran && ApiCommand::isPersistent(command.command))
+                {
+                    dbTran.reset(
+                        new detail::QnDbManager::QnDbTransactionLocker(m_db->getTransaction()));
+                }
+
+                result = command.result = command.execTranFunc(&command.postProcList);
+                if (result == ErrorCode::dbError)
+                    break;
+            }
+            if (result != ErrorCode::dbError && dbTran)
+            {
+                if (!NX_ASSERT(dbTran->commit()))
+                    result = ErrorCode::dbError;
+            }
+        }
+
+        for (auto& command: queue)
+        {
+            if (result == ErrorCode::dbError)
+                command.result = ErrorCode::dbError; //< Mark all transactions as error because data is rolled back.
+            if (command.result == ErrorCode::ok)
+            {
+                for (const auto& postProcFunc: command.postProcList)
+                    postProcFunc();
+            }
+            command.completionHandler(command.result);
+        }
+
+        NX_VERBOSE(this, "Aggregate %1 tranasction. Execution time %2 ms", queue.size(), timer.elapsed());
+    }
+}
+
+} // namespace detail
+
 } //namespace ec2

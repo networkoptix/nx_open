@@ -116,36 +116,20 @@
 
     <h2>Configuración del Registro</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Nivel de registro principal</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Ninguno: Registro deshabilitado.</option>
-                    <option value="ALWAYS">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
-                    <option value="ERROR">Error: Sólo errores de registro.</option>
-                    <option value="WARNING">Aviso: Registro de advertencias y errores.</option>
-                    <option value="INFO">Info: Registro de errores, avisos y todos los mensajes.</option>
-                    <option value="DEBUG">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
-                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de depuración ampliada.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Ninguno: Registro deshabilitado.</option>
+                    <option value="always">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
+                    <option value="error">Error: Sólo errores de registro.</option>
+                    <option value="warning">Aviso: Registro de advertencias y errores.</option>
+                    <option value="info">Info: Registro de errores, avisos y todos los mensajes.</option>
+                    <option value="debug">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
+                    <option value="debug2">Depuración2: Registre cada mensaje del sistema e información de depuración ampliada.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Nivel del registro de transacciones</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Ninguno: Registro deshabilitado.</option>
-                    <option value="ALWAYS">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
-                    <option value="ERROR">Error: Sólo errores de registro.</option>
-                    <option value="WARNING">Aviso: Las advertencias de registro y errores.</option>
-                    <option value="INFO">Info: Registro de errores, avisos y todos los mensajes.</option>
-                    <option value="DEBUG">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
-                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de depuración ampliada.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Guardar</button>
         </div>

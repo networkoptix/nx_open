@@ -16,66 +16,48 @@
 #include <client/client_settings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-
-#include <update/update_checker.h>
-#include <update/update_info.h>
 
 #include <utils/common/html.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <nx/utils/random.h>
+#include <nx/utils/guarded_callback.h>
+
+#include <nx/update/update_information.h>
+#include <nx/update/update_check.h>
 
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
     constexpr int kUpdatePeriodMSec = 60 * 60 * 1000; //< 1 hour.
-
     constexpr int kHoursPerDay = 24;
     constexpr int kMinutesPerHour = 60;
     constexpr int kSecsPerMinute = 60;
-
     constexpr int kTooLateDayOfWeek = Qt::Thursday;
-
 } // anonymous namespace
 
 QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject* parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_checker(
-        [this]() -> QnUpdateChecker*
-        {
-            const QUrl updateFeedUrl(qnSettings->updateFeedUrl());
-            return updateFeedUrl.isEmpty()
-                ? nullptr
-                : new QnUpdateChecker(updateFeedUrl, this);
-        }()),
     m_timer(new QTimer(this)),
     m_notifiedVersion()
 {
-    if (!m_checker)
-        return;
-
-    connect(m_checker, &QnUpdateChecker::updateAvailable, this,
-        &QnWorkbenchUpdateWatcher::at_checker_updateAvailable);
-
     m_timer->setInterval(kUpdatePeriodMSec);
-    connect(m_timer, &QTimer::timeout, m_checker, &QnUpdateChecker::checkForUpdates);
+    connect(m_timer, &QTimer::timeout, this, &QnWorkbenchUpdateWatcher::atStartCheckUpdate);
 }
 
 QnWorkbenchUpdateWatcher::~QnWorkbenchUpdateWatcher() {}
 
 void QnWorkbenchUpdateWatcher::start()
 {
-    if (!m_checker)
-        return;
-
     m_timer->start();
-    m_checker->checkForUpdates();
+    atStartCheckUpdate();
 }
 
 void QnWorkbenchUpdateWatcher::stop()
@@ -83,82 +65,107 @@ void QnWorkbenchUpdateWatcher::stop()
     m_timer->stop();
 }
 
-void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &info)
+void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
 {
-    NX_ASSERT(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
+    // This signal will be removed when update check is complete.
+    if (m_updateInfo.valid())
+        return;
+    QString updateUrl = qnSettings->updateFeedUrl();
+    auto callback = nx::utils::guarded(this,
+        [this](const UpdateContents& contents)
+        {
+            atCheckerUpdateAvailable(contents);
+        });
+    m_updateInfo = nx::update::checkLatestUpdate(updateUrl, std::move(callback));
+}
 
-    if (info.currentRelease.isNull())
+void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
+{
+    m_updateInfo = std::future<UpdateContents>();
+
+    // 'NoNewVersion' is considered invalid as well.
+    if (!contents.info.isValid())
         return;
 
-    /* We are not interested in updates right now. */
+    // We are not interested in updates right now.
     if (!m_timer->isActive())
         return;
 
-    /* We have no access rights. */
+    // We have no access rights.
     if (!menu()->canTrigger(action::SystemUpdateAction))
         return;
 
-    /* User was already notified about this release. */
-    if (m_notifiedVersion == info.currentRelease)
+    auto targetVersion = contents.getVersion();
+    // User was already notified about this release.
+    if (m_notifiedVersion == targetVersion)
         return;
 
-    /* Current version is greater or equal to latest. */
-    if (qnStaticCommon->engineVersion() >= info.currentRelease)
+    // Current version is greater or equal to latest.
+    if (qnStaticCommon->engineVersion() >= targetVersion)
         return;
 
-    /* User is not interested in this update. */
-    if (qnSettings->ignoredUpdateVersion() >= info.currentRelease)
+    // User is not interested in this update.
+    if (qnSettings->ignoredUpdateVersion() >= targetVersion)
         return;
 
-    /* Administrator disabled update notifications globally. */
+    // Administrator disabled update notifications globally.
     if (!qnGlobalSettings->isUpdateNotificationsEnabled())
         return;
 
-    /* Do not show notifications near the end of the week or on our holidays. */
+    // Do not show notifications near the end of the week or on our holidays.
      if (QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek)
          return;
 
-    QnUpdateInfo oldUpdateInfo = qnSettings->latestUpdateInfo();
-    if (oldUpdateInfo.currentRelease != info.currentRelease
-        ||
-        oldUpdateInfo.releaseDateMs != info.releaseDateMs
-        ||
-        oldUpdateInfo.releaseDeliveryDays != info.releaseDeliveryDays)
-    {
-        /* New release was published - or we decided to change delivery period. Estimating new delivery date. */
-        QDateTime releaseDate = QDateTime::fromMSecsSinceEpoch(info.releaseDateMs);
+    // TODO: Should inject this values inside UpdateInformation
+    // Release date - in msecs since epoch.
+    qint64 releaseDateMs = contents.info.releaseDateMs;
+    // Maximum days for release delivery.
+    int releaseDeliveryDays = contents.info.releaseDeliveryDays;
 
-        /* We do not need high precision, selecting time to deliver. */
-        int timeToDeliverMinutes = nx::utils::random::number(0, info.releaseDeliveryDays * kHoursPerDay * kMinutesPerHour);
+    nx::update::Information oldUpdateInfo = qnSettings->latestUpdateInfo();
+    if (nx::utils::SoftwareVersion(oldUpdateInfo.version) != targetVersion
+        || oldUpdateInfo.releaseDateMs != releaseDateMs
+        || oldUpdateInfo.releaseDeliveryDays != releaseDeliveryDays)
+    {
+        // New release was published - or we decided to change delivery period.
+        // Estimating new delivery date.
+        QDateTime releaseDate = QDateTime::fromMSecsSinceEpoch(releaseDateMs);
+
+        // We do not need high precision, selecting time to deliver.
+        int timeToDeliverMinutes = nx::utils::random::number(0,
+            releaseDeliveryDays * kHoursPerDay * kMinutesPerHour);
         qint64 timeToDeliverMs = timeToDeliverMinutes * kSecsPerMinute;
         qnSettings->setUpdateDeliveryDate(releaseDate.addSecs(timeToDeliverMs).toMSecsSinceEpoch());
     }
-    qnSettings->setLatestUpdateInfo(info);
+    qnSettings->setLatestUpdateInfo(contents.info);
     qnSettings->save();
 
-    /* Update is postponed */
+    // Update is postponed
     if (qnSettings->updateDeliveryDate() > QDateTime::currentMSecsSinceEpoch())
         return;
 
-    showUpdateNotification(info);
+    showUpdateNotification(targetVersion, contents.info.releaseNotesUrl, contents.info.description);
 }
 
-void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
+void QnWorkbenchUpdateWatcher::showUpdateNotification(
+    const nx::utils::SoftwareVersion& targetVersion,
+    const nx::utils::Url& releaseNotesUrl,
+    const QString& description)
 {
-    m_notifiedVersion = info.currentRelease;
+    m_notifiedVersion = targetVersion;
 
     const auto current = qnStaticCommon->engineVersion();
-    const bool majorVersionChange = ((info.currentRelease.major() > current.major())
-        || (info.currentRelease.minor() > current.minor()));
+    const bool majorVersionChange = ((targetVersion.major() > current.major())
+        || (targetVersion.minor() > current.minor()));
 
-    const auto text = tr("%1 version available").arg(info.currentRelease.toString());
-    const auto releaseNotesLink = makeHref(tr("Release Notes"), info.releaseNotesUrl);
+    const auto text = tr("%1 version available").arg(targetVersion.toString());
+    const auto releaseNotesLink = makeHref(tr("Release Notes"), releaseNotesUrl);
 
     QStringList extras;
     if (majorVersionChange)
         extras.push_back(tr("Major issues have been fixed. Update is strongly recommended."));
-    if (!info.description.isEmpty())
-        extras.push_back(info.description);
+    if (!description.isEmpty())
+        extras.push_back(description);
     extras.push_back(releaseNotesLink);
 
     QnMessageBox messageBox(QnMessageBoxIcon::Information,
@@ -175,7 +182,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     if (messageBox.isChecked())
     {
-        qnSettings->setIgnoredUpdateVersion(info.currentRelease);
+        qnSettings->setIgnoredUpdateVersion(targetVersion);
         qnSettings->save();
     }
 

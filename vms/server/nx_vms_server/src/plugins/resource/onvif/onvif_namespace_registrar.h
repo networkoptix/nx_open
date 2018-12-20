@@ -3,7 +3,7 @@
 #include <onvif/soapStub.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace onvif {
 
@@ -19,5 +19,5 @@ const Namespace* requestNamespaces()
 
 } // namespace onvif
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

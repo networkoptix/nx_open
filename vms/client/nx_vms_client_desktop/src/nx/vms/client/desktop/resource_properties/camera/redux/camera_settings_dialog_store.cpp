@@ -4,6 +4,8 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <nx/vms/client/desktop/common/redux/private_redux_store.h>
+
 #include "camera_settings_dialog_state.h"
 #include "camera_settings_dialog_state_reducer.h"
 
@@ -36,42 +38,10 @@ L fromVariantList(const QVariantList& list)
 
 } // namespace
 
-struct CameraSettingsDialogStore::Private
+struct CameraSettingsDialogStore::Private:
+    PrivateReduxStore<CameraSettingsDialogStore, State>
 {
-    CameraSettingsDialogStore* const q;
-    bool actionInProgress = false;
-    State state;
-
-    explicit Private(CameraSettingsDialogStore* owner):
-        q(owner)
-    {
-    }
-
-    void executeAction(std::function<State(State&&)> reduce)
-    {
-        // Chained actions are forbidden.
-        if (actionInProgress)
-            return;
-
-        QScopedValueRollback<bool> guard(actionInProgress, true);
-        state = reduce(std::move(state));
-        emit q->stateChanged(state);
-    }
-
-    void executeAction(std::function<std::pair<bool, State>(State&&)> reduce)
-    {
-        // Chained actions are forbidden.
-        if (actionInProgress)
-            return;
-
-        QScopedValueRollback<bool> guard(actionInProgress, true);
-
-        bool changed = false;
-        std::tie(changed, state) = reduce(std::move(state));
-
-        if (changed)
-            emit q->stateChanged(state);
-    }
+    using PrivateReduxStore::PrivateReduxStore;
 };
 
 CameraSettingsDialogStore::CameraSettingsDialogStore(QObject* parent):
@@ -424,6 +394,20 @@ void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QSet<QnUuid>& v
 {
     d->executeAction(
         [&](State state) { return Reducer::setEnabledAnalyticsEngines(std::move(state), value); });
+}
+
+QnUuid CameraSettingsDialogStore::currentAnalyticsEngineId() const
+{
+    return d->state.analytics.currentEngineId;
+}
+
+void CameraSettingsDialogStore::setCurrentAnalyticsEngineId(const QnUuid& value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setCurrentAnalyticsEngineId(std::move(state), value);
+        });
 }
 
 bool CameraSettingsDialogStore::analyticsSettingsLoading() const

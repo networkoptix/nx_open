@@ -11,8 +11,8 @@
 #include <common/common_module_aware.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/meta/member_detector.h>
-#include <nx/utils/meta/type_traits.h>
+#include <nx/utils/member_detector.h>
+#include <nx/utils/type_traits.h>
 #include <nx/utils/std/optional.h>
 
 #include <nx/fusion/model_functions.h>
@@ -26,30 +26,25 @@ namespace details {
 
 using PluginIds = std::set<QString>;
 
-DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
+NX_UTILS_DECLARE_FIELD_DETECTOR(HasField_paths,
+    paths, std::set<nx::vms::api::analytics::HierarchyPath>);
 
 inline QnMediaServerResourcePtr server(
     QnCommonModule* commonModule,
     const QnUuid& serverId = QnUuid())
 {
-    if (!commonModule)
-    {
-        NX_ASSERT(false, "Can't access common module");
+    if (!NX_ASSERT(commonModule, "Can't access common module"))
         return QnMediaServerResourcePtr();
-    }
 
     auto resourcePool = commonModule->resourcePool();
-    if (!resourcePool)
-    {
-        NX_ASSERT(false, "Can't access resource pool");
+    if (!NX_ASSERT(resourcePool, "Can't access resource pool"))
         return QnMediaServerResourcePtr();
-    }
 
     return resourcePool->getResourceById<QnMediaServerResource>(
         serverId.isNull() ? commonModule->moduleGUID() : serverId);
 }
 
-// TODO: #dmishin make generic getter for supported ids
+// TODO: #dmishin Make generic getter for supported ids.
 template<typename T>
 std::set<QString> descriptorIds(const QnVirtualCameraResourcePtr& /*device*/)
 {
@@ -73,6 +68,7 @@ class DescriptorListManager: public QnCommonModuleAware
 
     template<typename Descriptor>
     using Container = std::map<QString, Descriptor>;
+
 public:
     DescriptorListManager(QnCommonModule* serverModule);
 
@@ -160,7 +156,7 @@ public:
             {
                 descriptors[descriptor.getId()] = descriptor;
             }
-            else if constexpr (details::hasPaths<Descriptor>::value)
+            else if constexpr (details::HasField_paths<Descriptor>::value)
             {
                 auto& existingDescriptor = itr->second;
                 existingDescriptor.paths.insert(
@@ -176,11 +172,8 @@ public:
         }
 
         auto currentServerPtr = details::server(commonModule());
-        if (!currentServerPtr)
-        {
-            NX_ASSERT(false, "Can't find current server resource");
+        if (!NX_ASSERT(currentServerPtr, "Can't find current server resource"))
             return;
-        }
 
         currentServerPtr->setProperty(
             propertyName(typeid(Descriptor)),
@@ -200,11 +193,8 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
         auto currentServerPtr = details::server(commonModule());
-        if (!currentServerPtr)
-        {
-            NX_ASSERT(false, "Can't find current server resource");
+        if (!NX_ASSERT(currentServerPtr, "Can't find current server resource"))
             return;
-        }
 
         currentServerPtr->setProperty(propertyName(typeid(Descriptor)), QString());
     }

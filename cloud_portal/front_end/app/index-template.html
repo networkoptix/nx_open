@@ -35,7 +35,7 @@
     Please, turn on JavaScript in your browser
 </noscript>
 
-<nx-header></nx-header>
+<nx-header ng-cloak></nx-header>
 
 <nx-app>
     <div class="placeholder">
@@ -49,7 +49,7 @@
     </div>
 </nx-app>
 
-<nx-footer></nx-footer>
+<nx-footer ng-cloak></nx-footer>
 
 <% for (key in htmlWebpackPlugin.files.chunks) { %>
 <script type="text/javascript" src="/static<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>

@@ -5,7 +5,7 @@
 #include <QAbstractListModel>
 
 #include <base/types.h>
-#include <nx/mediaserver/api/client.h>
+#include <nx/vms/server/api/client.h>
 
 namespace rtu
 {
@@ -21,12 +21,12 @@ namespace rtu
 
         virtual ~ServersSelectionModel();
 
-        typedef nx::mediaserver::api::ServerInfoPtrContainer ServerInfoPtrContainer;
-        typedef nx::mediaserver::api::ServerInfo ServerInfo;
-        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
-        typedef nx::mediaserver::api::ExtraServerInfo ExtraServerInfo;
-        typedef nx::mediaserver::api::InterfaceInfoList InterfaceInfoList;
-        typedef nx::mediaserver::api::HttpAccessMethod HttpAccessMethod;
+        typedef nx::vms::server::api::ServerInfoPtrContainer ServerInfoPtrContainer;
+        typedef nx::vms::server::api::ServerInfo ServerInfo;
+        typedef nx::vms::server::api::BaseServerInfo BaseServerInfo;
+        typedef nx::vms::server::api::ExtraServerInfo ExtraServerInfo;
+        typedef nx::vms::server::api::InterfaceInfoList InterfaceInfoList;
+        typedef nx::vms::server::api::HttpAccessMethod HttpAccessMethod;
 
     public slots:
         /// Sets items with specified ids selected

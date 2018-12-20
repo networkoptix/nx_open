@@ -37,10 +37,10 @@ static const nx::utils::log::Tag kHikvisionApiLogTag(QString("hikvision_api_prot
 } // namespace
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
-using namespace nx::mediaserver_core::plugins::hikvision;
+using namespace nx::vms::server::plugins::hikvision;
 using namespace nx::plugins::utils;
 
 HikvisionResource::HikvisionResource(QnMediaServerModule* serverModule):
@@ -57,7 +57,7 @@ QString HikvisionResource::defaultCodec() const
     return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
@@ -65,7 +65,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
     if (!capabilities)
         return base_type::getStreamCapabilityMapFromDrives(streamIndex);
 
-    nx::mediaserver::resource::StreamCapabilityMap result;
+    nx::vms::server::resource::StreamCapabilityMap result;
     for (const auto& codec: capabilities->codecs)
     {
         for (const auto& resolution: capabilities->resolutions)
@@ -112,9 +112,9 @@ QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
-    const CapabilitiesResp& onvifCapabilities)
+    const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities)
 {
-    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(ResourceDataKey::kDisableHevc, false);
 
     if (!hevcIsDisabled && m_integrationProtocols[Protocol::isapi].enabled)
     {
@@ -137,7 +137,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             {
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
-                    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
+                    setProperty(ResourcePropertyKey::kHasDualStreaming, 1);
                     if (!channelCapabilities.fpsInDeviceUnits.empty())
                         setMaxFps(channelCapabilities.realMaxFps());
                 }
@@ -365,7 +365,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByE
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif  //ENABLE_ONVIF

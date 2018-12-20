@@ -19,24 +19,22 @@ public:
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
-        registerKey<Ptz::Capabilities>(Qn::PTZ_CAPABILITIES_PARAM_NAME);
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
-        registerKey<QList<nx::common::utils::Credentials>>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
-        registerKey<nx::common::utils::Credentials>(Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<QList<nx::vms::common::Credentials>>(
+            ResourceDataKey::kPossibleDefaultCredentials);
+        registerKey<nx::vms::common::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
-            Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
-        registerKey<QnHttpConfigureRequestList>(Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
-        registerKey<QnBitrateList>(Qn::HIGH_STREAM_AVAILABLE_BITRATES_PARAM_NAME);
-        registerKey<QnBitrateList>(Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME);
-        registerKey<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
-
-        registerKey<QnBounds>(Qn::HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME);
-        registerKey<QnBounds>(Qn::LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME);
-
-        registerKey<std::vector<QnCameraAdvancedParameterOverload>>(Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
+            ResourceDataKey::kMultiresourceVideoChannelMapping);
+        registerKey<QnHttpConfigureRequestList>(ResourceDataKey::kPreStreamConfigureRequests);
+        registerKey<QnBitrateList>(ResourceDataKey::kHighStreamAvailableBitrates);
+        registerKey<QnBitrateList>(ResourceDataKey::kLowStreamAvailableBitrates);
+        registerKey<QnBounds>(ResourceDataKey::kHighStreamBitrateBounds);
+        registerKey<QnBounds>(ResourceDataKey::kLowStreamBitrateBounds);
+        registerKey<TwoWayAudioParams>(ResourceDataKey::kTwoWayAudio);
+        registerKey<std::vector<QnCameraAdvancedParameterOverload>>(
+            ResourceDataKey::kAdvancedParameterOverloads);
         registerKey<nx::core::ptz::Override>(nx::core::ptz::Override::kPtzOverrideKey);
     }
 

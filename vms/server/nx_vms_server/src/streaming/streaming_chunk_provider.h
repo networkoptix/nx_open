@@ -9,7 +9,7 @@ class QnResourcePool;
 class StreamingChunkTranscoder;
 class QnMediaServerModule;
 
-namespace nx::mediaserver { class Settings; }
+namespace nx::vms::server { class Settings; }
 
 class AbstractStreamingChunkProvider
 {

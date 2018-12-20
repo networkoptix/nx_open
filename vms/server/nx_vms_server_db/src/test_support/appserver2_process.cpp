@@ -319,6 +319,24 @@ void Appserver2Process::registerHttpHandlers(
             return nx::network::http::StatusCode::ok;
         });
 
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/metrics",
+        [](const nx::network::http::Request&, QnHttpConnectionListener* owner,
+            QnJsonRestResult* result)
+        {
+            auto metrics = owner->commonModule()->metrics();
+            metrics->tcpConnections().totalBytesSent() = nx::network::totalSocketBytesSent();
+
+            const auto& counters = nx::p2p::Connection::sendCounters();
+            for (int i = 0; i < (int) nx::p2p::MessageType::counter; ++i)
+            {
+                auto messageName = toString(nx::p2p::MessageType(i));
+                metrics->p2pCounters().dataSentByMessageType()[messageName] = counters[i];
+            }
+
+            result->reply = owner->commonModule()->metrics()->toJson(true);
+            return nx::network::http::StatusCode::ok;
+        });
+
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", rest::helper::P2pStatistics::kUrlPath,
         [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {

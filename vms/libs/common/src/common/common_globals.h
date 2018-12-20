@@ -54,6 +54,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DualStreamingForLiveOnly            = 0x8000,
         customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
         CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
+        FixedQualityCapability              = 0x40000, //< Camera does not allow to change stream quality/fps
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -86,8 +87,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         UpdateHomeObjectPtzCommand,
         GetHomeObjectPtzCommand,
 
-        GetAuxilaryTraitsPtzCommand,
-        RunAuxilaryCommandPtzCommand,
+        GetAuxiliaryTraitsPtzCommand,
+        RunAuxiliaryCommandPtzCommand,
 
         GetDataPtzCommand,
 
@@ -98,19 +99,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
 
     enum PtzDataField {
-        CapabilitiesPtzField    = 0x001,
-        DevicePositionPtzField  = 0x002,
-        LogicalPositionPtzField = 0x004,
-        DeviceLimitsPtzField    = 0x008,
-        LogicalLimitsPtzField   = 0x010,
-        FlipPtzField            = 0x020,
-        PresetsPtzField         = 0x040,
-        ToursPtzField           = 0x080,
-        ActiveObjectPtzField    = 0x100,
-        HomeObjectPtzField      = 0x200,
-        AuxilaryTraitsPtzField  = 0x400,
-        NoPtzFields             = 0x000,
-        AllPtzFields            = 0xFFF
+        NoPtzFields = 0,
+        CapabilitiesPtzField = 1 << 0,
+        DevicePositionPtzField = 1 << 1,
+        LogicalPositionPtzField = 1 << 2,
+        DeviceLimitsPtzField = 1 << 3,
+        LogicalLimitsPtzField = 1 << 4,
+        FlipPtzField = 1 << 5,
+        PresetsPtzField = 1 << 6,
+        ToursPtzField = 1 << 7,
+        ActiveObjectPtzField = 1 << 8,
+        HomeObjectPtzField = 1 << 9,
+        AuxiliaryTraitsPtzField = 1 << 10,
+        AllPtzFields = -1 //< All ones.
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzDataField)
 

@@ -148,7 +148,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qt::DisplayRole:
         {
             const auto fallbackTitle =
-                [this, typeId = object.objectTypeId]()
+                [typeId = object.objectTypeId]()
                 {
                     return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
                 };
@@ -157,9 +157,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            const auto descriptorListManager = objectCamera
-                ->commonModule()
-                ->analyticsDescriptorListManager();
+            const auto descriptorListManager =
+                objectCamera->commonModule()->analyticsDescriptorListManager();
 
             auto objectTypeDescriptor = descriptorListManager
                 ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
@@ -167,9 +166,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectTypeDescriptor)
                 return fallbackTitle();
 
-            return objectTypeDescriptor->item.name.value.isEmpty()
+            return objectTypeDescriptor->item.name.isEmpty()
                 ? fallbackTitle()
-                : objectTypeDescriptor->item.name.value;
+                : objectTypeDescriptor->item.name;
         }
 
         case Qt::DecorationRole:
@@ -245,6 +244,20 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
     m_filterText = value;
 }
 
+QString AnalyticsSearchListModel::Private::selectedObjectType() const
+{
+    return m_selectedObjectType;
+}
+
+void AnalyticsSearchListModel::Private::setSelectedObjectType(const QString& value)
+{
+    if (m_selectedObjectType == value)
+        return;
+
+    q->clear();
+    m_selectedObjectType = value;
+}
+
 void AnalyticsSearchListModel::Private::clearData()
 {
     ScopedReset reset(q, !m_data.empty());
@@ -261,7 +274,7 @@ void AnalyticsSearchListModel::Private::truncateToMaximumCount()
             m_objectIdToTimestamp.remove(object.objectAppearanceId);
         };
 
-    this->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
+    q->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
 }
 
 void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
@@ -272,8 +285,8 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
             m_objectIdToTimestamp.remove(object.objectAppearanceId);
         };
 
-    this->truncateDataToTimePeriod(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+    q->truncateDataToTimePeriod(
+        m_data, &startTime, q->relevantTimePeriod(), itemCleanup);
 }
 
 bool AnalyticsSearchListModel::Private::isCameraApplicable(
@@ -282,11 +295,6 @@ bool AnalyticsSearchListModel::Private::isCameraApplicable(
     // TODO: #vkutin Implement it when it's possible!
     NX_ASSERT(camera);
     return true;
-}
-
-bool AnalyticsSearchListModel::Private::hasAccessRights() const
-{
-    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -351,13 +359,13 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
     const auto count = std::distance(begin, end);
     if (count <= 0)
     {
-        NX_VERBOSE(q) << "Committing no analytics";
+        NX_VERBOSE(q, "Committing no analytics");
         return false;
     }
 
-    NX_VERBOSE(q) << "Committing" << count << "analytics from"
-        << nx::utils::timestampToDebugString(startTime(*(end - 1)).count()) << "to"
-        << nx::utils::timestampToDebugString(startTime(*begin).count());
+    NX_VERBOSE(q, "Committing %1 analytics:\n    from: %2\n    to: %3", count,
+        nx::utils::timestampToDebugString(startTime(*(end - 1)).count()),
+        nx::utils::timestampToDebugString(startTime(*begin).count()));
 
     ScopedInsertRows insertRows(q, position, position + count - 1);
     for (auto iter = begin; iter != end; ++iter)
@@ -385,11 +393,10 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& perio
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& period,
-    GetCallback callback, int limit)
+    GetCallback callback, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    if (!NX_ASSERT(callback && server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     Filter request;
@@ -405,6 +412,9 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.maxObjectsToSelect = limit;
     request.freeText = m_filterText;
 
+    if (!m_selectedObjectType.isEmpty())
+        request.objectTypeId = {m_selectedObjectType};
+
     request.boundingBox = q->cameraSet()->type() == ManagedCameraSet::Type::single
         ? m_filterRect
         : QRectF();
@@ -413,11 +423,14 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
 
-    NX_VERBOSE(q) << "Requesting analytics from"
-        << nx::utils::timestampToDebugString(period.startTimeMs) << "to"
-        << nx::utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.sortOrder).toString()
-        << "maximum objects" << request.maxObjectsToSelect;
+    NX_VERBOSE(q, "Requesting analytics:\n    from: %1\n    to: %2\n"
+        "    box: %3\n    text filter: %4\n    sort: %5\n    limit: %6",
+        nx::utils::timestampToDebugString(period.startTimeMs),
+        nx::utils::timestampToDebugString(period.endTimeMs()),
+        request.boundingBox,
+        request.freeText,
+        QVariant::fromValue(request.sortOrder).toString(),
+        request.maxObjectsToSelect);
 
     return server->restConnection()->lookupDetectedObjects(
         request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
@@ -456,15 +469,13 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
             }
         }
 
-        NX_VERBOSE(q) << "Ensured metadata receivers for"
-            << newMetadataReceivers.size() << "cameras";
-
+        NX_VERBOSE(q, "Ensured metadata receivers for %1 cameras", newMetadataReceivers.size());
         m_metadataReceivers = std::move(newMetadataReceivers);
     }
     else
     {
         m_metadataReceivers.clear();
-        NX_VERBOSE(q) << "Released all metadata receivers";
+        NX_VERBOSE(q, "Released all metadata receivers");
     }
 }
 
@@ -473,7 +484,7 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
     if (m_liveReceptionActive == value)
         return;
 
-    NX_VERBOSE(q) << "Setting live reception" << (value ? "active" : "inactive");
+    NX_VERBOSE(q, "Setting live reception %1", (value ? "active" : "inactive"));
     m_liveReceptionActive = value;
 
     updateMetadataReceivers();
@@ -482,14 +493,14 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
 void AnalyticsSearchListModel::Private::processMetadata()
 {
     // Don't start receiving live data until first archive fetch is finished.
-    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || canFetch()))
+    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || q->canFetchMore()))
         return;
 
     // Completely stop metadata reception if paused.
     if (q->livePaused())
         q->setLive(false);
 
-    setLiveReceptionActive(q->isLive() && q->isOnline());
+    setLiveReceptionActive(q->isLive() && q->isOnline() && !q->isFilterDegenerate());
 
     if (!m_liveReceptionActive)
         return;
@@ -514,8 +525,8 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     // Process all metadata packets.
 
-    NX_VERBOSE(q) << "Processing" << totalPackets << "live metadata packets from"
-        << packetsBySource.size() << "sources";
+    NX_VERBOSE(q, "Processing %1 live metadata packets from %2 sources",
+        totalPackets, packetsBySource.size());
 
     QList<DetectedObject> newObjects;
     QHash<QnUuid, int> newObjectIndices;
@@ -556,11 +567,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
                 }
 
-                if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                if ((!m_selectedObjectType.isEmpty() && m_selectedObjectType != item.objectTypeId)
+                    || (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                    || !acceptedByTextFilter(item, m_filterText))
+                {
                     continue;
-
-                if (!acceptedByTextFilter(item, m_filterText))
-                    continue;
+                }
 
                 DetectedObject newObject;
                 newObject.objectAppearanceId = item.objectId;
@@ -593,12 +605,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     q->addToFetchedTimeWindow(periodToCommit);
 
-    NX_VERBOSE(q) << "Live update commit";
+    NX_VERBOSE(q, "Live update commit");
     commitInternal(periodToCommit, newObjects.rbegin(), newObjects.rend(), 0, true);
 
     if (count() > q->maximumCount())
     {
-        NX_VERBOSE(q) << "Truncating to maximum count";
+        NX_VERBOSE(q, "Truncating to maximum count");
         truncateToMaximumCount();
     }
 }
@@ -757,7 +769,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
         for (const auto& actionDescriptor: descriptors)
         {
-            const auto name = actionDescriptor.item.name.value;
+            const auto name = actionDescriptor.item.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
                 [this, actionDescriptor, object, pluginId = pluginId]()
                 {
@@ -774,7 +786,6 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
     const analytics::storage::DetectedObject& object) const
 {
-
     const auto& actionType = actionDescriptor.item;
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());

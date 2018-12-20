@@ -1,5 +1,5 @@
 <!--suppress ALL -->
-<header>
+<header ng-if="viewHeader">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="app-header-left">
@@ -18,7 +18,7 @@
 
                 <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
                     <li ng-class="{ 'active' :active.view }">
-                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">Просмотр</a>
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">Вид</a>
                     </li>
                     <li ng-class="{ 'active' :active.settings}">
                         <a class="inset" ng-href="/systems/{{activeSystem.id}}">Настройки</a>
@@ -47,7 +47,11 @@
                     </li>
 
                     <li ng-if="systemCounter && !singleSystem" class="collapse-second">
-                        <nx-systems [systems]="systems" [active-system]="activeSystem"></nx-systems>
+                        <nx-systems
+                                [endpoint]="active"
+                                [systems]="systems"
+                                [active-system]="activeSystem">
+                        </nx-systems>
                     </li>
 
                     <li class="vertical-bar"></li>

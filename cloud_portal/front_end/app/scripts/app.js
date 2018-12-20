@@ -80,20 +80,25 @@ window.L = {};
                         viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
                         previewPath: '',
                         viewsDirCommon: 'static/web_common/views/',
-                        trafficRelayHost: '{host}/gateway/{systemId}'
+                        trafficRelayHost: '{host}/gateway/{systemId}',
+                        publicDownloads: false,
+                        showHeaderAndFooter: true
                     };
 
                 $.ajax({
-                    url: 'api/utils/settings',
+                    url: CONFIG.apiBase + '/utils/settings',
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    angular.extend(CONFIG, response);
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.publicDownloads = response.publicDownloads;
+                    appState.publicReleases = response.publicReleases;
+                    angular.extend(CONFIG, appState);
                 });
 
                 $.ajax({
                     // url: 'static/views/language.json',
-                    url: 'api/utils/language',
+                    url: CONFIG.apiBase + '/utils/language',
                     async: false,
                     dataType: 'json'
                 })
@@ -222,6 +227,16 @@ window.L = {};
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
+                            .when('/embed/:systemId/view/:cameraId', {
+                                title      : lang.pageTitles.view,
+                                templateUrl: CONFIG.viewsDir + 'view.html',
+                                controller : 'ViewPageCtrl',
+                                resolve: {
+                                    cleanSlate: [function () {
+                                        CONFIG.showHeaderAndFooter = false;
+                                    }]
+                                }
+                            })
                             .when('/activate', {
                                 title: lang.pageTitles.activate,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
@@ -347,5 +362,11 @@ window.L = {};
                                 templateUrl: CONFIG.viewsDir + '404.html'
                             });
                     });
-            }]);
+            }])
+        .run(['nxLanguageService', 'languageService', function (nxLanguageService, languageService) {
+            // make sure both language services are synchronized
+            // had problem downgrading A6 'nxLanguageService' service to AJS provider so
+            // it's set as regular service and running after 'config' phase --TT
+            nxLanguageService.translate.use(languageService.lang.language);
+        }]);
 })();

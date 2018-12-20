@@ -6,6 +6,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
@@ -74,15 +75,52 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 {
-    return parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later)
-        ? false
-        : canFetch();
+    if (parent.isValid()
+        || (!m_offlineAllowed && !m_isOnline)
+        || (isLive() && fetchDirection() == FetchDirection::later)
+        || m_relevantTimePeriod.isEmpty()
+        || !canFetchNow()
+        || !hasAccessRights())
+    {
+        return false;
+    }
+
+    if (m_fetchedTimeWindow.isEmpty())
+        return true;
+
+    if (fetchDirection() == FetchDirection::earlier)
+        return m_fetchedTimeWindow.startTimeMs > m_relevantTimePeriod.startTimeMs;
+
+    NX_ASSERT(fetchDirection() == FetchDirection::later);
+    return m_fetchedTimeWindow.endTimeMs() < m_relevantTimePeriod.endTimeMs();
 }
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
 {
-    if (!parent.isValid())
+    if (parent.isValid())
+        return;
+
+    if (isFilterDegenerate())
+    {
+        NX_ASSERT(rowCount() == 0);
+        setFetchedTimeWindow(m_relevantTimePeriod);
+        finishFetch(FetchResult::complete);
+    }
+    else
+    {
         requestFetch();
+    }
+}
+
+bool AbstractSearchListModel::canFetchNow() const
+{
+    return true;
+}
+
+bool AbstractSearchListModel::isFilterDegenerate() const
+{
+    return m_relevantTimePeriod.isEmpty()
+        || (cameraSet()->type() != ManagedCameraSet::Type::all && cameras().empty());
 }
 
 ManagedCameraSet* AbstractSearchListModel::cameraSet() const
@@ -115,6 +153,11 @@ bool AbstractSearchListModel::isConstrained() const
     return m_relevantTimePeriod != QnTimePeriod::anytime();
 }
 
+bool AbstractSearchListModel::hasAccessRights() const
+{
+    return true;
+}
+
 const QnTimePeriod& AbstractSearchListModel::relevantTimePeriod() const
 {
     return m_relevantTimePeriod;
@@ -125,13 +168,12 @@ void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
     if (value == m_relevantTimePeriod)
         return;
 
-    NX_VERBOSE(this) << "Relevant time period changed"
-        << "\n --- Old was from"
-        << utils::timestampToDebugString(m_relevantTimePeriod.startTimeMs) << "to"
-        << utils::timestampToDebugString(m_relevantTimePeriod.endTimeMs())
-        << "\n --- New is from"
-        << utils::timestampToDebugString(value.startTimeMs) << "to"
-        << utils::timestampToDebugString(value.endTimeMs());
+    NX_VERBOSE(this, "Relevant time period changed.\n"
+        "    Old was from: %1\n        to: %2\n    New is from: %3\n        to: %4",
+        utils::timestampToDebugString(m_relevantTimePeriod.startTimeMs),
+        utils::timestampToDebugString(m_relevantTimePeriod.endTimeMs()),
+        utils::timestampToDebugString(value.startTimeMs),
+        utils::timestampToDebugString(value.endTimeMs()));
 
     m_relevantTimePeriod = value;
 
@@ -163,7 +205,7 @@ void AbstractSearchListModel::setFetchDirection(FetchDirection value)
     if (m_fetchDirection == value)
         return;
 
-    NX_VERBOSE(this) << "Set fetch direction to" << value;
+    NX_VERBOSE(this, "Set fetch direction to: %1", QVariant::fromValue(value).toString());
 
     cancelFetch();
     m_fetchDirection = value;
@@ -179,14 +221,14 @@ void AbstractSearchListModel::setMaximumCount(int value)
     if (m_maximumCount == value)
         return;
 
-    NX_VERBOSE(this) << "Set maximum count to" << value;
+    NX_VERBOSE(this, "Set maximum count to %1", value);
 
     m_maximumCount = value;
 
     const bool needToTruncate = m_maximumCount < rowCount();
     if (needToTruncate)
     {
-        NX_VERBOSE(this) << "Truncating to maximum count";
+        NX_VERBOSE(this, "Truncating to maximum count");
         truncateToMaximumCount();
     }
 }
@@ -198,7 +240,7 @@ int AbstractSearchListModel::fetchBatchSize() const
 
 void AbstractSearchListModel::setFetchBatchSize(int value)
 {
-    NX_VERBOSE(this) << "Set fetch batch size to" << value;
+    NX_VERBOSE(this, "Set fetch batch size to %1", value);
     m_fetchBatchSize = value;
 }
 
@@ -209,7 +251,18 @@ bool AbstractSearchListModel::liveSupported() const
 
 bool AbstractSearchListModel::effectiveLiveSupported() const
 {
-    return liveSupported() && relevantTimePeriod().isInfinite();
+    return liveSupported() && m_relevantTimePeriod.isInfinite();
+}
+
+void AbstractSearchListModel::setLiveSupported(bool value)
+{
+    if (m_liveSupported == value)
+        return;
+
+    m_liveSupported = value;
+    setLive(m_live && m_liveSupported);
+
+    clear();
 }
 
 bool AbstractSearchListModel::isLive() const
@@ -230,7 +283,7 @@ void AbstractSearchListModel::setLive(bool value)
             return;
     }
 
-    NX_VERBOSE(this) << "Setting live mode to" << value;
+    NX_VERBOSE(this, "Setting live mode to %1", value);
     m_live = value;
 
     emit liveChanged(m_live, {});
@@ -246,21 +299,24 @@ void AbstractSearchListModel::setLivePaused(bool value)
     if (m_livePaused == value)
         return;
 
-    NX_VERBOSE(this) << "Setting live" << (value ? "paused" : "unpaused");
+    NX_VERBOSE(this, "Setting live %1", (value ? "paused" : "unpaused"));
     m_livePaused = value;
 
     emit livePausedChanged(m_livePaused, {});
 }
 
-void AbstractSearchListModel::setLiveSupported(bool value)
+bool AbstractSearchListModel::offlineAllowed() const
 {
-    if (m_liveSupported == value)
+    return m_offlineAllowed;
+}
+
+void AbstractSearchListModel::setOfflineAllowed(bool value)
+{
+    if (m_offlineAllowed == value)
         return;
 
-    m_liveSupported = value;
-    setLive(m_live && m_liveSupported);
-
-    clear();
+    NX_VERBOSE(this, "Setting offline allowed to %1", value);
+    m_offlineAllowed = value;
 }
 
 QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const
@@ -277,9 +333,9 @@ bool AbstractSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePt
 
 void AbstractSearchListModel::setFetchedTimeWindow(const QnTimePeriod& value)
 {
-    NX_VERBOSE(this) << "Set fetched time window from"
-        << utils::timestampToDebugString(value.startTimeMs) << "to"
-        << utils::timestampToDebugString(value.endTimeMs());
+    NX_VERBOSE(this, "Set fetched time window:\n    from: %1\n    to: %2",
+        utils::timestampToDebugString(value.startTimeMs),
+        utils::timestampToDebugString(value.endTimeMs()));
 
     m_fetchedTimeWindow = value;
 }
@@ -293,13 +349,13 @@ void AbstractSearchListModel::addToFetchedTimeWindow(const QnTimePeriod& period)
 
 void AbstractSearchListModel::finishFetch(FetchResult result)
 {
-    NX_VERBOSE(this) << "Finish fetch;" << QVariant::fromValue(result).toString();
+    NX_VERBOSE(this, "Finish fetch, result: %1", QVariant::fromValue(result).toString());
     emit fetchFinished(result, {});
 }
 
 void AbstractSearchListModel::clear()
 {
-    NX_VERBOSE(this) << "Clear model";
+    NX_VERBOSE(this, "Clear model");
 
     setFetchDirection(FetchDirection::earlier);
     setFetchedTimeWindow({});
@@ -307,8 +363,15 @@ void AbstractSearchListModel::clear()
     clearData();
 
     setLive(effectiveLiveSupported());
-    if (canFetchMore())
-        emit dataNeeded();
+
+    const auto emitDataNeeded =
+        [this]()
+        {
+            if (canFetchMore())
+                emit dataNeeded();
+        };
+
+    executeLater(emitDataNeeded, this);
 }
 
 } // namespace nx::vms::client::desktop

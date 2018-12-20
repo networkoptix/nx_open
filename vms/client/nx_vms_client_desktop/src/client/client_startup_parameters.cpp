@@ -2,11 +2,12 @@
 
 #include <QtCore/QFile>
 
+#include <nx/vms/client/core/common/utils/encoded_string.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <utils/common/util.h>
-#include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -36,6 +37,16 @@ void addParserParam(QnCommandLineParser& parser, ValueType* valuePtr, const char
 
 static const QString kEncodeAuthMagic = lit("@@");
 static const nx::vms::api::SoftwareVersion kEncodeSupportVersion(3, 0, 0, 14350);
+
+QString fromNativePath(const QString &path)
+{
+    QString result = QDir::cleanPath(QDir::fromNativeSeparators(path));
+
+    if (!result.isEmpty() && result.endsWith(QLatin1Char('/')))
+        result.chop(1);
+
+    return result;
+}
 
 } // namespace
 
@@ -105,9 +116,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     {
         /* Restore protocol part that was cut out. */
         QString fixedUri = lit("%1://%2").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).arg(strCustomUri);
-        NX_DEBUG(typeid(QnStartupParameters), lit("Run with custom URI %1").arg(fixedUri));
+        NX_DEBUG(typeid(QnStartupParameters), "Run with custom URI %1", fixedUri);
         result.customUri = nx::vms::utils::SystemUri(fixedUri);
-        NX_DEBUG(typeid(QnStartupParameters), lit("Parsed to %1").arg(result.customUri.toString()));
+        NX_DEBUG(typeid(QnStartupParameters), "Parsed to %1", result.customUri.toUrl());
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
@@ -127,12 +138,15 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 QString QnStartupParameters::createAuthenticationString(const nx::utils::Url& url,
     const nx::vms::api::SoftwareVersion& version)
 {
+    const auto logonInformation = QString::fromUtf8(url.toEncoded());
+
     // For old clients use compatible format
     if (!version.isNull() && version < kEncodeSupportVersion)
-        return QString::fromUtf8(url.toEncoded());
+        return logonInformation;
 
-    QnEncodedString encoded(QString::fromUtf8(url.toEncoded()));
-    return kEncodeAuthMagic + encoded.encoded();
+    // TODO: #GDM Possibly it's better to add extra key to the logon info as a salt.
+    const auto secure = nx::vms::client::core::EncodedString::fromDecoded(logonInformation);
+    return kEncodeAuthMagic + secure.encoded();
 }
 
 nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
@@ -140,7 +154,7 @@ nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
     if (string.startsWith(kEncodeAuthMagic))
     {
         string = string.mid(kEncodeAuthMagic.length());
-        string = QnEncodedString::fromEncoded(string).value();
+        string = nx::vms::client::core::EncodedString::fromEncoded(string).decoded();
     }
 
     return nx::utils::Url::fromUserInput(string);

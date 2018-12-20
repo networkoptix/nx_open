@@ -1,10 +1,13 @@
 #include "storage.h"
 
+#include <utils/crypt/symmetrical.h>
+
 #include <nx/utils/log/assert.h>
 
 namespace nx::utils::property_storage {
 
-Storage::Storage(AbstractBackend* backend):
+Storage::Storage(AbstractBackend* backend, QObject* parent):
+    QObject(parent),
     m_backend(backend)
 {
 }
@@ -12,22 +15,51 @@ Storage::Storage(AbstractBackend* backend):
 void Storage::load()
 {
     for (const auto& property: m_properties)
-        property->updateValue(readValue(property->name));
+        loadProperty(property);
 }
 
 void Storage::sync()
 {
+    m_backend->sync();
+}
+
+void Storage::setSecurityKey(const QByteArray& value)
+{
+    m_securityKey = value;
 }
 
 void Storage::registerProperty(BaseProperty* property)
 {
     NX_ASSERT(!m_properties.contains(property->name));
     m_properties[property->name] = property;
+    connect(property, &BaseProperty::changed, this, &Storage::saveProperty);
 }
 
 void Storage::unregisterProperty(BaseProperty* property)
 {
+    property->disconnect(this);
     m_properties.remove(property->name);
+}
+
+QList<BaseProperty*> Storage::properties() const
+{
+    return m_properties.values();
+}
+
+void Storage::loadProperty(BaseProperty* property)
+{
+    QString rawValue = readValue(property->name);
+    if (property->secure)
+        rawValue = decodeStringFromHexStringAES128CBC(rawValue, m_securityKey);
+    property->loadSerializedValue(rawValue);
+}
+
+void Storage::saveProperty(BaseProperty* property)
+{
+    QString rawValue = property->serialized();
+    if (property->secure)
+        rawValue = encodeHexStringFromStringAES128CBC(rawValue, m_securityKey);
+    writeValue(property->name, rawValue);
 }
 
 QString Storage::readValue(const QString& name)

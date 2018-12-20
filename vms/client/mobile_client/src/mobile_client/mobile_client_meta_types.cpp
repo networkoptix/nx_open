@@ -1,5 +1,7 @@
 #include "mobile_client_meta_types.h"
 
+#include <atomic>
+
 #include <QtQml/QtQml>
 #include <private/qqmlvaluetype_p.h>
 
@@ -36,11 +38,19 @@
 #include <nx/client/mobile/models/action_buttons_model.h>
 #include <nx/client/mobile/software_trigger/software_triggers_controller.h>
 #include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
+#include <nx/client/mobile/motion/motion_playback_mask_watcher.h>
 
 using namespace nx::client::mobile;
 
 void QnMobileClientMetaTypes::initialize()
 {
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
+        return;
+
+    initialized = true;
+
     nx::vms::client::core::initializeMetaTypes();
 
     registerMetaTypes();
@@ -95,4 +105,5 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     nx::client::mobile::ActionButtonsModel::registerQmlType();
     nx::client::mobile::SoftwareTriggersController::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
+    nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
 }

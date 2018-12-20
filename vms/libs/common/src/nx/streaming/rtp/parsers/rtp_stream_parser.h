@@ -56,14 +56,7 @@ public:
 protected:
     struct Chunk
     {
-        Chunk():
-            bufferStart(nullptr),
-            bufferOffset(0),
-            len(0),
-            nalStart(false)
-        {
-        }
-
+        Chunk() = default;
         Chunk(int bufferOffset, quint16 len, quint8 nalStart = false):
             bufferStart(nullptr),
             bufferOffset(bufferOffset),
@@ -94,10 +87,6 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() = 0;
     virtual QnAbstractMediaDataPtr nextData() override;
 
-protected:
-    void processIntParam(const QString& checkName, int& setValue, const QString& param);
-    void processHexParam(const QString& checkName, QByteArray& setValue, const QString& param);
-    void processStringParam(const QString& checkName, QString& setValue,const QString& param);
 protected:
     std::deque<QnAbstractMediaDataPtr> m_audioData;
 };

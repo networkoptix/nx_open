@@ -270,7 +270,7 @@ static const qint64 kDbCleanupIntervalUs = 1000000ll * 3600;
 
 QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_lastCleanuptimeUs(0),
     m_auditCleanuptimeUs(0),
     m_runtimeActionsTotalRecords(0),
@@ -871,7 +871,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
 
     if (!request.eventSubtype.isEmpty())
     {
-        requestStr += lit(" AND event_subtype = %1 ").arg(request.eventSubtype);
+        requestStr += lit(" AND event_subtype = '%1' ").arg(request.eventSubtype);
     }
 
     if (request.actionType != vms::api::ActionType::undefinedAction)

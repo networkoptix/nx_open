@@ -19,8 +19,8 @@ std::vector<QString> getRestrictedKeysByMode(Mode mode)
                 kNamePassword,
                 ldapAdminPassword,
                 kNameCloudAuthKey,
-                Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME
+                ResourcePropertyKey::kCredentials,
+                ResourcePropertyKey::kDefaultCredentials
             };
         case Mode::write:
             return {

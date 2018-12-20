@@ -20,6 +20,12 @@ function(nx_generate_qrc qrc_file)
         if(IS_DIRECTORY ${input})
             file(GLOB_RECURSE files "${input}/*")
             foreach(file ${files})
+                if(file MATCHES "(.orig|.rej)$")
+                    # These files are often left by version control systems, but they should
+                    # definitely not appear in the resources.
+                    continue()
+                endif()
+
                 if(base)
                     file(RELATIVE_PATH alias ${base} ${file})
                 else()

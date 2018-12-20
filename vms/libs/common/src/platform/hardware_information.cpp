@@ -1,12 +1,12 @@
 #include "hardware_information.h"
 
-static const QString CPU_X86       = lit("x86");
-static const QString CPU_X86_64    = lit("x86_64");
-static const QString CPU_IA64      = lit("ia64");
-static const QString CPU_ARM       = lit("arm");
-static const QString CPU_ARM6      = lit("armv6");
-static const QString CPU_ARM7      = lit("armv7");
-static const QString CPU_UNKNOWN   = lit("unknown");
+static const QString CPU_X86 = "x86";
+static const QString CPU_X86_64 = "x86_64";
+static const QString CPU_IA64 = "ia64";
+static const QString CPU_ARM = "arm";
+static const QString CPU_ARM6 = "armv6";
+static const QString CPU_ARM7 = "armv7";
+static const QString CPU_UNKNOWN = "unknown";
 
 const HardwareInformation& HardwareInformation::instance()
 {

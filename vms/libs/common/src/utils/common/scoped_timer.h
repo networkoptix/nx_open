@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QString>
 
 class QnScopedTimer
 {

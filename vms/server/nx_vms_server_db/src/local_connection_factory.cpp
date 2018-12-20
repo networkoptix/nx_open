@@ -110,7 +110,7 @@ LocalConnectionFactory::LocalConnectionFactory(
 
 void LocalConnectionFactory::shutdown()
 {
-	m_serverQueryProcessor->waitForAsyncTasks();
+	m_serverQueryProcessor->stop();
 
 	pleaseStop();
 	join();
@@ -281,8 +281,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value Sunday
      * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
-     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
-     *     value if not limited.
+     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative value if not
+     *     limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
@@ -297,16 +297,15 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
-     * %param allowAutoRedundancy Whether the server can take cameras from
-     *     an offline server automatically.
+     * %param allowAutoRedundancy Whether the server can take cameras from an offline server
+     *     automatically.
      *     %value false
      *     %value true
      * %param backupType Settings for storage redundancy.
      *     %value Backup_Manual Backup is performed only at a user's request.
      *     %value Backup_RealTime Backup is performed during recording.
      *     %value Backup_Schedule Backup is performed on schedule.
-     * %param backupDaysOfTheWeek Combination (via "|") of weekdays
-     *     the backup is active on.
+     * %param backupDaysOfTheWeek Combination (via "|") of weekdays the backup is active on.
      *     %value Monday
      *     %value Tuesday
      *     %value Wednesday
@@ -957,7 +956,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %param eventCondition.description Substring to be found in the long event
      *             description. Empty string matches any value.
      *         %//param eventCondition.metadata (object) Imposes filtering based on the event
-     *             metadata fields. The object contains the following fields:
+     *             metadata fields.
      *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
      *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
      *                 or "logicalId" field via request '/ec2/getCamerasEx'.
@@ -1011,7 +1010,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             - text - HTTP message body for POST method.
      *         %value acknowledgeAction
      *     %param actionResourceIds List of action resource ids.
-     *     %param actionParams String containing a JSON object which fields depend on actionType
+     *     %param:objectJson actionParams String containing a JSON object which fields depend on actionType
      *         and thus are described next to the respective actionType values.
      *     %param aggregationPeriod Period (in seconds) during which the consecutive similar events
      *         are aggregated into a single event.
@@ -1037,9 +1036,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     /**%apidoc POST /ec2/saveEventRule
-     * Create or update event rule in event/actions rule list. Parameters should be passed
-	 * as a JSON object in POST message body with content type "application/json".
-	 * Example of such object can be seen in the result of the corresponding GET function.
+     * Create or update event rule in event/actions rule list.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
      * %param eventType Event type to match the rule. Example of possible values can be seen in
 	 *     the result of the corresponding GET function.
      * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
@@ -1135,7 +1137,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     a previously received object, use false when creating a new one.
      *     %value false
      *     %value true
-     * %param permissions Combination (via "|") of the following flags:
+     * %param permissions Combination (via "|") of the flags defining permissions.
      *     %value GlobalAdminPermission Admin, can edit other non-admins.
      *     %value GlobalEditCamerasPermission Can edit camera settings.
      *     %value GlobalControlVideoWallPermission Can control video walls.
@@ -1195,7 +1197,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *     a previously received object, use false when creating a new one.
     *     %value false
     *     %value true
-    * %param permissions Combination (via "|") of the following flags:
+    * %param permissions Combination (via "|") of the flags defining permissions.
     *     %value GlobalAdminPermission Admin, can edit other non-admins.
     *     %value GlobalEditCamerasPermission Can edit camera settings.
     *     %value GlobalControlVideoWallPermission Can control video walls.
@@ -1258,7 +1260,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt] id User role unique id. Can be omitted when creating a new object. If such
      *     object exists, omitted fields will not be changed.
      * %param name User role name.
-     * %param permissions Combination (via "|") of the following flags:
+     * %param permissions Combination (via "|") of the flags defining permissions.
      *     %value GlobalEditCamerasPermission Can edit camera settings.
      *     %value GlobalControlVideoWallPermission Can control video walls.
      *     %value GlobalViewArchivePermission Can view archives of available cameras.
@@ -1349,7 +1351,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // can't be created or removed via REST API for now.
 
     /**%apidoc GET /ec2/getAnalyticsPlugins
-     * Return list of analytics plugins
      * %param[default] format
      * %return List of analytics plugins in the requested format.
      * %// AbstractAnalyticsManager::getAnalyticsPlugins
@@ -1357,7 +1358,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, AnalyticsPluginDataList>(p, ApiCommand::getAnalyticsPlugins);
 
     /**%apidoc GET /ec2/getAnalyticsEngines
-     * Return list of analytics engines
      * %param[default] format
      * %return List of analytics engines in the requested format.
      * %// AbstractAnalyticsManager::getAnalyticsEngines

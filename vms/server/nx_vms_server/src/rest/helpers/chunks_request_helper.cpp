@@ -15,7 +15,7 @@
 #include "media_server/media_server_module.h"
 
 QnChunksRequestHelper::QnChunksRequestHelper(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

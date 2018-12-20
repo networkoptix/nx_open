@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include <base/types.h>
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 
 namespace rtu
 {
@@ -30,9 +30,9 @@ namespace rtu
         Q_PROPERTY(QObject *failedModel READ failedModel NOTIFY changesApplied)
 
     public:
-        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
-        typedef nx::mediaserver::api::ExtraServerInfo ExtraServerInfo;
-        typedef nx::mediaserver::api::ServerInfoPtrContainer ServerInfoPtrContainer;
+        typedef nx::vms::server::api::BaseServerInfo BaseServerInfo;
+        typedef nx::vms::server::api::ExtraServerInfo ExtraServerInfo;
+        typedef nx::vms::server::api::ServerInfoPtrContainer ServerInfoPtrContainer;
 
         static ApplyChangesTaskPtr create(const ChangesetPointer &changeset
             , const ServerInfoPtrContainer &target);

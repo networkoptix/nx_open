@@ -5,7 +5,6 @@
 #include <nx/utils/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
-#include <QtCore/QDebug>
 #include <QtCore/QBuffer>
 #include <core/dataprovider/data_provider_factory.h>
 
@@ -41,6 +40,7 @@ extern "C"
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <rtsp/rtp_universal_encoder.h>
+#include <rtsp/rtsp_utils.h>
 #include <utils/common/synctime.h>
 #include <network/tcp_listener.h>
 #include <media_server/settings.h>
@@ -76,27 +76,27 @@ static const QByteArray kSendMotionHeaderName("x-send-motion");
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 //static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
-static const std::chrono::seconds DEFAULT_RTSP_TIMEOUT(60);
+static const std::chrono::seconds kDefaultRtspTimeout(60);
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
 QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
 namespace {
 
-    bool updatePort(nx::network::AbstractDatagramSocket* &socket, int port)
-    {
-        delete socket;
-        socket = nx::network::SocketFactory::createDatagramSocket().release();
-        return socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
-    }
+bool updatePort(nx::network::AbstractDatagramSocket* &socket, int port)
+{
+    delete socket;
+    socket = nx::network::SocketFactory::createDatagramSocket().release();
+    return socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
+}
 
-    QByteArray getParamValue(const QByteArray& paramName, const QUrlQuery& urlQuery, const nx::network::http::HttpHeaders& headers)
-    {
-        QByteArray paramValue = urlQuery.queryItemValue(paramName).toUtf8();
-        if (paramValue.isEmpty())
-            paramValue = nx::network::http::getHeaderValue(headers, QByteArray("x-") + paramName);
-        return paramValue;
-    }
+QByteArray getParamValue(const QByteArray& paramName, const QUrlQuery& urlQuery, const nx::network::http::HttpHeaders& headers)
+{
+    QByteArray paramValue = urlQuery.queryItemValue(paramName).toUtf8();
+    if (paramValue.isEmpty())
+        paramValue = nx::network::http::getHeaderValue(headers, QByteArray("x-") + paramName);
+    return paramValue;
+}
 
 Qn::Permission requiredPermission(PlaybackMode mode)
 {
@@ -235,6 +235,7 @@ public:
     QnMediaResourcePtr mediaRes;
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
+    bool multiChannelVideo = true;
 
     struct TranscodeParams
     {
@@ -308,7 +309,7 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
     d->lastMediaPacketTime = timestampUsec;
 }
 
-void QnRtspConnectionProcessor::parseRequest()
+bool QnRtspConnectionProcessor::parseRequestParams()
 {
     Q_D(QnRtspConnectionProcessor);
     QnTCPConnectionProcessor::parseRequest();
@@ -330,38 +331,43 @@ void QnRtspConnectionProcessor::parseRequest()
     }
 
     if (!d->mediaRes)
-        return;
-
-    if (!nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
-        d->useProprietaryFormat = true;
-    else {
-        d->sessionTimeOut =
-            std::chrono::duration_cast<std::chrono::seconds>(DEFAULT_RTSP_TIMEOUT).count();
-        d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
+    {
+        d->response.messageBody = "Media resource not found";
+        return false;
     }
 
-    const QUrlQuery urlQuery( url.query() );
-
+    if (!nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
+    {
+        d->useProprietaryFormat = true;
+    }
+    else
+    {
+        d->sessionTimeOut =
+            std::chrono::duration_cast<std::chrono::seconds>(kDefaultRtspTimeout).count();
+        d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
+    }
+    const QUrlQuery urlQuery(url.query());
     d->transcodeParams.codecId = AV_CODEC_ID_NONE;
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
-        if (avCodec)
-            d->transcodeParams.codecId = avCodec->id;
-
+        d->transcodeParams.codecId = nx::rtsp::findEncoderCodecId(codec);
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-            NX_WARNING(this) << "Requested codec: " << codec << " not found";
+        {
+            d->response.messageBody = "Requested codec is not supported: ";
+            d->response.messageBody.append(codec);
+            return false;
+        }
     };
 
-    const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
+    const QString pos = urlQuery.queryItemValue(StreamingParams::START_POS_PARAM_NAME);
     if (pos.isEmpty())
         processRangeHeader();
     else
-        d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
+        d->startTime = nx::utils::parseDateTime(pos);
 
     d->transcodeParams.resolution = QSize();
-    QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers).split('/')[0];
+    QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers);
     if (!resolutionStr.isEmpty())
     {
         QSize videoSize(640,480);
@@ -375,8 +381,9 @@ void QnRtspConnectionProcessor::parseRequest()
             videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
             if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
             {
-                qWarning() << "Invalid resolution specified for web streaming. Defaulting to 480p";
-                videoSize = QSize(0,480);
+                d->response.messageBody = "Invalid resolution specified: ";
+                d->response.messageBody.append(resolutionStr);
+                return false;
             }
         }
         d->transcodeParams.resolution = videoSize;
@@ -394,26 +401,27 @@ void QnRtspConnectionProcessor::parseRequest()
     }
     else
     {
-        d->quality = MEDIA_Quality_High;
-
-        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
-        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        const QString& streamIndexStr = urlQuery.queryItemValue("stream");
         if( !streamIndexStr.isEmpty() )
         {
             const int streamIndex = streamIndexStr.toInt();
-            if( streamIndex == 0 )
-                d->quality = MEDIA_Quality_High;
-            else if( streamIndex == 1 )
-                d->quality = MEDIA_Quality_Low;
+            if (streamIndex > 1)
+            {
+                d->response.messageBody = "Invalid stream specified: ";
+                d->response.messageBody.append(streamIndexStr);
+                return false;
+            }
+            d->quality = streamIndex == 0 ? MEDIA_Quality_High : MEDIA_Quality_Low;
         }
     }
     d->qualityFastSwitch = true;
-
-    d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights,
+    d->peerHasAccess = resourceAccessManager()->hasPermission(
+        d->accessRights,
         d->mediaRes.dynamicCast<QnResource>(),
         requiredPermission(getStreamingMode()));
 
     d->clientRequest.clear();
+    return true;
 }
 
 QnMediaResourcePtr QnRtspConnectionProcessor::getResource() const
@@ -496,13 +504,13 @@ void QnRtspConnectionProcessor::sendResponse(
 
     const QByteArray response = d->response.toString();
 
-    NX_DEBUG(this, lit("Server response to %1:\n%2").
-        arg(d->socket->getForeignAddress().address.toString()).
-        arg(QString::fromLatin1(response)));
+    NX_DEBUG(this, "Server response to %1:\n%2",
+        d->socket->getForeignAddress().address.toString(),
+        response);
 
-    NX_DEBUG(QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
-        arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(response)));
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n\n\n",
+        d->socket->getForeignAddress().toString(),
+        response);
 
     QnMutexLocker lock(&d->sockMutex);
     sendData(response.constData(), response.size());
@@ -611,8 +619,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
     QnConstAbstractMediaDataPtr mediaHigh,
     QnConstAbstractMediaDataPtr mediaLow,
-    MediaQuality quality,
-    QSize resolution)
+    MediaQuality quality)
 {
     QnConstAbstractMediaDataPtr media =
         quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh
@@ -631,8 +638,8 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
 
     if (commonModule()->isTranscodeDisabled() && dstCodec != AV_CODEC_ID_NONE)
     {
-        NX_WARNING(this)
-            << "Video transcoding is disabled in the server settings. Feature unavailable.";
+        NX_WARNING(this,
+            "Video transcoding is disabled in the server settings. Feature unavailable.");
         return nullptr;
     }
     QnResourcePtr res = getResource()->toResourcePtr();
@@ -660,9 +667,9 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
     extraTranscodeParams.forcedAspectRatio = getResource()->customAspectRatio();
     QnUniversalRtpEncoderPtr universalEncoder(new QnUniversalRtpEncoder(config, commonModule()->metrics()));
     if (!universalEncoder->open(
-        mediaHigh, mediaLow, quality, dstCodec, resolution, extraTranscodeParams))
+        mediaHigh, mediaLow, quality, dstCodec, d->transcodeParams.resolution, extraTranscodeParams))
     {
-        qWarning() << "no RTSP encoder for codec " << dstCodec << "skip track";
+        NX_WARNING(this, "no RTSP encoder for codec %1 skip track", dstCodec);
         return nullptr;
     }
     return universalEncoder;
@@ -748,6 +755,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
 
+    // if transcoding used -> multiple channels will be sticked to single stream video
+    if (d->transcodeParams.codecId != AV_CODEC_ID_NONE)
+        d->multiChannelVideo = false;
+
     d->playbackMode = getStreamingMode();
 
     createDataProvider();
@@ -758,9 +769,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->response.messageBody);
 
-
     QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
-
 
     int numAudio = 0;
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
@@ -776,7 +785,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
             numAudio = audioLayout->channelCount();
     }
 
-    int numVideo = videoLayout && d->useProprietaryFormat ? videoLayout->channelCount() : 1;
+    int numVideo = 1;
+    if (videoLayout && (d->useProprietaryFormat || d->multiChannelVideo))
+        numVideo = videoLayout->channelCount();
 
     addResponseRangeHeader();
 
@@ -784,6 +795,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
     sdp << "v=0" << ENDL;
     sdp << "s=" << d->mediaRes->toResource()->getName() << ENDL;
     sdp << "c=IN IP4 " << d->socket->getLocalAddress().address.toString() << ENDL;
+    nx::utils::Url controlUrl = d->request.requestLine.url;
+    controlUrl.setQuery(QUrlQuery());
+    sdp << "a=control:" << controlUrl.toString() << ENDL;
 #if 0
     QUrl sessionControlUrl = d->request.requestLine.url;
     if( sessionControlUrl.port() == -1 )
@@ -805,14 +819,13 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
             }
             encoder = AbstractRtspEncoderPtr(ffmpegEncoder);
         }
-        else {
+        else
+        {
             QnAbstractMediaData::DataType dataType = i < numVideo ?
                 QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO;
             QnConstAbstractMediaDataPtr mediaHigh = getCameraData(dataType, MEDIA_Quality_High);
             QnConstAbstractMediaDataPtr mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
-            encoder = createEncoderByMediaData(
-                mediaHigh, mediaLow, d->quality, d->transcodeParams.resolution
-            );
+            encoder = createEncoderByMediaData(mediaHigh, mediaLow, d->quality);
             if (!encoder)
             {
                 if (i >= numVideo)
@@ -866,11 +879,6 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetup()
         return nx::network::http::StatusCode::notFound;
 
     QByteArray transport = nx::network::http::getHeaderValue(d->request.headers, "Transport");
-    //if (transport.indexOf("TCP") == -1)
-    //    return nx::network::http::StatusCode::notImplemented;
-    //QByteArray lowLevelTransport = transport.split(';').first().split('/').last().toLower();
-    //if (lowLevelTransport != "tcp" && lowLevelTransport != "udp")
-    //    return nx::network::http::StatusCode::notImplemented;
     QByteArray lowLevelTransport = "udp";
     if (transport.toLower().contains("tcp")) {
         lowLevelTransport = "tcp";
@@ -1028,7 +1036,7 @@ void QnRtspConnectionProcessor::createDataProvider()
                 speed = tmpSpeed;
         }
         d->dataProcessor->setStreamingSpeed(speed);
-        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat || d->multiChannelVideo);
     }
     else
         d->dataProcessor->clearUnprocessedData();
@@ -1123,11 +1131,15 @@ void QnRtspConnectionProcessor::checkQuality()
     {
         if (d->liveDpLow == 0) {
             d->quality = MEDIA_Quality_High;
-            qWarning() << "Low quality not supported for camera" << d->mediaRes->toResource()->getUniqueId();
+            NX_WARNING(this,
+                "Low quality not supported for camera %1",
+                d->mediaRes->toResource()->getUniqueId());
         }
         else if (d->liveDpLow->isPaused()) {
             d->quality = MEDIA_Quality_High;
-            qWarning() << "Primary stream has big fps for camera" << d->mediaRes->toResource()->getUniqueId() << ". Secondary stream is disabled.";
+            NX_WARNING(this,
+                "Primary stream has big fps for camera %1 . Secondary stream is disabled.",
+                d->mediaRes->toResource()->getUniqueId());
         }
     }
     QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
@@ -1159,6 +1171,7 @@ void QnRtspConnectionProcessor::updatePredefinedTracks()
             if (track->mediaType == RtspServerTrackInfo::MediaType::Video)
                 track->setEncoder(AbstractRtspEncoderPtr(createRtspFfmpegEncoder(true)));
         }
+        d->prevTranscodeParams = d->transcodeParams;
     }
 }
 
@@ -1251,7 +1264,6 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         updatePredefinedTracks();
     }
 
-    d->prevTranscodeParams = d->transcodeParams;
     d->lastPlayCSeq = nx::network::http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
 
@@ -1290,29 +1302,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
     if (!currentDP)
         return nx::network::http::StatusCode::notFound;
 
-
     Qn::ResourceStatus status = getResource()->toResource()->getStatus();
-
     d->dataProcessor->setLiveMode(d->playbackMode == PlaybackMode::Live);
-
-    if (!d->useProprietaryFormat)
-    {
-        d->quality = MEDIA_Quality_High;
-
-        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
-        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
-        if( !streamIndexStr.isEmpty() )
-        {
-            const int streamIndex = streamIndexStr.toInt();
-            if( streamIndex == 0 )
-                d->quality = MEDIA_Quality_High;
-            else if( streamIndex == 1 )
-                d->quality = MEDIA_Quality_Low;
-        }
-    }
-
-    //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
-
     if (d->playbackMode == PlaybackMode::Live)
     {
         auto camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
@@ -1527,7 +1518,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeGetParamete
             addResponseRangeHeader();
         }
         else {
-            qWarning() << Q_FUNC_INFO << __LINE__ << "Unsupported RTSP parameter " << parameter.trimmed();
+            NX_WARNING(this, "Unsupported RTSP parameter %1", parameter.trimmed());
             return nx::network::rtsp::StatusCode::parameterNotUnderstood;
         }
     }
@@ -1611,14 +1602,26 @@ void QnRtspConnectionProcessor::run()
     initSystemThreadId();
 
     //d->socket->setNoDelay(true);
-    d->socket->setSendBufferSize(16*1024);
+
+    // NOTE: Sending data bigger than socket's send buffer size causes unexpected delays in some
+    // scenarios. E.g., when streaming within a single Linux PC (VMS-11880).
+    // Also, send buffer size cannot be set to a value less than 32K in Linux.
+    d->socket->setSendBufferSize(64*1024);
     //d->socket->setRecvTimeout(1000*1000);
     //d->socket->setSendTimeout(1000*1000);
 
     if (d->clientRequest.isEmpty())
         readRequest();
 
-    parseRequest();
+    if (!parseRequestParams())
+    {
+        NX_WARNING(this,
+            "RTSP request parsing error: %1, request:\n%2",
+            d->response.messageBody,
+            d->clientRequest);
+        sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
+        return;
+    }
 
     if (!d->peerHasAccess)
     {
@@ -1661,7 +1664,8 @@ void QnRtspConnectionProcessor::run()
                     processBinaryRequest();
                 }
             }
-            else {
+            else
+            {
                 // text request
                 while (true)
                 {
@@ -1674,7 +1678,15 @@ void QnRtspConnectionProcessor::run()
 
                     d->clientRequest = d->receiveBuffer.left(msgLen);
                     d->receiveBuffer.remove(0, msgLen);
-                    parseRequest();
+                    if (!parseRequestParams())
+                    {
+                        NX_WARNING(this,
+                            "RTSP request parsing error: %1, request:\n%2",
+                            d->response.messageBody,
+                            d->clientRequest);
+                        sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
+                        return;
+                    }
                     if (!d->peerHasAccess)
                     {
                         sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
@@ -1691,7 +1703,7 @@ void QnRtspConnectionProcessor::run()
             {
                 // check rtcp keep alive
                 if (d->dataProcessor &&
-                    d->dataProcessor->timeFromLastReceiverReport() < DEFAULT_RTSP_TIMEOUT)
+                    d->dataProcessor->timeFromLastReceiverReport() < kDefaultRtspTimeout)
                     continue;
             }
             break;

@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Suite Setup       Open Restore Password Dialog With Link
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Restart

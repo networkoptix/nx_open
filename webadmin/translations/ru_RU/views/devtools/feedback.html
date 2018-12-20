@@ -1,8 +1,8 @@
-<alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
+<uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
     <p><b>Вы разработчик? Оставьте свой отзыв!</b></p>
     <p>Нашей команде крайне интересны отзывы разработчиков, создающих интеграцию с использованием наших SDK и API.
         Если у вас есть предложения по улучшению средств разработки, или вы просто хотите передать нам привет, пожалуйста, заполните форму обратной связи!
     </p>
     <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Оставить отзыв</a></p>
-</alert>
+</uib-alert>

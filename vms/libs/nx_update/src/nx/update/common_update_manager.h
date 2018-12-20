@@ -45,7 +45,7 @@ private:
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);
     update::Status start();
 
-    virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
+    virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
 };
 

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+
 #include <nx/utils/system_error.h>
 
 namespace nx {
@@ -21,7 +24,7 @@ namespace nx {
      */
     SystemError::ErrorCode startProcessDetached(
         const QString& executablePath,
-        const QStringList& arguments,
+        const QStringList& arguments = QStringList(),
         const QString& workingDirectory = QString(),
         qint64* pid = nullptr);
 

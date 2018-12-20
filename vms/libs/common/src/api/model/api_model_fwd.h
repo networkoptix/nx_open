@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QList>
+
 struct QnStorageSpaceData;
 typedef QList<QnStorageSpaceData> QnStorageSpaceDataList;
 

@@ -16,8 +16,8 @@ public:
 
     AbstractSystemTimerImpl( AbstractSystemTimer* _timerInstance )
     :
-        timerInstance( _timerInstance ),
-        hTimer( NULL )
+        hTimer( NULL ),
+        timerInstance( _timerInstance )
     {
     }
 

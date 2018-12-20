@@ -207,6 +207,9 @@
                         //     }
                         // }).result;
                     },
+                    embed: function (system) {
+                        return NxDialogsService.embed();
+                    },
                     noClientDetected: function () {
                         // message, title, actionLabel, actionType
                         return this

@@ -2,23 +2,8 @@
 #include <nx/streaming/rtp/rtp.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
-
-AVCodecID toFfmpegCodec(const QString& codec)
-{
-    const auto lCodec = codec.toLower();
-    if (lCodec == lit("aac") || lCodec == lit("mpeg4-generic"))
-        return AV_CODEC_ID_AAC;
-    else if (lCodec == lit("g726"))
-        return AV_CODEC_ID_ADPCM_G726;
-    else if (lCodec == lit("pcmu"))
-        return AV_CODEC_ID_PCM_MULAW;
-    else if (lCodec == lit("pcma"))
-        return AV_CODEC_ID_PCM_ALAW;
-    else
-        return AV_CODEC_ID_NONE;
-}
 
 OnvifAudioTransmitter::OnvifAudioTransmitter(QnVirtualCameraResource* res):
     QnAbstractAudioTransmitter(),
@@ -52,12 +37,22 @@ void OnvifAudioTransmitter::prepare()
     QnRtspClient::Config config{/*shouldGuessAuthDigest*/ false, /*backChannelAudioOnly*/ true};
     m_rtspConnection.reset(new QnRtspClient(config));
     m_rtspConnection->setAuth(m_resource->getAuth(), nx::network::http::header::AuthScheme::digest);
-    m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
-    m_rtspConnection->setTransport(QnRtspClient::TRANSPORT_TCP);
+
+    // DW cameras have issues with this attribute in current firmware. It change channel URL in SETUP response
+    // if this attribute is specified.
+    if (m_resource->resourceData().value<bool>("sendBackChannelAttribute", true))
+        m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
+    m_rtspConnection->setTransport(RtspTransport::tcp);
 
     const QString url = m_resource->sourceUrl(Qn::CR_LiveVideo);
     const CameraDiagnostics::Result result = m_rtspConnection->open(url);
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
+    {
+        close();
+        return;
+    }
+
+    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
     {
         close();
         return;
@@ -69,17 +64,16 @@ void OnvifAudioTransmitter::prepare()
         close();
         return;
     }
-    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
-    {
-        close();
-        return;
-    }
 
     m_trackInfo = tracks[0];
-    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_trackInfo.sdpMedia.rtpmap.codecName)));
+    int defaultBitrate = 0;
+    auto codecId = QnAbstractAudioTransmitter::toFfmpegCodec(m_trackInfo.sdpMedia.rtpmap.codecName, &defaultBitrate);
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(codecId));
     m_transcoder->setSampleRate(m_trackInfo.sdpMedia.rtpmap.clockRate);
     if (m_bitrateKbps > 0)
         m_transcoder->setBitrate(m_bitrateKbps);
+    else if (defaultBitrate > 0)
+        m_transcoder->setBitrate(defaultBitrate);
 }
 
 bool OnvifAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)
@@ -176,5 +170,5 @@ bool OnvifAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

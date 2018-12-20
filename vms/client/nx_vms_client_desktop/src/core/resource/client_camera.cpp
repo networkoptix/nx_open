@@ -42,7 +42,7 @@ void QnClientCameraResource::setAuthToCameraGroup(
     for (const auto& sensor: sensors)
     {
         sensor->setAuth(authenticator);
-        sensor->saveParamsAsync();
+        sensor->savePropertiesAsync();
     }
 }
 
@@ -72,7 +72,6 @@ QnConstResourceAudioLayoutPtr QnClientCameraResource::getAudioLayout(const QnAbs
     else
         return QnMediaResource::getAudioLayout();
 }
-
 
 QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
 {

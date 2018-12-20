@@ -169,7 +169,10 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 
 QString CommonUpdateInstaller::installerWorkDir() const
 {
-    return closeDirPath(dataDirectoryPath()) + "nx_installer";
+    QString selfPath = commonModule()->moduleInformation().localSystemId.toSimpleString();
+    // This path will look like /tmp/nx_isntaller-server_guid/
+    // We add server_guid to allow to run multiple servers on a single machine.
+    return closeDirPath(dataDirectoryPath()) + "nx_installer-" + selfPath;
 }
 
 void CommonUpdateInstaller::stopSync()
@@ -182,7 +185,10 @@ void CommonUpdateInstaller::stopSync()
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()
 {
-    return QDir(installerWorkDir()).removeRecursively() && QDir().mkpath(installerWorkDir());
+    QString path = installerWorkDir();
+    if (!QDir(path).removeRecursively())
+        return false;
+    return QDir().mkpath(path);
 }
 
 QVariantMap CommonUpdateInstaller::updateInformation(const QString& outputPath) const

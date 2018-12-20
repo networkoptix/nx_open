@@ -12,7 +12,7 @@
 #include "ptz_preset.h"
 #include "ptz_tour.h"
 #include "ptz_object.h"
-#include "ptz_auxilary_trait.h"
+#include "ptz_auxiliary_trait.h"
 
 #include <nx/core/ptz/vector.h>
 
@@ -34,7 +34,7 @@ struct QnPtzData {
     QnPtzTourList tours;
     QnPtzObject activeObject;
     QnPtzObject homeObject;
-    QnPtzAuxilaryTraitList auxilaryTraits;
+    QnPtzAuxiliaryTraitList auxiliaryTraits;
 };
 #define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)\
     (logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)

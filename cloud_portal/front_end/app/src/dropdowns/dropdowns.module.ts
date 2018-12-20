@@ -1,22 +1,24 @@
 import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { NxGenericDropdown }                 from './generic/dropdown.component';
-import { NxAccountSettingsDropdown }         from './account-settings/account-settings.component';
-import { NxLanguageDropdown }                from './language/language.component';
-import { NxActiveSystemDropdown }            from './active-system/active-system.component';
-import { NxSystemsDropdown }                 from './systems/systems.component';
-import { NxPermissionsDropdown }             from './permissions/permissions.component';
-import { downgradeComponent }                from '@angular/upgrade/static';
+import { NxGenericDropdown }         from './generic/dropdown.component';
+import { NxAccountSettingsDropdown } from './account-settings/account-settings.component';
+import { NxLanguageDropdown }        from './language/language.component';
+import { NxActiveSystemDropdown }    from './active-system/active-system.component';
+import { NxSystemsDropdown }         from './systems/systems.component';
+import { NxPermissionsDropdown }     from './permissions/permissions.component';
+import { downgradeComponent }        from '@angular/upgrade/static';
 
-import { DirectivesModule }                  from '../directives/directives.module';
+import { DirectivesModule } from '../directives/directives.module';
+import { TranslateModule }  from '@ngx-translate/core';
 
 @NgModule({
-    imports: [
+    imports        : [
         CommonModule,
         DirectivesModule,
+        TranslateModule,
     ],
-    declarations: [
+    declarations   : [
         NxGenericDropdown,
         NxLanguageDropdown,
         NxAccountSettingsDropdown,
@@ -32,7 +34,7 @@ import { DirectivesModule }                  from '../directives/directives.modu
         NxSystemsDropdown,
         NxPermissionsDropdown
     ],
-    exports: [
+    exports        : [
         NxGenericDropdown,
         NxLanguageDropdown,
         NxAccountSettingsDropdown,
@@ -49,9 +51,10 @@ angular
     .module('cloudApp.directives')
     .directive('nxLanguageSelect',
         downgradeComponent({
-            component: NxLanguageDropdown}) as angular.IDirectiveFactory)
-    .directive('nxSelect', downgradeComponent({component: NxGenericDropdown}) as angular.IDirectiveFactory)
-    .directive('nxAccountSettingsSelect', downgradeComponent({component: NxAccountSettingsDropdown}) as angular.IDirectiveFactory)
-    .directive('nxActiveSystem', downgradeComponent({component: NxActiveSystemDropdown}) as angular.IDirectiveFactory)
-    .directive('nxSystems', downgradeComponent({component: NxSystemsDropdown}) as angular.IDirectiveFactory)
-    .directive('nxPermissions', downgradeComponent({component: NxPermissionsDropdown}) as angular.IDirectiveFactory);
+            component: NxLanguageDropdown
+        }) as angular.IDirectiveFactory)
+    .directive('nxSelect', downgradeComponent({ component: NxGenericDropdown }) as angular.IDirectiveFactory)
+    .directive('nxAccountSettingsSelect', downgradeComponent({ component: NxAccountSettingsDropdown }) as angular.IDirectiveFactory)
+    .directive('nxActiveSystem', downgradeComponent({ component: NxActiveSystemDropdown }) as angular.IDirectiveFactory)
+    .directive('nxSystems', downgradeComponent({ component: NxSystemsDropdown }) as angular.IDirectiveFactory)
+    .directive('nxPermissions', downgradeComponent({ component: NxPermissionsDropdown }) as angular.IDirectiveFactory);

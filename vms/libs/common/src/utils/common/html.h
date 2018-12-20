@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
+
 #include <nx/utils/url.h>
 
 /** RAII helper to consistently open/close html tags on the given string. */
@@ -45,7 +46,7 @@ QString escapeHtml(const QString& input);
 
 QString unescapeHtml(const QString& escaped);
 
-QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
+QString elideHtml(const QString &html, int maxLength, const QString &tail = QStringLiteral("..."));
 
 bool mightBeHtml(const QString& text);
 bool mightBeHtml(const QStringList& lines);

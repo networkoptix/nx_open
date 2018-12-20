@@ -19,7 +19,7 @@
 #include <common/common_module.h>
 
 QnRecordedChunksRestHandler::QnRecordedChunksRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

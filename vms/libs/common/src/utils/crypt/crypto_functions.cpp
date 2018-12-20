@@ -1,7 +1,10 @@
 #include "crypto_functions.h"
 
 #include <random>
+
 #include <openssl/evp.h>
+
+#include <nx/utils/log/assert.h>
 
 namespace nx::utils::crypto_functions {
 
@@ -43,7 +46,7 @@ Key getKeyHash(const Key& key)
 {
     EVP_MD_CTX* mdctx = EVP_MD_CTX_create();
     NX_ASSERT(mdctx);
-    auto result = EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL);
+    auto result = EVP_DigestInit_ex(mdctx, EVP_sha256(), nullptr);
     NX_ASSERT(result);
 
     Key xored = key;

@@ -5,7 +5,7 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 struct HanwhaInformation
@@ -20,5 +20,5 @@ struct HanwhaInformation
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

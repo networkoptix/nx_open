@@ -130,16 +130,19 @@
 			<param id = "mReboot"
 					dataType="Button"
 					name="System Reboot"
+                    availableInOffline="true"
                     confirmation="Are you sure you want to reboot the device?"
 					description="This operation reboots the device."/>
 			<param id = "mSoftReset"
 					dataType="Button"
 					name="Soft Factory Reset"
+                    availableInOffline="true"
                     confirmation="Are you sure you want to reset all settings (except network) to default?"
 					description="This operation reloads all parameters on the device to their factory default values, except basic network settings like IP address, subnet and gateway or DHCP settings."/>
 			<param id="mHardReset"
 					dataType="Button"
 					name="Hard Factory Reset"
+                    availableInOffline="true"
                     confirmation="Are you sure you want to reset all settings (including network) to default?"
 					description="This operation reloads all parameters on the device to their factory default values." />
 		</group>

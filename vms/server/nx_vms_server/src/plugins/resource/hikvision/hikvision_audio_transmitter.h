@@ -6,7 +6,7 @@
 #include <nx/network/http/http_client.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HikvisionAudioTransmitter: public BaseHttpAudioTransmitter
@@ -42,5 +42,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

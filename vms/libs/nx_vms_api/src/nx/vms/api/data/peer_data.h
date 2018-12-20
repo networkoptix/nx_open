@@ -23,7 +23,7 @@ struct NX_VMS_API PersistentIdData: IdData
     bool isNull() const { return id.isNull(); }
 
     bool operator<(const PersistentIdData& other) const;
-    bool operator>(const PersistentIdData& other) const { return !(*this < other); }
+    bool operator>(const PersistentIdData& other) const { return other < *this; }
 };
 #define PersistentIdData_Fields \
     IdData_Fields \
@@ -78,6 +78,14 @@ struct NX_VMS_API PeerData: PersistentIdData
 
 using PeerSet = QSet<QnUuid>;
 
+enum class P2pTransportMode
+{
+    automatic,
+    websocket,
+    http
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(P2pTransportMode)
+
 struct PeerDataEx: public PeerData
 {
     QnUuid systemId;
@@ -85,6 +93,8 @@ struct PeerDataEx: public PeerData
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = 0;
+    P2pTransportMode transport = P2pTransportMode::automatic;
+    QnUuid connectionGuid;
 
     void assign(const PeerData& data) { PeerData::operator=(data); }
 };
@@ -95,7 +105,9 @@ struct PeerDataEx: public PeerData
     (cloudHost) \
     (identityTime) \
     (aliveUpdateIntervalMs) \
-    (protoVersion)
+    (protoVersion) \
+    (transport) \
+    (connectionGuid)
 
 } // namespace api
 } // namespace vms
@@ -104,3 +116,4 @@ struct PeerDataEx: public PeerData
 Q_DECLARE_METATYPE(nx::vms::api::PersistentIdData)
 Q_DECLARE_METATYPE(nx::vms::api::PeerData)
 Q_DECLARE_METATYPE(nx::vms::api::PeerDataEx)
+

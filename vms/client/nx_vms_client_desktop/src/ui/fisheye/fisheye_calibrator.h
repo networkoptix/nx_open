@@ -28,7 +28,7 @@ public:
     ~QnFisheyeCalibrator();
 
     /*
-    *   analize frame. Can be called several times for different video frames to improve quality
+    *   analyze frame. Can be called several times for different video frames to improve quality
     */
     void analyseFrameAsync(QImage frame);
     Error analyseFrame(QImage frame);

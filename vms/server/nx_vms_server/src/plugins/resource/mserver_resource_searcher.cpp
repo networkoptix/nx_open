@@ -13,7 +13,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h> /* For DEFAULT_APPSERVER_HOST. */
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/event/events/server_conflict_event.h>
 #include <nx/network/nettools.h>
 #include <nx/network/system_socket.h>
@@ -33,7 +33,7 @@ QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
     else
         host = DEFAULT_APPSERVER_HOST;
     QByteArray result = host.toUtf8();
-    if (nx::mediaserver::Utils::isLocalAppServer(result))
+    if (nx::vms::server::Utils::isLocalAppServer(result))
     {
         QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
         if (!interfaces.isEmpty())
@@ -160,7 +160,7 @@ public:
 };
 
 QnMServerResourceSearcher::QnMServerResourceSearcher(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

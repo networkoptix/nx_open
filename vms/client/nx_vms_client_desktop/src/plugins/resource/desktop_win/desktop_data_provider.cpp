@@ -60,11 +60,7 @@ namespace {
 
 QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
     m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
-    m_speexPreprocess(nullptr),
-    m_owner(owner),
-    hWaveIn(0),
-    m_terminated(false),
-    m_waveInOpened(false)
+    m_owner(owner)
 {
 }
 
@@ -273,42 +269,26 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
     return true;
 }
 
-QnDesktopDataProvider::QnDesktopDataProvider (
-                   QnResourcePtr res,
-                   int desktopNum,
-                   const QnAudioDeviceInfo* audioDevice,
-                   const QnAudioDeviceInfo* audioDevice2,
-                   Qn::CaptureMode captureMode,
-                   bool captureCursor,
-                   const QSize& captureResolution,
-                   float encodeQualuty, // in range 0.0 .. 1.0
-                   QWidget* glWidget,
-                   const QPixmap& logo
-                   ):
+QnDesktopDataProvider::QnDesktopDataProvider(
+    QnResourcePtr res,
+    int desktopNum,
+    const QnAudioDeviceInfo* audioDevice,
+    const QnAudioDeviceInfo* audioDevice2,
+    Qn::CaptureMode captureMode,
+    bool captureCursor,
+    const QSize& captureResolution,
+    float encodeQualuty, //< In range [0.0, 1.0].
+    QWidget* glWidget,
+    const QPixmap& logo)
+    :
     QnDesktopDataProviderBase(res),
-    m_videoBuf(0),
-    m_videoBufSize(0),
-    m_videoCodecCtx(0),
-    m_audioCodecCtx(0),
-    m_grabber(0),
     m_desktopNum(desktopNum),
-
-    m_audioFramesCount(0),
-    m_audioFrameDuration(0),
-    m_storedAudioPts(0),
-    m_maxAudioJitter(0),
-
     m_captureMode(captureMode),
     m_captureCursor(captureCursor),
     m_captureResolution(captureResolution),
     m_encodeQualuty(encodeQualuty),
-    m_encodedFrames(0),
     m_widget(glWidget),
-    m_encodedAudioBuf(0),
-    m_capturingStopped(false),
     m_logo(logo),
-    m_started(false),
-    m_isInitialized(false),
     m_inputAudioFrame(av_frame_alloc()),
     m_outPacket(av_packet_alloc())
 {

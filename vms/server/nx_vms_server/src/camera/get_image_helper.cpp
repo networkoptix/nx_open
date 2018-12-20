@@ -66,7 +66,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
 } // namespace
 
 QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -165,7 +165,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
     auto camera = serverModule()->videoCameraPool()->getVideoCamera(resource);
 
-    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
     bool isArchiveVideoPacket = false;
     if (request.usecSinceEpoch == DATETIME_NOW)
@@ -249,9 +248,10 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (!video)
         return nullptr;
 
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
+    bool gotFrame = false;
     QnFfmpegVideoDecoder decoder(
         DecoderConfig::fromResource(resource), video->compressionType, video, false);
-    bool gotFrame = false;
 
     if (!isArchiveVideoPacket)
     {
@@ -279,7 +279,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (video)
         outFrame->channel = video->channelNumber;
 
-    return outFrame;
+    return gotFrame ? outFrame : nullptr;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
@@ -341,7 +341,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
 
     const auto secondaryResolution =
         request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
-    const Qn::StreamIndex streamIndex = (
+    Qn::StreamIndex streamIndex = (
             (request.size.width() <= 0 && request.size.height() <= 0)
             || request.size.width() > secondaryResolution.width()
             || request.size.height() > secondaryResolution.height())
@@ -481,15 +481,14 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
     }
     else
     {
-        const int MAX_VIDEO_FRAME = outFrame->width * outFrame->height * 3 / 2;
-        quint8* m_videoEncodingBuffer = (quint8*)qMallocAligned(MAX_VIDEO_FRAME, 32);
-        //int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
-        QnFfmpegAvPacket outPacket(m_videoEncodingBuffer, MAX_VIDEO_FRAME);
+        QnFfmpegAvPacket outPacket;
         int got_packet = 0;
-        int encodeResult = avcodec_encode_video2(videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
+        int encodeResult = avcodec_encode_video2(
+            videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
+
         if (encodeResult == 0 && got_packet)
         {
-            result.append((const char*)m_videoEncodingBuffer, outPacket.size);
+            result.append((const char*) outPacket.data, outPacket.size);
         }
         else
         {
@@ -497,10 +496,9 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
                 codecId, pixelFormat, outFrame->width, outFrame->height, encodeResult);
         }
 
-        qFreeAligned(m_videoEncodingBuffer);
     }
-    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
 
+    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
     return result;
 }
 

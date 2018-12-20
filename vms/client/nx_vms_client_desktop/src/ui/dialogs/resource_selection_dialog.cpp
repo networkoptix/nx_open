@@ -60,7 +60,7 @@ public:
                 }
                 break;
             }
-            case Qt::TextColorRole:
+            case Qt::ForegroundRole:
             {
                 return QBrush(qnGlobals->errorTextColor());
             }

@@ -124,13 +124,13 @@ void QnFullscreenCameraActionWidget::updateWarningLabel()
         {
             ui->layoutWarningWidget->setText(
                 tr("This camera is not currently on the selected layout. "
-                   "Action will work if camera will be added before action triggers."));
+                   "Action will work if camera is added before action triggers."));
         }
         else
         {
             ui->layoutWarningWidget->setText(
                 tr("This camera is not currently on some of the selected layouts. "
-                    "Action will work if camera will be added before action triggers."));
+                    "Action will work if camera is added before action triggers."));
         }
     }
 }

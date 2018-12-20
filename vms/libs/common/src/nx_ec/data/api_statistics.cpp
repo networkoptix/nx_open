@@ -9,23 +9,24 @@ using namespace nx::vms;
 
 const static QString __CAMERA_EXCEPT_PARAMS[] =
 {
-    Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-    Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-    Qn::CAMERA_ADVANCED_PARAMETERS,
-    QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
-    QLatin1String("MediaUrl"),
+    ResourcePropertyKey::kCredentials,
+    ResourcePropertyKey::kDefaultCredentials,
+    ResourcePropertyKey::kCameraAdvancedParams,
+    ResourcePropertyKey::Onvif::kDeviceID,
+    ResourcePropertyKey::Onvif::kDeviceUrl,
+    ResourcePropertyKey::Onvif::kMediaUrl
 };
 
 const static QString __CAMERA_RESOURCE_PARAMS[] =
 {
-    Qn::ANALOG_PARAM_NAME,
-    Qn::CAMERA_CAPABILITIES_PARAM_NAME,
-    Qn::HAS_DUAL_STREAMING_PARAM_NAME,
-    Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
-    Qn::MAX_FPS_PARAM_NAME,
-    Qn::PTZ_CAPABILITIES_PARAM_NAME,
-    Qn::STREAM_FPS_SHARING_PARAM_NAME,
-    Qn::SUPPORTED_MOTION_PARAM_NAME,
+    ResourcePropertyKey::kAnalog,
+    ResourcePropertyKey::kCameraCapabilities,
+    ResourcePropertyKey::kHasDualStreaming,
+    ResourcePropertyKey::kIsAudioSupported,
+    ResourcePropertyKey::kMediaCapabilities,
+    ResourcePropertyKey::kPtzCapabilities,
+    ResourcePropertyKey::kStreamFpsSharing,
+    ResourcePropertyKey::kSupportedMotion,
 };
 
 // TODO: remove this hack when VISUAL STUDIO supports initializer lists
@@ -39,7 +40,7 @@ ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& da
     : nx::vms::api::CameraDataEx(std::move(data))
 {
     // find out if default password worked
-    const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
+    const auto& defCred = ResourcePropertyKey::kDefaultCredentials;
     const auto it = std::find_if(addParams.begin(), addParams.end(),
         [&defCred](const auto& param) { return param.name == defCred; });
     const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();

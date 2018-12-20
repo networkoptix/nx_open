@@ -10,7 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/resource_type.h>
 
-using nx::common::utils::Credentials;
+using nx::vms::common::Credentials;
 
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
 static const QRegExp UNNEEDED_CHARACTERS(QLatin1String("[^\\d\\w]+"));

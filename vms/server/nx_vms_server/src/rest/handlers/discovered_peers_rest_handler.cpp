@@ -1,7 +1,7 @@
 #include "discovered_peers_rest_handler.h"
 
 #include <common/common_module.h>
-#include <nx/mediaserver/discovery/discovery_monitor.h>
+#include <nx/vms/server/discovery/discovery_monitor.h>
 #include <network/tcp_connection_priv.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/discovery/manager.h>
@@ -13,6 +13,6 @@ int QnDiscoveredPeersRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    result.setReply(nx::mediaserver::discovery::getServers(owner->commonModule()->moduleDiscoveryManager()));
+    result.setReply(nx::vms::server::discovery::getServers(owner->commonModule()->moduleDiscoveryManager()));
     return nx::network::http::StatusCode::ok;
 }

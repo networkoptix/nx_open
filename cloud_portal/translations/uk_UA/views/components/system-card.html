@@ -3,14 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Ваша система</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Перейменувати систему</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Перейменувати систему</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Об’єднати з іншою системою</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Об’єднати з іншою системою</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Від’єднатися від <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -29,13 +28,21 @@
         <button class="btn btn-default" ng-click="delete()">Від'єднатись від мого облікового запису</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong> об'єднатися із цією системою</div>
         <hr />
         <div class="merge-info-text">Залежно від розміру бази даних це може зайняти до декількох годин</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>Ця система об'єднується в <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />
         <div class="merge-info-text">

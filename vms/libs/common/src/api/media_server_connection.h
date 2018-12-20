@@ -228,15 +228,15 @@ public:
         QObject* target,
         const char* slot);
 
-    int ptzGetAuxilaryTraitsAsync(
+    int ptzGetAuxiliaryTraitsAsync(
         const QnNetworkResourcePtr& camera,
         const nx::core::ptz::Options& options,
         QObject* target,
         const char* slot);
 
-    int ptzRunAuxilaryCommandAsync(
+    int ptzRunAuxiliaryCommandAsync(
         const QnNetworkResourcePtr& camera,
-        const QnPtzAuxilaryTrait& trait,
+        const QnPtzAuxiliaryTrait& trait,
         const QString& data,
         const nx::core::ptz::Options& options,
         QObject* target,
@@ -316,7 +316,7 @@ public:
     int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
-        qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot);
+        qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
 
     int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);

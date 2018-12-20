@@ -546,8 +546,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
             : "Password must be cleared");
 
         const auto credentials = (storePassword
-            ? QnEncodedCredentials(url)
-            : QnEncodedCredentials(url.userName(), QString()));
+            ? nx::vms::common::Credentials(url)
+            : nx::vms::common::Credentials(url.userName(), QString()));
 
         nx::vms::client::core::helpers::storeCredentials(localId, credentials);
         qnClientCoreSettings->save();
@@ -881,7 +881,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
                 url.userName());
             if (credentials.isValid())
             {
-                url.setPassword(credentials.decodedPassword());
+                url.setPassword(credentials.password);
                 testConnectionToServer(url, AutoLogin, true);
             }
         }
@@ -916,7 +916,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     nx::utils::Url url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
-    url.setPassword(credentials.password.value());
+    url.setPassword(credentials.password);
 
     action::Parameters connectParams{Qn::UrlRole, url};
     connectParams.setArgument(Qn::StoreSessionRole, true);

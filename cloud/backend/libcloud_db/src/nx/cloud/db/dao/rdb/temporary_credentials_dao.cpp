@@ -141,7 +141,8 @@ void TemporaryCredentialsDao::update(
                 prolongation_period_sec = :prolongationPeriodSec,
                 max_use_count = :maxUseCount,
                 access_rights = :accessRights,
-                is_email_code = :isEmailCode
+                is_email_code = :isEmailCode,
+                use_count = :useCount
             WHERE
                 login = :login AND password_ha1 = :passwordString
             )sql");

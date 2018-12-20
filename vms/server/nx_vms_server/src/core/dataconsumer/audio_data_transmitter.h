@@ -54,6 +54,8 @@ public:
 
     virtual void unsubscribe(QnAbstractStreamDataProvider* dataProvider);
 
+    static AVCodecID toFfmpegCodec(const QString& codec, int* outDefaultBitrate);
+
 protected:
     virtual void endOfRun() override;
 private:

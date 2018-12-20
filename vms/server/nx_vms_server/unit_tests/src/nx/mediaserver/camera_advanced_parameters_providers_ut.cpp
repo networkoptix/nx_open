@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include "camera_mock.h"
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace resource {
 namespace test {
 
@@ -396,7 +396,7 @@ TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
 
 TEST_F(CameraAdvancedParametersProviders, AdvancedParametersEquality)
 {
-    auto camera = newCamera([](CameraMock* camera) {});
+    auto camera = newCamera([](CameraMock* /*camera*/) {});
     auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
     ASSERT_EQ(parameters, QnCameraAdvancedParams());
 
@@ -421,5 +421,5 @@ TEST_F(CameraAdvancedParametersProviders, AdvancedParametersEquality)
 
 } // namespace test
 } // namespace resource
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

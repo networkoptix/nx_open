@@ -85,7 +85,9 @@ ResourceSelectionNodeView::ResourceSelectionNodeView(QWidget* parent):
         [this](const ViewNodePath& path, Qt::CheckState checkedState)
         {
             const auto node = state().rootNode->nodeAt(path);
-            emit resourceSelectionChanged(getResource(node)->getId(), checkedState);
+            auto resource = getResource(node);
+            if (resource)
+                emit resourceSelectionChanged(resource->getId(), checkedState);
         });
 }
 

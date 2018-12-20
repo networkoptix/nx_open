@@ -90,8 +90,8 @@ TEST(Sdp, parsing)
         "a=control:*\r\n"
         "a=range:npt=0-\r\n"
         "a=x-qt-text-nam:Session streamed by \"ISD RTSP Server\"\r\n"
-        "m=video 0 RTP/AVP 96\r\n"
-        "c=IN IP4 0.0.0.0\r\n"
+        "m=video 4040 RTP/AVP 96\r\n"
+        "c=IN IP4 127.0.0.1\r\n"
         "b=AS:500\r\n"
         "a=rtpmap:96 H264/90000\r\n"
         "a=fmtp:96 packetization-mode=1; profile-level-id=4D401E; sprop-parameter-sets=Z01AHppkBQF/y/+AEAANtwEBAUAAAPoAAA2sOhgdgB167y40MDsAOvXeXCg=,aO48gA==\r\n"
@@ -102,36 +102,40 @@ TEST(Sdp, parsing)
         "a=fmtp:97 streamtype=5; profile-level-id=15; mode=AAC-hbr; sizeLength=13; indexLength=3; indexDeltaLength=3; profile=1; bitrate=12000; config=1588\r\n"
         "a=control:track2\r\n";
     sdp.parse(sdpString2);
-    ASSERT_EQ(sdp.media.size(), 2);
-    ASSERT_EQ(sdp.media[0].payloadType, 96);
-    ASSERT_EQ(sdp.media[0].mediaType, Sdp::MediaType::Video);
-    ASSERT_EQ(sdp.media[0].control, "track1");
-    ASSERT_EQ(sdp.media[0].sendOnly, false);
-    ASSERT_EQ(sdp.media[0].rtpmap.codecName, "H264");
-    ASSERT_EQ(sdp.media[0].rtpmap.clockRate, 90000);
-    ASSERT_EQ(sdp.media[0].rtpmap.channels, 0);
-    ASSERT_EQ(sdp.media[0].fmtp.params.size(), 3);
-    ASSERT_EQ(sdp.media[0].fmtp.params[0], "packetization-mode=1");
-    ASSERT_EQ(sdp.media[0].fmtp.params[1], "profile-level-id=4D401E");
-    ASSERT_EQ(sdp.media[0].fmtp.params[2], "sprop-parameter-sets=Z01AHppkBQF/y/+AEAANtwEBAUAAAPoAAA2sOhgdgB167y40MDsAOvXeXCg=,aO48gA==");
 
-    ASSERT_EQ(sdp.media[1].payloadType, 97);
-    ASSERT_EQ(sdp.media[1].mediaType, Sdp::MediaType::Audio);
-    ASSERT_EQ(sdp.media[1].control, "track2");
-    ASSERT_EQ(sdp.media[1].sendOnly, false);
-    ASSERT_EQ(sdp.media[1].rtpmap.codecName, "mpeg4-generic");
-    ASSERT_EQ(sdp.media[1].rtpmap.clockRate, 8000);
-    ASSERT_EQ(sdp.media[1].rtpmap.channels, 1);
-    ASSERT_EQ(sdp.media[1].fmtp.params.size(), 9);
-    ASSERT_EQ(sdp.media[1].fmtp.params[0], "streamtype=5");
-    ASSERT_EQ(sdp.media[1].fmtp.params[1], "profile-level-id=15");
-    ASSERT_EQ(sdp.media[1].fmtp.params[2], "mode=AAC-hbr");
-    ASSERT_EQ(sdp.media[1].fmtp.params[3], "sizeLength=13");
-    ASSERT_EQ(sdp.media[1].fmtp.params[4], "indexLength=3");
-    ASSERT_EQ(sdp.media[1].fmtp.params[5], "indexDeltaLength=3");
-    ASSERT_EQ(sdp.media[1].fmtp.params[6], "profile=1");
-    ASSERT_EQ(sdp.media[1].fmtp.params[7], "bitrate=12000");
-    ASSERT_EQ(sdp.media[1].fmtp.params[8], "config=1588");
+    ASSERT_EQ("127.0.0.1", sdp.serverAddress.toString());
+
+    ASSERT_EQ(2, sdp.media.size());
+    ASSERT_EQ(96, sdp.media[0].payloadType);
+    ASSERT_EQ(Sdp::MediaType::Video, sdp.media[0].mediaType);
+    ASSERT_EQ("track1", sdp.media[0].control);
+    ASSERT_FALSE(sdp.media[0].sendOnly);
+    ASSERT_EQ("H264", sdp.media[0].rtpmap.codecName);
+    ASSERT_EQ(90000, sdp.media[0].rtpmap.clockRate);
+    ASSERT_EQ(0, sdp.media[0].rtpmap.channels);
+    ASSERT_EQ(3, sdp.media[0].fmtp.params.size());
+    ASSERT_EQ("packetization-mode=1", sdp.media[0].fmtp.params[0]);
+    ASSERT_EQ("profile-level-id=4D401E", sdp.media[0].fmtp.params[1]);
+    ASSERT_EQ("sprop-parameter-sets=Z01AHppkBQF/y/+AEAANtwEBAUAAAPoAAA2sOhgdgB167y40MDsAOvXeXCg=,aO48gA==", sdp.media[0].fmtp.params[2]);
+    ASSERT_EQ(4040, sdp.media[0].serverPort);
+
+    ASSERT_EQ(97, sdp.media[1].payloadType);
+    ASSERT_EQ(Sdp::MediaType::Audio, sdp.media[1].mediaType);
+    ASSERT_EQ("track2", sdp.media[1].control);
+    ASSERT_FALSE(sdp.media[1].sendOnly);
+    ASSERT_EQ("mpeg4-generic", sdp.media[1].rtpmap.codecName);
+    ASSERT_EQ(8000, sdp.media[1].rtpmap.clockRate);
+    ASSERT_EQ(1, sdp.media[1].rtpmap.channels);
+    ASSERT_EQ(9, sdp.media[1].fmtp.params.size());
+    ASSERT_EQ("streamtype=5", sdp.media[1].fmtp.params[0]);
+    ASSERT_EQ("profile-level-id=15", sdp.media[1].fmtp.params[1]);
+    ASSERT_EQ("mode=AAC-hbr", sdp.media[1].fmtp.params[2]);
+    ASSERT_EQ("sizeLength=13", sdp.media[1].fmtp.params[3]);
+    ASSERT_EQ("indexLength=3", sdp.media[1].fmtp.params[4]);
+    ASSERT_EQ("indexDeltaLength=3", sdp.media[1].fmtp.params[5]);
+    ASSERT_EQ("profile=1", sdp.media[1].fmtp.params[6]);
+    ASSERT_EQ("bitrate=12000", sdp.media[1].fmtp.params[7]);
+    ASSERT_EQ("config=1588", sdp.media[1].fmtp.params[8]);
 }
 
 

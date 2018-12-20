@@ -4,13 +4,15 @@
 
 #include <core/resource_management/manual_camera_searcher.h>
 #include <rest/server/json_rest_handler.h>
-#include <nx/utils/concurrent.h>
 #include <api/model/manual_camera_data.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
+
+#include <memory>
+#include <unordered_map>
 
 class QnManualCameraAdditionRestHandler: 
     public QnJsonRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -36,6 +38,11 @@ private:
     int addCamerasAction(const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner);
 
+    int extractSearchStartParams(QnJsonRestResult* const result,
+        const QnRequestParams& params,
+        nx::utils::Url* const outUrl,
+        std::optional<std::pair<nx::network::HostAddress, nx::network::HostAddress>>* const outIpRange);
+
     /**
      * Get status of the manual camera search process. Thread-safe.
      * @param searchProcessUuid Uuid of the process.
@@ -56,9 +63,9 @@ private:
         const QnRestConnectionProcessor* owner);
 
 private:
+    using QnManualCameraSearcherPtr = std::unique_ptr<QnManualCameraSearcher>;
+
     // Mutex that is used to synchronize access to manual camera addition progress.
     QnMutex m_searchProcessMutex;
-
-    QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QnUuid, nx::utils::concurrent::Future<bool>> m_searchProcessRuns;
+    std::unordered_map<QnUuid, QnManualCameraSearcherPtr> m_searchProcesses;
 };

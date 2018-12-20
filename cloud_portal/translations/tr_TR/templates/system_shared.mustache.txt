@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+Merhaba, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}}({{message.sharer_email}})video yönetim sistemini sizinle paylaştı {{message.system_name}}.

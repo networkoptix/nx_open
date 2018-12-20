@@ -1,11 +1,11 @@
 #pragma once
 
 #include <rest/server/fusion_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnEventLog2RestHandler:
     public QnFusionRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     QnEventLog2RestHandler(QnMediaServerModule* serverModule);

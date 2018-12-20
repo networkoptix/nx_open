@@ -40,24 +40,9 @@ void AbstractAsyncSearchListModel::Private::cancelPrefetch()
     m_request = {};
 }
 
-bool AbstractAsyncSearchListModel::Private::canFetch() const
-{
-    if (fetchInProgress() || !hasAccessRights())
-        return false;
-
-    if (q->fetchedTimeWindow().isEmpty())
-        return true;
-
-    if (q->fetchDirection() == FetchDirection::earlier)
-        return q->fetchedTimeWindow().startTimeMs > q->relevantTimePeriod().startTimeMs;
-
-    NX_ASSERT(q->fetchDirection() == FetchDirection::later);
-    return q->fetchedTimeWindow().endTimeMs() < q->relevantTimePeriod().endTimeMs();
-}
-
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
 {
-    if (!canFetch() || !completionHandler)
+    if (fetchInProgress() || !completionHandler)
         return false;
 
     m_request.direction = q->fetchDirection();
@@ -86,7 +71,7 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     if (!m_request.id)
         return false;
 
-    NX_VERBOSE(q) << "Prefetch id:" << m_request.id;
+    NX_VERBOSE(q, "Prefetch id: %1", m_request.id);
 
     m_prefetchCompletionHandler = completionHandler;
     return true;
@@ -97,13 +82,13 @@ void AbstractAsyncSearchListModel::Private::commit(const QnTimePeriod& periodToC
     if (!fetchInProgress())
         return;
 
-    NX_VERBOSE(q) << "Commit id:" << m_request.id;
+    NX_VERBOSE(q, "Commit id: %1", m_request.id);
 
     commitPrefetch(periodToCommit);
 
     if (count() > q->maximumCount())
     {
-        NX_VERBOSE(q) << "Truncating to maximum count";
+        NX_VERBOSE(q, "Truncating to maximum count");
         q->truncateToMaximumCount();
     }
 
@@ -129,13 +114,13 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
 
     if (fetchedCount == 0)
     {
-        NX_VERBOSE(q) << "Pre-fetched no items";
+        NX_VERBOSE(q, "Pre-fetched no items");
     }
     else
     {
-        NX_VERBOSE(q) << "Pre-fetched" << fetchedCount << "items from"
-            << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
-            << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+        NX_VERBOSE(q, "Pre-fetched %1 items:\n    from: %2\b    to: %3", fetchedCount,
+            utils::timestampToDebugString(actuallyFetched.startTimeMs),
+            utils::timestampToDebugString(actuallyFetched.endTimeMs()));
     }
 
     const bool fetchedAll = success && fetchedCount < m_request.batchSize;
@@ -174,9 +159,9 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
                     result.truncate(fetched.endTimeMs());
             }
 
-            NX_VERBOSE(q) << "Effective period is from"
-                << utils::timestampToDebugString(result.startTimeMs) << "to"
-                << utils::timestampToDebugString(result.endTimeMs());
+            NX_VERBOSE(q, "Effective period: \n    from: %1\n    to: %2",
+                utils::timestampToDebugString(result.startTimeMs),
+                utils::timestampToDebugString(result.endTimeMs()));
 
             return result;
         };
@@ -185,7 +170,7 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
         ? (fetchedAll ? FetchResult::complete : FetchResult::incomplete)
         : FetchResult::failed;
 
-    NX_VERBOSE(q) << "Fetch result:" << QVariant::fromValue(result).toString();
+    NX_VERBOSE(q, "Fetch result: %1", QVariant::fromValue(result).toString());
 
     NX_ASSERT(m_prefetchCompletionHandler);
     m_prefetchCompletionHandler(fetchedPeriod(), result);

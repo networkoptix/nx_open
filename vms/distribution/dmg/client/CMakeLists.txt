@@ -89,7 +89,7 @@ add_custom_target(distribution_dmg_client ALL
         ${CMAKE_CURRENT_BINARY_DIR}/${update_file_name} ${distribution_output_dir}
 )
 
-if(NOT mac.skip.sign)
+if(codeSigning)
     prepare_mac_keychain(distribution_dmg_client)
 endif()
 

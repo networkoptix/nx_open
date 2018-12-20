@@ -76,7 +76,7 @@ private:
         QnAudioFormat m_audioFormat;
         QnSafeQueue<QnWritableCompressedAudioDataPtr>  m_audioQueue;
         QnWritableCompressedAudioData m_tmpAudioBuffer;
-        SpeexPreprocessState* m_speexPreprocess;
+        SpeexPreprocessState* m_speexPreprocess = nullptr;
 
         int audioPacketSize();
         bool setupFormat(QString& errMessage);
@@ -89,51 +89,52 @@ private:
         void gotData();
         void clearBuffers();
     private:
-        QnDesktopDataProvider* m_owner;
-        HWAVEIN hWaveIn;
+        QnDesktopDataProvider* const m_owner;
+        HWAVEIN hWaveIn = 0;
         QQueue<WAVEHDR*> m_buffers;
         QnMutex m_mtx;
-        std::atomic<bool> m_terminated;
-        bool m_waveInOpened;
+        std::atomic<bool> m_terminated = false;
+        bool m_waveInOpened = false;
     };
 
-    int m_encodedFrames;
-    QnBufferedScreenGrabber* m_grabber;
-    quint8* m_videoBuf;
-    int m_videoBufSize;
-    AVCodecContext* m_videoCodecCtx;
+    int m_encodedFrames = 0;
+    QnBufferedScreenGrabber* m_grabber = nullptr;
+    quint8* m_videoBuf = nullptr;
+    int m_videoBufSize = 0;
+    AVCodecContext* m_videoCodecCtx = nullptr;
     QnConstMediaContextPtr m_videoContext;
-    AVFrame* m_frame;
-    int m_desktopNum;
+    AVFrame* m_frame = nullptr;
+    const int m_desktopNum;
 
     QVector<quint8> m_buffer;
 
     // single audio objects
-    quint8* m_encodedAudioBuf;
-    AVCodecContext* m_audioCodecCtx;
+    quint8* m_encodedAudioBuf = nullptr;
+    AVCodecContext* m_audioCodecCtx = nullptr;
     QnConstMediaContextPtr m_audioContext;
-    int m_audioFramesCount;
-    double m_audioFrameDuration;
-    qint64 m_storedAudioPts;
-    int m_maxAudioJitter;
-    QVector <EncodedAudioInfo*> m_audioInfo;
+    int m_audioFramesCount = 0;
+    double m_audioFrameDuration = 0.0;
+    qint64 m_storedAudioPts = 0;
+    int m_maxAudioJitter = 0;
+    QVector<EncodedAudioInfo*> m_audioInfo;
 
-    Qn::CaptureMode m_captureMode;
-    bool m_captureCursor;
-    QSize m_captureResolution;
-    float m_encodeQualuty;
-    QWidget* m_widget;
+    const Qn::CaptureMode m_captureMode;
+    const bool m_captureCursor;
+    const QSize m_captureResolution;
+    const float m_encodeQualuty;
+    QWidget* const m_widget;
 
-    bool m_capturingStopped;
+    bool m_capturingStopped = false;
     const QPixmap m_logo;
     qint64 m_initTime;
     mutable QnMutex m_startMutex;
-    bool m_started;
-    bool m_isInitialized;
+    bool m_started = false;
+    bool m_isInitialized = false;
 
     QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
-    AVFrame* m_inputAudioFrame;
-    AVPacket* m_outPacket;
+    AVFrame* m_inputAudioFrame = nullptr;
+    AVPacket* m_outPacket = nullptr;
 
-    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
+    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,
+        DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };

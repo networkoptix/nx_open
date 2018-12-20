@@ -18,7 +18,6 @@ class SearchEdit: public QWidget
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
-    Q_PROPERTY(int selectedTagIndex READ selectedTagIndex NOTIFY selectedTagIndexChanged)
 
 public:
     SearchEdit(QWidget* parent = nullptr);
@@ -33,13 +32,26 @@ public:
     QString placeholderText() const;
     void setPlaceholderText(const QString& value);
 
-    QStringList tagsList() const;
-    void setTags(const QStringList& value);
+    bool isMenuEnabled() const;
+    void setMenuEnabled(bool enabled);
 
-    int selectedTagIndex() const;
+    QVariant currentTagData() const;
+    void setCurrentTagData(const QVariant& tagData);
 
-    void setClearingTagIndex(int index);
-    int clearingTagIndex() const;
+    /**
+    * SearchEdit control can display discardable badge with certain meaning and description.
+    *     It may be assigned by both picking some option from context menu or directly calling
+    *     setCurrentTagData method.
+    *
+    * @param tagMenuCreator Factory functor that returns pointer to QMenu instance. Picking one of
+    *     menu actions will cause setCurrentTagData method call parametrized with menu action data.
+    *
+    * @param tagNameProvider Functor that provides descriptive name for tag badge based on value
+    *     returned by currentTagData method.
+    */
+    using MenuCreator = std::function<QMenu*(QWidget* parent)>;
+    void setTagOptionsSource(MenuCreator tagMenuCreator,
+        std::function<QString(const QVariant&)> tagNameProvider);
 
     bool focused() const;
 
@@ -50,35 +62,30 @@ public:
 signals:
     void textChanged();
     void editingFinished();
-    void selectedTagIndexChanged();
-
+    void currentTagDataChanged();
     void enterPressed();
     void ctrlEnterPressed();
     void focusedChanged();
     void filteringChanged();
 
 protected:
-    void resizeEvent(QResizeEvent* event) override;
     void focusInEvent(QFocusEvent* event) override;
     void focusOutEvent(QFocusEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     void inputMethodEvent(QInputMethodEvent* event) override;
     void enterEvent(QEvent* event) override;
     void leaveEvent(QEvent* event) override;
-
     bool event(QEvent* event) override;
 
 private:
     void setupMenuButton();
-
     void updatePalette();
-    void setSelectedTagIndex(int value);
     void handleTagButtonStateChanged();
     void updateTagButton();
     void setHovered(bool value);
     void setButtonHovered(bool value);
     void updateMenuButtonIcon();
-
+    void showFilterMenu();
     void setFocused(bool value);
     void updateFocused();
 

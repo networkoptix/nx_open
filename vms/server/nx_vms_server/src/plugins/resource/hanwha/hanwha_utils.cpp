@@ -4,7 +4,7 @@
 #include <utils/common/app_info.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 QStringList fromHanwhaInternalRange(const QStringList& internalRange)
@@ -345,17 +345,6 @@ HanwhaStreamingType fromHanwhaString(const QString& str)
 }
 
 template<>
-HanwhaTransportProtocol fromHanwhaString(const QString& str)
-{
-    if (str == kHanwhaTcp)
-        return HanwhaTransportProtocol::tcp;
-    else if (str == kHanwhaUdp)
-        return HanwhaTransportProtocol::udp;
-
-    return HanwhaTransportProtocol::undefined;
-}
-
-template<>
 HanwhaClientType fromHanwhaString(const QString& str)
 {
     if (str == kHanwhaPcClient)
@@ -474,19 +463,6 @@ QString toHanwhaString(HanwhaStreamingType streamingType)
             return kHanwhaRtpMulticast;
         default:
             return kHanwhaRtpUnicast;
-    }
-}
-
-QString toHanwhaString(HanwhaTransportProtocol transportProtocol)
-{
-    switch (transportProtocol)
-    {
-        case HanwhaTransportProtocol::tcp:
-            return kHanwhaTcp;
-        case HanwhaTransportProtocol::udp:
-            return kHanwhaUdp;
-        default:
-            return kHanwhaTcp;
     }
 }
 
@@ -621,5 +597,5 @@ QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift)
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

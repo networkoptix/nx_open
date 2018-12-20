@@ -9,12 +9,15 @@
 #include <nx/network/ping.h>
 
 #include <api/app_server_connection.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <api/global_settings.h>
+
+#include <nx/vms/server/event/event_connector.h>
 #include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_searcher.h>
@@ -29,8 +32,8 @@
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
-#include <nx/mediaserver/resource/analytics_plugin_resource.h>
-#include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/analytics_plugin_resource.h>
+#include <nx/vms/server/resource/analytics_engine_resource.h>
 
 namespace {
 
@@ -44,9 +47,27 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServ
     QnResourceDiscoveryManager(serverModule->commonModule()),
     m_serverModule(serverModule)
 {
+    connect(resourcePool(),
+        &QnResourcePool::resourceRemoved, 
+        this,
+        &QnMServerResourceDiscoveryManager::at_resourceDeleted, 
+        Qt::DirectConnection);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, 
+        this,
+        &QnMServerResourceDiscoveryManager::at_resourceAdded, 
+        Qt::DirectConnection);
+    connect(commonModule()->globalSettings(),
+        &QnGlobalSettings::disabledVendorsChanged, 
+        this,
+        &QnMServerResourceDiscoveryManager::updateSearchersUsage);
+    connect(commonModule()->globalSettings(), 
+        &QnGlobalSettings::autoDiscoveryChanged, 
+        this,
+        &QnMServerResourceDiscoveryManager::updateSearchersUsage);
+
     connect(
         this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
-        serverModule->eventConnector(), &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
+        serverModule->eventConnector(), &nx::vms::server::event::EventConnector::at_cameraDisconnected);
     m_serverOfflineTimeout = serverModule->settings().redundancyTimeout() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_startupTimer.restart();
@@ -279,7 +300,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_WARNING(this, QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)));
-                    existCamRes->saveParams();
+                    existCamRes->saveProperties();
                 }
             }
         }
@@ -348,18 +369,60 @@ nx::vms::common::AnalyticsPluginResourcePtr
     QnMServerResourceDiscoveryManager::createAnalyticsPluginResource(
         const QnResourceParams& /*parameters*/)
 {
-    namespace mserver = nx::mediaserver::resource;
-    return mserver::AnalyticsPluginResourcePtr(
-        new mserver::AnalyticsPluginResource(m_serverModule));
+    return nx::vms::server::resource::AnalyticsPluginResourcePtr(
+        new nx::vms::server::resource::AnalyticsPluginResource(m_serverModule));
 }
 
 nx::vms::common::AnalyticsEngineResourcePtr
     QnMServerResourceDiscoveryManager::createAnalyticsEngineResource(
         const QnResourceParams& /*parameters*/)
 {
-    namespace mserver = nx::mediaserver::resource;
-    return mserver::AnalyticsEngineResourcePtr(
-        new mserver::AnalyticsEngineResource(m_serverModule));
+    return nx::vms::server::resource::AnalyticsEngineResourcePtr(
+        new nx::vms::server::resource::AnalyticsEngineResource(m_serverModule));
+}
+
+void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & resource)
+{
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server)
+    {
+        connect(server, 
+            &QnMediaServerResource::redundancyChanged, 
+            this, 
+            &QnMServerResourceDiscoveryManager::updateSearchersUsage);
+        updateSearchersUsage();
+    }
+
+    std::vector<QnManualCameraInfo> newCameras;
+    {
+        QnMutexLocker lock( &m_searchersListMutex );
+        const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+        if (!camera || !camera->isManuallyAdded())
+            return;
+
+        if (!m_manualCameraByUniqueId.contains(camera->getUniqueId()))
+            newCameras.push_back(manualCameraInfo(camera));
+    }
+
+    if (!newCameras.empty())
+        registerManualCameras(newCameras);
+}
+
+void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr & resource)
+{
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server)
+    {
+        disconnect(server, nullptr, this, nullptr);
+        updateSearchersUsage();
+    }
+
+    QnMutexLocker lock(&m_searchersListMutex);
+    m_manualCameraByUniqueId.remove(resource->getUniqueId());
+    m_recentlyDeleted << resource->getUniqueId();
+
+    NX_DEBUG(this, lm("Manual camera %1 is deleted on %2")
+        .args(resource->getUniqueId(), resource->getUrl()));
 }
 
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)

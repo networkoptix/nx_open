@@ -109,25 +109,27 @@ const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
 {
     if (m_allParamTypeListCache.isNull())
     {
-        if (!m_allParamTypeListCache.isNull())
-            return *(m_allParamTypeListCache.data());
-
         QSharedPointer<ParamTypeMap> allParamTypeListCache(new ParamTypeMap());
         *allParamTypeListCache = m_paramTypeList;
 
-        for (const QnUuid& parentId: allParentList()) {
-            if (parentId.isNull()) {
+        for (const QnUuid& parentId: allParentList())
+        {
+            if (parentId.isNull())
+            {
                 continue;
             }
 
             if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId))
             {   // Note. Copy below, should be thread safe.
                 ParamTypeMap parentData = parent->paramTypeList();
-                for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
+                for(auto itr = parentData.begin(); itr != parentData.end(); ++itr)
+                {
                     if (!allParamTypeListCache->contains(itr.key()))
                         allParamTypeListCache->insert(itr.key(), itr.value());
                 }
-            } else {
+            }
+            else
+            {
                 qWarning() << "parentId is" << parentId.toString() << "but there is no such parent in database";
             }
         }

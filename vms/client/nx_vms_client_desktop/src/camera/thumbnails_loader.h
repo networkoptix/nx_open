@@ -17,7 +17,7 @@
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;
 class QnThumbnailsLoaderHelper;
-class QnTimePeriod;
+struct QnTimePeriod;
 
 struct SwsContext;
 

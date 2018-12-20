@@ -41,7 +41,7 @@
 #include <nx/utils/string.h>
 #include <utils/common/warnings.h>
 
-#include "transcoding/filters/filter_helper.h"
+#include <transcoding/filters/filter_helper.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 
@@ -165,10 +165,13 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     m_progressShowTime(0),
     m_canceled(false)
 {
-    connect(action(action::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
+    connect(action(action::TakeScreenshotAction), &QAction::triggered,
+        this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
-ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
+ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget,
+    const QnScreenshotParameters &parameters, bool forced) const
+{
     QnResourceDisplayPtr display = widget->display();
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
@@ -187,6 +190,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
     imageProcessingParams.rotation = parameters.rotationAngle;
     imageProcessingParams.forcedAspectRatio = parameters.customAspectRatio;
+    imageProcessingParams.watermark = watermark();
 
     QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
     if (screenshot.isNull())
@@ -525,6 +529,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.timestampParams = parameters.timestampParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
+        transcodeParams.watermark = watermark();
         auto filters = QnImageFilterHelper::createFilterChain(
             transcodeParams);
 

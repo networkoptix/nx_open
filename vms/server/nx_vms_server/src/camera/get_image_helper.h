@@ -15,7 +15,7 @@
 
 #include "camera_fwd.h"
 #include "nx/streaming/media_data_packet.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class CLVideoDecoderOutput;
 typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
@@ -27,7 +27,7 @@ QSize updateDstSize(const QnVirtualCameraResource* camera,
     const CLVideoDecoderOutput& outFrame,
     nx::api::ImageRequest::AspectRatio aspectRatio);
 
-class QnGetImageHelper: public nx::mediaserver::ServerModuleAware
+class QnGetImageHelper: public nx::vms::server::ServerModuleAware
 {
 public:
     QnGetImageHelper(QnMediaServerModule* serverModule);

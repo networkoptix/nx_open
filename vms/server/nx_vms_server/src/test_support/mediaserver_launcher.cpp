@@ -65,7 +65,7 @@ QnMediaServerModule* MediaServerLauncher::serverModule() const
     return m_mediaServerProcess->serverModule();
 }
 
-nx::mediaserver::Authenticator* MediaServerLauncher::authenticator() const
+nx::vms::server::Authenticator* MediaServerLauncher::authenticator() const
 {
     return m_mediaServerProcess->authenticator();
 }

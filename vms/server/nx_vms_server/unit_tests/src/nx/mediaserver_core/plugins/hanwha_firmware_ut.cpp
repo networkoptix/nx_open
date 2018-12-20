@@ -2,7 +2,7 @@
 
 #include <plugins/resource/hanwha/hanwha_firmware.h>
 
-using namespace nx::mediaserver_core::plugins;
+using namespace nx::vms::server::plugins;
 
 TEST(HanwhaFirmware, parsing)
 {
@@ -25,7 +25,7 @@ TEST(HanwhaFirmware, parsing)
 
 TEST(HanwhaFirmware, comparsion)
 {
-    using namespace nx::mediaserver_core::plugins;
+    using namespace nx::vms::server::plugins;
 
     static const std::map<QString, QString> kEqualFirmwareOptions = {
         {{"v0.12_123456"}, {"0.12_123456"}},

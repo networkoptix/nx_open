@@ -11,7 +11,7 @@
 #include <QtWidgets/QBoxLayout>
 
 #include <client_core/client_core_settings.h>
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <client_core/client_core_module.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
@@ -23,7 +23,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/file_processor.h>
 
-#include <nx/client/core/settings/secure_settings.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
@@ -43,6 +42,7 @@
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
 #include <utils/common/app_info.h>
+#include <utils/common/credentials.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include <nx/utils/log/log.h>
@@ -153,7 +153,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
             return;
 
         const auto credentialsList =
-            nx::vms::client::core::secureSettings()->systemAuthenticationData()[system->localId()];
+            nx::vms::client::core::settings()->systemAuthenticationData()[system->localId()];
 
         if (!credentialsList.isEmpty() && !credentialsList.first().password.isEmpty())
         {
@@ -165,7 +165,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
             const auto serverHost = system->getServerHost(firstServerId);
 
             connectToLocalSystem(system->id(), serverHost.toString(),
-                credentials.user, credentials.password.value(),
+                credentials.user, credentials.password,
                 kAlwaysStorePassword, kNeverAutologin);
 
             return;
@@ -324,10 +324,10 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
-    connectToSystemInternal(        
+    connectToSystemInternal(
         systemId,
         helpers::parseConnectionUrlFromUserInput(serverUrl),
-        QnEncodedCredentials(userName, password),
+        {userName, password},
         storePassword,
         autoLogin);
 }
@@ -345,10 +345,10 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
     const auto callback = [localId, userName]()
         {
-            auto authData = nx::vms::client::core::secureSettings()->systemAuthenticationData();
+            auto authData = nx::vms::client::core::settings()->systemAuthenticationData();
             auto& credentialsList = authData[localId];
             const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-                [userName](const QnEncodedCredentials& other)
+                [userName](const auto& other)
                 {
                     return other.user == userName;
                 });
@@ -358,9 +358,9 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
             const auto insertionIndex = it - credentialsList.begin();
             credentialsList.erase(it);
-            credentialsList.insert(insertionIndex, QnEncodedCredentials(userName, QString()));
+            credentialsList.insert(insertionIndex, {userName, QString()});
 
-            nx::vms::client::core::secureSettings()->systemAuthenticationData = authData;
+            nx::vms::client::core::settings()->systemAuthenticationData = authData;
         };
 
     executeDelayedParented(callback, 0, this);
@@ -375,7 +375,7 @@ void QnWorkbenchWelcomeScreen::forceActiveFocus()
 void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QString& systemId,
     const nx::utils::Url& serverUrl,
-    const QnEncodedCredentials& credentials,
+    const nx::vms::common::Credentials& credentials,
     bool storePassword,
     bool autoLogin,
     const nx::utils::SharedGuardPtr& completionTracker)
@@ -392,7 +392,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 
             auto url = serverUrl;
             if (!credentials.password.isEmpty())
-                url.setPassword(credentials.password.value());
+                url.setPassword(credentials.password);
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
@@ -410,7 +410,9 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
-void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, const QString& serverUrl)
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(
+    const QString& systemId, 
+    const QString& serverUrl)
 {
     if (!isLoggedInToCloud())
         return;
@@ -458,7 +460,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
                         if (dialog->savePassword())
                         {
-                            nx::vms::client::core::secureSettings()->cloudCredentials =
+                            nx::vms::client::core::settings()->cloudCredentials =
                                 cloudCredentials;
                         }
 

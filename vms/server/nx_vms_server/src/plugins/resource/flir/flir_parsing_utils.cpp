@@ -16,7 +16,7 @@ const QString kSerialNumberKey = lit("serialNumber");
 
 bool isThgObjectNotificationType(const QString& notificationTypeString)
 {
-    return notificationTypeString == nexus::kThgSpotPrefix 
+    return notificationTypeString == nexus::kThgSpotPrefix
         || notificationTypeString == nexus::kThgAreaPrefix;
 };
 
@@ -28,24 +28,24 @@ boost::optional<nexus::Notification> parseAlarmNotification(const QStringList& n
     const auto kAlarmSourceIndexFieldPosition = 6;
     const auto kAlarmStateFieldPosition = 9;
 
-    const auto kDeviceType = 
+    const auto deviceType =
         notificationParts[kDeviceTypeFieldPosition].toInt(&status);
 
     if (!status)
         return boost::none;
 
-    const auto kAlarmSourceIndex = 
+    const auto kAlarmSourceIndex =
         notificationParts[kAlarmSourceIndexFieldPosition].toInt(&status);
 
     if (!status)
         return boost::none;
 
     QString prefix;
-    if (kDeviceType == nexus::kIODeviceType)
+    if (deviceType == nexus::kIODeviceType)
         prefix = nexus::kDigitalInputPrefix;
-    else if (kDeviceType == nexus::kThgObjectDeviceType)
+    else if (deviceType == nexus::kThgObjectDeviceType)
         prefix = nexus::kAlarmPrefix;
-    else if (kDeviceType == nexus::kMdDeviceType)
+    else if (deviceType == nexus::kMdDeviceType)
         prefix = nexus::kMdAreaPrefix;
 
     alarmEvent.alarmId = lit("%1:%2")
@@ -98,7 +98,7 @@ boost::optional<nexus::Notification> parseThgObjectNotification(const QStringLis
 
 bool isValidTransmissionType(int rawValue)
 {
-    return rawValue == static_cast<int>(nexus::TransmissionType::unicast) 
+    return rawValue == static_cast<int>(nexus::TransmissionType::unicast)
         || rawValue == static_cast<int>(nexus::TransmissionType::multicast);
 };
 
@@ -327,5 +327,3 @@ boost::optional<nexus::DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QStri
 } // namespace flir
 } // namespace plugins
 } // namespace nx
-
-

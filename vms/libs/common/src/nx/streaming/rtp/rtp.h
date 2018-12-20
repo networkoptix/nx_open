@@ -1,6 +1,10 @@
 #pragma once
 
 #include <chrono>
+#include <utility>
+
+#include <QtCore/QtGlobal>
+#include <QtCore/QtEndian>
 
 #ifdef Q_OS_WIN
 #include <WinSock2.h>
@@ -42,7 +46,7 @@ struct RtpHeader
     //uint32_t csrc;                  // synchronization source
     //uint32_t csrc[1];               // optional CSRC list
 
-    uint32_t payloadOffset() { return kSize + CSRCCount * kCsrcSize; };
+    uint32_t payloadOffset() { return kSize + CSRCCount * kCsrcSize; }
 };
 
 struct RtpHeaderExtension
@@ -77,9 +81,9 @@ inline void buildRtpHeader(
     rtp->CSRCCount = 0;
     rtp->marker  =  markerBit;
     rtp->payloadType = payloadType;
-    rtp->sequence = htons(sequence);
-    rtp->timestamp = htonl(timestamp);
-    rtp->ssrc = htonl(ssrc);
+    rtp->sequence = qToBigEndian(sequence);
+    rtp->timestamp = qToBigEndian(timestamp);
+    rtp->ssrc = qToBigEndian(ssrc);
 }
 
 } // namespace nx::streaming::rtp

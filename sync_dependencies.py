@@ -91,7 +91,8 @@ def determine_package_versions(
         v["sysroot"] = "jessie"
 
     if box == "tx1":
-        v["festival"] = "2.1x"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
 
     if not "festival-vox" in v:

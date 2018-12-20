@@ -2,39 +2,51 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <QtCore/QByteArray>
+
 #include <utils/media/bitStream.h>
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
+#include <decoders/audio/aac.h>
 
 namespace nx::streaming::rtp {
 
-AacParser::AacParser():
-    AudioStreamParser()
+struct FmtpParam
 {
-    m_sizeLength = 0;
-    m_constantSize = 0;
-    m_indexLength = 0;
-    m_indexDeltaLength = 0;
-    m_CTSDeltaLength = 0;
-    m_DTSDeltaLength = 0;
-    m_randomAccessIndication = 0;
-    m_streamStateIndication = 0;
-    m_profile = 0;
-    m_bitrate = 0;
+    bool parse(const QString& str)
+    {
+        int valuePos = str.indexOf('=');
+        if (valuePos == -1)
+            return false;
+
+        name = str.left(valuePos);
+        value = str.mid(valuePos + 1);
+        return true;
+    }
+
+    void getValueInt(const QString& paramName, int& result)
+    {
+        if (name.toLower() == paramName.toLower())
+            result = value.toInt();
+    }
+
+    void getValueHex(const QString& paramName, QByteArray& result)
+    {
+        if (name.toLower() == paramName.toLower())
+            result = QByteArray::fromHex(value.toUtf8());
+    }
+
+    QString name;
+    QString value;
+};
+
+AacParser::AacParser()
+{
     StreamParser::setFrequency(16000);
-    m_channels = 0;
-    m_streamtype = 0;
-    m_auHeaderExists = false;
-
-    m_audioLayout.reset( new QnRtspAudioLayout() );
-}
-
-AacParser::~AacParser()
-{
-    // Do nothing.
+    m_audioLayout.reset(new QnRtspAudioLayout());
 }
 
 void AacParser::setSdpInfo(const Sdp::Media& sdp)
@@ -47,34 +59,40 @@ void AacParser::setSdpInfo(const Sdp::Media& sdp)
     if (sdp.rtpmap.channels > 0)
         m_channels = sdp.rtpmap.channels;
 
-    for(const QString& param: sdp.fmtp.params)
+    QByteArray aacConfig;
+    for(const QString& paramStr: sdp.fmtp.params)
     {
-        processIntParam("sizeLength", m_sizeLength, param);
-        processIntParam("indexLength", m_indexLength, param);
-        processIntParam("indexDeltaLength", m_indexDeltaLength, param);
-        processIntParam("CTSDeltaLength", m_CTSDeltaLength, param);
-        processIntParam("DTSDeltaLength", m_DTSDeltaLength, param);
-        processIntParam("randomAccessIndication", m_randomAccessIndication, param);
-        processIntParam("streamStateIndication", m_streamStateIndication, param);
-        processIntParam("profile", m_profile, param);
-        processIntParam("bitrate", m_bitrate, param);
-        processIntParam("streamtype", m_streamtype, param);
-        processHexParam("config", m_config, param);
-        processStringParam("mode", m_mode, param);
-        processIntParam("constantSize", m_constantSize, param);
+        FmtpParam param;
+        if (!param.parse(paramStr))
+            continue;
+
+        param.getValueInt("sizeLength", m_sizeLength);
+        param.getValueInt("indexLength", m_indexLength);
+        param.getValueInt("indexDeltaLength", m_indexDeltaLength);
+        param.getValueInt("CTSDeltaLength", m_CTSDeltaLength);
+        param.getValueInt("DTSDeltaLength", m_DTSDeltaLength);
+        param.getValueInt("randomAccessIndication", m_randomAccessIndication);
+        param.getValueInt("streamStateIndication", m_streamStateIndication);
+        param.getValueInt("profile", m_profile);
+        param.getValueInt("bitrate", m_bitrate);
+        param.getValueInt("streamtype", m_streamtype);
+        param.getValueInt("constantSize", m_constantSize);
+        param.getValueHex("config", aacConfig);
     }
-    m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
-    m_aacHelper.readConfig(m_config);
+    m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength ||
+        m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
+    AACCodec aacCodec;
+    aacCodec.readConfig(aacConfig);
 
     const auto context = new QnAvCodecMediaContext(AV_CODEC_ID_AAC);
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
-    av->channels = m_aacHelper.m_channels;
-    av->sample_rate = m_aacHelper.m_sample_rate;
+    av->channels = aacCodec.m_channels;
+    av->sample_rate = aacCodec.m_sample_rate;
     av->sample_fmt = AV_SAMPLE_FMT_FLTP;
     av->time_base.num = 1;
-    av->time_base.den = m_aacHelper.m_sample_rate;
-    context->setExtradata((const quint8*) m_config.data(), m_config.size());
+    av->time_base.den = aacCodec.m_sample_rate;
+    context->setExtradata((const quint8*) aacConfig.data(), aacConfig.size());
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
@@ -90,8 +108,6 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
     QVector<int> auIndex;
     QVector<int> auCtsDelta;
     QVector<int> auDtsDelta;
-    //bool rapFlag = false;
-    //int streamStateValue = 0;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
@@ -113,7 +129,6 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
     if (curPtr >= end)
         return false;
 
-    //bool isLastPacket = rtpHeader->marker;
     try
     {
         if (m_auHeaderExists)
@@ -148,15 +163,15 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
                         auDtsDelta << 0;
                 }
                 if (m_randomAccessIndication)
-                    //rapFlag = reader.getBit();
                     reader.skipBit();
                 if (m_streamStateIndication)
-                    //streamStateValue = reader.getBits(m_streamStateIndication);
                     reader.skipBits(m_streamStateIndication);
             }
             curPtr += qPower2Ceil(auHeaderLen, 8)/8;
         }
-    } catch(...) {
+    }
+    catch (const BitStreamException&)
+    {
         return false;
     }
 

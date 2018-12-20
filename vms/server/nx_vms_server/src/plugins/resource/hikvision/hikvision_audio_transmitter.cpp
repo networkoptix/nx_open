@@ -25,7 +25,7 @@ bool responseIsOk(const nx::network::http::Response* const response)
 } // namespace
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 HikvisionAudioTransmitter::HikvisionAudioTransmitter(QnSecurityCamResource* resource):
@@ -194,5 +194,5 @@ std::unique_ptr<nx::network::http::HttpClient> HikvisionAudioTransmitter::create
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

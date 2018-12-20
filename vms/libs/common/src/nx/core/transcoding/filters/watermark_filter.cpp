@@ -2,25 +2,27 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
+#include <utils/media/frame_info.h>
 #include <nx/core/watermark/watermark_images.h>
 
-namespace nx {
-namespace core {
-namespace transcoding {
+namespace nx::core::transcoding {
 
 WatermarkImageFilter::WatermarkImageFilter(const Watermark& watermark): m_watermark(watermark)
 {
 }
 
-QSize WatermarkImageFilter::updatedResolution(const QSize& sourceSize)
+CLVideoDecoderOutputPtr WatermarkImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    PaintImageFilter::updatedResolution(sourceSize);
-    setImage(createWatermarkImage(m_watermark, sourceSize).toImage());
-    return sourceSize;
+    const auto frameSize = QSize(frame->width, frame->height);
+    if (frameSize != m_lastFrameSize)
+    {
+        setImage(retrieveWatermarkImage(m_watermark, frameSize).scaled(frameSize).toImage());
+        m_lastFrameSize = frameSize;
+    }
+
+    return PaintImageFilter::updateImage(frame);
 }
 
-} // namespace transcoding
-} // namespace core
-} // namespace nx
+} // namespace nx::core::transcoding
 
 #endif // ENABLE_DATA_PROVIDERS

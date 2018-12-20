@@ -5,11 +5,11 @@
 #include <client_core/connection_context_aware.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
-#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include "update_contents.h"
 
 namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
@@ -32,34 +32,40 @@ class ClientUpdateTool:
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
     using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
+    using UpdateContents = nx::update::UpdateContents;
 
 public:
     ClientUpdateTool(QObject* parent = nullptr);
-    ~ClientUpdateTool();
-
-    void useServer(nx::utils::Url url, QnUuid serverId);
+    virtual ~ClientUpdateTool() override;
 
     enum State
     {
-        // Tool starts to this state.
+        /** Tool starts at this state. */
         initial,
-        // Waiting for mediaserver's response with current update info.
+        /** Waiting for mediaserver's response with current update info. */
         pendingUpdateInfo,
-        // Got update info and ready to download.
+        /** Got update info and ready to download. */
         readyDownload,
-        // Downloading client package.
+        /** Downloading client package. */
         downloading,
-        // Ready to install client package.
+        /** Ready to install client package. */
         readyInstall,
-        // Installing update using applauncher.
+        /** Installing update using applauncher. */
         installing,
-        // Installation is complete, client has newest version.
+        /** Installation is complete, client has newest version. */
         complete,
-        // Got some critical error and can not continue installation.
+        /** Got some critical error and can not continue installation. */
         error,
-        // Got an error during installation.
+        /** Got an error during installation. */
         applauncherError,
     };
+
+    /**
+     * Simple check whether client should install anything from the contents.
+     * @param contents
+     * @return true if client's update package should be installed.
+     */
+    bool shouldInstallThis(const UpdateContents& contents) const;
 
     /**
      * Asks downloader to get update for client.
@@ -114,7 +120,7 @@ public:
     /**
      * Updates URL of the current mediaserver.
      */
-    void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);
+    void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
     virtual PeerManagerPtr createPeerManager(
         FileInformation::PeerSelectionPolicy peerPolicy,
@@ -122,7 +128,7 @@ public:
 
     std::future<UpdateContents> requestRemoteUpdateInfo();
 
-    // Get cached update information from the mediaservers.
+    /** Get cached update information from the mediaservers. */
     UpdateContents getRemoteUpdateInfo() const;
 
     static QString toString(State state);
@@ -132,7 +138,7 @@ signals:
      * This event is emitted every time update state changes,
      * or its internal state is updated.
      * @param state - current state, corresponds to enum ClientUpdateTool::State;
-     * @param percentComlete - progress for this state.
+     * @param percentComplete - progress for this state.
      */
     void updateStateChanged(int state, int percentComplete);
 
@@ -146,14 +152,15 @@ protected:
 
 protected:
     void setState(State newState);
-    void setError(QString error);
-    void setApplauncherError(QString error);
+    void setError(const QString& error);
+    void setApplauncherError(const QString& error);
+    void clearDownloadFolder();
 
     std::unique_ptr<Downloader> m_downloader;
-    // Directory to store unpacked files.
+    /** Directory to store unpacked files. */
     QDir m_outputDir;
 
-    // Special peer manager to be used in the downloader.
+    /** Special peer manager to be used in the downloader. */
     std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
     nx::update::Package m_clientPackage;
     State m_state = State::initial;
@@ -161,9 +168,9 @@ protected:
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
-    // Direct connection to the mediaserver.
+    /** Direct connection to the mediaserver. */
     rest::QnConnectionPtr m_serverConnection;
-    // Full path to update package.
+    /** Full path to update package. */
     QString m_updateFile;
     QString m_lastError;
 

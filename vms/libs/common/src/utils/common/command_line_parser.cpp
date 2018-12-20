@@ -10,7 +10,7 @@
 
 namespace {
 
-static const auto kUriDelimiter = lit("://");
+static const QString kUriDelimiter = "://";
 static const auto kParamDelimiter = L'=';
 };
 
@@ -142,7 +142,7 @@ bool QnCommandLineParser::parse(int argc, const char **argv, FILE *errorFile)
     }
     else
     {
-        return parse(argc, argv, static_cast<QTextStream *>(NULL));
+        return parse(argc, argv, static_cast<QTextStream*>(nullptr));
     }
 }
 
@@ -155,7 +155,7 @@ bool QnCommandLineParser::parse(const QStringList& arguments, FILE *errorFile)
     }
     else
     {
-        return parse(arguments, static_cast<QTextStream *>(NULL));
+        return parse(arguments, static_cast<QTextStream*>(nullptr));
     }
 }
 
@@ -208,7 +208,10 @@ bool QnCommandLineParser::parse(const QStringList& arguments, QTextStream *error
             if (pos >= arguments.size())
             {
                 if (errorStream)
-                    *errorStream << lit("No value provided for the '%1' argument.").arg(name) << endl;
+                {
+                    *errorStream
+                        << lm("No value provided for the '%1' argument.").arg(name) << endl;
+                }
                 result = false;
             }
             else
@@ -223,10 +226,12 @@ bool QnCommandLineParser::parse(const QStringList& arguments, QTextStream *error
         if (!success)
         {
             if (errorStream)
-                *errorStream << lit("Invalid value for '%1' argument - expected %2, provided '%3'.")
-                .arg(name)
-                .arg(QLatin1String(QMetaType::typeName(parameter.type())))
-                .arg(value.toString()) << endl;
+            {
+                *errorStream
+                    << lm("Invalid value for '%1' argument - expected %2, provided '%3'.").args(
+                        name, QMetaType::typeName(parameter.type()), value.toString())
+                    << endl;
+            }
             result = false;
         }
         else

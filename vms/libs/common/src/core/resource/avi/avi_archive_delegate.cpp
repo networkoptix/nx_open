@@ -7,6 +7,7 @@
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
+#include <utils/media/h263_utils.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
@@ -59,6 +60,17 @@ static bool isH264IFrame(const QnAbstractMediaDataPtr& data)
     }
 
     return false;
+}
+
+static void updateKeyFrameFlagH263(QnAbstractMediaDataPtr& data)
+{
+    nx::media_utils::h263::PictureHeader header;
+    if (header.decode((uint8_t*)data->data(), data->dataSize()))
+    {
+        data->flags.setFlag(
+            QnAbstractMediaData::MediaFlag::MediaFlags_AVKey,
+            nx::media_utils::h263::isKeyFrame(header.pictureType));
+    }
 }
 
 } // namespace
@@ -265,6 +277,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
     data->compressionType = stream->codecpar->codec_id;
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
+
+    // ffmpeg sets key frame flag for every received h263 frames (bug?), update flag manually.
+    if (data->compressionType == AV_CODEC_ID_H263)
+        updateKeyFrameFlagH263(data);
 
     /**
      * When parsing h264 stream FFMPEG fills MediaFlags_AVKey for IDR frames but won't do it for

@@ -2,6 +2,41 @@
     <h1>SANDBOX</h1>
 
     <div class="row">
+        <div class="col-12">
+            <!--<iframe-->
+                <!--style="border : 1px solid gold; height: 400px; width: 100%;"-->
+                <!--src="https://0.0.0.0:9000/embed/c9899a0f-4ce9-4114-946c-3a4f4df06a49/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras&noheader&nocontrols&auth=dHRzb2xvdkBuZXR3b3Jrb3B0aXguY29tOnF3ZWFzZDEyMzU=">-->
+                <!--Your browser doesn't support iframe.-->
+            <!--</iframe>-->
+            <iframe
+                    style="border : 1px solid gold; height: 400px; width: 100%;"
+                    src="https://cloud-test.hdw.mx/embed/262d629d-144c-4402-bfa9-c490d9f6dbe9/view/ff2f7cd0-4220-bcf6-2dac-a63441454daf?nocameras&noheader&nocontrols&auth=bm9wdGl4YXV0b3FhK293bmVyQGdtYWlsLmNvbTpxd2Vhc2QgMTIz">
+                Your browser doesn't support iframe.
+            </iframe>
+        </div>
+    </div>
+
+    <!--<div class="row">-->
+        <!--<div class="col-12">-->
+            <!--<iframe-->
+                    <!--style="border : 1px solid gold; height: 500px; width: 100%;"-->
+                    <!--src="/embed/766a58d2-a5e6-4765-87d5-95a4d1798995/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras">-->
+                <!--Your browser doesn't support iframe.-->
+            <!--</iframe>-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <!--<div class="row">-->
+        <!--<div class="col-12">-->
+            <!--<iframe-->
+                    <!--style="border : 1px solid gold; height: 500px; width: 100%;"-->
+                    <!--src="/embed/766a58d2-a5e6-4765-87d5-95a4d1798995/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras&nocontrols&noheader">-->
+                <!--Your browser doesn't support iframe.-->
+            <!--</iframe>-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <div class="row">
         <div class="col-12 col-md-4 border-right">
             <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
 
@@ -25,7 +60,7 @@
                             disabled>
                     </nx-checkbox>
 
-                    <label for="show">Remember me (disabled)</label>
+                    <label for="show" disabled>Remember me (disabled)</label>
                 </div>
 
                 <div class="form-group">
@@ -89,7 +124,7 @@
                             [(ngModel)]="group"
                             disabled>Tsanko
                     </nx-radio>
-                    <label for="group3">Tsanko</label>
+                    <label for="group3" disabled>Tsanko</label>
                     <br/>
                     <nx-radio
                             name="group2" compId="group4"
@@ -97,7 +132,7 @@
                             [(ngModel)]="group"
                             disabled>Evgeny
                     </nx-radio>
-                    <label for="group4">Evgeny</label>
+                    <label for="group4" disabled>Evgeny</label>
                 </div>
 
                 <br/>

@@ -78,7 +78,7 @@
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;specific=true">
                 </param>
-                
+
                 <!-- NVR only properties -->
                 <param id="PRIMARY%media/videoprofile/FrameRate"
                     name="Frame Rate"
@@ -1048,6 +1048,7 @@
                     writeCmd="control"
                     confirmation="Are you sure you want to reset all settings (except network) to default?"
                     description="Resets all camera parameters to defaults except for network settings"
+                    availableInOffline="true"
                     aux="noChannel=true"/>
             <param id="system/factoryreset"
                     name="Reset to Factory Defaults"
@@ -1055,6 +1056,7 @@
                     writeCmd="control"
                     confirmation="Are you sure you want to reset all settings (including network) to default?"
                     description="Resets all camera parameters to defaults"
+                    availableInOffline="true"
                     aux="noChannel=true"/>
             <param id="system/power/Type=Restart"
                     name="Restart"
@@ -1062,6 +1064,7 @@
                     writeCmd="control"
                     confirmation="Are you sure you want to restart the device?"
                     description="Restarts the device"
+                    availableInOffline="true"
                     aux="noChannel=true"/>
         </group>
     </parameters>

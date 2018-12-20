@@ -5,7 +5,7 @@
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 
 QnPlIqResource::QnPlIqResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setVendor(MANUFACTURE);
 }
@@ -34,11 +34,11 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
     // Do nothing.
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
@@ -58,7 +58,7 @@ CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
             return CameraDiagnostics::UnknownErrorResult();
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -109,7 +109,7 @@ bool QnPlIqResource::isRtp() const
     // TODO: #dmihsin determine a camera type via API.
     QString name = getModel().toUpper();
     return
-		name == QLatin1String("IQA35") ||
+        name == QLatin1String("IQA35") ||
         name == QLatin1String("IQA33N") ||
         //name == QLatin1String("IQA32N") ||
         name == QLatin1String("IQA31") ||

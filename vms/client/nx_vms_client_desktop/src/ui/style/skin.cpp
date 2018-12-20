@@ -12,6 +12,8 @@
 #include <QtCore/QPluginLoader>
 #include <QtWidgets/QApplication>
 
+#include <QtSvg/QSvgRenderer>
+
 #include <iostream>
 
 #include <utils/common/warnings.h>
@@ -126,15 +128,15 @@ QIcon QnSkin::icon(const QIcon& icon)
     return m_iconLoader->polish(icon);
 }
 
-QPixmap QnSkin::pixmap(const char* name, bool correctDevicePixelRatio)
-{
-    return pixmap(QString::fromLatin1(name), correctDevicePixelRatio);
-}
-
-QPixmap QnSkin::pixmap(const QString& name, bool correctDevicePixelRatio)
+QPixmap QnSkin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)
 {
     if (name.endsWith(".svg"))
-        return maximumSizePixmap(icon(name), QIcon::Normal, QIcon::Off, correctDevicePixelRatio);
+    {
+        if (desiredSize.isEmpty())
+            return maximumSizePixmap(icon(name), QIcon::Normal, QIcon::Off, correctDevicePixelRatio);
+
+        return getPixmapFromSvgInternal(name, correctDevicePixelRatio, desiredSize);
+    }
 
     static const auto kHiDpiSuffix = lit("@2x");
 
@@ -170,6 +172,45 @@ QPixmap QnSkin::getPixmapInternal(const QString& name)
         pixmap.setDevicePixelRatio(1); // Force to use not scaled images
         NX_ASSERT(!pixmap.isNull() || name.contains(lit("@2x")));
         QPixmapCache::insert(name, pixmap);
+    }
+
+    return pixmap;
+}
+
+QPixmap QnSkin::getPixmapFromSvgInternal(const QString& name, bool correctDevicePixelRatio, const QSize& size)
+{
+    const auto key = name + QString(":%1:%2:%3").arg(correctDevicePixelRatio).arg(size.width()).arg(size.height());
+
+    QPixmap pixmap;
+    if (!QPixmapCache::find(key, &pixmap))
+    {
+        QFile source(path(name));
+        if (!source.open(QIODevice::ReadOnly))
+        {
+            NX_ASSERT(false, "Cannot load svg");
+            return pixmap; //< Cache it?
+        }
+
+        const QByteArray data = source.readAll();
+
+        QSvgRenderer renderer;
+        if (!renderer.load(data))
+        {
+            NX_ASSERT(false, "Error while loading svg");
+            return pixmap; //< Cache it?;
+        }
+
+        const QSize& correctedSize = correctDevicePixelRatio
+            ? size * qApp->devicePixelRatio()
+            : size;
+
+        pixmap = QPixmap(correctedSize);
+        pixmap.fill(Qt::transparent);
+        QPainter p(&pixmap);
+        renderer.render(&p);
+
+        if (correctDevicePixelRatio)
+            pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
     }
 
     return pixmap;

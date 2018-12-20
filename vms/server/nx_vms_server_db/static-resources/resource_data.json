@@ -15,7 +15,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0",
+    "version": "1.0.1.2",
     "data": [
         {
             "keys": ["Hanwha|*"],
@@ -188,7 +188,7 @@
         {
             "keys": [
                 "ActiveCam|*",
-                "ACTI|B915", 
+                "ACTI|B915",
                 "*|ACTi-915"
             ],
             "forceONVIF": true
@@ -211,7 +211,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 12,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 6
+            "adamOutputCount": 6,
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -220,7 +221,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 14,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 2
+            "adamOutputCount": 2,
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -239,7 +241,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 6,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 6
+            "adamOutputCount": 6,
+            "noVideoSupport": true
         },
         {
             "keys": ["FLIR|FC*"],
@@ -478,6 +481,7 @@
             "keys": [
                 "DW|*"
             ],
+            "sendBackChannelAttribute": false,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",
@@ -499,7 +503,9 @@
                     "password": "12345"
                 }
             ],
-            "unauthorizedTimeoutSec": 185
+            "unauthorizedTimeoutSec": 185,
+            "additionalInputSourceNames": [ "alarmintoken" ],
+            "additionalNotificationTopics":[ "Trigger/AlarmIn" ]
         },
         {
             "keys": [
@@ -773,16 +779,18 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
-                "Sony|SNC-XM636",
-            "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20","DW|DWC-MD421D"
+                "ACTI|KCM3311", "ACTI|KCM7211", "ACTI|KCM5611", "ACTI|KCM5311",
+                "Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T", "Sony|SNC-XM636",
+                "DW|DWC-MB421TIR", "DW|DWC-MD421D", "DW|DWC-MV85DiA",
+                "Win4NET Co., Ltd.|Clebo-BL20"
             ],
             "operationalPtzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
                 "AXIS|AXISP8221",
-                "AXIS|AXISC3003E"
+                "AXIS|AXISC3003E",
+                "AXIS|AXISA9161"
             ],
             "noVideoSupport": true
         },
@@ -800,7 +808,7 @@
                 "VISTA|VK2-3MPBIR28V12re",
                 "VISTA|VK2-3MPVRDIR28V12re"
             ],
-            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxiliaryPtzCapability"
         },
         {
             "keys": [
@@ -861,10 +869,10 @@
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER",
-        "Pelco|D5220",
+                "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
-            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxiliaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
@@ -990,12 +998,13 @@
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
-                "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
-                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "Hikvision|DS-6716*",
+                "Hikvision|DS-6708*",
+                "HIKVISION|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*",
                 "ONVIF|NC328-VBZ",
-                "Hikvision|DS-2DF8223*"
+                "Hikvision|DS-2DF8223*",
+                "hikvision|DS-2CD2155FWD-IS"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -1020,10 +1029,10 @@
                 "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2CD2625FWD*", "hikvision|DS-2CD2625FWD*", "HIKVISION|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*", "hikvision|DS-2TD2166", "HIKVISION|DS-2TD2166"
+                "HIKVISION|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*",
+                "Hikvision|DS-2CD2625FWD*",
+                "Hikvision|DS-2TD2166*"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2022,9 +2031,9 @@
         },
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR", 
-                "DigitalWatchdog|DWC-MD85DiA", 
-                "DigitalWatchdog|DWC-MV85DiA", 
+                "Digital_Watchdog|DWC-PF5M1TIR",
+                "DigitalWatchdog|DWC-MD85DiA",
+                "DigitalWatchdog|DWC-MV85DiA",
                 "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
@@ -2381,52 +2390,6 @@
         {
      "keys": ["*|H.264+4MP+HD+IR+IP+Camera"],
           "onvifManufacturerReplacement": "merit-lilin"
-        },
-        {
-            "keys":[
-            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
-            ],
-            "multiresourceVideoChannelMapping": [
-                {
-                    "resourceChannel": 1,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [0]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 2,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [1]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 3,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [2]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 4,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [3]
-                        }
-                    ]
-                }
-            ],
-            "ignoreMultisensors": true,
-            "shouldAppearAsSingleChannel": true,
-            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
         },
         {
             "keys":[
@@ -2877,7 +2840,8 @@
             "Hikvision|DS-2CD6D54*", "HIKVISION|DS-2CD6D54*",
             "NVM3-A16|IP-Camera", "IPNC|NVM3-A16",
             "Hanwha|*", "Hanwha Techwin|*",
-            "Samsung|*", "Samsung Techwin|*"
+            "Samsung|*", "Samsung Techwin|*",
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
             ],
             "canShareLicenseGroup": true
         },
@@ -2912,6 +2876,129 @@
         {
             "keys": ["UNIVIEW|*"],
             "needToReloadAllAdvancedParametersAfterApply": true
+        },
+        {
+            "keys": [
+                "*|DS-7332HUHI-K4"
+            ],
+            "forcedOnvifParams": {
+                "ptzProfiles":[
+                    "ProfileToken001",
+                    "ProfileToken002",
+                    "ProfileToken003",
+                    "ProfileToken004",
+                    "ProfileToken005",
+                    "ProfileToken006",
+                    "ProfileToken007",
+                    "ProfileToken008",
+                    "ProfileToken009",
+                    "ProfileToken010",
+                    "ProfileToken011",
+                    "ProfileToken012",
+                    "ProfileToken013",
+                    "ProfileToken014",
+                    "ProfileToken015",
+                    "ProfileToken016",
+                    "ProfileToken017",
+                    "ProfileToken018",
+                    "ProfileToken019",
+                    "ProfileToken020",
+                    "ProfileToken021",
+                    "ProfileToken022",
+                    "ProfileToken023",
+                    "ProfileToken024",
+                    "ProfileToken025",
+                    "ProfileToken026",
+                    "ProfileToken027",
+                    "ProfileToken028",
+                    "ProfileToken029",
+                    "ProfileToken030",
+                    "ProfileToken031",
+                    "ProfileToken032"
+                ]
+            }
+        },
+        {
+            "keys": ["Hanwha|PNM-9320VQP"],
+            "ptzTargetChannel": 4
+        },
+        {
+            "keys": [
+                "VIVOTEK|SD9365*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                        "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Videotec S.p.A.|UCHD-30x-VT"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  90, -85]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                        "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+		{
+            "keys": [
+                "VIVOTEK|SD9366*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                        "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }

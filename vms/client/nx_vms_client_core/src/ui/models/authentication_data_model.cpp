@@ -1,6 +1,6 @@
 #include "authentication_data_model.h"
 
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <client_core/client_core_settings.h>
 
 namespace {
@@ -20,7 +20,7 @@ AuthenticationDataModel::AuthenticationDataModel(QObject* parent):
     connect(this, &AuthenticationDataModel::modelReset,
         this, &AuthenticationDataModel::defaultCredentialsChanged);
 
-    connect(&secureSettings()->systemAuthenticationData, &SecureSettings::BaseProperty::changed,
+    connect(&settings()->systemAuthenticationData, &Settings::BaseProperty::changed,
         this, &AuthenticationDataModel::updateData);
 }
 
@@ -44,10 +44,10 @@ void AuthenticationDataModel::setSystemId(const QUuid& localId)
     updateData();
 }
 
-QnEncodedCredentials AuthenticationDataModel::defaultCredentials() const
+nx::vms::common::Credentials AuthenticationDataModel::defaultCredentials() const
 {
     if (m_credentialsList.isEmpty())
-        return QnEncodedCredentials();
+        return {};
 
     return m_credentialsList.first();
 }
@@ -55,7 +55,7 @@ QnEncodedCredentials AuthenticationDataModel::defaultCredentials() const
 void AuthenticationDataModel::updateData()
 {
     beginResetModel();
-    m_credentialsList = secureSettings()->systemAuthenticationData()[m_systemId];
+    m_credentialsList = settings()->systemAuthenticationData()[m_systemId];
     endResetModel();
 }
 

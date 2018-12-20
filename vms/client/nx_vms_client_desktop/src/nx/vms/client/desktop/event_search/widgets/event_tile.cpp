@@ -12,7 +12,6 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
-#include <utils/common/delayed.h>
 #include <utils/common/html.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -25,7 +24,15 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 namespace {
+
+// Delay after which preview is initially requested.
+static constexpr milliseconds kPreviewLoadDelay = 100ms;
+
+// Delay after which preview is requested again in case of receiving "NO DATA".
+static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
 static constexpr auto kRoundingRadius = 2;
 
@@ -51,6 +58,29 @@ static constexpr int kSeparatorHeight = 6;
 
 static constexpr int kMaximumResourceListSize = 3; //< Before "...and n more"
 
+static constexpr int kMaximumPreviewHeightWithHeader = 120;
+static constexpr int kMaximumPreviewHeightWithoutHeader = 136;
+
+static constexpr QMargins kMarginsWithHeader(8, 8, 8, 8);
+static constexpr QMargins kMarginsWithoutHeader(8, 4, 8, 8);
+
+static constexpr QMargins kWidePreviewMarginsWithHeader(0, 0, 0, 0);
+static constexpr QMargins kWidePreviewMarginsWithoutHeader(0, 4, 0, 0);
+
+// Close button margins are fine-tuned in correspondence with tile layout.
+static constexpr QMargins kCloseButtonMarginsWithHeader(0, 6, 2, 0);
+static constexpr QMargins kCloseButtonMarginsWithoutHeader(0, 2, 2, 0);
+
+void setWidgetHolder(QWidget* widget, QWidget* newHolder)
+{
+    auto oldHolder = widget->parentWidget();
+    const bool wasHidden = widget->isHidden();
+    oldHolder->layout()->removeWidget(widget);
+    widget->setParent(newHolder);
+    newHolder->layout()->addWidget(widget);
+    widget->setHidden(wasHidden);
+};
+
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -60,23 +90,30 @@ struct EventTile::Private
 {
     EventTile* const q;
     CloseButton* const closeButton;
+    WidgetAnchor* const closeButtonAnchor;
     bool closeable = false;
     CommandActionPtr action; //< Button action.
     QnElidedLabel* const progressLabel;
-    QTimer* autoCloseTimer = nullptr;
+    const QScopedPointer<QTimer> loadPreviewTimer;
     qreal progressValue = 0.0;
     bool isRead = false;
     bool footerEnabled = true;
     Style style = Style::standard;
     bool highlighted = false;
-    bool clickPending = false;
+    QPalette defaultTitlePalette;
+    Qt::MouseButton clickButton = Qt::NoButton;
+    Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
 
     Private(EventTile* q):
         q(q),
         closeButton(new CloseButton(q)),
-        progressLabel(new QnElidedLabel(q))
+        closeButtonAnchor(anchorWidgetToParent(closeButton, Qt::RightEdge | Qt::TopEdge)),
+        progressLabel(new QnElidedLabel(q)),
+        loadPreviewTimer(new QTimer(q))
     {
+        loadPreviewTimer->setSingleShot(true);
+        QObject::connect(loadPreviewTimer.get(), &QTimer::timeout, [this]() { requestPreview(); });
     }
 
     void handleHoverChanged(bool hovered)
@@ -88,14 +125,6 @@ struct EventTile::Private
 
         if (showCloseButton)
             closeButton->raise();
-
-        if (autoCloseTimer)
-        {
-            if (hovered)
-                autoCloseTimer->stop();
-            else
-                autoCloseTimer->start();
-        }
     }
 
     void updateBackgroundRole(bool hovered)
@@ -121,7 +150,7 @@ struct EventTile::Private
     {
         if (list.empty())
         {
-            q->ui->resourceListLabel->hide();
+            q->ui->resourceListHolder->hide();
             q->ui->resourceListLabel->setText({});
         }
         else
@@ -141,8 +170,38 @@ struct EventTile::Private
             }
 
             q->ui->resourceListLabel->setText(text);
-            q->ui->resourceListLabel->show();
+            q->ui->resourceListHolder->show();
         }
+    }
+
+    bool isPreviewNeeded() const
+    {
+        return q->preview() && q->previewEnabled();
+    }
+
+    void requestPreview()
+    {
+        if (!isPreviewNeeded())
+            return;
+
+        switch (q->preview()->status())
+        {
+            case Qn::ThumbnailStatus::Invalid:
+            case Qn::ThumbnailStatus::NoData:
+                q->preview()->loadAsync();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    void updatePreview(milliseconds delay)
+    {
+        if (isPreviewNeeded())
+            loadPreviewTimer->start(delay);
+        else
+            loadPreviewTimer->stop();
     }
 };
 
@@ -157,11 +216,12 @@ EventTile::EventTile(QWidget* parent):
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    // Close button margins are fine-tuned in correspondence with UI-file.
-    static constexpr QMargins kCloseButtonMargins(0, 6, 2, 0);
-
     d->closeButton->setHidden(true);
-    anchorWidgetToParent(d->closeButton, Qt::RightEdge | Qt::TopEdge, kCloseButtonMargins);
+    d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
+
+    ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
+    ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+    ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
@@ -172,7 +232,7 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->hide();
     ui->actionHolder->hide();
     ui->footerLabel->hide();
-    ui->resourceListLabel->hide();
+    ui->resourceListHolder->hide();
     ui->progressDescriptionLabel->hide();
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
@@ -229,9 +289,11 @@ EventTile::EventTile(QWidget* parent):
         style::Metrics::kStandardPadding,
         style::Metrics::kStandardPadding);
 
-    ui->busyIndicator->setHidden(true);
-    ui->progressHolder->setHidden(true);
-    ui->mainWidget->setHidden(true);
+    ui->busyIndicator->hide();
+    ui->progressHolder->hide();
+    ui->mainWidget->hide();
+
+    ui->secondaryTimestampHolder->hide();
 
     QFont progressLabelFont;
     progressLabelFont.setWeight(QFont::DemiBold);
@@ -251,6 +313,9 @@ EventTile::EventTile(QWidget* parent):
 
     ui->progressBar->setRange(0, kProgressBarResolution);
     ui->progressBar->setValue(0);
+
+    ui->nameLabel->ensurePolished();
+    d->defaultTitlePalette = ui->nameLabel->palette();
 
     connect(d->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
@@ -298,7 +363,7 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
-    d->handleHoverChanged(d->closeable && underMouse());
+    d->handleHoverChanged(underMouse());
 }
 
 QString EventTile::title() const
@@ -320,8 +385,10 @@ QColor EventTile::titleColor() const
 
 void EventTile::setTitleColor(const QColor& value)
 {
-    ui->nameLabel->ensurePolished();
-    setPaletteColor(ui->nameLabel, ui->nameLabel->foregroundRole(), value);
+    if (value.isValid())
+        setPaletteColor(ui->nameLabel, ui->nameLabel->foregroundRole(), value);
+    else
+        ui->nameLabel->setPalette(d->defaultTitlePalette);
 }
 
 QString EventTile::description() const
@@ -411,6 +478,18 @@ void EventTile::setPreview(ImageProvider* value)
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
 
+    d->updatePreview(kPreviewLoadDelay);
+
+    if (preview() && kPreviewReloadDelay > 0s)
+    {
+        connect(preview(), &ImageProvider::statusChanged, this,
+            [this](Qn::ThumbnailStatus status)
+            {
+                if (status == Qn::ThumbnailStatus::NoData)
+                    d->updatePreview(kPreviewReloadDelay);
+            });
+    }
+
     if (!ini().showDebugTimeInformationInRibbon)
         return;
 
@@ -485,6 +564,12 @@ bool EventTile::event(QEvent* event)
         return result;
     }
 
+    const auto closeToStart =
+        [this](const QPoint& point)
+        {
+            return (point - d->clickPoint).manhattanLength() < qApp->startDragDistance();
+        };
+
     switch (event->type())
     {
         case QEvent::Enter:
@@ -494,7 +579,12 @@ bool EventTile::event(QEvent* event)
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
+        case QEvent::Hide:
             d->handleHoverChanged(false);
+            break;
+
+        case QEvent::Show:
+            d->handleHoverChanged(underMouse());
             break;
 
         case QEvent::MouseButtonPress:
@@ -502,34 +592,36 @@ bool EventTile::event(QEvent* event)
             const auto mouseEvent = static_cast<QMouseEvent*>(event);
             base_type::event(event);
             event->accept();
-            d->clickPending = (mouseEvent->button() == Qt::LeftButton);
+            d->clickButton = mouseEvent->button();
+            d->clickModifiers = mouseEvent->modifiers();
             d->clickPoint = mouseEvent->pos();
             return true;
         }
 
         case QEvent::MouseButtonRelease:
-            if (d->clickPending && static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
-                emit clicked();
-            d->clickPending = false;
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
+            if ((mouseEvent->button() == d->clickButton) && closeToStart(mouseEvent->pos()))
+                emit clicked(d->clickButton, mouseEvent->modifiers() & d->clickModifiers);
+            d->clickButton = Qt::NoButton;
             break;
+        }
 
         case QEvent::MouseButtonDblClick:
-            d->clickPending = false;
+            d->clickButton = Qt::NoButton;
             if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
                 emit doubleClicked();
             break;
 
-        case QEvent::MouseMove:
+        // Child widgets can capture mouse, so drag is handled in HoverMove instead of MouseMove.
+        case QEvent::HoverMove:
         {
-            const auto mouseEvent = static_cast<QMouseEvent*>(event);
-            if (!mouseEvent->buttons().testFlag(Qt::LeftButton))
+            const auto hoverEvent = static_cast<QHoverEvent*>(event);
+            if ((d->clickButton == Qt::NoButton) || closeToStart(hoverEvent->pos()))
                 break;
-
-            if ((mouseEvent->pos() - d->clickPoint).manhattanLength() < qApp->startDragDistance())
-                break;
-
-            d->clickPending = false;
-            emit dragStarted();
+            if (d->clickButton == Qt::LeftButton)
+                emit dragStarted(d->clickPoint, size());
+            d->clickButton = Qt::NoButton;
             break;
         }
 
@@ -538,62 +630,6 @@ bool EventTile::event(QEvent* event)
     }
 
     return base_type::event(event);
-}
-
-bool EventTile::hasAutoClose() const
-{
-    return closeable() && d->autoCloseTimer;
-}
-
-std::chrono::milliseconds EventTile::autoCloseTime() const
-{
-    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
-}
-
-std::chrono::milliseconds EventTile::autoCloseRemainingTime() const
-{
-    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
-}
-
-void EventTile::setAutoCloseTime(std::chrono::milliseconds value)
-{
-    using namespace std::literals::chrono_literals;
-
-    if (value <= 0ms)
-    {
-        if (!d->autoCloseTimer)
-            return;
-
-        d->autoCloseTimer->deleteLater();
-        d->autoCloseTimer = nullptr;
-        return;
-    }
-
-    const auto autoClose =
-        [this]()
-        {
-            if (closeable())
-                emit closeRequested();
-        };
-
-    if (d->autoCloseTimer)
-    {
-        if (!d->isRead)
-            d->autoCloseTimer->stop();
-
-        d->autoCloseTimer->setInterval(value.count());
-    }
-    else
-    {
-        d->autoCloseTimer = new QTimer(this);
-        d->autoCloseTimer->setSingleShot(true);
-        d->autoCloseTimer->setInterval(value.count());
-
-        connect(d->autoCloseTimer, &QTimer::timeout, this, autoClose);
-
-        if (d->isRead)
-            d->autoCloseTimer->start();
-    }
 }
 
 bool EventTile::busyIndicatorVisible() const
@@ -652,19 +688,6 @@ void EventTile::setProgressTitle(const QString& value)
     d->progressLabel->setText(value);
 }
 
-bool EventTile::isRead() const
-{
-    return d->isRead;
-}
-
-void EventTile::setRead(bool value)
-{
-    d->isRead = value;
-
-    if (d->isRead && d->autoCloseTimer)
-        d->autoCloseTimer->start();
-}
-
 bool EventTile::previewEnabled() const
 {
     return !ui->previewWidget->isHidden();
@@ -672,8 +695,13 @@ bool EventTile::previewEnabled() const
 
 void EventTile::setPreviewEnabled(bool value)
 {
+    if (previewEnabled() == value)
+        return;
+
     ui->previewWidget->setHidden(!value);
     ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
+
+    d->updatePreview(kPreviewLoadDelay);
 }
 
 bool EventTile::footerEnabled() const
@@ -685,6 +713,41 @@ void EventTile::setFooterEnabled(bool value)
 {
     d->footerEnabled = value;
     ui->footerLabel->setHidden(!d->footerEnabled || ui->footerLabel->text().isEmpty());
+}
+
+bool EventTile::headerEnabled() const
+{
+    return !ui->iconLabel->isHidden();
+}
+
+void EventTile::setHeaderEnabled(bool value)
+{
+    if (headerEnabled() == value)
+        return;
+
+    ui->iconLabel->setHidden(!value);
+    ui->nameLabel->setHidden(!value);
+
+    if (value)
+    {
+        setWidgetHolder(ui->timestampLabel, ui->primaryTimestampHolder);
+        ui->secondaryTimestampHolder->hide();
+        ui->primaryTimestampHolder->show();
+        ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+        ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
+        ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+        d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
+    }
+    else
+    {
+        setWidgetHolder(ui->timestampLabel, ui->secondaryTimestampHolder);
+        ui->secondaryTimestampHolder->show();
+        ui->primaryTimestampHolder->hide();
+        ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
+        ui->mainWidget->layout()->setContentsMargins(kMarginsWithoutHeader);
+        ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithoutHeader);
+        d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithoutHeader);
+    }
 }
 
 EventTile::Mode EventTile::mode() const
@@ -701,28 +764,17 @@ void EventTile::setMode(Mode value)
     if (mode() == value)
         return;
 
-    const auto reparentPreview =
-        [this](QWidget* newParent)
-        {
-            auto oldParent = ui->previewWidget->parentWidget();
-            const bool wasHidden = ui->previewWidget->isHidden();
-            oldParent->layout()->removeWidget(ui->previewWidget);
-            ui->previewWidget->setParent(newParent);
-            newParent->layout()->addWidget(ui->previewWidget);
-            ui->previewWidget->setHidden(wasHidden);
-        };
-
     const bool noPreview = ui->previewWidget->isHidden() || !ui->previewWidget->imageProvider();
     switch (value)
     {
         case Mode::standard:
-            reparentPreview(ui->narrowHolder);
+            setWidgetHolder(ui->previewWidget, ui->narrowHolder);
             ui->narrowHolder->setHidden(noPreview);
             ui->wideHolder->setHidden(true);
             break;
 
         case Mode::wide:
-            reparentPreview(ui->wideHolder);
+            setWidgetHolder(ui->previewWidget, ui->wideHolder);
             ui->wideHolder->setHidden(noPreview);
             ui->narrowHolder->setHidden(false); //< There is a spacer child item.
             break;
@@ -765,6 +817,7 @@ void EventTile::clear()
 {
     setCloseable(false);
     setTitle({});
+    setTitleColor({});
     setDescription({});
     setFooterText({});
     setTimestamp({});
@@ -772,12 +825,10 @@ void EventTile::clear()
     setPreview({});
     setPreviewCropRect({});
     setAction({});
-    setAutoCloseTime({});
     setBusyIndicatorVisible(false);
     setProgressBarVisible(false);
     setProgressValue(0.0);
     setProgressTitle({});
-    setRead(false);
     setResourceList(QStringList());
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/utils/std/cpp14.h>
 #include <providers/live_stream_provider.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace resource {
 namespace test {
 
@@ -23,5 +23,5 @@ public:
 
 } // namespace test
 } // namespace resource
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

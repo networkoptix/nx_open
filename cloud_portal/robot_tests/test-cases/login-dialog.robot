@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -30,17 +29,6 @@ can be opened in anonymous state
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
-
-can be closed by clicking on background
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    # used instead of click because it's more generic and allows the dismissal of the dialog
-    # using "click element" would require the element to be on the top layer or it would throw an error
-    # I am clicking on the header here because it is the only thing I am sure will always be visible and not part of the modal
-    Mouse Down    //header
-    Mouse Up    //header
-    Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
 
 can be closed by clicking on the X
     [tags]    C24212
@@ -77,15 +65,15 @@ allows log in with existing email in uppercase
 allows log in with 'Remember Me checkmark' switched off
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}/..   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
-    Click Element    ${REMEMBER ME CHECKBOX}/..
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Click Element    ${REMEMBER ME CHECKBOX VISIBLE}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX REAL}
     Log In    ${email}    ${password}    None
     Validate Log In
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form
     Log In    ${email}    'aderhgadehf'
-    Wait Until Element Is Visible    ${FORGOT PASSWORD}
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -129,7 +117,7 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log In
     Log Out
     Go Back
-    Validate Log Out
+    Wait Until Element Is Visible    ${LOG IN MODAL}
 
 handles more than 255 symbols email and password
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
@@ -169,9 +157,10 @@ should respond to Esc key and close dialog
 should respond to Enter key and log in
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
     Press Key    ${PASSWORD INPUT}    ${ENTER}
     Validate Log In
 
@@ -186,12 +175,12 @@ should respond to Tab key
 should respond to Space key and toggle checkbox
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
-    Set Focus To Element    ${REMEMBER ME CHECKBOX}/../input
-    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
-    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
-    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX VISIBLE}
+    Set Focus To Element    ${REMEMBER ME CHECKBOX REAL}
+    Press Key    ${REMEMBER ME CHECKBOX REAL}    ${SPACEBAR}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX REAL}
+    Press Key    ${REMEMBER ME CHECKBOX REAL}    ${SPACEBAR}
+    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX REAL}
 
 handles two tabs, updates second tab state if logout is done on first
     Go To    ${url}/register
@@ -218,4 +207,4 @@ handles two tabs, updates second tab state if logout is done on first
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/systems
     Reload Page
-    Validate Log Out
+    Wait Until Element Is Visible    ${LOG IN MODAL}

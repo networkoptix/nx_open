@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             Ваш обліковий запис успішно активовано
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">Увійти</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             Обліковий запис вже активовано або код підтвердження невірний
         </h1>
     </div>
@@ -24,14 +24,13 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>Ви зареєстровані в %PRODUCT_NAME%</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <p>Ми надіслали вам лист з посиланням на активацію до {{data.email}}<br> Будь ласка, активуйте свій обліковий запис, відвідавши це посилання.</p>
         </div>
         <h1 ng-if="!data.email">Активувати обліковий запис</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
-                    <label for="emailReactivate" class="control-label">Електронна пошта</label>
+                    <label for="emailReactivate" class="control-label">Email</label>
                 </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"
@@ -43,9 +42,8 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> Електронна пошта обов'язкова </span> <span class="help-block input-error"
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Будь ласка, введіть дійсну електронну адресу</span>
                 </div>
             </div>
             <div class="form-group">
@@ -65,11 +63,11 @@
     </div>
 
     <div ng-if="restoring">
-        <h1>Відновити пароль</h1>
+        <h1>Скидання пароля</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
-                    <label for="email" class="col-sm-4 control-label">Електронна пошта</label>
+                    <label for="email" class="col-sm-4 control-label">Email</label>
                 </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control" validate-email
@@ -80,9 +78,8 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> Електронна пошта обов'язкова </span> <span class="help-block input-error"
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Будь ласка, введіть дійсну електронну скриню </span>
                 </div>
             </div>
             <div class="form-group">

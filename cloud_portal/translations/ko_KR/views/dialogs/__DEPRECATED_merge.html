@@ -24,7 +24,7 @@
             <p ng-if="systemMergeable =='offline'"
                class="help-block-no-height warning-label">{{targetSystem.name}}이 연결해제 되었습니다. 현재 시스템과 ​​병합 할 수 없습니다.</p>
             <p ng-if="systemMergeable =='cannotMerge'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is incompatible. 현재 시스템과 ​​병합 할 수 없습니다.</p>
+               class="help-block-no-height warning-label">{{targetSystem.name}} 시스템은 호환되지 않습니다. 현재 시스템과 ​​병합 할 수 없습니다.</p>
             <p ng-if="systemMergeable == ''"
                class="help-block-no-height">소유자 권한이 있는 시스템 만 병합 할 수 있습니다.</p>
             <div>

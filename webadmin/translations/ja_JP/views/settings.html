@@ -4,20 +4,20 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 このデバイスは、インストールされているハード ディスク ドライブで動作するものです<br>デバイスをオフにして、ハード ディスク ドライブを取り付けます
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 このデバイスにはネットワーク接続が必要です<br>ローカルネットワークやインターネットに接続してください
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 このデバイスは、不適切なネットワーク構成です<br> IP アドレスを設定しネットワークに接続してください
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>ポート</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -48,12 +48,12 @@
                     </div>
                     <div>
                         <h3>再起動</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>                            
-<button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>adminパスワードの変更</h3>
+                            <h3>Adminパスワードの変更</h3>
                             <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます<br>　　
 それ以外は回復パスワードのみを変更</p>
                             <div class="col-sm-6">
@@ -62,7 +62,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">パスワードを変更</button>
+                                        ng-click="changePassword()">パスワードの変更</button>
                             </div>
                         </form>
                     </div>
@@ -101,13 +101,13 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">このシステムは、{{Config.cloud.productName}}にリンクされていません。
+                            <uib-alert type="warning">このシステムは、{{Config.cloud.productName}}にリンクされていません。
 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">詳細情報</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">サーバー設定を行う為にインターネットに接続します
-{{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">システムを{{Config.cloud.productName}}に接続するのにインターネット接続が必要です</alert>
+                                   target="_blank">詳細情報</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">サーバー設定を行う為にインターネットに接続します
+{{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">システムを{{Config.cloud.productName}}に接続するのにインターネット接続が必要です</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">{{Config.cloud.productName}} への接続</button>                                
@@ -119,18 +119,20 @@
 
 
                     <div>
-                        <h3>暗号化</h3>
+                        <h3>Traffic encryption</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encription
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Force Video Traffic Encription
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
+                                           ng-checked="checkTrafficEncryption()">
+                                    Force Video Traffic Encryption
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">保存</button>

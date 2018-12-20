@@ -4,12 +4,12 @@
     <h3 class="modal-title" ng-bind-html="title"></h3>
 </div>
 
-<div class="col-sm-12">
-    <alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></alert>
+<div class="modal-body">
+    <uib-alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></uib-alert>
 
-    <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
+    <uib-alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></uib-alert>
 
-    <alert type="info" ng-if="connecting">Kết nối Hệ thống với... <span class="product-name">{{Config.cloud.productName}}</span> ... <br> Điều này có thể kéo dài khoảng một phút.</alert>
+    <uib-alert type="info" ng-if="connecting">Kết nối Hệ thống với... <span class="product-name">{{Config.cloud.productName}}</span> ... <br> Điều này có thể kéo dài khoảng một phút.</uib-alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>

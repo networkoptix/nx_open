@@ -99,7 +99,8 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release'):
+    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release') \
+            and not Customization.objects.get(name=customization).public_release_history:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
@@ -108,7 +109,7 @@ def download_build(request, build):
     downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
 
-    if downloads_json.status_code == 403:
+    if downloads_json.status_code != 200:
         raise APINotFoundException("Build number does not exist", ErrorCodes.not_found, error_data=request.query_params)
 
     downloads_json = downloads_json.json()

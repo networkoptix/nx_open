@@ -256,7 +256,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
             const nx::vms::api::analytics::EventTypeDescriptor& descriptor)
         {
             if (!hasDifferentDrivers)
-                return QStringList(descriptor.item.name.value);
+                return QStringList(descriptor.item.name);
 
             QStringList names;
             for (const auto& path: descriptor.paths)
@@ -268,9 +268,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                     continue;
 
                 names.push_back(
-                    lit("%1 - %2")
-                        .arg(pluginDescriptor->name)
-                        .arg(descriptor.item.name.value));
+                    lm("%1 - %2").args(pluginDescriptor->name, descriptor.item.name));
             }
 
             return names;
@@ -281,7 +279,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
         const auto& descriptor = entry.second;
         const auto names = eventNames(descriptor);
 
-        for (const auto& name : names)
+        for (const auto& name: names)
         {
             auto item = new QStandardItem(name);
             item->setData(EventType::analyticsSdkEvent, EventTypeRole);
@@ -369,7 +367,7 @@ void QnEventLogDialog::initEventsModel()
             connect(resource, &QnResource::propertyChanged, this,
                 [this](const QnResourcePtr& /*res*/, const QString& key)
                 {
-                    if (key == Qn::kAnalyticsDriversParamName)
+                    if (key == ResourcePropertyKey::kAnalyticsDriversParamName)
                         updateAnalyticsEvents();
                 });
 

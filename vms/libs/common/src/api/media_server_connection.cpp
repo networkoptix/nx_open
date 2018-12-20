@@ -80,8 +80,8 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (PtzGetActiveObjectObject, "ptz")
     (PtzUpdateHomeObjectObject, "ptz")
     (PtzGetDataObject, "ptz")
-    (PtzGetAuxilaryTraitsObject, "ptz")
-    (PtzRunAuxilaryCommandObject, "ptz")
+    (PtzGetAuxiliaryTraitsObject, "ptz")
+    (PtzRunAuxiliaryCommandObject, "ptz")
     (GetParamsObject, "getCameraParam")
     (SetParamsObject, "setCameraParam")
     (TimeObject, "gettime")
@@ -226,7 +226,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case PtzRemoveTourObject:
         case PtzActivateTourObject:
         case PtzUpdateHomeObjectObject:
-        case PtzRunAuxilaryCommandObject:
+        case PtzRunAuxiliaryCommandObject:
             emitFinished(this, response.status, handle);
             break;
         case PtzGetPositionObject:
@@ -242,8 +242,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case PtzGetHomeObjectObject:
             processJsonReply<QnPtzObject>(this, response, handle);
             break;
-        case PtzGetAuxilaryTraitsObject:
-            processJsonReply<QnPtzAuxilaryTraitList>(this, response, handle);
+        case PtzGetAuxiliaryTraitsObject:
+            processJsonReply<QnPtzAuxiliaryTraitList>(this, response, handle);
             break;
         case PtzGetDataObject:
             processJsonReply<QnPtzData>(this, response, handle);
@@ -488,6 +488,7 @@ int QnMediaServerConnection::setParamsAsync(
     for(const QnCameraAdvancedParamValue value: values)
         params << QnRequestParam(value.id, value.value);
 
+    // TODO: Change GET to POST when compatibility with old servers is not needed anymore.
     return sendAsyncGetRequestLogged(SetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
@@ -1015,7 +1016,7 @@ int QnMediaServerConnection::ptzGetHomeObjectAsync(
         slot);
 }
 
-int QnMediaServerConnection::ptzGetAuxilaryTraitsAsync(
+int QnMediaServerConnection::ptzGetAuxiliaryTraitsAsync(
     const QnNetworkResourcePtr& camera,
     const nx::core::ptz::Options& options,
     QObject* target,
@@ -1023,37 +1024,37 @@ int QnMediaServerConnection::ptzGetAuxilaryTraitsAsync(
 {
     QnRequestParamList params;
     addOldVersionPtzParams(camera, params);
-    params << QnRequestParam("command", QnLexical::serialized(Qn::GetAuxilaryTraitsPtzCommand));
+    params << QnRequestParam("command", QnLexical::serialized(Qn::GetAuxiliaryTraitsPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("type", QnLexical::serialized(options.type));
 
     return sendAsyncPostRequestLogged(
-        PtzGetAuxilaryTraitsObject,
+        PtzGetAuxiliaryTraitsObject,
         makeDefaultHeaders(),
         params,
         nx::Buffer(),
-        QN_STRINGIZE_TYPE(QnPtzAuxilaryTraitList),
+        QN_STRINGIZE_TYPE(QnPtzAuxiliaryTraitList),
         target,
         slot);
 }
 
-int QnMediaServerConnection::ptzRunAuxilaryCommandAsync(
+int QnMediaServerConnection::ptzRunAuxiliaryCommandAsync(
     const QnNetworkResourcePtr& camera,
-    const QnPtzAuxilaryTrait& trait,
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options,
     QObject* target, const char* slot)
 {
     QnRequestParamList params;
     addOldVersionPtzParams(camera, params);
-    params << QnRequestParam("command", QnLexical::serialized(Qn::RunAuxilaryCommandPtzCommand));
+    params << QnRequestParam("command", QnLexical::serialized(Qn::RunAuxiliaryCommandPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("trait", QnLexical::serialized(trait));
     params << QnRequestParam("data", data);
     params << QnRequestParam("type", QnLexical::serialized(options.type));
 
     return sendAsyncPostRequestLogged(
-        PtzRunAuxilaryCommandObject,
+        PtzRunAuxiliaryCommandObject,
         makeDefaultHeaders(),
         params,
         nx::Buffer(),
@@ -1257,10 +1258,10 @@ int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* t
 }
 
 int QnMediaServerConnection::getRecordingStatisticsAsync(
-    qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot)
+    qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot)
 {
     QnRequestParamList params;
-    params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
+    params << QnRequestParam("bitrateAnalyzePeriodMs", bitrateAnalyzePeriodMs);
     return sendAsyncGetRequestLogged(RecordingStatsObject,
         params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }

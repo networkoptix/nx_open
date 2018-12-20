@@ -24,6 +24,7 @@ import * as angular from 'angular';
                         this.info = { name: '' };
                         this.permissions = {};
                         this.accessRole = '';
+                        this.mergeInfo = {};
 
                         this.currentUserEmail = currentUserEmail;
                         this.mediaserver = systemAPI(currentUserEmail, systemId, null, () => {
@@ -107,6 +108,7 @@ import * as angular from 'angular';
                             this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
                                     || CONFIG.allowDebugMode
                                     || CONFIG.allowBetaMode);
+                            this.mergeInfo = this.info.mergeInfo;
 
                             this.checkPermissions();
 

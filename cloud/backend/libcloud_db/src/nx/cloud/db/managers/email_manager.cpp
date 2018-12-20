@@ -3,8 +3,6 @@
 #include <chrono>
 #include <future>
 
-#include <nx/email/mustache/mustache_helper.h>
-#include <nx/email/email_manager_impl.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/cloud_module_url_fetcher.h>

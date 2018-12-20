@@ -2,10 +2,10 @@
 
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/wearable_fwd.h>
 
-class QnDisconnectHelper;
 namespace Ui { class WearableCameraUploadWidget; }
 
 namespace nx::vms::client::desktop {
@@ -32,7 +32,7 @@ private:
 
 private:
     const QScopedPointer<Ui::WearableCameraUploadWidget> ui;
-    QScopedPointer<QnDisconnectHelper> m_storeConnections;
+    nx::utils::ScopedConnections m_storeConnections;
 };
 
 } // namespace nx::vms::client::desktop

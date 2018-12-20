@@ -4,7 +4,7 @@
 #include "testcamera_stream_reader.h"
 
 QnTestCameraResource::QnTestCameraResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
 }
 
@@ -23,11 +23,11 @@ void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnTestCameraResource::initializeCameraDriver()

@@ -116,36 +116,20 @@
 
     <h2>Cài đặt nhật ký</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Mức đăng nhập chính</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Không có: Đăng nhập bị vô hiệu.</option>
-                    <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
-                    <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
-                    <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
-                    <option value="INFO">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
-                    <option value="DEBUG">Gỡ lỗi: Đăng nhập tất cả thông tin thư và gỡ lỗi hệ thống.</option>
-                    <option value="DEBUG2">Gỡ lỗi 2: Đăng nhập mọi thông báo hệ thống và thông tin gỡ rối mở rộng.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Không có: Đăng nhập bị vô hiệu.</option>
+                    <option value="always">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
+                    <option value="error">Lỗi: Duy nhất lỗi đăng nhập.</option>
+                    <option value="warning">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
+                    <option value="info">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
+                    <option value="debug">Gỡ lỗi: Đăng nhập tất cả thông tin thư và gỡ lỗi hệ thống.</option>
+                    <option value="debug2">Gỡ lỗi 2: Đăng nhập mọi thông báo hệ thống và thông tin gỡ rối mở rộng.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Cấp nhật ký giao dịch</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Không: Vô hiệu hoá log.</option>
-                    <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
-                    <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
-                    <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
-                    <option value="INFO">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
-                    <option value="DEBUG">Gỡ lỗi: Đăng nhập tất cả thông tin thư và gỡ lỗi hệ thống.</option>
-                    <option value="DEBUG2">Gỡ lỗi 2: Đăng nhập mọi thông báo hệ thống và thông tin gỡ rối mở rộng.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >tiết kiệm</button>
         </div>

@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
     "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
+    "CONTINUE BUTTON TEXT"                 :    "Continue",
     "RELEASE HISTORY BUTTON TEXT"          :    "Other releases, patches and beta versions",
     "RESET EMAIL SENT MESSAGE TEXT"        :    "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
@@ -32,7 +33,7 @@
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
     "SHARE PERMISSIONS HINT ADMINISTRATOR"         :    "Unrestricted access including the ability to share",
-    "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER"    :    "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"        :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the %VMS_NAME% Client application to set up custom permissions",
@@ -43,22 +44,25 @@
 
     "EDIT USER BUTTON TEXT"                :    "Edit",
     "DELETE USER BUTTON TEXT"              :    "Delete",
-    "DELETE USER CANCEL BUTTON TEXT"       :    "Cancel",
+    "CANCEL BUTTON TEXT"                   :    "Cancel",
+    "SAVE BUTTON TEXT"                     :    "Save",
+    "SHARE BUTTON TEXT"                    :    "Share",
 
     "OWNER TEXT"                           :    "Owner",
     "ADMIN TEXT"                           :    "Administrator",
     "ADV VIEWER TEXT"                      :    "Advanced Viewer",
     "VIEWER TEXT"                          :    "Viewer",
-    "LIVE VIEWER TEXT"                     :    "Live Viewer",    
+    "LIVE VIEWER TEXT"                     :    "Live Viewer",
     "CUSTOM TEXT"                          :    "Custom",
     "YOUR SYSTEM TEXT"                     :    "Your System",
+    "YOUR PERMISSIONS TEXT"                :    "Your permissions:",
 
     "ABOUT"                                :    "About",
     "KNOWN LIMITATIONS"                    :    "Known limitations",
     "SUPPORT"                              :    "Support",
     "TERMS"                                :    "Terms",
     "PRIVACY"                              :    "Privacy",
-    "COPYWRIGHT"                           :    "Copywright",
+    "COPYRIGHT"                            :    "Copyright",
 
     "DOWNLOADS HEADER TEXT"                :    "Download",
 
@@ -91,7 +95,7 @@
     "PATCHES TEXT"                         :    "Patches",
     "BETAS TEXT"                           :    "Betas",
     "CLIENT ONLY TEXT"                     :    "Client only",
-            
+
     "PASSWORD TOO SHORT BADGE TEXT"        :    "too short",
     "PASSWORD TOO COMMON BADGE TEXT"       :    "too common",
     "PASSWORD IS WEAK BADGE TEXT"          :    "weak",

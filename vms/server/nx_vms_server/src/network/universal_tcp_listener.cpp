@@ -39,7 +39,7 @@ void QnUniversalTcpListener::setupAuthorizer(
     TimeBasedNonceProvider* timeBasedNonceProvider,
     nx::vms::cloud_integration::CloudManagerGroup& cloudManagerGroup)
 {
-    m_authenticator = std::make_unique<nx::mediaserver::Authenticator>(
+    m_authenticator = std::make_unique<nx::vms::server::Authenticator>(
         commonModule(), timeBasedNonceProvider,
         &cloudManagerGroup.authenticationNonceFetcher,
         &cloudManagerGroup.userAuthenticator);
@@ -187,12 +187,12 @@ void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* reque
     m_httpModManager->apply(request);
 }
 
-nx::mediaserver::Authenticator* QnUniversalTcpListener::authenticator() const
+nx::vms::server::Authenticator* QnUniversalTcpListener::authenticator() const
 {
     return m_authenticator.get();
 }
 
-nx::mediaserver::Authenticator* QnUniversalTcpListener::authenticator(const QnTcpListener* listener)
+nx::vms::server::Authenticator* QnUniversalTcpListener::authenticator(const QnTcpListener* listener)
 {
     const auto universalListener = dynamic_cast<const QnUniversalTcpListener*>(listener);
     NX_CRITICAL(universalListener);

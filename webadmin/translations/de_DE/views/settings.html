@@ -4,23 +4,23 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Dieses Gerät ist dafür gedacht mit einem installierten Festplattenlaufwerk zu arbeiten<br>
 Schalten Sie das Gerät bitte ab und installieren Sie ein Festplattenlaufwerk.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Dieses Gerät benötigt eine Netzwerkverbindung, um zu funktionieren.<br>
 Bitte verbinden Sie es mit dem lokalen Netzwerk zum Internet
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Dieses Gerät hat eine falsche Netzwerkkonfiguration.<br>
 Bitte an das Netzwerk anschließen oder eine korrekte IP-Adresse vergeben.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -50,7 +50,7 @@ Bitte an das Netzwerk anschließen oder eine korrekte IP-Adresse vergeben.
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Vom System trennen</button></p>
                     </div>
                     <div>
-                        <h3>Neustart</h3>
+                        <h3>Neu starten</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Server neustarten</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Neustart</button></p>
                     </div>
@@ -104,12 +104,12 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Dieses System ist nicht mit {{Config.cloud.productName}} verknüpft.
+                            <uib-alert type="warning">Dieses System ist nicht mit {{Config.cloud.productName}} verknüpft.
 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Weitere Informationen</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Verbinden Sie den Server mit dem Internet, um das Setup für {{Config.cloud.productName}} durchzuführen</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Eine Internetverbindung wird benötigt um das System mit {{Config.cloud.productName}} zu verbinden</alert>
+                                   target="_blank">Weitere Informationen</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">Verbinden Sie den Server mit dem Internet, um das Setup für {{Config.cloud.productName}} durchzuführen</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Eine Internetverbindung wird benötigt um das System mit {{Config.cloud.productName}} zu verbinden</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Herstellen einer Verbindung mit {{Config.cloud.productName}}</button>
@@ -132,7 +132,9 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Videotrafficverschlüsselung erzwingen
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
+                                           ng-checked="checkTrafficEncryption()">
+                                    Videotrafficverschlüsselung erzwingen
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Speichern</button>

@@ -4,7 +4,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
@@ -38,7 +38,7 @@ public:
 
 } // namespace hikvision
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::hikvision::Protocol, (metatype)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::plugins::hikvision::Protocol, (metatype)(lexical))

@@ -6,7 +6,7 @@
 #include "plugins/storage/third_party/third_party_storage.h"
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::mediaserver{ class Settings; }
+namespace nx::vms::server { class Settings; }
 
 class QnThirdPartyStorageResource: public QnStorageResource
 {
@@ -32,7 +32,7 @@ public: // static funcs
         QnCommonModule* commonModule,
         const QString               &url,
         const StorageFactoryPtrType &sf,
-        const nx::mediaserver::Settings* settings
+        const nx::vms::server::Settings* settings
     );
 
 public: //ctors, dtor
@@ -40,7 +40,7 @@ public: //ctors, dtor
         QnCommonModule* commonModule,
         const StorageFactoryPtrType &sf,
         const QString               &storageUrl,
-        const nx::mediaserver::Settings* settings
+        const nx::vms::server::Settings* settings
     );
 
     QnThirdPartyStorageResource(); //designates invalid storagere source
@@ -78,5 +78,5 @@ private:
     StoragePtrType                      m_storage;
     mutable QnMutex                      m_mutex;
     bool                                m_valid;
-    const nx::mediaserver::Settings* m_settings = nullptr;
+    const nx::vms::server::Settings* m_settings = nullptr;
 }; // QnThirdPartyStorageResource

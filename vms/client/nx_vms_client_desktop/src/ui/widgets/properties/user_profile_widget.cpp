@@ -198,7 +198,7 @@ void QnUserProfileWidget::applyChanges()
             using namespace nx::vms::client::core::helpers;
             const auto localSystemId = commonModule()->globalSettings()->localSystemId();
             if (getCredentials(localSystemId, url.userName()).isValid())
-                storeCredentials(localSystemId, QnEncodedCredentials(url));
+                storeCredentials(localSystemId, nx::vms::common::Credentials(url));
             qnClientCoreSettings->save();
         }
     }

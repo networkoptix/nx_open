@@ -1,12 +1,17 @@
-<div class="cameras-panel">
-    <div class="cameras-search" ng-class="{active:searchCams!=''}" ng-model-options="{ updateOn: 'default', debounce: 0 }">
-        <input type="search" placeholder="{{inputPlaceholder}}" ng-class="{active:searchCams!=''}" ng-model="searchCams">
+<div class="cameras-panel" ng-if="showCameraPanel">
+    <div class="cameras-search" ng-class="{active:panel.filter!=''}">
+        <input type="search"
+               placeholder="{{inputPlaceholder}}"
+               ng-class="{active:panel.filter!=''}"
+               ng-model="panel.filter"
+               ng-model-options="{ updateOn: 'default', debounce: 0 }">
+
         <div class="icon-left" ><span class="glyphicon glyphicon-search"></span></div>
         <div class="icons-right" ng-class="{'active':toggleInfo}">
-            <div ng-hide="!searchCams || searchCams==''" class="clear-button" ng-click="searchCams=''" >
+            <div ng-hide="!panel.filter || panel.filter==''" class="clear-button" ng-click="panel.filter=''" >
                 <span class="glyphicon glyphicon-remove"></span>
             </div>
-            <div class="clear-divider" ng-hide="!searchCams || searchCams==''"></div>
+            <div class="clear-divider" ng-hide="!panel.filter || panel.filter==''"></div>
             <div class="info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfoFn()">
                 <span ng-class="{'active':toggleInfo}" class="glyphicon glyphicon-info-sign"></span>
             </div>

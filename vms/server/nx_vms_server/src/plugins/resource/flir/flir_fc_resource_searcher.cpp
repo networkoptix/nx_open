@@ -37,7 +37,7 @@ FcResourceSearcher::FcResourceSearcher(QnMediaServerModule* serverModule)
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    mediaserver::ServerModuleAware(serverModule),
+    vms::server::ServerModuleAware(serverModule),
     m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
     m_terminated(false)
 {

@@ -1,6 +1,6 @@
 {
   "activate_account": {
-    "emailSubject": "Prosím, aktivujte si váš účet"
+    "emailSubject": "Aktivujte svůj účet"
   },
   "restore_password": {
     "emailSubject": "Resetovat heslo"

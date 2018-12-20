@@ -1,12 +1,12 @@
 #pragma once
 
 #include <core/resource_management/resource_searcher.h>
-#include <nx/mediaserver/resource/camera.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/resource/camera.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnArchiveCamResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
@@ -28,7 +28,7 @@ public:
 };
 
 class QnArchiveCamResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 public:
@@ -44,7 +44,7 @@ public:
     static QString cameraName();
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

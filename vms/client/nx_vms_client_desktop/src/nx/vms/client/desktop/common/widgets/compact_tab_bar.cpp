@@ -18,7 +18,6 @@ namespace nx::vms::client::desktop {
 namespace {
 
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
 
 static constexpr int kTabMargin = 6; //< Tab horizontal margin.
 static constexpr int kTabInnerSpacing = 4; //< Spacing between tab icon and text.

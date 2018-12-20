@@ -3,7 +3,7 @@
 #include <nx/streaming/abstract_archive_delegate.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class ArchiveDelegateWrapper: public QnAbstractArchiveDelegate
@@ -56,5 +56,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

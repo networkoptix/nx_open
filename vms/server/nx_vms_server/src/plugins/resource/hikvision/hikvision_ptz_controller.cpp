@@ -6,7 +6,7 @@
 #include <nx/utils/std/algorithm.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
@@ -407,5 +407,5 @@ std::optional<std::map<int, QString>> IsapiPtzController::readCameraPresets() co
 
 } // namespace hikvision
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

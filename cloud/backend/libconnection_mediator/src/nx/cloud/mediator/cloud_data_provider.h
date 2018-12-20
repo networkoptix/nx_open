@@ -23,9 +23,9 @@ public:
     {
         String id;
         String authKey;
-        bool mediatorEnabled;
+        bool mediatorEnabled = true;
 
-        System();
+        System() = default;
         System(
             String authKey_,
             bool mediatorEnabled_ = false);

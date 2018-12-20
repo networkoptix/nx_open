@@ -134,6 +134,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     QObject(parent),
     m_messageProcessor(nullptr)
 {
+    QnCommonMetaTypes::initialize();
+
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
 

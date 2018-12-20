@@ -8,13 +8,18 @@ AbstractButton
     id: control
 
     property bool alwaysCompleteHighlightAnimation: true
+    property color normalIconColor: "transparent"
+    property color checkedIconColor: normalIconColor
+    property color checkedBackgroundColor: ColorTheme.contrast1
 
     padding: 6
 
     implicitWidth: Math.max(48, background.implicitWidth, contentItem.implicitWidth)
     implicitHeight: Math.max(48, background.implicitHeight, contentItem.implicitHeight)
 
-    icon.color: "transparent"
+    icon.color: checkable && checked
+        ? checkedIconColor
+        : normalIconColor
 
     onPressAndHold: { d.pressedAndHeld = true }
     onCanceled: { d.pressedAndHeld = false }
@@ -38,6 +43,14 @@ AbstractButton
     {
         implicitWidth: 36
         implicitHeight: 36
+
+        Rectangle
+        {
+            anchors.fill: parent
+            radius: Math.min(width, height) / 2
+            visible: control.checkable && control.checked
+            color: control.checkedBackgroundColor
+        }
 
         MaterialEffect
         {

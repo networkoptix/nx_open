@@ -34,8 +34,8 @@
 #include <common/static_common_module.h>
 #include <managers/discovery_manager.h>
 #include "core/multicast/multicast_http_server.h"
-#include "nx/mediaserver/hls/hls_session_pool.h"
-#include "nx/mediaserver/hls/hls_server.h"
+#include "nx/vms/server/hls/hls_session_pool.h"
+#include "nx/vms/server/hls/hls_server.h"
 #include <recorder/remote_archive_synchronizer.h>
 #include <recorder/recording_manager.h>
 #include <camera/camera_pool.h>
@@ -53,8 +53,8 @@
 #include <media_server/server_update_tool.h>
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
-#include <nx/mediaserver/command_line_parameters.h>
-#include <nx/mediaserver/discovery/discovery_monitor.h>
+#include <nx/vms/server/command_line_parameters.h>
+#include <nx/vms/server/discovery/discovery_monitor.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -92,7 +92,7 @@ public:
     /** Entry point. */
     static int main(int argc, char* argv[]);
 
-    const nx::mediaserver::CmdLineArguments cmdLineArguments() const;
+    const nx::vms::server::CmdLineArguments cmdLineArguments() const;
 
     QnCommonModule* commonModule() const
     {
@@ -110,7 +110,7 @@ public:
             return nullptr;
     }
 
-    nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
+    nx::vms::server::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -153,10 +153,25 @@ private:
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
+    
     void registerRestHandlers(
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
+
+    /**
+     * This weird name is an apidoctool requirement.
+     */
+    void reg(
+        const QString& path,
+        QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
+
+    void reg(
+        const nx::network::http::Method::ValueType& method,
+        const QString& path,
+        QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
 
     template<class TcpConnectionProcessor, typename... ExtraParam>
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
@@ -183,7 +198,7 @@ private:
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    nx::utils::log::Settings makeLogSettings(const nx::mediaserver::Settings& settings);
+    nx::utils::log::Settings makeLogSettings(const nx::vms::server::Settings& settings);
 
     void initializeLogging(MSSettings* serverSettings);
     void initializeHardwareId();
@@ -233,7 +248,7 @@ private:
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
-    nx::mediaserver::CmdLineArguments m_cmdLineArguments;
+    nx::vms::server::CmdLineArguments m_cmdLineArguments;
     const bool m_serviceMode;
     quint64 m_dumpSystemResourceUsageTaskId = 0;
     bool m_stopping = false;
@@ -262,10 +277,10 @@ private:
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 
-    std::unique_ptr<nx::mediaserver::discovery::DiscoveryMonitor> m_discoveryMonitor;
+    std::unique_ptr<nx::vms::server::discovery::DiscoveryMonitor> m_discoveryMonitor;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
-    std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
+    std::unique_ptr<nx::vms::server::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
     std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;

@@ -108,6 +108,7 @@ bool isCodecSupported(AVCodecID codecId)
         case AV_CODEC_ID_VP8:
         case AV_CODEC_ID_ADPCM_G722:
         case AV_CODEC_ID_ADPCM_G726:
+        case AV_CODEC_ID_MJPEG:
             return true;
         default:
             return false;

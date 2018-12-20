@@ -156,8 +156,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_forcedAudioLayout(nullptr),
     m_disableRegisterFile(false)
 {
-    m_writeFrameFunc = av_write_frame;
-
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
@@ -630,7 +628,8 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         NX_ASSERT(md->timestamp >= 0);
 
-        QnFfmpegAvPacket avPkt;
+        AVPacket avPkt;
+        av_init_packet(&avPkt);
         qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts + 1, dts);
@@ -651,11 +650,15 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         if (avPkt.pts < avPkt.dts)
         {
             avPkt.pts = avPkt.dts;
-            NX_WARNING(this, QLatin1String("Timestamp error: PTS < DTS. Fixed."));
+            NX_WARNING(this, "Timestamp error: PTS < DTS. Fixed.");
         }
 
         auto startWriteTime = std::chrono::high_resolution_clock::now();
-        int ret = m_writeFrameFunc(m_recordingContextVector[i].formatCtx, &avPkt);
+        int ret;
+        if (m_interleavedStream)
+            ret = av_interleaved_write_frame(m_recordingContextVector[i].formatCtx, &avPkt);
+        else
+            ret = av_write_frame(m_recordingContextVector[i].formatCtx, &avPkt);
         auto endWriteTime = std::chrono::high_resolution_clock::now();
 
         m_recordingContextVector[i].totalWriteTimeNs +=
@@ -681,7 +684,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         if (ret < 0)
         {
-            NX_WARNING(this, QLatin1String("AV packet write error"));
+            NX_WARNING(this, "AV packet write error");
         }
         else
         {
@@ -691,7 +694,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
                 if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
                     m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
                 AVCodecContext* srcCodec = m_recordingContextVector[i].formatCtx->streams[streamIndex]->codec;
-                NX_VERBOSE(this) << "SignVideo: add video packet of size" << avPkt.size;
+                NX_VERBOSE(this, "SignVideo: add video packet of size %1", avPkt.size);
                 QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
                 //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
             }
@@ -719,7 +722,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             StreamRecorderError::containerNotFound,
             QnStorageResourcePtr()
         );
-        NX_ERROR(this, lit("No %1 container in FFMPEG library.").arg(m_container));
+        NX_ERROR(this, "No %1 container in FFMPEG library.", m_container);
         return false;
     }
 
@@ -757,8 +760,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 StreamRecorderError::fileCreate,
                 context.storage
             );
-            NX_ERROR(this, lit("Can't create output file '%1' for video recording.")
-                .arg(context.fileName));
+            NX_ERROR(this, "Can't create output file '%1' for video recording.", context.fileName);
 
             msleep(500); // avoid createFile flood
             return false;
@@ -818,7 +820,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         {
             const int videoChannels = isTranscode ? 1 : layout->channelCount();
             if (videoChannels > 1)
-                m_writeFrameFunc = av_interleaved_write_frame;
+                m_interleavedStream = true;
 
             for (int j = 0; j < videoChannels; ++j)
             {

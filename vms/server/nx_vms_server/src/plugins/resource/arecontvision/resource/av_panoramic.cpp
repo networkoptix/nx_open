@@ -120,11 +120,11 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& id, const QStrin
     return false;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnArecontPanoramicResource::initializeCameraDriver()
@@ -180,12 +180,12 @@ void QnArecontPanoramicResource::updateFlipState()
     // Get from kvpairs directly. Do not read default value from resourceTypes.
     QString oldVideoLayoutString = commonModule()
         ->propertyDictionary()
-        ->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME);
+        ->value(getId(), ResourcePropertyKey::kVideoLayout);
     if (newVideoLayoutString != oldVideoLayoutString)
     {
         commonModule()
             ->propertyDictionary()
-            ->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayoutString);
+            ->setValue(getId(), ResourcePropertyKey::kVideoLayout, newVideoLayoutString);
         commonModule()->propertyDictionary()->saveParams(getId());
     }
 }
@@ -220,9 +220,14 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (resType)
-        m_defaultVideoLayout = QnResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME)));
+    {
+        m_defaultVideoLayout = QnResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(
+            resType->defaultValue(ResourcePropertyKey::kVideoLayout)));
+    }
     else
+    {
         m_defaultVideoLayout = QnResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout());
+    }
     return m_defaultVideoLayout;
 }
 
@@ -237,7 +242,7 @@ int QnArecontPanoramicResource::getChannelCount() const
 
 void QnArecontPanoramicResource::initializeVideoLayoutUnsafe() const
 {
-    auto layoutString = getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    auto layoutString = getProperty(ResourcePropertyKey::kVideoLayout);
     m_customVideoLayout = QnCustomResourceVideoLayout::fromString(layoutString);
 }
 

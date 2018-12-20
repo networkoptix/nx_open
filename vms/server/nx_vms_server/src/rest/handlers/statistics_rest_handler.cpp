@@ -13,7 +13,7 @@
 
 QnStatisticsRestHandler::QnStatisticsRestHandler(QnMediaServerModule* serverModule):
     QnJsonRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

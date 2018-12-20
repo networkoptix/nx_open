@@ -3,11 +3,9 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/events/instant_event.h>
 #include <core/resource/resource_fwd.h>
-//#include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/event/events/events_fwd.h>
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 class PluginEvent: public InstantEvent
 {
@@ -15,7 +13,7 @@ class PluginEvent: public InstantEvent
 
 public:
     explicit PluginEvent(
-        qint64 timeStamp, 
+        qint64 timeStamp,
         const QnUuid& pluginInstance,
         const QString& caption,
         const QString& description,
@@ -32,6 +30,6 @@ private:
     /*const*/ EventMetaData m_metadata;
 };
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event
+
+Q_DECLARE_METATYPE(nx::vms::event::PluginEventPtr);

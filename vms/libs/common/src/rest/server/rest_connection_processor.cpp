@@ -29,53 +29,84 @@ static const QByteArray NOT_AUTHORIZED_HTML("\
     </HTML>"
 );
 
-QnRestProcessorPool::QnRestProcessorPool()
+const nx::network::http::Method::ValueType QnRestProcessorPool::kAnyHttpMethod = "";
+const QString QnRestProcessorPool::kAnyPath = QString();
+
+void QnRestProcessorPool::registerHandler(
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permissions)
 {
+    registerHandler(kAnyHttpMethod, path, handler, permissions);
 }
 
-void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, GlobalPermission permissions )
+void QnRestProcessorPool::registerHandler(
+    nx::network::http::Method::ValueType httpMethod,
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permissions)
 {
-    m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
+    m_handlers[httpMethod].insert(path, QnRestRequestHandlerPtr(handler));
     handler->setPath(path);
     handler->setPermissions(permissions);
-
 }
 
-QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
+QnRestRequestHandlerPtr QnRestProcessorPool::findHandler(
+    const nx::network::http::Method::ValueType& httpMethod,
+    const QString& path) const
 {
-    path = QnTcpListener::normalizedPath(path);
-
-
-    Handlers::const_iterator i = m_handlers.upperBound(path);
-    if (i == m_handlers.begin())
-        return path.startsWith(i.key()) ? i.value() : QnRestRequestHandlerPtr();
-    while (i-- != m_handlers.begin())
-    {
-        if (path.startsWith(i.key()))
-            return i.value();
-    }
-
-    return QnRestRequestHandlerPtr();
+    if (auto handler = findHandlerForSpecificMethod(httpMethod, path))
+        return handler;
+    return findHandlerForSpecificMethod(kAnyHttpMethod, path);
 }
 
-const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
+void QnRestProcessorPool::registerRedirectRule(const QString& path, const QString& newPath)
 {
-    return m_handlers;
+    m_redirectRules.insert(path, newPath);
 }
 
-void QnRestProcessorPool::registerRedirectRule( const QString& path, const QString& newPath )
+boost::optional<QString> QnRestProcessorPool::getRedirectRule(const QString& path)
 {
-    m_redirectRules.insert( path, newPath );
-}
-
-boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& path )
-{
-    const auto it = m_redirectRules.find( path );
+    const auto it = m_redirectRules.find(path);
     if (it != m_redirectRules.end())
         return it.value();
     else
         return boost::none;
 }
+
+QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerForSpecificMethod(
+    const nx::network::http::Method::ValueType& httpMethod,
+    const QString& path) const
+{
+    const auto it = m_handlers.find(httpMethod);
+    if (it == m_handlers.end())
+        return nullptr;
+
+    return findHandlerByPath(it->second, path);
+}
+
+QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerByPath(
+    const HandlersByPath& handlersByPath,
+    const QString& path) const
+{
+    const auto normalizedPath = QnTcpListener::normalizedPath(path);
+
+    auto it = handlersByPath.upperBound(normalizedPath);
+    if (it == handlersByPath.begin())
+        return normalizedPath.startsWith(it.key()) ? it.value() : nullptr;
+    while (it-- != handlersByPath.begin())
+    {
+        if (normalizedPath.startsWith(it.key()))
+            return it.value();
+    }
+
+    if (handlersByPath.contains(kAnyPath))
+        return handlersByPath.value(kAnyPath);
+
+    return nullptr;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
@@ -107,11 +138,15 @@ void QnRestConnectionProcessor::run()
     d->response.messageBody.clear();
 
     nx::utils::Url url = getDecodedUrl();
-    RestRequest request{url.path(),  QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded), this};
+    RestRequest request{
+        url.path(),
+        QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded),
+        this,
+        &d->request};
     RestResponse response;
 
     QnRestRequestHandlerPtr handler = static_cast<QnHttpConnectionListener*>(d->owner)
-        ->processorPool()->findHandler(request.path);
+        ->processorPool()->findHandler(d->request.requestLine.method, request.path);
     if (handler)
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
@@ -129,34 +164,14 @@ void QnRestConnectionProcessor::run()
             }
         }
 
-        const auto requestContentType = nx::network::http::getHeaderValue(d->request.headers, "Content-Type");
+        const auto requestContentType =
+            nx::network::http::getHeaderValue(d->request.headers, "Content-Type");
         const auto method = d->request.requestLine.method.toUpper();
-        if (method == nx::network::http::Method::get)
-        {
-            response = handler->executeGet(request);
-        }
-        else
-        if (method == nx::network::http::Method::post)
-        {
-            response = handler->executePost(request, {requestContentType, d->requestBody});
-        }
-        else
-        if (method == nx::network::http::Method::put)
-        {
-            response = handler->executePut(request, {requestContentType, d->requestBody});
-        }
-        else
-        if (method == nx::network::http::Method::delete_)
-        {
-            response = handler->executeDelete(request);
-        }
-        else
-        {
-            NX_WARNING(this, lm("Unknown REST method %1").arg(method));
-            response.statusCode = nx::network::http::StatusCode::notFound;
-            response.content.type = "text/plain";
-            response.content.body = "Invalid HTTP method";
-        }
+
+        response = handler->executeRequest(
+            method,
+            request,
+            {requestContentType, d->requestBody});
     }
     else
     {
@@ -177,6 +192,9 @@ void QnRestConnectionProcessor::run()
     {
         d->response.messageBody = response.content.body;
     }
+
+    d->response.headers.insert(
+        response.httpHeaders.begin(), response.httpHeaders.end());
 
     nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
     nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));

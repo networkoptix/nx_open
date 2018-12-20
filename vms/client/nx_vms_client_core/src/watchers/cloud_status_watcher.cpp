@@ -14,13 +14,14 @@
 
 #include <client_core/client_core_settings.h>
 #include <client_core/connection_context_aware.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+
 #include <cloud/cloud_connection.h>
 #include <network/cloud_system_data.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 #include <utils/common/id.h>
 
-#include <nx/client/core/settings/secure_settings.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -105,7 +106,7 @@ public:
 
     std::string cloudHost;
     int cloudPort;
-    QnEncodedCredentials credentials;
+    nx::vms::common::Credentials credentials;
     QString effectiveUserName;
     bool stayConnected;
     QnCloudStatusWatcher::ErrorCode errorCode;
@@ -183,7 +184,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
     d_ptr->isMobile = isMobile;
-    setStayConnected(!nx::vms::client::core::secureSettings()->cloudCredentials().password.isEmpty());
+    setStayConnected(!nx::vms::client::core::settings()->cloudCredentials().password.isEmpty());
 
     const auto correctOfflineState = [this]()
         {
@@ -220,12 +221,12 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     using namespace nx::vms::client::core;
 
     // TODO: #GDM store temporary credentials
-    setCredentials(secureSettings()->cloudCredentials(), true);
+    setCredentials(settings()->cloudCredentials(), true);
 
-    connect(&secureSettings()->cloudCredentials, &SecureSettings::BaseProperty::changed, this,
+    connect(&settings()->cloudCredentials, &Settings::BaseProperty::changed, this,
         [this]()
         {
-            setStayConnected(!secureSettings()->cloudCredentials().password.isEmpty());
+            setStayConnected(!settings()->cloudCredentials().password.isEmpty());
         });
 }
 
@@ -233,7 +234,7 @@ QnCloudStatusWatcher::~QnCloudStatusWatcher()
 {
 }
 
-QnEncodedCredentials QnCloudStatusWatcher::credentials() const
+nx::vms::common::Credentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
     return d->credentials;
@@ -246,7 +247,7 @@ QString QnCloudStatusWatcher::cloudLogin() const
 
 QString QnCloudStatusWatcher::cloudPassword() const
 {
-    return credentials().password.value();
+    return credentials().password;
 }
 
 QString QnCloudStatusWatcher::effectiveUserName() const
@@ -302,15 +303,17 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void QnCloudStatusWatcher::resetCredentials()
 {
-    setCredentials(QnEncodedCredentials());
+    setCredentials({});
 }
 
-bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
+bool QnCloudStatusWatcher::setCredentials(
+    const nx::vms::common::Credentials& credentials,
+    bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
     const auto loweredCredentials =
-        QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
+        nx::vms::common::Credentials(credentials.user.toLower(), credentials.password);
 
     if (d->credentials == loweredCredentials)
         return false;
@@ -332,10 +335,10 @@ bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
     return true;
 }
 
-QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
+nx::vms::common::Credentials QnCloudStatusWatcher::createTemporaryCredentials()
 {
     Q_D(QnCloudStatusWatcher);
-    const QnEncodedCredentials result(
+    const nx::vms::common::Credentials result(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
     d->createTemporaryCredentials();
@@ -562,8 +565,8 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     }
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
-    cloudConnection->setCredentials(credentials.user.toStdString(),
-        credentials.password.value().toStdString());
+    cloudConnection->setCredentials(credentials.user.toStdString(), 
+        credentials.password.toStdString());
 
     /* Very simple email check. */
     if (credentials.user.contains(L'@'))

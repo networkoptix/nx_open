@@ -4,8 +4,7 @@
 
 #include "image_provider.h"
 
-
-class QnDisconnectHelper;
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -48,10 +47,10 @@ private:
 
 private:
     ImageProvider* m_sourceProvider = nullptr;
-    QScopedPointer<QnDisconnectHelper> m_sourceProviderConnections;
+    nx::utils::ScopedConnections m_sourceProviderConnections;
 
     AbstractImageProcessor* m_imageProcessor = nullptr;
-    QScopedPointer<QnDisconnectHelper> m_imageProcessorConnections;
+    nx::utils::ScopedConnections m_imageProcessorConnections;
 
     QImage m_image;
     Qn::ThumbnailStatus m_status = Qn::ThumbnailStatus::Invalid;

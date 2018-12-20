@@ -13,8 +13,14 @@ class QString;
 
 namespace nx::vms::client::desktop::layout {
 
+/** Mark layout as encrypted. */
+void markAsEncrypted(const QnLayoutResourcePtr& layout, bool value = true);
+
 /** Returns true if layout is encrypted. */
 bool isEncrypted(const QnLayoutResourcePtr& layout);
+
+/** Retreive actual entered password. */
+QString password(const QnLayoutResourcePtr& layout);
 
 /** Returns true if layout is encrypted and password is unknown. */
 bool requiresPassword(const QnLayoutResourcePtr& layout);

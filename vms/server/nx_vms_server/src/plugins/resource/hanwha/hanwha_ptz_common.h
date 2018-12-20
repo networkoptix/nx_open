@@ -8,7 +8,7 @@
 #include <nx/core/ptz/type.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 using HanwhaPtzCapabilitiesMap = std::map<nx::core::ptz::Type, Ptz::Capabilities>;

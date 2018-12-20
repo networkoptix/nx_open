@@ -21,7 +21,7 @@ export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
     show: boolean;
 
     constructor(private location: Location,
-                private route: ActivatedRoute,) {
+                private route: ActivatedRoute) {
 
         this.show = false;
     }

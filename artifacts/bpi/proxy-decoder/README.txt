@@ -53,5 +53,5 @@ make -C mobile_client/arm-bpi -f Makefile.debug -j12
 sudo cp -r build_environment/target-bpi/bin/debug/mobile_client /bpi/opt/networkoptix/lite_client/bin/
 
 # Rebuild and install nx_media:
-make -C nxlib/nx_media/arm-bpi -f Makefile.debug -j12
+make -C vms/libs/nx_media/arm-bpi -f Makefile.debug -j12
 sudo cp -r build_environment/target-bpi/lib/debug/libnx_media* /bpi/opt/networkoptix/lite_client/lib/

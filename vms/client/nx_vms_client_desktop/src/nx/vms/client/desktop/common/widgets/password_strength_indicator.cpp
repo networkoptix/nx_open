@@ -175,7 +175,7 @@ void PasswordStrengthIndicator::paintEvent(QPaintEvent* /*event*/)
     painter.setPen(Qt::NoPen);
     painter.setBrush(background);
 
-    const auto rect = this->rect();
+    const QRectF rect(this->rect());
 
     painter.setRenderHint(QPainter::Antialiasing);
     painter.drawRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5),

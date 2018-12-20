@@ -11,7 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QnTimePeriod;
+struct QnTimePeriod;
 
 /** Base class for loading custom camera archive-related data. */
 class QnAbstractCameraDataLoader: public QObject

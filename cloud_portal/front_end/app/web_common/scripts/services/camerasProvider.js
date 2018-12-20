@@ -87,7 +87,7 @@ angular.module('nxCommon')
             var findIoConfigCapability = function(param){
                 return param.name === 'ioConfigCapability';
             };
-            
+
             function cameraFilter(camera){
                 // Filter desktop cameras here
                 // Hide desktop cameras and ioDevices
@@ -164,7 +164,7 @@ angular.module('nxCommon')
             cameras = _.filter(cameras, cameraFilter);
             //7 sort again
             cameras = _.sortBy(cameras, cameraSorter);
-            
+
             //8. Group by servers
             var camerasByServers = _.groupBy(cameras, function (camera) {
                 return camera.parentId;
@@ -211,8 +211,8 @@ angular.module('nxCommon')
             var self = this;
             function serverSorter(server){
                 server.url = self.extractDomain(server.url);
-                server.collapsed = self.storage.serverStates[server.id];
-                server.active = server.id == Config.currentServerId;
+                server.collapsed = (self.storage.serverStates) ? self.storage.serverStates[server.id] || true : true;
+                server.active = server.id === Config.currentServerId;
 
 
                 if(typeof(server.visible) === 'undefined'){
@@ -343,14 +343,24 @@ angular.module('nxCommon')
         };
         camerasProvider.prototype.getServerTimes = function(){
             var self = this;
-            return self.systemAPI.getServerTimes().then(function(result){
+            return self.systemAPI.getServerTimes().then(function (result) {
                 var serverOffsets = result.data.reply;
-                _.each(serverOffsets, function(server){
-                    //Typo with server api so we check for both spellings
-                    //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
-                    var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
-                    self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
-                });
+        
+                function setServerOffsetTime(time) {
+                    return _.each(serverOffsets, function (server) {
+                        //Typo with server api so we check for both spellings
+                        //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
+                        var timeSinceEpochMs = time || server.timeSinceEpochMs || server.timeSinseEpochMs;
+                        self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
+                    });
+                }
+        
+                if (Config.webclient.useSystemTime) {
+                    return self.systemAPI.getSystemTime().then(function (systemTime) {
+                        return setServerOffsetTime(systemTime);
+                    });
+                }
+                return setServerOffsetTime();
             });
         };
 

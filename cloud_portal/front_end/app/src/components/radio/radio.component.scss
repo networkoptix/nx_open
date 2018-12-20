@@ -5,13 +5,23 @@ nx-radio {
     &[disabled] {
         .nx-radio {
             opacity : .3;
+
+            .check {
+                cursor : default;
+            }
+
+            input:hover ~ .check {
+                svg path.circle {
+                    fill : $dark9 !important;
+                }
+            }
         }
     }
 
     .nx-radio {
         display : flex;
         float   : left;
-        margin   : 0;
+        margin  : 0;
 
         input[type="radio"] {
             position : absolute;
@@ -23,19 +33,11 @@ nx-radio {
             svg path.circle {
                 fill : $dark1;
             }
-
-            & ~ .text {
-                color : $dark1;
-            }
         }
 
         input:active ~ .check {
             svg path.circle {
                 fill : $dark9 !important;
-            }
-
-            & ~ .text {
-                color : $dark9 !important;
             }
         }
     }

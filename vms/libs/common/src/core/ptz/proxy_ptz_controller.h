@@ -74,11 +74,11 @@ public: // Overrides section
     virtual bool updateHomeObject(const QnPtzObject& homeObject) override;
     virtual bool getHomeObject(QnPtzObject* homeObject) const override;
 
-    virtual bool getAuxilaryTraits(
-        QnPtzAuxilaryTraitList* auxilaryTraits,
+    virtual bool getAuxiliaryTraits(
+        QnPtzAuxiliaryTraitList* auxiliaryTraits,
         const nx::core::ptz::Options& options) const override;
-    virtual bool runAuxilaryCommand(
-        const QnPtzAuxilaryTrait& trait,
+    virtual bool runAuxiliaryCommand(
+        const QnPtzAuxiliaryTrait& trait,
         const QString& data,
         const nx::core::ptz::Options& options) override;
 

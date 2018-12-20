@@ -10,9 +10,9 @@
   },
   "systemOffline": "Система знаходиться поза мережею",
   "cameraStates": {
-    "offline": "Офлайн",
+    "offline": "Поза мережею",
     "error": "Помилка",
-    "unauthorized": "Потрібна авторизація",
+    "unauthorized": "Потрібна аутентифікація",
     "noData": "Немає даних",
     "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
     "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео.",
@@ -25,13 +25,13 @@
   },
   "searchCamPlaceholder": "Пошук",
   "resolution": {
-    "auto": "Автоматично",
+    "auto": "Авто",
     "high": "Високий",
     "low": "Низький"
   },
   "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
   "voiceCommands": {
-    "play": "відтворити",
+    "play": "відтворення",
     "pause": "пауза",
     "live": "go to live | show me live",
     "view": "view + [camera name]",

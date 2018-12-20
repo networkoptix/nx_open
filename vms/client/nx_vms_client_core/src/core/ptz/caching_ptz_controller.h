@@ -36,8 +36,8 @@ public:
 
     virtual bool getHomeObject(QnPtzObject* homeObject) const override;
 
-    virtual bool getAuxilaryTraits(
-        QnPtzAuxilaryTraitList* auxilaryTraits,
+    virtual bool getAuxiliaryTraits(
+        QnPtzAuxiliaryTraitList* auxiliaryTraits,
         const nx::core::ptz::Options& options) const override;
 
     virtual bool getData(

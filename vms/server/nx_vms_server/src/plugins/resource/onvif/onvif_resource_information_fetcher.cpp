@@ -30,7 +30,7 @@
 
 using namespace nx::plugins;
 using namespace nx::plugins::onvif;
-using namespace nx::mediaserver_core::plugins;
+using namespace nx::vms::server::plugins;
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -86,7 +86,7 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
 }
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
 {
@@ -130,7 +130,7 @@ bool OnvifResourceInformationFetcher::ignoreCamera(
 {
     QnResourceData resourceData = dataPool->data(manufacturer, name);
 
-    if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kIgnoreONVIF))
         return true;
 
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
@@ -302,8 +302,8 @@ void OnvifResourceInformationFetcher::findResources(
         return;
 
     QnResourceData resourceData = res->commonModule()->dataPool()->data(res->getVendor(), res->getModel());
-    bool shouldAppearAsSingleChannel =
-        resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+    auto shouldAppearAsSingleChannel =
+        resourceData.value<bool>(ResourceDataKey::kShouldAppearAsSingleChannel);
 
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
 
@@ -367,11 +367,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
         return QnPlOnvifResourcePtr();
 
     auto resData = serverModule()->commonModule()->dataPool()->data(manufacturer, model);
-    auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
+    auto manufacturerAlias = resData.value<QString>(ResourceDataKey::kOnvifVendorSubtype);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
-    bool doNotAddVendorToDeviceName = resData.value<bool>(Qn::DO_NOT_ADD_VENDOR_TO_DEVICE_NAME);
+    bool doNotAddVendorToDeviceName = resData.value<bool>(ResourceDataKey::kDoNotAddVendorToDeviceName);
 
     QnPlOnvifResourcePtr resource = createOnvifResourceByManufacture(serverModule(), manufacturerAlias);
     if (!resource)
@@ -434,34 +434,37 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     const QString& manufacture)
 {
     QnPlOnvifResourcePtr resource;
-    if (manufacture.toLower().contains(QLatin1String("digital watchdog")) ||
-            manufacture.toLower().contains(QLatin1String("digitalwatchdog")))
+    const QString lowerCaseManufacture = manufacture.toLower();
+
+    if (lowerCaseManufacture.contains("digital watchdog")
+        || lowerCaseManufacture.contains("digital_watchdog")
+        || lowerCaseManufacture.contains("digitalwatchdog")
+        || lowerCaseManufacture == "panoramic"
+        || lowerCaseManufacture == "ipnc") //< new dw panoramic cameras
+    {
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource(serverModule));
-    else if (manufacture.toLower() == QLatin1String("panoramic"))
-        resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource(serverModule));
-    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
-        resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("sony")))
+    }
+    else if (lowerCaseManufacture.contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
+    else if (lowerCaseManufacture.contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("vista")))
+    else if (lowerCaseManufacture.contains(QLatin1String("vista")))
         resource = QnPlOnvifResourcePtr(new QnVistaResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("avigilon")))
+    else if (lowerCaseManufacture.contains(QLatin1String("avigilon")))
         resource = QnPlOnvifResourcePtr(new QnAvigilonResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("pelcooptera")))
+    else if (lowerCaseManufacture.contains(QLatin1String("pelcooptera")))
         resource = QnPlOnvifResourcePtr(new QnOpteraResource(serverModule));
 #ifdef ENABLE_AXIS
-    else if (manufacture.toLower().contains(QLatin1String("axis")))
+    else if (lowerCaseManufacture.contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource(serverModule));
 #endif
-    else if (manufacture.toLower().contains(QLatin1String("hikvision")))
+    else if (lowerCaseManufacture.contains(QLatin1String("hikvision")))
         resource = QnPlOnvifResourcePtr(new HikvisionResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("flir")))
+    else if (lowerCaseManufacture.contains(QLatin1String("flir")))
         resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("vivotek")))
+    else if (lowerCaseManufacture.contains(QLatin1String("vivotek")))
         resource = QnPlOnvifResourcePtr(new VivotekResource(serverModule));
-    else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
+    else if (lowerCaseManufacture.contains(QLatin1String("merit-lilin")))
         resource = QnPlOnvifResourcePtr(new LilinResource(serverModule));
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource(serverModule));

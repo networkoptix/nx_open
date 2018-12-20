@@ -1,17 +1,17 @@
 import {
     Component, OnInit, OnDestroy,
     ViewChild, Inject, Input
-}                                       from '@angular/core';
-import { ActivatedRoute, Router }       from '@angular/router';
-import { Title }                        from '@angular/platform-browser';
-import { DOCUMENT, Location }           from '@angular/common';
-import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
-import { DeviceDetectorService }        from 'ngx-device-detector';
+}                                            from '@angular/core';
+import { ActivatedRoute, Router }            from '@angular/router';
+import { Title }                             from '@angular/platform-browser';
+import { DOCUMENT, Location, TitleCasePipe } from '@angular/common';
+import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
+import { DeviceDetectorService }             from 'ngx-device-detector';
 
 @Component({
-    selector: 'download-component',
+    selector   : 'download-component',
     templateUrl: 'download.component.html',
-    styleUrls: ['download.component.scss']
+    styleUrls  : [ 'download.component.scss' ]
 })
 
 export class DownloadComponent implements OnInit, OnDestroy {
@@ -40,17 +40,17 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.downloads = this.configService.config.downloads;
 
         this.downloadsData = {
-            version: '',
-            installers: [{platform: '', appType: ''}],
+            version   : '',
+            installers: [ { platform: '', appType: '' } ],
             releaseUrl: ''
         };
 
-        this.installers = [{}];
+        this.installers = [ {} ];
 
         this.platformMatch = {
-            unix: 'Linux',
-            linux: 'Linux',
-            mac: 'MacOS',
+            unix   : 'Linux',
+            linux  : 'Linux',
+            mac    : 'MacOS',
             windows: 'Windows'
         };
     }
@@ -60,6 +60,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
                 @Inject('configService') private configService: any,
                 @Inject('account') private account: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
+                @Inject('locationProxyService') private locationProxy: any,
                 @Inject(DOCUMENT) private document: any,
                 private deviceService: DeviceDetectorService,
                 private route: ActivatedRoute,
@@ -72,48 +73,35 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     private detectOS(): string {
-        return this.platformMatch[this.deviceService.getDeviceInfo().os];
+        return this.platformMatch[ this.deviceService.getDeviceInfo().os ];
     }
 
-    private getDownloadersPer(platform: string) {
-        this.cloudApi
-            .getDownloads()
-            .then(data => {
-                this.downloadsData = data.data;
+    private getDownloadsInfo() {
+        this.downloads.groups.forEach(platform => {
+            return platform.installers.filter(installer => {
+                const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
 
-                this.downloads.groups.forEach(platform => {
-                    return platform.installers.filter(installer => {
-                        const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
-
-                            return installer.platform === existingInstaller.platform &&
-                                installer.appType === existingInstaller.appType;
-                        });
-
-                        if (targetInstaller) {
-                            Object.assign(installer, targetInstaller);
-                            installer.formatName = this.language.lang.downloads.platforms[installer.platform] + ' - ' + this.language.lang.downloads.appTypes[installer.appType];
-                            installer.url = this.downloadsData.releaseUrl + installer.path;
-                        }
-                        return !!targetInstaller;
-                    })[0];
+                    return installer.platform === existingInstaller.platform &&
+                        installer.appType === existingInstaller.appType;
                 });
-            });
+
+                if (targetInstaller) {
+                    Object.assign(installer, targetInstaller);
+                    installer.formatName = this.language.lang.downloads.platforms[ installer.platform ] + ' - ' + this.language.lang.downloads.appTypes[ installer.appType ];
+                    installer.url = this.downloadsData.releaseUrl + installer.path;
+                }
+                return !!targetInstaller;
+            })[ 0 ];
+        });
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
-        const platform = $event.nextId;
-
-        if (this.location.path() === '/download/' + platform) {
-            return;
-        }
-
-        // TODO: Repace this once 'register' page is moved to A5
-        // AJS and A5 routers freak out about route change *****
-        // this.router.navigate(['/download', platform]);
-        this.location.go('/download/' + platform);
+        this.getDownloadsInfo();
+        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + $event.nextId);
+        this.locationProxy.path('/download/' + $event.nextId, false);
     }
 
-    private getDownloads () {
+    private getDownloads() {
         // TODO: Commented until we ged rid of AJS
         // this.routeData = this.route.snapshot.data;
 
@@ -124,12 +112,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
             // TODO: Commented until we ged rid of AJS
             // this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
-            this.activeOs = this.platform || this.platformMatch[this.platform];
+            this.activeOs = this.platform || this.platformMatch[ this.platform ];
 
             for (const mobile in this.downloads.mobile) {
-                if (this.downloads.mobile[mobile].os === this.activeOs) {
-                    if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
-                        this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                if (this.downloads.mobile[ mobile ].os === this.activeOs) {
+                    if (this.language.lang.downloads.mobile[ this.downloads.mobile[ mobile ].name ].link !== 'disabled') {
+                        this.document.location.href = this.language.lang.downloads.mobile[ this.downloads.mobile[ mobile ].name ].link;
                         return;
                     }
                     break;
@@ -148,11 +136,17 @@ export class DownloadComponent implements OnInit, OnDestroy {
             }
 
             if (!foundPlatform) {
-                this.downloads.groups[0].active = true;
+                this.downloads.groups[ 0 ].active = true;
             }
         });
 
-        this.getDownloadersPer(this.platform);
+        this.cloudApi
+            .getDownloads()
+            .then(data => {
+                this.downloadsData = data.data;
+                this.getDownloadsInfo();
+            });
+
         this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
 
         setTimeout(() => {
@@ -163,17 +157,13 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (!this.configService.config.publicReleases) {
-            this.account
-                .get()
-                .then(result => {
-                    this.canSeeHistory = (this.configService.config.publicReleases ||
-                        result.is_superuser ||
-                        result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
-                });
-        } else {
-            this.canSeeHistory = true;
-        }
+        this.account
+            .get()
+            .then(result => {
+                this.canSeeHistory = (this.configService.config.publicReleases ||
+                    result.is_superuser ||
+                    result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
+            });
 
         if (!this.configService.config.publicDownloads) {
             this.authorizationService

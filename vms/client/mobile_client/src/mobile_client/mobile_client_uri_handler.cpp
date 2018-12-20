@@ -119,7 +119,7 @@ void QnMobileClientUriHandler::Private::loginToCloudDirectlyInternal(
                 loginToCloud(auth, true, connectHandle);
         };
 
-    const auto credentials = QnEncodedCredentials(auth.user, auth.password);
+    const nx::vms::common::Credentials credentials(auth.user, auth.password);
     cloudStatusWatcher->setCredentials(credentials);
     directCloudConnectionHandle = operationManager->startOperation(callback);
 }

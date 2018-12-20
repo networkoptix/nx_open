@@ -72,12 +72,11 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
             return true;
         };
 
-
     bool status = false;
     {
         QnMutexLocker locker(&m_mutex);
         if ((status = doPresetsAction(createPresetActionFunc, preset)))
-            m_camera->saveParamsAsync();
+            m_camera->savePropertiesAsync();
     }
 
     if (status)
@@ -101,14 +100,13 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
         return true;
     };
 
-
     bool status = false;
     {
         QnMutexLocker locker(&m_mutex);
         if ((status = doPresetsAction(updatePresetActionFunc, preset)))
         {
             NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot update preset since corresponding resource does not exist.");
-            m_camera->saveParamsAsync();
+            m_camera->savePropertiesAsync();
         }
     }
 
@@ -134,7 +132,7 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
         if ((status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString()))))
         {
             NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot remove preset since correspondent resource does not exist.");
-            m_camera->saveParamsAsync();
+            m_camera->savePropertiesAsync();
         }
     }
 
@@ -215,4 +213,3 @@ bool QnPresetPtzController::doPresetsAction(PresetsActionFunc actionFunc, QnPtzP
 
     return true;
 }
-

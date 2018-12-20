@@ -4,7 +4,7 @@
 
 
 QnUpdateStatusRestHandler::QnUpdateStatusRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

@@ -60,6 +60,7 @@
 			<param id = "sysReboot"
 					dataType="Button"
 					name="System Reboot"
+                    availableInOffline="true"
                     confirmation="Are you sure you want to reboot the device?"
 					description="This operation reboots the device."
                     writeCmd ="pravis_reboot_ip"/>

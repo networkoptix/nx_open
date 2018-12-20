@@ -5,7 +5,7 @@
 #include <utils/common/app_info.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -219,5 +219,5 @@ QString HanwhaMappedPresetManager::channel() const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

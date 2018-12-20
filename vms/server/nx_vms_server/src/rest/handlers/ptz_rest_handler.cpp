@@ -41,11 +41,17 @@ QString toString(const QnRequestParams& params)
 }
 
 bool checkUserAccess(
-    const Qn::UserAccessData& accessRights,
-    const QnSecurityCamResourcePtr& camera,
-    Qn::PtzCommand command)
+    const Qn::UserAccessData& accessRights, QnResourcePtr camera, Qn::PtzCommand command)
 {
-    const auto& accessManager = camera->commonModule()->resourceAccessManager();
+    const auto accessManager = camera->commonModule()->resourceAccessManager();
+    if (const auto id = camera->getProperty(ResourcePropertyKey::kPtzTargetId); !id.isEmpty())
+    {
+        if (auto target = camera->resourcePool()->getResourceByUniqueId(id))
+            camera = target;
+        else
+            return false;
+    }
+
     switch (command)
     {
         case Qn::ContinuousMovePtzCommand:
@@ -57,7 +63,7 @@ bool checkUserAccess(
         case Qn::RelativeFocusPtzCommand:
         case Qn::ActivateTourPtzCommand:
         case Qn::UpdateHomeObjectPtzCommand:
-        case Qn::RunAuxilaryCommandPtzCommand:
+        case Qn::RunAuxiliaryCommandPtzCommand:
         case Qn::ActivatePresetPtzCommand:
         {
             if (!accessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
@@ -85,7 +91,7 @@ bool checkUserAccess(
         case Qn::GetToursPtzCommand:
         case Qn::GetActiveObjectPtzCommand:
         case Qn::GetHomeObjectPtzCommand:
-        case Qn::GetAuxilaryTraitsPtzCommand:
+        case Qn::GetAuxiliaryTraitsPtzCommand:
         case Qn::GetDataPtzCommand:
         default:
             return true;
@@ -97,7 +103,7 @@ bool checkUserAccess(
 } // namespace
 
 QnPtzRestHandler::QnPtzRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -309,10 +315,10 @@ int QnPtzRestHandler::executePost(
             return executeUpdateHomeObject(controller, params, result);
         case Qn::GetHomeObjectPtzCommand:
             return executeGetHomeObject(controller, params, result);
-        case Qn::GetAuxilaryTraitsPtzCommand:
-            return executeGetAuxilaryTraits(controller, params, result);
-        case Qn::RunAuxilaryCommandPtzCommand:
-            return executeRunAuxilaryCommand(controller, params, result);
+        case Qn::GetAuxiliaryTraitsPtzCommand:
+            return executeGetAuxiliaryTraits(controller, params, result);
+        case Qn::RunAuxiliaryCommandPtzCommand:
+            return executeRunAuxiliaryCommand(controller, params, result);
         case Qn::GetDataPtzCommand:
             return executeGetData(controller, params, result);
         default:
@@ -703,29 +709,29 @@ int QnPtzRestHandler::executeGetHomeObject(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnPtzRestHandler::executeGetAuxilaryTraits(
+int QnPtzRestHandler::executeGetAuxiliaryTraits(
     const QnPtzControllerPtr& controller,
     const QnRequestParams& params,
     QnJsonRestResult& result)
 {
-    QnPtzAuxilaryTraitList traits;
+    QnPtzAuxiliaryTraitList traits;
     nx::core::ptz::Options options;
 
     requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
 
-    if (!controller->getAuxilaryTraits(&traits, options))
+    if (!controller->getAuxiliaryTraits(&traits, options))
         return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(traits);
     return nx::network::http::StatusCode::ok;
 }
 
-int QnPtzRestHandler::executeRunAuxilaryCommand(
+int QnPtzRestHandler::executeRunAuxiliaryCommand(
     const QnPtzControllerPtr& controller,
     const QnRequestParams& params,
     QnJsonRestResult& result)
 {
-    QnPtzAuxilaryTrait trait;
+    QnPtzAuxiliaryTrait trait;
     QString data;
     nx::core::ptz::Options options;
 
@@ -739,7 +745,7 @@ int QnPtzRestHandler::executeRunAuxilaryCommand(
         return nx::network::http::StatusCode::unprocessableEntity;
     }
 
-    if (!controller->runAuxilaryCommand(trait, data, options))
+    if (!controller->runAuxiliaryCommand(trait, data, options))
         return nx::network::http::StatusCode::internalServerError;
 
     return nx::network::http::StatusCode::ok;

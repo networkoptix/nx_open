@@ -12,10 +12,10 @@
 #include <utils/common/synctime.h>
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/server_failure_event.h>
-#include <nx/mediaserver/event/event_connector.h>
-#include <nx/mediaserver/event/rule_processor.h>
+#include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/event/rule_processor.h>
 #include "media_server_module.h"
-#include <nx/mediaserver/event/extended_rule_processor.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 
 namespace {
 

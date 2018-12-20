@@ -9,26 +9,25 @@
 #include <recording/time_period_list.h>
 
 namespace {
+
 #ifdef _DEBUG
-    const qint64 bigDataTestsLimitMs = 5000;
+    const qint64 kBigDataTestsLimitMs = 5000;
 #else
-    const qint64 bigDataTestsLimitMs = 2000;
+    const qint64 kBigDataTestsLimitMs = 2000;
 #endif
-}
 
-void PrintTo(const QnTimePeriod& period, ::std::ostream* os) {
-    const QString fmt = "%1 - %2";
-    QString result;
-    if (!period.isInfinite())
-        result = fmt.arg(period.startTimeMs).arg(period.endTimeMs());
-    else
-        result = fmt.arg(period.startTimeMs).arg("Inf");
-    *os << result.toStdString();
-}
+static const qint64 kTwoMonthMs = 1000ll * 60 * 60 * 24 * 60;
+static const qint64 kChunkLengthMs = 1000ll * 60; //< One minute each.
+static const qint64 kChunkSpaceMs = 1000ll * 5; //< 5 seconds spacing.
+static const  int kMergingListsCount = 10;
 
-void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
+} // namespace
+
+void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os)
+{
     const QString fmt = "{%1 - %2} ";
-    for (const QnTimePeriod &period: periodList) {
+    for (const QnTimePeriod &period: periodList)
+    {
         QString result;
         if (!period.isInfinite())
             result = fmt.arg(period.startTimeMs).arg(period.endTimeMs());
@@ -38,17 +37,12 @@ void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
     }
 }
 
-static const qint64 kTwoYearsMs = 1000ll * 60 * 60 * 24 * 365 * 2;
-static const qint64 kTwoMonthMs = 1000ll * 60 * 60 * 24 * 60;
-static const qint64 kChunkLengthMs = 1000ll * 60; //< One minute each.
-static const qint64 kChunkSpaceMs = 1000ll * 5; //< 5 seconds spacing.
-static const  int kMergingListsCount = 10;
+namespace test {
 
 TEST( QnTimePeriodsListTest, mergeBigData )
 {
     std::vector<QnTimePeriodList> lists;
-    for (int i = 0; i < kMergingListsCount; ++i)
-        lists.push_back(QnTimePeriodList());
+    lists.resize(kMergingListsCount);
 
     QnTimePeriodList resultPeriods;
 
@@ -66,11 +60,11 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     QElapsedTimer t;
     t.start();
     QnTimePeriodList merged = QnTimePeriodList::mergeTimePeriods(lists);
-    qint64 elapsed =  t.elapsed();
+    const qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, merged);
     if (!nx::utils::AppInfo::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
-        ASSERT_LE(elapsed, bigDataTestsLimitMs);
+        ASSERT_LE(elapsed, kBigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
@@ -100,19 +94,19 @@ TEST( QnTimePeriodsListTest, unionBigData )
 
     ASSERT_EQ(resultPeriods, lists[0]);
     if (!nx::utils::AppInfo::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
-        ASSERT_LE(elapsed, bigDataTestsLimitMs);
+        ASSERT_LE(elapsed, kBigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBySameChunk )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(12, 1) << QnTimePeriod(30, 5);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -122,13 +116,13 @@ TEST( QnTimePeriodsListTest, unionBySameChunk )
 TEST( QnTimePeriodsListTest, unionByAppending )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(12, 5) << QnTimePeriod(30, 7);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(10, 7) << QnTimePeriod(20, 5) << QnTimePeriod(30, 7) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    resultList << QnTimePeriod(10, 7) << QnTimePeriod(20, 5) << QnTimePeriod(30, 7) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -138,13 +132,21 @@ TEST( QnTimePeriodsListTest, unionByAppending )
 TEST( QnTimePeriodsListTest, unionByPrepending )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList
+        << QnTimePeriod(10, 5)
+        << QnTimePeriod(20, 5)
+        << QnTimePeriod(30, 5)
+        << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(8, 5) << QnTimePeriod(28, 7);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(8, 7) << QnTimePeriod(20, 5) << QnTimePeriod(28, 7) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    resultList
+        << QnTimePeriod(8, 7)
+        << QnTimePeriod(20, 5)
+        << QnTimePeriod(28, 7)
+        << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -154,13 +156,13 @@ TEST( QnTimePeriodsListTest, unionByPrepending )
 TEST( QnTimePeriodsListTest, unionByExtending )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(8, 9) << QnTimePeriod(18, 9);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(8, 9) << QnTimePeriod(18, 9) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    resultList << QnTimePeriod(8, 9) << QnTimePeriod(18, 9) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -170,13 +172,13 @@ TEST( QnTimePeriodsListTest, unionByExtending )
 TEST( QnTimePeriodsListTest, unionByCombining )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(12, 10) << QnTimePeriod(25, 5);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(10, 25) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    resultList << QnTimePeriod(10, 25) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     std::vector<QnTimePeriodList> periods;
     periods.push_back(sourceList);
@@ -192,7 +194,7 @@ TEST( QnTimePeriodsListTest, unionByCombining )
 TEST( QnTimePeriodsListTest, unionByCombiningSeveral )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(5, 30);
@@ -229,7 +231,7 @@ TEST( QnTimePeriodsListTest, unionByLimits )
 TEST( QnTimePeriodsListTest, serializationUnsigned )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QByteArray serialized;
     sourceList.encode(serialized);
@@ -273,15 +275,15 @@ TEST( QnTimePeriodsListTest, overwriteTailEmpty )
 TEST( QnTimePeriodsListTest, overwriteTailByPeriodStart )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList tail;
-    tail << QnTimePeriod(40, 5) << QnTimePeriod(50, QnTimePeriod::infiniteDuration());
+    tail << QnTimePeriod(40, 5) << QnTimePeriod(50, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::overwriteTail(sourceList, tail, 40);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5) << QnTimePeriod(50, QnTimePeriod::infiniteDuration());
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5) << QnTimePeriod(50, QnTimePeriod::kInfiniteDuration);
 
     ASSERT_EQ(resultList, sourceList);
 }
@@ -289,7 +291,7 @@ TEST( QnTimePeriodsListTest, overwriteTailByPeriodStart )
 TEST( QnTimePeriodsListTest, overwriteTailByTrimLive )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList tail;
 
@@ -304,15 +306,15 @@ TEST( QnTimePeriodsListTest, overwriteTailByTrimLive )
 TEST( QnTimePeriodsListTest, overwriteTailByTrimLiveAndAppend )
 {
     QnTimePeriodList sourceList;
-    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList tail;
-    tail << QnTimePeriod(55, QnTimePeriod::infiniteDuration());
+    tail << QnTimePeriod(55, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::overwriteTail(sourceList, tail, 50);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::infiniteDuration());;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::kInfiniteDuration);;
 
     ASSERT_EQ(resultList, sourceList);
 }
@@ -323,12 +325,12 @@ TEST( QnTimePeriodsListTest, overwriteTailByTrimAndAppend )
     sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 20);
 
     QnTimePeriodList tail;
-    tail << QnTimePeriod(55, QnTimePeriod::infiniteDuration());
+    tail << QnTimePeriod(55, QnTimePeriod::kInfiniteDuration);
 
     QnTimePeriodList::overwriteTail(sourceList, tail, 50);
 
     QnTimePeriodList resultList;
-    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::infiniteDuration());;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::kInfiniteDuration);;
 
     ASSERT_EQ(resultList, sourceList);
 }
@@ -613,15 +615,15 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsAsc)
         checkLists(expectedList, result);
     }
 
-    data.last().durationMs = QnTimePeriod::infiniteDuration();
+    data.last().durationMs = QnTimePeriod::kInfiniteDuration;
     result = data.filterTimePeriods(itr, endItr, /*detail level*/ 6, true, 100, Qt::SortOrder::AscendingOrder);
     ASSERT_EQ(5, result.size());
-    ASSERT_EQ(QnTimePeriod::infiniteDuration(), result.last().durationMs);
+    ASSERT_EQ(QnTimePeriod::kInfiniteDuration, result.last().durationMs);
 
     result = data.filterTimePeriods(
         itr, endItr, /*detail level*/ 6, false, 100, Qt::SortOrder::AscendingOrder);
     ASSERT_EQ(4, result.size());
-    ASSERT_EQ(QnTimePeriod::infiniteDuration(), result.last().durationMs);
+    ASSERT_EQ(QnTimePeriod::kInfiniteDuration, result.last().durationMs);
 
 }
 
@@ -674,13 +676,13 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsDesc)
         checkLists(expectedList, result);
     }
 
-    data.last().durationMs = QnTimePeriod::infiniteDuration();
+    data.last().durationMs = QnTimePeriod::kInfiniteDuration;
     result = data.filterTimePeriods(itr, endItr, /*detail level*/ 6, true, 100, Qt::SortOrder::DescendingOrder);
 
     {
         QnTimePeriodList expectedList;
         expectedList
-            << QnTimePeriod(100, QnTimePeriod::infiniteDuration())
+            << QnTimePeriod(100, QnTimePeriod::kInfiniteDuration)
             << QnTimePeriod(85, 4)
             << QnTimePeriod(52, 20)
             << QnTimePeriod(32, 10)
@@ -692,11 +694,12 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsDesc)
     {
         QnTimePeriodList expectedList;
         expectedList
-            << QnTimePeriod(100, QnTimePeriod::infiniteDuration())
+            << QnTimePeriod(100, QnTimePeriod::kInfiniteDuration)
             << QnTimePeriod(52, 20)
             << QnTimePeriod(32, 10)
             << QnTimePeriod(15, 11);
         checkLists(expectedList, result);
     }
-
 }
+
+} // namespace test

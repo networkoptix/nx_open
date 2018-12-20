@@ -66,6 +66,7 @@ private:
 
 private:
     bool m_visible = false;
+    bool m_blockAction = false;
 
     /** If we are currently in the resize process. */
     bool m_resizing = false;

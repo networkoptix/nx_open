@@ -16,7 +16,8 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -63,7 +64,7 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
     {
         m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindowWidget());
         m_loginToCloudDialog->setLogin(
-            nx::vms::client::core::secureSettings()->cloudCredentials().user);
+            nx::vms::client::core::settings()->cloudCredentials().user);
         m_loginToCloudDialog->show();
 
         connect(m_loginToCloudDialog, &QnLoginToCloudDialog::finished, this,
@@ -79,11 +80,12 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    nx::vms::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
-        nx::vms::client::core::secureSettings()->cloudCredentials().user, QString());
-    /* Updating login if were logged under temporary credentials. */
-    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
-        qnCloudStatusWatcher->effectiveUserName(), QString()));
+    nx::vms::client::core::settings()->cloudCredentials = {
+        nx::vms::client::core::settings()->cloudCredentials().user, QString()};
+
+    // Updating login if were logged under temporary credentials.
+    qnCloudStatusWatcher->setCredentials({
+        qnCloudStatusWatcher->effectiveUserName(), QString()});
 }
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()

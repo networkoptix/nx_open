@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             Ihr Konto wurde erfolgreich aktiviert
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">Einloggen</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             Account ist bereits aktiviert oder der Bestätigungscode ist falsch
         </h1>
     </div>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email ist erforderlich</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">E-Mail ist erforderlich</span>
                     <span class="help-block input-error"
                           ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Geben Sie bitte eine gültige Email an</span>
                 </div>
@@ -80,7 +80,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-Mail ist erforderlich</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email ist erforderlich</span>
                     <span class="help-block input-error"
                           ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Geben Sie bitte eine gültige Email an</span>
                 </div>

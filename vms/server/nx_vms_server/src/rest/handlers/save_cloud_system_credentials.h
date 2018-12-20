@@ -2,7 +2,7 @@
 
 #include <core/resource_access/user_access_data.h>
 #include <rest/server/json_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 struct CloudCredentialsData;
 namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
@@ -10,7 +10,7 @@ class QnCommonModule;
 
 class QnSaveCloudSystemCredentialsHandler:
     public QnJsonRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

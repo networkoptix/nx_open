@@ -37,7 +37,7 @@ inline bool operator<(const QSize& lhs, const QSize& rhs)
 }
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 using HanwhaProfileNumber = int;
@@ -119,7 +119,6 @@ T fromHanwhaString(const QString& str)
         || std::is_same<T, HanwhaMediaType>::value
         || std::is_same<T, HanwhaStreamingMode>::value
         || std::is_same<T, HanwhaStreamingType>::value
-        || std::is_same<T, HanwhaTransportProtocol>::value
         || std::is_same<T, HanwhaClientType>::value,
         "No specialization for type");
 }
@@ -161,9 +160,6 @@ template<>
 HanwhaStreamingType fromHanwhaString(const QString& str);
 
 template<>
-HanwhaTransportProtocol fromHanwhaString(const QString& str);
-
-template<>
 HanwhaClientType fromHanwhaString(const QString& str);
 
 QString toHanwhaString(bool value);
@@ -186,8 +182,6 @@ QString toHanwhaString(HanwhaStreamingMode streamingMode);
 
 QString toHanwhaString(HanwhaStreamingType encodingPriority);
 
-QString toHanwhaString(HanwhaTransportProtocol codecId);
-
 QString toHanwhaString(HanwhaClientType entropyCoding);
 
 bool areaComparator(const QString& lhs, const QString& rhs);
@@ -199,5 +193,5 @@ qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZo
 QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift);
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

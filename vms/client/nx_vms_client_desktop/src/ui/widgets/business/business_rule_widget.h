@@ -71,6 +71,8 @@ private slots:
 
     void updateModelAggregationPeriod();
 
+    void updateWarningLabel();
+
 private:
     void retranslateUi();
 

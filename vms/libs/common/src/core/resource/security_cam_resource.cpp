@@ -89,39 +89,39 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedCameraCapabilities(
         [this]()->Qn::CameraCapabilities {
             return static_cast<Qn::CameraCapabilities>(
-                getProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME).toInt()); },
+                getProperty(ResourcePropertyKey::kCameraCapabilities).toInt()); },
         &m_mutex ),
     m_cachedIsDtsBased(
-        [this]()->bool{ return getProperty(Qn::DTS_PARAM_NAME).toInt() > 0; },
+        [this]()->bool{ return getProperty(ResourcePropertyKey::kDts).toInt() > 0; },
         &m_mutex ),
     m_motionType(
         std::bind( &QnSecurityCamResource::calculateMotionType, this ),
         &m_mutex ),
     m_cachedIsIOModule(
-        [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
+        [this]()->bool{ return getProperty(ResourcePropertyKey::kIoConfigCapability).toInt() > 0; },
         &m_mutex),
     m_cachedCanConfigureRemoteRecording(
-        [this]() { return getProperty(Qn::kCanConfigureRemoteRecording).toInt() > 0; },
+        [this]() { return getProperty(ResourcePropertyKey::kCanConfigureRemoteRecording).toInt() > 0; },
         &m_mutex),
     m_cachedCameraMediaCapabilities(
         [this]()
         {
             return QJson::deserialized<nx::media::CameraMediaCapability>(
-                getProperty(nx::media::kCameraMediaCapabilityParamName).toUtf8());
+                getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
         },
         &m_mutex),
     m_cachedDeviceType(
         [this]()
         {
             return QnLexical::deserialized<nx::core::resource::DeviceType>(
-                getProperty(Qn::kDeviceType),
+                getProperty(ResourcePropertyKey::kDeviceType),
                 nx::core::resource::DeviceType::unknown);
         },
         &m_mutex),
     m_cachedHasVideo(
         [this]()
         {
-            return !resourceData().value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+            return !resourceData().value(ResourceDataKey::kNoVideoSupport, false);
         },
         &m_mutex)
 {
@@ -148,17 +148,28 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         this, &QnSecurityCamResource::at_motionRegionChanged,
         Qt::DirectConnection);
 
-    connect(this, &QnNetworkResource::propertyChanged, this,
+    connect(this, &QnNetworkResource::propertyChanged,
         [this](const QnResourcePtr& /*resource*/, const QString& key)
         {
-            if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
+            if (key == ResourcePropertyKey::kCameraCapabilities)
+            {
                 emit capabilitiesChanged(toSharedPointer());
-
-            if (key == Qn::DTS_PARAM_NAME)
+            }
+            else if (key == ResourcePropertyKey::kDts)
+            {
                 emit licenseTypeChanged(toSharedPointer(this));
-
-            if (key == Qn::kDeviceType)
+            }
+            else if (key == ResourcePropertyKey::kDeviceType)
+            {
                 emit licenseTypeChanged(toSharedPointer(this));
+            }
+            else if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
+                || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
+                || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
+                || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities)
+            {
+                emit ptzConfigurationChanged(toSharedPointer(this));
+            }
         });
 
     QnMediaResource::initMediaResource();
@@ -185,7 +196,7 @@ bool QnSecurityCamResource::setProperty(
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
-    return hasParam(Qn::kGroupPlayParamName);
+    return hasDefaultProperty(ResourcePropertyKey::kGroupPlayParamName);
 }
 
 bool QnSecurityCamResource::needsToChangeDefaultPassword() const
@@ -255,10 +266,20 @@ int QnSecurityCamResource::getMaxFps() const
         return result;
 
     // Compatibility with version < 3.1.2
-    QString value = getProperty(Qn::MAX_FPS_PARAM_NAME);
+    QString value = getProperty(ResourcePropertyKey::kMaxFps);
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 
+void QnSecurityCamResource::setMaxFps(int fps)
+{
+    nx::media::CameraMediaCapability capability = cameraMediaCapability();
+    capability.streamCapabilities[Qn::StreamIndex::primary].maxFps = fps;
+
+    // We use direct setProperty() call instead of setCameraMediaCapability(),
+    // because setMaxFps function should not save parameters.
+    setProperty(ResourcePropertyKey::kMediaCapabilities,
+        QString::fromLatin1(QJson::serialized(capability)));
+}
 int QnSecurityCamResource::reservedSecondStreamFps() const
 {
     QString value = getProperty(lit("reservedSecondStreamFps"));
@@ -436,9 +457,9 @@ nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() 
 void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMediaCapability& value)
 {
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName, QString::fromLatin1(QJson::serialized(value)));
+        ResourcePropertyKey::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
     m_cachedCameraMediaCapabilities.reset();
-    saveParams();
+    saveProperties();
 }
 
 bool QnSecurityCamResource::hasDualStreamingInternal() const
@@ -448,7 +469,7 @@ bool QnSecurityCamResource::hasDualStreamingInternal() const
         return true;
 
     // Compatibility with version < 3.1.2
-    QString val = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kHasDualStreaming);
     return val.toInt() > 0;
 }
 
@@ -464,7 +485,7 @@ bool QnSecurityCamResource::canConfigureRecording() const
 
 bool QnSecurityCamResource::isAnalog() const
 {
-    QString val = getProperty(Qn::ANALOG_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kAnalog);
     return val.toInt() > 0;
 }
 
@@ -478,14 +499,14 @@ bool QnSecurityCamResource::isAnalogEncoder() const
 
 CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
 {
-    const auto& value = getProperty(Qn::kCombinedSensorsDescriptionParamName);
+    const auto& value = getProperty(ResourcePropertyKey::kCombinedSensorsDescription);
     return QJson::deserialized<CombinedSensorsDescription>(value.toLatin1());
 }
 
 void QnSecurityCamResource::setCombinedSensorsDescription(
     const CombinedSensorsDescription& sensorsDescription)
 {
-    setProperty(Qn::kCombinedSensorsDescriptionParamName,
+    setProperty(ResourcePropertyKey::kCombinedSensorsDescription,
         QString::fromLatin1(QJson::serialized(sensorsDescription)));
 }
 
@@ -501,7 +522,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
 
-    return resourceData().value<bool>(Qn::kCanShareLicenseGroup, false);
+    return resourceData().value<bool>(ResourceDataKey::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -527,7 +548,7 @@ void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceT
 {
     m_cachedDeviceType.reset();
     m_cachedLicenseType.reset();
-    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
+    setProperty(ResourcePropertyKey::kDeviceType, QnLexical::serialized(deviceType));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -536,7 +557,7 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
-    QString sval = getProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME);
+    QString sval = getProperty(ResourcePropertyKey::kStreamFpsSharing);
     if (sval.isEmpty())
         return kDefaultStreamFpsSharingMethod;
 
@@ -552,13 +573,13 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     switch( value )
     {
         case Qn::BasicFpsSharing:
-            setProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"));
+            setProperty(ResourcePropertyKey::kStreamFpsSharing, lit("shareFps"));
             break;
         case Qn::NoFpsSharing:
-            setProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"));
+            setProperty(ResourcePropertyKey::kStreamFpsSharing, lit("noSharing"));
             break;
         default:
-            setProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"));
+            setProperty(ResourcePropertyKey::kStreamFpsSharing, lit("sharePixels"));
             break;
     }
 }
@@ -596,7 +617,7 @@ bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, boo
         hasOutputs |= supportedTypes & Qn::PT_Output;
     }
 
-    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(newPorts)));
+    setProperty(ResourcePropertyKey::kIoSettings, QString::fromUtf8(QJson::serialized(newPorts)));
     setCameraCapability(Qn::InputPortCapability, hasInputs);
     setCameraCapability(Qn::OutputPortCapability, hasOutputs);
     return wasDataMerged;
@@ -605,7 +626,7 @@ bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, boo
 QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
 {
     auto ports = QJson::deserialized<QnIOPortDataList>(
-        getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+        getProperty(ResourcePropertyKey::kIoSettings).toUtf8());
 
     if (type != Qn::PT_Unknown)
         nx::utils::remove_if(ports, [&](auto p) { return p.portType != type; });
@@ -635,19 +656,19 @@ void QnSecurityCamResource::at_motionRegionChanged()
 
 int QnSecurityCamResource::motionWindowCount() const
 {
-    QString val = getProperty(Qn::MOTION_WINDOW_CNT_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kMotionWindowCnt);
     return val.toInt();
 }
 
 int QnSecurityCamResource::motionMaskWindowCount() const
 {
-    QString val = getProperty(Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kMotionMaskWindowCnt);
     return val.toInt();
 }
 
 int QnSecurityCamResource::motionSensWindowCount() const
 {
-    QString val = getProperty(Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kMotionSensWindowCnt);
     return val.toInt();
 }
 
@@ -663,7 +684,7 @@ bool QnSecurityCamResource::isAudioSupported() const
         return true;
 
     // Compatibility with version < 3.1.2
-    QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kIsAudioSupported);
     return val.toInt() > 0;
 }
 
@@ -737,7 +758,7 @@ bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabil
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities)
 {
-    setProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+    setProperty(ResourcePropertyKey::kCameraCapabilities, static_cast<int>(capabilities));
     m_cachedCameraCapabilities.reset();
 }
 
@@ -858,24 +879,23 @@ void QnSecurityCamResource::setModel(const QString &model)
 
 QString QnSecurityCamResource::getFirmware() const
 {
-    return getProperty(Qn::FIRMWARE_PARAM_NAME);
+    return getProperty(ResourcePropertyKey::kFirmware);
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
+    setProperty(ResourcePropertyKey::kFirmware, firmware);
 }
 
 bool QnSecurityCamResource::trustCameraTime() const
 {
-    return QnLexical::deserialized<bool>(getProperty(Qn::TRUST_CAMERA_TIME_NAME));
+    return QnLexical::deserialized<bool>(getProperty(ResourcePropertyKey::kTrustCameraTime));
 }
 
 void QnSecurityCamResource::setTrustCameraTime(bool value)
 {
-    setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
+    setProperty(ResourcePropertyKey::kTrustCameraTime, boolToPropertyStr(value));
 }
-
 
 QString QnSecurityCamResource::getVendor() const
 {
@@ -1037,7 +1057,7 @@ void QnSecurityCamResource::setAudioEnabled(bool enabled)
 
 bool QnSecurityCamResource::isAudioForced() const
 {
-    return getProperty(Qn::IS_AUDIO_FORCED_PARAM_NAME).toInt() > 0;
+    return getProperty(ResourcePropertyKey::kForcedAudioStream).toInt() > 0;
 }
 
 bool QnSecurityCamResource::isAudioEnabled() const
@@ -1271,7 +1291,7 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
 Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const
 {
-    QString val = getProperty(Qn::SUPPORTED_MOTION_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kSupportedMotion);
     if (val.isEmpty())
         return Qn::MotionType::MT_SoftwareGrid;
 
@@ -1309,12 +1329,11 @@ void QnSecurityCamResource::resetCachedValues()
 
 bool QnSecurityCamResource::useBitratePerGop() const
 {
-    auto result = getProperty(Qn::FORCE_BITRATE_PER_GOP);
+    auto result = getProperty(ResourcePropertyKey::kBitratePerGOP);
     if (!result.isEmpty())
         return result.toInt() > 0;
 
-    return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
-    return false;
+    return resourceData().value<bool>(ResourceDataKey::kBitratePerGOP);
 }
 
 bool QnSecurityCamResource::isIOModule() const
@@ -1380,48 +1399,48 @@ nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
 nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() const
 {
     return QnLexical::deserialized(
-        getProperty(Qn::kUserPreferredPtzPresetType),
+        getProperty(ResourcePropertyKey::kUserPreferredPtzPresetType),
         nx::core::ptz::PresetType::undefined);
 }
 
 void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
 {
-    setProperty(Qn::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
+    setProperty(ResourcePropertyKey::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
 nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType() const
 {
     return QnLexical::deserialized(
-        getProperty(Qn::kDefaultPreferredPtzPresetType),
+        getProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType),
         nx::core::ptz::PresetType::native);
 }
 
 void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
 {
-    setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
+    setProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
 bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilities() const
 {
-    return QnLexical::deserialized(getProperty(Qn::kUserIsAllowedToOverridePtzCapabilities), false);
+    return QnLexical::deserialized(getProperty(ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities), false);
 }
 
 void QnSecurityCamResource::setIsUserAllowedToModifyPtzCapabilities(bool allowed)
 {
     setProperty(
-        Qn::kUserIsAllowedToOverridePtzCapabilities,
+        ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities,
         QnLexical::serialized(allowed));
 }
 
 Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesAddedByUser() const
 {
     return QnLexical::deserialized<Ptz::Capabilities>(
-        getProperty(Qn::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
+        getProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
 }
 
 void QnSecurityCamResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
 {
-    setProperty(Qn::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
+    setProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
 }
 
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const

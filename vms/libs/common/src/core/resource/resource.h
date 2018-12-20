@@ -8,6 +8,7 @@
 
 #include <api/model/kvpair.h>
 
+#include <nx/utils/url.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
 
@@ -106,10 +107,11 @@ public:
 
     // ==================================================
 
-    bool hasParam(const QString &name) const;
+    nx::utils::Url url() const;
+    void setUrl(const nx::utils::Url& url);
 
-    virtual QString getUrl() const;
-    virtual void setUrl(const QString &url);
+    virtual QString getUrl() const; //< Unsafe, deprecated. url() should be used instead.
+    virtual void setUrl(const QString &url); //< Unsafe, deprecated. setUrl() should be used instead.
 
     virtual int logicalId() const;
     virtual void setLogicalId(int value);
@@ -117,6 +119,9 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
     virtual bool isInitialized() const;
+    virtual bool isInitializationInProgress() const;
+
+    bool hasDefaultProperty(const QString &name) const;
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway
@@ -158,11 +163,12 @@ public:
         return setProperty(key, update(getProperty(key)));
     }
 
-    //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
+    //!Call this with proper field names to emit corresponding *changed signals.
+    // Signal can be defined in a derived class.
     void emitModificationSignals(const QSet<QByteArray>& modifiedFields);
 
-    virtual bool saveParams();
-    virtual int saveParamsAsync();
+    virtual bool saveProperties();
+    virtual int savePropertiesAsync();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
@@ -214,8 +220,6 @@ private:
 
     bool emitDynamicSignal(const char *signal, void **arguments);
 
-    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
-
     bool useLocalProperties() const;
 
     friend class InitAsyncTask;
@@ -265,7 +269,7 @@ private:
         }
     };
 
-    /** Resource pool this this resource belongs to. */
+    /** Resource pool this resource belongs to. */
     QnResourcePool* m_resourcePool = nullptr;
 
     /** Identifier of this resource. */
@@ -277,7 +281,7 @@ private:
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags = 0;
 
-    bool m_initialized = false;
+    std::atomic<bool> m_initialized{false};
     static QnMutex m_initAsyncMutex;
 
     qint64 m_lastInitTime = 0;
@@ -287,7 +291,7 @@ private:
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_initInProgress = false;
+    std::atomic<bool> m_initInProgress{false};
     QnCommonModule* m_commonModule;
 };
 

@@ -348,7 +348,7 @@ void QnUserManagementWidget::applyChanges()
         if (messages::Resources::deleteResources(this, usersToDelete))
         {
             qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-                [this](bool success)
+                [this](bool /*success*/)
                 {
                     setEnabled(true);
                     emit hasChangesChanged();
@@ -382,7 +382,7 @@ void QnUserManagementWidget::modelUpdated()
 {
     ui->usersTable->setColumnHidden(QnUserListModel::UserTypeColumn,
         !boost::algorithm::any_of(visibleUsers(),
-            [this](const QnUserResourcePtr& user)
+            [](const QnUserResourcePtr& user)
             {
                 return !user->isLocal();
             }));

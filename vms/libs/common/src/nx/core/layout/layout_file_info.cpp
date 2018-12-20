@@ -1,7 +1,9 @@
 #include "layout_file_info.h"
 
 #include <exception>
+
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
 #include <utils/crypt/crypted_file_stream.h>
 

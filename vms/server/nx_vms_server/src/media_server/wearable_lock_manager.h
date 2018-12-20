@@ -5,7 +5,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include <common/common_module_aware.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 struct QnWearableLockInfo
 {
@@ -13,7 +13,7 @@ struct QnWearableLockInfo
     QnUuid userId;
 };
 
-class QnWearableLockManager: public QObject, public nx::mediaserver::ServerModuleAware
+class QnWearableLockManager: public QObject, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

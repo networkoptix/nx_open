@@ -1,20 +1,20 @@
 #include "rtp_stream_reader.h"
 #if defined(ENABLE_DATA_PROVIDERS)
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/utils/log/log.h>
 
 static const size_t kPacketCountToOmitLog = 50;
 
 QnRtpStreamReader::QnRtpStreamReader(
-    const nx::mediaserver::resource::CameraPtr& res,
+    const nx::vms::server::resource::CameraPtr& res,
     const QString& request)
     :
     CLServerPushStreamReader(res),
     m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
-    m_rtpTransport(RtpTransport::_auto),
+    m_rtpTransport(RtspTransport::autoDetect),
     m_camera(res)
 {
 }
@@ -24,7 +24,7 @@ QnRtpStreamReader::~QnRtpStreamReader()
     stop();
 }
 
-void QnRtpStreamReader::setRtpTransport(const RtpTransport::Value& transport)
+void QnRtpStreamReader::setRtpTransport(const RtspTransport& transport)
 {
     m_rtpTransport = transport;
 }

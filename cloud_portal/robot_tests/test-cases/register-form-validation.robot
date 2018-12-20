@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Suite Setup       Open Browser and go to URL    ${url}/register
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Restart
@@ -66,7 +65,7 @@ Smiley Password ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★      mark        hamil
     [tags]    C41860
 Glyph Password 您都可以享受源源不絕的好禮及優惠    mark        hamill      ${valid email}            ${GLYPH TEXT}               True
     [tags]    C41860
-TM Password qweasdzxc123®™       mark        hamill      ${valid email}            ${TM TEXT}                  True
+TM Password qweasdzxc123®™                mark        hamill      ${valid email}            ${TM TEXT}                  True
     [tags]    C41860
 Leading Space Password                    mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}    True
     [tags]    C41860
@@ -85,8 +84,10 @@ Invalid Last Name                         mark        ${SPACE}    ${valid email}
 Empty Last Name                           mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41556
 Invalid All                               ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}           True
+    [tags]    C41556
 Terms Unchecked                           mark        hamill      ${valid email}            ${BASE PASSWORD}            False
-Empty All                                 ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    True
+    [tags]    C41556
+Empty All                                 ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    False
     [tags]    C41556
 
 *** Keywords ***
@@ -96,9 +97,12 @@ Restart
 
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}    ${checked}
+    Reload Page
+    Elements Should Not Be Visible    ${EMAIL INVALID}    ${EMAIL ALREADY REGISTERED}    ${EMAIL IS REQUIRED}    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,"has-error")]
+    ...                               ${PASSWORD BADGE}    ${PASSWORD IS REQUIRED}    ${PASSWORD TOO SHORT}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid ')]
+    ...                               ${FIRST NAME IS REQUIRED}    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${LAST NAME IS REQUIRED}    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${TERMS AND CONDITIONS ERROR}
     # These two lines are because Hebrew has double quotes in its text.
     # This makes for issues with strings in xpaths.  These lines convert to single quotes if the language is Hebrew
-    Reload Page
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL INVALID}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email" and contains(text(),'${EMAIL INVALID TEXT}')]
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
@@ -107,18 +111,17 @@ Test Register Invalid
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
-    Run Keyword Unless    "${checked}"=="True"    Check Terms and Conditions
-    Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
-
+    Run Keyword Unless    "${checked}"=="True"    Check Terms and Conditions Error
 
 Register Form Validation
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
+    Click Element    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Run Keyword If    '''${password}'''!='''${EMPTY}'''     Check Password Badge    ${password}
-    Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}
     Sleep    .1    #On Ubuntu it was going too fast
     click button    ${CREATE ACCOUNT BUTTON}
 
@@ -158,5 +161,5 @@ Check Last Name Outline
     Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
-Check Terms and Conditions
+Check Terms and Conditions Error
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS ERROR}

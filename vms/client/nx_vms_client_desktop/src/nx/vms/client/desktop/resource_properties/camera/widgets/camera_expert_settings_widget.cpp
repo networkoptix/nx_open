@@ -209,7 +209,10 @@ CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
 
 void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
-    // Camera settings.
+    // Disable unactual controls leaving only Logical Id for dts, wearable cameras or i/o modules.
+    ui->leftWidget->setEnabled(state.supportsVideoStreamControl());
+    ui->groupBoxArchive->setEnabled(state.supportsVideoStreamControl());
+    ui->groupBoxRTP->setEnabled(state.supportsVideoStreamControl());
 
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
     const bool hasDualStreaming =
@@ -438,7 +441,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // Reset to defaults.
 
-    ui->restoreDefaultsButton->setEnabled(!state.isDefaultExpertSettings);
+    ui->restoreDefaultsButton->setEnabled(!state.isDefaultExpertSettings
+        && state.supportsVideoStreamControl());
     ::setReadOnly(ui->restoreDefaultsButton, state.readOnly);
 
     // Force important layout change propagation.

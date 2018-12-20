@@ -32,7 +32,7 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
 QnPlAreconVisionResource::QnPlAreconVisionResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_totalMdZones(64),
     m_zoneSite(8),
     m_dualsensor(false),
@@ -159,10 +159,10 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
@@ -228,7 +228,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
         setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
-    saveParams();
+    saveProperties();
 
     setApiParameter(lit("mdzonesize"), QString::number(zone_size));
     m_zoneSite = zone_size;
@@ -539,7 +539,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMed
 
 bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 {
-    QString layoutStr = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    QString layoutStr = resType->defaultValue(ResourcePropertyKey::kVideoLayout);
     return !layoutStr.isEmpty() && QnCustomResourceVideoLayout::fromString(layoutStr)->channelCount() > 1;
 };
 

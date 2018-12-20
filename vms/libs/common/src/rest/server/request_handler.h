@@ -26,9 +26,13 @@ struct RestRequest
     QString path;
     QnRequestParamList params; //< Should be QnRequestParams
     const QnRestConnectionProcessor* owner = nullptr; //< Better to pass data instead of owner
+    const nx::network::http::Request* httpRequest = nullptr;
 
-    RestRequest(QString path = {}, QnRequestParamList params = {},
-        const QnRestConnectionProcessor* owner = nullptr);
+    RestRequest(
+        QString path = {},
+        QnRequestParamList params = {},
+        const QnRestConnectionProcessor* owner = nullptr,
+        const nx::network::http::Request* httpRequest = nullptr);
 };
 
 struct RestContent
@@ -44,6 +48,7 @@ struct RestResponse
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     RestContent content;
     bool isUndefinedContentLength = false;
+    nx::network::http::HttpHeaders httpHeaders;
 
     RestResponse(nx::network::http::StatusCode::Value statusCode= nx::network::http::StatusCode::undefined,
         RestContent content = {}, bool isUndefinedContentLength = false);
@@ -60,6 +65,11 @@ class QnRestRequestHandler: public QObject
 
 public:
     QnRestRequestHandler();
+
+    virtual RestResponse executeRequest(
+        nx::network::http::Method::ValueType method,
+        const RestRequest& request,
+        const RestContent& content);
 
     // TODO: By default these methods use protected virtual functions, which should be removed.
     // Only new functions are supposed to be used in future
@@ -87,11 +97,14 @@ protected:
      * @return Http status code.
      */
     virtual int executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& result,
-        QByteArray& contentType,
-        const QnRestConnectionProcessor* owner) = 0;
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        QByteArray& /*result*/,
+        QByteArray& /*contentType*/,
+        const QnRestConnectionProcessor* /*owner*/)
+    {
+        return nx::network::http::StatusCode::notImplemented;
+    }
 
     /**
      * @return HTTP status code.
@@ -107,13 +120,16 @@ protected:
      * @return HTTP status code.
      */
     virtual int executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& result,
-        QByteArray& resultContentType,
-        const QnRestConnectionProcessor* owner) = 0;
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        const QByteArray& /*body*/,
+        const QByteArray& /*srcBodyContentType*/,
+        QByteArray& /*result*/,
+        QByteArray& /*resultContentType*/,
+        const QnRestConnectionProcessor* /*owner*/)
+    {
+        return nx::network::http::StatusCode::notImplemented;
+    }
 
     /**
      * @return HTTP status code.

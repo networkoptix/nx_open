@@ -12,7 +12,7 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameter.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaCgiParameters

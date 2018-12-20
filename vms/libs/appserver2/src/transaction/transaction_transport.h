@@ -11,15 +11,14 @@
 
 namespace ec2 {
 
-class QnTransactionTransport
-:
+class QnTransactionTransport:
     public QnTransactionTransportBase
 {
 public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
         TransactionMessageBusBase* bus,
-        const QnUuid& connectionGuid,
+        const std::string& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const nx::vms::api::PeerData& localPeer,
         const nx::vms::api::PeerData& remotePeer,
@@ -118,7 +117,9 @@ public:
         switch (remotePeer().dataFormat)
         {
         case Qn::JsonFormat:
-            if (remotePeer().peerType == nx::vms::api::PeerType::oldMobileClient)
+            if (localPeer().peerType == nx::vms::api::PeerType::mobileClient)
+                addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedLegacyTransactionWithHeader(transaction, header));
+            else if (remotePeer().peerType == nx::vms::api::PeerType::oldMobileClient)
                 addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
             else
                 addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));

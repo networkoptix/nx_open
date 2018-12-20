@@ -194,6 +194,11 @@ void View::loadSslCertificate()
         nx::network::ssl::Engine::loadCertificateFromFile(
             m_settings.https().certificatePath.c_str());
     }
+    else
+    {
+        nx::network::ssl::Engine::useCertificateAndPkey(
+            nx::network::ssl::Engine::makeCertificateAndKey("nxcloud/traffic_relay", "US", "Nx"));
+    }
 }
 
 void View::startAcceptor()

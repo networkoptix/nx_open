@@ -200,7 +200,8 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
     {
         case SystemHealthIndex::NoInternetForTimeSync:
             return isAdmin()
-                && q->globalSettings()->isSynchronizingTimeWithInternet()
+                && q->globalSettings()->isTimeSynchronizationEnabled()
+                && q->globalSettings()->primaryTimeServer().isNull()
                 && !internetAccessWatcher()->systemHasInternetAccess();
 
         case SystemHealthIndex::SystemIsReadOnly:

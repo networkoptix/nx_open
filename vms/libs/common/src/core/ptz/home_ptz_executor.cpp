@@ -1,6 +1,8 @@
 #include "home_ptz_executor.h"
 
 #include <QtCore/QTimerEvent>
+#include <QtCore/QBasicTimer>
+#include <QtCore/QThread>
 
 #include <nx/utils/thread/mutex.h>
 

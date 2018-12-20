@@ -53,7 +53,13 @@
    </item>
    <item>
     <widget class="nx::vms::client::desktop::Panel" name="controlsPanel" native="true">
-     <layout class="QVBoxLayout" name="controlsVerticalLayout">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QVBoxLayout" name="controlsVerticalLayout" stretch="1,1,1,1">
       <property name="leftMargin">
        <number>16</number>
       </property>
@@ -282,12 +288,24 @@
        </widget>
       </item>
       <item>
-       <widget class="QStackedWidget" name="infoStackedWidget">
+       <widget class="nx::vms::client::desktop::StackedWidget" name="infoStackedWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
         <widget class="QWidget" name="releaseNotesPage">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -302,6 +320,12 @@
           </property>
           <item>
            <widget class="QLabel" name="releaseNotesLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='notes'&gt;Release notes&lt;/a&gt;</string>
             </property>
@@ -309,8 +333,21 @@
           </item>
           <item>
            <widget class="QLabel" name="releaseDescriptionLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid red;
+border-radius: 2px;</string>
+            </property>
             <property name="text">
              <string notr="true">&lt;Here will be release description (if not empty)&gt;</string>
+            </property>
+            <property name="margin">
+             <number>16</number>
             </property>
            </widget>
           </item>
@@ -332,6 +369,12 @@
           </property>
           <item>
            <widget class="QLabel" name="errorLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string notr="true"/>
             </property>
@@ -339,7 +382,14 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="emptyInfoPage"/>
+        <widget class="QWidget" name="emptyInfoPage">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
@@ -498,7 +548,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,1">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
       <property name="leftMargin">
        <number>8</number>
       </property>
@@ -512,9 +562,9 @@
        <number>16</number>
       </property>
       <item>
-       <widget class="QTableView" name="tableView">
+       <widget class="nx::vms::client::desktop::TableView" name="tableView">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -522,7 +572,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>40</height>
+          <height>60</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -536,6 +586,9 @@
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustToContents</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
@@ -561,7 +614,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
         <property name="leftMargin">
          <number>8</number>
         </property>
@@ -598,7 +651,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>10</height>
+          <height>40</height>
          </size>
         </property>
        </spacer>
@@ -619,6 +672,18 @@
    <class>nx::vms::client::desktop::BusyIndicatorWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/busy_indicator.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::StackedWidget</class>
+   <extends>QStackedWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/stacked_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::TableView</class>
+   <extends>QTableView</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/table_view.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

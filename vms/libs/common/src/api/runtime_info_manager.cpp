@@ -27,6 +27,12 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
                 m_items->addOrUpdateItem(info);
             });
 
+        connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoRemoved, this,
+            [this](const nx::vms::api::IdData& peerId)
+            {
+                m_items->removeItem(peerId.id);
+            });
+
         connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this,
             [this](QnUuid peer, nx::vms::api::PeerType peerType)
             {

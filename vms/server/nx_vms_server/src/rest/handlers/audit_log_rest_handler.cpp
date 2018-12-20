@@ -12,7 +12,7 @@
 #include <nx/utils/string.h>
 
 QnAuditLogRestHandler::QnAuditLogRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

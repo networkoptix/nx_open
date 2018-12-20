@@ -4,6 +4,7 @@
 #include "axis_resource_searcher.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/network/url/url_builder.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -16,8 +17,8 @@ extern QString getValueFromString(const QString& line);
 
 namespace
 {
-    const QString kTestCredentialsUrl = lit("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName");
     const int kDefaultAxisTimeout = 4000;
+    const QString kTestCredentialsUrl = lit("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName");
     static const QString kChannelNumberSuffix(lit("_channel_")); //< For physicalId.
     static const QString kUrlChannelNumber(lit("channel"));
 }
@@ -73,26 +74,40 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
-    int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
-
     if (port < 0)
         port = nx::network::http::DEFAULT_HTTP_PORT;
 
-    CLHttpStatus status;
-    //QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
-    QByteArray response1 = downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName"), host, port, timeout, auth);
-    if (response1.length()==0)
+    nx::utils::Url baseRequestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(host)
+        .setPort(port)
+        .setUserName(auth.user())
+        .setPassword(auth.password())
+        .setPath("/axis-cgi/param.cgi")
+        .toUrl();
+    nx::network::http::StatusCode::Value status;
+
+    QByteArray response1;
+    nx::network::http::downloadFileSync(nx::network::url::Builder(baseRequestUrl)
+        .setQuery("action=list&group=root.Network.Bonjour.FriendlyName").toUrl(),
+        (int*) &status, &response1);
+    if (response1.isEmpty() || !nx::network::http::StatusCode::isSuccessCode(status))
         return QList<QnResourcePtr>();
-    QByteArray response2 = downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=root.Network.eth0.MACAddress"), host, port, timeout, auth);
-    if (response2.length()==0)
+
+    QByteArray response2;
+    nx::network::http::downloadFileSync(nx::network::url::Builder(baseRequestUrl)
+        .setQuery("action=list&group=root.Network.eth0.MACAddress").toUrl(),
+        (int*) &status, &response2);
+    if (response2.isEmpty() || !nx::network::http::StatusCode::isSuccessCode(status))
         return QList<QnResourcePtr>();
+
     QString response = QString(QLatin1String(response1.append(response2)));
     QStringList lines = response.split(QLatin1String("\n"), QString::SkipEmptyParts);
 
     QString name;
     QString mac;
 
-    for(QString line: lines)
+    for (const QString& line: lines)
     {
         if (line.contains(QLatin1String("root.Network.Bonjour.FriendlyName")))
         {
@@ -118,7 +133,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
         return QList<QnResourcePtr>();
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnPlAxisResourcePtr resource(new QnPlAxisResource(m_serverModule));
@@ -260,7 +275,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return local_results; // model forced by ONVIF
 
     QnPlAxisResourcePtr resource (new QnPlAxisResource(m_serverModule));
@@ -343,8 +358,8 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
         return QAuthenticator();
 
     auto resData = dataPool()->data(resource->getVendor(), resource->getModel());
-    auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
-        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+    auto possibleCredentials = resData.value<QList<nx::vms::common::Credentials>>(
+        ResourceDataKey::kPossibleDefaultCredentials);
 
     for (const auto& credentials: possibleCredentials)
     {
@@ -381,7 +396,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();
 
     uint channels = 1;
-    if (firstResource->hasParam(QLatin1String("channelsAmount")))
+    if (firstResource->hasDefaultProperty(QLatin1String("channelsAmount")))
     {
         QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
         channels = val.toUInt();

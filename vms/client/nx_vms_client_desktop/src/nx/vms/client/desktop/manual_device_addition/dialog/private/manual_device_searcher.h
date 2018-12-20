@@ -17,10 +17,10 @@ class ManualDeviceSearcher: public Connective<QObject>
 public:
     ManualDeviceSearcher(
         const QnMediaServerResourcePtr& server,
-        const QString& address,
+        const QString& url,
         const QString& login,
         const QString& password,
-        int port);
+        std::optional<int> port = {});
 
     ManualDeviceSearcher(
         const QnMediaServerResourcePtr& server,
@@ -28,7 +28,7 @@ public:
         const QString& endAddress,
         const QString& login,
         const QString& password,
-        int port);
+        std::optional<int> port = {});
 
     virtual ~ManualDeviceSearcher() override;
 
@@ -63,11 +63,11 @@ private:
         const QString& startAddress,
         const QString& endAddress);
     void searchForDevices(
-        const QString& startAddress,
+        const QString& urlOrStartAddress,
         const QString& endAddress,
         const QString& login,
         const QString& password,
-        int port);
+        std::optional<int> port);
 
     void abort();
     void setStatus(const QnManualResourceSearchStatus& value);

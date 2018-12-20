@@ -5,7 +5,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <utils/common/adaptive_sleep.h>
 #include "live_stream_provider.h"
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 struct QnAbstractMediaData;
 
@@ -14,7 +14,7 @@ class QnClientPullMediaStreamProvider : public QnLiveStreamProvider
     Q_OBJECT;
 
 public:
-    QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev);
+    QnClientPullMediaStreamProvider(const nx::vms::server::resource::CameraPtr& dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
 protected:

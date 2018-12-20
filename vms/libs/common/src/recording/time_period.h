@@ -7,15 +7,22 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-class QnTimePeriod;
-
-class QnTimePeriod
+struct QnTimePeriod
 {
-public:
+    /**
+     * Infinite duration value.
+     */
+    static constexpr qint64 kInfiniteDuration = -1;
 
-    static const qint64 UnlimitedPeriod;
-    static const qint64 kMaxTimeValue;
-    static const qint64 kMinTimeValue;
+    /**
+     * Minimal possible timestamp value.
+     */
+    static constexpr qint64 kMinTimeValue = 0;
+
+    /**
+     * Maximal possible timestamp value.
+     */
+    static constexpr qint64 kMaxTimeValue = std::numeric_limits<qint64>::max();
 
     /**
      * Constructs a null time period.
@@ -25,8 +32,8 @@ public:
     /**
      * Constructor.
      *
-     * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
-     * \param durationMs                Period's duration, in milliseconds.
+     * \param startTimeMs Period's start time, normally in milliseconds since epoch.
+     * \param durationMs Period's duration, in milliseconds.
      */
     constexpr QnTimePeriod(qint64 startTimeMs, qint64 durationMs):
         startTimeMs(startTimeMs),
@@ -56,8 +63,6 @@ public:
         return fromInterval(startTime.count(), endTime.count());
     };
 
-    QnTimePeriod& operator = (const QnTimePeriod &other);
-
     bool isLeftIntersection(const QnTimePeriod& other) const;
 
     bool isRightIntersection(const QnTimePeriod& other) const;
@@ -65,6 +70,7 @@ public:
     bool isContainedIn(const QnTimePeriod& other) const;
 
     bool contains(qint64 timeMs) const;
+    bool contains(std::chrono::milliseconds time) const { return contains(time.count()); }
     bool contains(const QnTimePeriod &timePeriod) const;
 
     /**
@@ -81,56 +87,31 @@ public:
     qint64 bound(qint64 timeMs) const;
 
     /**
-     * \returns                         Whether this is an empty period --- a
-     *                                  period of zero length.
+     * Whether this is an empty period - a period of zero length.
      */
-    bool isEmpty() const;
+    constexpr bool isEmpty() const { return durationMs == 0; };
 
     qint64 endTimeMs() const;
     void setEndTimeMs(qint64 value);
 
     /**
-     * \returns                         Whether this is a null time period.
+     * Whether this is a null time period.
      */
-    bool isNull() const;
+    constexpr bool isNull() const { return startTimeMs == 0 && durationMs == 0; };
 
     /**
-     * \returns                         Whether this is a infinite time period.
+     * Whether this is a infinite time period.
      */
-    bool isInfinite() const;
+    constexpr bool isInfinite() const { return durationMs == kInfiniteDuration; }
 
-    bool isValid() const;
+    constexpr bool isValid() const { return durationMs == kInfiniteDuration || durationMs > 0; };
 
     /**
-     * \returns                         Infinite duration constant value (-1).
+     * Returns infinite period starting from zero.
      */
-    static constexpr qint64 infiniteDuration()
-    {
-        return -1;
-    };
-
-    /**
-    * \returns                         Maximal possible timestamp value.
-    */
-    static constexpr qint64 maxTimeValue()
-    {
-        return std::numeric_limits<qint64>::max();
-    };
-
-    /**
-    * \returns                         Minimal possible timestamp value (0).
-    */
-    static constexpr qint64 minTimeValue()
-    {
-        return 0;
-    };
-
-    /**
-    * \returns                          Returns infinite period starting from zero.
-    */
     static constexpr QnTimePeriod anytime()
     {
-        return QnTimePeriod(minTimeValue(), infiniteDuration());
+        return QnTimePeriod(kMinTimeValue, kInfiniteDuration);
     };
 
     /**
@@ -184,13 +165,12 @@ public:
         return this->startTimeMs < timeMs;
     };
 
-public:
     /** Start time in milliseconds. */
     qint64 startTimeMs = 0;
 
     /**
      * Duration in milliseconds.
-     * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period
+     * kInfiniteDuration if duration is infinite or unknown. It may be the case if this time period
      * represents a video chunk that is being recorded at the moment.
      */
     qint64 durationMs = 0;
@@ -201,6 +181,7 @@ constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other)
     return timeMs < other.startTimeMs;
 };
 
+void PrintTo(const QnTimePeriod& period, ::std::ostream* os);
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);

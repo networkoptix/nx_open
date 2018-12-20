@@ -7,6 +7,7 @@
 #include <nx/cloud/db/client/data/types.h>
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization_format.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
@@ -20,9 +21,6 @@
 #include <nx/utils/time.h>
 
 #include "abstract_authentication_data_provider.h"
-#include "../managers/account_manager.h"
-#include "../managers/temporary_account_password_manager.h"
-#include "../managers/system_manager.h"
 #include "../stree/cdb_ns.h"
 #include "../stree/http_request_attr_reader.h"
 #include "../stree/socket_attr_reader.h"
@@ -61,6 +59,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::other,
+            request,
             api::ResultCode::accountBlocked);
     }
 
@@ -72,6 +71,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::other,
+            request,
             api::ResultCode::notAuthorized,
             prepareWwwAuthenticateHeader());
     }
@@ -91,6 +91,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::credentials,
+            request,
             authResultCode);
     }
 }
@@ -193,12 +194,14 @@ void AuthenticationHelper::reportSuccess(
 
 void AuthenticationHelper::reportFailure(
     AuthenticationType authenticationType,
+    const nx::network::http::Request request,
     api::ResultCode resultCode,
     std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate)
 {
     m_transportSecurityManager->onAuthenticationFailure(
         authenticationType,
         m_connection,
+        request,
         m_username);
 
     nx::utils::swapAndCall(

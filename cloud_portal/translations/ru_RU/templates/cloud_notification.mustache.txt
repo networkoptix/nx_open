@@ -1,3 +1,3 @@
-Hello, {{message.userFullName}}
+Здравствуйте, {{message.userFullName}}
 
 {{message.text_body}}

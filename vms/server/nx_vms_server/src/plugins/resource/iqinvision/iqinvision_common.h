@@ -1,7 +1,7 @@
 #pragma once
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 static const QString kIqInvisionManufacturer = lit("IQinVision");
@@ -12,5 +12,5 @@ static const QString kIqInvisionOidModel = lit("2.8");
 static const QString kIqInvisionOidManufacturer = lit("2.27");
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

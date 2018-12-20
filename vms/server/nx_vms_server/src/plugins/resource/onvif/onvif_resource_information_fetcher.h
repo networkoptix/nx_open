@@ -9,7 +9,7 @@
 #include "onvif_helper.h"
 #include "soap_wrapper.h"
 #include "onvif_resource.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 struct EndpointAdditionalInfo
 {
@@ -68,7 +68,7 @@ private:
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
-class OnvifResourceInformationFetcher: public nx::mediaserver::ServerModuleAware
+class OnvifResourceInformationFetcher: public nx::vms::server::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:

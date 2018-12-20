@@ -67,7 +67,7 @@ OnvifResourceSearcher::OnvifResourceSearcher(QnMediaServerModule* serverModule)
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_informationFetcher(new OnvifResourceInformationFetcher(serverModule)),
     m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {
@@ -188,7 +188,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
     // TODO: Move out to some helper class, to remove direct link to hikvision.
     if (isSearchAction)
     {
-        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
+        nx::vms::server::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
             deviceUrl,
             auth);
     }
@@ -214,8 +214,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         auto resData = commonModule()->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
-        bool shouldAppearAsSingleChannel = resData.value<bool>(
-            Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+        auto shouldAppearAsSingleChannel = resData.value<bool>(
+            ResourceDataKey::kShouldAppearAsSingleChannel);
 
         if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
             resource->setGroupId(rpResource->getPhysicalId());
@@ -241,7 +241,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
 
         auto resData = dataPool()->data(manufacturer, modelName);
         const auto manufacturerReplacement = resData.value<QString>(
-            Qn::ONVIF_MANUFACTURER_REPLACEMENT);
+            ResourceDataKey::kOnvifManufacturerReplacement);
 
         if (!manufacturerReplacement.isEmpty())
         {
@@ -276,7 +276,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
             }
         }
 
-        auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
+        auto manufacturerAlias = resData.value<QString>(ResourceDataKey::kOnvifVendorSubtype);
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
         QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);
@@ -303,8 +303,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
             //    resource->updateToChannel(channel-1);
             resList << resource;
 
-            bool shouldAppearAsSingleChannel = resData
-                .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+            auto shouldAppearAsSingleChannel = resData
+                .value<bool>(ResourceDataKey::kShouldAppearAsSingleChannel);
 
             // checking for multichannel encoders
             if (isSearchAction && !shouldAppearAsSingleChannel)

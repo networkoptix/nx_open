@@ -4,6 +4,8 @@
 #include <memory>
 #include <chrono>
 #include <string>
+#include <atomic>
+#include <functional>
 
 #include <nx/streaming/rtp/rtcp.h>
 
@@ -18,7 +20,7 @@ enum class TimePolicy
 struct TimeOffset
 {
     std::chrono::microseconds get() { return std::chrono::microseconds(*m_timeOffset); }
-    void reset(std::chrono::microseconds value) { m_timeOffset = value.count(); };
+    void reset(std::chrono::microseconds value) { m_timeOffset = value.count(); }
     bool hasValue() { return m_timeOffset.has_value(); }
 
 private:
@@ -39,7 +41,7 @@ public:
         std::chrono::microseconds currentTime,
         uint32_t rtpTime,
         const RtcpSenderReport& senderReport,
-        std::optional<std::chrono::microseconds> onvifTime,
+        const std::optional<std::chrono::microseconds>& onvifTime,
         int rtpFrequency,
         bool isPrimaryStream);
 
@@ -59,7 +61,7 @@ private:
     std::chrono::microseconds getCameraTimestamp(
         uint32_t rtpTime,
         const RtcpSenderReport& senderReport,
-        std::optional<std::chrono::microseconds> onvifTime,
+        const std::optional<std::chrono::microseconds>& onvifTime,
         int frequency);
 private:
     TimeOffsetPtr m_primaryOffset;

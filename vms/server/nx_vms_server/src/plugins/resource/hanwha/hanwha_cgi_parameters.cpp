@@ -3,7 +3,7 @@
 #include "hanwha_utils.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 HanwhaCgiParameters::HanwhaCgiParameters(nx::network::http::StatusCode::Value statusCode):
@@ -189,5 +189,5 @@ void HanwhaCgiParameters::parseDataType(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

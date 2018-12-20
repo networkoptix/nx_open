@@ -1,10 +1,8 @@
-#include <api/server_rest_connection.h>
-#include <common/common_module.h>
-//#include <client_core/client_core_module.h>
-#include <nx/vms/common/p2p/downloader/validate_result.h>
-#include <nx_ec/ec_api.h>
 #include "single_connection_peer_manager.h"
 
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <nx_ec/ec_api.h>
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -142,80 +140,6 @@ rest::Handle SingleConnectionPeerManager::downloadChunk(
         thread());
 }
 
-rest::Handle SingleConnectionPeerManager::validateFileInformation(
-    const QnUuid& peerId,
-    const FileInformation& fileInformation,
-    AbstractPeerManager::ValidateCallback callback)
-{
-    if (peerId != selfId())
-    {
-        NX_VERBOSE(
-            this,
-            lm("[Downloader, validate] File %1 via other peer %2")
-                .args(fileInformation.name, peerId));
-
-        const auto& connection = getConnection(peerId);
-        if (!connection)
-        {
-            NX_WARNING(this, lm("[Downloader, validate] File %1. No rest connection for %2")
-                .args(fileInformation.name, peerId));
-            return -1;
-        }
-
-        auto handleReply =
-            [callback, fileInformation, peerId](
-                bool success,
-                rest::Handle handle,
-                const QnJsonRestResult& result)
-            {
-                if (!success)
-                {
-                    NX_WARNING(typeid(AbstractPeerManager), lm("[Downloader, validate] File %1. Rest connection to %2 response error")
-                        .args(fileInformation.name, peerId));
-                    return callback(success, handle);
-                }
-
-                const auto validateResult = result.deserialized<ValidateResult>();
-                if (!validateResult.success)
-                {
-                    NX_WARNING(typeid(AbstractPeerManager), lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
-                        .args(fileInformation.name, peerId));
-                    return callback(false, handle);
-                }
-
-                NX_VERBOSE(typeid(AbstractPeerManager), lm("[Downloader, validate] File %1. peer %2 validation successful")
-                    .args(fileInformation.name, peerId));
-
-                callback(success, handle);
-            };
-
-        return connection->validateFileInformation(
-            QString::fromLatin1(fileInformation.url.toString().toLocal8Bit().toBase64()),
-            fileInformation.size, handleReply, thread());
-    }
-
-    NX_VERBOSE(
-        this,
-        lm("[Downloader, validate] Trying to validate %1 directly")
-            .args(fileInformation.name));
-
-    auto handle = ++m_currentSelfRequestHandle;
-    if (handle < 0)
-    {
-        m_currentSelfRequestHandle = 1;
-        handle = 1;
-    }
-
-    Downloader::validateAsync(
-        fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
-        [callback, handle](bool success)
-        {
-            callback(success, handle);
-        });
-
-    return handle;
-}
-
 rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& fileName,
@@ -266,7 +190,14 @@ rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
             using namespace network;
             QByteArray result;
 
+            if (!client)
+                return callback(false, handle, result);
+
             auto response = client->response();
+
+            if (!response)
+                return callback(false, handle, result);
+
             auto statusCode = response->statusLine.statusCode;
 
             auto okResponse = response &&
@@ -275,7 +206,6 @@ rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
 
             if (!client->failed() && okResponse)
                 result = client->fetchMessageBodyBuffer();
-
             callback(!result.isNull(), handle, result);
         });
 
@@ -307,7 +237,7 @@ rest::QnConnectionPtr SingleConnectionPeerManager::getConnection(const QnUuid& p
     NX_ASSERT(peerId != selfId());
     if (peerId == selfId())
         return rest::QnConnectionPtr();
-    NX_ASSERT(m_directConnection);
+    //NX_ASSERT(m_directConnection);
     return m_directConnection;
 }
 

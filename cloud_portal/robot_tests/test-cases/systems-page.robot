@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -14,9 +13,9 @@ ${url}         ${ENV}
 *** Keywords ***
 Check Systems Text
     [arguments]    ${user}
+    Sleep    1
     Log Out
     Validate Log Out
-    sleep    5
     Log In    ${user}    ${password}
     Validate Log In
     Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
@@ -73,6 +72,25 @@ should show the no systems connected message when you have no systems
     Validate Log In
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
+should show system name in header with no dropdown if user has only one system
+    [tags]    C41569
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Wait Until Element Is Visible    ${SYSTEM NAME AUTO TESTS HEADER}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Remove User Permissions    ${EMAIL NOPERM}
+
 should show the system page instead of all systems when user only has one
     [tags]    C41878
     Log In    ${EMAIL OWNER}    ${password}
@@ -111,6 +129,12 @@ Should show your system for owner and owner name for non-owners
     Element Text Should Be    ${AUTO TESTS USER}    ${YOUR SYSTEM TEXT}
     :FOR    ${user}    IN    @{EMAILS LIST}
     \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check Systems Text    ${user}
+
+Should not show systems dropdown with no systems
+    [tags]    C41568
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Element Should Not Be Visible    ${SYSTEMS DROPDOWN}
 
 should update owner name in systems list, if it's changed
     Go To    ${url}/account

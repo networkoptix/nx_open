@@ -41,6 +41,7 @@ private:
     void setupTable();
     void setupTableHeader();
     void setupPortStuff(QCheckBox* autoCheckbox, QStackedWidget* portStackedWidget);
+    void setupSearchResultsPlaceholder();
 
     void updateProgress();
     void handleStartSearchClicked();
@@ -51,14 +52,9 @@ private:
     void updateResultsWidgetState();
     void handleSearchTypeChanged();
     void handleDialogClosed();
-    void updateAddDevicesButtonText();
     void handleServerOnlineStateChanged();
     void updateSelectedServerButtonVisibility();
     void handleSelectedServerChanged(const QnMediaServerResourcePtr& previous);
-    void handleModelDataChanged(
-        const QModelIndex& topLeft,
-        const QModelIndex& bottomRight,
-        const QVector<int>& roles);
 
     void handleStartAddressFieldTextChanged(const QString& value);
     void handleStartAddressEditingFinished();
@@ -67,14 +63,15 @@ private:
     void showAdditionFailedDialog(const FakeResourceList& resources);
 
     void handleTabClicked(int index);
-    void updateMessageBar();
 
-    using AddingDevicesSet = QSet<QString>;
-    void appendAddingDevices(const AddingDevicesSet& value);
+    void updateAddDevicesPanel();
+    void showAddDevicesButton(const QString& buttonText);
+    void showAddDevicesPlaceholder(const QString& placeholderText);
+
     void setDeviceAdded(const QString& uniqueId);
     void handleDeviceRemoved(const QString& uniqueId);
 
-    int port() const;
+    std::optional<int> port() const;
     QString password() const;
     QString login() const;
     QString progressMessage() const;
@@ -90,13 +87,14 @@ private:
 
     SearcherPtr m_currentSearch;
     SearchersList m_unfinishedSearches;
+    QString m_lastSearchLogin;
+    QString m_lastSearchPassword;
 
     QScopedPointer<FoundDevicesModel> m_model;
-    AddingDevicesSet m_addingDevices;
     bool m_addressEditing;
 
-    nx::common::utils::Credentials m_knownAddressCredentials;
-    nx::common::utils::Credentials m_subnetScanCredentials;
+    nx::vms::common::Credentials m_knownAddressCredentials;
+    nx::vms::common::Credentials m_subnetScanCredentials;
 };
 
 } // namespace nx::vms::client::desktop

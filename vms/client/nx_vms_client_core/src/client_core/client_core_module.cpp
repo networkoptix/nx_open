@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
+#include <client_core/client_core_meta_types.h>
 #include <client_core/client_core_settings.h>
 
 #include <nx/core/access/access_types.h>
@@ -19,11 +20,13 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/client/core/settings/migration.h>
 #include <ec2/remote_connection_factory.h>
 #include <nx/client/core/utils/operation_manager.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
+
+#include <nx/utils/app_info.h>
 
 using namespace nx::vms::client::core;
 
@@ -32,8 +35,13 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 {
     m_commonModule = new QnCommonModule(true, nx::core::access::Mode::cached, this);
 
+    initializeMetaTypes();
+
     m_commonModule->store(new QnClientCoreSettings());
-    m_commonModule->store(new SecureSettings());
+
+    using nx::utils::AppInfo;
+
+    m_commonModule->store(new Settings());
     settings_migration::migrate();
 
     m_commonModule->store(new QnFfmpegInitializer());

@@ -53,10 +53,11 @@ ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     const QnCameraBookmark& bookmark,
     FileNameValidator isFileNameValid,
+    const nx::core::Watermark& watermark,
     QWidget* parent)
     :
     base_type(parent),
-    d(new Private(bookmark, kPreviewSize)),
+    d(new Private(bookmark, kPreviewSize, watermark)),
     ui(new ::Ui::ExportSettingsDialog),
     isFileNameValid(isFileNameValid),
     m_passwordWidget(new ExportPasswordWidget(this))
@@ -400,11 +401,6 @@ ExportMediaSettings ExportSettingsDialog::exportMediaSettings() const
 ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 {
     return d->exportLayoutSettings();
-}
-
-void ExportSettingsDialog::setWatermark(const nx::core::Watermark& watermark)
-{
-    d->setWatermark(watermark);
 }
 
 void ExportSettingsDialog::initSettingsWidgets()

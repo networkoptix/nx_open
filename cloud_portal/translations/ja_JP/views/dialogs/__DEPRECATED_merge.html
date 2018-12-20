@@ -26,7 +26,7 @@
             <p ng-if="systemMergeable =='cannotMerge'"
                class="help-block-no-height warning-label">システム {{targetSystem.name}} は互換性がありません 現在のものと統合することはできません</p>
             <p ng-if="systemMergeable == ''"
-               class="help-block-no-height">結合できるはオーナー権限のシステムのみ</p>
+               class="help-block-no-height">結合できるは、オーナー権限のシステムのみ</p>
             <div>
                 <div ng-class="{'text-muted': systemStatus != ''}">システム名と設定を取得</div>
                 <div ng-init="$parent.masterSystemId=system.id">

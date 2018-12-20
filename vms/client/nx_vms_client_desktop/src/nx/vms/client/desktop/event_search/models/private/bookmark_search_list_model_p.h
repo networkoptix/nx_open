@@ -35,21 +35,26 @@ public:
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
 
+    void dynamicUpdate(const QnTimePeriod& period);
+
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
-    virtual bool hasAccessRights() const override;
+
+    using GetCallback = std::function<void(bool, const QnCameraBookmarkList&, rest::Handle)>;
+    rest::Handle getBookmarks(
+        const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const;
 
 private:
-    void watchBookmarkChanges();
-
-    void addBookmark(const QnCameraBookmark& bookmark);
-    void updateBookmark(const QnCameraBookmark& bookmark);
-    void removeBookmark(const QnUuid& guid);
-
     int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
 
     QnVirtualCameraResourcePtr camera(const QnCameraBookmark& bookmark) const;
+
+    void watchBookmarkChanges();
+    void addBookmark(const QnCameraBookmark& bookmark);
+    void updateBookmark(const QnCameraBookmark& bookmark);
+    void removeBookmark(const QnUuid& id);
+    void updatePeriod(const QnTimePeriod& period, const QnCameraBookmarkList& bookmarks);
 
     template<typename Iter>
     bool commitPrefetch(const QnTimePeriod& periodToCommit,
@@ -64,6 +69,7 @@ private:
     QnCameraBookmarkList m_prefetch;
     std::deque<QnCameraBookmark> m_data;
     QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
+    QHash<rest::Handle, QnTimePeriod> m_updateRequests;
 };
 
 } // namespace nx::vms::client::desktop

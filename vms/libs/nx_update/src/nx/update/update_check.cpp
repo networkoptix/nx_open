@@ -5,6 +5,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
@@ -12,8 +13,7 @@
 
 #include <common/static_common_module.h>
 
-namespace nx {
-namespace update {
+namespace nx::update {
 
 struct AlternativeServerData
 {
@@ -31,13 +31,15 @@ struct CustomizationInfo
     QString updates_prefix;
     QString release_notes;
     QString description;
+    qint64 release_date = 0;
+    int release_delivery = 0;
     QMap<QString, nx::vms::api::SoftwareVersion> releases;
 };
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CustomizationInfo,
     (json),
-    (current_release)(updates_prefix)(release_notes)(description)(releases))
+    (current_release)(updates_prefix)(release_notes)(release_date)(release_delivery)(description)(releases))
 
 struct FileData
 {
@@ -108,6 +110,9 @@ static InformationError findCustomizationInfo(
     }
 
     result->releaseNotesUrl = customizationInfo->release_notes;
+    result->releaseDeliveryDays = customizationInfo->release_delivery;
+    result->releaseDateMs = customizationInfo->release_date;
+    result->description = customizationInfo->description;
     return InformationError::noError;
 }
 
@@ -132,21 +137,89 @@ static InformationError parsePackages(
     return InformationError::noError;
 }
 
-static InformationError parseAndExtractInformation(
-    const QByteArray& data,
+static InformationError parseLegacyPackages(
+    const QJsonObject topLevelObject,
     const QString& baseUpdateUrl,
     const QString& publicationKey,
     Information* result)
 {
-    QJsonParseError parseError;
-    auto topLevelObject = QJsonDocument::fromJson(data, &parseError).object();
-    if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
-        return InformationError::jsonError;
+    // Legacy update.json has two core package maps: "packages" and "clientPackages":
+    //  OS:
+    //      arch:
+    QList<Package> packages;
 
-    auto packagesError = parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
-    if (packagesError != InformationError::noError)
-        return packagesError;
+    if (!topLevelObject.contains("packages"))
+        return InformationError::brokenPackageError;
 
+    if (!topLevelObject.contains("clientPackages"))
+        return InformationError::brokenPackageError;
+
+    auto readPackages =
+        [](const QString& component, const QJsonValue& source, QList<Package>& output)
+        {
+            if (!source.isObject())
+                return InformationError::jsonError;
+            QJsonObject packages = source.toObject();
+            for (auto itOs = packages.begin(); itOs != packages.end(); ++itOs)
+            {
+                if (!itOs->isObject())
+                    return InformationError::jsonError;
+
+                auto os = itOs->toObject();
+                for (auto itArch = os.begin(); itArch != os.end(); ++itArch)
+                {
+                    if (!itArch->isObject())
+                        return InformationError::jsonError;
+
+                    // Arch actually consists of arch_variant.
+                    QStringList archAndVariant = itArch.key().split("_");
+                    if (archAndVariant.empty())
+                        return InformationError::jsonError;
+
+                    Package package;
+                    // It should fill in file, md5 and size fields.
+                    if (!QJson::deserialize(itArch.value(), &package))
+                        return InformationError::jsonError;
+
+                    package.component = component;
+                    package.arch = archAndVariant[0];
+                    package.platform = itOs.key();
+                    package.variant = archAndVariant.size() == 2 ? archAndVariant[1] : QString();
+                    // TODO: Do we need to do anything with variantVersion? It does not seem to be used.
+                    output.append(package);
+                }
+            }
+
+            return InformationError::noError;
+        };
+
+    auto serverPackages = topLevelObject.value("packages");
+    auto error = readPackages("server", serverPackages, packages);
+    if (error != InformationError::noError)
+        return error;
+
+    auto clientPackages = topLevelObject.value("clientPackages");
+    error = readPackages("client", clientPackages, packages);
+    if (error != InformationError::noError)
+        return error;
+
+    for (const auto& p: packages)
+    {
+        Package newPackage = p;
+        newPackage.file = "updates/" + publicationKey + '/' + p.file;
+        newPackage.url = baseUpdateUrl + "/" + p.file;
+        result->packages.append(newPackage);
+    }
+
+    return InformationError::noError;
+}
+
+// Parses header for packages.json or update.json. Header part is mostly equal.
+static InformationError parseHeader(
+    const QJsonObject& topLevelObject,
+    const QString& baseUpdateUrl,
+    Information* result)
+{
     if (!QJson::deserialize(topLevelObject, "version", &result->version))
         return InformationError::jsonError;
 
@@ -160,10 +233,59 @@ static InformationError parseAndExtractInformation(
         NX_WARNING(typeid(Information)) << "no eulaVersion at" << baseUpdateUrl;
     }
 
-    if(!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
+    if (!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
     {
         NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
     }
+
+    QString description;
+    // We take update's description from the root updates.json and
+    // override it by description in packages.json
+    if (QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
+        result->description = description;
+    return InformationError::noError;
+}
+
+static InformationError parseAndExtractInformation(
+    const QByteArray& data,
+    const QString& baseUpdateUrl,
+    const QString& publicationKey,
+    Information* result)
+{
+    QJsonParseError parseError;
+    auto topLevelObject = QJsonDocument::fromJson(data, &parseError).object();
+    if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
+        return InformationError::jsonError;
+
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
+    if (error != InformationError::noError)
+        return error;
+
+    error = parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
+    if (error != InformationError::noError)
+        return error;
+
+    return InformationError::noError;
+}
+
+static InformationError parseAndExtractLegacyInformation(
+    const QByteArray& data,
+    const QString& baseUpdateUrl,
+    const QString& publicationKey,
+    Information* result)
+{
+    QJsonParseError parseError;
+    auto topLevelObject = QJsonDocument::fromJson(data, &parseError).object();
+    if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
+        return InformationError::jsonError;
+
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
+    if (error != InformationError::noError)
+        return error;
+
+    error = parseLegacyPackages(topLevelObject, baseUpdateUrl, publicationKey, result);
+    if (error != InformationError::noError)
+        return error;
 
     return InformationError::noError;
 }
@@ -208,14 +330,29 @@ static InformationError fillUpdateInformation(
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
     error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
 
-    if (error != InformationError::noError)
-        return error;
+    if (error == InformationError::noError)
+    {
+        return parseAndExtractInformation(
+            httpClient->fetchMessageBodyBuffer(),
+            baseUpdateUrl,
+            publicationKey,
+            result);
+    }
 
-    return parseAndExtractInformation(
-        httpClient->fetchMessageBodyBuffer(),
-        baseUpdateUrl,
-        publicationKey,
-        result);
+    // Falling back to previous protocol with update.json
+    if (error == InformationError::httpError )
+        error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
+
+    if (error == InformationError::noError)
+    {
+        return parseAndExtractLegacyInformation(
+            httpClient->fetchMessageBodyBuffer(),
+            baseUpdateUrl,
+            publicationKey,
+            result);
+    }
+
+    return error;
 }
 
 Information updateInformationImpl(
@@ -277,13 +414,6 @@ Information updateInformation(
     return updateInformationImpl(url, publicationKey, version, error, /*checkAlternativeServers*/ true);
 }
 
-Information updateInformation(const QString& /*zipFileName*/, InformationError* /*error*/)
-{
-    // TODO: Implement it.
-    // Right now ServerUpdateTool deals with zip package.
-    return Information();
-}
-
 static void setErrorMessage (const QString& message, QString* outMessage)
 {
     if (outMessage)
@@ -315,7 +445,7 @@ FindPackageResult findPackage(
         return FindPackageResult::otherError;
     }
 
-    if (nx::utils::SoftwareVersion(updateInformation.version) == qnStaticCommon->engineVersion())
+    if (nx::utils::SoftwareVersion(updateInformation.version) == qnStaticCommon->engineVersion() && !isClient)
     {
         setErrorMessage(QString::fromLatin1(
             "Latest update (%1) installed")
@@ -324,7 +454,7 @@ FindPackageResult findPackage(
         return FindPackageResult::latestUpdateInstalled;
     }
 
-    if (nx::utils::SoftwareVersion(updateInformation.version) < qnStaticCommon->engineVersion())
+    if (nx::utils::SoftwareVersion(updateInformation.version) < qnStaticCommon->engineVersion() && !isClient)
     {
         setErrorMessage(QString::fromLatin1(
             "The update application version (%1) is less than the peer application version (%2)")
@@ -344,7 +474,7 @@ FindPackageResult findPackage(
 
         if (package.arch == systemInformation.arch
             && package.platform == systemInformation.platform
-            && package.variant == systemInformation.modification
+            && (package.variant == systemInformation.modification || package.variant.isNull())
             && (packageOsVariant <= selfOsVariant || selfOsVariant.isNull()))
         {
             *outPackage = package;
@@ -390,6 +520,70 @@ FindPackageResult findPackage(
         outPackage, outMessage);
 }
 
-} // namespace update
-} // namespace nx
+nx::update::Package* findPackage(
+    const QString& component,
+    nx::vms::api::SystemInformation& systemInfo,
+    nx::update::Information& info)
+{
+    for(auto& pkg: info.packages)
+    {
+        if (pkg.component == component)
+        {
+            // Check arch and OS
+            if (pkg.arch == systemInfo.arch
+                && pkg.platform == systemInfo.platform
+                && pkg.variant == systemInfo.modification)
+                return &pkg;
+        }
+    }
+    return nullptr;
+}
 
+std::future<UpdateContents> checkLatestUpdate(
+    const QString& updateUrl,
+    UpdateCheckCallback&& callback)
+{
+    return std::async(std::launch::async,
+        [updateUrl, callback = std::move(callback), thread = QThread::currentThread()]()
+        {
+            UpdateContents result;
+            result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
+            result.sourceType = UpdateSourceType::internet;
+            result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
+            if (callback)
+            {
+                executeInThread(thread,
+                    [callback = std::move(callback), result]()
+                    {
+                        callback(result);
+                    });
+            }
+            return result;
+        });
+}
+
+std::future<UpdateContents> checkSpecificChangeset(
+    const QString& updateUrl,
+    const QString& build,
+    UpdateCheckCallback&& callback)
+{
+    return std::async(std::launch::async,
+        [updateUrl, build, callback = std::move(callback), thread = QThread::currentThread()]()
+        {
+            UpdateContents result;
+            result.info = nx::update::updateInformation(updateUrl, build, &result.error);
+            result.sourceType = UpdateSourceType::internetSpecific;
+            result.source = lit("%1 for build=%2").arg(updateUrl, build);
+            if (callback)
+            {
+                executeInThread(thread,
+                    [callback = std::move(callback), result]()
+                    {
+                        callback(result);
+                    });
+            }
+            return result;
+        });
+}
+
+} // namespace nx::update

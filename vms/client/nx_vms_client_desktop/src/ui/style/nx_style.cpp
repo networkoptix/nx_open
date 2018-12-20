@@ -59,6 +59,7 @@
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/scroll_bar_proxy.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
 
@@ -632,7 +633,8 @@ QnNxStyle::QnNxStyle() :
                 /* If menu was invoked by a click on some area we most probably want to
                  * prevent re-invoking menu if it was closed by click in the same area: */
                 QRect noReplayRect = getNoReplayRect(activeMenu);
-                qDebug() << "NO REPLAY RECT:" << noReplayRect;
+
+                NX_VERBOSE(this, "No-replay rect: %1", noReplayRect);
 
                 if (noReplayRect.isValid() && noReplayRect.contains(globalPos))
                     return;

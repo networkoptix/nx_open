@@ -116,36 +116,20 @@
 
     <h2>ล็อกการตั้งค่า</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">ระดับล็อกหลัก</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">ไม่มี: ล็อกถูกปิดใช้งาน</option>
-                    <option value="ALWAYS">เสมอ: บันทึกข้อผิดพลาดคำเตือนและข้อความที่สำคัญที่สุด</option>
-                    <option value="ERROR">ข้อผิดพลาด: บันทึกข้อผิดพลาดเท่านั้น</option>
-                    <option value="WARNING">คำเตือน: บันทึกคำเตือนและข้อผิดพลาด</option>
-                    <option value="INFO">ข้อมูล: บันทึกข้อผิดพลาดคำเตือนและข้อความทั้งหมด</option>
-                    <option value="DEBUG">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
-                    <option value="DEBUG2">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">ไม่มี: ล็อกถูกปิดใช้งาน</option>
+                    <option value="always">เสมอ: บันทึกข้อผิดพลาดคำเตือนและข้อความที่สำคัญที่สุด</option>
+                    <option value="error">ข้อผิดพลาด: บันทึกข้อผิดพลาดเท่านั้น</option>
+                    <option value="warning">คำเตือน: บันทึกคำเตือนและข้อผิดพลาด</option>
+                    <option value="info">ข้อมูล: บันทึกข้อผิดพลาดคำเตือนและข้อความทั้งหมด</option>
+                    <option value="debug">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
+                    <option value="debug2">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">ระดับล็อกธุรกรรม</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">ไม่มี: ล็อกถูกปิดใช้งาน</option>
-                    <option value="ALWAYS">เสมอ: บันทึกข้อผิดพลาดคำเตือนและข้อความที่สำคัญที่สุด</option>
-                    <option value="ERROR">ข้อผิดพลาด: บันทึกข้อผิดพลาดเท่านั้น</option>
-                    <option value="WARNING">คำเตือน: บันทึกคำเตือนและข้อผิดพลาด</option>
-                    <option value="INFO">ข้อมูล: บันทึกข้อผิดพลาดคำเตือนและข้อความทั้งหมด</option>
-                    <option value="DEBUG">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
-                    <option value="DEBUG2">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >บันทึก</button>
         </div>

@@ -13,20 +13,21 @@ bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
         QnRequestParamList());
 
     request.isLocal = true;
-    QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request,
+    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
         processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply, &context);
+    detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply,
+        &context);
 
-    for (const auto& status: reply)
-    {
-        if (status.code != nx::update::Status::Code::readyToInstall)
-            return false;
-    }
-
-    return true;
+    return std::all_of(reply.cbegin(), reply.cend(),
+        [](const auto& status)
+        {
+            using nx::update::Status;
+            return status.code == Status::Code::readyToInstall
+                || status.code == Status::Code::latestUpdateInstalled
+                || status.code == Status::Code::offline;
+        });
 }
 
 void sendInstallRequest(
@@ -81,7 +82,7 @@ void sendInstallRequest(
 } // namespace
 
 QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

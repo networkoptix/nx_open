@@ -1,7 +1,6 @@
 #include "p2p_fwd.h"
 
-#include <nx/fusion/serialization/lexical.h>
-#include <nx/fusion/serialization/lexical_enum.h>
+#include <nx/fusion/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::p2p, MessageType);
 

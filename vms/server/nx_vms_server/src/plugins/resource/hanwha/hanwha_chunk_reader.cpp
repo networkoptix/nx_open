@@ -13,7 +13,7 @@
 #include "hanwha_utils.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -920,5 +920,5 @@ bool HanwhaChunkLoader::isNvr() const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

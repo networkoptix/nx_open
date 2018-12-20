@@ -87,6 +87,8 @@ public:
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList enabledAnalyticsEngines() const;
     void setEnabledAnalyticsEngines(const QSet<QnUuid>& value);
+    Q_INVOKABLE QnUuid currentAnalyticsEngineId() const;
+    Q_INVOKABLE void setCurrentAnalyticsEngineId(const QnUuid& engineId);
     Q_INVOKABLE bool analyticsSettingsLoading() const;
     void setAnalyticsSettingsLoading(bool value);
     Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);

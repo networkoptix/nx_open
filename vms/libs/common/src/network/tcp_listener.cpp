@@ -143,7 +143,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_INFO(this, lm("Server started at %1").arg(d->localEndpoint));
+    NX_INFO(this, "Server started at %1", d->localEndpoint);
     return true;
 }
 
@@ -248,7 +248,7 @@ void QnTcpListener::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    NX_DEBUG(this, lm("pleaseStop() called"));
+    NX_DEBUG(this, "pleaseStop() called");
 }
 
 void QnTcpListener::removeAllConnections()
@@ -272,8 +272,7 @@ void QnTcpListener::removeAllConnections()
         itr != oldConnections.end(); ++itr)
     {
         QnLongRunnable* processor = *itr;
-        NX_DEBUG(this, lit("Stopping processor (sysThreadID %1)")
-            .arg(processor->systemThreadId()));
+        NX_DEBUG(this, "Stopping processor (sysThreadID %1)", processor->systemThreadId());
         delete processor;
     }
 }
@@ -301,8 +300,9 @@ void QnTcpListener::run()
     if(!d->serverSocket)
         bindToLocalAddress();
 
-    NX_DEBUG(this, lit("Entered run(). %1:%2, system thread id %3")
-        .arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()));
+    NX_DEBUG(this, "Entered run(). %1:%2, system thread id %3",
+        d->serverAddress, d->localPort, systemThreadId());
+
     try
     {
         if (!d->serverSocket)
@@ -313,8 +313,8 @@ void QnTcpListener::run()
             {
                 int oldPort = d->localPort;
                 d->localPort.store(d->newPort);
-                NX_INFO(this, lit("(%1:%2). Switching port to: %3")
-                    .arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort));
+                NX_INFO(this, "(%1:%2). Switching port to: %3",
+                    d->serverAddress, oldPort, d->localPort);
                 // TODO: Add comment why this code is commented out.
                 //removeAllConnections();
                 destroyServerSocket(d->serverSocket);
@@ -324,8 +324,8 @@ void QnTcpListener::run()
                     QThread::msleep(1000);
                     continue;
                 }
-                NX_INFO(this, lit("(%1:%2). Switched to port %3")
-                    .arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort));
+                NX_INFO(this, "(%1:%2). Switched to port %3",
+                    d->serverAddress, oldPort, d->localPort);
                 int currentValue = d->localPort;
 
                 // Reset newPort if no more changes.
@@ -358,9 +358,11 @@ void QnTcpListener::run()
                     && prevErrorCode != SystemError::again
                     && prevErrorCode != SystemError::interrupted)
                 {
-                    NX_WARNING(this, lit("(%1:%2). Accept failed: %3 (%4)")
-                        .arg(d->serverAddress.toString()).arg(d->localPort)
-                        .arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)));
+                    NX_WARNING(this, "(%1:%2). Accept failed: %3 (%4)",
+                        d->serverAddress,
+                        d->localPort,
+                        prevErrorCode,
+                        SystemError::toString(prevErrorCode));
                     QThread::msleep(1000);
                     int zero = 0;
                     d->newPort.compare_exchange_strong(zero, d->localPort); //< reopen tcp socket
@@ -370,17 +372,16 @@ void QnTcpListener::run()
     }
     catch (const std::exception& e)
     {
-        NX_WARNING(this, lit("Exception in TCPListener (%1:%2). %3")
-            .arg(d->serverAddress.toString()).arg(d->localPort).arg(QString::fromLatin1(e.what())));
+        NX_WARNING(this, "Exception in TCPListener (%1:%2). %3",
+            d->serverAddress, d->localPort, e.what());
     }
 
-    NX_DEBUG(this, lit("(%1:%2). Removing all connections before stop")
-        .arg(d->serverAddress.toString()).arg(d->localPort));
+    NX_DEBUG(this, "(%1:%2). Removing all connections before stop",
+        d->serverAddress, d->localPort);
     removeAllConnections();
     destroyServerSocket(d->serverSocket);
     d->serverSocket = nullptr;
-    NX_DEBUG(this, lit("Exiting run(). %1:%2")
-        .arg(d->serverAddress.toString()).arg(d->localPort));
+    NX_DEBUG(this, "Exiting run(). %1:%2", d->serverAddress, d->localPort);
 }
 
 void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
@@ -399,8 +400,7 @@ void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractSt
         return;
     }
     d->ddosWarned = false;
-    NX_VERBOSE(this, lit("New client connection from %1")
-        .arg(socket->getForeignAddress().address.toString()));
+    NX_VERBOSE(this, "New client connection from %1", socket->getForeignAddress().address);
 
     socket->setRecvTimeout(kDefaultSocketTimeout);
     socket->setSendTimeout(kDefaultSocketTimeout);

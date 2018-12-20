@@ -9,7 +9,7 @@
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include "live_stream_provider.h"
 
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 struct QnAbstractMediaData;
 
@@ -20,7 +20,7 @@ class CLServerPushStreamReader
 {
 public:
     CLServerPushStreamReader(
-        const nx::mediaserver::resource::CameraPtr& dev);
+        const nx::vms::server::resource::CameraPtr& dev);
     virtual ~CLServerPushStreamReader(){stop();}
 
     //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
@@ -53,7 +53,7 @@ private:
     bool processOpenStreamResult();
 
 private:
-    const nx::mediaserver::resource::CameraPtr m_camera;
+    const nx::vms::server::resource::CameraPtr m_camera;
     bool m_needReopen = false;
     bool m_cameraAudioEnabled = false;
     CameraDiagnostics::Result m_openStreamResult = CameraDiagnostics::Result(

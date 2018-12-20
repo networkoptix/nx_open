@@ -96,7 +96,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
     const quint8* payload = data + RtpHeader::kSize;
     dataSize -= RtpHeader::kSize;
-    const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
+    // Odd numbers - codec context, even numbers - data.
+    const bool isCodecContext = qFromBigEndian(rtpHeader->ssrc) & 1;
     if (isCodecContext)
     {
         m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(
@@ -107,7 +108,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
         QnConstMediaContextPtr context = m_context;
 
         if (rtpHeader->padding)
-            dataSize -= ntohl(rtpHeader->padding);
+            dataSize -= qFromBigEndian(rtpHeader->padding);
         if (dataSize < 1)
             return false;
 
@@ -118,7 +119,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
             const QnAbstractMediaData::DataType dataType =
                 (QnAbstractMediaData::DataType) *(payload++);
-            quint32 timestampHigh = ntohl(*(quint32*) payload);
+            quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
             dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
             payload  += 4; // deserialize timeStamp high part
 
@@ -155,8 +156,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
                     return false;
 
-                auto duration = ntohl(*((quint32*)payload)) * 1000;
-                auto metadataType = static_cast<MetadataType>(htonl(*((quint32*)(payload) + 1)));
+                auto duration = qFromBigEndian(*((quint32*) payload)) * 1000;
+                auto metadataType = (MetadataType) qFromBigEndian(*((quint32*) (payload) + 1));
 
                 QnAbstractCompressedMetadata* metadata = nullptr;
 
@@ -235,7 +236,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
                 if (context)
                     m_nextDataPacket->compressionType = context->getCodecId();
-                m_nextDataPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
+                m_nextDataPacket->timestamp =
+                    qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
 
                 // TODO: Investigate whether this code is needed.
                 //m_nextDataPacket->channelNumber = channelNum;

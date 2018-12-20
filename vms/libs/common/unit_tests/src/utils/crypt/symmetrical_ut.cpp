@@ -5,9 +5,9 @@
 #include <utils/crypt/symmetrical.h>
 
 namespace {
-const std::array<uint8_t, 16> kArrayKey = { 
-    0x2b, 0x00, 0x15, 0x00, 0x28, 0xae, 0xd2, 0xa6, 
-    0xab, 0xf7, 0x15, 0x88, 0x00, 0xcf, 0x4f, 0x3c 
+const std::array<uint8_t, 16> kArrayKey = {
+    0x2b, 0x00, 0x15, 0x00, 0x28, 0xae, 0xd2, 0xa6,
+    0xab, 0xf7, 0x15, 0x88, 0x00, 0xcf, 0x4f, 0x3c
 };
 
 const std::vector<std::vector<uint8_t>> kVariableKeys = {
@@ -35,10 +35,16 @@ const std::vector<QByteArray> kTestData = {
     u8"101",
     u8"0bcdefg hefjklmnoprstuvwxyzabcdefgh efj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0 \
      0bcdefghefjklmnoprstuvwxyzabcdefghefj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0",
-    u8"0bcdefghefjklmnoprstuvwxyzabавыф фывафы  вфыавыфа фываcdefghe fj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0", 
-    u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12", 
-    u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12 аыфдлафыджвлавыджлаоджлауцйащшзуцоащш оывал дуцйщшзак уцщйзо", 
+    u8"0bcdefghefjklmnoprstuvwxyzabавыф фывафы  вфыавыфа фываcdefghe fj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0",
+    u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12",
+    u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12 аыфдлафыджвлавыджлаоджлауцйащшзуцоащш оывал дуцйщшзак уцщйзо",
 };
+}
+
+TEST(SymmetricalEncryptionCBC, AesExtraKey)
+{
+    const auto key = nx::utils::generateAesExtraKey();
+    ASSERT_EQ(key.size(), 16);
 }
 
 TEST(SymmetricalEncryptionCBC, ArrayKey)

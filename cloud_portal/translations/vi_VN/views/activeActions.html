@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             Tài khoản của bạn đã được kích hoạt thành công
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">Đăng nhập</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             Tài khoản đã được kích hoạt hoặc mã xác nhận không chính xác
         </h1>
     </div>

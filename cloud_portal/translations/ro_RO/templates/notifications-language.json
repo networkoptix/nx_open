@@ -1,9 +1,9 @@
 {
   "activate_account": {
-    "emailSubject": "Activate your account"
+    "emailSubject": "Activează-ți contul"
   },
   "restore_password": {
-    "emailSubject": "Reset your password"
+    "emailSubject": "Reseteaza parola"
   },
   "system_invite": {
     "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"

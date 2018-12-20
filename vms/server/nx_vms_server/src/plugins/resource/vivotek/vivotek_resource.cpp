@@ -13,7 +13,7 @@
 #include <utils/media/av_codec_helper.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -45,13 +45,14 @@ VivotekResource::VivotekResource(QnMediaServerModule* serverModule):
 {
 }
 
-CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesResp& onvifCapabilities)
+CameraDiagnostics::Result VivotekResource::initializeMedia(
+    const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities)
 {
     auto result = base_type::initializeMedia(onvifCapabilities);
     if (!result)
         return result;
 
-    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(ResourceDataKey::kDisableHevc, false);
 
     if (hevcIsDisabled)
         return result;
@@ -270,18 +271,18 @@ bool VivotekResource::setVivotekParameter(
     return true;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
 
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
     QSet<QPair<int,int>> resolutions;
     for (const auto key: onvifResult.keys())
         resolutions.insert(QPair<int, int>(key.resolution.width(), key.resolution.height()));
 
-    nx::mediaserver::resource::StreamCapabilityMap result = onvifResult;
+    nx::vms::server::resource::StreamCapabilityMap result = onvifResult;
     if (m_hasHevcSupport && m_hasHevcSupport.get())
     {
         for (const auto& resolution: resolutions)
@@ -296,7 +297,7 @@ nx::mediaserver::resource::StreamCapabilityMap VivotekResource::getStreamCapabil
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE_ONVIF

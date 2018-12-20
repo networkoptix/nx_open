@@ -3,11 +3,11 @@
 
 #include <gtest/gtest.h>
 #include <test_support/mediaserver_launcher.h>
-#include <nx/mediaserver/unused_wallpapers_watcher.h>
+#include <nx/vms/server/unused_wallpapers_watcher.h>
 #include "nx_ec/ec_api.h"
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 QStringList readFiles(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
@@ -38,7 +38,7 @@ TEST(UnusedLayoutsWatcherTest, main)
     fileManager->addStoredFileSync(lit("%1/file2.jpg").arg(Qn::kWallpapersFolder), QByteArray());
 
     ASSERT_EQ(2, readFiles(ec2Connection).size());
-    nx::mediaserver::UnusedWallpapersWatcher fileDeleter(mediaServerLauncher->commonModule());
+    nx::vms::server::UnusedWallpapersWatcher fileDeleter(mediaServerLauncher->commonModule());
 
     fileDeleter.update();
     ASSERT_EQ(2, readFiles(ec2Connection).size());
@@ -52,5 +52,5 @@ TEST(UnusedLayoutsWatcherTest, main)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

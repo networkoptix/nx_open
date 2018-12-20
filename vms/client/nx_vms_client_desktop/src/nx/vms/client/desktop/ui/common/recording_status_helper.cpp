@@ -152,7 +152,7 @@ QString RecordingStatusHelper::shortTooltip(int recordingMode)
         case Qn::RecordingType::motionOnly:
             return tr("Motion only");
         case Qn::RecordingType::motionAndLow:
-            return tr("Motion + Lo-Res");
+            return tr("Motion + Low-Res");
     }
     return QString();
 }

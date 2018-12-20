@@ -11,10 +11,10 @@
 
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/network/http/http_client.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class LilinRemoteArchiveManager:
@@ -78,7 +78,7 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE ONVIF

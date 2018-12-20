@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -137,6 +136,7 @@ SPACE for last name is not valid
     [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
@@ -180,8 +180,9 @@ Langauge is changeable on the account page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${lang}']/..
+    \  Click Button    ${ACCOUNT SAVE}
     \  Sleep    1    #to allow the system to change languages
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1[text()='${account}']
     Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']

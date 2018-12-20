@@ -196,15 +196,16 @@ void ServerTimeSyncManager::saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs)
         kTimeDeltaParamName,
         QByteArray::number(systemTimeDeltaMs));
 
-    // Avoid passing this in async callback.
-    auto logTag = nx::utils::log::Tag(this);
+    // TODO: Avoid passing `this` in async callback.
+    const auto logTag = nx::utils::log::Tag(this);
     connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
-        deltaData, this,
+        deltaData,
+        this,
         [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
-    {
-        if (errorCode != ec2::ErrorCode::ok)
-            NX_WARNING(logTag, lm("Failed to save time delta data to the database"));
-    });
+        {
+            if (errorCode != ec2::ErrorCode::ok)
+                NX_WARNING(logTag, "Failed to save time delta data to the database");
+        });
 }
 
 void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()
@@ -221,13 +222,23 @@ void ServerTimeSyncManager::updateTime()
 
     const auto primaryTimeServerId = getPrimaryTimeServerId();
     const auto ownId = commonModule()->moduleGUID();
-    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
+    bool syncWithInternel = primaryTimeServerId.isNull();
 
-    auto networkTimeSyncInterval = commonModule()->globalSettings()->syncTimeExchangePeriod();
+    auto globalSettings = commonModule()->globalSettings();
+    auto networkTimeSyncInterval = globalSettings->syncTimeExchangePeriod();
+    const bool isTimeSyncEnabled = globalSettings->isTimeSynchronizationEnabled();
     const bool isTimeRecentlySync = m_lastNetworkSyncTime.isValid()
         && !m_lastNetworkSyncTime.hasExpired(networkTimeSyncInterval);
 
-    if (syncWithInternel)
+    if (primaryTimeServerId == ownId || !isTimeSyncEnabled)
+    {
+        // Reset network time sync period. If user will change settings, next network request
+        // should be applied immediately without regular delay.
+        m_lastNetworkSyncTime.invalidate();
+
+        loadTimeFromLocalClock();
+    }
+    else if (syncWithInternel)
     {
         QnRoute route = routeToNearestServerWithInternet();
         if (!route.isValid() && !route.reverseConnect)
@@ -245,10 +256,6 @@ void ServerTimeSyncManager::updateTime()
             m_timeLoadFromServer = route.id;
             m_lastNetworkSyncTime.restart();
         }
-    }
-    else if (primaryTimeServerId.isNull() || primaryTimeServerId == ownId)
-    {
-        loadTimeFromLocalClock();
     }
     else
     {

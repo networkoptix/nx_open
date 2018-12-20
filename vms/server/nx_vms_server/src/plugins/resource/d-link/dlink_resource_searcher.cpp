@@ -10,6 +10,8 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 
+#include <nx/network/url/url_builder.h>
+
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
 
@@ -22,7 +24,7 @@ extern QString getValueFromString(const QString& line);
 QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -143,7 +145,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 continue;
 
             QnResourceData resourceData = dataPool()->data(manufacture(), name);
-            if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+            if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
                 continue; // model forced by ONVIF
 
             resource->setTypeId(rt);
@@ -166,25 +168,44 @@ QString QnPlDlinkResourceSearcher::manufacture() const
     return QnPlDlinkResource::MANUFACTURE;
 }
 
-QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(
+    const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() && isSearchAction )
-        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+    if (!url.scheme().isEmpty() && isSearchAction)
+        return QList<QnResourcePtr>();  // Searching if only host is present, not specific protocol.
 
     QString host = url.host();
-    int port = url.port();
+    // #dliman This logic should be removed, url must contain host field here.
+    NX_ASSERT(!host.isEmpty());
     if (host.isEmpty())
-        host = url.toString(); // in case if url just host address without protocol and port
+        host = url.toString(); //< If url is just a host address without a protocol and a port.
 
-    int timeout = 2000;
+    int port = url.port();
+    if (port <= 0)
+        port = nx::network::http::DEFAULT_HTTP_PORT;
 
-    if (port < 0)
-        port = 80;
+    const auto requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(host)
+        .setPort(port)
+        .setUserName(auth.user())
+        .setPassword(auth.password())
+        .setPath("/common/info.cgi")
+        .toUrl();
 
-    CLHttpStatus status;
-    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("common/info.cgi"), host, port, timeout, auth)));
+    nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::undefined;
+    nx::network::http::BufferType responseBuffer;
+    const auto returnCode =
+        nx::network::http::downloadFileSync(requestUrl, (int*) &status, &responseBuffer);
+    if (returnCode != SystemError::noError || !nx::network::http::StatusCode::isSuccessCode(status))
+    {
+        NX_DEBUG(this, "Request error, system error: %1, status code: %2",
+            returnCode, nx::network::http::StatusCode::toString(status));
+        return QList<QnResourcePtr>();
+    }
 
-    if (response.length()==0)
+    const QString response = responseBuffer;
+    if (response.isEmpty())
         return QList<QnResourcePtr>();
 
     QStringList lines = response.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
@@ -214,7 +235,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
         return QList<QnResourcePtr>();
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource(serverModule()) );

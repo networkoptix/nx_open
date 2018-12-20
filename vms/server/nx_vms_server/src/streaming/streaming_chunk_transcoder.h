@@ -16,7 +16,7 @@
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 #include "../camera/camera_pool.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class StreamingChunkCacheKey;
 class StreamingChunkTranscoderThread;
@@ -32,7 +32,7 @@ class StreamingChunkTranscoder:
     public QObject,
     public nx::utils::TimerEventHandler,
     public Qn::EnableSafeDirectConnection,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

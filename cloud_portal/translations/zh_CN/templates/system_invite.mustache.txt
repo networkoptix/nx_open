@@ -9,5 +9,5 @@
 您已被授予访问 {{message.system_name}}的权限。
 {{/message.sharer_name}}
 
-注册并查看系统︰{{config.portal_url}}/register/{{message.code}}
+注册并查看系统︰ {{config.portal_url}}/注册/{{message.code}}
 

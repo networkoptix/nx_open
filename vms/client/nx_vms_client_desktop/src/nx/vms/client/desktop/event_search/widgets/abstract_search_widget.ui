@@ -100,46 +100,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QWidget" name="areaSelectionHolder" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="nx::vms::client::desktop::SelectableTextButton" name="areaSelectionButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string notr="true">&lt;area filter&gt;</string>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -186,105 +146,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QWidget" name="counterContainer" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>32</height>
-         </size>
-        </property>
-        <layout class="QHBoxLayout" name="counterLineLayout">
-         <property name="spacing">
-          <number>8</number>
-         </property>
-         <property name="leftMargin">
-          <number>8</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>8</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="itemCounterLabel">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="text">
-            <string notr="true">&lt;event counter&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="toolbar" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <layout class="QHBoxLayout" name="toolbarLayout">
-            <property name="spacing">
-             <number>8</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="nx::vms::client::desktop::ToolButton" name="toggleFootersButton">
-              <property name="text">
-               <string notr="true"/>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="nx::vms::client::desktop::ToolButton" name="togglePreviewsButton">
-              <property name="text">
-               <string notr="true"/>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
       <item>
        <widget class="nx::vms::client::desktop::EventRibbon" name="ribbon" native="true">
         <property name="sizePolicy">
@@ -411,11 +272,6 @@
    <class>nx::vms::client::desktop::SelectableTextButton</class>
    <extends>QPushButton</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/selectable_text_button.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::ToolButton</class>
-   <extends>QToolButton</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/tool_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

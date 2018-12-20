@@ -208,9 +208,6 @@ namespace Qn
 
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
 
-        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
-        RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
         DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
@@ -244,11 +241,13 @@ namespace Qn
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
-        AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
         DurationRole,                               /**< Role for duration in microseconds (std::chrono::microseconds). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
+
+        SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
+        RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.
@@ -444,6 +443,7 @@ namespace Qn
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::ItemDataRole);
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

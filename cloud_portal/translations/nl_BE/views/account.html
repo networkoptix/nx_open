@@ -17,7 +17,10 @@
                 <label for="firstName" class="text-left text-md-right control-label">Voornaam</label>
             </div>
             <div class="col-md-4">
-                <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
+                <input type="text" class="form-control" ng-model="account.first_name"
+                       name="firstName" id="firstName" maxlength="255"
+                       required
+ autofocus>
             </div>
             <div class="col-md-4">
                 <span class="help-block input-error" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">Voornaam is verplicht</span>
@@ -39,7 +42,7 @@
                 <label for="lastName" class="text-left text-md-right control-label">Taal</label>
             </div>
             <div class="col-md-4">
-                <nx-language-select></nx-language-select>
+                <nx-language-select (on-selected)="changeLanguage($event)"></nx-language-select>
                 <!--<language-select account-mode="true" ng-model="account.language"></language-select>-->
             </div>
             <div class="col-md-4">
@@ -57,7 +60,7 @@
 </div>
 
 <div class="container" ng-if="passwordMode" >
-    <h1>Wijzig wachtwoord</h1>
+    <h1>Wachtwoord wijzigen</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
@@ -66,11 +69,11 @@
             <div class="col-md-4">
                 <input type="password" class="form-control"
                        ng-model="pass.password"
-                       name="password"
-                       id="password" required>
+                       name="password" autofocus
+ id="password" required>
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Huidig ​​wachtwoord is vereist</span>
+                <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Huidig wachtwoord (verplicht)</span>
             </div>
         </div>
 

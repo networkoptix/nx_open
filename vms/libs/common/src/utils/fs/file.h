@@ -119,11 +119,7 @@ public:
 
     //!Returns true if file system entry with name \a fileName exists
     static bool fileExists( const QString& fileName );
-    //!Retrieves file size
-    /*!
-        \return file size in bytes. -1 if file size could not be read (no file, access denied, \a fileName is a directory etc...)
-    */
-    static qint64 getFileSize( const QString& fileName );
+
     //!If \a path /etc/smb.conf, returns /etc/, if /etc/ returns /etc/
     static QString filePath( const QString& path );
     //!If \a path /etc/smb.conf, returns smb.conf

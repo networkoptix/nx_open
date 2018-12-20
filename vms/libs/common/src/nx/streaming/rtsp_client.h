@@ -33,41 +33,55 @@ class QnRtspClient;
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+enum class RtspTransport
+{
+    udp,
+    tcp,
+    multicast,
+    autoDetect
+};
+RtspTransport rtspTransportFromString(const QString& value);
+QString toString(const RtspTransport& value);
+
 class QnRtspIoDevice
 {
 public:
-    explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
+    explicit QnRtspIoDevice(QnRtspClient* owner, RtspTransport rtspTransport, quint16 mediaPort = 0, quint16 rtcpPort = 0);
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
     const nx::streaming::rtp::RtcpSenderReport& getSenderReport() { return m_senderReport; }
     void setSenderReport(const nx::streaming::rtp::RtcpSenderReport& value) { m_senderReport = value; }
     nx::network::AbstractCommunicatingSocket* getMediaSocket();
-    nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket.get(); }
     void shutdown();
-    void setTcpMode(bool value);
+    void setTransport(RtspTransport rtspTransport);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
-    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
+    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteRtcpPort = rtcpPort;}
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
+
+    void bindToMulticastAddress(const QHostAddress& address);
 private:
     void processRtcpData();
 
 private:
-    QnRtspClient* m_owner;
-    bool m_tcpMode;
+    QnRtspClient* m_owner = nullptr;
+    RtspTransport m_transport = RtspTransport::tcp;
+
     nx::streaming::rtp::RtcpSenderReport m_senderReport;
-    nx::network::AbstractDatagramSocket* m_mediaSocket;
-    nx::network::AbstractDatagramSocket* m_rtcpSocket;
-    quint16 m_mediaPort;
-    quint16 m_remoteEndpointRtcpPort;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_mediaSocket;
+    std::unique_ptr< nx::network::AbstractDatagramSocket> m_rtcpSocket;
+    quint16 m_remoteMediaPort = 0;
+    quint16 m_remoteRtcpPort = 0;
     nx::network::HostAddress m_hostAddress;
-    quint32 ssrc;
+    quint32 ssrc = 0;
     QElapsedTimer m_reportTimer;
-    bool m_reportTimerStarted;
-    bool m_forceRtcpReports;
+    bool m_reportTimerStarted = false;
+    bool m_forceRtcpReports = false;
+    QHostAddress m_multicastAddress;
 };
 
 class QnRtspClient
@@ -78,7 +92,6 @@ public:
         bool shouldGuessAuthDigest = false;
         bool backChannelAudioOnly = false;
     };
-    enum TransportType { TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
     static const QByteArray kPlayCommand;
     static const QByteArray kSetupCommand;
@@ -98,10 +111,10 @@ public:
     struct SDPTrackInfo
     {
         SDPTrackInfo() = default;
-        SDPTrackInfo(const nx::streaming::Sdp::Media& sdpMedia, QnRtspClient* owner, bool useTCP):
+        SDPTrackInfo(const nx::streaming::Sdp::Media& sdpMedia, QnRtspClient* owner, RtspTransport transport, int serverPort):
             sdpMedia(sdpMedia)
         {
-            ioDevice = std::make_shared<QnRtspIoDevice>(owner, useTCP);
+            ioDevice = std::make_shared<QnRtspIoDevice>(owner, transport, serverPort);
             ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host()));
         }
         void setRemoteEndpointRtcpPort(quint16 rtcpPort) { ioDevice->setRemoteEndpointRtcpPort(rtcpPort); };
@@ -138,14 +151,12 @@ public:
     // session timeout in ms
     unsigned int sessionTimeoutMs();
 
-    const QByteArray& getSdp() const;
+    const nx::streaming::Sdp& getSdp() const;
 
     bool sendKeepAliveIfNeeded();
 
-    void setTransport(TransportType transport);
-    void setTransport(const QString& transport);
-    TransportType getTransport() const { return m_transport; }
-    bool isTcpMode() const { return m_prefferedTransport != TRANSPORT_UDP; }
+    void setTransport(RtspTransport transport);
+    RtspTransport getTransport() const { return m_transport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
@@ -241,7 +252,7 @@ private:
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
     void updateTransportHeader(QByteArray &responce);
 
-    void parseSDP();
+    void parseSDP(const QByteArray& data);
 
     void addAdditionAttrs( nx::network::http::Request* const request );
     void updateResponseStatus(const QByteArray& response);
@@ -250,7 +261,6 @@ private:
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
-    bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx::network::http::Request&& request);
     void addCommonHeaders(nx::network::http::HttpHeaders& headers);
     void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
@@ -263,7 +273,7 @@ private:
 
     // 'initialization in order' block
     unsigned int m_csec;
-    TransportType m_transport;
+    RtspTransport m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
     qint64 m_openedTime;
@@ -279,7 +289,7 @@ private:
 
     quint8* m_responseBuffer;
     int m_responseBufferLen;
-    QByteArray m_sdp;
+    nx::streaming::Sdp m_sdp;
 
     std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     nx::utils::Url m_url;
@@ -294,7 +304,7 @@ private:
     QAuthenticator m_auth;
     boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    TransportType m_prefferedTransport;
+    RtspTransport m_prefferedTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;

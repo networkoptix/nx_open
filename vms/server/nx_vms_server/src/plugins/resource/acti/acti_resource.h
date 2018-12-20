@@ -6,8 +6,8 @@
 #include <QtCore/QMap>
 
 #include <network/multicodec_rtp_reader.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
@@ -19,7 +19,7 @@
 class QnActiPtzController;
 
 class QnActiResource:
-    public nx::mediaserver::resource::Camera,
+    public nx::vms::server::resource::Camera,
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
@@ -50,7 +50,6 @@ public:
     virtual void setIframeDistance(int frames, int timems) override;
 
     virtual bool hasDualStreamingInternal() const override;
-    virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
@@ -58,7 +57,7 @@ public:
     int roundBitrate(int srcBitrateKbps) const;
     QString formatBitrateString(int bitrateKbps) const;
 
-    RtpTransport::Value getDesiredTransport() const;
+    RtspTransport getDesiredTransport() const;
 
     bool isAudioSupported() const;
 
@@ -102,7 +101,7 @@ public:
     static QString formatResolutionStr(const QSize& resolution);
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
@@ -215,13 +214,12 @@ private:
         }
     };
 
-
     QList<QSize> m_resolutionList[MAX_STREAMS];
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
     QMap<ComparableSize, int> m_maxSecondaryFps;
     QSet<QString> m_availableEncoders;
-    RtpTransport::Value m_desiredTransport;
+    RtspTransport m_desiredTransport;
 
     int m_rtspPort;
     bool m_hasAudio;
@@ -233,7 +231,7 @@ private:
     bool m_inputMonitored;
     QnMutex m_audioCfgMutex;
     boost::optional<bool> m_audioInputOn;
-    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnActiResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnActiResource> m_advancedParametersProvider;
 };
 
 #endif // #ifdef ENABLE_ACTI

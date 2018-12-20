@@ -2,11 +2,11 @@
 
 #include <typeindex>
 
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnAbstractResourceSearcher;
 
-class QnMediaServerResourceSearchers: public QObject, public nx::mediaserver::ServerModuleAware
+class QnMediaServerResourceSearchers: public QObject, public nx::vms::server::ServerModuleAware
 {
 public:
     QnMediaServerResourceSearchers(QnMediaServerModule* serverModule);

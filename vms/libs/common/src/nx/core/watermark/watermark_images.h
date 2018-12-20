@@ -4,8 +4,7 @@
 
 class QSize;
 
-namespace nx {
-namespace core {
+namespace nx::core {
 
 struct Watermark;
 
@@ -17,5 +16,4 @@ QPixmap createWatermarkImage(const Watermark& watermark, const QSize& size);
 // May return pixmap with different size but the same aspect ratio.
 QPixmap retrieveWatermarkImage(const Watermark& watermark, const QSize& size);
 
-} // namespace core
-} // namespace nx
+} // namespace nx::core

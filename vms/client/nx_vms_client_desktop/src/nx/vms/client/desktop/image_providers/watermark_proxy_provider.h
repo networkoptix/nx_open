@@ -5,9 +5,7 @@
 #include "image_provider.h"
 
 #include <nx/core/watermark/watermark.h>
-
-
-class QnDisconnectHelper;
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::core { struct Watermark; }
 
@@ -45,7 +43,7 @@ private:
 
 private:
     ImageProvider* m_sourceProvider = nullptr;
-    QScopedPointer<QnDisconnectHelper> m_sourceProviderConnections;
+    nx::utils::ScopedConnections m_sourceProviderConnections;
 
     QImage m_image;
     Watermark m_watermark;

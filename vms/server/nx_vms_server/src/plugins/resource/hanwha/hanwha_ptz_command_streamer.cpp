@@ -1,7 +1,7 @@
 #include "hanwha_ptz_command_streamer.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -176,5 +176,5 @@ void HanwhaPtzCommandStreamer::scheduleNextRequest(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

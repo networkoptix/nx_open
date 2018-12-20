@@ -45,10 +45,10 @@ public:
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
-    bool moveConnectionToReadyForStreaming(const QnUuid& connectionGuid);
+    bool moveConnectionToReadyForStreaming(const std::string& connectionGuid);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
-    void waitForNewTransactionsReady(const QnUuid& connectionGuid);
-    void connectionFailure(const QnUuid& connectionGuid);
+    void waitForNewTransactionsReady(const std::string& connectionGuid);
+    void connectionFailure(const std::string& connectionGuid);
 
     nx::vms::api::PeerData localPeer() const;
 

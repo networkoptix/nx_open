@@ -88,6 +88,13 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
     return open(audio->context);
 }
 
+int getDefaultBitrate(AVCodecContext* context)
+{
+    if (context->codec_id == AV_CODEC_ID_ADPCM_G726)
+        return 16000; // G726 supports bitrate in range [16000..40000] Kbps only.
+    return 64000 * context->channels;
+}
+
 bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 {
     NX_ASSERT(context);
@@ -116,7 +123,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-    m_encoderCtx->bit_rate = m_bitrate > 0 ? m_bitrate : 64000 * m_encoderCtx->channels;
+    m_encoderCtx->bit_rate = m_bitrate > 0 ? m_bitrate : getDefaultBitrate(m_encoderCtx);
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {

@@ -4,7 +4,7 @@
 
 #include <QtGui/QImage>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
@@ -15,7 +15,7 @@ class QnMediaServerModule;
 
 // TODO: #Elric rename class to *ArecontVision*, rename file
 class QnPlAreconVisionResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
     friend class QnPlArecontResourceSearcher;
@@ -79,7 +79,7 @@ public:
     virtual bool setApiParameter(const QString &id, const QString &value);
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();

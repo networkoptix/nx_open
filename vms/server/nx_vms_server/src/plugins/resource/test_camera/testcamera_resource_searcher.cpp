@@ -14,7 +14,7 @@ QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(QnMediaServerModule* 
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

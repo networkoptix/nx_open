@@ -140,15 +140,15 @@ bool QnBasicPtzController::getHomeObject(QnPtzObject* /*object*/) const
     return false;
 }
 
-bool QnBasicPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* /*traits*/,
+bool QnBasicPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* /*traits*/,
     const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
 
-bool QnBasicPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& /*trait*/,
+bool QnBasicPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& /*trait*/,
     const QString& /*data*/,
     const nx::core::ptz::Options& /*options*/)
 {

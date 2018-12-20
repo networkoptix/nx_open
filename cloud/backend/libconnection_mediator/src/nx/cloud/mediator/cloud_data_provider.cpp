@@ -47,11 +47,6 @@ AbstractCloudDataProviderFactory::FactoryFunc
 }
 
 
-AbstractCloudDataProvider::System::System():
-    mediatorEnabled(false)
-{
-}
-
 AbstractCloudDataProvider::System::System(String authKey_, bool mediatorEnabled_):
     authKey(std::move(authKey_)),
     mediatorEnabled(mediatorEnabled_)

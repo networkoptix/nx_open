@@ -4,7 +4,7 @@
 
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 
-namespace nx::mediaserver { class Settings; }
+namespace nx::vms::server { class Settings; }
 
 class QnFlexWatchResourceSearcher: public OnvifResourceSearcher
 {

@@ -29,7 +29,7 @@
 #include <utils/threaded_chunks_merge_tool.h>
 #include <camera/thumbnails_loader.h>
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 class QAction;
 class QCompleter;
@@ -124,8 +124,12 @@ public:
     qint64 positionUsec() const;
     void setPosition(qint64 positionUsec);
 
+    QnTimePeriod timelineRange() const;
+
     QnResourceWidget* currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
+
+    QnMediaResourceWidget* currentMediaWidget() const;
 
     QnResourcePtr currentResource() const;
 
@@ -220,6 +224,8 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+
+    bool calculateTimelineRelevancy() const;
     void updateTimelineRelevancy();
     void updateSyncIsForced();
 
@@ -374,8 +380,8 @@ private:
     /** Timeline position animator. */
     QPointer<VariantAnimator> m_positionAnimator;
 
-    QnDisconnectHelperPtr m_currentWidgetConnections;
-    QnDisconnectHelperPtr m_centralWidgetConnections;
+    nx::utils::ScopedConnections m_currentWidgetConnections;
+    nx::utils::ScopedConnections m_centralWidgetConnections;
 
     std::array<QnTimePeriodList, Qn::TimePeriodContentCount> m_mergedTimePeriods;
 };

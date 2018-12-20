@@ -96,8 +96,11 @@ private:
     void sendListenResponse(
         boost::optional<QUrl> trafficRelayInstanceUrl,
         std::function<void(api::ResultCode, api::ListenResponse)> responseSender);
+
     void reportClientBind(const MediaserverData& mediaserverConnectionKey);
-    void sendClientBindIndications(const ConnectionStrongRef& connection);
+
+    std::vector<network::stun::Message> prepareClientBindIndications();
+
     nx::network::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
 };
 

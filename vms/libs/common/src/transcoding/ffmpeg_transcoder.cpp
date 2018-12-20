@@ -306,7 +306,8 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     }
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
-    QnFfmpegAvPacket packet;
+    AVPacket packet;
+    av_init_packet(&packet);
     QnAbstractMediaDataPtr transcodedData;
 
     QnCodecTranscoderPtr transcoder;

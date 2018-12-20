@@ -8,8 +8,8 @@ DOXYCHECK=`command -v doxygen`
 SDK_NAME=nx_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
-SERVER_PLUGINS_DIR=../plugins
-NX_SDK_DIR=../../../nxlib/nx_sdk
+SERVER_PLUGINS_DIR=../plugins/device
+NX_SDK_DIR=../../../libs/nx_sdk
 
 if [ -z "$DOXYCHECK" ]; then
      sudo apt-get install -y doxygen
@@ -36,7 +36,7 @@ cp -f $NX_SDK_DIR/src/plugins/plugin_container_api.h $TARGET_DIR/include/plugins
 cp -f $NX_SDK_DIR/src/camera/camera_plugin.h $TARGET_DIR/include/plugins/
 cp -f $NX_SDK_DIR/src/camera/camera_plugin_types.h $TARGET_DIR/include/plugins/
 
-PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
+PLUGINS=(axis_camera_plugin image_library_plugin usb_camera_plugin)
 
 for (( i=0; i<${#PLUGINS[@]}; i++ ))
 do

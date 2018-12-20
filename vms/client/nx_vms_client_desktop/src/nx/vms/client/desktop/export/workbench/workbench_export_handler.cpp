@@ -408,12 +408,8 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     if (!hasPermission && !widget)
         return;
 
-    ExportSettingsDialog dialog(
-            period,
-            QnCameraBookmark(),
-            d->fileNameValidator(),
+    ExportSettingsDialog dialog(period, QnCameraBookmark(), d->fileNameValidator(), watermark(),
             mainWindowWidget());
-    setWatermark(&dialog); //< This should go right after constructor.
 
     if (!hasPermission)
     {
@@ -472,8 +468,8 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
         return;
 
     const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
-    ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), mainWindowWidget());
-    setWatermark(&dialog); //< This should go right after constructor.
+    ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), watermark(),
+        mainWindowWidget());
 
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
     dialog.setMediaParams(camera, itemData, context());
@@ -499,14 +495,17 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
 
     const auto boundingPeriod = periods.boundingPeriod();
 
-    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), mainWindowWidget());
-    setWatermark(&dialog); //< This should go right after constructor.
+    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), watermark(),
+        mainWindowWidget());
 
     static const QString reason =
         tr("Several bookmarks can be exported as layout only.");
     dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
     dialog.setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
     dialog.setBookmarks(bookmarks);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
 
     auto context = prepareExportTool(dialog);
     runExport(std::move(context));
@@ -611,19 +610,6 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     return std::make_pair(exportId, std::move(tool));
 }
 
-void WorkbenchExportHandler::setWatermark(nx::vms::client::desktop::ExportSettingsDialog* dialog)
-{
-    if (ini().enableWatermark)
-    {
-        if (globalSettings()->watermarkSettings().useWatermark
-            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
-            && context()->user() && !context()->user()->getName().isEmpty())
-        {
-            dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});
-        }
-    }
-}
-
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {
 #ifdef Q_OS_WIN
@@ -716,7 +702,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     if (!layout || !layout->isFile())
         return;
 
-    if (layout->data(Qn::LayoutEncryptionRole).toBool())
+    if (layout::isEncrypted(layout))
     {
         if (!layout::confirmPassword(layout, mainWindowWidget()))
             return; //< Reconfirm the password from user and exit if it is invalid.
@@ -730,8 +716,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     layoutSettings.mode = ExportLayoutSettings::Mode::LocalSave;
     layoutSettings.period = layout->getLocalRange();
     layoutSettings.readOnly = readOnly;
-    layoutSettings.encryption = {layout->data(Qn::LayoutEncryptionRole).toBool(),
-        layout->data(Qn::LayoutPasswordRole).toString()};
+    layoutSettings.encryption = {layout::isEncrypted(layout), layout::password(layout)};
 
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));

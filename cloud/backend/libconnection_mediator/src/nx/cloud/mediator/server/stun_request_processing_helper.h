@@ -10,8 +10,9 @@
 namespace nx {
 namespace hpm {
 
-typedef std::shared_ptr< network::stun::AbstractServerConnection > ConnectionStrongRef;
-typedef std::weak_ptr< network::stun::AbstractServerConnection > ConnectionWeakRef;
+using ConnectionPtr = network::stun::AbstractServerConnection*;
+using ConnectionStrongRef = std::shared_ptr<network::stun::AbstractServerConnection>;
+using ConnectionWeakRef = std::weak_ptr<network::stun::AbstractServerConnection>;
 
 /** Send success responce without attributes. */
 template<typename ConnectionPtr>

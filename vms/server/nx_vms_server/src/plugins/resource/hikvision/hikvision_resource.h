@@ -11,7 +11,7 @@
 #include <nx/network/http/http_client.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HikvisionResource: public QnPlOnvifResource
@@ -35,12 +35,12 @@ public:
         bool isAdditionalSupportCheckNeeded = false);
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
-        const CapabilitiesResp& onvifCapabilities) override;
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities) override;
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
@@ -63,7 +63,7 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif  //ENABLE_ONVIF

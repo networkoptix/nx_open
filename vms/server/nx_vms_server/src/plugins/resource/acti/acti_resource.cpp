@@ -57,8 +57,8 @@ const char* kApiRequestPath = "/cgi-bin/cmd/";
 } // namespace
 
 QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule),
-    m_desiredTransport(RtpTransport::_auto),
+    nx::vms::server::resource::Camera(serverModule),
+    m_desiredTransport(RtspTransport::autoDetect),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -429,9 +429,9 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
     return CameraDiagnostics::NoErrorResult();
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
 
     const auto& resolutionList = m_resolutionList[(int)streamIndex];
 
@@ -501,11 +501,8 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         m_availableEncoders.insert(lit("H264"));
     }
 
-    auto desiredTransport = resourceData().value<QString>(
-        Qn::DESIRED_TRANSPORT_PARAM_NAME,
-        RtpTransport::_auto);
-
-    m_desiredTransport = RtpTransport::fromString(desiredTransport);
+    auto desiredTransport = resourceData().value<QString>(ResourceDataKey::kDesiredTransport);
+    m_desiredTransport = rtspTransportFromString(desiredTransport);
 
     bool dualStreamingCapability = false;
     bool fisheyeStreamingCapability = false;
@@ -580,14 +577,14 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     // Resolution list depends on streaming mode, so we should make this request
     // after setting proper streaming mode.
-    QByteArray resolutions= makeActiRequest(
+    QByteArray resolutions = makeActiRequest(
         lit("system"),
         lit("VIDEO_RESOLUTION_CAP"),
         status);
 
     // Save this check for backward compatibility
     // since SYSTEM_INFO request potentially can work without auth
-    if (!nx::network::http::StatusCode::unauthorized == status)
+    if (nx::network::http::StatusCode::unauthorized == status)
         setStatus(Qn::Unauthorized);
 
     if (!nx::network::http::StatusCode::isSuccessCode(status))
@@ -661,6 +658,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
             std::sort(m_availFps[i].begin(), m_availFps[i].end());
         }
+        setMaxFps(m_availFps[0].last());
     }
     auto rtspPortString = makeActiRequest(lit("system"), lit("V2_PORT_RTSP"), status);
 
@@ -690,9 +688,9 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     fetchAndSetAdvancedParameters();
 
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
-    setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolutionList[1].isEmpty() ? 1 : 0);
+    setProperty(ResourcePropertyKey::kIsAudioSupported, m_hasAudio ? 1 : 0);
+
+    setProperty(ResourcePropertyKey::kHasDualStreaming, !m_resolutionList[1].isEmpty() ? 1 : 0);
     QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
     if (!serialNumber.isEmpty())
         setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
@@ -701,7 +699,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     if (!result)
         return result;
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -919,12 +917,6 @@ QSet<QString> QnActiResource::setApiParameters(const QnCameraAdvancedParamValueM
     return resultIds;
 }
 
-int QnActiResource::getMaxFps() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_availFps[0].last();
-}
-
 QString QnActiResource::formatBitrateString(int bitrateKbps) const
 {
     if (m_availableBitrates.contains(bitrateKbps))
@@ -933,7 +925,7 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
     return bitrateToDefaultString(bitrateKbps);
 }
 
-RtpTransport::Value QnActiResource::getDesiredTransport() const
+RtspTransport QnActiResource::getDesiredTransport() const
 {
     return m_desiredTransport;
 }
@@ -980,7 +972,7 @@ bool QnActiResource::isAudioSupported() const
 
 bool QnActiResource::hasDualStreamingInternal() const
 {
-    return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
+    return getProperty(ResourcePropertyKey::kHasDualStreaming).toInt() > 0;
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
@@ -1517,7 +1509,7 @@ void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
 }
 
-std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnActiResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};

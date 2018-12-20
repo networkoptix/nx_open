@@ -3,7 +3,7 @@
 #include <nx/update/common_update_manager.h>
 
 QnCancelUpdateRestHandler::QnCancelUpdateRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

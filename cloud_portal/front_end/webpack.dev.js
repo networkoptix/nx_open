@@ -22,27 +22,29 @@ module.exports = merge(common, {
                 //target : 'http://cloud-local',
                 target : 'https://cloud-dev2.hdw.mx',
                 //target : 'https://cloud-test.hdw.mx',
-                changeOrigin: true,
-                //secure: false
+                changeOrigin: true
 
             },
             // Rewrite English translations to be served from DEV files
             {
                 context     : '/static/lang_en_US/',
-                target      : "https://0.0.0.0:9000",
-                pathRewrite : { "^/static/lang_en_US": "" },
+                target      : 'https://0.0.0.0:9000',
+                pathRewrite : { '^/static/lang_en_US': '' },
                 changeOrigin: true,
                 secure      : false
             },
             {
                 context     : '/static/',
-                target      : "https://0.0.0.0:9000",
-                pathRewrite : { "^/static": "" },
+                target      : 'https://0.0.0.0:9000',
+                pathRewrite : { '^/static': '' },
                 changeOrigin: true,
                 secure      : false
-            },
+            }
         ],
         https             : {
+            spdy: {
+                protocols: ['http/1.1']
+            },
             key : fs.readFileSync('ssl_keys/server.key').toString(),
             cert: fs.readFileSync('ssl_keys/server.crt').toString()
         },

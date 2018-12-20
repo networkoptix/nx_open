@@ -9,26 +9,52 @@
 #include <core/resource/resource.h>
 #include <core/resource/file_processor.h>
 
+#include <nx/utils/range_adapters.h>
+
 namespace {
+
+enum class Protocol
+{
+    unknown = -1,
+    v10,
+    v31,
+    v40
+};
 
 enum
 {
     RESOURCES_BINARY_V1_TAG = 0xE1E00001,
     RESOURCES_BINARY_V2_TAG = 0xE1E00002,
+    RESOURCES_BINARY_V3_TAG = 0xE1E00003,
 };
+
+Protocol protocolFromTag(quint32 tag)
+{
+    switch (tag)
+    {
+        case RESOURCES_BINARY_V1_TAG:
+            return Protocol::v10;
+        case RESOURCES_BINARY_V2_TAG:
+            return Protocol::v31;
+        case RESOURCES_BINARY_V3_TAG:
+            return Protocol::v40;
+        default:
+            return Protocol::unknown;
+    }
+}
 
 Q_GLOBAL_STATIC_WITH_ARGS(quint64, qn_localMagic, (QDateTime::currentMSecsSinceEpoch()));
 
 static const QString kInternalMimeType = lit("application/x-noptix-resources");
 static const QString kUriListMimeType = lit("text/uri-list"); //< Must be equal to Qt internal type
 
-QByteArray serializeToInternal(const QList<QnUuid>& ids)
+QByteArray serializeToInternal(const QList<QnUuid>& ids, const QHash<int, QVariant>& arguments)
 {
     QByteArray result;
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     // Magic signature.
-    stream << static_cast<quint32>(RESOURCES_BINARY_V2_TAG);
+    stream << static_cast<quint32>(RESOURCES_BINARY_V3_TAG);
 
     // For local D&D.
     stream << static_cast<quint64>(QApplication::applicationPid());
@@ -39,18 +65,24 @@ QByteArray serializeToInternal(const QList<QnUuid>& ids)
     for (const auto& id: ids)
         stream << id.toString();
 
+    stream << static_cast<quint32>(arguments.size());
+    for (const auto& [key, value]: nx::utils::keyValueRange(arguments))
+        stream << key << value;
+
     return result;
 }
 
-QList<QnUuid> deserializeFromInternal(const QByteArray& data)
+std::pair<QList<QnUuid>, QHash<int, QVariant>> deserializeFromInternal(const QByteArray& data)
 {
     QByteArray tmp = data;
     QDataStream stream(&tmp, QIODevice::ReadOnly);
-    QList<QnUuid> result;
+    std::pair<QList<QnUuid>, QHash<int, QVariant>> result;
 
     quint32 tag;
     stream >> tag;
-    if (tag != RESOURCES_BINARY_V1_TAG && tag != RESOURCES_BINARY_V2_TAG)
+
+    const auto protocol = protocolFromTag(tag);
+    if (protocol == Protocol::unknown)
         return result;
 
     bool fromOtherApp = false;
@@ -65,22 +97,40 @@ QList<QnUuid> deserializeFromInternal(const QByteArray& data)
     if (magic != *qn_localMagic())
         fromOtherApp = true;
 
-    quint32 size;
-    stream >> size;
-    for (quint32 i = 0; i < size; i++)
+    quint32 count{0};
+    stream >> count;
+
+    for (quint32 i = 0; i < count; i++)
     {
         QString id;
         stream >> id;
-        result.push_back(QnUuid(id));
+        if (stream.status() != QDataStream::Ok)
+            break;
 
-        if (tag == RESOURCES_BINARY_V1_TAG)
+        result.first.push_back(QnUuid(id));
+
+        if (protocol == Protocol::v10)
         {
             QString uniqueId; //< Is not used in the later format.
             stream >> uniqueId;
         }
+    }
 
+    if (stream.status() != QDataStream::Ok || protocol < Protocol::v40)
+        return result;
+
+    count = 0;
+    stream >> count;
+
+    for (quint32 i = 0; i < count; i++)
+    {
+        int key{};
+        QVariant value;
+        stream >> key >> value;
         if (stream.status() != QDataStream::Ok)
             break;
+
+        result.second[key] = value;
     }
 
     return result;
@@ -200,7 +250,8 @@ void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
     for (const QString &format: data->formats())
         setData(format, data->data(format));
 
-    auto ids = deserializeFromInternal(this->data(kInternalMimeType));
+    QnUuidList ids;
+    std::tie(ids, m_arguments) = deserializeFromInternal(this->data(kInternalMimeType));
 
     m_resources.clear();
 
@@ -222,6 +273,7 @@ void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
 
     for (const auto resource: m_resources)
         ids.removeAll(resource->getId());
+
     m_entities = ids;
     m_resources = m_resources.filtered(QnResourceAccessFilter::isDroppable);
 
@@ -239,7 +291,7 @@ void MimeData::updateInternalStorage()
             urls.append(QUrl::fromLocalFile(resource->getUrl()));
     }
 
-    setData(kInternalMimeType, serializeToInternal(ids));
+    setData(kInternalMimeType, serializeToInternal(ids, m_arguments));
 
     if (!urls.empty())
     {
@@ -247,6 +299,17 @@ void MimeData::updateInternalStorage()
         d.setUrls(urls);
         setData(kUriListMimeType, d.data(kUriListMimeType));
     }
+}
+
+QHash<int, QVariant> MimeData::arguments() const
+{
+    return m_arguments;
+}
+
+void MimeData::setArguments(const QHash<int, QVariant>& value)
+{
+    m_arguments = value;
+    updateInternalStorage();
 }
 
 } // namespace nx::vms::client::desktop

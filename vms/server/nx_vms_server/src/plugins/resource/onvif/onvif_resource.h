@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <set>
 
 #include <QString>
 #include <QtCore/QDateTime>
@@ -19,11 +20,11 @@
 #include <QElapsedTimer>
 #include <QtCore/QTimeZone>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
 #include <core/resource/resource_data_structures.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
@@ -90,10 +91,10 @@ struct QnOnvifServiceUrls
 };
 
 class QnPlOnvifResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
-    using base_type = nx::mediaserver::resource::Camera;
+    using base_type = nx::vms::server::resource::Camera;
 
 public:
     using GSoapAsyncPullMessagesCallWrapper = GSoapAsyncCallWrapper<
@@ -150,6 +151,11 @@ public:
             const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
             QnBounds frameRateBounds = QnBounds());
 
+        static std::vector<QnPlOnvifResource::VideoOptionsLocal> createVideoOptionsLocalList(
+            const QString& id,
+            const onvifXsd__VideoEncoderConfigurationOptions& options,
+            QnBounds frameRateBounds);
+
         UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
         // Profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
@@ -178,9 +184,6 @@ public:
     };
 
     static const QString MANUFACTURE;
-    static QString MEDIA_URL_PARAM_NAME;
-    static QString ONVIF_URL_PARAM_NAME;
-    static QString ONVIF_ID_PARAM_NAME;
     static const float QUALITY_COEF;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
@@ -367,17 +370,17 @@ protected:
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODEC c);
 
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         DeviceSoapWrapper& deviceSoapWrapper,
-        CapabilitiesResp* outCapabilitiesResponse);
-    virtual CameraDiagnostics::Result initializeMedia(const CapabilitiesResp& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializePtz(const CapabilitiesResp& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializeIo(const CapabilitiesResp& onvifCapabilities);
+        _onvifDevice__GetCapabilitiesResponse* outCapabilitiesResponse);
+    virtual CameraDiagnostics::Result initializeMedia(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializePtz(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeIo(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
     virtual CameraDiagnostics::Result initializeAdvancedParameters(
-        const CapabilitiesResp& onvifCapabilities);
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
@@ -395,12 +398,10 @@ protected:
         const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
 
     virtual CameraDiagnostics::Result customInitialization(
-        const CapabilitiesResp& /*capabilitiesResponse*/)
+        const _onvifDevice__GetCapabilitiesResponse& /*capabilitiesResponse*/)
     {
         return CameraDiagnostics::NoErrorResult();
     }
-
-    void setMaxFps(int f);
 
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities)
     {
@@ -456,10 +457,17 @@ private:
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
     void setAudioOutputConfigurationToken(const QString& value);
+
+    std::set<QString> notificationTopicsForMonitoring() const;
+    std::set<QString> allowedInputSourceNames() const;
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
+
+    std::vector<VideoOptionsLocal> m_primaryStreamCapabilitiesExtension;
+    std::vector<VideoOptionsLocal> m_secondaryStreamCapabilitiesExtension;
 
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
@@ -615,7 +623,7 @@ private:
     //!Reads relay output list from resource
     bool fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList);
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
-    bool fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse );
+    bool fetchRelayInputInfo( const _onvifDevice__GetCapabilitiesResponse& capabilitiesResponse );
     bool fetchPtzInfo();
     bool setRelayOutputInfo( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
@@ -629,15 +637,55 @@ private:
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper& soapWrapper,
-        CapabilitiesResp* response );
+        _onvifDevice__GetCapabilitiesResponse* response );
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
-    void fillFullUrlInfo( const CapabilitiesResp& response );
-    bool getVideoEncoderTokens(
+    void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
+    bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
         QStringList* tokenList);
     QString getInputPortNumberFromString(const QString& portName);
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
+protected:
+    // Logging functions
+    //** SOAP request failed. */
+    QString makeSoapFailMessage(BaseSoapWrapper& soapWrapper,
+        const QString& caller, const QString& requestCommand,
+        int soapError, const QString& text = QString()) const;
+
+    //** SOAP request succeeded. */
+    QString makeSoapSuccessMessage(BaseSoapWrapper& soapWrapper,
+        const QString& caller, const QString& requestCommand,
+        const QString& text = QString()) const;
+
+    //** SOAP response has no desired parameter. */
+    QString makeSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
+        const QString& missedParameter, const QString& caller, const QString& requestCommand,
+        const QString& text = QString()) const;
+
+    //** SOAP response has no desired parameter. */
+    QString makeSoapNoRangeParameterMessage(BaseSoapWrapper& soapWrapper,
+        const QString& rangeParameter, int index, const QString& caller,
+        const QString& requestCommand, const QString& text = QString()) const;
+
+    //** SOAP response has a range (e.g. vector) of parameters of no enough size. */
+    QString makeSoapSmallRangeMessage(BaseSoapWrapper& soapWrapper,
+        const QString& rangeParameter, int rangeSize, int desiredSize,
+        const QString& caller, const QString& requestCommand,
+        const QString& text = QString()) const;
+
+    //* SOAP request failed - static analogue for makeSoapFailMessage. */
+    static QString makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
+        const QString& requestCommand, int soapError, const QString& text = QString());
+
+    //** SOAP response is incomplete - static analogue for makeSoapNoParameterMessage. */
+    static QString makeStaticSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
+        const QString& missedParameter, const QString& caller, const QString& requestCommand,
+        const QString& text = QString());
+
+    QString makeFailMessage(const QString& text) const;
+
+private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
@@ -648,7 +696,7 @@ public:
     mutable QnOnvifServiceUrls m_serviceUrls;
 
 protected:
-    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
     QString m_audioOutputConfigurationToken;

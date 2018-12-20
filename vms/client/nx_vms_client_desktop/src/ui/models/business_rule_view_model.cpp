@@ -42,7 +42,7 @@
 #include <utils/media/audio_player.h>
 #include <nx/network/http/http_types.h>
 
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/fusion/model_functions.h>
 
 using namespace nx;
 
@@ -212,9 +212,6 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     {
         if (eventType == EventType::pluginEvent)
         {
-            if (!ini().enablePluginEvents)
-                continue;
-
             /** Show it only for users who have at least one plugin installed. */
             const auto pirs =
                 resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>();
@@ -494,24 +491,42 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
     bool cameraRequired = vms::event::requiresCameraResource(m_eventType);
     bool serverRequired = vms::event::requiresServerResource(m_eventType);
 
+    // Store params for the current event type
+    m_cachedEventParams[m_eventType] = m_eventParams;
+
     m_eventType = value;
     m_modified = true;
 
-    switch (m_eventType)
+    // Create or load params for the new event type
+    if (!m_cachedEventParams.contains(m_eventType))
     {
-    case EventType::cameraInputEvent:
-        m_eventParams.inputPortId = QString();
-        break;
+        nx::vms::event::EventParameters eventParams;
 
-    case EventType::softwareTriggerEvent:
-        m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
-        m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
-        m_eventParams.caption = QString();
-        break;
+        switch (m_eventType)
+        {
+            case EventType::pluginEvent:
+            {
+                using namespace nx::vms::api;
+                EventLevels levels = 0;
+                levels |= ErrorEventLevel;
+                levels |= WarningEventLevel;
+                levels |= InfoEventLevel;
+                eventParams.inputPortId = QnLexical::serialized(levels);
+                break;
+            }
 
-    default:
-        m_eventParams.caption = m_eventParams.description = QString();
+            case EventType::softwareTriggerEvent:
+                eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
+                eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
+                break;
+
+            default:
+                break;
+        }
+
+        m_cachedEventParams[m_eventType] = eventParams;
     }
+    m_eventParams = m_cachedEventParams[m_eventType];
 
     Fields fields = Field::eventType | Field::modified;
 

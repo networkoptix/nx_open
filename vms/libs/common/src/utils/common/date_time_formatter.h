@@ -1,9 +1,7 @@
-#ifndef QN_DATE_TIME_FORMATTER_H
-#define QN_DATE_TIME_FORMATTER_H
+#pragma once
 
-class QString;
-class QDate;
-class QTime;
+#include <QtCore/QDateTime>
+
 class QLocale;
 
 struct QnDateTimeFormatter {
@@ -16,5 +14,3 @@ public:
         return dateTimeToString(format, &date, &time, &locale);
     }
 };
-
-#endif // QN_DATE_TIME_FORMATTER_H

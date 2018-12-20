@@ -43,7 +43,7 @@ bool CameraResourceStub::hasDualStreamingInternal() const
 void CameraResourceStub::setHasDualStreaming(bool value)
 {
     m_hasDualStreaming = value;
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1); //< to reset cached values;
+    setProperty(ResourcePropertyKey::kHasDualStreaming, 1); //< to reset cached values;
 }
 
 void CameraResourceStub::markCameraAsNvr()
@@ -60,7 +60,7 @@ void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)
 void CameraResourceStub::markCameraAsVMax()
 {
     m_licenseType = Qn::LC_VMAX;
-    setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
+    setProperty(ResourcePropertyKey::kDts, 1); //< to reset cached values;
     emit licenseTypeChanged(toSharedPointer(this));
 }
 

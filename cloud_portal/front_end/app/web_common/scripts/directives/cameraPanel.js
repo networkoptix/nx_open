@@ -1,35 +1,60 @@
 (function () {
-    "use strict";
+    
+    'use strict';
 
-    angular
-        .module('nxCommon')
-        .directive('cameraPanel', CameraPanel);
-
-    CameraPanel.$inject = [ '$localStorage', '$timeout', '$filter' ];
-
-    function CameraPanel($localStorage, $timeout, $filter) {
-
+    function CameraPanel($localStorage, $timeout, $location, $routeParams,
+                         configService, languageService) {
+    
+        const CONFIG = configService.config;
+        const LANG = languageService.lang;
+        
         return {
             restrict   : 'E',
             scope      : {
-                "activeCamera"   : "=",
-                "camerasProvider": "=",
-                "showCameraPanel": "=",
-                "searchCams"     : "="
+                'activeCamera'   : '=',
+                'camerasProvider': '=',
+                'showCameraPanel': '=',
+                'isEmbeded'      : '<'
             },
-            templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
+            templateUrl: CONFIG.viewsDirCommon + 'components/cameraPanel.html',
             link       : function (scope/*, element, attrs*/) {
-                scope.Config = Config;
+                scope.Config = CONFIG;
                 scope.storage = $localStorage;
-                scope.inputPlaceholder = L.common.searchCamPlaceholder;
-
+                scope.inputPlaceholder = LANG.common.searchCamPlaceholder;
+                
+                scope.panel = {
+                    filter : ''
+                };
+                
                 scope.selectCamera = function (activeCamera) {
                     if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
                         return;
                     }
                     scope.activeCamera = activeCamera;
                 };
-
+    
+                function searchCameras() {
+                    function has(str, substr) {
+                        return str && str.toLowerCase().replace(/\s/g, '').indexOf(substr.toLowerCase().replace(/\s/g, '')) >= 0;
+                    }
+    
+                    angular.forEach(scope.mediaServers, function (server) {
+                        var cameras = scope.cameras[server.id];
+                        var camsVisible = false;
+    
+                        angular.forEach(cameras, function (camera) {
+                            camera.visible = scope.panel.filter === '' ||
+                                has(camera.name, scope.panel.filter) ||
+                                has(camera.url, scope.panel.filter);
+                            camsVisible = camsVisible || camera.visible;
+                        });
+            
+                        server.visible = scope.panel.filter === '' || camsVisible /*||
+                        has(server.name, scope.panel.filter) ||
+                        has(server.url, scope.panel.filter)*/;
+                    });
+                }
+                
                 function updateCameras () {
                     scope.cameras = scope.camerasProvider.cameras;
 
@@ -39,7 +64,9 @@
                         if (scope.cameras.hasOwnProperty(serverId)) {
 
                             for (var idx = 0; idx < scope.cameras[serverId].length; idx++) {
-                                if (scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
+                                if (scope.isEmbeded && scope.cameras[serverId][idx].id === '{' + $routeParams.cameraId + '}' ||
+                                    !scope.isEmbeded && scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
+                                    
                                     scope.selectCamera(scope.cameras[serverId][idx]);
                                     selected = true;
                                     break;
@@ -62,7 +89,7 @@
                         }
                     }
 
-                    searchCams();
+                    searchCameras();
                 }
 
                 scope.toggleInfoFn = function () {
@@ -71,7 +98,6 @@
                 };
 
                 scope.showCamera = function (camera) {
-                    scope.showCameraPanel = false;
                     scope.selectCamera(camera);
                 };
 
@@ -79,33 +105,6 @@
                     server.expanded = !server.expanded;
                     scope.storage.serverStates[ server.id ] = server.expanded;
                 };
-
-                function searchCams(searchText) {
-                    function has(str, substr) {
-                        return str && str.toLowerCase().replace(/\s/g, '').indexOf(substr.toLowerCase().replace(/\s/g, '')) >= 0;
-                    }
-
-                    //If the text is blank allow scope.searchCams to update in dom then update cameras
-                    if (searchText === '') {
-                        return $timeout(searchCams);
-                    }
-
-                    _.forEach(scope.mediaServers, function (server) {
-                        var cameras = scope.cameras[ server.id ];
-                        var camsVisible = false;
-
-                        _.forEach(cameras, function (camera) {
-                            camera.visible = scope.searchCams === '' ||
-                                has(camera.name, scope.searchCams) ||
-                                has(camera.url, scope.searchCams);
-                            camsVisible = camsVisible || camera.visible;
-                        });
-
-                        server.visible = scope.searchCams === '' || camsVisible /*||
-                        has(server.name, scope.searchCams) ||
-                        has(server.url, scope.searchCams)*/;
-                    });
-                }
 
                 function updateMediaServers () {
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
@@ -118,14 +117,20 @@
                             }
 
                             server.expanded = scope.storage.serverStates[server.id] !== undefined && scope.storage.serverStates[server.id];
-                        })
+                        });
                     }
                 }
-
-                scope.$watch('searchCams', searchCams);
+                
+                scope.$watch('panel.filter', searchCameras);
                 scope.$watch('camerasProvider.cameras', updateCameras, true);
                 scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);
             }
         };
     }
+    
+    CameraPanel.$inject = ['$localStorage', '$timeout', '$location', '$routeParams', 'configService', 'languageService'];
+    
+    angular
+        .module('nxCommon')
+        .directive('cameraPanel', CameraPanel);
 })();

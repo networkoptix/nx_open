@@ -152,17 +152,15 @@ std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
 void MediatorFunctionalTest::registerCloudDataProvider(
     AbstractCloudDataProvider* cloudDataProvider)
 {
-    m_factoryFuncToRestore =
+    auto oldFactoryFunc =
         AbstractCloudDataProviderFactory::setFactoryFunc(
-            [cloudDataProvider](
-                const std::optional<nx::utils::Url>& /*cdbUrl*/,
-                const std::string& /*user*/,
-                const std::string& /*password*/,
-                std::chrono::milliseconds /*updateInterval*/,
-                std::chrono::milliseconds /*startTimeout*/)
+            [cloudDataProvider](auto&&...)
             {
                 return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
             });
+
+    if (!m_factoryFuncToRestore)
+        m_factoryFuncToRestore = std::move(oldFactoryFunc);
 }
 
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()

@@ -766,6 +766,13 @@ void QnWorkbenchNavigator::setPosition(qint64 positionUsec)
     emit positionChanged();
 }
 
+QnTimePeriod QnWorkbenchNavigator::timelineRange() const
+{
+    return m_timeSlider && m_timelineRelevant
+        ? QnTimePeriod::fromInterval(m_timeSlider->minimum(), m_timeSlider->maximum())
+        : QnTimePeriod();
+}
+
 void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 {
     if (widget == NULL)
@@ -844,6 +851,11 @@ QnResourceWidget* QnWorkbenchNavigator::currentWidget() const
     return m_currentWidget;
 }
 
+QnMediaResourceWidget* QnWorkbenchNavigator::currentMediaWidget() const
+{
+    return m_currentMediaWidget;
+}
+
 QnResourcePtr QnWorkbenchNavigator::currentResource() const
 {
     return m_currentWidget ? m_currentWidget->resource() : QnResourcePtr();
@@ -863,7 +875,7 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
 
     QnTimePeriod window(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     if (m_timeSlider->windowEnd() == m_timeSlider->maximum()) // TODO: #Elric check that widget supports live.
-        window.durationMs = QnTimePeriod::infiniteDuration();
+        window.durationMs = QnTimePeriod::kInfiniteDuration;
     item->setData(Qn::ItemSliderWindowRole, QVariant::fromValue<QnTimePeriod>(window));
 
     if (workbench()->currentLayout()->isSearchLayout())
@@ -892,7 +904,7 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
     else
     {
         if (window.isEmpty())
-            window = QnTimePeriod(0, QnTimePeriod::infiniteDuration());
+            window = QnTimePeriod::anytime();
 
         milliseconds windowStart = milliseconds(window.startTimeMs);
         milliseconds windowEnd = window.isInfinite()
@@ -1098,14 +1110,13 @@ void QnWorkbenchNavigator::updateCentralWidget()
     if (m_centralWidget == centralWidget)
         return;
 
-    m_centralWidgetConnections.clear();
+    m_centralWidgetConnections = {};
 
     m_centralWidget = centralWidget;
 
     if (m_centralWidget)
     {
-        m_centralWidgetConnections = QnDisconnectHelper::create();
-        *m_centralWidgetConnections << connect(m_centralWidget->resource(),
+        m_centralWidgetConnections << connect(m_centralWidget->resource(),
             &QnResource::parentIdChanged,
             this,
             &QnWorkbenchNavigator::updateLocalOffset);
@@ -1120,7 +1131,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     if (m_currentWidget == widget)
         return;
 
-    QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
+    QnMediaResourceWidget* mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
 
     const auto previousResource = currentResource();
 
@@ -1128,7 +1139,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
-    m_currentWidgetConnections.clear();
+    m_currentWidgetConnections = {};
 
     if (m_currentWidget)
     {
@@ -1166,14 +1177,12 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentWidget)
     {
-        m_currentWidgetConnections = QnDisconnectHelper::create();
-
-        *m_currentWidgetConnections << connect(m_currentWidget,
+        m_currentWidgetConnections << connect(m_currentWidget,
             &QnMediaResourceWidget::aspectRatioChanged,
             this,
             &QnWorkbenchNavigator::updateThumbnailsLoader);
 
-        *m_currentWidgetConnections << connect(m_currentWidget->resource(),
+        m_currentWidgetConnections << connect(m_currentWidget->resource(),
             &QnResource::nameChanged,
             this,
             &QnWorkbenchNavigator::updateLines);
@@ -1474,8 +1483,15 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             }
             else
             {
-                // #vkutin It seems we shouldn't do anything here until we receive actual data.
-                return;
+                // Trying to display data from the loaded chunks.
+                const auto periods = m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent);
+                // We shouldn't do anything here until we receive actual data.
+                if (periods.empty())
+                    return;
+
+                // Set to periods limits.
+                startTimeMSec = periods.first().startTimeMs;
+                endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
             }
         }
         else
@@ -1955,19 +1971,39 @@ void QnWorkbenchNavigator::updateSpeedRange()
     emit speedRangeChanged();
 }
 
+bool QnWorkbenchNavigator::calculateTimelineRelevancy() const
+{
+    // Timeline is not actual if there is no current widget or it is not a playable media.
+    if (!isPlayingSupported())
+        return false;
+
+    NX_ASSERT(m_currentMediaWidget);
+    if (!m_currentMediaWidget)
+        return false;
+
+    const auto resource = m_currentMediaWidget->resource()->toResourcePtr();
+    NX_ASSERT(resource);
+    if (!resource)
+        return false;
+
+    // Timeline is not relevant for desktop cameras.
+    if (resource->hasFlags(Qn::desktop_camera))
+        return false;
+
+    // Timeline is always actual for local files.
+    if (resource->flags().testFlag(Qn::local))
+        return true;
+
+    const bool rtspStreamIsOpen = m_currentWidgetLoaded;
+
+    return isRecording()
+        || hasArchive()
+        || rtspStreamIsOpen;
+}
+
 void QnWorkbenchNavigator::updateTimelineRelevancy()
 {
-    // We cannot get earliest time via RTSP for cameras we cannot view.
-    const auto resource = currentWidget() ? currentWidget()->resource() : QnResourcePtr();
-    const bool widgetIsReady = m_currentWidgetLoaded ||
-        (resource && !accessController()->hasPermissions(resource, Qn::ViewLivePermission));
-
-    const auto value = isRecording()
-        || (currentWidget()
-            && widgetIsReady
-            && isPlayingSupported()
-            && !resource->hasFlags(Qn::desktop_camera)
-            && (hasArchive() || resource->flags().testFlag(Qn::local)));
+    const bool value = calculateTimelineRelevancy();
 
     if (m_timelineRelevant == value)
         return;

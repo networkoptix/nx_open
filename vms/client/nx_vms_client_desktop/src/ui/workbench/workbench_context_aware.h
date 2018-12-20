@@ -4,6 +4,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 
 #include <client_core/connection_context_aware.h>
+#include <nx/core/watermark/watermark.h>
 
 class QnWorkbenchContext;
 class QnWorkbench;
@@ -89,6 +90,8 @@ protected:
      * MainWindow header.
      */
     QWidget* mainWindowWidget() const;
+
+    nx::core::Watermark watermark() const;
 
 private:
     void init(QObject* parent);

@@ -116,36 +116,20 @@
 
     <h2>Impostazioni registro</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Livello principale del registro</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Nessuno: log disabilitato.</option>
-                    <option value="ALWAYS">Sempre: registra errori, avvisi e messaggi più importanti.</option>
-                    <option value="ERROR">Errore: solo errori di registro.</option>
-                    <option value="WARNING">Avviso: registra avvisi ed errori.</option>
-                    <option value="INFO">Info: registra errori, avvisi e tutti i messaggi.</option>
-                    <option value="DEBUG">Debug: registra tutti i messaggi di sistema e le informazioni di debug.</option>
-                    <option value="DEBUG2">Debug2: registra ogni messaggio di sistema e le informazioni di debug estese.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Nessuno: log disabilitato.</option>
+                    <option value="always">Sempre: registra errori, avvisi e messaggi più importanti.</option>
+                    <option value="error">Errore: solo errori di registro.</option>
+                    <option value="warning">Avviso: registra avvisi ed errori.</option>
+                    <option value="info">Info: registra errori, avvisi e tutti i messaggi.</option>
+                    <option value="debug">Debug: registra tutti i messaggi di sistema e le informazioni di debug.</option>
+                    <option value="debug2">Debug2: registra ogni messaggio di sistema e le informazioni di debug estese.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Livello del registro delle transazioni</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Nessuno: log disabilitato.</option>
-                    <option value="ALWAYS">Sempre: registra errori, avvisi e messaggi più importanti.</option>
-                    <option value="ERROR">Errore: solo errori di registro.</option>
-                    <option value="WARNING">Avviso: registra avvisi ed errori.</option>
-                    <option value="INFO">Info: registra errori, avvisi e tutti i messaggi.</option>
-                    <option value="DEBUG">Debug: registra tutti i messaggi di sistema e le informazioni di debug.</option>
-                    <option value="DEBUG2">Debug2: registra ogni messaggio di sistema e le informazioni di debug estese.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Salva</button>
         </div>

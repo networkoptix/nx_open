@@ -3,7 +3,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QUuid>
 
-#include <utils/common/encoded_credentials.h>
+#include <utils/common/credentials.h>
 
 namespace nx::vms::client::core {
 
@@ -13,7 +13,7 @@ class AuthenticationDataModel: public QAbstractListModel
     typedef QAbstractListModel base_type;
 
     Q_PROPERTY(QUuid systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
-    Q_PROPERTY(QnEncodedCredentials defaultCredentials
+    Q_PROPERTY(nx::vms::common::Credentials defaultCredentials
         READ defaultCredentials NOTIFY defaultCredentialsChanged)
 
 public:
@@ -30,7 +30,7 @@ public:
     QUuid systemId() const;
     void setSystemId(const QUuid& localId);
 
-    QnEncodedCredentials defaultCredentials() const;
+    nx::vms::common::Credentials defaultCredentials() const;
 
 public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -45,7 +45,7 @@ signals:
 
 private:
     QUuid m_systemId;
-    QList<QnEncodedCredentials> m_credentialsList;
+    QList<nx::vms::common::Credentials> m_credentialsList;
 };
 
 } // namespace nx::vms::client::core

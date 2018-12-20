@@ -6,12 +6,12 @@
 #include <atomic>
 
 #include <modbus/modbus_async_client.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
 
 class QnAdamResource:
-    public nx::mediaserver::resource::Camera,
+    public nx::vms::server::resource::Camera,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
@@ -42,7 +42,7 @@ public slots:
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 

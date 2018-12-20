@@ -783,6 +783,9 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted()
 
 void QnResourceWidget::setOption(Option option, bool value /*= true*/)
 {
+    if (value && option == DisplayMotion)
+        NX_ASSERT(m_resource && m_resource->hasFlags(Qn::motion));
+
     setOptions(value ? m_options | option : m_options & ~option);
 }
 

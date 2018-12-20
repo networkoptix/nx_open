@@ -7,11 +7,11 @@
 #include "core/resource_management/resource_searcher.h"
 #include "nx/network/socket.h"
 #include <qglobal.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnAdamResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     struct QnAdamAsciiCommand
     {

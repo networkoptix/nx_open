@@ -5,7 +5,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 
 #include <nx/utils/std/optional.h>
-#include <nx/utils/meta/signature_extractor.h>
+#include <nx/utils/signature_extractor.h>
 
 namespace nx {
 namespace core {
@@ -45,8 +45,8 @@ using GetActiveObjectExecutor = FUNC_TYPE(getActiveObject);
 using GetHomeObjectExecutor = FUNC_TYPE(getHomeObject);
 using UpdateHomeObjectExecutor = FUNC_TYPE(updateHomeObject);
 
-using GetAuxilaryTraitsExecutor = FUNC_TYPE(getAuxilaryTraits);
-using RunAuxilaryCommandExecutor = FUNC_TYPE(runAuxilaryCommand);
+using GetAuxiliaryTraitsExecutor = FUNC_TYPE(getAuxiliaryTraits);
+using RunAuxiliaryCommandExecutor = FUNC_TYPE(runAuxiliaryCommand);
 
 using GetDataExecutor = FUNC_TYPE(getData);
 
@@ -117,11 +117,11 @@ public:
     virtual bool updateHomeObject(const QnPtzObject& homeObject) override;
     virtual bool getHomeObject(QnPtzObject* homeObject) const override;
 
-    virtual bool getAuxilaryTraits(
-        QnPtzAuxilaryTraitList* auxilaryTraits,
+    virtual bool getAuxiliaryTraits(
+        QnPtzAuxiliaryTraitList* auxiliaryTraits,
         const nx::core::ptz::Options& options) const override;
-    virtual bool runAuxilaryCommand(
-        const QnPtzAuxilaryTrait& trait,
+    virtual bool runAuxiliaryCommand(
+        const QnPtzAuxiliaryTrait& trait,
         const QString& data,
         const nx::core::ptz::Options& options) override;
 
@@ -167,8 +167,8 @@ public:
     MAKE_EXECUTOR_SETTER(UpdateHomeObjectExecutor, updateHomeObject)
     MAKE_EXECUTOR_SETTER(GetHomeObjectExecutor, getHomeObject)
 
-    MAKE_EXECUTOR_SETTER(GetAuxilaryTraitsExecutor, getAuxilaryTraits)
-    MAKE_EXECUTOR_SETTER(RunAuxilaryCommandExecutor, runAuxilaryCommand)
+    MAKE_EXECUTOR_SETTER(GetAuxiliaryTraitsExecutor, getAuxiliaryTraits)
+    MAKE_EXECUTOR_SETTER(RunAuxiliaryCommandExecutor, runAuxiliaryCommand)
 
     MAKE_EXECUTOR_SETTER(GetDataExecutor, getData)
 
@@ -183,7 +183,7 @@ public:
     void setTours(std::optional<QnPtzTourList> tours);
     void setActiveObject(std::optional<QnPtzObject> activeObject);
     void setHomeObject(std::optional<QnPtzObject> activeObject);
-    void setAuxilaryTraits(std::optional<QnPtzAuxilaryTraitList> traits);
+    void setAuxiliaryTraits(std::optional<QnPtzAuxiliaryTraitList> traits);
     void setData(std::optional<QnPtzData> data);
 
 private:
@@ -217,8 +217,8 @@ private:
     GetHomeObjectExecutor m_getHomeObjectExecutor;
     UpdateHomeObjectExecutor m_updateHomeObjectExecutor;
 
-    GetAuxilaryTraitsExecutor m_getAuxilaryTraitsExecutor;
-    RunAuxilaryCommandExecutor m_runAuxilaryCommandExecutor;
+    GetAuxiliaryTraitsExecutor m_getAuxiliaryTraitsExecutor;
+    RunAuxiliaryCommandExecutor m_runAuxiliaryCommandExecutor;
 
     GetDataExecutor m_getDataExecutor;
 
@@ -231,7 +231,7 @@ private:
     std::optional<QnPtzTourList> m_predefinedTours;
     std::optional<QnPtzObject> m_predefinedActiveObject;
     std::optional<QnPtzObject> m_predefinedHomeObject;
-    std::optional<QnPtzAuxilaryTraitList> m_predefinedAuxilaryTraits;
+    std::optional<QnPtzAuxiliaryTraitList> m_predefinedAuxiliaryTraits;
     std::optional<QnPtzData> m_predefinedData;
 };
 

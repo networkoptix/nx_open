@@ -1,7 +1,7 @@
 #include "migration.h"
 
 #include <client/client_settings.h>
-#include <nx/client/core/settings/secure_settings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::desktop::settings {
 
@@ -15,7 +15,7 @@ static const QString kPasswordTag = "pwd";
 
 void migratePasswordFromCustomConnections()
 {
-    auto authData = core::secureSettings()->systemAuthenticationData();
+    auto authData = core::settings()->systemAuthenticationData();
 
     auto settings = qnSettings->rawSettings();
     settings->beginGroup(kCustomConnectionsKey);
@@ -32,7 +32,7 @@ void migratePasswordFromCustomConnections()
             const nx::utils::Url url = settings->value(kUrlTag).toString();
             const auto userName = url.userName();
 
-            QnEncodedCredentials credentials(userName, decodedPassword);
+            nx::vms::common::Credentials credentials(userName, decodedPassword);
             if (credentials.isValid())
             {
                 auto& credentialsList = authData[localSystemId];
@@ -47,7 +47,7 @@ void migratePasswordFromCustomConnections()
     settings->endGroup();
     settings->sync();
 
-    core::secureSettings()->systemAuthenticationData = authData;
+    core::settings()->systemAuthenticationData = authData;
 }
 
 }

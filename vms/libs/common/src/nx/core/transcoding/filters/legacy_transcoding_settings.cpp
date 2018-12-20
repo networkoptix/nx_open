@@ -31,6 +31,9 @@ bool LegacyTranscodingSettings::isEmpty() const
     if (timestampParams.enabled)
         return false;
 
+    if (watermark.visible())
+        return false;
+
     return true;
 }
 

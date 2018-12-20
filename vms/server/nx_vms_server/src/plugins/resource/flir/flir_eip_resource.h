@@ -2,8 +2,8 @@
 
 #ifdef ENABLE_FLIR
 
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/utils/timer_manager.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
@@ -20,7 +20,7 @@ enum class FlirAlarmMonitoringState
 };
 
 class QnFlirEIPResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 public:
@@ -44,7 +44,7 @@ public:
     boost::optional<QString> getApiParameter(const QString& id);
     bool setApiParameter(const QString& id, const QString& value);
 
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -62,7 +62,7 @@ protected:
     virtual void stopInputPortStatesMonitoring() override;
 
 private:
-    nx::mediaserver::resource::ApiSingleAdvancedParametersProvider<QnFlirEIPResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiSingleAdvancedParametersProvider<QnFlirEIPResource> m_advancedParametersProvider;
     mutable QnMutex m_ioMutex;
     mutable QnMutex m_alarmMutex;
 

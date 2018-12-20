@@ -28,7 +28,11 @@ using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
 
 namespace nx::vms::client::desktop {
 
-CameraAdvancedParamWidgetsManager::CameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
+CameraAdvancedParamWidgetsManager::CameraAdvancedParamWidgetsManager(
+    QTreeWidget* groupWidget,
+    QStackedWidget* contentsWidget,
+    QObject* parent)
+    :
     QObject(parent),
     m_groupWidget(groupWidget),
     m_contentsWidget(contentsWidget)
@@ -37,16 +41,17 @@ CameraAdvancedParamWidgetsManager::CameraAdvancedParamWidgetsManager(QTreeWidget
 
 void CameraAdvancedParamWidgetsManager::clear()
 {
-    disconnect(m_groupWidget, NULL, this, NULL);
+    m_groupWidget->disconnect(this);
 
-    for (auto widget : m_paramWidgetsById)
-        disconnect(widget, NULL, this, NULL);
+    for (const auto widget: m_paramWidgetsById)
+        widget->disconnect(this);
 
     m_paramWidgetsById.clear();
     m_paramLabelsById.clear();
     m_parametersById.clear();
     m_handlerChains.clear();
     m_groupWidget->clear();
+    m_itemsAvailableInOffline.clear();
     while (m_contentsWidget->count() > 0)
         m_contentsWidget->removeWidget(m_contentsWidget->widget(0));
 }
@@ -86,7 +91,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(
     }
 
     // Disconnect all watches to not trigger handler chains.
-    m_handlerChainConnections = QnDisconnectHelper::create();
+    m_handlerChainConnections = {};
 
     // Set widget values and store initial values that should be kept.
     QMap<QString, QString> valuesToKeep;
@@ -95,8 +100,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(
         if (!m_paramWidgetsById.contains(param.id))
             continue;
 
-        auto widget = m_paramWidgetsById[param.id];
-
+        const auto widget = m_paramWidgetsById.value(param.id);
         widget->setValue(param.value);
         widget->setEnabled(true);
 
@@ -113,12 +117,11 @@ void CameraAdvancedParamWidgetsManager::loadValues(
         const auto& handlerChains = itr.value();
         for (auto& func: handlerChains)
         {
-            auto watchWidget = m_paramWidgetsById[watch];
-            m_handlerChainConnections->add(
-                connect(
-                    watchWidget,
-                    &AbstractCameraAdvancedParamWidget::valueChanged,
-                    func));
+            auto watchWidget = m_paramWidgetsById.value(watch);
+            m_handlerChainConnections << connect(
+                watchWidget,
+                &AbstractCameraAdvancedParamWidget::valueChanged,
+                func);
         }
     }
 
@@ -134,7 +137,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(
 
     for (const auto& param: params)
     {
-        auto widget = m_paramWidgetsById[param.id];
+        auto widget = m_paramWidgetsById.value(param.id);
         connect(
             widget,
             &AbstractCameraAdvancedParamWidget::valueChanged,
@@ -145,16 +148,50 @@ void CameraAdvancedParamWidgetsManager::loadValues(
 }
 
 std::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
-    const QString & parameterId) const
+    const QString& parameterId) const
 {
-    if (!m_paramWidgetsById.contains(parameterId))
+    const auto widget = m_paramWidgetsById.value(parameterId);
+    if (!widget)
         return std::nullopt;
-
-    return m_paramWidgetsById[parameterId]->value();
+    return widget->value();
 }
 
+void CameraAdvancedParamWidgetsManager::updateParametersVisibility(ParameterVisibility visibility)
+{
+    const bool visible = (visibility == ParameterVisibility::showAll);
 
-bool CameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup& group) const
+    for (auto it = m_parametersById.cbegin(); it != m_parametersById.cend(); ++it)
+    {
+        if (it->availableInOffline)
+            continue; //< Nothing to do with such parameters.
+
+        if (const auto label = m_paramLabelsById.value(it.key()))
+            label->setVisible(visible);
+        if (const auto widget = m_paramWidgetsById.value(it.key()))
+            widget->setVisible(visible);
+    }
+
+    const auto updateItemVisibility =
+        [this, visible](QTreeWidgetItem* item, const auto& updateItemVisibility) -> void
+        {
+            if (!m_itemsAvailableInOffline.contains(item))
+                item->setHidden(!visible);
+
+            for (int i = item->childCount() - 1; i >= 0; --i)
+                updateItemVisibility(item->child(i), updateItemVisibility);
+        };
+
+    for (int i = m_groupWidget->topLevelItemCount() - 1; i >= 0; --i)
+        updateItemVisibility(m_groupWidget->topLevelItem(i), updateItemVisibility);
+}
+
+bool CameraAdvancedParamWidgetsManager::hasItemsAvailableInOffline() const
+{
+    return !m_itemsAvailableInOffline.isEmpty();
+}
+
+bool CameraAdvancedParamWidgetsManager::hasValidValues(
+    const QnCameraAdvancedParamGroup& group) const
 {
     bool hasValidParameter = boost::algorithm::any_of(
         group.params,
@@ -167,10 +204,16 @@ bool CameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedPar
 }
 
 
-void CameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem)
+void CameraAdvancedParamWidgetsManager::createGroupWidgets(
+    const QnCameraAdvancedParamGroup& group, QTreeWidgetItem* parentItem, bool* availableInOffline)
 {
+    if (availableInOffline)
+        *availableInOffline = false;
+
     if (!hasValidValues(group))
         return;
+
+    bool itemAvailableInOffline = false;
 
     QTreeWidgetItem* item;
     if (parentItem)
@@ -201,8 +244,28 @@ void CameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvance
             m_groupWidget->setCurrentItem(item);
     }
 
-    for (const QnCameraAdvancedParamGroup &subGroup : group.groups)
-        createGroupWidgets(subGroup, item);
+    for (const QnCameraAdvancedParameter& param: group.params)
+    {
+        if (param.availableInOffline)
+        {
+            itemAvailableInOffline = true;
+            break;
+        }
+    }
+
+    for (const QnCameraAdvancedParamGroup& subGroup: group.groups)
+    {
+        bool anyGroupAvailableInOffline = false;
+        createGroupWidgets(subGroup, item, &anyGroupAvailableInOffline);
+        itemAvailableInOffline |= anyGroupAvailableInOffline;
+    }
+
+    if (itemAvailableInOffline)
+    {
+        m_itemsAvailableInOffline.insert(item);
+        if (availableInOffline)
+            *availableInOffline = true;
+    }
 }
 
 QWidget* CameraAdvancedParamWidgetsManager::createContentsPage(
@@ -335,7 +398,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
 }
 
 void CameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
-    const std::vector<QnCameraAdvancedParameter> &params)
+    const std::vector<QnCameraAdvancedParameter>& params)
 {
     for (const auto& param : params)
     {
@@ -494,13 +557,12 @@ void CameraAdvancedParamWidgetsManager::setLabelText(
     const QnCameraAdvancedParameter& parameter,
     const QString& range) const
 {
-    NX_ASSERT(label);
-    if (!label)
+    if (!NX_ASSERT(label))
         return;
 
     if (!parameter.showRange)
     {
-        label->setText(lit("%1").arg(parameter.name));
+        label->setText(parameter.name);
         return;
     }
 
@@ -509,11 +571,8 @@ void CameraAdvancedParamWidgetsManager::setLabelText(
         return;
 
     NX_ASSERT(parameter.dataType == QnCameraAdvancedParameter::DataType::Number);
-    label->setText(
-        lit("%1 (%2-%3)")
-        .arg(parameter.name)
-        .arg(rangeSplit[0].trimmed())
-        .arg(rangeSplit[1].trimmed()));
+    label->setText(QStringLiteral("%1 (%2-%3)").arg(
+        parameter.name, rangeSplit[0].trimmed(), rangeSplit[1].trimmed()));
 }
 
 } // namespace nx::vms::client::desktop

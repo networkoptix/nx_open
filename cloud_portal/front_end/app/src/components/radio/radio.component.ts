@@ -56,6 +56,7 @@ export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator
     }
 
     ngOnInit() {
+        this.disabled = (this.disabled !== undefined);  // optional param
         this.state = this._rbxStates.rbFalse; // 'unchecked'
     }
 
@@ -86,7 +87,7 @@ export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator
     registerOnTouched(fn: () => void): void {}
 
     changeState() {
-        if (this.disabled !== undefined) {
+        if (this.disabled) {
             return;
         }
 

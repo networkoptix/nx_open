@@ -209,6 +209,16 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
     expectDisconnect(id2);
 }
 
+TEST_F(DiscoveryModuleConnector, forgetModule)
+{
+    const auto id = QnUuid::createUuid();
+    const auto endpoint = addMediaserver(id);
+    connector.newEndpoints({endpoint});
+    expectConnect(id, endpoint);
+    connector.forgetModule(id);
+    expectDisconnect(id);
+}
+
 TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 {
     connector.deactivate();

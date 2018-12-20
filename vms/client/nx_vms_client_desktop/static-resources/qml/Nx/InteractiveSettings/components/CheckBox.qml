@@ -10,9 +10,16 @@ LabeledItem
     property alias value: checkBox.checked
     property bool defaultValue: false
 
-    contentItem: CheckBox
+    contentItem: checkBox
+
+    CheckBox
     {
         id: checkBox
         checked: defaultValue
+    }
+
+    function setValue(value)
+    {
+        control.value = (value === true || value === "true" || value === 1)
     }
 }

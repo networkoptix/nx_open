@@ -4,6 +4,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource/media_server_resource.h>
 
 #include <client/client_settings.h>
 
@@ -11,13 +12,11 @@
 
 #include <nx/utils/string.h>
 
-#include <utils/common/synctime.h>
 #include <nx/client/core/utils/human_readable.h>
 
 namespace {
 
-// TODO: #vkutin #common Refactor all this to use some common formatting
-// TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+// TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
 const qreal kBytesInKB = 1024.0;
 
 const qreal kBytesInMB = kBytesInKB * kBytesInKB;
@@ -31,69 +30,69 @@ const qreal kSecondsPerMonth = kSecondsPerYear / 12.0;
 
 const int kPrecision = 2;
 
-/* One additional row for footer. */
-const int footerRowsCount = 1;
-
-const int kMaxNameLength = 30;
-
 } // namespace
-
-const QString QnSortedRecordingStatsModel::kForeignCameras(lit("C7139D2D-0CB2-424D-9C73-704C417B32F2"));
 
 bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
-    QnCamRecordingStatsData leftData = left.data(Qn::RecordingStatsDataRole).value<QnCamRecordingStatsData>();
-    QnCamRecordingStatsData rightData = right.data(Qn::RecordingStatsDataRole).value<QnCamRecordingStatsData>();
+    const auto leftRow = left.data(QnRecordingStatsModel::RowKind).value<QnRecordingStatsModel::RowType>();
+    const auto rightRow = right.data(QnRecordingStatsModel::RowKind).value<QnRecordingStatsModel::RowType>();
+    if (leftRow == QnRecordingStatsModel::Totals || rightRow == QnRecordingStatsModel::Totals) //< Totals last.
+        return (leftRow == QnRecordingStatsModel::Totals) != (sortOrder() == Qt::AscendingOrder);
 
-    bool isNulIDLeft = leftData.uniqueId.isNull();
-    bool isNulIDRight = rightData.uniqueId.isNull();
-    if (isNulIDLeft != isNulIDRight) {
-        if (sortOrder() == Qt::AscendingOrder)
-            return isNulIDLeft < isNulIDRight; // keep footer without ID at the last place
-        else
-            return isNulIDLeft > isNulIDRight; // keep footer without ID at the last place
-    }
+    if (leftRow == QnRecordingStatsModel::Foreign || rightRow == QnRecordingStatsModel::Foreign) //< Foreign last.
+        return (leftRow == QnRecordingStatsModel::Foreign) != (sortOrder() == Qt::AscendingOrder);
 
-    bool isForeignLeft = leftData.uniqueId == kForeignCameras;
-    bool isForeignRight = rightData.uniqueId == kForeignCameras;
-    if (isForeignLeft != isForeignRight) {
-        if (sortOrder() == Qt::AscendingOrder)
-            return isForeignLeft < isForeignRight;
-        else
-            return isForeignLeft > isForeignRight;
-    }
+    const auto leftData = left.data(QnRecordingStatsModel::StatsData).value<QnCamRecordingStatsData>();
+    const auto rightData = right.data(QnRecordingStatsModel::StatsData).value<QnCamRecordingStatsData>();
 
-    switch(left.column()) {
-    case QnRecordingStatsModel::CameraNameColumn:
-        return nx::utils::naturalStringLess(left.data(Qt::DisplayRole).toString(), right.data(Qt::DisplayRole).toString());
-    case QnRecordingStatsModel::BytesColumn:
-        return leftData.recordedBytes < rightData.recordedBytes;
-    case QnRecordingStatsModel::DurationColumn:
-        return leftData.archiveDurationSecs < rightData.archiveDurationSecs;
-    case QnRecordingStatsModel::BitrateColumn:
-        return leftData.averageBitrate < rightData.averageBitrate;
-    default:
-        return false;
+    switch(left.column())
+    {
+        case QnRecordingStatsModel::CameraNameColumn:
+            return nx::utils::naturalStringLess(left.data(Qt::DisplayRole).toString(), right.data(Qt::DisplayRole).toString());
+        case QnRecordingStatsModel::BytesColumn:
+            return leftData.recordedBytes < rightData.recordedBytes;
+        case QnRecordingStatsModel::DurationColumn:
+            return leftData.archiveDurationSecs < rightData.archiveDurationSecs;
+        case QnRecordingStatsModel::BitrateColumn:
+            return leftData.averageBitrate < rightData.averageBitrate;
+        default:
+            return false;
     }
+}
+
+const QnCamRecordingStatsData& QnCameraStatsData::getStatsForRow(int row) const
+{
+    if (row < cameras.size())
+        return cameras[row];
+
+    if (row == cameras.size())
+        return showForeignCameras ? foreignCameras : totals;
+
+    NX_ASSERT(showForeignCameras && row == cameras.size() + 1, "Row is out of range.");
+    return totals;
 }
 
 QnRecordingStatsModel::QnRecordingStatsModel(bool isForecastRole, QObject *parent):
     base_type(parent),
-    m_isForecastRole(isForecastRole),
-    m_isHeaderTextBlocked(false)
-{ }
+    m_isForecastRole(isForecastRole)
+{
+}
 
 QnRecordingStatsModel::~QnRecordingStatsModel()
 { }
 
-int QnRecordingStatsModel::rowCount(const QModelIndex &parent) const {
-    if (!parent.isValid()) {
-        int dataSize = m_data.size();
+int QnRecordingStatsModel::rowCount(const QModelIndex &parent) const
+{
+    int dataSize = 0;
+    if (!parent.isValid())
+    {
+        dataSize = m_data.cameras.size();
         if (dataSize > 0)
-            return dataSize + footerRowsCount;
-        return 0;
+            dataSize++;  // Add footer row.
+        if (m_data.showForeignCameras)
+            dataSize++;  // Add row for foreign cameras.
     }
-    return 0;
+    return dataSize;
 }
 
 int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const
@@ -109,100 +108,59 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const
     return 0;
 }
 
-QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
-    const QnCamRecordingStatsData& value = m_data.at(index.row());
-    bool isForeign = (value.uniqueId == QnSortedRecordingStatsModel::kForeignCameras);
-    switch(index.column())
-    {
-    case CameraNameColumn:
-        {
-            QString foreignText = tr("Cameras from other servers and removed cameras");
-            int maxLength = qMax(foreignText.length(), kMaxNameLength); /* There is no need to limit name to be shorter than predefined string. */
-            return isForeign
-                ? foreignText
-                : nx::utils::elideString(
-                    QnResourceDisplayInfo(resourcePool()->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
-                    maxLength);
-        }
-    case BytesColumn:
-        return formatBytesString(value.recordedBytes);
-    case DurationColumn:
-        return isForeign ? QString() : formatDurationString(value);
-    case BitrateColumn:
-        return isForeign ? QString() : formatBitrateString(value.averageBitrate);
-    default:
-        return QString();
-    }
-}
+QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
+{
+    const auto rowType = data(index, RowKind).value<RowType>();
+    const auto& value = m_data.getStatsForRow(index.row());
 
-QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const {
     switch(index.column())
     {
         case CameraNameColumn:
         {
-            QnVirtualCameraResourceList cameras;
-            for (const QnCamRecordingStatsData &data: m_data)
-                if (QnVirtualCameraResourcePtr camera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
-                    cameras << camera;
-            //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
-            static const auto kNDash = QString::fromWCharArray(L"\x2013");
-            return QnDeviceDependentStrings::getNameFromSet(
-                resourcePool(),
-                QnCameraDeviceStringSet(
-                    tr("Total %1 %n devices", "%1 is long dash, do not replace",
-                        cameras.size()).arg(kNDash),
-                    tr("Total %1 %n cameras", "%1 is long dash, do not replace",
-                        cameras.size()).arg(kNDash),
-                    tr("Total %1 %n I/O modules", "%1 is long dash, do not replace",
-                        cameras.size()).arg(kNDash)
-                ), cameras
-            );
-        }
-        case BytesColumn: return formatBytesString(m_footer.recordedBytes);
-        case DurationColumn: return QString();// Removed.
-        case BitrateColumn: return formatBitrateString(m_footer.bitrateSum);
-        default: return QString();
-    }
-    return QString();
-}
+            if (rowType == Foreign || rowType == Totals)
+                return value.uniqueId; //< We use value.uniqueId as name for pseudo-cameras.
 
-QnResourcePtr QnRecordingStatsModel::getResource(const QModelIndex &index) const
-{
-    const QnCamRecordingStatsData& value = m_data.at(index.row());
-    switch(index.column())
-    {
-    case CameraNameColumn:
-        return resourcePool()->getResourceByUniqueId(value.uniqueId);
-    default:
-        return QnResourcePtr();
+            return nx::utils::elideString(
+                QnResourceDisplayInfo(resourcePool()->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
+                m_data.maxNameLength);
+        }
+        case BytesColumn: return formatBytesString(value.recordedBytes);
+        case DurationColumn: return rowType != Normal ? QString() : formatDurationString(value);
+        case BitrateColumn: return formatBitrateString(value.averageBitrate);
+        default: return QString();
     }
 }
 
 qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
 {
-    const QnCamRecordingStatsData& value = m_data.at(index.row());
+    if (data(index, RowKind).value<RowType>() == Totals)
+        return 0.0; //< No chart for "totals" row.
+
+    const auto& value = m_data.getStatsForRow(index.row());;
     qreal result = 0.0;
 
-    const auto& footer = m_footer;
+    const auto& scale = m_data.chartScale;
+
     switch (index.column())
     {
         case BytesColumn:
-            if (footer.maxValues.recordedBytes <= 0)
+            if (scale.recordedBytes <= 0)
                 return 0.0;
-            result = value.recordedBytes / (qreal) footer.maxValues.recordedBytes;
+            result = value.recordedBytes / (qreal) scale.recordedBytes;
             break;
 
         case DurationColumn:
-            if (footer.maxValues.archiveDurationSecs <= 0)
+            if (scale.archiveDurationSecs <= 0)
                  return 0.0;
-            result = value.archiveDurationSecs / (qreal) footer.maxValues.archiveDurationSecs;
+            result = value.archiveDurationSecs / (qreal) scale.archiveDurationSecs;
             break;
 
         case BitrateColumn:
-            if (footer.maxValues.averageBitrate <= 0)
+            if (scale.averageBitrate <= 0)
                 return 0.0;
-            result = value.averageBitrate / (qreal) footer.maxValues.averageBitrate;
+            result = value.averageBitrate / (qreal) scale.averageBitrate;
             break;
+        default: result = 0.0;
     }
 
     result = qBound(0.0, result, 1.0);
@@ -212,54 +170,53 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
 
 QString QnRecordingStatsModel::tooltipText(Columns column) const
 {
-    switch (column)
-    {
-        case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("Devices with non-empty archive"),
-                tr("Cameras with non-empty archive")
-                );
-        case BytesColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("Storage space occupied by devices"),
-                tr("Storage space occupied by cameras")
-                );
-        case DurationColumn:
-            return tr("Archived duration in calendar days since the first recording");
-        case BitrateColumn:
-            return tr("Average bitrate for the recorded period");
-        default:
-            break;
-    }
-    return QString();
+    return QString(); //< We currently decided to skip tooltips.
 }
 
 QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 {
     /* Check invalid indices. */
-    if (!index.isValid() || index.model() != this
-        || !hasIndex(index.row(), index.column(), index.parent()))
-    {
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
-    }
 
-    if (index.row() >= m_data.size())
-        return footerData(index, role);
+    RowType rowType = Normal;
+    if (index.row() == m_data.cameras.size())
+        rowType = m_data.showForeignCameras ? Foreign : Totals;
+    if (index.row() >= m_data.cameras.size() + 1)
+        rowType = Totals;
 
     switch(role)
     {
         case Qt::DisplayRole:
             return displayData(index);
         case Qt::DecorationRole:
-            return qnResIconCache->icon(getResource(index));
-        case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(getResource(index));
-        case Qn::RecordingStatsDataRole:
-            return QVariant::fromValue<QnCamRecordingStatsData>(m_data.at(index.row()));
-        case Qn::RecordingStatChartDataRole:
-            return chartData(index);
+        {
+            if (index.column() != CameraNameColumn)
+                return QVariant();
+
+            if (rowType == Totals)
+                return qnResIconCache->icon(QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
+
+            if (rowType == Normal)
+                return qnResIconCache->icon(resourcePool()->getResourceByUniqueId(m_data.cameras[index.row()].uniqueId));
+
+            break;
+        }
+        case Qn::ResourceRole: //< This is used by QnResourceItemDelegate to draw contents.
+        {
+            if (rowType == Normal)
+                return QVariant::fromValue<QnResourcePtr>(
+                    resourcePool()->getResourceByUniqueId(m_data.cameras[index.row()].uniqueId));
+
+            break;
+        }
+        case RowKind:
+            return rowType;
+
+        case StatsData:
+            return QVariant::fromValue<QnCamRecordingStatsData>(m_data.getStatsForRow(index.row()));
+        case ChartData:
+            return chartData(index); //< Returns qreal.
         case Qt::ToolTipRole:
             return tooltipText(static_cast<Columns>(index.column()));
         default:
@@ -285,83 +242,38 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
                     resourcePool(),
                     tr("Device"),
                     tr("Camera"));
-            case BytesColumn:      return tr("Space");
-            case DurationColumn:   return tr("Calendar Days");
-            case BitrateColumn:    return tr("Current Bitrate");
-            default:               break;
+            case BytesColumn: return tr("Space");
+            case DurationColumn: return tr("Calendar Days");
+            case BitrateColumn: return tr("Current Bitrate");
+            default: break;
         }
     }
 
     return base_type::headerData(section, orientation, role);
 }
 
-QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const
+void QnRecordingStatsModel::clear()
 {
-    switch(role)
-    {
-        case Qt::DisplayRole:
-            return footerDisplayData(index);
-        case Qt::ToolTipRole:
-            return tooltipText(static_cast<Columns>(index.column()));
-        case Qt::DecorationRole:
-        {
-            if (index.column() != CameraNameColumn)
-                break;
-
-            return qnResIconCache->icon(
-                QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
-        }
-        case Qn::RecordingStatsDataRole:
-            return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
-        default:
-            break;
-    }
-
-    return QVariant();
-}
-
-void QnRecordingStatsModel::clear() {
     beginResetModel();
-    m_data.clear();
+    m_data = QnCameraStatsData();
     endResetModel();
 }
 
-void QnRecordingStatsModel::setModelData(const QnRecordingStatsReply& data) {
+void QnRecordingStatsModel::setModelData(const QnCameraStatsData& data)
+{
     beginResetModel();
     m_data = data;
-    m_footer = calculateFooter(data);
     endResetModel();
 }
 
-QnRecordingStatsReply QnRecordingStatsModel::modelData() const {
+QnCameraStatsData QnRecordingStatsModel::modelData() const
+{
     return m_data;
 }
 
 void QnRecordingStatsModel::setHeaderTextBlocked(bool value)
 {
     m_isHeaderTextBlocked = value;
-}
-
-QnFooterData QnRecordingStatsModel::calculateFooter(const QnRecordingStatsReply& data) const {
-    QnRecordingStatsData summ;
-    QnFooterData footer;
-
-    for(const QnCamRecordingStatsData& value: data)
-    {
-        summ += value;
-        footer.maxValues.recordedBytes = qMax(footer.maxValues.recordedBytes, value.recordedBytes);
-        footer.maxValues.recordedSecs = qMax(footer.maxValues.recordedSecs, value.recordedSecs);
-        // Removed footer.maxValues.archiveDurationSecs.
-        footer.maxValues.averageBitrate = qMax(footer.maxValues.averageBitrate, value.averageBitrate);
-        footer.bitrateSum += value.averageBitrate;
-    }
-
-    footer.recordedBytes = summ.recordedBytes;
-    footer.recordedSecs = summ.recordedSecs;
-    // Removed footer.archiveDurationSecs.
-    footer.averageBitrate = footer.maxValues.averageBitrate;
-
-    return footer;
 }
 
 QString QnRecordingStatsModel::formatBitrateString(qint64 bitrate) const
@@ -383,7 +295,7 @@ QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const
 QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData& data) const
 {
     if (data.archiveDurationSecs == 0)
-        return tr("empty");
+        return m_isForecastRole ? tr("no data for forecast") : tr("empty");
 
     if (data.archiveDurationSecs < kSecondsPerHour)
         return tr("less than an hour");

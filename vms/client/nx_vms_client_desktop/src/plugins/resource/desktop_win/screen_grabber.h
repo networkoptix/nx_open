@@ -69,38 +69,39 @@ private:
 
 private:
     QPixmap m_logo;
-    int m_displayNumber;
+    const int m_displayNumber;
 
-    IDirect3D9*                        m_pD3D;
-    IDirect3DDevice9*        m_pd3dDevice;
-    QVector<IDirect3DSurface9*>        m_pSurface;
-    QVector<quint8*>        m_openGLData;
-    RECT                m_rect;
-    HRESULT m_initialized;
-    D3DDISPLAYMODE        m_ddm;
+    IDirect3D9* m_pD3D = nullptr;
+    IDirect3DDevice9* m_pd3dDevice = nullptr;
+    QVector<IDirect3DSurface9*> m_pSurface;
+    QVector<quint8*> m_openGLData;
+    RECT m_rect{0, 0, 0, 0};
+    D3DDISPLAYMODE m_ddm{};
     QTime m_timer;
-    unsigned m_frameNum;
-    int m_currentIndex;
+    unsigned m_frameNum = 0;
+    int m_currentIndex = 0;
 
-    Qn::CaptureMode m_mode;
-    int m_poolSize;
-    bool m_captureCursor;
-    HDC m_cursorDC;
-    QSize m_captureResolution;
-    bool m_needRescale;
-    SwsContext* m_scaleContext;
+    const Qn::CaptureMode m_mode;
+    const int m_poolSize;
+    const bool m_captureCursor;
+    const HDC m_cursorDC;
+    const QSize m_captureResolution;
+    const bool m_needRescale;
+    SwsContext* m_scaleContext = nullptr;
     int m_outWidth;
     int m_outHeight;
-    AVFrame* m_tmpFrame;
-    quint8* m_tmpFrameBuffer;
-    MONITORINFO m_monInfo;
-    QWidget* m_widget;
-    int m_tmpFrameWidth;
-    int m_tmpFrameHeight;
+    AVFrame* m_tmpFrame = nullptr;
+    quint8* m_tmpFrameBuffer = nullptr;
+    MONITORINFO m_monInfo{};
+    const QWidget* m_widget;
+    int m_tmpFrameWidth = 0;
+    int m_tmpFrameHeight = 0;
     mutable std::unique_ptr<quint8> m_colorBits;
-    mutable size_t m_colorBitsCapacity;
+    mutable size_t m_colorBitsCapacity = 0;
 
     static QnMutex m_guiWaitMutex;
     QnWaitCondition m_waitCond;
-    bool m_needStop;
+    bool m_needStop = false;
+
+    HRESULT m_initialized = 0;
 };

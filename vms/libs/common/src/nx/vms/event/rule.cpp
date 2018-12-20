@@ -309,7 +309,12 @@ RuleList Rule::getDefaultRules()
     result << RulePtr(new Rule(10022, 21600,   false, ActionType::sendMailAction, EventType::licenseIssueEvent,     kOwnerRoleIds));
     result << RulePtr(new Rule(10023, 30,      false, ActionType::showPopupAction, EventType::licenseIssueEvent,     {},        true));
 
-    result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
+    result
+        << getSystemRules()
+        << getRulesUpd43()
+        << getRulesUpd48()
+        << getPluginEventUpdateRules();
+
     auto disabledRules = getDisabledRulesUpd43();
 
     result.erase(std::remove_if(result.begin(), result.end(),
@@ -359,6 +364,29 @@ RuleList Rule::getDisabledRulesUpd43()
     return {//           Id      period isSystem actionType         eventType            subjects allUsers
         RulePtr(new Rule(900022, 0,     true,    ActionType::diagnosticsAction, EventType::userDefinedEvent))
     };
+}
+
+RuleList Rule::getPluginEventUpdateRules()
+{
+    using namespace nx::vms::api;
+    RulePtr rule(new Rule(
+            /*internalId*/ 900025,
+            /*aggregationPeriod*/ 0,
+            /*isSystem*/ false,
+            ActionType::showPopupAction,
+            EventType::pluginEvent,
+            /*subjects*/ {},
+            /*allUsers*/ true));
+
+    EventParameters parameters;
+    parameters.inputPortId = QnLexical::serialized(
+        EventLevel::InfoEventLevel
+        |EventLevel::WarningEventLevel
+        |EventLevel::ErrorEventLevel);
+
+    rule->setEventParams(parameters);
+    return {rule};
+
 }
 
 } // namespace event

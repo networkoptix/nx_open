@@ -9,7 +9,7 @@ public:
     }
 
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> /* clientSocket*/) override
     {
         return nullptr;
     }

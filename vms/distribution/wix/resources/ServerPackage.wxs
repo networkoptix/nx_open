@@ -39,6 +39,7 @@
           Format="raw"
           Win64="yes"/>
 
+        <!-- Returns advertised (1), absent (2), or locally installed (5). -->
         <util:ProductSearch
             Id="ServerMsiSearch"
             UpgradeCode="$(var.serverUpgradeCode)"

@@ -27,6 +27,9 @@ public:
     QColor pastMotion;
     QColor futureMotion;
 
+    QColor pastAnalytics;
+    QColor futureAnalytics;
+
     QColor pastBookmark;
     QColor futureBookmark;
     QColor pastBookmarkHover;

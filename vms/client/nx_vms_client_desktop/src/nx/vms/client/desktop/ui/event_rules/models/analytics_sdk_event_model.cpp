@@ -58,6 +58,8 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     const auto groups = descriptorListManager->allDescriptorsInTheSystem<
         nx::vms::api::analytics::GroupDescriptor>();
 
+// TODO: #dmishin return to this code when device dependent analytics will work properly on the
+// server side
 #if 0
     cameras.empty()
         ? helper.systemCameraIndependentAnalyticsEvents()
@@ -67,7 +69,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     const bool usePluginName = descriptorListManager->pluginIds(deviceEventTypes).size() > 1;
     struct PluginNode
     {
-        QStandardItem* item;
+        QStandardItem* item = nullptr;
         QMap<QString, QStandardItem*> groups;
     };
 
@@ -94,7 +96,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                     pluginDescriptor.id,
                     QString());
 
-                item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+                item->setFlags(item->flags().setFlag(Qt::ItemIsEnabled, false));
                 items.insert(pluginId, {item, {}});
             }
 
@@ -123,7 +125,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             if (!groupId.isEmpty() && pluginNode.groups.contains(groupId))
                 parentItem = pluginNode.groups.value(groupId);
 
-            addItem(parentItem, descriptor.item.name.value, pluginId, descriptor.getId());
+            addItem(parentItem, descriptor.item.name, pluginId, descriptor.getId());
         }
     }
 

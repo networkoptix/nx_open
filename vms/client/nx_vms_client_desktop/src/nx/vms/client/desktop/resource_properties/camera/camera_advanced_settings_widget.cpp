@@ -103,11 +103,15 @@ void CameraAdvancedSettingsWidget::updateFromResource()
 
 bool CameraAdvancedSettingsWidget::hasManualPage() const
 {
-    if (!m_camera || !isStatusValid(m_camera->getStatus()))
+    if (!m_camera)
         return false;
 
-    auto params = QnCameraAdvancedParamsReader::paramsFromResource(m_camera);
-    return !params.groups.empty();
+    const auto& params = QnCameraAdvancedParamsReader::paramsFromResource(m_camera);
+    if (params.groups.empty())
+        return false;
+
+     return isStatusValid(m_camera->getStatus())
+        || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
 }
 
 bool CameraAdvancedSettingsWidget::hasWebPage() const

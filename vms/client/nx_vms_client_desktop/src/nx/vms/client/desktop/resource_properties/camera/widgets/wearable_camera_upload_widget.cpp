@@ -5,7 +5,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -31,13 +31,13 @@ WearableCameraUploadWidget::~WearableCameraUploadWidget()
 
 void WearableCameraUploadWidget::setStore(CameraSettingsDialogStore* store)
 {
-    m_storeConnections.reset(new QnDisconnectHelper());
+    m_storeConnections = {};
 
     NX_ASSERT(store);
     if (!store)
         return;
 
-    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+    m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &WearableCameraUploadWidget::loadState);
 }
 

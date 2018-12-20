@@ -323,27 +323,27 @@ bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
         {nx::core::ptz::Type::operational});
 }
 
-bool QnRemotePtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* /*auxilaryTraits*/,
+bool QnRemotePtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* /*auxiliaryTraits*/,
     const nx::core::ptz::Options& options) const
 {
     RUN_COMMAND(
-        Qn::GetAuxilaryTraitsPtzCommand,
+        Qn::GetAuxiliaryTraitsPtzCommand,
         QVariant(),
-        ptzGetAuxilaryTraitsAsync,
+        ptzGetAuxiliaryTraitsAsync,
         options,
         options);
 }
 
-bool QnRemotePtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool QnRemotePtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
     RUN_COMMAND(
-        Qn::RunAuxilaryCommandPtzCommand,
+        Qn::RunAuxiliaryCommandPtzCommand,
         trait,
-        ptzRunAuxilaryCommandAsync,
+        ptzRunAuxiliaryCommandAsync,
         options,
         trait,
         data,

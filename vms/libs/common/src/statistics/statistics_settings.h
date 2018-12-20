@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSet>
+
 #include <statistics/statistics_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 

@@ -6,6 +6,16 @@
 
 void restartServer(int restartTimeout);
 
+int QnRestartRestHandler::executePost(const QString& path,
+    const QnRequestParams& /*params*/,
+    const QByteArray& /*body*/,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* /*owner*/)
+{
+    result.setError(QnJsonRestResult::NoError);
+    return nx::network::http::StatusCode::ok;
+}
+
 int QnRestartRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& /*params*/,
     QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {

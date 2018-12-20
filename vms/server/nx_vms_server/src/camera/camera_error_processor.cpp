@@ -6,13 +6,13 @@
 
 #include "camera_error_processor.h"
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <camera/video_camera.h>
 #include <camera/camera_pool.h>
 #include <utils/common/synctime.h>
 #include <nx/network/http/http_types.h>
 
-namespace nx::mediaserver::camera {
+namespace nx::vms::server::camera {
 
 ErrorProcessor::ErrorProcessor()
 {}
@@ -57,7 +57,6 @@ void ErrorProcessor::processStreamError(
     QnAbstractMediaStreamDataProvider* streamReader,
     CameraDiagnostics::Result error)
 {
-    return;
     auto ownerResource = streamReader->getResource().dynamicCast<resource::Camera>();
     NX_ASSERT(ownerResource);
     if (!ownerResource || !ownerResource->isInitialized())
@@ -108,4 +107,4 @@ void ErrorProcessor::processStreamError(
     }
 }
 
-} // namespace nx::mediaserver::camera
+} // namespace nx::vms::server::camera

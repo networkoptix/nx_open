@@ -1,20 +1,16 @@
 #pragma once
 
+#include <QtCore/QSize>
 #include <QtCore/QString>
 
 #include <QtGui/QImage>
 
+#include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
+
 namespace nx::vms::client::desktop {
 
-struct LayoutSettingsDialogState
+struct LayoutSettingsDialogState: AbstractReduxState
 {
-    LayoutSettingsDialogState() = default;
-    LayoutSettingsDialogState(const LayoutSettingsDialogState& other) = delete;
-    LayoutSettingsDialogState(LayoutSettingsDialogState&& other) = default;
-    LayoutSettingsDialogState& operator=(const LayoutSettingsDialogState&) = delete;
-    LayoutSettingsDialogState& operator=(LayoutSettingsDialogState&&) = default;
-    ~LayoutSettingsDialogState() = default;
-
     bool locked = false;
     bool isLocalFile = false;
     float cellAspectRatio = 0.0;

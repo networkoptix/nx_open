@@ -51,7 +51,9 @@
 </div>
 <ng-include ng-if="settings.template" src="settings.template"></ng-include>
 <div class="modal-footer" ng-if="settings.hasFooter">
-    <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!settings.cancellable" ng-click="cancel()" > ยกเลิก </button> <button type="button" class="btn" ng-class="settings.buttonClass" enter-button
+    <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!settings.cancellable" ng-click="cancel()" >Cancel</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" enter-button
  ng-disabled="settings.needOldPassword && !settings.oldPassword || settings.createLoginAndPassword && !forms.localForm.$valid"
-            ng-if="!settings.cancellable" ng-click="ok()" > {{settings.actionLabel}} </button> <button type="button" class="btn" ng-class="settings.buttonClass" enter-button auto-focus ng-if="settings.cancellable" ng-click="close()" > ปิด </button>
+            ng-if="!settings.cancellable" ng-click="ok()" >{{settings.actionLabel}}</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" enter-button ng-if="settings.cancellable" ng-click="close()" >Close</button>
 </div>

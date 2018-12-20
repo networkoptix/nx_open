@@ -101,14 +101,6 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(config['cmake_binary_dir'], 'build_info.txt'), 'build_info.txt')
 
 
-'''
-<?if $(var.quicksync) = true ?>
-<File Id="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
-<File Id="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
-<?endif?>
-'''
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help="Config file", required=True)

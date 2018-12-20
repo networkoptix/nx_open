@@ -1,2 +1,1 @@
 add_subdirectory(cloud_connect_integration_tests)
-add_subdirectory(cloud_connectivity_ut)

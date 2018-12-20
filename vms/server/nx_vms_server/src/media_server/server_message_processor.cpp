@@ -16,7 +16,7 @@
 
 #include "serverutil.h"
 #include <transaction/message_bus_adapter.h>
-#include <nx/mediaserver/event/event_message_bus.h>
+#include <nx/vms/server/event/event_message_bus.h>
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include <nx/vms/api/data/connection_data.h>
@@ -133,7 +133,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
             configSystemData.tranLogTime = tranLogTime;
             configSystemData.wholeSystem = true;
             if (m_connection)
-                nx::mediaserver::Utils(m_serverModule).configureLocalSystem(configSystemData);
+                nx::vms::server::Utils(m_serverModule).configureLocalSystem(configSystemData);
         });
 }
 
@@ -180,9 +180,12 @@ void QnServerMessageProcessor::onResourceStatusChanged(
     {
         // It's own server. change status to online.
         auto connection = commonModule()->ec2Connection();
-        auto deviceAgent = connection->getResourceManager(Qn::kSystemAccess);
-        deviceAgent->setResourceStatusSync(resource->getId(), Qn::Online);
-        resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
+        if (connection)
+        {
+            auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+            resourceManager->setResourceStatusSync(resource->getId(), Qn::Online);
+            resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
+        }
     }
     else if (resource->getParentId() == commonModule()->moduleGUID() &&
         resource.dynamicCast<QnStorageResource>())

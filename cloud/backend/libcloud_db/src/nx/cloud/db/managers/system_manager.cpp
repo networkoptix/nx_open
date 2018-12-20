@@ -14,7 +14,7 @@
 #include <nx/utils/sync_call.h>
 
 #include <nx/cloud/db/ec2/data_conversion.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include <api/global_settings.h>
 #include <core/resource/param.h>
@@ -47,7 +47,7 @@ SystemManager::SystemManager(
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     nx::sql::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
-    data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
+    clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
 :
     m_settings(settings),
     m_timerManager(timerManager),
@@ -76,20 +76,20 @@ SystemManager::SystemManager(
     // Since it may lead to inconsistence between transactions and data cache (for a quite short period, though).
 
     // Registering transaction handler.
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveUser>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::RemoveUser>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
 
     // Currently this transaction can only rename some system.
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SetResourceParam>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3));
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::RemoveResourceParam>(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3));
 
@@ -98,16 +98,16 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::RemoveResourceParam>();
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::SetResourceParam>();
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::RemoveUser>();
 
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::SaveUser>();
 
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
@@ -212,7 +212,7 @@ void SystemManager::bindSystemToAccount(
                 std::move(completionHandler));
         };
 
-    // Creating db transaction via TransactionLog.
+    // Creating db transaction via CommandLog.
     m_ec2SyncronizationEngine->transactionLog().startDbTransaction(
         newSystemDataPtr->systemData.id.c_str(),
         std::move(dbUpdateFunc),
@@ -1881,7 +1881,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 nx::sql::DBResult SystemManager::processEc2SaveUser(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    data_sync_engine::Command<vms::api::UserData> transaction)
+    clusterdb::engine::Command<vms::api::UserData> transaction)
 {
     const auto& vmsUser = transaction.params;
 
@@ -1951,7 +1951,7 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
 nx::sql::DBResult SystemManager::processEc2RemoveUser(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    data_sync_engine::Command<nx::vms::api::IdData> transaction)
+    clusterdb::engine::Command<nx::vms::api::IdData> transaction)
 {
     const auto& data = transaction.params;
 
@@ -1998,7 +1998,7 @@ void SystemManager::removeVmsUserFromCache(
 nx::sql::DBResult SystemManager::processSetResourceParam(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> transaction)
+    clusterdb::engine::Command<nx::vms::api::ResourceParamWithRefData> transaction)
 {
     const auto& data = transaction.params;
 
@@ -2029,7 +2029,7 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
 nx::sql::DBResult SystemManager::processRemoveResourceParam(
     nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId,
-    data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data)
+    clusterdb::engine::Command<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
     NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction %1 with "

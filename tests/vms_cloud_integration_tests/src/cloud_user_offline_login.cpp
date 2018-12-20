@@ -148,28 +148,28 @@ protected:
 
     void thenUserCanStillLogin()
     {
-        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        nx::vms::api::ResourceParamDataList vmsSettings;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetSettings(&vmsSettings));
+        waitUntilUserLoginFuncPasses([this]() { return checkIfOwnerCanLogin(); });
     }
 
     void thenAllUsersCanStillLogin()
     {
-        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         for (const auto& account: m_additionalCloudUsers)
         {
-            mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+            nx::network::http::Credentials credentials(
                 account.email.c_str(),
-                nx::network::http::PasswordAuthToken(account.password.c_str())));
+                nx::network::http::PasswordAuthToken(account.password.c_str()));
 
-            nx::vms::api::UserDataList users;
-            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
+            waitUntilUserLoginFuncPasses(
+                [this, credentials]()
+                {
+                    return checkIfUserCanLogin(credentials);
+                });
         }
     }
 
-    void thenInvitedUserCanLoginToTheSystem()
+    void thenInvitedUserCanLoginToTheSystemEventually()
     {
-        ASSERT_EQ(ec2::ErrorCode::ok, checkInvitedUserLoginToVms());
+        waitUntilUserLoginFuncPasses([this](){ return checkInvitedUserLoginToVms(); });
     }
 
     void thenInvitedUserCannotLoginToTheSystem()
@@ -241,6 +241,46 @@ private:
         nx::vms::api::UserDataList users;
         return mediaServerClient->ec2GetUsers(&users);
     }
+
+    ec2::ErrorCode checkIfUserCanLogin(
+        const nx::network::http::Credentials& credentials)
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        mediaServerClient->setUserCredentials(credentials);
+
+        nx::vms::api::UserDataList users;
+        return mediaServerClient->ec2GetUsers(&users);
+    }
+
+    ec2::ErrorCode checkIfOwnerCanLogin()
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        nx::vms::api::ResourceParamDataList vmsSettings;
+        return mediaServerClient->ec2GetSettings(&vmsSettings);
+    }
+
+    template<typename CheckUserLoginFunc>
+    void waitUntilUserLoginFuncPasses(CheckUserLoginFunc checkUserLoginFunc)
+    {
+        for (;;)
+        {
+            const auto result = checkUserLoginFunc();
+            switch (result)
+            {
+                case ec2::ErrorCode::ok:
+                    return;
+
+                case ec2::ErrorCode::unauthorized:
+                case ec2::ErrorCode::forbidden:
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    continue;
+
+                default:
+                    FAIL() << toString(result).toStdString();
+                    break;
+            }
+        }
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -280,7 +320,7 @@ TEST_P(
     whenUserCompletesRegistrationInCloud();
     whenVmsLostConnectionToTheCloud();
 
-    thenInvitedUserCanLoginToTheSystem();
+    thenInvitedUserCanLoginToTheSystemEventually();
 }
 
 TEST_P(
@@ -293,7 +333,7 @@ TEST_P(
     whenUserActivatesAccountByFollowingActivationLink();
     whenVmsLostConnectionToTheCloud();
 
-    thenInvitedUserCanLoginToTheSystem();
+    thenInvitedUserCanLoginToTheSystemEventually();
 }
 
 TEST_P(

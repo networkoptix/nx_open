@@ -13,7 +13,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 Provider::Provider(
     const network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-    const data_sync_engine::statistics::Provider& dataSyncEngineStatisticsProvider)
+    const clusterdb::engine::statistics::Provider& dataSyncEngineStatisticsProvider)
     :
     m_httpServerStatisticsProvider(httpServerStatisticsProvider),
     m_dataSyncEngineStatisticsProvider(dataSyncEngineStatisticsProvider)

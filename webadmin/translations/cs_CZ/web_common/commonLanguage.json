@@ -2,7 +2,7 @@
   "cameraLinks": {
     "highStream": "Hlavní stream",
     "lowStream": "Vedlejší stream",
-    "transcoding": "Transkódování",
+    "transcoding": "Překódování",
     "unknown": "Neznámý",
     "copyToClipboard": "kopírovat do schránky",
     "copyDefaultText": "kopírovat",
@@ -26,13 +26,13 @@
   "searchCamPlaceholder": "Hledat",
   "resolution": {
     "auto": "Auto",
-    "high": "Hlavní",
-    "low": "Vedlejší"
+    "high": "Vysoká",
+    "low": "Nízký"
   },
   "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
   "voiceCommands": {
     "play": "přehrát",
-    "pause": "pauza",
+    "pause": "pozastavit",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
@@ -41,7 +41,7 @@
     "collapse server": "collapse server + [server name]",
     "expand all servers": "rozbalit všechny servery",
     "collapse all servers": "sbalit všechny servery",
-    "stop listening": "přestat poslouchat",
+    "stop listening": "zastavení poslech",
     "help": "help | show commands"
   }
 }

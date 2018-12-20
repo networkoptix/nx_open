@@ -1,16 +1,12 @@
-
 #include "manual_camera_searcher.h"
 
 #include <type_traits>
+#include <functional>
 
-#include <QtCore/QFutureWatcher>
-#include <QtConcurrent/QtConcurrentMap>
-
-#include <utils/common/scoped_thread_rollback.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
 #include <core/resource_management/camera_driver_restriction_list.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_searcher.h>
 
@@ -25,198 +21,43 @@ static const int MAX_PERCENT = 100;
 static const int PORT_SCAN_MAX_PROGRESS_PERCENT = 10;
 static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROGRESS_PERCENT must be less than MAX_PERCENT" );
 
-namespace {
-
-    bool restrictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
-    {
-        if (netRes->hasCameraCapabilities(Qn::ShareIpCapability))
-            return false; //< don't block
-
-        auto resCommonModule = netRes->commonModule();
-        NX_ASSERT(resCommonModule, lit("Common module should be set for resource"));
-        if (!resCommonModule)
-            return true; //< Don't add resource without properly set common module
-
-        auto resPool = resCommonModule->resourcePool();
-        NX_ASSERT(resPool, "Resource should have correspondent resource pool");
-        if (!resPool)
-            return true; // Don't add resource without properly set resource pool
-
-        QnNetworkResourceList existResList = resPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-        existResList = existResList.filtered(
-            [&netRes](const QnNetworkResourcePtr& existRes)
-            {
-                bool sameParent = netRes->getParentId() == existRes->getParentId();
-                return sameParent && existRes->getStatus() != Qn::Offline;
-            });
-
-        for (const QnNetworkResourcePtr& existRes: existResList)
-        {
-            QnSecurityCamResourcePtr existCam = existRes.dynamicCast<QnSecurityCamResource>();
-            if (!existCam)
-                continue;
-
-            if (existCam->hasCameraCapabilities(Qn::ShareIpCapability))
-                return false; //< don't block
-
-            if (!existCam->isManuallyAdded())
-                return true; //< block manual and auto camera at same IP
-
-            if (existRes->getTypeId() != netRes->getTypeId())
-            {
-                // allow several manual cameras with the same IP if cameras have different ports
-                QUrl url1(existRes->getUrl());
-                QUrl url2(netRes->getUrl());
-                if (url1.port() == url2.port())
-                    return true; //< camera found by different drivers with the same port
-            }
-        }
-        return false;
-    }
-
-    QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr& camera)
-    {
-        const auto type = qnResTypePool->getResourceType(camera->getTypeId());
-        const auto resourceInPool = QnResourceDiscoveryManager::findSameResource(camera);
-
-        const bool exists =
-            (resourceInPool && resourceInPool->getHostAddress() == camera->getHostAddress())
-            || restrictNewManualCameraByIP(camera);
-
-        return QnManualResourceSearchEntry(
-            camera->getName(), camera->getUrl(), type->getName(),
-            camera->getVendor(), camera->getUniqueId(), exists);
-    }
-
-    QnManualResourceSearchEntry entryFromResource(const QnResourcePtr& resource)
-    {
-        if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
-            return entryFromCamera(camera);
-
-        return QnManualResourceSearchEntry();
-    }
-}
-
-QnSearchTask::QnSearchTask(
-    QnCommonModule* commonModule,
-    const QString& addr,
-    int port,
-    const QAuthenticator& auth,
-    bool breakOnGotResult)
-:
-    m_commonModule(commonModule),
-    m_auth(auth),
-    m_breakIfGotResult(breakOnGotResult),
-    m_blocking(false),
-    m_interruptTaskProcesing(false)
-{
-    if (QUrl(addr).scheme().isEmpty())
-        m_url.setHost(addr);
-    else
-        m_url.setUrl(addr);
-
-    if (!m_url.userInfo().isEmpty())
-    {
-        m_auth.setUser(m_url.userName());
-        m_auth.setPassword(m_url.password());
-        m_url.setUserInfo(QString());
-    }
-
-    if (port)
-        m_url.setPort(port);
-}
-
-void QnSearchTask::setSearchers(const SearcherList& searchers)
-{
-    m_searchers = searchers;
-}
-
-void QnSearchTask::setSearchDoneCallback(const SearchDoneCallback& callback)
-{
-    m_callback = callback;
-}
-
-void QnSearchTask::setBlocking(bool isBlocking)
-{
-    m_blocking = isBlocking;
-}
-
-void QnSearchTask::setInterruptTaskProcessing(bool interrupt)
-{
-    m_interruptTaskProcesing = interrupt;
-}
-
-bool QnSearchTask::isBlocking() const
-{
-    return m_blocking;
-}
-
-bool QnSearchTask::doesInterruptTaskProcessing() const
-{
-    return m_interruptTaskProcesing;
-}
-
-void QnSearchTask::doSearch()
-{
-    QnManualResourceSearchList results;
-    for (const auto& checker: m_searchers)
-    {
-        auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
-
-        for (const auto& res: seqResults)
-        {
-            res->setCommonModule(checker->commonModule());
-            QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
-            Q_ASSERT(camRes);
-            // Checking, if found resource is reserved by some other searcher
-            if(camRes && !m_commonModule->cameraDriverRestrictionList()->driverAllowedForCamera(
-                checker->manufacture(),
-                camRes->getVendor(),
-                camRes->getModel()))
-            {
-                continue;   //< Camera is not allowed to be used with this driver.
-            }
-
-            results.push_back(entryFromResource(res));
-        }
-
-        if (!results.isEmpty() && m_breakIfGotResult)
-        {
-            m_callback(results, this);
-            return;
-        }
-    }
-
-    m_callback(results, this);
-}
-
-nx::utils::Url QnSearchTask::url()
-{
-    return m_url;
-}
-
-QString QnSearchTask::toString()
-{
-    QString str;
-
-    for (const auto& searcher: m_searchers)
-        str += searcher->manufacture() + lit(" ");
-
-    return str;
-}
 
 QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_state(QnManualResourceSearchStatus::Init),
-    m_cancelled(false),
     m_hostRangeSize(0),
-    m_totalTaskCount(0),
-    m_remainingTaskCount(0)
+    m_ipScanner(m_pollable.getAioThread()),
+    m_taskManager(commonModule, m_pollable.getAioThread())
 {
+    NX_VERBOSE(this, "Created");
 }
 
 QnManualCameraSearcher::~QnManualCameraSearcher()
 {
+    NX_VERBOSE(this, "Destroying (state: %1)", m_state.load());
+    pleaseStopSync();
+}
+
+void QnManualCameraSearcher::pleaseStop(nx::utils::MoveOnlyFunc<void ()> completionHandler)
+{
+    // Stopping: ip scanner -> task manager -> m_pollable -> completionHandler called.
+
+    auto onTaskManagerStop =
+        [this, handler = std::move(completionHandler)]() mutable
+        {
+            if (m_state != QnManualResourceSearchStatus::Finished)
+                changeState(QnManualResourceSearchStatus::Aborted);
+            m_pollable.pleaseStop(std::move(handler));
+        };
+
+    auto onIpCheckerStop =
+        [this, handler = std::move(onTaskManagerStop)]() mutable
+        {
+            m_taskManager.pleaseStop(std::move(handler));
+        };
+
+    NX_VERBOSE(this, "Canceling search");
+    m_ipScanner.pleaseStop(std::move(onIpCheckerStop));
 }
 
 QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkSearchers() const
@@ -227,7 +68,7 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     {
         QnAbstractNetworkResourceSearcher* ns =
             dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-        Q_ASSERT(ns);
+        NX_CRITICAL(ns);
 
         result.push_back(ns);
     }
@@ -235,64 +76,116 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     return result;
 }
 
-bool QnManualCameraSearcher::run(
-    QThreadPool* threadPool,
-    const QString& startAddr,
-    const QString& endAddr,
-    const QAuthenticator& auth,
-    int port )
+void QnManualCameraSearcher::startSearch(SearchDoneCallback callback, nx::utils::Url url)
 {
+    NX_ASSERT(url.isValid());
 
-    {
-        QnMutexLocker lock( &m_mutex );
-        if (m_state == QnManualResourceSearchStatus::Aborted)
-            return false;
-
-        m_totalTaskCount = 0;
-        m_remainingTaskCount = 0;
-        m_urlSearchTaskQueues.clear();
-        m_searchQueueContexts.clear();
-        m_cancelled = false;
-    }
-
-    QnSearchTask::SearchDoneCallback callback =
-        [this, threadPool](const QnManualResourceSearchList& results, QnSearchTask* const task)
+    m_pollable.dispatch(
+        [this, callback = std::move(callback), url = std::move(url)]() mutable
         {
-            QnMutexLocker lock(&m_mutex);
-            auto queueName = task->url().toString();
+            NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
+            m_searchDoneCallback = std::move(callback);
+            onOnlineHostsScanDone(url, {nx::network::HostAddress(url.host())});
+        });
+}
 
-            m_remainingTaskCount--;
+void QnManualCameraSearcher::startRangeSearch(
+    SearchDoneCallback callback,
+    nx::network::HostAddress startAddr,
+    nx::network::HostAddress endAddr,
+    nx::utils::Url baseUrl)
+{
+    NX_ASSERT(startAddr.isIpAddress());
+    NX_ASSERT(endAddr.isIpAddress());
 
-            auto& context = m_searchQueueContexts[queueName];
+    m_pollable.dispatch(
+        [this, callback = std::move(callback), startAddr, endAddr, url = std::move(baseUrl)]() mutable
+        {
+            NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
+            m_searchDoneCallback = std::move(callback);
+            startOnlineHostsScan(std::move(startAddr), std::move(endAddr), std::move(url));
+        });
+}
 
-            context.isBlocked = false;
-            context.runningTaskCount--;
-
-            if (m_cancelled)
+QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
+{
+    return m_pollable.executeInAioThreadSync(
+        [this]() -> QnManualCameraSearchProcessStatus
+        {
+            QnManualCameraSearchProcessStatus result;
+            switch (m_state)
             {
-                m_waitCondition.wakeOne();
-                return;
+                case QnManualResourceSearchStatus::Finished:
+                case QnManualResourceSearchStatus::Aborted:
+                {
+                    result.cameras = m_results;
+                    result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
+                    break;
+                }
+                case QnManualResourceSearchStatus::CheckingOnline:
+                {
+                    NX_ASSERT(m_hostRangeSize);
+                    int currentProgress = m_hostRangeSize
+                        ? (int) m_ipScanner.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
+                            / m_hostRangeSize
+                        : 0;
+
+                    result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
+                    break;
+                }
+                case QnManualResourceSearchStatus::CheckingHost:
+                {
+                    result.cameras = m_taskManager.foundResources();
+                    auto currentPercent = std::floor(0.5
+                        + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
+                        * m_taskManager.doneToTotalTasksRatio()) + PORT_SCAN_MAX_PROGRESS_PERCENT;
+                    result.status = QnManualResourceSearchStatus(m_state, currentPercent, MAX_PERCENT);
+                    break;
+                }
+                default:
+                {
+                    result.status = QnManualResourceSearchStatus(m_state, 0, MAX_PERCENT);
+                    break;
+                }
             }
 
-            m_results.append(results);
+            NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
+            return result;
+        });
+}
 
-            if (task->doesInterruptTaskProcessing() && !results.isEmpty())
-            {
-                m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
-                context.isInterrupted = true;
-            }
+void QnManualCameraSearcher::startOnlineHostsScan(
+    nx::network::HostAddress startAddr,
+    nx::network::HostAddress endAddr,
+    nx::utils::Url baseUrl)
+{
+    NX_VERBOSE(this, "Getting online hosts in range [%1, %2]", startAddr, endAddr);
+    const auto oldState = changeState(QnManualResourceSearchStatus::CheckingOnline);
+    NX_ASSERT(oldState == QnManualResourceSearchStatus::Init);
 
-            runTasksUnsafe(threadPool);
+    m_hostRangeSize = ntohl(endAddr.ipV4().get().s_addr) - ntohl(startAddr.ipV4().get().s_addr) + 1;
+    NX_ASSERT(m_hostRangeSize > 0);
 
-            if (m_remainingTaskCount == 0 || m_cancelled)
-                m_waitCondition.wakeOne();
-        };
+    int port = baseUrl.port(nx::network::http::DEFAULT_HTTP_PORT);
+    m_ipScanner.scanOnlineHosts(
+        [this, baseUrl = std::move(baseUrl)](auto results)
+        {
+            onOnlineHostsScanDone(baseUrl, std::move(results));
+        },
+        std::move(startAddr), std::move(endAddr), port);
+}
+
+void QnManualCameraSearcher::onOnlineHostsScanDone(
+    nx::utils::Url baseUrl, std::vector<nx::network::HostAddress> onlineHosts)
+{
+    NX_ASSERT(m_pollable.isInSelfAioThread());
+    NX_ASSERT(m_state == QnManualResourceSearchStatus::Init
+        || m_state == QnManualResourceSearchStatus::CheckingOnline);
+    NX_VERBOSE(this, "Will check %1 hosts", onlineHosts.size());
 
     QnSearchTask::SearcherList sequentialSearchers;
     QnSearchTask::SearcherList parallelSearchers;
-
     auto searchers = getAllNetworkSearchers();
-
     for (const auto& searcher: searchers)
     {
         if (searcher->isSequential())
@@ -300,303 +193,38 @@ bool QnManualCameraSearcher::run(
         else
             parallelSearchers.push_back(searcher);
     }
-
-    QStringList onlineHosts;
-
-    if (endAddr.isNull())
-        onlineHosts.push_back(startAddr);
-    else
-        onlineHosts = getOnlineHosts(startAddr, endAddr, port);
+    NX_VERBOSE(this, "Will use %1 sequential and %2 concurrent searchers",
+        sequentialSearchers.size(), parallelSearchers.size());
 
     for (const auto& host: onlineHosts)
     {
-        QString hostToCheck;
-
-        QnSearchTask sequentialTask(commonModule(), host, port, auth, true);
-        sequentialTask.setSearchers(sequentialSearchers);
-        sequentialTask.setSearchDoneCallback(callback);
-        sequentialTask.setBlocking(true);
-        sequentialTask.setInterruptTaskProcessing(true);
-
-        hostToCheck = sequentialTask.url().toString();
-
-        m_urlSearchTaskQueues[hostToCheck].enqueue(sequentialTask);
-        m_searchQueueContexts[hostToCheck] = SearchTaskQueueContext();
-
-        m_remainingTaskCount++;
+        const auto url = nx::network::url::Builder(baseUrl).setHost(host.toString()).toUrl();
+        m_taskManager.addTask(url, sequentialSearchers, /*isSequential*/ true);
 
         for (const auto& searcher: parallelSearchers)
-        {
-            QnSearchTask::SearcherList searcherList;
-            searcherList.push_back(searcher);
-
-            QnSearchTask parallelTask(commonModule(), host, port, auth, false);
-            parallelTask.setSearchers(searcherList);
-            parallelTask.setSearchDoneCallback(callback);
-
-            m_urlSearchTaskQueues[hostToCheck].enqueue(parallelTask);
-
-            m_remainingTaskCount++;
-        }
+            m_taskManager.addTask(url, {searcher}, /*isSequential*/ false);
     }
 
-    m_totalTaskCount = m_remainingTaskCount;
-    int kMaxWaitTimeMs = 2000;
-
-    auto hasRunningTasks =
-        [this]() -> bool
-        {
-            for (const auto& context: m_searchQueueContexts)
-            {
-                if (context.isInterrupted)
-                    continue;
-
-                if (context.runningTaskCount > 0)
-                    return true;
-            }
-
-            return false;
-        };
-
-    QnMutexLocker lock(&m_mutex);
-    m_state = QnManualResourceSearchStatus::CheckingHost;
-    if (m_cancelled)
-    {
-        m_state = QnManualResourceSearchStatus::Aborted;
-        return true;
-    }
-
-    runTasksUnsafe(threadPool);
-
-    while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
-        m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
-
-    if (!m_cancelled)
-        m_state = QnManualResourceSearchStatus::Finished;
-
-    return true;
+    changeState(QnManualResourceSearchStatus::CheckingHost);
+    m_taskManager.startTasks([this](auto result){ onManualSearchDone(std::move(result)); });
 }
 
-void QnManualCameraSearcher::cancel() {
-
-    QnMutexLocker lock( &m_mutex );
-    m_cancelled = true;
-
-    switch (m_state)
-    {
-        case QnManualResourceSearchStatus::Finished:
-        {
-            return;
-        }
-        case QnManualResourceSearchStatus::CheckingOnline:
-        {
-            m_ipChecker.pleaseStop();
-            m_ipChecker.join();
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-
-    m_state = QnManualResourceSearchStatus::Aborted;
-}
-
-QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
+void QnManualCameraSearcher::onManualSearchDone(
+    QnManualResourceSearchList results)
 {
-    QnMutexLocker lock( &m_mutex );
-    QnManualCameraSearchProcessStatus result;
+    NX_ASSERT(m_pollable.isInSelfAioThread());
+    NX_ASSERT(m_state == QnManualResourceSearchStatus::CheckingHost);
+    changeState(QnManualResourceSearchStatus::Finished);
 
-    switch (m_state)
-    {
-        case QnManualResourceSearchStatus::CheckingHost:
-        {
-            result.cameras = m_results;
-            break;
-        }
-        case QnManualResourceSearchStatus::Finished:
-        case QnManualResourceSearchStatus::Aborted:
-        {
-            result.cameras = m_results;
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-
-    switch (m_state)
-    {
-        case QnManualResourceSearchStatus::Finished:
-        case QnManualResourceSearchStatus::Aborted:
-        {
-            result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
-            NX_DEBUG(this, lit("%1 : %2")
-                .arg(result.status.current)
-                .arg(result.status.total));
-            break;
-        }
-        case QnManualResourceSearchStatus::CheckingOnline:
-        {
-            Q_ASSERT(m_hostRangeSize);
-            int currentProgress = m_hostRangeSize
-                ? (int) m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
-                    / m_hostRangeSize
-                : 0;
-
-            result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
-
-            NX_DEBUG(this, lit("%1 : %2")
-                .arg(result.status.current)
-                .arg(result.status.total));
-            break;
-        }
-        case QnManualResourceSearchStatus::CheckingHost:
-        {
-            auto currentPercent = m_totalTaskCount ?
-               std::floor(0.5
-                    + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
-                    * (m_totalTaskCount - m_remainingTaskCount)
-                    / m_totalTaskCount) + PORT_SCAN_MAX_PROGRESS_PERCENT : 0;
-
-            result.status = QnManualResourceSearchStatus(
-                m_state,
-                currentPercent,
-                MAX_PERCENT);
-
-            break;
-        }
-        default:
-        {
-            result.status = QnManualResourceSearchStatus(m_state, 0, MAX_PERCENT);
-            break;
-        }
-    }
-
-    return result;
+    m_results = std::move(results);
+    NX_ASSERT(m_searchDoneCallback);
+    m_searchDoneCallback(this);
 }
 
-QStringList QnManualCameraSearcher::getOnlineHosts(
-    const QString& startAddr,
-    const QString& endAddr,
-    int port)
+QnManualResourceSearchStatus::State QnManualCameraSearcher::changeState(
+    QnManualResourceSearchStatus::State newState)
 {
-    QStringList onlineHosts;
-
-    const quint32 startIPv4Addr = QHostAddress(startAddr).toIPv4Address();
-    const quint32 endIPv4Addr = QHostAddress(endAddr).toIPv4Address();
-
-    if (endIPv4Addr < startIPv4Addr)
-        return QStringList();
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_hostRangeSize = endIPv4Addr - startIPv4Addr;
-        m_state = QnManualResourceSearchStatus::CheckingOnline;
-
-        if (m_cancelled)
-        {
-            m_state = QnManualResourceSearchStatus::Aborted;
-            return QStringList();
-        }
-    }
-
-    onlineHosts = m_ipChecker.onlineHosts(
-        QHostAddress(startAddr),
-        QHostAddress(endAddr),
-        port ? port : nx::network::http::DEFAULT_HTTP_PORT );
-
-    {
-        QnMutexLocker lock( &m_mutex );
-        if( m_cancelled )
-        {
-            m_state = QnManualResourceSearchStatus::Aborted;
-            return QStringList();
-        }
-    }
-
-    return onlineHosts;
-}
-
-void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
-{
-    if (m_cancelled)
-    {
-        m_state = QnManualResourceSearchStatus::Aborted;
-        return;
-    }
-
-    int totalRunningTasks = 0;
-
-    for (const auto& context: m_searchQueueContexts)
-    {
-        if (!context.isInterrupted)
-            totalRunningTasks += context.runningTaskCount;
-    }
-
-    auto canRunTask =
-        [&totalRunningTasks, threadPool, this]() -> bool
-        {
-            bool allQueuesAreBlocked = true;
-            for (const auto& queueName: m_urlSearchTaskQueues.keys())
-            {
-                auto& context = m_searchQueueContexts[queueName];
-                if (!context.isBlocked)
-                {
-                    allQueuesAreBlocked = false;
-                    break;
-                }
-            }
-            return (totalRunningTasks <= threadPool->maxThreadCount())
-                && !m_urlSearchTaskQueues.isEmpty()
-                && !allQueuesAreBlocked;
-        };
-
-    /**
-     * We are launching tasks until count of running tasks do not exceeds
-     * maximum thread count in pool.
-     */
-    while(canRunTask())
-    {
-        // Take one task from each queue.
-        for (auto it = m_urlSearchTaskQueues.begin(); it != m_urlSearchTaskQueues.end();)
-        {
-            auto queueName = it.key();
-
-            auto& queue = m_urlSearchTaskQueues[queueName];
-            auto& context = m_searchQueueContexts[queueName];
-
-            if (it->isEmpty() || context.isInterrupted)
-            {
-                it = m_urlSearchTaskQueues.erase(it);
-                continue;
-            }
-            else
-            {
-                it++;
-            }
-
-            if (!canRunTask())
-                break;
-
-            if (context.isBlocked)
-                continue;
-
-            QnSearchTask task = queue.dequeue();
-
-            auto taskFn = std::bind(&QnSearchTask::doSearch, task);
-            nx::utils::concurrent::run(threadPool, taskFn);
-
-            context.runningTaskCount++;
-            totalRunningTasks++;
-
-            if (task.isBlocking())
-            {
-                context.isBlocked = true;
-                break;
-            }
-        }
-    }
+    auto oldState = m_state.exchange(newState);
+    NX_VERBOSE(this, "State change: %1 -> %2", oldState, newState);
+    return oldState;
 }

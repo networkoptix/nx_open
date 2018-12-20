@@ -3,6 +3,7 @@
 #include <nx/vms/api/types/resource_types.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/types/connection_types.h>
 
 namespace nx::vms::api::test {
 
@@ -101,6 +102,15 @@ TEST(Lexical, numericDeserialization)
     ASSERT_EQ(
         QnLexical::deserialized<Quality>("3"),
         Quality::CameraBackup_Both);
+}
+
+TEST(Lexical, peerType)
+{
+    ASSERT_EQ("PT_OldSetver", QnLexical::serialized<PeerType>(PeerType::oldServer).toStdString());
+
+    ASSERT_EQ(
+        PeerType::oldServer,
+        QnLexical::deserialized<PeerType>("PT_OldSetver"));
 }
 
 } // namespace nx::vms::api::test

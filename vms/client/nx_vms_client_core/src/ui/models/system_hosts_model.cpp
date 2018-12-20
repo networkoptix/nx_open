@@ -4,7 +4,7 @@
 #include <utils/common/util.h>
 #include <utils/common/connective.h>
 #include <finders/systems_finder.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <network/system_description.h>
 #include <client_core/client_core_settings.h>
@@ -75,9 +75,9 @@ private:
     ServerIdHostList::iterator getDataIt(const QnUuid& serverId);
 
 private:
-    QnSystemHostsModel* m_owner;
+    QnSystemHostsModel* const m_owner;
 
-    QnDisconnectHelperPtr m_disconnectHelper;
+    nx::utils::ScopedConnections m_connections;
     QString m_systemId;
     QUuid m_localSystemId;
     ServerIdHostList m_hosts;
@@ -178,51 +178,42 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
         endResetModel();
     }
 
-    m_disconnectHelper.reset(new QnDisconnectHelper());
+    m_connections = {};
     if (m_systemId.isNull())
         return;
 
-    const auto reloadHostsHandler = [this](const QnSystemDescriptionPtr& system)
-    {
-        if (m_systemId != system->id())
-            return;
+    const auto reloadHostsHandler =
+        [this](const QnSystemDescriptionPtr& system)
+        {
+            if (m_systemId != system->id())
+                return;
 
-        for (const auto server: system->servers())
-            addServer(system, server.id);
+            for (const auto server: system->servers())
+                addServer(system, server.id);
 
-        const auto serverAddedConnection =
-            connect(system, &QnBaseSystemDescription::serverAdded, this,
+            m_connections << connect(system, &QnBaseSystemDescription::serverAdded, this,
                 [this, system](const QnUuid& id) { addServer(system, id); });
 
-        const auto serverRemovedConnection =
-            connect(system, &QnBaseSystemDescription::serverRemoved, this,
+            m_connections << connect(system, &QnBaseSystemDescription::serverRemoved, this,
                 [this, system](const QnUuid& id) { removeServer(system, id); });
 
-        const auto changedConnection =
-            connect(system, &QnBaseSystemDescription::serverChanged, this,
+            m_connections << connect(system, &QnBaseSystemDescription::serverChanged, this,
                 [this, system](const QnUuid& id, QnServerFields fields)
                 {
                     if (fields.testFlag(QnServerField::Host))
                         updateServerHost(system, id);
                 });
+        };
 
-        m_disconnectHelper->add(serverAddedConnection);
-        m_disconnectHelper->add(serverRemovedConnection);
-        m_disconnectHelper->add(changedConnection);
-    };
-
-    const auto system = qnSystemsFinder->getSystem(m_systemId);
-    if (!system)
+    if (const auto system = qnSystemsFinder->getSystem(m_systemId))
     {
-        const auto reloadHostsConnection =
-            connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
-                this, reloadHostsHandler);
-
-        m_disconnectHelper->add(reloadHostsConnection);
-        return;
+        reloadHostsHandler(system);
     }
-
-    reloadHostsHandler(system);
+    else
+    {
+        m_connections << connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
+            this, reloadHostsHandler);
+    }
 }
 
 void QnSystemHostsModel::HostsModel::addServer(

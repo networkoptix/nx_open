@@ -30,6 +30,11 @@ http {
         application/javascript     epoch;
     }
 
+    map ${DOLLAR}request_uri ${DOLLAR}fopts {
+        ~^/embed/ "";
+        default "SAMEORIGIN";
+    }
+
     upstream app_server {
         # For a TCP configuration:
         server $PORTAL_HOST:5000 fail_timeout=0;
@@ -81,6 +86,10 @@ http {
 
             # checks for static file, if not found proxy to app
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
+        }
+
+        location ~* .php$ {
+            return 404;
         }
 
         location /api/cloud_modules {
@@ -167,7 +176,7 @@ http {
         # and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking
         # if you need to allow [i]frames, you can use SAMEORIGIN or even set an uri with ALLOW-FROM uri
         # https://developer.mozilla.org/en-US/docs/HTTP/X-Frame-Options
-        add_header X-Frame-Options SAMEORIGIN;
+        add_header X-Frame-Options ${DOLLAR}fopts;
 
         # when serving user-supplied content, include a X-Content-Type-Options: nosniff header along with the Content-Type: header,
         # to disable content-type sniffing on some browsers.

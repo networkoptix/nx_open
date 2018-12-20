@@ -3,6 +3,8 @@
 #include <vector>
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtNetwork/QHostAddress>
 
 namespace nx::streaming {
 
@@ -30,6 +32,7 @@ struct Sdp
 
     struct Media
     {
+        int serverPort = 0;
         int payloadType = -1; //< RTP payload type number
         MediaType mediaType = MediaType::Unknown;
         QString control;
@@ -48,6 +51,7 @@ struct Sdp
      */
     void parse(const QString& sdp);
 
+    QHostAddress serverAddress;
     std::vector<Media> media;
 };
 

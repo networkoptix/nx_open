@@ -94,7 +94,11 @@ Item
                     __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
             }
 
-            Component.onCompleted: setPlayer(mediaPlayer, index)
+            Connections
+            {
+                target: multiVideoOutput
+                onMediaPlayerChanged: setPlayer(target.mediaPlayer, index)
+            }
         }
     }
 

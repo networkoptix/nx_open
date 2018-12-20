@@ -64,6 +64,8 @@ public:
 
     virtual int getMaxFps() const;
 
+    virtual void setMaxFps(int fps);
+
     virtual int reservedSecondStreamFps() const;
 
     /** sets the distance between I frames */
@@ -375,6 +377,7 @@ signals:
     void capabilitiesChanged(const QnResourcePtr& resource);
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
+    void ptzConfigurationChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 

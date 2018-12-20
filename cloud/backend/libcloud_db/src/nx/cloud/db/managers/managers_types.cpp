@@ -36,21 +36,21 @@ api::ResultCode dbResultToApiResult(nx::sql::DBResult dbResult)
     return api::ResultCode::dbError;
 }
 
-api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode)
+api::ResultCode ec2ResultToResult(clusterdb::engine::ResultCode resultCode)
 {
     switch (resultCode)
     {
-        case data_sync_engine::ResultCode::ok:
+        case clusterdb::engine::ResultCode::ok:
             return api::ResultCode::ok;
-        case data_sync_engine::ResultCode::partialContent:
+        case clusterdb::engine::ResultCode::partialContent:
             return api::ResultCode::partialContent;
-        case data_sync_engine::ResultCode::dbError:
+        case clusterdb::engine::ResultCode::dbError:
             return api::ResultCode::dbError;
-        case data_sync_engine::ResultCode::retryLater:
+        case clusterdb::engine::ResultCode::retryLater:
             return api::ResultCode::retryLater;
-        case data_sync_engine::ResultCode::notFound:
+        case clusterdb::engine::ResultCode::notFound:
             return api::ResultCode::notFound;
-        case data_sync_engine::ResultCode::badRequest:
+        case clusterdb::engine::ResultCode::badRequest:
             return api::ResultCode::badRequest;
         default:
             return api::ResultCode::unknownError;

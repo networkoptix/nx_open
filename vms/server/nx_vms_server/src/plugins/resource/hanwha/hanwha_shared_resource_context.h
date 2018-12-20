@@ -5,8 +5,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
-#include <nx/mediaserver/resource/abstract_shared_resource_context.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/resource/abstract_shared_resource_context.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/semaphore.h>
@@ -21,7 +21,7 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 static const std::chrono::seconds kUpdateCacheTimeout(30);
@@ -72,6 +72,8 @@ public:
         m_timer.invalidate();
     }
 
+    std::chrono::milliseconds timeout() { return m_timeout; }
+
 private:
     const std::function<HanwhaResult<Value>()> m_getter;
     const std::chrono::milliseconds m_timeout;
@@ -120,12 +122,12 @@ using SessionContextPtr = QSharedPointer<SessionContext>;
 using SessionContextWeakPtr = QWeakPointer<SessionContext>;
 
 class HanwhaSharedResourceContext:
-    public nx::mediaserver::resource::AbstractSharedResourceContext,
+    public nx::vms::server::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
 public:
     HanwhaSharedResourceContext(
-        const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
+        const nx::vms::server::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
     void setResourceAccess(const nx::utils::Url& url, const QAuthenticator& authenticator);
@@ -160,6 +162,7 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
     HanwhaCachedData<HanwhaCodecInfo> videoCodecInfo;
     HanwhaCachedData<bool> isBypassSupported;
+    HanwhaCachedData<std::set<int>> ptzCalibratedChannels;
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
@@ -168,6 +171,7 @@ private:
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
     HanwhaResult<HanwhaCodecInfo> loadVideoCodecInfo();
     HanwhaResult<bool> checkBypassSupport();
+    HanwhaResult<std::set<int>> loadPtzCalibratedChannels();
 
     void cleanupUnsafe();
     int totalAmountOfSessions(bool isLive) const;
@@ -175,7 +179,7 @@ private:
     static const int kDefaultNvrMaxLiveSessions = 10;
     static const int kDefaultNvrMaxArchiveSessions = 3;
 
-    const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
+    const nx::vms::server::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
     mutable QnMutex m_dataMutex;
     nx::utils::Url m_resourceUrl;
@@ -204,5 +208,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

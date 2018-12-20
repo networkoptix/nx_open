@@ -137,7 +137,7 @@
 
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
-        "maxProgressiveDownloaders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info":{
         "tabs":{

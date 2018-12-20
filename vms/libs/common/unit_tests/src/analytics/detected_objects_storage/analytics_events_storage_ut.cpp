@@ -763,7 +763,7 @@ protected:
 
         m_filter.objectAppearanceId = QnUuid();
     }
-    
+
     void givenObjectWithLongTrack()
     {
         using namespace std::chrono;
@@ -1288,7 +1288,7 @@ protected:
     {
         Filter filter;
         filter.timePeriod.setStartTime(m_oldestAvailableDataTimestamp);
-        filter.timePeriod.durationMs = QnTimePeriod::infiniteDuration();
+        filter.timePeriod.durationMs = QnTimePeriod::kInfiniteDuration;
 
         for (;;)
         {

@@ -4,20 +4,20 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 class AbstractRemoteArchiveSynchronizationTask:
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     AbstractRemoteArchiveSynchronizationTask(QnMediaServerModule* serverModule):
-        nx::mediaserver::ServerModuleAware(serverModule)
+        nx::vms::server::ServerModuleAware(serverModule)
     {
     }
 
@@ -31,5 +31,5 @@ public:
 using RemoteArchiveTaskPtr = std::shared_ptr<AbstractRemoteArchiveSynchronizationTask>;
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

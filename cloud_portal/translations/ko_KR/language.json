@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "고급 뷰어",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "라이브 비디오를보고, 아카이브를 검색하고, PTZ 등을 제어 할 수 있습니다."
     },
     "Administrator": {
       "label": "관리자",
@@ -163,11 +163,11 @@
     "openClient": "%VMS_NAME%에서 열기",
     "openClientNoSystem": "%VMS_NAME% 열기",
     "confirmMergeAction": "병합",
-    "mergeSystemTitle": "병합 시스템",
+    "mergeSystemTitle": "시스템 병합",
     "confirmRenameTitle": "시스템 이름",
     "confirmRenameAction": "저장",
     "successRename": "시스템 이름 저장",
-    "confirmDisconnectTitle": "%PRODUCT_NAME%에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectTitle": "%PRODUCT_NAME%에서 시스템을 분리하실래요?",
     "confirmDisconnectAction": "연결 끊기",
     "confirmUnshareFromMe": "이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle": "시스템 연결을 끊으시겠습니까?",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "삭제",
     "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "시스템 {{systemName}} 이 {{systemName}} 과 병합되었습니다.",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "클립보드에 복사됨"
     },
     "systemOffline": "시스템 오프라인",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "카메라 없음",
     "cameraStates": {
       "offline": "오프라인",
       "error": "오류",

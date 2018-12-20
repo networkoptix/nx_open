@@ -13,7 +13,7 @@
 #include <database/server_db.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace bookmarks {
 namespace test {
 
@@ -298,5 +298,5 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
 }
 } // namespace test
 } // namespace bookmarks
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

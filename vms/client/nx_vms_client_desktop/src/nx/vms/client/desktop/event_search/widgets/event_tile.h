@@ -10,7 +10,7 @@
 #include <ui/customization/customized.h>
 
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 
 class QModelIndex;
@@ -71,11 +71,6 @@ public:
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
 
-    bool hasAutoClose() const;
-    std::chrono::milliseconds autoCloseTime() const;
-    std::chrono::milliseconds autoCloseRemainingTime() const;
-    void setAutoCloseTime(std::chrono::milliseconds value);
-
     bool busyIndicatorVisible() const;
     void setBusyIndicatorVisible(bool value);
 
@@ -88,14 +83,14 @@ public:
     QString progressTitle() const;
     void setProgressTitle(const QString& value);
 
-    bool isRead() const;
-    void setRead(bool value);
-
     bool previewEnabled() const;
     void setPreviewEnabled(bool value);
 
     bool footerEnabled() const;
     void setFooterEnabled(bool value);
+
+    bool headerEnabled() const;
+    void setHeaderEnabled(bool value);
 
     void setResourceList(const QnResourceList& list); //< Doesn't store it, only generates text.
     void setResourceList(const QStringList& list);
@@ -124,9 +119,9 @@ public:
     void clear();
 
 signals:
-    void clicked();
+    void clicked(Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked();
-    void dragStarted();
+    void dragStarted(const QPoint& pos, const QSize& size);
 
     void closeRequested();
 

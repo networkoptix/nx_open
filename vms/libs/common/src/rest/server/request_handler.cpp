@@ -2,10 +2,18 @@
 
 #include <QtCore/QDebug>
 
+#include <nx/utils/log/log.h>
+
 RestRequest::RestRequest(
-    QString path, QnRequestParamList params, const QnRestConnectionProcessor* owner)
+    QString path, 
+    QnRequestParamList params,
+    const QnRestConnectionProcessor* owner,
+    const nx::network::http::Request* httpRequest)
 :
-    path(std::move(path)), params(std::move(params)), owner(owner)
+    path(std::move(path)),
+    params(std::move(params)),
+    owner(owner),
+    httpRequest(httpRequest)
 {
 }
 
@@ -25,6 +33,40 @@ RestResponse::RestResponse(
 
 QnRestRequestHandler::QnRestRequestHandler()
 {
+}
+
+RestResponse QnRestRequestHandler::executeRequest(
+    nx::network::http::Method::ValueType method,
+    const RestRequest& request,
+    const RestContent& content)
+{
+    RestResponse response;
+
+    if (method == nx::network::http::Method::get)
+    {
+        response = executeGet(request);
+    }
+    else if (method == nx::network::http::Method::post)
+    {
+        response = executePost(request, content);
+    }
+    else if (method == nx::network::http::Method::put)
+    {
+        response = executePut(request, content);
+    }
+    else if (method == nx::network::http::Method::delete_)
+    {
+        response = executeDelete(request);
+    }
+    else
+    {
+        NX_WARNING(this, lm("Unknown REST method %1").arg(method));
+        response.statusCode = nx::network::http::StatusCode::notFound;
+        response.content.type = "text/plain";
+        response.content.body = "Invalid HTTP method";
+    }
+
+    return response;
 }
 
 RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)

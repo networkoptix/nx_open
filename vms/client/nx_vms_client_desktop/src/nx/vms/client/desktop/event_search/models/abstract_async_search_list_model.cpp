@@ -33,9 +33,9 @@ void AbstractAsyncSearchListModel::clearData()
     d->clearData();
 }
 
-bool AbstractAsyncSearchListModel::canFetch() const
+bool AbstractAsyncSearchListModel::canFetchNow() const
 {
-    return d->canFetch();
+    return !d->fetchInProgress();
 }
 
 void AbstractAsyncSearchListModel::requestFetch()
@@ -67,13 +67,6 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
 {
     if (!isValid(index))
         return QVariant();
-
-    if (role == Qn::AnimatedRole)
-    {
-        using namespace std::chrono;
-        return data(index, Qn::TimestampRole).value<microseconds>()
-            >= fetchedTimeWindow().startTime();
-    }
 
     bool handled = false;
     const auto result = d->data(index, role, handled);

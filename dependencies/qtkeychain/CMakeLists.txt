@@ -20,7 +20,7 @@ endif()
 
 if(APPLE)
     if(IOS)
-        list(APPEND sources ${qtkeychain_dir}/keychain_ios.cpp)
+        list(APPEND sources ${qtkeychain_dir}/keychain_ios.mm)
     else()
         list(APPEND sources ${qtkeychain_dir}/keychain_mac.cpp)
     endif()
@@ -70,8 +70,8 @@ target_include_directories(qtkeychain
 )
 
 generate_export_header(qtkeychain
-  EXPORT_FILE_NAME qkeychain_export.h
-  EXPORT_MACRO_NAME QKEYCHAIN_EXPORT
+    EXPORT_FILE_NAME qkeychain_export.h
+    EXPORT_MACRO_NAME QKEYCHAIN_EXPORT
 )
 nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/qkeychain_export.h)
 

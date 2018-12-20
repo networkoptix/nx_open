@@ -16,7 +16,12 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
+    // Clients do not receive any live updates from the server, therefore time periods of interest
+    // must be periodically polled for updates by calling this method.
+    void dynamicUpdate(const QnTimePeriod& period);
+
     virtual bool isConstrained() const override;
+    virtual bool hasAccessRights() const override;
 
 private:
     class Private;

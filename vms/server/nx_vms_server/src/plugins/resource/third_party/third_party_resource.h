@@ -7,19 +7,19 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera.h>
 #include <plugins/camera_plugin_qt_wrapper.h>
 
 //!Camera resource, integrated via external driver. Routes requests to \a nxcip::BaseCameraManager interface
 class QnThirdPartyResource
 :
-    public nx::mediaserver::resource::Camera,
+    public nx::vms::server::resource::Camera,
     public nxcip::CameraInputEventHandler
 {
     Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
 
-    typedef nx::mediaserver::resource::Camera base_type;
+    typedef nx::vms::server::resource::Camera base_type;
 
 public:
     static const QString AUX_DATA_PARAM_NAME;
@@ -93,7 +93,7 @@ public:
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
@@ -120,7 +120,7 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
-    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution(Qn::StreamIndex encoderNumber) const;

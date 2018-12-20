@@ -3,7 +3,7 @@
 #include <nx/kit/ini_config.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 struct HanwhaIni: public nx::kit::IniConfig
@@ -66,5 +66,5 @@ inline HanwhaIni& ini()
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

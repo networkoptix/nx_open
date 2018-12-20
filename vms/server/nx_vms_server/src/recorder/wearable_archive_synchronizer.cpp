@@ -13,11 +13,11 @@
 
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
 {
     m_workerPool->setMaxTaskCount(maxSynchronizationThreads());
@@ -109,6 +109,6 @@ void WearableArchiveSynchronizer::cancelAllTasks(const QnResourcePtr& resource)
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 

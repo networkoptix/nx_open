@@ -22,13 +22,13 @@ using namespace nx;
 //-------------------------------------------------------------------------------------------------
 // QnMultiserverEventsRestHandler::Private
 
-class QnMultiserverEventsRestHandler::Private: public nx::mediaserver::ServerModuleAware
+class QnMultiserverEventsRestHandler::Private: public nx::vms::server::ServerModuleAware
 {
     using MultiData = std::vector<vms::event::ActionDataList>;
 
 public:
     Private(QnMediaServerModule* serverModule, const QString& urlPath):
-        nx::mediaserver::ServerModuleAware(serverModule),
+        nx::vms::server::ServerModuleAware(serverModule),
         urlPath(urlPath)
     {
     }

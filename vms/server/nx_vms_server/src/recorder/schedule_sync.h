@@ -21,7 +21,7 @@
 #include <nx/vms/api/types/days_of_week.h>
 
 class QnScheduleSync: 
-    public QnLongRunnable, public nx::mediaserver::ServerModuleAware
+    public QnLongRunnable, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 private:

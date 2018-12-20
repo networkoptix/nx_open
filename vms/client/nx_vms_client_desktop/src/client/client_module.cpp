@@ -146,10 +146,10 @@ typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
 {
     QnTranslationManagerPtr translationManager(new QnTranslationManager());
-    translationManager->addPrefix(lit("client_base"));
-    translationManager->addPrefix(lit("client_ui"));
-    translationManager->addPrefix(lit("client_core"));
-    translationManager->addPrefix(lit("client_qml"));
+    translationManager->addPrefix("client_base");
+    translationManager->addPrefix("client_ui");
+    translationManager->addPrefix("client_core");
+    translationManager->addPrefix("client_qml");
 
     QnTranslation translation;
     if (translation.isEmpty()) /* By path. */
@@ -191,12 +191,12 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
     {
         // we hope self-updater will run only once per time and will not overflow log-file
         // qnClientInstanceManager is not initialized in self-update mode
-        return lit("self_update");
+        return "self_update";
     }
 
     if (qnRuntime->isAcsMode())
     {
-        return lit("ax");
+        return "ax";
     }
 
     if (qnClientInstanceManager && qnClientInstanceManager->isValid())
@@ -382,7 +382,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     auto commonModule = m_clientCoreModule->commonModule();
 
-    commonModule->store(new QnResourceRuntimeDataManager());
+    commonModule->store(new QnResourceRuntimeDataManager(commonModule));
     commonModule->store(translationManager.release());
     commonModule->store(new QnClientRuntimeSettings());
     commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
@@ -532,7 +532,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
 
     m_clientCoreModule->mainQmlEngine()->setBaseUrl(
-        qmlRoot.startsWith(lit("qrc:"))
+        qmlRoot.startsWith("qrc:")
             ? QUrl(qmlRoot)
             : QUrl::fromLocalFile(qmlRoot));
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
@@ -554,13 +554,16 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
 
     nx::utils::log::Settings logSettings;
     logSettings.loggers.resize(1);
-    logSettings.loggers.front().maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
-    logSettings.loggers.front().maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
-    logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    logSettings.loggers.front().maxBackupCount =
+        qnSettings->rawSettings()->value("logArchiveSize", 10).toUInt();
+    logSettings.loggers.front().maxFileSize =
+        qnSettings->rawSettings()->value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
+    logSettings.updateDirectoryIfEmpty(
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.loggers.front().level.parse(logLevel);
     logSettings.loggers.front().logBaseName = logFile.isEmpty()
-        ? lit("client_log") + logFileNameSuffix
+        ? ("client_log" + logFileNameSuffix)
         : logFile;
 
     nx::utils::log::setMainLogger(
@@ -569,10 +572,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             qApp->applicationName(),
             qApp->applicationFilePath()));
 
-    if (ec2TranLogLevel != lit("none"))
+    if (ec2TranLogLevel != "none")
     {
         logSettings.loggers.front().level.parse(ec2TranLogLevel);
-        logSettings.loggers.front().logBaseName = lit("ec2_tran") + logFileNameSuffix;
+        logSettings.loggers.front().logBaseName = "ec2_tran" + logFileNameSuffix;
         nx::utils::log::addLogger(
             nx::utils::log::buildLogger(
                 logSettings,
@@ -585,7 +588,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
         nx::utils::log::addLogger(
             std::make_unique<nx::utils::log::Logger>(
-                std::set<nx::utils::log::Tag>{nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))},
+                std::set<nx::utils::log::Tag>{
+                    nx::utils::log::Tag(QStringLiteral("DecodedPictureToOpenGLUploader"))},
                 nx::utils::log::Level::info));
     }
 
@@ -628,15 +632,15 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 {
     QStringList paths;
-    paths << lit(":/skin");
-    paths << lit(":/skin_dark");
+    paths << ":/skin";
+    paths << ":/skin_dark";
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     if (!startupParams.dynamicCustomizationPath.isEmpty())
     {
         QDir base(startupParams.dynamicCustomizationPath);
-        paths << base.absoluteFilePath(lit("skin"));
-        paths << base.absoluteFilePath(lit("skin_dark"));
+        paths << base.absoluteFilePath("skin");
+        paths << base.absoluteFilePath("skin_dark");
     }
 #else
     Q_UNUSED(startupParams);
@@ -656,7 +660,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     {
         nx::vms::client::core::FontLoader::loadFonts(
             QDir(QApplication::applicationDirPath()).absoluteFilePath(
-                nx::utils::AppInfo::isMacOsX() ? lit("../Resources/fonts") : lit("fonts")));
+                nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
 
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));

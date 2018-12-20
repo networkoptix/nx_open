@@ -1,6 +1,6 @@
 #include "proxy_image_provider.h"
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/utils/abstract_image_processor.h>
 
 namespace nx::vms::client::desktop {
@@ -18,8 +18,6 @@ ProxyImageProvider::ProxyImageProvider(ImageProvider* sourceProvider, QObject* p
 
 ProxyImageProvider::~ProxyImageProvider()
 {
-    m_imageProcessorConnections.reset();
-    m_sourceProviderConnections.reset();
 }
 
 QImage ProxyImageProvider::image() const
@@ -47,21 +45,21 @@ void ProxyImageProvider::setSourceProvider(ImageProvider* sourceProvider)
     if (m_sourceProvider == sourceProvider)
         return;
 
-    m_sourceProviderConnections.reset(new QnDisconnectHelper());
+    m_sourceProviderConnections = {};
     m_sourceProvider = sourceProvider;
 
     if (m_sourceProvider)
     {
-        *m_sourceProviderConnections << connect(m_sourceProvider, &QObject::destroyed,
+        m_sourceProviderConnections << connect(m_sourceProvider, &QObject::destroyed,
             this, [this]() { setSourceProvider(nullptr); });
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::statusChanged,
+        m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::statusChanged,
             this, &ProxyImageProvider::setStatus);
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::sizeHintChanged,
+        m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::sizeHintChanged,
             this, &ProxyImageProvider::setSourceSizeHint);
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::imageChanged,
+        m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::imageChanged,
             this, &ProxyImageProvider::setSourceImage);
 
         setStatus(m_sourceProvider->status());
@@ -86,15 +84,15 @@ void ProxyImageProvider::setImageProcessor(AbstractImageProcessor* imageProcesso
     if (m_imageProcessor == imageProcessor)
         return;
 
-    m_imageProcessorConnections.reset(new QnDisconnectHelper());
+    m_imageProcessorConnections = {};
     m_imageProcessor = imageProcessor;
 
     if (m_imageProcessor)
     {
-        *m_imageProcessorConnections << connect(m_imageProcessor, &QObject::destroyed,
+        m_imageProcessorConnections << connect(m_imageProcessor, &QObject::destroyed,
             this, [this]() { setImageProcessor(nullptr); });
 
-        *m_imageProcessorConnections << connect(m_imageProcessor,
+        m_imageProcessorConnections << connect(m_imageProcessor,
             &AbstractImageProcessor::updateRequired, this, &ProxyImageProvider::updateFromSource);
     }
 

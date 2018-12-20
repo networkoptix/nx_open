@@ -116,7 +116,8 @@ bool calculateRecordingParametersAvailable(const Cameras& cameras)
         [](const Camera& camera)
         {
             return camera->hasVideo()
-                && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
+                && !camera->hasDefaultProperty(ResourcePropertyKey::kNoRecordingParams)
+                && !camera->hasCameraCapabilities(Qn::FixedQualityCapability);
         });
 }
 
@@ -487,10 +488,21 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
+    state.devicesDescription.supportsRecording = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasVideo() || camera->isAudioSupported(); });
+
     state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
     state.devicesDescription.isIoModule = combinedValue(cameras,
         [](const Camera& camera) { return camera->isIOModule(); });
+
+    state.devicesDescription.supportsVideo = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasVideo(); });
+    state.devicesDescription.supportsAudio = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isAudioSupported(); });
+    state.devicesDescription.isAudioForced = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isAudioForced(); });
+
     state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
@@ -584,7 +596,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             state.singleIoModuleSettings.visualStyle.setBase(
                 QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
-                    firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {}));
+                    firstCamera->getProperty(ResourcePropertyKey::kIoOverlayStyle), {}));
 
             state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->ioPortDescriptions());
         }
@@ -740,7 +752,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         fetchFromCameras<int>(state.wearableMotion.sensitivity, cameras,
             [](const Camera& camera)
             {
-                NX_ASSERT(camera->getVideoLayout()->channelCount() == 0);
+                NX_ASSERT(camera->getVideoLayout()->channelCount() == 1);
                 QnMotionRegion region = camera->getMotionRegion(0);
                 const auto rects = region.getAllMotionRects();
                 return rects.empty()
@@ -1315,6 +1327,13 @@ State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
+    State state, const QnUuid& value)
+{
+    state.analytics.currentEngineId = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
 {
     state.analytics.loading = value;
@@ -1337,17 +1356,17 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
         state.analytics.engines.end(),
         [engineId](const auto& engine) { return engine.id == engineId; }))
     {
-        return std::make_pair(false, std::move(state));
+        return {false, std::move(state)};
     }
 
     auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
     if (storedValues.get() == values)
-        return std::make_pair(false, std::move(state));
+        return {false, std::move(state)};
 
     storedValues.setUser(values);
     state.hasChanges = true;
 
-    return std::make_pair(true, std::move(state));
+    return {true, std::move(state)};
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentSettingsValues(

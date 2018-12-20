@@ -97,7 +97,6 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
         if (!path.isEmpty() && !m_dir.exists(path) && !m_dir.mkpath(path))
             return OtherError;
 
-
         if (isSymlink(info))
         {
             if (!file.open(QuaZipFile::ReadOnly))
@@ -133,7 +132,11 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
                 }
             }
 
-            destFile.setPermissions(info.getPermissions());
+            auto permissions = info.getPermissions();
+            permissions |= QFile::ReadOwner;
+            permissions |= QFile::ReadUser;
+            permissions |= QFile::ReadGroup;
+            destFile.setPermissions(permissions);
             destFile.close();
             file.close();
         }

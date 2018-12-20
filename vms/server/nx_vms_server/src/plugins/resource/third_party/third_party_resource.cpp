@@ -27,9 +27,36 @@
 
 namespace core_ptz = nx::core::ptz;
 
-static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
-const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
+const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME("aux_data");
+
+static const std::map<Qn::CameraCapability, nxcip::BaseCameraManager::CameraCapability>
+    kDeviceCapabilityMap =
+{
+    {Qn::CameraTimeCapability, nxcip::BaseCameraManager::cameraTimeCapability},
+    {Qn::InputPortCapability, nxcip::BaseCameraManager::relayOutputCapability},
+    {Qn::OutputPortCapability, nxcip::BaseCameraManager::relayOutputCapability},
+    {Qn::ShareIpCapability, nxcip::BaseCameraManager::shareIpCapability},
+    {Qn::CustomMediaUrlCapability, nxcip::BaseCameraManager::customMediaUrlCapability},
+    {Qn::FixedQualityCapability, nxcip::BaseCameraManager::fixedQualityCapability},
+};
+
+static const std::map<Ptz::Capability, nxcip::CameraPtzManager::Capability>
+    kPtzCapabilityMap =
+{
+    {Ptz::ContinuousPanCapability, nxcip::CameraPtzManager::ContinuousPanCapability},
+    {Ptz::ContinuousTiltCapability, nxcip::CameraPtzManager::ContinuousTiltCapability},
+    {Ptz::ContinuousZoomCapability, nxcip::CameraPtzManager::ContinuousZoomCapability},
+
+    {Ptz::AbsolutePanCapability, nxcip::CameraPtzManager::AbsolutePanCapability},
+    {Ptz::AbsoluteTiltCapability, nxcip::CameraPtzManager::AbsoluteTiltCapability},
+    {Ptz::AbsoluteZoomCapability, nxcip::CameraPtzManager::AbsoluteZoomCapability},
+
+    {Ptz::FlipPtzCapability, nxcip::CameraPtzManager::FlipPtzCapability},
+    {Ptz::LimitsPtzCapability, nxcip::CameraPtzManager::LimitsPtzCapability},
+    {Ptz::DevicePositioningPtzCapability, nxcip::CameraPtzManager::DevicePositioningPtzCapability},
+    {Ptz::LogicalPositioningPtzCapability, nxcip::CameraPtzManager::LogicalPositioningPtzCapability},
+};
 
 QnThirdPartyResource::QnThirdPartyResource(
     QnMediaServerModule* serverModule,
@@ -37,7 +64,7 @@ QnThirdPartyResource::QnThirdPartyResource(
     nxcip::BaseCameraManager* camManager,
     const nxcip_qt::CameraDiscoveryManager& discoveryManager )
     :
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_camInfo( camInfo ),
     m_camManager( camManager ? new nxcip_qt::BaseCameraManager(camManager) : nullptr ),
     m_discoveryManager( discoveryManager ),
@@ -73,7 +100,7 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal() con
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
-std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnThirdPartyResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};
@@ -151,7 +178,7 @@ bool QnThirdPartyResource::ping()
     return true;
 }
 
-static const QString PROPERTIES_TO_MERGE[] = { QnThirdPartyResource::AUX_DATA_PARAM_NAME, Qn::FIRMWARE_PARAM_NAME };
+static const QString PROPERTIES_TO_MERGE[] = { QnThirdPartyResource::AUX_DATA_PARAM_NAME, ResourcePropertyKey::kFirmware };
 
 bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& newResource )
 {
@@ -193,7 +220,6 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);
 
-
     return result;
 }
 
@@ -221,7 +247,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
 {
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     if( !archiveDelegate )
-        return nx::mediaserver::resource::Camera::createArchiveDataProvider();
+        return nx::vms::server::resource::Camera::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
     return archiveReader;
@@ -374,7 +400,7 @@ void QnThirdPartyResource::inputPortStateChanged(
     int newState,
     unsigned long int /*timestamp*/ )
 {
-    emit nx::mediaserver::resource::Camera::inputPortStateChanged(
+    emit nx::vms::server::resource::Camera::inputPortStateChanged(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
         newState != 0,
@@ -395,11 +421,11 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::Stre
     return nxcip::Resolution();
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
@@ -511,44 +537,18 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    setCameraCapability(Qn::CameraTimeCapability,
-        cameraCapabilities & nxcip::BaseCameraManager::cameraTimeCapability);
-    if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
-        setCameraCapability( Qn::InputPortCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
-        setCameraCapability( Qn::OutputPortCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
-        setCameraCapability( Qn::ShareIpCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
-        setCameraCapability( Qn::CustomMediaUrlCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::ptzCapability)
+    for (const auto& [nxCapabilty, pluginCapability]: kDeviceCapabilityMap)
+        setCameraCapability(nxCapabilty, cameraCapabilities & pluginCapability);
+
+    if (cameraCapabilities & nxcip::BaseCameraManager::ptzCapability)
     {
-        nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager();
-        if( ptzManager )
+        if (nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager())
         {
             const int ptzCapabilities = ptzManager->getCapabilities();
-            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability)
-                setPtzCapability( Ptz::ContinuousPanCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability)
-                setPtzCapability( Ptz::ContinuousTiltCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability)
-                setPtzCapability( Ptz::ContinuousZoomCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability)
-                setPtzCapability( Ptz::AbsolutePanCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability)
-                setPtzCapability( Ptz::AbsoluteTiltCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability)
-                setPtzCapability( Ptz::AbsoluteZoomCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability)
-                setPtzCapability( Ptz::FlipPtzCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability)
-                setPtzCapability( Ptz::LimitsPtzCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability)
-                setPtzCapability( Ptz::DevicePositioningPtzCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability)
-                setPtzCapability( Ptz::LogicalPositioningPtzCapability, true );
+            ptzManager->releaseRef();
+            for (const auto& [nxCapabilty, pluginCapability]: kPtzCapabilityMap)
+                setPtzCapability(nxCapabilty, ptzCapabilities & pluginCapability);
         }
-        ptzManager->releaseRef();
     }
 
     bool hasDualStreaming = m_encoderCount > 1;
@@ -557,36 +557,35 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     {
         hasDualStreaming = false;
     }
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, hasDualStreaming ? 1 : 0);
+    setProperty(ResourcePropertyKey::kHasDualStreaming, hasDualStreaming ? 1 : 0);
 
     setProperty(
-        Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
+        ResourcePropertyKey::kIsAudioSupported,
         (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
     {
-        setProperty( Qn::DTS_PARAM_NAME, 1);
-        setProperty( Qn::ANALOG_PARAM_NAME, 1);
+        setProperty(ResourcePropertyKey::kDts, 1);
+        setProperty(ResourcePropertyKey::kAnalog, 1);
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
         //setMotionType( Qn::MotionType::MT_HardwareGrid );
-        setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
-        setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
-        setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
+        setProperty(ResourcePropertyKey::kMotionWindowCnt, 100);
+        setProperty(ResourcePropertyKey::kMotionMaskWindowCnt, 100);
+        setProperty(ResourcePropertyKey::kMotionSensWindowCnt, 100);
+        setProperty(ResourcePropertyKey::kSupportedMotion, QStringLiteral("softwaregrid,hardwaregrid"));
     }
     else
     {
         //setMotionType( Qn::MotionType::MT_SoftwareGrid );
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
+        setProperty(ResourcePropertyKey::kSupportedMotion, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
-		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
+        setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
-		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
+        setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
     else
         setStreamFpsSharingMethod(Qn::NoFpsSharing);
-
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
@@ -630,7 +629,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     if( !maxFps )
         maxFps = DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN;
 
-    setProperty( MAX_FPS_PARAM_NAME, maxFps);
+    setMaxFps(maxFps);
 
     if( (cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
         (cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability) )
@@ -698,7 +697,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -776,7 +775,7 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution(Qn::StreamIndex enc
 nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
 {
     const nxcip::Resolution& primaryStreamResolution = getMaxResolution(Qn::StreamIndex::primary);
-    const float currentAspect = nx::mediaserver::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
+    const float currentAspect = nx::vms::server::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
 
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList(Qn::StreamIndex::secondary);
     if (resolutionList.isEmpty())
@@ -792,7 +791,7 @@ nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
         resolutionList.begin(), resolutionList.end(), std::back_inserter(resList),
         []( const nxcip::Resolution& resolution ){ return QSize(resolution.width, resolution.height); } );
 
-    QSize secondaryResolution = nx::mediaserver::resource::Camera::closestResolution(
+    QSize secondaryResolution = nx::vms::server::resource::Camera::closestResolution(
         SECONDARY_STREAM_DEFAULT_RESOLUTION,
         currentAspect,
         SECONDARY_STREAM_MAX_RESOLUTION,

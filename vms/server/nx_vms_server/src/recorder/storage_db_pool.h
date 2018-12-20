@@ -6,13 +6,13 @@
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnCommonModule;
 
 class QnStorageDbPool:
     public QObject,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

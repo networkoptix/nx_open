@@ -14,7 +14,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 class BaseRemoteArchiveSynchronizationTask:
@@ -87,5 +87,5 @@ protected:
 };
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

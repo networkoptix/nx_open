@@ -9,5 +9,5 @@ Bạn được mời bạn tham gia %PRODUCT_NAME%.
 Bạn đã được cấp quyền truy cập vào {{message.system_name}}.
 {{/message.sharer_name}}
 
-Đăng ký và xem hệ thống: {{config.portal_url}}/register/{{message.code}}
+Đăng ký và xem hệ thống: {{config.portal_url}} / register / {{message.code}}
 

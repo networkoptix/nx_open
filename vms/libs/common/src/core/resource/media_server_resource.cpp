@@ -54,7 +54,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
         [this]()
         {
             return QJson::deserialized<QList<nx::vms::api::analytics::EngineManifest>>(
-                getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
+                getProperty(ResourcePropertyKey::kAnalyticsDriversParamName).toUtf8());
         },
         &m_mutex
     )
@@ -83,7 +83,7 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr& /*res*/, con
 {
     if (key == QnMediaResource::panicRecordingKey())
         m_panicModeCache.reset();
-    else if (key == Qn::kAnalyticsDriversParamName)
+    else if (key == ResourcePropertyKey::kAnalyticsDriversParamName)
         m_analyticsDriversCache.reset();
 }
 
@@ -608,7 +608,7 @@ void QnMediaServerResource::setAnalyticsDrivers(
     const QList<nx::vms::api::analytics::EngineManifest>& drivers)
 {
     QString value = QString::fromUtf8(QJson::serialized(drivers));
-    setProperty(Qn::kAnalyticsDriversParamName, value);
+    setProperty(ResourcePropertyKey::kAnalyticsDriversParamName, value);
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
@@ -667,7 +667,9 @@ qint64 QnMediaServerResource::currentStatusTime() const
 qint64 QnMediaServerResource::utcOffset(qint64 defaultValue) const
 {
     bool present = true;
-    const auto offset = getProperty(Qn::kTimezoneUtcOffset).toLongLong(&present);
+    const auto offset = getProperty(
+        ResourcePropertyKey::Server::kTimezoneUtcOffset).toLongLong(&present);
+
     if (present && offset != Qn::InvalidUtcOffset)
         return offset;
     return defaultValue;
@@ -740,4 +742,3 @@ nx::utils::Url QnMediaServerResource::buildApiUrl() const
 
     return url;
 }
-

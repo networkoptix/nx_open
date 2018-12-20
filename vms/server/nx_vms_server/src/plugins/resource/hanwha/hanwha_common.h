@@ -3,7 +3,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 enum class HanwhaMediaType
@@ -26,13 +26,6 @@ enum class HanwhaStreamingType
     undefined,
     rtpUnicast,
     rtpMulticast
-};
-
-enum class HanwhaTransportProtocol
-{
-    undefined,
-    tcp,
-    udp
 };
 
 enum class HanwhaClientType
@@ -65,14 +58,6 @@ enum class HanwhaDeviceType
     hybrid
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaDeviceType);
-
-enum class HanwhaBypassSupportType
-{
-    normal,
-    forced,
-    disabled
-};
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaBypassSupportType);
 
 static const int kHanwhaBlockedHttpCode = 490;
 static const int kHanwhaInvalidParameterHttpCode = 602;
@@ -123,9 +108,6 @@ static const QString kHanwhaFullMode = lit("Full");
 
 static const QString kHanwhaRtpUnicast = lit("RTPUnicast");
 static const QString kHanwhaRtpMulticast = lit("RTPMulticast");
-
-static const QString kHanwhaTcp = lit("TCP");
-static const QString kHanwhaUdp = lit("UDP");
 
 static const QString kHanwhaPcClient = lit("PC");
 static const QString kHanwhaMobileClient = lit("Mobile");
@@ -257,10 +239,7 @@ static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStre
 static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::HanwhaDeviceType, (lexical));
-QN_FUSION_DECLARE_FUNCTIONS(
-    nx::mediaserver_core::plugins::HanwhaBypassSupportType,
-    (metatype)(numeric)(lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::plugins::HanwhaDeviceType, (lexical));

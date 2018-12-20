@@ -3,7 +3,7 @@
 
 #include "nx/streaming/video_data_packet.h"
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include "utils/common/synctime.h"
 #include <nx/network/http/http_types.h>
@@ -65,7 +65,7 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 */
 
 MJPEGStreamReader::MJPEGStreamReader(
-    const nx::mediaserver::resource::CameraPtr& res,
+    const nx::vms::server::resource::CameraPtr& res,
     const QString& streamHttpPath)
 :
     CLServerPushStreamReader(res),

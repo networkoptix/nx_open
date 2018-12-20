@@ -10,6 +10,10 @@
 #include <common/static_common_module.h>
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
+#include <nx/network/p2p_transport/p2p_http_client_transport.h>
+#include <nx/network/p2p_transport/p2p_http_server_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_transport.h>
+#include <nx/network/p2p_transport/p2p_http_client_transport.h>
 
 // For debug purpose only
 //#define CHECK_SEQUENCE
@@ -65,7 +69,7 @@ ConnectionBase::ConnectionBase(
 ConnectionBase::ConnectionBase(
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
-    nx::network::WebSocketPtr webSocket,
+    nx::network::P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
@@ -73,13 +77,13 @@ ConnectionBase::ConnectionBase(
     m_direction(Direction::incoming),
     m_remotePeer(remotePeer),
     m_localPeer(localPeer),
-    m_webSocket(std::move(webSocket)),
+    m_p2pTransport(std::move(p2pTransport)),
     m_state(State::Connected),
     m_opaqueObject(std::move(opaqueObject)),
     m_connectionLockGuard(std::move(connectionLockGuard))
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_timer.bindToAioThread(m_webSocket->getAioThread());
+    m_timer.bindToAioThread(m_p2pTransport->getAioThread());
 
     const auto& queryItems = requestUrlQuery.queryItems();
     std::transform(
@@ -89,11 +93,30 @@ ConnectionBase::ConnectionBase(
             { return std::make_pair(item.first, item.second); });
 }
 
+void ConnectionBase::gotPostConnection(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    nx::Buffer requestBody)
+{
+    m_timer.post(
+        [this, socket = std::move(socket), requestBody = std::move(requestBody)]() mutable
+        {
+            using namespace nx::network;
+            if(auto httpTransport = dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get()))
+            {
+                httpTransport->gotPostConnection(std::move(socket), std::move(requestBody));
+            }
+            else
+            {
+                // TODO: send HTTP error here
+            }
+        });
+}
+
 void ConnectionBase::stopWhileInAioThread()
 {
     // All objects in the same AIO thread
     m_timer.pleaseStopSync();
-    m_webSocket.reset();
+    m_p2pTransport.reset();
     m_httpClient.reset();
 }
 
@@ -109,8 +132,8 @@ ConnectionBase::~ConnectionBase()
         m_timer.pleaseStop(
             [&]()
             {
-                if (m_webSocket)
-                    m_webSocket->pleaseStopSync();
+                if (m_p2pTransport)
+                    m_p2pTransport->pleaseStopSync();
                 if (m_httpClient)
                     m_httpClient->pleaseStopSync();
                 waitToStop.set_value();
@@ -124,9 +147,9 @@ nx::utils::Url ConnectionBase::remoteAddr() const
 {
     if (m_direction == Direction::outgoing)
         return m_remotePeerUrl;
-    if (m_webSocket)
+    if (m_p2pTransport)
     {
-        auto address = m_webSocket->socket()->getForeignAddress();
+        auto address = m_p2pTransport->getForeignAddress();
         return nx::utils::Url(lit("http://%1:%2")
             .arg(address.address.toString())
             .arg(address.port));
@@ -160,6 +183,7 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 void ConnectionBase::onHttpClientDone()
 {
     nx::network::http::AsyncClient::State state = m_httpClient->state();
+
     if (state == nx::network::http::AsyncClient::State::sFailed)
     {
         cancelConnecting(State::Error, lm("Http request failed %1").arg(m_httpClient->lastSysErrorCode()));
@@ -245,14 +269,24 @@ void ConnectionBase::onHttpClientDone()
     }
 
     using namespace nx::network;
-    auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
-    if (error != websocket::Error::noError)
+    using namespace nx::vms::api;
+
+    bool useWebsocketMode = m_remotePeer.transport != P2pTransportMode::http;
+    if (useWebsocketMode)
     {
-        NX_ERROR(this,
-            lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int)error));
-        setState(State::Error);
-        m_httpClient.reset();
-        return;
+        auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
+        if (error != websocket::Error::noError)
+        {
+            NX_WARNING(this,
+                lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
+            if (m_remotePeer.transport == P2pTransportMode::websocket)
+            {
+                setState(State::Error);
+                m_httpClient.reset();
+                return;
+            }
+            useWebsocketMode = false;
+        }
     }
 
     //saving credentials we used to authorize request
@@ -263,19 +297,25 @@ void ConnectionBase::onHttpClientDone()
         m_httpAuthCacheItem = m_httpClient->authCacheItem();
     }
 
-    auto socket = m_httpClient->takeSocket();
-    socket->setNonBlockingMode(true);
-
     using namespace nx::network;
-    m_webSocket.reset(new websocket::WebSocket(
-        std::move(socket),
-        remotePeer.dataFormat == Qn::JsonFormat
-            ? websocket::FrameType::text
-            : websocket::FrameType::binary));
-    m_httpClient.reset();
-    m_webSocket->setAliveTimeout(m_keepAliveTimeout);
-    m_webSocket->start();
+    websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
+        ? websocket::FrameType::text
+        : websocket::FrameType::binary;
+    if (useWebsocketMode)
+    {
+        auto socket = m_httpClient->takeSocket();
+        socket->setNonBlockingMode(true);
+        m_p2pTransport.reset(new P2PWebsocketTransport(std::move(socket), frameType));
+    }
+    else
+    {
+        m_p2pTransport.reset(new P2PHttpClientTransport(
+            std::move(m_httpClient),
+            remotePeer.connectionGuid.toByteArray()));
+    }
 
+    m_p2pTransport->start();
+    m_httpClient.reset();
     setState(State::Connected);
 }
 
@@ -283,6 +323,7 @@ void ConnectionBase::startConnection()
 {
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
+    headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray());
     m_httpClient->addRequestHeaders(headers);
 
     auto requestUrl = m_remotePeerUrl;
@@ -290,6 +331,7 @@ void ConnectionBase::startConnection()
     for (const auto& param: m_requestQueryParams)
         requestUrlQuery.addQueryItem(param.first, param.second);
     requestUrlQuery.addQueryItem("format", QnLexical::serialized(localPeer().dataFormat));
+
     requestUrl.setQuery(requestUrlQuery.toString());
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
@@ -313,7 +355,7 @@ void ConnectionBase::startConnection()
 void ConnectionBase::startReading()
 {
     using namespace std::placeholders;
-    m_webSocket->readSomeAsync(
+    m_p2pTransport->readSomeAsync(
         &m_readBuffer,
         std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
 }
@@ -404,7 +446,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
                 m_sendCounters[(quint8)messageType] += m_dataToSend.front().size();
 
                 using namespace std::placeholders;
-                m_webSocket->sendAsync(
+                m_p2pTransport->sendAsync(
                     m_dataToSend.front(),
                     std::bind(&ConnectionBase::onMessageSent, this, _1, _2));
             }
@@ -424,10 +466,10 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8)getMessageType(m_dataToSend.front(), remotePeer().isClient());
+        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
-        m_webSocket->sendAsync(
+        m_p2pTransport->sendAsync(
             m_dataToSend.front(),
             std::bind(&ConnectionBase::onMessageSent, this, _1, _2));
     }
@@ -454,7 +496,7 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
 
     using namespace std::placeholders;
     m_readBuffer.resize(0);
-    m_webSocket->readSomeAsync(
+    m_p2pTransport->readSomeAsync(
         &m_readBuffer,
         std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
 }
@@ -501,23 +543,13 @@ QObject* ConnectionBase::opaqueObject()
     return m_opaqueObject.get();
 }
 
-const nx::network::WebSocket* ConnectionBase::webSocket() const
-{
-    return m_webSocket.get();
-}
-
-nx::network::WebSocket* ConnectionBase::webSocket()
-{
-    return m_webSocket.get();
-}
-
 void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     m_timer.bindToAioThread(aioThread);
     if (m_httpClient)
         m_httpClient->bindToAioThread(aioThread);
-    if (m_webSocket)
-        m_webSocket->bindToAioThread(aioThread);
+    if (m_p2pTransport)
+        m_p2pTransport->bindToAioThread(aioThread);
 }
 
 } // namespace p2p

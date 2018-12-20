@@ -36,7 +36,6 @@
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
 
-
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -541,7 +540,7 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
     addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, true, true));
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
-        this, &QnMediaResourceWidget::analyticsSelectionChanged);
+        this, &QnMediaResourceWidget::handleSelectedAreaChanged);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -602,33 +601,127 @@ void QnMediaResourceWidget::initStatusOverlayController()
          });
 }
 
-void QnMediaResourceWidget::setAnalyticsSelectionEnabled(bool enabled)
+QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
+{
+    return m_areaSelectionType;
+}
+
+void QnMediaResourceWidget::setAreaSelectionType(AreaType value)
+{
+    if (m_areaSelectionType == value)
+        return;
+
+    const auto oldType = m_areaSelectionType;
+    m_areaSelectionType = value;
+
+    // Reset old selection dependencies.
+    if (oldType == AreaType::motion)
+        setMotionSearchModeEnabled(false);
+
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setActive(false);
+
+    if (m_areaSelectionType == AreaType::motion)
+        setMotionSearchModeEnabled(true);
+
+    updateSelectedArea();
+    emit areaSelectionTypeChanged();
+}
+
+void QnMediaResourceWidget::unsetAreaSelectionType(AreaType value)
+{
+    if (m_areaSelectionType == value)
+        setAreaSelectionType(AreaType::none);
+}
+
+bool QnMediaResourceWidget::areaSelectionEnabled() const
+{
+    return m_areaSelectOverlayWidget && m_areaSelectionType != AreaType::none
+        ? m_areaSelectOverlayWidget->active()
+        : false;
+}
+
+void QnMediaResourceWidget::setAreaSelectionEnabled(bool value)
 {
     if (!m_areaSelectOverlayWidget)
         return;
 
-    m_areaSelectOverlayWidget->setActive(enabled);
-    if (enabled)
+    if (m_areaSelectionType == AreaType::none || m_areaSelectionType == AreaType::motion)
+        return;
+
+    if (value == m_areaSelectOverlayWidget->active())
+        return;
+
+    m_areaSelectOverlayWidget->setActive(value);
+    emit areaSelectionEnabledChanged();
+}
+
+void QnMediaResourceWidget::setAreaSelectionEnabled(AreaType areaType, bool value)
+{
+    if (value)
     {
-        titleBar()->rightButtonsBar()->setButtonsChecked(
-            Qn::MotionSearchButton | Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton,
-            false);
+        setAreaSelectionType(areaType);
+        setAreaSelectionEnabled(true);
     }
     else
     {
-        m_areaSelectOverlayWidget->clearSelectedArea();
+        if (m_areaSelectionType == areaType)
+            setAreaSelectionEnabled(false);
     }
 }
 
-QRectF QnMediaResourceWidget::analyticsSelection() const
+QRectF QnMediaResourceWidget::analyticsFilterRect() const
 {
-    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
+    return m_analyticsFilterRect;
 }
 
-void QnMediaResourceWidget::setAnalyticsSelection(const QRectF& value)
+void QnMediaResourceWidget::setAnalyticsFilterRect(const QRectF& value)
 {
-    if (m_areaSelectOverlayWidget)
-        m_areaSelectOverlayWidget->setSelectedArea(value); //< May emit analyticsSelectionChanged.
+    if (qFuzzyEquals(m_analyticsFilterRect, value))
+        return;
+
+    m_analyticsFilterRect = value;
+    updateSelectedArea();
+
+    emit analyticsFilterRectChanged();
+}
+
+void QnMediaResourceWidget::updateSelectedArea()
+{
+    switch (m_areaSelectionType)
+    {
+        case AreaType::motion:
+            // TODO: #vkutin Ensure stored motion regions are used by motion selection instrument.
+            [[fallthrough]];
+        case AreaType::none:
+            if (m_areaSelectOverlayWidget)
+                m_areaSelectOverlayWidget->setSelectedArea({});
+            break;
+
+        case AreaType::analytics:
+            if (m_areaSelectOverlayWidget)
+                m_areaSelectOverlayWidget->setSelectedArea(m_analyticsFilterRect);
+            break;
+    }
+}
+
+void QnMediaResourceWidget::handleSelectedAreaChanged()
+{
+    switch (m_areaSelectionType)
+    {
+        case AreaType::none:
+        case AreaType::motion:
+            NX_ASSERT(m_areaSelectOverlayWidget->selectedArea().isEmpty());
+            break;
+
+        case AreaType::analytics:
+            NX_ASSERT(m_areaSelectOverlayWidget);
+            if (!m_areaSelectOverlayWidget)
+                break;
+
+            setAnalyticsFilterRect(m_areaSelectOverlayWidget->selectedArea());
+            break;
+    }
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
@@ -650,7 +743,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
+    const auto triggerIt = lowerBoundbyTriggerName(rule);
 
     if (triggerIt == m_triggers.end())
         return;
@@ -713,7 +806,6 @@ void QnMediaResourceWidget::createButtons()
             &QnMediaResourceWidget::setMotionSearchModeEnabled);
         titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
-
 
     createActionAndButton(
         "item/ptz.png",
@@ -1187,13 +1279,22 @@ void QnMediaResourceWidget::clearMotionSelection()
     emit motionSelectionChanged();
 }
 
-void QnMediaResourceWidget::setMotionSelection(const QList<QRegion> &regions)
+void QnMediaResourceWidget::setMotionSelection(const QList<QRegion>& regions)
 {
-    if (regions.size() != m_motionSelection.size())
+    if (regions.empty())
     {
-        qWarning() << "invalid motion selection list";
+        clearMotionSelection();
         return;
     }
+
+    if (regions.size() != m_motionSelection.size())
+    {
+        NX_ASSERT(false, "invalid motion selection channel count");
+        return;
+    }
+
+    if (m_motionSelection == regions)
+        return;
 
     m_motionSelection = regions;
     invalidateMotionSelectionCache();
@@ -1693,7 +1794,6 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
             gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
     }
 
-
     QnScopedPainterTransformRollback transformRollback(painter);
     painter->translate(rect.topLeft());
 
@@ -1791,9 +1891,13 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
 
         paintMotionSensitivityIndicators(painter, channel, rect);
     }
-    else
+    else if (m_motionSensitivity.size() > channel)
     {
-        paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
+        paintFilledRegionPath(painter,
+            rect,
+            m_motionSensitivity[channel].getMotionMaskPath(),
+            qnGlobals->motionMaskColor(),
+            qnGlobals->motionMaskColor());
     }
 }
 
@@ -1913,25 +2017,43 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 {
     if (changedFlags.testFlag(DisplayMotion))
     {
-        if (QnAbstractArchiveStreamReader *reader = d->display()->archiveReader())
+        const bool motionSearchEnabled = options().testFlag(DisplayMotion);
+
+        if (auto reader = d->display()->archiveReader())
         {
             using namespace nx::vms::api;
             StreamDataFilters filter = reader->streamDataFilter();
-            filter.setFlag(StreamDataFilter::motion, options() & DisplayMotion);
+            filter.setFlag(StreamDataFilter::motion, motionSearchEnabled);
             filter.setFlag(StreamDataFilter::media);
             reader->setStreamDataFilter(filter);
         }
 
-        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
+        titleBar()->rightButtonsBar()->setButtonsChecked(
+            Qn::MotionSearchButton, motionSearchEnabled);
 
-        if (options().testFlag(DisplayMotion))
+        if (motionSearchEnabled)
         {
-            setProperty(Qn::MotionSelectionModifiers, 0);
+            titleBar()->rightButtonsBar()->setButtonsChecked(
+                Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
+
+            action(action::ToggleTimelineAction)->setChecked(true);
+            setAreaSelectionType(AreaType::motion);
+
+            selectThisWidget(true); //< Single-select this widget.
         }
         else
         {
-            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
+            unsetAreaSelectionType(AreaType::motion);
         }
+
+        setOption(WindowResizingForbidden, motionSearchEnabled);
+
+        if (motionSearchEnabled)
+            setProperty(Qn::MotionSelectionModifiers, 0);
+        else
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); //< Use defaults.
+
+        emit motionSearchModeEnabled(motionSearchEnabled);
     }
 
     base_type::optionsChangedNotify(changedFlags);
@@ -1954,7 +2076,6 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString codecString;
     if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
-
 
     QString hqLqString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
@@ -2026,7 +2147,6 @@ QString QnMediaResourceWidget::calculatePositionText() const
     static const int kPositionTextPixelSize = 14;
     return htmlFormattedParagraph(timeString, kPositionTextPixelSize, true);
 }
-
 
 QString QnMediaResourceWidget::calculateTitleText() const
 {
@@ -2164,7 +2284,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
@@ -2314,11 +2433,11 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
 {
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
-    else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
+    else if (key == ResourcePropertyKey::kCameraCapabilities)
         ensureTwoWayAudioWidget();
-    else if (key == Qn::kCombinedSensorsDescriptionParamName)
+    else if (key == ResourcePropertyKey::kCombinedSensorsDescription)
         updateAspectRatio();
-    else if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+    else if (key == ResourcePropertyKey::kMediaStreams)
         updateAspectRatio();
 }
 
@@ -2724,21 +2843,6 @@ void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
 void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 {
     setOption(DisplayMotion, enabled);
-    titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, enabled);
-
-    if (enabled)
-    {
-        titleBar()->rightButtonsBar()->setButtonsChecked(
-            Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
-        action(action::ToggleTimelineAction)->setChecked(true);
-
-        if (m_areaSelectOverlayWidget)
-            m_areaSelectOverlayWidget->setActive(false);
-    }
-
-    setOption(WindowResizingForbidden, enabled);
-
-    emit motionSearchModeEnabled(enabled);
 }
 
 bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
@@ -2820,22 +2924,28 @@ nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
 * Soft Triggers
 */
 
+QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInfo(
+    const nx::vms::event::RulePtr& rule) const
+{
+    return SoftwareTriggerInfo({
+        rule->eventParams().inputPortId,
+        rule->eventParams().caption,
+        rule->eventParams().description,
+        rule->isActionProlonged() });
+}
+
 void QnMediaResourceWidget::createTriggerIfRelevant(
     const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto it = lowerBoundbyTriggerRuleId(ruleId);
+    const auto it = lowerBoundbyTriggerName(rule);
 
     NX_ASSERT(it == m_triggers.end() || it->ruleId != ruleId);
 
     if (!isRelevantTriggerRule(rule))
         return;
 
-    const SoftwareTriggerInfo info({
-        rule->eventParams().inputPortId,
-        rule->eventParams().caption,
-        rule->eventParams().description,
-        rule->isActionProlonged() });
+    const SoftwareTriggerInfo info = makeTriggerInfo(rule);
 
     std::function<void()> clientSideHandler;
 
@@ -2860,15 +2970,17 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
 }
 
 QnMediaResourceWidget::TriggerDataList::iterator
-    QnMediaResourceWidget::lowerBoundbyTriggerRuleId(const QnUuid& id)
+    QnMediaResourceWidget::lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule)
 {
     static const auto compareFunction =
         [](const SoftwareTrigger& left, const SoftwareTrigger& right)
         {
-            return left.ruleId > right.ruleId; // Bottom in the thick client - right in the mobile.
+            return left.info.name < right.info.name
+                || (left.info.name == right.info.name
+                    && left.info.icon < right.info.icon);
         };
 
-    const auto idValue = SoftwareTrigger{id, SoftwareTriggerInfo(), QnUuid()};
+    const auto idValue = SoftwareTrigger{rule->id(), makeTriggerInfo(rule), QnUuid()};
     return std::lower_bound(m_triggers.begin(), m_triggers.end(), idValue, compareFunction);
 }
 
@@ -2929,8 +3041,11 @@ void QnMediaResourceWidget::updateWatermark()
         return;
 
     // First create normal watermark according to current client state.
-    nx::core::Watermark watermark{ settings,
-        context()->user() ? context()->user()->getName() : QString() };
+    auto watermark = context()->watermark();
+
+    // Do not show watermark for local AVI resources.
+    if (resource().dynamicCast<QnAviResource>())
+        watermark = {};
 
     // Force using layout watermark if it exists and is visible.
     bool useLayoutWatermark = false;
@@ -3112,7 +3227,8 @@ void QnMediaResourceWidget::resetTriggers()
 
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 {
-    const auto it = lowerBoundbyTriggerRuleId(id);
+    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
+        [id](const auto& val) { return val.ruleId == id; });
     if (it == m_triggers.end() || it->ruleId != id)
         return;
 
@@ -3131,7 +3247,7 @@ void QnMediaResourceWidget::clearEntropixEnhancedImage()
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto it = lowerBoundbyTriggerRuleId(ruleId);
+    const auto it = lowerBoundbyTriggerName(rule);
     if (it == m_triggers.end() || it->ruleId != ruleId)
     {
         /* Create trigger if the rule is relevant: */

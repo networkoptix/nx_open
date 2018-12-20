@@ -14,7 +14,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/vms_server_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -27,9 +27,10 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/analytics/engine.h>
-#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/sdk/analytics/i_engine.h>
+#include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/vms/server/plugins/resource_data_support/hanwha.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -41,7 +42,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 using namespace nx::core;
@@ -50,7 +51,7 @@ namespace {
 
 static const QString kBypassPrefix("Bypass");
 
-bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
+static bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
 {
     return param && param->possibleValues().contains(kHanwhaTrue);
 }
@@ -206,7 +207,7 @@ static const std::map<QString, PtzTraitDescriptor> kHanwhaPtzTraitDescriptors = 
     }
 };
 
-Ptz::Capabilities calculateSupportedPtzCapabilities(
+static Ptz::Capabilities calculateSupportedPtzCapabilities(
     const std::map<QString, PtzDescriptor>& descriptors,
     const HanwhaAttributes& attributes,
     int channel)
@@ -240,7 +241,7 @@ Ptz::Capabilities calculateSupportedPtzCapabilities(
     return supportedPtzCapabilities;
 };
 
-QnPtzLimits calculatePtzLimits(
+static QnPtzLimits calculatePtzLimits(
     const HanwhaAttributes& attributes,
     const HanwhaCgiParameters& parameters,
     int channel)
@@ -436,6 +437,15 @@ struct GroupParameterInfo
     QString groupLead;
     QString groupIncludeCondition;
 };
+
+static QString physicalIdForChannel(const QString& groupId, int value)
+{
+    auto id = groupId;
+    if (value > 0)
+        id += lit("_channel=%1").arg(value + 1);
+
+    return id;
+}
 
 } // namespace
 
@@ -638,7 +648,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
             *info,
             value.value);
     }
-    saveParams();
+    saveProperties();
 
     bool success = true;
     for (const auto& request: requests)
@@ -676,7 +686,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     if (reopenPrimaryStream || reopenSecondaryStream)
     {
         initMediaStreamCapabilities();
-        saveParams();
+        saveProperties();
         reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
     }
 
@@ -697,7 +707,7 @@ bool HanwhaResource::setOutputPortState(
     if (autoResetTimeoutMs > 0)
     {
         m_timerHolder.addTimer(
-            outputId,
+            lm("%1 output %2").args(this, outputId),
             resetHandler,
             std::chrono::milliseconds(autoResetTimeoutMs));
     }
@@ -787,11 +797,11 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
@@ -820,7 +830,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
             setCameraCapability(Qn::IsOldFirmwareCapability, isOldFirmware);
-            saveParams();
+            saveProperties();
         });
 
     const auto sharedContext = serverModule()->sharedContextPool()
@@ -897,7 +907,7 @@ void HanwhaResource::initMediaStreamCapabilities()
     m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName,
+        ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(m_capabilities)));
 }
 
@@ -1045,16 +1055,16 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
     }
 
     const auto resData = resourceData();
-    const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
+    const auto bypassOverride = resData.value<resource_data_support::HanwhaBypassSupportType>(
         kHanwhaBypassOverrideParameterName,
-        HanwhaBypassSupportType::normal);
+        resource_data_support::HanwhaBypassSupportType::normal);
 
-    if (bypassOverride == HanwhaBypassSupportType::forced)
+    if (bypassOverride == resource_data_support::HanwhaBypassSupportType::forced)
     {
         m_isBypassSupported = true;
         return CameraDiagnostics::NoErrorResult();
     }
-    else if (bypassOverride == HanwhaBypassSupportType::disabled)
+    else if (bypassOverride == resource_data_support::HanwhaBypassSupportType::disabled)
     {
         m_isBypassSupported = false;
         return CameraDiagnostics::NoErrorResult();
@@ -1087,15 +1097,19 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isVideoSourceActive())
-        return CameraDiagnostics::CameraInvalidParams(lit("Video source is not active"));
+        return CameraDiagnostics::CameraInvalidParams("Video source is not active");
+
+    // We always try to pull an audio stream if possible for NVRs
+    if (isNvr())
+        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
 
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;
 
     const auto channel = getChannel();
-    m_capabilities.hasAudio = m_attributes.attribute<int>(
-        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+    m_capabilities.hasAudio = isNvr() //< We assume NVR channels are always capable of audio stream.
+        || m_attributes.attribute<int>(lm("Media/MaxAudioInput/%1").arg(channel)) > 0;
 
     if (isConnectedViaSunapi())
     {
@@ -1289,6 +1303,9 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
+
+            if (m_defaultOutputPortId.isEmpty())
+                m_defaultOutputPortId = outputPortData.id;
         }
     }
 
@@ -1335,9 +1352,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_attributes,
         getChannel());
 
-    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
-
+    NX_VERBOSE(this, "Supported PTZ capabilities direct: %1", ptzCapabilityBits(capabilities));
     if (isBypassSupported())
     {
         const auto bypassPtzCapabilities = calculateSupportedPtzCapabilities(
@@ -1345,14 +1360,12 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
 
-        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(bypassPtzCapabilities)));
+        NX_VERBOSE(this, "Supported PTZ capabilities bypass: %1",
+            ptzCapabilityBits(bypassPtzCapabilities));
 
         // We consider capability is true if it's supported both by a NVR and a camera.
         capabilities &= bypassPtzCapabilities;
-
-        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+        NX_VERBOSE(this, "Supported PTZ capabilities both: %1", ptzCapabilityBits(capabilities));
     }
 
     if ((capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
@@ -1365,11 +1378,11 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     m_ptzTraits.append(calculatePtzTraits());
 
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
-        capabilities |= Ptz::AuxilaryPtzCapability;
+        capabilities |= Ptz::AuxiliaryPtzCapability;
 
-    NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+    initRedirectedAreaZoomPtz();
 
+    NX_DEBUG(this, "Supported PTZ capabilities: %1", ptzCapabilityBits(capabilities));
     if (isAnalogEncoder())
     {
         // Encoder PTZ capabilities are being overriden from 'Expert' tab
@@ -1425,6 +1438,36 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
         .args(getPhysicalId(), ptzCapabilityBits(configurationalCapabilities)));
     return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
+{
+    const auto ptzTargetChannel = resourceData().value<int>(ResourceDataKey::kPtzTargetChannel, -1);
+    if (ptzTargetChannel == -1 || ptzTargetChannel == getChannel())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
+    const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
+    if (isCalibrated)
+    {
+        const auto id = physicalIdForChannel(getGroupId(), ptzTargetChannel);
+        NX_DEBUG(this, "Set PTZ target id: %1", id);
+        setProperty(ResourcePropertyKey::kPtzTargetId, id);
+
+        // TODO: Remove this workaround when client fixes a bug:
+        //     Absolute move and viewport is not accessible if continious move is not supportd.
+        //
+        // m_ptzCapabilities[core::ptz::Type::operational] |= Ptz::ContinuousPanTiltCapabilities;
+    }
+    else
+    {
+        NX_DEBUG(this, "Remove PTZ target id");
+        setProperty(ResourcePropertyKey::kPtzTargetId, QString());
+        m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
+    }
+
+    setPtzCalibarionTimer();
+    return calibratedChannels.diagnostics;
 }
 
 HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
@@ -1490,9 +1533,9 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
     return result;
 }
 
-QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
+QnPtzAuxiliaryTraitList HanwhaResource::calculatePtzTraits() const
 {
-    QnPtzAuxilaryTraitList ptzTraits;
+    QnPtzAuxiliaryTraitList ptzTraits;
     if (deviceType() == HanwhaDeviceType::nwc) //< Camera device type.
         ptzTraits = calculateCameraOnlyTraits();
 
@@ -1500,12 +1543,12 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
     return ptzTraits;
 }
 
-QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
+QnPtzAuxiliaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
 {
-    QnPtzAuxilaryTraitList ptzTraits;
+    QnPtzAuxiliaryTraitList ptzTraits;
     for (const auto& item: kHanwhaPtzTraitDescriptors)
     {
-        const auto trait = QnPtzAuxilaryTrait(item.first);
+        const auto trait = QnPtzAuxiliaryTrait(item.first);
         const auto& descriptor = item.second;
         const auto& parameter = m_cgiParameters.parameter(descriptor.parameterName);
 
@@ -1525,7 +1568,7 @@ QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
     return ptzTraits;
 }
 
-void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const
+void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxiliaryTraitList* outTraitList) const
 {
     const auto parameter = cgiParameters().parameter(lit("image/focus/control/Mode"));
     if (!parameter)
@@ -1548,7 +1591,7 @@ void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitL
 
             if (possibleValues.contains(mode))
             {
-                outTraitList->push_back(QnPtzAuxilaryTrait(traitName));
+                outTraitList->push_back(QnPtzAuxiliaryTrait(traitName));
                 gotAutoFocus = true;
             }
         }
@@ -1561,13 +1604,13 @@ void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitL
 
         if (attribute != boost::none && attribute.get())
         {
-            outTraitList->push_back(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait));
+            outTraitList->push_back(QnPtzAuxiliaryTrait(kHanwhaSimpleFocusTrait));
             gotAutoFocus = true;
         }
     }
 
     if (gotAutoFocus)
-        outTraitList->push_back(QnPtzAuxilaryTrait(Ptz::ManualAutoFocusPtzTrait));
+        outTraitList->push_back(QnPtzAuxiliaryTrait(Ptz::ManualAutoFocusPtzTrait));
 }
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
@@ -2472,7 +2515,7 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
@@ -3047,16 +3090,11 @@ void HanwhaResource::updateToChannel(int value)
     url.setQuery(query);
     setUrl(url.toString());
 
-    QString physicalId = getPhysicalId().split('_')[0];
     setDefaultGroupName(getModel());
-    setGroupId(physicalId);
+    setGroupId(getPhysicalId().split('_')[0]);
+    setPhysicalId(physicalIdForChannel(getGroupId(), value));
 
-    QString suffix = lit("_channel=%1").arg(value + 1);
-    if (value > 0)
-        physicalId += suffix;
-    setPhysicalId(physicalId);
-
-    suffix = lit("-channel %1").arg(value + 1);
+    const auto suffix = lit("-channel %1").arg(value + 1);
     if (value > 0 && !getName().endsWith(suffix))
         setName(getName() + suffix);
 }
@@ -3480,7 +3518,7 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
         setProperty(kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
     }
 
-    saveParams();
+    saveProperties();
     return true;
 }
 
@@ -3517,7 +3555,7 @@ boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
 
 bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
-    const auto info = portInfoFromId(outputId);
+    const auto info = portInfoFromId(outputId.isEmpty() ? m_defaultOutputPortId : outputId);
     if (info == boost::none)
         return false;
 
@@ -3565,6 +3603,36 @@ boost::optional<int> HanwhaResource::bypassChannel() const
         return getChannel();
 
     return boost::none;
+}
+
+CameraDiagnostics::Result HanwhaResource::enableAudioInput()
+{
+    const auto audioInputEnabledParameter =
+        m_cgiParameters.parameter("media/audioinput/set/Enable");
+
+    if (!audioInputEnabledParameter)
+    {
+        NX_DEBUG(
+            this,
+            "media/audioinput/set/Enable parameter is not supported by device: %1 (%2)",
+            getUserDefinedName(), getId());
+
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    HanwhaRequestHelper helper(sharedContext());
+    const auto response = helper.set("media/audioinput", {
+        {"Enable", kHanwhaTrue},
+        {"Channel", QString::number(getChannel())}
+    });
+
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(), response.errorString());
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool HanwhaResource::isNvr() const
@@ -3684,7 +3752,6 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-
     const auto& periods = timeline.cbegin()->second;
     auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);
     if (itr != periods.begin())
@@ -3702,7 +3769,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
-    auto defaultLayout = nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
+    auto defaultLayout = nx::vms::server::resource::Camera::getAudioLayout(dataProvider);
     if (!isAudioEnabled())
         return defaultLayout;
 
@@ -3803,7 +3870,7 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    auto audioInputEnableParameter = cgiParameters().parameter(
+    const auto audioInputEnableParameter = cgiParameters().parameter(
         QString("media/videoprofile/add_update/") + kHanwhaAudioInputEnableProperty);
 
     if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && audioInputEnableParameter)
@@ -3873,6 +3940,36 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
     return itr->second;
 }
 
+void HanwhaResource::setPtzCalibarionTimer()
+{
+    const auto kUpdateTimeout = sharedContext()->ptzCalibratedChannels.timeout() / 3;
+    NX_VERBOSE(this, "Set PTZ calibration timer");
+    m_timerHolder.addTimer(
+        lm("%1 PTZ calibration").args(this),
+        [this]()
+        {
+            if (getStatus() != Qn::Online && getStatus() != Qn::Recording)
+            {
+                NX_DEBUG(this, "PTZ calibration timer is not needed any more");
+                return;
+            }
+
+            if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
+            {
+                const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+                const bool isCalibrated = calibratedChannels->count(getChannel());
+                if (isRedirected != isCalibrated)
+                {
+                    NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
+                    return setStatus(Qn::Offline);
+                }
+            }
+
+            setPtzCalibarionTimer();
+        },
+        kUpdateTimeout);
+}
+
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

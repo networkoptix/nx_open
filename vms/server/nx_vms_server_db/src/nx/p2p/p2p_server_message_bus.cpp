@@ -5,6 +5,7 @@
 
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
+#include <nx/network/p2p_transport/i_p2p_transport.h>
 
 namespace {
 
@@ -115,7 +116,7 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
     auto serializeMessage = [this](const P2pConnectionPtr& connection)
     {
-		std::vector<PeerDistanceRecord> records;
+        std::vector<PeerDistanceRecord> records;
         records.reserve(m_peers->allPeerDistances.size());
         const auto localPeer = vms::api::PersistentIdData(this->localPeer());
         for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
@@ -139,15 +140,15 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
                 firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
             records.emplace_back(PeerDistanceRecord{peerNumber, minDistance, firstViaNumber});
         }
-		NX_ASSERT(!records.empty());
+        NX_ASSERT(!records.empty());
 
         std::sort(records.begin(), records.end(),
             [](const PeerDistanceRecord& left, const PeerDistanceRecord& right)
-	        {
-	            if (left.distance != right.distance)
-	                return left.distance < right.distance;
-	            return left.peerNumber < right.peerNumber;
-	        });
+            {
+                if (left.distance != right.distance)
+                    return left.distance < right.distance;
+                return left.peerNumber < right.peerNumber;
+            });
 
         QByteArray data = serializePeersMessage(records, 1);
         data.data()[0] = (quint8)MessageType::alivePeers;
@@ -374,6 +375,7 @@ void ServerMessageBus::commitLazyData()
         dbTran.commit();
         m_dbCommitTimer.restart();
     }
+    emit lazyDataCommtDone();
 }
 
 void ServerMessageBus::stop()
@@ -391,16 +393,61 @@ void ServerMessageBus::stop()
 
 void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
-    auto data = serializeSubscribeAllRequest(m_db->transactionLog()->getTransactionsState());
+    const auto& state = m_db->transactionLog()->getTransactionsState();
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+    {
+        QVector<vms::api::PersistentIdData> data;
+        QVector<qint32> indexes;
+        for (auto itr = state.values.cbegin(); itr != state.values.cend(); ++itr)
+        {
+            data << itr.key();
+            indexes << itr.value();
+        }
+        printSubscribeMessage(
+            connection->remotePeer().id, data, indexes);
+    }
+
+    auto data = serializeSubscribeAllRequest(state);
     data.data()[0] = (quint8)MessageType::subscribeAll;
     connection->sendMessage(data);
     context(connection)->isLocalStarted = true;
 }
 
+bool ServerMessageBus::gotPostConnection(
+    const vms::api::PeerDataEx& remotePeer,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    nx::Buffer requestBody)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto existingConnectionIt = std::find_if(
+            m_connections.cbegin(),
+            m_connections.cend(),
+            [&remotePeer](const auto& connection)
+            {
+                return remotePeer.connectionGuid == connection->remotePeer().connectionGuid;
+            });
+
+        if (existingConnectionIt == m_connections.cend())
+        {
+            NX_DEBUG(
+                this,
+                lm("Got an incoming POST connection with guid %1 but failed to find an "
+                    "existing connection with the same guid").args(remotePeer.connectionGuid));
+            return false;
+        }
+
+        existingConnectionIt.value()->gotPostConnection(std::move(socket), std::move(requestBody));
+        return true;
+    }
+
+    return false;
+}
+
 void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::WebSocketPtr webSocket,
+    nx::network::P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
@@ -415,7 +462,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         commonModule(),
         remotePeer,
         localPeerEx(),
-        std::move(webSocket),
+        std::move(p2pTransport),
         requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
@@ -733,8 +780,20 @@ void ServerMessageBus::gotTransaction(
             dbTran->commit();
             m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
             proxyFillerTransaction(tran, transportHeader);
+
+            NX_VERBOSE(this,
+                lit("Skip transaction because of timestamp: %1, seq: %2, timestamp: %3")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(tran.persistentInfo.sequence)
+                    .arg(tran.persistentInfo.timestamp.toString()));
             return;
         case ErrorCode::containsBecauseSequence:
+
+            NX_VERBOSE(this,
+                lit("Skip transaction because of sequence: %1, seq: %2, timestamp: %3")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(tran.persistentInfo.sequence)
+                    .arg(tran.persistentInfo.timestamp.toString()));
             dbTran->commit();
             return; // do not proxy if transaction already exists
         default:
@@ -754,7 +813,11 @@ void ServerMessageBus::gotTransaction(
     sendTransaction(tran, transportHeader);
 
     if (m_handler)
-        m_handler->triggerNotification(tran, NotificationSource::Remote);
+    {
+        auto amendedTran = tran;
+        amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+        m_handler->triggerNotification(amendedTran, NotificationSource::Remote);
+    }
 }
 
 bool ServerMessageBus::handlePushTransactionData(
@@ -800,7 +863,7 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
                 stop();
                 commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
             },
-            0, m_thread);
+            0, qApp->thread());
 
         return false;
     }

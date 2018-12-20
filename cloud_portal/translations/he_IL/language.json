@@ -6,7 +6,7 @@
   "dialogs": {
     "okButton": "אישור",
     "cancelButton": "ביטול",
-    "loginTitle": "התחבר אל %PRODUCT_NAME%",
+    "loginTitle": "היכנס ל- %PRODUCT_NAME%",
     "loginButton": "התחבר",
     "logoutAuthorisedTitle": "אתה כבר מחובר",
     "logoutAuthorisedContinueButton": "המשך",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "שם מערכת",
     "confirmRenameAction": "שמור",
     "successRename": "שם המערכת נשמר",
-    "confirmDisconnectTitle": "נתק את המערכת מ- %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "נתק את מערכת מ %PRODUCT_NAME%?",
     "confirmDisconnectAction": "נתק",
     "confirmUnshareFromMe": "אתה עומד לנתק את המערכת מהחשבון שלך. לא תוכל עוד לגשת למערכת זו. האם להמשיך?",
     "confirmUnshareFromMeTitle": "נתק מערכת?",

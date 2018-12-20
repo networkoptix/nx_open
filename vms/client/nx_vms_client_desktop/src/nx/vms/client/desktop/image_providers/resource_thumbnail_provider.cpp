@@ -1,5 +1,7 @@
 #include "resource_thumbnail_provider.h"
 
+#include <chrono>
+
 #include <QtGui/QPainter>
 
 #include <api/server_rest_connection.h>
@@ -44,7 +46,7 @@ struct ResourceThumbnailProvider::Private
         {
             placeholderIconPath = lit("item_placeholders/videowall_webpage_placeholder.png");
         }
-        else if(useCustomSoundIcon)
+        else if (useCustomSoundIcon)
         {
             // Some cameras are actually provide only sound stream. So we draw sound icon for this.
             placeholderIconPath = lit("item_placeholders/sound.png");
@@ -56,7 +58,8 @@ struct ResourceThumbnailProvider::Private
         }
         else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
         {
-            baseProvider.reset(new FfmpegImageProvider(resource, request.usecSinceEpoch));
+            baseProvider.reset(new FfmpegImageProvider(resource,
+                std::chrono::microseconds(request.usecSinceEpoch), request.size));
         }
         else
         {
@@ -112,6 +115,7 @@ nx::api::ResourceImageRequest ResourceThumbnailProvider::requestData() const
 
 void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageRequest& request)
 {
+    const bool wasValid = status() != Qn::ThumbnailStatus::Invalid;
     if (d->baseProvider)
     {
         d->baseProvider->disconnect(this);
@@ -128,37 +132,34 @@ void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageReque
         connect(p, &ImageProvider::statusChanged, this, &ImageProvider::statusChanged);
         connect(p, &ImageProvider::sizeHintChanged, this, &ImageProvider::sizeHintChanged);
     }
+
+    if (wasValid)
+    {
+        emit imageChanged(image());
+        emit sizeHintChanged(sizeHint());
+        emit statusChanged(status());
+    }
 }
 
 QImage ResourceThumbnailProvider::image() const
- {
-    if (d->baseProvider)
-        return d->baseProvider->image();
-    return QImage();
+{
+    return d->baseProvider ? d->baseProvider->image() : QImage();
 }
 
 QSize ResourceThumbnailProvider::sizeHint() const
 {
-    if (d->baseProvider)
-        return d->baseProvider->sizeHint();
-    return QSize();
+    return d->baseProvider ? d->baseProvider->sizeHint() : QSize();
 }
 
 Qn::ThumbnailStatus ResourceThumbnailProvider::status() const
 {
-    if (d->baseProvider)
-        return d->baseProvider->status();
-    return Qn::ThumbnailStatus::Invalid;
+    return d->baseProvider ? d->baseProvider->status() : Qn::ThumbnailStatus::Invalid;
 }
 
 void ResourceThumbnailProvider::doLoadAsync()
 {
     if (d->baseProvider)
         d->baseProvider->loadAsync();
-    else
-    {
-        emit statusChanged(Qn::ThumbnailStatus::Invalid);
-    }
 }
 
 } // namespace nx::vms::client::desktop

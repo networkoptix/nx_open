@@ -7,11 +7,11 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <functional>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnPtzRestHandler:
     public QnJsonRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -132,12 +132,12 @@ private:
         const QnRequestParams& params,
         QnJsonRestResult& result);
 
-    int executeGetAuxilaryTraits(
+    int executeGetAuxiliaryTraits(
         const QnPtzControllerPtr& controller,
         const QnRequestParams& params,
         QnJsonRestResult& result);
 
-    int executeRunAuxilaryCommand(
+    int executeRunAuxiliaryCommand(
         const QnPtzControllerPtr& controller,
         const QnRequestParams& params,
         QnJsonRestResult& result);

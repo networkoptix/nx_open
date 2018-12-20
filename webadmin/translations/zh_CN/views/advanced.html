@@ -116,36 +116,20 @@
 
     <h2>日志设置</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">主要日志级别</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">无︰ 禁用日志。</option>
-                    <option value="ALWAYS">总是︰错误日志, 警告和最重要的讯息.</option>
-                    <option value="ERROR">仅错误︰ 记录错误。</option>
-                    <option value="WARNING">警告︰ 日志警告和错误。</option>
-                    <option value="INFO">信息：记录错误，警告和所有消息。</option>
-                    <option value="DEBUG">调试︰ 记录每个系统消息和调试信息。</option>
-                    <option value="DEBUG2">调试2︰ 记录每个系统消息和扩展的调试信息。</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">无︰ 禁用日志。</option>
+                    <option value="always">总是︰错误日志, 警告和最重要的讯息.</option>
+                    <option value="error">仅错误︰ 记录错误。</option>
+                    <option value="warning">警告︰ 日志警告和错误。</option>
+                    <option value="info">信息：记录错误，警告和所有消息。</option>
+                    <option value="debug">调试︰ 记录每个系统消息和调试信息。</option>
+                    <option value="debug2">调试2︰ 记录每个系统消息和扩展的调试信息。</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">事务日志级别</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">无︰ 禁用日志。</option>
-                    <option value="ALWAYS">总是︰错误日志, 警告和最重要的讯息.</option>
-                    <option value="ERROR">仅错误︰ 记录错误。</option>
-                    <option value="WARNING">警告︰ 日志警告和错误。</option>
-                    <option value="INFO">信息：记录错误，警告和所有消息。</option>
-                    <option value="DEBUG">调试︰ 记录每个系统消息和调试信息。</option>
-                    <option value="DEBUG2">调试2︰ 记录每个系统消息和扩展的调试信息。</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >保存</button>
         </div>

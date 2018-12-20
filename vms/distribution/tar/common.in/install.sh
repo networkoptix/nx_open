@@ -168,15 +168,9 @@ upgradeVms()
 
     rm -rf "/opt/deb" #< Delete deb packages to free some space.
 
-    # Register autostart for rc.d, if it is supported and not yet registered.
-    if [ -f "/etc/init.d/.depend.stop" ]; then
-        if grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop >/dev/null 2>&1; then
-            echo "Mediaserver autostart already enabled."
-        else
-            echo "Enabling mediaserver autostart via update-rc.d"
-            update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
-        fi
-    fi
+    # Register autostart for rc.d.
+    echo "Enabling mediaserver autostart via update-rc.d"
+    update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
 }
 
 getPidWhichUsesPort() # port
@@ -255,7 +249,7 @@ main()
     fi
 
     if [ "$BOX" = "rpi" ]; then
-        source nx_rpi_cam_setup.sh
+        source $INSTALLER_DIR/nx_rpi_cam_setup.sh
         if [ "$NX_RPI_REBOOT" = "1" ]; then
             reboot
             exit 0

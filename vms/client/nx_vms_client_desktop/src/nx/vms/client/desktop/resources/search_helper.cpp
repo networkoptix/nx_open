@@ -15,57 +15,57 @@ bool isSearchStringValid(const QString& searchString)
 
 bool matches(const QString& searchString, const QnResourcePtr& resource)
 {
-    const auto mv = matchValues(searchString, resource);
-#ifdef RESOURCE_SEARCH_DEBUG
-    qDebug() << "search " << searchString << " in " << resource->getName();
-    for (auto [k, v]: mv)
-    {
-        qDebug() << "key" << (int)k << " value " << v;
-    }
-    if (!mv.empty())
-        qDebug() << "----MATCH!----------";
-    else
-        qDebug() << "----FAIL!----------";
-#endif
-    return !mv.empty();
+    if (!isSearchStringValid(searchString))
+        return false;
+
+    auto searchWords = uniqueSearchWords(searchString);
+    const auto matches = matchSearchWords(searchWords, resource);
+
+    // Deduce result by loose AND logic: each search word should match at least one resource parameter.
+    return matches.keys().size() == searchWords.size();
 }
 
-Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
+Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& resource)
 {
+    static constexpr int kIdMatchLength = 4;
+
     Matches result;
 
-    if (!isSearchStringValid(searchString))
-        return result;
-
-    // Combining search values with AND logic.
-    QStringList values = searchString.toLower().split(" ", QString::SkipEmptyParts);
-    for (const auto& searchValue: values)
+    for (const auto& searchWord: searchWords)
     {
         auto checkParameter =
-            [&result, &searchValue](Parameter parameter, QString value, bool fullMatch = false)
+            [&result, &searchWord](Parameter parameter, QString value, int matchLength = 1)
             {
-                if (fullMatch && searchValue == value.toLower())
-                    result.emplace(parameter, value);
-                else if (!fullMatch && value.toLower().contains(searchValue))
-                    result.emplace(parameter, value);
+                if (value.compare(searchWord, Qt::CaseInsensitive) == 0)
+                    result[searchWord].append(parameter);
+
+                if (searchWord.size() >= matchLength && value.contains(searchWord, Qt::CaseInsensitive))
+                    result[searchWord].append(parameter);
+            };
+
+        auto checkParameterFullMatch =
+            [&result, &searchWord](Parameter parameter, QString value)
+            {
+                if (value.compare(searchWord, Qt::CaseInsensitive) == 0)
+                    result[searchWord].append(parameter);
             };
 
         if (resource->logicalId() > 0)
-            checkParameter(Parameter::logicalId, QString::number(resource->logicalId()), true);
+            checkParameterFullMatch(Parameter::logicalId, QString::number(resource->logicalId()));
         checkParameter(Parameter::name, resource->getName());
         checkParameter(Parameter::url, resource->getUrl());
 
         if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
-            // Check id's by full match, both with and without braces.
-            checkParameter(Parameter::id, camera->getId().toSimpleString(), true);
-            checkParameter(Parameter::id, camera->getId().toString(), true);
+            // Check ids by at least 4 character substring match, both with and without braces.
+            checkParameter(Parameter::id, camera->getId().toSimpleString(), kIdMatchLength);
+            checkParameter(Parameter::id, camera->getId().toString(), kIdMatchLength);
             checkParameter(Parameter::mac, camera->getMAC().toString());
             checkParameter(Parameter::host, camera->getHostAddress());
             checkParameter(Parameter::model, camera->getModel());
             checkParameter(Parameter::vendor, camera->getVendor());
             checkParameter(Parameter::firmware, camera->getFirmware());
-            checkParameter(Parameter::physicalId, camera->getPhysicalId(), true);
+            checkParameter(Parameter::physicalId, camera->getPhysicalId(), kIdMatchLength);
         }
 
         if (const auto& user = resource.dynamicCast<QnUserResource>())
@@ -77,6 +77,14 @@ Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
         }
     }
 
+    return result;
+}
+
+QStringList uniqueSearchWords(const QString& searchString)
+{
+    QStringList result = searchString.split(" ", QString::SkipEmptyParts);
+    std::for_each(result.begin(), result.end(), [](QString& str) { str.toLower(); });
+    result.removeDuplicates();
     return result;
 }
 

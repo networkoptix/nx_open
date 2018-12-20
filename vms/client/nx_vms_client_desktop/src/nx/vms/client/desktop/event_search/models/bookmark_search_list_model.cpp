@@ -1,7 +1,7 @@
 #include "bookmark_search_list_model.h"
 #include "private/bookmark_search_list_model_p.h"
 
-#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 
@@ -23,6 +23,16 @@ void BookmarkSearchListModel::setFilterText(const QString& value)
 bool BookmarkSearchListModel::isConstrained() const
 {
     return !filterText().isEmpty() || base_type::isConstrained();
+}
+
+bool BookmarkSearchListModel::hasAccessRights() const
+{
+    return accessController()->hasGlobalPermission(GlobalPermission::viewBookmarks);
+}
+
+void BookmarkSearchListModel::dynamicUpdate(const QnTimePeriod& period)
+{
+    d->dynamicUpdate(period);
 }
 
 } // namespace nx::vms::client::desktop

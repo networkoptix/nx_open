@@ -1,9 +1,11 @@
-#ifndef QN_TOUR_PTZ_EXECUTOR_H
-#define QN_TOUR_PTZ_EXECUTOR_H
+#pragma once
 
 #include <QtCore/QObject>
 
+#include <common/common_globals.h>
 #include "ptz_fwd.h"
+
+class QThreadPool;
 
 class QnTourPtzExecutorPrivate;
 
@@ -21,7 +23,7 @@ class QnTourPtzExecutor: public QObject
 
 public:
     QnTourPtzExecutor(const QnPtzControllerPtr &controller, QThreadPool* threadPool);
-    virtual ~QnTourPtzExecutor();
+    virtual ~QnTourPtzExecutor() override;
 
     void startTour(const QnPtzTour &tour);
     void stopTour();
@@ -36,12 +38,10 @@ private:
     Q_SIGNAL void stopTourRequested();
     Q_SIGNAL void controllerFinishedLater(Qn::PtzCommand command, const QVariant &data);
 
-    Q_SLOT void at_controller_finished(Qn::PtzCommand command, const QVariant &data);
-    Q_SLOT void at_startTourRequested(const QnPtzTour &tour);
-    Q_SLOT void at_stopTourRequested();
+    void at_controller_finished(Qn::PtzCommand command, const QVariant &data);
+    void at_startTourRequested(const QnPtzTour &tour);
+    void at_stopTourRequested();
 
 private:
     QScopedPointer<QnTourPtzExecutorPrivate> d;
 };
-
-#endif // QN_TOUR_PTZ_EXECUTOR_H

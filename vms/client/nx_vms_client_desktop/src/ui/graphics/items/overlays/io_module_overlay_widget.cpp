@@ -124,7 +124,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
     if (module)
     {
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
-            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {});
+            module->getProperty(ResourcePropertyKey::kIoOverlayStyle), {});
     }
 
     bool needToCreateNewContents = style != overlayStyle || !contents;
@@ -237,11 +237,11 @@ void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePt
     if (resource != module)
         return;
 
-    if (key == Qn::IO_SETTINGS_PARAM_NAME)
+    if (key == ResourcePropertyKey::kIoSettings)
     {
         setPorts(module->ioPortDescriptions());
     }
-    else if (key == Qn::IO_OVERLAY_STYLE_PARAM_NAME)
+    else if (key == ResourcePropertyKey::kIoOverlayStyle)
     {
         updateOverlayStyle();
     }

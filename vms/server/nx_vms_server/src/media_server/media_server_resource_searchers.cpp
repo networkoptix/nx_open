@@ -49,7 +49,7 @@ void QnMediaServerResourceSearchers::registerSearcher(T* instance)
 
 QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModule* serverModule):
     QObject(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -97,7 +97,7 @@ void QnMediaServerResourceSearchers::start()
         registerSearcher(new QnPlISDResourceSearcher(serverModule()));
     #endif
     #ifdef ENABLE_HANWHA
-        registerSearcher(new nx::mediaserver_core::plugins::HanwhaResourceSearcher(serverModule()));
+        registerSearcher(new nx::vms::server::plugins::HanwhaResourceSearcher(serverModule()));
     #endif
 
     #ifdef ENABLE_ADVANTECH

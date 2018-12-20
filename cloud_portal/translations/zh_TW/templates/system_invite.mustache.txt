@@ -9,5 +9,5 @@
 您已被授予對{{message.system_name}}的存取權限.
 {{/message.sharer_name}}
 
-註冊並查看系統: {{config.portal_url}}/register/{{message.code}}
+註冊並查看系統: {{config.portal_url}}/註冊/{{message.code}}
 

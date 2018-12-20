@@ -100,15 +100,13 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty(
-        Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+    setProperty(ResourcePropertyKey::kCredentials,
         lit("%1:%2").arg(auth.user()) .arg(auth.password()));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
-    setProperty(
-        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+    setProperty(ResourcePropertyKey::kDefaultCredentials,
         lit("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 
@@ -120,13 +118,13 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
-        Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+        ResourcePropertyKey::kCredentials,
         resourceId,
         resourceTypeId);
     if (value.isNull())
         value = getResourceProperty(
             commonModule,
-            Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+            ResourcePropertyKey::kDefaultCredentials,
             resourceId,
             resourceTypeId);
 
@@ -135,15 +133,16 @@ QAuthenticator QnNetworkResource::getResourceAuth(
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-    QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
+    QString value = getProperty(ResourcePropertyKey::kCredentials);
     if (value.isNull())
-        value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+        value = getProperty(ResourcePropertyKey::kDefaultCredentials);
+
     return getAuthInternal(value);
 }
 
 QAuthenticator QnNetworkResource::getDefaultAuth() const
 {
-    QString value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    QString value = getProperty(ResourcePropertyKey::kDefaultCredentials);
     return getAuthInternal(value);
 }
 

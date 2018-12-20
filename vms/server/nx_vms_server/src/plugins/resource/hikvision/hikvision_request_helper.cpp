@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
@@ -124,12 +124,12 @@ bool IsapiRequestHelper::setOnvifCredentials(int userId, const QString& login, c
 
 } // namespace hikvision
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_core::plugins::hikvision, Protocol,
-    (nx::mediaserver_core::plugins::hikvision::Protocol::onvif, "ONVIF")
-    (nx::mediaserver_core::plugins::hikvision::Protocol::isapi, "ISAPI")
-    (nx::mediaserver_core::plugins::hikvision::Protocol::cgi, "CGI")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::plugins::hikvision, Protocol,
+    (nx::vms::server::plugins::hikvision::Protocol::onvif, "ONVIF")
+    (nx::vms::server::plugins::hikvision::Protocol::isapi, "ISAPI")
+    (nx::vms::server::plugins::hikvision::Protocol::cgi, "CGI")
 )
 

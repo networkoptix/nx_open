@@ -33,8 +33,8 @@
 #include <recorder/file_deletor.h>
 
 #include <core/resource/avi/avi_resource.h>
-#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
-#include <nx/mediaserver/event/rule_processor.h>
+#include <nx/vms/server/ptz/server_ptz_controller_pool.h>
+#include <nx/vms/server/event/rule_processor.h>
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <recorder/storage_db_pool.h>
@@ -44,17 +44,18 @@
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 
-#include <nx/mediaserver/event/event_message_bus.h>
-#include <nx/mediaserver/unused_wallpapers_watcher.h>
-#include <nx/mediaserver/license_watcher.h>
-#include <nx/mediaserver/analytics/manager.h>
-#include <nx/mediaserver/analytics/event_rule_watcher.h>
-#include <nx/mediaserver/resource/shared_context_pool.h>
-#include <nx/mediaserver/resource/camera.h>
-#include <nx/mediaserver/root_fs.h>
-#include <nx/mediaserver/server_update_manager.h>
+#include <nx/vms/server/event/event_message_bus.h>
+#include <nx/vms/server/unused_wallpapers_watcher.h>
+#include <nx/vms/server/license_watcher.h>
+#include <nx/vms/server/analytics/manager.h>
+#include <nx/vms/server/analytics/event_rule_watcher.h>
+#include <nx/vms/server/resource/shared_context_pool.h>
+#include <nx/vms/server/resource/camera.h>
+#include <nx/vms/server/root_fs.h>
+#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/meta_types.h>
 
-#include <nx/mediaserver/analytics/sdk_object_factory.h>
+#include <nx/vms/server/analytics/sdk_object_factory.h>
 
 #include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
@@ -62,7 +63,6 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 #include "wearable_lock_manager.h"
@@ -70,8 +70,8 @@
 #include <core/resource/resource_command_processor.h>
 #include <nx/vms/network/reverse_connection_manager.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
-#include <nx/mediaserver/event/event_connector.h>
-#include <nx/mediaserver/event/extended_rule_processor.h>
+#include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 #include "server_update_tool.h"
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
@@ -90,7 +90,7 @@
 #include "resource_status_watcher.h"
 
 using namespace nx;
-using namespace nx::mediaserver;
+using namespace nx::vms::server;
 
 namespace {
 
@@ -109,12 +109,12 @@ void installTranslations()
 
 class ServerDataProviderFactory:
     public QnDataProviderFactory,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     ServerDataProviderFactory(QnMediaServerModule* serverModule):
         QnDataProviderFactory(),
-        nx::mediaserver::ServerModuleAware(serverModule)
+        nx::vms::server::ServerModuleAware(serverModule)
     {
     }
 
@@ -130,7 +130,7 @@ public:
                 mediaProvider,
                 &QnAbstractMediaStreamDataProvider::streamEvent,
                 serverModule()->cameraErrorProcessor(),
-                &nx::mediaserver::camera::ErrorProcessor::onStreamReaderEvent,
+                &nx::vms::server::camera::ErrorProcessor::onStreamReaderEvent,
                 Qt::DirectConnection);
         }
         return result;
@@ -139,7 +139,7 @@ public:
 };
 
 QnMediaServerModule::QnMediaServerModule(
-    const nx::mediaserver::CmdLineArguments* arguments,
+    const nx::vms::server::CmdLineArguments* arguments,
     std::unique_ptr<MSSettings> serverSettings,
     QObject* parent)
 {
@@ -154,7 +154,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     Q_INIT_RESOURCE(nx_vms_server);
     Q_INIT_RESOURCE(nx_vms_server_db);
-    nx::mediaserver::MetaTypes::initialize();
 
     if (serverSettings.get())
     {
@@ -167,6 +166,7 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
+    nx::vms::server::registerSerializers();
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
@@ -197,12 +197,12 @@ QnMediaServerModule::QnMediaServerModule(
     }
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
-    m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
-    m_licenseWatcher = store(new nx::mediaserver::LicenseWatcher(commonModule()));
+    m_unusedWallpapersWatcher = store(new nx::vms::server::UnusedWallpapersWatcher(commonModule()));
+    m_licenseWatcher = store(new nx::vms::server::LicenseWatcher(commonModule()));
 
-    m_eventMessageBus = store(new nx::mediaserver::event::EventMessageBus(commonModule()));
+    m_eventMessageBus = store(new nx::vms::server::event::EventMessageBus(commonModule()));
 
-    m_ptzControllerPool = store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
+    m_ptzControllerPool = store(new nx::vms::server::ptz::ServerPtzControllerPool(commonModule()));
 
     m_storageDbPool = store(new QnStorageDbPool(this));
 
@@ -244,32 +244,35 @@ QnMediaServerModule::QnMediaServerModule(
         ));
 
     const bool isRootToolEnabled = !settings().ignoreRootTool();
-    m_rootFileSystem = nx::mediaserver::instantiateRootFileSystem(isRootToolEnabled, qApp->applicationFilePath());
+    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(isRootToolEnabled, qApp->applicationFilePath());
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(), commonModule(), nullptr, this));
+        downloadsDirectory(),
+        commonModule(),
+        nullptr,
+        this));
 
     m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());
 
-    m_eventRuleProcessor = store(new nx::mediaserver::event::ExtendedRuleProcessor(this));
-    m_eventConnector = store(new nx::mediaserver::event::EventConnector(this));
+    m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));
+    m_eventConnector = store(new nx::vms::server::event::EventConnector(this));
 
-    m_analyticsEventRuleWatcher = store(new nx::mediaserver::analytics::EventRuleWatcher(this));
-    m_analyticsManager = store(new nx::mediaserver::analytics::Manager(this));
+    m_analyticsEventRuleWatcher = store(new nx::vms::server::analytics::EventRuleWatcher(this));
+    m_analyticsManager = store(new nx::vms::server::analytics::Manager(this));
 
-    m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
-    m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher(this));
-    m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this));
+    m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));
+    m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
+    m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
     auto dataDir = settings().dataDir();
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
 
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
-    store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
+    store(new nx::vms::server::recorder::WearableArchiveSynchronizer(this));
     store(new QnWearableLockManager(this));
     store(new QnWearableUploadManager(this));
 
@@ -282,7 +285,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
 
     m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(this));
-    m_cameraErrorProcessor = store(new nx::mediaserver::camera::ErrorProcessor());
+    m_cameraErrorProcessor = store(new nx::vms::server::camera::ErrorProcessor());
 
     commonModule()->setResourceDiscoveryManager(
         new QnMServerResourceDiscoveryManager(this));
@@ -295,9 +298,9 @@ QnMediaServerModule::QnMediaServerModule(
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
-    m_sdkObjectFactory = store(new nx::mediaserver::analytics::SdkObjectFactory(this));
+    m_sdkObjectFactory = store(new nx::vms::server::analytics::SdkObjectFactory(this));
 
-    m_hlsSessionPool = store(new nx::mediaserver::hls::SessionPool());
+    m_hlsSessionPool = store(new nx::vms::server::hls::SessionPool());
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -408,17 +411,17 @@ void QnMediaServerModule::setLastRunningTime(std::chrono::milliseconds value) co
     runTimeSettings()->sync();
 }
 
-nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
+nx::vms::server::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
 {
     return m_unusedWallpapersWatcher;
 }
 
-nx::mediaserver::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
+nx::vms::server::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
 {
     return m_licenseWatcher;
 }
 
-nx::mediaserver::event::EventMessageBus* QnMediaServerModule::eventMessageBus() const
+nx::vms::server::event::EventMessageBus* QnMediaServerModule::eventMessageBus() const
 {
     return m_eventMessageBus;
 }
@@ -428,23 +431,23 @@ PluginManager* QnMediaServerModule::pluginManager() const
     return m_pluginManager;
 }
 
-nx::mediaserver::analytics::Manager* QnMediaServerModule::analyticsManager() const
+nx::vms::server::analytics::Manager* QnMediaServerModule::analyticsManager() const
 {
     return m_analyticsManager;
 }
 
-nx::mediaserver::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEventRuleWatcher()
+nx::vms::server::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEventRuleWatcher()
     const
 {
     return m_analyticsEventRuleWatcher;
 }
 
-nx::mediaserver::analytics::SdkObjectFactory* QnMediaServerModule::sdkObjectFactory() const
+nx::vms::server::analytics::SdkObjectFactory* QnMediaServerModule::sdkObjectFactory() const
 {
     return m_sdkObjectFactory;
 }
 
-nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
+nx::vms::server::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
 {
     return m_sharedContextPool;
 }
@@ -459,7 +462,7 @@ nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEve
     return m_analyticsEventsStorage.get();
 }
 
-nx::mediaserver::RootFileSystem* QnMediaServerModule::rootFileSystem() const
+nx::vms::server::RootFileSystem* QnMediaServerModule::rootFileSystem() const
 {
     return m_rootFileSystem.get();
 }
@@ -467,7 +470,7 @@ nx::mediaserver::RootFileSystem* QnMediaServerModule::rootFileSystem() const
 void QnMediaServerModule::registerResourceDataProviders()
 {
     m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
-    m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+    m_resourceDataProviderFactory->registerResourceType<nx::vms::server::resource::Camera>();
 }
 
 nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
@@ -510,12 +513,12 @@ QnStorageManager* QnMediaServerModule::backupStorageManager() const
     return m_context->backupStorageManager.get();
 }
 
-nx::mediaserver::event::EventConnector* QnMediaServerModule::eventConnector() const
+nx::vms::server::event::EventConnector* QnMediaServerModule::eventConnector() const
 {
     return m_eventConnector;
 }
 
-nx::mediaserver::event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
+nx::vms::server::event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
 {
     return m_eventRuleProcessor;
 }
@@ -600,7 +603,7 @@ QnResourceDiscoveryManager* QnMediaServerModule::resourceDiscoveryManager() cons
     return m_commonModule->resourceDiscoveryManager();
 }
 
-nx::mediaserver::camera::ErrorProcessor* QnMediaServerModule::cameraErrorProcessor() const
+nx::vms::server::camera::ErrorProcessor* QnMediaServerModule::cameraErrorProcessor() const
 {
     return m_cameraErrorProcessor;
 }
@@ -640,7 +643,7 @@ nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() con
     return m_upnpDeviceSearcher.get();
 }
 
-nx::mediaserver::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
+nx::vms::server::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
 {
     return m_hlsSessionPool;
 }

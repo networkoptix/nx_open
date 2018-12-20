@@ -64,6 +64,7 @@ public:
     static State resetExpertSettings(State state);
     static State setAnalyticsEngines(
         State state, const QList<AnalyticsEngineInfo>& value);
+    static State setCurrentAnalyticsEngineId(State state, const QnUuid& engineId);
     static State setAnalyticsSettingsLoading(State state, bool value);
     static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
     static std::pair<bool, State> setDeviceAgentSettingsValues(

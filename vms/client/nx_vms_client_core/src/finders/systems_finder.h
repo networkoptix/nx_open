@@ -1,8 +1,9 @@
-
 #pragma once
 
+#include <QtCore/QSharedPointer>
+
 #include <nx/utils/singleton.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <finders/abstract_systems_finder.h>
 
 class ConnectionsHolder;
@@ -38,9 +39,9 @@ private:
     void updateRecentConnections(const QnUuid& localSystemId, const QString& name);
 
 private:
-    typedef QMap<QnAbstractSystemsFinder *, QnDisconnectHelperPtr> SystemsFinderList;
-    typedef QSharedPointer<QnSystemDescriptionAggregator> AggregatorPtr;
-    typedef QHash<QString, AggregatorPtr> AggregatorsList;
+    using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
+    using AggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;
+    using AggregatorsList = QHash<QString, AggregatorPtr>;
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;

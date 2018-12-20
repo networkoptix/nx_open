@@ -11,11 +11,11 @@
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include "nx/utils/thread/long_runnable.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
-namespace nx::mediaserver { class RootTool; }
+namespace nx::vms::server { class RootTool; }
 
-class QnFileDeletor: public QnLongRunnable, public nx::mediaserver::ServerModuleAware
+class QnFileDeletor: public QnLongRunnable, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

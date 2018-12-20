@@ -43,7 +43,6 @@ set(ios.group_identifier "group.com.rassecurity.probox")
 set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")
 set(ios.old_app_appstore_id "")
 
-set(mac.skip.sign "false")
 set(mac.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: RAS Bvba (CJ7G58V6NE)")

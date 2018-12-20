@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -297,5 +297,5 @@ bool HanwhaCodecInfo::fetchCodecProfiles(const HanwhaCgiParameters& cgiParameter
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

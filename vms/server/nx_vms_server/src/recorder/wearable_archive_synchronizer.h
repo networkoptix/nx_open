@@ -3,7 +3,7 @@
 #include <atomic>
 #include <memory>
 
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 #include <utils/common/connective.h>
 
@@ -12,14 +12,14 @@
 #include "wearable_archive_synchronization_task.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 class RemoteArchiveWorkerPool;
 
 class WearableArchiveSynchronizer:
     public Connective<QObject>,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -43,7 +43,7 @@ private:
 };
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 

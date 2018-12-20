@@ -21,3 +21,5 @@ void setKeepScreenOn(bool keepScreenOn);
 void setScreenOrientation(Qt::ScreenOrientation orientation);
 
 QMargins getCustomMargins();
+
+void makeShortVibration();

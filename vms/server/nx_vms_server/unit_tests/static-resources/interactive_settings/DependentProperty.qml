@@ -2,21 +2,19 @@ import nx.mediaserver.interactive_settings 1.0
 
 Settings
 {
-    readonly property var _serialized:
+    readonly property var _serializedModel:
     {
         "type": "Settings",
         "items": [
             {
                 "type": "CheckBox",
                 "name": "master",
-                "defaultValue": false,
-                "value": master.value
+                "defaultValue": false
             },
             {
                 "type": "ComboBox",
                 "name": "slave",
                 "defaultValue": "one",
-                "value": "one",
                 "range": master.value ? ["one", "two"] : ["one"]
             }
         ]

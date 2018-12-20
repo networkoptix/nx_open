@@ -11,7 +11,7 @@
 #include <nx/utils/log/log.h>
 
 #include <camera/camera_plugin.h>
-#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/i_engine.h>
 #include <plugins/plugin_tools.h>
 
 #include "plugins_ini.h"
@@ -184,7 +184,7 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    // TODO: Find a better solution. Needed to chech that libName equals Plugin::name().
+    // TODO: Find a better solution. Needed to check that libName equals IPlugin::name().
     bool isAnalyticsPlugin = false;
 
     auto entryPoint = (nxpl::Plugin::EntryPoint) lib.resolve("createNXPluginInstance");

@@ -6,7 +6,7 @@
 #include <common/common_module.h>
 
 QnBackupDbRestHandler::QnBackupDbRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -16,7 +16,7 @@ int QnBackupDbRestHandler::executeGet(
     QnJsonRestResult& /*result*/,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    nx::mediaserver::Utils utils(serverModule());
+    nx::vms::server::Utils utils(serverModule());
     if (!utils.backupDatabase())
         return nx::network::http::StatusCode::internalServerError;
 

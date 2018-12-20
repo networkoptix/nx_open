@@ -6,6 +6,8 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
 #include "isd_resource.h"
@@ -51,20 +53,25 @@ QString QnISDStreamReader::serializeStreamParams(
 
 CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
+    namespace StatusCode = nx::network::http::StatusCode;
+
     QnLiveStreamParams params = liveStreamParams;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
     Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
-    CLHttpStatus status;
 
     int port = QUrl(m_isdCam->getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT);
-    CLSimpleHTTPClient http(
-        m_isdCam->getHostAddress(),
-        port,
-        ISD_HTTP_REQUEST_TIMEOUT_MS,
-        m_isdCam->getAuth());
+    const auto baseRequestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(m_isdCam->getHostAddress())
+        .setPort(port)
+        .toUrl();
+
+    nx::network::http::HttpClient httpClient;
+    httpClient.setUserName(m_isdCam->getAuth().user());
+    httpClient.setUserPassword(m_isdCam->getAuth().password());
 
     QSize resolution;
     int profileIndex;
@@ -84,61 +91,56 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     if (isCameraControlRequired)
     {
         QString streamProfileStr = serializeStreamParams(params, profileIndex);
-        status = http.doPOST(QByteArray("/api/param.cgi"), streamProfileStr);
+
+        const auto url = nx::network::url::Builder(baseRequestUrl).setPath("/api/param.cgi").toUrl();
+        bool ok = httpClient.doPost(
+            url, "Content-Type: application/x-www-form-urlencoded", streamProfileStr.toUtf8());
+        if (!ok)
+        {
+            NX_DEBUG(this, "Request %1 system error: %2", url, httpClient.lastSysErrorCode());
+        }
+        else if (!StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
+        {
+            NX_DEBUG(this, "Request %1 error: %2", url,
+                StatusCode::toString(httpClient.response()->statusLine.statusCode));
+        }
         QnSleep::msleep(100);
     }
 
-    QString urlrequest =
-        lit("api/param.cgi?req=VideoInput.1.h264.%1.Rtsp.AbsolutePath").arg(profileIndex);
+    const auto requestUrl = nx::network::url::Builder(baseRequestUrl)
+            .setPath("/api/param.cgi")
+            .setQuery(lm("req=VideoInput.1.h264.%1.Rtsp.AbsolutePath").arg(profileIndex))
+            .toUrl();
 
-    QByteArray reslst = downloadFile(
-        status,
-        urlrequest,
-        m_isdCam->getHostAddress(),
-        port,
-        ISD_HTTP_REQUEST_TIMEOUT_MS,
-        m_isdCam->getAuth());
-    if (status == CL_HTTP_AUTH_REQUIRED)
-    {
-        QUrl requestedUrl;
-        requestedUrl.setHost( m_isdCam->getHostAddress() );
-        requestedUrl.setPort( port );
-        requestedUrl.setScheme( QLatin1String("http") );
-        requestedUrl.setPath( urlrequest );
-        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
-    }
+    if (!httpClient.doGet(requestUrl))
+        return CameraDiagnostics::IOErrorResult(requestUrl.toString());
 
-    QString url = getValueFromString(QLatin1String(reslst));
+    const auto statusCode = StatusCode::Value(httpClient.response()->statusLine.statusCode);
+    if (!StatusCode::isSuccessCode(statusCode))
+        NX_DEBUG(this, "Request %1 failed with %2", requestUrl, StatusCode::toString(statusCode));
 
-    QStringList urlLst = url.split(QLatin1Char('\r'), QString::SkipEmptyParts);
+    if (statusCode == nx::network::http::StatusCode::unauthorized)
+        return CameraDiagnostics::NotAuthorisedResult(requestUrl.toString());
+
+    auto messageBody = httpClient.fetchEntireMessageBody();
+    QString rtspUrl;
+    if (messageBody)
+        rtspUrl = getValueFromString(*messageBody);
+
+    QStringList urlLst = rtspUrl.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
-    {
-        QUrl requestedUrl;
-        requestedUrl.setHost( m_isdCam->getHostAddress() );
-        requestedUrl.setPort( port );
-        requestedUrl.setScheme( QLatin1String("http") );
-        requestedUrl.setPath( urlrequest );
-        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
-    }
+        return CameraDiagnostics::NoMediaTrackResult(requestUrl.toString());
 
-    url = urlLst.at(0);
+    rtspUrl = urlLst.at(0);
 
+    if (rtspUrl.isEmpty())
+        return CameraDiagnostics::NoMediaTrackResult(requestUrl.toString());
 
-    if (url.isEmpty())
-    {
-        QUrl requestedUrl;
-        requestedUrl.setHost( m_isdCam->getHostAddress() );
-        requestedUrl.setPort( port );
-        requestedUrl.setScheme( QLatin1String("http") );
-        requestedUrl.setPath( urlrequest );
-        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
-    }
+    m_isdCam->updateSourceUrl(rtspUrl, getRole());
+    NX_INFO(this, "Got stream URL %1 for camera %2 for role %3", rtspUrl, m_resource->getUrl(), getRole());
 
-    m_isdCam->updateSourceUrl(url, getRole());
-    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()));
-
-    m_rtpStreamParser.setRequest(url);
-	m_isdCam->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
+    m_rtpStreamParser.setRequest(rtspUrl);
+    m_isdCam->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 

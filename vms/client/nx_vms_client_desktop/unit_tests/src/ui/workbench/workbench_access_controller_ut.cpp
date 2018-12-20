@@ -7,6 +7,7 @@
 #include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -35,6 +36,7 @@ protected:
         m_staticCommon.reset(new QnStaticCommonModule());
         m_module.reset(new QnClientCoreModule());
         m_runtime.reset(new QnClientRuntimeSettings());
+        m_resourceRuntime.reset(new QnResourceRuntimeDataManager(m_module->commonModule()));
         m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
     }
 
@@ -43,6 +45,7 @@ protected:
     {
         m_currentUser.clear();
         m_accessController.clear();
+        m_resourceRuntime.clear();
         m_runtime.clear();
         m_module.clear();
         m_staticCommon.reset();
@@ -121,6 +124,7 @@ protected:
     QSharedPointer<QnClientCoreModule> m_module;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
     QSharedPointer<QnClientRuntimeSettings> m_runtime;
+    QSharedPointer<QnResourceRuntimeDataManager> m_resourceRuntime;
     QnUserResourcePtr m_currentUser;
 };
 

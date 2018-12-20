@@ -4,10 +4,10 @@
 #include <media_server/media_server_module.h>
 #include <motion/motion_helper.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/mediaserver/camera_mock.h>
+#include "../camera_mock.h"
 #include <nx/fusion/model_functions.h>
 
-namespace nx::mediaserver::test
+namespace nx::vms::server::test
 {
 
 static const int kSteps = 1200;
@@ -111,4 +111,29 @@ TEST_F(MotionArchive, findMotionDesc)
     ASSERT_EQ(deltaMs,result[0].durationMs);
 }
 
-} // nx::mediaserver::test
+TEST_F(MotionArchive, findMotionWithFilter)
+{
+    createTestData();
+    QnChunksRequestData request = createRequest(Qt::SortOrder::AscendingOrder);
+    request.limit = 50;
+
+    QList<QRegion> rectFilter;
+    rectFilter << QRect(0, 0, 1, 1);
+    request.filter = QJson::serialized<QList<QRegion>>(rectFilter);
+
+    checkData(serverModule().motionHelper()->matchImage(request), request.limit);
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    std::reverse(m_numericDates.begin(), m_numericDates.end());
+    checkData(serverModule().motionHelper()->matchImage(request), request.limit);
+
+    request.sortOrder = Qt::SortOrder::AscendingOrder;
+    rectFilter.clear();
+    rectFilter << QRect(Qn::kMotionGridWidth/2, Qn::kMotionGridHeight/2, 1, 1);
+    request.filter = QJson::serialized<QList<QRegion>>(rectFilter);
+
+    checkData(serverModule().motionHelper()->matchImage(request), 0);
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    checkData(serverModule().motionHelper()->matchImage(request), 0);
+}
+
+} // nx::vms::server::test

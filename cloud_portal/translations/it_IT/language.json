@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Visualizzatore avanzato",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "È possibile visualizzare video in diretta, sfogliare l'archivio, controllare PTZ ecc"
     },
     "Administrator": {
       "label": "Amministratore",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Elimina",
     "successDisconnected": "Il sistema è stato scollegato correttamente da %PRODUCT_NAME%",
     "successDeleted": "Il sistema {{systemName}} è stato eliminato correttamente dal suo account",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Il sistema {{systemName}} è stato unito a {{systemName}}",
     "permissionsRemoved": "Le autorizzazioni sono state rimosse da {{email}}"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "copiato negli appunti"
     },
     "systemOffline": "Il sistema è offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "NON CI SONO TELECAMERE",
     "cameraStates": {
       "offline": "Offiline",
       "error": "Errore",

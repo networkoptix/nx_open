@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 
-class QnPlIqResource: public nx::mediaserver::resource::Camera
+class QnPlIqResource: public nx::vms::server::resource::Camera
 {
 public:
     static const QString MANUFACTURE;
@@ -17,7 +17,7 @@ public:
 
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 

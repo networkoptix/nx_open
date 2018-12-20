@@ -111,10 +111,11 @@ Appserver2MessageProcessor::Appserver2MessageProcessor(QObject* parent):
 }
 
 void Appserver2MessageProcessor::onResourceStatusChanged(
-    const QnResourcePtr& /*resource*/,
-    Qn::ResourceStatus /*status*/,
+    const QnResourcePtr& resource,
+    Qn::ResourceStatus status,
     ec2::NotificationSource /*source*/)
 {
+    commonModule()->statusDictionary()->setValue(resource->getId(), status);
 }
 
 QnResourceFactory* Appserver2MessageProcessor::getResourceFactory() const

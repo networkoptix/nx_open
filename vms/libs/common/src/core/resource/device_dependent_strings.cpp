@@ -1,5 +1,7 @@
 #include "device_dependent_strings.h"
 
+#include <algorithm>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -204,16 +206,11 @@ QnCameraDeviceType QnDeviceDependentStrings::calculateDeviceType(
     if (!resPool || !resPool->containsIoModules())
         return QnCameraDeviceType::Camera;
 
-    using boost::algorithm::any_of;
+    const bool hasCameras = std::any_of(devices.begin(), devices.end(),
+        [](const auto& device) { return device->hasVideo(nullptr); });
 
-    const bool hasCameras = any_of(devices,
-        [](const QnVirtualCameraResourcePtr& device) { return device->hasVideo(nullptr); });
-
-    const bool hasIoModules = any_of(devices,
-        [](const QnVirtualCameraResourcePtr& device)
-        {
-            return device->isIOModule() && !device->hasVideo(nullptr);
-        });
+    const bool hasIoModules = std::any_of(devices.begin(), devices.end(),
+        [](const auto& device) { return device->isIOModule() && !device->hasVideo(nullptr); });
 
     // If only one type of devices.
     if (hasCameras ^ hasIoModules)

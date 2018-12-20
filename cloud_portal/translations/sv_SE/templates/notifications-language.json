@@ -1,18 +1,18 @@
 {
   "activate_account": {
-    "emailSubject": "Activate your account"
+    "emailSubject": "Aktivera ditt konto"
   },
   "restore_password": {
-    "emailSubject": "Reset your password"
+    "emailSubject": "Återställ ditt lösenord"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} inbjuder till %PRODUCT_NAME%{{messaging.sharer_name}}{{^message.sharer_name}}Videosystem {{message.system_name}} delades med dig {{/ message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "Videosystemet {{message.system_name}} delades med dig"
   },
   "review_version": {
-    "emailSubject": "Version {{message.id}} is ready to be reviewed"
+    "emailSubject": "Version {{message.id}} är redo att ses över"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"

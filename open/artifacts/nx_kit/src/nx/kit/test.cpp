@@ -11,6 +11,12 @@
 #include <vector>
 #include <fstream>
 
+#if defined(_WIN32)
+    #include <direct.h> //< For mkdir().
+#else
+    #include <sys/stat.h> //< For mkdir().
+#endif
+
 namespace nx {
 namespace kit {
 namespace test {
@@ -191,8 +197,12 @@ static std::string systemTempDir()
 /** Create directory, issuing a fatal error on failure. */
 static void createDir(const std::string& dir)
 {
-    // NOTE: mkdir works in both Windows and Linux.
-    if (system(("mkdir \"" + dir + "\"").c_str()) != 0)
+#if defined(_WIN32)
+    const int resultCode = _mkdir(dir.c_str());
+#else
+        const int resultCode = mkdir(dir.c_str(), /*octal*/ 0777);
+#endif
+    if (resultCode != 0)
         fatalError("Unable to create dir: [%s]", dir.c_str());
 }
 

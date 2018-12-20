@@ -11,8 +11,6 @@ class CameraSettingsDialogStore;
 
 class CameraAnalyticsSettingsWidget: public QQuickWidget
 {
-    Q_OBJECT
-
     using base_type = QQuickWidget;
 
 public:
@@ -20,12 +18,6 @@ public:
         CameraSettingsDialogStore* store,
         QQmlEngine* engine,
         QWidget* parent = nullptr);
-
-signals:
-    void currentEngineIdChanged(const QnUuid& engineId);
-
-private slots:
-    void onCurrentEngineIdChanged();
 };
 
 } // namespace nx::vms::client::desktop

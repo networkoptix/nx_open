@@ -71,7 +71,8 @@ QnVirtualCameraResourcePtr CameraAdvancedParamsWidget::camera() const {
     return m_camera;
 }
 
-void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
+{
     if (m_camera == camera)
         return;
 
@@ -80,17 +81,19 @@ void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
 
     m_camera = camera;
 
-    if (m_camera) {
-        connect(m_camera, &QnResource::statusChanged,   this, &CameraAdvancedParamsWidget::updateCameraAvailability);
+    if (m_camera)
+    {
+        connect(m_camera, &QnResource::statusChanged, this,
+            &CameraAdvancedParamsWidget::updateCameraAvailability);
 
-        connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key) {
-            if (resource != m_camera)
-                return;
-            if (key == Qn::CAMERA_ADVANCED_PARAMETERS) {
-                /* Re-init state if key parameter changed. */
-                initialize();
-            }
-        });
+        connect(m_camera, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr &resource, const QString &key)
+            {
+                if (resource != m_camera)
+                    return;
+                if (key == ResourcePropertyKey::kCameraAdvancedParams)
+                    initialize(); //< Re-init state if key parameter changed.
+            });
     }
 
     /* Initialize state */
@@ -135,6 +138,7 @@ void CameraAdvancedParamsWidget::displayParams() {
 
     auto params = m_advancedParamsReader->params(m_camera);
     m_advancedParamWidgetsManager->displayParams(params);
+    updateParameretsVisibility();
 }
 
 void CameraAdvancedParamsWidget::loadValues() {
@@ -163,33 +167,42 @@ void CameraAdvancedParamsWidget::loadValues() {
     setState(State::Loading);
 }
 
-void CameraAdvancedParamsWidget::saveSingleValue(const QnCameraAdvancedParamValue &value) {
-    /* Check that we are in the correct state. */
-    if (state() != State::Init || !m_cameraAvailable)
+void CameraAdvancedParamsWidget::saveSingleValue(
+    const QnCameraAdvancedParameter& parameter,
+    const QString& value)
+{
+    // Check that we are in the correct state.
+    if (state() != State::Init || (!m_cameraAvailable && !parameter.availableInOffline))
         return;
 
-    /* Check that the server and camera are available. */
-    auto serverConnection = getServerConnection();
-    if (!serverConnection) {
-        /* Notify user about error. */
-        // TODO: #GDM
+    // Check that the server and camera are available.
+    const auto serverConnection = getServerConnection();
+    if (!serverConnection)
+    {
+        // TODO: #GDM Notify user about error.
         return;
     }
 
-    /* Update state. */
-    m_paramRequestHandle = serverConnection->setParamsAsync(m_camera, QnCameraAdvancedParamValueList() << value, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+    // Update state.
+    m_paramRequestHandle = serverConnection->setParamsAsync(
+        m_camera,
+        {QnCameraAdvancedParamValue(parameter.id, value)},
+        this,
+        SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList&, int)));
+
     setState(State::Applying);
 }
 
-void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvancedParameter& parameter,
+void CameraAdvancedParamsWidget::sendCustomParameterCommand(
+    const QnCameraAdvancedParameter& parameter,
     const QString& value)
 {
-    /* Check that we are in the correct state. */
-    if (state() != State::Init || !m_cameraAvailable)
+    // Check that we are in the correct state.
+    if (state() != State::Init || (!m_cameraAvailable && !parameter.availableInOffline))
         return;
 
-    /* Check that the server and camera are available. */
-    auto serverConnection = getServerConnection();
+    // Check that the server and camera are available.
+    const auto serverConnection = getServerConnection();
     if (!serverConnection)
         return;
 
@@ -204,7 +217,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
     {
         // Expecting a single value.
         nx::core::ptz::Vector speed;
-        qreal val = value.toFloat(&ok);
+        qreal val = value.toDouble(&ok);
         if (ok)
         {
             speed.zoom = val * 0.01;
@@ -223,12 +236,12 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
 
         nx::core::ptz::Vector speed;
 
-        speed.pan = values[0].toFloat(&ok);
-        speed.tilt = values[1].toFloat(&ok);
+        speed.pan = values[0].toDouble(&ok);
+        speed.tilt = values[1].toDouble(&ok);
 
         // Control provides the angle in range [-180; 180],
         // but we should send values in range [-1.0, 1.0].
-        speed.rotation = qBound<qreal>(values[2].toFloat(&ok) / 180.0, -1.0, 1.0);
+        speed.rotation = qBound(values[2].toDouble(&ok) / 180.0, -1.0, 1.0);
 
         qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
 
@@ -244,7 +257,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
     else if (parameter.writeCmd == lit("custom_focus"))
     {
         // Expecting a single value.
-        qreal speed = value.toFloat(&ok);
+        qreal speed = value.toDouble(&ok);
         if (ok)
         {
             speed *= 0.01;
@@ -259,22 +272,23 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
     //    setState(State::Applying);
 }
 
-void CameraAdvancedParamsWidget::at_ptzCommandProcessed(int status, const QVariant& reply, int handle)
+void CameraAdvancedParamsWidget::at_ptzCommandProcessed(
+    int /*status*/, const QVariant& /*reply*/, int /*handle*/)
 {
     // Just an empty handler for REST response.
 }
 
-
-void CameraAdvancedParamsWidget::saveValues() {
-    /* Check that we are in the correct state. */
-    if (state() != State::Init || !m_cameraAvailable)
+void CameraAdvancedParamsWidget::saveValues()
+{
+    // Check that we are in the correct state.
+    if (state() != State::Init)
         return;
 
-    /* Check that the server and camera are available. */
-    auto serverConnection = getServerConnection();
-    if (!serverConnection) {
-        /* Notify user about error. */
-        // TODO: #GDM
+    // Check that the server and camera are available.
+    const auto serverConnection = getServerConnection();
+    if (!serverConnection)
+    {
+        // TODO: #GDM Notify user about error.
         return;
     }
 
@@ -282,28 +296,46 @@ void CameraAdvancedParamsWidget::saveValues() {
     if (modifiedValues.isEmpty())
         return;
 
-    QSet<QString> groups;
     const auto parameters = m_advancedParamsReader->params(m_camera);
-    for (auto itr = modifiedValues.cbegin(); itr != modifiedValues.cend(); ++itr)
+
+    if (!m_cameraAvailable)
     {
-        const auto parameter = parameters.getParameterById(itr.key());
+        // Remove parameters not available in offline.
+
+        for (auto it = modifiedValues.begin(); it != modifiedValues.end(); /*no increment*/)
+        {
+            const auto parameter = parameters.getParameterById(it.key());
+            if (!parameter.availableInOffline)
+                it = modifiedValues.erase(it);
+            else
+                ++it;
+        }
+    }
+
+    if (modifiedValues.isEmpty())
+        return;
+
+    QSet<QString> groups;
+    for (auto it = modifiedValues.cbegin(); it != modifiedValues.cend(); ++it)
+    {
+        const auto parameter = parameters.getParameterById(it.key());
         if (!parameter.group.isEmpty())
             groups.insert(parameter.group);
     }
 
     const auto additionalValues = groupParameters(groups);
-    for (auto itr = additionalValues.cbegin(); itr != additionalValues.cend(); ++itr)
+    for (auto it = additionalValues.cbegin(); it != additionalValues.cend(); ++it)
     {
-        if (!modifiedValues.contains(itr.key()))
-            modifiedValues[itr.key()] = itr.value();
+        if (!modifiedValues.contains(it.key()))
+            modifiedValues[it.key()] = it.value();
     }
 
-    /* Update state. */
+    // Update state.
     m_paramRequestHandle = serverConnection->setParamsAsync(
         m_camera,
         modifiedValues.toValueList(),
         this,
-        SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+        SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList&, int)));
 
     setState(State::Applying);
 }
@@ -313,20 +345,33 @@ bool CameraAdvancedParamsWidget::hasChanges() const
     return m_currentValues.differsFrom(m_loadedValues);
 }
 
+bool CameraAdvancedParamsWidget::hasItemsAvailableInOffline() const
+{
+    return m_advancedParamWidgetsManager->hasItemsAvailableInOffline();
+}
+
 void CameraAdvancedParamsWidget::updateCameraAvailability() {
-    bool cameraAvailable = isCameraAvailable();
+    const bool cameraAvailable = isCameraAvailable();
     if (m_cameraAvailable == cameraAvailable)
         return;
+
     m_cameraAvailable = cameraAvailable;
 
     this->setEnabled(!m_camera.isNull());
     updateButtonsState();
+    updateParameretsVisibility();
 }
 
 void CameraAdvancedParamsWidget::updateButtonsState() {
     ui->loadButton->setEnabled(m_cameraAvailable && m_state == State::Init);
 }
 
+void CameraAdvancedParamsWidget::updateParameretsVisibility()
+{
+    m_advancedParamWidgetsManager->updateParametersVisibility(m_cameraAvailable
+        ? CameraAdvancedParamWidgetsManager::ParameterVisibility::showAll
+        : CameraAdvancedParamWidgetsManager::ParameterVisibility::showOfflineOnly);
+}
 
 bool CameraAdvancedParamsWidget::isCameraAvailable() const {
     if (!m_camera)
@@ -336,17 +381,16 @@ bool CameraAdvancedParamsWidget::isCameraAvailable() const {
     return m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording;
 }
 
+QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() const
+{
+    if (!m_camera)
+        return {};
 
-QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() const {
-    if (!m_cameraAvailable)
-        return QnMediaServerConnectionPtr();
+    if (const auto& server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>())
+        return server->apiConnection();
 
-    if (QnMediaServerResourcePtr mediaServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>())
-        return mediaServer->apiConnection();
-
-    return QnMediaServerConnectionPtr();
+    return {};
 }
-
 
 QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
     const QSet<QString>& groups) const
@@ -369,16 +413,15 @@ QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
     return result;
 }
 
-
 void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, const QString& value)
 {
-    /* Check that we are in correct state. */
+    // Check that we are in correct state.
     if (state() != State::Init)
         return;
 
-    /* Check parameter validity. */
-    auto params = m_advancedParamsReader->params(m_camera);
-    QnCameraAdvancedParameter parameter = params.getParameterById(id);
+    // Check parameter validity.
+    const QnCameraAdvancedParams params = m_advancedParamsReader->params(m_camera);
+    const QnCameraAdvancedParameter parameter = params.getParameterById(id);
     if (!parameter.isValid())
         return;
 
@@ -390,13 +433,12 @@ void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, cons
     else if (parameterIsInstant(parameter))
     {
         // Apply instant parameters immediately.
-        saveSingleValue(QnCameraAdvancedParamValue(id, value));
+        saveSingleValue(parameter, value);
     }
     else
     {
-        /* Queue modified parameter. */
+        // Queue modified parameter.
         m_currentValues[id] = value;
-
         emit hasChangesChanged();
     }
 }
@@ -468,7 +510,7 @@ void CameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCame
     setState(State::Init);
     emit hasChangesChanged();
 
-    // Reload all values if one of parameters requires resync.
+    // Reload all values if one of the parameters requires resync.
     if (needResync && !parameters.packet_mode)
         loadValues();
 }

@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace test {
 
 TEST(MediaServerProcess, ApiRestrictions)
@@ -32,10 +32,6 @@ TEST(MediaServerProcess, ApiRestrictions)
 
         {"/static/index.html", AuthMethod::noAuth},
         {"/static/script.js", AuthMethod::noAuth},
-
-        {"/api/installUpdateUnauthenticated", AuthMethod::noAuth},
-        {"/web/api/installUpdateUnauthenticated", AuthMethod::noAuth},
-        {"/web/proxy/127.0.0.1:7001/api/installUpdateUnauthenticated", AuthMethod::noAuth},
     };
 
     AuthMethodRestrictionList restrictions;
@@ -51,5 +47,5 @@ TEST(MediaServerProcess, ApiRestrictions)
 }
 
 } // namespace test
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

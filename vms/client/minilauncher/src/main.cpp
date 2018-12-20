@@ -1,32 +1,43 @@
 #include <string>
 #include <vector>
 #include <locale>
-#include <codecvt>
 #include <iostream>
 
-#include <tchar.h>
 #include <Windows.h>
 #include "Shlwapi.h"
 #include "shlobj.h"
 
 #include "version.h"
 
-typedef signed __int64 int64_t;
+namespace {
 
-std::wstring utf8toUtf16(const std::string& str)
-{
-    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > converter;
-    return converter.from_bytes(str);
-}
+static constexpr auto kQuote = L'\"';
+static constexpr auto kSpace = L' ';
+static constexpr auto kSlash = L'/';
+static constexpr auto kBackSlash = L'\\';
 
+// Appends unix-style slashe to the end of the directory name if needed.
 std::wstring closeDirPath(const std::wstring& name)
 {
     if (name.empty())
         return name;
-    else if (name[name.length() - 1] == L'/' || name[name.length() - 1] == L'\\')
+
+    if (name[name.length() - 1] == kSlash || name[name.length() - 1] == kBackSlash)
         return name;
-    else
-        return name + L'/';
+
+    return name + kSlash;
+}
+
+// Replaces windows-style backslashes to unix-style slashes.
+std::wstring toStandardPath(const std::wstring& path)
+{
+    std::wstring result = path;
+    for (auto& symbol: result)
+    {
+        if (symbol == kBackSlash)
+            symbol = kSlash;
+    }
+    return result;
 }
 
 std::wstring getSharedApplauncherDir()
@@ -38,18 +49,17 @@ std::wstring getSharedApplauncherDir()
         PathAppend(result, L"\\" QN_ORGANIZATION_NAME  L"\\applauncher\\"  QN_CUSTOMIZATION_NAME);
     }
     return std::wstring(closeDirPath(result));
-
 }
 
 std::wstring getInstalledApplauncherDir()
 {
     wchar_t ownPath[MAX_PATH];
 
-    // Will contain exe path
-    HMODULE hModule = GetModuleHandle(NULL);
-    if (hModule != NULL)
+    // Will contain exe path.
+    const HMODULE hModule = GetModuleHandle(nullptr);
+    if (hModule != nullptr)
     {
-        // When passing NULL to GetModuleHandle, it returns handle of exe itself
+        // When passing NULL to GetModuleHandle, it returns handle of exe itself.
         GetModuleFileNameW(hModule, ownPath, MAX_PATH);
         PathRemoveFileSpecW(ownPath);
     }
@@ -59,23 +69,13 @@ std::wstring getInstalledApplauncherDir()
 
 std::wstring getFullFileName(const std::wstring& folder, const std::wstring& fileName)
 {
-    if (folder.empty())
-        return fileName;
-
-    std::wstring value = folder;
-    for (int i = 0; i < value.length(); ++i)
-    {
-        if (value[i] == L'\\')
-            value[i] = L'/';
-    }
-    if (value[value.length() - 1] != L'/')
-        value += L'/';
-    value += fileName;
-
-    return value;
+    return closeDirPath(toStandardPath(folder)) + fileName;
 }
 
-BOOL startProcessAsync(wchar_t* commandline, const std::wstring& dstDir)
+bool startProcessAsync(
+    const std::wstring& applicationPath,
+    std::wstring commandLine,
+    const std::wstring& currentDirectory)
 {
     STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION lpProcessInfo;
@@ -83,37 +83,36 @@ BOOL startProcessAsync(wchar_t* commandline, const std::wstring& dstDir)
     memset(&lpProcessInfo, 0, sizeof(lpProcessInfo));
 
     return CreateProcess(
-        0,                  /*<  _In_opt_   LPCTSTR               lpApplicationName */
-        commandline,        /*< _Inout_opt_ LPTSTR                lpCommandLine */
-        NULL,               /*< _In_opt_    LPSECURITY_ATTRIBUTES lpProcessAttributes */
-        NULL,               /*< _In_opt_    LPSECURITY_ATTRIBUTES lpThreadAttributes */
-        NULL,               /*< _In_        BOOL                  bInheritHandles */
-        NULL,               /*< _In_        DWORD                 dwCreationFlags */
-        NULL,               /*< _In_opt_    LPVOID                lpEnvironment */
-        dstDir.c_str(),     /*< _In_opt_    LPCTSTR               lpCurrentDirectory */
-        &lpStartupInfo,     /*< _In_        LPSTARTUPINFO         lpStartupInfo */
-        &lpProcessInfo      /*< _Out_       LPPROCESS_INFORMATION lpProcessInformation */
+        applicationPath.c_str(),
+        &commandLine[0],
+        /*lpProcessAttributes*/ nullptr,
+        /*lpThreadAttributes*/ nullptr,
+        /*bInheritHandles*/ false,
+        /*dwCreationFlags*/ 0,
+        /*lpEnvironment*/ nullptr,
+        currentDirectory.c_str(),
+        &lpStartupInfo,
+        &lpProcessInfo
     );
 }
 
-bool launchInDir(const std::wstring& dir, int argc, _TCHAR* argv[])
+bool launchInDir(const std::wstring& currentDirectory, int argc, LPWSTR* argv)
 {
-    std::wcout << L"Launching in path " << dir;
+    std::wcout << L"Launching in path " << currentDirectory << std::endl;
+    const auto applicationPath = getFullFileName(currentDirectory, QN_APPLAUNCHER_BINARY_NAME);
+    auto commandLine = kQuote + applicationPath + kQuote;
+
+    for (int i = 1; i < argc; ++i)
+    {
+        std::wstring argument(argv[i]);
+        commandLine += kSpace + argument;
+    }
+
+    std::wcout << L"Command line: " << commandLine.c_str() << std::endl;
+
     try
     {
-        wchar_t buffer[MAX_PATH * 2 + 3];
-        int offset = wsprintf(buffer, L"\"%s\"", getFullFileName(dir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dir.c_str());
-
-        for (int i = 1; i < argc; ++i)
-        {
-            std::wstring argument(utf8toUtf16(argv[i]));
-            offset += wsprintf(buffer + offset, L" %s", argument.c_str());
-        }
-
-        wsprintf(buffer + offset, L" \"%s\"", dir.c_str());
-        if (startProcessAsync(buffer, dir))
-            return true;
-        return false;
+        return startProcessAsync(applicationPath, commandLine, currentDirectory);
     }
     catch (...)
     {
@@ -121,7 +120,7 @@ bool launchInDir(const std::wstring& dir, int argc, _TCHAR* argv[])
     }
 }
 
-int launchFile(int argc, _TCHAR* argv[])
+int launchFile(int argc, LPWSTR* argv)
 {
     if (launchInDir(getSharedApplauncherDir(), argc, argv))
         return 0;
@@ -132,10 +131,17 @@ int launchFile(int argc, _TCHAR* argv[])
     return 1;
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+} // namespace
+
+int main()
 {
     try
     {
+        int argc{};
+        LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+        setlocale(LC_CTYPE, ""); //< For correct std::wcout work.
+
         /* All additional arguments are passed to applauncher. */
         return launchFile(argc, argv);
     }
@@ -144,4 +150,3 @@ int _tmain(int argc, _TCHAR* argv[])
         return 2;
     }
 }
-

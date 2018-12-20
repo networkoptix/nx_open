@@ -53,20 +53,13 @@ class Account(PermissionsMixin):
 
     @property
     def permissions(self):
-        permissions = []
-        perm_groups = UserGroupsToCustomizationPermissions.objects.filter(customization__name=CUSTOMIZATION,
-                                                                          group__in=self.groups.all())
-        for perm_group in perm_groups:
-            permissions.extend([permission.codename for permission in perm_group.group.permissions.all()])
-        return permissions
+        if not UserGroupsToCustomizationPermissions.check_permission(self, CUSTOMIZATION):
+            return []
 
-    @property
-    def permissions(self):
-        user_groups = self.groups.all()
         permissions = []
-        for group in user_groups:
+        for group in self.groups.all():
             permissions.extend([permission.codename for permission in group.permissions.all()])
-        return permissions
+        return list(set(permissions))
 
     def short_email(self):
         return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)

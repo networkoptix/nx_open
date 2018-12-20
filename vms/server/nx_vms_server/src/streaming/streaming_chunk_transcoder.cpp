@@ -41,7 +41,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder(
     QnMediaServerModule* serverModule,
     Flags flags)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_flags(flags),
     m_dataSourceCache(nx::utils::TimerManager::instance())
 {

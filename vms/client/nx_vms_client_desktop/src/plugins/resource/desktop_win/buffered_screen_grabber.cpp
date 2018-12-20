@@ -44,8 +44,8 @@ QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
                                                  const QSize& captureResolution,
                                                  QWidget* widget):
     m_grabber(displayNumber, queueSize, mode, captureCursor, captureResolution, widget),
-    m_queue(queueSize),
     m_frameRate(frameRate),
+    m_queue(queueSize),
     m_frameIndex(0),
     m_currentFrameNum(0)
 {

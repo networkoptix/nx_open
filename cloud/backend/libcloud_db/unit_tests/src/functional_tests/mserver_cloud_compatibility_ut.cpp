@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/data_sync_engine/compatible_ec2_protocol_version.h>
+#include <nx/clusterdb/engine/compatible_ec2_protocol_version.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/db/controller.h>
@@ -115,7 +115,7 @@ TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rej
 
 TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 {
-    const nx::data_sync_engine::ProtocolVersionRange cdbProtocolVersionRange(
+    const nx::clusterdb::engine::ProtocolVersionRange cdbProtocolVersionRange(
         nx::cloud::db::kMinSupportedProtocolVersion,
         nx::cloud::db::kMaxSupportedProtocolVersion);
 
@@ -130,7 +130,7 @@ TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 
 TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
 {
-    const nx::data_sync_engine::ProtocolVersionRange cdbProtocolVersionRange(
+    const nx::clusterdb::engine::ProtocolVersionRange cdbProtocolVersionRange(
         nx::cloud::db::kMinSupportedProtocolVersion,
         nx::cloud::db::kMaxSupportedProtocolVersion);
 

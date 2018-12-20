@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             您的帳號已成功啟動
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">登入</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             帳號已經啟動或確認碼不正確
         </h1>
     </div>
@@ -24,8 +24,8 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>您已在%PRODUCT_NAME% 中註冊</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <p>我們已將啟動連結發信至{{data.email}}。<br>
+            請點擊此連結以啟動您的帳號。</p>
         </div>
         <h1 ng-if="!data.email">啟動您的帳號</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -43,9 +43,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">電子郵件是必填欄位</span>
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">請輸入一個有效的電子郵件</span>
                 </div>
             </div>
             <div class="form-group">
@@ -80,9 +80,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">電子郵件是必填欄位</span>
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">請輸入一個有效的電子郵件</span>
                 </div>
             </div>
             <div class="form-group">

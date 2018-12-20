@@ -2,11 +2,11 @@
 
 #include <QtCore/QObject>
 
-#include <nx/mediaserver/server_module_aware.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 #include "nx/streaming/abstract_media_stream_data_provider.h"
 
-namespace nx::mediaserver::camera {
+namespace nx::vms::server::camera {
 
 class ErrorProcessor: public QObject
 {
@@ -23,4 +23,4 @@ private:
     void processStreamError(QnAbstractMediaStreamDataProvider* streamReader, CameraDiagnostics::Result error);
 };
 
-} // namespace nx::mediaserver::camera
+} // namespace nx::vms::server::camera

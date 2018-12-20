@@ -7,7 +7,7 @@
 #include <nx/network/http/http_types.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaAttributes
@@ -107,5 +107,5 @@ boost::optional<double> HanwhaAttributes::attribute<double>(
     int channel) const;
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

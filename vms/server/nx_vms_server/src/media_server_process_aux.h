@@ -8,7 +8,7 @@ class QnMediaServerModule;
 
 namespace nx {
 
-namespace mediaserver { class Settings; }
+namespace vms::server { class Settings; }
 
 namespace mserver_aux {
 
@@ -33,11 +33,11 @@ private:
 QnStorageResourceList getUnmountedStorages(
     QnPlatformAbstraction* platform,
     const QnStorageResourceList& allServerStorages,
-    const nx::mediaserver::Settings* settings);
+    const nx::vms::server::Settings* settings);
 bool isStorageUnmounted(
     QnPlatformAbstraction* platform,
     const QnStorageResourcePtr& storage,
-    const nx::mediaserver::Settings* settings);
+    const nx::vms::server::Settings* settings);
 
 class SystemNameProxy
 {

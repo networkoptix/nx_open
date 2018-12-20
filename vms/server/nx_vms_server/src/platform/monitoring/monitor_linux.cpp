@@ -25,9 +25,9 @@
 #include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_fs.h>
+#include <nx/vms/server/root_fs.h>
 #include <nx/utils/mac_address.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -38,11 +38,11 @@ static const size_t MAX_LINE_LENGTH = 512;
 
 class ServerSystemInfoProvider:
     public AbstractSystemInfoProvider,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
   public:
     ServerSystemInfoProvider(QnMediaServerModule* serverModule):
-        nx::mediaserver::ServerModuleAware(serverModule)
+        nx::vms::server::ServerModuleAware(serverModule)
     {
     }
 

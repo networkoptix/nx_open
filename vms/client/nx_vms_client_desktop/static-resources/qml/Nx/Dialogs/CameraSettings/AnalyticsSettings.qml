@@ -26,7 +26,26 @@ Item
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
-            settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
+
+            if (store.currentAnalyticsEngineId() === currentEngineId)
+            {
+                settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
+            }
+            else
+            {
+                currentEngineId = store.currentAnalyticsEngineId()
+
+                for (var i = 0; i < analyticsEngines.length; ++i)
+                {
+                    const engineInfo = analyticsEngines[i]
+                    if (engineInfo.id === currentEngineId)
+                    {
+                        settingsView.loadModel(
+                            engineInfo.settingsModel,
+                            store.deviceAgentSettingsValues(currentEngineId))
+                    }
+                }
+            }
         }
     }
 
@@ -45,13 +64,7 @@ Item
             {
                 text: modelData.name
                 active: enabledAnalyticsEngines.indexOf(modelData.id) !== -1
-                onClicked:
-                {
-                    currentEngineId = modelData.id
-                    settingsView.loadModel(
-                        modelData.settingsModel,
-                        store.deviceAgentSettingsValues(currentEngineId))
-                }
+                onClicked: store.setCurrentAnalyticsEngineId(modelData.id)
             }
         }
     }
@@ -104,8 +117,7 @@ Item
             width: parent.width
             Layout.fillHeight: true
 
-            onValuesEdited:
-                store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+            onValuesEdited: store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
             enabled: enableSwitch.checked
         }

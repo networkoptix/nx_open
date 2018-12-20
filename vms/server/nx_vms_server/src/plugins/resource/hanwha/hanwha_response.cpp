@@ -2,7 +2,7 @@
 #include "hanwha_utils.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -239,5 +239,5 @@ boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& param
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

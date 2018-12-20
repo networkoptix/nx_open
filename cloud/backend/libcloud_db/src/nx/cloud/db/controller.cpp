@@ -18,14 +18,19 @@ const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-Controller::Controller(const conf::Settings& settings):
+Controller::Controller(
+    const conf::Settings& settings,
+    Model* model)
+    :
     m_settings(settings),
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
     m_tempPasswordManager(
+        settings.accountManager(),
         m_streeManager.resourceNameSet(),
-        &m_dbInstanceController.queryExecutor()),
+        &m_dbInstanceController.queryExecutor(),
+        model->temporaryCredentialsDao.get()),
     m_accountManager(
         settings,
         m_streeManager,
@@ -37,7 +42,7 @@ Controller::Controller(const conf::Settings& settings):
         std::string(), //< No application id.
         kCdbGuid,
         settings.p2pDb(),
-        nx::data_sync_engine::ProtocolVersionRange(
+        nx::clusterdb::engine::ProtocolVersionRange(
             kMinSupportedProtocolVersion,
             kMaxSupportedProtocolVersion),
         &m_dbInstanceController.queryExecutor()),
@@ -90,7 +95,7 @@ Controller::Controller(const conf::Settings& settings):
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler
+    m_ec2SyncronizationEngine.incomingCommandDispatcher().removeHandler
         <ec2::command::SaveSystemMergeHistoryRecord>();
 
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
@@ -117,7 +122,7 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-data_sync_engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+clusterdb::engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
 {
     return m_ec2SyncronizationEngine;
 }
@@ -236,7 +241,7 @@ void Controller::initializeDataSynchronizationEngine()
 {
     using namespace std::placeholders;
 
-    nx::data_sync_engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
+    nx::clusterdb::engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
     outgoingCommandFilter.sendOnlyOwnCommands = true;
 
     m_ec2SyncronizationEngine.setOutgoingCommandFilter(outgoingCommandFilter);
@@ -244,12 +249,12 @@ void Controller::initializeDataSynchronizationEngine()
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
+    m_ec2SyncronizationEngine.incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
                 const std::string& /*systemId*/,
-                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
+                clusterdb::engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
@@ -264,7 +269,7 @@ void Controller::initializeDataSynchronizationEngine()
 nx::sql::DBResult Controller::copyExternalTransaction(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const nx::data_sync_engine::EditableSerializableTransaction& transaction)
+    const nx::clusterdb::engine::EditableSerializableCommand& transaction)
 {
     if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
         return nx::sql::DBResult::ok;

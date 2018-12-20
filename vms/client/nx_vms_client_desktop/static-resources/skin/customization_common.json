@@ -417,6 +417,9 @@
             "pastMotion": "red_d1",
             "futureMotion": "red_d1",
 
+            "pastAnalytics": "yellow_core",
+            "futureAnalytics": "yellow_core",
+
             "noThumbnailsLabel": "dark16",
 
             "separator": "dark6",

@@ -1,4 +1,5 @@
 #include "workbench_debug_handler.h"
+#include "workbench_debug_handler.h"
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -49,8 +50,8 @@
 #include <nx/utils/random.h>
 #include <nx/vms/client/desktop/debug_utils/dialogs/credentials_store_dialog.h>
 
-//#ifdef _DEBUG
-#define DEBUG_ACTIONS
+//#if defined(_DEBUG)
+    #define DEBUG_ACTIONS
 //#endif
 
 using namespace nx::vms::client::desktop;
@@ -58,10 +59,10 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-
 class QnWebViewDialog: public QDialog
 {
     using base_type = QDialog;
+
 public:
     QnWebViewDialog(QWidget* parent = nullptr):
         base_type(parent, Qt::Window),
@@ -94,6 +95,7 @@ public:
         }
 
     QString url() const { return m_urlLineEdit->text(); }
+
     void setUrl(const QString& value)
     {
         m_urlLineEdit->setText(value);
@@ -106,57 +108,63 @@ private:
     QLineEdit* m_urlLineEdit;
 };
 
-// -------------------------------------------------------------------------- //
+//-------------------------------------------------------------------------------------------------
 // QnDebugControlDialog
-// -------------------------------------------------------------------------- //
-class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
+
+class QnDebugControlDialog:
+    public QnDialog,
+    public QnWorkbenchContextAware
 {
     typedef QnDialog base_type;
 
 public:
-    QnDebugControlDialog(QWidget *parent):
+    QnDebugControlDialog(QWidget* parent):
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
         using namespace nx::vms::client::desktop::ui;
 
-        QVBoxLayout *layout = new QVBoxLayout(this);
+        QVBoxLayout* layout = new QVBoxLayout(this);
         layout->addWidget(newActionButton(action::DebugDecrementCounterAction));
         layout->addWidget(newActionButton(action::DebugIncrementCounterAction));
 
-        auto addButton = [this, parent, layout]
-            (const QString& name, std::function<void(void)> handler)
+        auto addButton =
+            [this, parent, layout](const QString& name, std::function<void(void)> handler)
             {
                 auto button = new QPushButton(name, parent);
                 connect(button, &QPushButton::clicked, handler);
                 layout->addWidget(button);
             };
 
-        addButton(lit("Applaucher control"), [this] { (new QnApplauncherControlDialog(this))->show();});
+        addButton("Applaucher control",
+            [this]() { (new QnApplauncherControlDialog(this))->show(); });
 
-        addButton(lit("Animations control"), [this] { (new AnimationsControlDialog(this))->show(); });
+        addButton("Animations control",
+            [this]() { (new AnimationsControlDialog(this))->show(); });
 
-        addButton("Credentials", [this]{ (new CredentialsStoreDialog(this))->show(); });
+        addButton("Credentials",
+            [this]() { (new CredentialsStoreDialog(this))->show(); });
 
-        addButton(lit("Custom Settings Test"), [this]
-            { (new CustomSettingsTestDialog(this))->show(); });
+        addButton("Custom Settings Test",
+            [this]() { (new CustomSettingsTestDialog(this))->show(); });
 
-        addButton(lit("Interactive Settings Test"),
-            [this]
+        addButton("Interactive Settings Test",
+            [this]()
             {
                 const auto dialog = new InteractiveSettingsTestDialog(this);
                 dialog->show();
             });
 
-        addButton(lit("Web View"), [this]
+        addButton("Web View",
+            [this]()
             {
                 auto dialog(new QnWebViewDialog(this));
-                //dialog->setUrl(lit("http://localhost:7001"));
+                //dialog->setUrl("http://localhost:7001");
                 dialog->show();
             });
 
-        addButton(lit("Toggle default password"),
-            [this]
+        addButton("Toggle default password",
+            [this]()
             {
                 const auto cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
                 if (cameras.empty())
@@ -173,12 +181,13 @@ public:
                         camera->setCameraCapabilities(camera->getCameraCapabilities() & ~caps);
                     else
                         camera->setCameraCapabilities(camera->getCameraCapabilities() | caps);
-                    camera->saveParamsAsync();
+                    camera->savePropertiesAsync();
                 }
 
             });
 
-        addButton(lit("Palette"), [this]
+        addButton("Palette",
+            [this]()
             {
                 auto w = new PaletteWidget(this);
                 w->setPalette(qApp->palette());
@@ -189,17 +198,18 @@ public:
                 messageBox->show();
             });
 
-        addButton(lit("RandomizePtz"), [this]
+        addButton("RandomizePtz",
+            [this]()
             {
                 QList<Ptz::Capabilities> presets;
                 presets.push_back(Ptz::NoPtzCapabilities);
                 presets.push_back(Ptz::ContinuousZoomCapability);
                 presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
                 presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
-                    | Ptz::AuxilaryPtzCapability);
+                    | Ptz::AuxiliaryPtzCapability);
                 presets.push_back(Ptz::ContinuousPanTiltCapabilities);
                 presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
-                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
+                    | Ptz::AuxiliaryPtzCapability | Ptz::PresetsPtzCapability);
 
                 for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
                 {
@@ -211,10 +221,10 @@ public:
 
                     camera->setPtzCapabilities(presets[idx]);
                 }
-
             });
 
-        addButton(lit("Resource Pool"), [this]
+        addButton("Resource Pool",
+            [this]()
             {
                 auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
@@ -226,76 +236,74 @@ public:
                 messageBox->show();
             });
 
-        addButton(lit("Tiles tests"),
+        addButton("Tiles tests",
             [this]()
             {
                 runTilesTest();
                 close();
             });
 
-        /**
-         * ATTENTION: I made analytics related code below able to compile, but it doesn't work
-         * properly. If you still need it after the change of analytics data
-         * storage layout in the database - please fix it yourself.
-         */
+        // ATTENTION: Analytics-related code below is able to compile, but doesn't work properly.
+        // If it is still needed after the change of analytics data storage layout in the database,
+        // it should be reworked.
         addButton("Generate Analytics Plugins and Engines",
             [this]()
             {
                 const QJsonObject kEngineSettingsModel = QJsonDocument::fromJson(R"json(
-                {
-                    "items":
-                    [
-                        {
-                            "type": "GroupBox",
-                            "caption": "General",
-                            "items": [
-                                {
-                                    "type": "TextField",
-                                    "name": "description",
-                                    "caption": "Description"
-                                },
-                                {
-                                    "type": "ComboBox",
-                                    "name": "networkType",
-                                    "caption": "Neural Network Type",
-                                    "defaultValue": "Type 1",
-                                    "range": ["Type 1", "Type 2", "Type 3"]
-                                }
-                            ]
-                        }
-                    ]
-                })json").object();
+                    {
+                        "items": [
+                            {
+                                "type": "GroupBox",
+                                "caption": "General",
+                                "items": [
+                                    {
+                                        "type": "TextField",
+                                        "name": "description",
+                                        "caption": "Description"
+                                    },
+                                    {
+                                        "type": "ComboBox",
+                                        "name": "networkType",
+                                        "caption": "Neural Network Type",
+                                        "defaultValue": "Type 1",
+                                        "range": ["Type 1", "Type 2", "Type 3"]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                )json").object();
 
                 const QJsonObject kDeviceAgentSettingsModel = QJsonDocument::fromJson(R"json(
-                {
-                    "items":
-                    [
-                        {
-                            "type": "GroupBox",
-                            "caption": "Detection",
-                            "items": [
-                                {
-                                    "type": "CheckBox",
-                                    "name": "detectFaces",
-                                    "caption": "Detect Faces",
-                                    "defaultValue": true
-                                },
-                                {
-                                    "type": "CheckBox",
-                                    "name": "detectPeople",
-                                    "caption": "Detect People",
-                                    "defaultValue": true
-                                },
-                                {
-                                    "type": "CheckBox",
-                                    "name": "detectCars",
-                                    "caption": "Detect Cars",
-                                    "defaultValue": true
-                                }
-                            ]
-                        }
-                    ]
-                })json").object();
+                    {
+                        "items": [
+                            {
+                                "type": "GroupBox",
+                                "caption": "Detection",
+                                "items": [
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "detectFaces",
+                                        "caption": "Detect Faces",
+                                        "defaultValue": true
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "detectPeople",
+                                        "caption": "Detect People",
+                                        "defaultValue": true
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "detectCars",
+                                        "caption": "Detect Cars",
+                                        "defaultValue": true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                )json").object();
 
                 using namespace nx::vms::common;
                 using namespace nx::vms::api::analytics;
@@ -345,7 +353,7 @@ public:
                 addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"), "Engine 3", plugin2);
             });
 
-        addButton(lit("Generate analytics manifests"),
+        addButton("Generate analytics manifests",
             [this]()
             {
                 auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
@@ -361,8 +369,7 @@ public:
                     {
                         nx::vms::api::analytics::EventType eventType;
                         eventType.id = "";
-                        eventType.name.value = lit("Event %1").arg(j);
-                        eventType.name.localization[lit("ru_RU")] = lit("Russian %1").arg(j);
+                        eventType.name = lm("Event %1").arg(j);
                         manifest.eventTypes.push_back(eventType);
                     }
 
@@ -370,7 +377,7 @@ public:
                     auto manifests = server->analyticsDrivers();
                     manifests.push_back(manifest);
                     server->setAnalyticsDrivers(manifests);
-                    server->saveParamsAsync();
+                    server->savePropertiesAsync();
 
                     serverIndex = (serverIndex + 1) % servers.size();
                 }
@@ -379,6 +386,7 @@ public:
                 {
                     // TODO: #sivanov: Get rid of the term "driver".
                     auto drivers = server->analyticsDrivers();
+
                     // Some devices will not have an Engine.
                     drivers.push_back(nx::vms::api::analytics::EngineManifest());
 
@@ -391,70 +399,68 @@ public:
 
                         camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
 
-                        camera->saveParamsAsync();
+                        camera->savePropertiesAsync();
                     }
                 }
             });
 
-        addButton(lit("Clear analytics manifests"),
+        addButton("Clear analytics manifests",
             [this]()
             {
                 for (auto camera: resourcePool()->getAllCameras({}))
                 {
                     camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
-                    camera->saveParamsAsync();
+                    camera->savePropertiesAsync();
                 }
 
                 for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
                 {
                     server->setAnalyticsDrivers({});
-                    server->saveParamsAsync();
+                    server->savePropertiesAsync();
                 }
             });
-
-
     }
 
 private:
-    QToolButton *newActionButton(action::IDType actionId, QWidget *parent = NULL)
+    QToolButton* newActionButton(action::IDType actionId, QWidget* parent = nullptr)
     {
-        QToolButton *button = new QToolButton(parent);
+        QToolButton* button = new QToolButton(parent);
         button->setDefaultAction(action(actionId));
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);
         return button;
     }
 
-    static QnSystemTilesTestCase *m_tilesTests;
+    static QnSystemTilesTestCase* s_tilesTests;
 
     void runTilesTest()
     {
         if (!qnRuntime->isDesktopMode())
             return;
 
-        if (!m_tilesTests)
+        if (!s_tilesTests)
         {
             static constexpr auto kSomeFarPriority = 1000;
             const auto testSystemsFinder = new QnTestSystemsFinder(qnSystemsFinder);
             qnSystemsFinder->addSystemsFinder(testSystemsFinder, kSomeFarPriority);
 
-            m_tilesTests = new QnSystemTilesTestCase(testSystemsFinder, this);
+            s_tilesTests = new QnSystemTilesTestCase(testSystemsFinder, this);
 
             const auto welcomeScreen = mainWindow()->welcomeScreen();
 
-            connect(m_tilesTests, &QnSystemTilesTestCase::openTile,
+            connect(s_tilesTests, &QnSystemTilesTestCase::openTile,
                 welcomeScreen, &QnWorkbenchWelcomeScreen::openTile);
-            connect(m_tilesTests, &QnSystemTilesTestCase::switchPage,
+            connect(s_tilesTests, &QnSystemTilesTestCase::switchPage,
                 welcomeScreen, &QnWorkbenchWelcomeScreen::switchPage);
-            connect(m_tilesTests, &QnSystemTilesTestCase::collapseExpandedTile, this,
-                [welcomeScreen]() { emit welcomeScreen->openTile(QString());});
-            connect(m_tilesTests, &QnSystemTilesTestCase::restoreApp, this,
+            connect(s_tilesTests, &QnSystemTilesTestCase::collapseExpandedTile, this,
+                [welcomeScreen]() { emit welcomeScreen->openTile(QString()); });
+            connect(s_tilesTests, &QnSystemTilesTestCase::restoreApp, this,
                 [this]()
                 {
                     const auto maximizeAction = action(action::FullscreenAction);
                     if (maximizeAction->isChecked())
                         maximizeAction->toggle();
                 });
-            connect(m_tilesTests, &QnSystemTilesTestCase::makeFullscreen, this,
+            connect(s_tilesTests, &QnSystemTilesTestCase::makeFullscreen, this,
                 [this]()
                 {
                     const auto maximizeAction = action(action::FullscreenAction);
@@ -462,38 +468,38 @@ private:
                         maximizeAction->toggle();
                 });
 
-            connect(m_tilesTests, &QnSystemTilesTestCase::messageChanged,
+            connect(s_tilesTests, &QnSystemTilesTestCase::messageChanged,
                 welcomeScreen, &QnWorkbenchWelcomeScreen::setMessage);
         }
 
-        m_tilesTests->runTestSequence(QnTileTest::First);
+        s_tilesTests->runTestSequence(QnTileTest::First);
     }
 };
 
-QnSystemTilesTestCase *QnDebugControlDialog::m_tilesTests = nullptr;
-
+QnSystemTilesTestCase *QnDebugControlDialog::s_tilesTests = nullptr;
 
 } // namespace
 
-// -------------------------------------------------------------------------- //
+//------------------------------------------------------------------------------------------------
 // QnWorkbenchDebugHandler
-// -------------------------------------------------------------------------- //
+
 QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-#ifdef DEBUG_ACTIONS
-    // TODO: #GDM #High remove before release
-    qDebug() << "------------- Debug actions ARE ACTIVE -------------";
-    connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
-        &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
-    connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
-        &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
-    connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
-        &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
-#endif
+    #if defined(DEBUG_ACTIONS)
+        // TODO: #sivanov #High Remove before release.
+        qDebug() << "------------- Debug actions ARE ACTIVE -------------";
+        connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
+            &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
+        connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
+            &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
+        connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
+            &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
+    #endif
 
-    auto supressLog = [](const nx::utils::log::Tag& tag)
+    auto supressLog =
+        [](const nx::utils::log::Tag& tag)
         {
             nx::utils::log::addLogger(
                 std::make_unique<nx::utils::log::Logger>(
@@ -502,7 +508,8 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
                     std::make_unique<nx::utils::log::StdOut>()));
         };
 
-    auto consoleLog = [](const nx::utils::log::Tag& tag)
+    auto consoleLog =
+        [](const nx::utils::log::Tag& tag)
         {
             nx::utils::log::addLogger(
                 std::make_unique<nx::utils::log::Logger>(
@@ -511,12 +518,12 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
                     std::make_unique<nx::utils::log::StdOut>()));
         };
 
-    // Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
-    supressLog(nx::utils::log::Tag(lit("__freeSlot")));
-    supressLog(nx::utils::log::Tag(lit("__workbenchState")));
-    supressLog(nx::utils::log::Tag(lit("__itemMap")));
+    // TODO: Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
+    supressLog(nx::utils::log::Tag(QStringLiteral("__freeSlot")));
+    supressLog(nx::utils::log::Tag(QStringLiteral("__workbenchState")));
+    supressLog(nx::utils::log::Tag(QStringLiteral("__itemMap")));
     supressLog(QnLog::PERMISSIONS_LOG);
-    //consoleLog(lit("nx::vms::client::desktop::RadassController::Private"));
+    //consoleLog("nx::vms::client::desktop::RadassController::Private");
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

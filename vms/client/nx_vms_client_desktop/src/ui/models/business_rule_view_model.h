@@ -165,6 +165,7 @@ private:
     QSet<QnUuid> m_eventResources;
     nx::vms::event::EventParameters m_eventParams;
     nx::vms::api::EventState m_eventState;
+    QHash<nx::vms::api::EventType, nx::vms::event::EventParameters> m_cachedEventParams;
 
     nx::vms::api::ActionType m_actionType;
     QSet<QnUuid> m_actionResources;

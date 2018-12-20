@@ -6,6 +6,7 @@ import Nx 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
+import nx.client.mobile 1.0
 
 // TODO: #ynikitenkov After 18.1 refactor this control.
 
@@ -21,6 +22,13 @@ Item
     property bool canViewArchive: true
     property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
 
+    property alias motionSearchMode: motionSearchModeButton.checked
+    property alias motionFilter: cameraChunkProvider.motionFilter
+    property alias changingMotionRoi: timeline.changingMotionRoi
+    property bool hasCustomRoi: false;
+
+    property string warningText
+
     signal ptzButtonClicked()
     signal switchToNextCamera()
     signal switchToPreviousCamera()
@@ -28,6 +36,9 @@ Item
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
+
+    onHasCustomRoiChanged: d.updateWarningText()
+    onMotionSearchModeChanged: d.updateWarningText()
 
     Connections
     {
@@ -58,6 +69,9 @@ Item
     {
         id: d
 
+        readonly property bool loadingChunks:
+            cameraChunkProvider.loading
+            || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool playbackStarted: false
         property bool controlsNeeded:
@@ -78,6 +92,23 @@ Item
         Behavior on timelineOpacity
         {
             NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
+        }
+
+        onLoadingChunksChanged: updateWarningText()
+
+        function updateWarningText()
+        {
+            if (videoNavigation.loadingChunks)
+                return
+
+            if (!videoNavigation.motionSearchMode || cameraChunkProvider.hasMotionChunks())
+                videoNavigation.warningText = ""
+            else if (!cameraChunkProvider.hasChunks())
+                videoNavigation.warningText = qsTr("No motion data for this camera")
+            else if (videoNavigation.hasCustomRoi)
+                videoNavigation.warningText = qsTr("No motion found in the selected area")
+            else
+                videoNavigation.warningText = qsTr("No motion found in the visible area")
         }
 
         readonly property bool hasArchive: timeline.startBound > 0
@@ -107,6 +138,7 @@ Item
     QnCameraChunkProvider
     {
         id: cameraChunkProvider
+
         resourceId: videoScreenController.resourceId
 
         onLoadingChanged:
@@ -228,12 +260,20 @@ Item
             }
         }
 
+        MotionPlaybackMaskWatcher
+        {
+            active: videoNavigation.motionSearchMode
+            mediaPlayer: videoScreenController.mediaPlayer
+            chunkProvider: cameraChunkProvider
+        }
+
         Timeline
         {
             id: timeline
 
             property bool resumeWhenDragFinished: false
 
+            motionSearchMode: videoNavigation.motionSearchMode
             serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
             visible: videoNavigation.canViewArchive
@@ -428,6 +468,21 @@ Item
                     calendarPanel.date = timeline.positionDate
                     calendarPanel.open()
                 }
+            }
+
+            IconButton
+            {
+                id: motionSearchModeButton
+
+                width: 40
+                height: width
+                checked: false
+                checkable: true
+                anchors.left:  calendarButton.right
+                anchors.verticalCenter: parent.verticalCenter
+                icon.source: lp("/images/motion.svg")
+                normalIconColor: ColorTheme.contrast1
+                checkedIconColor: ColorTheme.base1
             }
 
             Row

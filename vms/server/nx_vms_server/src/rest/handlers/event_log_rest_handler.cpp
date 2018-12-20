@@ -5,12 +5,12 @@
 #include <media_server/media_server_module.h>
 
 QnEventLogRestHandler::QnEventLogRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
 #include <rest/server/rest_connection_processor.h>
-#include "nx/mediaserver/server_module_aware.h"
+#include "nx/vms/server/server_module_aware.h"
 
 int QnEventLogRestHandler::executeGet(
     const QString& /*path*/,

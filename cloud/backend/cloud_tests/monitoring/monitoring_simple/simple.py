@@ -172,10 +172,14 @@ class CloudSession(object):
     def _url(self, path):
         return '{}{}'.format(self.base_url, path)
 
-    def wait_for_message(self, queue, tries=3, seconds_per_try=20):
-        sqs = boto3.resource('sqs')
-        queue = sqs.get_queue_by_name(QueueName=queue)
+    def purge_queue(self, queue):
+        log.info('Purging queue')
+        queue.purge()
 
+        log.info('Sleeping 60 seconds')
+        time.sleep(60)
+
+    def wait_for_message(self, queue, tries=3, seconds_per_try=20):
         for i in range(tries):
             for message in queue.receive_messages(WaitTimeSeconds=seconds_per_try):
                 try:
@@ -403,11 +407,16 @@ class CloudSession(object):
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):
+        sqs = boto3.resource('sqs')
+        queue = sqs.get_queue_by_name(QueueName='noptixqa-owner-queue')
+
+        self.purge_queue(queue)
+
         r = self.post('/api/account/restorePassword', {"user_email": self.email})
 
         self.assert_response_text_is_ok(r)
 
-        assert self.wait_for_message('noptixqa-owner-queue'), "Timeout waiting for e-mail to arrive"
+        assert self.wait_for_message(queue), "Timeout waiting for e-mail to arrive"
 
     # We stop here. No other metrics would be reported if we couldn't log in to the system
     @testmethod(metric='cloud_portal_failure')
@@ -535,8 +544,11 @@ def mediaserver():
 
     client = docker.client.from_env()
 
+    volumes = {'/srv/containers/mediaserver/etc': {'bind': '/opt/networkoptix/mediaserver/etc', 'mode': 'rw'},
+                '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
+
     log.info('Running mediaserver')
-    container = client.containers.run(image, ports={7001: 7001}, detach=True)
+    container = client.containers.run(image, ports={7001: 7001},volumes=volumes,  detach=True)
 
     try:
         mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
