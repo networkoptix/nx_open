@@ -807,6 +807,26 @@ api::ResultCode CdbLauncher::getCdbNonce(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getAuthenticationResponse(
+    const std::string& login,
+    const std::string& password,
+    const api::AuthRequest& authRequest,
+    api::AuthResponse* response)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(login, password);
+
+    api::ResultCode resultCode = api::ResultCode::ok;
+    std::tie(resultCode, *response) =
+        makeSyncCall<api::ResultCode, api::AuthResponse>(
+            std::bind(
+                &nx::cloud::db::api::AuthProvider::getAuthenticationResponse,
+                connection->authProvider(),
+                authRequest,
+                std::placeholders::_1));
+    return resultCode;
+}
+
 api::ResultCode CdbLauncher::ping(
     const std::string& systemId,
     const std::string& authKey)
