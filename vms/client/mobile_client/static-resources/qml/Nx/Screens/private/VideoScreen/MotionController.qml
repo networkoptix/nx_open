@@ -197,9 +197,9 @@ Item
         if (drawingRoi)
             return
 
-        d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
         d.customRoi = d.selectionRoi
         d.selectionRoi = null
+        d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
     }
 
     onCameraRotationChanged: updateDefaultRoi()
@@ -247,8 +247,10 @@ Item
 
         function getMotionFilter(first, second)
         {
+            var result = { filter: "", correctBounds: true }
+
             if (!first|| !second)
-                return "";
+                return result
 
             var topLeft = Qt.point(
                 Math.min(first.x, second.x),
@@ -265,8 +267,21 @@ Item
             var top = Math.floor(topLeft.y * verticalRange)
             var bottom = Math.ceil(bottomRight.y * verticalRange)
 
-            return "[[{\"x\": %1, \"y\": %2, \"width\": %3, \"height\": %4}]]"
+            result.correctBounds =
+                left <= horizontalRange
+                && right >= 0
+                && top <= verticalRange
+                && bottom >= 0
+
+            left = result.correctBounds ? Math.max(left, 0) : 0
+            right = result.correctBounds ? Math.min(right, horizontalRange) : horizontalRange
+            top = result.correctBounds ? Math.max(top, 0) : 0
+            bottom = result.correctBounds ? Math.min(bottom, verticalRange) : verticalRange
+
+            result.filter = "[[{\"x\": %1, \"y\": %2, \"width\": %3, \"height\": %4}]]"
                 .arg(left).arg(top).arg(right - left + 1).arg(bottom - top + 1)
+
+            return result
         }
 
         function getRectangle(first, second)
@@ -310,7 +325,14 @@ Item
         {
             currentFirstPoint = first
             currentSecondPoint = second
-            controller.motionFilter = getMotionFilter(first, second)
+
+            var filterResult = getMotionFilter(first, second)
+            controller.motionFilter = filterResult.filter
+            if (!filterResult.correctBounds)
+            {
+                // TODO: add banner with "incorect roi" warning
+                controller.clearCustomRoi()
+            }
         }
     }
 }
