@@ -79,9 +79,16 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     // route gateway is found
     result.gatewayId = routeVia;
     if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
+    {
         result.addr = *endpoint;
+    }
     else
-        result.reverseConnect = true;
+    {
+        int gatewayDistance = 0;
+        connection->routeToPeerVia(result.gatewayId, &gatewayDistance, &result.addr);
+        if (result.addr.isNull())
+            result.reverseConnect = true;
+    }
 
     return result;
 }
