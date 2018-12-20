@@ -311,7 +311,7 @@ void HttpServerConnection::prepareAndSendResponse(
     if (responseMessageContext->msgBody && responseMessageContext->msgBody->contentLength())
         responseContentLengthStr = std::to_string(*responseMessageContext->msgBody->contentLength());
 
-    NX_VERBOSE(this, lm("%1 - %2 [%3] \"%4\" %5 -")
+    NX_VERBOSE(this, lm("%1 - %2 [%3] \"%4\" %5 %6")
         .args(getForeignAddress().address, "?" /*username*/, // TODO: #ak Fetch username.
             nx::utils::timestampToRfc2822(nx::utils::utcTime()),
             requestDescriptor.requestLine.toString(),
