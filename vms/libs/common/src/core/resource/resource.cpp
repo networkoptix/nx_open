@@ -148,34 +148,6 @@ void QnResource::update(const QnResourcePtr& other)
 
     for (auto notifier : notifiers)
         notifier();
-
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!useLocalProperties() && !m_locallySavedProperties.empty() && commonModule())
-        {
-            std::map<QString, LocalPropertyValue> locallySavedProperties;
-            std::swap(locallySavedProperties, m_locallySavedProperties);
-            QnUuid id = m_id;
-            lk.unlock();
-
-            for (auto prop : locallySavedProperties)
-            {
-                if (commonModule()->propertyDictionary()->setValue(
-                    id,
-                    prop.first,
-                    prop.second.value,
-                    prop.second.markDirty,
-                    prop.second.replaceIfExists))   //isModified?
-                {
-                    emitPropertyChanged(prop.first);
-                }
-            }
-        }
-    }
-
-    //silently ignoring missing properties because of removeProperty method lack
-    for (const auto& param : other->getRuntimeProperties())
-        emitPropertyChanged(param.name);   //here "propertyChanged" will be called
 }
 
 QnUuid QnResource::getParentId() const
