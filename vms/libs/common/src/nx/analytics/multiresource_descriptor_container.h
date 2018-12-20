@@ -36,6 +36,10 @@ public:
             std::make_unique<Container>(std::move(writableStorage));
     }
 
+    /**
+     * Returns descriptors from all container resources merged into a single map with the help of
+     * merge executor.
+     */
     std::optional<TopLevelMap> descriptors()
     {
         TopLevelMap result;
@@ -52,6 +56,9 @@ public:
         return result;
     }
 
+    /**
+     * Returns descriptors grouped by a resource.
+     */
     template<typename... Scopes>
     auto descriptors(const QnUuid& resourceId, const Scopes&... scopes)
         -> std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
@@ -64,6 +71,10 @@ public:
         return container->descriptors(scopes...);
     }
 
+    /**
+     * Returns descriptors from all container resources merged into a single map with the help of
+     * merge executor.
+     */
     template<typename... Scopes>
     auto mergedDescriptors(const Scopes&... scopes)
         ->std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
@@ -94,7 +105,11 @@ public:
         return result;
     }
 
-    // Methods below affect only own resource.
+    /**
+     * Removes descriptors by the specified scope chain. Affects only the own resource (usually it
+     * is the current server) descriptor map. Method is prohibited to be called from the client
+     * side.
+     */
     template<typename... Scopes>
     void removeDescriptors(const Scopes&... scopes)
     {
@@ -105,6 +120,11 @@ public:
         container->removeDescriptors(scopes...);
     }
 
+    /**
+     * Inserts or replaces descriptors by the specified scope chain. Affects only the own resource
+     * (usually it is the current server) descriptor map. Method is prohibited to be called from
+     * the client side.
+     */
     template<typename Descriptors, typename... Scopes>
     void setDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
     {
@@ -115,6 +135,11 @@ public:
         container->setDescriptors(std::forward<Descriptors>(descriptors), scopes...);
     }
 
+    /**
+     * Merges provided descriptors with the current ones with the help of merge executor.
+     * Affects only the own resource (usually it is the current server) descriptor map. Method is
+     * prohibited to be called from the client side.
+     */
     template<typename Descriptors, typename... Scopes>
     void mergeWithDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
     {

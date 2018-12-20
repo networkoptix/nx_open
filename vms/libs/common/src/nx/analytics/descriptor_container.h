@@ -32,6 +32,9 @@ public:
     {
     }
 
+    /**
+     * Returns descriptors corresponding to the provided scopes.
+     */
     template<typename... Scopes>
     auto descriptors(const Scopes&... scopes)
         -> std::optional<MapHelper::MappedTypeOnLevel<Container, sizeof...(Scopes)>>
@@ -40,6 +43,9 @@ public:
         return MapHelper::getOptional(allDescriptors, scopes...);
     }
 
+    /**
+     * Removes descriptors by the specified scope chain.
+     */
     void removeDescriptors()
     {
         m_descriptorStorage->save(Container());
@@ -53,6 +59,9 @@ public:
         m_descriptorStorage->save(std::move(allDescriptors));
     }
 
+    /**
+     * Inserts or replaces descriptors by the specified scope chain.
+     */
     template<typename Descriptors, typename... Scopes>
     void setDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
     {
@@ -61,6 +70,9 @@ public:
         m_descriptorStorage->save(std::move(allDescriptors));
     }
 
+    /**
+     * Merges provided descriptors with the current ones with the help of merge executor.
+     */
     template<typename Descriptors, typename... Scopes>
     void mergeWithDescriptors(const Descriptors& descriptors, const Scopes&... scopes)
     {
