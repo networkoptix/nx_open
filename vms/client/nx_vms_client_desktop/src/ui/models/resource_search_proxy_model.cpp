@@ -134,7 +134,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     }
 
     // We don't show servers and videowalls in case of search.
-    const auto resource = QnResourceSearchProxyModel::resource(index);
+    const auto resource = getResource(index);
     const auto scope = index.data(Qn::ResourceTreeScopeRole).value<QnResourceTreeModel::Scope>();
     if (resource && scope == QnResourceTreeModel::FullScope)
     {
