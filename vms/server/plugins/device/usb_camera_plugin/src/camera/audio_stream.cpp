@@ -74,6 +74,7 @@ void AudioStream::AudioStreamPrivate::addPacketConsumer(
         m_packetConsumerManager->addConsumer(consumer);
     }
     m_consumerWaitCondition.notify_all();
+
     tryToStartIfNotStarted();
 }
 
@@ -442,15 +443,17 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 
 uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
-    const AVRational sourceRate = { 1, m_encoder->sampleRate() };
-    const AVRational targetRate = { 1, 1000 };
-    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, targetRate);
+    uint64_t now = m_timeProvider->millisSinceEpoch();
 
-    if (labs(m_timeProvider->millisSinceEpoch() - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
+    const AVRational sourceRate = { 1, m_encoder->sampleRate() };
+    static const AVRational kTargetRate = { 1, 1000 };
+    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+
+    if (labs(now - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
     {
         m_offsetTicks = 0;
         offsetMsec = 0;
-        m_baseTimestamp = m_timeProvider->millisSinceEpoch();
+        m_baseTimestamp = now;
     }
 
     uint64_t timestamp = m_baseTimestamp + offsetMsec;
@@ -489,7 +492,7 @@ void AudioStream::AudioStreamPrivate::terminate()
 
 void AudioStream::AudioStreamPrivate::tryToStartIfNotStarted()
 {
-    std::lock_guard<std::mutex> lock(m_threadMutex);
+    std::lock_guard<std::mutex> lock(m_threadStartMutex);
     if (m_terminated)
     {
         if (pluggedIn())
@@ -508,11 +511,9 @@ void AudioStream::AudioStreamPrivate::start()
 
 void AudioStream::AudioStreamPrivate::stop()
 {
-    std::lock_guard<std::mutex>lock(m_threadMutex);
-
     terminate();
-
     m_consumerWaitCondition.notify_all();
+
     if (m_audioThread.joinable())
         m_audioThread.join();
 }

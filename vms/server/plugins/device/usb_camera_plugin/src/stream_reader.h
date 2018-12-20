@@ -74,7 +74,6 @@ public:
 
 protected:
     static constexpr int kMsecInSec = 1000;
-    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(200);
     static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(1000);
 
     int m_encoderIndex;
