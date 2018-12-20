@@ -5,6 +5,8 @@
 
 #include <QtCore/QDateTime>
 
+#include <nx/utils/datetime.h>
+
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
@@ -50,7 +52,7 @@ void HttpServerConnection::processMessage(
         closeConnection(SystemError::invalidData);
         return;
     }
-    
+
     auto requestContext = prepareRequestProcessingContext(
         std::move(*requestMessage.request));
 
@@ -177,7 +179,7 @@ std::unique_ptr<HttpServerConnection::RequestContext>
 {
     auto requestContext = std::make_unique<RequestContext>();
     requestContext->descriptor.sequence = ++m_lastRequestSequence;
-    requestContext->descriptor.httpVersion = request.requestLine.version;
+    requestContext->descriptor.requestLine = request.requestLine;
     requestContext->descriptor.protocolToUpgradeTo =
         nx::network::http::getHeaderValue(request.headers, "Upgrade");
     requestContext->request = std::move(request);
@@ -288,7 +290,7 @@ void HttpServerConnection::prepareAndSendResponse(
     std::unique_ptr<ResponseMessageContext> responseMessageContext)
 {
     responseMessageContext->msg.response->statusLine.version =
-        std::move(requestDescriptor.httpVersion);
+        std::move(requestDescriptor.requestLine.version);
 
     responseMessageContext->msg.response->statusLine.reasonPhrase =
         nx::network::http::StatusCode::toString(
@@ -304,6 +306,17 @@ void HttpServerConnection::prepareAndSendResponse(
             responseMessageContext->msgBody.reset();
         }
     }
+
+    std::string responseContentLengthStr = "-";
+    if (responseMessageContext->msgBody && responseMessageContext->msgBody->contentLength())
+        responseContentLengthStr = std::to_string(*responseMessageContext->msgBody->contentLength());
+
+    NX_VERBOSE(this, lm("%1 - %2 [%3] \"%4\" %5 -")
+        .args(getForeignAddress().address, "?" /*username*/, // TODO: #ak Fetch username.
+            nx::utils::timestampToRfc2822(nx::utils::utcTime()),
+            requestDescriptor.requestLine.toString(),
+            responseMessageContext->msg.response->statusLine.statusCode,
+            responseContentLengthStr));
 
     addResponseHeaders(
         requestDescriptor,
