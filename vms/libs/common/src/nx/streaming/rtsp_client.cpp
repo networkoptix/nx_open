@@ -13,6 +13,7 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 #include <utils/common/sleep.h>
+#include <nx/network/nettools.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
@@ -97,12 +98,12 @@ QnRtspIoDevice::~QnRtspIoDevice()
     }
 }
 
-void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address)
+void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress)
 {
     if (m_mediaSocket)
-        m_mediaSocket->joinGroup(address.toString());
+        m_mediaSocket->joinGroup(address.toString(), interfaceAddress);
     if (m_rtcpSocket)
-        m_rtcpSocket->joinGroup(address.toString());
+        m_rtcpSocket->joinGroup(address.toString(), interfaceAddress);
     m_multicastAddress = address;
 }
 
@@ -608,6 +609,21 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
     m_rtpToTrack[rtcpNum].isRtcp = true;
 }
 
+QString hostAddressToInterfaceAddress(const nx::network::HostAddress& addressStr)
+{
+    QHostAddress address(addressStr.toString());
+    using namespace nx::network;
+    const auto interfaceList =
+        getAllIPv4Interfaces(InterfaceListPolicy::keepAllAddressesPerInterface);
+    for (const auto& netInterface: interfaceList)
+    {
+        if (netInterface.isHostBelongToIpv4Network(address))
+            return netInterface.address.toString();
+    }
+
+    return QString();
+}
+
 bool QnRtspClient::sendSetup()
 {
     int audioNum = 0;
@@ -652,7 +668,10 @@ bool QnRtspClient::sendSetup()
             transportStr += m_prefferedTransport == RtspTransport::multicast ? ";multicast;" : ";unicast;";
 
             if (m_prefferedTransport == RtspTransport::multicast)
-                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress);
+            {
+                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
+                    hostAddressToInterfaceAddress(m_tcpSock->getForeignAddress().address));
+            }
 
             if (m_prefferedTransport != RtspTransport::tcp)
             {
