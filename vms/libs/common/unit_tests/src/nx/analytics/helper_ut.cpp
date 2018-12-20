@@ -4,9 +4,9 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
 #include <nx/core/access/access_types.h>
 #include <nx/core/resource/device_mock.h>
+#include <nx/core/resource/server_mock.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -51,7 +51,7 @@ QSet<QString> makeEventIds(const std::vector<int>& indices)
 
 QnMediaServerResourcePtr makeServer(QnCommonModule* commonModule)
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule));
+    QnMediaServerResourcePtr server(new nx::core::resource::ServerMock(commonModule));
     server->setId(QnUuid::createUuid());
     server->setResourcePool(commonModule->resourcePool());
     server->setStatus(Qn::Online);

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/core/resource/device_mock.h>
+
 #include <nx/analytics/test_merge_executor.h>
 #include <nx/analytics/test_descriptor_storage_factory.h>
 
@@ -126,7 +128,7 @@ protected:
 private:
     static QnResourcePtr makeResource()
     {
-        QnResourcePtr resource(new QnResource());
+        QnResourcePtr resource(new nx::core::resource::DeviceMock());
         resource->setId(QnUuid::createUuid());
         return resource;
     }

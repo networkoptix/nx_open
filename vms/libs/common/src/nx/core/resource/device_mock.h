@@ -1,10 +1,15 @@
 #include <core/resource/camera_resource.h>
+#include <nx/core/resource/resource_with_local_property_storage.h>
 
 namespace nx::core::resource {
 
-class DeviceMock: public QnVirtualCameraResource
+class DeviceMock: public ResourceWithLocalPropertyStorage<QnVirtualCameraResource>
 {
+    using base_type = ResourceWithLocalPropertyStorage<QnVirtualCameraResource>;
+
 public:
+    DeviceMock(QnCommonModule* commonModule = nullptr): base_type(commonModule) {};
+
     virtual QString getDriverName() const override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
