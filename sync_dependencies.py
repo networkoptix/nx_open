@@ -70,6 +70,8 @@ def determine_package_versions():
         v["quazip"] = "0.7.2"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
+        v["ffmpeg"] = "3.1.9"
+        v["sysroot"] = "jessie"
 
     if box == "edge1":
         v["qt"] = "5.6.3"
