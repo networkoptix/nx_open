@@ -121,12 +121,12 @@ private:
 
     TimestampMapper m_timestamps;    
 
-    mutable std::mutex m_ConsumerManagerMutex;
+    mutable std::mutex m_cameraMutex;
     std::condition_variable m_consumerWaitCondition;
     FrameConsumerManager m_frameConsumerManager;
     PacketConsumerManager m_packetConsumerManager;
 
-    mutable std::mutex m_threadMutex;
+    mutable std::mutex m_threadStartMutex;
     std::thread m_videoThread;
     std::atomic_bool m_terminated = true;
     std::atomic_bool m_ioError = false;
@@ -164,6 +164,7 @@ private:
     void updateUnlocked();
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
+    void setCameraState(CameraState cameraState);
 
     bool checkIoError(int ffmpegError);
     void setLastError(int ffmpegError);
