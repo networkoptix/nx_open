@@ -3803,6 +3803,8 @@ void MediaServerProcess::connectStorageSignals(QnStorageManager* storage)
         &MediaServerProcess::at_storageManager_storageFailure);
     connect(storage, &QnStorageManager::rebuildFinished, this,
         &MediaServerProcess::at_storageManager_rebuildFinished);
+    connect(storage, &QnStorageManager::backupFinished, this,
+        &MediaServerProcess::at_archiveBackupFinished);
 }
 
 void MediaServerProcess::connectSignals()
