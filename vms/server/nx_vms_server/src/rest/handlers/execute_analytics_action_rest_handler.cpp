@@ -154,7 +154,6 @@ QString errorMessage(nx::sdk::Error error)
         case nx::sdk::Error::noError: return QString();
         case nx::sdk::Error::unknownError: return "error";
         case nx::sdk::Error::networkError: return "network error";
-        case nx::sdk::Error::typeIsNotSupported: return "type is not supported";
         default: return "unrecognized error";
     }
 }
