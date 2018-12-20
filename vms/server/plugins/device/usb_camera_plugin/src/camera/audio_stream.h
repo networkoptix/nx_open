@@ -63,7 +63,7 @@ private:
         int64_t m_baseTimestamp = 0;
 
         std::atomic_bool m_terminated = true;
-        mutable std::mutex m_threadMutex;
+        mutable std::mutex m_threadStartMutex;
         std::thread m_audioThread;
 
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;

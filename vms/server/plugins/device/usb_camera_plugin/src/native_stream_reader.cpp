@@ -87,16 +87,14 @@ void NativeStreamReader::ensureConsumerAdded()
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    if (m_camera->audioEnabled())
+    while(m_camera->audioEnabled())
     {
-        for(;;)
-        {
-            // the time span keeps audio and video timestamps monotonic
-            if (m_avConsumer->waitForTimeSpan(kStreamDelay, kWaitTimeout))
-                break;
-            else if (m_interrupted || m_camera->ioError())
-                    return nullptr;
-        }
+        std::chrono::milliseconds delay = m_camera->videoStream()->actualTimePerFrame() * 2;
+        // the time span keeps audio and video timestamps monotonic
+        if (m_avConsumer->waitForTimeSpan(delay, kWaitTimeout))
+            break;
+        else if (m_interrupted || m_camera->ioError())
+                return nullptr;
     }
 
     for(;;)

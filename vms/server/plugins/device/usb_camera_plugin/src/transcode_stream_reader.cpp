@@ -241,22 +241,20 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
         };
 
     // Audio disabled
-    if (!m_camera->audioEnabled())
+    while (!m_camera->audioEnabled())
     {
-        for (;;)
-        {
-            auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeout);
-            if (interrupted() || ioError())
-                return nullptr;
-            if (!shouldDrop(videoFrame.get()))
-                return transcodeVideo(videoFrame.get(), outNxError);
-        }
+        auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeout);
+        if (interrupted() || ioError())
+            return nullptr;
+        if (!shouldDrop(videoFrame.get()))
+            return transcodeVideo(videoFrame.get(), outNxError);
     }
 
     // Audio enabled
     for(;;)
     {
-        if (waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeout))
+        std::chrono::milliseconds delay = m_camera->videoStream()->actualTimePerFrame() * 2;
+        if (waitForTimeSpan(delay, kWaitTimeout))
             break;
         else if (interrupted() || ioError())
             return nullptr;
