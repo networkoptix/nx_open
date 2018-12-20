@@ -75,13 +75,10 @@ function(set_distribution_names)
     set(product_distribution_name
         "${prefix}" PARENT_SCOPE)
 
-    if("${dotNetFramework}" STREQUAL "v4.0")
-        set(net2Version "Net2v5")
-    else()
-        set(net2Version "Net2v6")
+    if(TARGET paxton_plugin)
+        set(paxton_plugin_distribution_name
+            "${prefix}-paxton_plugin-${releaseVersion.full}-${net2Version}" PARENT_SCOPE)
     endif()
-    set(paxton_plugin_distribution_name
-        "${prefix}-paxton_plugin-${releaseVersion.full}-${net2Version}" PARENT_SCOPE)
 
 endfunction()
 
