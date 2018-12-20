@@ -120,9 +120,14 @@ public:
     // TODO: move all state restoration logic to widget.
     std::future<UpdateContents> getUpdateCheck();
 
-    // Check if update info contains all the packages necessary to update the system.
-    // @param contents - current update contents.
-    bool verifyUpdateManifest(UpdateContents& contents) const;
+    /**
+     * Check if update info contains all the packages necessary to update the system.
+     * @param contents - current update contents.
+     * @param clientVersions - current client versions installed.
+     */
+    bool verifyUpdateManifest(
+        UpdateContents& contents,
+        const std::set<nx::utils::SoftwareVersion>& clientVersions) const;
 
     // Start uploading local update packages to the server(s).
     bool startUpload(const UpdateContents& contents);

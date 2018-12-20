@@ -61,7 +61,7 @@
 #include <nx/utils/counter.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;

@@ -41,7 +41,7 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
         this, &PeerStateTracker::atResourceRemoved);
 }
 
-UpdateItemPtr PeerStateTracker::findItemById(QnUuid id)
+UpdateItemPtr PeerStateTracker::findItemById(QnUuid id) const
 {
     for (const auto& item: m_items)
     {
@@ -63,11 +63,16 @@ int PeerStateTracker::peersCount() const
     return m_items.size();
 }
 
-QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItem* item) const
+QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) const
 {
     if (!item)
         return QnMediaServerResourcePtr();
     return resourcePool()->getResourceById<QnMediaServerResource>(item->id);
+}
+
+QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
+{
+    return getServer(findItemById(id));
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -75,7 +80,7 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
     nx::utils::SoftwareVersion result;
     for (const auto& item: m_items)
     {
-        const auto& server = getServer(item.get());
+        const auto& server = getServer(item);
         if (server)
         {
             const auto status = server->getStatus();
@@ -96,6 +101,41 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
     m_targetVersion = version;
+}
+
+void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const QString& message)
+{
+    for (auto& item: m_items)
+    {
+        if (!targets.contains(item->id))
+            continue;
+        item->verificationMessage = message;
+    }
+}
+
+void PeerStateTracker::setVerificationError(const QMap<QnUuid, QString>& errors)
+{
+    for (auto& item: m_items)
+    {
+        if (auto it = errors.find(item->id); it != errors.end())
+            item->verificationMessage = it.value();
+    }
+}
+
+void PeerStateTracker::clearVerificationErrors()
+{
+    for (auto& item: m_items)
+        item->verificationMessage = QString();
+}
+
+bool PeerStateTracker::hasVerificationErrors() const
+{
+    for (auto& item: m_items)
+    {
+        if (!item->verificationMessage.isEmpty())
+            return true;
+    }
+    return false;
 }
 
 void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
@@ -138,6 +178,7 @@ void PeerStateTracker::clearState()
         item->state = StatusCode::idle;
         item->progress = 0;
         item->statusMessage = "Waiting for data";
+        item->verificationMessage = "";
         emit itemChanged(item);
     }
 }
@@ -203,7 +244,7 @@ QSet<QnUuid> PeerStateTracker::getLegacyServers() const
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
-        if (!getServer(item.get()))
+        if (!getServer(item))
             continue;
         if (item->onlyLegacyUpdate)
             result.insert(item->id);
@@ -237,7 +278,7 @@ QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
-        if (!getServer(item.get()))
+        if (!getServer(item))
             continue;
         if (item->changedProtocol)
             result.insert(item->id);

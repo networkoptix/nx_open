@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
+#include <client/client_settings.h>
 
 namespace {
 
@@ -85,9 +86,15 @@ NodePtr createServerNode(
     QnResourcePool* pool,
     const NodeList& children)
 {
-    const auto extraText = lit("- %1").arg(
-        CameraSelectionDialog::tr("%n cameras", nullptr, children.size()));
-    return createResourceNode(pool->getResourceById(serverId), extraText, true);
+    auto serverResource = pool->getResourceById(serverId);
+    const bool showExtraInfo = qnSettings->extraInfoInTree() == Qn::RI_FullInfo;
+    const auto extraInfoText =
+        showExtraInfo ? QnResourceDisplayInfo(serverResource).extraInfo() : QString();
+
+    const auto extraText = lit("%1 - %2").arg(extraInfoText,
+        CameraSelectionDialog::tr("%n cameras", nullptr, children.size())).trimmed();
+
+    return createResourceNode(serverResource, extraText, true);
 }
 
 NodePtr createCameraNodes(
@@ -97,6 +104,7 @@ NodePtr createCameraNodes(
     QnResourcePool* pool)
 {
     const NodePtr root = ViewNode::create();
+    const bool showExtraInfo = qnSettings->extraInfoInTree() == Qn::RI_FullInfo;
 
     for (auto serverId: data.serverIds)
     {
@@ -110,15 +118,17 @@ NodePtr createCameraNodes(
                 NodeList groupChildren;
                 for (const auto cameraId: data.singleCamerasByGroupId.value(groupId))
                 {
-                    const auto cameraNode =
-                        createResourceNode(pool->getResourceById(cameraId), QString(), true);
+                    auto resource = pool->getResourceById(cameraId);
+                    QString extraText =
+                        showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
+                    const auto cameraNode = createResourceNode(resource, extraText, true);
                     groupChildren.append(cameraNode);
                 }
-                auto cameraResource =
+                auto groupResource =
                     data.allCameras.value(pool->getResourcesBySharedId(groupId).first()->getId());
-
-                const auto groupNode =
-                    createGroupNode(cameraResource, QString(), true);
+                QString groupExtraText =
+                    showExtraInfo ? QnResourceDisplayInfo(groupResource).extraInfo() : QString();
+                const auto groupNode = createGroupNode(groupResource, groupExtraText, true);
                 groupNode->addChildren(groupChildren);
 
                 children.append(groupNode);
@@ -132,10 +142,13 @@ NodePtr createCameraNodes(
             if (invalidCamera && !showInvalidCameras)
                 continue;
 
-            const auto cameraNode = createResourceNode(
-                pool->getResourceById(cameraId), QString(), true);
+            auto resource = pool->getResourceById(cameraId);
+            QString extraText =
+                showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
+            const auto cameraNode = createResourceNode(resource, extraText, true);
             if (invalidCamera)
                 setNodeValidState(cameraNode, false);
+
             children.append(cameraNode);
         }
 

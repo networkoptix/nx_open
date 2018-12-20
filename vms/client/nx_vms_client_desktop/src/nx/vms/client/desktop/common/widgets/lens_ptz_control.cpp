@@ -316,7 +316,7 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
         update();
 }
 
-void LensPtzControl::mouseReleaseEvent(QMouseEvent* event)
+void LensPtzControl::mouseReleaseEvent(QMouseEvent* /*event*/)
 {
     for (int i = 0; i < ButtonMax; ++i)
     {

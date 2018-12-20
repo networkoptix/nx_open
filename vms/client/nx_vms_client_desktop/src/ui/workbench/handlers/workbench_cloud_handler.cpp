@@ -52,6 +52,15 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
         {
             QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
         });
+
+    // Forcing logging out if found 'logged out' status.
+    // Seems like it can cause double disconnect.
+    auto watcher = qnCloudStatusWatcher;
+    connect(watcher, &QnCloudStatusWatcher::forcedLogout, this,
+        [this]()
+        {
+            menu()->trigger(action::LogoutFromCloud);
+        });
 }
 
 QnWorkbenchCloudHandler::~QnWorkbenchCloudHandler()
@@ -80,12 +89,8 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    nx::vms::client::core::settings()->cloudCredentials = {
-        nx::vms::client::core::settings()->cloudCredentials().user, QString()};
-
     // Updating login if were logged under temporary credentials.
-    qnCloudStatusWatcher->setCredentials({
-        qnCloudStatusWatcher->effectiveUserName(), QString()});
+    qnCloudStatusWatcher->resetCredentials(true);
 }
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()

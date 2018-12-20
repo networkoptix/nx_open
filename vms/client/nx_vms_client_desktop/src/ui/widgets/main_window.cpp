@@ -39,9 +39,9 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
-#include <nx/vms/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
@@ -85,7 +85,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <ui/workbench/workbench_ui.h>
+#include <nx/vms/client/desktop/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
@@ -222,11 +222,11 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_controller.reset(new QnWorkbenchController(this));
     if (qnRuntime->isVideoWallMode())
         m_controller->setMenuEnabled(false);
-    m_ui.reset(new QnWorkbenchUi(this));
+    m_ui.reset(new WorkbenchUi(this));
     if (qnRuntime->isVideoWallMode())
-        m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );
+        m_ui->setFlags(WorkbenchUi::HideWhenZoomed | WorkbenchUi::HideWhenNormal );
     else
-        m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
+        m_ui->setFlags(WorkbenchUi::HideWhenZoomed | WorkbenchUi::AdjustMargins);
 
     /* State manager */
     context->instance<QnWorkbenchStateManager>();

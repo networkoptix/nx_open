@@ -6,7 +6,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/utils/math/fuzzy.h>
 
 #include <utils/common/warnings.h>

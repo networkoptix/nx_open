@@ -11,7 +11,7 @@ QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QnCommonModule* commo
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            QnMutexLocker lock(&m_mutex);
+            NX_MUTEX_LOCKER lock(&m_mutex);
             m_data.remove(resource->getId());
             if (auto layout = resource.dynamicCast<QnLayoutResource>())
             {
@@ -27,7 +27,7 @@ QVariant QnResourceRuntimeDataManager::resourceData(const QnResourcePtr& resourc
     if (!resource)
         return QVariant();
 
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_data.value(resource->getId()).value(role);
 }
 
@@ -42,7 +42,7 @@ void QnResourceRuntimeDataManager::setResourceData(
 
     Qn::Notifier notify;
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         notify = setDataInternal(resource->getId(), role, data);
     }
     if (notify)
@@ -69,7 +69,7 @@ void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& reso
 
 QVariant QnResourceRuntimeDataManager::layoutItemData(const QnUuid& id, Qn::ItemDataRole role) const
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_data.value(id).value(role);
 }
 
@@ -80,7 +80,7 @@ void QnResourceRuntimeDataManager::setLayoutItemData(
 {
     Qn::Notifier notify;
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         notify = setDataInternal(id, role, data);
     }
     if (notify)
@@ -91,7 +91,7 @@ void QnResourceRuntimeDataManager::cleanupData(const QnUuid& id, Qn::ItemDataRol
 {
     Qn::Notifier notify;
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         notify = setDataInternal(id, role, QVariant());
     }
     if (notify)
@@ -102,7 +102,7 @@ void QnResourceRuntimeDataManager::cleanupData(const QnUuid& id)
 {
     Qn::NotifierList notifiers;
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         for (auto role: m_data.value(id).keys())
         {
             auto notify = setDataInternal(id, role, QVariant());

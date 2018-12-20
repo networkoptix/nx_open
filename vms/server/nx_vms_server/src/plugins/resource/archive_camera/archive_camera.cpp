@@ -55,10 +55,6 @@ QString QnArchiveCamResource::getDriverName() const
     return kArchiveCamName;
 }
 
-void QnArchiveCamResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-}
-
 void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
 }

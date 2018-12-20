@@ -510,7 +510,7 @@ protected:
         m_sentData = nx::utils::generateRandomName(16*1024);
         m_connection->sendAsync(
             m_sentData,
-            [this](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
+            [](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
             {
             });
     }
