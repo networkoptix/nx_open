@@ -269,6 +269,7 @@ ZoomableFlickable
         {
             id: motionSearchController
 
+            parent: viewport
             anchors.fill: viewport
             viewport: content.videoOutput
 
