@@ -47,6 +47,8 @@ void initUserData()
 
 } // namespace
 
+using namespace network;
+
 class SaveUserEx: public ::testing::Test
 {
 protected:
@@ -62,7 +64,7 @@ protected:
 
     void whenSaveUserRequestIssued(const vms::api::UserDataEx& accessUser,
         const vms::api::UserDataEx& userToSave,
-        network::http::StatusCode::Value expectedCode)
+        http::StatusCode::Value expectedCode)
     {
         NX_TEST_API_POST(m_server.get(), "/ec2/saveUser", userToSave, nullptr,
             expectedCode, accessUser.name.toLower(), accessUser.password, &m_responseBuffer);
@@ -72,7 +74,7 @@ protected:
     void whenChangePasswordRequestIssued(const vms::api::UserDataEx& accessUser,
         vms::api::UserDataEx* userToSave,
         const QString& newPassword,
-        network::http::StatusCode::Value expectedCode)
+        http::StatusCode::Value expectedCode)
     {
         userToSave->password = newPassword;
         NX_TEST_API_POST(m_server.get(), "/ec2/saveUser", *userToSave, nullptr,
@@ -91,7 +93,7 @@ protected:
     void thenSavedUserShouldBeAuthorizedByServer(const vms::api::UserDataEx& accessUser)
     {
         NX_TEST_API_GET(m_server.get(), "/ec2/getUsers", &m_userDataList,
-            network::http::StatusCode::ok, accessUser.name.toLower(), accessUser.password);
+            http::StatusCode::ok, accessUser.name.toLower(), accessUser.password);
     }
 
     void whenUserNameChanged(vms::api::UserDataEx* userData, const QString& newName)
@@ -120,72 +122,72 @@ private:
 
 TEST_F(SaveUserEx, success)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
-    whenSaveUserRequestIssued(defaultAdmin, newAdminUser, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, newAdminUser, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(newAdminUser);
 }
 
 TEST_F(SaveUserEx, savedAdminLowerCaseMustBeAbleToLogin)
 {
-    whenSaveUserRequestIssued(defaultAdmin, newAdminUser, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, newAdminUser, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(newAdminUser);
     thenSavedUserShouldBeAuthorizedByServer(newAdminUser);
 }
 
 TEST_F(SaveUserEx, savedUserUpperCaseMustBeAbleToLogin)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
     thenSavedUserShouldBeAuthorizedByServer(regularUser1);
 }
 
 TEST_F(SaveUserEx, nonAdminAccessShouldFail)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
-    whenSaveUserRequestIssued(regularUser1, newAdminUser, network::http::StatusCode::forbidden);
+    whenSaveUserRequestIssued(regularUser1, newAdminUser, http::StatusCode::forbidden);
 }
 
 TEST_F(SaveUserEx, shouldBeImpossibleToSaveNewUserWithSameName)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::forbidden);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::forbidden);
 }
 
 TEST_F(SaveUserEx, shouldBeImpossibleToChangeExistingUserNameIfAnotherUserHasIt)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
-    whenSaveUserRequestIssued(defaultAdmin, regularUser2, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser2, http::StatusCode::ok);
 
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
     thenUserShouldAppearInTheGetUsersResponse(regularUser2);
 
     whenIdFilled(&regularUser1);
     whenUserNameChanged(&regularUser1, regularUser2.name);
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::forbidden);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::forbidden);
 }
 
 TEST_F(SaveUserEx, shouldPossibleToSaveSameUserTwice)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
     whenIdFilled(&regularUser1);
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 }
 
 TEST_F(SaveUserEx, shouldPossibleToChangeUserPassword)
 {
-    whenSaveUserRequestIssued(defaultAdmin, regularUser1, network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
     whenIdFilled(&regularUser1);
     whenChangePasswordRequestIssued(defaultAdmin, &regularUser1, "new_password",
-        network::http::StatusCode::ok);
+        http::StatusCode::ok);
 
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 }
