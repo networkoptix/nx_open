@@ -8,6 +8,7 @@
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/maintenance/server.h>
 #include <nx/cloud/relaying/http_view/listening_peer_connection_tunneling.h>
 
 #include "authentication_manager.h"
@@ -51,6 +52,7 @@ private:
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
+    network::maintenance::Server m_maintenanceServer;
 
     void registerApiHandlers();
 

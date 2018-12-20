@@ -144,6 +144,10 @@ void View::registerApiHandlers()
         registerApiHandler<view::OptionsRequestHandler>(
             nx::network::http::Method::options);
     }
+
+    m_maintenanceServer.registerRequestHandlers(
+        api::kApiPrefix,
+        &m_httpMessageDispatcher);
 }
 
 template<typename Handler, typename ... Args>

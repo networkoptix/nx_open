@@ -5,6 +5,7 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/maintenance/server.h>
 #include <nx/network/socket_common.h>
 
 #include <nx/cloud/db/api/result_code.h>
@@ -56,6 +57,7 @@ private:
     Controller* m_controller;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     HttpServer m_multiAddressHttpServer;
+    network::maintenance::Server m_maintenanceServer;
 
     void registerApiHandlers(
         const SecurityManager& securityManager,
