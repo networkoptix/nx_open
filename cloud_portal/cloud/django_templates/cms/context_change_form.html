@@ -24,7 +24,12 @@
     <input type="hidden" name="currentLanguage" value="{{ language_code }}">
     <input type="hidden" id="languageChanged">
     {% for field in custom_form %}
-    <div class="form-row {% if field.field.disabled %} disabled-row{% endif %}">
+    <div class="form-row{% if field.errors %} errors {% endif %}{% if field.field.disabled %} disabled-row{% endif %}">
+        <ul class="errorlist">
+            {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+        </ul>
         <div>
             {% get_data_structure field.name original as data_structure %}
             {% get_datastructure_type data_structure as data_structure_type %}

@@ -98,7 +98,7 @@
                                 <div class="show-html">{{ record|safe }}</div>
                             {% endif %}
                             {% if product.product_type.single_customization %}
-                                <a href="{% url 'admin:cms_context_change' data_structure.context.id %}"
+                                <a href="{% url 'admin:change_page' product.id data_structure.context.id %}"
                                    target="_blank">(edit)</a>
                             {% endif %}
                         </li>

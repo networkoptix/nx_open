@@ -247,7 +247,7 @@ export class NxConfigService {
             messageType: {
                 ipvd: 'ipvd_feedback',
                 inquiry: 'sales_inquiry',
-                support: 'support_request',
+                support: 'request_support',
                 unknown: 'unknown'
             },
             permissions                   : {

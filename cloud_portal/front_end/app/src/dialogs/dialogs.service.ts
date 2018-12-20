@@ -66,8 +66,8 @@ export class NxDialogsService {
         return this.mergeModal.open(system);
     }
 
-    message(type, productId) {
-        return this.messageModel.open(type, productId);
+    message(type, product, productId) {
+        return this.messageModel.open(type, product, productId);
     }
 
     embed(system) {

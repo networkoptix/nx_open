@@ -12,11 +12,13 @@ import { NxConfigService }                                                from '
 export class MessageModalContent {
     @Input() messageType;
     @Input() productId;
+    @Input() product;
     @Input() closable;
 
     config: any;
     sendMessage: any;
     message: string;
+    title: string;
 
     constructor(private activeModal: NgbActiveModal,
                 private configService: NxConfigService,
@@ -32,6 +34,7 @@ export class MessageModalContent {
         if (this.messageType === 'undefined') {
             this.messageType = this.language.messageType.unknown;
         }
+        this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
         this.sendMessage = this.process.init(() => {
             return this.cloudApi.sendMessage(this.messageType, this.productId, this.message);
         }, {
@@ -62,7 +65,7 @@ export class NxModalMessageComponent implements OnInit {
         this.config = configService.getConfig();
     }
 
-    private dialog(type, productId) {
+    private dialog(type, product, productId) {
         // TODO: Refactor dialog to use generic dialog
         // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(MessageModalContent,
@@ -72,16 +75,22 @@ export class NxModalMessageComponent implements OnInit {
                         });
         this.modalRef.componentInstance.closable = true;
         this.modalRef.componentInstance.messageType = type;
+        this.modalRef.componentInstance.product = product;
         this.modalRef.componentInstance.productId = productId;
 
         return this.modalRef;
     }
 
-    open(type, productId) {
+    open(type, product, productId) {
         if (productId === 'undefined') {
             productId = '';
         }
-        return this.dialog(type, productId).result;
+        if (product === 'undefined') {
+            product = '';
+        }
+
+        console.log(product);
+        return this.dialog(type, product, productId).result;
     }
 
     ngOnInit() {
