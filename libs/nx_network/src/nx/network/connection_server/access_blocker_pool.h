@@ -4,6 +4,7 @@
 #include <deque>
 #include <map>
 #include <vector>
+#include <string>
 #include <type_traits>
 
 #include <nx/utils/elapsed_timer_pool.h>
@@ -16,6 +17,8 @@ enum class AuthResult
     success,
     failure,
 };
+
+NX_NETWORK_API std::string toString(AuthResult authResult);
 
 enum class LockUpdateResult
 {

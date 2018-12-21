@@ -429,7 +429,7 @@ StringType RequestLine::toString() const
 {
     BufferType buf;
     serialize(&buf);
-    return buf;
+    return buf.trimmed();
 }
 
 //-------------------------------------------------------------------------------------------------

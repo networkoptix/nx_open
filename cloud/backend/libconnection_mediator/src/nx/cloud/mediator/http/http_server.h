@@ -7,6 +7,7 @@
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+#include <nx/network/maintenance/server.h>
 
 #include "../discovery/discovery_http_server.h"
 #include "../server/hole_punching_processor.h"
@@ -47,6 +48,7 @@ private:
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+    network::maintenance::Server m_maintenanceServer;
 
     void loadSslCertificate();
 

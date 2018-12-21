@@ -6,9 +6,15 @@
 
 #include "../socket_common.h"
 
-namespace nx {
-namespace network {
-namespace url {
+namespace nx::network::url {
+
+namespace detail {
+
+NX_NETWORK_API std::string joinPath(
+    const std::string& left,
+    const std::string& right);
+
+} // namespace detail
 
 /**
  * @param scheme Comparison is done in low-case.
@@ -21,8 +27,16 @@ NX_NETWORK_API std::string normalizePath(const std::string&);
 NX_NETWORK_API QString normalizePath(const QString&);
 NX_NETWORK_API std::string normalizePath(const char*);
 
-NX_NETWORK_API std::string joinPath(const std::string& left, const std::string& right);
+template<typename... Path>
+std::string joinPath(
+    const std::string& first,
+    const std::string& second,
+    const Path&... other)
+{
+    if constexpr (sizeof...(other) == 0)
+        return detail::joinPath(first, second);
+    else
+        return joinPath(detail::joinPath(first, second), other...);
+}
 
-} // namespace url
-} // namespace network
-} // namespace nx
+} // namespace nx::network::url
