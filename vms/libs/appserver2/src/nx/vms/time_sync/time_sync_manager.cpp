@@ -196,7 +196,6 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
 
     setSyncTimeInternal(value);
     emit timeChanged(value.count());
-    NX_INFO(this, lm("Set sync time to the new value %1").arg(value.count()));
     return true;
 }
 
