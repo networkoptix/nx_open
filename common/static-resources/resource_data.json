@@ -2807,7 +2807,11 @@
             "NVM3-A16|IP-Camera", "IPNC|NVM3-A16",
             "Hanwha|*", "Hanwha Techwin|*",
             "Samsung|*", "Samsung Techwin|*",
-            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W",
+            "gv-sv48000|geovision",
+            "dahua|ipc-pdbw5831p-b360",
+            "axis|axisp3717*", "axis|p3717*", 
+            "axis|axis p3717*"
             ],
             "canShareLicenseGroup": true
         },
