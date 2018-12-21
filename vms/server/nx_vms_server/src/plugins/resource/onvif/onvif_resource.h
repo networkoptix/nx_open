@@ -138,24 +138,25 @@ public:
         SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
-    class VideoOptionsLocal
+    class VideoEncoderCapabilities
     {
     public:
-        VideoOptionsLocal() = default;
+        VideoEncoderCapabilities() = default;
 
-        VideoOptionsLocal(const QString& id,
+        VideoEncoderCapabilities(const QString& videoEncoderToken,
             const onvifXsd__VideoEncoderConfigurationOptions& options,
             QnBounds frameRateBounds = QnBounds());
 
-        VideoOptionsLocal(const QString& id,
+        VideoEncoderCapabilities(const QString& videoEncoderToken,
             const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
             QnBounds frameRateBounds = QnBounds());
 
-        static std::vector<QnPlOnvifResource::VideoOptionsLocal> createVideoOptionsLocalList(
-            const QString& id,
+        static std::vector<QnPlOnvifResource::VideoEncoderCapabilities> createVideoEncoderCapabilitiesList(
+            const QString& videoEncoderToken,
             const onvifXsd__VideoEncoderConfigurationOptions& options,
             QnBounds frameRateBounds);
 
+        QString videoEncoderToken;
         UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
         // Profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
@@ -167,16 +168,14 @@ public:
         // Usually is empty (this obviously means, Main is used).
         QVector<onvifXsd__VideoEncodingProfiles> h265Profiles; //< filled for h265 codec
 
-        QString id;
         QList<QSize> resolutions;
-        //bool isH264 = false;
         int minQ = -1;
         int maxQ = 1;
         int frameRateMin = -1;
         int frameRateMax = -1;
         int govMin = -1;
         int govMax = -1;
-        bool usedInProfiles = false;
+        bool isUsedInProfiles = false;
         QString currentProfile;
 
     private:
@@ -283,7 +282,6 @@ public:
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(
         QnCommonModule* commonModule,
         const SoapTimeouts& onvifTimeouts,
@@ -340,12 +338,8 @@ public:
         QnResourceDataPool* dataPool,
         const QString& manufacturer, const QString& model);
 
-    VideoOptionsLocal primaryVideoCapabilities() const;
-    VideoOptionsLocal secondaryVideoCapabilities() const;
-    const VideoEncoderConfigOptionsList& videoEncoderConfigOptionsList() const
-    {
-        return m_videoEncoderConfigOptionsList;
-    }
+    VideoEncoderCapabilities primaryVideoCapabilities() const;
+    VideoEncoderCapabilities secondaryVideoCapabilities() const;
 
     void updateVideoEncoder(
         onvifXsd__VideoEncoderConfiguration& encoder,
@@ -401,22 +395,20 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
-    void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities)
+    void setPrimaryVideoCapabilities(const VideoEncoderCapabilities& capabilities)
     {
-        m_primaryStreamCapabilities = capabilities;
+        if (!m_primaryStreamCapabilitiesList.empty())
+            m_primaryStreamCapabilitiesList.front() = capabilities;
     }
-    void setSecondaryVideoCapabilities(const VideoOptionsLocal& capabilities)
+    void setSecondaryVideoCapabilities(const VideoEncoderCapabilities& capabilities)
     {
-        m_secondaryStreamCapabilities = capabilities;
-    }
-
-    void setVideoEncoderConfigOptionsList(const VideoEncoderConfigOptionsList& optionsList)
-    {
-        m_videoEncoderConfigOptionsList = optionsList;
+        if (!m_secondaryStreamCapabilitiesList.empty())
+            m_secondaryStreamCapabilitiesList.front() = capabilities;
     }
 
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(
-        const VideoOptionsLocal& videoOptionsLocal);
+        const VideoEncoderCapabilities& videoEncoderCapabilities);
+
     CameraDiagnostics::Result sendVideoEncoderToCamera(
         onvifXsd__VideoEncoderConfiguration& encoderConfig);
     CameraDiagnostics::Result sendVideoEncoder2ToCamera(
@@ -432,7 +424,7 @@ private:
     QnIOPortDataList generateOutputPorts() const;
 
     CameraDiagnostics::Result ReadVideoEncoderOptionsForToken(
-        const std::string& token, QList<VideoOptionsLocal>* dstOptionsList, const QnBounds& frameRateBounds);
+        const std::string& token, QList<VideoEncoderCapabilities>* dstOptionsList, const QnBounds& frameRateBounds);
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions();
     //CameraDiagnostics::Result fetchAndSetVideoEncoderOptionsNew();
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
@@ -450,7 +442,7 @@ private:
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
-    CameraDiagnostics::Result updateVideoEncoderUsage(QList<VideoOptionsLocal>& optionsList);
+    CameraDiagnostics::Result updateVideoEncoderUsage(QList<VideoEncoderCapabilities>& optionsList);
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
@@ -459,19 +451,23 @@ private:
     std::set<QString> notificationTopicsForMonitoring() const;
     std::set<QString> allowedInputSourceNames() const;
 
+    //* fill m_primaryStreamCapabilitiesList and m_secondaryStreamCapabilitiesList
+    void fillStreamCapabilityLists(const QList<VideoEncoderCapabilities>& capabilitiesList);
+
+    VideoEncoderCapabilities findVideoEncoderCapabilities(
+        UnderstandableVideoCodec encoding, Qn::StreamIndex streamIndex);
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
-    VideoOptionsLocal m_primaryStreamCapabilities;
-    VideoOptionsLocal m_secondaryStreamCapabilities;
 
-    std::vector<VideoOptionsLocal> m_primaryStreamCapabilitiesExtension;
-    std::vector<VideoOptionsLocal> m_secondaryStreamCapabilitiesExtension;
+    std::vector<VideoEncoderCapabilities> m_primaryStreamCapabilitiesList;
+    std::vector<VideoEncoderCapabilities> m_secondaryStreamCapabilitiesList;
 
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
-    int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
+    int getSecondaryIndex(const QList<VideoEncoderCapabilities>& optList) const;
     //!Registers local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
@@ -698,8 +694,6 @@ protected:
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
     QString m_audioOutputConfigurationToken;
-    VideoEncoderConfigOptionsList m_videoEncoderConfigOptionsList;
-
 };
 
 #endif //ENABLE_ONVIF
