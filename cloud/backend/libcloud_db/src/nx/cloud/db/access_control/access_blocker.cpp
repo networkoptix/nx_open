@@ -72,6 +72,9 @@ void AccessBlocker::onAuthenticationFailure(
     const nx::network::http::Request request,
     const std::string& login)
 {
+    NX_VERBOSE(this, lm("Authentication failure. %1 - \"%2\" \"%3\"")
+        .args(connection.clientEndpoint().address, login, request.requestLine.toString()));
+
     if (authenticationType == AuthenticationType::credentials)
     {
         updateUserLockoutState(
@@ -112,6 +115,9 @@ void AccessBlocker::updateUserLockoutState(
     if (!m_userLocker)
         return;
 
+    NX_VERBOSE(this, lm("Updating user %1 lockout state. Request %2, host %3, auth result %4")
+        .args(login, request.requestLine.url.path(), host, toString(authResult)));
+
     const auto key = std::make_tuple(host, login);
     switch (m_userLocker->updateLockoutState(
         key, authResult, request.requestLine.url.path().toStdString()))
@@ -134,16 +140,19 @@ void AccessBlocker::updateUserLockoutState(
 void AccessBlocker::updateHostLockoutState(
     const nx::network::HostAddress& host,
     const nx::network::http::Request request,
-    nx::network::server::AuthResult authenticationResult,
+    nx::network::server::AuthResult authResult,
     const std::string& login)
 {
     if (login.empty())
         return;
 
+    NX_VERBOSE(this, lm("Updating host %1 lockout state. Request %2, login %3, auth result %4")
+        .args(host, request.requestLine.url.path(), login, toString(authResult)));
+
     std::chrono::milliseconds lockPeriod{0};
     const auto result = m_hostLockerPool.updateLockoutState(
         host,
-        authenticationResult,
+        authResult,
         request.requestLine.url.path().toStdString(),
         login,
         &lockPeriod);

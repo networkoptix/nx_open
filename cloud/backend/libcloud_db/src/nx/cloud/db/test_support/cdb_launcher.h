@@ -174,11 +174,19 @@ public:
         const std::string& systemId,
         const std::string& authKey,
         api::NonceData* const nonceData);
+
     api::ResultCode getCdbNonce(
         const std::string& accountEmail,
         const std::string& accountPassword,
         const std::string& systemId,
         api::NonceData* const nonceData);
+
+    api::ResultCode getAuthenticationResponse(
+        const std::string& login,
+        const std::string& password,
+        const api::AuthRequest& authRequest,
+        api::AuthResponse* response);
+
     //calls on system's regard
     api::ResultCode ping(
         const std::string& systemId,

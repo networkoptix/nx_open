@@ -1469,12 +1469,15 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
 {
-    this->givenSilentServer();
+    this->givenPingPongServer();
     this->givenConnectedSocket();
 
     this->whenReadSocketInBlockingWayWithFlags(MSG_DONTWAIT);
-
     this->thenClientSocketReported(SystemError::wouldBlock);
+
+    this->whenClientSendsPing();
+    this->whenReadSocketInBlockingWay();
+    this->thenServerMessageIsReceived();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
