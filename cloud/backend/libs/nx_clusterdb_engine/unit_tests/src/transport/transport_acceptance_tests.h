@@ -152,7 +152,7 @@ TYPED_TEST_P(
     constexpr int connectionToEstablishCount = 11;
 
     this->setMaximumActiveConnectionCountPerSystem(1);
-   
+
     this->establishSameSystemConnectionsSimultaneosly(connectionToEstablishCount);
 
     this->waitForEveryConnectToComplete();
