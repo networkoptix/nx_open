@@ -35,6 +35,10 @@ bool TransactionDataObject::TransactionKey::operator<(const TransactionKey& rhs)
     return sequence < rhs.sequence;
 }
 
+bool TransactionDataObject::TransactionKey::operator<=(const TransactionKey& rhs) const
+{
+    return !(rhs < *this);
+}
 
 //-------------------------------------------------------------------------------------------------
 // TransactionDataObject
@@ -90,7 +94,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     const auto& indexBySourceAndSequence = m_transactions.get<kIndexBySourceAndSequence>();
     auto tranIter = indexBySourceAndSequence.lower_bound(from);
     for (;
-         (tranIter != indexBySourceAndSequence.end()) && (tranIter->uniqueKey < to);
+         (tranIter != indexBySourceAndSequence.end()) && (tranIter->uniqueKey <= to);
          ++tranIter)
     {
         dao::TransactionLogRecord logRecord;

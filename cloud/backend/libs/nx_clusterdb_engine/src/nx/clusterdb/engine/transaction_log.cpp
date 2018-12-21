@@ -219,7 +219,7 @@ nx::sql::DBResult CommandLog::fillCache()
     nx::utils::promise<nx::sql::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
-    NX_DEBUG(this, lm("Filling tranaction log cache"));
+    NX_DEBUG(this, lm("Filling transaction log cache"));
 
     // Starting async operation.
     using namespace std::placeholders;
@@ -330,6 +330,8 @@ nx::sql::DBResult CommandLog::fetchTransactions(
 
     outputData->resultCode = ResultCode::dbError;
 
+    outputData->state = {};
+
     for (auto it = currentState.values.begin();
          it != currentState.values.end();
          ++it)
@@ -337,21 +339,24 @@ nx::sql::DBResult CommandLog::fetchTransactions(
         if (!filter.sources.empty() && !nx::utils::contains(filter.sources, it.key().id))
             continue;
 
+        const auto minSequence = filter.from->values.value(it.key());
+        const auto maxSequence = filter.to->values.value(it.key(), it.value());
         const auto dbResult = m_transactionDataObject->fetchTransactionsOfAPeerQuery(
             queryContext,
             systemId,
             it.key().id.toSimpleString(),
             it.key().persistentId.toSimpleString(),
-            filter.from->values.value(it.key()),
-            filter.to->values.value(it.key(), std::numeric_limits<qint32>::max()),
+            minSequence,
+            maxSequence,
             &outputData->transactions);
         if (dbResult != nx::sql::DBResult::ok)
             return dbResult;
+
+        outputData->state.values[it.key()] = maxSequence;
     }
 
-    // TODO #ak currentState is not correct here since it can be limited by "to" and 
+    // TODO #ak currentState is not correct here since it can be limited by "to" and
     // "maxTransactionsToReturn".
-    outputData->state = currentState;
     outputData->resultCode = ResultCode::ok;
 
     return nx::sql::DBResult::ok;
