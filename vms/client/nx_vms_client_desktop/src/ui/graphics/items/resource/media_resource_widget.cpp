@@ -815,14 +815,31 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
 
-    createActionAndButton(
-        "item/ptz.png",
-        false,
-        lit("P"),
-        tr("PTZ"),
-        Qn::MainWindow_MediaItem_Ptz_Help,
-        Qn::PtzButton, lit("media_widget_ptz"),
-        &QnMediaResourceWidget::at_ptzButton_toggled);
+
+    if (d->camera && d->camera->isPtzRedirected())
+    {
+        createActionAndButton(
+            /* icon*/ "item/area_zoom.png",
+            /* checked*/ false,
+            /* shortcut*/ {},
+            /* tooltip */ tr("Area Zoom"),
+            /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
+            /* internal id */ Qn::PtzButton,
+            /* statistics key */ "media_widget_area_zoom",
+            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+    }
+    else
+    {
+        createActionAndButton(
+            /* icon*/ "item/ptz.png",
+            /* checked*/ false,
+            /* shortcut*/ QKeySequence::fromString("P"),
+            /* tooltip */ tr("PTZ"),
+            /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
+            /* internal id */ Qn::PtzButton,
+            /* statistics key */ "media_widget_ptz",
+            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+    }
 
     createActionAndButton(
         "item/fisheye.png",
@@ -3065,7 +3082,7 @@ void QnMediaResourceWidget::updateWatermark()
 
 void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     bool checked,
-    const QString& shortcut,
+    const QKeySequence& shortcut,
     const QString& toolTip,
     Qn::HelpTopic helpTopic,
     Qn::WidgetButtons buttonId, const QString& buttonName,
