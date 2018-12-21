@@ -96,33 +96,33 @@ public:
 
     /**
      * Wait for the difference in timestamps between the oldest and newest items in buffer 
-     *    to be >= timeSpan. Terminates early if interrupt() is called, returning false.
+     *    to be >= timespan. Terminates early if interrupt() is called, returning false.
      * 
-     * @param[in] timeSpan - The amount of items in terms of their timestamps that the buffer 
+     * @param[in] timespan - The amount of items in terms of their timestamps that the buffer 
      *    should contain.
      * @param[in] timeout - The maximum amount of time to wait for the time span condition before
      *    terminating early
      * @return - true if the wait terminated due to satisfying the timespan condition, false if
      *    the wait terminated due to calling interrupt().
      */
-    bool waitForTimeSpan(
-        const std::chrono::milliseconds& timeSpan,
+    bool waitForTimespan(
+        const std::chrono::milliseconds& timespan,
         const std::chrono::milliseconds& timeout)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         m_wait.wait_for(
             lock,
             timeout,
-            [&]() { return m_interrupted || timeSpanInternal() >= timeSpan; });
-        if (interrupted() || timeSpanInternal() < timeSpan)
+            [&]() { return m_interrupted || timespanInternal() >= timespan; });
+        if (interrupted() || timespanInternal() < timespan)
             return false;
         return true;// < Timespan condition was satisfied
     }
     
-    std::chrono::milliseconds timeSpan() const
+    std::chrono::milliseconds timespan() const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        return timeSpanInternal();
+        return timespanInternal();
     }
 
 protected:
@@ -132,7 +132,7 @@ protected:
     bool m_interrupted = false;
 
 protected:
-    std::chrono::milliseconds timeSpanInternal() const
+    std::chrono::milliseconds timespanInternal() const
     {
         return m_buffer.empty()
             ? std::chrono::milliseconds(0)
@@ -211,10 +211,10 @@ public:
 
     void interrupt();
 
-    bool waitForTimeSpan(
-        const std::chrono::milliseconds& timeSpan,
+    bool waitForTimespan(
+        const std::chrono::milliseconds& timespan,
         const std::chrono::milliseconds& timeout);
-    std::chrono::milliseconds timeSpan() const;
+    std::chrono::milliseconds timespan() const;
 
     size_t size() const;
     bool empty() const;
