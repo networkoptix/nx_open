@@ -244,7 +244,7 @@ void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
 {
     NX_KIT_ASSERT(engine,
         "nx::sdk::analytics::common::VideoFrameProcessingDeviceAgent "
-        + nx::kit::debug::toString(this)
+        + nx::kit::utils::toString(this)
         + " has m_engine of incorrect runtime type " + typeid(*m_engine).name());
 }
 

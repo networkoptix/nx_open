@@ -147,7 +147,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
         {
             const int64_t dPts = ptsUs - m_lastFramePtsUs;
             const std::string dPtsMsStr =
-                (dPts >= 0 ? "+" : "-") + nx::kit::debug::format("%lld", (500 + abs(dPts)) / 1000);
+                (dPts >= 0 ? "+" : "-") + nx::kit::utils::format("%lld", (500 + abs(dPts)) / 1000);
 
             NX_OUTPUT << "Got " << rects.size() << " rect(s) for PTS " << ptsUs
                 << " (" << dPtsMsStr << " ms):";

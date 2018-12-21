@@ -1,6 +1,7 @@
 #include "to_string.h"
 
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 
 namespace nx {
 namespace sdk {
@@ -27,8 +28,8 @@ std::string toJsonString(const IStringMap* map, int overallIndent)
     for (int i = 0; i < count; ++i)
     {
         result += indent(overallIndent, 1) + "{ "
-            + "\"name\": " + nx::kit::debug::toString(map->key(i)) + ", "
-            + "\"value\": " + nx::kit::debug::toString(map->value(i))
+            + "\"name\": " + nx::kit::utils::toString(map->key(i)) + ", "
+            + "\"value\": " + nx::kit::utils::toString(map->value(i))
             + " }" + ((i < count - 1) ? "," : "") + "\n";
     }
 
@@ -38,7 +39,7 @@ std::string toJsonString(const IStringMap* map, int overallIndent)
 
 std::string toJsonString(const DeviceInfo* deviceInfo, int overallIndent)
 {
-    using nx::kit::debug::toString;
+    using nx::kit::utils::toString;
 
     std::string result = indent(overallIndent, 0) + "{\n";
 

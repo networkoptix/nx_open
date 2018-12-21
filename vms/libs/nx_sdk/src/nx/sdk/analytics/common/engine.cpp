@@ -3,6 +3,7 @@
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 
 #include <nx/sdk/common/log_utils.h>
 #include <nx/sdk/common/string_map.h>
@@ -128,7 +129,7 @@ void Engine::executeAction(Action* action, Error* outError)
 
     NX_OUTPUT << __func__ << "():";
     NX_OUTPUT << "{";
-    NX_OUTPUT << "    actionId: " << nx::kit::debug::toString(action->actionId());
+    NX_OUTPUT << "    actionId: " << nx::kit::utils::toString(action->actionId());
     NX_OUTPUT << "    objectId: " << action->objectId();
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
@@ -176,7 +177,7 @@ bool Engine::isCompatible(const DeviceInfo* /*deviceInfo*/) const
 void Engine::assertPluginCasted(void* plugin) const
 {
     NX_KIT_ASSERT(plugin,
-        "nx::sdk::analytics::common::Engine " + nx::kit::debug::toString(this)
+        "nx::sdk::analytics::common::Engine " + nx::kit::utils::toString(this)
         + " has m_plugin of incorrect runtime type " + typeid(*m_plugin).name());
 }
 

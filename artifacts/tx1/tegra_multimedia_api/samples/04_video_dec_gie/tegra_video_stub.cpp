@@ -115,7 +115,7 @@ public:
             const int64_t ptsModuloUs = *outPtsUs % m_ptsModulusUs;
 
             const std::string filename =
-                ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", ptsModuloUs);
+                ini().rectanglesFilePrefix + nx::kit::utils::format("%lld.txt", ptsModuloUs);
             if (!readRectsFromFile(filename, outRects, maxRectCount, outRectCount))
                 return false; //< Error already logged.
         }

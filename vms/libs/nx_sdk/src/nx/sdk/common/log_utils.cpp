@@ -39,8 +39,8 @@ bool LogUtils::convertAndOutputStringMap(
         NX_OUTPUT << indentStr << "{";
         for (int i = 0; i < count; ++i)
         {
-            NX_OUTPUT << indentStr << "    " << nx::kit::debug::toString(stringMap->key(i))
-                << ": " << nx::kit::debug::toString(stringMap->value(i))
+            NX_OUTPUT << indentStr << "    " << nx::kit::utils::toString(stringMap->key(i))
+                << ": " << nx::kit::utils::toString(stringMap->value(i))
                 << ((i < count - 1) ? "," : "");
         }
         NX_OUTPUT << indentStr << "}";

@@ -1,4 +1,4 @@
-#include "engine.h"
+﻿#include "engine.h"
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -127,13 +127,13 @@ bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
 
     if (!vendor.startsWith(kDwMttVendor))
     {
-        NX_PRINT << "Unsupported camera vendor: " << nx::kit::debug::toString(deviceInfo->vendor);
+        NX_PRINT << "Unsupported camera vendor: " << nx::kit::utils::toString(deviceInfo->vendor);
         return false;
     }
 
     if (!m_typedManifest.supportsModel(model))
     {
-        NX_PRINT << "Unsupported camera model: " << nx::kit::debug::toString(deviceInfo->model);
+        NX_PRINT << "Unsupported camera model: " << nx::kit::utils::toString(deviceInfo->model);
         return false;
     }
 

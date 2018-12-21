@@ -404,7 +404,7 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
             else
             {
                 NX_PRINT_HEX_DUMP(
-                    nx::kit::debug::format("Plane %d bytes %d..%d of %d",
+                    nx::kit::utils::format("Plane %d bytes %d..%d of %d",
                         plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
                     frame->data(plane) + dumpOffset, dumpSize);
             }

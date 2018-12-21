@@ -10,6 +10,8 @@
 #include <sstream>
 #include <string>
 
+#include <nx/kit/utils.h>
+
 #if !defined(NX_KIT_API)
     #define NX_KIT_API
 #endif
@@ -21,7 +23,7 @@ namespace test {
 #define TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
     static const nx::kit::test::detail::Test testDescriptor_##TEST_CASE##_##TEST_NAME = \
-        {#TEST_CASE, #TEST_NAME, &test_##TEST_CASE##_##TEST_NAME}; \
+        {#TEST_CASE, #TEST_NAME, &test_##TEST_CASE##_##TEST_NAME, /*tempDir*/ ""}; \
     static const int unused_##TEST_CASE##_##TEST_NAME = \
         nx::kit::test::detail::regTest(testDescriptor_##TEST_CASE##_##TEST_NAME); \
     static void test_##TEST_CASE##_##TEST_NAME()
@@ -115,13 +117,9 @@ void assertEq(
 {
     if (!(expected == actual)) //< Require only operator==().
     {
-        std::ostringstream expectedValue;
-        expectedValue << expected;
-        std::ostringstream actualValue;
-        actualValue << actual;
         detail::failEq(
-            expectedValue.str().c_str(), expectedExpr,
-            actualValue.str().c_str(), actualExpr,
+            utils::toString(expected).c_str(), expectedExpr,
+            utils::toString(actual).c_str(), actualExpr,
             file, line);
     }
 }

@@ -238,8 +238,8 @@ public:
     {
         NX_PRINT << "DeviceAgentHandler: Received plugin event: "
             << "level " << (int) event->level() << ", "
-            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
-            << "description " << nx::kit::debug::toString(event->description());
+            << "caption " << nx::kit::utils::toString(event->caption()) << ", "
+            << "description " << nx::kit::utils::toString(event->description());
     }
 };
 
@@ -250,8 +250,8 @@ public:
     {
         NX_PRINT << "EngineHandler: Received plugin event: "
             << "level " << (int) event->level() << ", "
-            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
-            << "description " << nx::kit::debug::toString(event->description());
+            << "caption " << nx::kit::utils::toString(event->caption()) << ", "
+            << "description " << nx::kit::utils::toString(event->description());
     }
 };
 
