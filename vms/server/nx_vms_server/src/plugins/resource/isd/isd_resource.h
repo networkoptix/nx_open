@@ -21,8 +21,6 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
 protected:
     QSize m_resolution1;
     QSize m_resolution2;

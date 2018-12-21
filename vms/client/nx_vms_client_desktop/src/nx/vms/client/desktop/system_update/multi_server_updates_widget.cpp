@@ -243,6 +243,14 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
         this, &MultiServerUpdatesWidget::checkForInternetUpdates);
 
+    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
+        [this]()
+        {
+            NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
+            if (m_stateTracker)
+                m_stateTracker->setResourceFeed(resourcePool());
+        });
+
     setWarningStyle(ui->errorLabel);
     setWarningStyle(ui->longUpdateWarning);
 
@@ -493,17 +501,17 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     packageErrors << tr("Missing update package for client");
                 if (!contents.missingUpdate.empty())
                     packageErrors << tr("Missing update package for some servers");
-                if (packageErrors.empty() && !contents.unsupportedSystem.empty())
+                if (packageErrors.empty() && !contents.unsuportedSystemsReport.empty())
                 {
-                    if (contents.unsupportedSystem.size() > 1)
+                    if (contents.unsuportedSystemsReport.size() > 1)
                     {
                         packageErrors << tr("Detected unsupported OS for some servers");
                     }
                     else
                     {
-                        auto id = contents.unsupportedSystem.firstKey();
+                        auto id = contents.unsuportedSystemsReport.firstKey();
                         auto serverInfo = QnResourceDisplayInfo(m_stateTracker->getServer(id));
-                        QString serverName = serverInfo.toString(qnSettings->extraInfoInTree());
+                        QString serverName = serverInfo.toString(Qn::RI_WithUrl);
                         packageErrors << tr("Detected unsupported OS for the server %1").arg(serverName);
                     }
                 }
@@ -554,12 +562,14 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         {
             m_updateInfo = checkResponse;
 
-            if (!m_updateInfo.unsupportedSystem.empty())
-                m_stateTracker->setVerificationError(checkResponse.unsupportedSystem);
+            if (!m_updateInfo.unsuportedSystemsReport.empty())
+                m_stateTracker->setVerificationError(checkResponse.unsuportedSystemsReport);
 
             if (!m_updateInfo.missingUpdate.empty())
+            {
                 m_stateTracker->setVerificationError(
                     checkResponse.missingUpdate, tr("No update package available"));
+            }
 
             m_updateReport = calculateUpdateVersionReport(m_updateInfo);
 

@@ -47,6 +47,8 @@ public:
 
         NotificationsPanelExpand,
         NotificationsPanelCollapse,
+        RightPanelTileInsertion,
+        RightPanelTileRemoval,
 
         TitlePanelExpand,
         TitlePanelCollapse,

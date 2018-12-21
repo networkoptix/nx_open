@@ -40,8 +40,6 @@ public:
     virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
     //!Implementation of QnSecurityCamResource::manufacture
     virtual QString getDriverName() const override;
-    //!Implementation of QnSecurityCamResource::setIframeDistance
-    virtual void setIframeDistance( int frames, int timems ) override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

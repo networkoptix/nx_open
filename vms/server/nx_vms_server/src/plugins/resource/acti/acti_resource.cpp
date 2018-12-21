@@ -132,11 +132,6 @@ QString QnActiResource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
-}
-
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 {
     return new QnActiStreamReader(toSharedPointer(this));

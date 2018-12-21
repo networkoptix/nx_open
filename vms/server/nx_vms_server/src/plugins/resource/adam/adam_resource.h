@@ -27,8 +27,6 @@ public:
     QnAdamResource(QnMediaServerModule* serverModule);
     virtual ~QnAdamResource();
 
-    virtual void setIframeDistance(int frames, int timeMs) override;
-
     virtual QString getDriverName() const override;
 
     virtual QnIOStateDataList ioPortStates() const override;

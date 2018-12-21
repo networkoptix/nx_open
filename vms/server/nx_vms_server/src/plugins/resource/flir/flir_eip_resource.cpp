@@ -77,11 +77,6 @@ QString QnFlirEIPResource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnFlirEIPResource::setIframeDistance(int, int)
-{
-
-}
-
 QnAbstractStreamDataProvider* QnFlirEIPResource::createLiveDataProvider()
 {
     return new QnRtpStreamReader(toSharedPointer(this), "avc");

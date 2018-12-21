@@ -18,11 +18,6 @@ QString QnTestCameraResource::getDriverName() const
     return QLatin1String(kManufacturer);
 }
 
-void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
-}
-
 nx::vms::server::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {

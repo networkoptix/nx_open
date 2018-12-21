@@ -47,8 +47,6 @@ public:
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual void setIframeDistance(int frames, int timems) override;
-
     virtual bool hasDualStreamingInternal() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N

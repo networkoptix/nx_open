@@ -2,17 +2,20 @@
 
 #include <core/resource/client_core_camera.h>
 
-class QnMobileClientCamera: public QnClientCoreCamera {
+class QnMobileClientCamera: public nx::vms::client::core::Camera
+{
     Q_OBJECT
-
-    typedef QnClientCoreCamera base_type;
+    using base_type = nx::vms::client::core::Camera;
 
 public:
-    QnMobileClientCamera(const QnUuid &resourceTypeId);
+    explicit QnMobileClientCamera(const QnUuid& resourceTypeId);
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider *dataProvider = 0) const override;
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider *dataProvider = 0) const override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
+        const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
+
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(
+        const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 
 protected:
-    virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };

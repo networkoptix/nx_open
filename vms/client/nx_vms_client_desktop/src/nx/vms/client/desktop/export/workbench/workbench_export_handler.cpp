@@ -50,6 +50,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -255,16 +256,15 @@ struct WorkbenchExportHandler::Private
             };
     }
 
-    static void addResourceToPool(const Filename& filename, QnResourcePool* resourcePool)
+    static QnResourcePtr ensureResourceIsInPool(const Filename& filename, QnResourcePool* resourcePool)
     {
         const auto completeFilename = filename.completeFileName();
         NX_ASSERT(QFileInfo(completeFilename).exists());
         if (!QFileInfo(completeFilename).exists())
-            return;
+            return {};
 
-        const auto existing = resourcePool->getResourceByUrl(completeFilename);
-        if (existing)
-            resourcePool->removeResource(existing);
+        if (const auto existing = resourcePool->getResourceByUrl(completeFilename))
+            return existing;
 
         switch (filename.extension)
         {
@@ -275,7 +275,7 @@ struct WorkbenchExportHandler::Private
                 QnAviResourcePtr file(new QnAviResource(completeFilename));
                 file->setStatus(Qn::Online);
                 resourcePool->addResource(file);
-                break;
+                return file;
             }
 
             case FileExtension::nov:
@@ -286,11 +286,11 @@ struct WorkbenchExportHandler::Private
                     completeFilename, resourcePool);
                 if (layout)
                     resourcePool->addResource(layout);
-                break;
+                return layout;
             }
             default:
                 NX_ASSERT(false, "Unsuported format");
-                break;
+                return {};
         }
     }
 };
@@ -365,10 +365,13 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     switch (info.status)
     {
         case ExportProcessStatus::success:
-            d->addResourceToPool(exportProcess.filename, resourcePool());
+        {
+            const auto resource = d->ensureResourceIsInPool(exportProcess.filename, resourcePool());
+            if (const auto layout = resource.dynamicCast<QnLayoutResource>())
+                snapshotManager()->store(layout);
             QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
             break;
-
+        }
         case ExportProcessStatus::failure:
             QnMessageBox::critical(mainWindowWidget(), tr("Export failed"),
                 ExportProcess::errorString(info.error));

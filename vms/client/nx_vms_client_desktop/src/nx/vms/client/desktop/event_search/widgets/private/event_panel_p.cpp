@@ -109,7 +109,7 @@ EventPanel::Private::Private(EventPanel* q):
     for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
     {
         connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
-        connect(tab, &AbstractSearchWidget::isAllowedChanged, this, &Private::rebuildTabs);
+        connect(tab, &AbstractSearchWidget::allowanceChanged, this, &Private::rebuildTabs);
     }
 
     rebuildTabs();

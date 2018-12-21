@@ -12,7 +12,7 @@ details::NodePtr createCheckAllNode(
     int mainColumn,
     const QString& text,
     const QIcon& icon = QIcon(),
-    int siblingGroup = 0);
+    int groupSortOrder = 0);
 
 int selectedChildrenCount(const details::NodePtr& node);
 
