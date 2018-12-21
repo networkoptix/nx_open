@@ -145,7 +145,7 @@
                 }
                 
                 function updateAvailableResolutions() {
-                    if ($scope.player == null) {
+                    if ($scope.player === null) {
                         $scope.availableResolutions = [LANG.common.resolution.auto];
                         return;
                     }
@@ -179,7 +179,7 @@
                         $scope.availableResolutions = streams;
                         
                         if ($scope.activeCamera && streams.length === 1) {
-                            if (window.jscd.os === 'iOS') {
+                            if (window.jscd.os === 'iOS' && $scope.activeCamera.status !== 'Unauthorized') {
                                 $scope.iOSVideoTooLarge = true;
                             } else {
                                 console.error("no suitable streams from this camera");
