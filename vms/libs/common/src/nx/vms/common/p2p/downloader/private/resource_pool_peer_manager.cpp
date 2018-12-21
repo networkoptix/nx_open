@@ -204,7 +204,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
 
     const auto handleReply =
         [this, callback, localRequestId](
-            bool success, rest::Handle handle, const QnJsonRestResult& result)
+            bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
             d->removeCanceller(localRequestId);
 
@@ -239,7 +239,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
 
     const auto handleReply =
         [this, callback, localRequestId](
-            bool success, rest::Handle handle, const QnJsonRestResult& result)
+            bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
             d->removeCanceller(localRequestId);
 
@@ -276,7 +276,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     const auto handleReply =
         [this, callback = std::move(callback), localRequestId](
             bool success,
-            rest::Handle requestId,
+            rest::Handle /*requestId*/,
             QByteArray result,
             const nx::network::http::HttpHeaders& /*headers*/)
         {
@@ -314,7 +314,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
         const auto handleReply =
             [this, callback = std::move(callback), localRequestId](
                 bool result,
-                rest::Handle handle,
+                rest::Handle /*handle*/,
                 const QByteArray& data)
             {
                 d->removeCanceller(localRequestId);
@@ -336,7 +336,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
         const auto handleReply =
             [this, callback = std::move(callback), localRequestId](
                 bool success,
-                rest::Handle requestId,
+                rest::Handle /*requestId*/,
                 QByteArray result,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {

@@ -30,13 +30,12 @@ public:
         SkipStartupTilesManagement,
         StartupDiscoveryPeriodMs,
         KnownServerConnections,
-        CloudCredentials,
-        SystemAuthenticationData,
 
         // Obsolete values.
         CloudLogin,
         CloudPassword,
         KnownServerUrls,
+        SystemAuthenticationData,
 
         PropertiesCount
     };

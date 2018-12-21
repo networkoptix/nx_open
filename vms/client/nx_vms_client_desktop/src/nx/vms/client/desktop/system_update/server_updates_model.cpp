@@ -85,7 +85,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
     if (!item)
         return QVariant();
 
-    auto server = m_tracker->getServer(item.get());
+    auto server = m_tracker->getServer(item);
 
     int column = index.column();
 

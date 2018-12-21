@@ -113,4 +113,14 @@ EventRibbon* AbstractSearchWidget::view() const
     return d->view();
 }
 
+bool AbstractSearchWidget::isAllowed() const
+{
+    return d->isAllowed();
+}
+
+void AbstractSearchWidget::updateIsAllowed()
+{
+    d->setAllowed(calculateIsAllowed());
+}
+
 } // namespace nx::vms::client::desktop

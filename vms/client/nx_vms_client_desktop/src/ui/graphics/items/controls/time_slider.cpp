@@ -41,7 +41,7 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/timeline/graphics/timeline_cursor_layout.h>
 #include <nx/vms/client/desktop/timeline/graphics/timeline_screenshot_cursor.h>

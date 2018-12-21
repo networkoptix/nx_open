@@ -276,7 +276,8 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
         m_uploadDestination = QString("updates/%1/").arg(contents.info.version);
 
         // TODO: Move this verification to multi_server_updates_widget.cpp
-        if (verifyUpdateManifest(contents) && !contents.filesToUpload.empty())
+        // TODO: Provide proper installed versions.
+        if (verifyUpdateManifest(contents, {}) && !contents.filesToUpload.empty())
         {
             contents.error = nx::update::InformationError::noError;
             changeUploadState(OfflineUpdateState::ready);
@@ -302,7 +303,7 @@ QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
     auto items = m_stateTracker->getAllItems();
     for (const auto& record: items)
     {
-        auto server = m_stateTracker->getServer(record.get());
+        auto server = m_stateTracker->getServer(record);
         if (!server)
             continue;
         bool isOurServer = !server->hasFlags(Qn::fake_server)
@@ -563,11 +564,13 @@ void ServerUpdateTool::stopUpload()
     changeUploadState(OfflineUpdateState::ready);
 }
 
-bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
+bool ServerUpdateTool::verifyUpdateManifest(
+    UpdateContents& contents,
+    const std::set<nx::utils::SoftwareVersion>& clientVersions) const
 {
     NX_ASSERT(m_stateTracker);
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
-    return verifyUpdateContents(commonModule(), contents, activeServers);
+    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
@@ -660,7 +663,8 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
         systemInfo,
         m_updateManifest,
         true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
-    verifyUpdateManifest(contents);
+    // TODO: Should move this to Widget somehow.
+    verifyUpdateManifest(contents, {});
     return contents;
 }
 

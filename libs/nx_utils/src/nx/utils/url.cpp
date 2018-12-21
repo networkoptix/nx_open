@@ -4,6 +4,7 @@
 #include <QtCore/QRegExp>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #include "url.h"
 
@@ -594,13 +595,23 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
     return result;
 }
 
+QString hideUrlPassword(const QString& urlStr)
+{
+    if (displayPasswordInLogs())
+        return urlStr;
+
+    nx::utils::Url url(urlStr);
+    if (url.isValid())
+        url.toDisplayString();
+
+    return urlStr;
+}
+
+bool displayPasswordInLogs()
+{
+    return nx::utils::ini().displayUrlPasswordInLogs;
+}
+
 } // namespace url
 } // namespace utils
 } // namespace nx
-
-QString toString(const nx::utils::Url &value)
-{
-    if (nx::utils::ini().displayUrlPasswordInLogs)
-        return value.toString();
-    return value.toDisplayString();
-}

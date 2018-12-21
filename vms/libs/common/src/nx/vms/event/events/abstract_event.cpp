@@ -238,6 +238,8 @@ AbstractEvent::AbstractEvent(
     m_resource(resource),
     m_toggleState(toggleState)
 {
+    NX_VERBOSE(this, "Created with type [%1] for resource [%2] at [%3]us",
+        eventType, resource, timeStampUsec);
 }
 
 AbstractEvent::~AbstractEvent()

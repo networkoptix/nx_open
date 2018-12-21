@@ -95,6 +95,7 @@ int TransactionMessageBusStub::distanceToPeer(const QnUuid& /*dstPeer*/) const
 
 void TransactionMessageBusStub::addOutgoingConnectionToPeer(
     const QnUuid& /*id*/,
+    nx::vms::api::PeerType /*peerType*/,
     const nx::utils::Url& /*url*/)
 {
     // TODO

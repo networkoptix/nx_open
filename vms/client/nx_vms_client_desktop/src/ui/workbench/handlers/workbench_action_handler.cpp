@@ -165,7 +165,7 @@
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>

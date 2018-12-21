@@ -21,6 +21,16 @@
 
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+static const std::vector<QPalette::ColorRole> kTextRoles{
+    QPalette::ButtonText,
+    QPalette::BrightText,
+    QPalette::WindowText,
+    QPalette::Text};
+
+} // namespace
+
 // TODO: #vkutin Default disabledOpacity to style::Hints::kDisabledItemOpacity in new versions.
 void setWarningStyle(QWidget* widget, qreal disabledOpacity)
 {
@@ -39,17 +49,15 @@ void resetStyle(QWidget* widget)
 
 void setCustomStyle(QPalette* palette, const QColor& color, qreal disabledOpacity)
 {
-    palette->setColor(QPalette::ButtonText, color);
-    palette->setColor(QPalette::WindowText, color);
-    palette->setColor(QPalette::Text, color);
+    for (const auto& role: kTextRoles)
+        palette->setColor(role, color);
 
     if (qFuzzyIsNull(disabledOpacity - 1.0))
         return;
 
     const auto disabledColor = toTransparent(color, disabledOpacity);
-    palette->setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
-    palette->setColor(QPalette::Disabled, QPalette::WindowText, disabledColor);
-    palette->setColor(QPalette::Disabled, QPalette::Text, disabledColor);
+    for (const auto& role: kTextRoles)
+        palette->setColor(QPalette::Disabled, role, disabledColor);
 }
 
 void setWarningStyle(QPalette* palette, qreal disabledOpacity)

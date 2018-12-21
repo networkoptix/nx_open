@@ -14,6 +14,29 @@
 
 namespace nx::vms::client::desktop {
 
+bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
+{
+    using namespace applauncher::api;
+
+    /* Try to run applauncher if it is not running. */
+    if (!checkOnline())
+        return false;
+
+    const auto result = applauncher::api::getInstalledVersions(versions);
+    if (result == ResultType::ok)
+        return true;
+
+    static const int kMaxTries = 5;
+    for (int i = 0; i < kMaxTries; ++i)
+    {
+        QThread::msleep(100);
+        qApp->processEvents();
+        if (applauncher::api::getInstalledVersions(versions) == ResultType::ok)
+            return true;
+    }
+    return false;
+}
+
 ClientUpdateTool::ClientUpdateTool(QObject *parent):
     base_type(parent),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
@@ -41,6 +64,17 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
         this, &ClientUpdateTool::atDownloadFailed);
 
     m_downloader->startDownloads();
+
+    m_installedVersionsFuture = std::async(std::launch::async,
+        []()
+        {
+            std::set<nx::utils::SoftwareVersion> output;
+            QList<nx::utils::SoftwareVersion> versions;
+            if (requestInstalledVersions(&versions))
+                for (const auto& version: versions)
+                    output.insert(version);
+            return output;
+        });
 }
 
 ClientUpdateTool::~ClientUpdateTool()
@@ -145,6 +179,13 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
 {
     return m_remoteUpdateContents;
+}
+
+std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions() const
+{
+    if (m_installedVersionsFuture.valid())
+        m_installedVersions = m_installedVersionsFuture.get();
+    return m_installedVersions;
 }
 
 bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
