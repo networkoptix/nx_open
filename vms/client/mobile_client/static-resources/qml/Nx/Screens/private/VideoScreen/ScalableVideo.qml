@@ -269,9 +269,9 @@ ZoomableFlickable
         {
             id: motionSearchController
 
-            parent: viewport
-            anchors.fill: viewport
-            viewport: content.videoOutput
+            parent: content.videoOutput
+            anchors.fill: parent
+            viewport: control
 
             allowDrawing: !control.fisheyeMode
             cameraRotation: control.resourceHelper.customRotation
