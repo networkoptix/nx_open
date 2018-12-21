@@ -49,6 +49,7 @@ struct
     int serverPort;
     aio::AbstractAioThread* aioThread = nullptr;
     Mode mode = Mode::automatic;
+    bool readOnly = false;
 } config;
 
 class P2PConnection;
@@ -107,13 +108,16 @@ public:
         if (startTransport)
             m_p2pTransport->start();
 
-        m_p2pTransport->sendAsync(
-            kTestMessage,
-            [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
-                size_t bytesRead)
-            {
-                onSend(errorCode, bytesRead);
-            });
+        if (!config.readOnly)
+        {
+            m_p2pTransport->sendAsync(
+                kTestMessage,
+                [self = shared_from_this(), this] (SystemError::ErrorCode errorCode,
+                    size_t bytesRead)
+                {
+                    onSend(errorCode, bytesRead);
+                });
+        }
 
         m_p2pTransport->readSomeAsync(
             &m_readBuffer,
@@ -532,6 +536,7 @@ static void printHelp()
            "--force-http (Forces server to accept http p2p connection only)]\n");
     printf("Additional options:\n" \
            " --verbose\n" \
+           " --read-only (Don't send test messages. Useful when connecting to a real server)\n" \
            " --help\n");
     printf("Note:\n");
     printf(" In case if you want to connect to the p2p_connection_testing_utility run in the "
@@ -579,6 +584,10 @@ static bool parseCommandLineArguments(int argc, const char* argv[])
         else if (strcmp(argv[i], "--force-http") == 0)
         {
             config.mode = Mode::http;
+        }
+        else if (strcmp(argv[i], "--read-only") == 0)
+        {
+            config.readOnly = true;
         }
     }
 

@@ -259,8 +259,6 @@ void ConnectionBase::onHttpClientDone()
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
-    if (m_remotePeer.id == ::ec2::kCloudPeerId)
-        m_remotePeer.peerType = vms::api::PeerType::cloudServer;
 
     if (m_connectionLockGuard && !m_connectionLockGuard->tryAcquireConnected())
     {

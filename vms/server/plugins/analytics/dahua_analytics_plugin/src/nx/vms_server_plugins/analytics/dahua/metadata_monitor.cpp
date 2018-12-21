@@ -18,22 +18,22 @@ namespace analytics {
 namespace dahua {
 
 static const QString kMonitorUrlPath("/cgi-bin/eventManager.cgi");
-static const QString kMonitorUrlQueryPattern("action=attach&codes=[%1]&heartbeat=10");
+static const QString kMonitorUrlQueryPattern("action=attach&codes=[%1]&heartbeat=3");
 
 static const std::chrono::minutes kKeepAliveTimeout(2);
 static const std::chrono::seconds kMinReopenInterval(10);
 static const std::chrono::seconds kExpiredEventTimeout(5);
 
 MetadataMonitor::MetadataMonitor(
-    const EngineManifest& manifest,
-    const nx::vms::api::analytics::DeviceAgentManifest& deviceManifest,
+    const EngineManifest& parsedEngineManifest,
+    const nx::vms::api::analytics::DeviceAgentManifest& parsedDeviceAgentManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth,
-    const std::vector<QString>& eventTypes)
+    const std::vector<QString>& eventTypeIdList)
     :
-    m_engineManifest(manifest),
-    m_deviceManifest(deviceManifest),
-    m_monitorUrl(buildMonitoringUrl(url, eventTypes)),
+    m_parsedEngineManifest(parsedEngineManifest),
+    m_parsedDeviceAgentManifest(parsedDeviceAgentManifest),
+    m_monitorUrl(buildMonitoringUrl(url, eventTypeIdList)),
     m_auth(auth)
 {
 }
@@ -81,22 +81,23 @@ void MetadataMonitor::clearHandlers()
 
 nx::utils::Url MetadataMonitor::buildMonitoringUrl(
     const nx::utils::Url& resourceUrl,
-    const std::vector<QString>& eventTypes) const
+    const std::vector<QString>& eventTypeIdList) const
 {
-    NX_ASSERT(!eventTypes.empty());
+    NX_ASSERT(!eventTypeIdList.empty());
 
     nx::utils::Url monitorUrl(resourceUrl);
     monitorUrl.setPath(kMonitorUrlPath);
 
-    QString eventNames;
-    for (const auto& eventTypeId: eventTypes)
+    QString eventInternalNames;
+    for (const auto& eventTypeId: eventTypeIdList)
     {
-        const QString name = m_engineManifest.eventTypeDescriptorById(eventTypeId).internalName;
-        eventNames = eventNames + name + ',';
+        const QString name =
+            m_parsedEngineManifest.eventTypeDescriptorById(eventTypeId).internalName;
+        eventInternalNames = eventInternalNames + name + ',';
     }
-    eventNames.chop(1); //< Remove last comma.
+    eventInternalNames.chop(1); //< Remove last comma.
 
-    monitorUrl.setQuery(kMonitorUrlQueryPattern.arg(eventNames));
+    monitorUrl.setQuery(kMonitorUrlQueryPattern.arg(eventInternalNames));
     return monitorUrl;
 }
 
@@ -117,7 +118,8 @@ void MetadataMonitor::initEventMonitor()
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
 
     m_contentParser = std::make_unique<nx::network::http::MultipartContentParser>();
-    m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_engineManifest, this));
+    m_contentParser->setNextFilter(
+        std::make_shared<BytestreamFilter>(m_parsedEngineManifest, this));
 
     m_monitorHttpClient = std::move(httpClient);
     m_monitorHttpClient->doGet(m_monitorUrl);
@@ -174,7 +176,7 @@ bool MetadataMonitor::processEvent(const Event& event)
             return result;
         };
 
-    auto eventTypeDescriptor = m_engineManifest.eventTypeDescriptorById(event.typeId);
+    auto eventTypeDescriptor = m_parsedEngineManifest.eventTypeDescriptorById(event.typeId);
     using namespace nx::sdk::analytics;
     if (eventTypeDescriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {
@@ -207,8 +209,8 @@ void MetadataMonitor::addExpiredEvents(std::vector<Event>& result)
         {
             auto& event = itr.value().event;
             event.isActive = false;
-            event.caption = buildCaption(m_engineManifest, event);
-            event.description = buildDescription(m_engineManifest, event);
+            event.caption = buildCaption(m_parsedEngineManifest, event);
+            event.description = buildDescription(m_parsedEngineManifest, event);
             result.push_back(std::move(itr.value().event));
             itr = m_startedEvents.erase(itr);
         }

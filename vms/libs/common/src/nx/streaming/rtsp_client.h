@@ -63,7 +63,7 @@ public:
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
 
-    void bindToMulticastAddress(const QHostAddress& address);
+    void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
 private:
     void processRtcpData();
 

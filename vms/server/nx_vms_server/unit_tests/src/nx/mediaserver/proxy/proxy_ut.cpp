@@ -10,6 +10,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/vms/api/data/module_information.h>
+#include <transaction/message_bus_adapter.h>
 
 using namespace nx::utils::test;
 
@@ -48,14 +49,8 @@ public:
 
     void connectPeers()
     {
-        for (int i = 0; i < m_peers.size(); ++i)
-        {
-            for (int j = 0; j < m_peers.size(); ++j)
-            {
-                if (i != j)
-                    m_peers[i]->moduleInstance()->connectTo(m_peers[j]->moduleInstance().get());
-            }
-        }
+        for (int i = 0; i < m_peers.size() - 1; ++i)
+            m_peers[i]->moduleInstance()->connectTo(m_peers[i + 1]->moduleInstance().get());
     }
 
     nx::utils::Url serverUrl(int index, const QString& path)
@@ -69,8 +64,17 @@ public:
 
 TEST_F(ProxyTest, proxyToAnotherThenToThemself)
 {
-    startPeers(2);
+    startPeers(3);
     connectPeers();
+
+    auto messageBus = m_peers[0]->moduleInstance()->ecConnection()->messageBus();
+    auto server2Id = m_peers[2]->moduleInstance()->commonModule()->moduleGUID();
+    int distance = std::numeric_limits<int>::max();
+    while (distance > m_peers.size())
+    {
+        distance = messageBus->distanceToPeer(server2Id);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     auto client = std::make_unique<nx::network::http::HttpClient>();
 

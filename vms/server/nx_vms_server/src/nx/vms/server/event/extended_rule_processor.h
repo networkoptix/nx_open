@@ -4,6 +4,7 @@
 #include <nx/vms/server/event/rule_processor.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/email/email_manager_impl.h>
+#include <nx/utils/elapsed_timer.h>
 
 class QnMediaServerModule;
 
@@ -47,10 +48,8 @@ private:
     {
     public:
         vms::event::SendMailActionPtr action;
-        quint64 periodicTaskID;
-        int eventCount;
-
-        SendEmailAggregationData() : periodicTaskID(0), eventCount(0) {}
+        quint64 periodicTaskID = 0;
+        nx::utils::ElapsedTimer lastMailTime;
     };
 
     QMap<QnUuid, qint64> m_runningBookmarkActions;

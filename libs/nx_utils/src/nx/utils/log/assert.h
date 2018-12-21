@@ -11,7 +11,6 @@
 
 #include "log_message.h"
 
-#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/general_macros.h>
 
 #if defined(ANDROID) || defined(__ANDROID__)
@@ -33,6 +32,8 @@ bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
 
 void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
+
+bool NX_UTILS_API isAssertHeavyConditionEnabled();
 
 /**
  * @return Always false.
@@ -110,8 +111,11 @@ private:
 #endif
 
 /**
- * Debug and Release: Cause segfault in case of failure.
- * Usage: Unrecoverable situations when later crash or deadlock is inevitable.
+ * - Debug and Release: Causes segfault in case of failure.
+ * - Usage: Unrecoverable situations when later crash or deadlock is inevitable.
+ *     ```
+ *         NX_CRITICAL(veryImportantObjectPointer);
+ *     ```
  */
 #define NX_CRITICAL(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
@@ -127,9 +131,18 @@ private:
     NX_CHECK(/*isCritical*/ true, CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
- * Debug: Cause segfault in case of failure.
- * Release: Write log in case of failure.
- * Usage: Recoveroble situations, application must keep going after such failure.
+ * - Debug: Causes segfault in case of assertion failure, if not disabled via
+ *     nx_utils.ini assertCrash = 0.
+ * - Release: Writes log in case of assertion failure, if not enabled via
+ *     nx_utils.ini assertCrash = 0.
+ * - Usage: Recoverable situations, application must keep going after such failure.
+ *     ```
+ *         if (!NX_ASSERT(objectPointer))
+ *             return false;
+ *
+ *         NX_ASSERT(!objectPointer->name().isEmpty());
+ *     ```
+ * @return Condition evaluation result.
  */
 #define NX_ASSERT(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
@@ -145,12 +158,18 @@ private:
     NX_CHECK(/*isCritical*/ false, CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
- * Debug: Leads to segfault in case of failure.
- * Release: Does nothing (condition is not even evaluated).
- * Usage: The same as NX_ASSERT but condition affects application performance.
+ * - Debug: Works the same way as NX_ASSERT(), if not disabled via
+ *     nx_utils.ini assertHeavyCondition = 0.
+ * - Release: Does nothing (the condition is never evaluated).
+ *
+ * - Usage: The same as NX_ASSERT() but for cases when condition evaluation may affect application
+ *     performance.
+ *     ```
+ *         NX_ASSERT_HEAVY_CONDITION(!getObjectFromDb().isEmpty());
+ *     ```
  */
 #define NX_ASSERT_HEAVY_CONDITION(...) do \
 { \
-    if (::nx::utils::ini().assertHeavyCondition) \
+    if (::nx::utils::isAssertHeavyConditionEnabled()) \
         NX_ASSERT(__VA_ARGS__); \
 } while (0)

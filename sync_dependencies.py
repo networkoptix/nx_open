@@ -85,7 +85,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg"] = "3.1.1-1"
+        v["ffmpeg"] = "3.1.9"
 
     if box == "edge1":
         v["sysroot"] = "jessie"

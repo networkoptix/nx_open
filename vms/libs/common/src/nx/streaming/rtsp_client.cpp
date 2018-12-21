@@ -13,6 +13,7 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 #include <utils/common/sleep.h>
+#include <nx/network/nettools.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
@@ -43,12 +44,15 @@ RtspTransport rtspTransportFromString(const QString& value)
     auto upperValue = value.toUpper().trimmed();
     if (upperValue == "TCP")
         return RtspTransport::tcp;
-    else if (upperValue == "UDP")
+    if (upperValue == "UDP")
         return RtspTransport::udp;
-    else if (upperValue == "MULTICAST")
+    if (upperValue == "MULTICAST")
         return RtspTransport::multicast;
-    else
+    if (upperValue == "" || upperValue == "AUTO_DETECT")
         return RtspTransport::autoDetect;
+
+    NX_ASSERT(false, lm("Unsupported value: %1").arg(value));
+    return RtspTransport::autoDetect;
 }
 
 QString toString(const RtspTransport& value)
@@ -61,9 +65,13 @@ QString toString(const RtspTransport& value)
             return "TCP";
         case RtspTransport::multicast:
             return "MULTICAST";
-        default:
-            return "";
+        case RtspTransport::autoDetect:
+            return "AUTO_DETECT";
     }
+
+    const auto s = lm("TRANSPORT_%1").arg(static_cast<int>(value));
+    NX_ASSERT(false, lm("Unsupported value: %1").arg(s));
+    return s;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -90,12 +98,12 @@ QnRtspIoDevice::~QnRtspIoDevice()
     }
 }
 
-void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address)
+void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress)
 {
     if (m_mediaSocket)
-        m_mediaSocket->joinGroup(address.toString());
+        m_mediaSocket->joinGroup(address.toString(), interfaceAddress);
     if (m_rtcpSocket)
-        m_rtcpSocket->joinGroup(address.toString());
+        m_rtcpSocket->joinGroup(address.toString(), interfaceAddress);
     m_multicastAddress = address;
 }
 
@@ -645,7 +653,10 @@ bool QnRtspClient::sendSetup()
             transportStr += m_prefferedTransport == RtspTransport::multicast ? ";multicast;" : ";unicast;";
 
             if (m_prefferedTransport == RtspTransport::multicast)
-                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress);
+            {
+                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
+                    m_tcpSock->getLocalAddress().address.toString());
+            }
 
             if (m_prefferedTransport != RtspTransport::tcp)
             {
