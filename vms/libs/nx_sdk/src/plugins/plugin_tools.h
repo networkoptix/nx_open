@@ -224,16 +224,20 @@ protected:
 };
 
 /**
- * Intended for debug.
- * @return Reference counter, or 0 if object is null.
+ * Intended for debug. Is not thread-safe.
+ * @return Reference counter, or 0 if the pointer is null.
  */
-template<typename Interface>
-int refCount(Interface* object)
+template<typename RefCountableInterface>
+int refCount(const nxpl::PluginInterface* object)
 {
-	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
+    if (object == nullptr)
+        return 0;
+
+	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<RefCountableInterface>*>(object))
 		return commonRefCounter->refCount();
 
-	return 0;
+    (void) object->addRef();
+    return object->releaseRef();
 }
 
 enum NxGuidFormatOption

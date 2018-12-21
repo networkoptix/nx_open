@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include <nx/kit/test.h>
 
 #include <map>
 #include <string>
