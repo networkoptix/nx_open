@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tuple>
+#include <set>
 #include <type_traits>
 
 #include <nx/utils/std/optional.h>
@@ -851,6 +852,45 @@ namespace MapHelper
 
         MapHelper::forEach(nestedMap, filterFunc);
         return result;
+    }
+
+    /**
+     * Removes from the first map all elements that have no corresponding elements in the second
+     * map. Other elements are merged in-place with the help of the given merge executor.
+     */
+    template<
+        typename Map,
+        typename MergeExecutor = DefaultMergeExecutor<DeepestMappedType<Map>>
+    >
+    void intersected(
+        Map* first,
+        const Map& second,
+        const MergeExecutor& mergeExecutor = MergeExecutor())
+    {
+        const auto firstKeys = keys(*first);
+        const auto secondKeys = keys(second);
+
+        MapKeys<Map> intersectedKeys;
+        std::set_intersection(
+            firstKeys.begin(), firstKeys.end(),
+            secondKeys.begin(), secondKeys.end(),
+            std::inserter(intersectedKeys, intersectedKeys.begin()));
+
+        for (const auto& key: firstKeys)
+        {
+            if (intersectedKeys.find(key) == intersectedKeys.cend())
+                std::apply(NX_WRAP_FUNC_TO_LAMBDA(erase), flatTuple(first, key));
+        }
+
+        for (const auto& key: intersectedKeys)
+        {
+            auto merged = mergeExecutor(
+                std::apply(NX_WRAP_FUNC_TO_LAMBDA(getPointer), flatTuple(*first, key)),
+                std::apply(NX_WRAP_FUNC_TO_LAMBDA(getPointer), flatTuple(second, key)));
+
+            if (merged)
+                std::apply(NX_WRAP_FUNC_TO_LAMBDA(set), flatTuple(first, key, *merged));
+        }
     }
 }
 

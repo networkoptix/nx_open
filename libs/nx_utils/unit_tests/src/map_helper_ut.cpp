@@ -218,4 +218,29 @@ TEST_F(MapHelperTest, forEach)
     ASSERT_EQ(result, m_nestedMap);
 }
 
+TEST_F(MapHelperTest, intersected)
+{
+    MapHelper::NestedMap<std::map, std::string, std::string, int> first;
+
+    MapHelper::set(&first, "hello0", "section1", 1);
+    MapHelper::set(&first, "hello0", "section1", 2);
+    MapHelper::set(&first, "hello1", "section1", 3);
+    MapHelper::set(&first, "hello2", "section0", 4);
+
+    MapHelper::NestedMap<std::map, std::string, std::string, int> second;
+
+    MapHelper::set(&second, "hello0", "section0", 5);
+    MapHelper::set(&second, "hello0", "section1", 6);
+    MapHelper::set(&second, "hello1", "section1", 7);
+    MapHelper::set(&second, "hello3", "section4", 8);
+
+    MapHelper::NestedMap<std::map, std::string, std::string, int> expectedResult;
+
+    MapHelper::set(&expectedResult, "hello0", "section1", 6);
+    MapHelper::set(&expectedResult, "hello1", "section1", 7);
+
+    MapHelper::intersected(&first, second);
+    ASSERT_EQ(expectedResult, first);
+}
+
 } // namespace nx::utils::data_structures::test
