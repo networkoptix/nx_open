@@ -4715,8 +4715,6 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
 
-    restrictions->allow(webPrefix + "/ec2/getFullInfo", nx::network::http::AuthMethod::noAuth);
-
     // For open in new browser window.
     restrictions->allow(webPrefix + "/api/showLog.*",
         nx::network::http::AuthMethod::urlQueryDigest | nx::network::http::AuthMethod::allowWithourCsrf);
