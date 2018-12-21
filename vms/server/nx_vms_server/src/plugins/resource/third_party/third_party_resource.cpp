@@ -366,7 +366,6 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods(
         sortOrder);
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
 void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_CameraInputEventHandler, sizeof(nxcip::IID_CameraInputEventHandler) ) == 0 )
@@ -382,13 +381,11 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
 int QnThirdPartyResource::addRef() const
 {
     return m_refCounter.fetchAndAddOrdered(1) + 1;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
 int QnThirdPartyResource::releaseRef() const
 {
     return m_refCounter.fetchAndAddOrdered(-1) - 1;

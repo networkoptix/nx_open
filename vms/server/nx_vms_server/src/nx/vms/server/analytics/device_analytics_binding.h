@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/std/optional.h>
+#include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
 
 #include <nx/sdk/common/ptr.h>

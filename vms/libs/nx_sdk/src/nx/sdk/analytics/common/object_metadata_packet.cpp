@@ -33,7 +33,7 @@ int64_t ObjectMetadataPacket::durationUs() const
 
 IObject* ObjectMetadataPacket::nextItem()
 {
-    if (m_currentIndex < m_objects.size())
+    if (m_currentIndex < (int) m_objects.size())
         return m_objects[m_currentIndex++];
 
     return nullptr;
