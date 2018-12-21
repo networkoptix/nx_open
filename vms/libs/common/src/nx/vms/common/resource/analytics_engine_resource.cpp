@@ -16,7 +16,6 @@
 
 namespace nx::vms::common {
 
-using namespace nx::analytics;
 using namespace nx::vms::api::analytics;
 
 const QString AnalyticsEngineResource::kSettingsValuesProperty{"settingsValues"};

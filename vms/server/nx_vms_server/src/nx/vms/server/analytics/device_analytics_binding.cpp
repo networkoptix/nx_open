@@ -1,4 +1,4 @@
-﻿#include "device_analytics_binding.h"
+#include "device_analytics_binding.h"
 
 #include <plugins/plugins_ini.h>
 

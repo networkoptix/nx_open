@@ -1,4 +1,4 @@
-﻿#include "device_agent.h"
+#include "device_agent.h"
 
 #include <iostream>
 #include <chrono>

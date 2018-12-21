@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 #include "device_agent.h"
 #include "common.h"

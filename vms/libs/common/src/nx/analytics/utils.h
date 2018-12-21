@@ -11,7 +11,7 @@ std::map<QString, Descriptor> fromManifestItemListToDescriptorMap(
     const nx::analytics::EngineId& engineId, const QList<Item>& items)
 {
     std::map<QString, Descriptor> result;
-    for (const auto& item : items)
+    for (const auto& item: items)
     {
         auto descriptor = Descriptor(engineId, item);
         result.emplace(descriptor.getId(), std::move(descriptor));

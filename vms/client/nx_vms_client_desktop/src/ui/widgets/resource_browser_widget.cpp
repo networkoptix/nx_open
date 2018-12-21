@@ -1,4 +1,4 @@
-﻿#include "resource_browser_widget.h"
+#include "resource_browser_widget.h"
 #include "ui_resource_browser_widget.h"
 
 #include <QtCore/QItemSelectionModel>

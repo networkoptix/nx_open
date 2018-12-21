@@ -1,4 +1,4 @@
-﻿#include "resource_item_delegate.h"
+#include "resource_item_delegate.h"
 
 #include <QtCore/QtMath>
 

@@ -1,4 +1,4 @@
-﻿#include "action_parameter_types.h"
+#include "action_parameter_types.h"
 
 #include <nx/utils/flat_map.h>
 
