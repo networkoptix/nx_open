@@ -243,6 +243,14 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
         this, &MultiServerUpdatesWidget::checkForInternetUpdates);
 
+    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
+        [this]()
+        {
+            NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
+            if (m_stateTracker)
+                m_stateTracker->setResourceFeed(resourcePool());
+        });
+
     setWarningStyle(ui->errorLabel);
     setWarningStyle(ui->longUpdateWarning);
 
