@@ -522,7 +522,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
     {
         NX_DEBUG(this, lit("%1 Mounting remote drive %2. Result: %3")
                .arg(Q_FUNC_INFO)
-               .arg(nx::utils::url::hideUrlPassword(getUrl()))
+               .arg(getUrl())
                .arg(message));
         return result;
     };
@@ -541,7 +541,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
         default:
             NX_WARNING(this, lit("%1 Mounting remote drive %2 error %3.")
                     .arg(Q_FUNC_INFO)
-                    .arg(nx::utils::url::hideUrlPassword(getUrl()))
+                    .arg(getUrl())
                     .arg(errCode));
             return Qn::StorageInit_WrongPath;
     };
@@ -556,7 +556,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
     if (!url.startsWith("smb://"))
         return Qn::StorageInit_Ok;
 
-    NX_VERBOSE(this, lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(nx::utils::url::hideUrlPassword(getUrl())));
+    NX_VERBOSE(this, lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()));
 
     QUrl storageUrl(url);
     NETRESOURCE netRes;
