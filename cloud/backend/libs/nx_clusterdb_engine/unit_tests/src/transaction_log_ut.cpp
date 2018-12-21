@@ -520,8 +520,6 @@ public:
 
     void startDbTransaction()
     {
-        using namespace std::placeholders;
-
         m_completedState = State::startedTransaction;
         m_desiredState = State::startedTransaction;
         m_commandLog->startDbTransaction(
@@ -686,8 +684,6 @@ protected:
 
     void whenAddBunchOfTransactionsConcurrently()
     {
-        using namespace std::placeholders;
-
         const int transactionToAddCount = dbConnectionOptions().maxConnectionCount;
         ASSERT_GT(transactionToAddCount, 1);
         m_transactionToExecuteThreshold = 7;
