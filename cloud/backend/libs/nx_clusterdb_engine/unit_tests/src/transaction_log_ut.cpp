@@ -663,6 +663,13 @@ public:
     }
 
 protected:
+    struct ReadResult
+    {
+        ResultCode resultCode;
+        std::vector<dao::TransactionLogRecord> serializedTransactions;
+        vms::api::TranState readedUpTo;
+    };
+
     void whenAddOverlappingTransactions()
     {
         constexpr std::size_t transactionCount = 5;
@@ -679,6 +686,13 @@ protected:
 
     void whenAddBunchOfTransactionsConcurrently()
     {
+        whenScheduleMultipleConcurrentCommands();
+
+        waitUntilAllScheduledCommandsHaveCompleted();
+    }
+
+    void whenScheduleMultipleConcurrentCommands()
+    {
         const int transactionToAddCount = dbConnectionOptions().maxConnectionCount;
         ASSERT_GT(transactionToAddCount, 1);
         m_transactionToExecuteThreshold = 7;
@@ -691,18 +705,13 @@ protected:
         std::mt19937 g(rd());
         std::shuffle(m_transactionOrder.begin(), m_transactionOrder.end(), g);
 
-        QnWaitCondition cond;
-        int transactionsToWait = 0;
-
-        QnMutexLocker lk(&m_mutex);
-
         for (int i = 0; i < transactionToAddCount; ++i)
         {
-            ++transactionsToWait;
+            ++m_scheduledCommandCount;
             commandLog()->startDbTransaction(
-                getSystem(0).id.c_str(),
+                getSystem(0).id,
                 [this, i](auto&&... args) { return shareSystemToRandomUser(std::move(args)..., i); },
-                [this, &transactionsToWait, &cond](
+                [this](
                     nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
@@ -710,14 +719,37 @@ protected:
                         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
                     }
 
-                    QnMutexLocker lk(&m_mutex);
-                    --transactionsToWait;
-                    cond.wakeAll();
+                    m_commandResults.push(dbResult);
                 });
         }
+    }
 
-        while (transactionsToWait > 0)
-            cond.wait(lk.mutex());
+    void waitUntilAllScheduledCommandsHaveCompleted()
+    {
+        for (int i = 0; i < m_scheduledCommandCount; ++i)
+            m_commandResults.pop();
+    }
+
+    void whenReadCommandLog()
+    {
+        commandLog()->readTransactions(
+            getSystem(0).id,
+            ReadCommandsFilter(),
+            [this](auto&&... args) { saveReadResult(std::move(args)...); });
+    }
+
+    void thenReadSucceeded()
+    {
+        m_prevReadResult = m_readResults.pop();
+
+        ASSERT_EQ(ResultCode::ok, m_prevReadResult.resultCode);
+    }
+
+    void andReportedReadPositionCorrespondsToCommandsRead()
+    {
+        ASSERT_EQ(
+            m_prevReadResult.readedUpTo.values.begin().value(),
+            m_prevReadResult.serializedTransactions.size());
     }
 
     std::vector<std::unique_ptr<TestTransactionController>>
@@ -753,6 +785,10 @@ private:
     QnWaitCondition m_cond;
     std::vector<int> m_transactionOrder;
     int m_transactionToExecuteThreshold = 0;
+    int m_scheduledCommandCount = 0;
+    nx::utils::SyncQueue<nx::sql::DBResult> m_commandResults;
+    nx::utils::SyncQueue<ReadResult> m_readResults;
+    ReadResult m_prevReadResult;
 
     nx::sql::DBResult shareSystemToRandomUser(
         nx::sql::QueryContext* queryContext,
@@ -765,6 +801,7 @@ private:
         sharing.accountId = accountToShareWith.id;
         sharing.accountEmail = accountToShareWith.email;
         sharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
+        sharing.vmsUserId = QnUuid::createUuid().toSimpleString().toStdString();
 
         // It does not matter for transaction log whether we save application data or not.
         // TODO #ak But, it is still better to mockup data access object here.
@@ -810,6 +847,17 @@ private:
         ++m_transactionToExecuteThreshold;
         m_cond.wakeAll();
     }
+
+    void saveReadResult(
+        ResultCode resultCode,
+        std::vector<dao::TransactionLogRecord> serializedTransactions,
+        vms::api::TranState readedUpTo)
+    {
+        m_readResults.push({
+            resultCode,
+            std::move(serializedTransactions),
+            std::move(readedUpTo)});
+    }
 };
 
 TEST_F(CommandLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
@@ -824,6 +872,19 @@ TEST_F(CommandLogOverlappingTransactions, multiple_simultaneous_transactions)
     givenRandomSystem();
     whenAddBunchOfTransactionsConcurrently();
     assertTransactionsAreSentInAscendingSequenceOrder();
+}
+
+TEST_F(CommandLogOverlappingTransactions, command_read_position_matches_actual_commands_read)
+{
+    givenRandomSystem();
+    whenScheduleMultipleConcurrentCommands();
+
+    whenReadCommandLog();
+
+    thenReadSucceeded();
+    andReportedReadPositionCorrespondsToCommandsRead();
+
+    waitUntilAllScheduledCommandsHaveCompleted();
 }
 
 } // namespace nx::clusterdb::engine::test
