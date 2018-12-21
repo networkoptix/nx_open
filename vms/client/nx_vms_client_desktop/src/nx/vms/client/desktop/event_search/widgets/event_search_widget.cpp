@@ -121,7 +121,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         });
 
     connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
-        q, &EventSearchWidget::updateIsAllowed);
+        q, &EventSearchWidget::updateAllowance);
 }
 
 void EventSearchWidget::Private::resetType()
@@ -346,7 +346,7 @@ QString EventSearchWidget::itemCounterText(int count) const
     return tr("%n events", "", count);
 }
 
-bool EventSearchWidget::calculateIsAllowed() const
+bool EventSearchWidget::calculateAllowance() const
 {
     return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs);
 }

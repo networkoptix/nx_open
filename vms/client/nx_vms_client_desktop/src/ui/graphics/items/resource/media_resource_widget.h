@@ -414,7 +414,7 @@ private:
     void createActionAndButton(
         const char* iconName,
         bool checked,
-        const QString& shortcut,
+        const QKeySequence& shortcut,
         const QString& toolTip,
         Qn::HelpTopic helpTopic,
         Qn::WidgetButtons buttonId,

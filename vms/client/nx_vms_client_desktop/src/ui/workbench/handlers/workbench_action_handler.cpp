@@ -418,7 +418,7 @@ void ActionHandler::addToLayout(
         if (workbench()->currentLayout()->resource() == layout)
         {
             if (!m_layoutIsFullMessage)
-                m_layoutIsFullMessage = QnGraphicsMessageBox::information(tr("Layout is full."));
+                m_layoutIsFullMessage = QnGraphicsMessageBox::information(tr("Layout is full"));
         }
         return;
     }
@@ -1255,7 +1255,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
         layouts.empty() &&
         videowalls.empty())
     {
-        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
+        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed"));
         return;
     }
 

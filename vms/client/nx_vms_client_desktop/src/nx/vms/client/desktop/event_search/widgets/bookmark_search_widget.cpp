@@ -111,7 +111,7 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
         [this]() { d->sinceViewUpdated.restart(); });
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
-        this, &BookmarkSearchWidget::updateIsAllowed);
+        this, &BookmarkSearchWidget::updateAllowance);
 }
 
 BookmarkSearchWidget::~BookmarkSearchWidget()
@@ -135,7 +135,7 @@ QString BookmarkSearchWidget::itemCounterText(int count) const
     return tr("%n bookmarks", "", count);
 }
 
-bool BookmarkSearchWidget::calculateIsAllowed() const
+bool BookmarkSearchWidget::calculateAllowance() const
 {
     return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
 }
