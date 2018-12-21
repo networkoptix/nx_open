@@ -9,14 +9,29 @@ CloudConnector::CloudConnector(AbstractTransactionMessageBus* messageBus):
 {
 }
 
-void CloudConnector::startDataSynchronization(const nx::utils::Url &cloudUrl)
+void CloudConnector::startDataSynchronization(
+    const std::string& peerId,
+    const nx::utils::Url& cloudUrl)
 {
-    m_messageBus->addOutgoingConnectionToPeer(::ec2::kCloudPeerId, cloudUrl);
+    QnMutexLocker lock(&m_mutex);
+
+    m_currentPeerId = QnUuid::fromStringSafe(peerId);
+
+    m_messageBus->addOutgoingConnectionToPeer(
+        *m_currentPeerId,
+        nx::vms::api::PeerType::cloudServer,
+        cloudUrl);
 }
 
 void CloudConnector::stopDataSynchronization()
 {
-    m_messageBus->removeOutgoingConnectionFromPeer(::ec2::kCloudPeerId);
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_currentPeerId)
+    {
+        m_messageBus->removeOutgoingConnectionFromPeer(*m_currentPeerId);
+        m_currentPeerId = std::nullopt;
+    }
 }
 
 } // namespace ec2

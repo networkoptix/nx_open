@@ -4,8 +4,7 @@
 
 #include <nx/utils/string.h>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 namespace test {
 
 namespace {
@@ -60,6 +59,77 @@ TEST(String, maxPrefix)
         maxPrefix(std::vector<int>({1, 2, 3, 4, 5}), std::vector<int>({1, 2, 3, 6, 7})));
 }
 
+TEST(replaceStrings, emptySubstitutionsLeaveIntact)
+{
+    ASSERT_EQ(replaceStrings(
+        "abc",
+        {}),
+        QString("abc"));
+}
+
+TEST(replaceStrings, noMatch)
+{
+    ASSERT_EQ(replaceStrings(
+        "def",
+        {{"a", "b"}}),
+        QString("def"));
+}
+
+TEST(replaceStrings, independentSubstitutions)
+{
+    ASSERT_EQ(replaceStrings(
+        "abc",
+        {{"a", "d"}, {"c", "e"}}),
+        QString("dbe"));
+}
+
+TEST(replaceStrings, sequentiveSubstitutions)
+{
+    ASSERT_EQ(replaceStrings(
+        "abc",
+        {{"a", "b"}, {"b", "c"}, {"c", "a"}}),
+        QString("bca"));
+}
+
+TEST(replaceStrings, sequentiveSubstitutionsOfDifferentSize)
+{
+    ASSERT_EQ(replaceStrings(
+        "abc",
+        {{"a", "abc"}, {"b", "abc"}, {"c", "abc"}}),
+        QString("abcabcabc"));
+}
+
+TEST(replaceStrings, sequentiveSubstitutionsWithOverriding)
+{
+    ASSERT_EQ(replaceStrings(
+        "abc",
+        {{"ab", "b"}, {"b", "c"}}),
+        QString("bc"));
+}
+
+TEST(replaceStrings, substitutionStartsWithSubstringOfAnotherSubstitution)
+{
+    ASSERT_EQ(replaceStrings(
+        "abac",
+        {{"ab", "b"}, {"a", "c"}}),
+        QString("bcc"));
+}
+
+TEST(replaceStrings, orderDoesMatter)
+{
+    ASSERT_EQ(replaceStrings(
+        "abc",
+        {{"a", "b"}, {"a", "c"}}),
+        QString("bbc"));
+}
+
+TEST(replaceStrings, specialCharacters)
+{
+    ASSERT_EQ(replaceStrings(
+        "|.*",
+        {{".", "*"}, {"|", "*"}}),
+        QString("***"));
+}
+
 } // namespace test
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

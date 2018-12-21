@@ -36,9 +36,9 @@ public:
         const nx::sdk::DeviceInfo* deviceInfo,
         nx::sdk::Error* outError) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* outError) const override;
 
-    const EngineManifest& engineManifest() const;
+    const EngineManifest& parsedManifest() const;
 
     virtual void executeAction(
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
@@ -46,15 +46,20 @@ public:
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
 private:
-    QList<QString> fetchSupportedEventTypeIds(const nx::sdk::DeviceInfo& deviceInfo);
+    nx::vms::api::analytics::DeviceAgentManifest fetchDeviceAgentParsedManifest(
+        const nx::sdk::DeviceInfo& deviceInfo);
     QList<QString> parseSupportedEvents(const QByteArray& data);
 
+    static QByteArray loadManifest();
+    static EngineManifest parseManifest(const QByteArray& manifest);
 private:
     nx::sdk::analytics::common::Plugin* const m_plugin;
 
     mutable QnMutex m_mutex;
-    QByteArray m_manifest;
-    EngineManifest m_engineManifest;
+
+    // Engine manifest is stored in serialized and deserialized states, since both of them needed.
+    const QByteArray m_jsonManifest;
+    const EngineManifest m_parsedManifest;
 
     struct DeviceData
     {

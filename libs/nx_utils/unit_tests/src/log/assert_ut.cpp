@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
+
 #include <nx/utils/log/assert.h>
+#include <nx/utils/nx_utils_ini.h>
 
 namespace nx {
 namespace utils {

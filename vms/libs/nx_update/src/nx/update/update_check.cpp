@@ -321,7 +321,7 @@ static InformationError fillUpdateInformation(
             return InformationError::noNewVersion;
         auto updateVersion = it.value();
         publicationKey = QString::number(updateVersion.build());
-        NX_INFO(typeid(Information))
+        NX_VERBOSE(typeid(Information))
             << "fillUpdateInformation will use version"
             << updateVersion.toString(nx::vms::api::SoftwareVersion::FullFormat)
             << "build" << publicationKey;

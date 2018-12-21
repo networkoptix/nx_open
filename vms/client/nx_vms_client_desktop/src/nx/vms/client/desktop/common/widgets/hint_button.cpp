@@ -182,7 +182,7 @@ void HintButton::addHintLine(QString line)
     }
 }
 
-void HintButton::paintEvent(QPaintEvent* event)
+void HintButton::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
 
@@ -209,7 +209,7 @@ void HintButton::paintEvent(QPaintEvent* event)
     }
 }
 
-void HintButton::enterEvent(QEvent* event)
+void HintButton::enterEvent(QEvent* /*event*/)
 {
     bool skipHover = !isEnabled();
 
@@ -228,7 +228,7 @@ void HintButton::enterEvent(QEvent* event)
     showTooltip(true);
 }
 
-void HintButton::leaveEvent(QEvent* event)
+void HintButton::leaveEvent(QEvent* /*event*/)
 {
     if (m_isHovered)
     {

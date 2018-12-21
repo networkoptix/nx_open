@@ -7,7 +7,8 @@
 namespace nx {
 namespace test {
 
-TEST(SaveCamera, invalidData)
+// #TODO: #akulikov move below to the test class
+TEST(SaveCamera_, invalidData)
 {
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
@@ -42,6 +43,53 @@ TEST(SaveCamera, invalidData)
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({/*"id",*/ /*"physicalId",*/ "parentId", "typeId", "vendor"}),
         nx::network::http::StatusCode::forbidden);
+}
+
+class SaveCamera: public ::testing::Test
+{
+protected:
+    virtual void SetUp() override
+    {
+        m_server.addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+        ASSERT_TRUE(m_server.start());
+        m_cameraData.parentId = QnUuid::createUuid();
+        m_cameraData.typeId = qnResTypePool->getResourceTypeByName("Camera")->getId();
+        m_cameraData.vendor = "test vendor";
+        m_cameraData.physicalId = "matching physicalId";
+        m_cameraData.id = nx::vms::api::CameraData::physicalIdToId(m_cameraData.physicalId);
+    }
+
+    void whenCameraAdded()
+    {
+        NX_TEST_API_POST(&m_server, "/ec2/saveCamera", m_cameraData);
+    }
+
+    void thenItShouldAppearInFullInfo()
+    {
+        vms::api::FullInfoData fullInfoData;
+        NX_TEST_API_GET(&m_server, "/ec2/getFullInfo", &fullInfoData);
+        ASSERT_TRUE(std::any_of(fullInfoData.cameras.cbegin(), fullInfoData.cameras.cend(),
+            [this](const auto& cameraData) { return cameraData.id == m_cameraData.id; }));
+    }
+
+    void thenItShouldAppearInGetCameras()
+    {
+        vms::api::CameraDataList cameraDataList;
+        NX_TEST_API_GET(&m_server, "/ec2/getCameras", &cameraDataList);
+        ASSERT_TRUE(std::any_of(cameraDataList.cbegin(), cameraDataList.cend(),
+            [this](const auto& cameraData) { return cameraData.id == m_cameraData.id; }));
+    }
+
+private:
+    MediaServerLauncher m_server;
+    nx::vms::api::CameraData m_cameraData;
+};
+
+TEST_F(SaveCamera, CameraAppearsInFullInfo)
+{
+    whenCameraAdded();
+    thenItShouldAppearInGetCameras();
+    thenItShouldAppearInFullInfo();
 }
 
 } // namespace test

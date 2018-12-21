@@ -477,7 +477,9 @@ void AudioStream::AudioStreamPrivate::setLastError(int ffmpegError)
 
 void AudioStream::AudioStreamPrivate::terminate()
 {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_terminated = true;
+    m_wait.notify_all();
 }
 
 void AudioStream::AudioStreamPrivate::tryStart()

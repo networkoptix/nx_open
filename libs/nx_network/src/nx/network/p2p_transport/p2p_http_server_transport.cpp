@@ -5,6 +5,18 @@
 
 namespace nx::network {
 
+namespace {
+
+const int kBufferSize = 4096;
+
+static void resetBuffer(nx::Buffer* buffer)
+{
+    buffer->clear();
+    buffer->reserve(kBufferSize);
+}
+
+} // namespace
+
 P2PHttpServerTransport::P2PHttpServerTransport(
     std::unique_ptr<AbstractStreamSocket> socket,
     websocket::FrameType messageType)
@@ -16,9 +28,11 @@ P2PHttpServerTransport::P2PHttpServerTransport(
 
     m_sendSocket->setNonBlockingMode(true);
     m_sendSocket->bindToAioThread(getAioThread());
+    m_sendSocket->setRecvTimeout(0);
     m_timer.bindToAioThread(getAioThread());
-    m_sendBuffer.reserve(4096);
-    m_readContext.buffer.reserve(4096);
+    m_sendBuffer.reserve(kBufferSize);
+    m_readContext.buffer.reserve(kBufferSize);
+    m_sendChannelReadBuffer.reserve(kBufferSize);
 }
 
 void P2PHttpServerTransport::start(
@@ -38,13 +52,54 @@ void P2PHttpServerTransport::start(
         &m_sendBuffer,
         [this](SystemError::ErrorCode error, size_t transferred)
         {
-            auto onGetRequestReceived = std::move(m_onGetRequestReceived);
-            m_onGetRequestReceived = nullptr;
-            onGetRequestReceived(
+            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            m_onGetRequestReceived(
                 error != SystemError::noError || transferred == 0
                     ? SystemError::connectionAbort
                     : SystemError::noError);
+
+            if (watcher.objectDestroyed())
+                return;
+
+            m_onGetRequestReceived = nullptr;
+            if (error != SystemError::noError)
+            {
+                NX_ASSERT(false, "Transport is supposed to be destroyed on error");
+                return;
+            }
+
+            m_sendSocket->readSomeAsync(
+                &m_sendChannelReadBuffer,
+                [this](SystemError::ErrorCode error, size_t transferred)
+                {
+                    onReadFromSendSocket(error, transferred);
+                });
         });
+}
+
+void P2PHttpServerTransport::onReadFromSendSocket(
+    SystemError::ErrorCode error,
+    size_t transferred)
+{
+    if (error != SystemError::noError || transferred == 0)
+    {
+        m_failed = true;
+        if (m_userReadHandlerPair)
+        {
+            auto userReadHandlerPair = std::move(m_userReadHandlerPair);
+            userReadHandlerPair->second(error, 0);
+        }
+    }
+    else
+    {
+        resetBuffer(&m_sendChannelReadBuffer);
+        m_sendSocket->readSomeAsync(
+            &m_sendChannelReadBuffer,
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                onReadFromSendSocket(error, transferred);
+            });
+    }
 }
 
 P2PHttpServerTransport::~P2PHttpServerTransport()
@@ -62,6 +117,7 @@ void P2PHttpServerTransport::gotPostConnection(
             m_readSocket = std::move(socket);
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
+            m_readSocket->setRecvTimeout(0);
 
             if (m_userReadHandlerPair)
             {
@@ -81,7 +137,7 @@ void P2PHttpServerTransport::gotPostConnection(
                             SystemError::ErrorCode error,
                             IoCompletionHandler handler)
                         {
-                            buffer->append(body);
+                            buffer->append(QByteArray::fromBase64(body));
                             handler(error, body.size());
                         });
                 }
@@ -98,7 +154,7 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_onGetRequestReceived)
+            if (m_onGetRequestReceived || m_failed)
                 return handler(SystemError::connectionAbort, 0);
 
             if (!m_providedPostBody.isEmpty())
@@ -108,7 +164,7 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
                     std::move(handler),
                     [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
                     {
-                        buffer->append(m_providedPostBody);
+                        buffer->append(QByteArray::fromBase64(m_providedPostBody));
                         const auto bodySize = m_providedPostBody.size();
                         m_providedPostBody = nx::Buffer();
                         handler(error, bodySize);
@@ -179,8 +235,11 @@ void P2PHttpServerTransport::onBytesRead(
     }
 
     auto completionHandler =
-        [this](SystemError::ErrorCode error, IoCompletionHandler handler)
+        [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
         {
+            m_readContext.buffer = QByteArray::fromBase64(*buffer);
+            *buffer = m_readContext.buffer;
+
             utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
             handler(error, m_readContext.bytesParsed);
             if (watcher.objectDestroyed())
@@ -273,7 +332,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            if (m_onGetRequestReceived)
+            if (m_onGetRequestReceived || m_failed)
                 return handler(SystemError::connectionAbort, 0);
 
             if (m_firstSend)
@@ -282,7 +341,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 m_firstSend = false;
             }
 
-            m_sendBuffer += buffer + "\r\n" + makeFrameHeader();
+            m_sendBuffer += buffer.toBase64() + "\r\n" + makeFrameHeader();
             m_sendSocket->sendAsync(
                 m_sendBuffer,
                 [this, handler = std::move(handler)](
@@ -292,8 +351,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                     NX_VERBOSE(
                         this,
                         lm("Send completed. error: %1, transferred: %2").args(error, transferred));
-                    m_sendBuffer.clear();
-                    m_sendBuffer.reserve(4096);
+                    resetBuffer(&m_sendBuffer);
                     handler(error, transferred);
                 });
         });
@@ -371,8 +429,7 @@ void P2PHttpServerTransport::ReadContext::reset()
 {
     message = http::Message();
     parser.reset();
-    buffer.clear();
-    buffer.reserve(4096);
+    resetBuffer(&buffer);
     bytesParsed = 0;
 }
 

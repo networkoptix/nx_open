@@ -14,7 +14,7 @@ void setWarningStyle(QPalette* palette, qreal disabledOpacity = 1.0);
 void setCustomStyle(QPalette* palette, const QColor& color, qreal disabledOpacity = 1.0);
 
 /** Enable/disable warning style with a single call. */
-void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity = 1.0);
+void setWarningStyleOn(QWidget* widget, bool on = true, qreal disabledOpacity = 1.0);
 
 QString setWarningStyleHtml(const QString& source);
 
