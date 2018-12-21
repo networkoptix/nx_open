@@ -417,7 +417,7 @@
                 
                 $scope.showEmbed = function () {
                     $scope.showSettings = false;
-                    dialogs.embed({})
+                    dialogs.embed({});
                 };
                 
                 $scope.selectResolution = function (resolution) {

@@ -130,8 +130,11 @@ import * as Hls from 'hls.js';
                             });
                             var jsHlsSupported = Hls.isSupported();
                             
-                            //Should Catch MS edge, Safari, Mobile Devices
-                            if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
+                            // Should Catch MS edge, Safari, Mobile Devices
+                            // if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
+    
+                            // Should catch Mobile Devices
+                            if ($window.jscd.mobile) {
                                 return 'native-hls';
                             }
                             
