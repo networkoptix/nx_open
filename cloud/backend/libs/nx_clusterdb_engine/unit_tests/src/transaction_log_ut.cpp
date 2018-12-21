@@ -26,8 +26,7 @@
 
 #include "test_outgoing_transaction_dispatcher.h"
 
-namespace nx::clusterdb::engine {
-namespace test {
+namespace nx::clusterdb::engine::test {
 
 class CommandLog:
     public nx::cloud::db::test::BasePersistentDataTest,
@@ -120,11 +119,11 @@ private:
     }
 };
 
-class TransactionLogSameTransaction:
+class CommandLogSameTransaction:
     public CommandLog
 {
 public:
-    TransactionLogSameTransaction():
+    CommandLogSameTransaction():
         CommandLog(dao::DataObjectType::rdbms),
         m_systemId(nx::cloud::db::test::BusinessDataGenerator::generateRandomSystemId()),
         m_otherPeerId(QnUuid::createUuid()),
@@ -133,10 +132,6 @@ public:
         m_dbConnectionHolder(dbConnectionOptions())
     {
         init();
-    }
-
-    ~TransactionLogSameTransaction()
-    {
     }
 
 protected:
@@ -420,20 +415,20 @@ private:
     }
 };
 
-TEST_F(TransactionLogSameTransaction, newly_generated_transaction_is_there)
+TEST_F(CommandLogSameTransaction, newly_generated_transaction_is_there)
 {
     whenGenerateTransactionLocally();
     assertTransactionIsPresent();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_from_remote_peer_has_been_added)
+TEST_F(CommandLogSameTransaction, transaction_from_remote_peer_has_been_added)
 {
     whenReceiveTransactionFromOtherPeerWithGreaterTimestamp();
     assertTransactionIsPresent();
 }
 
 TEST_F(
-    TransactionLogSameTransaction,
+    CommandLogSameTransaction,
     transaction_from_other_peer_with_greater_timestamp_replaces_existing_one)
 {
     whenGenerateTransactionLocally();
@@ -443,7 +438,7 @@ TEST_F(
     assertTransactionAuthorIsOtherPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_with_lesser_timestamp_is_ignored)
+TEST_F(CommandLogSameTransaction, transaction_with_lesser_timestamp_is_ignored)
 {
     whenGenerateTransactionLocally();
     whenReceiveTransactionFromOtherPeerWithLesserTimestamp();
@@ -452,7 +447,7 @@ TEST_F(TransactionLogSameTransaction, transaction_with_lesser_timestamp_is_ignor
     assertTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_with_greater_sequence_replaces_existing)
+TEST_F(CommandLogSameTransaction, transaction_with_greater_sequence_replaces_existing)
 {
     whenGenerateTransactionLocally();
     whenAddTransactionLocallyWithGreaterSequence();
@@ -461,7 +456,7 @@ TEST_F(TransactionLogSameTransaction, transaction_with_greater_sequence_replaces
     assertTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignored)
+TEST_F(CommandLogSameTransaction, transaction_with_lesser_sequence_is_ignored)
 {
     whenGenerateTransactionLocally();
     whenReceiveOwnOldTransactionWithLesserSequence();
@@ -470,7 +465,7 @@ TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignore
     assertTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, tran_rollback_clears_raw_data)
+TEST_F(CommandLogSameTransaction, tran_rollback_clears_raw_data)
 {
     whenGenerateTransactionLocally();
     beginTran();
@@ -479,7 +474,7 @@ TEST_F(TransactionLogSameTransaction, tran_rollback_clears_raw_data)
     assertTransactionIsNotReplaced();
 }
 
-TEST_F(TransactionLogSameTransaction, max_timestamp_sequence_is_restored_after_restart)
+TEST_F(CommandLogSameTransaction, max_timestamp_sequence_is_restored_after_restart)
 {
     addTransactionsWithIncreasingTimestampSequence();
     reinitialiseTransactionLog();
@@ -657,11 +652,11 @@ private:
     TestTransactionController& operator=(const TestTransactionController&) = delete;
 };
 
-class TransactionLogOverlappingTransactions:
+class CommandLogOverlappingTransactions:
     public CommandLog
 {
 public:
-    TransactionLogOverlappingTransactions():
+    CommandLogOverlappingTransactions():
         CommandLog(dao::DataObjectType::ram)
     {
         persistentDbManager()->queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
@@ -817,19 +812,18 @@ private:
     }
 };
 
-TEST_F(TransactionLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
+TEST_F(CommandLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
 {
     givenRandomSystem();
     whenAddOverlappingTransactions();
     assertTransactionsAreSentInAscendingSequenceOrder();
 }
 
-TEST_F(TransactionLogOverlappingTransactions, multiple_simultaneous_transactions)
+TEST_F(CommandLogOverlappingTransactions, multiple_simultaneous_transactions)
 {
     givenRandomSystem();
     whenAddBunchOfTransactionsConcurrently();
     assertTransactionsAreSentInAscendingSequenceOrder();
 }
 
-} // namespace test
-} // namespace nx::clusterdb::engine
+} // namespace nx::clusterdb::engine::test
