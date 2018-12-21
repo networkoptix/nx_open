@@ -319,7 +319,7 @@ public:
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
                     qint64 scanPeriodDuration = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);
                     NX_VERBOSE(this, "[Scan]: Partial scan period duration for storage %1, catalog %2 = %3 ms (%4 hrs)",
-                            nx::utils::url::hideUrlPassword(scanData.storage->getUrl()),
+                            nx::utils::url::hidePassword(scanData.storage->getUrl()),
                             itr.key()->cameraUniqueId(),
                             scanPeriodDuration,
                             scanPeriodDuration / (1000 * 60 * 60));
@@ -332,7 +332,7 @@ public:
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
                 scanData.storage->removeFlags(Qn::storage_fastscan);
                 NX_VERBOSE(this, "[Scan]: Partial scan for storage %1 has been finished",
-                    nx::utils::url::hideUrlPassword(scanData.storage->getUrl()));
+                    nx::utils::url::hidePassword(scanData.storage->getUrl()));
             }
             else
             {
@@ -953,7 +953,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
                 logStream << "\tFollowing storages found:\n";
 
             for (const auto& s: storagesToScan)
-                logStream << "\t" << nx::utils::url::hideUrlPassword(s->getUrl()) << "\n";
+                logStream << "\t" << nx::utils::url::hidePassword(s->getUrl()) << "\n";
 
             NX_DEBUG(this, logString);
         }
@@ -1106,7 +1106,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     int storageIndex = storageDbPool()->getStorageIndex(storage);
-    NX_INFO(this, "Adding storage. Path: %1", nx::utils::url::hideUrlPassword(storage->getUrl()));
+    NX_INFO(this, "Adding storage. Path: %1", nx::utils::url::hidePassword(storage->getUrl()));
 
     removeStorage(storage); // remove existing storage record if exists
     storage->setStatus(Qn::Offline); // we will check status after
@@ -1199,7 +1199,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
                 storageIndex = itr.key();
                 NX_DEBUG(this, "%1 Removing storage %2 from %3 StorageManager",
                     Q_FUNC_INFO,
-                    nx::utils::url::hideUrlPassword(storage->getUrl()),
+                    nx::utils::url::hidePassword(storage->getUrl()),
                     m_role == QnServer::StoragePool::Normal ? "Main" : "Backup");
                 itr = m_storageRoots.erase(itr);
                 break;
@@ -1707,7 +1707,7 @@ void QnStorageManager::clearSpace(bool forced)
 
     for (const auto& storage: getUsedWritableStorages()) {
         if (!storages.contains(storage)) {
-            NX_VERBOSE(this, "[Cleanup]: Storage %1 is being fast scanned. Skipping", nx::utils::url::hideUrlPassword(storage->getUrl()));
+            NX_VERBOSE(this, "[Cleanup]: Storage %1 is being fast scanned. Skipping", nx::utils::url::hidePassword(storage->getUrl()));
             allStoragesReady = false;
         }
     }
@@ -1732,14 +1732,14 @@ void QnStorageManager::clearSpace(bool forced)
                     != QnAbstractStorageResource::cap::RemoveFile)
             {
                 NX_VERBOSE(this, "[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping",
-                        nx::utils::url::hideUrlPassword(storage->getUrl()), storage->getSpaceLimit(),
+                        nx::utils::url::hidePassword(storage->getUrl()), storage->getSpaceLimit(),
                         (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) == QnAbstractStorageResource::cap::RemoveFile);
                 continue;
             }
 
             qint64 toDeleteForStorage = storage->getSpaceLimit() - storage->getFreeSpace();
             NX_VERBOSE(this, "[Cleanup, measure]: storage: %1, spaceLimit: %2, freeSpace: %3, toDelete: %4",
-                    nx::utils::url::hideUrlPassword(storage->getUrl()),
+                    nx::utils::url::hidePassword(storage->getUrl()),
                     storage->getSpaceLimit(),
                     storage->getFreeSpace(),
                     toDeleteForStorage);
@@ -2150,13 +2150,13 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         {
             NX_DEBUG(this,
                 "Cleanup. Won't cleanup storage %1 because this storage contains no archive",
-                nx::utils::url::hideUrlPassword(storage->getUrl()));
+                nx::utils::url::hidePassword(storage->getUrl()));
             m_fullDisksIds << storage->getId();
             return true;
         }
 
         NX_DEBUG(this, "Cleanup. Starting for storage %1. %2 Mb to clean",
-            nx::utils::url::hideUrlPassword(storage->getUrl()), toDelete / (1024 * 1024));
+            nx::utils::url::hidePassword(storage->getUrl()), toDelete / (1024 * 1024));
     }
 
     DeviceFileCatalog::Chunk deletedChunk;
@@ -2305,14 +2305,14 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             NX_VERBOSE(
                 this,
                 "[ApiStorageSpace, Writable storages] candidate: %1, available: %2, threshold: %3",
-                nx::utils::url::hideUrlPassword(fileStorage->getUrl()), available, bigStorageThreshold);
+                nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
         }
         else
         {
             NX_VERBOSE(
                 this,
                 "[ApiStorageSpace, Writable storages] candidate: %1 is offline and thus neglected",
-                nx::utils::url::hideUrlPassword(fileStorage->getUrl()));
+                nx::utils::url::hidePassword(fileStorage->getUrl()));
         }
     }
     bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
@@ -2330,7 +2330,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                 NX_VERBOSE(
                     this,
                     "[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate",
-                    nx::utils::url::hideUrlPassword(fileStorage->getUrl()));
+                    nx::utils::url::hidePassword(fileStorage->getUrl()));
             }
             else
             {
@@ -2338,7 +2338,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                 NX_VERBOSE(
                     this,
                     "[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.",
-                    nx::utils::url::hideUrlPassword(fileStorage->getUrl()), available, bigStorageThreshold);
+                    nx::utils::url::hidePassword(fileStorage->getUrl()), available, bigStorageThreshold);
             }
         }
     }
@@ -2368,7 +2368,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             NX_VERBOSE(
                 this,
                 "[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates",
-                nx::utils::url::hideUrlPassword((*it)->getUrl()));
+                nx::utils::url::hidePassword((*it)->getUrl()));
 
             (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
             result.remove(*it);
@@ -2393,7 +2393,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
         NX_INFO(this,
             "Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB",
-            nx::utils::url::hideUrlPassword(fileStorage->getUrl()),
+            nx::utils::url::hidePassword(fileStorage->getUrl()),
             fileStorage->getSpaceLimit() / 1024 / 1024,
             fileStorage->getFreeSpace() / 1024 / 1024);
 
@@ -2403,7 +2403,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         addDataFromDatabase(fileStorage);
         NX_VERBOSE(this,
             "[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan",
-            nx::utils::url::hideUrlPassword(fileStorage->getUrl()));
+            nx::utils::url::hidePassword(fileStorage->getUrl()));
         m_spaceInfo.storageAdded(storageDbPool()->getStorageIndex(fileStorage),
             fileStorage->getTotalSpace());
         {
@@ -2597,7 +2597,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     result = getStorageByIndex(optimalStorageIndex);
     if (result)
     {
-        NX_VERBOSE(this, "[Storage, Selection] Selected storage %1", nx::utils::url::hideUrlPassword(result->getUrl()));
+        NX_VERBOSE(this, "[Storage, Selection] Selected storage %1", nx::utils::url::hidePassword(result->getUrl()));
         return result;
     }
 

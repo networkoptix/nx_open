@@ -595,7 +595,7 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
     return result;
 }
 
-QString hideUrlPassword(const QString& urlStr)
+QString hidePassword(const QString& urlStr)
 {
     if (displayPasswordInLogs())
         return urlStr;

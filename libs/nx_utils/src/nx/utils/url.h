@@ -184,7 +184,7 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
  * Hides password if the string is a valid url with password. Otherwise returns original string.
  * Note: the function MUST be used for any string which may contain URL when printing to logs.
  */
-NX_UTILS_API QString hideUrlPassword(const QString& urlStr);
+NX_UTILS_API QString hidePassword(const QString& urlStr);
 
 NX_UTILS_API bool displayPasswordInLogs();
 
