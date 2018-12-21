@@ -74,7 +74,7 @@ ftplib::ftplib()
                 
     #ifndef NOSSL
     SSL_library_init();
-    #endif	
+    #endif    
 
     mp_ftphandle = static_cast<ftphandle *>(calloc(1,sizeof(ftphandle)));
     if (mp_ftphandle == NULL)
@@ -224,7 +224,7 @@ int ftplib::readline(char *buf,int max,ftphandle *ctl)
             else x = net_read(ctl->handle,ctl->cput,ctl->cleft);
         }
 #else
-        x = net_read(ctl->handle,ctl->cput,ctl->cleft);		
+        x = net_read(ctl->handle,ctl->cput,ctl->cleft);        
 #endif
         if ( x == -1)
         {
@@ -294,7 +294,7 @@ int ftplib::writeline(char *buf, int len, ftphandle *nData)
             else w = net_write(nData->handle, nbp, FTPLIB_BUFSIZ);
 #else
             w = net_write(nData->handle, nbp, FTPLIB_BUFSIZ);
-#endif	
+#endif    
             if (w != FTPLIB_BUFSIZ)
             {
                 printf("write(2) returned %d, errno = %d\n", w, errno);
@@ -311,7 +311,7 @@ int ftplib::writeline(char *buf, int len, ftphandle *nData)
         if (nData->tlsctrl) w = SSL_write(nData->ssl, nbp, nb);
         else w = net_write(nData->handle, nbp, nb);
 #else
-        w = net_write(nData->handle, nbp, nb);	
+        w = net_write(nData->handle, nbp, nb);    
 #endif
         if (w != nb)
         {
@@ -385,7 +385,7 @@ int ftplib::Connect(const char *host)
     mp_ftphandle->ctrl = NULL;
     mp_ftphandle->xfered = 0;
     mp_ftphandle->xfered1 = 0;
-#ifndef NOSSL	
+#ifndef NOSSL    
     mp_ftphandle->tlsctrl = 0;
     mp_ftphandle->tlsdata = 0;
 #endif
@@ -1214,7 +1214,7 @@ int ftplib::FtpXfer(const char *localfile, const char *path, ftphandle *nControl
         if (type == ftplib::filewriteappend) fseeko64(local,mp_ftphandle->offset,SEEK_SET);
 #else
         local = fopen(localfile, ac);
-        if (type == ftplib::filewriteappend) fseek(local,mp_ftphandle->offset,SEEK_SET);	
+        if (type == ftplib::filewriteappend) fseek(local,mp_ftphandle->offset,SEEK_SET);    
 #endif
         if (local == NULL)
         {
@@ -1631,7 +1631,7 @@ void ftplib::ClearHandle()
     mp_ftphandle->xfered = 0;
     mp_ftphandle->xfered1 = 0;
     mp_ftphandle->cbbytes = 0;
-#ifndef NOSSL	
+#ifndef NOSSL    
     mp_ftphandle->tlsctrl = 0;
     mp_ftphandle->tlsdata = 0;
     mp_ftphandle->certcb = NULL;

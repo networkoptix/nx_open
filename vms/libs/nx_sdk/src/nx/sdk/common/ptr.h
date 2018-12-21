@@ -34,7 +34,7 @@ public:
     template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     explicit Ptr(OtherRefCountable* ptr): m_ptr(ptr) {}
 
-	template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     Ptr(const Ptr<OtherRefCountable>& other): m_ptr(other.get()) { addRef(); }
 
     /** Defined because the template above does not suppress generation of such member. */
@@ -52,7 +52,7 @@ public:
     /** Defined because the template above does not work for same-type assignment. */
     Ptr& operator=(const Ptr& other) { return assignConst(other); }
 
-	template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     Ptr& operator=(Ptr<OtherRefCountable>&& other) { return assignRvalue(std::move(other)); }
 
     /** Defined because the template above does not work for same-type assignment. */
@@ -60,10 +60,10 @@ public:
 
     ~Ptr() { releaseRef(); }
 
-	template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     bool operator==(const Ptr<OtherRefCountable>& other) const { return m_ptr == other.get(); }
 
-	template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     bool operator!=(const Ptr<OtherRefCountable>& other) const { return !operator==(other); }
 
     /**
@@ -80,7 +80,7 @@ public:
      * Decrements the reference counter of the owned object (will be deleted if reaches 0), and
      * starts owning the specified object, leaving its reference counter intact.
      */
-	template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     void reset(OtherRefCountable* ptr)
     {
         releaseRef();

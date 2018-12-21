@@ -113,12 +113,12 @@ public:
         return newRefCounter;
     }
 
-	int refCount() const
-	{
-		if (m_refCountingDelegate)
-			return m_refCountingDelegate->refCount();
-		return m_refCount;
-	}
+    int refCount() const
+    {
+        if (m_refCountingDelegate)
+            return m_refCountingDelegate->refCount();
+        return m_refCount;
+    }
 
 private:
     mutable atomic::AtomicLong m_refCount;
@@ -139,7 +139,7 @@ public:
     virtual int addRef() const override { return m_refManager.addRef(); }
     virtual int releaseRef() const override { return m_refManager.releaseRef(); }
 
-	int refCount() const { return m_refManager.refCount(); }
+    int refCount() const { return m_refManager.refCount(); }
 
 protected:
     CommonRefManager m_refManager;
@@ -158,8 +158,8 @@ int refCount(const nxpl::PluginInterface* object)
     if (object == nullptr)
         return 0;
 
-	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<RefCountableInterface>*>(object))
-		return commonRefCounter->refCount();
+    if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<RefCountableInterface>*>(object))
+        return commonRefCounter->refCount();
 
     (void) object->addRef();
     return object->releaseRef();

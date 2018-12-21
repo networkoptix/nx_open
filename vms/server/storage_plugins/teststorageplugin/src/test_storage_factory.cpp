@@ -26,12 +26,12 @@ std::string getAppDir()
 
 #if defined (_WIN32)
 
-	TCHAR tBuf[512];
+    TCHAR tBuf[512];
     int bytes = GetModuleFileName(NULL, tBuf, 512);
     if (bytes == 0)
         return result;
     char separator = '\\';
-	WideCharToMultiByte(CP_UTF8, 0, tBuf, 512, buf, 512, 0, 0);
+    WideCharToMultiByte(CP_UTF8, 0, tBuf, 512, buf, 512, 0, 0);
 
 #elif defined (__linux__)
 

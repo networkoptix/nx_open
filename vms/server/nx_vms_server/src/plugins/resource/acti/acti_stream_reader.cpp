@@ -150,7 +150,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
         .arg(getRole()));
 
     m_multiCodec.setRequest(streamUrl);
-	m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
+    m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
     m_multiCodec.setRtpTransport(desiredTransport);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     return result;
