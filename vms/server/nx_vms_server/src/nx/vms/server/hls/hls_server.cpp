@@ -334,10 +334,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         (lastVideoFrame->compressionType != AV_CODEC_ID_NONE))
     {
         //video is not in h.264 format
-        NX_WARNING(this, lm("Error. HLS request to resource %1 with codec %2")
-            .args(camResource->getUniqueId(),
-                QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)));
-        return nx::network::http::StatusCode::forbidden;
+        NX_WARNING(this, lit("Non standard video codec %1 is used for HLS streaming for resource %2")
+            .arg(QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)).arg(camResource->getUniqueId()));
     }
 
     if (extension.compare(QLatin1String("m3u")) == 0 ||

@@ -93,7 +93,6 @@ copyBuildLibs()
         libavutil
         libswresample
         libswscale
-        libpostproc
 
         # third-party
         libquazip
