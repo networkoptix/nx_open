@@ -1,17 +1,11 @@
-/**********************************************************
-* 22 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef GENERIC_RTSP_CAMERA_MANAGER_H
-#define GENERIC_RTSP_CAMERA_MANAGER_H
+#pragma once
 
 #include <memory>
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/common/ptr.h>
 
-#include <plugins/plugin_tools.h>
 #include "generic_rtsp_plugin.h"
 
 
@@ -77,11 +71,9 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpt::ScopedRef<GenericRTSPPlugin> m_pluginRef;
+    nx::sdk::common::Ptr<GenericRTSPPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     static const int kEncodersCount = 2;
     std::unique_ptr<GenericRTSPMediaEncoder> m_encoder[kEncodersCount];
 };
-
-#endif  //GENERIC_RTSP_CAMERA_MANAGER_H

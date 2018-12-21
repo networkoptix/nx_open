@@ -8,6 +8,7 @@
 #include <nx/sdk/analytics/i_data_packet.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/wrapping_compressed_video_packet.h>
+#include <nx/sdk/common/ptr.h>
 #include <plugins/plugin_tools.h>
 
 namespace nx {
@@ -43,9 +44,9 @@ private:
     nx::utils::MoveOnlyFunc<CLConstVideoDecoderOutputPtr()> m_getUncompressedFrame;
 
     std::map<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat,
-        nxpt::ScopedRef<nx::sdk::analytics::IUncompressedVideoFrame>> m_uncompressedFrames;
+        nx::sdk::common::Ptr<nx::sdk::analytics::IUncompressedVideoFrame>> m_uncompressedFrames;
 
-    nxpt::ScopedRef<WrappingCompressedVideoPacket> m_compressedFrame;
+    nx::sdk::common::Ptr<WrappingCompressedVideoPacket> m_compressedFrame;
 };
 
 } // namespace analytics

@@ -176,8 +176,8 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_sdkDeviceAgent)
         return;
 
-    m_sdkDeviceAgent->setNeededMetadataTypes(
-        nx::sdk::common::Ptr<MetadataTypes>::make().get());
+    const auto neededMetadataTypes = nx::sdk::common::makePtr<MetadataTypes>();
+    m_sdkDeviceAgent->setNeededMetadataTypes(neededMetadataTypes.get());
 }
 
 QVariantMap DeviceAnalyticsBinding::getSettings() const
@@ -362,9 +362,7 @@ nx::sdk::common::Ptr<DeviceAnalyticsBinding::DeviceAgent>
     }
 
     nx::sdk::common::Ptr<IConsumingDeviceAgent> streamConsumer(
-        sdk_support::queryInterface<IConsumingDeviceAgent>(
-            deviceAgent,
-            IID_ConsumingDeviceAgent));
+        deviceAgent->queryInterface(IID_ConsumingDeviceAgent));
 
     m_isStreamConsumer = !!streamConsumer;
 
@@ -525,9 +523,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
     }
     // Returning true means the data has been processed.
     nx::sdk::common::Ptr<nx::sdk::analytics::IConsumingDeviceAgent> consumingDeviceAgent(
-        sdk_support::queryInterface<nx::sdk::analytics::IConsumingDeviceAgent>(
-            m_sdkDeviceAgent,
-            nx::sdk::analytics::IID_ConsumingDeviceAgent));
+        m_sdkDeviceAgent->queryInterface(nx::sdk::analytics::IID_ConsumingDeviceAgent));
 
     NX_ASSERT(consumingDeviceAgent);
     if (!consumingDeviceAgent)

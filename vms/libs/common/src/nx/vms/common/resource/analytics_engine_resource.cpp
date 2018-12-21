@@ -58,18 +58,18 @@ AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
         .dynamicCast<AnalyticsPluginResource>();
 }
 
-EventTypeDescriptorMap AnalyticsEngineResource::analyticsEventTypeDescriptors() const
+analytics::EventTypeDescriptorMap AnalyticsEngineResource::analyticsEventTypeDescriptors() const
 {
     const auto engineManifest = manifest();
-    return nx::analytics::fromManifestItemListToDescriptorMap<EventTypeDescriptor>(
+    return analytics::fromManifestItemListToDescriptorMap<EventTypeDescriptor>(
         getId(),
         engineManifest.eventTypes);
 }
 
-ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeDescriptors() const
+analytics::ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeDescriptors() const
 {
     const auto engineManifest = manifest();
-    return nx::analytics::fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(
+    return analytics::fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(
         getId(),
         engineManifest.objectTypes);
 }

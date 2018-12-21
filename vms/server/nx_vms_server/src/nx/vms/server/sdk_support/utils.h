@@ -91,12 +91,6 @@ std::optional<ManifestType> manifest(
     return deserializedManifest;
 }
 
-template<typename Interface, typename SdkObject>
-Interface* queryInterface(SdkObject sdkObject, const nxpl::NX_GUID& guid)
-{
-    return static_cast<Interface*>(sdkObject->queryInterface(guid));
-}
-
 template<typename ResourceType>
 QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, const QString& id)
 {

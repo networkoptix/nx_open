@@ -2,6 +2,7 @@
 
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/common/string.h>
 
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
@@ -99,8 +100,9 @@ nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandle
 
 nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
 {
+// TODO: Investigate why this code is commented out.
 #if 0
-    nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> compressedVideo(
+    nx::sdk::common::Ptr<nx::sdk::analytics::CompressedVideoPacket> compressedVideo(
         dataPacket->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
 
     if (!compressedVideo)

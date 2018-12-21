@@ -6,6 +6,7 @@
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/event/events/events_fwd.h>
 
@@ -54,13 +55,13 @@ private:
         const QString& eventTypeId) const;
 
     void handleEventsPacket(
-        nxpt::ScopedRef<nx::sdk::analytics::IEventMetadataPacket> packet);
+        nx::sdk::common::Ptr<nx::sdk::analytics::IEventMetadataPacket> packet);
 
     void handleObjectsPacket(
-        nxpt::ScopedRef<nx::sdk::analytics::IObjectMetadataPacket> packet);
+        nx::sdk::common::Ptr<nx::sdk::analytics::IObjectMetadataPacket> packet);
 
     void handleMetadataEvent(
-        nxpt::ScopedRef<nx::sdk::analytics::IEvent> eventData,
+        nx::sdk::common::Ptr<nx::sdk::analytics::IEvent> eventData,
         qint64 timestampUsec);
 
 private:

@@ -1,11 +1,13 @@
 #include "base_callbacks.h"
-#include "base_pipeline.h"
 
-#include "deepstream_analytics_plugin_ini.h"
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
+
+#include "deepstream_analytics_plugin_ini.h"
+#include "base_pipeline.h"
 
 namespace nx{
 namespace vms_server_plugins {
@@ -16,17 +18,15 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    nxpt::ScopedRef<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket());
+    const nx::sdk::common::Ptr<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket());
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
         return;
     }
 
-    nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> video(
-        (nx::sdk::analytics::CompressedVideoPacket*) frame->queryInterface(
-            nx::sdk::analytics::IID_CompressedVideoPacket));
-
+    const nx::sdk::common::Ptr<nx::sdk::analytics::CompressedVideoPacket> video(
+        frame->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
     if (!video)
     {
         NX_OUTPUT << __func__ << " Can not convert data packet to 'CompressedVideoPacket'";

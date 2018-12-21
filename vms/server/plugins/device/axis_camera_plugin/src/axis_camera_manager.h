@@ -1,10 +1,4 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef AXIS_CAMERA_MANAGER_H
-#define AXIS_CAMERA_MANAGER_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -14,6 +8,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/common/ptr.h>
 
 class AxisCameraPlugin;
 class AxisMediaEncoder;
@@ -93,7 +88,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpt::ScopedRef<AxisCameraPlugin> m_pluginRef;
+    nx::sdk::common::Ptr<AxisCameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
@@ -107,5 +102,3 @@ private:
 
     int updateCameraInfo() const;
 };
-
-#endif  //AXIS_CAMERA_MANAGER_H

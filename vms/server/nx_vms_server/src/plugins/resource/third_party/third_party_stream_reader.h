@@ -68,6 +68,7 @@ private:
     mutable QnMutex m_streamReaderMutex;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
+    // TODO: Migrate to nx::sdk::common::Ptr.
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;

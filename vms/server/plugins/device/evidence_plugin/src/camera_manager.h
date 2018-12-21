@@ -1,10 +1,4 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef AXIS_CAMERA_MANAGER_H
-#define AXIS_CAMERA_MANAGER_H
+#pragma once
 
 #include <functional>
 #include <map>
@@ -18,9 +12,9 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/common/ptr.h>
 
 #include "ptz_manager.h"
-
 
 class CameraPlugin;
 class MediaEncoder;
@@ -150,7 +144,7 @@ private:
         Holding reference to \a CameraPlugin, but not \a CameraDiscoveryManager,
         since \a CameraDiscoveryManager instance is not required for \a CameraManager object
     */
-    nxpt::ScopedRef<CameraPlugin> m_pluginRef;
+    nx::sdk::common::Ptr<CameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
@@ -182,5 +176,3 @@ private:
     template<class ParamAssignFunc>
         int readCameraParam( ParamAssignFunc func ) const;
 };
-
-#endif  //AXIS_CAMERA_MANAGER_H

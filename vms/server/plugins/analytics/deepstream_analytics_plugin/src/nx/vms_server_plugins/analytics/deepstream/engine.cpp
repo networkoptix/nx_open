@@ -8,15 +8,19 @@ extern "C" {
 
 } // extern "C"
 
+#include <nx/sdk/common/ptr.h>
+
+#define NX_PRINT_PREFIX "deepstream::Engine::"
+#include <nx/kit/debug.h>
+
+#include <nx/gstreamer/gstreamer_common.h>
+#include <nx/sdk/common/string.h>
+
 #include "device_agent.h"
 #include "utils.h"
 #include "deepstream_common.h"
 #include "openalpr_common.h"
 #include "deepstream_analytics_plugin_ini.h"
-#define NX_PRINT_PREFIX "deepstream::Engine::"
-#include <nx/kit/debug.h>
-#include <nx/gstreamer/gstreamer_common.h>
-#include <nx/sdk/common/string.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -57,13 +61,12 @@ Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
         m_objectClassDescritions = loadObjectClasses();
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
-    nxpt::ScopedRef<nxpl::TimeProvider> timeProvider(
-        m_plugin->pluginContainer()->queryInterface(nxpl::IID_TimeProvider));
 
-    if (timeProvider)
+    if (const auto timeProvider = nx::sdk::common::Ptr<nxpl::TimeProvider>(
+        m_plugin->pluginContainer()->queryInterface(nxpl::IID_TimeProvider)))
     {
         m_timeProvider = decltype(m_timeProvider)(
-            timeProvider.release(),
+            timeProvider.get(),
             [](nxpl::TimeProvider* provider) { provider->releaseRef(); });
     }
 }

@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/common/log_utils.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/common/string.h>
 #include <nx/sdk/analytics/common/engine.h>
 #include <nx/sdk/common/plugin_event.h>
@@ -105,7 +106,7 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
         return Error::unknownError;
     }
 
-    if (auto compressedFrame = nxpt::ScopedRef<CompressedVideoPacket>(
+    if (const auto compressedFrame = nx::sdk::common::Ptr<CompressedVideoPacket>(
         dataPacket->queryInterface(IID_CompressedVideoPacket)))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
@@ -114,7 +115,7 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
             return Error::unknownError;
         }
     }
-    else if (auto uncompressedFrame = nxpt::ScopedRef<IUncompressedVideoFrame>(
+    else if (const auto uncompressedFrame = nx::sdk::common::Ptr<IUncompressedVideoFrame>(
         dataPacket->queryInterface(IID_UncompressedVideoFrame)))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
@@ -228,9 +229,8 @@ void VideoFrameProcessingDeviceAgent::pushPluginEvent(
         return;
     }
 
-    nxpt::ScopedRef<IPluginEvent> event(
-        new nx::sdk::common::PluginEvent(level, caption, description));
-
+    const auto event = nx::sdk::common::makePtr<nx::sdk::common::PluginEvent>(
+        level, caption, description);
     m_handler->handlePluginEvent(event.get());
 }
 

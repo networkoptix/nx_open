@@ -6,6 +6,7 @@
 #include <nx/kit/utils.h>
 
 #include <nx/sdk/common/log_utils.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/common/string_map.h>
 #include <nx/sdk/common/string.h>
 
@@ -70,9 +71,8 @@ void Engine::pushPluginEvent(
         return;
     }
 
-    nxpt::ScopedRef<IPluginEvent> event(
-        new nx::sdk::common::PluginEvent(level, std::move(caption), std::move(description)));
-
+    const auto event = nx::sdk::common::makePtr<nx::sdk::common::PluginEvent>(
+        level, std::move(caption), std::move(description));
     m_handler->handlePluginEvent(event.get());
 }
 

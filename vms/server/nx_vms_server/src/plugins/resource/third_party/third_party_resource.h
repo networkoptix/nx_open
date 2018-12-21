@@ -110,6 +110,7 @@ private:
         QList<nxcip::Resolution> resolutionList;
     };
 
+    // TODO: Migrate to nx::sdk::common::Ptr.
     nxcip::CameraInfo m_camInfo;
     std::unique_ptr<nxcip_qt::BaseCameraManager> m_camManager;
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;

@@ -4,6 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
@@ -55,19 +56,17 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 
     bool handled = false;
-    nxpt::ScopedRef<IEventMetadataPacket> eventsPacket(
-        metadata->queryInterface(IID_EventMetadataPacket));
-    if (eventsPacket)
+    if (const auto eventsPacket = nx::sdk::common::Ptr<IEventMetadataPacket>(
+        metadata->queryInterface(IID_EventMetadataPacket)))
     {
-        handleEventsPacket(std::move(eventsPacket));
+        handleEventsPacket(eventsPacket);
         handled = true;
     }
 
-    nxpt::ScopedRef<IObjectMetadataPacket> objectsPacket(
-        metadata->queryInterface(IID_ObjectMetadataPacket));
-    if (objectsPacket)
+    if (const auto objectsPacket = nx::sdk::common::Ptr<IObjectMetadataPacket>(
+        metadata->queryInterface(IID_ObjectMetadataPacket)))
     {
-        handleObjectsPacket(std::move(objectsPacket));
+        handleObjectsPacket(objectsPacket);
         handled = true;
     }
 
@@ -79,22 +78,21 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 }
 
-void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> packet)
+void MetadataHandler::handleEventsPacket(nx::sdk::common::Ptr<IEventMetadataPacket> packet)
 {
     int eventsCount = 0;
     while (true)
     {
-        nxpt::ScopedRef<IMetadataItem> item(packet->nextItem());
+        nx::sdk::common::Ptr<IMetadataItem> item(packet->nextItem());
         if (!item)
             break;
 
         ++eventsCount;
 
-        nxpt::ScopedRef<IEvent> eventData(item->queryInterface(IID_Event));
-        if (eventData)
+        if (const auto event = nx::sdk::common::Ptr<IEvent>(item->queryInterface(IID_Event)))
         {
             const int64_t timestampUsec = packet->timestampUs();
-            handleMetadataEvent(std::move(eventData), timestampUsec);
+            handleMetadataEvent(event, timestampUsec);
         }
         else
         {
@@ -106,13 +104,13 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> p
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
-void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket> packet)
+void MetadataHandler::handleObjectsPacket(nx::sdk::common::Ptr<IObjectMetadataPacket> packet)
 {
     using namespace nx::vms_server_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<IObject> item(packet->nextItem());
+        nx::sdk::common::Ptr<IObject> item(packet->nextItem());
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
@@ -152,7 +150,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket>
 }
 
 void MetadataHandler::handleMetadataEvent(
-    nxpt::ScopedRef<IEvent> eventData,
+    nx::sdk::common::Ptr<IEvent> eventData,
     qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;

@@ -1,18 +1,12 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ILP_CAMERA_MANAGER_H
-#define ILP_CAMERA_MANAGER_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/common/ptr.h>
 
 #include <plugins/plugin_tools.h>
 #include "dir_contents_manager.h"
 #include "plugin.h"
-
 
 class MediaEncoder;
 
@@ -70,11 +64,9 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpt::ScopedRef<ImageLibraryPlugin> m_pluginRef;
+    nx::sdk::common::Ptr<ImageLibraryPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::unique_ptr<MediaEncoder> m_encoder[2];
     mutable DirContentsManager m_dirContentsManager;
 };
-
-#endif  //ILP_CAMERA_MANAGER_H

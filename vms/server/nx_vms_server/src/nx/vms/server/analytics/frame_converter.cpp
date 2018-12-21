@@ -1,6 +1,7 @@
 #include "frame_converter.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/analytics/common/pixel_format.h>
 #include <nx/vms/server/analytics/generic_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/yuv420_uncompressed_video_frame.h>
@@ -83,7 +84,7 @@ IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelForma
         {
             auto insertResult = m_uncompressedFrames.emplace(
                 *pixelFormat,
-                nxpt::ScopedRef<IUncompressedVideoFrame>(
+                nx::sdk::common::Ptr<IUncompressedVideoFrame>(
                     createUncompressedVideoFrameFromVideoDecoderOutput(
                         uncompressedFrame, *pixelFormat)));
             it = insertResult.first;

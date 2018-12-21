@@ -7,6 +7,7 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/common/ptr.h>
 #include <nx/sdk/common/string_map.h>
 #include <nx/sdk/analytics/common/metadata_types.h>
 
@@ -40,8 +41,7 @@ static const int noError = (int) nx::sdk::Error::noError;
 static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    nxpt::ScopedRef<const nx::sdk::IString> manifest(
-        engine->manifest(&error));
+    const nx::sdk::common::Ptr<const nx::sdk::IString> manifest(engine->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -62,8 +62,7 @@ static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    nxpt::ScopedRef<const nx::sdk::IString> manifest(
-        deviceAgent->manifest(&error));
+    const nx::sdk::common::Ptr<const nx::sdk::IString> manifest(deviceAgent->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -180,7 +179,7 @@ public:
     bool m_expectedNonNullMessageToUser = false;
 
 private:
-    nxpt::ScopedRef<nx::sdk::common::StringMap> m_params;
+    nx::sdk::common::Ptr<nx::sdk::common::StringMap> m_params;
 };
 
 static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
@@ -335,7 +334,7 @@ TEST(stub_analytics_plugin, test)
     DeviceAgentHandler deviceAgentHandler;
     ASSERT_EQ(noError, (int) deviceAgent->setHandler(&deviceAgentHandler));
 
-    nxpt::ScopedRef<nx::sdk::analytics::common::MetadataTypes> metadataTypes(
+    const nx::sdk::common::Ptr<nx::sdk::analytics::common::MetadataTypes> metadataTypes(
         new nx::sdk::analytics::common::MetadataTypes());
 
     ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));

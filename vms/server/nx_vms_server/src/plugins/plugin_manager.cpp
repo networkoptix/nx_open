@@ -11,8 +11,9 @@
 #include <nx/utils/log/log.h>
 
 #include <camera/camera_plugin.h>
-#include <nx/sdk/analytics/i_engine.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/common/ptr.h>
 
 #include "plugins_ini.h"
 
@@ -214,7 +215,7 @@ bool PluginManager::loadNxPlugin(
     NX_WARNING(this, "Loaded Nx plugin [%1]", filename);
     m_nxPlugins.push_back(obj);
 
-    if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
+    if (const auto pluginObj = nx::sdk::common::Ptr<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
         if (isAnalyticsPlugin && pluginObj->name() != libName)
         {
@@ -227,7 +228,7 @@ bool PluginManager::loadNxPlugin(
             pluginObj->setSettings(settingsHolder.array(), settingsHolder.size());
     }
 
-    if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))
+    if (const auto plugin2Obj = nx::sdk::common::Ptr<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))
     {
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);
