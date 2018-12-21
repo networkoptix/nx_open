@@ -19,6 +19,8 @@ class AnalyticsEngineResource:
     public nx::vms::common::AnalyticsEngineResource,
     public nx::vms::server::ServerModuleAware
 {
+    Q_OBJECT
+
     using base_type = nx::vms::common::AnalyticsEngineResource;
 
 public:
@@ -33,6 +35,9 @@ public:
     virtual void setSettingsValues(const QVariantMap& values) override;
 
     bool sendSettingsToSdkEngine();
+
+signals:
+    void engineInitialized(const AnalyticsEngineResourcePtr& engine);
 
 private:
     std::optional<nx::vms::api::analytics::PluginManifest> pluginManifest() const;

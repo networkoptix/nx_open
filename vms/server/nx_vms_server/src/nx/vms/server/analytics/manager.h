@@ -86,6 +86,8 @@ private:
         const QnVirtualCameraResourcePtr& device,
         const QString& propertyName);
 
+    void at_deviceStatusChanged(const QnResourcePtr& device);
+
     void handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device);
     void handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device);
 
@@ -95,12 +97,26 @@ private:
         const resource::AnalyticsEngineResourcePtr& engine,
         const QString& propertyName);
 
+    void at_engineInitializationStateChanged(
+        const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
+
     QWeakPointer<QnAbstractDataReceptor> metadataSink(
         const QnVirtualCameraResourcePtr& device) const;
     QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& device) const;
     QWeakPointer<ProxyVideoDataReceptor> mediaSource(
         const QnVirtualCameraResourcePtr& device) const;
     QWeakPointer<ProxyVideoDataReceptor> mediaSource(const QnUuid& device) const;
+
+    nx::vms::server::resource::AnalyticsEngineResourceList localEngines() const;
+    std::set<QnUuid> compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const;
+
+    void updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device);
+    void updateCompatibilityWithDevices(
+        const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
+
+    void removeDeviceDescriptor(const QnVirtualCameraResourcePtr& device);
+    void removeEngineFromCompatible(
+        const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
 
 private:
     mutable QnMutex m_contextMutex;

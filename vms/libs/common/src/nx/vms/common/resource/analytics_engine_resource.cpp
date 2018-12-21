@@ -11,8 +11,12 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/analytics/types.h>
+#include <nx/analytics/utils.h>
+
 namespace nx::vms::common {
 
+using namespace nx::analytics;
 using namespace nx::vms::api::analytics;
 
 const QString AnalyticsEngineResource::kSettingsValuesProperty{"settingsValues"};
@@ -53,6 +57,22 @@ AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
 
     return common->resourcePool()->getResourceById(getParentId())
         .dynamicCast<AnalyticsPluginResource>();
+}
+
+EventTypeDescriptorMap AnalyticsEngineResource::analyticsEventTypeDescriptors() const
+{
+    const auto engineManifest = manifest();
+    return nx::analytics::fromManifestItemListToDescriptorMap<EventTypeDescriptor>(
+        getId(),
+        engineManifest.eventTypes);
+}
+
+ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeDescriptors() const
+{
+    const auto engineManifest = manifest();
+    return nx::analytics::fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(
+        getId(),
+        engineManifest.objectTypes);
 }
 
 } // namespace nx::vms::common

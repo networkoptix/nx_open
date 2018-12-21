@@ -81,6 +81,8 @@ public:
         const EngineId& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
+    void removeDeviceDescriptors(const std::set<DeviceId>& deviceIds);
+
     void addCompatibleAnalyticsEngines(
         const DeviceId& deviceId,
         std::set<EngineId> compatibleEngineIds);
@@ -88,6 +90,8 @@ public:
     void removeCompatibleAnalyticsEngines(
         const DeviceId& deviceId,
         std::set<EngineId> engineIdsToRemove);
+
+    void removeCompatibleAnalyticsEngines(const std::set<EngineId>& engineIds);
 
     void setCompatibleAnalyticsEngines(
         const DeviceId& deviceId,
@@ -115,6 +119,13 @@ public:
         const QnVirtualCameraResourceList& deviceList) const;
     EventTypeDescriptorMap supportedEventTypeDescriptorsIntersection(
         const QnVirtualCameraResourceList& deviceList) const;
+
+    EventTypeDescriptorMap compatibleEventTypeDescriptors(
+        const QnVirtualCameraResourcePtr& device) const;
+    EventTypeDescriptorMap compatibleEventTypeDescriptorsUnion(
+        const QnVirtualCameraResourceList& devices) const;
+    EventTypeDescriptorMap compatibleEventTypeDescriptorsIntersection(
+        const QnVirtualCameraResourceList& devices) const;
 
     EngineDescriptorMap eventTypesParentEngineDescriptors(
         const EventTypeDescriptorMap& eventTypeDescriptors) const;

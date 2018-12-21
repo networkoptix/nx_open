@@ -38,6 +38,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/debugging/visual_metadata_debugger_factory.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/analytics/descriptor_manager.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/common/pixel_format.h>
@@ -232,12 +233,18 @@ void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
         device, &QnResource::parentIdChanged,
         this, &Manager::at_resourceParentIdChanged);
 
+    connect(
+        device, &QnResource::statusChanged,
+        this, &Manager::at_deviceStatusChanged);
+
+    updateCompatibilityWithEngines(device);
     if (isLocalDevice(device))
         handleDeviceArrivalToServer(device);
 }
 
 void Manager::at_deviceRemoved(const QnVirtualCameraResourcePtr& device)
 {
+    removeDeviceDescriptor(device);
     handleDeviceRemovalFromServer(device);
 }
 
@@ -275,6 +282,17 @@ void Manager::at_devicePropertyChanged(
     }
 }
 
+void Manager::at_deviceStatusChanged(const QnResourcePtr& resource)
+{
+    const auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!NX_ASSERT(device))
+        return;
+
+    const auto deviceStatus = device->getStatus();
+    if (deviceStatus == Qn::Online || deviceStatus == Qn::Recording)
+        updateCompatibilityWithEngines(device);
+}
+
 void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
 {
     connect(
@@ -302,6 +320,12 @@ void Manager::at_engineAdded(const resource::AnalyticsEngineResourcePtr& engine)
     connect(
         engine, &QnResource::propertyChanged,
         this, &Manager::at_resourcePropertyChanged);
+
+    connect(
+        engine, &resource::AnalyticsEngineResource::engineInitialized,
+        this, &Manager::at_engineInitializationStateChanged);
+
+    updateCompatibilityWithDevices(engine);
 }
 
 void Manager::at_engineRemoved(const resource::AnalyticsEngineResourcePtr& engine)
@@ -327,6 +351,12 @@ void Manager::at_enginePropertyChanged(
 
     if (propertyName == nx::vms::common::AnalyticsEngineResource::kSettingsValuesProperty)
         engine->sendSettingsToSdkEngine();
+}
+
+void Manager::at_engineInitializationStateChanged(
+    const resource::AnalyticsEngineResourcePtr& engine)
+{
+    updateCompatibilityWithDevices(engine);
 }
 
 void Manager::registerMetadataSink(
@@ -442,6 +472,92 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId
         return QWeakPointer<ProxyVideoDataReceptor>();
 
     return it->second;
+}
+
+nx::vms::server::resource::AnalyticsEngineResourceList Manager::localEngines() const
+{
+    using namespace nx::vms::server::resource;
+    return resourcePool()->getResources<AnalyticsEngineResource>(
+            [](const AnalyticsEngineResourcePtr& engine) { return engine->sdkEngine(); });
+}
+
+std::set<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const
+{
+    std::set<QnUuid> result;
+    if (!NX_ASSERT(device))
+        return result;
+
+    for (auto& engine: localEngines())
+    {
+        auto sdkEngine = engine->sdkEngine();
+        if (!NX_ASSERT(sdkEngine))
+            continue;
+
+        nx::sdk::DeviceInfo deviceInfo;
+        const bool success = sdk_support::deviceInfoFromResource(device, &deviceInfo);
+        if (!success)
+        {
+            NX_WARNING(this, "Unable to build device info for device %1 (%2)",
+                device->getUserDefinedName(), device->getId());
+
+            continue;
+        }
+
+        if (sdkEngine->isCompatible(&deviceInfo))
+            result.insert(engine->getId());
+    }
+
+    return result;
+}
+
+void Manager::updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device)
+{
+    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    descriptorManager.setCompatibleAnalyticsEngines(device->getId(), compatibleEngineIds(device));
+}
+
+void Manager::updateCompatibilityWithDevices(
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
+{
+    const auto sdkEngine = engine->sdkEngine();
+    if (!sdkEngine)
+    {
+        NX_DEBUG(this, "Engine resource %1 (%2) has no assigned SDK engine",
+            engine->getName(), engine->getId());
+        return;
+    }
+
+    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    auto devices = resourcePool()->getAllCameras(
+        /*any server*/ QnResourcePtr(),
+        /*ignoreDesktopCamera*/ true);
+
+    for (auto& device: devices)
+    {
+        nx::sdk::DeviceInfo deviceInfo;
+        if (!sdk_support::deviceInfoFromResource(device, &deviceInfo))
+        {
+            NX_WARNING(this, "Unable to build device info for device %1 (%2)",
+                device->getUserDefinedName(), device->getId());
+            continue;
+        }
+
+        if (sdkEngine->isCompatible(&deviceInfo))
+            descriptorManager.addCompatibleAnalyticsEngines(device->getId(), {engine->getId()});
+    }
+}
+
+void Manager::removeDeviceDescriptor(const QnVirtualCameraResourcePtr& device)
+{
+    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    descriptorManager.removeDeviceDescriptors({device->getId()});
+}
+
+void Manager::removeEngineFromCompatible(
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
+{
+    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    descriptorManager.removeCompatibleAnalyticsEngines({engine->getId()});
 }
 
 } // namespace nx::vms::server::analytics

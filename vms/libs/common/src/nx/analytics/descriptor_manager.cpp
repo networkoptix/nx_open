@@ -8,9 +8,15 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/utils/data_structures/map_helper.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
+#include <nx/analytics/utils.h>
+
 namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
+using namespace nx::utils::data_structures;
 
 const QString DescriptorManager::kPluginDescriptorsProperty("pluginDescriptors");
 const QString DescriptorManager::kEngineDescriptorsProperty("engineDescriptors");
@@ -34,19 +40,6 @@ std::unique_ptr<Container> makeContainer(QnCommonModule* commonModule, QString p
     auto factory = typename Container::StorageFactory(std::move(propertyName));
 
     return std::make_unique<Container>(std::move(factory), servers, ownResource);
-}
-
-template<typename Descriptor, typename Item>
-std::map<QString, Descriptor> toMap(const EngineId& engineId, const QList<Item>& items)
-{
-    std::map<QString, Descriptor> result;
-    for (const auto& item: items)
-    {
-        auto descriptor = Descriptor(engineId, item);
-        result.emplace(descriptor.getId(), std::move(descriptor));
-    }
-
-    return result;
 }
 
 std::set<EventTypeId> eventTypeIdsSupportedByDevice(const QnVirtualCameraResourcePtr& device)
@@ -135,14 +128,16 @@ void DescriptorManager::updateFromEngineManifest(
         EngineDescriptor(engineId, engineName, pluginId), engineId);
 
     m_actionTypeDescriptorContainer->mergeWithDescriptors(
-        toMap<ActionTypeDescriptor>(engineId, manifest.objectActions),
+        fromManifestItemListToDescriptorMap<ActionTypeDescriptor>(
+            engineId, manifest.objectActions),
         engineId);
 
-    m_groupDescriptorContainer->mergeWithDescriptors(toMap<GroupDescriptor>(engineId, manifest.groups));
+    m_groupDescriptorContainer->mergeWithDescriptors(
+        fromManifestItemListToDescriptorMap<GroupDescriptor>(engineId, manifest.groups));
     m_objectTypeDescriptorContainer->mergeWithDescriptors(
-        toMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
+        fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
     m_eventTypeDescriptorContainer->mergeWithDescriptors(
-        toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
+        fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
 void DescriptorManager::updateFromDeviceAgentManifest(
@@ -151,11 +146,17 @@ void DescriptorManager::updateFromDeviceAgentManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
     m_groupDescriptorContainer->mergeWithDescriptors(
-        toMap<GroupDescriptor>(engineId, manifest.groups));
+        fromManifestItemListToDescriptorMap<GroupDescriptor>(engineId, manifest.groups));
     m_objectTypeDescriptorContainer->mergeWithDescriptors(
-        toMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
+        fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
     m_eventTypeDescriptorContainer->mergeWithDescriptors(
-        toMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
+        fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
+}
+
+void DescriptorManager::removeDeviceDescriptors(const std::set<DeviceId>& deviceIds)
+{
+    for (const auto& deviceId: deviceIds)
+        m_deviceDescriptorContainer->removeDescriptors(deviceId);
 }
 
 void DescriptorManager::addCompatibleAnalyticsEngines(
@@ -173,7 +174,10 @@ void DescriptorManager::removeCompatibleAnalyticsEngines(
     if (engineIdsToRemove.empty())
         return;
 
-    auto descriptor = m_deviceDescriptorContainer->mergedDescriptors(deviceId);
+    auto descriptor = m_deviceDescriptorContainer->descriptors(
+        commonModule()->moduleGUID(),
+        deviceId);
+
     if (!descriptor)
         return;
 
@@ -181,6 +185,21 @@ void DescriptorManager::removeCompatibleAnalyticsEngines(
         descriptor->compatibleEngines.erase(engineId);
 
     m_deviceDescriptorContainer->setDescriptors(*descriptor, deviceId);
+}
+
+void DescriptorManager::removeCompatibleAnalyticsEngines(const std::set<EngineId>& engineIds)
+{
+    auto descriptors = m_deviceDescriptorContainer->descriptors(commonModule()->moduleGUID());
+    if (!descriptors)
+        descriptors = typename decltype(descriptors)::value_type();
+
+    for (auto& [deviceId, descriptor]: *descriptors)
+    {
+        for (const auto& engineId: engineIds)
+            descriptor.compatibleEngines.erase(engineId);
+    }
+
+    m_deviceDescriptorContainer->setDescriptors(*descriptors);
 }
 
 void DescriptorManager::setCompatibleAnalyticsEngines(
@@ -333,6 +352,9 @@ EngineDescriptorMap DescriptorManager::parentEngineDescriptors(
             engineIds.insert(scope.engineId);
     }
 
+    if (engineIds.empty())
+        return EngineDescriptorMap();
+
     return engineDescriptors(engineIds);
 }
 
@@ -345,6 +367,9 @@ GroupDescriptorMap DescriptorManager::parentGroupDescriptors(const DescriptorMap
         for (const auto scope : typeDescriptor.scopes)
             groupIds.insert(scope.groupId);
     }
+
+    if (groupIds.empty())
+        return GroupDescriptorMap();
 
     return groupDescriptors(groupIds);
 }
@@ -389,6 +414,68 @@ EventTypeDescriptorMap DescriptorManager::supportedEventTypeDescriptorsIntersect
         deviceList,
         [](const auto& device) { return eventTypeIdsSupportedByDevice(device); },
         "EventType");
+}
+
+EventTypeDescriptorMap DescriptorManager::compatibleEventTypeDescriptors(
+    const QnVirtualCameraResourcePtr& device) const
+{
+    const auto descriptor = deviceDescriptor(device->getId());
+    if (!descriptor)
+        return EventTypeDescriptorMap();
+
+    EventTypeDescriptorMap result;
+    for (const auto& engineId: descriptor->compatibleEngines)
+    {
+        auto engine = resourcePool()
+            ->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
+
+        if (!engine)
+        {
+            NX_WARNING(this, "Analytics Engine resource with id %1 is not found", engineId);
+            continue;
+        }
+
+        auto eventDescriptors = engine->analyticsEventTypeDescriptors();
+        MapHelper::merge(&result, eventDescriptors, ScopedMergeExecutor<EventTypeDescriptor>());
+    }
+
+    return result;
+}
+
+EventTypeDescriptorMap DescriptorManager::compatibleEventTypeDescriptorsUnion(
+    const QnVirtualCameraResourceList& devices) const
+{
+    EventTypeDescriptorMap result;
+    for (const auto& device: devices)
+    {
+        auto descriptors = compatibleEventTypeDescriptors(device);
+        MapHelper::merge(&result, descriptors, ScopedMergeExecutor<EventTypeDescriptor>());
+    }
+
+    MapHelper::merge(&result, supportedEventTypeDescriptorsUnion(devices));
+
+    return result;
+}
+
+EventTypeDescriptorMap DescriptorManager::compatibleEventTypeDescriptorsIntersection(
+    const QnVirtualCameraResourceList& devices) const
+{
+    if (devices.isEmpty())
+        return EventTypeDescriptorMap();
+
+    EventTypeDescriptorMap result = compatibleEventTypeDescriptors(devices[0]);
+    for (auto i = 0; i < devices.size(); ++i)
+    {
+        if (result.empty())
+            return EventTypeDescriptorMap();
+
+        auto descriptors = compatibleEventTypeDescriptors(devices[i]);
+        MapHelper::intersected(&result, descriptors, ScopedMergeExecutor<EventTypeDescriptor>());
+    }
+
+    MapHelper::merge(&result, supportedEventTypeDescriptorsIntersection(devices));
+
+    return result;
 }
 
 EngineDescriptorMap DescriptorManager::eventTypesParentEngineDescriptors(

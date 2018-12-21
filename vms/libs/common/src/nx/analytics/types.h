@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/data_structures/map_helper.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics {
@@ -20,11 +21,9 @@ using ObjectTypeDescriptorMap = std::map<
     ObjectTypeId,
     nx::vms::api::analytics::ObjectTypeDescriptor>;
 
-using ActionTypeDescriptorMap = MapHelper::NestedMap<
-    std::map,
+using ActionTypeDescriptorMap = std::map<
     EngineId,
-    ActionTypeId,
-    nx::vms::api::analytics::ActionTypeDescriptor>;
+    std::map<ActionTypeId, nx::vms::api::analytics::ActionTypeDescriptor>>;
 
 using DeviceDescriptorMap = std::map<DeviceId, nx::vms::api::analytics::DeviceDescriptor>;
 

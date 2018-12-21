@@ -160,6 +160,9 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     setManifest(*manifest);
     saveProperties();
+
+    emit engineInitialized(toSharedPointer(this));
+
     return CameraDiagnostics::NoErrorResult();
 }
 
