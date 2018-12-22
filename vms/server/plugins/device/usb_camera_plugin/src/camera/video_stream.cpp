@@ -98,7 +98,7 @@ AVPixelFormat VideoStream::decoderPixelFormat() const
 void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         static constexpr PacketConsumerManager::ConsumerState skipUntilNextKeyPacket =
             PacketConsumerManager::ConsumerState::skipUntilNextKeyPacket;
@@ -106,7 +106,7 @@ void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>&
         m_packetConsumerManager.addConsumer(consumer, skipUntilNextKeyPacket);
         updateUnlocked();
     }
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
 
     tryToStartIfNotStarted();
 }
@@ -114,21 +114,21 @@ void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>&
 void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager.removeConsumer(consumer);
         updateUnlocked();
     }
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
 }
 
 void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_frameConsumerManager.addConsumer(consumer);
         updateUnlocked();
     }
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
 
     tryToStartIfNotStarted();
 }
@@ -136,31 +136,31 @@ void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& c
 void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_frameConsumerManager.removeConsumer(consumer);
 
         // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
         if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
             setCameraState(csModified);
     }
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
 }
 
 void VideoStream::updateFps()
 {
-    std::lock_guard<std::mutex> lock(m_cameraMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     updateFpsUnlocked();
 }
 
 void VideoStream::updateBitrate()
 {
-    std::lock_guard<std::mutex> lock(m_cameraMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     updateBitrateUnlocked();
 }
 
 void VideoStream::updateResolution()
 {
-    std::lock_guard<std::mutex> lock(m_cameraMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     updateResolutionUnlocked();
 }
 
@@ -200,17 +200,17 @@ bool VideoStream::waitForConsumers()
 {
     bool wait;
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         wait = noConsumers();
     }
     if (wait)
         uninitialize(); // < Don't stream the camera if there are no consumers
 
     // Check again if there are no consumers because they could have been added during unitialize.
-    std::unique_lock<std::mutex> lock(m_cameraMutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
     if(noConsumers())
     {
-        m_consumerWaitCondition.wait(lock, [&]() { return m_terminated || !noConsumers(); });
+        m_wait.wait(lock, [&]() { return m_terminated || !noConsumers(); });
         return !m_terminated;
     }
 
@@ -252,7 +252,7 @@ void VideoStream::stop()
 {
     terminate();
 
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
     if (m_videoThread.joinable())
         m_videoThread.join();
 }
@@ -276,7 +276,7 @@ void VideoStream::run()
         updateActualFps(m_timeProvider->millisSinceEpoch());
 
         {
-            std::lock_guard<std::mutex> lock(m_cameraMutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             m_packetConsumerManager.givePacket(packet);
             if (frame)
                 m_frameConsumerManager.giveFrame(frame);
@@ -291,9 +291,9 @@ bool VideoStream::ensureInitialized()
     bool needInit;
     bool needUninit;
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
-        needUninit = m_cameraState == csModified;
-        needInit = needUninit || m_cameraState == csOff;
+        std::lock_guard<std::mutex> lock(m_mutex);
+        needUninit = m_streamState == csModified;
+        needInit = needUninit || m_streamState == csOff;
     }
 
     if (needUninit)
@@ -312,14 +312,14 @@ bool VideoStream::ensureInitialized()
     }
 
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
-        return m_cameraState == csInitialized;
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_streamState == csInitialized;
     }
 }
 
 int VideoStream::initialize()
 {
-    std::lock_guard<std::mutex> lock(m_cameraMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     int result = initializeInputFormat();
     if (result < 0)
@@ -337,13 +337,13 @@ int VideoStream::initialize()
 void VideoStream::uninitialize()
 {
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         // Flushing to reduce m_packetCount and m_frameCount before sleepy loop below.
         m_packetConsumerManager.flush();
         m_frameConsumerManager.flush();
     }
 
-    // Make sure not to keep m_cameraMutex locked while sleeping here.
+    // Make sure not to keep m_mutex locked while sleeping here.
 
     // Some cameras segfault if they are unintialized while there are still packets and / or frames
     // allocated. They own the memory being referred to by the packet, so the packets / frames
@@ -356,7 +356,7 @@ void VideoStream::uninitialize()
     }
 
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         // flush the decoder to avoid memory ownership problems described above.
         if (m_decoder)
@@ -412,11 +412,6 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // So, two things may help: instructing the AVFormatContext not to buffer packets when it can
     // avoid it, and increasing the default real time buffer size from 3041280 (3M) to 20M.
     context->flags |= AVFMT_FLAG_NOBUFFER; //< Could be helpful for Linux too.
-#ifdef _WIN32
-    static constexpr int kRealTimeBufferSize = 20000000; //< 20 Megabytes.
-    if(context->video_codec_id == AV_CODEC_ID_H264)
-        context->max_picture_buffer = kRealTimeBufferSize;
-#endif
 
     if (m_codecParams.fps > 0)
         inputFormat->setFps(m_codecParams.fps);
@@ -476,11 +471,22 @@ int VideoStream::initializeDecoder()
 std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
-        m_inputFormat->videoCodecID(),
+        m_inputFormat->videoCodecId(),
         AVMEDIA_TYPE_VIDEO,
         m_packetCount);
 
-    int result = m_inputFormat->readFrame(packet->packet());
+    int result;
+    if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
+    {
+        using namespace std::chrono_literals;
+        result = m_inputFormat->readFrameNonBlock(packet->packet(), 1000ms);
+        if (result == AVERROR(EAGAIN))
+            result = AVERROR(EIO); //< Treating a one second timeout as an io error.
+    }
+    else
+    {
+        result = m_inputFormat->readFrame(packet->packet());
+    }
 
     checkIoError(result); // < Need to reset m_ioError if readFrame was successful.
 
@@ -507,7 +513,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * packet)
 {
     {
-        std::lock_guard<std::mutex> lock(m_cameraMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         if (m_frameConsumerManager.empty())
             return nullptr;
     }
@@ -721,7 +727,7 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 
 void VideoStream::setCameraState(CameraState cameraState)
 {
-    m_cameraState = cameraState;
+    m_streamState = cameraState;
 }
 
 bool VideoStream::checkIoError(int ffmpegError)

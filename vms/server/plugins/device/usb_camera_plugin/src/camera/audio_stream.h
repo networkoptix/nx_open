@@ -48,8 +48,8 @@ private:
         std::weak_ptr<Camera> m_camera;
         nxpl::TimeProvider * const m_timeProvider;
         std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
-        mutable std::mutex m_consumerManagerMutex;
-        std::condition_variable m_consumerWaitCondition;
+        mutable std::mutex m_mutex;
+        std::condition_variable m_wait;
 
         std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
         std::unique_ptr<ffmpeg::Codec> m_decoder;
