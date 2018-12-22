@@ -656,7 +656,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     return !resources.isEmpty();
 }
 
-QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera)
+QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera) const
 {
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -667,6 +667,8 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurity
         : camera->getModel();
     QnManualCameraInfo info(
         nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getUniqueId());
+
+    QnMutexLocker lock(&m_searchersListMutex);
     for (const auto& searcher: m_searchersList)
     {
         if (searcher->isResourceTypeSupported(resourceTypeId))
@@ -713,7 +715,9 @@ bool QnResourceDiscoveryManager::isManuallyAdded(const QnSecurityCamResourcePtr&
     return m_manualCameraByUniqueId.contains(camera->getUniqueId());
 }
 
-QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {
+QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const
+{
+    QnMutexLocker lock(&m_searchersListMutex);
     return m_searchersList;
 }
 
@@ -745,10 +749,8 @@ bool QnResourceDiscoveryManager::isRedundancyUsing() const
     return false;
 }
 
-void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable)
+void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSearcher *searcher, bool usePartialEnable)
 {
-    // TODO: #Elric strictly speaking, we must do this under lock.
-
     DiscoveryMode discoveryMode = commonModule()->globalSettings()->isAutoDiscoveryEnabled() ?
         DiscoveryMode::fullyEnabled :
         DiscoveryMode::partiallyEnabled;
@@ -785,15 +787,11 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
 
 void QnResourceDiscoveryManager::updateSearchersUsage()
 {
-    ResourceSearcherList searchers;
-    {
-        QnMutexLocker lock( &m_searchersListMutex );
-        searchers = m_searchersList;
-    }
+    QnMutexLocker lock(&m_searchersListMutex);
 
     bool usePartialEnable = isRedundancyUsing();
-    for(QnAbstractResourceSearcher *searcher: searchers)
-        updateSearcherUsage(searcher, usePartialEnable);
+    for(QnAbstractResourceSearcher *searcher: m_searchersList)
+        updateSearcherUsageUnsafe(searcher, usePartialEnable);
 }
 
 void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources)

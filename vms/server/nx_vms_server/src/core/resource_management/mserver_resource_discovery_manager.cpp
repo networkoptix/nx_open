@@ -48,20 +48,20 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServ
     m_serverModule(serverModule)
 {
     connect(resourcePool(),
-        &QnResourcePool::resourceRemoved, 
+        &QnResourcePool::resourceRemoved,
         this,
-        &QnMServerResourceDiscoveryManager::at_resourceDeleted, 
+        &QnMServerResourceDiscoveryManager::at_resourceDeleted,
         Qt::DirectConnection);
-    connect(resourcePool(), &QnResourcePool::resourceAdded, 
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this,
-        &QnMServerResourceDiscoveryManager::at_resourceAdded, 
+        &QnMServerResourceDiscoveryManager::at_resourceAdded,
         Qt::DirectConnection);
     connect(commonModule()->globalSettings(),
-        &QnGlobalSettings::disabledVendorsChanged, 
+        &QnGlobalSettings::disabledVendorsChanged,
         this,
         &QnMServerResourceDiscoveryManager::updateSearchersUsage);
-    connect(commonModule()->globalSettings(), 
-        &QnGlobalSettings::autoDiscoveryChanged, 
+    connect(commonModule()->globalSettings(),
+        &QnGlobalSettings::autoDiscoveryChanged,
         this,
         &QnMServerResourceDiscoveryManager::updateSearchersUsage);
 
@@ -76,6 +76,14 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServ
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
 {
     stop();
+}
+
+void QnMServerResourceDiscoveryManager::stop()
+{
+    base_type::stop();
+    resourcePool()->disconnect(this);
+    commonModule()->globalSettings()->disconnect(this);
+    this->disconnect(this);
 }
 
 QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& resourceTypeId,
@@ -386,9 +394,9 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
     const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
     {
-        connect(server, 
-            &QnMediaServerResource::redundancyChanged, 
-            this, 
+        connect(server,
+            &QnMediaServerResource::redundancyChanged,
+            this,
             &QnMServerResourceDiscoveryManager::updateSearchersUsage);
         updateSearchersUsage();
     }
