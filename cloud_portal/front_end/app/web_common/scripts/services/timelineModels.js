@@ -69,7 +69,7 @@
         return (new Date()).getTime();
     };
     window.timeManager.debug = function (message, date) {
-        console.log(message, {
+        console.info(message, {
             display: new Date(date),
             toServer: new Date(this.displayToServer(date)),
             toLocal: new Date(this.displayToLocal(date))
@@ -122,7 +122,7 @@
         var format = 'dd.mm.yyyy HH:MM:ss.l';
         this.title = window.dateFormat(this.start, format) + ' - ' + window.dateFormat(this.end, format);
         
-        console.log(new Array(this.level + 1).join(' '), this.title, this.level, this.children.length);
+        console.info(new Array(this.level + 1).join(' '), this.title, this.level, this.children.length);
     };
     
     function isDate(val) {
@@ -130,7 +130,7 @@
     }
     
     function NumberToDate(date) {
-        if (typeof(date) == 'number' || typeof(date) == 'Number') {
+        if (typeof(date) === 'number' || typeof(date) === 'Number') {
             date = Math.round(date);
             date = new Date(date);
         }
@@ -725,7 +725,7 @@
     };
     window.CameraRecordsProvider.prototype.debug = function (currentNode, depth) {
         if (!currentNode) {
-            console.log('Chunks tree:' + (this.chunksTree ? '' : 'empty'));
+            console.info('Chunks tree:' + (this.chunksTree ? '' : 'empty'));
         }
         if (typeof(depth) === 'undefined') {
             depth = window.RulerModel.levels.length - 1;
@@ -742,11 +742,11 @@
         }
     };
     window.CameraRecordsProvider.prototype.debugSplice = function (events, level) {
-        console.log('Events:', level, events.length);
+        console.info('Events:', level, events.length);
         for (var i = 0; i < events.length; i++) {
             events[i].debug();
         }
-        console.log('/ Events:', level, events.length);
+        console.info('/ Events:', level, events.length);
     };
     /**
      * Add chunk to tree - find or create good position for it
@@ -1584,10 +1584,11 @@
     };
     window.ScaleManager.prototype.checkZoomOut = function (zoomTarget) {
         // Anticipate visible interval after setting zoomTarget
-        var msPerPixel = this.zoomToMs(zoomTarget);
-        var visibleInterval = msPerPixel * this.viewportWidth;
-        var invisibleInterval = (this.end - this.start) - visibleInterval;
-        this.disableZoomOut = invisibleInterval <= this.zoomAccuracyMs;
+        var msPerPixel = this.zoomToMs(zoomTarget),
+            visibleInterval = msPerPixel * this.viewportWidth,
+            invisibleInterval = (this.end - this.start) - visibleInterval;
+        
+        this.disableZoomOut = invisibleInterval <= this.zoomAccuracyMs ;
     };
     window.ScaleManager.prototype.checkZoomIn = function (zoomTarget) {
         this.disableZoomIn = zoomTarget <= this.fullZoomInValue();
