@@ -95,22 +95,22 @@ private:
     };
 
 private:
-    bool m_encoderNeedsReinitialization = true;
+    std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
 
     int m_initCode = 0;
 
-    uint64_t m_lastVideoPts = 0;
-    uint64_t m_lastTimestamp = 0;
-    uint64_t m_timePerFrame = 0;
-    std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
-    
     std::unique_ptr<ffmpeg::Codec> m_encoder;
+    bool m_encoderNeedsReinitialization = true;
+
+    ScaleParameters m_scaleParams;
+    SwsContext * m_scaleContext = nullptr;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
     TimestampMapper m_timestamps;
 
-    SwsContext * m_scaleContext = nullptr;
-    ScaleParameters m_scaleParams;
+    uint64_t m_lastVideoPts = 0;
+    uint64_t m_lastTimestamp = 0;
+    uint64_t m_timePerFrame = 0;
 
 private:
     bool shouldDrop(const ffmpeg::Frame * frame);
