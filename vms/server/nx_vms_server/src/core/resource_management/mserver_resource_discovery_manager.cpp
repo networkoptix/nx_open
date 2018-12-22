@@ -409,7 +409,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
             return;
 
         if (!m_manualCameraByUniqueId.contains(camera->getUniqueId()))
-            newCameras.push_back(manualCameraInfo(camera));
+            newCameras.push_back(manualCameraInfoUnsafe(camera));
     }
 
     if (!newCameras.empty())

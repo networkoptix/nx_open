@@ -139,6 +139,7 @@ public slots:
 protected:
     unsigned int m_runNumber;
     virtual void run() override;
+    QnManualCameraInfo manualCameraInfoUnsafe(const QnSecurityCamResourcePtr& camera) const;
 
 signals:
     void localSearchDone();

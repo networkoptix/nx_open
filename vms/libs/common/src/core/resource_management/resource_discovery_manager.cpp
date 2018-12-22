@@ -658,6 +658,12 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera) const
 {
+    QnMutexLocker lock(&m_searchersListMutex);
+    return manualCameraInfoUnsafe(camera);
+}
+
+QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(const QnSecurityCamResourcePtr& camera) const
+{
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     NX_ASSERT(resourceType, lit("Resource type %1 was not found").arg(resourceTypeId.toString()));
@@ -668,7 +674,6 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurity
     QnManualCameraInfo info(
         nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getUniqueId());
 
-    QnMutexLocker lock(&m_searchersListMutex);
     for (const auto& searcher: m_searchersList)
     {
         if (searcher->isResourceTypeSupported(resourceTypeId))
