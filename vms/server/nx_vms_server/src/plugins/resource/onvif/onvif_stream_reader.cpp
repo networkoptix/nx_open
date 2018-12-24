@@ -196,11 +196,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
         return result;
     }
 
-    ////Printing chosen profile
-    //if (cl_log.logLevel() >= cl_logDEBUG1) {
-    //    printProfile(*info.finalProfile, isPrimary);
-    //}
-
     {
         MediaSoapWrapper soapWrapper(m_onvifRes);
 
@@ -408,7 +403,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if (m_onvifRes->commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    if (!isCameraControlRequired || m_mustNotConfigureResource)
+    if (!isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult(); //< Do not update video encoder configuration.
 
     if (m_onvifRes->m_serviceUrls.media2ServiceUrl.isEmpty())
@@ -606,6 +601,15 @@ onvifXsd__Profile* QnOnvifStreamReader::selectExistingProfile(
             return profile;
         else if (profile->Name == filteredProfileName.toStdString())
             continue;
+
+        if (!info.videoSourceId.isEmpty())
+        {
+            if (!profile->VideoSourceConfiguration
+                || (profile->VideoSourceConfiguration->token != info.videoSourceId.toStdString()))
+            {
+                continue;
+            }
+        }
         availableProfiles << QString::fromStdString(profile->token);
     }
 
@@ -629,7 +633,6 @@ onvifXsd__Profile* QnOnvifStreamReader::selectExistingProfile(
     // try to select profile by is lexicographical order
     std::sort(availableProfiles.begin(), availableProfiles.end());
     int profileIndex = isPrimary ? 0 : 1;
-    profileIndex += m_onvifRes->getChannel()* (m_onvifRes->hasDualStreamingInternal() ? 2 : 1);
     if (availableProfiles.size() <= profileIndex)
         return 0; // no existing profile matched
 
@@ -1002,6 +1005,11 @@ QnConstResourceVideoLayoutPtr QnOnvifStreamReader::getVideoLayout() const
 void QnOnvifStreamReader::setMustNotConfigureResource(bool mustNotConfigureResource)
 {
     m_mustNotConfigureResource = mustNotConfigureResource;
+}
+
+bool QnOnvifStreamReader::needConfigureProvider() const
+{
+    return CLServerPushStreamReader::needConfigureProvider() && !m_mustNotConfigureResource;
 }
 
 #endif //ENABLE_ONVIF
