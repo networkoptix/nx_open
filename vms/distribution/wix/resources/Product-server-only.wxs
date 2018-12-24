@@ -224,14 +224,13 @@
                 <![CDATA[ (!ServerFeature=3 OR &ServerFeature = 3) AND REMOVE <> "ALL" ]]>
             </Custom>
 
-            <Custom Action="DeleteDatabaseFile_Cmd" After="BackupDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
-            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteAllRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="DeleteRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
