@@ -2244,6 +2244,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string url URL of one Server in the System to join.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
+     * %param:string currentPassword Current user password.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.
