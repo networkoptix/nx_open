@@ -14,7 +14,8 @@ Rectangle
     implicitWidth: textItem.width
     implicitHeight: textItem.height
 
-    visible: text.length
+    visible: opacity > 0
+    opacity: text.length ? 1 : 0
 
     radius: 2
     color: ColorTheme.transparent(ColorTheme.base8, 80)

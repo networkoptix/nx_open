@@ -26,6 +26,7 @@ Item
     property alias motionFilter: cameraChunkProvider.motionFilter
     property alias changingMotionRoi: timeline.changingMotionRoi
     property bool hasCustomRoi: false;
+    property bool drawingRoi: false
 
     property string warningText
 
@@ -37,6 +38,7 @@ Item
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
+    onDrawingRoiChanged: d.updateWarningText()
     onHasCustomRoiChanged: d.updateWarningText()
     onMotionSearchModeChanged: d.updateWarningText()
 
@@ -98,10 +100,12 @@ Item
 
         function updateWarningText()
         {
-            if (videoNavigation.loadingChunks)
+            if (loadingChunks)
                 return
 
-            if (!videoNavigation.motionSearchMode || cameraChunkProvider.hasMotionChunks())
+            var motionMode = videoNavigation.motionSearchMode
+            var hasMotionChunks = cameraChunkProvider.hasMotionChunks
+            if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
                 videoNavigation.warningText = ""
             else if (!cameraChunkProvider.hasChunks())
                 videoNavigation.warningText = qsTr("No motion data for this camera")

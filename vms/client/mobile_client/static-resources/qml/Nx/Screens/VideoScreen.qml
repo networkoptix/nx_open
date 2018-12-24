@@ -195,7 +195,7 @@ PageBase
                 || Screen.orientation === Qt.InvertedPortraitOrientation
                 || videoScreen.width < videoScreen.height //< TODO: remove me some day before merge.
 
-            y: portraitOrientation? parent.height : 8
+            y: portraitOrientation ? parent.height : 8
             x: (parent.width - width) / 2
             maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
             text: videoNavigation.warningText
@@ -509,6 +509,7 @@ PageBase
         {
             id: videoNavigation
 
+            drawingRoi: video.motionController.motionSearchMode && video.motionController.drawingRoi
             changingMotionRoi:
             {
                 return video.motionController.drawingRoi
