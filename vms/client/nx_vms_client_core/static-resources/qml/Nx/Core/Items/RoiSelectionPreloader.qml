@@ -62,7 +62,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: parent.width - width - d.thickness
             color: item.mainColor
-            width: item.dashSize + d.thickness
+            width: item.dashSize
             height: d.thickness
         }
 
