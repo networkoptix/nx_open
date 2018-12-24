@@ -111,6 +111,8 @@ QnFileConnectionProcessor::~QnFileConnectionProcessor()
 
 QByteArray QnFileConnectionProcessor::readStaticFile(const QString& path)
 {
+    QnMutexLocker lock(&cacheMutex);
+
     QIODevicePtr file = getStaticFile(path);
     if (file)
         return file->readAll();
