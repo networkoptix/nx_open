@@ -100,7 +100,8 @@ public:
                     "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::network::AppInfo::cloudName());
             case duplicateMediaServerFound:
-                return tr("These Systems have server with same ID. Please remove it before merge.")
+                return tr("Cannot merge Systems because they have at least one server with the "
+                    "same ID. Please remove this server and try again.")
                     .arg(nx::network::AppInfo::cloudName());
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");
