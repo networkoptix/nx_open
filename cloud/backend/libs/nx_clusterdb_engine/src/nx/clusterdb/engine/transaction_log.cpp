@@ -355,8 +355,6 @@ nx::sql::DBResult CommandLog::fetchTransactions(
         outputData->state.values[it.key()] = maxSequence;
     }
 
-    // TODO #ak currentState is not correct here since it can be limited by "to" and
-    // "maxTransactionsToReturn".
     outputData->resultCode = ResultCode::ok;
 
     return nx::sql::DBResult::ok;
