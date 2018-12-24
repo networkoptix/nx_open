@@ -32,7 +32,7 @@ public:
      * Extract the information about the event occurred from notification message and create
      * the corresponding Event object.
      * @param[in] content The content of the notification message.
-     * @param[in] engineManifest Manifest, that contains engine's possible event types and their
+     * @param[in] EngineManifest Manifest, that contains engine's possible event types and their
      * properties.
      * @return std::nullopt, if the message is incomplete or invalid, extracted Event object, if
      * message is complete and valid.

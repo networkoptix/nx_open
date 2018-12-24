@@ -170,7 +170,9 @@ private:
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
-    static RtspTransport m_defaultTransportToUse;
+
+    static nx::utils::Mutex s_defaultTransportMutex;
+    static RtspTransport s_defaultTransportToUse;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

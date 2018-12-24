@@ -47,7 +47,10 @@ public:
     virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
     virtual AbstractAnalyticsNotificationManagerPtr getAnalyticsNotificationManager() override;
 
-    virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) override;
+    virtual void addRemotePeer(
+        const QnUuid& id,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& _url) override;
     virtual void deleteRemotePeer(const QnUuid& id) override;
 
     virtual nx::vms::api::Timestamp getTransactionLogTime() const override;

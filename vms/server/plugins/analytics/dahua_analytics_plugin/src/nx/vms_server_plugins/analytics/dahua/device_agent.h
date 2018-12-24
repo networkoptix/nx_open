@@ -23,10 +23,10 @@ class DeviceAgent:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
 {
-    Q_OBJECT
-
 public:
-    DeviceAgent(Engine* engine);
+    DeviceAgent(Engine* engine,
+        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest);
 
     virtual ~DeviceAgent();
 
@@ -42,13 +42,13 @@ public:
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
-    void setDeviceAgentManifest(const QByteArray& manifest);
-    void setEngineManifest(const EngineManifest& manifest);
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
+
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
+    void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
+
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
@@ -57,8 +57,10 @@ private:
 private:
     Engine* const m_engine;
 
-    EngineManifest m_engineManifest;
-    QByteArray m_deviceAgentManifest;
+    // Device Agent manifest is stored in serialized and deserialized states, since both of them
+    // needed.
+    const QByteArray m_jsonManifest;
+    const nx::vms::api::analytics::DeviceAgentManifest m_parsedManifest;
 
     nx::utils::Url m_url;
     QString m_model;

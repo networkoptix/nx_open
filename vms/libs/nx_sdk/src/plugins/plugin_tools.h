@@ -204,12 +204,12 @@ public:
         return newRefCounter;
     }
 
-	unsigned int refCount() const
-	{
-		if (m_refCountingDelegate)
-			return m_refCountingDelegate->refCount();
-		return m_refCount;
-	}
+    unsigned int refCount() const
+    {
+        if (m_refCountingDelegate)
+            return m_refCountingDelegate->refCount();
+        return m_refCount;
+    }
 
 private:
     atomic::AtomicLong m_refCount;
@@ -230,7 +230,7 @@ public:
     virtual unsigned int addRef() override { return m_refManager.addRef(); }
     virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
 
-	unsigned int refCount() const { return m_refManager.refCount(); }
+    unsigned int refCount() const { return m_refManager.refCount(); }
 
 protected:
     CommonRefManager m_refManager;
@@ -246,10 +246,10 @@ protected:
 template<typename Interface>
 unsigned int refCount(Interface* object)
 {
-	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
-		return commonRefCounter->refCount();
+    if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
+        return commonRefCounter->refCount();
 
-	return 0;
+    return 0;
 }
 
 enum NxGuidFormatOption
