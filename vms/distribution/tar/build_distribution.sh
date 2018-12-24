@@ -517,7 +517,7 @@ copySystemLibs()
 {
     echo "Copying system libs"
 
-    local LIBS_TO_COPY
+    local LIBS_TO_COPY=()
 
     if [ "$BOX" = "rpi" ]
     then
