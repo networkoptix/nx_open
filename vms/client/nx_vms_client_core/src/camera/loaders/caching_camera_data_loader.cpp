@@ -271,15 +271,17 @@ void QnCachingCameraDataLoader::invalidateCachedData()
     NX_VERBOSE(this, "Chunks: mark local cache as dirty");
 
     for (int i = 0; i < Qn::TimePeriodContentCount; i++)
-        if (m_loaders[i])
-            m_loaders[i]->discardCachedData();
+    {
+        if (auto loader = m_loaders[i])
+            loader->discardCachedData();
+    }
 }
 
 void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type)
 {
     trace(lit("discardCachedDataType()"), type);
-    if (m_loaders[type])
-        m_loaders[type]->discardCachedData();
+    if (auto loader = m_loaders[type])
+        loader->discardCachedData();
 
     m_cameraChunks[type].clear();
     if (m_enabled)
