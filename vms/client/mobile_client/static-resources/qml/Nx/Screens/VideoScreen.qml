@@ -198,7 +198,6 @@ PageBase
             y: portraitOrientation ? parent.height : 8
             x: (parent.width - width) / 2
             maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
-            text: videoNavigation.warningText
         }
     }
 
@@ -516,6 +515,8 @@ PageBase
                     ? false
                     : video.moving && !video.motionController.customRoiExists
             }
+
+            onWarningTextChanged: banner.showText(warningText)
 
             hasCustomRoi: video.motionController.customRoiExists
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive

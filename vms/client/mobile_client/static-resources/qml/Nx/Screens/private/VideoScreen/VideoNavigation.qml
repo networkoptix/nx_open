@@ -104,11 +104,11 @@ Item
                 return
 
             var motionMode = videoNavigation.motionSearchMode
-            var hasMotionChunks = cameraChunkProvider.hasMotionChunks
+            var hasMotionChunks = cameraChunkProvider.hasMotionChunks()
             if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
                 videoNavigation.warningText = ""
             else if (!cameraChunkProvider.hasChunks())
-                videoNavigation.warningText = qsTr("No motion data for this camera")
+                videoNavigation.warningText = qsTr("No motion data for this aaaaa aaaa camera")
             else if (videoNavigation.hasCustomRoi)
                 videoNavigation.warningText = qsTr("No motion found in the selected area")
             else
