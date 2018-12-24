@@ -10,7 +10,6 @@ Item
     property point endPoint
     property bool drawing: false
 
-    property alias animationDuration: singleSelectionMarker.animationDuration
     property color roiColor
     property color shadowColor
     property int lineWidth: 1
@@ -25,12 +24,13 @@ Item
     // Shows preloader
     function start()
     {
-        d.preloader = true
+        startDelayTimer.restart()
     }
 
     // Shows selection
     function show()
     {
+        startDelayTimer.stop()
         d.visible = true
         d.preloader = false
     }
@@ -38,8 +38,18 @@ Item
     // Hides whatever it shows.
     function hide()
     {
+        startDelayTimer.stop()
         d.preloader = false
         d.visible = false
+    }
+
+    Timer
+    {
+        id: startDelayTimer
+
+        interval: 200
+        repeat: false
+        onTriggered: d.preloader = true
     }
 
     RoiSelectionPreloader

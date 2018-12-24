@@ -17,7 +17,7 @@ Item
     property real normalThickness: 1
 
     property bool enableAnimation: true
-    property int animationDuration: 600
+    property int animationDuration: 400
     property real expandedSize: 63
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
