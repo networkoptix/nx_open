@@ -495,6 +495,10 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
         if (!info || !info->isValid())
             continue;
 
+        const bool isProfileDependent = info->profileDependency() != Qn::CR_Default;
+        if (isProfileDependent && isCameraControlDisabled())
+            continue;
+
         const auto cgi = info->cgi();
         const auto submenu = info->submenu();
         const auto parameterName = info->parameterName();
