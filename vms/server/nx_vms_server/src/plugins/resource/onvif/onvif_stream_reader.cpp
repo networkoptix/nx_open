@@ -494,14 +494,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConfig(
     std::vector<onvifXsd__VideoEncoderConfiguration *>& configs, bool isPrimary) const
 {
-    const QString id = isPrimary
-        ? m_onvifRes->primaryVideoCapabilities().id
-        : m_onvifRes->secondaryVideoCapabilities().id;
+    const QString videoEncoderToken = isPrimary
+        ? m_onvifRes->primaryVideoCapabilities().videoEncoderToken
+        : m_onvifRes->secondaryVideoCapabilities().videoEncoderToken;
 
     for (auto itr = configs.begin(); itr != configs.end(); ++itr)
     {
         onvifXsd__VideoEncoderConfiguration* conf = *itr;
-        if (conf && id == QString::fromStdString(conf->token))
+        if (conf && videoEncoderToken == QString::fromStdString(conf->token))
             return conf;
     }
 
@@ -511,14 +511,14 @@ onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConf
 onvifXsd__VideoEncoder2Configuration* QnOnvifStreamReader::selectVideoEncoder2Config(
     std::vector<onvifXsd__VideoEncoder2Configuration *>& configs, bool isPrimary) const
 {
-    const QString id = isPrimary
-        ? m_onvifRes->primaryVideoCapabilities().id
-        : m_onvifRes->secondaryVideoCapabilities().id;
+    const QString videoEncoderToken = isPrimary
+        ? m_onvifRes->primaryVideoCapabilities().videoEncoderToken
+        : m_onvifRes->secondaryVideoCapabilities().videoEncoderToken;
 
     for (auto itr = configs.begin(); itr != configs.end(); ++itr)
     {
         onvifXsd__VideoEncoder2Configuration* conf = *itr;
-        if (conf && id == QString::fromStdString(conf->token))
+        if (conf && videoEncoderToken == QString::fromStdString(conf->token))
             return conf;
     }
 
