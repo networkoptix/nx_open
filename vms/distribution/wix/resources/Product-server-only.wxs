@@ -229,9 +229,6 @@
 
             <Custom Action="DeleteAllRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-
-            <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="server.cab" EmbedCab="yes" />
