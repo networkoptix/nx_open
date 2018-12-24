@@ -16,8 +16,8 @@ namespace nx {
 namespace usb_cam {
 
 CameraManager::CameraManager(
-    DiscoveryManager * discoveryManager,
-    nxpl::TimeProvider *const timeProvider,
+    DiscoveryManager* discoveryManager,
+    nxpl::TimeProvider* const timeProvider,
     const nxcip::CameraInfo& info)
 :
     m_discoveryManager(discoveryManager),
