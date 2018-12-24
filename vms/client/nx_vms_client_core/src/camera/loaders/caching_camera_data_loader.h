@@ -67,6 +67,8 @@ private:
     void updateTimePeriods(Qn::TimePeriodContent dataType, bool forced = false);
     void trace(const QString& message, Qn::TimePeriodContent periodType = Qn::RecordingContent);
 
+    void discardCachedDataType(Qn::TimePeriodContent type);
+
 private:
     bool m_enabled = false;
 
