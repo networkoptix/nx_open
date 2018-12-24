@@ -236,6 +236,7 @@ namespace Qn
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
+        DisplayedResourceListRole,                  /**< Resource list displayed in a Right Panel tile (QnResourceList or QStringList). */
         PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */

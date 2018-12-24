@@ -101,7 +101,7 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
 
         default:
             handled = false;
-            return QVariant();
+            return {};
     }
 }
 

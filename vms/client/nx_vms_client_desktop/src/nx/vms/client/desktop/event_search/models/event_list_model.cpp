@@ -29,7 +29,7 @@ int EventListModel::rowCount(const QModelIndex& /*parent*/) const
 QVariant EventListModel::data(const QModelIndex& index, int role) const
 {
     if (!isValid(index))
-        return QVariant();
+        return {};
 
     const auto& event = d->getEvent(index.row());
     switch (role)
@@ -68,6 +68,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 
         case Qn::ResourceListRole:
             return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
+
+        case Qn::DisplayedResourceListRole:
+            return {};
 
         case Qn::RemovableRole:
             return event.removable;
