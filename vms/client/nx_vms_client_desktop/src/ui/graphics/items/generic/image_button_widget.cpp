@@ -235,6 +235,8 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event)
 
     QPointer<QObject> self(this);
 
+    QScopedValueRollback<bool> clickedRollback(m_isClicked, true);
+
     if (m_action != NULL)
     {
         m_action->trigger();

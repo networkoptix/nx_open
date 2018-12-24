@@ -58,6 +58,7 @@ public:
     bool isChecked() const { return state() & Checked; }
     bool isPressed() const { return state() & Pressed; }
     bool isDisabled() const { return !isEnabled(); }
+    bool isClicked() const { return m_isClicked; }
     Q_SLOT void setChecked(bool checked = true);
     Q_SLOT void setPressed(bool pressed = true);
     Q_SLOT void setDisabled(bool disabled = true);
@@ -159,6 +160,8 @@ private:
     QMarginsF m_imageMargins;
 
     QIcon m_icon;
+
+    bool m_isClicked = false;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
