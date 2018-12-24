@@ -48,25 +48,23 @@ RtspTransport rtspTransportFromString(const QString& value)
         return RtspTransport::udp;
     if (upperValue == "MULTICAST")
         return RtspTransport::multicast;
-    if (upperValue == "" || upperValue == "AUTO_DETECT")
-        return RtspTransport::autoDetect;
 
-    NX_ASSERT(false, lm("Unsupported value: %1").arg(value));
-    return RtspTransport::autoDetect;
+    NX_ASSERT(upperValue.isEmpty(), lm("Unsupported value: %1").arg(value));
+    return RtspTransport::notDefined;
 }
 
 QString toString(const RtspTransport& value)
 {
     switch (value)
     {
+        case RtspTransport::notDefined:
+            return QString();
         case RtspTransport::udp:
             return "UDP";
         case RtspTransport::tcp:
             return "TCP";
         case RtspTransport::multicast:
             return "MULTICAST";
-        case RtspTransport::autoDetect:
-            return "AUTO_DETECT";
     }
 
     const auto s = lm("TRANSPORT_%1").arg(static_cast<int>(value));
@@ -465,7 +463,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
     m_prefferedTransport = m_transport;
-    if (m_prefferedTransport == RtspTransport::autoDetect)
+    if (m_prefferedTransport == RtspTransport::notDefined)
         m_prefferedTransport = RtspTransport::tcp;
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
     if (!m_playNowMode) {
@@ -682,7 +680,7 @@ bool QnRtspClient::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == RtspTransport::autoDetect && m_prefferedTransport == RtspTransport::tcp)
+            if (m_transport == RtspTransport::notDefined && m_prefferedTransport == RtspTransport::tcp)
             {
                 m_prefferedTransport = RtspTransport::udp;
                 if (!sendSetup()) //< Try UDP transport.
