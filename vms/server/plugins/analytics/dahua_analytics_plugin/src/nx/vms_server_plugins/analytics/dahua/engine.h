@@ -14,10 +14,7 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/analytics/common/plugin.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
@@ -72,7 +69,4 @@ private:
     QMap<QString, DeviceData> m_cachedDeviceData;
 };
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

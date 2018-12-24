@@ -11,10 +11,7 @@
 #include "common.h"
 #include "device_agent.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -169,7 +166,4 @@ void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
     m_channel = deviceInfo.channel;
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

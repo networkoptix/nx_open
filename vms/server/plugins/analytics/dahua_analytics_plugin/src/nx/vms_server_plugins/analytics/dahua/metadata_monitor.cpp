@@ -12,10 +12,7 @@
 #include "string_helper.h"
 #include "metadata_monitor.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 static const QString kMonitorUrlPath("/cgi-bin/eventManager.cgi");
 static const QString kMonitorUrlQueryPattern("action=attach&codes=[%1]&heartbeat=3");
@@ -221,7 +218,4 @@ void MetadataMonitor::addExpiredEvents(std::vector<Event>& result)
     }
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua
