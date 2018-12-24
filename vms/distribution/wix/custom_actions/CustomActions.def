@@ -8,6 +8,7 @@ FindFreePorts
 CopyMediaServerProfile
 CopyAppServerProfile
 CopyAppServerNotificationFiles
+DeleteDatabaseFile
 DeleteRegistryKeys
 DeleteAllRegistryKeys
 CopyHostedFiles

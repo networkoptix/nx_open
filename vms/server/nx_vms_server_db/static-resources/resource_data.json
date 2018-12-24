@@ -2841,7 +2841,11 @@
             "NVM3-A16|IP-Camera", "IPNC|NVM3-A16",
             "Hanwha|*", "Hanwha Techwin|*",
             "Samsung|*", "Samsung Techwin|*",
-            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W",
+            "gv-sv48000|geovision",
+            "dahua|ipc-pdbw5831p-b360",
+            "axis|axisp3717*", "axis|p3717*", 
+            "axis|axis p3717*"
             ],
             "canShareLicenseGroup": true
         },
@@ -2995,6 +2999,90 @@
                         "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
                         "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
                         "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapping for firmware: V5.4.71 build 170309",
+            "keys": [
+                "HIKVISION|DS-2DF8836*"
+            ],
+            "forceONVIF": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.005, 0.007, 0.011, 0.014, 0.019, 0.026, 0.033, 0.05, 0.06, 0.08, 0.09, 0.1, 0.2, 0.3, 0.5, 1],
+                        "logical": [1, 1.8, 2.6, 3.5, 4.3, 5.2, 6.0, 8.5, 12.5, 16.4, 18.6, 22, 23, 26.4, 41.3, 74.82, 138],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for V5.5.3 build 171214",
+            "keys": [
+                "Hikvision|DS-2DE4A320*"
+            ],
+            "forceONVIF": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+		{
+            "_comment1": "Mapped for V5.5.3 build 171214",
+            "keys": [
+                "Dahua|PDN6CT230HN"
+            ],
+            "forceONVIF": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [0, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 35,
                         "space": "35MmEquiv"
                     }
                 }

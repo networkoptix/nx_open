@@ -119,7 +119,7 @@ qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
         bytesRead = m_mediaSocket->recv(data, maxSize);
     }
     m_owner->sendKeepAliveIfNeeded();
-    if (m_transport != RtspTransport::tcp)
+    if (m_transport == RtspTransport::udp)
         processRtcpData();
     return bytesRead;
 }
