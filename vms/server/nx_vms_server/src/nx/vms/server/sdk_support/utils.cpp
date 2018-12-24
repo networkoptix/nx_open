@@ -155,7 +155,11 @@ nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
 
     auto stringMap = new nx::sdk::common::StringMap();
     for (const auto& setting: deserialized)
+    {
+        if (stringMap->value(setting.name.c_str()) != nullptr) //< Duplicate key.
+            return nullptr;
         stringMap->addItem(setting.name, setting.value);
+    }
 
     return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
 }

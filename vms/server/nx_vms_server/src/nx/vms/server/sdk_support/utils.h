@@ -120,6 +120,12 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
 
 nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
 nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
+
+/**
+ * @param mapJson Json array of objects with string fields "name" and "value".
+ * @return Null if the json is invalid, has unexpected structure (besides potentially added
+ * unknown fields) or there are duplicate keys.
+ */
 nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
