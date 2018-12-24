@@ -74,7 +74,7 @@ add_custom_target(distribution_dmg_client ALL
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} ${CMAKE_BINARY_DIR}/bin
 
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh
+    COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh
 
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/qml
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/imageformats
