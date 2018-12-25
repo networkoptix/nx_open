@@ -412,9 +412,6 @@ bool CLH264RtpParser::processData(
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
 
-    if (rtpHeader->payloadType != m_rtpChannel)
-        return true; // skip data
-
     if (rtpHeader->extension)
     {
         if (bytesRead < RtpHeader::RTP_HEADER_SIZE + 4)
@@ -430,8 +427,10 @@ bool CLH264RtpParser::processData(
     if (curPtr >= bufferEnd)
         return clearInternalBuffer();
 
-    bool isPacketLost = m_prevSequenceNum != -1
-        && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
+    bool isPacketLost =
+        m_prevSequenceNum != -1 &&
+        quint16(m_prevSequenceNum) != quint16(sequenceNum-1) &&
+        m_prevSequenceNum != sequenceNum; // Some cameras send duplicate packets, ignore it
 
     if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
     {
@@ -462,6 +461,9 @@ bool CLH264RtpParser::processData(
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
         return false;
+
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; // skip data
 
     if (rtpHeader->padding)
     {
