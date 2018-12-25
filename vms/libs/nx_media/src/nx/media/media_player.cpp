@@ -541,6 +541,9 @@ void PlayerPrivate::presentNextFrame()
 
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
 
+    if (videoSurfaces.isEmpty())
+        return;
+
     if (metadata.videoChannel == videoSurfaces.firstKey())
         updateCurrentResolution(videoFrameToRender->size());
 
@@ -958,7 +961,9 @@ void Player::setPosition(qint64 value)
     d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
     {
-        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value));
+        qint64 usecResult = 0;
+        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &usecResult);
+        d->positionMs = d->lastSeekTimeMs = value = usecToMsec(usecResult);
     }
 
     d->setLiveMode(value == kLivePosition);
