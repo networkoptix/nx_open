@@ -14,6 +14,7 @@ Item
 {
     id: videoNavigation
 
+    readonly property bool hasArchive: d.hasArchive && videoNavigation.canViewArchive
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
@@ -27,7 +28,6 @@ Item
     property alias changingMotionRoi: timeline.changingMotionRoi
     property bool hasCustomRoi: false;
     property bool drawingRoi: false
-
     property string warningText
 
     signal ptzButtonClicked()
@@ -487,6 +487,7 @@ Item
                 icon.source: lp("/images/motion.svg")
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
+                visible: videoNavigation.hasArchive
             }
 
             Row

@@ -279,7 +279,7 @@ PageBase
         mediaPlayer: videoScreenController.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
         motionController.motionSearchMode: videoNavigation.motionSearchMode
-        motionController.enabled: videoNavigation.canViewArchive
+        motionController.enabled: videoNavigation.hasArchive
 
         onClicked: toggleUi()
 
