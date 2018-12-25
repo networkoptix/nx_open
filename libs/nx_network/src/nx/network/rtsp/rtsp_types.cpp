@@ -77,7 +77,7 @@ bool parseRangeHeader(
     const auto rangeType = rangeStr.trimmed().split('=');
     if (rangeType.size() != 2)
         return false;
-    if (rangeType[0] == "clock")
+    if (rangeType[0] == "clock" || rangeType[0] == "npt")
     {
         const auto values = rangeType[1].split('-');
         if (values.isEmpty() || values.size() > 2)
