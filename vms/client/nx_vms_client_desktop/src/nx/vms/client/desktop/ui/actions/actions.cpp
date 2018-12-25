@@ -1246,7 +1246,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::local_media, MatchMode::All));
+        .condition(condition::hasFlags(Qn::local_media, MatchMode::All)
+            && condition::isTrue(ini().allowDeleteLocalFiles));
 
     factory(SetAsBackgroundAction)
         .flags(Scene | SingleTarget)
