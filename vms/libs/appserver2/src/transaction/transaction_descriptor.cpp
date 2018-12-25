@@ -396,7 +396,7 @@ struct InvalidAccessOut
     template<typename Param>
     RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData&, const Param&)
     {
-        NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(typeid(Param).name));
+        NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(typeid(Param).name()));
         return RemotePeerAccess::Forbidden;
     }
 };
