@@ -42,7 +42,7 @@ void TestOutgoingTransactionDispatcher::clear()
     m_outgoingTransactions.clear();
 }
 
-void TestOutgoingTransactionDispatcher::assertIfTransactionsWereNotSentInAscendingSequenceOrder()
+void TestOutgoingTransactionDispatcher::assertTransactionsAreSentInAscendingSequenceOrder()
 {
     int prevSequence = -1;
     for (const auto& transaction: m_outgoingTransactions)
@@ -52,7 +52,7 @@ void TestOutgoingTransactionDispatcher::assertIfTransactionsWereNotSentInAscendi
     }
 }
 
-void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeader(
+void TestOutgoingTransactionDispatcher::assertTransactionWithHeaderIsFound(
     const CommandHeader& transactionHeader)
 {
     const auto it = std::find_if(
