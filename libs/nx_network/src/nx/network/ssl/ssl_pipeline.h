@@ -23,9 +23,9 @@ public:
 
     /**
      * NOTE: SSL pipeline does not recover from any I/O error because openssl supports
-     * retrying write only with the same data. That does not conform to 
+     * retrying write only with the same data. That does not conform to
      * utils::bstream::AbstractOutput.
-     * So, even after wouldBlock write error, next write will always produce non-recoverable 
+     * So, even after wouldBlock write error, next write will always produce non-recoverable
      * failure. Though, it conforms to utils::bstream::AbstractOutput.
      */
     virtual int write(const void* data, size_t size) override;
