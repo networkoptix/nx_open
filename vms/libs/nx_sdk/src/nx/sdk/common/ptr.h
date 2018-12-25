@@ -20,9 +20,11 @@ public:
     /** Supports implicit conversion from nullptr. */
     Ptr(std::nullptr_t = nullptr) {}
 
+    // TODO: #mshevchenko: Remove when queryInterface returns IRefCountable*.
     /** Intended to be applied to queryInterface(). */
     explicit Ptr(void* ptr): Ptr(static_cast<RefCountable*>(ptr)) {}
 
+    // TODO: #mshevchenko: Remove when queryInterface returns IRefCountable*.
     /** Intended to be applied to queryInterface(). */
     explicit Ptr(const void* ptr): Ptr(static_cast<RefCountable*>(ptr)) {}
 

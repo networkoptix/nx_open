@@ -20,13 +20,13 @@
 
 #include "plugin_api.h"
 
-// TODO: #mshevchenko: Split into GUID tools (e.g. nx::sdk::common::Guid) and ref-counting class
-// (e.g. nx::sdk::common::Object), merging nx/vms/server/sdk_support/utils.h with the latter.
+// TODO: #mshevchenko: Split into nx::sdk::common::UuidHelper and nx::sdk::common::RefCountable.
 
 namespace nxpt {
 
 namespace atomic {
 
+    // TODO: #mshevchenko: Rewrite via atomic.
 #ifdef _WIN32
     typedef volatile LONG AtomicLong;
 #elif __GNUC__
