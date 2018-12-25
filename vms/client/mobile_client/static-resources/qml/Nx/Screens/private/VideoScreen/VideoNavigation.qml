@@ -108,7 +108,7 @@ Item
             if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
                 videoNavigation.warningText = ""
             else if (!cameraChunkProvider.hasChunks())
-                videoNavigation.warningText = qsTr("No motion data for this aaaaa aaaa camera")
+                videoNavigation.warningText = qsTr("No motion data for this camera")
             else if (videoNavigation.hasCustomRoi)
                 videoNavigation.warningText = qsTr("No motion found in the selected area")
             else

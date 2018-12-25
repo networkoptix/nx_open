@@ -42,9 +42,14 @@ Rectangle
 
         anchors.centerIn: parent
 
-        readonly property FontMetrics fontMetrics: FontMetrics{ font: textItem.font }
         readonly property real textSpace:
             fontMetrics.boundingRect(text).width + leftPadding + rightPadding + 1
+
+        FontMetrics
+        {
+            id: fontMetrics
+            font: textItem.font
+        }
 
         font.pixelSize: 14
         font.weight: Font.Normal
