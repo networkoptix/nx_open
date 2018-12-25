@@ -1,5 +1,7 @@
 #include "stream_proxy.h"
 
+#include <nx/network/aio/async_channel_adapter.h>
+#include <nx/network/aio/stream_transforming_async_channel.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/thread/barrier_handler.h>
 
@@ -100,6 +102,10 @@ void StreamProxy::initiateConnectionToTheDestination(
         std::make_unique<detail::StreamProxyChannel>(
             std::move(sourceConnection),
             m_destinationEndpoint));
+    if (m_upStreamConverterFactory)
+        m_proxyChannels.back()->setUpStreamConverter(m_upStreamConverterFactory());
+    if (m_downStreamConverterFactory)
+        m_proxyChannels.back()->setDownStreamConverter(m_downStreamConverterFactory());
 
     if (m_connectToDestinationTimeout)
     {
@@ -236,6 +242,20 @@ void StreamProxyChannel::setConnectTimeout(
     m_connectTimeout = timeout;
 }
 
+void StreamProxyChannel::setUpStreamConverter(
+    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter)
+{
+    m_upStreamConverter = std::move(converter);
+    m_converter.setOutputConverter(m_upStreamConverter.get());
+}
+
+void StreamProxyChannel::setDownStreamConverter(
+    std::unique_ptr<nx::utils::bstream::AbstractInputConverter> converter)
+{
+    m_downStreamConverter = std::move(converter);
+    m_converter.setInputConverter(m_downStreamConverter.get());
+}
+
 void StreamProxyChannel::start(ProxyCompletionHandler completionHandler)
 {
     m_completionHandler = std::move(completionHandler);
@@ -290,7 +310,9 @@ void StreamProxyChannel::onConnectToTargetCompletion(
     }
 
     m_bridge = aio::makeAsyncChannelBridge(
-        std::move(m_sourceConnection),
+        std::make_unique<aio::StreamTransformingAsyncChannel>(
+            aio::makeAsyncChannelAdapter(std::move(m_sourceConnection)),
+            &m_converter),
         std::move(m_destinationConnection));
     m_bridge->start(
         [this](auto&&... args) { onBridgeCompleted(std::move(args)...); });

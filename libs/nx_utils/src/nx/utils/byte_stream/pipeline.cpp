@@ -9,11 +9,6 @@ namespace bstream {
 //-------------------------------------------------------------------------------------------------
 // AbstractOutputConverter
 
-AbstractOutputConverter::AbstractOutputConverter():
-    m_outputStream(nullptr)
-{
-}
-
 void AbstractOutputConverter::setOutput(AbstractOutput* outputStream)
 {
     m_outputStream = outputStream;
@@ -22,13 +17,63 @@ void AbstractOutputConverter::setOutput(AbstractOutput* outputStream)
 //-------------------------------------------------------------------------------------------------
 // AbstractTwoWayConverter
 
-AbstractInputConverter::AbstractInputConverter()
-{
-}
-
 void AbstractInputConverter::setInput(AbstractInput* inputStream)
 {
     m_inputStream = inputStream;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+int CompositeConverter::write(const void* data, size_t size)
+{
+    return m_outputConverter
+        ? m_outputConverter->write(data, size)
+        : m_outputStream->write(data, size);
+}
+
+int CompositeConverter::read(void* data, size_t size)
+{
+    return m_inputConverter
+        ? m_inputConverter->read(data, size)
+        : m_inputStream->read(data, size);
+}
+
+void CompositeConverter::setOutput(AbstractOutput* output)
+{
+    base_type::setOutput(output);
+
+    if (m_outputConverter)
+        m_outputConverter->setOutput(output);
+}
+
+void CompositeConverter::setInput(AbstractInput* input)
+{
+    base_type::setInput(input);
+
+    if (m_inputConverter)
+        m_inputConverter->setInput(input);
+}
+
+bool CompositeConverter::eof() const
+{
+    return false;
+}
+
+bool CompositeConverter::failed() const
+{
+    return false;
+}
+
+void CompositeConverter::setInputConverter(AbstractInputConverter* inputConverter)
+{
+    m_inputConverter = inputConverter;
+    m_inputConverter->setInput(m_inputStream);
+}
+
+void CompositeConverter::setOutputConverter(AbstractOutputConverter* outputConverter)
+{
+    m_outputConverter = outputConverter;
+    m_outputConverter->setOutput(m_outputStream);
 }
 
 //-------------------------------------------------------------------------------------------------
