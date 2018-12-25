@@ -1453,8 +1453,12 @@ void Player::setPlaybackMask(const QnTimePeriodList& periods)
         return;
 
     d->periods = periods;
-    if (d->archiveReader)
-        d->archiveReader->setPlaybackMask(periods);
+    if (!d->archiveReader)
+        return;
+
+    const auto lastPosition = position();
+    d->archiveReader->setPlaybackMask(periods);
+    setPosition(lastPosition); //< Tries to update position according to the new playback mask.
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
