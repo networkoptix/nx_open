@@ -58,6 +58,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, raiseCameraFromClickedTile, "Raise camera after selecting it when Right Panel camera-related tile is clicked.");
     NX_INI_INT(30, rightPanelPreviewReloadDelay, "Right Panel preview reload delay in seconds after receiving \"NO DATA\" (0 to disable).");
     NX_INI_FLAG(0, exclusiveMotionSelection, "Whether selecting a motion search region on a camera clears motion selection on other cameras on the layout.");
+    NX_INI_FLAG(0, allowDeleteLocalFiles, "Allow delete local files from the context menu.");
 };
 
 inline Ini& ini()

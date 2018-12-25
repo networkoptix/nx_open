@@ -249,7 +249,9 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 
 QnClientModule::~QnClientModule()
 {
-    m_clientCoreModule->commonModule()->resourceDiscoveryManager()->stop();
+    // Discovery manager may not exist in self-update mode.
+    if (auto discoveryManager = m_clientCoreModule->commonModule()->resourceDiscoveryManager())
+        discoveryManager->stop();
 
     // Stop all long runnables before deinitializing singletons. Pool may not exist in update mode.
     if (auto longRunnablePool = QnLongRunnablePool::instance())

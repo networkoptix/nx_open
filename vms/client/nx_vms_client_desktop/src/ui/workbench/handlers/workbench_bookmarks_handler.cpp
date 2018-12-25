@@ -311,17 +311,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
     const bool checked = bookmarkModeAction->isChecked();
     const bool enabled = bookmarkModeAction->isEnabled();
 
-    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
-    if (!checked)
-    {
-        const auto currentWidget = navigator()->currentWidget();
-        canSaveBookmarksMode = (!currentWidget
-            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
-    }
-
-    if (enabled && canSaveBookmarksMode)
-        workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
-
+    // TODO: #vkutin #gdm Maybe we should remove this, as it's handled by the Right Panel.
     if (checked)
         menu()->trigger(action::StopSmartSearchAction, display()->widgets());
 

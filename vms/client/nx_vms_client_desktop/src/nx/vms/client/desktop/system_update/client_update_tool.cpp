@@ -203,7 +203,6 @@ bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
 
 void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
 {
-    NX_VERBOSE(this) << "downloadUpdate() ver" << contents.info.version;
     m_clientPackage = contents.clientPackage;
     NX_ASSERT(m_clientPackage.isValid());
 
@@ -212,12 +211,28 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
     if (contents.sourceType == nx::update::UpdateSourceType::file)
     {
         // Expecting that file is stored at:
+        NX_INFO(this)
+            << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
+            << m_clientPackage.file;
         QString path = contents.storageDir.filePath(m_clientPackage.file);
-        m_updateFile = path;
-        setState(State::readyInstall);
+        if (!QFileInfo::exists(path))
+        {
+            NX_INFO(this)
+                << "downloadUpdate(" << contents.info.version << ") the file"
+                << path << "does not exist!";
+            setError(QString("File %1 does not exist").arg(path));
+        }
+        else
+        {
+            m_updateFile = path;
+            setState(State::readyInstall);
+        }
     }
     else
     {
+        NX_INFO(this)
+            << "downloadUpdate(" << contents.info.version << ") this is an internet update";;
+
         FileInformation info;
         info.md5 = QByteArray::fromHex(m_clientPackage.md5.toLatin1());
         info.size = m_clientPackage.size;

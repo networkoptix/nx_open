@@ -515,6 +515,8 @@ copyToolchainLibs()
 # [in] STAGE_LIB
 copySystemLibs()
 {
+    set +u
+
     echo "Copying system libs"
 
     local LIBS_TO_COPY=()
