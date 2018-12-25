@@ -28,8 +28,6 @@ SystemError::ErrorCode readPartitionsInformation(
 
     QBuffer file(&fileContent);
     file.open(QIODevice::ReadOnly);
-    if (!partitionsInfoProvider->isScanfLongPattern())
-        file.readLine();
 
     enum {fsPath, fsType};
     QMap<QByteArray, std::pair<QByteArray, QByteArray>> deviceToPath;
@@ -53,11 +51,11 @@ SystemError::ErrorCode readPartitionsInformation(
 
         decodeOctalEncodedPath(cPath);
 
-        if (!deviceToPath.contains(cDevName)
-            || (int) strlen(cPath) < std::get<fsPath>(deviceToPath[cDevName]).size())
-        {
+        const bool suitableForInsert = !deviceToPath.contains(cDevName)
+            || (int) strlen(cPath) < std::get<fsPath>(deviceToPath[cDevName]).size();
+
+        if (suitableForInsert && partitionsInfoProvider->isFolder(cPath))
             deviceToPath[cDevName] = std::make_pair(cPath, cFSName);
-        }
     }
 
     for (auto deviceKey: deviceToPath.keys())
@@ -68,8 +66,6 @@ SystemError::ErrorCode readPartitionsInformation(
         partitionInfo.isUsb = nx::utils::file_system::isUsb(QString::fromLatin1(deviceKey));
         partitionInfo.devName = QString::fromLatin1(deviceKey);
         partitionInfo.path = QString::fromLatin1(std::get<fsPath>(pathInfo));
-        if (!partitionsInfoProvider->isFolder(std::get<fsPath>(pathInfo)))
-            continue;
 
         partitionInfo.fsName = QString::fromLatin1(std::get<fsType>(pathInfo));
         partitionInfo.sizeBytes = partitionsInfoProvider->totalSpace(std::get<fsPath>(pathInfo));
