@@ -283,6 +283,40 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "DeleteDatabaseFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    try {
+        CString dbFolder = GetProperty(hInstall, L"CustomActionData");
+
+        CString localAppDataFolder = GetAppDataLocalFolderPath();
+        dbFolder.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+
+        WcaLog(LOGMSG_STANDARD, "Deleting ecs and mserver %S with -shm,-val.", dbFolder);
+
+        DeleteFile(dbFolder + L"\\ecs.sqlite");
+        DeleteFile(dbFolder + L"\\ecs.sqlite-shm");
+        DeleteFile(dbFolder + L"\\ecs.sqlite-wal");
+        DeleteFile(dbFolder + L"\\mserver.sqlite");
+        DeleteFile(dbFolder + L"\\mserver.sqlite-shm");
+        DeleteFile(dbFolder + L"\\mserver.sqlite-wal");
+    } catch (const Error& e) {
+        WcaLog(LOGMSG_STANDARD, "DeleteDatabaseFile(): Error: %S", e.msg());
+    }
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 UINT __stdcall DeleteRegistryKeys(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
