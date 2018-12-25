@@ -477,7 +477,7 @@ bool doRequest(
     else if (method == nx_http::Method::put && bufferToSend)
         result = httpClient.doPut(url, kContentType.toUtf8(), *bufferToSend);
 
-    if (!result)
+    if (!result || !httpClient.response())
         return false;
 
     nx::Buffer responseBuffer;
