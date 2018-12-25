@@ -78,7 +78,7 @@ const QLatin1String kHttpsCertificatePath("https/certificatePath");
 
 //Statistics
 const QLatin1String kStatisticsEnabled("stats/enabled");
-const QLatin1String kDefaultStatisticsEnabled("true");
+const QLatin1String kDefaultStatisticsEnabled("false");
 
 //CloudConnect
 const QLatin1String kRendezvousConnectTimeout("cloudConnect/rendezvousConnectTimeout");
