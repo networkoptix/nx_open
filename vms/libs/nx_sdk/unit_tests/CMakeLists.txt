@@ -1,6 +1,7 @@
 add_executable(nx_sdk_ut
-    src/plugin_tools_ut.cpp
+    src/ref_countable_ut.cpp
     src/ptr_ut.cpp
+    src/uuid_helper_ut.cpp
     src/main.cpp
 )
 

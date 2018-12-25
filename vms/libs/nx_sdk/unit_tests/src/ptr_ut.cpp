@@ -12,7 +12,7 @@ namespace sdk {
 namespace common {
 namespace test {
 
-using namespace nx::sdk;
+namespace {
 
 class IBase: public nxpl::PluginInterface
 {
@@ -100,7 +100,7 @@ void assertEq(
 {
     ASSERT_EQ(expected.get(), actual.get());
     ASSERT_TRUE(expected == actual); //< operator==()
-    ASSERT_FALSE(expected != actual); //< operator==()
+    ASSERT_FALSE(expected != actual); //< operator!=()
 
     // This is the only correct way to access the ref counter of an arbitrary interface.
     const int increasedRefCount = actual->addRef();
@@ -109,25 +109,9 @@ void assertEq(
     ASSERT_EQ(expectedRefCount, actualRefCount);
 }
 
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
-
-TEST(RefCountable, simple)
-{
-    Data::s_destructorCalled = false;
-
-    Data* data = new Data(113);
-    ASSERT_EQ(data->number(), 113);
-    ASSERT_EQ(1, data->refCount());
-
-    data->addRef();
-    ASSERT_EQ(2, data->refCount());
-
-    data->releaseRef();
-    ASSERT_EQ(1, data->refCount());
-
-    data->releaseRef();
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
 
 TEST(Ptr, null)
 {

@@ -6,6 +6,9 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
+// TODO: #mshevchenko: Migrate to UuidHelper.
+// TODO: #mshevchenko: Add more tests.
+
 TEST(NxGuidHelper, fromString)
 {
     const std::map<std::string, nxpl::NX_GUID> goodGuids = {
