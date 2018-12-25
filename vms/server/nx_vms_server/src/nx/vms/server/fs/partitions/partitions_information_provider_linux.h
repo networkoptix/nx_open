@@ -26,7 +26,6 @@ class PartitionsInformationProvider:
         qint64 totalSpace = kUnknownValue;
     };
 
-    CommonFileSystemInformationProvider m_commonSystemInfoProvider;
     mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
     mutable QnMutex m_mutex;
     mutable int m_tries;

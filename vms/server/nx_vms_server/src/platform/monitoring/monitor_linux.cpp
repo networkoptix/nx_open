@@ -23,11 +23,12 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
-#include <utils/fs/dir.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx/utils/mac_address.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/fs/partitions/read_partitions_linux.h>
+#include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -363,7 +364,7 @@ private:
 
     time_t lastPartitionsUpdateTime;
     struct timespec lastDiskUsageUpdateTime;
-    std::unique_ptr<RootFsBasedFileSystemInformationProvider> serverSystemInfoProvider;
+    std::unique_ptr<nx::vms::server::fs::PartitionsInformationProvider> partitionsInfoProvider;
 
 private:
     Q_DECLARE_PUBLIC(QnLinuxMonitor)
@@ -561,10 +562,12 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
 */
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
-    std::list<PartitionInfo> partitions;
+    std::list<nx::vms::server::fs::PartitionInfo> partitions;
     QList<QnPlatformMonitor::PartitionSpace> result;
 
-    const auto errCode = readPartitions(d_ptr->serverSystemInfoProvider.get(), &partitions);
+    const auto errCode = nx::vms::server::fs::readPartitionsInformation(
+        d_ptr->partitionsInfoProvider.get(),
+        &partitions);
     if (errCode != SystemError::noError)
         return result;
 
@@ -585,5 +588,6 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
 
 void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
 {
-    d_ptr->serverSystemInfoProvider.reset(new RootFsBasedFileSystemInformationProvider(serverModule));
+    d_ptr->partitionsInfoProvider.reset(
+        new nx::vms::server::fs::PartitionsInformationProvider(serverModule));
 }

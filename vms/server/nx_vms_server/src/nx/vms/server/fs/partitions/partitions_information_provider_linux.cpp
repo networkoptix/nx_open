@@ -1,5 +1,6 @@
 #include "partitions_information_provider_linux.h"
 
+#include <nx/utils/app_info.h>
 #include <nx/vms/server/root_fs.h>
 
 namespace nx::vms::server::fs {
@@ -89,7 +90,11 @@ qint64 PartitionsInformationProvider::freeSpace(const QByteArray& fsPath) const
 
 bool PartitionsInformationProvider::isFolder(const QByteArray& fsPath) const
 {
-    return rootFileSystem()->
+    SystemCommands::FileType fileType;
+    if (!rootFileSystem()->isPathExists(fsPath, &fileType))
+        return false;
+
+    return fileType == SystemCommands::FileType::directory;
 }
 
 } // namesapce nx::vms::server::fs

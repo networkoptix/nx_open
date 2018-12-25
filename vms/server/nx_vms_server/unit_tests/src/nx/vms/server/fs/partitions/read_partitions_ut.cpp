@@ -1,7 +1,8 @@
-#include <utils/fs/dir.h>
+#include <nx/vms/server/fs/partitions/read_partitions_linux.h>
 #include <gtest/gtest.h>
 #include <string.h>
 
+namespace nx::vms::server::fs::test {
 
 void assertDecodedStrings(QByteArray source, const QByteArray& desired)
 {
@@ -17,3 +18,5 @@ TEST(decodeOctalEncodedPath, variousCases)
     assertDecodedStrings("abcdef\0", "abcdef\0");
     assertDecodedStrings("ab\040", "ab ");
 }
+
+} // namespace nx::vms::server::fs::test

@@ -13,7 +13,6 @@
 
 #include <nx_ec/ec_api.h>
 
-#include "settings.h"
 #include <transaction/threadsafe_message_bus_adapter.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
@@ -58,7 +57,6 @@ public:
 
 private:
     QnMutex m_mutex;
-    Settings m_settingsInstance;
     std::unique_ptr<ThreadsafeMessageBusAdapter> m_bus;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;

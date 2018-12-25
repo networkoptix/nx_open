@@ -1,14 +1,12 @@
-/**********************************************************
-* Oct 5, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_DIR_H
-#define NX_DIR_H
+#pragma once
 
 #include <list>
 
 #include <nx/utils/system_error.h>
+
+namespace nx::vms::server::fs {
+
+class AbstractPartitionsInformationProvider;
 
 struct PartitionInfo
 {
@@ -37,10 +35,10 @@ struct PartitionInfo
     bool isUsb = false;
 };
 
-SystemError::ErrorCode readPartitions(
-    AbstractFileSystemInformationProvider* systemInfoProvider,
+SystemError::ErrorCode readPartitionsInformation(
+    AbstractPartitionsInformationProvider* partitionsInfoProvider,
     std::list<PartitionInfo>* const partitionInfoList);
 
 void decodeOctalEncodedPath(char* path);
 
-#endif  //NX_DIR_H
+} // namespace nx::vms::server::fs

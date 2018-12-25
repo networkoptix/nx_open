@@ -11,27 +11,30 @@
 #include <QtCore/QTextStream>
 
 #include "utils/common/app_info.h"
-#include "utils/fs/dir.h"
+#include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
+#include <nx/vms/server/fs/partitions/read_partitions_linux.h>
 #include <nx/network/nettools.h>
-
+#include <media_server/media_server_module.h>
 
 namespace
 {
-    QString readFile(const QString& file)
-    {
-        QString result;
 
-        QFile f(file);
-        if (!f.open(QFile::ReadOnly | QFile::Text))
-            return result;
+static QString readFile(const QString& file)
+{
+    QString result;
 
-        QTextStream in(&f);
-        result = in.readAll();
-        f.close();
+    QFile f(file);
+    if (!f.open(QFile::ReadOnly | QFile::Text))
+        return result;
 
-        return result.trimmed();
-    }
+    QTextStream in(&f);
+    result = in.readAll();
+    f.close();
+
+    return result.trimmed();
 }
+
+} // namespace
 
 QString Nx1::getMac()
 {
@@ -43,13 +46,19 @@ QString Nx1::getSerial()
     return readFile("/tmp/serial");
 }
 
-bool Nx1::isBootedFromSD()
+bool Nx1::isBootedFromSD(QnMediaServerModule* serverModule)
 {
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    CommonFileSystemInformationProvider systemInfoProvider;
-    std::list<PartitionInfo> partitionInfoList;
-    if (readPartitions(&systemInfoProvider, &partitionInfoList) != SystemError::noError)
+    namespace fs = nx::vms::server::fs;
+
+    fs::PartitionsInformationProvider partitionsInfoProvider(serverModule);
+    std::list<fs::PartitionInfo> partitionInfoList;
+
+    if (fs::readPartitionsInformation(&partitionsInfoProvider, &partitionInfoList)
+        != SystemError::noError)
+    {
         return true;
+    }
 
     for (const auto& partitionInfo: partitionInfoList)
     {

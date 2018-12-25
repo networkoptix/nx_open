@@ -11,7 +11,6 @@
 #include <nx_ec/ec_api.h>
 
 #include "ec2_connection.h"
-#include "settings.h"
 #include <nx/vms/network/abstract_server_connector.h>
 #include <nx/vms/network/reverse_connection_manager.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
@@ -32,6 +31,7 @@ public:
         QnCommonModule* commonModule,
         nx::vms::api::PeerType peerType,
         bool isP2pMode,
+        bool ecDbReadOnly,
         QnHttpConnectionListener* tcpListener);
 
     virtual ~LocalConnectionFactory();
@@ -70,7 +70,6 @@ public:
 
 private:
     QnMutex m_mutex;
-    Settings m_settingsInstance;
 
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
@@ -90,6 +89,7 @@ private:
     bool m_sslEnabled;
 
     bool m_p2pMode = false;
+    bool m_ecDbReadOnly = false;
 private:
 
     int establishDirectConnection(const nx::utils::Url& url, impl::ConnectHandlerPtr handler);

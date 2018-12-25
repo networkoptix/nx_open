@@ -29,8 +29,14 @@ private:
     }
 
     QString m_dataDirectory;
+    QnMediaServerModule* m_serverModule;
 
 public:
+    void setServerModule(QnMediaServerModule* serverModule)
+    {
+        m_serverModule = serverModule;
+    }
+
     // TODO: #lbusygin: Check int options for convertion to bool.
     Option<int> port{this, "port",
         7001,
@@ -145,7 +151,7 @@ public:
 
             #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
                 if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-                    return Nx1::isBootedFromSD();
+                    return Nx1::isBootedFromSD(m_serverModule);
             #endif
 
             return false;

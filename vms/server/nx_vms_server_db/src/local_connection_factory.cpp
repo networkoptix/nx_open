@@ -55,6 +55,7 @@ LocalConnectionFactory::LocalConnectionFactory(
     QnCommonModule* commonModule,
     PeerType peerType,
     bool isP2pMode,
+    bool ecDbReadOnly,
     QnHttpConnectionListener* tcpListener)
     :
     AbstractECConnectionFactory(commonModule),
@@ -68,7 +69,8 @@ LocalConnectionFactory::LocalConnectionFactory(
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
-    m_p2pMode(isP2pMode)
+    m_p2pMode(isP2pMode),
+    m_ecDbReadOnly(ecDbReadOnly)
 {
     if (peerType == PeerType::server)
     {
@@ -1870,7 +1872,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
 #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-    //connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
+    connectionInfo->ecDbReadOnly = m_ecDbReadOnly;
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;
     if (response)
