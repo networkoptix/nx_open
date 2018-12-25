@@ -35,22 +35,6 @@ public:
     virtual int write(const void* data, size_t count) = 0;
 };
 
-/**
- * Output that converts byte stream and passes it to another output.
- * Can be used to organize chains of converters.
- */
-class NX_UTILS_API AbstractOutputConverter:
-    public AbstractOutput
-{
-public:
-    AbstractOutputConverter();
-
-    virtual void setOutput(AbstractOutput*);
-
-protected:
-    AbstractOutput* m_outputStream;
-};
-
 class NX_UTILS_API AbstractInput
 {
 public:
@@ -62,17 +46,30 @@ public:
     virtual int read(void* data, size_t count) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Output that converts byte stream and passes it to another output.
+ * Can be used to organize chains of converters.
+ */
+class NX_UTILS_API AbstractOutputConverter:
+    public AbstractOutput
+{
+public:
+    virtual void setOutput(AbstractOutput*);
+
+protected:
+    AbstractOutput* m_outputStream = nullptr;
+};
+
 class NX_UTILS_API AbstractInputConverter:
     public AbstractInput
 {
 public:
-    AbstractInputConverter();
-    virtual ~AbstractInputConverter() = default;
-
     virtual void setInput(AbstractInput*);
 
 protected:
-    AbstractInput* m_inputStream;
+    AbstractInput* m_inputStream = nullptr;
 };
 
 /**
@@ -91,6 +88,34 @@ class NX_UTILS_API Converter:
 public:
     virtual bool eof() const = 0;
     virtual bool failed() const = 0;
+};
+
+/**
+ * By default, just forwards data without any conversion.
+ * Conversion can be enabled by setting convertors with
+ * CompositeConverter::setInputConverter and CompositeConverter::setOutputConverter.
+ */
+class NX_UTILS_API CompositeConverter:
+    public Converter
+{
+    using base_type = Converter;
+
+public:
+    virtual int write(const void* data, size_t size) override;
+    virtual int read(void* data, size_t size) override;
+
+    virtual void setOutput(AbstractOutput*) override;
+    virtual void setInput(AbstractInput*) override;
+
+    virtual bool eof() const override;
+    virtual bool failed() const override;
+
+    void setInputConverter(AbstractInputConverter* inputConverter);
+    void setOutputConverter(AbstractOutputConverter* outputConverter);
+
+private:
+    AbstractInputConverter* m_inputConverter = nullptr;
+    AbstractOutputConverter* m_outputConverter = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
