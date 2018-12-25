@@ -280,6 +280,7 @@ ZoomableFlickable
             Connections
             {
                 target: control.mouseArea
+                enabled: motionSearchController.enabled
 
                 onPressed: motionSearchController.handlePressed(
                     control.mapToItem(motionSearchController, mouse.x, mouse.y))
