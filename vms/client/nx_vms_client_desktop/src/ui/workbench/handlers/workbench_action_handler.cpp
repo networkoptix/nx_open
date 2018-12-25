@@ -1984,10 +1984,8 @@ void ActionHandler::at_deleteFromDiskAction_triggered()
 {
     auto resources = menu()->currentParameters(sender()).resources().toSet().toList();
 
-    /**
-     * #ynikitenkov According to specs this functionality is disabled
-     * Change texts and dialog when it is enabled
-     */
+    // TODO: #gdm allow to delete exported layouts.
+    // TODO: #ynikitenkov Change texts and dialog when it is enabled.
     QnMessageBox messageBox(
         QnMessageBoxIcon::Warning,
         tr("Confirm files deleting"),
