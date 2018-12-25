@@ -72,8 +72,7 @@ Item
         id: d
 
         readonly property bool loadingChunks:
-            cameraChunkProvider.loading
-            || cameraChunkProvider.loadingMotion
+            cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool playbackStarted: false
         property bool controlsNeeded:
@@ -118,8 +117,8 @@ Item
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
             videoScreenController
-                && videoScreenController.mediaPlayer.liveMode
-                && !playbackController.paused
+            && videoScreenController.mediaPlayer.liveMode
+            && !playbackController.paused
         property real resumePosition: -1
 
         function updateNavigatorPosition()

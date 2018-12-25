@@ -193,7 +193,6 @@ PageBase
             property bool portraitOrientation:
                 Screen.orientation === Qt.PortraitOrientation
                 || Screen.orientation === Qt.InvertedPortraitOrientation
-                || videoScreen.width < videoScreen.height //< TODO: remove me some day before merge.
 
             y: portraitOrientation ? parent.height : 8
             x: (parent.width - width) / 2
