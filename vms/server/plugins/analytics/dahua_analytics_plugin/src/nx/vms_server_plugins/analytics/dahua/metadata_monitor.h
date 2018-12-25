@@ -51,7 +51,7 @@ private:
 
     std::chrono::milliseconds reopenDelay() const;
 
-    void addExpiredEvents(std::vector<Event>& result);
+    void addExpiredEvents(std::vector<Event>* outResult);
 private:
     void at_monitorResponseReceived();
     void at_monitorSomeBytesAvailable();
@@ -71,7 +71,7 @@ private:
 
     struct StartedEvent
     {
-        StartedEvent(const Event& event = Event()) :
+        StartedEvent(const Event& event = Event()):
             event(event)
         {
             timer.restart();

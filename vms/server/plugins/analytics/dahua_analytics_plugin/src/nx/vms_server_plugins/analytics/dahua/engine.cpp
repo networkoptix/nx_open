@@ -72,8 +72,7 @@ const QString manifestResourceName(":/dahua/manifest.json");
 /*static*/ EngineManifest Engine::parseManifest(const QByteArray& manifest)
 {
     bool success = false;
-    // parsedManifest is not declared as const to allow copy elision on return
-    EngineManifest parsedManifest = QJson::deserialized<EngineManifest>(
+    const EngineManifest parsedManifest = QJson::deserialized<EngineManifest>(
         manifest, EngineManifest(), &success);
     if (!success)
         NX_WARNING(NX_SCOPE_TAG, "Can't deserialize Dahua engine manifest");

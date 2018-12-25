@@ -52,7 +52,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
 {
-    // There are no DeviceAgent settings for this plugin.
+    // This plugin doesn't use DeviceAgent setting, it just ignores them.
 }
 
 nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const

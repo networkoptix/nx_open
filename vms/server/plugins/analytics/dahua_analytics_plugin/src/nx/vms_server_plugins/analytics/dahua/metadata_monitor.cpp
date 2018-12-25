@@ -164,14 +164,14 @@ bool MetadataMonitor::processEvent(const Event& event)
 
     auto getEventKey =
         [](const Event& event)
-        {
-            QString result = event.typeId;
-            if (event.region)
-                result += QString::number(*event.region) + lit("_");
-            if (event.channel)
-                result += QString::number(*event.channel);
-            return result;
-        };
+    {
+        QString result = event.typeId;
+        if (event.region)
+            result += QString::number(*event.region) + "_";
+        if (event.channel)
+            result += QString::number(*event.channel);
+        return result;
+    };
 
     auto eventTypeDescriptor = m_parsedEngineManifest.eventTypeDescriptorById(event.typeId);
     using namespace nx::sdk::analytics;
@@ -183,22 +183,27 @@ bool MetadataMonitor::processEvent(const Event& event)
         else
             m_startedEvents.remove(key);
     }
-    addExpiredEvents(result);
+    addExpiredEvents(&result);
 
     if (result.empty())
         return true;
 
-    for (const Event& e: result)
+    for (const Event& e : result)
         NX_VERBOSE(this, "Got event %1, isActive=%2", e.caption, e.isActive);
 
-    QnMutexLocker lock(&m_mutex);
-    for (const auto& handler: m_handlers)
+    QMap<QString, Handler> handlersCopy;
+    {
+        QnMutexLocker lock(&m_mutex);
+        handlersCopy = m_handlers;
+    }
+
+    for (const auto& handler: handlersCopy)
         handler(result);
 
     return true;
 }
 
-void MetadataMonitor::addExpiredEvents(std::vector<Event>& result)
+void MetadataMonitor::addExpiredEvents(std::vector<Event>* outResult)
 {
     for (auto itr = m_startedEvents.begin(); itr != m_startedEvents.end();)
     {
@@ -208,7 +213,7 @@ void MetadataMonitor::addExpiredEvents(std::vector<Event>& result)
             event.isActive = false;
             event.caption = buildCaption(m_parsedEngineManifest, event);
             event.description = buildDescription(m_parsedEngineManifest, event);
-            result.push_back(std::move(itr.value().event));
+            outResult->push_back(std::move(itr.value().event));
             itr = m_startedEvents.erase(itr);
         }
         else
