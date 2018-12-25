@@ -63,6 +63,7 @@ SystemError::ErrorCode readPartitionsInformation(
         const auto& pathInfo = deviceToPath[deviceKey];
         PartitionInfo partitionInfo;
 
+        // #TODO #akulikov Move below to PartitionsInformationProvider
         partitionInfo.isUsb = nx::utils::file_system::isUsb(QString::fromLatin1(deviceKey));
         partitionInfo.devName = QString::fromLatin1(deviceKey);
         partitionInfo.path = QString::fromLatin1(std::get<fsPath>(pathInfo));

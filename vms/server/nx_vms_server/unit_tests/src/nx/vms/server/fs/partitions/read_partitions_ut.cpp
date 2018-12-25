@@ -122,4 +122,14 @@ TEST_F(ReadPartitions, FilterOutNonFolders)
     thenOnlyFoldersOnDeviceShouldBeSelectedAsStoragePaths();
 }
 
+TEST_F(ReadPartitions, InvalidSpacePathsShouldNotBeReturned)
+{
+
+}
+
+TEST_F(ReadPartitions, PathsWithSpacesShouldBeReturned)
+{
+
+}
+
 } // namespace nx::vms::server::fs::test
