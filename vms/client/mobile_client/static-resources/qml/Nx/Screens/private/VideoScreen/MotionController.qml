@@ -20,6 +20,7 @@ Item
         d.customInitialPoint && d.nearPositions(d.customInitialPoint, d.customFirstPoint))
 
     signal requestDrawing()
+    signal emptyRoiCleared()
 
     onAllowDrawingChanged:
     {
@@ -264,9 +265,9 @@ Item
             var verticalRange = 31
 
             var left = Math.floor(topLeft.x * horizontalRange)
-            var right = Math.ceil(bottomRight.x * horizontalRange)
+            var right = Math.floor(bottomRight.x * horizontalRange)
             var top = Math.floor(topLeft.y * verticalRange)
-            var bottom = Math.ceil(bottomRight.y * verticalRange)
+            var bottom = Math.floor(bottomRight.y * verticalRange)
 
             result.correctBounds =
                 left <= horizontalRange
@@ -331,8 +332,8 @@ Item
             controller.motionFilter = filterResult.filter
             if (!filterResult.correctBounds)
             {
-                // TODO: add banner with "incorect roi" warning
                 controller.clearCustomRoi()
+                controller.emptyRoiCleared()
             }
         }
     }

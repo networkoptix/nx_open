@@ -293,6 +293,8 @@ PageBase
             }
 
             onRequestDrawing: videoNavigation.motionSearchMode = true
+            onEmptyRoiCleared:
+                banner.showText(qsTr("Invalid custom area. Please draw a correct one."))
         }
     }
 
