@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <nx/utils/log/log.h>
+
 #include "camera_manager.h"
 #include "device/video/utils.h"
 
@@ -55,30 +57,48 @@ Camera::Camera(
     CameraManager * cameraManager,
     nxpl::TimeProvider* const timeProvider):
     m_cameraManager(cameraManager),
-    m_timeProvider(timeProvider),
-    m_audioEnabled(false),
-    m_lastError(0)
+    m_timeProvider(timeProvider)
 {
-    auto codecList = device::video::getSupportedCodecs(url().c_str());
+}
+
+bool Camera::initialize()
+{
+    if (isInitialized())
+        return true;
+
+    auto codecList = device::video::getSupportedCodecs(ffmpegUrl().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
 
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
-    if(m_compressionTypeDescriptor)
-        m_defaultVideoParams = getDefaultVideoParameters();
-    else
-        setLastError(AVERROR(ENODEV));
-}
+    if(!m_compressionTypeDescriptor)
+    {
+        NX_DEBUG(
+            this,
+            "%1: Failed to obtain a valid compression type descriptor for camera: %2",
+            __func__,
+            toString());
 
-void Camera::initialize()
-{
-    m_audioStream = std::make_shared<AudioStream>(
-            info().auxiliaryData,
-            weak_from_this(),
-            m_audioEnabled);
+        setLastError(AVERROR(ENODEV));
+        return false;
+    }
+
+    m_defaultVideoParams = getDefaultVideoParameters();
 
     m_videoStream = std::make_shared<VideoStream>(
-            weak_from_this(),
-            m_defaultVideoParams);
+        weak_from_this(),
+        m_defaultVideoParams);
+
+    m_audioStream = std::make_shared<AudioStream>(
+        info().auxiliaryData,
+        weak_from_this(),
+        m_audioEnabled);
+
+    return isInitialized();
+}
+
+bool Camera::isInitialized() const
+{
+    return m_compressionTypeDescriptor && m_videoStream && m_audioStream;
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
@@ -93,7 +113,7 @@ std::shared_ptr<VideoStream> Camera::videoStream()
 
 std::vector<device::video::ResolutionData> Camera::resolutionList() const
 {
-    return device::video::getResolutionList(url(), m_compressionTypeDescriptor);
+    return device::video::getResolutionList(ffmpegUrl(), m_compressionTypeDescriptor);
 }
 
 void Camera::setAudioEnabled(bool value)
@@ -139,14 +159,14 @@ const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() 
     return m_compressionTypeDescriptor;
 }
 
-std::string Camera::url() const
-{
-    return m_cameraManager->getFfmpegUrl();
-}
-
 CodecParameters Camera::defaultVideoParameters() const
 {
     return m_defaultVideoParams;
+}
+
+std::string Camera::ffmpegUrl() const
+{
+    return m_cameraManager->ffmpegUrl();
 }
 
 std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
@@ -157,13 +177,22 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
     return ffmpegCodecList;
 }
 
-nxcip::CameraInfo Camera::info() const
+const nxcip::CameraInfo& Camera::info() const
 {
     return m_cameraManager->info();
 }
 
+std::string Camera::toString() const
+{
+    const nxcip::CameraInfo& cameraInfo = info();
+    return std::string("{ name: ") + cameraInfo.modelName + ", uid: " + cameraInfo.uid + "}";
+}
+
 CodecParameters Camera::getDefaultVideoParameters()
 {
+    if(!m_compressionTypeDescriptor)
+        return CodecParameters();
+
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
     AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecId(nxCodecID);
 
@@ -176,7 +205,8 @@ CodecParameters Camera::getDefaultVideoParameters()
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = device::video::getMaxBitrate(url().c_str(), m_compressionTypeDescriptor);
+        int maxBitrate = 
+            device::video::getMaxBitrate(ffmpegUrl().c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,
             it->fps,

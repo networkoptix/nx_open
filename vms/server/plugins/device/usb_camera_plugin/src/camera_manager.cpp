@@ -82,12 +82,12 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (!m_camera)
-    {
         m_camera = std::make_shared<Camera>(this, m_timeProvider);
-        m_camera->initialize();
-    }
 
-    switch(encoderIndex)
+    if (!m_camera->isInitialized() && !m_camera->initialize())
+        return nxcip::NX_IO_ERROR;
+    
+    switch (encoderIndex)
     {
         case 0:
         {
@@ -210,7 +210,7 @@ nxpt::CommonRefManager* CameraManager::refManager()
     return &m_refManager;
 }
 
-std::string CameraManager::getFfmpegUrl() const
+std::string CameraManager::ffmpegUrl() const
 {
     return m_discoveryManager->getFfmpegUrl(m_info.uid);
 }

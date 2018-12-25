@@ -48,6 +48,8 @@ private:
         std::weak_ptr<Camera> m_camera;
         nxpl::TimeProvider * const m_timeProvider;
         std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
+        mutable std::mutex m_mutex;
+        std::condition_variable m_wait;
 
         std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
         std::unique_ptr<ffmpeg::Codec> m_decoder;
@@ -61,9 +63,8 @@ private:
         int64_t m_baseTimestamp = 0;
 
         std::atomic_bool m_terminated = true;
-        mutable std::mutex m_mutex;
-        std::condition_variable m_wait;
-        std::thread m_runThread;
+        mutable std::mutex m_threadStartMutex;
+        std::thread m_audioThread;
 
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
         std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
@@ -96,7 +97,7 @@ private:
         bool checkIoError(int ffmpegError);
         void setLastError(int ffmpegError);
         void terminate();
-        void tryStart();
+        void tryToStartIfNotStarted();
         void start();
         void stop();
         void run();
@@ -106,7 +107,6 @@ public:
     AudioStream(const std::string url, const std::weak_ptr<Camera>& camera, bool enabled);
     ~AudioStream() = default;
 
-    std::string url() const;
     void setEnabled(bool enabled);
     bool enabled() const;
 
