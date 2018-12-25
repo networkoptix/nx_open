@@ -1,11 +1,14 @@
 #pragma once
 
+#include <QtCore/QDebug>
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
 #include <QtGui/QImage>
 
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::client::desktop {
 
@@ -135,5 +138,30 @@ struct LayoutSettingsDialogState: AbstractReduxState
 
     Background background;
 };
+
+#define LayoutSettingsDialogState_Range_Fields (min)(max)(value)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Range,
+    (debug)(eq),
+    NX_VMS_DESKTOP_CLIENT_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::BackgroundImageStatus,
+    (debug)(lexical),
+    NX_VMS_DESKTOP_CLIENT_API)
+
+#define LayoutSettingsDialogState_Background_Fields (status)(errorText)(width)(height)\
+    (keepImageAspectRatio)(opacityPercent)(cropToMonitorAspectRatio)(filename)(imageSourcePath)\
+    (preview)(croppedPreview)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Background,
+    (debug)(eq),
+    NX_VMS_DESKTOP_CLIENT_API)
+
+#define LayoutSettingsDialogState_Fields (locked)(isLocalFile)(cellAspectRatio)(logicalId)\
+    (reservedLogicalId)(fixedSizeEnabled)(fixedSize)(background)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState,
+    (debug)(eq),
+    NX_VMS_DESKTOP_CLIENT_API)
 
 } // namespace nx::vms::client::desktop

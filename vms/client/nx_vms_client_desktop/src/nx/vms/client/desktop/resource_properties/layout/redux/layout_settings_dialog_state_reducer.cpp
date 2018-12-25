@@ -164,10 +164,28 @@ int findFreeLogicalId(const QnLayoutResourcePtr& layout)
     return previousValue + 1;
 }
 
+static std::atomic_bool tracingEnabled(false);
+
+void trace(const State& state, const char* message)
+{
+    if (tracingEnabled)
+    {
+        NX_DEBUG(typeid(LayoutSettingsDialogStateReducer), message);
+        NX_DEBUG(typeid(LayoutSettingsDialogStateReducer), state);
+    }
+}
+
 } // namespace
 
-//using Camera = QnVirtualCameraResourcePtr;
-//using Cameras = QnVirtualCameraResourceList;
+bool LayoutSettingsDialogStateReducer::isTracingEnabled()
+{
+    return tracingEnabled;
+}
+
+void LayoutSettingsDialogStateReducer::setTracingEnabled(bool value)
+{
+    tracingEnabled = value;
+}
 
 State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutResourcePtr& layout)
 {
