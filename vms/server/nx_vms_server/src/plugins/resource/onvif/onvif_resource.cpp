@@ -3663,11 +3663,10 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     if (response.SubscriptionReference.Address)
     {
-        // While debugging port-forwarded devices it may be necessary to switch of port updating
-        // in fromOnvifDiscoveredUrl function, i.e. updatePort parameter should be set to false.
-        // Don't forget to restore true after working with port-forwarded device.
+        const bool updatePort =
+            nx::network::SocketGlobals::ini().doUpdatePortInSubscriptionAddress;
         m_onvifNotificationSubscriptionReference =
-            fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, /*updatePort*/true);
+            fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, updatePort);
     }
 
     QnMutexLocker lk(&m_ioPortMutex);
