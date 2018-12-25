@@ -386,9 +386,7 @@ struct InvalidAccess
     template<typename Param>
     bool operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&)
     {
-        auto td = getTransactionDescriptorByParam<Param>();
-        auto transactionName = td->getName();
-        NX_ASSERT(0, lit("Invalid access check for this transaction (%1). We shouldn't be here.").arg(transactionName));
+        NX_ASSERT(0, lit("Invalid access check for this transaction (%1). We shouldn't be here.").arg(typeid(Param).name()));
         return false;
     }
 };
@@ -398,9 +396,7 @@ struct InvalidAccessOut
     template<typename Param>
     RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData&, const Param&)
     {
-        auto td = getTransactionDescriptorByParam<Param>();
-        auto transactionName = td->getName();
-        NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(transactionName));
+        NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(typeid(Param).name));
         return RemotePeerAccess::Forbidden;
     }
 };
@@ -1008,9 +1004,7 @@ struct InvalidFilterFunc
     template<typename ParamType>
     void operator()(QnCommonModule*, const Qn::UserAccessData&, ParamType&)
     {
-        auto td = getTransactionDescriptorByParam<ParamType>();
-        auto transactionName = td->getName();
-        NX_ASSERT(0, lit("This transaction (%1) param type doesn't support filtering").arg(transactionName));
+        NX_ASSERT(0, lit("This transaction (%1) param type doesn't support filtering").arg(typeid(ParamType).name()));
     }
 };
 
@@ -1104,7 +1098,7 @@ struct ModifyListAccess
             NX_WARNING(this, lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
                 .arg(paramContainer.size() - tmpContainer.size())
                 .arg(paramContainer.size())
-                .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()));
+                .arg(typeid(ParamContainer)));
             return false;
         }
         return true;

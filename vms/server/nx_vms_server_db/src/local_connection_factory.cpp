@@ -1949,7 +1949,7 @@ ErrorCode LocalConnectionFactory::getSettings(
 {
     if (!m_dbManager)
         return ErrorCode::ioError;
-    return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
+    return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(ApiCommand::getSettings, nullptr, *outData);
 }
 
 template<class InputDataType, class ProcessedDataType>

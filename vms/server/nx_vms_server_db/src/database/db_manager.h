@@ -908,8 +908,9 @@ public:
 
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    ErrorCode doQuery(std::nullptr_t /*dummy*/, nx::vms::api::FullInfoData& data)
+    ErrorCode doQuery(ApiCommand::Value command, std::nullptr_t /*dummy*/, nx::vms::api::FullInfoData& data)
     {
+        NX_ASSERT(command == ApiCommand::getFullInfo);
         return readFullInfoDataComplete(&data);
     }
 
@@ -920,28 +921,27 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        filterData(data->resourceTypes);
-        filterData(data->servers);
-        filterData(data->serversUserAttributesList);
-        filterData(data->cameras);
-        filterData(data->cameraUserAttributesList);
-        filterData(data->users);
-        filterData(data->userRoles);
-        filterData(data->userRoles);
-        filterData(data->accessRights);
-        filterData(data->layouts);
-        filterData(data->layoutTours);
-        filterData(data->videowalls);
-        filterData(data->rules);
-        filterData(data->cameraHistory);
-        filterData(data->licenses);
-        filterData(data->discoveryData);
-        filterData(data->allProperties);
-        filterData(data->storages);
-        filterData(data->resStatusList);
-        filterData(data->webPages);
-        filterData(data->analyticsPlugins);
-        filterData(data->analyticsEngines);
+        filterData(ApiCommand::getResourceTypes, data->resourceTypes);
+        filterData(ApiCommand::getMediaServers, data->servers);
+        filterData(ApiCommand::getMediaServerUserAttributesList, data->serversUserAttributesList);
+        filterData(ApiCommand::getCameras, data->cameras);
+        filterData(ApiCommand::getCameraUserAttributesList, data->cameraUserAttributesList);
+        filterData(ApiCommand::getUsers, data->users);
+        filterData(ApiCommand::getUserRoles, data->userRoles);
+        filterData(ApiCommand::getAccessRights, data->accessRights);
+        filterData(ApiCommand::getLayouts, data->layouts);
+        filterData(ApiCommand::getLayoutTours, data->layoutTours);
+        filterData(ApiCommand::getVideowalls, data->videowalls);
+        filterData(ApiCommand::getEventRules, data->rules);
+        filterData(ApiCommand::getCameraHistoryItems, data->cameraHistory);
+        filterData(ApiCommand::getLicenses, data->licenses);
+        filterData(ApiCommand::getDiscoveryData, data->discoveryData);
+        filterData(ApiCommand::getResourceParams, data->allProperties);
+        filterData(ApiCommand::getStorages, data->storages);
+        filterData(ApiCommand::getStatusList, data->resStatusList);
+        filterData(ApiCommand::getWebPages, data->webPages);
+        filterData(ApiCommand::getAnalyticsPlugins, data->analyticsPlugins);
+        filterData(ApiCommand::getAnalyticsEngines, data->analyticsEngines);
 
         return ErrorCode::ok;
     }
@@ -960,13 +960,12 @@ public:
         nx::vms::api::ResourceParamWithRefDataList& resourceParams);
 
     template <typename T1, typename T2>
-    ErrorCode doQuery(const T1 &t1, T2 &t2)
+    ErrorCode doQuery(ApiCommand::Value command, const T1 &t1, T2 &t2)
     {
         ErrorCode errorCode = m_dbManager->doQuery(t1, t2);
         if (errorCode != ErrorCode::ok)
             return errorCode;
-
-        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
+        if (!getActualTransactionDescriptorByValue<T2>(command)->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();
@@ -975,13 +974,14 @@ public:
     }
 
     template<typename T1, template<typename, typename> class Cont, typename T2, typename A>
-    ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
+    ErrorCode doQuery(ApiCommand::Value command, const T1 &inParam, Cont<T2,A>& outParam)
     {
         ErrorCode errorCode = m_dbManager->doQuery(inParam, outParam);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParam);
+        getActualTransactionDescriptorByValue<Cont<T2, A>>(command)
+            ->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParam);
         return errorCode;
     }
 
@@ -1039,9 +1039,9 @@ public:
     }
 private:
     template<typename T>
-    void filterData(T& target)
+    void filterData(ApiCommand::Value command, T& target)
     {
-        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, target);
+        getActualTransactionDescriptorByValue<T>(command)->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, target);
     }
 
     detail::QnDbManager* m_dbManager;
