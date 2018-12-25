@@ -143,17 +143,11 @@ private:
 
     void scheduleRead()
     {
-        using namespace std::placeholders;
-
         NX_ASSERT(m_isSourceOpened);
 
         m_source->readSomeAsync(
             &m_readBuffer,
-            [this](
-                SystemError::ErrorCode sysErrorCode, std::size_t bytesRead)
-            {
-                onDataRead(sysErrorCode, bytesRead);
-            });
+            [this](auto&&... args) { onDataRead(std::move(args)...); });
         m_isReading = true;
     }
 
@@ -208,15 +202,9 @@ private:
 
     void sendNextDataChunk()
     {
-        using namespace std::placeholders;
-
         m_destination->sendAsync(
             m_sendQueue.front(),
-            [this](
-                SystemError::ErrorCode sysErrorCode, std::size_t bytesRead)
-            {
-                onDataSent(sysErrorCode, bytesRead);
-            });
+            [this](auto&&... args) { onDataSent(std::move(args)...); });
     }
 
     void onDataSent(
