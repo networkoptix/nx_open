@@ -4268,15 +4268,16 @@ void MediaServerProcess::run()
         cmdLineArguments().configFilePath,
         cmdLineArguments().rwConfigFilePath);
 
+    auto serverSettingsRawPtr = serverSettings.get();
     if (m_serviceMode)
-        initializeLogging(serverSettings.get());
+        initializeLogging(serverSettingsRawPtr);
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments, std::move(serverSettings)));
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
-    serverSettings->setServerModule(serverModule.get());
+    serverSettingsRawPtr->setServerModule(serverModule.get());
     serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
