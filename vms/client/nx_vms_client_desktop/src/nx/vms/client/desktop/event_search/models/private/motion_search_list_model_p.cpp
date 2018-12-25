@@ -86,7 +86,6 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
     using namespace std::chrono;
 
-    static const auto kDefaultLocale = QString();
     switch (role)
     {
         case Qt::DisplayRole:
@@ -108,11 +107,15 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             return QVariant::fromValue<QnResourcePtr>(camera(chunk));
 
         case Qn::ResourceListRole:
+        case Qn::DisplayedResourceListRole:
         {
-            const auto resource = camera(chunk);
-            return resource
-                ? QVariant::fromValue(QnResourceList({resource}))
-                : QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+            if (const auto resource = camera(chunk))
+                return QVariant::fromValue(QnResourceList({resource}));
+
+            if (role == Qn::DisplayedResourceListRole)
+                return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+
+            return {};
         }
 
         case Qn::DescriptionTextRole:
@@ -137,7 +140,7 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
         default:
             handled = false;
-            return QVariant();
+            return {};
     }
 }
 

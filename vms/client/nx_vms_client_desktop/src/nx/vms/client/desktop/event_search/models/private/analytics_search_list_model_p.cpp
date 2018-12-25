@@ -193,12 +193,15 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return Qn::Empty_Help;
 
         case Qn::ResourceListRole:
+        case Qn::DisplayedResourceListRole:
         {
-            const auto resource = camera(object);
-            if (resource)
+            if (const auto resource = camera(object))
                 return QVariant::fromValue(QnResourceList({resource}));
 
-            return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+            if (role == Qn::DisplayedResourceListRole)
+                return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+
+            return {};
         }
 
         case Qn::ResourceRole:
@@ -212,7 +215,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         default:
             handled = false;
-            return QVariant();
+            return {};
     }
 }
 

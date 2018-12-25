@@ -309,7 +309,7 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
-    NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
+    //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
     if (status == Qn::Unauthorized)
         return;

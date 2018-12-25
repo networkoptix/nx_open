@@ -109,7 +109,9 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return QVariant::fromValue(navigator()->currentResource());
 
         case Qn::ResourceListRole:
-            return QVariant::fromValue(QnResourceList({navigator()->currentResource()}));
+            if (auto resource = navigator()->currentResource())
+                return QVariant::fromValue(QnResourceList({resource}));
+            return {};
 
         case Qn::DescriptionTextRole:
         {

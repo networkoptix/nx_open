@@ -748,10 +748,45 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         // TODO: We should get a list of the servers to be updated and filter away the servers
         // with the same version.
         auto targets = m_stateTracker->getAllPeers();
+        auto offlineServers = m_stateTracker->getOfflineServers();
+
+        if (!offlineServers.empty())
+        {
+            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+            messageBox->setIcon(QnMessageBoxIcon::Warning);
+            messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
+            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
+            messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
+                QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
+            auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
+
+            messageBox->exec();
+            auto clicked = messageBox->clickedButton();
+            if (clicked == cancel)
+                return;
+            targets.subtract(offlineServers);
+        }
+
+        auto incompatible = m_stateTracker->getLegacyServers();
+        if (!incompatible.empty())
+        {
+            /*
+            nx::utils::SoftwareVersion version = m_targetVersion;
+            m_updatesTool->startOnlineClientUpdate(incompatible, m_targetVersion, false);
+            // Run compatibility update
+            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+            messageBox->setIcon(QnMessageBoxIcon::Warning);
+            messageBox->setText(tr("Some servers have incompatible versions and will not be updated"));
+            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(incompatible));
+            auto ok = messageBox->addButton(QDialogButtonBox::Ok);
+            messageBox->setEscapeButton(ok);
+            messageBox->exec();*/
+
+            targets.subtract(incompatible);
+        }
 
         if (m_updateSourceMode == UpdateSourceType::file)
         {
-            QSet<QnUuid> targets = {};
             setTargetState(WidgetUpdateState::pushing, {});
             m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, targets);
             m_clientUpdateTool->downloadUpdate(m_updateInfo);
@@ -765,42 +800,6 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             // TODO: We have the case when all mediaservers have installed update.
 
             NX_INFO(this) << "atStartUpdateAction() - sending 'download' command to peers" << targets;
-            auto offlineServers = m_stateTracker->getOfflineServers();
-            if (!offlineServers.empty())
-            {
-                QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-                messageBox->setIcon(QnMessageBoxIcon::Warning);
-                messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
-                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
-                messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
-                    QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
-                auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
-
-                messageBox->exec();
-                auto clicked = messageBox->clickedButton();
-                if (clicked == cancel)
-                    return;
-                targets.subtract(offlineServers);
-            }
-
-            auto incompatible = m_stateTracker->getLegacyServers();
-            if (!incompatible.empty())
-            {
-                /*
-                nx::utils::SoftwareVersion version = m_targetVersion;
-                m_updatesTool->startOnlineClientUpdate(incompatible, m_targetVersion, false);
-                // Run compatibility update
-                QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-                messageBox->setIcon(QnMessageBoxIcon::Warning);
-                messageBox->setText(tr("Some servers have incompatible versions and will not be updated"));
-                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(incompatible));
-                auto ok = messageBox->addButton(QDialogButtonBox::Ok);
-                messageBox->setEscapeButton(ok);
-                messageBox->exec();*/
-
-                targets.subtract(incompatible);
-            }
-
             setTargetState(WidgetUpdateState::downloading, targets);
             m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, targets);
             m_clientUpdateTool->downloadUpdate(m_updateInfo);

@@ -65,7 +65,7 @@ class QmlDeployUtil:
         qt_deps = []
 
         for item in imports:
-            path = item.get("path")
+            path = os.path.abspath(item.get("path"))
 
             if not path or os.path.commonprefix([self.qt_root, path]) != self.qt_root:
                 continue
@@ -127,7 +127,7 @@ class QmlDeployUtil:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        paths  = []
+        paths = []
         previous_path = None
 
         for item in imports:
@@ -143,8 +143,11 @@ class QmlDeployUtil:
             dst = os.path.join(output_dir, subdir)
             if os.path.exists(dst):
                 shutil.rmtree(dst)
-            shutil.copytree(path, dst, symlinks=True,
-                ignore = shutil.ignore_patterns("*.a", "*.prl"))
+            shutil.copytree(
+                path,
+                dst,
+                symlinks=True,
+                ignore=shutil.ignore_patterns("*.a", "*.prl", "*.pdb", "designer"))
 
     def deploy(self, qml_root, output_dir):
         imports_dict = self.invoke_qmlimportscanner(qml_root)

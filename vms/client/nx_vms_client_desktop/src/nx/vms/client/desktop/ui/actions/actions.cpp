@@ -1242,12 +1242,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree)
         .separator();
 
-    // TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(DeleteFromDiskAction)
-        //flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
+        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::local_media, MatchMode::All));
+        .condition(condition::hasFlags(Qn::local_media, MatchMode::All)
+            && condition::isTrue(ini().allowDeleteLocalFiles));
 
     factory(SetAsBackgroundAction)
         .flags(Scene | SingleTarget)
