@@ -251,12 +251,34 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
 }
 
 /**
-* Semantics of the transactionHash() function is following:
-* if transaction A follows transaction B and overrides it,
-* their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
-* Obviously, transactionHash() is not needed for the non-persistent transaction.
-*/
+ * For this function to work properly all transaction descriptors for the same api data structures should have
+ * same Access Rights checker functions. For example setResourceParam and getResourceParam have the same checker for
+ * read access - ReadResourceParamAccess.
+ */
+template<typename Param>
+detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
+{
+    static std::atomic<detail::TransactionDescriptor<Param>*> holder(nullptr);
+    if (!holder.load())
+    {
+        for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+        {
+            auto tdBase = (*it).get();
+            auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+            if (td)
+                holder = td;
+        }
+    }
+    NX_ASSERT(holder.load(), "Transaciton descriptor for the given param not found");
+    return holder;
+}
 
+/**
+ * Semantics of the transactionHash() function is following:
+ * if transaction A follows transaction B and overrides it,
+ * their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
+ * Obviously, transactionHash() is not needed for the non-persistent transaction.
+ */
 template<typename Param>
 static QnUuid transactionHash(ApiCommand::Value command, const Param &param)
 {
