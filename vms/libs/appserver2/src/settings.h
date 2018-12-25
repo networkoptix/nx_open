@@ -21,13 +21,13 @@ namespace ec2 {
 class Settings
 {
 public:
-    bool dbReadOnly() const;
+//    bool dbReadOnly() const;
 
-    //time_sync
-    size_t internetSyncTimePeriodSec(size_t defaultValue) const;
-    size_t maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const;
+//    //time_sync
+//    size_t internetSyncTimePeriodSec(size_t defaultValue) const;
+//    size_t maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const;
 
-    void loadParams( std::map<QString, QVariant> confParams );
+//    void loadParams( std::map<QString, QVariant> confParams );
 
 private:
     std::map<QString, QVariant> m_confParams;

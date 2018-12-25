@@ -4317,7 +4317,7 @@ void MediaServerProcess::run()
 
     m_mediaServerStatusWatcher = std::make_unique<MediaServerStatusWatcher>(serverModule.get());
 
-    m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
+//    m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
 
     // If an exception is thrown by Qt event handler from within exec(), we want to do some cleanup
     // anyway.

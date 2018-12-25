@@ -54,11 +54,11 @@ static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 LocalConnectionFactory::LocalConnectionFactory(
     QnCommonModule* commonModule,
     PeerType peerType,
-	bool isP2pMode,
+    bool isP2pMode,
     QnHttpConnectionListener* tcpListener)
     :
     AbstractECConnectionFactory(commonModule),
-	// dbmanager is initialized by direct connection.
+    // dbmanager is initialized by direct connection.
 
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
@@ -110,10 +110,10 @@ LocalConnectionFactory::LocalConnectionFactory(
 
 void LocalConnectionFactory::shutdown()
 {
-	m_serverQueryProcessor->stop();
+    m_serverQueryProcessor->stop();
 
-	pleaseStop();
-	join();
+    pleaseStop();
+    join();
 
     if (m_directConnection)
         messageBus()->removeHandler(m_directConnection->notificationManager());
@@ -1043,7 +1043,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * the result of the corresponding GET function.
      * </p>
      * %param eventType Event type to match the rule. Example of possible values can be seen in
-	 *     the result of the corresponding GET function.
+     *     the result of the corresponding GET function.
      * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
      * %param[opt] eventCondition Additional text filter for event rule. Used for some event types.
      * %param[opt] EventState Event state to match the rule.
@@ -1051,7 +1051,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value active Prolonged event has started.
      *     %value undefined Any state.
      * %param actionType Action to execute if the rule matches. Example of possible values can be
-	 *     seen in the result of the corresponding GET function.
+     *     seen in the result of the corresponding GET function.
      * %param[opt] actionResourceIds Resource list associated with the action. The action is executed
      *     for each resource in the list.
      * %param[opt] actionParams Additional parameters used in the action. It depends on the action type.
@@ -1061,7 +1061,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt] comment Human-readable text. Not used on the server side.
      * %param[opt] schedule Hex representation of the binary data. Each bit defines whether
      *     the action should or should not be executed at some hour of week. Hour numbers
-	 *     start with 0. There are 24 * 7 = 168 bits.
+     *     start with 0. There are 24 * 7 = 168 bits.
      * %param[opt] system Whether the rule can't be deleted by user. System rules can't be deleted.
     */
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
@@ -1686,11 +1686,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 #endif // 0
 }
 
-void LocalConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)
-{
-    m_settingsInstance.loadParams(std::move(confParams));
-}
-
 int LocalConnectionFactory::establishDirectConnection(
     const nx::utils::Url& url, impl::ConnectHandlerPtr handler)
 {
@@ -1875,7 +1870,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
 #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-    connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
+    //connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;
     if (response)

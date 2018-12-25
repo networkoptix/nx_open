@@ -111,11 +111,6 @@ int RemoteConnectionFactory::connectAsync(
     return establishConnectionToRemoteServer(url, handler, clientInfo);
 }
 
-void RemoteConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)
-{
-    m_settingsInstance.loadParams(std::move(confParams));
-}
-
 int RemoteConnectionFactory::establishConnectionToRemoteServer(
     const nx::utils::Url& addr,
     impl::ConnectHandlerPtr handler,
@@ -379,7 +374,6 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-    connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;
     if (response)

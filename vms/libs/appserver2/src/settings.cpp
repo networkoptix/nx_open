@@ -22,32 +22,32 @@ namespace params
 }
 
 
-bool Settings::dbReadOnly() const
-{
-    //if booted from SD card, setting ecDbReadOnly to true by default
-    bool defaultValue = params::dbReadOnlyDefault;
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-        defaultValue = Nx1::isBootedFromSD();
-#endif
+//bool Settings::dbReadOnly() const
+//{
+//    //if booted from SD card, setting ecDbReadOnly to true by default
+//    bool defaultValue = params::dbReadOnlyDefault;
+//#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+//    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+//        defaultValue = Nx1::isBootedFromSD();
+//#endif
 
-    return value<bool>( params::dbReadOnly, defaultValue );
-}
+//    return value<bool>( params::dbReadOnly, defaultValue );
+//}
 
-size_t Settings::internetSyncTimePeriodSec(size_t defaultValue) const
-{
-    return value<size_t>(params::internetSyncTimePeriodSec, defaultValue);
-}
+//size_t Settings::internetSyncTimePeriodSec(size_t defaultValue) const
+//{
+//    return value<size_t>(params::internetSyncTimePeriodSec, defaultValue);
+//}
 
-size_t Settings::maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const
-{
-    return value<size_t>(params::maxInternetTimeSyncRetryPeriodSec, defaultValue);
-}
+//size_t Settings::maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const
+//{
+//    return value<size_t>(params::maxInternetTimeSyncRetryPeriodSec, defaultValue);
+//}
 
-void Settings::loadParams( std::map<QString, QVariant> confParams )
-{
-    QnMutexLocker lk( &m_mutex );
-    m_confParams = std::move( confParams );
-}
+//void Settings::loadParams( std::map<QString, QVariant> confParams )
+//{
+//    QnMutexLocker lk( &m_mutex );
+//    m_confParams = std::move( confParams );
+//}
 
 }   //ec2

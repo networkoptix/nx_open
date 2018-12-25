@@ -24,7 +24,7 @@
 static const size_t MAX_LINE_LENGTH = 512;
 
 SystemError::ErrorCode readPartitions(
-    AbstractSystemInfoProvider* systemInfoProvider,
+    AbstractFileSystemInformationProvider* systemInfoProvider,
     std::list<PartitionInfo>* const partitionInfoList)
 {
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
@@ -40,7 +40,7 @@ SystemError::ErrorCode readPartitions(
         PathInfo() = default;
     };
 
-    QByteArray fileContent = systemInfoProvider->fileContent();
+    QByteArray fileContent = systemInfoProvider->mountsFileContent();
     if (fileContent.isNull())
         return SystemError::fileNotFound;
 
@@ -83,6 +83,9 @@ SystemError::ErrorCode readPartitions(
         partitionInfo.isUsb = nx::utils::file_system::isUsb(QString::fromLatin1(deviceKey));
         partitionInfo.devName = QString::fromLatin1(deviceKey);
         partitionInfo.path = QString::fromLatin1(pathInfo.fsPath);
+//        if (!systemInfoProvider->isFolder(pathInfo.fsPath))
+//            continue;
+
         partitionInfo.fsName = QString::fromLatin1(pathInfo.fsType);
         partitionInfo.sizeBytes = systemInfoProvider->totalSpace(pathInfo.fsPath);
         if (partitionInfo.sizeBytes == -1)
@@ -125,7 +128,7 @@ void decodeOctalEncodedPath(char* path)
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 
-CommonSystemInfoProvider::CommonSystemInfoProvider()
+CommonFileSystemInformationProvider::CommonFileSystemInformationProvider()
 {
     m_fileName = lit("/proc/mounts");
     if (nx::utils::AppInfo::isRaspberryPi())
@@ -147,7 +150,7 @@ CommonSystemInfoProvider::CommonSystemInfoProvider()
     }
 }
 
-QByteArray CommonSystemInfoProvider::fileContent() const
+QByteArray CommonFileSystemInformationProvider::mountsFileContent() const
 {
     QFile mountsFile(m_fileName);
     if (!mountsFile.open(QIODevice::ReadOnly))
@@ -156,12 +159,12 @@ QByteArray CommonSystemInfoProvider::fileContent() const
     return mountsFile.readAll();
 }
 
-bool CommonSystemInfoProvider::scanfLongPattern() const
+bool CommonFileSystemInformationProvider::scanfLongPattern() const
 {
     return m_scanfLongPattern;
 }
 
-qint64 CommonSystemInfoProvider::totalSpace(const QByteArray& fsPath) const
+qint64 CommonFileSystemInformationProvider::totalSpace(const QByteArray& fsPath) const
 {
     struct statvfs64 stat;
     if (statvfs64(fsPath.constData(), &stat) == 0)
@@ -170,7 +173,7 @@ qint64 CommonSystemInfoProvider::totalSpace(const QByteArray& fsPath) const
     return -1LL;
 }
 
-qint64 CommonSystemInfoProvider::freeSpace(const QByteArray& fsPath) const
+qint64 CommonFileSystemInformationProvider::freeSpace(const QByteArray& fsPath) const
 {
     struct statvfs64 stat;
     if (statvfs64(fsPath.constData(), &stat) == 0)
@@ -179,7 +182,7 @@ qint64 CommonSystemInfoProvider::freeSpace(const QByteArray& fsPath) const
     return -1LL;
 }
 
-QString CommonSystemInfoProvider::fileName() const
+QString CommonFileSystemInformationProvider::fileName() const
 {
     return m_fileName;
 }

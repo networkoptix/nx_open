@@ -46,7 +46,7 @@ QString Nx1::getSerial()
 bool Nx1::isBootedFromSD()
 {
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    CommonSystemInfoProvider systemInfoProvider;
+    CommonFileSystemInformationProvider systemInfoProvider;
     std::list<PartitionInfo> partitionInfoList;
     if (readPartitions(&systemInfoProvider, &partitionInfoList) != SystemError::noError)
         return true;

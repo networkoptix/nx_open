@@ -5,6 +5,7 @@
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
+#include <nx/vms/server/system/nx1/info.h>
 
 namespace nx {
 namespace vms::server {
@@ -136,7 +137,19 @@ public:
     Option<bool> ecDbReadOnly{this, "ecDbReadOnly",
         false,
         "If set to \a true, EC DB is opened in read-only mode. So, any "
-        "data modification operation except license activation will fail"
+        "data modification operation except license activation will fail",
+        [this](bool value)
+        {
+            if (ecDbReadOnly.present())
+                return value;
+
+            #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+                if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+                    return Nx1::isBootedFromSD();
+            #endif
+
+            return false;
+        }
     };
     Option<QString> cdbEndpoint{this, "cdbEndpoint", "", ""};
     Option<QString> onvifTimeouts{this, "onvifTimeouts", "", ""};

@@ -51,8 +51,6 @@ public:
         const nx::vms::api::ClientInfoData& clientInfo,
         impl::ConnectHandlerPtr handler) override;
 
-    virtual void setConfParams(std::map<QString, QVariant> confParams) override;
-
     virtual TransactionMessageBusAdapter* messageBus() const override;
     virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
 

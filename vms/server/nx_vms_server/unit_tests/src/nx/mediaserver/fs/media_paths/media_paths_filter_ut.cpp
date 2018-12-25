@@ -10,7 +10,7 @@ namespace media_paths {
 namespace detail {
 namespace test {
 
-class Filter: public ::testing::Test
+class MediaPathFilter: public ::testing::Test
 {
 protected:
     enum class Os
@@ -179,12 +179,12 @@ private:
     }
 };
 
-const QnUuid Filter::kServerUuid = QnUuid::fromStringSafe("{AC4F57C2-DCC1-4D56-945B-4744D19FB7CC}");
-const QString Filter::kMediaFolder = "HD Witness Media";
-const QString Filter::kDataDirectory = "/opt/networkoptix/mediaserver/var";
+const QnUuid MediaPathFilter::kServerUuid = QnUuid::fromStringSafe("{AC4F57C2-DCC1-4D56-945B-4744D19FB7CC}");
+const QString MediaPathFilter::kMediaFolder = "HD Witness Media";
+const QString MediaPathFilter::kDataDirectory = "/opt/networkoptix/mediaserver/var";
 
 
-TEST_F(Filter, Windows_allAllowed_noMultipleInstances)
+TEST_F(MediaPathFilter, Windows_allAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
     whenNonHdd(true);
@@ -195,7 +195,7 @@ TEST_F(Filter, Windows_allAllowed_noMultipleInstances)
     thenPathsShouldBeAmendedCorrectly();
 }
 
-TEST_F(Filter, Windows_nonHddNotAllowed_noMultipleInstances)
+TEST_F(MediaPathFilter, Windows_nonHddNotAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
     whenNonHdd(false);
@@ -208,7 +208,7 @@ TEST_F(Filter, Windows_nonHddNotAllowed_noMultipleInstances)
     thenPathsShouldBeAmendedCorrectly();
 }
 
-TEST_F(Filter, Windows_networkNotAllowed_noMultipleInstances)
+TEST_F(MediaPathFilter, Windows_networkNotAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
     whenNonHdd(true);
@@ -221,7 +221,7 @@ TEST_F(Filter, Windows_networkNotAllowed_noMultipleInstances)
     thenPathsShouldBeAmendedCorrectly();
 }
 
-TEST_F(Filter, Windows_removableNotAllowed_noMultipleInstances)
+TEST_F(MediaPathFilter, Windows_removableNotAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
     whenNonHdd(true);
@@ -235,7 +235,7 @@ TEST_F(Filter, Windows_removableNotAllowed_noMultipleInstances)
 }
 
 
-TEST_F(Filter, Windows_allAllowed_MultipleInstances)
+TEST_F(MediaPathFilter, Windows_allAllowed_MultipleInstances)
 {
     givenOsIs(Os::windows);
     whenNonHdd(true);
@@ -246,7 +246,7 @@ TEST_F(Filter, Windows_allAllowed_MultipleInstances)
     thenPathsShouldBeAmendedCorrectly();
 }
 
-TEST_F(Filter, Linux_allAllowed_noMultipleInstances)
+TEST_F(MediaPathFilter, Linux_allAllowed_noMultipleInstances)
 {
     givenOsIs(Os::other);
     whenNonHdd(true);

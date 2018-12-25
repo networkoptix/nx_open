@@ -23,9 +23,9 @@ class QnDistributedMutexManager;
 class ClientRegistrar;
 
 class LocalConnectionFactory:
-	public AbstractECConnectionFactory,
-	public QnStoppable,
-	public QnJoinable
+    public AbstractECConnectionFactory,
+    public QnStoppable,
+    public QnJoinable
 {
 public:
     LocalConnectionFactory(
@@ -58,8 +58,6 @@ public:
 
     virtual void registerTransactionListener(
         QnHttpConnectionListener* httpConnectionListener);
-
-    virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
     TransactionMessageBusAdapter* messageBus() const;
     QnDistributedMutexManager* distributedMutex() const;
