@@ -2263,7 +2263,7 @@ void QnPlOnvifResource::fillStreamCapabilityLists(
 {
     class HasToken
     {
-        QString m_token;
+        const QString m_token;
     public:
         HasToken(const QString& token): m_token(token) {}
         bool operator()(const VideoEncoderCapabilities& capabilities) const
@@ -2603,11 +2603,11 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
         arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height())
         .arg(getHostAddress()));
 
-    class TooBigResolution
+    class IsResolutionTooBig
     {
-        QSize m_maxResolution;
+        const QSize m_maxResolution;
     public:
-        TooBigResolution(QSize maxResolution): m_maxResolution(maxResolution) {}
+        IsResolutionTooBig(QSize maxResolution): m_maxResolution(maxResolution) {}
         bool operator()(QSize resolution) const
         {
             return resolution.width() > m_maxResolution.width()
@@ -2620,7 +2620,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
     {
         const auto it = std::find_if_not(
             capabilities.resolutions.cbegin(), capabilities.resolutions.cend(),
-            TooBigResolution(m_videoSourceSize));
+            IsResolutionTooBig(m_videoSourceSize));
         if (it != capabilities.resolutions.cend())
         {
             // Trust to videoSourceSize, if
@@ -2649,7 +2649,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
     {
         const auto it = std::remove_if(
             capabilities.resolutions.begin(), capabilities.resolutions.end(),
-            TooBigResolution(m_videoSourceSize));
+            IsResolutionTooBig(m_videoSourceSize));
         capabilities.resolutions.erase(it, capabilities.resolutions.end());
     }
 
