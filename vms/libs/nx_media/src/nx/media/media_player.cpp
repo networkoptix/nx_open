@@ -963,15 +963,17 @@ void Player::setPosition(qint64 value)
     if (d->archiveReader)
     {
 
-        qint64 fixedPosition = 0;
-        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &fixedPosition);
-        if (fixedPosition != value)
+        qint64 actualJumpPositionUsec = 0;
+        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &actualJumpPositionUsec);
+
+        const qint64 actualJumpPositionMsec = usecToMsec(actualJumpPositionUsec);
+        if (actualJumpPositionMsec != value)
         {
             d->setLiveMode(value == kLivePosition);
             emit positionChanged();
-        }
 
-        d->positionMs = d->lastSeekTimeMs = value = usecToMsec(fixedPosition);
+            d->positionMs = d->lastSeekTimeMs = value = actualJumpPositionMsec;
+        }
     }
 
     d->setLiveMode(value == kLivePosition);
