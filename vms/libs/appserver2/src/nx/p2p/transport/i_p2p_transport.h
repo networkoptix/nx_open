@@ -4,13 +4,13 @@
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/http/http_types.h>
 
-namespace nx::network {
+namespace nx::p2p {
 
-class NX_NETWORK_API IP2PTransport: public aio::AbstractAsyncChannel
+class IP2PTransport: public network::aio::AbstractAsyncChannel
 {
 public:
     virtual ~IP2PTransport() = default;
-    virtual SocketAddress getForeignAddress() const = 0;
+    virtual network::SocketAddress getForeignAddress() const = 0;
     virtual void start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) = 0;
 };
 

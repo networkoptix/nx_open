@@ -5,7 +5,7 @@
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/std/future.h>
 
-namespace nx::network::test {
+namespace nx::p2p::test {
 
 class P2PHttpTransport: public ::testing::Test
 {
@@ -21,11 +21,11 @@ protected:
             }
         }
 
-        m_acceptor = SocketFactory::createStreamServerSocket();
+        m_acceptor = network::SocketFactory::createStreamServerSocket();
         m_acceptor->setNonBlockingMode(true);
         m_acceptor->setReuseAddrFlag(true);
         m_acceptor->setReusePortFlag(true);
-        m_acceptor->bind(SocketAddress::anyPrivateAddress);
+        m_acceptor->bind(network::SocketAddress::anyPrivateAddress);
         m_acceptor->listen();
     }
 
@@ -36,14 +36,14 @@ protected:
 
     void givenConnectedP2PTransports()
     {
-        std::unique_ptr<AbstractStreamSocket> clientSocket;
-        std::unique_ptr<AbstractStreamSocket> serverSocket;
+        std::unique_ptr<network::AbstractStreamSocket> clientSocket;
+        std::unique_ptr<network::AbstractStreamSocket> serverSocket;
         createConnectedSockets(&clientSocket, &serverSocket);
 
         m_acceptor->acceptAsync(
             [this](
                 SystemError::ErrorCode error,
-                std::unique_ptr<AbstractStreamSocket> acceptedSocket)
+                std::unique_ptr<network::AbstractStreamSocket> acceptedSocket)
             {
                 ASSERT_EQ(SystemError::noError, error);
                 m_server->gotPostConnection(std::move(acceptedSocket));
@@ -53,13 +53,14 @@ protected:
         ASSERT_TRUE((bool) clientSocket);
         ASSERT_TRUE((bool) serverSocket);
 
-        auto clientHttpClient = std::make_unique<http::AsyncClient>(std::move(clientSocket));
+        auto clientHttpClient =
+            std::make_unique<network::http::AsyncClient>(std::move(clientSocket));
 
         m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
         m_client.reset(new P2PHttpClientTransport(
             std::move(clientHttpClient),
             QnUuid::createUuid().toByteArray(),
-            websocket::binary,
+            network::websocket::binary,
             utils::Url("http://" + m_acceptor->getLocalAddress().toString() + kPath)));
 
         utils::promise<void> startedPromise;
@@ -138,21 +139,23 @@ private:
     nx::Buffer m_clientReadBuffer;
     static nx::Buffer m_clientSendBuffer;
     nx::Buffer m_serverReadBuffer;
-    std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
+    std::unique_ptr<network::AbstractStreamServerSocket> m_acceptor;
     utils::promise<void> m_serverPostConnectionPromise;
     utils::future<void> m_serverPostConnectionFuture = m_serverPostConnectionPromise.get_future();
 
     void createConnectedSockets(
-        std::unique_ptr<AbstractStreamSocket>* clientSocket,
-        std::unique_ptr<AbstractStreamSocket>* serverSocket)
+        std::unique_ptr<network::AbstractStreamSocket>* clientSocket,
+        std::unique_ptr<network::AbstractStreamSocket>* serverSocket)
     {
-        *clientSocket = SocketFactory::createStreamSocket();
+        *clientSocket = network::SocketFactory::createStreamSocket();
         (*clientSocket)->setNonBlockingMode(true);
 
         nx::utils::promise<void> connectPromise;
         auto connectFuture = connectPromise.get_future();
         m_acceptor->acceptAsync(
-            [&](SystemError::ErrorCode /*ecode*/, std::unique_ptr<AbstractStreamSocket> acceptedSocket)
+            [&](
+                SystemError::ErrorCode /*ecode*/,
+                std::unique_ptr<network::AbstractStreamSocket> acceptedSocket)
             {
                 *serverSocket = std::move(acceptedSocket);
                 (*serverSocket)->setNonBlockingMode(true);

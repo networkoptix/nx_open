@@ -6,14 +6,14 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/object_destruction_flag.h>
 
-namespace nx::network {
+namespace nx::p2p {
 
-class NX_NETWORK_API P2PHttpServerTransport: public IP2PTransport
+class P2PHttpServerTransport: public IP2PTransport
 {
 public:
     P2PHttpServerTransport(
-        std::unique_ptr<AbstractStreamSocket> socket,
-        websocket::FrameType messageType = websocket::FrameType::binary);
+        std::unique_ptr<network::AbstractStreamSocket> socket,
+        network::websocket::FrameType messageType = network::websocket::FrameType::binary);
 
     virtual ~P2PHttpServerTransport() override;
 
@@ -22,7 +22,7 @@ public:
      * provide a body of already accepted and read POST request.
      */
     void gotPostConnection(
-        std::unique_ptr<AbstractStreamSocket> socket,
+        std::unique_ptr<network::AbstractStreamSocket> socket,
         const nx::Buffer& body = nx::Buffer());
 
     /**
@@ -32,36 +32,41 @@ public:
     virtual void start(
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived) override;
 
-    virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
-    virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void readSomeAsync(
+        nx::Buffer* const buffer, 
+        network::IoCompletionHandler handler) override;
+    virtual void sendAsync(
+        const nx::Buffer& buffer, 
+        network::IoCompletionHandler handler) override;
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
-    virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual SocketAddress getForeignAddress() const override;
+    virtual network::aio::AbstractAioThread* getAioThread() const override;
+    virtual network::SocketAddress getForeignAddress() const override;
 
 private:
     struct ReadContext
     {
-        http::Message message;
-        http::MessageParser parser;
+        network::http::Message message;
+        network::http::MessageParser parser;
         size_t bytesParsed = 0;
         nx::Buffer buffer;
 
         void reset();
     };
 
-    using UserReadHandlerPair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
+    using UserReadHandlerPair = 
+        std::unique_ptr<std::pair<nx::Buffer* const, network::IoCompletionHandler>>;
 
-    std::unique_ptr<AbstractStreamSocket> m_sendSocket;
-    std::unique_ptr<AbstractStreamSocket> m_readSocket;
-    websocket::FrameType m_messageType;
+    std::unique_ptr<network::AbstractStreamSocket> m_sendSocket;
+    std::unique_ptr<network::AbstractStreamSocket> m_readSocket;
+    network::websocket::FrameType m_messageType;
     nx::Buffer m_sendBuffer;
     nx::Buffer m_responseBuffer;
     nx::Buffer m_providedPostBody;
     nx::Buffer m_sendChannelReadBuffer;
     bool m_firstSend = true;
     ReadContext m_readContext;
-    aio::Timer m_timer;
+    network::aio::Timer m_timer;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
         [](SystemError::ErrorCode) {};
     bool m_failed = false;
@@ -72,18 +77,18 @@ private:
         SystemError::ErrorCode error,
         size_t transferred,
         nx::Buffer* const buffer,
-        IoCompletionHandler handler);
+        network::IoCompletionHandler handler);
 
-    void readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler);
+    void readFromSocket(nx::Buffer* const buffer, network::IoCompletionHandler handler);
     QByteArray makeInitialResponse() const;
     QByteArray makeFrameHeader() const;
     void sendPostResponse(
         SystemError::ErrorCode error,
-        IoCompletionHandler userHandler,
-        utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler);
+        network::IoCompletionHandler userHandler,
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode, network::IoCompletionHandler)> completionHandler);
     void onReadFromSendSocket(SystemError::ErrorCode error, size_t transferred);
 
-    static void addDateHeader(http::HttpHeaders* headers);
+    static void addDateHeader(network::http::HttpHeaders* headers);
 
     virtual void stopWhileInAioThread() override;
 };

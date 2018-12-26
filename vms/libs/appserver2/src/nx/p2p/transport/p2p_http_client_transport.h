@@ -7,9 +7,9 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/object_destruction_flag.h>
 
-namespace nx::network {
+namespace nx::p2p {
 
-class NX_NETWORK_API P2PHttpClientTransport: public IP2PTransport
+class P2PHttpClientTransport: public IP2PTransport
 {
 private:
     using HttpClientPtr = std::unique_ptr<nx::network::http::AsyncClient>;
@@ -21,44 +21,49 @@ public:
     P2PHttpClientTransport(
         HttpClientPtr readHttpClient,
         const nx::Buffer& connectionGuid,
-        websocket::FrameType frameType = websocket::FrameType::binary,
+        network::websocket::FrameType frameType = network::websocket::FrameType::binary,
         const boost::optional<utils::Url>& url = boost::none);
 
     virtual ~P2PHttpClientTransport() override;
 
-    virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
-    virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void readSomeAsync(
+        nx::Buffer* const buffer,
+        network::IoCompletionHandler handler) override;
+    virtual void sendAsync(
+        const nx::Buffer& buffer,
+        network::IoCompletionHandler handler) override;
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
-    virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual SocketAddress getForeignAddress() const override;
+    virtual network::aio::AbstractAioThread* getAioThread() const override;
+    network:: SocketAddress getForeignAddress() const override;
     virtual void start(
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
 private:
-    class PostBodySource: public http::AbstractMsgBodySource
+    class PostBodySource: public network::http::AbstractMsgBodySource
     {
     public:
-        PostBodySource(websocket::FrameType messageType, const Buffer& data);
+        PostBodySource(network::websocket::FrameType messageType, const nx::Buffer& data);
         using CompletionHandler =
-            utils::MoveOnlyFunc<void(SystemError::ErrorCode, http::BufferType)>;
-        virtual http::StringType mimeType() const override;
+            utils::MoveOnlyFunc<void(SystemError::ErrorCode, network::http::BufferType)>;
+        virtual network::http::StringType mimeType() const override;
         virtual boost::optional<uint64_t> contentLength() const override;
         virtual void readAsync(CompletionHandler completionHandler) override;
 
     private:
-        websocket::FrameType m_messageType;
+        network::websocket::FrameType m_messageType;
         const nx::Buffer m_data;
     };
 
-    using UserReadHandlerPair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
+    using UserReadHandlerPair =
+        std::unique_ptr<std::pair<nx::Buffer* const, network::IoCompletionHandler>>;
 
     HttpClientPtr m_writeHttpClient;
     HttpClientPtr m_readHttpClient;
-    http::MultipartContentParser m_multipartContentParser;
+    network::http::MultipartContentParser m_multipartContentParser;
     std::queue<nx::Buffer> m_incomingMessageQueue;
     UserReadHandlerPair m_userReadHandlerPair;
-    websocket::FrameType m_messageType;
+    network::websocket::FrameType m_messageType;
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
     utils::ObjectDestructionFlag m_destructionFlag;
