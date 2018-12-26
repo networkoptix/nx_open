@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/vms/time_sync/time_sync_manager.h>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace vms {
@@ -14,6 +15,8 @@ public:
     virtual ~ClientTimeSyncManager() override { stop(); }
 protected:
     virtual void updateTime() override;
+private:
+    nx::utils::ElapsedTimer m_lastSyncTimeInterval;
 };
 
 } // namespace time_sync
