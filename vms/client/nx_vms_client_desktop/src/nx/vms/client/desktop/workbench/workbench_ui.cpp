@@ -144,7 +144,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     /* Fps counter. */
     createFpsWidget();
 
-    QnPaneSettingsMap settings = qnSettings->paneSettings();
+    QnPaneSettingsMap settings = qnSettings->paneStateSettings();
 
     if (qnRuntime->isDesktopMode())
     {
@@ -313,7 +313,7 @@ void WorkbenchUi::storeSettings()
     thumbnails.state = makePaneState(m_timeline->isThumbnailsVisible());
     thumbnails.span = m_timeline->lastThumbnailsHeight;
 
-    qnSettings->setPaneSettings(settings);
+    qnSettings->setPaneStateSettings(settings);
     qnSettings->save();
 }
 
@@ -684,7 +684,7 @@ void WorkbenchUi::at_freespaceAction_triggered()
     }
     else
     {
-        QnPaneSettingsMap settings = qnSettings->paneSettings();
+        QnPaneSettingsMap settings = qnSettings->paneStateSettings();
         setTreeOpened(settings[Qn::WorkbenchPane::Tree].state == Qn::PaneState::Opened, isFullscreen);
         setTitleOpened(settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, isFullscreen);
         setTimelineOpened(settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, isFullscreen);
