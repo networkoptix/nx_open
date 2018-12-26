@@ -966,14 +966,14 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        const auto descriptor = (command == ApiCommand::NotDefined)
-            ? getTransactionDescriptorByParam<T2>()
-            : getActualTransactionDescriptorByValue<T2>(command);
-
-        if (!descriptor->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
+        if (m_userAccessData != Qn::kSystemAccess)
         {
-            errorCode = ErrorCode::forbidden;
-            t2 = T2();
+            const auto descriptor = getActualTransactionDescriptorByValue<T2>(command);
+            if (!descriptor->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
+            {
+                errorCode = ErrorCode::forbidden;
+                t2 = T2();
+            }
         }
 
         return errorCode;
@@ -986,11 +986,11 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        const auto descriptor = (command == ApiCommand::NotDefined)
-            ? getTransactionDescriptorByParam<Cont<T2, A>>()
-            : getActualTransactionDescriptorByValue<Cont<T2, A>>(command);
-
-        descriptor->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParam);
+        if (m_userAccessData != Qn::kSystemAccess)
+        {
+            getActualTransactionDescriptorByValue<Cont<T2, A>>(command)
+                ->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParam);
+        }
         return errorCode;
     }
 
