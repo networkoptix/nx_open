@@ -51,8 +51,10 @@ private:
 
 private:
     nx::sdk::analytics::common::Plugin* const m_plugin;
-    EngineManifest m_typedManifest;
-    QByteArray m_manifest;
+
+    // Engine manifest is stored in serialized and deserialized states, since both of them needed.
+    QByteArray m_jsonManifest;
+    EngineManifest m_parsedManifest;
 };
 
 } // namespace axis

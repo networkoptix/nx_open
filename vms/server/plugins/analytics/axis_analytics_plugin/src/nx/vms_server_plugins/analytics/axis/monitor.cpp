@@ -140,7 +140,7 @@ void Monitor::addRules(
             m_deviceAgent->events().eventTypes.cend(),
             [eventTypeIds, i](const EventType& event)
             {
-                return event.eventTypeIdExternal == eventTypeIds->at(i);
+                return event.id == eventTypeIds->at(i);
             });
         if (it != m_deviceAgent->events().eventTypes.cend())
         {
@@ -310,4 +310,3 @@ void Monitor::onTimer()
 } // namespace analytics
 } // namespace vms_server_plugins
 } // namespace nx
-

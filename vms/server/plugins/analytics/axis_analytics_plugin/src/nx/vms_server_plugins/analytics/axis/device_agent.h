@@ -46,14 +46,14 @@ public:
 
     const EngineManifest& events() const noexcept
     {
-        return m_typedManifest;
+        return m_parsedManifest;
     }
 
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
-    /** @return Null if not found. */
+    /** @return nullptr if not found. */
     const EventType* eventTypeById(const QString& id) const noexcept;
 
 private:
@@ -64,17 +64,11 @@ private:
 
 private:
     Engine* const m_engine;
-    EngineManifest m_typedManifest;
-    QByteArray m_manifest;
+    EngineManifest m_parsedManifest;
+    QByteArray m_jsonManifest;
     QUrl m_url;
     QAuthenticator m_auth;
     Monitor* m_monitor = nullptr;
-
-    /**
-     * Place to store manifests we gave to the caller to provide 1) sufficient lifetime and
-     * 2) memory releasing in destructor.
-     */
-    mutable QList<QByteArray> m_givenManifests;
 
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 };

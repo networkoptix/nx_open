@@ -41,20 +41,25 @@ QString ignoreNamespaces(const QString& tags)
 
 EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
 {
-    const QString eventTypeId = QString::fromLatin1(supportedEventType.fullName().c_str());
     name = supportedEventType.description.c_str();
     if (name.simplified().isEmpty())
     {
         name = supportedEventType.fullName().c_str();
         name = ignoreNamespaces(name);
     }
+
+    id = supportedEventType.fullName().c_str();
+//    id = ignoreNamespaces(id);
+//    id.replace(QChar('/'), QChar('-'));
+    id = QString("nx.axis.") + id;
+
     flags = (supportedEventType.stateful)
         ? nx::vms::api::analytics::EventTypeFlag::stateDependent
         : nx::vms::api::analytics::EventTypeFlag::noFlags;
 
     topic = supportedEventType.topic.c_str();
     caption = supportedEventType.name.c_str();
-    eventTypeIdExternal = eventTypeId;
+    eventTypeIdExternal = id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
