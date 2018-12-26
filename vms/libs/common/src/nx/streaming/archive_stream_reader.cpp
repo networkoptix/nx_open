@@ -1210,41 +1210,56 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 {
-    if (m_navDelegate)
-        return m_navDelegate->jumpTo(mksec, skipTime);
+    return jumpTo(mksec, skipTime, nullptr);
+}
 
-    if (m_resource)
-    {
-        const auto logText = lm("Set position %1 for device %2").args(mksecToDateTime(mksec));
-        NX_VERBOSE(this, logText, m_resource->getUniqueId());
+bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime)
+{
+    if (m_navDelegate) {
+        return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
-    const bool useMutex = !m_externalLocked;
+    if (m_resource)
+        NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
+
+    m_playbackMaskSync.lock();
+    const qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
+    m_playbackMaskSync.unlock();
+
+    if (outJumpTime)
+        *outJumpTime = newTime;
+
+    if (newTime != mksec)
+        skipTime = 0;
+
+    bool useMutex = !m_externalLocked;
     if (useMutex)
         m_jumpMtx.lock();
 
-    const bool needJump = mksec != m_lastJumpTime || m_lastSkipTime != skipTime;
-    m_lastJumpTime = mksec;
+    bool needJump = newTime != m_lastJumpTime || m_lastSkipTime != skipTime;
+    m_lastJumpTime = newTime;
     m_lastSkipTime = skipTime;
+
+    if(useMutex)
+        m_jumpMtx.unlock();
 
     if (needJump)
     {
-        beforeJumpInternal(mksec);
-        channeljumpToUnsync(mksec, 0, skipTime);
+        if (useMutex)
+            m_jumpMtx.lock();
+        beforeJumpInternal(newTime);
+        channeljumpToUnsync(newTime, 0, skipTime);
         if (useMutex)
             m_jumpMtx.unlock();
 
         if (m_archiveIntegrityWatcher)
             m_archiveIntegrityWatcher->reset();
     }
-    else if(useMutex)
-    {
-        m_jumpMtx.unlock();
-    }
 
-   if (isSingleShotMode())
+    //start(QThread::HighPriority);
+
+    if (isSingleShotMode())
         QnLongRunnable::resume();
-
     return needJump;
 }
 
