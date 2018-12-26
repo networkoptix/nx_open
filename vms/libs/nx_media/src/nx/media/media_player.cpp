@@ -959,14 +959,19 @@ void Player::setPosition(qint64 value)
     d->log(lm("setPosition(%1: %2)").args(value, QDateTime::fromMSecsSinceEpoch(value, Qt::UTC)));
 
     d->positionMs = d->lastSeekTimeMs = value;
-    d->setLiveMode(value == kLivePosition);
-    emit positionChanged();
 
     if (d->archiveReader)
     {
-        qint64 usecResult = 0;
-        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &usecResult);
-        d->positionMs = d->lastSeekTimeMs = value = usecToMsec(usecResult);
+
+        qint64 fixedPosition = 0;
+        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &fixedPosition);
+        if (fixedPosition != value)
+        {
+            d->setLiveMode(value == kLivePosition);
+            emit positionChanged();
+        }
+
+        d->positionMs = d->lastSeekTimeMs = value = usecToMsec(fixedPosition);
     }
 
     d->setLiveMode(value == kLivePosition);
