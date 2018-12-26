@@ -25,7 +25,7 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
     const std::shared_ptr<Camera>& camera)
     :
-    m_refManager(parentRefManager), 
+    m_refManager(parentRefManager),
     m_encoderIndex(encoderIndex),
     m_camera(camera),
     m_codecParams(camera->defaultVideoParameters())

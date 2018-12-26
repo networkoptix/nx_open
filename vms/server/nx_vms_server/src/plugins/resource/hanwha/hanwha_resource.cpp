@@ -987,6 +987,9 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
 
     if (isNvr())
     {
+        // We always try to pull an audio stream if possible for NVRs.
+        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
+
         setCameraCapability(Qn::IsPlaybackSpeedSupported, true);
         setCameraCapability(Qn::DeviceBasedSync, true);
         setCameraCapability(Qn::DualStreamingForLiveOnly, true);
@@ -1102,10 +1105,6 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     if (isNvr() && !isVideoSourceActive())
         return CameraDiagnostics::CameraInvalidParams("Video source is not active");
-
-    // We always try to pull an audio stream if possible for NVRs
-    if (isNvr())
-        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
 
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)

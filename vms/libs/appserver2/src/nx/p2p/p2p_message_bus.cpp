@@ -157,6 +157,8 @@ void MessageBus::start()
 
 void MessageBus::stop()
 {
+    m_started = false;
+
     {
         QnMutexLocker lock(&m_mutex);
         m_remoteUrls.clear();
@@ -164,7 +166,6 @@ void MessageBus::stop()
 
     dropConnections();
     base_type::stop();
-    m_started = false;
 }
 
 void MessageBus::addOutgoingConnectionToPeer(

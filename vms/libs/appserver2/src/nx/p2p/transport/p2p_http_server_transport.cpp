@@ -3,7 +3,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::network {
+namespace nx::p2p {
 
 namespace {
 
@@ -18,8 +18,8 @@ static void resetBuffer(nx::Buffer* buffer)
 } // namespace
 
 P2PHttpServerTransport::P2PHttpServerTransport(
-    std::unique_ptr<AbstractStreamSocket> socket,
-    websocket::FrameType messageType)
+    std::unique_ptr<network::AbstractStreamSocket> socket,
+    network::websocket::FrameType messageType)
     :
     m_sendSocket(std::move(socket)),
     m_messageType(messageType)
@@ -108,7 +108,7 @@ P2PHttpServerTransport::~P2PHttpServerTransport()
 }
 
 void P2PHttpServerTransport::gotPostConnection(
-    std::unique_ptr<AbstractStreamSocket> socket,
+    std::unique_ptr<network::AbstractStreamSocket> socket,
     const nx::Buffer& body)
 {
     post(
@@ -135,7 +135,7 @@ void P2PHttpServerTransport::gotPostConnection(
                         std::move(userReadHandlerPair->second),
                         [body, buffer = userReadHandlerPair->first](
                             SystemError::ErrorCode error,
-                            IoCompletionHandler handler)
+                            network::IoCompletionHandler handler)
                         {
                             buffer->append(QByteArray::fromBase64(body));
                             handler(error, body.size());
@@ -149,7 +149,9 @@ void P2PHttpServerTransport::gotPostConnection(
         });
 }
 
-void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
+void P2PHttpServerTransport::readSomeAsync(
+    nx::Buffer* const buffer,
+    network::IoCompletionHandler handler)
 {
     post(
         [this, buffer, handler = std::move(handler)]() mutable
@@ -162,7 +164,7 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
                 sendPostResponse(
                     SystemError::noError,
                     std::move(handler),
-                    [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
+                    [this, buffer](SystemError::ErrorCode error, network::IoCompletionHandler handler)
                     {
                         buffer->append(QByteArray::fromBase64(m_providedPostBody));
                         const auto bodySize = m_providedPostBody.size();
@@ -177,7 +179,9 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
         });
 }
 
-void P2PHttpServerTransport::readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler)
+void P2PHttpServerTransport::readFromSocket(
+    nx::Buffer* const buffer,
+    network::IoCompletionHandler handler)
 {
     if (!m_readSocket)
     {
@@ -189,7 +193,9 @@ void P2PHttpServerTransport::readFromSocket(nx::Buffer* const buffer, IoCompleti
         }
 
         m_userReadHandlerPair = UserReadHandlerPair(
-            new std::pair<nx::Buffer* const, IoCompletionHandler>(buffer, std::move(handler)));
+            new std::pair<nx::Buffer* const, network::IoCompletionHandler>(
+                buffer,
+                std::move(handler)));
 
         return;
     }
@@ -208,7 +214,7 @@ void P2PHttpServerTransport::onBytesRead(
     SystemError::ErrorCode error,
     size_t transferred,
     nx::Buffer* const buffer,
-    IoCompletionHandler handler)
+    network::IoCompletionHandler handler)
 {
     if (error != SystemError::noError)
     {
@@ -229,13 +235,15 @@ void P2PHttpServerTransport::onBytesRead(
         }
 
         m_userReadHandlerPair = UserReadHandlerPair(
-            new std::pair<nx::Buffer* const, IoCompletionHandler>(buffer, std::move(handler)));
+            new std::pair<nx::Buffer* const, network::IoCompletionHandler>(
+                buffer,
+                std::move(handler)));
 
         return;
     }
 
     auto completionHandler =
-        [this, buffer](SystemError::ErrorCode error, IoCompletionHandler handler)
+        [this, buffer](SystemError::ErrorCode error, network::IoCompletionHandler handler)
         {
             m_readContext.buffer = QByteArray::fromBase64(*buffer);
             *buffer = m_readContext.buffer;
@@ -259,19 +267,19 @@ void P2PHttpServerTransport::onBytesRead(
 
         switch(parserState)
         {
-        case server::ParserState::done:
+        case network::server::ParserState::done:
             buffer->append(m_readContext.parser.fetchMessageBody());
             sendPostResponse(SystemError::noError, std::move(handler), std::move(completionHandler));
             return;
-        case server::ParserState::failed:
+        case network::server::ParserState::failed:
             sendPostResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
             return;
-        case server::ParserState::readingBody:
-        case server::ParserState::readingMessage:
+        case network::server::ParserState::readingBody:
+        case network::server::ParserState::readingMessage:
             buffer->append(m_readContext.parser.fetchMessageBody());
             m_readContext.buffer.remove(0, (int) bytesProcessed);
             break;
-        case server::ParserState::init:
+        case network::server::ParserState::init:
             NX_ASSERT(false, "Should never get here");
             sendPostResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
             return;
@@ -281,24 +289,24 @@ void P2PHttpServerTransport::onBytesRead(
     readFromSocket(buffer, std::move(handler));
 }
 
-void P2PHttpServerTransport::addDateHeader(http::HttpHeaders* headers)
+void P2PHttpServerTransport::addDateHeader(network::http::HttpHeaders* headers)
 {
     using namespace std::chrono;
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(
         duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
-    headers->emplace("Date", http::formatDateTime(dateTime));
+    headers->emplace("Date", network::http::formatDateTime(dateTime));
 }
 
 void P2PHttpServerTransport::sendPostResponse(
     SystemError::ErrorCode error,
-    IoCompletionHandler userHandler,
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler)
+    network::IoCompletionHandler userHandler,
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode, network::IoCompletionHandler)> completionHandler)
 {
-    http::Response response;
+    network::http::Response response;
     response.statusLine.statusCode = error == SystemError::noError
-        ? http::StatusCode::ok
-        : http::StatusCode::internalServerError;
-    response.statusLine.version = http::http_1_1;
+        ? network::http::StatusCode::ok
+        : network::http::StatusCode::internalServerError;
+    response.statusLine.version = network::http::http_1_1;
     response.statusLine.reasonPhrase = "Ok";
 
     response.headers.emplace("Content-Length", "0");
@@ -327,7 +335,9 @@ void P2PHttpServerTransport::sendPostResponse(
         });
 }
 
-void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
+void P2PHttpServerTransport::sendAsync(
+    const nx::Buffer& buffer,
+    network::IoCompletionHandler handler)
 {
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
@@ -359,10 +369,10 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
 
 QByteArray P2PHttpServerTransport::makeInitialResponse() const
 {
-    http::Response initialResponse;
-    initialResponse.statusLine.statusCode = http::StatusCode::ok;
+    network::http::Response initialResponse;
+    initialResponse.statusLine.statusCode = network::http::StatusCode::ok;
     initialResponse.statusLine.reasonPhrase = "Ok";
-    initialResponse.statusLine.version = http::http_1_1;
+    initialResponse.statusLine.version = network::http::http_1_1;
 
     auto& headers = initialResponse.headers;
     headers.emplace("Host", m_sendSocket->getForeignHostName().toUtf8());
@@ -382,17 +392,17 @@ QByteArray P2PHttpServerTransport::makeFrameHeader() const
 {
     nx::Buffer headerBuffer;
 
-    http::serializeHeaders(
-        {http::HttpHeader(
+    network::http::serializeHeaders(
+        {network::http::HttpHeader(
             "Content-Type",
-            m_messageType == websocket::FrameType::text
+            m_messageType == network::websocket::FrameType::text
                 ? "application/json" : "application/ubjson")},
         &headerBuffer);
 
     return "--ec2boundary\r\n" + headerBuffer + "\r\n";
 }
 
-void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
+void P2PHttpServerTransport::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 {
     BasicPollable::bindToAioThread(aioThread);
     m_sendSocket->bindToAioThread(aioThread);
@@ -408,12 +418,12 @@ void P2PHttpServerTransport::cancelIoInAioThread(nx::network::aio::EventType eve
         m_readSocket->cancelIOSync(eventType);
 }
 
-aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
+network::aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
 {
     return BasicPollable::getAioThread();
 }
 
-SocketAddress P2PHttpServerTransport::getForeignAddress() const
+network::SocketAddress P2PHttpServerTransport::getForeignAddress() const
 {
     return m_sendSocket->getForeignAddress();
 }
@@ -427,7 +437,7 @@ void P2PHttpServerTransport::stopWhileInAioThread()
 
 void P2PHttpServerTransport::ReadContext::reset()
 {
-    message = http::Message();
+    message = network::http::Message();
     parser.reset();
     resetBuffer(&buffer);
     bytesParsed = 0;

@@ -40,7 +40,7 @@ int NativeMediaEncoder::getResolutionList(
 nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 {
     NX_DEBUG(
-        this, 
+        this,
         "%1: Primary stream requested with codec params: %2",
         m_camera->info().modelName,
         m_codecParams.toString());

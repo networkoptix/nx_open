@@ -1,1 +1,0 @@
-nx_add_target(p2p_connection_testing_utility EXECUTABLE PUBLIC_LIBS nx_network)

@@ -330,10 +330,19 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     return result;
 }
 
-bool SystemCommands::isPathExists(const std::string& path)
+bool SystemCommands::isPathExists(const std::string& path, FileType* outFileType)
 {
     struct stat buf;
     bool result = stat(path.c_str(), &buf) == 0;
+    if (result && outFileType)
+    {
+        if (S_ISDIR(buf.st_mode))
+            *outFileType = FileType::directory;
+        else if (S_ISREG(buf.st_mode))
+            *outFileType = FileType::regular;
+        else
+            *outFileType = FileType::other;
+    }
 
     return result;
 }

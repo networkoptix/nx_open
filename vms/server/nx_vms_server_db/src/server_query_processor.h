@@ -460,14 +460,14 @@ public:
      * TODO #ak Let compiler guess template params.
      */
     template<class InputData, class OutputData, class HandlerType>
-    void processQueryAsync(ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler)
+    void processQueryAsync(ApiCommand::Value cmdCode, InputData input, HandlerType handler)
     {
         QnDbManagerAccess accessDataCopy(m_db);
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [self = *this, accessDataCopy, input, handler]() mutable
+            [self = *this, accessDataCopy, input, handler, cmdCode]() mutable
             {
                 OutputData output;
-                const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
+                const ErrorCode errorCode = accessDataCopy.doQuery(cmdCode, input, output);
                 amendOutputDataIfNeeded(self.m_db.userAccessData(), &output);
                 handler(errorCode, output);
             });

@@ -276,10 +276,10 @@ qint64 RootFileSystem::totalSpace(const QString& path)
     return execViaRootTool("totalSpace " + enquote(path), &receiveInt64Action);
 }
 
-bool RootFileSystem::isPathExists(const QString& path)
+bool RootFileSystem::isPathExists(const QString& path, SystemCommands::FileType* fileType)
 {
     if (m_ignoreTool)
-        return SystemCommands().isPathExists(path.toStdString());
+        return SystemCommands().isPathExists(path.toStdString(), fileType);
 
     return (bool) execViaRootTool("exists " + enquote(path), &receiveInt64Action);
 }

@@ -146,9 +146,21 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     return totalSpaceImpl(QString::fromStdString(path));
 }
 
-bool SystemCommands::isPathExists(const std::string& path)
+bool SystemCommands::isPathExists(const std::string& path, FileType* outFileType)
 {
-    return QFileInfo::exists(QString::fromStdString(path));
+    const bool result = QFileInfo::exists(QString::fromStdString(path));
+    if (result && outFileType)
+    {
+        QFileInfo fileInfo(QString::fromStdString(path));
+        if (fileInfo.isDir())
+            *outFileType = FileType::directory;
+        else if (fileInfo.isFile())
+            *outFileType = FileType::regular;
+        else
+            *outFileType = FileType::other;
+
+    }
+    return result;
 }
 
 std::string SystemCommands::serializedFileList(const std::string& /*path*/)

@@ -62,6 +62,7 @@ protected:
         }
         catch (const Exception& e)
         {
+            NX_DEBUG(this, lm("Caught DB exception. %1").arg(e.what()));
             dbResult = e.dbResult();
         }
         catch (const std::exception& e)

@@ -194,8 +194,13 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 
 bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 {
-    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
-        return true; //< Ignore locally generated packets. It occurs when TCP connection is closed.
+    if (!data->flags.testFlag(QnAbstractMediaData::QnAbstractMediaData::MediaFlags_AfterEOF)
+        && !data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
+    {
+        // In case of it is not 'out of archive range' packet then
+        // ignore locally generated packets. It occurs when TCP connection is closed.
+        return true;
+    }
 
     if (m_awaitingJumpCounter > 0)
         return true; //< ignore EOF due to we are going set new position

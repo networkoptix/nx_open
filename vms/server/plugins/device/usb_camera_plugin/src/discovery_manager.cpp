@@ -208,7 +208,6 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
         }
 
         DeviceDataWithNxId nxDevice(device, nxId);
-        
         nxDevices.push_back(nxDevice);
         addOrUpdateCamera(nxDevice);
     }

@@ -87,7 +87,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotData(false),
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx::network::http::header::AuthScheme::digest),
-    m_rtpTransport(RtspTransport::autoDetect)
+    m_rtpTransport(RtspTransport::notDefined)
 {
     const auto& globalSettings = res->commonModule()->globalSettings();
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
@@ -527,16 +527,16 @@ RtspTransport QnMulticodecRtpReader::getRtpTransport() const
     {
         auto transport =
             rtspTransportFromString(m_resource->getProperty(QnMediaResource::rtpTransportKey()));
-        if (transport != RtspTransport::autoDetect)
+        if (transport != RtspTransport::notDefined)
             return transport; //< User defined settings for resource.
-        if (m_rtpTransport != RtspTransport::autoDetect)
+        if (m_rtpTransport != RtspTransport::notDefined)
             return m_rtpTransport; //< Server side setting for resource.
     }
 
-    if (!NX_ASSERT(s_defaultTransportToUse != RtspTransport::autoDetect))
-        return RtspTransport::tcp;
+    if (s_defaultTransportToUse != RtspTransport::notDefined)
+        s_defaultTransportToUse;  //< System wide default setting
 
-    return s_defaultTransportToUse; //< System wide default setting
+    return RtspTransport::tcp;
 }
 
 void QnMulticodecRtpReader::setRtpTransport(RtspTransport value )
@@ -732,9 +732,6 @@ void QnMulticodecRtpReader::pleaseStop()
 void QnMulticodecRtpReader::setDefaultTransport(const QString& value)
 {
     const auto transport = rtspTransportFromString(value);
-    if (!NX_ASSERT(transport != RtspTransport::autoDetect))
-        return;
-
     NX_INFO(typeid(QnMulticodecRtpReader), "Set default transport: %1", transport);
 
     NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);

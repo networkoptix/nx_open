@@ -116,7 +116,7 @@ private:
     bool m_asyncReadInProgress;
     InterruptionFlag m_aioInterruptionFlag;
     bool m_sendShutdown = false;
-    
+
     virtual void stopWhileInAioThread() override;
 
     void tryToCompleteUserTasks();

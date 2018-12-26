@@ -29,7 +29,7 @@ public:
         const std::string& systemId,
         const OutgoingCommandFilter& filter,
         const std::string& connectionId,
-        nx::network::P2pTransportPtr p2pTransport,
+        p2p::P2pTransportPtr p2pTransport,
         vms::api::PeerDataEx localPeerData,
         vms::api::PeerDataEx remotePeerData);
 

@@ -21,3 +21,7 @@ if(withMediaServer)
         add_subdirectory(root_tool)
     endif()
 endif()
+
+if(withP2PConnectionTestingUtility)
+    add_subdirectory(p2p_connection_testing_utility)
+endif()

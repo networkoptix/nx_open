@@ -260,7 +260,7 @@ void VideoStream::run()
 {
     while (!m_terminated)
     {
-        if (!waitForConsumers())    
+        if (!waitForConsumers())
             continue;
 
         if (!ensureInitialized())
