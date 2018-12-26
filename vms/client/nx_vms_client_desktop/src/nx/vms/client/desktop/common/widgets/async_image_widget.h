@@ -22,6 +22,7 @@ class ImageProvider;
 class AsyncImageWidget : public Connective<QWidget>
 {
     Q_OBJECT
+    Q_DECLARE_PRIVATE(QWidget)
     using base_type = Connective<QWidget>;
 
 public:

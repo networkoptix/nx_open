@@ -1,7 +1,6 @@
-
-
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStyle>
+#include <QtWidgets/private/qwidget_p.h>
 
 #include <client/client_globals.h>
 
@@ -206,7 +205,8 @@ bool AsyncImageWidget::cropRequired() const
 void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
-    painter.fillRect(rect(), palette().brush(backgroundRole()));
+    if (d_func()->bg_role != QPalette::NoRole)
+        painter.fillRect(rect(), palette().brush(backgroundRole()));
 
     const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
     const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
