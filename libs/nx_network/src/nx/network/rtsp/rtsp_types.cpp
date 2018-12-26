@@ -46,19 +46,31 @@ bool isUrlSheme(const QString& scheme)
 
 namespace {
 
-void extractNptTime(const nx::network::http::StringType& strValue, qint64* dst)
+bool extractNptTime(const nx::network::http::StringType& strValue, qint64* dst)
 {
     if (strValue == "now")
     {
-        //*dst = getRtspTime();
         *dst = DATETIME_NOW;
+        return true;
+    }
+
+    static qint64 kUsecInSec = 1000000;
+    bool ok = false;
+    double val = strValue.toDouble(&ok);
+    if (ok)
+    {
+        // Some client got time in seconds, some in microseconds, convert all to microseconds.
+        *dst = val < kUsecInSec ? val * 1000000.0 : val;
     }
     else
     {
-        double val = strValue.toDouble();
-        // Some client got time in seconds, some in microseconds, convert all to microseconds.
-        *dst = val < 1000000 ? val * 1000000.0 : val;
+        QTime time = QTime::fromString(strValue, "h:m:s.z");
+        if (time.isValid())
+            *dst = (time.hour() * 3600 + time.minute() * 60 + time.second()) * kUsecInSec + time.msec() * 1000;
+        else
+            return false;
     }
+    return true;
 }
 
 } // namespace
@@ -83,11 +95,17 @@ bool parseRangeHeader(
         if (values.isEmpty() || values.size() > 2)
             return false;
 
-        extractNptTime(values[0], startTime);
+        if (!extractNptTime(values[0], startTime))
+            return false;
         if (values.size() > 1 && !values[1].isEmpty())
-            extractNptTime(values[1], endTime);
+        {
+            if (!extractNptTime(values[1], endTime))
+                return false;
+        }
         else
+        {
             *endTime = DATETIME_NOW;
+        }
         return true;
     }
 
