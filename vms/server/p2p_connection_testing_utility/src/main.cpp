@@ -22,6 +22,7 @@
 #include <nx/utils/log/log_main.h>
 
 using namespace nx::network;
+using namespace nx::p2p;
 
 enum class Role
 {
@@ -92,11 +93,11 @@ public:
     }
 
     void gotIncomingPostConnection(
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<AbstractStreamSocket> socket,
         const nx::Buffer& body)
     {
         auto p2pHttpServerConnection =
-            dynamic_cast<nx::network::P2PHttpServerTransport*>(m_p2pTransport.get());
+            dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get());
 
         p2pHttpServerConnection->gotPostConnection(std::move(socket), body);
     }
@@ -140,7 +141,7 @@ private:
 
     void onConnect()
     {
-        if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed
+        if (m_httpClient->state() == http::AsyncClient::State::sFailed
             || !m_httpClient->response())
         {
             NX_ERROR(this, "onConnect: Http client failed to connect to host");
@@ -442,7 +443,7 @@ private:
 
                     auto p2pTransport = new P2PHttpServerTransport(
                         connection->takeSocket(),
-                        nx::network::websocket::FrameType::text);
+                        websocket::FrameType::text);
 
                     p2pTransport->bindToAioThread(m_aioThread);
                     p2pTransport->start(
@@ -507,7 +508,7 @@ private:
                     auto p2pTransport = P2pTransportPtr(
                         new P2PWebsocketTransport(
                             connection->takeSocket(),
-                            nx::network::websocket::FrameType::text));
+                            websocket::FrameType::text));
 
                     p2pTransport->bindToAioThread(m_aioThread);
 
@@ -519,7 +520,7 @@ private:
                     p2pConnection->start();
                 });
 
-            requestCompletionHandler(nx::network::http::StatusCode::switchingProtocols);
+            requestCompletionHandler(http::StatusCode::switchingProtocols);
         }
     }
 };
