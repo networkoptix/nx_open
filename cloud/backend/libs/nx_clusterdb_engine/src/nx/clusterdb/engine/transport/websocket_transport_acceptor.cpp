@@ -10,7 +10,7 @@
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 #include "../websocket_transaction_transport.h"
-#include <nx/network/p2p_transport/p2p_websocket_transport.h>
+#include <nx/p2p/transport/p2p_websocket_transport.h>
 
 namespace nx::clusterdb::engine::transport {
 

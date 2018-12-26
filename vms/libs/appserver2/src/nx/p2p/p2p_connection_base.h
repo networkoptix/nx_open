@@ -13,7 +13,7 @@
 #include <nx/vms/api/data/tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
 #include <transaction/abstract_transaction_transport.h>
-#include <nx/network/p2p_transport/i_p2p_transport.h>
+#include <nx/p2p/transport/i_p2p_transport.h>
 
 namespace ec2 {
 class QnAbstractTransaction;

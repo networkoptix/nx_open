@@ -20,8 +20,8 @@
 #include <nx/network/socket_delegate.h>
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_server_message_bus.h>
-#include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_websocket_transport.h>
+#include <nx/p2p/transport/p2p_http_server_transport.h>
+#include <nx/p2p/transport/p2p_websocket_transport.h>
 
 namespace nx {
 namespace p2p {

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_http_client_transport.h>
+#include <nx/p2p/transport/p2p_http_server_transport.h>
+#include <nx/p2p/transport/p2p_http_client_transport.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/std/future.h>

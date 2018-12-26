@@ -10,9 +10,9 @@
 #include <signal.h>
 
 #include <nx/network/aio/timer.h>
-#include <nx/network/p2p_transport/p2p_http_client_transport.h>
-#include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_websocket_transport.h>
+#include <nx/p2p/transport/p2p_http_client_transport.h>
+#include <nx/p2p/transport/p2p_http_server_transport.h>
+#include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>

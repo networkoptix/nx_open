@@ -10,10 +10,10 @@
 #include <common/static_common_module.h>
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
-#include <nx/network/p2p_transport/p2p_http_client_transport.h>
-#include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_websocket_transport.h>
-#include <nx/network/p2p_transport/p2p_http_client_transport.h>
+#include <nx/p2p/transport/p2p_http_client_transport.h>
+#include <nx/p2p/transport/p2p_http_server_transport.h>
+#include <nx/p2p/transport/p2p_websocket_transport.h>
+#include <nx/p2p/transport/p2p_http_client_transport.h>
 
 // For debug purpose only
 //#define CHECK_SEQUENCE

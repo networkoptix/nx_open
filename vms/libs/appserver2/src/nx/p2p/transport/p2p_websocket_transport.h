@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/p2p_transport/i_p2p_transport.h>
+#include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/websocket/websocket.h>
 
