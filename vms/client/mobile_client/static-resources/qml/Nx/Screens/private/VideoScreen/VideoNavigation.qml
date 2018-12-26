@@ -335,7 +335,7 @@ Item
             onPositionTapped:
             {
                 d.resumePosition = -1
-                timeline.position = position
+                timeline.timelineView.setPositionImmediately(position)
                 videoScreenController.setPosition(position, true)
             }
             onPositionChanged:
