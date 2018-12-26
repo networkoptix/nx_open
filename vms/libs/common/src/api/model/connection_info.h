@@ -31,7 +31,7 @@ struct QnConnectionInfo
     QString box;
     bool allowSslConnections;
     int nxClusterProtoVersion; //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
-    bool ecDbReadOnly;
+    bool ecDbReadOnly = false;
     QString effectiveUserName;
 
     /* --- 3.0 part goes further. It can be changed. ---- */

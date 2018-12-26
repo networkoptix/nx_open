@@ -164,6 +164,7 @@ QnMediaServerModule::QnMediaServerModule(
         m_settings = store(new MSSettings(
             arguments->configFilePath,
             arguments->rwConfigFilePath));
+        m_settings->setServerModule(this);
     }
 
     nx::vms::server::registerSerializers();

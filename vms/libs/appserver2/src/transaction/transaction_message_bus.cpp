@@ -12,7 +12,6 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <common/common_module.h>
-#include <settings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>

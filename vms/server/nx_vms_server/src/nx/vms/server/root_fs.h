@@ -35,7 +35,7 @@ public:
     int open(const QString& path, QIODevice::OpenMode mode);
     qint64 freeSpace(const QString& path);
     qint64 totalSpace(const QString& path);
-    bool isPathExists(const QString& path);
+    bool isPathExists(const QString& path, SystemCommands::FileType* fileType = nullptr);
     QnAbstractStorageResource::FileInfoList fileList(const QString& path);
     qint64 fileSize(const QString& path);
     QString devicePath(const QString& fsPath);

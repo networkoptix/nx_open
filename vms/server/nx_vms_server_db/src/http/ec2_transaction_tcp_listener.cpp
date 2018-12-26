@@ -14,7 +14,6 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_global.h>
 #include "audit/audit_manager.h"
-#include "settings.h"
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -36,11 +35,11 @@ public:
     {
     }
 
-	ServerTransactionMessageBus* messageBus;
+    ServerTransactionMessageBus* messageBus;
 };
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
-	ServerTransactionMessageBus* messageBus,
+    ServerTransactionMessageBus* messageBus,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :

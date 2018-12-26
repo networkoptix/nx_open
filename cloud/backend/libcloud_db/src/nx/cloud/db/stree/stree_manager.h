@@ -8,7 +8,6 @@
 #include <nx/utils/singleton.h>
 
 #include "cdb_ns.h"
-#include "settings.h"
 
 namespace nx::cloud::db {
 

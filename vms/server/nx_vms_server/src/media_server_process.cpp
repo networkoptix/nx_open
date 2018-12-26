@@ -4268,14 +4268,16 @@ void MediaServerProcess::run()
         cmdLineArguments().configFilePath,
         cmdLineArguments().rwConfigFilePath);
 
+    auto serverSettingsRawPtr = serverSettings.get();
     if (m_serviceMode)
-        initializeLogging(serverSettings.get());
+        initializeLogging(serverSettingsRawPtr);
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments, std::move(serverSettings)));
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
+    serverSettingsRawPtr->setServerModule(serverModule.get());
     serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
@@ -4307,6 +4309,7 @@ void MediaServerProcess::run()
         commonModule(),
         nx::vms::api::PeerType::server,
         serverModule->settings().p2pMode(),
+        serverModule->settings().ecDbReadOnly(),
         m_universalTcpListener.get());
 
     m_timeBasedNonceProvider = std::make_unique<TimeBasedNonceProvider>();
@@ -4316,8 +4319,6 @@ void MediaServerProcess::run()
         m_timeBasedNonceProvider.get());
 
     m_mediaServerStatusWatcher = std::make_unique<MediaServerStatusWatcher>(serverModule.get());
-
-    m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
 
     // If an exception is thrown by Qt event handler from within exec(), we want to do some cleanup
     // anyway.

@@ -11,7 +11,6 @@
 #include "transaction/transaction_transport.h"
 #include <nx/network/http/custom_headers.h>
 #include "audit/audit_manager.h"
-#include "settings.h"
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/serialization/lexical.h>
 
