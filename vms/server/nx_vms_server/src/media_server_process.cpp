@@ -286,7 +286,7 @@
 #endif
 
 #if defined(__arm__)
-    #include "nx1/info.h"
+    #include "nx/vms/server/system/nx1/info.h"
 #endif
 
 using namespace nx::vms::server;
