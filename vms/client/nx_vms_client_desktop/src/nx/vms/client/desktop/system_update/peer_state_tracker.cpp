@@ -496,10 +496,10 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    const nx::utils::SoftwareVersion newUpdateSupportVersion(4, 0);
+    const nx::utils::SoftwareVersion kNewUpdateSupportVersion(4, 0);
 
     const auto& version = server->getVersion();
-    if (version < newUpdateSupportVersion && !item->onlyLegacyUpdate)
+    if (version < kNewUpdateSupportVersion && !item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = true;
         changed = true;

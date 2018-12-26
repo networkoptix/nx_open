@@ -88,7 +88,7 @@ class SortedPeerUpdatesModel:
     Q_OBJECT
 
 public:
-    explicit SortedPeerUpdatesModel(QObject* parent = 0);
+    explicit SortedPeerUpdatesModel(QObject* parent = nullptr);
     void setShowClients(bool show);
 
 protected:

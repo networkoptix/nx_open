@@ -558,7 +558,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         }
 
         m_serverUpdateTool->verifyUpdateManifest(checkResponse, m_clientUpdateTool->getInstalledVersions());
-        if (m_updateInfo.compareUpdate(checkResponse))
+        if (m_updateInfo.preferOtherUpdate(checkResponse))
         {
             m_updateInfo = checkResponse;
 
@@ -1056,7 +1056,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             return;
         }
 
-        if (m_updateInfo.compareUpdate(updateInfo))
+        if (m_updateInfo.preferOtherUpdate(updateInfo))
         {
             NX_INFO(NX_SCOPE_TAG, "taking update info from mediaserver");
             m_updateInfo = updateInfo;

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <memory> // for shared_ptr
+
 #include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
