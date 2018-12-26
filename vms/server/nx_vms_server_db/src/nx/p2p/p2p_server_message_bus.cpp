@@ -452,12 +452,6 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
-    if (!isStarted())
-    {
-        NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
-        return;
-    }
-
     P2pConnectionPtr connection(new Connection(
         commonModule(),
         remotePeer,
@@ -469,6 +463,13 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         std::move(connectionLockGuard)));
 
     QnMutexLocker lock(&m_mutex);
+
+    if (!isStarted())
+    {
+        NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
+        return;
+    }
+
     const auto remoteId = connection->remotePeer().id;
     m_peers->removePeer(connection->remotePeer());
     m_connections[remoteId] = connection;
