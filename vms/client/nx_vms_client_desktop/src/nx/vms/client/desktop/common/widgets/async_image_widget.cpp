@@ -206,32 +206,17 @@ bool AsyncImageWidget::cropRequired() const
 void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
-    if (m_preview.isNull() || m_placeholder->isVisible())
+    painter.fillRect(rect(), palette().brush(backgroundRole()));
+
+    const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
+    const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+        paintSize.toSize(), rect());
+
+    QRectF highlightSubRect;
+    painter.setRenderHints(QPainter::SmoothPixmapTransform);
+
+    if (!m_preview.isNull() && !m_placeholder->isVisible())
     {
-        QRectF paintRect = rect();
-        painter.setBrush(palette().brush(backgroundRole()));
-
-        if (m_borderRole == QPalette::NoRole)
-        {
-            painter.setPen(Qt::NoPen);
-        }
-        else
-        {
-            painter.setPen(palette().color(m_borderRole));
-            paintRect.adjust(0.5, 0.5, -0.5, -0.5);
-        }
-
-        painter.drawRect(paintRect);
-    }
-    else
-    {
-        const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
-        const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-            paintSize.toSize(), rect());
-
-        QRectF highlightSubRect;
-        painter.setRenderHints(QPainter::SmoothPixmapTransform);
-
         if (cropRequired())
         {
             const auto croppedImageRect = core::Geometry::subRect(m_preview.rect(), m_highlightRect);
@@ -248,10 +233,18 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
             painter.drawPixmap(paintRect, m_preview);
             highlightSubRect = m_highlightRect;
         }
+    }
 
-        if (highlightSubRect.isEmpty())
-            return;
+    // For simplification, in current implementation the border covers 1-pixel frame boundary.
+    if (m_borderRole != QPalette::NoRole)
+    {
+        painter.setPen(palette().color(m_borderRole));
+        painter.setBrush(Qt::NoBrush);
+        painter.drawRect(QRectF(rect()).adjusted(0.5, 0.5, -0.5, -0.5));
+    }
 
+    if (!highlightSubRect.isEmpty())
+    {
         // Dim everything around highlighted area.
         const auto highlightRect = core::Geometry::subRect(paintRect, highlightSubRect)
             .toAlignedRect().intersected(paintRect);
@@ -263,7 +256,7 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
             painter.fillPath(path, palette().alternateBase());
         }
 
-        // Paint frame.
+        // Paint highlight frame.
         painter.setPen(QPen(palette().highlight(), 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         painter.drawRect(core::Geometry::eroded(QRectF(highlightRect), 0.5));
     }
