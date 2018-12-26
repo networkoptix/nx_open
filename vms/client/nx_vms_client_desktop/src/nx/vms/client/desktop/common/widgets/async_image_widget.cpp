@@ -285,9 +285,6 @@ QSize AsyncImageWidget::sizeHint() const
 {
     if (!m_cachedSizeHint.isValid())
     {
-        if (!m_preview.isNull())
-            m_cachedSizeHint = m_preview.size();
-
         if (m_cachedSizeHint.isEmpty())
         {
             if (m_imageProvider)
