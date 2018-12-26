@@ -1510,8 +1510,7 @@ void MediaServerProcess::registerRestHandlers(
      * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
-     *     or more parameters to set.
+     * %param:object paramValues Name-to-value map of camera parameters to set.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
@@ -2245,6 +2244,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string url URL of one Server in the System to join.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
+     * %param:string currentPassword Current user password.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.

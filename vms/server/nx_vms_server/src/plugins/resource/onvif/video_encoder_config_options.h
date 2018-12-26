@@ -82,29 +82,3 @@ public:
         const _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse& response);
 };
 
-/*
-    class VideoOptionsLocal
-    {
-    public:
-        VideoOptionsLocal() = default;
-
-        VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp,
-            QnBounds frameRateBounds = QnBounds());
-
-        QVector<onvifXsd__H264Profile> h264Profiles;
-        QString id;
-        QList<QSize> resolutions;
-        bool isH264 = false;
-        int minQ = -1;
-        int maxQ = 1;
-        int frameRateMin = -1;
-        int frameRateMax = -1;
-        int govMin = -1;
-        int govMax = -1;
-        bool usedInProfiles = false;
-        QString currentProfile;
-
-    private:
-        int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const;
-    };
-*/

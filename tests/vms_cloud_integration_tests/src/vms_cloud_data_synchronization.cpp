@@ -111,7 +111,7 @@ protected:
         systemSharing.isEnabled = true;
         systemSharing.accountEmail = m_cloudAccounts.back().email;
         systemSharing.systemId = m_vmsSystem->cloudSystemId();
-        systemSharing.vmsUserId = 
+        systemSharing.vmsUserId =
             QnUuid::fromArbitraryData(m_cloudAccounts.back().email).toSimpleString().toStdString();
 
         nx::vms::api::UserData userData;
@@ -147,7 +147,7 @@ TEST_F(
     data_added_while_mediaserver_is_offline_is_synchronized_when_back_online)
 {
     givenCloudSystemWithServerCount(1);
-    
+
     addCloudUserOnServer(0);
     addCloudUserOnCloud();
     waitForDataSynchronized(cloud(), server(0));

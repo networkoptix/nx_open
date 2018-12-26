@@ -27,5 +27,5 @@ private:
     bool shouldStreamTranscode() const;
 };
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx
+} // namespace usb_cam

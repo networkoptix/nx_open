@@ -810,6 +810,7 @@ void QnWorkbenchLayout::setCellAspectRatio(float cellAspectRatio)
         cellAspectRatio = 0.0;
 
     if (qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+        return;
 
     m_cellAspectRatio = cellAspectRatio;
 

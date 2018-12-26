@@ -7,10 +7,7 @@
 #include "metadata_monitor.h"
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 class MetadataMonitor;
 
@@ -26,7 +23,4 @@ private:
     MetadataMonitor* m_metadataMonitor = nullptr;
 };
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

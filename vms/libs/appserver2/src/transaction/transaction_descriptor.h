@@ -251,10 +251,10 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
 }
 
 /**
-* For this function to work properly all transaction descriptors for the same api data structures should have
-* same Access Rights checker functions. For example setResourceParam and getResourceParam have the same checker for
-* read access - ReadResourceParamAccess.
-*/
+ * For this function to work properly all transaction descriptors for the same api data structures should have
+ * same Access Rights checker functions. For example setResourceParam and getResourceParam have the same checker for
+ * read access - ReadResourceParamAccess.
+ */
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
@@ -274,12 +274,11 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 }
 
 /**
-* Semantics of the transactionHash() function is following:
-* if transaction A follows transaction B and overrides it,
-* their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
-* Obviously, transactionHash() is not needed for the non-persistent transaction.
-*/
-
+ * Semantics of the transactionHash() function is following:
+ * if transaction A follows transaction B and overrides it,
+ * their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
+ * Obviously, transactionHash() is not needed for the non-persistent transaction.
+ */
 template<typename Param>
 static QnUuid transactionHash(ApiCommand::Value command, const Param &param)
 {

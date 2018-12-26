@@ -35,10 +35,10 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
 enum class RtspTransport
 {
+    notDefined,
     udp,
     tcp,
-    multicast,
-    autoDetect
+    multicast
 };
 RtspTransport rtspTransportFromString(const QString& value);
 QString toString(const RtspTransport& value);

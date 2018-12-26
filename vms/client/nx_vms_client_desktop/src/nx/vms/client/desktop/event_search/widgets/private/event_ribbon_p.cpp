@@ -255,7 +255,7 @@ void EventRibbon::Private::updateTile(int index)
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
-    const auto resourceList = modelIndex.data(Qn::ResourceListRole);
+    const auto resourceList = modelIndex.data(Qn::DisplayedResourceListRole);
     if (resourceList.isValid())
     {
         if (resourceList.canConvert<QnResourceList>())
