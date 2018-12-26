@@ -212,7 +212,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         NX_ERROR(typeid(UpdateContents))
             << "verifyUpdateManifest(" << contents.info.version
-            << ")Error while trying to find client package:" << errorMessage;
+            << ") error while trying to find client package:" << errorMessage;
     }
 
     QSet<QnUuid> allServers;
