@@ -117,4 +117,4 @@ __VA_ARGS__ void PrintTo(const TYPE& value, ::std::ostream* os)          \
     QDebug dbg(&content);                                                \
     QnDebugSerialization::DebugSerializer<TYPE>()(dbg, value);           \
     *os << content.toStdString();                                        \
-}                                                                        \
+}
