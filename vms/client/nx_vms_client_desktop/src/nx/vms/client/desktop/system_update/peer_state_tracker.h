@@ -78,6 +78,8 @@ public:
      */
     QnMediaServerResourcePtr getServer(QnUuid id) const;
 
+    QnUuid getClientPeerId() const;
+
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
