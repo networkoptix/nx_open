@@ -1088,9 +1088,7 @@ QRectF WorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeom
     QPointF pos(notificationsGeometry.x(), qMax(titleGeometry.bottom(), 0.0));
 
     qreal top = m_controlsWidgetRect.bottom();
-    if (m_calendar && m_calendar->isOpened() && m_calendar->isEnabled())
-        top = m_calendar->effectiveGeometry().top();
-    else if (m_timeline->isVisible() && m_timeline->isOpened())
+    if (m_timeline->isVisible() && m_timeline->isOpened())
         top = m_timeline->effectiveGeometry().top();
 
     const qreal maxHeight = top - pos.y();
@@ -1271,12 +1269,6 @@ void WorkbenchUi::updateCalendarGeometry()
 void WorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 {
     m_calendar = new CalendarWorkbenchPanel(settings, m_controlsWidget, this);
-
-    connect(m_calendar, &AbstractWorkbenchPanel::visibleChanged, this,
-        &WorkbenchUi::updateNotificationsGeometry);
-
-    connect(m_calendar, &AbstractWorkbenchPanel::geometryChanged, this,
-        &WorkbenchUi::updateNotificationsGeometry);
 
     // TODO: #GDM refactor indirect dependency
     connect(navigator()->calendar(), &QnCalendarWidget::emptyChanged, this,

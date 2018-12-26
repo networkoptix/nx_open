@@ -1,4 +1,6 @@
+#include "buttons.h"
 #include "calendar_workbench_panel.h"
+#include "../workbench_animations.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsItem>
@@ -6,13 +8,13 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
@@ -21,11 +23,12 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/workbench_ui_globals.h>
-
 #include <utils/common/event_processors.h>
+#include <utils/math/color_transformations.h>
 
-#include "../workbench_animations.h"
-#include "buttons.h"
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -37,6 +40,26 @@ static const qreal kClosedPositionOffsetY = 20;
 
 /* Offset of pin button - in calendar header size count o_O */
 static const int kPinOffsetCellsCount = 2;
+
+QnFramedWidget* setupFrame(QGraphicsWidget* widget)
+{
+    const auto kFrameColor = toTransparent(colorTheme()->color("dark1"), 0.15);
+
+    auto frame = new QnFramedWidget(widget);
+    frame->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    frame->setWindowBrush(Qt::NoBrush);
+    frame->setFrameColor(kFrameColor);
+    frame->setPos(-frame->frameWidth(), -frame->frameWidth());
+
+    QObject::connect(widget, &QGraphicsWidget::geometryChanged, frame,
+        [widget, frame]()
+        {
+            const int sizeDelta = frame->frameWidth();
+            frame->resize(widget->size() + QSize(sizeDelta, sizeDelta));
+        });
+
+    return frame;
+}
 
 } // namespace
 
@@ -90,6 +113,9 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_widget->installEventFilter(item);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &CalendarWorkbenchPanel::updateControlsGeometry);
+
+    setupFrame(item);
+    setupFrame(m_dayTimeItem);
 
     /* Hide pin/unpin button when any child line edit is visible: */
     installEventHandler(m_widget->findChildren<QLineEdit*>(), { QEvent::Show, QEvent::Hide }, this,
