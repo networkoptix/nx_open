@@ -1,9 +1,8 @@
 #include "layout_settings_dialog_state_reducer.h"
 
-#include <QtCore/QtMath>
+#include <set>
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
+#include <QtCore/QtMath>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -15,8 +14,6 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/optional.h>
-#include <client/client_settings.h>
-#include <set>
 
 namespace nx::vms::client::desktop {
 
@@ -30,6 +27,15 @@ namespace {
 const qreal kAspectRatioVariation = 0.05;
 
 constexpr int kDefaultBackgroundOpacityPercent = 70;
+
+static bool tracingEnabled(false);
+
+static const nx::utils::log::Tag kTag(typeid(LayoutSettingsDialogStateReducer));
+
+// Default screen aspect ratio. Actual for screens of 1920*1080 and so on.
+static QnAspectRatio screenAspectRatioValue{16, 9};
+
+static bool keepBackgroundAspectRatioValue(true);
 
 int boundOpacityPercent(int value)
 {
@@ -81,61 +87,58 @@ bool cellsAreBestAspected(const State& state)
     return (w == state.background.width.value || h == state.background.height.value);
 }
 
-State updateBackgroundLimits(State state)
+void updateBackgroundLimits(State& state)
 {
-    const int kMinWidth = qnGlobals->layoutBackgroundMinSize().width();
-    const int kMaxWidth = qnGlobals->layoutBackgroundMaxSize().width();
-    const int kMinHeight = qnGlobals->layoutBackgroundMinSize().height();
-    const int kMaxHeight = qnGlobals->layoutBackgroundMaxSize().height();
-
     const auto targetAspectRatio = bestAspectRatioForCells(state);
     if (state.background.keepImageAspectRatio && targetAspectRatio)
     {
-        state.background.width.setRange(kMinWidth * (*targetAspectRatio), kMaxWidth);
-        state.background.height.setRange(kMinHeight, kMaxHeight / (*targetAspectRatio));
+        state.background.width.setRange(
+            State::kBackgroundMinSize * (*targetAspectRatio), State::kBackgroundMaxSize);
+        state.background.height.setRange(
+            State::kBackgroundMinSize, State::kBackgroundMaxSize / (*targetAspectRatio));
     }
     else
     {
-        state.background.width.setRange(kMinWidth, kMaxWidth);
-        state.background.height.setRange(kMinHeight, kMaxHeight);
+        state.background.width.setRange(State::kBackgroundMinSize, State::kBackgroundMaxSize);
+        state.background.height.setRange(State::kBackgroundMinSize, State::kBackgroundMaxSize);
     }
-
-    return state;
 }
 
-State resetBackgroundParameters(State state)
+void resetBackgroundParameters(State& state)
 {
     state.background = {};
-    state = updateBackgroundLimits(std::move(state));
+    updateBackgroundLimits(state);
     state.background.width.value = state.background.width.min;
     state.background.height.value = state.background.height.min;
-
     state.background.opacityPercent = kDefaultBackgroundOpacityPercent;
-    return state;
 }
 
-State applyRecommendedBackgroundSize(State state)
+void applyRecommendedBackgroundSize(State& state)
 {
     const auto targetAspectRatio = bestAspectRatioForCells(state);
     NX_ASSERT(targetAspectRatio);
     if (!targetAspectRatio)
-        return state;
+        return;
+
+    const auto aspectRatio = *targetAspectRatio;
 
     // Limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100.
-    const qreal height = qSqrt(qnGlobals->layoutBackgroundRecommendedArea() / (*targetAspectRatio));
-    const qreal width = height * (*targetAspectRatio);
+    qreal height = qSqrt(State::kBackgroundRecommendedArea / aspectRatio);
+    qreal width = height * aspectRatio;
+
+    if (height > State::kBackgroundMaxSize)
+    {
+        height = State::kBackgroundMaxSize;
+        width = height * aspectRatio;
+    }
+    else if (width > State::kBackgroundMaxSize)
+    {
+        width = State::kBackgroundMaxSize;
+        height = width / aspectRatio;
+    }
+
     state.background.width.setValue(width);
     state.background.height.setValue(height);
-
-    return state;
-}
-
-//TODO: #GDM Code duplication.
-// Aspect ratio of the current screen.
-QnAspectRatio screenAspectRatio()
-{
-    const auto screen = qApp->desktop()->screenGeometry();
-    return QnAspectRatio(screen.size());
 }
 
 int findFreeLogicalId(const QnLayoutResourcePtr& layout)
@@ -164,14 +167,12 @@ int findFreeLogicalId(const QnLayoutResourcePtr& layout)
     return previousValue + 1;
 }
 
-static std::atomic_bool tracingEnabled(false);
-
-void trace(const State& state, const char* message)
+void trace(const State& state, nx::utils::log::Message message)
 {
     if (tracingEnabled)
     {
-        NX_DEBUG(typeid(LayoutSettingsDialogStateReducer), message);
-        NX_DEBUG(typeid(LayoutSettingsDialogStateReducer), state);
+        NX_DEBUG(kTag, message);
+        NX_DEBUG(kTag, state);
     }
 }
 
@@ -184,11 +185,46 @@ bool LayoutSettingsDialogStateReducer::isTracingEnabled()
 
 void LayoutSettingsDialogStateReducer::setTracingEnabled(bool value)
 {
+    if (tracingEnabled == value)
+        return;
+
     tracingEnabled = value;
+
+    using namespace nx::utils::log;
+    if (value)
+    {
+        addLogger(std::make_unique<Logger>(
+            std::set<Tag>{kTag}, Level::verbose, std::make_unique<StdOut>()));
+    }
+    else
+    {
+         removeLoggers({kTag});
+    }
+}
+
+QnAspectRatio LayoutSettingsDialogStateReducer::screenAspectRatio()
+{
+    return screenAspectRatioValue;
+}
+
+void LayoutSettingsDialogStateReducer::setScreenAspectRatio(QnAspectRatio value)
+{
+    screenAspectRatioValue = value;
+}
+
+bool LayoutSettingsDialogStateReducer::keepBackgroundAspectRatio()
+{
+    return keepBackgroundAspectRatioValue;
+}
+
+void LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(bool value)
+{
+    keepBackgroundAspectRatioValue = value;
 }
 
 State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutResourcePtr& layout)
 {
+    trace(state, "loadLayout");
     state.locked = layout->locked();
     state.logicalId = layout->logicalId();
     state.reservedLogicalId = findFreeLogicalId(layout);
@@ -209,7 +245,7 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
         state.cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     }
 
-    state = resetBackgroundParameters(std::move(state));
+    resetBackgroundParameters(state);
     state.background.filename = layout->backgroundImageFilename();
     state.background.width.setValue(layout->backgroundSize().width());
     state.background.height.setValue(layout->backgroundSize().height());
@@ -220,30 +256,35 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
 
 State LayoutSettingsDialogStateReducer::setLocked(State state, bool value)
 {
+    trace(state, "setLocked");
     state.locked = value;
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setLogicalId(State state, int value)
 {
+    trace(state, "setLogicalId");
     state.logicalId = value;
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::resetLogicalId(State state)
 {
+    trace(state, "resetLogicalId");
     state.logicalId = 0;
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::generateLogicalId(State state)
 {
+    trace(state, "generateLogicalId");
     state.logicalId = state.reservedLogicalId;
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setFixedSizeEnabled(State state, bool value)
 {
+    trace(state, "setFixedSizeEnabled");
     state.fixedSizeEnabled = value;
     if (value && state.fixedSize.isEmpty())
         state.fixedSize = {1, 1};
@@ -252,18 +293,21 @@ State LayoutSettingsDialogStateReducer::setFixedSizeEnabled(State state, bool va
 
 State LayoutSettingsDialogStateReducer::setFixedSizeWidth(State state, int value)
 {
+    trace(state, "setFixedSizeWidth");
     state.fixedSize.setWidth(value);
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setFixedSizeHeight(State state, int value)
 {
+    trace(state, "setFixedSizeHeight");
     state.fixedSize.setHeight(value);
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageError(State state, const QString& errorText)
 {
+    trace(state, "setBackgroundImageError");
     state.background.status = BackgroundImageStatus::error;
     state.background.errorText = errorText;
     return state;
@@ -271,18 +315,21 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageError(State state, con
 
 State LayoutSettingsDialogStateReducer::clearBackgroundImage(State state)
 {
-    state = resetBackgroundParameters(std::move(state));
+    trace(state, "clearBackgroundImage");
+    resetBackgroundParameters(state);
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageOpacityPercent(State state, int value)
 {
+    trace(state, "setBackgroundImageOpacityPercent");
     state.background.opacityPercent = boundOpacityPercent(value);
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageWidth(State state, int value)
 {
+    trace(state, "setBackgroundImageWidth");
     state.background.width.setValue(value);
     if (state.background.keepImageAspectRatio)
     {
@@ -298,6 +345,7 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageWidth(State state, int
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageHeight(State state, int value)
 {
+    trace(state, "setBackgroundImageHeight");
     state.background.height.setValue(value);
     if (state.background.keepImageAspectRatio)
     {
@@ -313,24 +361,27 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageHeight(State state, in
 
 State LayoutSettingsDialogStateReducer::setCropToMonitorAspectRatio(State state, bool value)
 {
+    trace(state, "setCropToMonitorAspectRatio");
     state.background.cropToMonitorAspectRatio = value;
-    state = updateBackgroundLimits(std::move(state));
+    updateBackgroundLimits(state);
     if (!cellsAreBestAspected(state))
-        state = applyRecommendedBackgroundSize(std::move(state));
+        applyRecommendedBackgroundSize(state);
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::setKeepImageAspectRatio(State state, bool value)
 {
+    trace(state, "setKeepImageAspectRatio");
     state.background.keepImageAspectRatio = value;
-    state = updateBackgroundLimits(std::move(state));
+    updateBackgroundLimits(state);
     if (!cellsAreBestAspected(state))
-        state = applyRecommendedBackgroundSize(std::move(state));
+        applyRecommendedBackgroundSize(state);
     return state;
 }
 
 State LayoutSettingsDialogStateReducer::startDownloading(State state, const QString& targetPath)
 {
+    trace(state, "startDownloading");
     NX_ASSERT(state.background.canStartDownloading());
     state.background.imageSourcePath = targetPath;
     state.background.status = BackgroundImageStatus::downloading;
@@ -339,6 +390,7 @@ State LayoutSettingsDialogStateReducer::startDownloading(State state, const QStr
 
 State LayoutSettingsDialogStateReducer::imageDownloaded(State state)
 {
+    trace(state, "imageDownloaded");
     NX_ASSERT(state.background.status == BackgroundImageStatus::downloading);
     state.background.status = BackgroundImageStatus::loading;
     return state;
@@ -346,6 +398,7 @@ State LayoutSettingsDialogStateReducer::imageDownloaded(State state)
 
 State LayoutSettingsDialogStateReducer::imageSelected(State state, const QString& filename)
 {
+    trace(state, "imageSelected");
     state.background.status = BackgroundImageStatus::newImageLoading;
     state.background.imageSourcePath = filename;
     state.background.filename = QString();
@@ -357,6 +410,7 @@ State LayoutSettingsDialogStateReducer::imageSelected(State state, const QString
 
 State LayoutSettingsDialogStateReducer::startUploading(State state)
 {
+    trace(state, "startUploading");
     // We can re-upload existing image if it was cropped.
     NX_ASSERT(state.background.status == BackgroundImageStatus::loaded
         || state.background.status == BackgroundImageStatus::newImageLoaded);
@@ -366,6 +420,7 @@ State LayoutSettingsDialogStateReducer::startUploading(State state)
 
 State LayoutSettingsDialogStateReducer::imageUploaded(State state, const QString& filename)
 {
+    trace(state, "imageUploaded");
     state.background.filename = filename;
     state.background.status = BackgroundImageStatus::newImageLoaded;
     return state;
@@ -373,6 +428,7 @@ State LayoutSettingsDialogStateReducer::imageUploaded(State state, const QString
 
 State LayoutSettingsDialogStateReducer::setPreview(State state, const QImage& image)
 {
+    trace(state, "setPreview");
     if (state.background.status == BackgroundImageStatus::loading)
         state.background.status = BackgroundImageStatus::loaded;
     else if (state.background.status == BackgroundImageStatus::newImageLoading)
@@ -395,8 +451,12 @@ State LayoutSettingsDialogStateReducer::setPreview(State state, const QImage& im
     {
         // Always set flag to true for new images.
         state.background.keepImageAspectRatio = true;
+
+        // Adjust background size to the recommended values.
+        applyRecommendedBackgroundSize(state);
+
     }
-    else if (!qnSettings->layoutKeepAspectRatio())
+    else if (!keepBackgroundAspectRatio())
     {
         // Keep false if previous accepted value was false.
         state.background.keepImageAspectRatio = false;

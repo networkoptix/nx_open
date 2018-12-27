@@ -14,6 +14,15 @@ namespace nx::vms::client::desktop {
 
 struct LayoutSettingsDialogState: AbstractReduxState
 {
+    /** Recommended area of the layout background - in square cells. */
+    static constexpr int kBackgroundRecommendedArea = 40*40;
+
+    /** Recommended size of the layout background - in cells. */
+    static constexpr int kBackgroundMinSize = 5;
+
+    /** Recommended size of the layout background - in cells. */
+    static constexpr int kBackgroundMaxSize = 64;
+
     bool locked = false;
     bool isLocalFile = false;
     float cellAspectRatio = 0.0;
@@ -27,8 +36,8 @@ struct LayoutSettingsDialogState: AbstractReduxState
 
     struct Range
     {
-        int min = 0;
-        int max = 0;
+        int min = kBackgroundMinSize;
+        int max = kBackgroundMaxSize;
         int value = 0;
 
         void setRange(int min, int max)

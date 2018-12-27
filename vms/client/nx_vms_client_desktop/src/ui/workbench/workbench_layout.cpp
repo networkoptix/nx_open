@@ -825,14 +825,14 @@ qreal QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing spacing)
         case Qn::CellSpacing::None:
             return 0.0;
         case Qn::CellSpacing::Small:
-            return 0.05;
+            return nx::vms::api::LayoutData::kDefaultCellSpacing;
         case Qn::CellSpacing::Medium:
-            return 0.1;
+            return nx::vms::api::LayoutData::kDefaultCellSpacing * 2;
         case Qn::CellSpacing::Large:
-            return 0.15;
+            return nx::vms::api::LayoutData::kDefaultCellSpacing * 3;
     }
     NX_ASSERT(false, "Unhandled enum value");
-    return 0.0;
+    return nx::vms::api::LayoutData::kDefaultCellSpacing;
 }
 
 qreal QnWorkbenchLayout::cellSpacing() const
