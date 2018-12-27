@@ -9,8 +9,7 @@
             <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">ผสานกับระบบอื่น</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">ตัดการเชื่อมต่อจาก <span class="product-name"> {{PRODUCT_NAME}} </span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -49,8 +48,7 @@
         <div class="merge-info-text">
             <p>อาจใช้เวลาหลายชั่วโมงทั้งนี้ขึ้นอยู่กับขนาดของฐานข้อมูล</p>
             <p>จนกว่าการผสานจะเสร็จสิ้นคุณสามารถเข้าสู่ระบบนี้และชมวิดีโอ แต่ไม่สามารถเปลี่ยนการตั้งค่าใด ๆ ได้</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
+            <p>เมื่อผสานเสร็จสิ้นผู้ใช้และกล้องจากระบบนี้จะพร้อมใช้งานใน <span class="merge-system-name">{{mergeTargetSystem.name}}</span></p>
         </div>
     </div>
 </div>

@@ -406,6 +406,7 @@ table.webclient-window>tbody>tr>td{
   border: 1px solid $additional_light2;
   position:absolute;
   margin-left: -72px;
+  display : none; // Edge bug
 }
 
 .cameras-panel .nav > li.active > a .camera-preview{
@@ -684,9 +685,10 @@ table.webclient-window>tbody>tr>td{
 
 .cast-button{
   max-width:20px;
+  height : 20px;
   background-color:transparent;
   border:none;
-  padding:0px;
+  padding:0;
 }
 
 .fullscreen-notification{
@@ -964,6 +966,7 @@ table.webclient-window>tbody>tr>td{
   
   &.on-top {
     z-index : 99; /* Keeps the cameras-panel above the video player and preloads for mobile. */
+    display : block !important;
   }
 }
 

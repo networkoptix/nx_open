@@ -130,8 +130,11 @@ import * as Hls from 'hls.js';
                             });
                             var jsHlsSupported = Hls.isSupported();
                             
-                            //Should Catch MS edge, Safari, Mobile Devices
-                            if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
+                            // Should Catch MS edge, Safari, Mobile Devices
+                            // if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
+    
+                            // Should catch Mobile Devices
+                            if ($window.jscd.mobile) {
                                 return 'native-hls';
                             }
                             
@@ -257,20 +260,25 @@ import * as Hls from 'hls.js';
                             
                             scope
                                 .playerHandler(error)
-                                .then(function (response) {
+                                .then((response) => {
                                     scope.videoFlags.errorLoading = response;
+                                    
+                                    if ((err.url === undefined || err.url === '') && err.context === undefined) {
+                                        return;
+                                    }
                                     
                                     if (scope.videoFlags.errorLoading) {
                                         var url = err.url || err.context.url;
+                                        
                                         $http
                                             .get(url)
-                                            .then(function (response) {
+                                            .then((response) => {
                                                 scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                                 scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
                                             });
                                     }
                                     
-                                }, function (error) {
+                                }, (error) => {
                                     scope.videoFlags.errorLoading = error;
                                 });
                             
@@ -307,7 +315,7 @@ import * as Hls from 'hls.js';
                             scope.jsHls = false;
                             
                             $timeout(function () {
-                                var nativePlayer = new $window.NativePlayer();
+                                var nativePlayer = new window.NativePlayer();
                                 nativePlayer.init(element.find('.videoplayer'), function (api) {
                                     makingPlayer = false;
                                     scope.vgApi = api;
@@ -346,16 +354,20 @@ import * as Hls from 'hls.js';
                                         
                                         //If the player stalls give it a chance to recover
                                         scope.vgApi.addEventListener('stalled', resetTimeout);
-                                        scope.vgApi.addEventListener('error', function (e) {
-                                            if(!e.target){ // this is a special case - interrupted video
+                                        scope.vgApi.addEventListener('error', (e) => {
+                                            $timeout(() => {
+                                                if(e.target === null){ // this is a special case - interrupted video
                                                 // (switch to another camera)
                                                 return;
                                             }
-                                            $timeout(function () {
-                                                if (e.target.error.url === undefined) {
-                                                    e.target.error.url = e.target.currentSrc;
-                                                }
-                                                playerErrorHandler(e.target.error);
+                                            
+                                            var target = e.target;
+                                            if (target.error.url === undefined) {
+                                                target.error.url = target.currentSrc;
+                                            }
+                                            
+                                            
+                                                playerErrorHandler(target.error);
                                             });
                                         });
                                     }

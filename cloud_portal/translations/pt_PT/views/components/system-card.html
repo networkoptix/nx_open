@@ -9,7 +9,7 @@
             <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fazer o "Merge" com outro Sistema</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Desconectar de 
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -52,8 +52,8 @@
         <div class="merge-info-text">
             <p>Dependendo do tamanho da base de dados, poderá levar várias horas.</p>
             <p>Até que o "Merge" seja concluído, pode efectuar o login nesse sistema e reproduzir vídeo, mas não pode alterar as definições.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
+            <p>Quando o "Merge" terminar, todos os utilizadores e câmaras deste sistema ficarão disponíveis
+                no Sistema <span class="merge-system-name">{{mergeTargetSystem.name}}</span>.</p>
         </div>
     </div>
 </div>

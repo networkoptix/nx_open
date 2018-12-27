@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "tạo tài khoản",
         "errorNoHDD": "Thiết bị này thiết kế để làm việc với ổ đĩa cứng đã được cài đặt.<br>Vui lòng tắt thiết bị và cài đặt một ổ đĩa cứng.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "Thiết bị này cần kết nối mạng để làm việc. <br>Vui lòng kết nối thiết bị với mạng Lan hoặc Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Mật khẩu phải có ít nhất 8 ký tự",

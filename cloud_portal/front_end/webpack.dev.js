@@ -34,6 +34,14 @@ module.exports = merge(common, {
                 changeOrigin: true,
                 secure      : false
             },
+            // Rewrite Russian translations to be served from DEV files
+            {
+                context: '/static/lang_ru_RU/',
+                target: "https://0.0.0.0:9000",
+                pathRewrite: {"^/static/lang_ru_RU": ""},
+                changeOrigin: true,
+                secure: false
+            },
             {
                 context     : '/static/',
                 target      : "https://0.0.0.0:9000",

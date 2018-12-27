@@ -420,6 +420,19 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         });
 
+        // When a camera is loaded the offset might not be calculated. So we retry every second until its ready.
+        function setServerOffset(activeCameraParentId) {
+            var serverOffset = $scope.camerasProvider.getServerTimeOffset(activeCameraParentId);
+            if (serverOffset) {
+                window.timeManager.setOffset(serverOffset);
+                updateVideoSource(timeFromUrl);
+            } else {
+                $scope.camerasProvider.getServerTimes().then(() => {
+                    setServerOffset(activeCameraParentId);
+                });
+            }
+        }
+
         //timeFromUrl is used if we have a time from the url if not then set to false
         var timeFromUrl = $routeParams.time || null;
         $scope.$watch('activeCamera', function(){
@@ -436,10 +449,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             timeFromUrl = null;
 
             //When camera is changed request offset for camera
-            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-            if(serverOffset){
-                timeManager.setOffset(serverOffset);
-            }
+            setServerOffset($scope.activeCamera.parentId);
             $scope.showCameraPanel = !$scope.activeCamera;
         });
 
