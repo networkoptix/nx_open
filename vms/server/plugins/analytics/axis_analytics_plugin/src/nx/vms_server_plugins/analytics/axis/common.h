@@ -32,13 +32,13 @@ struct EventType: nx::vms::api::analytics::EventType
 #define AxisEventType_Fields EventType_Fields(topic)(name)
 
 /**
-  * The algorithm of building of the valid event type list:
-  * The final list is a union of two lists. The 1st is eventTypes white list.
-  * The 2nd is based on camera supported events. It is constructed in 3 steps:
-  *  a) plugin asks the camera about all supported events;
-  *  b) they are filtered with allowedTopics filter (only events with the allowed topics remain);
-  *  c) event with descriptions form forbiddenDescriptions list are excised.
-  */
+ * The algorithm of building of the valid event type list:
+ * The final list is a union of two lists. The 1st is eventTypes white list.
+ * The 2nd is based on camera supported events. It is constructed in 3 steps:
+ * a) plugin asks the camera about all supported events;
+ * b) they are filtered with allowedTopics filter (only events with the allowed topics remain);
+ * c) event with descriptions form forbiddenDescriptions list are excluded.
+ */
 struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
 {
     QStringList allowedTopics; //< Prorietary. Topic filter.

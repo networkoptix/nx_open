@@ -5,7 +5,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/network/http/custom_headers.h>
 
-namespace nx::network {
+namespace nx::p2p {
 
 namespace {
 
@@ -16,10 +16,10 @@ static const int kMaxMessageQueueSize = 500;
 P2PHttpClientTransport::P2PHttpClientTransport(
     HttpClientPtr readHttpClient,
     const nx::Buffer& connectionGuid,
-    websocket::FrameType messageType,
+    network::websocket::FrameType messageType,
     const boost::optional<utils::Url>& url)
     :
-    m_writeHttpClient(new http::AsyncClient),
+    m_writeHttpClient(new network::http::AsyncClient),
     m_readHttpClient(std::move(readHttpClient)),
     m_messageType(messageType),
     m_url(url),
@@ -29,7 +29,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
     m_readHttpClient->bindToAioThread(getAioThread());
-    m_readHttpClient->setAdditionalHeaders(http::HttpHeaders());
+    m_readHttpClient->setAdditionalHeaders(network::http::HttpHeaders());
 
     m_writeHttpClient->bindToAioThread(getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
@@ -54,7 +54,9 @@ void P2PHttpClientTransport::stopWhileInAioThread()
     m_readHttpClient.reset();
 }
 
-void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
+void P2PHttpClientTransport::readSomeAsync(
+    nx::Buffer* const buffer,
+    network::IoCompletionHandler handler)
 {
     post(
         [this, buffer, handler = std::move(handler)]() mutable
@@ -91,13 +93,16 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
             }
 
             // No incoming message in the queue.
-            m_userReadHandlerPair.reset(new std::pair<nx::Buffer* const, IoCompletionHandler>(
-                buffer,
-                std::move(handler)));
+            m_userReadHandlerPair.reset(
+                new std::pair<nx::Buffer* const, network::IoCompletionHandler>(
+                    buffer,
+                    std::move(handler)));
         });
 }
 
-void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
+void P2PHttpClientTransport::sendAsync(
+    const nx::Buffer& buffer,
+    network::IoCompletionHandler handler)
 {
     post(
         [this, buffer, handler = std::move(handler)]() mutable
@@ -109,7 +114,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 m_messageType,
                 buffer.toBase64()));
 
-            http::HttpHeaders additionalHeaders;
+            network::http::HttpHeaders additionalHeaders;
             additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
             m_writeHttpClient->setAdditionalHeaders(additionalHeaders);
 
@@ -119,7 +124,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 {
                     const bool isResponseValid = m_writeHttpClient->response()
                         && m_writeHttpClient->response()->statusLine.statusCode
-                            == http::StatusCode::ok;
+                            == network::http::StatusCode::ok;
 
                     const auto resultCode = !m_writeHttpClient->failed() && isResponseValid
                         ? SystemError::noError : SystemError::connectionAbort;
@@ -132,7 +137,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
         });
 }
 
-void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
+void P2PHttpClientTransport::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 {
     BasicPollable::bindToAioThread(aioThread);
     m_readHttpClient->bindToAioThread(aioThread);
@@ -147,14 +152,14 @@ void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eve
         m_writeHttpClient->socket()->cancelIOSync(eventType);
 }
 
-aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
+network::aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
 {
     return BasicPollable::getAioThread();
 }
 
-SocketAddress P2PHttpClientTransport::getForeignAddress() const
+network::SocketAddress P2PHttpClientTransport::getForeignAddress() const
 {
-    nx::utils::promise<SocketAddress> p;
+    nx::utils::promise<network::SocketAddress> p;
     auto f = p.get_future();
     m_readHttpClient->post(
         [this, &p]() mutable
@@ -260,7 +265,7 @@ void P2PHttpClientTransport::startReading()
 }
 
 P2PHttpClientTransport::PostBodySource::PostBodySource(
-    websocket::FrameType messageType,
+    network::websocket::FrameType messageType,
     const Buffer& data)
     :
     m_messageType(messageType),
@@ -268,9 +273,9 @@ P2PHttpClientTransport::PostBodySource::PostBodySource(
 {
 }
 
-http::StringType P2PHttpClientTransport::PostBodySource::mimeType() const
+network::http::StringType P2PHttpClientTransport::PostBodySource::mimeType() const
 {
-    if (m_messageType == websocket::FrameType::text)
+    if (m_messageType == network::websocket::FrameType::text)
         return "application/json";
     return "application/ubjson";
 }

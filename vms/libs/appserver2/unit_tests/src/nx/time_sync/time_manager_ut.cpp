@@ -19,7 +19,6 @@
 #include <common/common_module.h>
 
 #include <nx/vms/time_sync/server_time_sync_manager.h>
-#include <settings.h>
 #include <api/model/time_reply.h>
 
 #include <rest/server/json_rest_result.h>

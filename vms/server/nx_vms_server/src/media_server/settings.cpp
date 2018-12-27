@@ -46,6 +46,11 @@ MSSettings::MSSettings(
     loadAnalyticEventsStorageSettings();
 }
 
+void MSSettings::setServerModule(QnMediaServerModule* serverModule)
+{
+    m_settings.setServerModule(serverModule);
+}
+
 void MSSettings::initializeROSettingsFromConfFile(const QString& fileName)
 {
     m_roSettings.reset(new QSettings(fileName, QSettings::IniFormat));

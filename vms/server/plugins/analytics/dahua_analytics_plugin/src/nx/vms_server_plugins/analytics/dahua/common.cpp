@@ -6,10 +6,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 QnMutex EngineManifest::m_cachedIdMutex;
 QMap<QString, QString> EngineManifest::m_eventTypeIdByInternalName;
@@ -70,7 +67,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json), \
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json), \
     DahuaEngineManifest_Fields)
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua
