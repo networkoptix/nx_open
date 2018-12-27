@@ -410,6 +410,13 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
             m_showButton->setNotificationCount(count);
             m_showButton->setColor(QnNotificationLevel::notificationColor(level));
         });
+
+    connect(m_eventPanel.data(), &EventPanel::currentTabChanged, this,
+        [this](EventPanel::Tab tab)
+        {
+            if (tab == EventPanel::Tab::motion)
+                setOpened();
+        });
 }
 
 void NotificationsWorkbenchPanel::at_eventTileHovered(

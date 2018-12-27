@@ -91,7 +91,16 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
             return QVariant::fromValue(bookmark.guid);
 
         case Qn::ResourceListRole:
-            return QVariant::fromValue(QnResourceList({camera(bookmark)}));
+        case Qn::DisplayedResourceListRole:
+        {
+            if (const auto resource = camera(bookmark))
+                return QVariant::fromValue(QnResourceList({resource}));
+
+            if (role == Qn::DisplayedResourceListRole)
+                return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+
+            return {};
+        }
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera(bookmark));

@@ -35,7 +35,10 @@
 #include <nx/vms/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
 #include <nx/vms/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
 #include <nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.h>
+
 #include <nx/vms/client/desktop/debug_utils/widgets/palette_widget.h>
+#include <nx/vms/client/desktop/debug_utils/dialogs/credentials_store_dialog.h>
+#include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
@@ -48,7 +51,7 @@
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
-#include <nx/vms/client/desktop/debug_utils/dialogs/credentials_store_dialog.h>
+#include <nx/utils/range_adapters.h>
 
 //#if defined(_DEBUG)
     #define DEBUG_ACTIONS
@@ -419,6 +422,9 @@ public:
                     server->savePropertiesAsync();
                 }
             });
+
+        for (auto [name, handler]: nx::utils::constKeyValueRange(debugActions()))
+            addButton(name, handler);
     }
 
 private:

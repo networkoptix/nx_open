@@ -92,41 +92,18 @@ QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemI
 {
     if (info.platform == "linux")
     {
-        if (info.modification == "bananapi")
-        {
-            return tr("Debian %1 for Banana Pi is no longer supported").arg(info.version);
-        }
-        else if (info.modification == "rpi")
-        {
-            return tr("Raspbian %1 is no longer supported").arg(info.version);
-        }
-        else if (info.modification == "bpi")
-        {
-            if (!info.version.isEmpty())
-                return tr("Nx1 %1 is no longer supported").arg(info.version);
-            else
-                return tr("Nx1 is no longer supported");
-        }
-        else if (info.modification == "ubuntu")
+        if (info.modification == "ubuntu")
         {
             if (info.version.isEmpty())
                 return tr("Ubuntu is no longer supported");
-            else
-                return tr("Ubuntu %1 is no longer supported").arg(info.version);
+            return tr("Ubuntu %1 is no longer supported").arg(info.version);
         }
-        else if (info.arch == "arm")
-            return tr("This version of ARM Linux is not supported");
-        else
-            return tr("This version of Linux is not supported");
+        return tr("This version of Linux is not supported");
     }
-    else if (info.platform == "windows")
-    {
+    if (info.platform == "windows")
         return tr("This Windows version is no longer supported");
-    }
-    else if (info.modification == "mac")
-    {
+    if (info.modification == "mac")
         return tr("Mac Os X %1 is no longer supported").arg(info.version);
-    }
     return tr("This OS version is unsupported");
 }
 
@@ -212,7 +189,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         NX_ERROR(typeid(UpdateContents))
             << "verifyUpdateManifest(" << contents.info.version
-            << ")Error while trying to find client package:" << errorMessage;
+            << ") error while trying to find client package:" << errorMessage;
     }
 
     QSet<QnUuid> allServers;

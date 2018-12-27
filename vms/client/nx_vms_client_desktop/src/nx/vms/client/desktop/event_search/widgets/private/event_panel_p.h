@@ -43,6 +43,9 @@ public:
     Private(EventPanel* q);
     virtual ~Private() override;
 
+    Tab currentTab() const;
+    bool setCurrentTab(Tab tab);
+
 private:
     void rebuildTabs();
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
@@ -62,6 +65,7 @@ private:
     AnalyticsSearchWidget* const m_analyticsTab;
 
     const QHash<QWidget*, AbstractSearchSynchronizer*> m_synchronizers;
+    const QHash<QWidget*, Tab> m_tabIds;
 
     QWidget* m_previousTab = nullptr;
     QWidget* m_lastTab = nullptr;

@@ -12,6 +12,8 @@
 #include <utils/crypt/encryptable.h>
 #include <common/common_globals.h>
 
+#include <nx/vms/api/data/layout_data.h>
+
 /**
  * QnLayoutResource class describes the set of resources together with their view options.
  *
@@ -174,16 +176,16 @@ protected:
 
 private:
     QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;
-    float m_cellAspectRatio;
-    qreal m_cellSpacing;
-    QHash<int, QVariant> m_dataByRole;
+    float m_cellAspectRatio = 0; //< Means 'auto'.
+    qreal m_cellSpacing = nx::vms::api::LayoutData::kDefaultCellSpacing;
+    QHash<int, QVariant> m_dataByRole; //< TODO: Client-only variable, must be removed.
     QnTimePeriod m_localRange;
     QSize m_fixedSize;
     int m_logicalId = 0;
     QSize m_backgroundSize;
     QString m_backgroundImageFilename;
-    qreal m_backgroundOpacity;
-    bool m_locked;
+    qreal m_backgroundOpacity = nx::vms::api::LayoutData::kDefaultBackgroundOpacity;
+    bool m_locked = false;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

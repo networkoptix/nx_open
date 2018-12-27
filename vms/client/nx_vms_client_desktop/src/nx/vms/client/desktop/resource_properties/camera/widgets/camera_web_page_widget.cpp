@@ -160,7 +160,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         d->cookieJar->setCameraId(QnUuid(state.singleCameraProperties.id));
         d->credentials = state.credentials;
 
-        if (state.singleCameraProperties.settingsUrlPath.isEmpty())
+        if (!state.isSingleCamera() || state.singleCameraProperties.settingsUrlPath.isEmpty())
         {
             d->lastRequest = QNetworkRequest();
             d->webWidget->reset();

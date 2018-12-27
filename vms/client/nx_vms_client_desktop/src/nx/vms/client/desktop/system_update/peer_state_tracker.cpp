@@ -84,6 +84,12 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
     return getServer(findItemById(id));
 }
 
+QnUuid PeerStateTracker::getClientPeerId() const
+{
+    NX_ASSERT(m_clientItem);
+    return m_clientItem->id;
+}
+
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 {
     nx::utils::SoftwareVersion result;
@@ -303,9 +309,9 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
 
     if (!helpers::serverBelongsToCurrentSystem(server))
     {
-        auto systemId = helpers::currentSystemLocalId(commonModule());
-        NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
-             server->getName(), systemId);
+        //auto systemId = helpers::currentSystemLocalId(commonModule());
+        //NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
+        //     server->getName(), systemId);
         return;
     }
 
@@ -384,6 +390,7 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
 void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
 {
     NX_ASSERT(m_clientItem);
+    NX_VERBOSE(this, "PeerStateTracker::atClientupdateStateChanged(%1, %2)", state, percentComplete);
     using State = ClientUpdateTool::State;
 
     m_clientItem->installing = false;
@@ -409,6 +416,11 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
             m_clientItem->statusMessage = "Client is ready to download update";
+            break;
+        case State::readyRestart:
+            m_clientItem->statusMessage = "Client is ready to install and restart";
+            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->progress = 100;
             break;
         case State::installing:
             m_clientItem->state = StatusCode::readyToInstall;
@@ -484,10 +496,10 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    const nx::utils::SoftwareVersion newUpdateSupportVersion(4, 0);
+    const nx::utils::SoftwareVersion kNewUpdateSupportVersion(4, 0);
 
     const auto& version = server->getVersion();
-    if (version < newUpdateSupportVersion && !item->onlyLegacyUpdate)
+    if (version < kNewUpdateSupportVersion && !item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = true;
         changed = true;
