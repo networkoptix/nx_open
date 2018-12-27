@@ -453,7 +453,8 @@ void PlayerPrivate::at_gotVideoFrame()
     {
         videoFrameToRender.reset();
         log("at_gotVideoFrame(): EOF reached, jumping to LIVE.");
-        q->setPosition(kLivePosition);
+        if (q->playbackState() != Player::State::Previewing)
+            q->setPosition(kLivePosition);
         return;
     }
 
@@ -963,10 +964,14 @@ void Player::setPosition(qint64 value)
     if (d->archiveReader)
     {
 
-        qint64 actualJumpPositionUsec = 0;
-        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &actualJumpPositionUsec);
+        const qint64 valueUsec = msecToUsec(value);
+        qint64 actualPositionUsec = valueUsec;
+        if (playbackState() == State::Previewing)
+            d->archiveReader->directJumpToNonKeyFrame(actualPositionUsec);
+        else
+            d->archiveReader->jumpTo(valueUsec, valueUsec, &actualPositionUsec);
 
-        const qint64 actualJumpPositionMsec = usecToMsec(actualJumpPositionUsec);
+        const qint64 actualJumpPositionMsec = usecToMsec(actualPositionUsec);
         if (actualJumpPositionMsec != value)
         {
             d->setLiveMode(value == kLivePosition);
