@@ -145,7 +145,7 @@ private:
     QByteArray m_prevRangeHeader;
     quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
-    nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::mediaOnly};
+    nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::media};
 
     MediaQuality m_currentQuality[CL_MAX_CHANNELS]{MEDIA_Quality_None};
     /**

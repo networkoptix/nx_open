@@ -421,7 +421,7 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::AUDIO:
         case QnAbstractMediaData::CONTAINER:
         case QnAbstractMediaData::EMPTY_DATA:
-            return m_streamDataFilter == StreamDataFilters(StreamDataFilter::mediaOnly)
+            return !m_streamDataFilter //< Send media data for empty flags
                 || m_streamDataFilter.testFlag(StreamDataFilter::media);
         case QnAbstractMediaData::META_V1:
             return m_streamDataFilter.testFlag(StreamDataFilter::motion);
