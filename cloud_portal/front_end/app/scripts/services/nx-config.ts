@@ -222,6 +222,7 @@
                         // * 20 seconds for chunks
                         // * 10 seconds extra
                         updateArchiveStateTimeout: 60 * 1000,
+                        updateArchiveRecordsTimeout: 2 * 1000,
                         flashChromelessPath: 'components/flashlsChromeless.swf',
                         flashChromelessDebugPath: 'components/flashlsChromeless_debug.swf',
                         staticResources: 'static/web_common/',

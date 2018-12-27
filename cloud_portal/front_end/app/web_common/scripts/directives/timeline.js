@@ -69,7 +69,8 @@
                         scope.toggleActive = function () {
                             scope.activeVolume = !scope.activeVolume;
                         };
-                        var pixelAspectRatio = function () {
+                        
+                        var pixelAspectRatio = (function () {
                             if (window.devicePixelRatio > 1) {
                                 return window.devicePixelRatio;
                             }
@@ -82,11 +83,11 @@
                                 return 2;
                             }
                             return 1;
-                        }();
+                        })();
                         
                         var timelineConfig = window.TimelineConfig;
                         
-                        scope.scaleManager = new ScaleManager(timelineConfig.minMsPerPixel,
+                        scope.scaleManager = new window.ScaleManager(timelineConfig.minMsPerPixel,
                             timelineConfig.maxMsPerPixel,
                             timelineConfig.initialInterval,
                             100,
@@ -113,7 +114,7 @@
                             marks: 1
                         };
                         
-                        var timelineRender = new TimelineCanvasRender(canvas,
+                        var timelineRender = new window.TimelineCanvasRender(canvas,
                             timelineConfig,
                             scope.recordsProvider,
                             scope.scaleManager,
@@ -124,7 +125,7 @@
                             },
                             pixelAspectRatio);
                         
-                        var timelineActions = new TimelineActions(
+                        var timelineActions = new window.TimelineActions(
                             timelineConfig,
                             scope.positionProvider,
                             scope.scaleManager,
@@ -154,8 +155,10 @@
                             var now = window.timeManager.nowToDisplay();
                             scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                             scope.scaleManager.setEnd();
-                            timelineActions.updateZoomLevels(1); // Force update zoom levels
-                            timelineActions.fullZoomOut(); // Animate full zoom out
+                            
+                            $timeout(() => {
+                                timelineActions.fullZoomOut(); // Animate full zoom out
+                            });
                         }
                         
                         // !!! Render everything: updating function
@@ -609,23 +612,27 @@
                         }
                         
                         function initRecordsProvider() {
-                            scope.recordsProvider.init().then(function (hasArchive) {
-                                scope.emptyArchive = !hasArchive;
-                                scope.loading = false;
-                                if (hasArchive) {
-                                    initTimeline(); // There is archive - init timeline
-                                } else { // No archive - wait and repeat attempt
-                                    $timeout(initRecordsProvider, CONFIG.webclient.updateArchiveStateTimeout);
-                                }
-                            });
+                            scope.recordsProvider
+                                .init()
+                                .then((hasArchive) => {
+                                    scope.emptyArchive = !hasArchive;
+                                    scope.loading = false;
+                                    if (hasArchive) {
+                                        timelineRender.setRecordsProvider(scope.recordsProvider);
+                                        initTimeline(); // There is archive - init timeline
+                                    } else { // No archive - wait and repeat attempt
+                                        $timeout(initRecordsProvider, CONFIG.webclient.updateArchiveStateTimeout);
+                                    }
+                                });
                         }
                         
                         scope.$watch('recordsProvider', function () { // RecordsProvider was changed - means new camera was selected
                             scope.emptyArchive = true;
                             if (scope.recordsProvider) {
                                 scope.loading = true;
-                                initRecordsProvider();
-                                timelineRender.setRecordsProvider(scope.recordsProvider);
+                                $timeout(() => {
+                                    initRecordsProvider();
+                                }, CONFIG.webclient.updateArchiveRecordsTimeout);
                             }
                         });
                         

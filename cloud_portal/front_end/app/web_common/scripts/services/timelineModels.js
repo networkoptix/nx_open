@@ -668,7 +668,7 @@
                     continue; // Chunk is from future - do not add
                 }
                 
-                var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
+                var addchunk = new window.Chunk(null, chunks[i].startTimeMs, endChunk, level);
                 self.addChunk(addchunk, null);
             }
             
