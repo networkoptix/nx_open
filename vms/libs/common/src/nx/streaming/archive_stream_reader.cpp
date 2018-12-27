@@ -1216,7 +1216,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 bool QnArchiveStreamReader::jumpTo(
     qint64 mksec,
     qint64 skipTime,
-    bool allowCorrection,
+    bool bindPositionToPlaybackMask,
     qint64* outJumpTime)
 {
     if (m_navDelegate) {
@@ -1227,7 +1227,7 @@ bool QnArchiveStreamReader::jumpTo(
         NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
 
     qint64 newTime = mksec;
-    if (allowCorrection)
+    if (bindPositionToPlaybackMask)
     {
         m_playbackMaskSync.lock();
         newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
