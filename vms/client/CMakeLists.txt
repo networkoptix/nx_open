@@ -2,11 +2,12 @@ if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_vms_client_core)
 endif()
 
+find_package(Qt5 COMPONENTS Svg)
+
 if(withDesktopClient)
     find_package(Qt5
         COMPONENTS
             OpenGL
-            Svg
             QuickWidgets
             WebKit
             WebKitWidgets)
