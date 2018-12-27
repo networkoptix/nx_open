@@ -807,6 +807,15 @@ void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
     m_liveQuality = quality;
 }
 
+nx::vms::api::StreamDataFilters QnRtspDataConsumer::streamDataFilter() const
+{
+    using namespace nx::vms::api;
+    if (!m_streamDataFilter)
+        return nx::vms::api::StreamDataFilter::media;
+
+    return m_streamDataFilter;
+}
+
 void QnRtspDataConsumer::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
     m_streamDataFilter = filter;

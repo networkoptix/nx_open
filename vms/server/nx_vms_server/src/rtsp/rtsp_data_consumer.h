@@ -67,6 +67,7 @@ public:
     void setResource(const QnResourcePtr& resource);
     std::chrono::milliseconds timeFromLastReceiverReport();
 
+    nx::vms::api::StreamDataFilters streamDataFilter() const;
     void setStreamDataFilter(nx::vms::api::StreamDataFilters filter);
 protected:
     //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);

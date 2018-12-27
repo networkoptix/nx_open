@@ -1480,10 +1480,12 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
         }
         else if (normParam.startsWith(kSendMotionHeaderName))
         {
-            QByteArray value = vals[1].trimmed();
-            StreamDataFilters filter;
-            if (value == "1" || value == "true")
-                filter |= StreamDataFilter::motion;
+            QByteArray value = vals[1].trimmed().toLower();
+            const bool sendMotion = value == "1" || value == "true";
+
+            StreamDataFilters filter = d->dataProcessor->streamDataFilter();
+            filter.setFlag(StreamDataFilter::motion, sendMotion);
+
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
             d->dataProcessor->setStreamDataFilter(filter);
