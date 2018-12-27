@@ -98,16 +98,10 @@ void MotionPlaybackMaskWatcher::Private::setChunkProvider(QnCameraChunkProvider*
 
 void MotionPlaybackMaskWatcher::Private::setTimePeriods(const QnTimePeriodList& value)
 {
-    QnTimePeriodList target;
-    if (value.isEmpty())
-        target.append(QnTimePeriod(0, 0)); //< Motion mask with empty period to support jump to live.
-    else
-        target = value;
-
-    if (periods == target)
+    if (periods == value)
         return;
 
-    periods = target;
+    periods = value;
 
     updatePlayerPeriods();
 }
