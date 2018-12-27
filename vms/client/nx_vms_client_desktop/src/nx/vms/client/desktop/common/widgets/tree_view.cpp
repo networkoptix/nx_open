@@ -130,12 +130,19 @@ void TreeView::timerEvent(QTimerEvent* event)
 
 void TreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
+    const bool savedExpandsOnDoubleClick = expandsOnDoubleClick();
+    auto expandsOnDoubleClickGuard = nx::utils::makeScopeGuard(
+        [this, savedExpandsOnDoubleClick]()
+        {
+            setExpandsOnDoubleClick(savedExpandsOnDoubleClick);
+        });
+
     // Delegate can occasionally change the model, so keeping persistent index
     const QPersistentModelIndex persistent = indexAt(event->pos());
-    if (!m_confirmExpand || m_confirmExpand(persistent))
-        base_type::mouseDoubleClickEvent(event);
-    else if (persistent.isValid())
-        emit doubleClicked(persistent);
+    if (m_confirmExpand && !m_confirmExpand(persistent))
+        setExpandsOnDoubleClick(false);
+
+    base_type::mouseDoubleClickEvent(event);
 }
 
 QSize TreeView::viewportSizeHint() const
