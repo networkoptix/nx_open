@@ -145,7 +145,7 @@ bool SystemCommands::isPathExists(const std::string& path)
 SystemCommands::Stats SystemCommands::stat(const std::string& path)
 {
     Stats result;
-    const auto fileInfo = QFileInfo::exists(QString::fromStdString(path));
+    const auto fileInfo = QFileInfo(QString::fromStdString(path));
     result.exists = fileInfo.exists();
 
     if (result.exists)
