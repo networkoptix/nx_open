@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 struct LayoutSettingsDialogState: AbstractReduxState
 {
     /** Recommended area of the layout background - in square cells. */
-    static constexpr int kBackgroundRecommendedArea = 40*40;
+    static constexpr int kBackgroundRecommendedArea = 40 * 40;
 
     /** Recommended size of the layout background - in cells. */
     static constexpr int kBackgroundMinSize = 5;
