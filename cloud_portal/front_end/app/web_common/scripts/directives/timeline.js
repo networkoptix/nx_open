@@ -498,7 +498,7 @@
                         }
                         
                         element.on('mouseup', '.zoomOutButton', function () {
-                            onMouseUp();
+                            onMouseUp(true);
                             $timeout(() => {
                                 scope.disableZoomOut = scope.scaleManager.disableZoomOut;
                             });
@@ -521,7 +521,7 @@
                                 
                                 initialClick = $timeout(function () {
                                     waitingSecondClick = false;
-                                    onMouseUp(0);
+                                    onMouseUp(false);
                                     $timeout(() => {
                                         scope.disableZoomOut = scope.scaleManager.disableZoomOut;
                                     });
