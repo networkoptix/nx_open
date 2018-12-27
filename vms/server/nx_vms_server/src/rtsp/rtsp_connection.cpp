@@ -157,7 +157,7 @@ public:
         dataProcessor(0),
         sessionTimeOut(0),
         useProprietaryFormat(false),
-        startTime(0),
+        startTime(DATETIME_NOW), //< Default value
         startTimeTakenFromUrlQuery(false),
         endTime(0),
         rtspScale(1.0),
