@@ -966,10 +966,8 @@ void Player::setPosition(qint64 value)
 
         const qint64 valueUsec = msecToUsec(value);
         qint64 actualPositionUsec = valueUsec;
-        if (playbackState() == State::Previewing)
-            d->archiveReader->directJumpToNonKeyFrame(actualPositionUsec);
-        else
-            d->archiveReader->jumpTo(valueUsec, valueUsec, &actualPositionUsec);
+        const bool allowCorrection = playbackState() != State::Previewing;
+        d->archiveReader->jumpTo(valueUsec, valueUsec, allowCorrection, &actualPositionUsec);
 
         const qint64 actualJumpPositionMsec = usecToMsec(actualPositionUsec);
         if (actualJumpPositionMsec != value)
