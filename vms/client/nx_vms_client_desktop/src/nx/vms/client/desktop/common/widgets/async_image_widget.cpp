@@ -1,24 +1,21 @@
+#include "async_image_widget.h"
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStyle>
-#include <QtWidgets/private/qwidget_p.h>
 
 #include <client/client_globals.h>
-
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
-#include <nx/vms/client/desktop/image_providers/image_provider.h>
-#include <nx/client/core/utils/geometry.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
+#include <utils/common/scoped_painter_rollback.h>
+
+#include <nx/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-
-#include <utils/common/scoped_painter_rollback.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/image_providers/image_provider.h>
 
 namespace nx::vms::client::desktop {
 
@@ -72,6 +69,7 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
 {
     retranslateUi();
     setBackgroundRole(QPalette::Window);
+    setAutoFillBackground(true);
     setAttribute(Qt::WA_Hover);
 
     m_placeholder->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -204,16 +202,14 @@ bool AsyncImageWidget::cropRequired() const
 
 void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
-    QPainter painter(this);
-    if (d_func()->bg_role != QPalette::NoRole)
-        painter.fillRect(rect(), palette().brush(backgroundRole()));
-
     const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
     const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
         paintSize.toSize(), rect());
 
-    QRectF highlightSubRect;
+    QPainter painter(this);
     painter.setRenderHints(QPainter::SmoothPixmapTransform);
+
+    QRectF highlightSubRect;
 
     if (!m_preview.isNull() && !m_placeholder->isVisible())
     {
