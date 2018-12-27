@@ -428,6 +428,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
+    OnvifIniConfig::instance().reload();
     m_tmpH264Conf.reset(new onvifXsd__H264Configuration());
     m_pullMessagesResponseElapsedTimer.start();
     m_advSettingsLastUpdated.restart();
@@ -3664,7 +3665,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if (response.SubscriptionReference.Address)
     {
         const bool updatePort =
-            nx::network::SocketGlobals::ini().doUpdatePortInSubscriptionAddress;
+            OnvifIniConfig::instance().doUpdatePortInSubscriptionAddress;
         m_onvifNotificationSubscriptionReference =
             fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, updatePort);
     }
