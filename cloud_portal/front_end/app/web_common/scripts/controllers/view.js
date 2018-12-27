@@ -511,19 +511,6 @@
                     // record active camera again as only one camera should be selected per system
                     $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
                 }
-
-                // When a camera is loaded the offset might not be calculated. So we retry every second until its ready.
-                function setServerOffset(activeCameraParentId) {
-                    var serverOffset = $scope.camerasProvider.getServerTimeOffset(activeCameraParentId);
-                    if (serverOffset) {
-                        window.timeManager.setOffset(serverOffset);
-                        updateVideoSource(timeFromUrl);
-                    } else {
-                        $scope.camerasProvider.getServerTimes().then(() => {
-                            setServerOffset(activeCameraParentId);
-                        });
-                    }
-                }
                 
                 $scope.$watch('activeCamera', function () {
                     if (!$scope.activeCamera) {
@@ -550,11 +537,17 @@
                     
                     systemAPI.setCameraPath($scope.activeCamera.id);
                     timeFromUrl = timeFromUrl || null;
+                    if (!timeFromUrl && $scope.positionProvider) {
+                        timeFromUrl = $scope.positionProvider.playedPosition;
+                    }
                     $scope.updateCamera(timeFromUrl);
-                    timeFromUrl = null;
                     
                     //When camera is changed request offset for camera
-                    setServerOffset($scope.activeCamera.parentId);
+                    $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId).then( function(serverOffset) {
+                        window.timeManager.setOffset(serverOffset);
+                        updateVideoSource(timeFromUrl);
+                        timeFromUrl = null;
+                    });
                 });
                 
                 window.timeManager.init(CONFIG.webclient.useServerTime, CONFIG.webclient.useSystemTime);
