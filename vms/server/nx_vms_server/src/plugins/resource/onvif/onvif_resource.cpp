@@ -4894,7 +4894,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::secondaryVideoCap
 {
     QnMutexLocker lock(&m_mutex);
     return (!m_secondaryStreamCapabilitiesList.empty())
-        ? m_primaryStreamCapabilitiesList.front()
+        ? m_secondaryStreamCapabilitiesList.front()
         : VideoEncoderCapabilities();
 }
 
