@@ -4059,6 +4059,8 @@ void MediaServerProcess::startObjects()
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
         serverModule()->licenseWatcher()->start();
+
+    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
@@ -4465,7 +4467,6 @@ void MediaServerProcess::at_appStarted()
     if (isStopping())
         return;
 
-    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(serverModule()->runTimeSettings());
 
     QString dataLocation = serverModule()->settings().dataDir();
