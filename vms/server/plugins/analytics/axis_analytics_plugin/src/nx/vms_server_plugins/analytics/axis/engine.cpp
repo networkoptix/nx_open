@@ -18,11 +18,7 @@
 
 #include "device_agent.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
-
+namespace nx::vms_server_plugins::analytics::axis {
 namespace {
 
 const QString kAxisVendor("axis");
@@ -87,7 +83,6 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 
     EngineManifest events = fetchSupportedEvents(*deviceInfo);
-//    events.supportedEventTypeIds.push_back("nx.axis.VideoSource-Tampering");
 
     if (events.eventTypes.empty())
         return nullptr;
@@ -144,10 +139,7 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
     return nx::sdk::Error::noError;
 }
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis
 
 namespace {
 

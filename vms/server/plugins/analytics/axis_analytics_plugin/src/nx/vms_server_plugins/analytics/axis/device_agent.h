@@ -15,10 +15,7 @@
 #include "monitor.h"
 #include "engine.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 class MetadataHandler;
 
@@ -73,7 +70,4 @@ private:
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 };
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis
