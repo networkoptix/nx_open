@@ -65,9 +65,12 @@ class QmlDeployUtil:
         qt_deps = []
 
         for item in imports:
-            path = os.path.abspath(item.get("path"))
+            path = item.get("path")
+            if not path:
+                continue
 
-            if not path or os.path.commonprefix([self.qt_root, path]) != self.qt_root:
+            path = os.path.abspath(path)
+            if os.path.commonprefix([self.qt_root, path]) != self.qt_root:
                 continue
 
             qt_deps.append(
