@@ -77,12 +77,12 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     return 0;
 }
 
-bool SystemCommands::isPathExists(const std::string& /*path*/, FileType* /*outFileType*/)
+bool SystemCommands::isPathExists(const std::string& /*path*/)
 {
     return false;
 }
 
-SystemCommands::Stats SystemCommands::stat(const std::string& path)
+SystemCommands::Stats SystemCommands::stat(const std::string& /*path*/)
 {
     return SystemCommands::Stats();
 }
