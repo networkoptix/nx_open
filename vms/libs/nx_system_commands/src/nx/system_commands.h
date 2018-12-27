@@ -27,11 +27,19 @@ public:
         otherError
     };
 
-    enum class FileType
+
+    struct Stats
     {
-        regular,
-        directory,
-        other
+        enum class FileType
+        {
+            regular,
+            directory,
+            other
+        };
+
+        bool exists = false;
+        FileType type = FileType::other;
+        int64_t size = -1;
     };
 
     /** Mounts NAS from url to directory for real UID and GID. */
@@ -65,14 +73,14 @@ public:
     /** Returns total space on the device which given path belongs to */
     int64_t totalSpace(const std::string& path);
 
-    /**
-     * Returns the given path exists.
-     * @param outFileType If not null and path exists, it is filled with the file system node type.
-     */
-    bool isPathExists(const std::string& path, FileType* outFileType = nullptr);
+    /** Returns if the given path exists. */
+    bool isPathExists(const std::string& path);
 
     /** Returns CSV list of file entries - "fileName,fileSize,isDir" */
     std::string serializedFileList(const std::string& path);
+
+    /** Returns stats struct */
+    Stats stat(const std::string& path);
 
     /** Returns file size. */
     int64_t fileSize(const std::string& path);

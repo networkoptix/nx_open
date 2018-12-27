@@ -133,6 +133,17 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             sendInt64(transportFd, (int64_t) result);
             return result ? Result::ok : Result::execFailed;
         })
+    .reg({"stat"}, {"path"},
+        [systemCommands](const std::string& command, int transportFd)
+        {
+            std::string path;
+            if (!parseCommand(command, &path))
+                return Result::invalidArg;
+
+            const auto result = systemCommands->stat(path);
+            sendBuffer(transportFd, &result, sizeof(nx::SystemCommands::Stats));
+            return Result::ok;
+        })
     .reg({"list"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {

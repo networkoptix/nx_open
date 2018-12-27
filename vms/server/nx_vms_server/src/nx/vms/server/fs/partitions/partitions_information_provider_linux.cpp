@@ -90,11 +90,11 @@ qint64 PartitionsInformationProvider::freeSpace(const QByteArray& fsPath) const
 
 bool PartitionsInformationProvider::isFolder(const QByteArray& fsPath) const
 {
-    SystemCommands::FileType fileType;
-    if (!rootFileSystem()->isPathExists(fsPath, &fileType))
+    auto fileStats = rootFileSystem()->stat(fsPath);
+    if (!fileStats.exists)
         return false;
 
-    return fileType == SystemCommands::FileType::directory;
+    return fileStats.type == SystemCommands::Stats::FileType::directory;
 }
 
 } // namesapce nx::vms::server::fs
