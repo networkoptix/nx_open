@@ -358,7 +358,7 @@ public:
     VideoEncoderCapabilities primaryVideoCapabilities() const;
     VideoEncoderCapabilities secondaryVideoCapabilities() const;
 
-    void updateVideoEncoder(
+    void updateVideoEncoder1(
         onvifXsd__VideoEncoderConfiguration& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
