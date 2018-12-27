@@ -17,16 +17,16 @@ class CustomizationFilter(SimpleListFilter):
     title = 'Customization'
     parameter_name = 'customization'
     default_customization = None
-    all_customizations = '0'
-    other_customizations = '1000'
+    ALL_CUSTOMIZATIONS = '0'
+    OTHER_CUSTOMIZATIONS = '1000'
 
     def lookups(self, request, model_admin):
         # Temporary customization 0 is need for 'All' since we need to keep it,
         # but choose the customization for the current cloud portal as the default value
         self.default_customization = Customization.objects.get(name=settings.CUSTOMIZATION).id
-        customizations = [Customization(id=self.all_customizations, name='All Customizations')]
+        customizations = [Customization(id=self.ALL_CUSTOMIZATIONS, name='All Customizations')]
         customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
-        customizations.extend([Customization(id=self.other_customizations, name='Other Customizations')])
+        customizations.extend([Customization(id=self.OTHER_CUSTOMIZATIONS, name='Other Customizations')])
         return [(c.id, c.name) for c in customizations]
 
     def choices(self, cl):
@@ -39,9 +39,9 @@ class CustomizationFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            if self.value() == self.other_customizations:
+            if self.value() == self.OTHER_CUSTOMIZATIONS:
                 return queryset.exclude(customization__name__in=request.user.customizations)
-            elif self.value() != self.all_customizations:
+            elif self.value() != self.ALL_CUSTOMIZATIONS:
                 return queryset.filter(customization__id=self.value())
 
         else:
