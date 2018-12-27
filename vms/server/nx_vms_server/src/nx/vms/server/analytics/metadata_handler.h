@@ -18,6 +18,8 @@
 
 #include <nx/vms/api/analytics/descriptors.h>
 
+#include <nx/analytics/types.h>
+
 class QnAbstractDataReceptor;
 
 namespace nx::vms::server::analytics {
@@ -67,7 +69,7 @@ private:
 private:
     QnVirtualCameraResourcePtr m_resource;
     QString m_pluginId;
-    std::map<QString, nx::vms::api::analytics::EventTypeDescriptor> m_eventTypeDescriptors;
+    nx::analytics::EventTypeDescriptorMap m_eventTypeDescriptors;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_metadataSink = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;

@@ -9,6 +9,7 @@
 #include <QtWidgets/QMenu>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/style/skin.h>
 
 #include <nx/analytics/descriptor_manager.h>
@@ -215,15 +216,16 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    nx::analytics::DescriptorManager descriptorManager(q->commonModule());
-    const auto objectTypeDescriptors = descriptorManager.objectTypeDescriptors();
-    const auto engineDescriptors = descriptorManager.engineDescriptors();
+    nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(q->commonModule());
+    nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
+    const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
+    const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
 
     if (!objectTypeDescriptors.empty())
     {
         QHash<QnUuid, EngineInfo> engineById;
-        for (const auto&[engineId, engineDescriptor]: engineDescriptors)
+        for (const auto& [engineId, engineDescriptor]: engineDescriptors)
             engineById[engineId].name = engineDescriptor.name;
 
         for (const auto&[eventTypeId, objectTypeDescriptor]: objectTypeDescriptors)

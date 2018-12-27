@@ -19,8 +19,8 @@ std::optional<DeviceDescriptor> DeviceDescriptorMergeExecutor::operator()(
 
     auto mergeResult = *first;
 
-    const auto additionalCompatibleEngines = second->compatibleEngines;
-    mergeResult.compatibleEngines.insert(
+    const auto& additionalCompatibleEngines = second->compatibleEngineIds;
+    mergeResult.compatibleEngineIds.insert(
         additionalCompatibleEngines.cbegin(),
         additionalCompatibleEngines.cend());
 

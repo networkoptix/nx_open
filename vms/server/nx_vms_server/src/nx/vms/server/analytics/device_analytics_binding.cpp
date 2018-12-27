@@ -17,6 +17,7 @@
 #include <nx/sdk/common/ptr.h>
 
 #include <nx/analytics/descriptor_manager.h>
+#include <nx/analytics/utils.h>
 #include <nx/sdk/common/to_string.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 
@@ -38,24 +39,6 @@ using nx::sdk::analytics::common::MetadataTypes;
 namespace {
 
 static const int kMaxQueueSize = 100;
-
-QSet<QString> supportedObjectTypes(const DeviceAgentManifest& manifest)
-{
-    auto result = manifest.supportedObjectTypeIds.toSet();
-    for (const auto& objectType : manifest.objectTypes)
-        result.insert(objectType.id);
-
-    return result;
-}
-
-QSet<QString> supportedEventTypes(const DeviceAgentManifest& manifest)
-{
-    auto result = manifest.supportedEventTypeIds.toSet();
-    for (const auto& eventType: manifest.eventTypes)
-        result.insert(eventType.id);
-
-    return result;
-}
 
 } // namespace
 
@@ -428,19 +411,11 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
         return false;
     }
 
-    const auto pluginManifest = parentPlugin->manifest();
-
     nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
     descriptorManager.updateFromDeviceAgentManifest(
         m_device->getId(),
         m_engine->getId(),
         manifest);
-
-    // TODO: #dmishin make analytics helper handle supported event/object types.
-    m_device->setSupportedAnalyticsEventTypeIds(m_engine->getId(), supportedEventTypes(manifest));
-    m_device->setSupportedAnalyticsObjectTypeIds(
-        m_engine->getId(),
-        supportedObjectTypes(manifest));
 
     m_device->saveProperties();
 
@@ -455,15 +430,23 @@ nx::sdk::common::Ptr<MetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes(
     if (!NX_ASSERT(deviceAgentManifest, "Got invlaid device agent manifest"))
         return nx::sdk::common::Ptr<MetadataTypes>();
 
-    const auto eventTypes = supportedEventTypes(*deviceAgentManifest);
-    const auto objectTypes = supportedObjectTypes(*deviceAgentManifest);
+    using namespace nx::analytics;
+
+    const auto eventTypes = supportedEventTypeIdsFromManifest(*deviceAgentManifest);
+    const auto objectTypes = supportedObjectTypeIdsFromManifest(*deviceAgentManifest);
 
     const auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
     if (!NX_ASSERT(ruleWatcher, "Can't access analytics rule watcher"))
         return nx::sdk::common::Ptr<MetadataTypes>();
 
     auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
-    neededEventTypes.intersect(eventTypes);
+    for (auto it = neededEventTypes.begin(); it != neededEventTypes.end();)
+    {
+        if (eventTypes.find(*it) == eventTypes.cend())
+            it = neededEventTypes.erase(it);
+        else
+            ++it;
+    }
 
     nx::sdk::common::Ptr<MetadataTypes> result(new MetadataTypes());
     for (const auto& eventTypeId: neededEventTypes)

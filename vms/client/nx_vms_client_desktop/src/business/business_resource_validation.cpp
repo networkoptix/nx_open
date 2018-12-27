@@ -239,8 +239,9 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    // TODO: #dmishin implement this when IEngine::isCompatible is added to the SDK.
-    return true;
+    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(camera->commonModule());
+    const auto deviceDescriptor = deviceDescriptorManager.descriptor(camera->getId());
+    return deviceDescriptor && !deviceDescriptor->compatibleEngineIds.empty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)

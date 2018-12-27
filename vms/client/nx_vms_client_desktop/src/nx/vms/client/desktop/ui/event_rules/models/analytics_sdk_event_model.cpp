@@ -31,12 +31,12 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     auto addItem = [this](
         QStandardItem* parent,
         const QString& name,
-        const QString& pluginId,
+        const QString& engineId,
         const QString& id)
     {
         auto item = new QStandardItem(name);
         item->setData(qVariantFromValue(id), EventTypeIdRole);
-        item->setData(qVariantFromValue(pluginId), DriverIdRole);
+        item->setData(qVariantFromValue(engineId), DriverIdRole);
         if (parent)
             parent->appendRow(item);
         else
@@ -47,77 +47,53 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     using namespace nx::vms::event;
     clear();
 
-    nx::analytics::DescriptorManager descriptorManager(commonModule());
+    nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
+    nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule());
+    nx::analytics::GroupDescriptorManager groupDescriptorManager(commonModule());
 
-    // TODO: #dmishin show all 'potentially' supported event types. Return to this code when
-    // `isCompatible` method is added to the SDK IEngine interface.
-    const auto eventTypeDescriptors = descriptorManager.supportedEventTypeDescriptorsIntersection(cameras);
-    const auto engineDescriptors = descriptorManager.eventTypesParentEngineDescriptors(eventTypeDescriptors);
-    const auto groupDescriptors = descriptorManager.eventTypesParentGroupDescriptors(eventTypeDescriptors);
+    const auto scopedEventTypeIds = eventTypeDescriptorManager
+        .compatibleEventTypeIdsIntersection(cameras);
 
-    const bool useEngineName = engineDescriptors.size() > 1;
-    struct EngineNode
+    for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
     {
-        QStandardItem* item = nullptr;
-        QMap<QString, QStandardItem*> groups;
-    };
+        const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
+        QStandardItem* parentItem = nullptr;
 
-    EngineNode defaultPluginNode;
-    QMap<QnUuid, EngineNode> items;
-    for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
-    {
-        for (const auto& scope: eventTypeDescriptor.scopes)
+        if (!engineDescriptor)
+            continue;
+
+        parentItem = addItem(
+            nullptr,
+            engineDescriptor->name,
+            engineId.toString(),
+            QString());
+
+        for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
         {
-            QStandardItem* parentItem = nullptr;
-            const auto& engineId = scope.engineId;
-            const auto& groupId = scope.groupId;
-            if (useEngineName && !items.contains(engineId))
+            const auto groupDescriptor = groupDescriptorManager.descriptor(groupId);
+            if (groupDescriptor)
             {
-                auto itr = engineDescriptors.find(engineId);
-                if (itr == engineDescriptors.cend())
-                    continue;
-
-                const auto& engineDescriptor = itr->second;
-                auto item = addItem(
-                    nullptr,
-                    engineDescriptor.name,
-                    engineDescriptor.id.toString(),
-                    QString());
-
-                item->setFlags(item->flags().setFlag(Qt::ItemIsEnabled, false));
-                items.insert(engineId, {item, {}});
-            }
-
-            if (items.contains(engineId))
-                parentItem = items.value(engineId).item;
-
-            auto& engineNode = useEngineName ? items[engineId] : defaultPluginNode;
-            if (!groupId.isEmpty() && !engineNode.groups.contains(groupId))
-            {
-                auto itr = groupDescriptors.find(groupId);
-                if (itr == groupDescriptors.cend())
-                    continue;
-
-                const auto& groupDescriptor = itr->second;
-                auto item = addItem(
-                    engineNode.item,
-                    groupDescriptor.name,
+                parentItem = addItem(
+                    parentItem,
+                    groupDescriptor->name,
                     engineId.toString(),
-                    groupDescriptor.id);
-
-                item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
-                engineNode.groups.insert(groupId, item);
-                parentItem = item;
+                    groupDescriptor->id);
             }
 
-            if (!groupId.isEmpty() && engineNode.groups.contains(groupId))
-                parentItem = engineNode.groups.value(groupId);
+            for (const auto& eventTypeId: eventTypeIds)
+            {
+                const auto eventTypeDescriptor =
+                    eventTypeDescriptorManager.descriptor(eventTypeId);
 
-            addItem(
-                parentItem,
-                eventTypeDescriptor.name,
-                engineId.toString(),
-                eventTypeDescriptor.id);
+                if (!eventTypeDescriptor)
+                    continue;
+
+                addItem(
+                    parentItem,
+                    eventTypeDescriptor->name,
+                    engineId.toString(),
+                    eventTypeDescriptor->id);
+            }
         }
     }
 

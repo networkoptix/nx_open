@@ -44,7 +44,7 @@ public:
      * Returns descriptors from all container resources merged into a single map with the help of
      * merge executor.
      */
-    std::optional<TopLevelMap> descriptors()
+    std::optional<TopLevelMap> descriptors() const
     {
         TopLevelMap result;
         for (const auto&[resourceId, container]: m_containers)
@@ -64,7 +64,7 @@ public:
      * Returns descriptors grouped by a resource.
      */
     template<typename... Scopes>
-    auto descriptors(const QnUuid& resourceId, const Scopes&... scopes)
+    auto descriptors(const QnUuid& resourceId, const Scopes&... scopes) const
         -> std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
     {
         auto itr = m_containers.find(resourceId);
@@ -80,7 +80,7 @@ public:
      * merge executor.
      */
     template<typename... Scopes>
-    auto mergedDescriptors(const Scopes&... scopes)
+    auto mergedDescriptors(const Scopes&... scopes) const
         ->std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
     {
         MergeExecutor mergeExecutor;

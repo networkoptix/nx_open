@@ -26,7 +26,7 @@ public:
     {
     }
 
-    Container fetch()
+    Container fetch() const
     {
         Container container;
         const auto serialized = m_resource->getProperty(m_propertyName);

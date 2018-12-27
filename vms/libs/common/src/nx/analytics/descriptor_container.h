@@ -36,7 +36,7 @@ public:
      * Returns descriptors corresponding to the provided scopes.
      */
     template<typename... Scopes>
-    auto descriptors(const Scopes&... scopes)
+    auto descriptors(const Scopes&... scopes) const
         -> std::optional<MapHelper::MappedTypeOnLevel<Container, sizeof...(Scopes)>>
     {
         const auto allDescriptors = m_descriptorStorage->fetch();

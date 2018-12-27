@@ -512,7 +512,7 @@ std::set<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& 
 
 void Manager::updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device)
 {
-    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    nx::analytics::DeviceDescriptorManager descriptorManager(serverModule()->commonModule());
     descriptorManager.setCompatibleAnalyticsEngines(device->getId(), compatibleEngineIds(device));
 }
 
@@ -527,7 +527,7 @@ void Manager::updateCompatibilityWithDevices(
         return;
     }
 
-    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    nx::analytics::DeviceDescriptorManager descriptorManager(serverModule()->commonModule());
     auto devices = resourcePool()->getAllCameras(
         /*any server*/ QnResourcePtr(),
         /*ignoreDesktopCamera*/ true);
@@ -549,14 +549,14 @@ void Manager::updateCompatibilityWithDevices(
 
 void Manager::removeDeviceDescriptor(const QnVirtualCameraResourcePtr& device)
 {
-    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    nx::analytics::DeviceDescriptorManager descriptorManager(serverModule()->commonModule());
     descriptorManager.removeDeviceDescriptors({device->getId()});
 }
 
 void Manager::removeEngineFromCompatible(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
-    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
+    nx::analytics::DeviceDescriptorManager descriptorManager(serverModule()->commonModule());
     descriptorManager.removeCompatibleAnalyticsEngines({engine->getId()});
 }
 

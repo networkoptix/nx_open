@@ -174,11 +174,17 @@ struct ActionTypeDescriptor: BaseDescriptor
 struct DeviceDescriptor
 {
     QnUuid id; //< Device id.
-    std::set<QnUuid> compatibleEngines;
+    std::set<QnUuid> compatibleEngineIds;
+    std::map<QnUuid, std::set<QString>> supportedEventTypeIds;
+    std::map<QnUuid, std::set<QString>> supportedObjectTypeIds;
 
     QnUuid getId() const { return id; };
 };
-#define nx_vms_api_analytics_DeviceDescriptor_Fields (id) (compatibleEngines)
+#define nx_vms_api_analytics_DeviceDescriptor_Fields \
+    (id) \
+    (compatibleEngineIds) \
+    (supportedEventTypeIds) \
+    (supportedObjectTypeIds)
 
 QN_FUSION_DECLARE_FUNCTIONS(DescriptorScope, (json)(eq), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(BaseDescriptor, (json)(eq), NX_VMS_API)

@@ -157,8 +157,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            nx::analytics::DescriptorManager descriptorManager(objectCamera->commonModule());
-            const auto objectTypeDescriptor = descriptorManager.objectTypeDescriptor(
+            nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(
+                objectCamera->commonModule());
+
+            const auto objectTypeDescriptor = objectTypeDescriptorManager.descriptor(
                 object.objectTypeId);
 
             if (!objectTypeDescriptor)
@@ -733,7 +735,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     if (!camera)
         return {};
 
-    nx::analytics::DescriptorManager descriptorManager(q->commonModule());
+    nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
     auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
         object.objectTypeId,
         camera);

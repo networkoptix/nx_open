@@ -238,22 +238,22 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    const nx::analytics::DescriptorManager descriptorManager(commonModule());
+    const nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
     // We don't filter by cameras since we don't know if an event was supported by some device
     // before.
-    const auto allEventTypes = descriptorManager.eventTypeDescriptors();
+    const auto allEventTypes = eventTypeDescriptorManager.descriptors();
     if (allEventTypes.empty())
         return;
 
-    const auto engineDescriptors = descriptorManager.eventTypesParentEngineDescriptors(allEventTypes);
+    const nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule());
     auto buildEventTypeName =
-        [this, &engineDescriptors](const QnUuid& engineId, const QString& eventTypeName)
+        [this, &engineDescriptorManager](const QnUuid& engineId, const QString& eventTypeName)
         {
-            auto it = engineDescriptors.find(engineId);
-            if (it == engineDescriptors.cend())
+            const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
+            if (!engineDescriptor)
                 return eventTypeName;
 
-            return lm("%1 - %2").args(it->second.name, eventTypeName).toQString();
+            return lm("%1 - %2").args(engineDescriptor->name, eventTypeName).toQString();
         };
 
     for (const auto& [eventTypeId, eventTypeDescriptor]: allEventTypes)

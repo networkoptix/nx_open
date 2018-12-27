@@ -713,8 +713,8 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    nx::analytics::DescriptorManager descriptorManager(camera->commonModule());
-    const auto eventTypeDescriptor = descriptorManager.eventTypeDescriptor(eventTypeId);
+    nx::analytics::EventTypeDescriptorManager descriptorManager(camera->commonModule());
+    const auto eventTypeDescriptor = descriptorManager.descriptor(eventTypeId);
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }
 
