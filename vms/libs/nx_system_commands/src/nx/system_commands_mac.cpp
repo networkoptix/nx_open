@@ -82,6 +82,11 @@ bool SystemCommands::isPathExists(const std::string& /*path*/, FileType* /*outFi
     return false;
 }
 
+SystemCommands::Stats SystemCommands::stat(const std::string& path)
+{
+    return SystemCommands::Stats();
+}
+
 std::string SystemCommands::serializedFileList(const std::string& /*path*/)
 {
     return "";
