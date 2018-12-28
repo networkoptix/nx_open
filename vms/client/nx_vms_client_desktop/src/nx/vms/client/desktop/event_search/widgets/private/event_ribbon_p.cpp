@@ -569,11 +569,14 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
             if (!tile->animated)
                 continue;
 
+            // This is to prevent all inserted tiles appearing on the screen at once.
+            static constexpr qreal kStartingFraction = 0.25;
+
             AnimationPtr animator(new QVariantAnimation());
             static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileInsertion;
             animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
             animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
-            animator->setStartValue(0.0);
+            animator->setStartValue(kStartingFraction);
             animator->setEndValue(1.0);
             animator->start(QAbstractAnimation::DeleteWhenStopped);
 
