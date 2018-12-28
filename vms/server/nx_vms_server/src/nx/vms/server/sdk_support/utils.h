@@ -51,7 +51,7 @@ std::optional<ManifestType> manifest(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const nx::sdk::common::Ptr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    const nx::sdk::Ptr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](
@@ -118,15 +118,15 @@ bool deviceInfoFromResource(
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
-nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
 
 /**
  * @param mapJson Json array of objects with string fields "name" and "value".
  * @return Null if the json is invalid, has unexpected structure (besides potentially added
  * unknown fields) or there are duplicate keys.
  */
-nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
 

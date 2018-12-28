@@ -15,7 +15,7 @@
 
 #include <nx/vms/server/sdk_support/utils.h>
 
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 namespace nx::vms::server::analytics::debug_helpers {
 
@@ -124,7 +124,7 @@ QString debugFilesDirectoryPath(const QString& path)
 
 } // namespace
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
+nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename)
 {
@@ -160,7 +160,7 @@ nx::sdk::common::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     return settings;
 }
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
+nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
@@ -177,7 +177,7 @@ nx::sdk::common::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
         dir.absoluteFilePath(settingsFilename));
 }
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
+nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
     const auto settingsFilename = filename(engine, kSettingsFilenamePostfix);

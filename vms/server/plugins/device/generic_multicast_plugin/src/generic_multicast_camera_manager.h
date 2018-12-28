@@ -4,7 +4,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include "generic_multicast_plugin.h"
 
@@ -69,7 +69,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    nx::sdk::common::Ptr<GenericMulticastPlugin> m_pluginRef;
+    nx::sdk::Ptr<GenericMulticastPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::unique_ptr<GenericMulticastMediaEncoder> m_encoder;

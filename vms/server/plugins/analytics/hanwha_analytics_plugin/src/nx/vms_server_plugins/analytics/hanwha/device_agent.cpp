@@ -7,10 +7,10 @@
 #define NX_PRINT_PREFIX "[hanwha::DeviceAgent] "
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log.h>
 
 #include "common.h"
@@ -50,13 +50,13 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
     return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->eventTypeIds()->count() == 0)
     {
@@ -67,31 +67,31 @@ nx::sdk::Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadat
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
+Error DeviceAgent::startFetchingMetadata(
+    const IMetadataTypes* /*metadataTypes*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
         {
             using namespace std::chrono;
-            auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+            auto packet = new EventMetadataPacket();
 
             for (const auto& hanwhaEvent: events)
             {
                 if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
                     return;
 
-                auto event = new nx::sdk::analytics::common::Event();
+                auto event = new nx::sdk::analytics::Event();
                 NX_PRINT
                     << "Got event: caption ["
                     << hanwhaEvent.caption.toStdString() << "], description ["
@@ -154,10 +154,10 @@ const IString* DeviceAgent::manifest(Error* error) const
     }
 
     *error = Error::noError;
-    return new nx::sdk::common::String(m_deviceAgentManifest);
+    return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const DeviceInfo& deviceInfo)
 {
     m_url = deviceInfo.url;
     m_model = deviceInfo.model;

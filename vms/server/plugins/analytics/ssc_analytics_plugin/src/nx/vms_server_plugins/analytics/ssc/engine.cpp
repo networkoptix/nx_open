@@ -11,7 +11,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include <nx/vms_server_plugins/utils/uuid.h>
 
@@ -117,7 +117,7 @@ bool isCorrectLogicalId(int cameraLogicalId)
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     static const char* const kManifestResourceName = ":/ssc/manifest.json";
     static const char* const kManifestFilename = "plugins/ssc/manifest.json";
@@ -289,12 +289,12 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -365,7 +365,7 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
+IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo, Error* outError)
 {
     // We should invent more accurate test.
@@ -378,21 +378,21 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
-void Engine::executeAction(nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/)
+void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
     // Do nothing.
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-bool Engine::isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
 {
     return deviceInfo->logicalId != 0;
 }
@@ -419,13 +419,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::ssc::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

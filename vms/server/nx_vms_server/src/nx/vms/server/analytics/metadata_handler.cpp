@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
@@ -56,14 +56,14 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 
     bool handled = false;
-    if (const auto eventsPacket = nx::sdk::common::Ptr<IEventMetadataPacket>(
+    if (const auto eventsPacket = nx::sdk::Ptr<IEventMetadataPacket>(
         metadata->queryInterface(IID_EventMetadataPacket)))
     {
         handleEventsPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = nx::sdk::common::Ptr<IObjectMetadataPacket>(
+    if (const auto objectsPacket = nx::sdk::Ptr<IObjectMetadataPacket>(
         metadata->queryInterface(IID_ObjectMetadataPacket)))
     {
         handleObjectsPacket(objectsPacket);
@@ -78,18 +78,18 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 }
 
-void MetadataHandler::handleEventsPacket(nx::sdk::common::Ptr<IEventMetadataPacket> packet)
+void MetadataHandler::handleEventsPacket(nx::sdk::Ptr<IEventMetadataPacket> packet)
 {
     int eventsCount = 0;
     while (true)
     {
-        nx::sdk::common::Ptr<IMetadataItem> item(packet->nextItem());
+        nx::sdk::Ptr<IMetadataItem> item(packet->nextItem());
         if (!item)
             break;
 
         ++eventsCount;
 
-        if (const auto event = nx::sdk::common::Ptr<IEvent>(item->queryInterface(IID_Event)))
+        if (const auto event = nx::sdk::Ptr<IEvent>(item->queryInterface(IID_Event)))
         {
             const int64_t timestampUsec = packet->timestampUs();
             handleMetadataEvent(event, timestampUsec);
@@ -104,13 +104,13 @@ void MetadataHandler::handleEventsPacket(nx::sdk::common::Ptr<IEventMetadataPack
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
-void MetadataHandler::handleObjectsPacket(nx::sdk::common::Ptr<IObjectMetadataPacket> packet)
+void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> packet)
 {
     using namespace nx::vms_server_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nx::sdk::common::Ptr<IObject> item(packet->nextItem());
+        nx::sdk::Ptr<IObject> item(packet->nextItem());
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
@@ -150,7 +150,7 @@ void MetadataHandler::handleObjectsPacket(nx::sdk::common::Ptr<IObjectMetadataPa
 }
 
 void MetadataHandler::handleMetadataEvent(
-    nx::sdk::common::Ptr<IEvent> eventData,
+    nx::sdk::Ptr<IEvent> eventData,
     qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;

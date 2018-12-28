@@ -4,7 +4,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/i_device_info.h>
-#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
@@ -17,7 +17,7 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(IPlugin* plugin): nx::sdk::analytics::common::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(IPlugin* plugin): nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
@@ -30,7 +30,7 @@ Engine::~Engine()
         m_thread->join();
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
+IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* /*deviceInfo*/, Error* /*outError*/)
 {
     return new DeviceAgent(this);
@@ -44,8 +44,7 @@ void Engine::initCapabilities()
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
     {
-        if (!nx::sdk::analytics::common::pixelFormatFromStdString(
-            pixelFormatString, &m_pixelFormat))
+        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
         {
             NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
                 << ini().iniFile() << ": [" << pixelFormatString << "].";
@@ -379,7 +378,7 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)

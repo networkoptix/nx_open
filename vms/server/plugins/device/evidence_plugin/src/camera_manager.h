@@ -12,7 +12,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include "ptz_manager.h"
 
@@ -144,7 +144,7 @@ private:
         Holding reference to \a CameraPlugin, but not \a CameraDiscoveryManager,
         since \a CameraDiscoveryManager instance is not required for \a CameraManager object
     */
-    nx::sdk::common::Ptr<CameraPlugin> m_pluginRef;
+    nx::sdk::Ptr<CameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;

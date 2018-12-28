@@ -8,13 +8,13 @@ extern "C" {
 
 } // extern "C"
 
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
 #include <nx/kit/debug.h>
 
 #include <nx/gstreamer/gstreamer_common.h>
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "device_agent.h"
 #include "utils.h"
@@ -30,7 +30,7 @@ namespace deepstream {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     if (strcmp(ini().debugDotFilesDir, "") == 0)
     {
@@ -62,7 +62,7 @@ Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
 
-    if (const auto timeProvider = nx::sdk::common::Ptr<nxpl::TimeProvider>(
+    if (const auto timeProvider = Ptr<nxpl::TimeProvider>(
         m_plugin->pluginContainer()->queryInterface(nxpl::IID_TimeProvider)))
     {
         m_timeProvider = decltype(m_timeProvider)(
@@ -81,7 +81,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == IID_Engine)
     {
         addRef();
-        return static_cast<nx::sdk::analytics::IEngine*>(this);
+        return static_cast<IEngine*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
@@ -116,7 +116,7 @@ const IString* Engine::manifest(Error* error) const
     *error = Error::noError;
 
     if (!m_manifest.empty())
-        return new nx::sdk::common::String(m_manifest);
+        return new nx::sdk::String(m_manifest);
 
     std::string objectTypesManifest;
     if (ini().pipelineType == kOpenAlprPipeline)
@@ -154,10 +154,10 @@ const IString* Engine::manifest(Error* error) const
 }
 )json";
 
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
+IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo, Error* outError)
 {
     NX_OUTPUT
@@ -171,7 +171,7 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     return new DeviceAgent(this, std::string(deviceInfo->uid));
 }
 
-void Engine::executeAction(nx::sdk::analytics::Action*, Error*)
+void Engine::executeAction(Action*, Error*)
 {
     // Do nothing.
 }
@@ -276,13 +276,13 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* handler)
+Error Engine::setHandler(IHandler* handler)
 {
     // TODO: Implement.
     return Error::noError;
 }
 
-bool Engine::isCompatible(const nx::sdk::DeviceInfo* /*deviceInfo*/) const
+bool Engine::isCompatible(const DeviceInfo* /*deviceInfo*/) const
 {
     return true;
 }
@@ -309,13 +309,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::deepstream::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

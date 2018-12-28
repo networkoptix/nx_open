@@ -5,7 +5,7 @@
 #include <memory>
 #include <condition_variable>
 
-#include <nx/sdk/analytics/common/video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 
 #include "engine.h"
 
@@ -14,7 +14,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
-class DeviceAgent: public nx::sdk::analytics::common::VideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine);

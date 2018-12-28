@@ -11,7 +11,7 @@ extern "C" {
 } // extern "C"
 
 #include <plugins/plugin_api.h>
-#include <nx/sdk/analytics/common/attribute.h>
+#include <nx/sdk/analytics/helpers/attribute.h>
 #include <nx/vms_server_plugins/analytics/deepstream/utils.h>
 
 namespace nx {
@@ -50,7 +50,7 @@ struct TrackedObject
     nxpl::NX_GUID guid;
     int lifetime;
     bool found;
-    std::deque<nx::sdk::analytics::common::Attribute> attributes;
+    std::deque<nx::sdk::analytics::Attribute> attributes;
 };
 
 class TrackingMapper
@@ -62,7 +62,7 @@ public:
     void addMapping(int nvidiaTrackingId, const nxpl::NX_GUID& nxObjectId);
 
     void setLabelMapping(std::map<LabelMappingId, LabelMapping> labelMapping);
-    std::deque<nx::sdk::analytics::common::Attribute> attributes(const ROIMeta_Params& roiMeta);
+    std::deque<nx::sdk::analytics::Attribute> attributes(const ROIMeta_Params& roiMeta);
 
     void notifyFrameProcessed();
 

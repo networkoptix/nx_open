@@ -21,7 +21,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -227,7 +227,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(m_videoPacket.get())
     {
         *lpPacket = m_videoPacket.release();
-        const nx::sdk::common::Ptr<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+        const nx::sdk::Ptr<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
         if (!plugin)
         {
             NX_DEBUG(this, "No plugin");

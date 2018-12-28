@@ -4,13 +4,13 @@
 
 #include <chrono>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -46,24 +46,23 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
     {
@@ -74,21 +73,20 @@ nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     return startFetchingMetadata(metadataTypes);
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const HikvisionEventList& events)
         {
             using namespace std::chrono;
-            auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+            auto packet = new EventMetadataPacket();
 
             for (const auto& hikvisionEvent: events)
             {
                 if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
                     return;
 
-                auto event = new nx::sdk::analytics::common::Event();
+                auto event = new nx::sdk::analytics::Event();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
@@ -150,10 +148,10 @@ const IString* DeviceAgent::manifest(Error* error) const
     }
 
     *error = Error::noError;
-    return new nx::sdk::common::String(m_deviceAgentManifest);
+    return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const DeviceInfo& deviceInfo)
 {
     m_url = deviceInfo.url;
     m_model = deviceInfo.model;

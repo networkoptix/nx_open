@@ -4,7 +4,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 namespace nx {
 namespace sdk {

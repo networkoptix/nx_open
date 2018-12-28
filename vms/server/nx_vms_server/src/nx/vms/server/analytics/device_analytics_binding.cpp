@@ -13,12 +13,12 @@
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
-#include <nx/sdk/analytics/common/metadata_types.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/analytics/helpers/metadata_types.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/analytics/utils.h>
-#include <nx/sdk/common/to_string.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 
 #include <nx/vms/server/analytics/data_packet_adapter.h>
@@ -34,7 +34,7 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::vms::api::analytics;
 using namespace nx::sdk::analytics;
-using nx::sdk::analytics::common::MetadataTypes;
+using nx::sdk::analytics::MetadataTypes;
 
 namespace {
 
@@ -159,7 +159,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_sdkDeviceAgent)
         return;
 
-    const auto neededMetadataTypes = nx::sdk::common::makePtr<MetadataTypes>();
+    const auto neededMetadataTypes = nx::sdk::makePtr<MetadataTypes>();
     m_sdkDeviceAgent->setNeededMetadataTypes(neededMetadataTypes.get());
 }
 
@@ -189,7 +189,7 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
     jsonEngine.applyValues(settingsFromProperty);
 
-    nx::sdk::common::Ptr<nx::sdk::IStringMap> pluginSideSettings(
+    nx::sdk::Ptr<nx::sdk::IStringMap> pluginSideSettings(
         deviceAgent->pluginSideSettings());
     if (!pluginSideSettings)
     {
@@ -229,7 +229,7 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
 
 bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFromUser)
 {
-    nx::sdk::common::Ptr<nx::sdk::IStringMap> effectiveSettings;
+    nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
     if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
@@ -259,7 +259,7 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
     {
         debug_helpers::dumpStringToFile(
             this,
-            QString::fromStdString(nx::sdk::common::toJsonString(effectiveSettings.get())),
+            QString::fromStdString(nx::sdk::toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
             debug_helpers::filename(
                 m_device,
@@ -299,7 +299,7 @@ std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
     return m_engine->manifest();
 }
 
-nx::sdk::common::Ptr<DeviceAnalyticsBinding::DeviceAgent>
+nx::sdk::Ptr<DeviceAnalyticsBinding::DeviceAgent>
     DeviceAnalyticsBinding::createDeviceAgent()
 {
     if (!NX_ASSERT(m_device, "Device is empty"))
@@ -334,7 +334,7 @@ nx::sdk::common::Ptr<DeviceAnalyticsBinding::DeviceAgent>
     }
 
     nx::sdk::Error error = nx::sdk::Error::noError;
-    nx::sdk::common::Ptr<DeviceAgent> deviceAgent(
+    nx::sdk::Ptr<DeviceAgent> deviceAgent(
         sdkEngine->obtainDeviceAgent(&deviceInfo, &error));
 
     if (!deviceAgent)
@@ -344,7 +344,7 @@ nx::sdk::common::Ptr<DeviceAnalyticsBinding::DeviceAgent>
         return nullptr;
     }
 
-    nx::sdk::common::Ptr<IConsumingDeviceAgent> streamConsumer(
+    nx::sdk::Ptr<IConsumingDeviceAgent> streamConsumer(
         deviceAgent->queryInterface(IID_ConsumingDeviceAgent));
 
     m_isStreamConsumer = !!streamConsumer;
@@ -371,7 +371,7 @@ std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 }
 
 std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadDeviceAgentManifest(
-    const nx::sdk::common::Ptr<DeviceAgent>& deviceAgent)
+    const nx::sdk::Ptr<DeviceAgent>& deviceAgent)
 {
     if (!NX_ASSERT(deviceAgent, "Invalid device agent"))
         return std::nullopt;
@@ -422,13 +422,13 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
     return true;
 }
 
-nx::sdk::common::Ptr<MetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes() const
+nx::sdk::Ptr<MetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes() const
 {
     const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
         m_sdkDeviceAgent, makeLogger("DeviceAgent"));
 
     if (!NX_ASSERT(deviceAgentManifest, "Got invlaid device agent manifest"))
-        return nx::sdk::common::Ptr<MetadataTypes>();
+        return nx::sdk::Ptr<MetadataTypes>();
 
     using namespace nx::analytics;
 
@@ -437,7 +437,7 @@ nx::sdk::common::Ptr<MetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes(
 
     const auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
     if (!NX_ASSERT(ruleWatcher, "Can't access analytics rule watcher"))
-        return nx::sdk::common::Ptr<MetadataTypes>();
+        return nx::sdk::Ptr<MetadataTypes>();
 
     auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
     for (auto it = neededEventTypes.begin(); it != neededEventTypes.end();)
@@ -448,7 +448,7 @@ nx::sdk::common::Ptr<MetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes(
             ++it;
     }
 
-    nx::sdk::common::Ptr<MetadataTypes> result(new MetadataTypes());
+    nx::sdk::Ptr<MetadataTypes> result(new MetadataTypes());
     for (const auto& eventTypeId: neededEventTypes)
         result->addEventTypeId(eventTypeId.toStdString());
 
@@ -505,7 +505,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
         return true;
     }
     // Returning true means the data has been processed.
-    nx::sdk::common::Ptr<nx::sdk::analytics::IConsumingDeviceAgent> consumingDeviceAgent(
+    nx::sdk::Ptr<nx::sdk::analytics::IConsumingDeviceAgent> consumingDeviceAgent(
         m_sdkDeviceAgent->queryInterface(nx::sdk::analytics::IID_ConsumingDeviceAgent));
 
     NX_ASSERT(consumingDeviceAgent);

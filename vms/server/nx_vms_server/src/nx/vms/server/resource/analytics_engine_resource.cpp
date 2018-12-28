@@ -10,7 +10,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/common/to_string.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
 #include <nx/analytics/descriptor_manager.h>
@@ -24,12 +24,12 @@ AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModu
 }
 
 void AnalyticsEngineResource::setSdkEngine(
-    nx::sdk::common::Ptr<nx::sdk::analytics::IEngine> sdkEngine)
+    nx::sdk::Ptr<nx::sdk::analytics::IEngine> sdkEngine)
 {
     m_sdkEngine = std::move(sdkEngine);
 }
 
-nx::sdk::common::Ptr<nx::sdk::analytics::IEngine> AnalyticsEngineResource::sdkEngine() const
+nx::sdk::Ptr<nx::sdk::analytics::IEngine> AnalyticsEngineResource::sdkEngine() const
 {
     return m_sdkEngine;
 }
@@ -75,7 +75,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
 
     NX_DEBUG(this, "Sending settings to engine %1 (%2)", getName(), getId());
 
-    nx::sdk::common::Ptr<nx::sdk::IStringMap> effectiveSettings;
+    nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
@@ -95,7 +95,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     {
         analytics::debug_helpers::dumpStringToFile(
             this,
-            QString::fromStdString(nx::sdk::common::toJsonString(effectiveSettings.get())),
+            QString::fromStdString(nx::sdk::toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
             analytics::debug_helpers::filename(
                 QnVirtualCameraResourcePtr(),

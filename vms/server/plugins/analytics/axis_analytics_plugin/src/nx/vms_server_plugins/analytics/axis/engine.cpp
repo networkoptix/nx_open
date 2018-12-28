@@ -14,7 +14,7 @@
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "device_agent.h"
 
@@ -33,7 +33,7 @@ const QString kSoapPath("/vapix/services");
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -66,17 +66,17 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
+IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo,
     Error* outError)
 {
@@ -95,7 +95,7 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
 EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
@@ -135,10 +135,10 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
     // Do nothing.
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
 bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
@@ -169,13 +169,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::axis::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

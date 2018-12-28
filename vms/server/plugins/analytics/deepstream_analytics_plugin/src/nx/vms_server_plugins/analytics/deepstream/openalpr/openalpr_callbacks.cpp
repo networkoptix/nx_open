@@ -16,8 +16,8 @@ extern "C" {
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr/openalpr_pipeline.h>
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr_common.h>
 
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx {
@@ -48,7 +48,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (bboxes->gie_type != 3)
         return true;
 
-    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
     packet->setTimestampUs(GST_BUFFER_PTS(buffer));
     packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
 
@@ -75,7 +75,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::common::Object();
+        auto detectedObject = new nx::sdk::analytics::Object();
         nx::sdk::analytics::IObject::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
@@ -91,7 +91,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "height: " << rectangle.height;
 
         nxpl::NX_GUID guid;
-        std::deque<nx::sdk::analytics::common::Attribute> attributes;
+        std::deque<nx::sdk::analytics::Attribute> attributes;
 
         auto info = licensePlateTracker->licensePlateInfo(displayText);
         guid = info.guid;
@@ -148,7 +148,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         }
 
         detectedObject->setAttributes(
-            std::vector<nx::sdk::analytics::common::Attribute>(
+            std::vector<nx::sdk::analytics::Attribute>(
                 attributes.begin(),
                 attributes.end()));
 

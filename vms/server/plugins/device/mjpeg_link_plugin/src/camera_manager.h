@@ -2,7 +2,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include "plugin.h"
 
@@ -62,7 +62,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nx::sdk::common::Ptr<HttpLinkPlugin> m_pluginRef;
+    nx::sdk::Ptr<HttpLinkPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     nxpl::TimeProvider *const m_timeProvider;

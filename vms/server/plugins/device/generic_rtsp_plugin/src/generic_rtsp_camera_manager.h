@@ -4,7 +4,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include "generic_rtsp_plugin.h"
 
@@ -71,7 +71,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nx::sdk::common::Ptr<GenericRTSPPlugin> m_pluginRef;
+    nx::sdk::Ptr<GenericRTSPPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     static const int kEncodersCount = 2;

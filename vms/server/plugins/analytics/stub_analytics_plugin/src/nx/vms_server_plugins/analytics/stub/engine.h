@@ -6,7 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <nx/sdk/analytics/common/engine.h>
+#include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
@@ -14,7 +14,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
-class Engine: public nx::sdk::analytics::common::Engine
+class Engine: public nx::sdk::analytics::Engine
 {
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;

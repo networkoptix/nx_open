@@ -41,7 +41,7 @@
 #include <nx/analytics/descriptor_manager.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
-#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/i_string_map.h>
 

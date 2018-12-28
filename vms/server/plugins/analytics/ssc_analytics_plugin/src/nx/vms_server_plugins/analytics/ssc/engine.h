@@ -8,7 +8,7 @@
 #include <QtCore/QMutex>
 #include <QtSerialPort/QSerialPort>
 
-#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <plugins/plugin_tools.h>
@@ -26,9 +26,9 @@ class DeviceAgent;
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::common::Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -59,7 +59,7 @@ private:
     void onDataReceived(int index);
 
 private:
-    nx::sdk::analytics::common::Plugin* const m_plugin;
+    nx::sdk::analytics::Plugin* const m_plugin;
 
     QByteArray m_manifest;
     EngineManifest m_typedManifest;

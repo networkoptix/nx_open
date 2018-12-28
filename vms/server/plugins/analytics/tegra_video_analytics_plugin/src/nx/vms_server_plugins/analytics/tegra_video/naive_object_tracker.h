@@ -7,7 +7,7 @@
 
 #include <nx/utils/uuid.h>
 
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -53,7 +53,7 @@ private:
     void removeExpiredObjectsFromCache();
 
     void addNonExpiredObjectsFromCache(
-        nx::sdk::analytics::common::ObjectMetadataPacket* outPacket);
+        nx::sdk::analytics::ObjectMetadataPacket* outPacket);
 
     TegraVideo::Rect applySpeedToRectangle(
         const TegraVideo::Rect& rectangle,

@@ -7,7 +7,7 @@
 
 #include <QtCore/QTextStream>
 
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/utils/app_info.h>
@@ -180,7 +180,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
-            if (const auto mediaEncoder4 = nx::sdk::common::Ptr<nxcip::CameraMediaEncoder4>(
+            if (const auto mediaEncoder4 = nx::sdk::Ptr<nxcip::CameraMediaEncoder4>(
                 intf->queryInterface(nxcip::IID_CameraMediaEncoder4)))
             {
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
@@ -194,7 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     m_mediaEncoder2.reset();
     m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
 
-    nx::sdk::common::Ptr<nxcip::CameraMediaEncoder3> mediaEncoder3(
+    nx::sdk::Ptr<nxcip::CameraMediaEncoder3> mediaEncoder3(
         intf->queryInterface(nxcip::IID_CameraMediaEncoder3));
 
     if (mediaEncoder3) //< One-call config.
@@ -635,11 +635,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
-    nx::sdk::common::Ptr<nxcip::MediaDataPacket> packetAp(packet);
+    nx::sdk::Ptr<nxcip::MediaDataPacket> packetAp(packet);
 
     QnAbstractMediaDataPtr mediaPacket;
 
-    if (const auto mediaDataPacket2 = nx::sdk::common::Ptr<nxcip::MediaDataPacket2>(
+    if (const auto mediaDataPacket2 = nx::sdk::Ptr<nxcip::MediaDataPacket2>(
         packet->queryInterface(nxcip::IID_MediaDataPacket2)))
     {
         auto extradataSize = mediaDataPacket2->extradataSize();

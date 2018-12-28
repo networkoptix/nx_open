@@ -9,7 +9,7 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
@@ -139,7 +139,7 @@ private:
     nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::sdk::common::Ptr<nx::sdk::IStringMap> m_params;
+    const nx::sdk::Ptr<nx::sdk::IStringMap> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };

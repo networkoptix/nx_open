@@ -2,7 +2,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <vector>
 #include <mutex>
@@ -62,7 +62,7 @@ protected:
     nxpl::TimeProvider * const m_timeProvider;
     nxcip::CameraInfo m_info;
     nxpt::CommonRefManager m_refManager;
-    nx::sdk::common::Ptr<Plugin> m_pluginRef;
+    nx::sdk::Ptr<Plugin> m_pluginRef;
     unsigned int m_capabilities;
     static int constexpr kEncoderCount = 2;
     std::unique_ptr<MediaEncoder> m_encoders[kEncoderCount];

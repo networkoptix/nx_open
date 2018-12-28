@@ -7,9 +7,9 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/common/ptr.h>
-#include <nx/sdk/common/string_map.h>
-#include <nx/sdk/analytics/common/metadata_types.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/analytics/helpers/metadata_types.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
@@ -41,7 +41,7 @@ static const int noError = (int) nx::sdk::Error::noError;
 static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const nx::sdk::common::Ptr<const nx::sdk::IString> manifest(engine->manifest(&error));
+    const nx::sdk::Ptr<const nx::sdk::IString> manifest(engine->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -62,7 +62,7 @@ static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const nx::sdk::common::Ptr<const nx::sdk::IString> manifest(deviceAgent->manifest(&error));
+    const nx::sdk::Ptr<const nx::sdk::IString> manifest(deviceAgent->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -78,7 +78,7 @@ static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgen
 
 static void testEngineSettings(nx::sdk::analytics::IEngine* plugin)
 {
-    const auto settings = new nx::sdk::common::StringMap();
+    const auto settings = new nx::sdk::StringMap();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
@@ -88,7 +88,7 @@ static void testEngineSettings(nx::sdk::analytics::IEngine* plugin)
 
 static void testDeviceAgentSettings(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
-    const auto settings = new nx::sdk::common::StringMap();
+    const auto settings = new nx::sdk::StringMap();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
@@ -100,7 +100,7 @@ class Action: public nx::sdk::analytics::Action
 {
 public:
     Action():
-        m_params(new nx::sdk::common::StringMap())
+        m_params(new nx::sdk::StringMap())
     {
     }
 
@@ -164,7 +164,7 @@ public:
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
-        m_params.reset(new nx::sdk::common::StringMap());
+        m_params.reset(new nx::sdk::StringMap());
         for (const auto& param: params)
             m_params->addItem(param.first, param.second);
     }
@@ -179,7 +179,7 @@ public:
     bool m_expectedNonNullMessageToUser = false;
 
 private:
-    nx::sdk::common::Ptr<nx::sdk::common::StringMap> m_params;
+    nx::sdk::Ptr<nx::sdk::StringMap> m_params;
 };
 
 static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
@@ -334,8 +334,8 @@ TEST(stub_analytics_plugin, test)
     DeviceAgentHandler deviceAgentHandler;
     ASSERT_EQ(noError, (int) deviceAgent->setHandler(&deviceAgentHandler));
 
-    const nx::sdk::common::Ptr<nx::sdk::analytics::common::MetadataTypes> metadataTypes(
-        new nx::sdk::analytics::common::MetadataTypes());
+    const nx::sdk::Ptr<nx::sdk::analytics::MetadataTypes> metadataTypes(
+        new nx::sdk::analytics::MetadataTypes());
 
     ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 

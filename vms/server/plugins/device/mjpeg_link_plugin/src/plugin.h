@@ -54,7 +54,7 @@ private:
     void cleanStreamCacheUp();
 
 private:
-    // TODO: Migrate to nx::sdk::common::Ptr.
+    // TODO: Migrate to nx::sdk::Ptr.
     mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;

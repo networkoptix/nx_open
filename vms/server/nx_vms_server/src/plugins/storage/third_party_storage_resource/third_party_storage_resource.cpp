@@ -207,8 +207,8 @@ void QnThirdPartyStorageResource::openStorage(
     if (spRaw == nullptr)
         throw std::runtime_error("Couldn't create Storage");
 
-    // TODO: Migrate to nx::sdk::common::Ptr.
-    
+    // TODO: Migrate to nx::sdk::Ptr.
+
     std::shared_ptr<nx_spl::Storage> sp =
         std::shared_ptr<nx_spl::Storage>(
             spRaw,
@@ -254,8 +254,8 @@ QIODevice *QnThirdPartyStorageResource::open(
     if (openMode & QIODevice::WriteOnly)
         ioFlags |= nx_spl::io::WriteOnly;
 
-    // TODO: Migrate to nx::sdk::common::Ptr.
-    
+    // TODO: Migrate to nx::sdk::Ptr.
+
     nx_spl::IODevice* ioRaw = m_storage->open(
         QUrl(fileName).path().toLatin1().constData(),
         ioFlags,
@@ -414,8 +414,8 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     if (!m_valid)
         return QnAbstractStorageResource::FileInfoList();
 
-    // TODO: Migrate to nx::sdk::common::Ptr.
-    
+    // TODO: Migrate to nx::sdk::Ptr.
+
     QnMutexLocker lock(&m_mutex);
     int ecode;
     nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(

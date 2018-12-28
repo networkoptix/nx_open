@@ -3,7 +3,7 @@
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include "deepstream_analytics_plugin_ini.h"
@@ -18,14 +18,14 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    const nx::sdk::common::Ptr<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket());
+    const nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket());
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
         return;
     }
 
-    const nx::sdk::common::Ptr<nx::sdk::analytics::CompressedVideoPacket> video(
+    const nx::sdk::Ptr<nx::sdk::analytics::CompressedVideoPacket> video(
         frame->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
     if (!video)
     {

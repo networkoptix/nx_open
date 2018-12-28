@@ -12,9 +12,9 @@
 #include <nx/utils/uuid.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
-#include <nx/sdk/analytics/common/attribute.h>
+#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/attribute.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
 #include <nx/vms_server_plugins/utils/uuid.h>
@@ -40,7 +40,7 @@ void NaiveObjectTracker::filterAndTrack(
             addObjectToCache(QnUuid::createUuid(), rect);
     }
 
-    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
     packet->setTimestampUs(ptsUs);
     packet->setDurationUs(1000000LL * 10);
 
@@ -178,11 +178,11 @@ void NaiveObjectTracker::removeExpiredObjectsFromCache()
 }
 
 void NaiveObjectTracker::addNonExpiredObjectsFromCache(
-    nx::sdk::analytics::common::ObjectMetadataPacket* outPacket)
+    nx::sdk::analytics::ObjectMetadataPacket* outPacket)
 {
     for (auto& item: m_cachedObjects)
     {
-        auto object = new nx::sdk::analytics::common::Object();
+        auto object = new nx::sdk::analytics::Object();
         auto& cached = item.second;
 
         bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles
@@ -210,13 +210,13 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         object->setConfidence(1);
         object->setTypeId(m_objectTypeId.toStdString());
 
-        std::vector<nx::sdk::analytics::common::Attribute> attributes;
+        std::vector<nx::sdk::analytics::Attribute> attributes;
         for (const auto& entry: cached.attributes)
         {
             const auto attributeName = entry.first;
             const auto attributeValue = entry.second;
 
-            nx::sdk::analytics::common::Attribute attribute(
+            nx::sdk::analytics::Attribute attribute(
                 nx::sdk::IAttribute::Type::string,
                 attributeName.toStdString(),
                 attributeValue.toStdString());

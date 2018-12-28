@@ -20,7 +20,7 @@
 
 #include "plugin_api.h"
 
-// TODO: #mshevchenko: Split into nx::sdk::common::UuidHelper and nx::sdk::common::RefCountable.
+// TODO: #mshevchenko: Split into nx::sdk::UuidHelper and nx::sdk::RefCountable.
 
 namespace nxpt {
 

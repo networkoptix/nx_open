@@ -4,7 +4,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/common/ptr.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
@@ -19,9 +19,9 @@ class AnalyticsPluginResource:
 public:
     AnalyticsPluginResource(QnMediaServerModule* serverModule);
 
-    void setSdkPlugin(nx::sdk::common::Ptr<nx::sdk::analytics::IPlugin> plugin);
+    void setSdkPlugin(nx::sdk::Ptr<nx::sdk::analytics::IPlugin> plugin);
 
-    nx::sdk::common::Ptr<nx::sdk::analytics::IPlugin> sdkPlugin() const;
+    nx::sdk::Ptr<nx::sdk::analytics::IPlugin> sdkPlugin() const;
 
 private:
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger() const;
@@ -30,7 +30,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
 private:
-    nx::sdk::common::Ptr<nx::sdk::analytics::IPlugin> m_sdkPlugin;
+    nx::sdk::Ptr<nx::sdk::analytics::IPlugin> m_sdkPlugin;
 };
 
 } // namespace nx::vms::server::resource

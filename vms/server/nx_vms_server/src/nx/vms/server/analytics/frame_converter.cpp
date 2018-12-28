@@ -1,8 +1,8 @@
 #include "frame_converter.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/sdk/common/ptr.h>
-#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/vms/server/analytics/generic_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/yuv420_uncompressed_video_frame.h>
 
@@ -29,7 +29,7 @@ static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat)
 
         default:
             NX_ASSERT(false, lm("Unsupported PixelFormat \"%1\" = %2").args(
-                nx::sdk::analytics::common::pixelFormatToStdString(pixelFormat),
+                nx::sdk::analytics::pixelFormatToStdString(pixelFormat),
                 (int) pixelFormat));
             return AV_PIX_FMT_NONE;
     }
@@ -84,7 +84,7 @@ IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelForma
         {
             auto insertResult = m_uncompressedFrames.emplace(
                 *pixelFormat,
-                nx::sdk::common::Ptr<IUncompressedVideoFrame>(
+                nx::sdk::Ptr<IUncompressedVideoFrame>(
                     createUncompressedVideoFrameFromVideoDecoderOutput(
                         uncompressedFrame, *pixelFormat)));
             it = insertResult.first;

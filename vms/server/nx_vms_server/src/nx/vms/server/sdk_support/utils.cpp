@@ -12,9 +12,9 @@
 
 #include <plugins/plugins_ini.h>
 
-#include <nx/sdk/analytics/common/pixel_format.h>
-#include <nx/sdk/common/ptr.h>
-#include <nx/sdk/common/string_map.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/string_map.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/fusion/model_functions.h>
@@ -126,25 +126,25 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
     return std::make_unique<nx::plugins::SettingsHolder>(settingsMap);
 }
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map)
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map)
 {
-    auto stringMap = new nx::sdk::common::StringMap();
+    auto stringMap = new nx::sdk::StringMap();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
         stringMap->addItem(it.key().toStdString(), it.value().toString().toStdString());
 
-    return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
+    return nx::sdk::Ptr<nx::sdk::IStringMap>(stringMap);
 }
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map)
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map)
 {
-    auto stringMap = new nx::sdk::common::StringMap();
+    auto stringMap = new nx::sdk::StringMap();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
         stringMap->addItem(it.key().toStdString(), it.value().toStdString());
 
-    return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
+    return nx::sdk::Ptr<nx::sdk::IStringMap>(stringMap);
 }
 
-nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
 {
     bool isValid = false;
     const auto deserialized = QJson::deserialized<std::vector<StringMapItem>>(
@@ -153,7 +153,7 @@ nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
     if (!isValid)
         return nullptr;
 
-    auto stringMap = new nx::sdk::common::StringMap();
+    auto stringMap = new nx::sdk::StringMap();
     for (const auto& setting: deserialized)
     {
         if (stringMap->value(setting.name.c_str()) != nullptr) //< Duplicate key.
@@ -161,7 +161,7 @@ nx::sdk::common::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
         stringMap->addItem(setting.name, setting.value);
     }
 
-    return nx::sdk::common::Ptr<nx::sdk::IStringMap>(stringMap);
+    return nx::sdk::Ptr<nx::sdk::IStringMap>(stringMap);
 }
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map)
@@ -189,7 +189,7 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     PixelFormat pixelFormat = PixelFormat::yuv420;
 
     // To assert that all pixel formats are tested.
-    auto pixelFormats = nx::sdk::analytics::common::getAllPixelFormats();
+    auto pixelFormats = nx::sdk::analytics::getAllPixelFormats();
 
     auto checkCapability =
         [&](Capability value, PixelFormat correspondingPixelFormat)
