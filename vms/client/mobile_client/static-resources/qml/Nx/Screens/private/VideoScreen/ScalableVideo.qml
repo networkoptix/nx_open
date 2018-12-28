@@ -131,8 +131,10 @@ ZoomableFlickable
                 // Rollback fisheye video picture
                 if (interactor.scalePower != 0 || interactor.unconstrainedRotation != Qt.vector2d(0, 0))
                 {
+                    interactor.enableAnimation = true
                     interactor.scalePower = 0
                     interactor.unconstrainedRotation = Qt.vector2d(0, 0)
+                    interactor.enableAnimation = false
                 }
                 else
                 {
@@ -241,7 +243,7 @@ ZoomableFlickable
         id: interactor
 
         fisheyeShader: shader
-        enabledAnimation: fisheyeController.enabledAnimation
+        enableAnimation: fisheyeController.enableAnimation
     }
 
     FisheyeController

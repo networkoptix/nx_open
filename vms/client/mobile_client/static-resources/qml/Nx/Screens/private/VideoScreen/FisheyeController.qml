@@ -10,7 +10,7 @@ Object
     property PinchArea pinchArea: null
     property MouseArea mouseArea: null
 
-    readonly property bool enabledAnimation:
+    readonly property bool enableAnimation:
         mouseArea
         && pinchArea
         && pinchAreaHandler.zoomStarted
@@ -110,8 +110,6 @@ Object
 
                 if (distance > mouseArea.drag.threshold)
                     return
-
-                interactor.enableScaleAnimation = true
 
                 const kPowerThreshold = 0.8
                 if (interactor.scalePower > kPowerThreshold)

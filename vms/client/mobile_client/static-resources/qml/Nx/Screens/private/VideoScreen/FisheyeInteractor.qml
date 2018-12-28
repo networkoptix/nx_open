@@ -10,8 +10,7 @@ Object
 
     property FisheyeShaderItem fisheyeShader: null
 
-    property bool enabledAnimation: true
-    property bool enableScaleAnimation: scalePowerAnimationBehavior.enabled
+    property bool enableAnimation: true
     readonly property real animatedScale: scaleByPower(animatedScalePower)
     readonly property real currentScale: scaleByPower(scalePower)
 
@@ -95,6 +94,8 @@ Object
     Behavior on animatedScalePower
     {
         id: scalePowerAnimationBehavior
+
+        enabled: interactor.enableAnimation
         NumberAnimation
         {
             id: scaleAnimation
@@ -105,7 +106,7 @@ Object
     property real animatedRotationX: unconstrainedRotation.x
     Behavior on animatedRotationX
     {
-        enabled: interactor.enabledAnimation
+        enabled: interactor.enableAnimation
 
         RotationAnimation
         {
@@ -118,7 +119,7 @@ Object
     property real animatedRotationY: unconstrainedRotation.y
     Behavior on animatedRotationY
     {
-        enabled: interactor.enabledAnimation
+        enabled: interactor.enableAnimation
 
         RotationAnimation
         {
