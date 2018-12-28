@@ -330,18 +330,27 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     return result;
 }
 
-bool SystemCommands::isPathExists(const std::string& path, FileType* outFileType)
+bool SystemCommands::isPathExists(const std::string& path)
+{
+    return stat(path).exists;
+}
+
+SystemCommands::Stats SystemCommands::stat(const std::string& path)
 {
     struct stat buf;
-    bool result = stat(path.c_str(), &buf) == 0;
-    if (result && outFileType)
+    Stats result;
+    result.exists = ::stat(path.c_str(), &buf) == 0;
+
+    if (result.exists)
     {
         if (S_ISDIR(buf.st_mode))
-            *outFileType = FileType::directory;
+            result.type = Stats::FileType::directory;
         else if (S_ISREG(buf.st_mode))
-            *outFileType = FileType::regular;
+            result.type = Stats::FileType::regular;
         else
-            *outFileType = FileType::other;
+            result.type = Stats::FileType::other;
+
+        result.size = buf.st_size;
     }
 
     return result;
@@ -376,7 +385,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
         strncpy(pathBuf + pathBufLen, entry->d_name,
             std::max<int>((ssize_t) sizeof(pathBuf) - pathBufLen, 0));
 
-        if (stat(pathBuf, &statBuf) != 0)
+        if (::stat(pathBuf, &statBuf) != 0)
             continue;
 
         out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
@@ -391,20 +400,14 @@ std::string SystemCommands::serializedFileList(const std::string& path)
 
 int64_t SystemCommands::fileSize(const std::string& path)
 {
-    struct stat buf;
-    int64_t result = -1;
-
-    if (stat(path.c_str(), &buf) == 0)
-        result = buf.st_size;
-
-    return result;
+    return stat(path).size;
 }
 
 std::string SystemCommands::devicePath(const std::string& path)
 {
     struct stat statBuf;
     std::string result;
-    if (stat(path.c_str(), &statBuf) == 0)
+    if (::stat(path.c_str(), &statBuf) == 0)
     {
         std::ifstream partitionsFile("/proc/partitions");
         if (partitionsFile.is_open())
