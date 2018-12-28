@@ -68,6 +68,9 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     m_uploadManager.reset(new UploadManager());
     m_stateTracker.reset(new PeerStateTracker(this));
+
+    connect(this, &ServerUpdateTool::moduleInformationReceived,
+        m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
@@ -751,6 +754,23 @@ void ServerUpdateTool::requestInstallAction(
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         if (auto handle = connection->updateActionInstall(callback, thread()))
+            m_requestingInstall.insert(handle);
+    }
+}
+
+void ServerUpdateTool::requestModuleInformation()
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        auto callback =
+            [tool=QPointer(this)](
+                bool success, rest::Handle /*handle*/,
+                const QList<nx::vms::api::ModuleInformation>& response)
+            {
+                if (success && tool)
+                    emit tool->moduleInformationReceived(response);
+            };
+        if (auto handle = connection->getModuleInformation(callback, thread()))
             m_requestingInstall.insert(handle);
     }
 }

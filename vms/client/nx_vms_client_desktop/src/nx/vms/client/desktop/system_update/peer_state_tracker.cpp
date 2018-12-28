@@ -227,9 +227,7 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
     std::map<QnUuid, nx::update::Status::Code> result;
 
     for (const auto& item: m_items)
-    {
-        result.insert(std::make_pair(item->id, item->state));
-    }
+        result.emplace(item->id, item->state);
     return result;
 }
 

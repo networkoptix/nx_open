@@ -99,6 +99,12 @@ public:
      */
     void requestInstallAction(const QSet<QnUuid>& targets);
 
+    /**
+     * Send request for moduleInformation from the server.
+     * Response arrives at moduleInformationReceived signal.
+     */
+    void requestModuleInformation();
+
     // State for uploading offline update package.
     enum class OfflineUpdateState
     {
@@ -209,6 +215,7 @@ public:
 signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
+    void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);

@@ -1167,9 +1167,9 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
                         NX_VERBOSE(this)
                             << "processRemoteDownloading() - peer"
                             << id << "failed to download update package";
-                        m_peersFailed.insert(id);
                         m_peersActive.remove(id);
                     }
+                    m_peersFailed.insert(id);
                     break;
                 case StatusCode::preparing:
                 case StatusCode::downloading:
@@ -1427,6 +1427,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             }
         }
     }
+
+    // We need the most recent version information only in state 'installing'.
+    m_serverUpdateTool->requestModuleInformation();
 
     // No peers are doing anything right now. We should check if installation is complete.
     if (peersActive.empty())
