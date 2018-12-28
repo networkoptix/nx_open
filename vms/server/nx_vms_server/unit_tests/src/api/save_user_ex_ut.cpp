@@ -11,48 +11,17 @@
 
 namespace nx::test {
 
-namespace {
-
-vms::api::UserDataEx regularUser1;
-vms::api::UserDataEx regularUser2;
-vms::api::UserDataEx newAdminUser;
-vms::api::UserDataEx defaultAdmin;
-
-void initUserData()
-{
-    regularUser1.email = "test@test.com";
-    regularUser1.fullName = "Adv";
-    regularUser1.isEnabled = true;
-    regularUser1.name = "Adv";
-    regularUser1.password = "testUserPassword";
-    regularUser1.permissions = GlobalPermission::accessAllMedia;
-
-    regularUser2.email = "test2@test.com";
-    regularUser2.fullName = "testUser2";
-    regularUser2.isEnabled = true;
-    regularUser2.name = "test_user_name2";
-    regularUser2.password = "testUserPassword2";
-    regularUser2.permissions = GlobalPermission::accessAllMedia;
-
-    newAdminUser.email = "admin@test.com";
-    newAdminUser.fullName = "testAdminUser";
-    newAdminUser.isEnabled = true;
-    newAdminUser.name = "test_admin_user_name";
-    newAdminUser.password = "testAdminPassword";
-    newAdminUser.permissions = GlobalPermission::admin;
-
-    defaultAdmin.name = "admin";
-    defaultAdmin.password = "admin";
-}
-
-} // namespace
-
 using namespace network;
 
 class SaveUserEx: public ::testing::Test
 {
 protected:
     using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
+
+    vms::api::UserDataEx regularUser1;
+    vms::api::UserDataEx regularUser2;
+    vms::api::UserDataEx newAdminUser;
+    vms::api::UserDataEx defaultAdmin;
 
     virtual void SetUp() override
     {
@@ -114,11 +83,35 @@ protected:
 
 private:
     LauncherPtr m_server;
-    vms::api::UserDataEx m_adminUser;
-    vms::api::UserDataEx m_regularUser;
-    vms::api::UserDataEx m_regularUser2;
     vms::api::UserDataList m_userDataList;
     Buffer m_responseBuffer;
+
+    void initUserData()
+    {
+        regularUser1.email = "test@test.com";
+        regularUser1.fullName = "Adv";
+        regularUser1.isEnabled = true;
+        regularUser1.name = "Adv";
+        regularUser1.password = "testUserPassword";
+        regularUser1.permissions = GlobalPermission::accessAllMedia;
+
+        regularUser2.email = "test2@test.com";
+        regularUser2.fullName = "testUser2";
+        regularUser2.isEnabled = true;
+        regularUser2.name = "test_user_name2";
+        regularUser2.password = "testUserPassword2";
+        regularUser2.permissions = GlobalPermission::accessAllMedia;
+
+        newAdminUser.email = "admin@test.com";
+        newAdminUser.fullName = "testAdminUser";
+        newAdminUser.isEnabled = true;
+        newAdminUser.name = "test_admin_user_name";
+        newAdminUser.password = "testAdminPassword";
+        newAdminUser.permissions = GlobalPermission::admin;
+
+        defaultAdmin.name = "admin";
+        defaultAdmin.password = "admin";
+    }
 };
 
 TEST_F(SaveUserEx, success)
