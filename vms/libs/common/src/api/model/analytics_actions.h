@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QJsonObject>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 #include <utils/common/request_param.h>
