@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/analytics/replacement_merge_executor.h>
