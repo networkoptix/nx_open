@@ -109,7 +109,7 @@ public:
      */
     static QSize getNearestResolution(
         const QSize& resolution,
-        float aspectRatio,
+        float desirableAspectRatio,
         double maxResolutionArea,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
@@ -176,7 +176,6 @@ public:
         bool keepSmalChunks,
         int limit,
         Qt::SortOrder sortOrder);
-
 
 signals:
     /** Emit on camera or IO module input change. */
