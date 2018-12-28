@@ -261,8 +261,8 @@ Item
                 Math.max(first.x, second.x),
                 Math.max(first.y, second.y))
 
-            var horizontalRange = 43
-            var verticalRange = 31
+            var horizontalRange = 44
+            var verticalRange = 32
 
             var left = Math.floor(topLeft.x * horizontalRange)
             var right = Math.floor(bottomRight.x * horizontalRange)
