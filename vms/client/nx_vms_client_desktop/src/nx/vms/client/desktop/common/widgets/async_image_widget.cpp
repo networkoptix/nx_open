@@ -202,17 +202,17 @@ bool AsyncImageWidget::cropRequired() const
 
 void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
-    const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
-    const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-        paintSize.toSize(), rect());
-
     QPainter painter(this);
     painter.setRenderHints(QPainter::SmoothPixmapTransform);
 
+    QRect paintRect;
     QRectF highlightSubRect;
 
     if (!m_preview.isNull() && !m_placeholder->isVisible())
     {
+        const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
+        paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter, paintSize.toSize(), rect());
+
         if (cropRequired())
         {
             const auto croppedImageRect = core::Geometry::subRect(m_preview.rect(), m_highlightRect);
