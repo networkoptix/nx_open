@@ -280,8 +280,9 @@ Item
             top = result.correctBounds ? Math.max(top, 0) : 0
             bottom = result.correctBounds ? Math.min(bottom, verticalRange) : verticalRange
 
-            result.filter = "[[{\"x\": %1, \"y\": %2, \"width\": %3, \"height\": %4}]]"
-                .arg(left).arg(top).arg(right - left + 1).arg(bottom - top + 1)
+            result.filter = JSON.stringify([[
+                { "x": left, "y": top, "width": right - left + 1, "height": bottom - top + 1 }
+                ]])
 
             return result
         }

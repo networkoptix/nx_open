@@ -187,7 +187,8 @@ Object
             {
                 if (clickFilterTimer.running
                     && !doubleClickFilterTimer.running
-                    && mouseAreaHandler.downPos.x == mouse.x && mouseAreaHandler.downPos.y == mouse.y)
+                    && mouseAreaHandler.downPos.x == mouse.x
+                    && mouseAreaHandler.downPos.y == mouse.y)
                 {
 
                     delayedClickTimer.restart()
