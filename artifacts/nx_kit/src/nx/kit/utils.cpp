@@ -36,6 +36,11 @@ std::string toString(std::string s)
     return toString(s.c_str());
 }
 
+std::string toString(uint8_t i)
+{
+    return toString((int) i);
+}
+
 std::string toString(char c)
 {
     if (!isAsciiPrintable(c))
