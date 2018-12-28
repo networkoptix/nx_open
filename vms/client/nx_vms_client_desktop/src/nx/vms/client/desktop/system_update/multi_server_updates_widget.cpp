@@ -590,7 +590,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
     }
 
     // Maybe we should not call it right here.
-    m_serverUpdateTool->requestRemoteUpdateState();
+    m_serverUpdateTool->requestRemoteUpdateStateAsync();
 
     processRemoteChanges();
     processUploaderChanges();
@@ -1004,9 +1004,10 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     }
 
     if (!m_serverUpdateCheck.valid())
-    {
         m_serverUpdateCheck = m_serverUpdateTool->checkRemoteUpdateInfo();
-    }
+
+    if (!m_serverStatusCheck.valid())
+        m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
 
     setTargetState(WidgetUpdateState::checkingServers, {});
     // Maybe we should call loadDataToUi instead.
@@ -1024,9 +1025,18 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         return;
     }
 
-    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+    if (
+        m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready
+        && m_serverStatusCheck.valid()
+        && m_serverStatusCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
     {
         auto updateInfo = m_serverUpdateCheck.get();
+        auto serverStatus = m_serverStatusCheck.get();
+
+        ServerUpdateTool::RemoteStatus remoteStatus;
+        m_serverUpdateTool->getServersStatusChanges(remoteStatus);
+        m_stateTracker->setUpdateStatus(remoteStatus);
+
         /*
          * TODO: We should deal with starting client update.
          * There are two distinct situations:
@@ -1047,7 +1057,8 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
 
         NX_INFO(NX_SCOPE_TAG, "mediaservers have an active update process to version %1", updateInfo.info.version);
 
-        bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
+        m_clientUpdateTool->setUpdateTarget(updateInfo);
+        bool hasClientUpdate = m_clientUpdateTool->hasUpdate();
         if (updateInfo.alreadyInstalled && !hasClientUpdate)
         {
             // It seems like we should not change the state.
@@ -1062,9 +1073,6 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             m_updateInfo = updateInfo;
             m_haveValidUpdate = true;
         }
-
-        if (hasClientUpdate)
-            m_clientUpdateTool->setUpdateTarget(updateInfo);
 
         auto serversHaveDownloaded = m_stateTracker->getServersInState(StatusCode::readyToInstall);
         auto serversAreDownloading = m_stateTracker->getServersInState(StatusCode::downloading);
@@ -1081,6 +1089,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         }
         else if (!serversAreInstalling.empty())
         {
+            // How did we got 'installing' for any servers? We should have cleaned up this info.
             NX_INFO(this)
                 << "processRemoteUpdateInformation() - servers" << serversAreInstalling << " are installing an update";
             setTargetState(WidgetUpdateState::installing, serversAreInstalling);
@@ -1095,10 +1104,11 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         {
             NX_INFO(this)
                 << "processRemoteUpdateInformation() - servers" << serversHaveInstalled
-                << "have already downloaded an update";
-            // Should check if there are any servers not completed update
-            // Client could be there as well.
-            setTargetState(WidgetUpdateState::readyInstall, {});
+                << "have already installed an update";
+            // We are here only if there are some offline servers and the rest of peers
+            // have complete its update.
+            // TODO: This state will be fixed later
+            setTargetState(WidgetUpdateState::ready, {});
         }
         else
         {

@@ -125,6 +125,12 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             m_installationResult = InstallResult::installing;
             finalProgress = 95;
             break;
+        case ClientUpdateTool::State::readyRestart:
+            m_installationResult = InstallResult::complete;
+            setMessage(tr("Installation completed"));
+            finalProgress = 100;
+            done(QDialogButtonBox::StandardButton::Ok);
+            break;
         case ClientUpdateTool::State::complete:
             m_installationResult = InstallResult::complete;
             setMessage(tr("Installation completed"));

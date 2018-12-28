@@ -784,7 +784,7 @@ rest::QnConnectionPtr ServerUpdateTool::getServerConnection(const QnMediaServerR
     return server ? server->restConnection() : rest::QnConnectionPtr();
 }
 
-void ServerUpdateTool::requestRemoteUpdateState()
+void ServerUpdateTool::requestRemoteUpdateStateAsync()
 {
     // Request another state only if there is no pending request.
     if (m_checkingRemoteUpdateStatus)
@@ -820,6 +820,30 @@ void ServerUpdateTool::requestRemoteUpdateState()
         m_activeRequests.insert(handle);
     }
 }
+
+std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpdateState()
+{
+    auto promise = std::make_shared<std::promise<std::vector<nx::update::Status>>>();
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        using UpdateStatusAll = std::vector<nx::update::Status>;
+        connection->getUpdateStatus(
+            [promise, tool=QPointer<ServerUpdateTool>(this)](
+                 bool success, rest::Handle handle, const UpdateStatusAll& response)
+            {
+                if (tool)
+                    tool->atUpdateStatusResponse(success, handle, response);
+                promise->set_value(response);
+            }, thread());
+    }
+    else
+    {
+        promise->set_value({});
+    }
+
+    return promise->get_future();
+}
+
 
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {

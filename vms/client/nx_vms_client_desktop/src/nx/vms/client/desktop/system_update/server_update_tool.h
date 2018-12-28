@@ -69,7 +69,9 @@ public:
      * cache. Data from consequent requests is integrated into this cache, for each server.
      * This data can be obtained by getServersStatusChanges method.
      */
-    void requestRemoteUpdateState();
+    void requestRemoteUpdateStateAsync();
+
+    std::future<std::vector<nx::update::Status>> requestRemoteUpdateState();
 
     using RemoteStatus = std::map<QnUuid, nx::update::Status>;
     /**
@@ -213,7 +215,6 @@ private:
     void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void atExtractFilesFinished(int code);
-    void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
