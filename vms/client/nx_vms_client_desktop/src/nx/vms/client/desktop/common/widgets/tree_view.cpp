@@ -130,11 +130,10 @@ void TreeView::timerEvent(QTimerEvent* event)
 
 void TreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    const bool savedExpandsOnDoubleClick = expandsOnDoubleClick();
     auto expandsOnDoubleClickGuard = nx::utils::makeScopeGuard(
-        [this, savedExpandsOnDoubleClick]()
+        [this, previosValue = expandsOnDoubleClick()]()
         {
-            setExpandsOnDoubleClick(savedExpandsOnDoubleClick);
+            setExpandsOnDoubleClick(previosValue);
         });
 
     // Delegate can occasionally change the model, so keeping persistent index
