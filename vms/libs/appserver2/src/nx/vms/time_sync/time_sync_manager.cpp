@@ -186,7 +186,7 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
 {
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
-    if (timeDelta < rtt / 2)
+    if (timeDelta < rtt)
         return false;
 
     NX_INFO(this,
