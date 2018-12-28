@@ -106,7 +106,7 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_params(nx::vms::server::sdk_support::toIStringMap(actionData.params.toVariantMap())),
+        m_params(nx::vms::server::sdk_support::toIStringMap(actionData.params)),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);

@@ -4,10 +4,14 @@
 #include <chrono>
 
 #include <QtCore/QJsonObject>
+
 #include <QtGui/QPalette>
+
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickItem>
-#include <QtQml/QQmlProperty>
+
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
 
 #include <analytics/common/object_detection_metadata.h>
@@ -31,6 +35,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/client/desktop/common/widgets/panel.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
@@ -766,17 +771,22 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
 bool AnalyticsSearchListModel::Private::requestActionSettings(
     const QJsonObject& settingsModel,
-    QJsonObject* values) const
+    QMap<QString, QString>* values) const
 {
     if (!values)
         return false;
 
     QnMessageBox parametersDialog(q->mainWindowWidget());
+    parametersDialog.addButton(QDialogButtonBox::Ok);
+    parametersDialog.addButton(QDialogButtonBox::Cancel);
+    parametersDialog.setText(tr("Enter parameters:"));
+    parametersDialog.setInformativeText(tr("Action requires some parameters to be filled."));
+    parametersDialog.setIcon(QnMessageBoxIcon::Information);
 
     auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
     view->setClearColor(q->mainWindowWidget()->palette().window().color());
     view->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    view->setSource(QUrl("Nx/Dialogs/ActionSettings/ActionSettings.qml"));
+    view->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
     const auto root = view->rootObject();
     NX_ASSERT(root);
 
@@ -786,17 +796,30 @@ bool AnalyticsSearchListModel::Private::requestActionSettings(
     QMetaObject::invokeMethod(
         root,
         "loadModel",
-        Q_ARG(QJsonObject, settingsModel));
+        Qt::DirectConnection,
+        Q_ARG(QVariant, settingsModel.toVariantMap()),
+        Q_ARG(QVariant, {}));
 
-    parametersDialog.addCustomWidget(view);
-    if (!parametersDialog.exec())
+    auto panel = new Panel(&parametersDialog);
+    panel->setFixedSize(400, 400);
+    auto layout = new QHBoxLayout(panel);
+    layout->addWidget(view);
+
+    parametersDialog.addCustomWidget(panel);
+    if (parametersDialog.exec() != QDialogButtonBox::Ok)
         return false;
 
+    QVariant result;
     QMetaObject::invokeMethod(
         root,
         "getValues",
-        Q_RETURN_ARG(QJsonObject, *values));
+        Qt::DirectConnection,
+        Q_RETURN_ARG(QVariant, result));
 
+    values->clear();
+    const auto resultMap = result.value<QVariantMap>();
+    for (auto iter = resultMap.cbegin(); iter != resultMap.cend(); ++iter)
+        values->insert(iter.key(), iter.value().toString());
     return true;
 }
 
@@ -837,6 +860,9 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     actionData.objectId = object.objectAppearanceId;
 
     const auto actionParametersDescription = actionDescriptor.parametersModel;
+
+    const auto map = actionParametersDescription.toVariantMap();
+
     if (!actionParametersDescription.isEmpty())
     {
         // Show dialog asking to enter required parameters.

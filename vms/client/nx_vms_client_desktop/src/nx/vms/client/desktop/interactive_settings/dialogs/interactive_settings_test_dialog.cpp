@@ -49,7 +49,7 @@ void InteractiveSettingsTestDialog::loadManifest()
             m_settingsWidget->rootObject(),
             "loadModel",
             Qt::DirectConnection,
-            Q_ARG(QJsonObject, model),
+            Q_ARG(QVariant, model.toVariantMap()),
             Q_ARG(QVariant, {}));
 
         refreshValues();

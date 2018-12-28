@@ -85,7 +85,9 @@ private:
 
     QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
 
-    bool requestActionSettings(const QJsonObject& settingsModel, QJsonObject* values) const;
+    bool requestActionSettings(
+        const QJsonObject& settingsModel,
+        QMap<QString, QString>* values) const;
 
     void executePluginAction(
         const QnUuid& engineId,

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QJsonObject>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 #include <utils/common/request_param.h>
@@ -27,7 +25,8 @@ struct AnalyticsAction
 
     qint64 timestampUs;
 
-    QJsonObject params;
+    using Parameters = QMap<QString, QString>;
+    Parameters params;
 };
 #define AnalyticsAction_Fields (engineId)(actionId)(objectId)(deviceId)(timestampUs)(params)
 
