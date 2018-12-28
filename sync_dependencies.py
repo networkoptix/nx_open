@@ -28,9 +28,9 @@ def determine_package_versions(
     v = {
         "gcc": "8.1",
         "clang": "6.0.0",
-        "qt": "5.11.1",
+        "qt": "5.11.3",
         "boost": "1.67.0",
-        "openssl": "1.0.2o",
+        "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
         "openldap": "2.4.42",
