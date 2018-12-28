@@ -186,9 +186,16 @@ TEST_F(SaveUserEx, shouldPossibleToChangeUserPassword)
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
     whenIdFilled(&regularUser1);
-    whenChangePasswordRequestIssued(defaultAdmin, &regularUser1, "new_password",
+    whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password",
         http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
+    whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password2",
+        http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(regularUser1);
+
+    whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password",
+        http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 }
 
