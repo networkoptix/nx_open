@@ -505,16 +505,6 @@ namespace MapHelper
     const Map* getPointer(const Map& nestedMap) { return &nestedMap; }
 
     template<typename Map, typename FirstKey, typename... RemainingKeys>
-    MappedTypeOnLevel<Map, keyCount<FirstKey, RemainingKeys...>>* getPointer(
-        Map& nestedMap,
-        const FirstKey& firstKey,
-        const RemainingKeys&... remainingKeys)
-    {
-        return const_cast<MappedTypeOnLevel<Map, keyCount<FirstKey, RemainingKeys...>>*>(
-            getPointer(const_cast<const Map&>(nestedMap), firstKey, remainingKeys...));
-    };
-
-    template<typename Map, typename FirstKey, typename... RemainingKeys>
     const MappedTypeOnLevel<Map, keyCount<FirstKey, RemainingKeys...>>* getPointer(
         const Map& nestedMap,
         const FirstKey& firstKey,
@@ -528,6 +518,16 @@ namespace MapHelper
             return &itr->second;
         else
             return getPointer(itr->second, remainingKeys...);
+    };
+
+    template<typename Map, typename FirstKey, typename... RemainingKeys>
+    MappedTypeOnLevel<Map, keyCount<FirstKey, RemainingKeys...>>* getPointer(
+        Map& nestedMap,
+        const FirstKey& firstKey,
+        const RemainingKeys&... remainingKeys)
+    {
+        return const_cast<MappedTypeOnLevel<Map, keyCount<FirstKey, RemainingKeys...>>*>(
+            getPointer(const_cast<const Map&>(nestedMap), firstKey, remainingKeys...));
     };
 
     template<typename Map>
