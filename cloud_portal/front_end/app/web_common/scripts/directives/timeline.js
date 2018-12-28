@@ -470,12 +470,19 @@
                         // 0. Angular handlers for GUI
                         scope.goToLive = goToLive;
                         scope.playPause = playPause;
-                        scope.disableZoomOut = scope.scaleManager.disableZoomOut;
+                        
+                        function updateDisableZoomOut () {
+                            $timeout(() => {
+                                scope.disableZoomOut = scope.scaleManager.disableZoomOut;
+                            });
+                        }
                         
                         // 1. Visual buttons
                         const interval = CONFIG.timelineMouseEventTimeout;
                         var waitingSecondClick = false;
                         var initialClick;
+    
+                        updateDisableZoomOut();
                         
                         function onMouseUp(delay) {
                             if (!window.jscd.mobile) {
@@ -499,9 +506,7 @@
                         
                         element.on('mouseup', '.zoomOutButton', function () {
                             onMouseUp(true);
-                            $timeout(() => {
-                                scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                            });
+                            updateDisableZoomOut();
                         });
                         
                         element.on('mouseleave', '.zoomOutButton', function () {
@@ -522,16 +527,12 @@
                                 initialClick = $timeout(function () {
                                     waitingSecondClick = false;
                                     onMouseUp(false);
-                                    $timeout(() => {
-                                        scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                                    });
+                                    updateDisableZoomOut();
                                 }, interval);
                             } else {
                                 $timeout.cancel(initialClick);
                                 timelineActions.fullZoomOut();
-                                $timeout(() => {
-                                    scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                                });
+                                updateDisableZoomOut();
                                 $timeout(() => {
                                     waitingSecondClick = false;
                                 }, interval);
@@ -540,24 +541,18 @@
                         
                         element.on('dblclick', '.zoomOutButton', function () {
                             timelineActions.fullZoomOut();
-                            $timeout(() => {
-                                scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                            });
+                            updateDisableZoomOut();
                         });
                         
                         element.on('mouseup', '.zoomInButton', function () {
                             if (!window.jscd.mobile) {
                                 timelineActions.zoomingStop();
-                                $timeout(() => {
-                                    scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                                });
+                                updateDisableZoomOut();
                                 return;
                             }
                             $timeout(() => {
                                 timelineActions.zoomingStop();
-                                $timeout(() => {
-                                    scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                                });
+                                updateDisableZoomOut();
                             }, interval);
                         });
                         element.on('mouseleave', '.zoomInButton', function () {
