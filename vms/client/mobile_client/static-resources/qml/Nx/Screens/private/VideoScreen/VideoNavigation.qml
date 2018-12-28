@@ -38,9 +38,9 @@ Item
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
-    onDrawingRoiChanged: d.updateWarningText()
-    onHasCustomRoiChanged: d.updateWarningText()
-    onMotionSearchModeChanged: d.updateWarningText()
+    onDrawingRoiChanged: updateWarningTextTimer.restart()
+    onHasCustomRoiChanged: updateWarningTextTimer.restart()
+    onMotionSearchModeChanged: updateWarningTextTimer.restart()
 
     Connections
     {
@@ -67,7 +67,7 @@ Item
         }
     }
 
-    QtObject
+    Object
     {
         id: d
 
@@ -95,7 +95,17 @@ Item
             NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
         }
 
-        onLoadingChunksChanged: updateWarningText()
+        onLoadingChunksChanged: updateWarningTextTimer.restart()
+
+        Timer
+        {
+            // Updates warning message after some delay to prevent fast changes.
+            id: updateWarningTextTimer
+
+            interval: 10
+            repeat: false
+            onTriggered: d.updateWarningText()
+        }
 
         function updateWarningText()
         {
