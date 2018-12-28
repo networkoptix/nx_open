@@ -76,9 +76,10 @@ protected:
         const QString& newPassword,
         http::StatusCode::Value expectedCode)
     {
+        const auto accessPassword = accessUser.password;
         userToSave->password = newPassword;
         NX_TEST_API_POST(m_server.get(), "/ec2/saveUser", *userToSave, nullptr,
-            expectedCode, accessUser.name.toLower(), accessUser.password, &m_responseBuffer);
+            expectedCode, accessUser.name.toLower(), accessPassword, &m_responseBuffer);
         NX_VERBOSE(this, lm("/ex2/saveUser issued successfully, response: %1").args(m_responseBuffer));
     }
 
@@ -170,7 +171,7 @@ TEST_F(SaveUserEx, shouldBeImpossibleToChangeExistingUserNameIfAnotherUserHasIt)
     whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::forbidden);
 }
 
-TEST_F(SaveUserEx, shouldPossibleToSaveSameUserTwice)
+TEST_F(SaveUserEx, shouldBePossibleToSaveSameUserTwice)
 {
     whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
@@ -180,7 +181,7 @@ TEST_F(SaveUserEx, shouldPossibleToSaveSameUserTwice)
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 }
 
-TEST_F(SaveUserEx, shouldPossibleToChangeUserPassword)
+TEST_F(SaveUserEx, shouldBePossibleToChangeUserPassword)
 {
     whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
