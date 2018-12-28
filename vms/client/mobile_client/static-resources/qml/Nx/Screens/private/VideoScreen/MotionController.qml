@@ -17,7 +17,8 @@ Item
 
     readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingRoi
     readonly property bool drawingRoi: allowDrawing && d.toBool(
-        d.customInitialPoint && d.selectionRoi && d.selectionRoi.expanded)
+        d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
+
 
     signal requestDrawing()
     signal emptyRoiCleared()
@@ -27,7 +28,7 @@ Item
         if (!allowDrawing || !d.customInitialPoint)
             return
 
-        d.selectionRoi.start()
+        d.selectionRoi.start(true)
         handleLongPressed()
     }
 

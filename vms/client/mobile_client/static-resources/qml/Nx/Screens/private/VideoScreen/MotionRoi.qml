@@ -15,7 +15,7 @@ Item
     property int lineWidth: 1
     property bool singlePoint: true
 
-    readonly property alias expanded: singleSelectionMarker.expanded
+    readonly property alias expandingFinished: singleSelectionMarker.expandingFinished
 
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y
@@ -24,9 +24,12 @@ Item
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
     // Shows preloader
-    function start()
+    function start(immediate)
     {
-        startDelayTimer.restart()
+        if (immediate)
+            d.preloader = true
+        else
+            startDelayTimer.restart()
     }
 
     // Shows selection

@@ -22,7 +22,8 @@ Item
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
     property real centerCircleRadius: 2.5
-    readonly property bool expanded: d.circleRadius == expandedCircleRadius && state == "expanded"
+    readonly property bool expandingFinished: state == "normal"
+        || (d.circleRadius == expandedCircleRadius && state == "expanded")
 
     layer.enabled: true
 
