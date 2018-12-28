@@ -55,8 +55,8 @@ Animations::Animations(QObject* parent):
     setup(Id::NotificationsPanelCollapse, QEasingCurve::OutQuad, 300);
     setup(Id::RightPanelTileInsertion, QEasingCurve::OutCubic, 320);
     setup(Id::RightPanelTileRemoval, QEasingCurve::OutCubic, 320);
-    setup(Id::RightPanelTileFadeIn, QEasingCurve::Linear, 320);
-    setup(Id::RightPanelTileFadeOut, QEasingCurve::Linear, 320);
+    setup(Id::RightPanelTileFadeIn, QEasingCurve::OutQuad, 320);
+    setup(Id::RightPanelTileFadeOut, QEasingCurve::OutQuad, 320);
 
     setup(Id::TitlePanelExpand, QEasingCurve::InOutQuad, 100);
     setup(Id::TitlePanelCollapse, QEasingCurve::OutQuad, 100);
