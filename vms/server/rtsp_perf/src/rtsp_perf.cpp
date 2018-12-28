@@ -1,5 +1,7 @@
 #include "rtsp_perf.h"
 
+#include <thread>
+
 #include <nx/streaming/rtsp_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/custom_headers.h>
@@ -58,15 +60,15 @@ void RtspPerf::run()
 
     for (int32_t i = 0; i < m_config.count; ++i)
     {
-        usleep(50000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
         bool live = i < m_config.count * m_config.livePercent / 100;
         QString url = urls[i % urls.size()];
-        workers.emplace_back([&url, live, this]() { startSession(url, live); } );
+        workers.emplace_back([url, live, this]() { startSession(url, live); } );
     }
 
     while (true)
     {
-        usleep(1000000);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         NX_DEBUG(this, "Total bytesRead %1, success %2, failed %3",
             m_stat.totalBytesRead, m_stat.successStreams, m_stat.failedStreams);
     }
