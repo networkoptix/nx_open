@@ -32,8 +32,14 @@ namespace test {
 #define ASSERT_TRUE(CONDITION) \
     nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, __LINE__)
 
+#define ASSERT_TRUE_AT_LINE(LINE, CONDITION) \
+    nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, (LINE))
+
 #define ASSERT_FALSE(CONDITION) \
     nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, __LINE__)
+
+#define ASSERT_FALSE_AT_LINE(LINE, CONDITION) \
+    nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, (LINE))
 
 #define ASSERT_EQ(EXPECTED, ACTUAL) \
     nx::kit::test::detail::assertEq( \
