@@ -26,8 +26,7 @@
 
 #include "test_outgoing_transaction_dispatcher.h"
 
-namespace nx::clusterdb::engine {
-namespace test {
+namespace nx::clusterdb::engine::test {
 
 class CommandLog:
     public nx::cloud::db::test::BasePersistentDataTest,
@@ -77,7 +76,7 @@ public:
     }
 
 protected:
-    const std::unique_ptr<clusterdb::engine::CommandLog>& transactionLog()
+    const std::unique_ptr<clusterdb::engine::CommandLog>& commandLog()
     {
         return m_commandLog;
     }
@@ -120,11 +119,11 @@ private:
     }
 };
 
-class TransactionLogSameTransaction:
+class CommandLogSameTransaction:
     public CommandLog
 {
 public:
-    TransactionLogSameTransaction():
+    CommandLogSameTransaction():
         CommandLog(dao::DataObjectType::rdbms),
         m_systemId(nx::cloud::db::test::BusinessDataGenerator::generateRandomSystemId()),
         m_otherPeerId(QnUuid::createUuid()),
@@ -133,10 +132,6 @@ public:
         m_dbConnectionHolder(dbConnectionOptions())
     {
         init();
-    }
-
-    ~TransactionLogSameTransaction()
-    {
     }
 
 protected:
@@ -162,17 +157,18 @@ protected:
         for (int i = 0; i < 3; ++i)
         {
             auto tran = prepareFromOtherPeerWithTimestampDiff(1);
-            tran.persistentInfo.timestamp.sequence =
-                std::max<std::uint64_t>(m_lastUsedSequence + 1, tran.persistentInfo.timestamp.sequence + 1);
+            tran.persistentInfo.timestamp.sequence = std::max<std::uint64_t>(
+                m_lastUsedSequence + 1,
+                tran.persistentInfo.timestamp.sequence + 1);
             m_lastUsedSequence = tran.persistentInfo.timestamp.sequence;
             saveTransaction(tran);
         }
     }
 
-    void whenGeneratedTransactionLocally()
+    void whenGenerateTransactionLocally()
     {
         auto queryContext = getQueryContext();
-        auto transaction = transactionLog()->prepareLocalTransaction(
+        auto transaction = commandLog()->prepareLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
             ::ec2::ApiCommand::saveUser,
@@ -180,21 +176,21 @@ protected:
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
 
-        const auto transactionHash = 
+        const auto transactionHash =
             nx::cloud::db::ec2::command::SaveUser::hash(transaction.params);
         auto transactionSerializer = std::make_unique<
             UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>>(
                 std::move(transaction),
                 protocolVersionRange().currentVersion());
 
-        transactionLog()->saveLocalTransaction(
+        commandLog()->saveLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
             transactionHash,
             std::move(transactionSerializer));
     }
 
-    void assertIfTransactionIsNotPresent()
+    void assertTransactionIsPresent()
     {
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         ASSERT_EQ(1U, allTransactions.size());
@@ -204,49 +200,49 @@ protected:
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
 
-    void whenReceivedTransactionFromOtherPeerWithGreaterTimestamp()
+    void whenReceiveTransactionFromOtherPeerWithGreaterTimestamp()
     {
         addTransactionFromOtherPeerWithTimestampDiff(1);
     }
 
-    void assertIfTransactionHasNotBeenReplaced()
+    void assertTransactionIsReplaced()
     {
         const auto finalTransaction = getTransactionFromLog();
         ASSERT_NE(*m_initialTransaction, finalTransaction);
     }
 
-    void assertThatTransactionAuthorIsLocalPeer()
+    void assertTransactionAuthorIsLocalPeer()
     {
         const auto finalTransaction = getTransactionFromLog();
         ASSERT_EQ(peerId(), finalTransaction.peerID);
     }
 
-    void assertThatTransactionAuthorIsOtherPeer()
+    void assertTransactionAuthorIsOtherPeer()
     {
         const auto finalTransaction = getTransactionFromLog();
         ASSERT_EQ(m_otherPeerId, finalTransaction.peerID);
     }
 
-    void whenReceivedTransactionFromOtherPeerWithLesserTimestamp()
+    void whenReceiveTransactionFromOtherPeerWithLesserTimestamp()
     {
         addTransactionFromOtherPeerWithTimestampDiff(-1);
     }
 
-    void assertIfTransactionHasBeenReplaced()
+    void assertTransactionIsNotReplaced()
     {
         const auto finalTransaction = getTransactionFromLog();
         ASSERT_EQ(*m_initialTransaction, finalTransaction);
     }
 
-    void whenAddedTransactionLocallyWithGreaterSequence()
+    void whenAddTransactionLocallyWithGreaterSequence()
     {
-        whenGeneratedTransactionLocally();
+        whenGenerateTransactionLocally();
     }
 
-    void whenReceivedOwnOldTransactionWithLesserSequence()
+    void whenReceiveOwnOldTransactionWithLesserSequence()
     {
         auto queryContext = getQueryContext();
-        auto transaction = transactionLog()->prepareLocalTransaction(
+        auto transaction = commandLog()->prepareLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
             ::ec2::ApiCommand::saveUser,
@@ -255,7 +251,7 @@ protected:
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
 
-        const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog
+        const auto resultCode = commandLog()->checkIfNeededAndSaveToLog
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
@@ -266,7 +262,7 @@ protected:
 
     void assertMaxTimestampSequenceIsUsed()
     {
-        const auto timestamp = transactionLog()->generateTransactionTimestamp(m_systemId.c_str());
+        const auto timestamp = commandLog()->generateTransactionTimestamp(m_systemId.c_str());
         ASSERT_EQ(m_lastUsedSequence, timestamp.sequence);
     }
 
@@ -291,7 +287,7 @@ private:
         ASSERT_TRUE(m_dbConnectionHolder.open());
 
         // Moving local peer sequence.
-        transactionLog()->shiftLocalTransactionSequence(m_systemId.c_str(), 100);
+        commandLog()->shiftLocalTransactionSequence(m_systemId.c_str(), 100);
     }
 
     std::shared_ptr<nx::sql::QueryContext> getQueryContext()
@@ -358,7 +354,7 @@ private:
                 transactionsReadPromise.set_value(std::move(serializedTransactions));
             };
 
-        transactionLog()->readTransactions(
+        commandLog()->readTransactions(
             m_systemId.c_str(),
             ReadCommandsFilter::kEmptyFilter,
             completionHandler);
@@ -383,7 +379,7 @@ private:
         transaction.persistentInfo.timestamp =
             m_initialTransaction
             ? m_initialTransaction->persistentInfo.timestamp + timestampDiff
-            : transactionLog()->generateTransactionTimestamp(m_systemId.c_str()) + timestampDiff;
+            : commandLog()->generateTransactionTimestamp(m_systemId.c_str()) + timestampDiff;
         transaction.params = m_transactionData;
 
         if (!m_initialTransaction)
@@ -395,7 +391,7 @@ private:
     void saveTransaction(Command<vms::api::UserData> transaction)
     {
         auto queryContext = getQueryContext();
-        const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog
+        const auto dbResult = commandLog()->checkIfNeededAndSaveToLog
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
@@ -417,76 +413,68 @@ private:
 
         return *transaction;
     }
-
-    //void assertThatTransactionPresentAndBelongsTo(const QnUuid& peerId)
-    //{
-    //    const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
-    //    ASSERT_EQ(1U, allTransactions.size());
-
-    //    boost::optional<Command<vms::api::UserData>> transaction =
-    //        findTransaction(allTransactions, m_transactionData);
-    //    ASSERT_TRUE(static_cast<bool>(transaction));
-
-    //    ASSERT_EQ(peerId, transaction->peerID);
-    //}
 };
 
-TEST_F(TransactionLogSameTransaction, newly_generated_transaction_is_there)
+TEST_F(CommandLogSameTransaction, newly_generated_transaction_is_there)
 {
-    whenGeneratedTransactionLocally();
-    assertIfTransactionIsNotPresent();
+    whenGenerateTransactionLocally();
+    assertTransactionIsPresent();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_from_remote_peer_has_been_added)
+TEST_F(CommandLogSameTransaction, transaction_from_remote_peer_has_been_added)
 {
-    whenReceivedTransactionFromOtherPeerWithGreaterTimestamp();
-    assertIfTransactionIsNotPresent();
+    whenReceiveTransactionFromOtherPeerWithGreaterTimestamp();
+    assertTransactionIsPresent();
 }
 
 TEST_F(
-    TransactionLogSameTransaction,
+    CommandLogSameTransaction,
     transaction_from_other_peer_with_greater_timestamp_replaces_existing_one)
 {
-    whenGeneratedTransactionLocally();
-    whenReceivedTransactionFromOtherPeerWithGreaterTimestamp();
-    assertIfTransactionHasNotBeenReplaced();
-    assertThatTransactionAuthorIsOtherPeer();
+    whenGenerateTransactionLocally();
+    whenReceiveTransactionFromOtherPeerWithGreaterTimestamp();
+
+    assertTransactionIsReplaced();
+    assertTransactionAuthorIsOtherPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_with_lesser_timestamp_is_ignored)
+TEST_F(CommandLogSameTransaction, transaction_with_lesser_timestamp_is_ignored)
 {
-    whenGeneratedTransactionLocally();
-    whenReceivedTransactionFromOtherPeerWithLesserTimestamp();
-    assertIfTransactionHasBeenReplaced();
-    assertThatTransactionAuthorIsLocalPeer();
+    whenGenerateTransactionLocally();
+    whenReceiveTransactionFromOtherPeerWithLesserTimestamp();
+
+    assertTransactionIsNotReplaced();
+    assertTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_with_greater_sequence_replaces_existing)
+TEST_F(CommandLogSameTransaction, transaction_with_greater_sequence_replaces_existing)
 {
-    whenGeneratedTransactionLocally();
-    whenAddedTransactionLocallyWithGreaterSequence();
-    assertIfTransactionHasNotBeenReplaced();
-    assertThatTransactionAuthorIsLocalPeer();
+    whenGenerateTransactionLocally();
+    whenAddTransactionLocallyWithGreaterSequence();
+
+    assertTransactionIsReplaced();
+    assertTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignored)
+TEST_F(CommandLogSameTransaction, transaction_with_lesser_sequence_is_ignored)
 {
-    whenGeneratedTransactionLocally();
-    whenReceivedOwnOldTransactionWithLesserSequence();
-    assertIfTransactionHasBeenReplaced();
-    assertThatTransactionAuthorIsLocalPeer();
+    whenGenerateTransactionLocally();
+    whenReceiveOwnOldTransactionWithLesserSequence();
+
+    assertTransactionIsNotReplaced();
+    assertTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, tran_rollback_clears_raw_data)
+TEST_F(CommandLogSameTransaction, tran_rollback_clears_raw_data)
 {
-    whenGeneratedTransactionLocally();
+    whenGenerateTransactionLocally();
     beginTran();
-    whenAddedTransactionLocallyWithGreaterSequence();
+    whenAddTransactionLocallyWithGreaterSequence();
     rollbackTran();
-    assertIfTransactionHasBeenReplaced();
+    assertTransactionIsNotReplaced();
 }
 
-TEST_F(TransactionLogSameTransaction, max_timestamp_sequence_is_restored_after_restart)
+TEST_F(CommandLogSameTransaction, max_timestamp_sequence_is_restored_after_restart)
 {
     addTransactionsWithIncreasingTimestampSequence();
     reinitialiseTransactionLog();
@@ -508,11 +496,11 @@ public:
     };
 
     TestTransactionController(
-        const std::unique_ptr<clusterdb::engine::CommandLog>& transactionLog,
+        const std::unique_ptr<clusterdb::engine::CommandLog>& commandLog,
         const nx::cloud::db::api::SystemData& system,
         const nx::cloud::db::api::AccountData& accountToShareWith)
         :
-        m_commandLog(transactionLog),
+        m_commandLog(commandLog),
         m_system(system),
         m_accountToShareWith(accountToShareWith),
         m_completedState(State::init),
@@ -527,13 +515,11 @@ public:
 
     void startDbTransaction()
     {
-        using namespace std::placeholders;
-
         m_completedState = State::startedTransaction;
         m_desiredState = State::startedTransaction;
         m_commandLog->startDbTransaction(
             m_system.id.c_str(),
-            std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
+            [this](auto&&... args) { return doSomeDataModifications(std::move(args)...); },
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
                 nx::sql::DBResult /*dbResult*/)
             {
@@ -666,18 +652,25 @@ private:
     TestTransactionController& operator=(const TestTransactionController&) = delete;
 };
 
-class TransactionLogOverlappingTransactions:
+class CommandLogOverlappingTransactions:
     public CommandLog
 {
 public:
-    TransactionLogOverlappingTransactions():
+    CommandLogOverlappingTransactions():
         CommandLog(dao::DataObjectType::ram)
     {
         persistentDbManager()->queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
     }
 
 protected:
-    void whenAddedOverlappingTransactions()
+    struct ReadResult
+    {
+        ResultCode resultCode;
+        std::vector<dao::TransactionLogRecord> serializedTransactions;
+        vms::api::TranState readedUpTo;
+    };
+
+    void whenAddOverlappingTransactions()
     {
         constexpr std::size_t transactionCount = 5;
 
@@ -691,10 +684,15 @@ protected:
             dbTransactions[i-1]->commit();
     }
 
-    void whenAddedBunchOfTransactionsConcurrently()
+    void whenAddBunchOfTransactionsConcurrently()
     {
-        using namespace std::placeholders;
+        whenScheduleMultipleConcurrentCommands();
 
+        waitUntilAllScheduledCommandsHaveCompleted();
+    }
+
+    void whenScheduleMultipleConcurrentCommands()
+    {
         const int transactionToAddCount = dbConnectionOptions().maxConnectionCount;
         ASSERT_GT(transactionToAddCount, 1);
         m_transactionToExecuteThreshold = 7;
@@ -707,18 +705,13 @@ protected:
         std::mt19937 g(rd());
         std::shuffle(m_transactionOrder.begin(), m_transactionOrder.end(), g);
 
-        QnWaitCondition cond;
-        int transactionsToWait = 0;
-
-        QnMutexLocker lk(&m_mutex);
-
         for (int i = 0; i < transactionToAddCount; ++i)
         {
-            ++transactionsToWait;
-            transactionLog()->startDbTransaction(
-                getSystem(0).id.c_str(),
-                std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1, i),
-                [this, &transactionsToWait, &cond](
+            ++m_scheduledCommandCount;
+            commandLog()->startDbTransaction(
+                getSystem(0).id,
+                [this, i](auto&&... args) { return shareSystemToRandomUser(std::move(args)..., i); },
+                [this](
                     nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
@@ -726,14 +719,37 @@ protected:
                         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
                     }
 
-                    QnMutexLocker lk(&m_mutex);
-                    --transactionsToWait;
-                    cond.wakeAll();
+                    m_commandResults.push(dbResult);
                 });
         }
+    }
 
-        while (transactionsToWait > 0)
-            cond.wait(lk.mutex());
+    void waitUntilAllScheduledCommandsHaveCompleted()
+    {
+        for (int i = 0; i < m_scheduledCommandCount; ++i)
+            m_commandResults.pop();
+    }
+
+    void whenReadCommandLog()
+    {
+        commandLog()->readTransactions(
+            getSystem(0).id,
+            ReadCommandsFilter(),
+            [this](auto&&... args) { saveReadResult(std::move(args)...); });
+    }
+
+    void thenReadSucceeded()
+    {
+        m_prevReadResult = m_readResults.pop();
+
+        ASSERT_EQ(ResultCode::ok, m_prevReadResult.resultCode);
+    }
+
+    void andReportedReadPositionCorrespondsToCommandsRead()
+    {
+        ASSERT_EQ(
+            m_prevReadResult.readedUpTo.values.begin().value(),
+            m_prevReadResult.serializedTransactions.size());
     }
 
     std::vector<std::unique_ptr<TestTransactionController>>
@@ -752,16 +768,16 @@ protected:
             accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
 
         auto tranController = std::make_unique<TestTransactionController>(
-            transactionLog(),
+            commandLog(),
             getSystem(0),
             accountToShareWith);
         tranController->startDbTransaction();
         return tranController;
     }
 
-    void assertIfTransactionsWereNotSentInAscendingSequenceOrder()
+    void assertTransactionsAreSentInAscendingSequenceOrder()
     {
-        outgoingTransactionDispatcher().assertIfTransactionsWereNotSentInAscendingSequenceOrder();
+        outgoingTransactionDispatcher().assertTransactionsAreSentInAscendingSequenceOrder();
     }
 
 private:
@@ -769,6 +785,10 @@ private:
     QnWaitCondition m_cond;
     std::vector<int> m_transactionOrder;
     int m_transactionToExecuteThreshold = 0;
+    int m_scheduledCommandCount = 0;
+    nx::utils::SyncQueue<nx::sql::DBResult> m_commandResults;
+    nx::utils::SyncQueue<ReadResult> m_readResults;
+    ReadResult m_prevReadResult;
 
     nx::sql::DBResult shareSystemToRandomUser(
         nx::sql::QueryContext* queryContext,
@@ -781,6 +801,7 @@ private:
         sharing.accountId = accountToShareWith.id;
         sharing.accountEmail = accountToShareWith.email;
         sharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
+        sharing.vmsUserId = QnUuid::createUuid().toSimpleString().toStdString();
 
         // It does not matter for transaction log whether we save application data or not.
         // TODO #ak But, it is still better to mockup data access object here.
@@ -792,7 +813,7 @@ private:
         nx::cloud::db::ec2::convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);
-        auto dbResult = transactionLog()->generateTransactionAndSaveToLog
+        auto dbResult = commandLog()->generateTransactionAndSaveToLog
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext,
                 sharing.systemId.c_str(),
@@ -826,30 +847,44 @@ private:
         ++m_transactionToExecuteThreshold;
         m_cond.wakeAll();
     }
+
+    void saveReadResult(
+        ResultCode resultCode,
+        std::vector<dao::TransactionLogRecord> serializedTransactions,
+        vms::api::TranState readedUpTo)
+    {
+        m_readResults.push({
+            resultCode,
+            std::move(serializedTransactions),
+            std::move(readedUpTo)});
+    }
 };
 
-TEST_F(TransactionLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
+TEST_F(CommandLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
 {
     givenRandomSystem();
-    whenAddedOverlappingTransactions();
-    assertIfTransactionsWereNotSentInAscendingSequenceOrder();
+    whenAddOverlappingTransactions();
+    assertTransactionsAreSentInAscendingSequenceOrder();
 }
 
-//TEST_F(TransactionLogOverlappingTransactions, overlapping_transactions_to_multiple_systems)
-
-//-------------------------------------------------------------------------------------------------
-
-class FtTransactionLogOverlappingTransactions:
-    public TransactionLogOverlappingTransactions
-{
-};
-
-TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactions)
+TEST_F(CommandLogOverlappingTransactions, multiple_simultaneous_transactions)
 {
     givenRandomSystem();
-    whenAddedBunchOfTransactionsConcurrently();
-    assertIfTransactionsWereNotSentInAscendingSequenceOrder();
+    whenAddBunchOfTransactionsConcurrently();
+    assertTransactionsAreSentInAscendingSequenceOrder();
 }
 
-} // namespace test
-} // namespace nx::clusterdb::engine
+TEST_F(CommandLogOverlappingTransactions, command_read_position_matches_actual_commands_read)
+{
+    givenRandomSystem();
+    whenScheduleMultipleConcurrentCommands();
+
+    whenReadCommandLog();
+
+    thenReadSucceeded();
+    andReportedReadPositionCorrespondsToCommandsRead();
+
+    waitUntilAllScheduledCommandsHaveCompleted();
+}
+
+} // namespace nx::clusterdb::engine::test
