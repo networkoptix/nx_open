@@ -121,7 +121,7 @@ public:
      */
     static QSize closestResolution(
         const QSize& idealResolution,
-        float aspectRatio,
+        float desiredAspectRatio,
         const QSize& maxResolution,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);

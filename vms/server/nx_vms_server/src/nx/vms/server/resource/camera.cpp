@@ -279,10 +279,10 @@ QSize Camera::getNearestResolution(
     float desirableAspectRatio,
     double maxResolutionArea,
     const QList<QSize>& resolutionList,
-    double* coeff)
+    double* outCoefficient)
 {
-    if (coeff)
-        *coeff = INT_MAX;
+    if (outCoefficient)
+        *outCoefficient = INT_MAX;
 
     double requestSquare = resolution.width() * resolution.height();
     if (requestSquare < kMaxEps || requestSquare > maxResolutionArea)
@@ -327,8 +327,8 @@ QSize Camera::getNearestResolution(
         {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
-            if (coeff)
-                *coeff = bestMatchCoeff;
+            if (outCoefficient)
+                *outCoefficient = bestMatchCoeff;
         }
     }
 
@@ -337,7 +337,7 @@ QSize Camera::getNearestResolution(
 
 QSize Camera::closestResolution(
     const QSize& idealResolution,
-    float aspectRatio,
+    float desiredAspectRatio,
     const QSize& maxResolution,
     const QList<QSize>& resolutionList,
     double* outCoefficient)
@@ -345,19 +345,20 @@ QSize Camera::closestResolution(
     const auto maxResolutionArea = double(maxResolution.width()) * double(maxResolution.height());
     QSize result = getNearestResolution(
         idealResolution,
-        aspectRatio,
+        desiredAspectRatio,
         maxResolutionArea,
         resolutionList,
         outCoefficient);
 
     if (result == EMPTY_RESOLUTION_PAIR)
     {
+        // Try to get resolution ignoring aspect ratio
         result = getNearestResolution(
             idealResolution,
-            0.0,
+            0.0f,
             maxResolutionArea,
             resolutionList,
-            outCoefficient); //< Try to get resolution ignoring aspect ration
+            outCoefficient);
     }
 
     return result;
