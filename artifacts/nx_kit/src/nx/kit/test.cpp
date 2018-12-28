@@ -17,6 +17,8 @@
     #include <sys/stat.h> //< For mkdir().
 #endif
 
+static const bool kVerboseTestReg = false; //< Use to debug this unit test framework.
+
 namespace nx {
 namespace kit {
 namespace test {
@@ -161,8 +163,11 @@ int regTest(const Test& test)
 {
     allTests().push_back(test);
 
-    std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
-        << test.testCase << "." << test.testName << std::endl;
+    if (kVerboseTestReg)
+    {
+        std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
+            << test.testCase << "." << test.testName << std::endl;
+    }
 
     return 0; //< Return value is not used.
 }
