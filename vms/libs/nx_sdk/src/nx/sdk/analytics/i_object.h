@@ -61,6 +61,9 @@ public:
      */
     virtual nxpl::NX_GUID id() const = 0;
 
+    // TODO: #mshevchenko: Fix comments.
+
+    // TODO: #mshevchenko: Rename to subtype.
     /**
      * @brief (e.g. vehicle type: truck,  car, etc)
      */
