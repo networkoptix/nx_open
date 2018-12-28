@@ -123,7 +123,7 @@ public:
     TestStorageFactoryHelper(bool invalidConfig = false) : m_invalidConfig(invalidConfig) {}
 
     std::string getConfigPath() const { return m_path; }
-    std::unordered_set<std::string> storageHosts() const { return m_storageHosts; }
+    const std::unordered_set<std::string>& storageHosts() const { return m_storageHosts; }
 
 private:
     virtual bool readConfig(const std::string& path, std::string* outContent) override
