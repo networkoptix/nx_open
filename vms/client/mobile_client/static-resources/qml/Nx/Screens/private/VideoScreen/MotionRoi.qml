@@ -15,6 +15,8 @@ Item
     property int lineWidth: 1
     property bool singlePoint: true
 
+    readonly property alias expanded: singleSelectionMarker.expanded
+
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y
 
