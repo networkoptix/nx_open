@@ -73,13 +73,17 @@ void WebSocket::onPingTimer()
 void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
 {
     if (m_failed)
+    {
+        if (m_userReadPair)
+            callOnReadhandler(SystemError::connectionAbort, 0);
         return;
+    }
 
     if (ecode != SystemError::noError || transferred == 0)
     {
         m_failed = true;
         if (m_userReadPair)
-            m_userReadPair->first(SystemError::connectionAbort, 0);
+            callOnReadhandler(SystemError::connectionAbort, 0);
         return;
     }
 
@@ -87,7 +91,7 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
     if (m_failed) //< Might be set while parsing
     {
         if (m_userReadPair)
-            m_userReadPair->first(SystemError::connectionAbort, 0);
+            callOnReadhandler(SystemError::connectionAbort, 0);
         return;
     }
 
@@ -101,7 +105,7 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
             const auto incomingMessage = m_incomingMessageQueue.popFront();
             *(m_userReadPair->second) = incomingMessage;
             utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-            m_userReadPair->first(SystemError::noError, incomingMessage.size());
+            callOnReadhandler(SystemError::noError, incomingMessage.size());
             if (watcher.objectDestroyed())
                 return;
             m_userReadPair.reset();
@@ -114,6 +118,12 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
         {
             onRead(error, transferred);
         });
+}
+
+void WebSocket::callOnReadhandler(SystemError::ErrorCode error, size_t transferred)
+{
+    auto cb = std::move(m_userReadPair->first);
+    cb(error, transferred);
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -231,27 +241,31 @@ void WebSocket::sendMessage(const nx::Buffer& message, IoCompletionHandler handl
 void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
 {
     if (m_failed)
-        return;
+    {
+        while (!m_writeQueue.empty())
+        {
+            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            callOnWriteHandler(SystemError::connectionAbort, 0);
+            if (watcher.objectDestroyed())
+                return;
+        }
+    }
 
     if (error != SystemError::noError || transferred == 0)
     {
         m_failed = true;
         while (!m_writeQueue.empty())
         {
-            const auto userWritePair = std::move(m_writeQueue.front());
-            m_writeQueue.pop();
             utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-            userWritePair.first(SystemError::connectionAbort, 0);
+            callOnWriteHandler(SystemError::connectionAbort, 0);
             if (watcher.objectDestroyed())
                 return;
         }
     }
     else
     {
-        const auto userWritePair = std::move(m_writeQueue.front());
-        m_writeQueue.pop();
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-        userWritePair.first(SystemError::noError, transferred);
+        callOnWriteHandler(SystemError::noError, transferred);
         if (watcher.objectDestroyed())
             return;
 
@@ -265,6 +279,13 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
                 });
         }
     }
+}
+
+void WebSocket::callOnWriteHandler(SystemError::ErrorCode error, size_t transferred)
+{
+    const auto userWritePair = std::move(m_writeQueue.front());
+    m_writeQueue.pop();
+    userWritePair.first(error, transferred);
 }
 
 void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)

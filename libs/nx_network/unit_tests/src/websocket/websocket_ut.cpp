@@ -618,10 +618,7 @@ TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
     givenServerModes(SendMode::singleMessage, ReceiveMode::frame);
     givenServerClientWebSockets();
 
-    clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
-
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    whenReadWriteScheduled();
 
     readyFuture.wait();
 }
@@ -1227,36 +1224,36 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
 
     clientSendCb =
         [&](SystemError::ErrorCode ecode, size_t)
-    {
-        if (ecode != SystemError::noError)
         {
-            resetClientSocket();
-            try { readyPromise.set_value(); }
-            catch (...) {}
-            return;
-        }
-        sentMessageCount++;
-        if (sentMessageCount >= kTotalMessageCount)
-        {
-            readyPromise.set_value();
-            return;
-        }
-        clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    };
+            if (ecode != SystemError::noError)
+            {
+                resetClientSocket();
+                try { readyPromise.set_value(); }
+                catch (...) {}
+                return;
+            }
+            sentMessageCount++;
+            if (sentMessageCount >= kTotalMessageCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        };
 
     serverReadCb =
-        [&](SystemError::ErrorCode, size_t bytesRead)
-    {
-        if (bytesRead == 0)
+        [this](SystemError::ErrorCode, size_t bytesRead)
         {
-            resetServerSocket();
-            try { readyPromise.set_value(); }
-            catch (...) {}
-            return;
-        }
-        serverReadBuf.clear();
-        serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
-    };
+            if (bytesRead == 0)
+            {
+                resetServerSocket();
+                try { readyPromise.set_value(); }
+                catch (...) {}
+                return;
+            }
+            serverReadBuf.clear();
+            serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+        };
 
     whenReadWriteScheduled();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));

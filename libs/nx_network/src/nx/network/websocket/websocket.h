@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <QtCore>
 #include <nx/utils/log/log.h>
 #include <nx/utils/object_destruction_flag.h>
@@ -12,7 +13,6 @@
 #include "websocket_serializer.h"
 #include "websocket_common_types.h"
 #include "websocket_multibuffer.h"
-#include "websocket_handler_queue.h"
 
 namespace nx {
 namespace network {
@@ -113,6 +113,8 @@ private:
     void onWrite(SystemError::ErrorCode ecode, size_t transferred);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
     std::chrono::milliseconds pingTimeout() const;
+    void callOnReadhandler(SystemError::ErrorCode error, size_t transferred);
+    void callOnWriteHandler(SystemError::ErrorCode error, size_t transferred);
 };
 
 } // namespace websocket
