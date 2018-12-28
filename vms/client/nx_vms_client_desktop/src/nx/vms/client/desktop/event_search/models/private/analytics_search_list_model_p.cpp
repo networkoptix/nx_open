@@ -531,7 +531,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
     NX_VERBOSE(q, "Processing %1 live metadata packets from %2 sources",
         totalPackets, packetsBySource.size());
 
-    QList<DetectedObject> newObjects;
+    std::vector<DetectedObject> newObjects;
+    newObjects.reserve(totalPackets);
+
     QHash<QnUuid, int> newObjectIndices;
 
     for (const auto& packets: packetsBySource)
@@ -545,7 +547,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
             if (!detectionMetadata || detectionMetadata->objects.empty())
                 continue;
 
-            for (const auto& item: detectionMetadata->objects)
+            for (auto& item: detectionMetadata->objects)
             {
                 ObjectPosition pos;
                 pos.deviceId = detectionMetadata->deviceId;
@@ -556,7 +558,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 auto index = newObjectIndices.value(item.objectId, -1);
                 if (index >= 0)
                 {
-                    pos.attributes = item.labels;
+                    pos.attributes = std::move(item.labels);
                     advanceObject(newObjects[index], std::move(pos), false);
                     continue;
                 }
@@ -564,7 +566,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 index = indexOf(item.objectId);
                 if (index >= 0)
                 {
-                    pos.attributes = item.labels;
+                    pos.attributes = std::move(item.labels);
                     advanceObject(m_data[index], std::move(pos));
                     continue;
                 }
@@ -579,13 +581,13 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 DetectedObject newObject;
                 newObject.objectAppearanceId = item.objectId;
                 newObject.objectTypeId = item.objectTypeId;
-                newObject.attributes = item.labels;
+                newObject.attributes = std::move(item.labels);
                 newObject.track.push_back(pos);
                 newObject.firstAppearanceTimeUsec = pos.timestampUsec;
                 newObject.lastAppearanceTimeUsec = pos.timestampUsec;
 
                 newObjectIndices[item.objectId] = newObjects.size();
-                newObjects.push_back(newObject);
+                newObjects.push_back(std::move(newObject));
             }
         }
     }
