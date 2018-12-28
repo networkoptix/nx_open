@@ -98,18 +98,15 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
     m_readBuffer.resize(0);
     m_readBuffer.reserve(4096);
 
-    if (m_incomingMessageQueue.readySize() != 0)
+    if (m_incomingMessageQueue.readySize() != 0 && m_userReadPair)
     {
-        if (m_userReadPair)
-        {
-            const auto incomingMessage = m_incomingMessageQueue.popFront();
-            *(m_userReadPair->second) = incomingMessage;
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-            callOnReadhandler(SystemError::noError, incomingMessage.size());
-            if (watcher.objectDestroyed())
-                return;
-            m_userReadPair.reset();
-        }
+        const auto incomingMessage = m_incomingMessageQueue.popFront();
+        *(m_userReadPair->second) = incomingMessage;
+        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        callOnReadhandler(SystemError::noError, incomingMessage.size());
+        if (watcher.objectDestroyed())
+            return;
+        m_userReadPair.reset();
     }
 
     m_socket->readSomeAsync(
