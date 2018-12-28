@@ -14,16 +14,12 @@
 
 #include "nx/axis/camera_controller.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 struct EventType: nx::vms::api::analytics::EventType
 {
     QString topic;
     QString caption;
-    QString eventTypeIdExternal;
 
     EventType() = default; //< Fusion needs default constructor.
     EventType(const nx::axis::SupportedEventType& supportedEventType);
@@ -51,7 +47,4 @@ struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestB
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

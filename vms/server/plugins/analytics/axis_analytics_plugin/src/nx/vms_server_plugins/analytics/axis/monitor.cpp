@@ -13,10 +13,7 @@
 
 #include "device_agent.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 namespace {
 
@@ -30,7 +27,7 @@ nx::sdk::analytics::common::Event* createCommonEvent(
     const EventType& eventType, bool active)
 {
     auto commonEvent = new nx::sdk::analytics::common::Event();
-    commonEvent->setTypeId(eventType.eventTypeIdExternal.toStdString());
+    commonEvent->setTypeId(eventType.id.toStdString());
     commonEvent->setDescription(eventType.name.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
@@ -79,15 +76,24 @@ void axisHandler::processRequest(
     const auto& request = requestContext.request;
 
     NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
+    const QString query = request.requestLine.url.query();
 
-    const QString kMessage = "?Message=";
-    const int kGuidStringLength = 36; //< Size of guid string.
-    const int startIndex = request.toString().indexOf(kMessage);
-    const QString uuid = request.toString().mid(startIndex + kMessage.size(), kGuidStringLength);
+    static const QString kMessageKey = "Message";
+    QString id;
+    const QStringList queryItems = query.split('&');
+    for (const QString& item: queryItems)
+    {
+        QStringList keyValue = item.split('=');
+        if (keyValue.size() > 1 && keyValue[0] == kMessageKey)
+        {
+            id = keyValue[1];
+            break;
+        }
+    }
 
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
     const auto it = std::find_if(m_events.begin(), m_events.end(),
-        [&uuid](ElapsedEvent& event) { return event.type.id == uuid; });
+        [&id](ElapsedEvent& event) { return event.type.id == id; });
     if (it != m_events.end())
     {
         m_monitor->sendEventStartedPacket(it->type);
@@ -96,7 +102,7 @@ void axisHandler::processRequest(
     }
     else
     {
-        NX_PRINT << "Received packed with undefined event type. Uuid = " << uuid.toStdString();
+        NX_PRINT << "Received packed with undefined event type. id = " << id.toStdString();
     }
     completionHandler(nx::network::http::StatusCode::ok);
 }
@@ -149,26 +155,19 @@ void Monitor::addRules(
             NX_PRINT << "Try to add action " << fullPath;
             std::string actionName = kActionNamePrefix + std::to_string(++globalCounter);
 
-            // actionEventName - is a human readable event name, a part of a message that camera
-            // will send us. The other part of a message is event guid. actionEventName is slightly
-            // formatted to be recognizable in http URL query.
-            std::string actionEventName = it->fullName().toStdString();
-            std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
-            std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
-            std::string message = std::string(it->id.toLatin1()) +
-                std::string(".") + actionEventName;
+            std::string actionEventTypeName = it->id.toStdString();// fullName().toStdString();
 
             int actionId = cameraController.addActiveHttpNotificationAction(
                 actionName.c_str(),
-                message.c_str(),
+                actionEventTypeName.c_str(),
                 fullPath.c_str());
             if (actionId)
                 NX_PRINT << "Action addition succeeded, actionId = " << actionId;
             else
                 NX_PRINT << "Action addition failed";
 
-            NX_PRINT << "Try to add rule " << it->fullName().toStdString();
-            // event.fullname is something like "tns1:VideoSource/tnsaxis:DayNightVision"
+            NX_PRINT << "Try to add rule " << it->id.toStdString();
+            // event.fullname is something like "nx.axis.VideoSource-DayNightVision"
             std::string ruleName = kRuleNamePrefix + std::to_string(globalCounter);
             nx::axis::ActiveRule rule(
                 ruleName.c_str(),
@@ -306,7 +305,4 @@ void Monitor::onTimer()
     m_aioTimer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

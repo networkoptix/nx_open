@@ -16,10 +16,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
@@ -57,7 +54,4 @@ private:
     EngineManifest m_parsedManifest;
 };
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

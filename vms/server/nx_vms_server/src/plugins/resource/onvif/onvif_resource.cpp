@@ -428,6 +428,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
+    OnvifIniConfig::instance().reload();
     m_tmpH264Conf.reset(new onvifXsd__H264Configuration());
     m_pullMessagesResponseElapsedTimer.start();
     m_advSettingsLastUpdated.restart();
@@ -651,7 +652,7 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto& capabilities = (streamIndex == Qn::StreamIndex::primary)
+    const auto& capabilitiesList = (streamIndex == Qn::StreamIndex::primary)
         ? m_primaryStreamCapabilitiesList : m_secondaryStreamCapabilitiesList;
 
     nx::vms::server::resource::StreamCapabilityMap result;
@@ -663,11 +664,18 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
         {UnderstandableVideoCodec::H265, QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC)},
     };
 
-    for (const auto& extension: capabilities)
+    for (const auto& capabilities: capabilitiesList)
     {
         nx::vms::server::resource::StreamCapabilityKey key;
-        key.codec = kEncoderNames[extension.encoding];
-        for (const auto& resolution: extension.resolutions)
+        key.codec = kEncoderNames[capabilities.encoding];
+        if (key.codec.isEmpty())
+        {
+            NX_DEBUG(this, "getStreamCapabilityMapFromDrives encountered unknown "
+                "UnderstandableVideoCodec value - %1. Value will be ignored.",
+                (int) capabilities.encoding);
+            continue;
+        }
+        for (const auto& resolution: capabilities.resolutions)
         {
             key.resolution = resolution;
             result.insert(key, nx::media::CameraStreamCapability());
@@ -3664,7 +3672,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if (response.SubscriptionReference.Address)
     {
         const bool updatePort =
-            nx::network::SocketGlobals::ini().doUpdatePortInSubscriptionAddress;
+            OnvifIniConfig::instance().doUpdatePortInSubscriptionAddress;
         m_onvifNotificationSubscriptionReference =
             fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, updatePort);
     }
@@ -4653,7 +4661,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
     return *it;
 }
 
-void QnPlOnvifResource::updateVideoEncoder(
+void QnPlOnvifResource::updateVideoEncoder1(
     onvifXsd__VideoEncoderConfiguration& encoder,
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
@@ -4716,7 +4724,7 @@ void QnPlOnvifResource::updateVideoEncoder(
 
     if (!encoder.RateControl)
     {
-        NX_DEBUG(this, makeFailMessage("updateVideoEncoder: encoder.RateControl is not set"));
+        NX_DEBUG(this, makeFailMessage("updateVideoEncoder1: encoder.RateControl is not set"));
     }
     else
     {
@@ -4742,7 +4750,7 @@ void QnPlOnvifResource::updateVideoEncoder(
 
     if (!encoder.Resolution)
     {
-        NX_DEBUG(this, makeFailMessage("updateVideoEncoder: encoder.Resolution is not set"));
+        NX_DEBUG(this, makeFailMessage("updateVideoEncoder1: encoder.Resolution is not set"));
     }
     else
     {
@@ -4886,7 +4894,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::secondaryVideoCap
 {
     QnMutexLocker lock(&m_mutex);
     return (!m_secondaryStreamCapabilitiesList.empty())
-        ? m_primaryStreamCapabilitiesList.front()
+        ? m_secondaryStreamCapabilitiesList.front()
         : VideoEncoderCapabilities();
 }
 

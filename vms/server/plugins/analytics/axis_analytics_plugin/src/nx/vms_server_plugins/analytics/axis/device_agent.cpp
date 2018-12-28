@@ -12,10 +12,7 @@
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
@@ -121,7 +118,4 @@ const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept
         return &(*it);
 }
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

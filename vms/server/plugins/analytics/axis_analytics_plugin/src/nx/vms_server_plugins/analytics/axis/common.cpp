@@ -7,11 +7,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
-
+namespace nx::vms_server_plugins::analytics::axis {
 namespace {
 
 using namespace nx::vms_server_plugins::analytics::axis;
@@ -49,8 +45,8 @@ EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
     }
 
     id = supportedEventType.fullName().c_str();
-//    id = ignoreNamespaces(id);
-//    id.replace(QChar('/'), QChar('-'));
+    id = ignoreNamespaces(id);
+    id.replace(QChar('/'), QChar('-'));
     id = QString("nx.axis.") + id;
 
     flags = (supportedEventType.stateful)
@@ -59,7 +55,6 @@ EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
 
     topic = supportedEventType.topic.c_str();
     caption = supportedEventType.name.c_str();
-    eventTypeIdExternal = id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
@@ -67,7 +62,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json),
     AxisEngineManifest_Fields, (brief, true))
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis
