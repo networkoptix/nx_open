@@ -341,19 +341,19 @@ void MultiServerUpdatesWidget::initDropdownActions()
     m_selectUpdateTypeMenu.reset(new QMenu(this));
     m_selectUpdateTypeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
 
-    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internet),
+    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internet) + "...",
         [this]()
         {
             setUpdateSourceMode(UpdateSourceType::internet);
         });
 
-    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internetSpecific),
+    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internetSpecific) + "...",
         [this]()
         {
             setUpdateSourceMode(UpdateSourceType::internetSpecific);
         });
 
-    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::file),
+    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::file) + "...",
         [this]()
         {
             setUpdateSourceMode(UpdateSourceType::file);
@@ -2165,9 +2165,9 @@ QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
         case nx::update::UpdateSourceType::internet:
             return tr("Available Update");
         case nx::update::UpdateSourceType::internetSpecific:
-            return tr("Specific Build...");
+            return tr("Specific Build");
         case nx::update::UpdateSourceType::file:
-            return tr("Browse for Update File...");
+            return tr("Browse for Update File");
         case nx::update::UpdateSourceType::mediaservers:
             // This string should not appear at UI.
             return tr("Update from mediaservers");
