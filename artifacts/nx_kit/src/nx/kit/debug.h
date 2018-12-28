@@ -137,9 +137,9 @@ NX_KIT_API std::ostream*& stream();
 /**
  * Hex-dump binary data using NX_PRINT.
  */
-#define NX_PRINT_HEX_DUMP(TAG, BYTES, SIZE) \
+#define NX_PRINT_HEX_DUMP(CAPTION, BYTES, SIZE) \
     nx::kit::debug::detail::printHexDump( \
-        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (TAG), (const char*) (BYTES), (int) (SIZE))
+        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (CAPTION), (const char*) (BYTES), (int) (SIZE))
 
 //-------------------------------------------------------------------------------------------------
 // Time
