@@ -484,6 +484,8 @@ Item
                 anchors.left:  calendarButton.right
                 anchors.verticalCenter: parent.verticalCenter
                 icon.source: lp("/images/motion.svg")
+                icon.width: 24
+                icon.height: 24
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
                 visible: videoNavigation.hasArchive
