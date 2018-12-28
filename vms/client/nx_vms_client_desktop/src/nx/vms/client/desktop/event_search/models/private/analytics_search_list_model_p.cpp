@@ -35,7 +35,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
-#include <nx/vms/client/desktop/common/widgets/panel.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
@@ -46,6 +45,8 @@
 #include <common/common_module.h>
 #include <nx/analytics/descriptor_manager.h>
 #include <client_core/client_core_module.h>
+#include <QGroupBox>
+#include <QScrollArea>
 
 namespace nx::vms::client::desktop {
 
@@ -779,12 +780,12 @@ bool AnalyticsSearchListModel::Private::requestActionSettings(
     QnMessageBox parametersDialog(q->mainWindowWidget());
     parametersDialog.addButton(QDialogButtonBox::Ok);
     parametersDialog.addButton(QDialogButtonBox::Cancel);
-    parametersDialog.setText(tr("Enter parameters:"));
+    parametersDialog.setText(tr("Enter parameters"));
     parametersDialog.setInformativeText(tr("Action requires some parameters to be filled."));
     parametersDialog.setIcon(QnMessageBoxIcon::Information);
 
     auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
-    view->setClearColor(q->mainWindowWidget()->palette().window().color());
+    view->setClearColor(parametersDialog.palette().window().color());
     view->setResizeMode(QQuickWidget::SizeRootObjectToView);
     view->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
     const auto root = view->rootObject();
@@ -800,12 +801,12 @@ bool AnalyticsSearchListModel::Private::requestActionSettings(
         Q_ARG(QVariant, settingsModel.toVariantMap()),
         Q_ARG(QVariant, {}));
 
-    auto panel = new Panel(&parametersDialog);
-    panel->setFixedSize(400, 400);
+    auto panel = new QScrollArea(&parametersDialog);
+    panel->setFixedHeight(400);
     auto layout = new QHBoxLayout(panel);
     layout->addWidget(view);
 
-    parametersDialog.addCustomWidget(panel);
+    parametersDialog.addCustomWidget(panel, QnMessageBox::Layout::Main);
     if (parametersDialog.exec() != QDialogButtonBox::Ok)
         return false;
 
