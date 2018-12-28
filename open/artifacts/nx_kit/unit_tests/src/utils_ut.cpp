@@ -47,6 +47,11 @@ TEST(utils, toString_number)
     ASSERT_STREQ("3.14", toString(3.14));
 }
 
+TEST(utils, toString_uint8_t)
+{
+    ASSERT_STREQ("42", toString((uint8_t) 42));
+}
+
 TEST(utils, toString_char)
 {
     ASSERT_STREQ("'C'", toString('C'));

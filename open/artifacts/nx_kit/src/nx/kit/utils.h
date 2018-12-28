@@ -125,7 +125,8 @@ std::string toString(T value)
     return outputString.str();
 }
 
-NX_KIT_API std::string toString(std::string s);
+NX_KIT_API std::string toString(std::string s); //< By value to avoid calling the template impl.
+NX_KIT_API std::string toString(uint8_t i); //< Otherwise, uint8_t would be printed as char.
 NX_KIT_API std::string toString(char c);
 NX_KIT_API std::string toString(const char* s);
 NX_KIT_API std::string toString(char* s);
