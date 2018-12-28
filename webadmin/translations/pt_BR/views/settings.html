@@ -12,7 +12,7 @@
                 Este dispositivo precisa de ligação de rede para funcionar.<br>Por favor, conecte-o à rede local ou Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
-                Este dispositivo tem configuração de rede incorrecta. <br>
+                Este dispositivo tem configuração de rede incorreta. <br>
                 Conecte-o à rede ou defina um endereço IP correto.
             </uib-alert>
 
@@ -21,10 +21,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>Porta</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Porta" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -49,7 +49,7 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Desanexar do sistema</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Reiniciar</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Reiniciar o Servidor</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
@@ -64,7 +64,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Mudar senha</button>
                             </div>
                         </form>
                     </div>

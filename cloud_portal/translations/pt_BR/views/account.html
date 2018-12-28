@@ -60,11 +60,11 @@
 </div>
 
 <div class="container" ng-if="passwordMode" >
-    <h1>Change Password</h1>
+    <h1>Mudar Senha</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
-                <label for="password" class="text-left text-md-right control-label">Senha actual</label>
+                <label for="password" class="text-left text-md-right control-label">Senha atual</label>
             </div>
             <div class="col-md-4">
                 <input type="password" class="form-control"
@@ -73,7 +73,7 @@
  id="password" required>
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">A senha actual é obrigatória</span>
+                <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">A senha atual é obrigatória</span>
             </div>
         </div>
 

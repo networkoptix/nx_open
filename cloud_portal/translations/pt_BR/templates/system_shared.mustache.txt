@@ -1,7 +1,7 @@
 Olá {{message.userFullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) partilhou o acesso ao sistema de monitorização de vídeo "{{message.system_name}}" consigo.
+{{message.sharer_name}} ({{message.sharer_email}}) compartilhou o acesso ao sistema de monitorização de vídeo "{{message.system_name}}" consigo.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}

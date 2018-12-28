@@ -22,7 +22,7 @@
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>
             <p ng-if="systemMergeable =='offline'"
-               class="help-block-no-height warning-label">O Sistema {{targetSystem.name}} está offline. Não pode ser feito o "Merge" com o actual.</p>
+               class="help-block-no-height warning-label">O Sistema {{targetSystem.name}} está offline. Não pode ser feito o "Merge" com o atual.</p>
             <p ng-if="systemMergeable =='cannotMerge'"
                class="help-block-no-height warning-label">O sistema {{targetSystem.name}} é incompatível. Não pode ser feito o "Merge" com o actual.</p>
             <p ng-if="systemMergeable == ''"

@@ -1,7 +1,7 @@
-Welcome to %PRODUCT_NAME%
+Bem-vindo ao %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) está a convidá-lo a juntar-se a %PRODUCT_NAME% e partilhou o seu Sistema {{message.system_name}} consigo.
+{{message.sharer_name}} ({{message.sharer_email}}) está convidando a juntar-se a %PRODUCT_NAME% e compartilhou o seu Sistema {{message.system_name}} consigo.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
