@@ -1,9 +1,10 @@
-#ifndef QN_SERIALIZATION_DEBUG_MACROS_H
-#define QN_SERIALIZATION_DEBUG_MACROS_H
+#pragma once
 
 #include <type_traits>
 
+#include <QtCore/QDebug>
 #include <QtCore/QFlags>
+#include <QtCore/QString>
 
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -108,6 +109,12 @@ struct DebugSerializer: public std::conditional<
 __VA_ARGS__ QDebug& operator<<(QDebug& stream, const TYPE& value)        \
 {                                                                        \
     return QnDebugSerialization::DebugSerializer<TYPE>()(stream, value); \
+}                                                                        \
+                                                                         \
+__VA_ARGS__ void PrintTo(const TYPE& value, ::std::ostream* os)          \
+{                                                                        \
+    QString content;                                                     \
+    QDebug dbg(&content);                                                \
+    QnDebugSerialization::DebugSerializer<TYPE>()(dbg, value);           \
+    *os << content.toStdString();                                        \
 }
-
-#endif // QN_SERIALIZATION_DEBUG_MACROS_H

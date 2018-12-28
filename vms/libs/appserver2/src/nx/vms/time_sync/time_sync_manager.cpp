@@ -189,11 +189,13 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
     if (timeDelta < rtt / 2)
         return false;
 
+    NX_INFO(this,
+        lm("Set sync time to the new value %1. Difference between new and old value is %2")
+            .arg(value.count())
+            .arg(value - syncTime));
+
     setSyncTimeInternal(value);
     emit timeChanged(value.count());
-
-    NX_INFO(this, lm("Set sync time to the new value %1").arg(value.count()));
-
     return true;
 }
 

@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
@@ -360,33 +361,36 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
 {
     auto table = currentTable();
 
-    QScopedPointer<QMenu> menu;
-    QModelIndex idx = table->currentIndex();
-    if (idx.isValid())
+    QScopedPointer<QMenu> menu(new QMenu());
+
+    QModelIndexList selectedIndexes = table->selectionModel()->selectedRows(); //< Only 1 index for row.
+    QnResourceList selectedResources;
+    if (!selectedIndexes.empty())
     {
-        QnResourcePtr resource = table->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        auto manager = context()->menu();
-
-        if (resource)
+        for (auto index: selectedIndexes)
         {
-            action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
-
-            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
-            foreach(QAction* action, menu->actions())
-                action->setShortcut(QKeySequence());
+            if (auto resource = table->model()->data(index, Qn::ResourceRole).value<QnResourcePtr>())
+                selectedResources.append(resource);
         }
     }
 
-    if (menu)
+    if (!selectedResources.empty())
+    {
+        action::Parameters parameters(selectedResources);
+        parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+        auto manager = context()->menu();
+        menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters, 0,
+            {action::IDType::CameraSettingsAction}));
+
+        for (auto action: menu->actions())
+            action->setShortcut({});
+    }
+
+    if (!menu->actions().empty())
         menu->addSeparator();
-    else
-        menu.reset(new QMenu());
 
     m_clipboardAction->setEnabled(table->selectionModel()->hasSelection());
     m_exportAction->setEnabled(table->selectionModel()->hasSelection());
-
-    menu->addSeparator();
 
     menu->addAction(m_selectAllAction);
     menu->addAction(m_exportAction);

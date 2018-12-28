@@ -125,7 +125,7 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
     return tr("%n objects", "", count);
 }
 
-bool AnalyticsSearchWidget::calculateIsAllowed() const
+bool AnalyticsSearchWidget::calculateAllowance() const
 {
     return !commonModule()->analyticsDescriptorListManager()
         ->allDescriptorsInTheSystem<nx::vms::api::analytics::ObjectTypeDescriptor>().empty();
@@ -208,7 +208,7 @@ void AnalyticsSearchWidget::Private::resetFilters()
 
 void AnalyticsSearchWidget::Private::updateAvailableObjectTypes()
 {
-    q->updateIsAllowed();
+    q->updateAllowance();
     updateTypeMenu();
 }
 

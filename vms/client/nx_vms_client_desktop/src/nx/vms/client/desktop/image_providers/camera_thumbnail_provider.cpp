@@ -76,9 +76,6 @@ QImage CameraThumbnailProvider::image() const
 
 QSize CameraThumbnailProvider::sizeHint() const
 {
-    if (!m_image.isNull())
-        return m_image.size();
-
     return CameraThumbnailManager::sizeHintForCamera(m_request.camera, m_request.size);
 }
 

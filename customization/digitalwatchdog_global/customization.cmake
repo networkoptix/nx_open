@@ -28,7 +28,6 @@ set(defaultWebPages
 
 set(customization.upgradeCode "{36f26abf-0417-4c5c-8797-5e2ba4387a3f}")
 set(customization.clientUpgradeCode "{1ac0508c-2909-499b-b5e2-3cd600c635dd}")
-set(customization.serverUpgradeCode "{2db5b0cf-a79e-460d-9f13-e5fc27f4502a}")
 set(customization.clientBundleUpgradeCode "{6998ab85-e1fc-4643-8cdf-a2da9db405b8}")
 set(customization.serverBundleUpgradeCode "{70281bc5-b4e0-443e-a735-4ed91eefd236}")
 set(customization.fullBundleUpgradeCode "{c8464c92-10c9-4076-95ba-fa540111acda}")

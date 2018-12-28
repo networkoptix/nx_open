@@ -36,6 +36,7 @@ public:
     qint64 freeSpace(const QString& path);
     qint64 totalSpace(const QString& path);
     bool isPathExists(const QString& path);
+    SystemCommands::Stats stat(const QString& path);
     QnAbstractStorageResource::FileInfoList fileList(const QString& path);
     qint64 fileSize(const QString& path);
     QString devicePath(const QString& fsPath);

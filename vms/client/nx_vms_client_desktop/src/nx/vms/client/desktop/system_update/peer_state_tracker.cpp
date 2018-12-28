@@ -30,6 +30,15 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     m_items.clear();
     m_activeServers.clear();
 
+    if (!pool)
+    {
+        NX_DEBUG(this, "setResourceFeed() got nullptr resource pool");
+        return;
+    }
+
+    auto systemId = helpers::currentSystemLocalId(commonModule());
+    NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
+
     addItemForClient();
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
@@ -73,6 +82,12 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
 QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
 {
     return getServer(findItemById(id));
+}
+
+QnUuid PeerStateTracker::getClientPeerId() const
+{
+    NX_ASSERT(m_clientItem);
+    return m_clientItem->id;
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -293,7 +308,14 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
 
     if (!helpers::serverBelongsToCurrentSystem(server))
+    {
+        //auto systemId = helpers::currentSystemLocalId(commonModule());
+        //NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
+        //     server->getName(), systemId);
         return;
+    }
+
+    //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
     if (status == Qn::Unauthorized)
         return;
@@ -301,7 +323,7 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     bool fake = server->hasFlags(Qn::fake_server);
     if (fake)
     {
-        NX_DEBUG(this) << "atResourceAdded() - server" << server->getName() << "seems to be fake";
+        NX_VERBOSE(this, "atResourceAdded(%1) - server is fake", server->getName());
         return;
     }
 
@@ -350,6 +372,7 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
     if (!server)
         return;
 
+    NX_VERBOSE(this, "atResourceChanged(%1)", resource->getName());
     bool changed = false;
 
     UpdateItemPtr item;
@@ -367,6 +390,7 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
 void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
 {
     NX_ASSERT(m_clientItem);
+    NX_VERBOSE(this, "PeerStateTracker::atClientupdateStateChanged(%1, %2)", state, percentComplete);
     using State = ClientUpdateTool::State;
 
     m_clientItem->installing = false;
@@ -392,6 +416,11 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
             m_clientItem->statusMessage = "Client is ready to download update";
+            break;
+        case State::readyRestart:
+            m_clientItem->statusMessage = "Client is ready to install and restart";
+            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->progress = 100;
             break;
         case State::installing:
             m_clientItem->state = StatusCode::readyToInstall;
@@ -425,6 +454,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     NX_ASSERT(server);
     if (!server)
         return nullptr;
+    NX_VERBOSE(this, "addItemForServer(%1)", server->getName());
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = server->getId();
     item->component = UpdateItem::Component::server;
@@ -442,6 +472,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
 
 UpdateItemPtr PeerStateTracker::addItemForClient()
 {
+    NX_VERBOSE(this, "addItemForClient()");
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = commonModule()->globalSettings()->localSystemId();
     item->component = UpdateItem::Component::client;
@@ -465,10 +496,10 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    const nx::utils::SoftwareVersion newUpdateSupportVersion(4, 0);
+    const nx::utils::SoftwareVersion kNewUpdateSupportVersion(4, 0);
 
     const auto& version = server->getVersion();
-    if (version < newUpdateSupportVersion && !item->onlyLegacyUpdate)
+    if (version < kNewUpdateSupportVersion && !item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = true;
         changed = true;

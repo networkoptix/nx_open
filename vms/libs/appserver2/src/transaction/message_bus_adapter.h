@@ -50,7 +50,10 @@ namespace ec2 {
             const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
         virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
-        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
+        virtual void addOutgoingConnectionToPeer(
+            const QnUuid& id,
+            nx::vms::api::PeerType peerType,
+            const nx::utils::Url& url) override;
         virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
         virtual void dropConnections() override;

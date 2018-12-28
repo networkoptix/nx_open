@@ -141,7 +141,7 @@ Qn::StorageInitResult RootFileSystem::mount(const QUrl& url, const QString& path
                 case SystemCommands::MountCode::wrongCredentials:
                     NX_WARNING(this, lm(
                         "[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials").args(
-                            url, path, viaString, systemCommands.lastError()));
+                            url, path, viaString));
                     break;
                 }
             };
@@ -282,6 +282,21 @@ bool RootFileSystem::isPathExists(const QString& path)
         return SystemCommands().isPathExists(path.toStdString());
 
     return (bool) execViaRootTool("exists " + enquote(path), &receiveInt64Action);
+}
+
+static SystemCommands::Stats statsFromSerialized(const std::string& buffer)
+{
+    SystemCommands::Stats result;
+    memcpy(&result, buffer.data(), sizeof(SystemCommands::Stats));
+    return result;
+}
+
+SystemCommands::Stats RootFileSystem::stat(const QString& path)
+{
+    if (m_ignoreTool)
+        return SystemCommands().stat(path.toStdString());
+
+    return statsFromSerialized(execViaRootTool("stat " + enquote(path), &receiveBufferAction));
 }
 
 struct StringRef

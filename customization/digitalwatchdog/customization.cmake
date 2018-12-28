@@ -35,7 +35,6 @@ set(defaultWebPages
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{F2825E30-F367-4040-93B9-B71F05FDD6B1}")
 set(customization.clientUpgradeCode "{7083E473-BD53-4084-9BAD-9216EBF6BF3F}")
-set(customization.serverUpgradeCode "{31f9d975-d1e0-4aeb-af69-4d45f1b2cd67}")
 set(customization.clientBundleUpgradeCode "{b40de6ba-97ac-4591-8f27-2f1bba285472}")
 set(customization.serverBundleUpgradeCode "{631f8466-9baa-430d-ae15-da0e76dae3cd}")
 set(customization.fullBundleUpgradeCode "{c2c17dda-9651-44b9-841a-eee004ff2a16}")

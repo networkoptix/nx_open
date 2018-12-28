@@ -124,8 +124,9 @@ void GenericTransport::sendTransaction(
             const vms::api::PersistentIdData tranStateKey(
                 transactionSerializer->header().peerID,
                 transactionSerializer->header().persistentInfo.dbID);
-            m_tranStateToSynchronizeTo.values[tranStateKey] =
-                transactionSerializer->header().persistentInfo.sequence;
+            m_tranStateToSynchronizeTo.values[tranStateKey] = std::max(
+                m_tranStateToSynchronizeTo.values[tranStateKey],
+                transactionSerializer->header().persistentInfo.sequence);
             //transaction will be sent later
         });
 }

@@ -286,7 +286,7 @@
 #endif
 
 #if defined(__arm__)
-    #include "nx1/info.h"
+    #include "nx/vms/server/system/nx1/info.h"
 #endif
 
 using namespace nx::vms::server;
@@ -1510,8 +1510,7 @@ void MediaServerProcess::registerRestHandlers(
      * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
-     *     or more parameters to set.
+     * %param:object paramValues Name-to-value map of camera parameters to set.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
@@ -2245,6 +2244,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string url URL of one Server in the System to join.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
+     * %param:string currentPassword Current user password.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.
@@ -3803,6 +3803,8 @@ void MediaServerProcess::connectStorageSignals(QnStorageManager* storage)
         &MediaServerProcess::at_storageManager_storageFailure);
     connect(storage, &QnStorageManager::rebuildFinished, this,
         &MediaServerProcess::at_storageManager_rebuildFinished);
+    connect(storage, &QnStorageManager::backupFinished, this,
+        &MediaServerProcess::at_archiveBackupFinished);
 }
 
 void MediaServerProcess::connectSignals()
@@ -4266,14 +4268,16 @@ void MediaServerProcess::run()
         cmdLineArguments().configFilePath,
         cmdLineArguments().rwConfigFilePath);
 
+    auto serverSettingsRawPtr = serverSettings.get();
     if (m_serviceMode)
-        initializeLogging(serverSettings.get());
+        initializeLogging(serverSettingsRawPtr);
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments, std::move(serverSettings)));
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
+    serverSettingsRawPtr->setServerModule(serverModule.get());
     serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
@@ -4305,6 +4309,7 @@ void MediaServerProcess::run()
         commonModule(),
         nx::vms::api::PeerType::server,
         serverModule->settings().p2pMode(),
+        serverModule->settings().ecDbReadOnly(),
         m_universalTcpListener.get());
 
     m_timeBasedNonceProvider = std::make_unique<TimeBasedNonceProvider>();
@@ -4314,8 +4319,6 @@ void MediaServerProcess::run()
         m_timeBasedNonceProvider.get());
 
     m_mediaServerStatusWatcher = std::make_unique<MediaServerStatusWatcher>(serverModule.get());
-
-    m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
 
     // If an exception is thrown by Qt event handler from within exec(), we want to do some cleanup
     // anyway.
@@ -4712,8 +4715,6 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow("/crossdomain.xml", nx::network::http::AuthMethod::noAuth);
     restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
-
-    restrictions->allow(webPrefix + "/ec2/getFullInfo", nx::network::http::AuthMethod::noAuth);
 
     // For open in new browser window.
     restrictions->allow(webPrefix + "/api/showLog.*",

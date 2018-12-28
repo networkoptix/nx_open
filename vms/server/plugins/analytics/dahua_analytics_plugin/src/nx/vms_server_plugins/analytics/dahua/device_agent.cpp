@@ -11,17 +11,22 @@
 #include "common.h"
 #include "device_agent.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(Engine* engine):
-    m_engine(engine)
+DeviceAgent::DeviceAgent(
+    Engine* engine,
+    const DeviceInfo& deviceInfo,
+    const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest)
+    :
+    m_engine(engine),
+    m_jsonManifest(QJson::serialized(deviceAgentParsedManifest)),
+    m_parsedManifest(deviceAgentParsedManifest)
+
 {
+    setDeviceInfo(deviceInfo);
 }
 
 DeviceAgent::~DeviceAgent()
@@ -47,7 +52,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
 {
-    // There are no DeviceAgent settings for this plugin.
+    // This plugin doesn't use DeviceAgent setting, it just ignores them.
 }
 
 nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
@@ -111,18 +116,15 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-    const auto eventTypeList = metadataTypes->eventTypeIds();
-    for (int i = 0; i < eventTypeList->count(); ++i)
-        eventTypes.push_back(eventTypeList->at(i));
+    for (int i = 0; i < metadataTypes->eventTypeIds()->count(); ++i)
+        eventTypes.push_back(metadataTypes->eventTypeIds()->at(i));
 
-    m_monitor =
-        std::make_unique<MetadataMonitor>(
-            m_engine->engineManifest(),
-            QJson::deserialized<nx::vms::api::analytics::DeviceAgentManifest>(
-                m_deviceAgentManifest),
-            m_url,
-            m_auth,
-            eventTypes);
+    m_monitor = std::make_unique<MetadataMonitor>(
+        m_engine->parsedManifest(),
+        m_parsedManifest,
+        m_url,
+        m_auth,
+        eventTypes);
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
@@ -142,14 +144,14 @@ void DeviceAgent::stopFetchingMetadata()
 
 const IString* DeviceAgent::manifest(Error* error) const
 {
-    if (m_deviceAgentManifest.isEmpty())
+    if (m_jsonManifest.isEmpty())
     {
         *error = Error::unknownError;
         return nullptr;
     }
 
     *error = Error::noError;
-    return new nx::sdk::common::String(m_deviceAgentManifest);
+    return new nx::sdk::common::String(m_jsonManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
@@ -164,17 +166,4 @@ void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
     m_channel = deviceInfo.channel;
 }
 
-void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
-{
-    m_deviceAgentManifest = manifest;
-}
-
-void DeviceAgent::setEngineManifest(const EngineManifest& manifest)
-{
-    m_engineManifest = manifest;
-}
-
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

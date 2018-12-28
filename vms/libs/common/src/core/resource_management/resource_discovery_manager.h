@@ -97,7 +97,7 @@ public:
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
     QnResourceDiscoveryManager(QObject* parent);
-    ~QnResourceDiscoveryManager();
+    virtual ~QnResourceDiscoveryManager() override;
 
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
@@ -116,7 +116,7 @@ public:
     /** Returns number of cameras that were sucessfully added. */
     QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
     bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
-    QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera);
+    QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera) const;
 
     ResourceSearcherList plugins() const;
 
@@ -139,6 +139,7 @@ public slots:
 protected:
     unsigned int m_runNumber;
     virtual void run() override;
+    QnManualCameraInfo manualCameraInfoUnsafe(const QnSecurityCamResourcePtr& camera) const;
 
 signals:
     void localSearchDone();
@@ -171,7 +172,7 @@ protected:
 
     void appendManualDiscoveredResources(QnResourceList& resources);
 
-    void updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
+    void updateSearcherUsageUnsafe(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 

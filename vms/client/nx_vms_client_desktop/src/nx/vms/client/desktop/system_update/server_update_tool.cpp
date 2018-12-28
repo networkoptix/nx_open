@@ -280,6 +280,12 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
         if (verifyUpdateManifest(contents, {}) && !contents.filesToUpload.empty())
         {
             contents.error = nx::update::InformationError::noError;
+            if (!contents.eulaPath.isEmpty())
+            {
+                QString eulaPath = contents.storageDir.filePath(contents.eulaPath);
+                NX_VERBOSE(this, "atExtractFilesFinished() fixing EULA path from %1 to %2", contents.eulaPath, eulaPath);
+                contents.eulaPath = eulaPath;
+            }
             changeUploadState(OfflineUpdateState::ready);
         }
         else

@@ -164,6 +164,7 @@ QnMediaServerModule::QnMediaServerModule(
         m_settings = store(new MSSettings(
             arguments->configFilePath,
             arguments->rwConfigFilePath));
+        m_settings->setServerModule(this);
     }
 
     nx::vms::server::registerSerializers();
@@ -328,6 +329,8 @@ void QnMediaServerModule::stopStorages()
 
 void QnMediaServerModule::stop()
 {
+    // TODO: Find out why arent all of these are long runnables.
+
     m_upnpDeviceSearcher->pleaseStop();
     resourceDiscoveryManager()->pleaseStop();
 
@@ -340,6 +343,7 @@ void QnMediaServerModule::stop()
     resourceDiscoveryManager()->stop();
 
     m_licenseWatcher->stop();
+    m_resourceSearchers->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()

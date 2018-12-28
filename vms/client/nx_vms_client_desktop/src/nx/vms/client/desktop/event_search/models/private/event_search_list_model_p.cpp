@@ -128,18 +128,22 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::TimestampRole:
             return QVariant::fromValue(microseconds(eventParams.eventTimestampUsec));
 
-        case Qn::ResourceListRole:
+        case Qn::DisplayedResourceListRole:
         {
-            // TODO: #vkutin Display "[camera removed]" or "[server removed]"
-            // for event sources no longer in the system.
-
             if (eventParams.eventResourceId.isNull() && !eventParams.resourceName.isEmpty())
                 return QVariant::fromValue(QStringList({eventParams.resourceName}));
-
+        }
+        [[fallthrough]];
+        case Qn::ResourceListRole:
+        {
             const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
-            return resource
-                ? QVariant::fromValue(QnResourceList({resource}))
-                : QVariant(); //< TODO: #vkutin Replace with <deleted camera> or <deleted server>?
+            if (resource)
+                return QVariant::fromValue(QnResourceList({ resource }));
+
+            if (role == Qn::DisplayedResourceListRole)
+                return {}; //< TODO: #vkutin Replace with <deleted camera> or <deleted server>.
+
+            return {};
         }
 
         case Qn::ResourceRole: //< Resource for thumbnail preview only.
@@ -156,7 +160,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
 
         default:
             handled = false;
-            return QVariant();
+            return {};
     }
 }
 

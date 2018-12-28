@@ -74,7 +74,7 @@ void CompatibilityVersionInstallationDialog::atReceivedUpdateContents(
     nx::update::UpdateContents verifiedContents = contents;
     if (nx::vms::client::desktop::verifyUpdateContents(commonModule, verifiedContents, {}))
     {
-        m_clientUpdateTool->downloadUpdate(verifiedContents);
+        m_clientUpdateTool->setUpdateTarget(verifiedContents);
     }
     else
     {
@@ -107,7 +107,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             finalProgress = 20;
             setMessage(tr("Downloading update package"));
             auto contents = m_clientUpdateTool->getRemoteUpdateInfo();
-            m_clientUpdateTool->downloadUpdate(contents);
+            m_clientUpdateTool->setUpdateTarget(contents);
             break;
         }
         case ClientUpdateTool::State::downloading:

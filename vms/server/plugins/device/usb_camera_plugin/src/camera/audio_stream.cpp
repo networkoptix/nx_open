@@ -477,7 +477,9 @@ void AudioStream::AudioStreamPrivate::setLastError(int ffmpegError)
 
 void AudioStream::AudioStreamPrivate::terminate()
 {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_terminated = true;
+    m_wait.notify_all();
 }
 
 void AudioStream::AudioStreamPrivate::tryStart()
@@ -548,7 +550,7 @@ void AudioStream::AudioStreamPrivate::run()
 // AudioStream
 
 AudioStream::AudioStream(
-    const std::string url,
+    const std::string& url,
     const std::weak_ptr<Camera>& camera,
     bool enabled) 
     :

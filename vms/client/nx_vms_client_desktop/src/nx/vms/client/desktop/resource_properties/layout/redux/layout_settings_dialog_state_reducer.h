@@ -4,11 +4,25 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <utils/common/aspect_ratio.h>
+
 namespace nx::vms::client::desktop {
 
 class NX_VMS_DESKTOP_CLIENT_API LayoutSettingsDialogStateReducer
 {
 public:
+    /** Debug-level state tracing. */
+    static bool isTracingEnabled();
+
+    /** Enable debug-level state tracing. */
+    static void setTracingEnabled(bool value);
+
+    static QnAspectRatio screenAspectRatio();
+    static void setScreenAspectRatio(QnAspectRatio value);
+
+    static bool keepBackgroundAspectRatio();
+    static void setKeepBackgroundAspectRatio(bool value);
+
     using State = LayoutSettingsDialogState;
 
     static State loadLayout(State state, const QnLayoutResourcePtr& layout);

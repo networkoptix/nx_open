@@ -30,7 +30,6 @@ set(android.keypass "S6rtgPMk")
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{E10C4B91-CC3A-442F-A017-266BB23A44E4}")
 set(customization.clientUpgradeCode "{6E9B3B5B-0AC9-4718-A1B1-EA59F706A72F}")
-set(customization.serverUpgradeCode "{B85E5E85-963A-477A-9D04-F122576E2364}")
 
 set(customization.clientBundleUpgradeCode "{4A83450D-1F57-4314-9638-6C66AB1C8E06}")
 set(customization.serverBundleUpgradeCode "{76AEB816-5F97-4C06-96E4-2D5603F29111}")

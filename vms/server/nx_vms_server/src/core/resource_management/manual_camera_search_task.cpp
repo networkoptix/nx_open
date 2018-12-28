@@ -137,7 +137,7 @@ void QnSearchTask::start()
         authenticator.setUser(m_url.userName());
         authenticator.setPassword(m_url.password());
         nx::utils::Url url(m_url);
-        url.setUserInfo("");
+        url.setUserInfo(QString());
 
         auto seqResults = checker->checkHostAddr(url, authenticator, true);
         NX_VERBOSE(this, "Got %1 resources from searcher %2", seqResults.size(), checker);

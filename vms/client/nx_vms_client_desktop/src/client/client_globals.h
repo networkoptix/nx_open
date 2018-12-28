@@ -86,7 +86,6 @@ namespace Qn
         LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
-        LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
         LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
         LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
         LayoutEncryptionRole,                       /**< Role for encrypted layout. 'true' if encrypted. */
@@ -237,6 +236,7 @@ namespace Qn
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
+        DisplayedResourceListRole,                  /**< Resource list displayed in a Right Panel tile (QnResourceList or QStringList). */
         PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */

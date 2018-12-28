@@ -9,10 +9,10 @@ class QnResourceListSortedModel: public QSortFilterProxyModel, protected QnResou
 {
     using base_type = QSortFilterProxyModel;
 public:
-    explicit QnResourceListSortedModel(QObject *parent = 0);
+    explicit QnResourceListSortedModel(QObject* parent = nullptr);
     virtual ~QnResourceListSortedModel();
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 };

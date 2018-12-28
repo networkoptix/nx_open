@@ -1,5 +1,7 @@
 #pragma once
+
 #include <memory> // for shared_ptr
+
 #include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
@@ -77,6 +79,8 @@ public:
      * It will return nullptr if the item is not a server.
      */
     QnMediaServerResourcePtr getServer(QnUuid id) const;
+
+    QnUuid getClientPeerId() const;
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);

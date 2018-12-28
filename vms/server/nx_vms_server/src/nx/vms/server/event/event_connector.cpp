@@ -386,6 +386,8 @@ void EventConnector::at_fileIntegrityCheckFailed(const QnResourcePtr& resource)
 bool EventConnector::createEventFromParams(const vms::event::EventParameters& params,
     vms::api::EventState eventState, const QnUuid& userId, QString* errorMessage)
 {
+    NX_VERBOSE(this, "Creating event from params with type [%1]", params.eventType);
+
     const auto check =
         [errorMessage](bool condition, const QString& message)
         {

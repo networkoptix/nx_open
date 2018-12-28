@@ -13,6 +13,7 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 #include <utils/common/sleep.h>
+#include <nx/network/nettools.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
@@ -43,27 +44,32 @@ RtspTransport rtspTransportFromString(const QString& value)
     auto upperValue = value.toUpper().trimmed();
     if (upperValue == "TCP")
         return RtspTransport::tcp;
-    else if (upperValue == "UDP")
+    if (upperValue == "UDP")
         return RtspTransport::udp;
-    else if (upperValue == "MULTICAST")
+    if (upperValue == "MULTICAST")
         return RtspTransport::multicast;
-    else
-        return RtspTransport::autoDetect;
+
+    NX_ASSERT(upperValue.isEmpty(), lm("Unsupported value: %1").arg(value));
+    return RtspTransport::notDefined;
 }
 
 QString toString(const RtspTransport& value)
 {
     switch (value)
     {
+        case RtspTransport::notDefined:
+            return QString();
         case RtspTransport::udp:
             return "UDP";
         case RtspTransport::tcp:
             return "TCP";
         case RtspTransport::multicast:
             return "MULTICAST";
-        default:
-            return "";
     }
+
+    const auto s = lm("TRANSPORT_%1").arg(static_cast<int>(value));
+    NX_ASSERT(false, lm("Unsupported value: %1").arg(s));
+    return s;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -90,12 +96,12 @@ QnRtspIoDevice::~QnRtspIoDevice()
     }
 }
 
-void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address)
+void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress)
 {
     if (m_mediaSocket)
-        m_mediaSocket->joinGroup(address.toString());
+        m_mediaSocket->joinGroup(address.toString(), interfaceAddress);
     if (m_rtcpSocket)
-        m_rtcpSocket->joinGroup(address.toString());
+        m_rtcpSocket->joinGroup(address.toString(), interfaceAddress);
     m_multicastAddress = address;
 }
 
@@ -111,7 +117,7 @@ qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
         bytesRead = m_mediaSocket->recv(data, maxSize);
     }
     m_owner->sendKeepAliveIfNeeded();
-    if (m_transport != RtspTransport::tcp)
+    if (m_transport == RtspTransport::udp)
         processRtcpData();
     return bytesRead;
 }
@@ -457,7 +463,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
     m_prefferedTransport = m_transport;
-    if (m_prefferedTransport == RtspTransport::autoDetect)
+    if (m_prefferedTransport == RtspTransport::notDefined)
         m_prefferedTransport = RtspTransport::tcp;
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
     if (!m_playNowMode) {
@@ -645,7 +651,10 @@ bool QnRtspClient::sendSetup()
             transportStr += m_prefferedTransport == RtspTransport::multicast ? ";multicast;" : ";unicast;";
 
             if (m_prefferedTransport == RtspTransport::multicast)
-                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress);
+            {
+                track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
+                    m_tcpSock->getLocalAddress().address.toString());
+            }
 
             if (m_prefferedTransport != RtspTransport::tcp)
             {
@@ -671,7 +680,7 @@ bool QnRtspClient::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == RtspTransport::autoDetect && m_prefferedTransport == RtspTransport::tcp)
+            if (m_transport == RtspTransport::notDefined && m_prefferedTransport == RtspTransport::tcp)
             {
                 m_prefferedTransport = RtspTransport::udp;
                 if (!sendSetup()) //< Try UDP transport.

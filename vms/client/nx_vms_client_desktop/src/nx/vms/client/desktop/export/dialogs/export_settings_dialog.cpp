@@ -82,6 +82,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->mediaPreviewWidget->setBorderRole(QPalette::NoRole);
     ui->mediaPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->mediaPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
+    ui->layoutPreviewWidget->setBackgroundRole(QPalette::NoRole);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
 

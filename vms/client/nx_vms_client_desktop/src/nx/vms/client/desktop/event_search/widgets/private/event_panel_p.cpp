@@ -52,7 +52,13 @@ EventPanel::Private::Private(EventPanel* q):
     m_synchronizers({
         {m_motionTab, new MotionSearchSynchronizer(context(), m_motionTab, this)},
         {m_bookmarksTab, new BookmarkSearchSynchronizer(context(), m_bookmarksTab, this)},
-        {m_analyticsTab, new AnalyticsSearchSynchronizer(context(), m_analyticsTab, this)}})
+        {m_analyticsTab, new AnalyticsSearchSynchronizer(context(), m_analyticsTab, this)}}),
+    m_tabIds({
+        {m_notificationsTab, Tab::notifications},
+        {m_motionTab, Tab::motion},
+        {m_bookmarksTab, Tab::bookmarks},
+        {m_eventsTab, Tab::events},
+        {m_analyticsTab, Tab::analytics}})
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
@@ -85,6 +91,7 @@ EventPanel::Private::Private(EventPanel* q):
                 synchronizer->setActive(m_tabs->currentWidget() == tab);
 
             NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2", m_previousTab, m_lastTab);
+            emit this->q->currentTabChanged(m_tabIds.value(m_lastTab), {});
         });
 
     q->setAutoFillBackground(false);
@@ -109,7 +116,7 @@ EventPanel::Private::Private(EventPanel* q):
     for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
     {
         connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
-        connect(tab, &AbstractSearchWidget::isAllowedChanged, this, &Private::rebuildTabs);
+        connect(tab, &AbstractSearchWidget::allowanceChanged, this, &Private::rebuildTabs);
     }
 
     rebuildTabs();
@@ -128,6 +135,21 @@ EventPanel::Private::Private(EventPanel* q):
 EventPanel::Private::~Private()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+EventPanel::Tab EventPanel::Private::currentTab() const
+{
+    return m_tabIds.value(m_tabs->currentWidget());
+}
+
+bool EventPanel::Private::setCurrentTab(Tab tab)
+{
+    const int index = m_tabs->indexOf(m_tabIds.key(tab));
+    if (index < 0)
+        return false;
+
+    m_tabs->setCurrentIndex(index);
+    return true;
 }
 
 void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)

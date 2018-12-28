@@ -11,6 +11,7 @@ CommandLogCache::CommandLogCache():
     m_tranIdSequence(0)
 {
     m_committedData.timestampSequence = 0;
+    m_rawData.timestampSequence = 0;
 }
 
 bool CommandLogCache::isShouldBeIgnored(
@@ -82,6 +83,8 @@ void CommandLogCache::restoreTransaction(
         m_maxTimestamp = timestamp;
         m_timestampCalculator.init(timestamp);
     }
+
+    m_rawData = m_committedData;
 }
 
 CommandLogCache::TranId CommandLogCache::beginTran()
@@ -184,7 +187,7 @@ int CommandLogCache::generateTransactionSequence(
     const vms::api::PersistentIdData& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    int& currentSequence = m_committedData.transactionState.values[tranStateKey];
+    int& currentSequence = m_rawData.transactionState.values[tranStateKey];
     ++currentSequence;
     return currentSequence;
 }
@@ -193,9 +196,14 @@ void CommandLogCache::shiftTransactionSequence(
     const vms::api::PersistentIdData& tranStateKey,
     int delta)
 {
+    // TODO: #ak Get rid of this method.
+
     QnMutexLocker lock(&m_mutex);
+
     int& currentSequence = m_committedData.transactionState.values[tranStateKey];
     currentSequence += delta;
+
+    m_rawData = m_committedData;
 }
 
 vms::api::TranState CommandLogCache::committedTransactionState() const

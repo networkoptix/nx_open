@@ -10,10 +10,10 @@
 #include <common/static_common_module.h>
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
-#include <nx/network/p2p_transport/p2p_http_client_transport.h>
-#include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_websocket_transport.h>
-#include <nx/network/p2p_transport/p2p_http_client_transport.h>
+#include <nx/p2p/transport/p2p_http_client_transport.h>
+#include <nx/p2p/transport/p2p_http_server_transport.h>
+#include <nx/p2p/transport/p2p_websocket_transport.h>
+#include <nx/p2p/transport/p2p_http_client_transport.h>
 
 // For debug purpose only
 //#define CHECK_SEQUENCE
@@ -69,7 +69,7 @@ ConnectionBase::ConnectionBase(
 ConnectionBase::ConnectionBase(
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
-    nx::network::P2pTransportPtr p2pTransport,
+    P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
@@ -259,8 +259,6 @@ void ConnectionBase::onHttpClientDone()
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
-    if (m_remotePeer.id == ::ec2::kCloudPeerId)
-        m_remotePeer.peerType = vms::api::PeerType::cloudServer;
 
     if (m_connectionLockGuard && !m_connectionLockGuard->tryAcquireConnected())
     {

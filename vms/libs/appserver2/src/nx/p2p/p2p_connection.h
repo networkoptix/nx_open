@@ -24,7 +24,7 @@ public:
         QnCommonModule* commonModule,
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
-        nx::network::P2pTransportPtr p2pTransport,
+        P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject,

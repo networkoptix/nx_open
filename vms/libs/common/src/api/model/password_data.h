@@ -19,7 +19,6 @@ struct PasswordData
     QByteArray passwordDigest;
     QByteArray cryptSha512Hash;
 };
-
 #define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)
 
 struct CurrentPasswordData

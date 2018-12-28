@@ -13,16 +13,12 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/network/http/http_client.h>
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/common/string.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 namespace {
 
@@ -40,26 +36,55 @@ bool Engine::DeviceData::hasExpired() const
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+namespace {
+
+const QString manifestFileName("plugins/dahua/manifest.json");
+const QString manifestResourceName(":/dahua/manifest.json");
+
+} // namespace
+
+/*static*/ QByteArray Engine::loadManifest()
 {
-    QFile file(":/dahua/manifest.json");
+    QByteArray manifest;
+
+    QFile file(manifestFileName);
     if (file.open(QFile::ReadOnly))
-        m_manifest = file.readAll();
     {
-        QFile file("plugins/dahua/manifest.json");
-        if (file.open(QFile::ReadOnly))
-        {
-            NX_INFO(this,
-                lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
-            m_manifest = file.readAll();
-        }
+        NX_INFO(NX_SCOPE_TAG,
+            "Dahua engine manifest loaded from file %1", QFileInfo(file).absoluteFilePath());
+        manifest = file.readAll();
+        return manifest;
+    }
+    QFile resource(manifestResourceName);
+    if (resource.open(QFile::ReadOnly))
+    {
+        NX_INFO(NX_SCOPE_TAG,
+            "Dahua engine manifest loaded from resource %1", manifestResourceName);
+        manifest = resource.readAll();
+        return manifest;
     }
 
+    NX_DEBUG(NX_SCOPE_TAG, "Dahua engine manifest failed to load from file %1 of from resource %2",
+        manifestFileName, manifestResourceName);
+    return manifest;
+}
+
+/*static*/ EngineManifest Engine::parseManifest(const QByteArray& manifest)
+{
     bool success = false;
-    m_engineManifest = QJson::deserialized<EngineManifest>(
-        m_manifest, EngineManifest(), &success);
+    const EngineManifest parsedManifest = QJson::deserialized<EngineManifest>(
+        manifest, EngineManifest(), &success);
     if (!success)
-        NX_WARNING(this, lm("Can't deserialize driver manifest file"));
+        NX_WARNING(NX_SCOPE_TAG, "Can't deserialize Dahua engine manifest");
+    return parsedManifest;
+}
+
+Engine::Engine(nx::sdk::analytics::common::Plugin* plugin)
+    :
+    m_plugin(plugin),
+    m_jsonManifest(loadManifest()),
+    m_parsedManifest(parseManifest(m_jsonManifest))
+{
 }
 
 void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -89,34 +114,31 @@ nx::sdk::IStringMap* Engine::pluginSideSettings() const
 
 nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo,
-    Error* outError)
+    Error* /*outError*/)
 {
-    *outError = Error::noError;
-
     const auto vendor = QString(deviceInfo->vendor).toLower();
 
     if (!vendor.startsWith(kVendor))
         return nullptr;
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(*deviceInfo);
-    if (supportedEventTypeIds.isEmpty())
+    const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest
+        = fetchDeviceAgentParsedManifest(*deviceInfo);
+    if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
         return nullptr;
 
-    nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
-    deviceAgentManifest.supportedEventTypeIds = std::move(supportedEventTypeIds);
-
-    auto deviceAgent = new DeviceAgent(this);
-    deviceAgent->setDeviceInfo(*deviceInfo);
-    deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
-    deviceAgent->setEngineManifest(engineManifest());
-
-    return deviceAgent;
+    return new DeviceAgent(this, *deviceInfo, deviceAgentParsedManifest);
 }
 
-const nx::sdk::IString* Engine::manifest(Error* error) const
+const nx::sdk::IString* Engine::manifest(Error* outError) const
 {
-    *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    if (m_jsonManifest.isEmpty())
+    {
+        *outError = Error::unknownError;
+        return nullptr;
+    }
+
+    *outError = Error::noError;
+    return new nx::sdk::common::String(m_jsonManifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -126,14 +148,14 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     if (!supportedEvents.empty())
     for (const auto& internalName: supportedEvents)
     {
-        const QString eventTypeId = m_engineManifest.eventTypeByInternalName(internalName);
+        const QString eventTypeId = m_parsedManifest.eventTypeByInternalName(internalName);
         if (!eventTypeId.isEmpty())
         {
             result << eventTypeId;
-            const auto descriptor = m_engineManifest.eventTypeDescriptorById(eventTypeId);
+            const auto descriptor = m_parsedManifest.eventTypeDescriptorById(eventTypeId);
             for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
-                auto descriptor = m_engineManifest.eventTypeDescriptorByInternalName(dependedName);
+                auto descriptor = m_parsedManifest.eventTypeDescriptorByInternalName(dependedName);
                 if (!descriptor.id.isEmpty())
                     result << descriptor.id;
             }
@@ -142,11 +164,14 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     return result;
 }
 
-QList<QString> Engine::fetchSupportedEventTypeIds(const DeviceInfo& deviceInfo)
+nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManifest(
+    const DeviceInfo& deviceInfo)
 {
+    using namespace nx::vms::api::analytics;
+
     auto& data = m_cachedDeviceData[deviceInfo.sharedId];
     if (!data.hasExpired())
-        return data.supportedEventTypeIds;
+        return DeviceAgentManifest{ data.supportedEventTypeIds };
 
     using namespace std::chrono;
 
@@ -168,7 +193,7 @@ QList<QString> Engine::fetchSupportedEventTypeIds(const DeviceInfo& deviceInfo)
     {
         NX_WARNING(this, "No response for supported events request %1.", deviceInfo.url);
         data.timeout.invalidate();
-        return QList<QString>();
+        return DeviceAgentManifest{};
     }
 
     const auto statusCode = response->statusLine.statusCode;
@@ -178,7 +203,7 @@ QList<QString> Engine::fetchSupportedEventTypeIds(const DeviceInfo& deviceInfo)
         NX_WARNING(this, "Unable to fetch supported events for device %1. HTTP status code: %2",
             deviceInfo.url, statusCode);
         data.timeout.invalidate();
-        return QList<QString>();
+        return DeviceAgentManifest{};
     }
 
     NX_DEBUG(this, "Device url %1. RAW list of supported analytics events: %2",
@@ -186,12 +211,12 @@ QList<QString> Engine::fetchSupportedEventTypeIds(const DeviceInfo& deviceInfo)
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
-    return data.supportedEventTypeIds;
+    return nx::vms::api::analytics::DeviceAgentManifest{ data.supportedEventTypeIds };
 }
 
-const EngineManifest& Engine::engineManifest() const
+const EngineManifest& Engine::parsedManifest() const
 {
-    return m_engineManifest;
+    return m_parsedManifest;
 }
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
@@ -204,10 +229,7 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
     return nx::sdk::Error::noError;
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua
 
 namespace {
 

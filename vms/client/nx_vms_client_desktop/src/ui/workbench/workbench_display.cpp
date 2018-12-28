@@ -2029,8 +2029,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         }
     }
 
-    action(action::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
-
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
 

@@ -40,7 +40,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/tcp_connection_priv.h>
-#include <nx1/info.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
@@ -149,6 +148,7 @@ int Appserver2Process::exec()
             m_commonModule.get(),
             api::PeerType::server,
             settings.isP2pMode(),
+            /*ecDbReadOnly*/ false,
             &tcpListener));
 
     const nx::utils::Url dbUrl = nx::utils::Url::fromLocalFile(settings.dbFilePath());
@@ -266,12 +266,6 @@ void Appserver2Process::updateRuntimeData()
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-    {
-        runtimeData.nx1mac = Nx1::getMac();
-        runtimeData.nx1serial = Nx1::getSerial();
-    }
-
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
     m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 }
@@ -388,6 +382,7 @@ void Appserver2Process::registerHttpHandlers(
             {
                 m_ecConnection.load()->addRemotePeer(
                     systemMergeProcessor.remoteModuleInformation().id,
+                    nx::vms::api::PeerType::server,
                     data.url);
             }
 
@@ -600,7 +595,7 @@ void Appserver2Process::connectTo(const Appserver2Process* dstServer)
     auto peerId = dstServer->commonModule()->moduleGUID();
 
     nx::utils::Url url = lit("http://%1:%2/").arg(addr.address.toString()).arg(addr.port);
-    ecConnection()->messageBus()-> addOutgoingConnectionToPeer(peerId, url);
+    ecConnection()->messageBus()-> addOutgoingConnectionToPeer(peerId, nx::vms::api::PeerType::server, url);
 }
 
 // ----------------------------- Appserver2Launcher ----------------------------------------------

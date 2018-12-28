@@ -104,9 +104,19 @@ protected:
     void givenReconnectedClient()
     {
         givenConnectedClient();
+
         whenRestartServer();
+
         thenClientReportsConnectionClosure();
         thenClientReconnects();
+        // NOTE: Client reconnect does not mean server has initialized connection already.
+        thenServerHasAtLeastOneConnection();
+    }
+
+    void thenServerHasAtLeastOneConnection()
+    {
+        while (m_server->connectionCount() == 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     void givenBrokenServer()

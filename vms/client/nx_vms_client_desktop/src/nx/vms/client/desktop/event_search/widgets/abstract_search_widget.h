@@ -100,15 +100,15 @@ public:
 
 signals:
     /** This signal is for displaying external tooltips. */
-    void tileHovered(const QModelIndex& index, EventTile* tile);
+    void tileHovered(const QModelIndex& index, EventTile* tile, QPrivateSignal);
 
     /** This signal is sent when current camera selection type or actual camera set changes. */
-    void cameraSetChanged(const QnVirtualCameraResourceSet& value);
+    void cameraSetChanged(const QnVirtualCameraResourceSet& value, QPrivateSignal);
 
-    void textFilterChanged(const QString& value);
-    void timePeriodChanged(const QnTimePeriod& value);
+    void textFilterChanged(const QString& value, QPrivateSignal);
+    void timePeriodChanged(const QnTimePeriod& value, QPrivateSignal);
 
-    bool isAllowedChanged(bool value);
+    bool allowanceChanged(bool value, QPrivateSignal);
 
 protected:
     /** Sets an icon for no data placeholder. */
@@ -133,7 +133,7 @@ protected:
     EventRibbon* view() const;
 
     /** Should be called from descendants when isAllowed should be recalculated. */
-    void updateIsAllowed();
+    void updateAllowance();
 
 private:
     /**
@@ -149,7 +149,7 @@ private:
     virtual QString itemCounterText(int count) const = 0;
 
     /** Derived classes should override this method if the widget is not always allowed. */
-    virtual bool calculateIsAllowed() const { return true; }
+    virtual bool calculateAllowance() const { return true; }
 
 private:
     class Private;

@@ -63,7 +63,7 @@ bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &reso
 
 void QnCachingCameraDataLoader::init() {
     // TODO: #GDM 2.4 move to camera history
-    if(m_resource.dynamicCast<QnNetworkResource>())
+    if (m_resource.dynamicCast<QnNetworkResource>())
     {
         connect(qnSyncTime, &QnSyncTime::timeChanged,
                 this, &QnCachingCameraDataLoader::discardCachedData);
@@ -155,17 +155,13 @@ const QList<QRegion> &QnCachingCameraDataLoader::motionRegions() const {
     return m_motionRegions;
 }
 
-void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion> &motionRegions) {
-    if(m_motionRegions == motionRegions)
+void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion>& motionRegions)
+{
+    if (m_motionRegions == motionRegions)
         return;
 
     m_motionRegions = motionRegions;
-
-    if(!m_cameraChunks[Qn::MotionContent].isEmpty()) {
-        m_cameraChunks[Qn::MotionContent].clear();
-        emit periodsChanged(Qn::MotionContent);
-    }
-    updateTimePeriods(Qn::MotionContent, true);
+    discardCachedDataType(Qn::MotionContent);
 }
 
 const QnCachingCameraDataLoader::AnalyticsFilter& QnCachingCameraDataLoader::analyticsFilter() const
@@ -178,7 +174,10 @@ void QnCachingCameraDataLoader::setAnalyticsFilter(const AnalyticsFilter& value)
     if (m_analyticsFilter == value)
         return;
 
-    const auto deviceId = m_analyticsFilter.deviceIds.empty() ? QnUuid() : m_analyticsFilter.deviceIds.front();
+    const auto deviceId = m_analyticsFilter.deviceIds.empty()
+        ? QnUuid()
+        : m_analyticsFilter.deviceIds.front();
+
     NX_ASSERT(value.deviceIds == std::vector<QnUuid>{deviceId});
 
     m_analyticsFilter = value;
@@ -186,13 +185,7 @@ void QnCachingCameraDataLoader::setAnalyticsFilter(const AnalyticsFilter& value)
     if (m_analyticsFilter.deviceIds != std::vector<QnUuid>{deviceId})
         m_analyticsFilter.deviceIds = std::vector<QnUuid>{deviceId}; //< Just for safety.
 
-    if (!m_cameraChunks[Qn::AnalyticsContent].isEmpty())
-    {
-        m_cameraChunks[Qn::AnalyticsContent].clear();
-        emit periodsChanged(Qn::AnalyticsContent);
-    }
-
-    updateTimePeriods(Qn::AnalyticsContent, true);
+    discardCachedDataType(Qn::AnalyticsContent);
 }
 
 bool QnCachingCameraDataLoader::isMotionRegionsEmpty() const {
@@ -278,27 +271,31 @@ void QnCachingCameraDataLoader::invalidateCachedData()
     NX_VERBOSE(this, "Chunks: mark local cache as dirty");
 
     for (int i = 0; i < Qn::TimePeriodContentCount; i++)
-        if (m_loaders[i])
-            m_loaders[i]->discardCachedData();
+    {
+        if (auto loader = m_loaders[i])
+            loader->discardCachedData();
+    }
+}
+
+void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type)
+{
+    trace(lit("discardCachedDataType()"), type);
+    if (auto loader = m_loaders[type])
+        loader->discardCachedData();
+
+    m_cameraChunks[type].clear();
+    if (m_enabled)
+    {
+        updateTimePeriods(type, true);
+        emit periodsChanged(type);
+    }
 }
 
 void QnCachingCameraDataLoader::discardCachedData()
 {
     NX_VERBOSE(this) << "Chunks: clear local cache";
-    for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
-
-        Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
-        trace(lit("discardCachedData()"), timePeriodType);
-        if (m_loaders[i])
-            m_loaders[i]->discardCachedData();
-
-        m_cameraChunks[timePeriodType].clear();
-        if (m_enabled) {
-            updateTimePeriods(timePeriodType, true);
-            emit periodsChanged(timePeriodType);
-        }
-    }
-
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+        discardCachedDataType(Qn::TimePeriodContent(i));
 }
 
 void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodType, bool forced) {

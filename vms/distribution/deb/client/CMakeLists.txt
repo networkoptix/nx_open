@@ -67,7 +67,7 @@ set(installer_output_list ${zip_file} ${deb_file})
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 add_custom_command(
     OUTPUT ${installer_output_list}
-    COMMAND ${script}
+    COMMAND /bin/bash ${script}
     DEPENDS ${script} ${depends} ${configured_files}
     COMMENT "Creating desktop client .deb package"
 )

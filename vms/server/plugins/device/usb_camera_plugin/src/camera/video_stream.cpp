@@ -223,7 +223,9 @@ bool VideoStream::noConsumers() const
 
 void VideoStream::terminate()
 {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_terminated = true;
+    m_wait.notify_all();
 }
 
 void VideoStream::tryStart()
@@ -258,7 +260,7 @@ void VideoStream::run()
 {
     while (!m_terminated)
     {
-        if (!waitForConsumers())    
+        if (!waitForConsumers())
             continue;
 
         if (!ensureInitialized())
