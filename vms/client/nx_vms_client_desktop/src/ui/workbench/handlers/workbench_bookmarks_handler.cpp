@@ -307,13 +307,5 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 {
-    const auto bookmarkModeAction = action(action::BookmarksModeAction);
-    const bool checked = bookmarkModeAction->isChecked();
-    const bool enabled = bookmarkModeAction->isEnabled();
-
-    // TODO: #vkutin #gdm Maybe we should remove this, as it's handled by the Right Panel.
-    if (checked)
-        menu()->trigger(action::StopSmartSearchAction, display()->widgets());
-
-    navigator()->setBookmarksModeEnabled(checked);
+    navigator()->setBookmarksModeEnabled(action(action::BookmarksModeAction)->isChecked());
 }
