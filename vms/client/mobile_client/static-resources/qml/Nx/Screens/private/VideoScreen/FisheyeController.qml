@@ -128,7 +128,7 @@ Object
                 clickFilterTimer.restart()
             }
 
-            onCancelled: delayedClickTimer.stop()
+            onCanceled: delayedClickTimer.stop()
 
             onDoubleClicked:
             {
