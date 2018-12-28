@@ -3,7 +3,11 @@
 #include <algorithm>
 #include <chrono>
 
+#include <QtCore/QJsonObject>
 #include <QtGui/QPalette>
+#include <QtQuickWidgets/QQuickWidget>
+#include <QtQuick/QQuickItem>
+#include <QtQml/QQmlProperty>
 #include <QtWidgets/QMenu>
 
 #include <analytics/common/object_detection_metadata.h>
@@ -36,6 +40,7 @@
 
 #include <common/common_module.h>
 #include <nx/analytics/descriptor_manager.h>
+#include <client_core/client_core_module.h>
 
 namespace nx::vms::client::desktop {
 
@@ -760,6 +765,42 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     return menu;
 }
 
+bool AnalyticsSearchListModel::Private::requestActionSettings(
+    const QJsonObject& settingsModel,
+    QJsonObject* values) const
+{
+    if (!values)
+        return false;
+
+    QnMessageBox parametersDialog(q->mainWindowWidget());
+
+    auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
+    view->setClearColor(q->mainWindowWidget()->palette().window().color());
+    view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    view->setSource(QUrl("Nx/Dialogs/ActionSettings/ActionSettings.qml"));
+    const auto root = view->rootObject();
+    NX_ASSERT(root);
+
+    if (!root)
+        return false;
+
+    QMetaObject::invokeMethod(
+        root,
+        "loadModel",
+        Q_ARG(QJsonObject, settingsModel));
+
+    parametersDialog.addCustomWidget(view);
+    if (!parametersDialog.exec())
+        return false;
+
+    QMetaObject::invokeMethod(
+        root,
+        "getValues",
+        Q_RETURN_ARG(QJsonObject, *values));
+
+    return true;
+}
+
 void AnalyticsSearchListModel::Private::executePluginAction(
     const QnUuid& engineId,
     const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
@@ -795,6 +836,14 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     actionData.engineId = engineId;
     actionData.actionId = actionDescriptor.id;
     actionData.objectId = object.objectAppearanceId;
+
+    const auto actionParametersDescription = actionDescriptor.parametersModel;
+    if (!actionParametersDescription.isEmpty())
+    {
+        // Show dialog asking to enter required parameters.
+        if (!requestActionSettings(actionParametersDescription, &actionData.params))
+            return;
+    }
 
     server->restConnection()->executeAnalyticsAction(
         actionData, nx::utils::guarded(this, resultCallback), thread());

@@ -25,6 +25,7 @@
 class QnUuid;
 class QnMediaResourceWidget;
 class QMenu;
+class QJsonObject;
 
 namespace nx::utils { class PendingOperation; }
 
@@ -83,6 +84,8 @@ private:
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
 
     QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
+
+    bool requestActionSettings(const QJsonObject& settingsModel, QJsonObject* values) const;
 
     void executePluginAction(
         const QnUuid& engineId,
