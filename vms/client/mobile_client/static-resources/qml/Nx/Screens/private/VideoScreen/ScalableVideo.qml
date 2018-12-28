@@ -254,6 +254,7 @@ ZoomableFlickable
         interactor: interactor
         mouseArea: control.mouseArea
         pinchArea: control.pinchArea
+        onClicked: control.clicked()
     }
 
     MultiVideoPositioner

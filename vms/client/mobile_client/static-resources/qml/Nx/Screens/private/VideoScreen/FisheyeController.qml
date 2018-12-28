@@ -17,6 +17,8 @@ Object
         && !mouseArea.draggingStarted
         && !kineticAnimator.inertia
 
+    signal clicked()
+
     onMouseAreaChanged:
     {
         if (mouseArea)
@@ -90,6 +92,28 @@ Object
             ? Math.min(mouseArea.width, mouseArea.height) / 2.0
             : 1
 
+        // TODO: #ynikitenokov Refactor code, make generic mousearea handler
+        // that filters (double)click events.
+        Timer
+        {
+            id: delayedClickTimer
+
+            interval: 300
+            onTriggered: controller.clicked()
+        }
+
+        Timer
+        {
+            id: clickFilterTimer
+            interval: 400
+        }
+
+        Timer
+        {
+            id: doubleClickFilterTimer
+            interval: 300
+        }
+
         Connections
         {
             target: controller.mouseArea
@@ -100,10 +124,16 @@ Object
                 mouseAreaHandler.pressX = mouse.x
                 mouseAreaHandler.pressY = mouse.y
                 kineticAnimator.interrupt()
+
+                clickFilterTimer.restart()
             }
+
+            onCancelled: delayedClickTimer.stop()
 
             onDoubleClicked:
             {
+                delayedClickTimer.stop()
+                doubleClickFilterTimer.restart()
                 var distance = Qt.vector2d(
                     mouseAreaHandler.lastClickPosition.x - mouse.x,
                     mouseAreaHandler.lastClickPosition.y - mouse.y).length()
@@ -125,7 +155,15 @@ Object
 
             onReleased:
             {
+                if (clickFilterTimer.running && !doubleClickFilterTimer.running)
+                    delayedClickTimer.restart()
+                else
+                    delayedClickTimer.stop()
+
                 if (!mouseAreaHandler.draggingStarted)
+                    return
+
+                if (doubleClickFilterTimer.running)
                     return
 
                 kineticAnimator.finishMeasurement(mouse.x, mouse.y)
