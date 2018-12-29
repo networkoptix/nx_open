@@ -219,4 +219,8 @@ if(withClouds)
     endif()
 endif()
 
+if(withDocumentation)
+    add_subdirectory(doc)
+endif()
+
 nx_save_known_files()

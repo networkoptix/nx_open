@@ -201,7 +201,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("openldap")
             sync("sasl2")
 
-    if platform in ("linux", "windows"):
+    if have_mediaserver or have_desktop_client:
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
     sync("any/certificates", path_variable="certificates_path")
