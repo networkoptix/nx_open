@@ -158,6 +158,7 @@ QnMediaServerModule::QnMediaServerModule(
     if (serverSettings.get())
     {
         m_settings = store(serverSettings.release());
+        m_settings->setServerModule(this);
     }
     else
     {
