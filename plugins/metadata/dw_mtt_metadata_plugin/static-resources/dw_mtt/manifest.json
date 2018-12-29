@@ -55,20 +55,12 @@
             "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
         },
         {
-            "eventTypeId": "f01f9480-e3c2-4644-8d0c-092e7aa7898d",
-            "eventName": { "value": "Object Status Changed [exclusive]", "localization": {} },
-            "flags": "stateDependent",
-            "internalName": "OSC",
-            "alarmName": "oscAlarm",
-            "group": 1
-        },
-        {
             "eventTypeId": "7395066d-d870-4323-87aa-ca7ba2990d37",
             "eventName": { "value": "Scene Change", "localization": {} },
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "sceneChange",
-            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
         },
         {
             "eventTypeId": "50108bc1-ed4d-4bde-a2d4-735614368026",
@@ -76,15 +68,34 @@
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "clarityAbnormal",
-            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
         },
         {
             "eventTypeId": "787550c4-35bb-4490-baed-0800e03c61a6",
-            "eventName": { "value": "Video Cast Detection", "localization": {} },
+            "eventName": { "value": "Abnormal color detection", "localization": {} },
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "colorAbnormal",
-            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
+        },
+        {
+            "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
+            "eventName": { "value": "Video Face Detection [exclusive]", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "VFD",
+            "alarmName": "vfdAlarm",
+            "group": 1,
+            "unsupported": true
+        }
+    ],
+    "ignoredOutputEventTypes": [
+        {
+            "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
+            "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "CDD",
+            "alarmName": "cddAlarm",
+            "group": 1
         },
         {
             "eventTypeId": "2e149769-64d0-40ee-a79a-5d02962f0fe5",
@@ -103,21 +114,12 @@
             "group": 1
         },
         {
-            "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
-            "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },
+            "eventTypeId": "f01f9480-e3c2-4644-8d0c-092e7aa7898d",
+            "eventName": { "value": "Object Status Changed [exclusive]", "localization": {} },
             "flags": "stateDependent",
-            "internalName": "CDD",
-            "alarmName": "cddAlarm",
+            "internalName": "OSC",
+            "alarmName": "oscAlarm",
             "group": 1
-        },
-        {
-            "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
-            "eventName": { "value": "Video Face Detection [exclusive]", "localization": {} },
-            "flags": "stateDependent",
-            "internalName": "VFD",
-            "alarmName": "vfdAlarm",
-            "group": 1,
-            "unsupported": true
         }
     ]
 }
