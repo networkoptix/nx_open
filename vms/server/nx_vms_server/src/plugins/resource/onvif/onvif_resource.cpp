@@ -421,7 +421,6 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_renewSubscriptionTimerID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_previousPullMessagesResponseTimeMs(0),
     m_inputPortCount(0),
     m_videoLayout(nullptr),
     m_advancedParametersProvider(this),
@@ -3655,8 +3654,8 @@ bool QnPlOnvifResource::createPullPointSubscription()
     }
 
     m_eventMonitorType = emtPullPoint;
-    m_previousPullMessagesResponseTimeMs = m_pullMessagesResponseElapsedTimer.elapsed();
 
+    m_pullMessagesResponseElapsedTimer.restart();
     updateTimer(&m_nextPullMessagesTimerID,
         std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC * MS_PER_SECOND),
         std::bind(&QnPlOnvifResource::pullMessages, this, std::placeholders::_1));
@@ -3741,8 +3740,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     soapWrapper->soap()->imode |= SOAP_XML_IGNORENS;
 
     _onvifEvents__PullMessages request;
-    request.Timeout = (m_pullMessagesResponseElapsedTimer.elapsed() -
-        m_previousPullMessagesResponseTimeMs) / MS_PER_SECOND * MS_PER_SECOND;
+
+    request.Timeout = m_pullMessagesResponseElapsedTimer.elapsed(); //< milliseconds
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
 
     std::vector<void*> memToFreeOnResponseDone;
@@ -3888,18 +3887,16 @@ void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
 
 void QnPlOnvifResource::handleAllNotifications(const _onvifEvents__PullMessagesResponse& response)
 {
-    const qint64 currentPullMessagesResponseTimeMs = m_pullMessagesResponseElapsedTimer.elapsed();
-    const time_t timeSinceLastResponseSec = roundUp<qint64>(currentPullMessagesResponseTimeMs -
-        m_previousPullMessagesResponseTimeMs, MS_PER_SECOND) / MS_PER_SECOND;
+    // Notifications with timestamps older then minNotificationTimeMs are ignored.
+    const time_t minNotificationTimeMs = response.CurrentTime
+        - m_pullMessagesResponseElapsedTimer.elapsed();
 
-    // Notifications with timestamps older then minNotificationTime are ignored.
-    const time_t minNotificationTime = response.CurrentTime - timeSinceLastResponseSec;
     for (const auto& notification: response.oasisWsnB2__NotificationMessage)
     {
         if (notification)
-            handleOneNotification(*notification, minNotificationTime);
+            handleOneNotification(*notification, minNotificationTimeMs);
     }
-    m_previousPullMessagesResponseTimeMs = currentPullMessagesResponseTimeMs;
+    m_pullMessagesResponseElapsedTimer.restart();
 }
 
 bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList)

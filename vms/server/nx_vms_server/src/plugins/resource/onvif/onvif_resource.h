@@ -609,7 +609,6 @@ private:
     QString m_onvifNotificationSubscriptionReference;
 
     QElapsedTimer m_pullMessagesResponseElapsedTimer;
-    qint64 m_previousPullMessagesResponseTimeMs;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;
