@@ -20,6 +20,9 @@ MediaServerLauncher::MediaServerLauncher(
     m_serverEndpoint(nx::network::HostAddress::localhost, port),
     m_firstStartup(true)
 {
+    m_serverGuid = QnUuid::createUuid();
+    fillDefaultSettings();
+
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
         addSetting("noResourceDiscovery", "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
@@ -27,9 +30,6 @@ MediaServerLauncher::MediaServerLauncher(
 
     if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
         addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-
-    m_serverGuid = QnUuid::createUuid();
-    fillDefaultSettings();
 }
 
 void MediaServerLauncher::fillDefaultSettings()
