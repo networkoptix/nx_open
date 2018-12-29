@@ -106,7 +106,7 @@ def determine_package_versions(
 
 
 def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
-    have_mediaserver = platform not in ("android", "ios")
+    have_mediaserver = platform not in ("android", "ios", "macosx")
     have_desktop_client = platform in ("windows", "macosx") \
         or (platform == "linux" and box in ("none", "tx1"))
     have_mobile_client = have_desktop_client or platform in ("android", "ios")
