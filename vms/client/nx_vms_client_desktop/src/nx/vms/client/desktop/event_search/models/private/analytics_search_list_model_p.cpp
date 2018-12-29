@@ -586,7 +586,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 newObject.firstAppearanceTimeUsec = pos.timestampUsec;
                 newObject.lastAppearanceTimeUsec = pos.timestampUsec;
 
-                newObjectIndices[item.objectId] = newObjects.size();
+                newObjectIndices[item.objectId] = int(newObjects.size());
                 newObjects.push_back(std::move(newObject));
             }
         }
