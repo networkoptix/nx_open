@@ -678,9 +678,10 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 {
     auto commonModule = m_clientCoreModule->commonModule();
     // client uses ordinary QT file to access file system
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
+
+    commonModule->storagePluginFactory()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
+    commonModule->storagePluginFactory()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
+    commonModule->storagePluginFactory()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
