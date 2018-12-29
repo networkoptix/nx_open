@@ -102,7 +102,9 @@ private:
     void removeTiles(int first, int count, UpdateMode updateMode);
     void clear();
 
-    void highlightAppearance(EventTile* tile);
+    void fadeIn(EventTile* widget);
+    void fadeOut(EventTile* widget);
+    QWidget* createFadeCurtain(EventTile* widget, QVariantAnimation* animator);
 
     void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
 
@@ -119,7 +121,6 @@ private:
     void ensureWidget(int index);
     void reserveWidget(int index);
 
-    void handleWidgetChanged(int index);
     void closeExpiredTiles();
 
     int scrollValue() const;
@@ -189,6 +190,7 @@ private:
     nx::utils::Guard makeUnreadCountGuard();
 
     int m_endPosition = 0;
+    AnimationPtr m_endAnimation;
 
     Qt::ScrollBarPolicy m_scrollBarPolicy = Qt::ScrollBarAlwaysOn;
 

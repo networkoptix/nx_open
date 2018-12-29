@@ -170,6 +170,28 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
     }
 }
 
+void PeerStateTracker::setVersionInformation(
+    const QList<nx::vms::api::ModuleInformation>& moduleInformation)
+{
+    for (const auto& info: moduleInformation)
+    {
+        if (auto item = findItemById(info.id))
+        {
+            if (info.version != item->version)
+            {
+                item->version = info.version;
+
+                bool installed = (info.version == m_targetVersion)
+                    || item->state == StatusCode::latestUpdateInstalled;
+
+                if (installed != item->installed)
+                    item->installed = true;
+                emit itemChanged(item);
+            }
+        }
+    }
+}
+
 void PeerStateTracker::setPeersInstalling(const QSet<QnUuid>& targets, bool installing)
 {
     for (const auto& uid: targets)
@@ -192,8 +214,9 @@ void PeerStateTracker::clearState()
     {
         item->state = StatusCode::idle;
         item->progress = 0;
-        item->statusMessage = "Waiting for data";
+        item->statusMessage = "Waiting for peer data";
         item->verificationMessage = "";
+        item->installing = false;
         emit itemChanged(item);
     }
 }
@@ -204,9 +227,7 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
     std::map<QnUuid, nx::update::Status::Code> result;
 
     for (const auto& item: m_items)
-    {
-        result.insert(std::make_pair(item->id, item->state));
-    }
+        result.emplace(item->id, item->state);
     return result;
 }
 
@@ -282,7 +303,7 @@ QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
-        if (item->installed)
+        if (item->installed || item->state == StatusCode::latestUpdateInstalled)
             result.insert(item->id);
     return result;
 }
@@ -390,8 +411,9 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
 void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
 {
     NX_ASSERT(m_clientItem);
-    NX_VERBOSE(this, "PeerStateTracker::atClientupdateStateChanged(%1, %2)", state, percentComplete);
     using State = ClientUpdateTool::State;
+    NX_VERBOSE(this, "PeerStateTracker::atClientupdateStateChanged(%1, %2)",
+        ClientUpdateTool::toString(State(state)), percentComplete);
 
     m_clientItem->installing = false;
     m_clientItem->installed = false;
@@ -428,7 +450,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             m_clientItem->statusMessage = "Client is installing update";
             break;
         case State::complete:
-            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->state = StatusCode::latestUpdateInstalled;
             m_clientItem->installing = false;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
@@ -472,11 +494,11 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
 
 UpdateItemPtr PeerStateTracker::addItemForClient()
 {
-    NX_VERBOSE(this, "addItemForClient()");
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = commonModule()->globalSettings()->localSystemId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
+    NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
@@ -511,7 +533,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    bool installed = (version == m_targetVersion);
+    bool installed = (version == m_targetVersion) || item->state == StatusCode::latestUpdateInstalled;
     if (installed != item->installed)
     {
         item->installed = true;

@@ -53,6 +53,8 @@
 #include <nx/utils/random.h>
 #include <nx/utils/range_adapters.h>
 
+#include <nx/fusion/model_functions.h>
+
 //#if defined(_DEBUG)
     #define DEBUG_ACTIONS
 //#endif

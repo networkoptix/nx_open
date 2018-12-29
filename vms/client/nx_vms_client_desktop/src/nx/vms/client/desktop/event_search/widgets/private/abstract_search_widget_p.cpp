@@ -8,6 +8,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QToolButton>
 #include <QtWidgets/QScrollBar>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -29,7 +30,6 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
-#include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -77,6 +77,34 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
     return result;
 }
 
+QToolButton* createCheckableToolButton(QWidget* parent)
+{
+    const auto paintFunction =
+        [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
+        {
+            const auto button = qobject_cast<const QToolButton*>(widget);
+            if (!NX_ASSERT(button))
+                return false;
+
+            const bool hovered = option->state.testFlag(QStyle::State_MouseOver);
+
+            const auto mode = hovered && !button->isDown() ? QIcon::Active : QIcon::Normal;
+            const auto state = button->isChecked() ? QIcon::On : QIcon::Off;
+            const auto iconSize = qnSkin->maximumSize(button->icon(), mode, state);
+
+            const auto iconRect = QStyle::alignedRect(
+                Qt::LeftToRight, Qt::AlignCenter, iconSize, option->rect);
+
+            button->icon().paint(painter, iconRect, 0, mode, state);
+            return true;
+        };
+
+    auto result = new CustomPainted<QToolButton>(parent);
+    result->setCustomPaintFunction(paintFunction);
+    result->setCheckable(true);
+    return result;
+}
+
 } // namespace
 
 AbstractSearchWidget::Private::Private(
@@ -90,8 +118,8 @@ AbstractSearchWidget::Private::Private(
     m_headIndicatorModel(new BusyIndicatorModel()),
     m_tailIndicatorModel(new BusyIndicatorModel()),
     m_visualModel(new ConcatenationListModel()),
-    m_togglePreviewsButton(new ToolButton(q)),
-    m_toggleFootersButton(new ToolButton(q)),
+    m_togglePreviewsButton(createCheckableToolButton(q)),
+    m_toggleFootersButton(createCheckableToolButton(q)),
     m_itemCounterLabel(new QLabel(q)),
     m_textFilterEdit(createSearchLineEdit(q)),
     m_dayChangeTimer(new QTimer()),
@@ -234,9 +262,7 @@ void AbstractSearchWidget::Private::setupViewportHeader()
     m_itemCounterLabel->setForegroundRole(QPalette::Mid);
     m_itemCounterLabel->setText({});
 
-    m_toggleFootersButton->setCheckable(true);
     m_toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
-    m_toggleFootersButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     m_toggleFootersButton->setIcon(qnSkin->icon(
         "text_buttons/text.png", "text_buttons/text_selected.png"));
 
@@ -256,9 +282,7 @@ void AbstractSearchWidget::Private::setupViewportHeader()
 
     updateInformationToolTip();
 
-    m_togglePreviewsButton->setCheckable(true);
     m_togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    m_togglePreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     m_togglePreviewsButton->setIcon(qnSkin->icon(
         "text_buttons/image.png", "text_buttons/image_selected.png"));
 

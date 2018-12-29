@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../export_settings_dialog.h"
+
 #include <array>
 
 #include <QtCore/QObject>
@@ -9,7 +11,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
-#include <nx/vms/client/desktop/export/dialogs/export_settings_dialog.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>

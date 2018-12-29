@@ -72,8 +72,9 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     connect(action(action::UpdateLocalFilesAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered);
 
-    registerDebugAction("Tracing: Layout settings",
-        []{LayoutSettingsDialogStateReducer::setTracingEnabled(true); });
+    registerDebugAction(
+        "Tracing: Layout settings",
+        [] { LayoutSettingsDialogStateReducer::setTracingEnabled(true); });
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()

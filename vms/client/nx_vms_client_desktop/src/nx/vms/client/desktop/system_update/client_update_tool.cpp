@@ -574,7 +574,10 @@ ClientUpdateTool::State ClientUpdateTool::getState() const
 
 bool ClientUpdateTool::hasUpdate() const
 {
-    return m_state != State::initial && m_state != State::error && m_state != State::applauncherError;
+    return m_state != State::initial
+        && m_state != State::error
+        && m_state != State::applauncherError
+        && m_state != State::complete;
 }
 
 ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(

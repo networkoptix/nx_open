@@ -13,17 +13,20 @@
 #include <core/resource/media_resource.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
@@ -43,10 +46,7 @@ static constexpr int kScrollBarStep = 16;
 static constexpr int kDefaultThumbnailWidth = 224;
 static constexpr int kMaximumThumbnailWidth = 1024;
 
-static constexpr auto kHighlightCurtainColor = Qt::white;
-static constexpr qreal kHighlightCurtainOpacity = 0.25;
-static constexpr milliseconds kHighlightDuration = 400ms;
-static constexpr milliseconds kAnimationDuration = 250ms;
+static constexpr auto kFadeCurtainColorName = "dark3";
 
 /*
  * Tiles can have optional timed auto-close mode.
@@ -387,7 +387,9 @@ void EventRibbon::Private::ensureWidget(int index)
         m_reserveWidgets.pop();
     }
 
-    handleWidgetChanged(index);
+    const auto deadline = m_deadlines.find(m_model->index(index));
+    if (deadline != m_deadlines.end())
+        deadline->setRemainingTime(kVisibleAutoCloseDelay);
 }
 
 void EventRibbon::Private::reserveWidget(int index)
@@ -401,7 +403,6 @@ void EventRibbon::Private::reserveWidget(int index)
     widget->hide();
     widget->clear();
     m_reserveWidgets.emplace(widget.release());
-    handleWidgetChanged(index);
 }
 
 void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRelativeToTile)
@@ -419,16 +420,6 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
     menu->exec(globalPos);
-}
-
-void EventRibbon::Private::handleWidgetChanged(int index)
-{
-    if (!m_tiles[index]->widget)
-        return;
-
-    const auto deadline = m_deadlines.find(m_model->index(index));
-    if (deadline != m_deadlines.end())
-        deadline->setRemainingTime(kVisibleAutoCloseDelay);
 }
 
 void EventRibbon::Private::closeExpiredTiles()
@@ -512,11 +503,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     const bool live = m_live && index == 0 && viewportTopPosition() < kLiveThreshold;
     const bool scrollDown = !live && position < scrollValue() + kThreshold;
 
-    if (!viewportVisible || scrollDown || !m_visible.contains(index)
-        || (count == 1 && index == this->count()))
-    {
+    if (!viewportVisible || scrollDown || (m_scrollBarRelevant && !m_visible.contains(index)))
         updateMode = UpdateMode::instant;
-    }
 
     const int end = index + count;
     int currentPosition = position;
@@ -581,11 +569,14 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
             if (!tile->animated)
                 continue;
 
+            // This is to prevent all inserted tiles appearing on the screen at once.
+            static constexpr qreal kStartingFraction = 0.25;
+
             AnimationPtr animator(new QVariantAnimation());
             static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileInsertion;
             animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
             animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
-            animator->setStartValue(0.0);
+            animator->setStartValue(kStartingFraction);
             animator->setEndValue(1.0);
             animator->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -614,8 +605,9 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         const auto highlightRange = m_visible.intersected({index, index + count});
         for (int i = highlightRange.lower(); i < highlightRange.upper(); ++i)
         {
-            if (m_tiles[i]->animated)
-               highlightAppearance(m_tiles[i]->widget.get());
+            const auto& tile = m_tiles[i];
+            if (tile->animated && tile->widget)
+                fadeIn(tile->widget.get());
         }
     }
 
@@ -646,7 +638,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     const bool scrollUp = !m_visible.isEmpty() && removalInterval.contains(m_visible.lower());
     const bool untilTheEnd = end == this->count();
 
-    if (untilTheEnd || !m_visible.intersects({first, end}))
+    if (!m_visible.intersects({first, end}))
         updateMode = UpdateMode::instant;
 
     Interval newVisible(m_visible);
@@ -672,8 +664,11 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     int nextPosition = untilTheEnd ? m_endPosition : m_tiles[end]->position;
     for (int index = end - 1; index >= first; --index)
     {
-        reserveWidget(index);
         const auto& tile = m_tiles[index];
+        if (tile->animated && updateMode == UpdateMode::animated && tile->widget)
+            fadeOut(tile->widget.release());
+        else
+            reserveWidget(index);
 
         (tile->animated ? delta : instantDelta) += nextPosition - tile->position;
         nextPosition = tile->position;
@@ -705,15 +700,24 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
             [this]()
             {
                 const auto index = m_animations.take(static_cast<QVariantAnimation*>(sender()));
-                if (!index.isValid())
-                    return;
-                const auto& tile = m_tiles[index.row()];
-                if (tile->removeAnimation.get() == sender())
-                    tile->removeAnimation.release();
+                auto& animator = index.isValid()
+                    ? m_tiles[index.row()]->removeAnimation
+                    : m_endAnimation;
+
+                if (animator.get() == sender())
+                    animator.release();
             });
 
-        m_animations.insert(animator.get(), m_model->index(first));
-        m_tiles[first]->removeAnimation.reset(animator.release());
+        if (first < this->count())
+        {
+            m_animations.insert(animator.get(), m_model->index(first));
+            m_tiles[first]->removeAnimation.reset(animator.release());
+        }
+        else
+        {
+            m_endAnimation.swap(animator);
+            m_animations.insert(m_endAnimation.get(), {});
+        }
     }
 
     updateGuard.rollback();
@@ -748,6 +752,8 @@ void EventRibbon::Private::clear()
     m_endPosition = 0;
     m_live = true;
 
+    m_endAnimation.reset();
+
     setScrollBarRelevant(false);
 
     q->updateGeometry();
@@ -776,7 +782,8 @@ int EventRibbon::Private::indexOf(const EventTile* widget) const
 
 int EventRibbon::Private::totalHeight() const
 {
-    return totalTopMargin() + m_endPosition + m_bottomMargin;
+    const int animatedShift = m_endAnimation ? m_endAnimation->currentValue().toInt() : 0;
+    return totalTopMargin() + m_endPosition + animatedShift + m_bottomMargin;
 }
 
 QScrollBar* EventRibbon::Private::scrollBar() const
@@ -1168,36 +1175,73 @@ void EventRibbon::Private::doUpdateView()
         qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
 }
 
-void EventRibbon::Private::highlightAppearance(EventTile* tile)
+void EventRibbon::Private::fadeIn(EventTile* widget)
 {
-    if (!tile->isVisible())
-        return;
+    static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileFadeIn;
+    auto animator = new QVariantAnimation(this);
+    animator->setStartValue(1.0);
+    animator->setEndValue(0.0);
+    animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
+    animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
+    animator->start(QAbstractAnimation::DeleteWhenStopped);
 
-    auto animation = new QVariantAnimation(tile);
-    animation->setStartValue(kHighlightCurtainOpacity);
-    animation->setEndValue(0.0);
-    animation->setDuration(kHighlightDuration.count());
-    animation->setEasingCurve(QEasingCurve::InCubic);
+    createFadeCurtain(widget, animator);
+}
 
-    auto curtain = new CustomPainted<QWidget>(tile);
+void EventRibbon::Private::fadeOut(EventTile* widget)
+{
+    static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileFadeOut;
+    auto animator = new QVariantAnimation(this);
+    animator->setStartValue(0.0);
+    animator->setEndValue(1.0);
+    animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
+    animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
+
+    connect(animator, &QObject::destroyed, widget,
+        [this, widget]()
+        {
+            widget->hide();
+            widget->clear();
+            setReadOnly(widget, false);
+            m_reserveWidgets.emplace(widget);
+        });
+
+    const int base = widget->y() + m_scrollBar->value();
+
+    connect(m_scrollBar.get(), &QScrollBar::valueChanged, animator, nx::utils::guarded(widget,
+        [widget, base](int value) { widget->move(widget->x(), base - value); }));
+
+    animator->start(QAbstractAnimation::DeleteWhenStopped);
+
+    createFadeCurtain(widget, animator);
+    setReadOnly(widget, true);
+}
+
+QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnimation* animator)
+{
+    if (!NX_ASSERT(widget && animator))
+        return nullptr;
+
+    auto curtain = new CustomPainted<QWidget>(widget);
     anchorWidgetToParent(curtain);
 
-    curtain->setCustomPaintFunction(nx::utils::guarded(animation, true,
-        [animation, curtain](QPainter* painter, const QStyleOption* /*option*/,
+    const auto color = colorTheme()->color(kFadeCurtainColorName);
+
+    curtain->setCustomPaintFunction(nx::utils::guarded(animator, true,
+        [animator, curtain, color](QPainter* painter, const QStyleOption* /*option*/,
             const QWidget* /*widget*/)
         {
-            QColor color = kHighlightCurtainColor;
-            color.setAlphaF(animation->currentValue().toReal());
-            painter->fillRect(curtain->rect(), color);
+            const auto currentColor = toTransparent(color, animator->currentValue().toReal());
+            painter->fillRect(curtain->rect(), currentColor);
             curtain->update();
             return true;
         }));
 
-    connect(animation, &QObject::destroyed, curtain, &QObject::deleteLater);
-    installEventHandler(curtain, QEvent::Hide, animation, &QAbstractAnimation::stop);
+    connect(animator, &QObject::destroyed, curtain, &QObject::deleteLater);
+    installEventHandler(curtain, QEvent::Hide, animator, &QAbstractAnimation::stop);
 
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
-    curtain->setVisible(true);
+    curtain->show();
+    return curtain;
 }
 
 int EventRibbon::Private::count() const

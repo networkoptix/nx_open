@@ -1,8 +1,9 @@
 #include "screen_manager.h"
 
-#include <QtCore/QCoreApplication>
-
+#include <QtGui/QScreen>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QApplication>
 
 #include "utils/common/app_info.h"
 #include "utils/common/process.h"
@@ -98,6 +99,14 @@ QnScreenManager::~QnScreenManager()
 void QnScreenManager::updateCurrentScreens(const QWidget *widget)
 {
     m_geometry = widget->geometry();
+
+    // QWidget::geometry() returns QRect with logical size and physical position. We have to
+    // convert size to physical pixels too.
+    const int screenIndex = QApplication::desktop()->screenNumber(widget);
+    const QList<QScreen*>& screens = QApplication::screens();
+    if (screenIndex < screens.size())
+        m_geometry.setSize(m_geometry.size() * screens[screenIndex]->devicePixelRatio());
+
     m_refreshDelayTimer->start();
 }
 
