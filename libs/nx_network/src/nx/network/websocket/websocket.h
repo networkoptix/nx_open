@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <QtCore>
 #include <nx/utils/log/log.h>
 #include <nx/utils/object_destruction_flag.h>
@@ -12,7 +13,6 @@
 #include "websocket_serializer.h"
 #include "websocket_common_types.h"
 #include "websocket_multibuffer.h"
-#include "websocket_handler_queue.h"
 
 namespace nx {
 namespace network {
@@ -22,22 +22,6 @@ class NX_NETWORK_API WebSocket :
     public aio::AbstractAsyncChannel,
     private websocket::ParserHandler
 {
-    struct WriteData
-    {
-        nx::Buffer buffer;
-        int writeSize;
-
-        WriteData(nx::Buffer&& buffer, int writeSize):
-            buffer(std::move(buffer)),
-            writeSize(writeSize)
-        {}
-
-        WriteData(WriteData&& /*other*/) = default;
-        WriteData& operator=(WriteData&& /*other*/) = default;
-
-        WriteData() {}
-    };
-
 public:
     /**
      * If ROLE is undefined, payload won't be masked (unmasked). FRAME_TYPE may be only BINARY or
@@ -86,6 +70,27 @@ public:
     const AbstractStreamSocket* socket() const { return m_socket.get(); }
 
 private:
+    using UserReadPair = std::pair<IoCompletionHandler, nx::Buffer* const>;
+    using UserReadPairPtr = std::unique_ptr<UserReadPair>;
+
+    std::unique_ptr<AbstractStreamSocket> m_socket;
+    Parser m_parser;
+    Serializer m_serializer;
+    SendMode m_sendMode;
+    ReceiveMode m_receiveMode;
+    bool m_isLastFrame = false;
+    bool m_isFirstFrame = true;
+    std::queue<std::pair<IoCompletionHandler, nx::Buffer>> m_writeQueue;
+    UserReadPairPtr m_userReadPair;
+    websocket::MultiBuffer m_incomingMessageQueue;
+    nx::Buffer m_controlBuffer;
+    nx::Buffer m_readBuffer;
+    std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
+    std::chrono::milliseconds m_aliveTimeout;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    bool m_failed = false;
+    FrameType m_frameType;
+
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
@@ -98,41 +103,18 @@ private:
     /** Own helper functions*/
     void processReadData();
     bool isDataFrame() const;
-    void sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoCompletionHandler handler);
-    void sendControlResponse(FrameType requestType, FrameType responseType);
+    void sendMessage(const nx::Buffer& message, IoCompletionHandler handler);
+    void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);
     void readWithoutAddingToQueueSync();
     void readWithoutAddingToQueue();
-    void handlePingTimer();
-    void handleAliveTimer();
-    void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
+    void onPingTimer();
+    void onRead(SystemError::ErrorCode ecode, size_t transferred);
+    void onWrite(SystemError::ErrorCode ecode, size_t transferred);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
-    void reportErrorIfAny(
-        SystemError::ErrorCode ecode,
-        size_t bytesRead,
-        std::function<void(bool)> continueHandler);
     std::chrono::milliseconds pingTimeout() const;
-    void restartTimers();
-
-private:
-    std::unique_ptr<AbstractStreamSocket> m_socket;
-    Parser m_parser;
-    Serializer m_serializer;
-    SendMode m_sendMode;
-    ReceiveMode m_receiveMode;
-    bool m_isLastFrame;
-    bool m_isFirstFrame;
-    HandlerQueue<WriteData> m_writeQueue;
-    HandlerQueue<nx::Buffer*> m_readQueue;
-    websocket::MultiBuffer m_userDataBuffer;
-    nx::Buffer m_controlBuffer;
-    nx::Buffer m_readBuffer;
-    std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
-    std::unique_ptr<nx::network::aio::Timer> m_aliveTimer;
-    std::chrono::milliseconds m_aliveTimeout;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
-    SystemError::ErrorCode m_lastError;
-    FrameType m_frameType;
+    void callOnReadhandler(SystemError::ErrorCode error, size_t transferred);
+    void callOnWriteHandler(SystemError::ErrorCode error, size_t transferred);
 };
 
 } // namespace websocket
