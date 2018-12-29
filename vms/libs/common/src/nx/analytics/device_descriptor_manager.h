@@ -44,6 +44,14 @@ public:
         const DeviceId& deviceId,
         std::set<EngineId> engineIds);
 
+    std::set<QnUuid> compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const;
+
+    std::set<QnUuid> compatibleEngineIdsUnion(
+        const QnVirtualCameraResourceList& devices) const;
+
+    std::set<QnUuid> compatibleEngineIdsIntersection(
+        const QnVirtualCameraResourceList& devices) const;
+
 private:
     nx::vms::api::analytics::DeviceDescriptor deviceDescriptor(const DeviceId& deviceId) const;
 

@@ -4,6 +4,7 @@
 #include <nx/analytics/utils.h>
 
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 
 namespace nx::analytics {
 
@@ -113,6 +114,51 @@ void DeviceDescriptorManager::setCompatibleAnalyticsEngines(
 
     descriptor->compatibleEngineIds = std::move(engineIds);
     m_deviceDescriptorContainer.setDescriptors(*descriptor, deviceId);
+}
+
+std::set<EngineId> DeviceDescriptorManager::compatibleEngineIds(
+    const QnVirtualCameraResourcePtr& device) const
+{
+    const auto descriptorForDevice = descriptor(device->getId());
+    if (!descriptorForDevice)
+        return {};
+
+    return descriptorForDevice->compatibleEngineIds;
+}
+
+std::set<EngineId> DeviceDescriptorManager::compatibleEngineIdsUnion(
+    const QnVirtualCameraResourceList& devices) const
+{
+    std::set<EngineId> result;
+    for (const auto& device: devices)
+    {
+        const auto deviceCompatibleEngineIds = compatibleEngineIds(device);
+        result.insert(deviceCompatibleEngineIds.cbegin(), deviceCompatibleEngineIds.cend());
+    }
+
+    return result;
+}
+
+std::set<EngineId> DeviceDescriptorManager::compatibleEngineIdsIntersection(
+    const QnVirtualCameraResourceList& devices) const
+{
+    if (devices.isEmpty())
+        return {};
+
+    std::set<EngineId> result = compatibleEngineIds(devices[0]);
+    for (auto i = 1; i < devices.size(); ++i)
+    {
+        std::set<EngineId> currentIntersection;
+        const auto currentCompatibleEngineIds = compatibleEngineIds(devices[i]);
+        std::set_intersection(
+            result.cbegin(), result.cend(),
+            currentCompatibleEngineIds.cbegin(), currentCompatibleEngineIds.cend(),
+            std::inserter(currentIntersection, currentIntersection.end()));
+
+        result.swap(currentIntersection);
+    }
+
+    return result;
 }
 
 DeviceDescriptor DeviceDescriptorManager::deviceDescriptor(const DeviceId& deviceId) const
