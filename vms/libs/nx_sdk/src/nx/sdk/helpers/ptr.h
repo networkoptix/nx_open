@@ -12,7 +12,7 @@ namespace sdk {
  *
  * Supports dynamic-cast, and is assignment-compatible with smart pointers to derived classes.
  */
-template<typename RefCountable>
+template<class RefCountable>
 class Ptr final
 {
 public:
@@ -31,6 +31,8 @@ public:
     template<class OtherRefCountable>
     using IsConvertibleFrom =
         std::enable_if_t<std::is_base_of<RefCountable, OtherRefCountable>::value, int /*dummy*/>;
+
+    explicit Ptr(RefCountable* ptr): m_ptr(ptr) {}
 
     template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     explicit Ptr(OtherRefCountable* ptr): m_ptr(ptr) {}
@@ -152,10 +154,44 @@ private:
     RefCountable* m_ptr = nullptr;
 };
 
-template<typename RefCountable, typename... Args>
+template<class RefCountable>
+bool operator==(const Ptr<RefCountable>& ptr, std::nullptr_t) { return ! (bool) ptr; }
+
+template<class RefCountable>
+bool operator==(std::nullptr_t, const Ptr<RefCountable>& ptr) { return ! (bool) ptr; }
+
+template<class RefCountable>
+bool operator!=(const Ptr<RefCountable>& ptr, std::nullptr_t) { return (bool) ptr; }
+
+template<class RefCountable>
+bool operator!=(std::nullptr_t, const Ptr<RefCountable>& ptr) { return (bool) ptr; }
+
+/**
+ * Creates a new object via `new` (with reference count of 1) and returns a smart pointer to it.
+ */
+template<class RefCountable, typename... Args>
 static Ptr<RefCountable> makePtr(Args&&... args)
 {
     return Ptr<RefCountable>{new RefCountable(std::forward<Args>(args)...)};
+}
+
+/**
+ * Calls queryInterface() and returns a smart pointer to its result, possibly null.
+ */
+template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
+static auto queryInterfacePtr(RefCountablePtr refCountable)
+{
+    return Ptr<Interface>(refCountable->queryInterface(Interface::interfaceId()));
+}
+
+/**
+ * Intended for debug. Is not thread-safe.
+ * @return Reference counter, or 0 if the pointer is null.
+ */
+template<class RefCountable>
+int refCount(const Ptr<RefCountable>& ptr)
+{
+    return refCount(ptr.get());
 }
 
 } // namespace sdk
