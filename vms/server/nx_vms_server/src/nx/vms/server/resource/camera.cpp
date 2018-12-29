@@ -274,9 +274,9 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
     return result;
 }
 
-QSize Camera::getNearestResolution(
+/*static*/ QSize Camera::getNearestResolution(
     const QSize& resolution,
-    float desirableAspectRatio,
+    float desiredAspectRatio,
     double maxResolutionArea,
     const QList<QSize>& resolutionList,
     double* outCoefficient)
@@ -312,10 +312,10 @@ QSize Camera::getNearestResolution(
     {
 
         const double nextAspectRatio = getResolutionAspectRatio(resolutionList[i]);
-        const bool currentRatioFitsDesirable = nextAspectRatio * (1 - kEpsilon) < desirableAspectRatio
-            && desirableAspectRatio < nextAspectRatio * (1 + kEpsilon);
+        const bool currentRatioFitsDesirable = nextAspectRatio * (1 - kEpsilon) < desiredAspectRatio
+            && desiredAspectRatio < nextAspectRatio * (1 + kEpsilon);
 
-        if (desirableAspectRatio != 0 && !currentRatioFitsDesirable)
+        if (desiredAspectRatio != 0 && !currentRatioFitsDesirable)
             continue;
 
         const double square = resolutionList[i].width() * resolutionList[i].height();
@@ -335,7 +335,7 @@ QSize Camera::getNearestResolution(
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
-QSize Camera::closestResolution(
+/*static*/ QSize Camera::closestResolution(
     const QSize& idealResolution,
     float desiredAspectRatio,
     const QSize& maxResolution,
@@ -362,6 +362,23 @@ QSize Camera::closestResolution(
     }
 
     return result;
+}
+
+/*static*/ QSize Camera::closestSecondaryResolution(
+    float desiredAspectRatio,
+    const QList<QSize>& resolutionList)
+{
+    QSize selectedResolution = Camera::closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION, desiredAspectRatio,
+        SECONDARY_STREAM_MAX_RESOLUTION, resolutionList);
+
+    if (selectedResolution == EMPTY_RESOLUTION_PAIR)
+    {
+        selectedResolution = Camera::closestResolution(
+            SECONDARY_STREAM_DEFAULT_RESOLUTION, desiredAspectRatio,
+            UNLIMITED_RESOLUTION, resolutionList);
+    }
+    return selectedResolution;
 }
 
 CameraDiagnostics::Result Camera::initInternal()

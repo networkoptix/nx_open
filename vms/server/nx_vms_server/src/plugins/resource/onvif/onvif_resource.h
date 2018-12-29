@@ -348,9 +348,6 @@ public:
 
     double getClosestAvailableFps(double desiredFps);
 
-    QSize findSecondaryResolution(
-        const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
-
     static bool isCameraForcedToOnvif(
         QnResourceDataPool* dataPool,
         const QString& manufacturer, const QString& model);

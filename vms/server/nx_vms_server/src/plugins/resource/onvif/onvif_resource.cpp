@@ -988,43 +988,6 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
     }
 }
 
-QSize QnPlOnvifResource::findSecondaryResolution(
-    const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff)
-{
-    auto resData = resourceData();
-
-    auto forcedSecondaryResolution = resData.value<QString>(
-        ResourceDataKey::kForcedSecondaryStreamResolution);
-
-    if (!forcedSecondaryResolution.isEmpty())
-    {
-        auto split = forcedSecondaryResolution.split('x');
-        if (split.size() == 2)
-        {
-            QSize res;
-            res.setWidth(split[0].toInt());
-            res.setHeight(split[1].toInt());
-            return res;
-        }
-        else
-        {
-            NX_WARNING(this,
-                lm("findSecondaryResolution(): Wrong parameter format "
-                   "(ResourceDataKey::kForcedSecondaryStreamResolution) %1"),
-                forcedSecondaryResolution);
-        }
-    }
-
-    auto result = closestResolution(
-        SECONDARY_STREAM_DEFAULT_RESOLUTION,
-        getResolutionAspectRatio(primaryRes),
-        SECONDARY_STREAM_MAX_RESOLUTION,
-        secondaryResList,
-        matchCoeff);
-
-    return result;
-}
-
 const QString QnPlOnvifResource::getAudioEncoderId() const
 {
     QnMutexLocker lock(&m_mutex);
