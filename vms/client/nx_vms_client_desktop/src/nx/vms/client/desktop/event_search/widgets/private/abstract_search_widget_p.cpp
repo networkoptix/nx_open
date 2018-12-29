@@ -146,11 +146,7 @@ AbstractSearchWidget::Private::Private(
     installEventHandler(q, QEvent::Show, this, &Private::requestFetchIfNeeded);
 
     installEventHandler(q, {QEvent::Show, QEvent::Hide}, this,
-        [this, q]()
-        {
-            m_mainModel->setLivePaused(!q->isVisible());
-            updateRibbonLiveMode();
-        });
+        [this, q]() { m_mainModel->setLivePaused(!q->isVisible()); });
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setInterval(kQueuedFetchMoreDelay);
@@ -176,10 +172,31 @@ void AbstractSearchWidget::Private::setupModels()
     connect(m_mainModel.data(), &QAbstractItemModel::rowsInserted,
         this, &Private::handleItemCountChanged);
 
+    using FetchDirection = AbstractSearchListModel::FetchDirection;
+    using UpdateMode = EventRibbon::UpdateMode;
+
+    connect(m_mainModel.data(), &QAbstractItemModel::modelAboutToBeReset, this,
+        [this]() { ui->ribbon->setRemovalMode(UpdateMode::instant); });
+
+    connect(m_mainModel.data(), &QAbstractItemModel::rowsAboutToBeRemoved,
+        [this]() { ui->ribbon->setRemovalMode(UpdateMode::animated); });
+
+    connect(m_mainModel.data(), &AbstractSearchListModel::fetchCommitStarted, this,
+        [this](FetchDirection direction)
+        {
+            ui->ribbon->setInsertionMode(UpdateMode::instant, direction == FetchDirection::later);
+        });
+
+    connect(m_mainModel.data(), &AbstractSearchListModel::fetchFinished, this,
+        [this]()
+        {
+            ui->ribbon->setInsertionMode(UpdateMode::animated, false);
+            handleFetchFinished();
+        });
+
     connect(m_mainModel.data(), &AbstractSearchListModel::liveChanged, this,
         [this](bool isLive)
         {
-            updateRibbonLiveMode();
             if (isLive)
                 m_headIndicatorModel->setVisible(false);
         });
@@ -209,9 +226,6 @@ void AbstractSearchWidget::Private::setupModels()
 
     m_headIndicatorModel->setVisible(false);
     m_tailIndicatorModel->setVisible(true);
-
-    connect(m_mainModel.data(), &AbstractSearchListModel::fetchFinished,
-        this, &Private::handleFetchFinished);
 
     m_visualModel->setModels({
         m_headIndicatorModel.data(), m_mainModel.data(), m_tailIndicatorModel.data()});
@@ -803,12 +817,6 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
                 q->resourcePool(), item.mixedString, item.cameraString));
         }
     }
-}
-
-void AbstractSearchWidget::Private::updateRibbonLiveMode()
-{
-    if ((m_mainModel->isLive() || m_mainModel->rowCount() == 0) && !m_mainModel->livePaused())
-        ui->ribbon->setLive(true);
 }
 
 void AbstractSearchWidget::Private::setFetchDirection(AbstractSearchListModel::FetchDirection value)

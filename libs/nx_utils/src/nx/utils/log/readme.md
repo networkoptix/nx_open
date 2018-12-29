@@ -122,7 +122,29 @@ The following parameters are supported:
 - log/maxBackupCount={Maximum number of log files to keep}
 
 When using as command-line argument each parameter is prefixed with --. E.g., --log/logger=...
-When using in configuration file, then log/logger value should be specified as:
-
+When using a configuration file (`nx::utils::log::Settings::load(...) `) , then log/logger value should be specified as:
+```
 [log]
 logger=...
+```
+
+Alternative human-readable scheme is implemented using `QSettings` engine. It should be used by the following way: `nx::utils::log::Settings(QSettings*)`. Supported syntax is the following:
+```
+[General]
+logArchiveSize=10
+maxLogFileSize=10485760
+
+[-]
+debug=MediaPlayer|QnRtspClient
+none=::discovery::|^nx::network::|::time_sync::
+info=*
+
+[client_log]
+none=::discovery::|nx::network::
+debug=*
+```
+
+This file declares some general constants and two log outputs: console (`-`) and `client_log.log` file. Each output can contain keys for every log level. Value is the regular expression, which will be used for parsing.
+Default level is declared using the `*` value.
+
+For example, using this config will print to console every `INFO` level message except those containing `::discovery::` keyword in a tag and so on, and additionally `DEBUG` messages containing `MediaPlayer` or `QnRtspClient` keywords in their tags.
