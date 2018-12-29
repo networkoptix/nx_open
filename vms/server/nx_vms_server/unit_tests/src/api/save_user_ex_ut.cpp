@@ -11,48 +11,17 @@
 
 namespace nx::test {
 
-namespace {
-
-vms::api::UserDataEx regularUser1;
-vms::api::UserDataEx regularUser2;
-vms::api::UserDataEx newAdminUser;
-vms::api::UserDataEx defaultAdmin;
-
-void initUserData()
-{
-    regularUser1.email = "test@test.com";
-    regularUser1.fullName = "Adv";
-    regularUser1.isEnabled = true;
-    regularUser1.name = "Adv";
-    regularUser1.password = "testUserPassword";
-    regularUser1.permissions = GlobalPermission::accessAllMedia;
-
-    regularUser2.email = "test2@test.com";
-    regularUser2.fullName = "testUser2";
-    regularUser2.isEnabled = true;
-    regularUser2.name = "test_user_name2";
-    regularUser2.password = "testUserPassword2";
-    regularUser2.permissions = GlobalPermission::accessAllMedia;
-
-    newAdminUser.email = "admin@test.com";
-    newAdminUser.fullName = "testAdminUser";
-    newAdminUser.isEnabled = true;
-    newAdminUser.name = "test_admin_user_name";
-    newAdminUser.password = "testAdminPassword";
-    newAdminUser.permissions = GlobalPermission::admin;
-
-    defaultAdmin.name = "admin";
-    defaultAdmin.password = "admin";
-}
-
-} // namespace
-
 using namespace network;
 
 class SaveUserEx: public ::testing::Test
 {
 protected:
     using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
+
+    vms::api::UserDataEx regularUser1;
+    vms::api::UserDataEx regularUser2;
+    vms::api::UserDataEx newAdminUser;
+    vms::api::UserDataEx defaultAdmin;
 
     virtual void SetUp() override
     {
@@ -76,9 +45,10 @@ protected:
         const QString& newPassword,
         http::StatusCode::Value expectedCode)
     {
+        const auto accessPassword = accessUser.password;
         userToSave->password = newPassword;
         NX_TEST_API_POST(m_server.get(), "/ec2/saveUser", *userToSave, nullptr,
-            expectedCode, accessUser.name.toLower(), accessUser.password, &m_responseBuffer);
+            expectedCode, accessUser.name.toLower(), accessPassword, &m_responseBuffer);
         NX_VERBOSE(this, lm("/ex2/saveUser issued successfully, response: %1").args(m_responseBuffer));
     }
 
@@ -113,11 +83,35 @@ protected:
 
 private:
     LauncherPtr m_server;
-    vms::api::UserDataEx m_adminUser;
-    vms::api::UserDataEx m_regularUser;
-    vms::api::UserDataEx m_regularUser2;
     vms::api::UserDataList m_userDataList;
     Buffer m_responseBuffer;
+
+    void initUserData()
+    {
+        regularUser1.email = "test@test.com";
+        regularUser1.fullName = "Adv";
+        regularUser1.isEnabled = true;
+        regularUser1.name = "Adv";
+        regularUser1.password = "testUserPassword";
+        regularUser1.permissions = GlobalPermission::accessAllMedia;
+
+        regularUser2.email = "test2@test.com";
+        regularUser2.fullName = "testUser2";
+        regularUser2.isEnabled = true;
+        regularUser2.name = "test_user_name2";
+        regularUser2.password = "testUserPassword2";
+        regularUser2.permissions = GlobalPermission::accessAllMedia;
+
+        newAdminUser.email = "admin@test.com";
+        newAdminUser.fullName = "testAdminUser";
+        newAdminUser.isEnabled = true;
+        newAdminUser.name = "test_admin_user_name";
+        newAdminUser.password = "testAdminPassword";
+        newAdminUser.permissions = GlobalPermission::admin;
+
+        defaultAdmin.name = "admin";
+        defaultAdmin.password = "admin";
+    }
 };
 
 TEST_F(SaveUserEx, success)
@@ -170,7 +164,7 @@ TEST_F(SaveUserEx, shouldBeImpossibleToChangeExistingUserNameIfAnotherUserHasIt)
     whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::forbidden);
 }
 
-TEST_F(SaveUserEx, shouldPossibleToSaveSameUserTwice)
+TEST_F(SaveUserEx, shouldBePossibleToSaveSameUserTwice)
 {
     whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
@@ -180,15 +174,22 @@ TEST_F(SaveUserEx, shouldPossibleToSaveSameUserTwice)
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 }
 
-TEST_F(SaveUserEx, shouldPossibleToChangeUserPassword)
+TEST_F(SaveUserEx, shouldBePossibleToChangeUserPassword)
 {
     whenSaveUserRequestIssued(defaultAdmin, regularUser1, http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
     whenIdFilled(&regularUser1);
-    whenChangePasswordRequestIssued(defaultAdmin, &regularUser1, "new_password",
+    whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password",
         http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 
+    whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password2",
+        http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(regularUser1);
+
+    whenChangePasswordRequestIssued(regularUser1, &regularUser1, "new_password",
+        http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(regularUser1);
 }
 

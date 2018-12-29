@@ -45,7 +45,8 @@
         {
             "id": "nx.dahua.VideoAbnormalDetection",
             "name": "Scene change detection (Video abnormal detection)",
-            "internalName": "VideoAbnormalDetection",
+            "internalName": "SceneChange",
+            "_comment": "Documentation contains wrong value for internalName - VideoAbnormalDetection",
             "description": "Scene change %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
