@@ -7,7 +7,7 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
-class NX_VMS_DESKTOP_CLIENT_API ViewNode: public QEnableSharedFromThis<ViewNode>
+class NX_VMS_CLIENT_DESKTOP_API ViewNode: public QEnableSharedFromThis<ViewNode>
 {
 public:
     static NodePtr create();
