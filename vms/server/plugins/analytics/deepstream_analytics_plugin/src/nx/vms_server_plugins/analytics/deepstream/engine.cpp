@@ -32,7 +32,7 @@ using namespace nx::sdk::analytics;
 
 Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
-    if (strcmp(ini().debugDotFilesDir, "") == 0)
+    if (strcmp(ini().debugDotFilesDir, "") != 0)
     {
         NX_PRINT
             << __func__
@@ -168,7 +168,14 @@ IDeviceAgent* Engine::obtainDeviceAgent(
         << deviceInfo->uid;
 
     *outError = Error::noError;
-    return new DeviceAgent(this, std::string(deviceInfo->uid));
+
+    // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
+    // It's not a production-ready solution, but is OK for demos.
+    if (!m_deviceAgent)
+        m_deviceAgent = new DeviceAgent(this, std::string(deviceInfo->uid));
+
+    m_deviceAgent->addRef();
+    return m_deviceAgent;
 }
 
 void Engine::executeAction(Action*, Error*)

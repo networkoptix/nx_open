@@ -62,6 +62,8 @@ private:
     std::unique_ptr<
         nxpl::TimeProvider,
         std::function<void(nxpl::TimeProvider*)>> m_timeProvider;
+
+    nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;
 };
 
 } // namespace deepstream

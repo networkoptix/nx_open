@@ -51,8 +51,6 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
     gst_memory_unmap(memory, &info);
     gst_buffer_unref(buffer);
 
-    video->releaseRef();
-
     if (result != GST_FLOW_OK)
     {
         NX_PRINT << __func__ << " Error while pushing buffer";

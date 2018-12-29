@@ -23,7 +23,7 @@ DefaultPipeline::DefaultPipeline(
     const nx::gstreamer::ElementName& pipelineName,
     Engine* engine)
     :
-    base_type(pipelineName, m_engine),
+    base_type(pipelineName, engine),
     m_trackingMapper(kDefaultTrackingLifetime),
     m_objectClassDescriptions(m_engine->objectClassDescritions())
 {
