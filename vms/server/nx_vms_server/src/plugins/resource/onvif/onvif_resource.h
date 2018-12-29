@@ -94,7 +94,7 @@ struct QnOnvifServiceUrls
 
 struct OnvifIniConfig: public nx::kit::IniConfig
 {
-    OnvifIniConfig(): IniConfig("onvif.ini") {}
+    OnvifIniConfig(): IniConfig("server_onvif.ini") {}
 
     NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
         "Used in ONVIF event notification subscription.\n"
