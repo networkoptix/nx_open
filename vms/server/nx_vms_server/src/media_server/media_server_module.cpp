@@ -651,3 +651,8 @@ nx::vms::server::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
 {
     return m_hlsSessionPool;
 }
+
+QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
+{
+    return m_commonModule->storagePluginFactory();
+}

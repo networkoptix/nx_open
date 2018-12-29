@@ -25,6 +25,9 @@ MediaServerLauncher::MediaServerLauncher(
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting("noMonitorStatistics", "1");
 
+    if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
+        addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+
     m_serverGuid = QnUuid::createUuid();
     fillDefaultSettings();
 }
