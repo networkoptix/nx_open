@@ -129,7 +129,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
     m_autoCloseTimer->start();
 
-    insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
+    insertNewTiles(0, m_model->rowCount(), UpdateMode::instant, false);
 
     m_modelConnections << connect(m_model, &QObject::destroyed, this,
         [this]()
@@ -142,13 +142,13 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         [this]()
         {
             clear();
-            insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
+            insertNewTiles(0, m_model->rowCount(), UpdateMode::instant, false);
         });
 
     m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
-            insertNewTiles(first, last - first + 1, UpdateMode::animated);
+            insertNewTiles(first, last - first + 1, m_insertionMode, m_scrollDownAfterInsertion);
             NX_ASSERT(m_model->rowCount() == count());
         });
 
@@ -162,7 +162,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
     m_modelConnections << connect(m_model, &QAbstractListModel::rowsRemoved, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
-            removeTiles(first, last - first + 1, UpdateMode::animated);
+            removeTiles(first, last - first + 1, m_removalMode);
             NX_ASSERT(m_model->rowCount() == count());
         });
 
@@ -186,7 +186,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
             QnScopedValueRollback<bool> updateGuard(&m_updating, true);
             removeTiles(sourceFirst, movedCount, UpdateMode::instant);
-            insertNewTiles(index, movedCount, UpdateMode::instant);
+            insertNewTiles(index, movedCount, UpdateMode::instant, false);
 
             updateGuard.rollback();
             updateView();
@@ -482,7 +482,8 @@ int EventRibbon::Private::calculatePosition(int index) const
     return previousTile->position + previousTile->animatedHeight() + kDefaultTileSpacing;
 }
 
-void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updateMode)
+void EventRibbon::Private::insertNewTiles(
+    int index, int count, UpdateMode updateMode, bool scrollDown)
 {
     if (!m_model || count == 0)
         return;
@@ -497,11 +498,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     const auto unreadCountGuard = makeUnreadCountGuard();
     const bool viewportVisible = m_viewport->isVisible() && m_viewport->width() > 0;
 
-    // TODO: #vkutin Think how to make this magic more physical.
-    const int kThreshold = 100;
-    const int kLiveThreshold = 10;
-    const bool live = m_live && index == 0 && viewportTopPosition() < kLiveThreshold;
-    const bool scrollDown = !live && position < scrollValue() + kThreshold;
+    if (position < scrollValue())
+        scrollDown = true;
 
     if (!viewportVisible || scrollDown || (m_scrollBarRelevant && !m_visible.contains(index)))
         updateMode = UpdateMode::instant;
@@ -611,7 +609,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         }
     }
 
-    NX_VERBOSE(q, "%1 tiles inserted at position %2, new count is %3", count, index, m_tiles.size());
+    NX_VERBOSE(q, "%1 tiles inserted at position %2, new count is %3, update %4, scrollDown is %5",
+        count, index, m_tiles.size(), updateMode, scrollDown);
 
     if (m_updating)
         return;
@@ -724,7 +723,8 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     doUpdateView();
 
-    NX_VERBOSE(q, "%1 tiles removed at position %2, new count is %3", count, first, m_tiles.size());
+    NX_VERBOSE(q, "%1 tiles removed at position %2, new count is %3, updateMode %4",
+        count, first, m_tiles.size(), updateMode);
 
     if (m_updating)
         return;
@@ -750,7 +750,6 @@ void EventRibbon::Private::clear()
     m_hoveredIndex = QPersistentModelIndex();
     m_tileHovered = false;
     m_endPosition = 0;
-    m_live = true;
 
     m_endAnimation.reset();
 
@@ -978,14 +977,15 @@ void EventRibbon::Private::setHighlightedResources(const QSet<QnResourcePtr>& va
     updateHighlightedTiles();
 }
 
-bool EventRibbon::Private::live() const
+void EventRibbon::Private::setInsertionMode(UpdateMode updateMode, bool scrollDown)
 {
-    return m_live;
+    m_insertionMode = updateMode;
+    m_scrollDownAfterInsertion = scrollDown;
 }
 
-void EventRibbon::Private::setLive(bool value)
+void EventRibbon::Private::setRemovalMode(UpdateMode updateMode)
 {
-    m_live = value;
+    m_removalMode = updateMode;
 }
 
 void EventRibbon::Private::updateScrollRange()
