@@ -104,7 +104,7 @@ void QnScreenManager::updateCurrentScreens(const QWidget *widget)
     // convert size to physical pixels too.
     const int screenIndex = QApplication::desktop()->screenNumber(widget);
     const QList<QScreen*>& screens = QApplication::screens();
-    if (screenIndex < screens.size())
+    if (screenIndex >= 0 && screenIndex < screens.size())
         m_geometry.setSize(m_geometry.size() * screens[screenIndex]->devicePixelRatio());
 
     m_refreshDelayTimer->start();
