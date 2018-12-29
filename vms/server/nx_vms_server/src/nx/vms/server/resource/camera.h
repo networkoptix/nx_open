@@ -126,7 +126,7 @@ public:
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
 
-    static QSize Camera::closestSecondaryResolution(
+    static QSize closestSecondaryResolution(
         float desiredAspectRatio,
         const QList<QSize>& resolutionList);
 
