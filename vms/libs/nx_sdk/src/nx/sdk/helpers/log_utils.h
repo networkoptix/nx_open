@@ -3,8 +3,6 @@
 #include <map>
 #include <string>
 
-#include <plugins/plugin_api.h>
-
 namespace nx { namespace sdk { class IStringMap; } }
 
 namespace nx {
@@ -28,8 +26,8 @@ struct LogUtils
     const bool enableOutput;
     const std::string printPrefix;
 
-    LogUtils(bool enableOutput, const std::string& printPrefix):
-        enableOutput(enableOutput), printPrefix(printPrefix)
+    LogUtils(bool enableOutput, std::string printPrefix):
+        enableOutput(enableOutput), printPrefix(std::move(printPrefix))
     {
     }
 
@@ -41,7 +39,7 @@ struct LogUtils
      */
     bool convertAndOutputStringMap(
         std::map<std::string, std::string>* outMap,
-        const nx::sdk::IStringMap* stringMap,
+        const IStringMap* stringMap,
         const std::string& caption,
         int outputIndent = 0) const;
 };
