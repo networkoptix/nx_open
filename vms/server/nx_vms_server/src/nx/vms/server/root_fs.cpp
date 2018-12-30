@@ -18,8 +18,7 @@
     #define ssize_t SSIZE_T
 #endif
 
-namespace nx {
-namespace vms::server {
+namespace nx::vms::server {
 
 namespace {
 
@@ -431,6 +430,5 @@ std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
     return std::make_unique<RootFileSystem>(isRootToolUsed);
 }
 
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server
 

@@ -589,5 +589,5 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
 void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
 {
     d_ptr->partitionsInfoProvider.reset(
-        new nx::vms::server::fs::PartitionsInformationProvider(serverModule));
+        new nx::vms::server::fs::PartitionsInformationProvider(serverModule->rootFileSystem()));
 }
