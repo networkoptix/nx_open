@@ -26,16 +26,14 @@ static QByteArray osReleaseContents()
 
 QString SystemInformation::currentSystemRuntime()
 {
-    const auto contents = osReleaseContents();
-    const QString kPrettyNameKey = "PRETTY_NAME";
-
-    return contents.contains(kPrettyNameKey)
-        ? contents[kPrettyNameKey] : "GNU/Linux without /etc/os-release";
+    const auto prettyName = osReleaseContentsValueByKey(osReleaseContents(), "pretty_name");
+    return prettyName.isEmpty() ? "GNU/Linux without /etc/os-release" : prettyName;
 }
 
 QString SystemInformation::runtimeOsVersion()
 {
-    return ubuntuVersionFromOsReleaseContents(osReleaseContents());
+    return ubuntuVersionFromCodeName(
+        osReleaseContentsValueByKey(osReleaseContents(), "ubuntu_codename"));
 }
 
 } // namespace nx::vms::api

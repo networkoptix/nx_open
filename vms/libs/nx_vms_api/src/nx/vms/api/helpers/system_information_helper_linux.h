@@ -4,6 +4,7 @@
 
 namespace nx::vms::api {
 
-QString ubuntuVersionFromOsReleaseContents(const QByteArray& osReleaseContents);
+QString ubuntuVersionFromCodeName(const QString& codeName);
+QString osReleaseContentsValueByKey(const QByteArray& osReleaseContents, const QString& key);
 
 } // namespace nx::vms::api
