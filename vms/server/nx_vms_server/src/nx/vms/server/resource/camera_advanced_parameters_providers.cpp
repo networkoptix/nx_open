@@ -578,16 +578,9 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
     for (const auto& option: recomendedOptions)
         supportedResolutions.push_back(option.resolution);
 
-    QSize selectedResolution = Camera::closestResolution(
-        SECONDARY_STREAM_DEFAULT_RESOLUTION, Camera::getResolutionAspectRatio(baseResolution),
-        SECONDARY_STREAM_MAX_RESOLUTION, supportedResolutions);
-
-    if (selectedResolution == EMPTY_RESOLUTION_PAIR)
-    {
-        selectedResolution = Camera::closestResolution(
-            SECONDARY_STREAM_DEFAULT_RESOLUTION, Camera::getResolutionAspectRatio(baseResolution),
-            UNLIMITED_RESOLUTION, supportedResolutions);
-    }
+    QSize selectedResolution = Camera::closestSecondaryResolution(
+        Camera::getResolutionAspectRatio(baseResolution),
+        supportedResolutions);
 
     for (const auto& option: recomendedOptions)
     {

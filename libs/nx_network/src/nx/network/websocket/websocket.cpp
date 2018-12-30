@@ -21,8 +21,12 @@ WebSocket::WebSocket(
     m_serializer(role == Role::client),
     m_sendMode(sendMode),
     m_receiveMode(receiveMode),
+    m_isLastFrame(false),
+    m_isFirstFrame(true),
     m_pingTimer(new nx::network::aio::Timer),
+    m_aliveTimer(new nx::network::aio::Timer),
     m_aliveTimeout(kAliveTimeout),
+    m_lastError(SystemError::noError),
     m_frameType(
         frameType == FrameType::binary || frameType == FrameType::text
             ? frameType
@@ -32,6 +36,7 @@ WebSocket::WebSocket(
     m_socket->setSendTimeout(0);
     aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
+    m_aliveTimer->bindToAioThread(m_socket->getAioThread());
     m_readBuffer.reserve(4096);
 }
 
@@ -48,6 +53,7 @@ WebSocket::WebSocket(
 {
 }
 
+
 WebSocket::~WebSocket()
 {
     pleaseStopSync();
@@ -55,72 +61,8 @@ WebSocket::~WebSocket()
 
 void WebSocket::start()
 {
-    m_pingTimer->start( pingTimeout(), [this]() { onPingTimer(); });
-    m_socket->readSomeAsync(
-        &m_readBuffer,
-        [this](SystemError::ErrorCode error, size_t transferred)
-        {
-            onRead(error, transferred);
-        });
-}
-
-void WebSocket::onPingTimer()
-{
-    sendControlRequest(FrameType::ping);
-    m_pingTimer->start(pingTimeout(), [this]() { onPingTimer(); });
-}
-
-void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
-{
-    if (m_failed)
-    {
-        if (m_userReadPair)
-            callOnReadhandler(SystemError::connectionAbort, 0);
-        return;
-    }
-
-    if (ecode != SystemError::noError || transferred == 0)
-    {
-        m_failed = true;
-        if (m_userReadPair)
-            callOnReadhandler(SystemError::connectionAbort, 0);
-        return;
-    }
-
-    m_parser.consume(m_readBuffer.data(), (int)transferred);
-    if (m_failed) //< Might be set while parsing
-    {
-        if (m_userReadPair)
-            callOnReadhandler(SystemError::connectionAbort, 0);
-        return;
-    }
-
-    m_readBuffer.resize(0);
-    m_readBuffer.reserve(4096);
-
-    if (m_incomingMessageQueue.readySize() != 0 && m_userReadPair)
-    {
-        const auto incomingMessage = m_incomingMessageQueue.popFront();
-        *(m_userReadPair->second) = incomingMessage;
-        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-        callOnReadhandler(SystemError::noError, incomingMessage.size());
-        if (watcher.objectDestroyed())
-            return;
-        m_userReadPair.reset();
-    }
-
-    m_socket->readSomeAsync(
-        &m_readBuffer,
-        [this](SystemError::ErrorCode error, size_t transferred)
-        {
-            onRead(error, transferred);
-        });
-}
-
-void WebSocket::callOnReadhandler(SystemError::ErrorCode error, size_t transferred)
-{
-    auto cb = std::move(m_userReadPair->first);
-    cb(error, transferred);
+    m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
+    m_aliveTimer->start(m_aliveTimeout, [this]() { handleAliveTimer(); });
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -128,6 +70,7 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     AbstractAsyncChannel::bindToAioThread(aioThread);
     m_socket->bindToAioThread(aioThread);
     m_pingTimer->bindToAioThread(aioThread);
+    m_aliveTimer->bindToAioThread(aioThread);
 }
 
 std::chrono::milliseconds WebSocket::pingTimeout() const
@@ -136,9 +79,18 @@ std::chrono::milliseconds WebSocket::pingTimeout() const
     return std::chrono::milliseconds(timeoutMs);
 }
 
+void WebSocket::restartTimers()
+{
+    m_pingTimer->cancelSync();
+    m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
+    m_aliveTimer->cancelSync();
+    m_aliveTimer->start(m_aliveTimeout, [this]() { handleAliveTimer(); });
+}
+
 void WebSocket::stopWhileInAioThread()
 {
     m_pingTimer.reset();
+    m_aliveTimer.reset();
     m_socket.reset();
 }
 
@@ -147,34 +99,127 @@ void WebSocket::setIsLastFrame()
     dispatch([this]() { m_isLastFrame = true; });
 }
 
+void WebSocket::reportErrorIfAny(
+    SystemError::ErrorCode ecode,
+    size_t bytesRead,
+    std::function<void(bool)> continueHandler)
+{
+    if (ecode != SystemError::noError)
+        m_lastError = ecode;
+
+    if (m_lastError != SystemError::noError || bytesRead == 0)
+    {
+        NX_DEBUG(this, lm("Reporting error %1, read queue empty: %2").args(
+            m_lastError, m_readQueue.empty()));
+
+        if (!m_readQueue.empty())
+        {
+            auto readData = m_readQueue.pop();
+            readData.handler(m_lastError, bytesRead);
+        }
+        continueHandler(true);
+        return;
+    }
+
+    continueHandler(false); //< No error
+}
+
+void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
+{
+    reportErrorIfAny(
+        ecode,
+        bytesRead,
+        [this, bytesRead](bool errorOccured)
+        {
+            if (errorOccured)
+                return;
+
+            restartTimers();
+            m_parser.consume(m_readBuffer.data(), (int)bytesRead);
+            m_readBuffer.resize(0);
+
+            reportErrorIfAny(
+                m_lastError,
+                bytesRead,
+                [this](bool errorOccured)
+                {
+                    if (errorOccured)
+                        return;
+
+                    processReadData();
+                });
+        });
+}
+
+void WebSocket::processReadData()
+{
+    if (m_userDataBuffer.readySize() == 0)
+    {
+        NX_VERBOSE(this, "User buffer is not ready. Continue reading.");
+        m_socket->readSomeAsync(
+            &m_readBuffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesRead)
+            {
+                handleSocketRead(ecode, bytesRead);
+            });
+        return;
+    }
+
+    NX_ASSERT(!m_readQueue.empty());
+    auto readData = m_readQueue.pop();
+    bool queueEmpty = m_readQueue.empty();
+    auto handoutBuffer = m_userDataBuffer.popFront();
+
+    NX_VERBOSE(this, lm("processReadData(): user data size: %1").arg(handoutBuffer.size()));
+
+    readData.buffer->append(handoutBuffer);
+    readData.handler(SystemError::noError, handoutBuffer.size());
+    if (queueEmpty)
+        return;
+    readWithoutAddingToQueue();
+}
+
+void WebSocket::readWithoutAddingToQueue()
+{
+    post([this]() { readWithoutAddingToQueueSync(); });
+}
+
+void WebSocket::readWithoutAddingToQueueSync()
+{
+    if (m_userDataBuffer.readySize() != 0)
+    {
+        processReadData();
+    }
+    else
+    {
+        m_socket->readSomeAsync(
+            &m_readBuffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesRead)
+            {
+                handleSocketRead(ecode, bytesRead);
+            });
+    }
+}
+
 void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_failed)
+            if (socketCannotRecoverFromError(m_lastError))
             {
-                NX_DEBUG(
-                    this,
+                NX_DEBUG(this,
                     "readSomeAsync called after connection has been terminated. Ignoring.");
-                handler(SystemError::connectionAbort, 0);
+                handler(m_lastError, 0);
                 return;
             }
 
-            NX_ASSERT(
-                !m_userReadPair,
-                "Read operation has been queued before previous handler fired");
-
-            if (m_incomingMessageQueue.readySize() != 0)
-            {
-                const auto incomingMessage = m_incomingMessageQueue.popFront();
-                *buffer = incomingMessage;
-                utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-                handler(SystemError::noError, incomingMessage.size());
-                return;
-            }
-
-            m_userReadPair.reset(new UserReadPair(std::move(handler), buffer));
+            bool queueEmpty = m_readQueue.empty();
+            nx::Buffer* tmp = buffer;
+            m_readQueue.emplace(std::move(handler), std::move(tmp));
+            NX_ASSERT(queueEmpty);
+            if (queueEmpty)
+                readWithoutAddingToQueueSync();
         });
 }
 
@@ -183,12 +228,11 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            if (m_failed)
+            if (socketCannotRecoverFromError(m_lastError))
             {
-                NX_DEBUG(
-                    this,
+                NX_DEBUG(this,
                     "sendAsync called after connection has been terminated. Ignoring.");
-                handler(SystemError::connectionAbort, 0);
+                handler(m_lastError, 0);
                 return;
             }
 
@@ -207,8 +251,19 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
                     m_isLastFrame = false;
             }
 
-            sendMessage(writeBuffer, std::move(handler));
+            sendPreparedMessage(&writeBuffer, buffer.size(), std::move(handler));
         });
+}
+
+void WebSocket::handlePingTimer()
+{
+    sendControlRequest(FrameType::ping);
+    m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
+}
+
+void WebSocket::handleAliveTimer()
+{
+    post([this]() { handleSocketRead(SystemError::timedOut, 0); });
 }
 
 void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
@@ -218,77 +273,69 @@ void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
 
 void WebSocket::sendCloseAsync()
 {
-    post([this]() { sendControlRequest(FrameType::close); });
+    post(
+        [this]()
+        {
+            sendControlRequest(FrameType::close);
+            reportErrorIfAny(SystemError::connectionAbort, 0, [](bool) {});
+        });
 }
 
-void WebSocket::sendMessage(const nx::Buffer& message, IoCompletionHandler handler)
+void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSent*/)
 {
-    m_writeQueue.emplace(std::move(handler), message);
-    if (m_writeQueue.size() == 1)
+    if (m_writeQueue.empty())
     {
-        m_socket->sendAsync(
-            m_writeQueue.front().second,
-            [this](SystemError::ErrorCode error, size_t transferred)
-            {
-                onWrite(error, transferred);
-            });
-    }
-}
-
-void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
-{
-    if (m_failed)
-    {
-        while (!m_writeQueue.empty())
-        {
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-            callOnWriteHandler(SystemError::connectionAbort, 0);
-            if (watcher.objectDestroyed())
-                return;
-        }
+        NX_VERBOSE(this, "write queue is empty");
+        return; // might be the case on object destruction
     }
 
-    if (error != SystemError::noError || transferred == 0)
+    auto writeData = m_writeQueue.pop();
+    bool queueEmpty = m_writeQueue.empty();
     {
-        m_failed = true;
-        while (!m_writeQueue.empty())
-        {
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-            callOnWriteHandler(SystemError::connectionAbort, 0);
-            if (watcher.objectDestroyed())
-                return;
-        }
-    }
-    else
-    {
-        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-        callOnWriteHandler(SystemError::noError, transferred);
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        if (writeData.handler)
+            writeData.handler(ecode, writeData.buffer.writeSize);
         if (watcher.objectDestroyed())
             return;
-
-        if (!m_writeQueue.empty())
-        {
-            m_socket->sendAsync(
-                m_writeQueue.front().second,
-                [this](SystemError::ErrorCode error, size_t transferred)
-                {
-                    onWrite(error, transferred);
-                });
-        }
     }
+    if (!queueEmpty)
+        m_socket->sendAsync(
+            m_writeQueue.first().buffer.buffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesSent)
+            {
+                handleSocketWrite(ecode, bytesSent);
+            });
 }
 
-void WebSocket::callOnWriteHandler(SystemError::ErrorCode error, size_t transferred)
+void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoCompletionHandler handler)
 {
-    const auto userWritePair = std::move(m_writeQueue.front());
-    m_writeQueue.pop();
-    userWritePair.first(error, transferred);
+    WriteData writeData(std::move(*buffer), writeSize);
+    bool queueEmpty = m_writeQueue.empty();
+    m_writeQueue.emplace(std::move(handler), std::move(writeData));
+    if (queueEmpty)
+        m_socket->sendAsync(
+            m_writeQueue.first().buffer.buffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesSent)
+            {
+                handleSocketWrite(ecode, bytesSent);
+            });
 }
 
 void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    m_pingTimer->cancelSync();
-    m_socket->cancelIOSync(eventType);
+    nx::utils::promise<void> p;
+    auto f = p.get_future();
+
+    dispatch(
+        [this, eventType, p = std::move(p)] ()
+        {
+            m_pingTimer->cancelSync();
+            m_aliveTimer->cancelSync();
+            m_socket->cancelIOSync(eventType);
+
+        });
+
+    f.wait();
 }
 
 bool WebSocket::isDataFrame() const
@@ -312,9 +359,10 @@ void WebSocket::framePayload(const char* data, int len)
         return;
     }
 
-    m_incomingMessageQueue.append(data, len);
+    m_userDataBuffer.append(data, len);
+
     if (m_receiveMode == ReceiveMode::stream)
-        m_incomingMessageQueue.lock();
+        m_userDataBuffer.lock();
 }
 
 void WebSocket::frameEnded()
@@ -326,7 +374,7 @@ void WebSocket::frameEnded()
     if (m_parser.frameType() == FrameType::ping)
     {
         NX_VERBOSE(this, "Ping received.");
-        sendControlResponse(FrameType::pong);
+        sendControlResponse(FrameType::ping, FrameType::pong);
         return;
     }
 
@@ -339,9 +387,19 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::close)
     {
-        NX_DEBUG(this, "Received close request, responding and terminating.");
-        m_failed = true;
-        sendControlResponse(FrameType::close);
+        if (m_lastError == SystemError::noError)
+        {
+            NX_DEBUG(this, "Received close request, responding and terminating.");
+            sendControlResponse(FrameType::close, FrameType::close);
+            m_lastError = SystemError::connectionAbort;
+            return;
+        }
+        else
+        {
+            NX_DEBUG(this, "Received close response, terminating.");
+            NX_ASSERT(m_controlBuffer.isEmpty());
+        }
+
         return;
     }
 
@@ -355,24 +413,36 @@ void WebSocket::frameEnded()
     if (m_receiveMode != ReceiveMode::frame)
         return;
 
-    m_incomingMessageQueue.lock();
+    m_userDataBuffer.lock();
 }
 
-void WebSocket::sendControlResponse(FrameType type)
+void WebSocket::sendControlResponse(FrameType requestType, FrameType responseType)
 {
     nx::Buffer responseFrame;
-    m_serializer.prepareMessage(m_controlBuffer, type, &responseFrame);
+    m_serializer.prepareMessage(m_controlBuffer, responseType, &responseFrame);
+    auto writeSize = m_controlBuffer.size();
     m_controlBuffer.resize(0);
 
-    sendMessage(
-        responseFrame,
-        [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
+    sendPreparedMessage(
+        &responseFrame,
+        writeSize,
+        [this, requestType](SystemError::ErrorCode ecode, size_t)
         {
-            NX_VERBOSE(
-                this,
-                lm("Control response %1 has been sent. Result: %2").args(
-                    frameTypeString(type),
-                    error));
+            reportErrorIfAny(
+                ecode,
+                1, //< just not zero
+                [this, requestType](bool errorOccured)
+                {
+                    if (errorOccured)
+                    {
+                        NX_VERBOSE(this, lm("Control response for %1 failed.").arg(
+                            frameTypeString(requestType)));
+                        return;
+                    }
+
+                    NX_VERBOSE(this, lm("Control response for %1 successfully sent.").arg(
+                        frameTypeString(requestType)));
+                });
         });
 }
 
@@ -381,15 +451,26 @@ void WebSocket::sendControlRequest(FrameType type)
     nx::Buffer requestFrame;
     m_serializer.prepareMessage("", type, &requestFrame);
 
-    sendMessage(
-        requestFrame,
-        [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
+    sendPreparedMessage(
+        &requestFrame,
+        0,
+        [this, type](SystemError::ErrorCode ecode, size_t)
         {
-            NX_VERBOSE(
-                this,
-                lm("Control request %1 has been sent. Result: %2").args(
-                    frameTypeString(type),
-                    error));
+            reportErrorIfAny(
+                ecode,
+                1, //< just not zero
+                [this, type](bool errorOccured)
+                {
+                    if (errorOccured)
+                    {
+                        NX_VERBOSE(this, lm("Control request for %1 failed.").arg(
+                            frameTypeString(type)));
+                        return;
+                    }
+
+                    NX_VERBOSE(this, lm("Control request for %1 successfully sent.").arg(
+                        frameTypeString(type)));
+                });
         });
 }
 
@@ -408,13 +489,14 @@ void WebSocket::messageEnded()
     }
 
     NX_VERBOSE(this, "Message ended, LOCKING user data.");
-    m_incomingMessageQueue.lock();
+    m_userDataBuffer.lock();
 }
 
 void WebSocket::handleError(Error err)
 {
     NX_DEBUG(this, lm("Parse error %1. Closing connection.").arg((int) err));
-    m_failed = true;
+    sendControlRequest(FrameType::close);
+    m_lastError = SystemError::connectionAbort;
 }
 
 QString frameTypeString(FrameType type)

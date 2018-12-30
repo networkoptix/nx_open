@@ -94,7 +94,7 @@ struct QnOnvifServiceUrls
 
 struct OnvifIniConfig: public nx::kit::IniConfig
 {
-    OnvifIniConfig(): IniConfig("onvif.ini") {}
+    OnvifIniConfig(): IniConfig("server_onvif.ini") {}
 
     NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
         "Used in ONVIF event notification subscription.\n"
@@ -347,9 +347,6 @@ public:
         Qn::ConnectionRole role);
 
     double getClosestAvailableFps(double desiredFps);
-
-    QSize findSecondaryResolution(
-        const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
     static bool isCameraForcedToOnvif(
         QnResourceDataPool* dataPool,
@@ -612,7 +609,6 @@ private:
     QString m_onvifNotificationSubscriptionReference;
 
     QElapsedTimer m_pullMessagesResponseElapsedTimer;
-    qint64 m_previousPullMessagesResponseTimeMs;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;

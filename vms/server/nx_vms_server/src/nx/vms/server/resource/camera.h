@@ -109,7 +109,7 @@ public:
      */
     static QSize getNearestResolution(
         const QSize& resolution,
-        float desirableAspectRatio,
+        float desiredAspectRatio,
         double maxResolutionArea,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
@@ -125,6 +125,10 @@ public:
         const QSize& maxResolution,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
+
+    static QSize closestSecondaryResolution(
+        float desiredAspectRatio,
+        const QList<QSize>& resolutionList);
 
     class AdvancedParametersProvider
     {
