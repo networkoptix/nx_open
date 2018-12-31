@@ -181,7 +181,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
 void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
     post(
-        [this, &buffer, handler = std::move(handler)]() mutable
+        [this, buffer, handler = std::move(handler)]() mutable
         {
             if (m_failed)
             {
