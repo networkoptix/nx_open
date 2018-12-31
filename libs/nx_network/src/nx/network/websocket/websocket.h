@@ -103,7 +103,7 @@ private:
     /** Own helper functions*/
     void processReadData();
     bool isDataFrame() const;
-    void sendMessage(const nx::Buffer& message, IoCompletionHandler handler);
+    void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);
     void readWithoutAddingToQueueSync();

@@ -207,7 +207,7 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
                     m_isLastFrame = false;
             }
 
-            sendMessage(writeBuffer, std::move(handler));
+            sendMessage(writeBuffer, buffer.size(), std::move(handler));
         });
 }
 
@@ -221,16 +221,16 @@ void WebSocket::sendCloseAsync()
     post([this]() { sendControlRequest(FrameType::close); });
 }
 
-void WebSocket::sendMessage(const nx::Buffer& message, IoCompletionHandler handler)
+void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler)
 {
     m_writeQueue.emplace(std::move(handler), message);
     if (m_writeQueue.size() == 1)
     {
         m_socket->sendAsync(
             m_writeQueue.front().second,
-            [this](SystemError::ErrorCode error, size_t transferred)
+            [this, writeSize](SystemError::ErrorCode error, size_t transferred)
             {
-                onWrite(error, transferred);
+                onWrite(error, transferred == 0 ? 0 : writeSize);
             });
     }
 }
@@ -366,6 +366,7 @@ void WebSocket::sendControlResponse(FrameType type)
 
     sendMessage(
         responseFrame,
+        responseFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
         {
             NX_VERBOSE(
@@ -383,6 +384,7 @@ void WebSocket::sendControlRequest(FrameType type)
 
     sendMessage(
         requestFrame,
+        requestFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
         {
             NX_VERBOSE(
