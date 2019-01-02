@@ -3,10 +3,10 @@
     'use strict';
     
     angular.module('nxCommon')
-        .directive('timeline', ['$interval', '$timeout', 'animateScope', '$q', 'configService',
-            function ($interval, $timeout, animateScope, $q, configService) {
-                
-                const CONFIG = configService.config;
+        .directive('timeline', ['$interval', '$timeout', 'animateScope', '$q', 'nxConfigService',
+            function ($interval, $timeout, animateScope, $q, nxConfigService) {
+            
+                const CONFIG = nxConfigService.getConfig();
                 
                 return {
                     restrict: 'E',
