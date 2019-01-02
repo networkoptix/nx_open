@@ -1,8 +1,8 @@
 Olá {{message.userFullName}},
 
-  Por favor, clique no botão abaixo para confirmar o seu endereço de e-mail e activar a conta.
+  Por favor, clique no botão abaixo para confirmar o seu endereço de e-mail e ativar a conta.
 
 {{config.portal_url}}/activar/{{message.code}}
 
 Se você não se registou em %PRODUCT_NAME%, ignore este e-mail.
-Não partilhe esta mensagem ou o link com ninguém.
+Não compartilhe esta mensagem ou o link com ninguém.

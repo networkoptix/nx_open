@@ -13,7 +13,7 @@
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">Create account</h1>
+        <h1 ng-if="!session.fromClient">Criar Conta</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -35,7 +35,7 @@
         </div>
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
-                <label for="lastName"  class="text-left text-md-right control-label">Apelido</label>
+                <label for="lastName"  class="text-left text-md-right control-label">Sobrenome</label>
             </div>
             <div class="col-md-4">
                 <input type="text" class="form-control"
@@ -43,7 +43,7 @@
                        required name="lastName" autocomplete="off">
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">O apelido é obrigatório</span>
+                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">O sobrenome é obrigatório</span>
             </div>
         </div>
         <div class="form-group row" validate-field>

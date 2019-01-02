@@ -8,13 +8,13 @@
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success && !loading">
-            A conta já está activada ou o código de confirmação está incorreto
+            A conta já está ativada ou o código de confirmação está incorreto
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            A sua conta foi activada com sucesso
+            A sua conta foi ativada com sucesso
         </h1>
         <h1 class="process-success">
             <a class="btn btn-default" href="/login">Iniciar sessão</a>
@@ -24,8 +24,8 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>Você registou em %PRODUCT_NAME%</h1>
-            <p>Enviámos uma carta com o link de activação para {{data.email}}. <br>
-                Por favor, active a sua conta visitando este link.</p>
+            <p>Enviamos uma carta com o link de ativação para {{data.email}}. <br>
+                Por favor, ative a sua conta visitando este link.</p>
         </div>
         <h1 ng-if="!data.email">Ative sua conta</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
