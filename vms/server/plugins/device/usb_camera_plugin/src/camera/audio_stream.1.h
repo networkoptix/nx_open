@@ -1,8 +1,9 @@
 #pragma once
 
 #include "audio_common.h"
-#if defined(AUDIO_STREAM)
+#ifdef AUDIO_STREAM_1
 
+#include <deque>
 #include <memory>
 #include <string>
 #include <vector>
@@ -28,7 +29,7 @@ namespace usb_cam {
 
 class Camera;
 
-class AudioStream
+class AudioStream1
 {
 private:
     class AudioStreamPrivate
@@ -77,22 +78,29 @@ private:
 
         AdtsInjector m_adtsInjector;
 
+        mutable std::mutex m_resampleBufferMutex;
+        std::deque<std::shared_ptr<ffmpeg::Packet>> m_resampleBuffer;
+        std::thread m_resampleThread;
+
     private:
         std::string ffmpegUrlPlatformDependent() const;
-        bool waitForConsumers();
-        int initialize();
+        bool noConsumers() const;
+        std::shared_ptr<ffmpeg::Packet> popNextPacket();
+        void thisThreadSleep();
+        int initializeResampler();
         void uninitialize();
-        bool ensureInitialized();
+        bool ensureFormatInitialized();
+        bool ensureResamplerInitialized();
         int initializeInputFormat();
         int initializeDecoder();
         int initializeEncoder();
         int initializeResampledFrame();
         int initalizeResampleContext(const ffmpeg::Frame * frame);
-        int decodeNextFrame(ffmpeg::Frame * outFrame);
+        int decodeNextFrame(ffmpeg::Frame * frame);
         int resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame);
         std::chrono::milliseconds resampleDelay() const;
         int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
-        std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
+        int resampleAudio(ffmpeg::Packet * output);
         uint64_t calculateTimestamp(int64_t duration);
 
         std::chrono::milliseconds timePerVideoFrame() const;
@@ -103,12 +111,15 @@ private:
         void tryToStartIfNotStarted();
         void start();
         void stop();
-        void run();
+        void runAudioCaptureThread();
+        void runResampleThread();
+
+        int readFrame(ffmpeg::Packet * packet);
     };
 
 public:
-    AudioStream(const std::string url, const std::weak_ptr<Camera>& camera, bool enabled);
-    ~AudioStream() = default;
+    AudioStream1(const std::string url, const std::weak_ptr<Camera>& camera, bool enabled);
+    ~AudioStream1() = default;
 
     void setEnabled(bool enabled);
     bool enabled() const;
@@ -128,4 +139,4 @@ private:
 } //namespace usb_cam
 } //namespace nx
 
-#endif
+#endif // AUDIO_STREAM_1

@@ -7,7 +7,15 @@
 #include <plugins/plugin_container_api.h>
 
 #include "video_stream.h"
+
+#include "audio_common.h"
+#if defined(AUDIO_STREAM)
 #include "audio_stream.h"
+#endif
+#if defined(AUDIO_STREAM_1)
+#include "audio_stream.1.h"
+#define AudioStream AudioStream1
+#endif
 
 #include "device/video/resolution_data.h"
 #include "device/abstract_compression_type_descriptor.h"

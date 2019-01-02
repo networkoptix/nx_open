@@ -1,5 +1,7 @@
-#include "audio_stream.h"
-#if defined (AUDIO_STREAM)
+#include "audio_common.h"
+#if defined(AUDIO_STREAM_1)
+
+#include "audio_stream.1.h"
 
 #include <algorithm>
 
@@ -36,7 +38,7 @@ static const char * ffmpegDeviceTypePlatformDependent()
 //-------------------------------------------------------------------------------------------------
 // AudioStreamPrivate
 
-AudioStream::AudioStreamPrivate::AudioStreamPrivate(
+AudioStream1::AudioStreamPrivate::AudioStreamPrivate(
     const std::string& url,
     const std::weak_ptr<Camera>& camera,
     const std::shared_ptr<PacketConsumerManager>& packetConsumerManager)
@@ -51,23 +53,23 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
         tryToStartIfNotStarted();
 }
 
-AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
+AudioStream1::AudioStreamPrivate::~AudioStreamPrivate()
 {
     stop();
     m_timeProvider->releaseRef();
 }
 
-bool AudioStream::AudioStreamPrivate::pluggedIn() const
+bool AudioStream1::AudioStreamPrivate::pluggedIn() const
 {
     return device::audio::pluggedIn(m_url);
 }
 
-bool AudioStream::AudioStreamPrivate::ioError() const
+bool AudioStream1::AudioStreamPrivate::ioError() const
 {
     return m_ioError;
 }
 
-void AudioStream::AudioStreamPrivate::addPacketConsumer(
+void AudioStream1::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
@@ -79,7 +81,7 @@ void AudioStream::AudioStreamPrivate::addPacketConsumer(
     tryToStartIfNotStarted();
 }
 
-void AudioStream::AudioStreamPrivate::removePacketConsumer(
+void AudioStream1::AudioStreamPrivate::removePacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
@@ -89,7 +91,7 @@ void AudioStream::AudioStreamPrivate::removePacketConsumer(
     m_wait.notify_all();
 }
 
-std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
+std::string AudioStream1::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 {
 #ifdef _WIN32
     static const std::string kWindowsAudioPrefix = "audio=";
@@ -108,35 +110,33 @@ std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 #endif
 }
 
-bool AudioStream::AudioStreamPrivate::waitForConsumers()
-{
-    bool wait;
-    {
-        std::lock_guard<std::mutex> lockGuard(m_mutex);
-        wait = m_packetConsumerManager->empty();
-    }
-    if (wait)
-        uninitialize(); //< Don't stream the camera if there are no consumers.
-    
-    // Check again if there are no consumers. They could have been added during uninitialize().
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if(m_packetConsumerManager->empty())
-    {
-        m_wait.wait(
-            lock, 
-            [&]() { return m_terminated || !m_packetConsumerManager->empty(); });
-        return !m_terminated;
-    }
-
-    return true;
+bool AudioStream1::AudioStreamPrivate::noConsumers() const
+{    
+    std::lock_guard<std::mutex> lockGuard(m_mutex);
+    return m_packetConsumerManager->empty();
 }
 
-int AudioStream::AudioStreamPrivate::initialize()
+std::shared_ptr<ffmpeg::Packet> AudioStream1::AudioStreamPrivate::popNextPacket()
 {
-    m_initCode = initializeInputFormat();
-    if (m_initCode < 0) 
-        return m_initCode;
+    std::lock_guard<std::mutex> lock(m_resampleBufferMutex);
 
+    if (m_resampleBuffer.empty())
+        return nullptr;
+
+    auto packet = m_resampleBuffer.front();
+    m_resampleBuffer.pop_front();
+
+    return packet;
+}
+
+void AudioStream1::AudioStreamPrivate::thisThreadSleep()
+{
+    static const std::chrono::milliseconds kSleep = std::chrono::milliseconds(1);
+    std::this_thread::sleep_for(kSleep);
+}
+
+int AudioStream1::AudioStreamPrivate::initializeResampler()
+{
     m_initCode = initializeDecoder();
     if (m_initCode < 0)
         return m_initCode;
@@ -159,21 +159,10 @@ int AudioStream::AudioStreamPrivate::initialize()
     return 0;
 }
 
-void AudioStream::AudioStreamPrivate::uninitialize()
+void AudioStream1::AudioStreamPrivate::uninitialize()
 {
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->flush();
-    }
+    m_inputFormat.reset(nullptr);
 
-    while (*m_packetCount > 0)
-    {
-        static constexpr std::chrono::milliseconds kSleep(30);
-        std::this_thread::sleep_for(kSleep);
-    }
-
-    if (m_decoder)
-        m_decoder->flush();
     m_decoder.reset(nullptr);
 
     if (m_resampleContext)
@@ -185,18 +174,32 @@ void AudioStream::AudioStreamPrivate::uninitialize()
 
     m_adtsInjector.uninitialize();
 
-    m_inputFormat.reset(nullptr);
-
     m_initialized = false;
 }
 
-bool AudioStream::AudioStreamPrivate::ensureInitialized()
+bool AudioStream1::AudioStreamPrivate::ensureFormatInitialized()
 {
-    if(!m_initialized)
+    if(!m_inputFormat)
     {
-        m_initCode = initialize();
+        m_initCode = initializeInputFormat();
         checkIoError(m_initCode);
         if(m_initCode < 0)
+        {
+            setLastError(m_initCode);
+            if (m_ioError)
+                terminate();
+        }
+    }
+    return m_inputFormat != nullptr;
+}
+
+bool AudioStream1::AudioStreamPrivate::ensureResamplerInitialized()
+{
+    if (!m_initialized)
+    {
+        m_initCode = initializeResampler();
+        checkIoError(m_initCode);
+        if (m_initCode < 0)
         {
             setLastError(m_initCode);
             if (m_ioError)
@@ -206,7 +209,7 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
     return m_initialized;
 }
 
-int AudioStream::AudioStreamPrivate::initializeInputFormat()
+int AudioStream1::AudioStreamPrivate::initializeInputFormat()
 {
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
     int result = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
@@ -233,7 +236,7 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     return 0;
 }
 
-int AudioStream::AudioStreamPrivate::initializeDecoder()
+int AudioStream1::AudioStreamPrivate::initializeDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
     AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_AUDIO);
@@ -256,7 +259,7 @@ int AudioStream::AudioStreamPrivate::initializeDecoder()
     return 0;
 }
 
-int AudioStream::AudioStreamPrivate::initializeEncoder()
+int AudioStream1::AudioStreamPrivate::initializeEncoder()
 {
     int result = 0;
     auto encoder = getDefaultAudioEncoder(&result);
@@ -272,7 +275,7 @@ int AudioStream::AudioStreamPrivate::initializeEncoder()
     return 0;
 }
 
-int AudioStream::AudioStreamPrivate::initializeResampledFrame()
+int AudioStream1::AudioStreamPrivate::initializeResampledFrame()
 {
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
@@ -281,13 +284,11 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
 
     int nbSamples = context->frame_size ? context->frame_size : kDefaultFrameSize;
 
-    static constexpr int kDefaultAlignment =  32;
-
     int result = resampledFrame->getBuffer(
         context->sample_fmt,
         nbSamples,
-        context->channel_layout,
-        kDefaultAlignment);
+        context->channel_layout);
+
     if (result < 0)
         return result;
 
@@ -298,7 +299,7 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     return result;
 }
 
-int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Frame * frame)
+int AudioStream1::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Frame * frame)
 {
     AVCodecContext * encoder = m_encoder->codecContext();
 
@@ -308,7 +309,7 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fram
         encoder->sample_fmt,
         encoder->sample_rate,
         frame->channelLayout(),
-        (AVSampleFormat)frame->sampleFormat(),
+        frame->sampleFormat(),
         frame->sampleRate(),
         0,
         nullptr);
@@ -323,43 +324,30 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fram
     return result;
 }
 
-int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
+int AudioStream1::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
     for(;;)
     {
-        ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
-        
-        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see 
-        int result;
-        if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
+        auto packet = popNextPacket();
+        if (!packet)
         {
-            static constexpr std::chrono::milliseconds kTimeout = 
-                std::chrono::milliseconds(1000);
-            result = m_inputFormat->readFrameNonBlock(packet.packet(), kTimeout);
-            if (result < AVERROR(EAGAIN)) //< Treaat a timeout as an error.
-                result = AVERROR(EIO);
-        }
-        else
-        {
-            result = m_inputFormat->readFrame(packet.packet());
+            thisThreadSleep();
+            continue;
         }
 
-        if (result < 0)
-            return result;
-
-        result = m_decoder->sendPacket(packet.packet());
+        int result = m_decoder->sendPacket(packet->packet());
         if (result < 0 && result != AVERROR(EAGAIN))
             return result;
 
         result = m_decoder->receiveFrame(outFrame->frame());
         if (result == 0)
             return result;
-        else if (result < 0 && result != AVERROR(EAGAIN))
+        if (result < 0 && result != AVERROR(EAGAIN))
             return result;
     }
 }
 
-int AudioStream::AudioStreamPrivate::resample(
+int AudioStream1::AudioStreamPrivate::resample(
     const ffmpeg::Frame * frame,
     ffmpeg::Frame * outFrame)
 {
@@ -383,14 +371,14 @@ int AudioStream::AudioStreamPrivate::resample(
         frame ? frame->frame() : nullptr);
 }
 
-std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
+std::chrono::milliseconds AudioStream1::AudioStreamPrivate::resampleDelay() const
 {
     return m_resampleContext 
         ? std::chrono::milliseconds(swr_get_delay(m_resampleContext, kMsecInSec))
         : std::chrono::milliseconds(0);
 }
 
-int AudioStream::AudioStreamPrivate::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket)
+int AudioStream1::AudioStreamPrivate::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket)
 {
     int result = m_encoder->sendFrame(frame->frame());
     if (result < 0 && result != AVERROR(EAGAIN))
@@ -399,51 +387,48 @@ int AudioStream::AudioStreamPrivate::encode(const ffmpeg::Frame* frame, ffmpeg::
     return m_encoder->receivePacket(outPacket->packet());
 }
 
-std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int * outFfmpegError)
+int AudioStream1::AudioStreamPrivate::resampleAudio(ffmpeg::Packet * output)
 {
-    auto packet = std::make_shared<ffmpeg::Packet>(
-        m_encoder->codecId(),
-        AVMEDIA_TYPE_AUDIO,
-        m_packetCount);
-
+    int result = 0;
     for(;;)
     {
         // need to drain the the resampler periodically to avoid increasing audio delay
         if(m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
-            *outFfmpegError = resample(nullptr, m_resampledFrame.get());
-            if (*outFfmpegError < 0)
+            result = resample(nullptr, m_resampledFrame.get());
+            if (result < 0)
                 continue;
         }
         else
         {
-            *outFfmpegError = decodeNextFrame(m_decodedFrame.get());
-            if (*outFfmpegError < 0)
-                return nullptr;
+            result = decodeNextFrame(m_decodedFrame.get());
+            if (result < 0)
+                return result;
 
-            *outFfmpegError = resample(m_decodedFrame.get(), m_resampledFrame.get());
-            if(*outFfmpegError < 0)
-                return nullptr;
+            result = resample(m_decodedFrame.get(), m_resampledFrame.get());
+            if(result < 0)
+                return result;
         }
 
-        *outFfmpegError = encode(m_resampledFrame.get(), packet.get());
-        if (*outFfmpegError == 0)
+        result = encode(m_resampledFrame.get(), output);
+        if (result == 0)
             break;
     }
 
     // Get duration before injecting into the packet because injection erases other fields.
-    int64_t duration = packet->packet()->duration;
+    int64_t duration = output->packet()->duration;
 
     // Inject ADTS header into each packet becuase AAC encoder does not do it.
-    if (m_adtsInjector.inject(packet.get()) < 0)
-        return nullptr;
+    result = m_adtsInjector.inject(output);
+    if (result < 0)
+        return result;
 
-    packet->setTimestamp(calculateTimestamp(duration));
+    output->setTimestamp(calculateTimestamp(duration));
 
-    return packet;
+    return result;
 }
 
-uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
+uint64_t AudioStream1::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
     uint64_t now = m_timeProvider->millisSinceEpoch();
 
@@ -464,14 +449,14 @@ uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
     return timestamp;
 }
 
-std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
+std::chrono::milliseconds AudioStream1::AudioStreamPrivate::timePerVideoFrame() const
 {
     if(auto cam = m_camera.lock())
         return cam->videoStream()->actualTimePerFrame();
     return std::chrono::milliseconds(0); //< Should never happen
 }
 
-bool AudioStream::AudioStreamPrivate::checkIoError(int ffmpegError)
+bool AudioStream1::AudioStreamPrivate::checkIoError(int ffmpegError)
 {
     m_ioError = ffmpegError == AVERROR(EIO) //< Windows and Linux.
         || ffmpegError == AVERROR(ENODEV) //< Catch all.
@@ -479,20 +464,20 @@ bool AudioStream::AudioStreamPrivate::checkIoError(int ffmpegError)
     return m_ioError;
 }
 
-void AudioStream::AudioStreamPrivate::setLastError(int ffmpegError)
+void AudioStream1::AudioStreamPrivate::setLastError(int ffmpegError)
 {
     if (auto cam = m_camera.lock())
         cam->setLastError(ffmpegError);
 }
 
-void AudioStream::AudioStreamPrivate::terminate()
+void AudioStream1::AudioStreamPrivate::terminate()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_terminated = true;
     m_wait.notify_all();
 }
 
-void AudioStream::AudioStreamPrivate::tryToStartIfNotStarted()
+void AudioStream1::AudioStreamPrivate::tryToStartIfNotStarted()
 {
     std::lock_guard<std::mutex> lock(m_threadStartMutex);
     if (m_terminated)
@@ -502,36 +487,55 @@ void AudioStream::AudioStreamPrivate::tryToStartIfNotStarted()
     }
 }
 
-void AudioStream::AudioStreamPrivate::start()
+void AudioStream1::AudioStreamPrivate::start()
 {
     if (m_audioThread.joinable())
         m_audioThread.join();
 
+    if (m_resampleThread.joinable())
+        m_resampleThread.join();
+
     m_terminated = false;
-    m_audioThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
+    m_resampleThread = std::thread(&AudioStream1::AudioStreamPrivate::runResampleThread, this);
+    m_audioThread = std::thread(&AudioStream1::AudioStreamPrivate::runAudioCaptureThread, this);
 }
 
-void AudioStream::AudioStreamPrivate::stop()
+void AudioStream1::AudioStreamPrivate::stop()
 {
     terminate();
 
+    if (m_resampleThread.joinable())
+        m_resampleThread.join();
+
     if (m_audioThread.joinable())
         m_audioThread.join();
+
+    uninitialize();
 }
 
-void AudioStream::AudioStreamPrivate::run()
+void AudioStream1::AudioStreamPrivate::runAudioCaptureThread()
 {
     while (!m_terminated)
     {
-        if (!waitForConsumers())
+        auto t = m_timeProvider->millisSinceEpoch();
+
+        if (noConsumers())
+        {
+            m_inputFormat.reset(nullptr);
+            thisThreadSleep();
+            continue;
+        }
+
+        if (!ensureFormatInitialized())
             continue;
 
-        if (!ensureInitialized())
-            continue;
+        auto packet = 
+            std::make_shared<ffmpeg::Packet>(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
 
-        int result = 0;
-        auto packet = nextPacket(&result);
+        int result = readFrame(packet.get());
+
         checkIoError(result); // < Always check if it was an io error to reset m_ioError to false.
+
         if (result < 0)
         {
             setLastError(result);
@@ -540,22 +544,80 @@ void AudioStream::AudioStreamPrivate::run()
             continue;
         }
 
-        // If the encoder is AAC, some packets are buffered and copied before delivering.
-        // In that case, packet is nullptr.
-        if (packet)
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_packetConsumerManager->givePacket(packet);
+            std::lock_guard<std::mutex> lock(m_resampleBufferMutex);
+            m_resampleBuffer.push_back(packet);
+        }
+
+        auto tt = m_timeProvider->millisSinceEpoch();
+        //std::cout << "capture: " << tt - t << std::endl;
+    }
+}
+
+void AudioStream1::AudioStreamPrivate::runResampleThread()
+{
+    while (!m_terminated)
+    {
+        auto t = m_timeProvider->millisSinceEpoch();
+
+        if (noConsumers())
+        {
+            thisThreadSleep();
+            continue;
+        }
+
+        if (!m_inputFormat || !ensureResamplerInitialized())
+        {
+            thisThreadSleep();
+            continue;
+        }
+
+        auto encodedPacket = 
+            std::make_shared<ffmpeg::Packet>(m_encoder->codecId(), AVMEDIA_TYPE_AUDIO);
+
+        if (resampleAudio(encodedPacket.get()) < 0)
+        {
+            thisThreadSleep();
+            continue;
+        }
+        
+        {
+            std::lock_guard<std::mutex>lock(m_mutex);
+            m_packetConsumerManager->givePacket(encodedPacket);
+        }
+        {
+            auto tt = m_timeProvider->millisSinceEpoch();
+            std::lock_guard<std::mutex>lock(m_resampleBufferMutex);
+            //std::cout << "resample: " << tt - t << ", buf size: " << m_resampleBuffer.size() << std::endl;
         }
     }
+}
 
-    uninitialize();
+int AudioStream1::AudioStreamPrivate::readFrame(ffmpeg::Packet * packet)
+{
+        int result;
+        if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
+        {
+            static constexpr std::chrono::milliseconds kTimeout =
+                std::chrono::milliseconds(3000);
+            result = m_inputFormat->readFrameNonBlock(packet->packet(), kTimeout);
+            if (result < AVERROR(EAGAIN)) //< Treat a timeout as an error.
+                return result;
+        }
+        else
+        {
+            result = m_inputFormat->readFrame(packet->packet());
+        }
+
+        packet->setTimestamp(m_timeProvider->millisSinceEpoch());
+
+        return result;
 }
 
 //-------------------------------------------------------------------------------------------------
-// AudioStream
+// AudioStream1
 
-AudioStream::AudioStream(
+AudioStream1::AudioStream1(
     const std::string url,
     const std::weak_ptr<Camera>& camera,
     bool enabled) 
@@ -567,7 +629,7 @@ AudioStream::AudioStream(
     setEnabled(enabled);
 }
 
-void AudioStream::setEnabled(bool enabled)
+void AudioStream1::setEnabled(bool enabled)
 {
     if (enabled)
     {
@@ -585,17 +647,17 @@ void AudioStream::setEnabled(bool enabled)
     }
 }
 
-bool AudioStream::enabled() const
+bool AudioStream1::enabled() const
 {
     return m_streamReader != nullptr;
 }
 
-bool AudioStream::ioError() const
+bool AudioStream1::ioError() const
 {
     return m_streamReader ? m_streamReader->ioError() : false;
 }
 
-void AudioStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
+void AudioStream1::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     if (m_streamReader)
         m_streamReader->addPacketConsumer(consumer);
@@ -603,7 +665,7 @@ void AudioStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>&
         m_packetConsumerManager->addConsumer(consumer);
 }
 
-void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
+void AudioStream1::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     if (m_streamReader)
         m_streamReader->removePacketConsumer(consumer);
@@ -614,4 +676,4 @@ void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
 } //namespace usb_cam
 } //namespace nx 
 
-#endif // defined(AUDIO_STREAM)
+#endif // defined(AUDIO_STREAM_1)

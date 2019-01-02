@@ -32,7 +32,7 @@ static const char * ffmpegDeviceTypePlatformDependent()
 #ifdef _WIN32
 static bool isKeyFrame(const ffmpeg::Packet * packet)
 {
-    if(!packet)
+    if (!packet)
         return false;
 
     const quint8 * udata = static_cast<const quint8 *>(packet->data());
@@ -92,7 +92,7 @@ std::chrono::milliseconds VideoStream::actualTimePerFrame() const
 
 AVPixelFormat VideoStream::decoderPixelFormat() const
 {
-    return (AVPixelFormat) m_decoderPixelFormat.load();
+    return (AVPixelFormat)m_decoderPixelFormat.load();
 }
 
 void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
@@ -176,7 +176,7 @@ bool VideoStream::pluggedIn() const
 
 void VideoStream::updateActualFps(uint64_t now)
 {
-    ++ m_updatingFps;
+    ++m_updatingFps;
 
     if (now - m_oneSecondAgo >= kMsecInSec)
     {
@@ -208,7 +208,7 @@ bool VideoStream::waitForConsumers()
 
     // Check again if there are no consumers because they could have been added during unitialize.
     std::unique_lock<std::mutex> lock(m_mutex);
-    if(noConsumers())
+    if (noConsumers())
     {
         m_wait.wait(lock, [&]() { return m_terminated || !noConsumers(); });
         return !m_terminated;
@@ -234,7 +234,7 @@ void VideoStream::tryToStartIfNotStarted()
     std::lock_guard<std::mutex> lock(m_threadStartMutex);
     if (m_terminated)
     {
-        if (pluggedIn()) 
+        if (pluggedIn())
             start();
     }
 }
@@ -261,7 +261,8 @@ void VideoStream::run()
 {
     while (!m_terminated)
     {
-        if (!waitForConsumers())    
+        auto t = m_timeProvider->millisSinceEpoch();
+        if (!waitForConsumers())
             continue;
 
         if (!ensureInitialized())
@@ -270,6 +271,8 @@ void VideoStream::run()
         auto packet = readFrame();
         if (!packet)
             continue;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(0));
 
         auto frame = maybeDecode(packet.get());
 
@@ -281,6 +284,9 @@ void VideoStream::run()
             if (frame)
                 m_frameConsumerManager.giveFrame(frame);
         }
+
+        auto tt = m_timeProvider->millisSinceEpoch();
+        std::cout << "video tpp: " << tt - t << std::endl;
     }
 
     uninitialize();
@@ -303,7 +309,7 @@ bool VideoStream::ensureInitialized()
     {
         m_initCode = initialize();
         checkIoError(m_initCode);
-        if(m_initCode < 0)
+        if (m_initCode < 0)
         {
             setLastError(m_initCode);
             if (m_ioError)
@@ -373,7 +379,7 @@ void VideoStream::uninitialize()
 int VideoStream::initializeInputFormat()
 {
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
-    
+
     int result = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
     if (result < 0)
         return result;
@@ -412,6 +418,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // So, two things may help: instructing the AVFormatContext not to buffer packets when it can
     // avoid it, and increasing the default real time buffer size from 3041280 (3M) to 20M.
     context->flags |= AVFMT_FLAG_NOBUFFER; //< Could be helpful for Linux too.
+    context->max_picture_buffer = 200000000;
 
     if (m_codecParams.fps > 0)
         inputFormat->setFps(m_codecParams.fps);
@@ -426,7 +433,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
-        if(auto cam = m_camera.lock())
+        if (auto cam = m_camera.lock())
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::video::setBitrate(
@@ -547,14 +554,29 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
 int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 {
     int result = m_decoder->sendPacket(packet->packet());
-    if(result == 0 || result == AVERROR(EAGAIN))
-        return m_decoder->receiveFrame(frame->frame());
+    if (result < 0)
+    {
+        std::cout << m_camera.lock()->toString() << ", video stream sendPacket error: "
+            << result << ", " << ffmpeg::utils::errorToString(result) << std::endl;
+    }
+
+    if (result < 0 && result != AVERROR(EAGAIN))
+        return result;
+
+    result = m_decoder->receiveFrame(frame->frame());
+
+    if (result < 0)
+    {
+        std::cout << m_camera.lock()->toString() << ", receiveFrame error: "
+            << result << ", " << ffmpeg::utils::errorToString(result) << std::endl;
+    }
+
     return result;
 }
 
 float VideoStream::findLargestFps() const
 {
-    if(noConsumers())
+    if (noConsumers())
         return 0;
 
     float packetFps = m_packetConsumerManager.findLargestFps();
@@ -565,14 +587,14 @@ float VideoStream::findLargestFps() const
 
 nxcip::Resolution VideoStream::findLargestResolution() const
 {
-    if(noConsumers())
+    if (noConsumers())
         return {};
 
     nxcip::Resolution largest;
     auto packetResolution = m_packetConsumerManager.findLargestResolution();
     auto frameResolution = m_frameConsumerManager.findLargestResolution();
 
-    if(frameResolution.width * frameResolution.height > 
+    if (frameResolution.width * frameResolution.height >
         packetResolution.width * packetResolution.height)
     {
         largest = frameResolution;
@@ -635,8 +657,8 @@ void VideoStream::updateBitrateUnlocked()
 }
 
 void VideoStream::updateUnlocked()
-{   
-    if(noConsumers())
+{
+    if (noConsumers())
         return;
 
     // Could call updateFpsUnlocked() and updateResolutionUnlcoked() here, but this way
@@ -644,7 +666,7 @@ void VideoStream::updateUnlocked()
     CodecParameters newParams = m_codecParams;
 
     newParams.fps = findLargestFps();
-    newParams.resolution =  findLargestResolution();
+    newParams.resolution = findLargestResolution();
     updateBitrateUnlocked();
 
     CodecParameters finalParams = findClosestHardwareConfiguration(newParams);
@@ -663,11 +685,11 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
     for (const auto & resolution : resolutionList)
     {
         if (resolution.width == params.resolution.width
-            && resolution.height == params.resolution.height 
+            && resolution.height == params.resolution.height
             && resolution.fps == params.fps)
         {
             return CodecParameters(
-                m_codecParams.codecId, 
+                m_codecParams.codecId,
                 params.fps,
                 m_codecParams.bitrate,
                 params.resolution);
@@ -675,12 +697,12 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
     }
 
     // Then a match with similar aspect ratio whose resolution and fps are higher than requested
-    float aspectRatio = (float) params.resolution.width / params.resolution.height;
+    float aspectRatio = (float)params.resolution.width / params.resolution.height;
     for (const auto & resolution : resolutionList)
     {
         if (aspectRatio == resolution.aspectRatio())
         {
-            bool actualResolutionGreater = resolution.width * resolution.height >= 
+            bool actualResolutionGreater = resolution.width * resolution.height >=
                 params.resolution.width * params.resolution.height;
             if (actualResolutionGreater && resolution.fps >= params.fps)
             {
@@ -713,7 +735,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
 
 void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 {
-    bool newResolutionNotEqual = m_codecParams.resolution.width * m_codecParams.resolution.height 
+    bool newResolutionNotEqual = m_codecParams.resolution.width * m_codecParams.resolution.height
         != codecParams.resolution.width * codecParams.resolution.height;
 
     if (m_codecParams.fps != codecParams.fps || newResolutionNotEqual)

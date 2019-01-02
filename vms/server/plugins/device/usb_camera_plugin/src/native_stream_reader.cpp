@@ -32,6 +32,8 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
+    auto t = m_camera->millisSinceEpoch();
+
     ensureConsumerAdded();
 
     auto packet = nextPacket();
@@ -52,6 +54,9 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     }
 
     *lpPacket = toNxPacket(packet.get()).release();
+
+    auto tt = m_camera->millisSinceEpoch();
+    std::cout << "native tpp: " << tt - t << std::endl;
 
     return nxcip::NX_NO_ERROR;
 }
@@ -87,12 +92,14 @@ void NativeStreamReader::ensureConsumerAdded()
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    while (m_camera->audioEnabled())
+    //while (m_camera->audioEnabled())
+    for (;;)
     {
         // the time span keeps audio and video timestamps monotonic
+        //if (m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
         if (m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
             break;
-        else if (m_interrupted || m_camera->ioError())
+        if (m_interrupted || m_camera->ioError())
                 return nullptr;
     }
 
