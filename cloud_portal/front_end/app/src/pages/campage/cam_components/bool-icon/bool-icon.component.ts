@@ -1,29 +1,29 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 
-const noop = () => {
-};
+const noop = () => {};
 
 @Component({
-  selector: 'nx-bool-icon',
-  templateUrl: './bool-icon.component.html',
-  styleUrls: ['./bool-icon.component.scss']
+    selector   : 'nx-bool-icon',
+    templateUrl: './bool-icon.component.html',
+    styleUrls  : ['./bool-icon.component.scss']
 })
 export class BoolIconComponent implements OnInit {
-  @Input() value: string;
+    @Input() value: string;
 
-  // Placeholders for the callbacks which are later provided
+    // Placeholders for the callbacks which are later provided
     // by the Control Value Accessor
     private onTouchedCallback: () => void = noop;
     private onChangeCallback: (_: any) => void = noop;
 
-  constructor() { }
+    constructor() {
+    }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
-  ngOnChanges(changes: SimpleChanges) {
+    ngOnChanges(changes: SimpleChanges) {
         if (changes.value) {
-          this.value = changes.value.currentValue;
+            this.value = changes.value.currentValue;
         }
     }
 

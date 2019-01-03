@@ -1,6 +1,8 @@
-import { Component, OnInit, Input, ElementRef, forwardRef, Renderer2, AfterViewInit, ViewChild } from '@angular/core';
-import { fromEvent } from 'rxjs';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import {
+    Component, OnInit, Input, ElementRef,
+    forwardRef, Renderer2, AfterViewInit }          from '@angular/core';
+import { fromEvent }                                from 'rxjs';
+import { NG_VALUE_ACCESSOR, ControlValueAccessor }  from '@angular/forms';
 
 export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -9,14 +11,15 @@ export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'nx-search',
-  templateUrl: './search.component.html',
-  providers: [CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR],
+    selector: 'nx-camera-search',
+    templateUrl: './search.component.html',
+    providers: [CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR],
     styleUrls: ['./search.component.scss']
 })
 
 export class SearchComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     @Input() multiselectOptions: any = {};
+
     private filter: any = {};
     private emptyfilters: any = {};
     private debounceTime = 500;
@@ -50,8 +53,6 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
                 this.filter.query = event;
                 this.onChangeCallback(this.filter);
               });
-
-
       }
 
       selectBooleanFilter() {
@@ -108,19 +109,21 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
     }
 
     numberOfOptionsSelected() {
-        this.numberFilters = Object.keys(this.filter).length <= 1 ? 0 : (Number(this.filter.minResolution.value != 0) +
-              Number(this.filter.vendors.length != 0) +
-              Number(this.filter.hardwareTypes.length != 0) +
-
-              Number(this.filter.isPtzSupported) +
-              Number(this.filter.isAptzSupported) +
-              Number(this.filter.isAudioSupported) +
-              Number(this.filter.isTwAudioSupported) +
-              Number(this.filter.isIoSupported) +
-              Number(this.filter.isMdSupported) +
-              Number(this.filter.isFisheye) +
-              Number(this.filter.isH265));
-
+        this.numberFilters = (Object.keys(this.filter).length <= 1) ?
+                0 :
+                (
+                        +(+this.filter.minResolution.value !== 0) +
+                        +(this.filter.vendors.length !== 0) +
+                        +(this.filter.hardwareTypes.length !== 0) +
+                        +(this.filter.isPtzSupported) +
+                        +(this.filter.isAptzSupported) +
+                        +(this.filter.isAudioSupported) +
+                        +(this.filter.isTwAudioSupported) +
+                        +(this.filter.isIoSupported) +
+                        +(this.filter.isMdSupported) +
+                        +(this.filter.isFisheye) +
+                        +(this.filter.isH265)
+                );
     }
 
     modelChanged(model, result: any) {

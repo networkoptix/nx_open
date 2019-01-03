@@ -12,57 +12,51 @@ export class CampageSearchService {
 
   constructor() { }
 
-
     campageSearch (allCameras, filter, boolKeys): Observable<any> {
-      var query = filter.query;
-
-      var queryTerms = query.trim().split(' ');
-      //var window.preferred_vendors = '';
-      const preferred_vendors = '';
-
+      const query = filter.query;
+      const queryTerms = query.trim().split(' ');
+      const preferredVendors = '';
 
       function filterCamera(c, query) {
           function lowerNoDashes(str) {
               return str.replace(/-/g, '').toLowerCase();
           }
 
-          var queryLowerNoDashes = lowerNoDashes(query);
+          const queryLowerNoDashes = lowerNoDashes(query);
 
-          return (query.length == 0
+          return (query.length === 0
               || lowerNoDashes(c.vendor).includes(queryLowerNoDashes)
               || lowerNoDashes(c.model).includes(queryLowerNoDashes)
               || c.maxResolution.includes(query));
       }
 
-      var cameras = allCameras.filter(c => {
+      const cameras = allCameras.filter(camera => {
           if (boolKeys.some(key => {
-              return filter[key] === true && c[key] !== true;
+              return filter[key] === true && camera[key] !== true;
           })) {
               return false;
           }
 
-          if (filter.minResolution.value != 0 && c.resolutionArea <= filter.minResolution.value * 0.9) {
+          if (filter.minResolution.value !== 0 && camera.resolutionArea <= filter.minResolution.value * 0.9) {
               return false;
           }
 
-          if (filter.vendors.length > 0 && filter.vendors.indexOf(c.vendor) === -1) {
+          if (filter.vendors.length > 0 && filter.vendors.indexOf(camera.vendor) === -1) {
               return false;
           }
 
-          if (filter.hardwareTypes.length > 0 && filter.hardwareTypes.indexOf(c.hardwareType) === -1) {
+          if (filter.hardwareTypes.length > 0 && filter.hardwareTypes.indexOf(camera.hardwareType) === -1) {
               return false;
           }
 
           // Filter by query
           return queryTerms.every(term => {
-              return filterCamera(c, term);
+              return filterCamera(camera, term);
           });
-      });
+      }).sort(camera => {
+          const key = (camera.vendor + camera.model).toLowerCase();
 
-      var cameras = cameras.sort(c => {
-          var key = (c.vendor + c.model).toLowerCase();
-
-          if (preferred_vendors.indexOf(c.vendor.toLowerCase()) != -1) {
+          if (preferredVendors.indexOf(camera.vendor.toLowerCase()) !== -1) {
               return '!' + key;
           }
 

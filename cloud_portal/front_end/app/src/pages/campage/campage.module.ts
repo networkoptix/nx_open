@@ -6,7 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule }          from '@angular/forms';
 import { NgbModule }            from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule }      from '@ngx-translate/core';
-import { Angular2CsvModule }    from "angular2-csv";
+import { Angular2CsvModule }    from 'angular2-csv';
 
 import { NxCampageComponent } from './campage.component';
 import { ComponentsModule }   from '../../components/components.module';

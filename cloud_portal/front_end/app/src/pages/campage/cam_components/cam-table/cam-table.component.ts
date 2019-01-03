@@ -1,5 +1,16 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, SimpleChange, OnInit, ViewEncapsulation } from '@angular/core';
-import { PagerService } from '../../../../services/pager-service.service';
+import {
+    Component, Input, Output, EventEmitter,
+    OnChanges, SimpleChanges, SimpleChange,
+    OnInit, ViewEncapsulation } from '@angular/core';
+import { PagerService }         from '../../../../services/pager-service.service';
+import { NxConfigService }      from '../../../../services/nx-config';
+import { TranslateService }     from '@ngx-translate/core';
+import { _ }                    from '@biesbjerg/ngx-translate-extract';
+
+// _('Unknown');
+// _('Yes');
+// _('No');
+// _('Camera List');
 
 @Component({
   selector: 'nx-cam-table',
@@ -12,13 +23,15 @@ export class CamTableComponent implements OnChanges, OnInit {
   @Input() headers: string[];
   @Input() elements: any[];
   @Input() allowedParameters: string[];
-  @Output()
-  public onRowClick: EventEmitter<any> = new EventEmitter<any>();
+
+  @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
+
   private _elements: any[];
   private selectedRow;
   private results;
   pager: any = {};
   pagedItems: any[];
+  CONFIG: any = {};
 
   // Options for the Excel export
   public csvFilename: any;
@@ -35,8 +48,11 @@ export class CamTableComponent implements OnChanges, OnInit {
     removeNewLines: true
   };
 
-  constructor(private pagerService: PagerService) {
+  constructor(private pagerService: PagerService,
+              translate: TranslateService,
+              config: NxConfigService) {
       this._elements = this.elements;
+      this.CONFIG = config.getConfig();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -60,31 +76,32 @@ export class CamTableComponent implements OnChanges, OnInit {
 
   setPage(page: number) {
       // get pager object from service
-      this.pager = this.pagerService.getPager(this._elements.length, page, 20);
+      this.pager = this.pagerService.getPager(this._elements.length, page, this.CONFIG.layout.tableLarge.rows);
 
       // get current page of items
       this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
 
   yesNo (bVal) {
-      if (bVal === undefined || bVal === null)
+      if (bVal === undefined || bVal === null) {
           return 'Unknown';
+      }
 
       return bVal ? 'Yes' : 'No';
   }
 
   getCsvData() {
-      return this._elements.map(c => ({
-                    'Vendor': c.vendor,
-                    'Model': c.model,
-                    'Max Resolution': c.maxResolution,
-                    'Max FPS': c.maxFps,
-                    'Codec': c.primaryCodec,
-                    '2-Way Audio': this.yesNo(c.isTwAudioSupported),
-                    'Advanced PTZ': this.yesNo(c.isAptzSupported),
-                    'Fisheye': this.yesNo(c.isFisheye),
-                    'Motion': this.yesNo(c.isMdSupported),
-                    'I/O': this.yesNo(c.isIoSupported)
+      return this._elements.map(camera => ({
+                    'Vendor': camera.vendor,
+                    'Model': camera.model,
+                    'Max Resolution': camera.maxResolution,
+                    'Max FPS': camera.maxFps,
+                    'Codecamera': camera.primaryCodecamera,
+                    '2-Way Audio': this.yesNo(camera.isTwAudioSupported),
+                    'Advancameraed PTZ': this.yesNo(camera.isAptzSupported),
+                    'Fisheye': this.yesNo(camera.isFisheye),
+                    'Motion': this.yesNo(camera.isMdSupported),
+                    'I/O': this.yesNo(camera.isIoSupported)
                })
         );
   }
@@ -93,4 +110,7 @@ export class CamTableComponent implements OnChanges, OnInit {
       return Date.now();
   }
 
+    isString(x: any): boolean {
+        return typeof x === 'string';
+    }
 }

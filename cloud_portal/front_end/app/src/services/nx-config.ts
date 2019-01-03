@@ -20,6 +20,7 @@ export class NxConfigService {
             googleTagsCode: 'GTM-5MRNWP',
             apiBase       : '/api',
             realm         : 'VMS',
+            cacamerasUrl  : 'https://cameras.networkoptix.com/api/v1/cacameras/',
 
             cacheTimeout     : 20 * 1000, // Cache lives for 30 seconds
             updateInterval   : 30 * 1000, // Update content on pages every 30 seconds
@@ -40,6 +41,16 @@ export class NxConfigService {
                     product: '/admin/cms/product/'
                 }
             },
+
+            layout: {
+                table: {
+                    rows: 10
+                },
+                tableLarge: {
+                    rows: 20
+                },
+            },
+
             systemStatuses                : {
                 onlineStatus: 'online',
                 sortOrder   : [

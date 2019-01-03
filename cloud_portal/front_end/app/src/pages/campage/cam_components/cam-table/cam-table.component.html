@@ -31,23 +31,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let element of pagedItems  | keyvalue; index as i" [ngClass]="{'selected':i == selectedRow}"
+                <tr *ngFor="let element of pagedItems  | keyvalue; let i = index" [ngClass]="{'selected': i == selectedRow}"
                     (click)="setClickedRow(i, element);">
                     <td *ngFor="let p of allowedParameters" class="text-left">
-                        <div [ngSwitch]="element.value[p]">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
+                        <span *ngIf="isString(element.value[p]); else icon">
+                            {{ element.value[p] }}
                         </span>
-                            <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                            <span class="icon-negative" *ngSwitchCase="null">
-                            &#63;
-                        </span>
-                            <span class="icon-unknown" *ngSwitchDefault>
-                            {{element.value[p]}}
-                        </span>
-                        </div>
+                        <ng-template #icon>
+                            <nx-bool-icon [value]="element.value[p]"></nx-bool-icon>
+                        </ng-template>
                     </td>
                 </tr>
             </tbody>

@@ -10,8 +10,8 @@ describe('App', () => {
     });
   });
 
-  it ('should work', () => {
-    let fixture = TestBed.createComponent(NxCampageComponent);
-    expect(fixture.componentInstance instanceof NxCampageComponent).toBe(true, 'should create NxCampageComponent');
+  it ('should create NxCampageComponent', () => {
+    const fixture = TestBed.createComponent(NxCampageComponent);
+    expect(fixture.componentInstance instanceof NxCampageComponent).toBeTruthy();
   });
 });

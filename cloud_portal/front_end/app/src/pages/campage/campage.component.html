@@ -1,12 +1,12 @@
 <div class="container campage">
     <div class="row p-3">
         <div class="col">
-            <nx-search
-                       name="filterModel"
-                       [(ngModel)]="filterModel"
-                       [multiselectOptions] = "multiselectOptions"
-                       ngDefaultControl
-            ></nx-search>
+            <nx-camera-search
+                name="filterModel"
+                [(ngModel)]="filterModel"
+                [multiselectOptions] = "multiselectOptions"
+                ngDefaultControl>
+            </nx-camera-search>
         </div>
     </div>
     <div class="row p-3 campage-info" [hidden]="filterModel.query">
@@ -19,11 +19,12 @@
     </div>
      <nx-layout-right *ngIf="filterModel.query" [toggle]="toggleCamview">
          <ng-container>
-             <nx-cam-table  [headers] = "cameraHeaders"
-                            [elements] = "camerasTable"
-                            [allowedParameters] = "allowedParameters"
-                            (onRowClick)="activateCamera($event)"
-             ></nx-cam-table>
+             <nx-cam-table
+                     [headers] = "cameraHeaders"
+                     [elements] = "camerasTable"
+                     [allowedParameters] = "allowedParameters"
+                     (onRowClick)="activateCamera($event)">
+             </nx-cam-table>
          </ng-container>
          <nx-block *ngIf="activeCamera">
             <nx-cam-view

@@ -12,39 +12,44 @@
     padding-left: 5px;
     padding-right: 5px;
   }
+  
   .text-placeholder {
     color: $light16;
     font-family: $font-family-regular;
     font-size: 20px;
     height: 32px;
   }
-  li a {
-    color: $light16;
-    height: 24px;
-    font-family: $font-family-regular;
-    font-size: 15px;
-    text-decoration: none;
-  }
-  li a:hover {
-    color: $dark6;
-  }
-
-  /*** overwrite default table of component cam-table ***/
-  .nx-table-wrapper {
-    .nx-table {
-      th {
-        &:nth-child(n+7) {
-          width: 5%;
-        }
+  
+  li {
+    a {
+      color           : $light16;
+      height          : 24px;
+      font-family     : $font-family-regular;
+      font-size       : 15px;
+      text-decoration : none;
+    
+      &:hover {
+        color : $dark6;
       }
-      td {
-        &:nth-child(n+7) {
-          width: 5%;
-          text-align: center !important;
-        }
-      }
-
     }
   }
-
+  
+    /*** overwrite default table of component cam-table ***/
+    .nx-table-wrapper {
+      .nx-table {
+        th {
+          &:nth-child(n+7) {
+            width : 5%;
+          }
+        }
+      
+        td {
+          &:nth-child(n+7) {
+            width      : 5%;
+            text-align : center !important;
+          }
+        }
+      
+      }
+    }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, DoCheck, KeyValueDiffers, ViewEncapsulation } from '@angular/core';
 import { CamerasService } from '../../services/cameras.service';
-import { CampageSearchService } from '../../services/campage-search.service';
+import { CampageSearchService } from './campage-search.service';
 import { NxModalMessageComponent } from '../../dialogs/message/message.component';
 import { NxConfigService } from '../../services/nx-config';
 
@@ -127,6 +127,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
               // TODO: Use dialog service when it is not being downgraded
               private messageDialog: NxModalMessageComponent,
               private differs: KeyValueDiffers) {
+
       this.setupDefaults();
       this.differ = this.differs.find({}).create();
       this.vendorDiffer = this.differs.find([]).create();
@@ -149,10 +150,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   activate() {
       this.resetFilters();
-      this.cameraService.getAllCameras(this.company).subscribe(data => {
-          this.data = data;
-          this.camerasSuccessFn();
-      });
+      this.cameraService
+          .getAllCameras(this.company)
+          .subscribe(data => {
+              this.data = data;
+              this.camerasSuccessFn();
+          });
   }
 
   resetFilters() {
@@ -166,46 +169,46 @@ export class NxCampageComponent implements OnInit, DoCheck {
        const vendors = new Set();
        const camerasWithAliases = [];
 
-       response.forEach(c => {
-           c.isH265 = c.primaryCodec === 'H.265';
+       response.forEach(camera => {
+           camera.isH265 = camera.primaryCodec === 'H.265';
 
-           if (c.hardwareType === 'Camera' && c.isMultiSensor) {
-               c.hardwareType = 'Multi-Sensor Camera';
+           if (camera.hardwareType === 'Camera' && camera.isMultiSensor) {
+               camera.hardwareType = 'Multi-Sensor Camera';
            }
 
-           const res = c.maxResolution.split('x');
+           const res = camera.maxResolution.split('x');
            if (res.length === 2) {
-               c.resolutionArea = res[0] * res[1];
+               camera.resolutionArea = res[0] * res[1];
            } else {
-               c.resolutionArea = 0;
+               camera.resolutionArea = 0;
            }
 
-           vendors.add(c.vendor);
+           vendors.add(camera.vendor);
 
-           if (c.aliases) {
-               camerasWithAliases.push(c);
+           if (camera.aliases) {
+               camerasWithAliases.push(camera);
            }
 
-           const vm = c.vendor + c.model;
+           const vm = camera.vendor + camera.model;
            const existing = vendorModelCount[vm];
            if (existing !== undefined) {
-               if (c.count > existing.count) {
-                   vendorModelCount[vm] = c;
+               if (camera.count > existing.count) {
+                   vendorModelCount[vm] = camera;
                }
            } else {
-               vendorModelCount[vm] = c;
+               vendorModelCount[vm] = camera;
            }
        });
 
        this.allCameras = Object.keys(vendorModelCount);
 
-       camerasWithAliases.forEach(c => {
-           c.aliases.split(',').forEach(alias => {
+       camerasWithAliases.forEach(camera => {
+           camera.aliases.split(',').forEach(alias => {
                alias = alias.trim();
 
-               const va = c.vendor + alias;
+               const va = camera.vendor + alias;
                if (vendorModelCount[va] === undefined) {
-                   const aliasedCamera = {...c};
+                   const aliasedCamera = {...camera};
                    aliasedCamera.model = alias;
 
                    this.allCameras.push(aliasedCamera);
@@ -228,14 +231,14 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
-  preFilterCameratable (camerasArr) {
-    const values = Object.keys(camerasArr).map(key => camerasArr[key]);
+  preFilterCameraTable (cameras) {
+    const values = Object.keys(cameras).map(key => cameras[key]);
     const filteredCameras = [];
-    values.forEach(c => {
-        const filteredCamera = Object.keys(c)
+    values.forEach(camera => {
+        const filteredCamera = Object.keys(camera)
           .filter(key => this.allowedParameters.indexOf(key) > -1)
           .reduce((obj, key) => {
-            obj[key] = c[key];
+            obj[key] = camera[key];
             return obj;
           }, {});
         filteredCameras.push(filteredCamera);
@@ -250,7 +253,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
           this.camSearch.campageSearch(this.data, this.filter, this.boolKeys).subscribe(cameras => {
               this.activeCamera = undefined;
               this.cameras = cameras;
-              this.camerasTable = this.preFilterCameratable(cameras);
+              this.camerasTable = this.preFilterCameraTable(cameras);
           });
       }
   }
@@ -261,8 +264,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
       return false;
   }
 
-
-  vendorGroup (n) {
+  vendorGroup(n) {
       function nstart(m) {
           if (m === 0) {
               return 0;
@@ -330,5 +332,4 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.activeCamera = undefined;
       this.toggleCamview = 'off';
   }
-
 }
