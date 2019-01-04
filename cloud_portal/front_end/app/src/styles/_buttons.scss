@@ -139,27 +139,33 @@ button, .btn {
     background-color : transparent;
 }
 
-.txt-btn {
-    font-size: 13px;
-    color: $light16;
-
-    &.nav-arrow{
-      height: 20px;
-
-      span{
-        background-color: $light16;
-      }
+.btn-text {
+    height          : 20px;
+    font-size       : 13px;
+    color           : $light16;
+    text-decoration : none;
+    
+    .nav-arrow {
+        height       : 20px;
+        float        : left;
+        right        : 0;
+        margin-right : 2px;
+        
+        span {
+            background-color : $light16;
+        }
     }
-
-    a{
-      font-size: 13px;
-      color: $light16;
+    
+    span {
+        line-height: 20px;
     }
-
-    &:hover{
-        color: $dark15;
+    
+    &:hover {
+        color           : $dark15;
+        text-decoration : none;
     }
+    
     &:active, &:focus {
-        color: $light16;
+        color : $light16;
     }
 }

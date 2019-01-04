@@ -31,72 +31,82 @@
     box-shadow: none;
     border: 1px solid $light3;
     background-color: $light1;
-
-    .nx-table {
-      table-layout: auto;
-      min-width: 700px;
-      white-space: nowrap;
-      margin-bottom: 0px;
-
-      th {
-        padding: 0.5rem 1rem;
-        background-color: $additional_light1;
-        border-bottom: 1px solid $light3;
-        color: $dark9;
-        font-family: $font-family-regular;
-        font-size: 0.8125rem;
-        line-height: 16px;
-        text-transform: none;
-        overflow-wrap: break-word;
-
-        &.table-title {
-          font-family: $font-family-regular;
-          line-height: 24px;
-
-          .text-placeholder {
-            font-size: 1.25rem;
-            color: $light16;
-          }
+  }
+  
+  .nx-table {
+    table-layout  : auto;
+    min-width     : 700px;
+    white-space   : nowrap;
+    margin-bottom : 0;
+    
+    th {
+      padding          : 0.5rem 1rem;
+      background-color : $additional_light1;
+      border-bottom    : 1px solid $light3;
+      color            : $dark9;
+      font-family      : $font-family-regular;
+      font-size        : 0.8125rem;
+      line-height      : 16px;
+      text-transform   : none;
+      overflow-wrap    : break-word;
+      
+      &.table-title {
+        font-family : $font-family-regular;
+        line-height : 24px;
+        
+        .text-placeholder {
+          font-size : 1.25rem;
+          color     : $light16;
         }
       }
-      tbody {
-
-        tr {
-
-          &:hover {
-
-            td {
-              color: $dark9;
-              background: transparentize($brand_core, 0.8);
-            }
-          }
-
-          &.selected, &:active, &:focus {
-            background: $light16;
-
-            td {
-              color: $light1;
-            }
-          }
-
+    }
+    
+    tbody {
+      tr {
+        &:hover {
           td {
-            padding-left: 16px;
-            height: 24px;
-            font-family: $font-family-regular;
-            font-size: 13px;
-            color: $dark9;
-            line-height: 16px;
-
-            &:first-child {
-              padding-top: 8px;
-            }
-            &:last-child {
-              padding-bottom: 8px;
-            }
+            color      : $dark9;
+            background : transparentize($brand_core, 0.8);
           }
         }
+        
+        &.selected, &:active, &:focus {
+          background : $light16;
+          
+          td {
+            color : $light1;
+          }
+        }
+        
+        td {
+          padding      : 0.25rem 0 0.25rem 1rem;
+          font-family  : $font-family-regular;
+          font-size    : $font-size-base;
+          color        : $dark9;
+          line-height  : 1rem;
+          
+          //&:first-child {
+          //  padding-top : 8px;
+          //}
+          //
+          //&:last-child {
+          //  padding-bottom : 8px;
+          //}
+        }
       }
-
+    }
+    
+    &-header {
+      padding          : 0.5rem 1rem;
+      background-color : $additional_light1;
+      border           : 1px solid $light3;
+      border-bottom    : none;
+      color            : $dark9;
+      font-family      : $font-family-regular;
+      font-size        : 0.8125rem;
+      line-height      : 16px;
+      text-transform   : none;
+      overflow-wrap    : break-word;
     }
   }
 
