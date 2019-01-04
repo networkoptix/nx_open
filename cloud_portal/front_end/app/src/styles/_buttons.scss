@@ -138,3 +138,28 @@ button, .btn {
 .btn-dropdown-toggle {
     background-color : transparent;
 }
+
+.txt-btn {
+    font-size: 13px;
+    color: $light16;
+
+    &.nav-arrow{
+      height: 20px;
+
+      span{
+        background-color: $light16;
+      }
+    }
+
+    a{
+      font-size: 13px;
+      color: $light16;
+    }
+
+    &:hover{
+        color: $dark15;
+    }
+    &:active, &:focus {
+        color: $light16;
+    }
+}

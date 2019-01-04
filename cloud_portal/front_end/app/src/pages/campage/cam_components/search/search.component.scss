@@ -1,0 +1,66 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+@import '../../../../styles/_mixins';
+
+.nx-search {
+    .nav-arrow {
+        position: relative;
+    }
+    .icon-search {
+        position: absolute;
+        margin: 10px 0px 0px 10px;
+    }
+
+    .searchinput {
+        width: 200px;
+        height: 40px;
+        padding-left: 40px;
+        font-size: 15px;
+        font-family: $font-family-regular;
+        color: $light16;
+        border-radius: 2px;
+        border: 1px solid $light6;
+        background: transparent;
+
+        &:placeholder-shown {
+            @include placeholder();
+        }
+
+        &:active, &:focus{
+            background-color: $light1;
+            color: $dark9;
+            border: 1px solid $brand_core;
+        }
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:active,
+        &:-webkit-autofill:focus {
+            background-color: $light1 !important;
+            color: $dark9 !important;
+            -webkit-box-shadow: 0 0 0 1000px $light1 inset !important;
+            -webkit-text-fill-color: $dark9 !important;
+        }
+    }
+
+    .searchclear {
+        position: absolute;
+        right: 10px;
+        top: 0;
+        bottom: 0;
+        line-height: 40px;
+        margin: auto;
+        cursor: pointer
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+
+        li {
+            margin: 0px 5px 4px 0px;
+            cursor: pointer;
+            text-align: center;
+            width: auto;
+        }
+    }
+
+}

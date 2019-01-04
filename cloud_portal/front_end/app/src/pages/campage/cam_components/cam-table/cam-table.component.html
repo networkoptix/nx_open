@@ -1,0 +1,54 @@
+<div class="nx-table-wrapper">
+    <div class="table-wrapper">
+        <table class="table table-hover nx-table">
+            <thead>
+                <tr>
+                    <th class="table-title" [attr.colspan]="headers.length">
+                        <div class="col text-placeholder" *ngIf="results == 0; else camview">
+                            <span>
+                                Nothing Found
+                            </span>
+                        </div>
+                        <ng-template #camview>
+                            <div class="col-md-10 vertical-align d-inline-flex justify-content-center" [ngSwitch]="results">
+                                <div class="flex-grow-1" *ngSwitchCase="1">
+                                    <h4>1 result</h4>
+                                </div>
+                                <div class="flex-grow-1" *ngSwitchDefault>
+                                    <h4>{{results}} results</h4>
+                                </div>
+                                <div class="col-md-2">
+                                    <nx-csv-button [data]="csvCameraData" filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}" [options]="csvOptions">Export all to CSV</nx-csv-button>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </th>
+                </tr>
+                <tr  *ngIf="results > 0">
+                    <th *ngFor="let header of headers" class="align-bottom">
+                        {{header}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let element of pagedItems  | keyvalue; let i = index" [ngClass]="{'selected': i == selectedRow}"
+                    (click)="setClickedRow(i, element);">
+                    <td *ngFor="let p of allowedParameters" class="text-left">
+                        <span *ngIf="isString(element.value[p]); else icon">
+                            {{ element.value[p] }}
+                        </span>
+                        <ng-template #icon>
+                            <nx-bool-icon [value]="element.value[p]"></nx-bool-icon>
+                        </ng-template>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row vertical-align ml-0">
+        <nav aria-label="Cameras table navigation" class="pagination-nav pt-3">
+            <ngb-pagination [collectionSize]="pager.totalItems" [maxSize]="3" [pageSize]="20" (pageChange)="setPage($event)"></ngb-pagination>
+        </nav>
+    </div>
+</div>

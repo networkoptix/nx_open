@@ -1,0 +1,52 @@
+<div class="container campage">
+    <div class="row p-3">
+        <div class="col">
+            <nx-camera-search
+                name="filterModel"
+                [(ngModel)]="filterModel"
+                [multiselectOptions] = "multiselectOptions"
+                ngDefaultControl>
+            </nx-camera-search>
+        </div>
+    </div>
+    <div class="row p-3 campage-info" [hidden]="filterModel.query">
+        <h4>
+            <ul class="list-inline text-muted text-placeholder" *ngIf="totalVendors">
+                <li>{{ totalVendors }} manufacturers</li>
+                <li>{{ totalCameras }} devices</li>
+            </ul>
+        </h4>
+    </div>
+     <nx-layout-right *ngIf="filterModel.query" [toggle]="toggleCamview">
+         <ng-container>
+             <nx-cam-table
+                     [headers] = "cameraHeaders"
+                     [elements] = "camerasTable"
+                     [allowedParameters] = "allowedParameters"
+                     (onRowClick)="activateCamera($event)">
+             </nx-cam-table>
+         </ng-container>
+         <nx-block *ngIf="activeCamera">
+            <nx-cam-view
+                    [activeCamera] = "activeCamera"
+                    (onCloseView)="resetActiveCamera($event)"
+                    (onFeedbackClick)="open($event)"
+            ></nx-cam-view>
+        </nx-block>
+    </nx-layout-right>
+    <div class="row p-3" *ngIf="!filterModel.query">
+        <ul class="list-unstyled col-md-3" *ngFor="let n of [0, 1, 2, 3]">
+            <li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
+                <a href (click)="setVendor(vendor)">
+                    <span>
+                        {{ vendor }}
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <p>This list is limited to actual devices auto-reporting data to {{company}}, as approved by anonymous system users.
+        The complete list of supported manufacturers and models is greater in scope. Please <a href (click)="open()">submit a request</a> for additional
+        questions/concerns regarding supported devices.
+    </p>
+</div>

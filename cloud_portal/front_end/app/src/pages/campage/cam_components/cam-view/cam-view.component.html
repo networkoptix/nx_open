@@ -1,0 +1,177 @@
+<div class="camview col-12" *ngIf="activeCamera">
+    <nx-block type='gray'>
+
+        <header>
+            <span>{{ activeCamera.vendor }}</span>
+            <span> {{ activeCamera.model }}</span>
+            <span class="glyphicon close-icon detailsClose"
+                  (click)="activeCamera = undefined; onCloseView.emit(activeCamera)">
+            </span>
+        </header>
+
+        <nx-section>
+            <div [hidden]="!activeCamera.notes">
+                <pre class="no-padding" style="border:0;">{{ activeCamera.notes }}</pre>
+            </div>
+
+            <a class="blue" target="_blank"
+               href="https://www.google.com/search?q={{ activeCamera.vendor }}+{{ activeCamera.model }}">
+                <u>Search in google</u>
+            </a>
+
+            <table class="table table-condensed borderless no-left-padding">
+                <tr>
+                    <td>Max Resolution</td>
+                    <td style="width: 30%;">{{ activeCamera.maxResolution }}</td>
+                </tr>
+
+                <tr>
+                    <td>Max FPS</td>
+                    <td>{{ activeCamera.maxFps }}</td>
+                </tr>
+
+                <tr>
+                    <td>Codec</td>
+                    <td>{{ activeCamera.primaryCodec }}</td>
+                </tr>
+
+                <tr>
+                    <td>Audio</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isAudioSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>2-Way Audio</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isTwAudioSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>PTZ</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isPtzSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Advanced PTZ</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isAptzSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Motion Detection</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isMdSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Fisheye</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isFisheye">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>I/O</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isIoSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Dual Streaming</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isDualStreamingSupported">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Secondary Stream</td>
+                    <td>{{ activeCamera.sndResolution }}</td>
+                </tr>
+
+                <tr>
+                    <td>Multi Sensor</td>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isMultiSensor">
+                        </nx-bool-icon>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <table class="table table-condensed borderless" style="table-layout: fixed;">
+                <tr>
+                    <th style="width:50%;">Firmware version</th>
+                    <th style="width:50%;">Popularity</th>
+                </tr>
+                <ng-container *ngFor="let firmware of activeCamera.firmwares | slice:0:5">
+                    <tr *ngIf="firmware.name">
+                        <td class="no-linewrap" title="{{ firmware.name }}">{{ firmware.name }}</td>
+                        <td title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
+                            <div class="icon" role="img" style="width: 100%">
+                                <canvas class="icon-canvas" height="4"></canvas>
+                                <svg class="img-responsive icon-svg" height="4">
+                                    <line x1="0" y1="8"
+                                          [attr.x2]="firmwareLength(firmware.count, activeCamera.maxFirmwareCount)"
+                                          y2="8" class="firmware-line"
+                                          stroke-dasharray="8, 2"/>
+                                </svg>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+
+                <tr *ngIf="!showAll && activeCamera.firmwares.length > 5">
+                    <td colspan="2">
+                        <a href="javascript:void(0);" (click)="showAll=1">Show All</a>
+                    </td>
+                </tr>
+
+                <ng-container *ngFor="let firmware of activeCamera.firmwares | slice:5:100">
+                    <tr *ngIf="firmware.name && showAll">
+                        <td width="50%">{{ firmware.name }}</td>
+                        <td title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
+                            <div class="icon blue" role="img" style="width: 100%">
+                                <canvas class="icon-canvas" height="4"></canvas>
+                                <svg class="img-responsive icon-svg" height="4">
+                                    <line x1="0" y1="8"
+                                          [attr.x2]="firmwareLength(firmware.count, activeCamera.maxFirmwareCount)"
+                                          y2="8" class="firmware-line"
+                                          stroke-dasharray="8, 2"/>
+                                </svg>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </table>
+            <hr>
+            <div><a href="javascript:void(0);" (click)="onFeedbackClick.emit(activeCamera)">Send feedback about this
+                device</a></div>
+            <div style="color: gray;">Updated {{ activeCamera.timestamp | date:'fullDate'}}</div>
+
+        </nx-section>
+    </nx-block>
+</div>

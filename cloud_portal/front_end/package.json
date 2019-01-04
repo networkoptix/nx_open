@@ -24,6 +24,7 @@
         "angular-resource": "1.5.8",
         "angular-route": "1.5.8",
         "angular-sanitize": "1.5.8",
+        "angular2-csv": "^0.2.9",
         "bootstrap": "4.1.3",
         "core-js": "2.5.7",
         "hls.js": "0.12.1",

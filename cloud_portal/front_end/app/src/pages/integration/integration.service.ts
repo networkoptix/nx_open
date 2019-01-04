@@ -1,5 +1,4 @@
 import { Injectable, OnDestroy }        from '@angular/core';
-import { HttpClient }                   from '@angular/common/http';
 import { BehaviorSubject, Observable }  from 'rxjs';
 import { NxCloudApiService }            from '../../services/nx-cloud-api';
 import { NxConfigService }              from '../../services/nx-config';
@@ -22,8 +21,7 @@ export class IntegrationService implements OnDestroy {
     selectedPluginSubject = new BehaviorSubject(undefined);
     inReview: boolean;
 
-    constructor(private http: HttpClient,
-                private api: NxCloudApiService,
+    constructor(private api: NxCloudApiService,
                 private config: NxConfigService) {
 
         this.getIntegrations().subscribe(result => {

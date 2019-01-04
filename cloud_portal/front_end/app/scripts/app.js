@@ -352,6 +352,9 @@ window.L = {};
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
                             })
+                            .when('/campage', {
+                                template: ''
+                            })
                             .when('/sandbox', {
                                 template: ''
                             })

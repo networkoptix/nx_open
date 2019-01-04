@@ -9,6 +9,14 @@
     max-width : 1600px;
     
     .card-columns {
+        &.toggle-on {
+            width: 100%;
+            columns: 2;
+        }
+        &.toggle-off {
+            width: 100%;
+            columns: 1;
+        }
         @include media-breakpoint-up(sm) {
             width   : 66.66667%; // col-8
             columns : 1;         // overwrite default Bootstrap value
@@ -36,6 +44,7 @@
                 right : 1.5rem;
                 width : calc(16.66667% - 24px); // col-2 (-) 1.5rem margins for row and column
             }
+
         }
     }
 }

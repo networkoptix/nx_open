@@ -1,7 +1,9 @@
 <nx-pre-loader type="page" *ngIf="loading"></nx-pre-loader>
 
 <div class="layout m-0 p-3" *ngIf="!loading">
-    <div class="card-columns pl-2 pr-2">
+    <div class="card-columns pl-2 pr-2" [class.no-toggle]="!toggle"
+      [class.toggle-on]="toggle == 'on'"
+      [class.toggle-off]="toggle == 'off'">
         <ng-content select="[first-element]"></ng-content>
         <div class="right-sidemenu d-inline-block">
             <ng-content select="[side-element]"></ng-content>

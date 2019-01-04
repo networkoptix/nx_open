@@ -1,0 +1,55 @@
+@import '../../../../app/styles/native-theme/theme_palette';
+@import '../../../../app/styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+.campage {
+  .list-inline > li {
+    display: inline-block;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  
+  .text-placeholder {
+    color: $light16;
+    font-family: $font-family-regular;
+    font-size: 20px;
+    height: 32px;
+  }
+  
+  li {
+    a {
+      color           : $light16;
+      height          : 24px;
+      font-family     : $font-family-regular;
+      font-size       : 15px;
+      text-decoration : none;
+    
+      &:hover {
+        color : $dark6;
+      }
+    }
+  }
+  
+    /*** overwrite default table of component cam-table ***/
+    .nx-table-wrapper {
+      .nx-table {
+        th {
+          &:nth-child(n+7) {
+            width : 5%;
+          }
+        }
+      
+        td {
+          &:nth-child(n+7) {
+            width      : 5%;
+            text-align : center !important;
+          }
+        }
+      
+      }
+    }
+}

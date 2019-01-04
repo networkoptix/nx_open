@@ -15,7 +15,7 @@
     "messageSent": "Message has been sent."
   },
   "messageType": {
-    "ipvd_feedback": "IPVD Feedback",
+    "ipvd_feedback": "IPVD Feedback for {{product}}",
     "sales_inquiry": "Inquiry for {{product}}",
     "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, forwardRef, Input, OnInit, Output, SimpleChange, SimpleChanges } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
@@ -24,6 +24,17 @@ export class NxTagComponent implements OnInit, ControlValueAccessor {
         if (this.selected) {
             this.badgeClass = `${this.badgeClass}-selected`;
         }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        this.selected = changes.selected.currentValue;
+        setTimeout(() => {
+            if (!this.selected) {
+                this.deselectTag();
+            } else {
+                this.selectTag();
+            }
+        });
     }
 
     deselectTag() {
