@@ -64,7 +64,7 @@
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "Google ChromeやMozilla Firefoxの最新バージョンをインストールすることを推奨しますが、他の最新のWebブラウザを使用することもできます",
 	"What's new?": "新機能",
 	"Wrong password": "間違ったパスワード",
-	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "You can merge only those cloud Systems, where you have the \"Owner\" permissions.",
+	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "オーナー権限のあるクラウドシステムのみを統合することができます",
 	"You can only merge Systems in which you have owner permissions.": "結合できるはオーナー権限のシステムのみ",
 	"Your browser is not supported": "お使いのブラウザーはサポートされていません",
 	"is incompatible.": "互換性がありません",

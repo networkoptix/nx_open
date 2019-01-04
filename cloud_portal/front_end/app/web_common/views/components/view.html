@@ -27,6 +27,7 @@
                               search-cams="searchCams"
                               show-camera-panel="showCameraPanel"
                               is-embeded="isEmbeded"
+                              show-on-top="showOnTop"
                               class="cameras-panel-wrapper"
                               ng-class="{'hide-panel':!showCameraPanel, 'on-top': showOnTop}"></camera-panel>
             </div>
@@ -42,12 +43,14 @@
                                  ng-if="showCameraHeader">
 
                                 <div class="webclient-panel webclient-bottom-border">
-                                    <div class="float-right">
+                                    <div class="float-right d-flex">
                                         <div class="video-title-buffer">&nbsp;</div>
-                                        <span ng-if="debugMode || showCastButton" class="video-icon">
-                                                <button class="cast-button" is="google-cast-button" id="castbutton"
+                                        <div class="btn-group video-settings-icon">
+                                            <span ng-if="debugMode || showCastButton" class="video-icon">
+                                                <button class="cast-button d-flex" is="google-cast-button" id="castbutton"
                                                         ng-click="showWarning()"></button>
                                             </span>
+                                        </div>
                                         <div class="btn-group video-settings-icon">
                                             <span class="video-icon" ng-click="toggleSettingsMenu()">
                                                 <span class="glyphicon glyphicon-cog"></span>
@@ -97,14 +100,18 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
-                                              ng-click="fullScreen()">
+                                        <div>
+                                            <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
+                                                  ng-click="fullScreen()">
                                                 <span class="glyphicon glyphicon-fullscreen"></span>
                                             </span>
-                                        <span ng-if="isFullscreen" class="video-icon"
-                                              ng-click="closeFullscreen()">
+                                        </div>
+                                        <div>
+                                            <span ng-if="isFullscreen" class="video-icon"
+                                                  ng-click="closeFullscreen()">
                                                 <span class="glyphicon glyphicon-close-fullscreen"></span>
                                             </span>
+                                        </div>
                                     </div>
                                     <div class="hide-excess-text video-title">
                                             <span class="d-block d-md-none float-left" ng-click="showCamerasPanel()"

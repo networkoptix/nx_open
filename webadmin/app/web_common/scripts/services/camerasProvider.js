@@ -14,6 +14,7 @@ angular.module('nxCommon')
             this.storage = $localStorage;
             this.poll = null;
             this.serverOffsets = {};
+            this.serverOffsetsPromise = null;
 
             this.bothRequest = null;
         }
@@ -339,19 +340,38 @@ angular.module('nxCommon')
         };
 
         camerasProvider.prototype.getServerTimeOffset = function(serverId){
-            return this.serverOffsets[serverId];
+            var offset = this.serverOffsets[serverId];
+            if(!offset && this.serverOffsetsPromise) {
+                var self = this;
+                return this.serverOffsetsPromise.then(function(){
+                    return self.serverOffsets[serverId];
+                });
+            }
+            return $q.resolve(offset);
         };
         camerasProvider.prototype.getServerTimes = function(){
             var self = this;
-            return self.systemAPI.getServerTimes().then(function(result){
+            this.serverOffsetsPromise = self.systemAPI.getServerTimes().then(function (result) {
                 var serverOffsets = result.data.reply;
-                _.each(serverOffsets, function(server){
-                    //Typo with server api so we check for both spellings
-                    //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
-                    var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
-                    self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
-                });
+
+                function setServerOffsetTime(time) {
+                    self.serverOffsetsPromise = undefined;
+                    return _.each(serverOffsets, function (server) {
+                        //Typo with server api so we check for both spellings
+                        //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
+                        var timeSinceEpochMs = parseInt(time || server.timeSinceEpochMs || server.timeSinseEpochMs);
+                        self.serverOffsets[server.serverId] = window.timeManager.getOffset(timeSinceEpochMs, parseInt(server.timeZoneOffsetMs));
+                    });
+                }
+
+                if (Config.webclient.useSystemTime) {
+                    return self.systemAPI.getSystemTime().then(function (systemTime) {
+                        return setServerOffsetTime(systemTime.data.reply.utcTimeMs);
+                    });
+                }
+                return setServerOffsetTime();
             });
+            return this.serverOffsetsPromise;
         };
 
         camerasProvider.prototype.collapseServer = function(serverName, collapse){

@@ -16,7 +16,7 @@
             </div>
             <span ng-if="emptyArchive && !loading" class="no-archive-message">
                 No Archive
-            </span>  
+            </span>
         </div>
         <div class="text-right float-right d-none d-md-block" ng-class="{'no-volume':disableVolume, 'shadows-off': emptyArchive}">
             <span class="live-button inline-block float-left "
@@ -38,11 +38,11 @@
             </span>
             <div class="inline-block zoom-level float-right" ng-if="canViewArchive">
                 <span class="webclient-button glyphicon-pm zoomInButton"
-                      ng-class="{disabled:scaleManager.disableZoomIn || emptyArchive}">
+                      ng-class="{'disabled' : scaleManager.disableZoomIn || emptyArchive}">
                     <span class="glyphicon glyphicon-plus"></span>
                 </span>
                 <span class="webclient-button glyphicon-pm zoomOutButton"
-                      ng-class="{disabled:scaleManager.disableZoomOut || emptyArchive}">
+                      ng-class="{'disabled' : disableZoomOut || emptyArchive}">
                     <span class="glyphicon glyphicon-minus"></span>
                 </span>
             </div>
@@ -71,11 +71,11 @@
             </span>
         </div>
         <span class="webclient-button glyphicon-pm zoomInButton inline-block" ng-if="canViewArchive"
-            ng-class="{disabled:scaleManager.disableZoomIn || emptyArchive}">
+            ng-class="{'disabled' : scaleManager.disableZoomIn || emptyArchive}">
             <span class="glyphicon glyphicon-plus"></span>
         </span>
         <span class="webclient-button glyphicon-pm zoomOutButton inline-block" ng-if="canViewArchive"
-            ng-class="{disabled:scaleManager.disableZoomOut || emptyArchive}">
+            ng-class="{'disabled' : disableZoomOut || emptyArchive}">
             <span class="glyphicon glyphicon-minus"></span>
         </span>
     </div>

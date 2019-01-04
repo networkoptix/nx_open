@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        Documentação do Servidor
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Essas definições estão acessíveis em:</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                Para o Windows na chave do registro:
+                Computer\HKEY_LOCAL_MACHINE\SOFTWARE\"{{Config.productName}}"\"{{Config.productName}} Servidor Média"
+            </p>
+            <p>
+                Para todas as outras plataformas, é colocado em um ficheiro de configuração:
+                /opt/{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">Definições Servidor</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>Nome</th>
+                        <th>&Descrição</th>
+                        <th>Valor padrão</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

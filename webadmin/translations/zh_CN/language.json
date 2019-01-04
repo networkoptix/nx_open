@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "创建帐户",
         "errorNoHDD": "此设备只在硬盘上工作。<br>请关闭设备，然后安装硬盘。",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "这个设备需要网络连接才能工作。<br>请将它连接到本地网络或互联网"
     },
     "passwordRequirements": {
         "minLengthMessage": "密码必须至少 为8 个字符长",

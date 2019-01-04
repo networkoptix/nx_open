@@ -145,7 +145,7 @@
                 }
                 
                 function updateAvailableResolutions() {
-                    if ($scope.player == null) {
+                    if ($scope.player === null) {
                         $scope.availableResolutions = [LANG.common.resolution.auto];
                         return;
                     }
@@ -167,7 +167,7 @@
                             
                             for (var i = 0; i < availableFormats.length; i++) {
                                 if (availableFormats[i].encoderIndex === 0) {
-                                    if (!(window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera))) {
+                                    if (window.jscd.os !== 'iOS' || (window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera))) {
                                         streams.push(LANG.common.resolution.high);
                                     }
                                 }
@@ -179,7 +179,7 @@
                         $scope.availableResolutions = streams;
                         
                         if ($scope.activeCamera && streams.length === 1) {
-                            if (window.jscd.os === 'iOS') {
+                            if (window.jscd.os === 'iOS' && $scope.activeCamera.status !== 'Unauthorized') {
                                 $scope.iOSVideoTooLarge = true;
                             } else {
                                 console.error("no suitable streams from this camera");
@@ -208,6 +208,11 @@
                     // clear preview for next camera
                     $scope.preview = '';
                     
+                    if (!$scope.activeCamera) {
+                        $scope.activeVideoSource = {src: ''};
+                        return;
+                    }
+                    
                     var salt = '&' + Math.random(),
                         cameraId = $scope.activeCamera.id,
                         resolution = $scope.activeResolution,
@@ -228,7 +233,7 @@
                     
                     $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
                     if (live) {
-                        playingPosition = timeManager.nowToDisplay();
+                        playingPosition = window.timeManager.nowToDisplay();
                     } else {
                         playingPosition = Math.round(playingPosition);
                     }
@@ -239,8 +244,9 @@
                     }
                     $scope.resolution = resolutionHls;
                     
-                    $scope.currentResolution = $scope.player === "webm" ? resolution : resolutionHls;
-                    $scope.activeVideoSource = _.filter([
+                    $scope.currentResolution = $scope.player === 'webm' ? resolution : resolutionHls;
+                    
+                    let videoSources = [
                         {
                             src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt,
                             type: mimeTypes.hls,
@@ -256,8 +262,10 @@
                             type: mimeTypes.jpeg,
                             transport: 'preview'
                         }
-                    ], function (src) {
-                        return cameraSupports(src.transport) != null;
+                    ];
+                    
+                    $scope.activeVideoSource = videoSources.filter((src) => {
+                        return cameraSupports(src.transport);
                     });
                     
                     $scope.preview = _.find($scope.activeVideoSource, function (src) {
@@ -409,7 +417,7 @@
                 
                 $scope.showEmbed = function () {
                     $scope.showSettings = false;
-                    dialogs.embed({})
+                    dialogs.embed({});
                 };
                 
                 $scope.selectResolution = function (resolution) {
@@ -500,7 +508,7 @@
                         }
                     }
                     
-                    // record actice camera again as only one camera should be selected per system
+                    // record active camera again as only one camera should be selected per system
                     $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
                 }
                 
@@ -510,8 +518,8 @@
                             $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                         } else {
                             $scope.showCameraPanel = false;
-                            return;
                         }
+                        return;
                     }
                     
                     resetSystemActiveCamera();
@@ -529,14 +537,17 @@
                     
                     systemAPI.setCameraPath($scope.activeCamera.id);
                     timeFromUrl = timeFromUrl || null;
+                    if (!timeFromUrl && $scope.positionProvider) {
+                        timeFromUrl = $scope.positionProvider.playedPosition;
+                    }
                     $scope.updateCamera(timeFromUrl);
-                    timeFromUrl = null;
                     
                     //When camera is changed request offset for camera
-                    var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-                    if (serverOffset) {
+                    $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId).then( function(serverOffset) {
                         window.timeManager.setOffset(serverOffset);
-                    }
+                        updateVideoSource(timeFromUrl);
+                        timeFromUrl = null;
+                    });
                 });
                 
                 window.timeManager.init(CONFIG.webclient.useServerTime, CONFIG.webclient.useSystemTime);
@@ -594,7 +605,7 @@
                     $scope.ready = true;
                     $timeout(updateHeights);
                     $scope.camerasProvider.startPoll();
-                    if (($scope.betaMode || $scope.debugMode) && window.jscd.browser.toLowerCase() == 'chrome') {
+                    if (($scope.betaMode || $scope.debugMode) && window.jscd.browser.toLowerCase() === 'chrome') {
                         $scope.voiceControls = {enabled: true, showCommands: true};
                         voiceControl.initControls($scope);
                     }
@@ -618,12 +629,16 @@
                 
                 var killSubscription = $rootScope.$on('$routeChangeStart', function (event, next) {
                     timeFromUrl = $location.search().time;
-                    
+    
                     if (next.params.cameraId) {
                         $scope.storage.cameraId = '{' + next.params.cameraId + '}';
                         $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
-                        $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
+                        
+                        if ($scope.activeCamera) {
+                            $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
+                        }
                     }
+    
                 });
                 
                 $('html').addClass('webclient-page');

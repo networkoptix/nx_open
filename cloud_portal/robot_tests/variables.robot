@@ -219,7 +219,7 @@ ${BETAS TAB}                          //span[@class='tab-heading' and text()='${
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
 #Known Limitations
-${REMOTE CONNECTIVITY TILE LINK}      //h2[contains(text(),"${REMOTE CONNECTIVITY}")]/..//a[@href="${SUPPORT URL}"]
+${REMOTE CONNECTIVITY TILE LINK}      //h2[contains(text(),"${REMOTE CONNECTIVITY}")]/..//a[contains(@href,"${SUPPORT URL}")]
 ${SUPPORT TILE LINK}                  //h2[contains(text(),"${SUPPORT}")]/..//a[@href="${SUPPORT URL}"]
 #About
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']

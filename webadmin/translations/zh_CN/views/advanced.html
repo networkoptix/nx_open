@@ -16,7 +16,7 @@
                         URL地址
                     </th>
                     <th width="200">
-                        剩余空间
+                        已占存储
                     </th>
                     <th width="150">
                         保留空间
@@ -40,7 +40,8 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.totalSpace)}} {{formatSpace(storage.freeSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} / 
+{{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"

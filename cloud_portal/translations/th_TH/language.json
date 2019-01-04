@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "แสดงขั้นสูง",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
     },
     "Administrator": {
       "label": "ผู้ดูแลระบบ",
@@ -137,7 +137,7 @@
     "cantOpenClient": "ไม่พบแอ็พพลิเคชัน %VMS_NAME% <a href=\"/download\">Download</a>",
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
     "thisSystem": "ระบบ",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10"
   },
   "passwordRequirements": {
     "good": "ดี",
@@ -183,7 +183,7 @@
     "confirmUnshareAction": "ลบ",
     "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "ระบบ {{systemName}} ถูกผสานกับ {{systemName}}",
     "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
   },
   "account": {
@@ -285,7 +285,7 @@
       "copyActiveText": "คัดลอกไปยังคลิปบอร์ด"
     },
     "systemOffline": "ระบบออฟไลน์",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "ไม่พบกล้อง",
     "cameraStates": {
       "offline": "ออฟไลน์",
       "error": "ข้อผิดพลาด",

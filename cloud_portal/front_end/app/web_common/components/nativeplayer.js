@@ -13,6 +13,9 @@
     };
     
     window.NativePlayer.prototype.play = function () {
+        if (this.video === undefined) {
+            return;
+        }
         var playPromise = this.video.play();
         if (playPromise) {
             playPromise.catch(function (error) {
@@ -26,6 +29,9 @@
     };
     
     window.NativePlayer.prototype.pause = function () {
+        if (this.video === undefined) {
+            return;
+        }
         this.video.pause();
     };
     
@@ -42,10 +48,16 @@
     };
     
     window.NativePlayer.prototype.kill = function () {
+        if (this.video === undefined) {
+            return;
+        }
         this.video.src = '';
     };
     
     window.NativePlayer.prototype.load = function (url, type) {
+        if (this.video === undefined) {
+            return;
+        }
         this.video.setAttribute('type', type);
         this.video.src = url;
     };

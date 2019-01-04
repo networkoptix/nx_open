@@ -1,0 +1,3 @@
+Olá {{message.userFullName}}
+
+{{message.text_body}}

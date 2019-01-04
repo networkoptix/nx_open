@@ -110,7 +110,7 @@ TimelineActions.prototype.setClickedCoordinate = function(mouseX){
 
     this.updatePlayingState(position); // Force set clicked position as playing
 
-    return position;
+    return window.timeManager.displayToServer(position);
 };
 
 

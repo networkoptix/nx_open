@@ -6,7 +6,7 @@
     "emailSubject": "รีเซ็ตรหัสผ่านของคุณ"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} เชิญคุณไปที่ %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}ระบบวิดีโอ {{message.system_name}} ถูกแชร์กับคุณ{{/message.sharer_name}}"
   },
   "system_shared": {
     "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"

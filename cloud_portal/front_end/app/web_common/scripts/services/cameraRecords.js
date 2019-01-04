@@ -9,14 +9,14 @@ angular.module('nxCommon')
                 if(lastRecordProvider){
                     lastRecordProvider.abort("getRecordsProvider");
                 }
-                lastRecordProvider = new CameraRecordsProvider(cameras, mediaserver, width);
+                lastRecordProvider = new window.CameraRecordsProvider(cameras, mediaserver, width);
                 return lastRecordProvider;
             },
             getPositionProvider:function(cameras, mediaserver){
                 if(lastPositionProvider){
                     lastPositionProvider.abort("getPositionProvider");
                 }
-                lastPositionProvider = new ShortCache(cameras, mediaserver);
+                lastPositionProvider = new window.ShortCache(cameras, mediaserver);
                 return lastPositionProvider;
             }
         };

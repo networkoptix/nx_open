@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Trình xem nâng cao",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Có thể xem video trực tiếp, duyệt kho lưu trữ, kiểm soát PTZ"
     },
     "Administrator": {
       "label": "Giám sát viên",
@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "forbidden": "Bạn không có quyền thực hiện công việc này",
     "accountNotActivated": "Tài khoản này chưa được kích hoạt. <a href=\"/activate\">Gửi liên kết kích hoạt lại</a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "Tài khoản này tạm thời bị chặn, xin vui lòng thử lại sau vài phút.",
     "notFound": "Không tìm thấy",
     "alreadyExists": "Tài khoản này đã tồn tại",
     "unknownError": "Đã xảy ra lỗi không mong muốn",
@@ -137,7 +137,7 @@
     "cantOpenClient": "Ứng dụng %VMS_NAME% ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
     "lostConnection": "Kết nối với {{systemName}} bị mất",
     "thisSystem": "hệ thống",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10"
   },
   "passwordRequirements": {
     "good": "tốt",
@@ -183,7 +183,7 @@
     "confirmUnshareAction": "Xóa bỏ",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Hệ thống {{systemName}} đã được hợp nhất với {{systemName}}",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
   },
   "account": {
@@ -285,7 +285,7 @@
       "copyActiveText": "sao chép vào clipboard"
     },
     "systemOffline": "Hệ thống offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "KHÔNG CÓ MÁY ẢNH",
     "cameraStates": {
       "offline": "Ẩn",
       "error": "Lỗi",

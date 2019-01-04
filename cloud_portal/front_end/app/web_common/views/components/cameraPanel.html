@@ -42,10 +42,9 @@
             </a>
 
             <div class="collapse-box">
-                <ul class="nav" ng-if="server.expanded"
+                <ul class="nav" nx-collapsible="server.expanded"
                     ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy, closing:server.expanded}" >
-                    <li class="w-100"
-                        ng-repeat="camera in cameras[server.id]"
+                    <li ng-repeat="camera in cameras[server.id]"
                         ng-class="{active:activeCamera.id == camera.id}"
                         ng-if="camera.visible"
                         ng-include="Config.viewsDirCommon + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')">

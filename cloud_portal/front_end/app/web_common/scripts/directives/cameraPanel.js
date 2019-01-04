@@ -14,7 +14,8 @@
                 'activeCamera'   : '=',
                 'camerasProvider': '=',
                 'showCameraPanel': '=',
-                'isEmbeded'      : '<'
+                'isEmbeded'      : '<',
+                'showOnTop'      : '='
             },
             templateUrl: CONFIG.viewsDirCommon + 'components/cameraPanel.html',
             link       : function (scope/*, element, attrs*/) {
@@ -27,7 +28,7 @@
                 };
                 
                 scope.selectCamera = function (activeCamera) {
-                    if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
+                    if (scope.activeCamera && (scope.activeCamera.id === activeCamera.id)) {
                         return;
                     }
                     scope.activeCamera = activeCamera;
@@ -98,6 +99,7 @@
                 };
 
                 scope.showCamera = function (camera) {
+                    scope.showOnTop = false;
                     scope.selectCamera(camera);
                 };
 

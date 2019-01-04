@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "create account",
         "errorNoHDD": "Este dispositivo destina-se a funcionar com a unidade de disco rígido instalada.<br>Desligue o dispositivo e instale uma unidade de disco rígido.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
+        "errorNoNetwork": "Este dispositivo precisa de ligação de rede para funcionar.<br>Por favor, conecte-o à rede local ou Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Password must be at least 8 characters long",
@@ -144,7 +144,7 @@
         "cloudError": "Não é possível fazer o \"merge\" dos sistemas. O sistema dependente está conectado à \"Cloud\". É precisa desconectar primeiro.",
         "cloudBothError": "Não é possível fazer o \"merge\" dos sistemas. Ambos os sistemas estão conectados à \"Cloud\". É precisa desconectar um deles primeiro.",
         "cloudHostConflict": "Não é possível fazer o \"merge\" dos sistemas, porque os servidores estão criados com diferentes hosts na \"Cloud\"",
-        "licenceError": "Aviso! Você está prestes a efectuar o \"Merge\" de Sistemas com licenças Starter. Apenas é permitida uma licença Starter por sistema, e por isso a segunda licença será desativada. Efectuar o \"Merge\" mesmo assim?",
+        "licenceError": "Aviso! Você está prestes a efectuar o \"Merge\" de Sistemas com licenças Starter. Apenas é permitida uma licença Starter por sistema, e por isso a segunda licença será desactivada. Efectuar o \"Merge\" mesmo assim?",
         "connectionFailed": "A ligação falhou: ",
         "unknownError": "Erro desconhecido",
         "mergeFailed": "Falhou o \"Merge\": ",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Login ou senha incorrectos",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Demasiadas tentativas. Tente novamente dentro de um minuto."
     },
     "navigaion": {
         "cannotGetUser": "Falha do servidor: não é possível obter os dados do utilizador actual"

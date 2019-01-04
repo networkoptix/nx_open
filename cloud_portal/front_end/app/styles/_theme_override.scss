@@ -286,6 +286,11 @@ select {
         background-color: $warning;
         color           : $dark9;
     }
+    
+    &-success {
+        background-color : $brand-success;
+        color            : $light1;
+    }
 }
 
 .table {
