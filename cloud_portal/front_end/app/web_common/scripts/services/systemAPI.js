@@ -309,17 +309,24 @@ angular.module('nxCommon')
         ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
             var data = {
                     cameraId:cleanId(cameraId)
-                };
+                },
+                uri = '/ec2/cameraThumbnail';
+            
             if(time){
                 data.time = time;
+            } else {
+                uri += '?ignoreExternalArchive';
             }
+            
             if(width){
                 data.width = width;
             }
+            
             if(height){
                 data.height = height;
             }
-            return this._setGetParams('/ec2/cameraThumbnail?ignoreExternalArchive', data, this.systemId && this.authGet());
+            
+            return this._setGetParams(uri, data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};

@@ -115,7 +115,7 @@
         
         this.updatePlayingState(position); // Force set clicked position as playing
         
-        return position;
+        return window.timeManager.displayToServer(position);
     };
 
     // linear is for holding function

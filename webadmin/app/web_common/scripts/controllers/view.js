@@ -432,14 +432,17 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.storage.cameraId  = $scope.activeCamera.id;
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
+            if (!timeFromUrl && $scope.positionProvider) {
+                timeFromUrl = $scope.positionProvider.playedPosition;
+            }
             $scope.updateCamera(timeFromUrl);
-            timeFromUrl = null;
 
             //When camera is changed request offset for camera
-            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-            if(serverOffset){
-                timeManager.setOffset(serverOffset);
-            }
+            $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId).then( function(serverOffset) {
+                window.timeManager.setOffset(serverOffset);
+                updateVideoSource(timeFromUrl);
+                timeFromUrl = null;
+            });
             $scope.showCameraPanel = !$scope.activeCamera;
         });
 

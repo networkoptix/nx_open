@@ -40,7 +40,7 @@ function main()
 
     # Check if we have docker here
     if ! docker info &> /dev/null; then
-        echo 'No docker server found. If you are Evgeny make sure docker-machine is runnning.'
+        echo 'No docker server found. Make sure you have docker installed'
         exit 1
     fi
 

@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.conf.urls import url
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.html import format_html
-from django.http.response import HttpResponse
 
 from cloud import settings
 from cms.forms import *
@@ -18,14 +17,16 @@ class CustomizationFilter(SimpleListFilter):
     title = 'Customization'
     parameter_name = 'customization'
     default_customization = None
+    ALL_CUSTOMIZATIONS = '0'
+    OTHER_CUSTOMIZATIONS = '1000'
 
     def lookups(self, request, model_admin):
         # Temporary customization 0 is need for 'All' since we need to keep it,
         # but choose the customization for the current cloud portal as the default value
         self.default_customization = Customization.objects.get(name=settings.CUSTOMIZATION).id
-        customizations = [Customization(id=0, name='All Customizations')]
+        customizations = [Customization(id=self.ALL_CUSTOMIZATIONS, name='All Customizations')]
         customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
-        customizations.extend([Customization(id=1000, name='Other Customizations')])
+        customizations.extend([Customization(id=self.OTHER_CUSTOMIZATIONS, name='Other Customizations')])
         return [(c.id, c.name) for c in customizations]
 
     def choices(self, cl):
@@ -38,9 +39,9 @@ class CustomizationFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            if self.value() == '1000':
+            if self.value() == self.OTHER_CUSTOMIZATIONS:
                 return queryset.exclude(customization__name__in=request.user.customizations)
-            elif self.value() != '0':
+            elif self.value() != self.ALL_CUSTOMIZATIONS:
                 return queryset.filter(customization__id=self.value())
 
         else:
@@ -186,9 +187,9 @@ class ProductAdmin(CMSAdmin):
         return render(request, 'cms/page_list_view.html', context)
 
     def change_page(self, request, context_id=None, product_id=None):
-        context = {}
+        context = {'errors': []}
         if request.method == "POST" and 'product_id' in request.POST:
-            context['preview_link'] = page_editor(request)
+            context['preview_link'], context['errors'] = page_editor(request)
             if 'SendReview' in request.POST and context['preview_link']:
                 return redirect(context['preview_link'].url)
 
@@ -211,6 +212,9 @@ class ProductAdmin(CMSAdmin):
 
         form = CustomContextForm(initial={'language': context['language_code'], 'context': context_id})
         form.add_fields(product, target_context, Language.objects.get(code=context['language_code']), request.user)
+        form.cleaned_data = {}
+        for field_error in context['errors']:
+            form.add_error(field_error[0], field_error[1])
         context['custom_form'] = form
 
         return render(request, 'cms/context_change_form.html', context)

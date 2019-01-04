@@ -66,7 +66,7 @@
     "LAST NAME IS REQUIRED TEXT": "Фамилия обязательна для заполнения",
     "EMAIL IS REQUIRED TEXT": "Email обязателен для заполнения",
     "EMAIL ALREADY REGISTERED TEXT": "Этот Email уже зарегистрирован в %PRODUCT_NAME%",
-    "EMAIL INVALID TEXT": "Пожалуйста введите действительный адрес электронной почты",
+    "EMAIL INVALID TEXT": "Пожалуйста, введите действительный Email",
     "PASSWORD IS REQUIRED TEXT": "Пароль обязателен для заполнения",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Текущий пароль обязателен для заполнения",
     "PASSWORD SPECIAL CHARS TEXT": "Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",

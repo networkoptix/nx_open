@@ -24,8 +24,8 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>Bạn đã đăng ký tại %PRODUCT_NAME%</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <p>Chúng tôi đã gửi cho bạn một email với liên kết kích hoạt đến {{data.email}}.<br>
+                Vui lòng kích hoạt tài khoản của bạn bằng cách truy cập liên kết này.</p>
         </div>
         <h1 ng-if="!data.email">Kích hoạt tài khoản của bạn</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -43,9 +43,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> Email là bắt buộc </span> 
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vui lòng nhập Email hợp lệ </span>
                 </div>
             </div>
             <div class="form-group">
@@ -80,9 +80,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> Email là bắt buộc </span> 
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vui lòng nhập Email hợp lệ </span>
                 </div>
             </div>
             <div class="form-group">

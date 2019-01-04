@@ -49,10 +49,10 @@ def get_context_and_language(request, context_id, language_code, default_languag
 
 
 # If there are any errors they will be added to the django messages that show up in the response
-def add_upload_error_messages(request, errors):
+def add_upload_error_messages(request, message, errors):
     for error in errors:
         messages.error(
-            request, "Upload error for {}. {}".format(error[0], error[1]))
+            request, message.format(error[0], error[1]))
 
 
 # Used to make sure users without advanced permission don't modify advanced DataStructures
@@ -83,6 +83,7 @@ def context_editor_action(request, product, context_id, language_code):
     preview_link = ""
     saved_msg = "Changes have been saved."
     upload_errors = []
+    product_errors = []
 
     if not (request.user.is_superuser or request.user.has_perm('cms.edit_advanced'))\
             and advanced_touched_without_permission(request_data, context.datastructure_set.all(), product):
@@ -105,17 +106,19 @@ def context_editor_action(request, product, context_id, language_code):
                 warning_no_error_msg = "Cannot have any errors when sending for review."
                 messages.warning(request, "{} - {}".format(product.name, warning_no_error_msg))
             else:
-                modify_db.send_version_for_review(product, request.user)
+                # Product errors only applies to products with type integration
+                product_errors = modify_db.send_version_for_review(product, request.user)
                 saved_msg += " A new version has been created."
 
-        if upload_errors:
-            add_upload_error_messages(request, upload_errors)
+        if upload_errors or product_errors:
+            add_upload_error_messages(request, "Upload error for {}. {}", upload_errors)
+            add_upload_error_messages(request, "Product error for {}. {}", product_errors)
         else:
             messages.success(request, saved_msg)
             if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 preview_link = modify_db.generate_preview_link(context)
 
-    return preview_link, upload_errors
+    return preview_link, upload_errors, product_errors
 
 
 # Create your views here.
@@ -129,9 +132,9 @@ def page_editor(request):
     if not request.user.has_perm('cms.edit_content'):
         raise PermissionDenied
 
-    preview_link, errors = context_editor_action(request, product, context_id, language_code)
+    preview_link, context_errors, product_errors = context_editor_action(request, product, context_id, language_code)
 
-    if 'SendReview' in request.POST and not errors:
+    if 'SendReview' in request.POST and not context_errors and not product_errors:
         customization_review = ProductCustomizationReview.objects.\
             filter(version_id=ContentVersion.objects.latest('created_date'))
 
@@ -145,7 +148,7 @@ def page_editor(request):
         redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(customization_review.id,))
         return redirect(redirect_url)
 
-    return preview_link
+    return preview_link, context_errors
 
 
 @require_http_methods(["POST"])

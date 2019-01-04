@@ -64,7 +64,7 @@
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "建议您安装最新版本的Google Chrome或Mozilla Firefox，或可以使用任何其他最新的网络浏览器。",
 	"What's new?": "最新动态",
 	"Wrong password": "错误的密码。",
-	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "You can merge only those cloud Systems, where you have the \"Owner\" permissions.",
+	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "您只能合并那些拥有“所有者”权限的云系统。",
 	"You can only merge Systems in which you have owner permissions.": "您只能合并当您被授权为拥有者的系统",
 	"Your browser is not supported": "系统不支持您的浏览器",
 	"is incompatible.": "不相容",

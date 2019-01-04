@@ -124,7 +124,7 @@ Sharing roles are ordered: more access is on top of the list with options
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']/../../following-sibling::li/a/span[text()="${ADV VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${LIVE VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${CUSTOM TEXT}"]
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']/../../following-sibling::li/a/span[text()="${ADV VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${LIVE VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="Client Custom"]/../../following-sibling::li/a/span[text()="${CUSTOM TEXT}"]
     Click Button    ${SHARE CLOSE}
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
@@ -317,3 +317,17 @@ Check share email for registered user
     \    check in list    ${expected links}    ${link}
     Delete Email    ${email}
     Close Mailbox
+    Remove User Permissions    ${EMAIL NOPERM}
+
+User with client custom settings has access to system
+    Log in to Auto Tests System    ${EMAIL CLIENT CUSTOM}
+    Location Should Be    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Verify In System    ${AUTO TESTS}
+
+User can be invited with client custom permissions
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Share To    ${random email}    Client Custom
+    Check User Permissions    ${random email}    Client Custom
+    Sleep    2
+    Remove User Permissions    ${random email}

@@ -1,0 +1,20 @@
+<footer ng-if="viewFooter">
+    <div class="container">
+        <div class="row">
+            <ul class="nav navbar-nav col-6 col-md-8 flex-column flex-lg-row">
+                <li>
+                    <nx-language-select dropup="true" short="true" instant-reload="true"></nx-language-select>
+                </li>
+                <li><a href="/content/about">Sobre <span class="product-name">%PRODUCT_NAME%</span></a></li>
+                <li><a href="/download">Baixar %VMS_NAME%</a></li>
+                <li><a href="/content/faq">Limitações conhecidas</a></li>
+                <li><a href="%SUPPORT_LINK%" target="_blank">Suporte</a></li>
+                <li><a href="/content/eula">Termos</a></li>
+                <li><a href="%PRIVACY_LINK%">Privacidade</a></li>
+            </ul>
+            <ul class="nav navbar-nav col-6 col-md-4 justify-content-end">
+                <li><a href="%COMPANY_LINK%" target="_blank" class="company">&copy; 2018 %COMPANY_NAME%</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
