@@ -116,9 +116,11 @@
 
     /*** overwrite bootstrap pagination style ***/
     .pagination {
+      margin : 0;
+      
       .page-item {
         cursor: pointer;
-        margin: 0px 3px;
+        margin: 0 3px;
 
         .page-link {
           font-family: $font-family-regular;
@@ -128,7 +130,7 @@
           border-radius: 2px;
           height: 32px;
           line-height: 32px;
-          padding: 0px 12px;
+          padding: 0 12px;
 
           &:hover {
             background-color: $light5;

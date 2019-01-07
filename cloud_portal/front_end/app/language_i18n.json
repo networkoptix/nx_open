@@ -34,6 +34,7 @@
 	"Embed": "Embed",
 	"Enter \"Public User\" credentials:": "Enter \"Public User\" credentials:",
 	"Enter password to continue.": "Enter password to continue.",
+	"Export all to CSV": "Export all to CSV",
 	"Forgot password?": "Forgot password?",
 	"In-Client Upgrade:": "In-Client Upgrade:",
 	"Instructions": "Instructions",
@@ -44,6 +45,7 @@
 	"Merge": "Merge",
 	"Merge Systems": "Merge Systems",
 	"Merge current System with": "Merge current System with",
+	"Nothing Found": "Nothing Found",
 	"Ok": "Ok",
 	"Other packages:": "Other packages:",
 	"Other releases, patches and beta versions": "Other releases, patches and beta versions",
@@ -79,5 +81,7 @@
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Your browser is not supported": "Your browser is not supported",
 	"is incompatible.": "is incompatible.",
-	"is offline.": "is offline."
+	"is offline.": "is offline.",
+	"result": "result",
+	"results": "results"
 }

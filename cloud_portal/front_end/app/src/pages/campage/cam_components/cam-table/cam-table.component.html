@@ -1,20 +1,23 @@
 <div class="nx-table-wrapper">
     <div class="nx-table-header">
         <div class="col text-placeholder" *ngIf="results == 0; else camview">
-            <span>Nothing Found</span>
+            <span translate>Nothing Found</span>
         </div>
         <ng-template #camview>
-            <div class="col-md-12 d-flex align-items-center p-0" [ngSwitch]="results">
-                <div class="flex-grow-1" *ngSwitchCase="1">
-                    <h4 class="m-0">1 result</h4>
+            <div class="col-md-12 d-flex align-items-center p-0">
+
+                <div class="flex-grow-1">
+                    <h4 class="m-0">
+                        {{results}}
+                        <span *ngIf="results != 1" translate>results</span>
+                        <span *ngIf="results == 1" translate>result</span>
+                    </h4>
                 </div>
-                <div class="flex-grow-1" *ngSwitchDefault>
-                    <h4 class="m-0">{{results}} results</h4>
-                </div>
+
                 <div class="col-md-3 text-right">
                     <nx-csv-button [data]="csvCameraData"
                                    filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
-                                   [options]="csvOptions">Export all to CSV
+                                   [options]="csvOptions">{{ 'Export all to CSV' | translate }}
                     </nx-csv-button>
                 </div>
             </div>

@@ -154,7 +154,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
           .getAllCameras(this.company)
           .subscribe(data => {
               this.data = data;
-              this.camerasSuccessFn();
+              this.camerasSuccessFn(this.data);
           });
   }
 
@@ -162,14 +162,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.filter = {...this.emptyFilter};
   }
 
-  camerasSuccessFn() {
-       const response = this.data;
-
+  camerasSuccessFn(data) {
        const vendorModelCount = {};
        const vendors = new Set();
        const camerasWithAliases = [];
 
-       response.forEach(camera => {
+       data.forEach(camera => {
            camera.isH265 = camera.primaryCodec === 'H.265';
 
            if (camera.hardwareType === 'Camera' && camera.isMultiSensor) {

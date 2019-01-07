@@ -9,7 +9,7 @@
             </nx-camera-search>
         </div>
     </div>
-    <div class="row p-3 campage-info" [hidden]="filterModel.query">
+    <div class="row pl-3 pb-3 m-0 campage-info" [hidden]="filterModel.query">
         <h4>
             <ul class="list-inline text-muted text-placeholder" *ngIf="totalVendors">
                 <li>{{ totalVendors }} manufacturers</li>
@@ -34,8 +34,11 @@
             ></nx-cam-view>
         </nx-block>
     </nx-layout-right>
+
+    <nx-pre-loader *ngIf="!vendors.length"></nx-pre-loader>
+
     <div class="row p-3" *ngIf="!filterModel.query">
-        <ul class="list-unstyled col-md-3" *ngFor="let n of [0, 1, 2, 3]">
+        <ul class="pl-3 m-0 list-unstyled col-md-3" *ngFor="let n of [0, 1, 2, 3]">
             <li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
                 <a href (click)="setVendor(vendor)">
                     <span>
@@ -45,8 +48,10 @@
             </li>
         </ul>
     </div>
-    <p>This list is limited to actual devices auto-reporting data to {{company}}, as approved by anonymous system users.
-        The complete list of supported manufacturers and models is greater in scope. Please <a href (click)="open()">submit a request</a> for additional
-        questions/concerns regarding supported devices.
-    </p>
+    <div class="row pl-3 pr-3 pb-5">
+        <p class="pl-3 pr-3">This list is limited to actual devices auto-reporting data to {{company}}, as approved by anonymous system users.
+            The complete list of supported manufacturers and models is greater in scope. Please <a href (click)="open()">submit a request</a> for additional
+            questions/concerns regarding supported devices.
+        </p>
+    </div>
 </div>
