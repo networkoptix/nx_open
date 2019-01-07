@@ -154,7 +154,7 @@ Restore password
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    Sleep    .5
+    Sleep    5
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}

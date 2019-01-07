@@ -220,6 +220,7 @@ Log in more than 10 times
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     :FOR  ${x}  IN RANGE  10
+    \  sleep    2
     \  Input Text    ${PASSWORD INPUT}    incorrect
     \  Wait Until Element Is Visible    ${LOG IN BUTTON}
     \  Click Button    ${LOG IN BUTTON}
