@@ -24,13 +24,17 @@ namespace nx {
 namespace usb_cam {
 
 class CameraManager;
+class DiscoveryManager;
 
 class Camera: public std::enable_shared_from_this<Camera>
 {
 public:
     Camera(
-        CameraManager * cameraManager,
+        DiscoveryManager* m_discoveryManager,
+        const nxcip::CameraInfo& cameraInfo,
         nxpl::TimeProvider * const timeProvider);
+
+    virtual void setCredentials( const char* username, const char* password );
 
     bool initialize();
     bool isInitialized() const;
@@ -40,6 +44,7 @@ public:
 
     std::vector<device::video::ResolutionData> resolutionList() const;
 
+    bool hasAudio() const;
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
 
@@ -66,7 +71,9 @@ public:
 private:
     static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList;
 
-    CameraManager * m_cameraManager;
+    DiscoveryManager * m_discoveryManager;
+    nxcip::CameraInfo m_cameraInfo;
+    //CameraManager * m_cameraManager;
     nxpl::TimeProvider * const m_timeProvider;
     CodecParameters m_defaultVideoParams;
 

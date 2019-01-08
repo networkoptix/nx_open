@@ -1,13 +1,13 @@
 #include "discovery_manager.h"
 
 #include <QCryptographicHash>
-#include <QNetworkInterface>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
 #include "plugin.h"
 #include "camera_manager.h"
+#include "camera/camera.h"
 #include "device/video/utils.h"
 #include "device/audio/utils.h"
 
@@ -112,7 +112,15 @@ int DiscoveryManager::fromUpnpData(
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)
 {
-    return new CameraManager(this, m_timeProvider, info);
+    CameraAndDeviceDataWithNxId * cameraData = getCameraAndDeviceData(info.uid);
+
+    if (!cameraData)
+        return nullptr;
+
+    if (!cameraData->camera)
+        cameraData->camera = std::make_shared<Camera>(this, info, m_timeProvider);
+
+    return new CameraManager(cameraData->camera);
 }
 
 int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
@@ -129,19 +137,19 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     if(it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
-        m_cameras.emplace(device.nxId, device);
+        m_cameras.emplace(device.nxId, CameraAndDeviceDataWithNxId(device));
     }
     else
     {
-        if (it->second != device)
+        if (it->second.deviceData != device)
         {
             NX_DEBUG(
                 this,
                 "Device with nxId already found but device changed: old: %1, new: %2",
-                it->second.toString(),
+                it->second.deviceData.toString(),
                 device.toString());
 
-            it->second = device;
+            it->second.deviceData = device;
         }
         else
         {
@@ -156,7 +164,7 @@ std::string DiscoveryManager::getFfmpegUrl(const std::string& nxId) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(nxId);
-    return it != m_cameras.end() ? it->second.device.path : std::string();
+    return it != m_cameras.end() ? it->second.deviceData.device.path : std::string();
 }
 
 std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasInternal()
@@ -184,6 +192,14 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     }
 
     return nxDevices;
+}
+
+DiscoveryManager::CameraAndDeviceDataWithNxId* 
+DiscoveryManager::getCameraAndDeviceData(const std::string& nxId)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_cameras.find(nxId);
+    return it != m_cameras.end() ? &it->second : nullptr;
 }
 
 } // namespace nx 
