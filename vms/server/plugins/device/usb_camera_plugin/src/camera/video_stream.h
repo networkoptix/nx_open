@@ -89,7 +89,6 @@ private:
         csModified
     };
 
-    //std::string m_url;
     std::weak_ptr<Camera> m_camera;
     CodecParameters m_codecParams;
     nxpl::TimeProvider * const m_timeProvider;
@@ -104,6 +103,9 @@ private:
     std::atomic_int m_updatingFps = 0;
     std::atomic_int m_actualFps = 0;
     uint64_t m_oneSecondAgo = 0;
+
+    int m_calculatingGopSize = 0;
+    std::atomic_int m_gopSize = 0;
 
     /**
      * Some cameras crash the plugin if they are uninitialized while there are still packets and 
@@ -134,6 +136,8 @@ private:
 
 private:
     void updateActualFps(uint64_t now);
+    void updateGopSize(ffmpeg::Packet * packet);
+
     /**
      * Get the url of the video stream, modified appropriately based on platform.
      */

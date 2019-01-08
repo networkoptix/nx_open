@@ -188,6 +188,23 @@ void VideoStream::updateActualFps(uint64_t now)
     }
 }
 
+void VideoStream::updateGopSize(ffmpeg::Packet * packet)
+{
+    if (m_gopSize)
+        return;
+
+    if (!m_calculatingGopSize && packet->keyPacket())
+    {
+        ++m_calculatingGopSize;
+        return;
+    }
+
+    if (packet->keyPacket())
+        m_gopSize = m_calculatingGopSize;
+    else
+        ++m_calculatingGopSize;
+}
+
 std::string VideoStream::ffmpegUrlPlatformDependent() const
 {
     return
@@ -276,6 +293,9 @@ void VideoStream::run()
 
 
         auto frame = maybeDecode(packet.get());
+
+        if (!m_gopSize)
+            updateGopSize(packet.get());
 
         updateActualFps(m_timeProvider->millisSinceEpoch());
 
@@ -390,6 +410,7 @@ int VideoStream::initializeInputFormat()
         return result;
 
     m_inputFormat = std::move(inputFormat);
+    m_inputFormat->dumpFormat();
 
     return 0;
 }
@@ -565,7 +586,7 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 
     if (result < 0)
     {
-        std::cout << m_camera.lock()->toString() << ", receiveFrame error: "
+        std::cout << m_camera.lock()->toString() << ", video stream receiveFrame error: "
             << result << ", " << ffmpeg::utils::errorToString(result) << std::endl;
     }
 
