@@ -16,6 +16,8 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
+#include "timestamp_config.h"
+
 namespace nx {
 namespace usb_cam {
 
@@ -126,6 +128,8 @@ std::shared_ptr<ffmpeg::Packet> AudioStream1::AudioStreamPrivate::popNextPacket(
     auto packet = m_resampleBuffer.front();
     m_resampleBuffer.pop_front();
 
+    std::cout << "buffer size: " << m_resampleBuffer.size() << std::endl;
+
     return packet;
 }
 
@@ -135,7 +139,7 @@ void AudioStream1::AudioStreamPrivate::thisThreadSleep()
     std::this_thread::sleep_for(kSleep);
 }
 
-int AudioStream1::AudioStreamPrivate::initializeResampler()
+int AudioStream1::AudioStreamPrivate::initialize()
 {
     m_initCode = initializeDecoder();
     if (m_initCode < 0)
@@ -145,7 +149,7 @@ int AudioStream1::AudioStreamPrivate::initializeResampler()
     if (m_initCode < 0)
         return m_initCode;
 
-    m_initCode = initializeResampledFrame();
+    m_initCode = initializeResampledFrame(m_encoder.get());
     if (m_initCode < 0)
         return m_initCode;
 
@@ -197,7 +201,7 @@ bool AudioStream1::AudioStreamPrivate::ensureResamplerInitialized()
 {
     if (!m_initialized)
     {
-        m_initCode = initializeResampler();
+        m_initCode = initialize();
         checkIoError(m_initCode);
         if (m_initCode < 0)
         {
@@ -232,6 +236,8 @@ int AudioStream1::AudioStreamPrivate::initializeInputFormat()
         return result;
 
     m_inputFormat = std::move(inputFormat);
+
+    m_inputFormat->dumpFormat();
 
     return 0;
 }
@@ -275,18 +281,14 @@ int AudioStream1::AudioStreamPrivate::initializeEncoder()
     return 0;
 }
 
-int AudioStream1::AudioStreamPrivate::initializeResampledFrame()
+int AudioStream1::AudioStreamPrivate::initializeResampledFrame(ffmpeg::Codec * encoder)
 {
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
-    auto context = m_encoder->codecContext();
-
-    static constexpr int kDefaultFrameSize = 2000;
-
-    int nbSamples = context->frame_size ? context->frame_size : kDefaultFrameSize;
+    auto context = encoder->codecContext();
 
     int result = resampledFrame->getBuffer(
         context->sample_fmt,
-        nbSamples,
+        context->frame_size,
         context->channel_layout);
 
     if (result < 0)
@@ -326,13 +328,14 @@ int AudioStream1::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fra
 
 int AudioStream1::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
+    outFrame->unreference();
     for(;;)
     {
         auto packet = popNextPacket();
         if (!packet)
         {
             thisThreadSleep();
-            continue;
+            return AVERROR(EAGAIN);
         }
 
         int result = m_decoder->sendPacket(packet->packet());
@@ -373,7 +376,7 @@ int AudioStream1::AudioStreamPrivate::resample(
 
 std::chrono::milliseconds AudioStream1::AudioStreamPrivate::resampleDelay() const
 {
-    return m_resampleContext 
+    return m_resampleContext
         ? std::chrono::milliseconds(swr_get_delay(m_resampleContext, kMsecInSec))
         : std::chrono::milliseconds(0);
 }
@@ -387,7 +390,7 @@ int AudioStream1::AudioStreamPrivate::encode(const ffmpeg::Frame* frame, ffmpeg:
     return m_encoder->receivePacket(outPacket->packet());
 }
 
-int AudioStream1::AudioStreamPrivate::resampleAudio(ffmpeg::Packet * output)
+int AudioStream1::AudioStreamPrivate::transcodeAudio(ffmpeg::Packet * output)
 {
     int result = 0;
     for(;;)
@@ -408,6 +411,8 @@ int AudioStream1::AudioStreamPrivate::resampleAudio(ffmpeg::Packet * output)
             result = resample(m_decodedFrame.get(), m_resampledFrame.get());
             if(result < 0)
                 return result;
+
+            m_resampledFrame->frame()->pts = m_decodedFrame->frame()->pts;
         }
 
         result = encode(m_resampledFrame.get(), output);
@@ -415,35 +420,37 @@ int AudioStream1::AudioStreamPrivate::resampleAudio(ffmpeg::Packet * output)
             break;
     }
 
-    // Get duration before injecting into the packet because injection erases other fields.
-    int64_t duration = output->packet()->duration;
+    lastPts = m_resampledFrame->pts();
 
-    // Inject ADTS header into each packet becuase AAC encoder does not do it.
-    result = m_adtsInjector.inject(output);
-    if (result < 0)
-        return result;
+    if (m_encoder->codecId() == AV_CODEC_ID_AAC)
+    {
+        // Inject ADTS header into each packet becuase AAC encoder does not do it.
+        result = m_adtsInjector.inject(output);
+        if (result < 0)
+            return result;
+    }
 
-    output->setTimestamp(calculateTimestamp(duration));
+    output->setTimestamp(calculateTimestamp(output->packet()->duration));
 
     return result;
 }
 
 uint64_t AudioStream1::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
-    uint64_t now = m_timeProvider->millisSinceEpoch();
+    uint64_t now = usbGetTime();
 
     const AVRational sourceRate = { 1, m_encoder->sampleRate() };
-    static const AVRational kTargetRate = { 1, 1000 };
-    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+    static const AVRational kTargetRate = { 1, 1000000 }; // < One microsecond
+    int64_t offsetUsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
 
-    if (labs(now - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
+    if (labs(now - m_baseTimestamp - offsetUsec) > kResyncThresholdMsec)
     {
         m_offsetTicks = 0;
-        offsetMsec = 0;
+        offsetUsec = 0;
         m_baseTimestamp = now;
     }
 
-    uint64_t timestamp = m_baseTimestamp + offsetMsec;
+    uint64_t timestamp = m_baseTimestamp + offsetUsec;
     m_offsetTicks += duration;
 
     return timestamp;
@@ -517,8 +524,6 @@ void AudioStream1::AudioStreamPrivate::runAudioCaptureThread()
 {
     while (!m_terminated)
     {
-        auto t = m_timeProvider->millisSinceEpoch();
-
         if (noConsumers())
         {
             m_inputFormat.reset(nullptr);
@@ -529,8 +534,9 @@ void AudioStream1::AudioStreamPrivate::runAudioCaptureThread()
         if (!ensureFormatInitialized())
             continue;
 
-        auto packet = 
-            std::make_shared<ffmpeg::Packet>(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
+        auto packet = std::make_shared<ffmpeg::Packet>(
+            m_inputFormat->findStream(AVMEDIA_TYPE_AUDIO)->codecpar->codec_id,
+            AVMEDIA_TYPE_AUDIO);
 
         int result = readFrame(packet.get());
 
@@ -548,9 +554,6 @@ void AudioStream1::AudioStreamPrivate::runAudioCaptureThread()
             std::lock_guard<std::mutex> lock(m_resampleBufferMutex);
             m_resampleBuffer.push_back(packet);
         }
-
-        auto tt = m_timeProvider->millisSinceEpoch();
-        //std::cout << "capture: " << tt - t << std::endl;
     }
 }
 
@@ -558,8 +561,6 @@ void AudioStream1::AudioStreamPrivate::runResampleThread()
 {
     while (!m_terminated)
     {
-        auto t = m_timeProvider->millisSinceEpoch();
-
         if (noConsumers())
         {
             thisThreadSleep();
@@ -575,7 +576,7 @@ void AudioStream1::AudioStreamPrivate::runResampleThread()
         auto encodedPacket = 
             std::make_shared<ffmpeg::Packet>(m_encoder->codecId(), AVMEDIA_TYPE_AUDIO);
 
-        if (resampleAudio(encodedPacket.get()) < 0)
+        if (transcodeAudio(encodedPacket.get()) < 0)
         {
             thisThreadSleep();
             continue;
@@ -584,11 +585,6 @@ void AudioStream1::AudioStreamPrivate::runResampleThread()
         {
             std::lock_guard<std::mutex>lock(m_mutex);
             m_packetConsumerManager->givePacket(encodedPacket);
-        }
-        {
-            auto tt = m_timeProvider->millisSinceEpoch();
-            std::lock_guard<std::mutex>lock(m_resampleBufferMutex);
-            //std::cout << "resample: " << tt - t << ", buf size: " << m_resampleBuffer.size() << std::endl;
         }
     }
 }
@@ -609,7 +605,7 @@ int AudioStream1::AudioStreamPrivate::readFrame(ffmpeg::Packet * packet)
             result = m_inputFormat->readFrame(packet->packet());
         }
 
-        packet->setTimestamp(m_timeProvider->millisSinceEpoch());
+        packet->setTimestamp(usbGetTime());
 
         return result;
 }

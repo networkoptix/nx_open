@@ -73,6 +73,7 @@ private:
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
         std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
         struct SwrContext * m_resampleContext = nullptr;
+        int64_t lastPts = 0;
 
         std::shared_ptr<std::atomic_int> m_packetCount;
 
@@ -87,20 +88,20 @@ private:
         bool noConsumers() const;
         std::shared_ptr<ffmpeg::Packet> popNextPacket();
         void thisThreadSleep();
-        int initializeResampler();
+        int initialize();
         void uninitialize();
         bool ensureFormatInitialized();
         bool ensureResamplerInitialized();
         int initializeInputFormat();
         int initializeDecoder();
         int initializeEncoder();
-        int initializeResampledFrame();
+        int initializeResampledFrame(ffmpeg::Codec * encoder);
         int initalizeResampleContext(const ffmpeg::Frame * frame);
         int decodeNextFrame(ffmpeg::Frame * frame);
         int resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame);
         std::chrono::milliseconds resampleDelay() const;
         int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
-        int resampleAudio(ffmpeg::Packet * output);
+        int transcodeAudio(ffmpeg::Packet * output);
         uint64_t calculateTimestamp(int64_t duration);
 
         std::chrono::milliseconds timePerVideoFrame() const;

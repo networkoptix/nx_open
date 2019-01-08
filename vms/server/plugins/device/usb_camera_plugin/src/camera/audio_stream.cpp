@@ -2,6 +2,7 @@
 #if defined (AUDIO_STREAM)
 
 #include <algorithm>
+#include <iostream>
 
 extern "C" {
 #include <libswresample/swresample.h>
@@ -14,13 +15,15 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
+#include "timestamp_config.h"
+
 namespace nx {
 namespace usb_cam {
 
 namespace {
 
 static constexpr int kMsecInSec = 1000;
-static constexpr int kResyncThresholdMsec = 1000;
+static constexpr int kResyncThresholdUsec = 1000000;
 
 static const char * ffmpegDeviceTypePlatformDependent()
 {
@@ -161,19 +164,19 @@ int AudioStream::AudioStreamPrivate::initialize()
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->flush();
-    }
+    //{
+    //    std::lock_guard<std::mutex> lock(m_mutex);
+    //    m_packetConsumerManager->flush();
+    //}
 
-    while (*m_packetCount > 0)
-    {
-        static constexpr std::chrono::milliseconds kSleep(30);
-        std::this_thread::sleep_for(kSleep);
-    }
+    // while (*m_packetCount > 0)
+    // {
+    //     static constexpr std::chrono::milliseconds kSleep(30);
+    //     std::this_thread::sleep_for(kSleep);
+    // }
 
-    if (m_decoder)
-        m_decoder->flush();
+    // if (m_decoder)
+    //     m_decoder->flush();
     m_decoder.reset(nullptr);
 
     if (m_resampleContext)
@@ -224,9 +227,18 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     inputFormat->formatContext()->flags |= AVFMT_FLAG_NONBLOCK;
 #endif // _WIN32
 
+    //inputFormat->setEntry("ar", 44100);
+    //inputFormat->setEntry("ac", 1);
+
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
+    // if (strstr(m_camera.lock()->info().modelName, "C920"))
+    //     result = inputFormat->open("hw:1");
+    
     if (result < 0)
         return result;
+
+    std::cout << "Opened audio stream for " << m_camera.lock()->toString() << std::endl;
+    inputFormat->dumpFormat();
 
     m_inputFormat = std::move(inputFormat);
 
@@ -308,7 +320,7 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fram
         encoder->sample_fmt,
         encoder->sample_rate,
         frame->channelLayout(),
-        (AVSampleFormat)frame->sampleFormat(),
+        frame->sampleFormat(),
         frame->sampleRate(),
         0,
         nullptr);
@@ -327,22 +339,28 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
     for(;;)
     {
-        ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
+        ffmpeg::Packet packet(
+            m_inputFormat->findStream(AVMEDIA_TYPE_AUDIO)->codecpar->codec_id,
+            AVMEDIA_TYPE_AUDIO);
         
-        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see 
+        uint64_t start = usbGetTime();
+
+        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see initializeInputFormat().
         int result;
         if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
         {
             static constexpr std::chrono::milliseconds kTimeout = 
                 std::chrono::milliseconds(1000);
             result = m_inputFormat->readFrameNonBlock(packet.packet(), kTimeout);
-            if (result < AVERROR(EAGAIN)) //< Treaat a timeout as an error.
+            if (result < AVERROR(EAGAIN)) //< Treat a timeout as an error.
                 result = AVERROR(EIO);
         }
         else
         {
             result = m_inputFormat->readFrame(packet.packet());
         }
+
+        std::cout << "rf: " <<  usbGetTime() - start << std::endl;
 
         if (result < 0)
             return result;
@@ -409,7 +427,9 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
     for(;;)
     {
         // need to drain the the resampler periodically to avoid increasing audio delay
-        if(m_resampleContext && resampleDelay() > timePerVideoFrame())
+        if (m_resampleContext && resampleDelay() > timePerVideoFrame())
+        // if (m_resampleContext
+        //     && swr_get_delay(m_resampleContext, m_encoder->sampleRate()) >= m_encoder->sampleRate())
         {
             *outFfmpegError = resample(nullptr, m_resampledFrame.get());
             if (*outFfmpegError < 0)
@@ -439,26 +459,28 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
         return nullptr;
 
     packet->setTimestamp(calculateTimestamp(duration));
+    //packet->setTimestamp(usbGetTime());
 
     return packet;
 }
 
 uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
-    uint64_t now = m_timeProvider->millisSinceEpoch();
+    //uint64_t now = m_timeProvider->millisSinceEpoch();
+    uint64_t now = usbGetTime();
 
     const AVRational sourceRate = { 1, m_encoder->sampleRate() };
-    static const AVRational kTargetRate = { 1, 1000 };
-    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+    static const AVRational kTargetRate = { 1, 1000000 }; //< One microsecond.
+    int64_t offsetUsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
 
-    if (labs(now - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
+    if (labs(now - m_baseTimestamp - offsetUsec) > kResyncThresholdUsec)
     {
         m_offsetTicks = 0;
-        offsetMsec = 0;
+        offsetUsec = 0;
         m_baseTimestamp = now;
     }
 
-    uint64_t timestamp = m_baseTimestamp + offsetMsec;
+    uint64_t timestamp = m_baseTimestamp + offsetUsec;
     m_offsetTicks += duration;
 
     return timestamp;
@@ -523,6 +545,8 @@ void AudioStream::AudioStreamPrivate::run()
 {
     while (!m_terminated)
     {
+        auto start = usbGetTime();
+
         if (!waitForConsumers())
             continue;
 
@@ -540,13 +564,13 @@ void AudioStream::AudioStreamPrivate::run()
             continue;
         }
 
-        // If the encoder is AAC, some packets are buffered and copied before delivering.
-        // In that case, packet is nullptr.
         if (packet)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             m_packetConsumerManager->givePacket(packet);
         }
+
+        std::cout << "total: " << usbGetTime() - start << std::endl;
     }
 
     uninitialize();

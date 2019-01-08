@@ -8,8 +8,9 @@
 #include <atomic>
 #include <chrono>
 #include <vector>
-#include <deque>
 #include <map>
+
+#include "timestamp_config.h"
 
 namespace nx {
 namespace usb_cam {
@@ -119,7 +120,7 @@ public:
         return true;// < Timespan condition was satisfied
     }
     
-    std::chrono::milliseconds timespan() const
+    duration_t timespan() const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         return timespanInternal();
@@ -132,11 +133,11 @@ protected:
     bool m_interrupted = false;
 
 protected:
-    std::chrono::milliseconds timespanInternal() const
+    duration_t timespanInternal() const
     {
         return m_buffer.empty()
-            ? std::chrono::milliseconds(0)
-            : std::chrono::milliseconds(m_buffer.rbegin()->first - m_buffer.begin()->first);
+            ? duration_t()
+            : duration_t(m_buffer.rbegin()->first - m_buffer.begin()->first);
             // Largest key minus smallest key, or oldest - newest.
     }
 
@@ -214,7 +215,7 @@ public:
     bool waitForTimespan(
         const std::chrono::milliseconds& timespan,
         const std::chrono::milliseconds& timeout);
-    std::chrono::milliseconds timespan() const;
+    duration_t timespan() const;
 
     size_t size() const;
     bool empty() const;
