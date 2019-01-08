@@ -440,17 +440,27 @@ uint64_t AudioStream1::AudioStreamPrivate::calculateTimestamp(int64_t duration)
     uint64_t now = usbGetTime();
 
     const AVRational sourceRate = { 1, m_encoder->sampleRate() };
+#if defined(USE_MSEC)
+    static const AVRational kTargetRate = { 1, 1000 }; // < One millisecond
+#else
     static const AVRational kTargetRate = { 1, 1000000 }; // < One microsecond
-    int64_t offsetUsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+#endif
+    int64_t offset = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
 
-    if (labs(now - m_baseTimestamp - offsetUsec) > kResyncThresholdMsec)
+#if defined(USE_MSEC)
+    auto absolute = labs(now - m_baseTimestamp - offset);
+#else
+    auto absolute = labs(now - m_baseTimestamp - offset) / 1000;
+#endif   
+
+    if (absolute > kResyncThresholdMsec)
     {
         m_offsetTicks = 0;
-        offsetUsec = 0;
+        offset = 0;
         m_baseTimestamp = now;
     }
 
-    uint64_t timestamp = m_baseTimestamp + offsetUsec;
+    uint64_t timestamp = m_baseTimestamp + offset;
     m_offsetTicks += duration;
 
     return timestamp;

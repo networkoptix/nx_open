@@ -23,7 +23,7 @@ namespace usb_cam {
 namespace {
 
 static constexpr int kMsecInSec = 1000;
-static constexpr int kResyncThresholdUsec = 1000000;
+static constexpr int kResyncThresholdMsec = 1000;
 
 static const char * ffmpegDeviceTypePlatformDependent()
 {
@@ -428,8 +428,6 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
     {
         // need to drain the the resampler periodically to avoid increasing audio delay
         if (m_resampleContext && resampleDelay() > timePerVideoFrame())
-        // if (m_resampleContext
-        //     && swr_get_delay(m_resampleContext, m_encoder->sampleRate()) >= m_encoder->sampleRate())
         {
             *outFfmpegError = resample(nullptr, m_resampledFrame.get());
             if (*outFfmpegError < 0)
@@ -459,28 +457,36 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
         return nullptr;
 
     packet->setTimestamp(calculateTimestamp(duration));
-    //packet->setTimestamp(usbGetTime());
 
     return packet;
 }
 
 uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
-    //uint64_t now = m_timeProvider->millisSinceEpoch();
-    uint64_t now = usbGetTime();
+        uint64_t now = usbGetTime();
 
     const AVRational sourceRate = { 1, m_encoder->sampleRate() };
-    static const AVRational kTargetRate = { 1, 1000000 }; //< One microsecond.
-    int64_t offsetUsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+#if defined(USE_MSEC)
+    static const AVRational kTargetRate = { 1, 1000 }; // < One millisecond
+#else
+    static const AVRational kTargetRate = { 1, 1000000 }; // < One microsecond
+#endif
+    int64_t offset = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
 
-    if (labs(now - m_baseTimestamp - offsetUsec) > kResyncThresholdUsec)
+#if defined(USE_MSEC)
+    auto absolute = labs(now - m_baseTimestamp - offset);
+#else
+    auto absolute = labs(now - m_baseTimestamp - offset) / 1000;
+#endif   
+
+    if (absolute > kResyncThresholdMsec)
     {
         m_offsetTicks = 0;
-        offsetUsec = 0;
+        offset = 0;
         m_baseTimestamp = now;
     }
 
-    uint64_t timestamp = m_baseTimestamp + offsetUsec;
+    uint64_t timestamp = m_baseTimestamp + offset;
     m_offsetTicks += duration;
 
     return timestamp;

@@ -41,6 +41,11 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     *lpPacket = toNxPacket(packet.get()).release();
 
+    std::string media = packet->mediaType() == AVMEDIA_TYPE_VIDEO ? "v: " : "a: ";
+    std::stringstream ss;
+    ss << media << (*lpPacket)->timestamp();
+    std::cout << ss.str() << std::endl;
+
     return nxcip::NX_NO_ERROR;
 }
 
