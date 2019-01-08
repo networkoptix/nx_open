@@ -139,7 +139,7 @@
     },
     "scripts": {
         "serve": "npm run update-lang; webpack-dev-server --config webpack.dev.js --open --hot --inline --compress",
-        "build": "jest || exit 1; npm run update-lang; webpack --config webpack.prod.js --progress --profile --bail",
+        "build": "npm run update-lang; webpack --config webpack.prod.js --progress --profile --bail",
         "setSkin": "node setSkin.js --skin",
         "update-lang": "ngx-translate-extract -i ./app/src -o ./app/language_i18n.json --clean --sort --format json",
         "test": "jest",
