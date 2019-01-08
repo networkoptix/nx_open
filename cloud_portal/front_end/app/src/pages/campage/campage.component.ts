@@ -60,7 +60,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.allCameras = [];
       this.cameras = [];
       this.camerasTable = [];
-      this.vendors = [];
+      this.vendors = undefined;
 
       this.totalCameras = 0;
       this.totalVendors = 0;
@@ -139,14 +139,15 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.activate();
   }
 
-  ngDoCheck() {
+    ngDoCheck() {
         const filterChanges = this.differ.diff(this.filterModel);
         const vendorChanges = this.vendorDiffer.diff(this.filterModel.vendors);
         const hardwareChanges = this.hardwareDiffer.diff(this.filterModel.hardwareTypes);
-          if (filterChanges || vendorChanges || hardwareChanges) {
-              this.searchVendor(this.filterModel);
-          }
-  }
+
+        if (filterChanges || vendorChanges || hardwareChanges) {
+            this.searchVendor(this.filterModel);
+        }
+    }
 
   activate() {
       this.resetFilters();
@@ -155,6 +156,11 @@ export class NxCampageComponent implements OnInit, DoCheck {
           .subscribe(data => {
               this.data = data;
               this.camerasSuccessFn(this.data);
+
+              // reformat to fit the multiselect component
+              this.multiselectOptions.vendors = this.vendors.map(v => (
+                      { id: v, label: v }
+              ));
           });
   }
 
@@ -220,11 +226,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
            return a.toLowerCase().localeCompare(b.toLowerCase());
        });
 
-       // reformat to fit the multiselect component
-       this.multiselectOptions.vendors = this.vendors.map(v => (
-           {id: v, label: v}
-       ));
-
        this.totalVendors = this.vendors.length;
   }
 
@@ -247,10 +248,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
   searchVendor (filter) {
       this.resetActiveCamera();
       this.filter = filter;
+
       if (this.data) {
           this.camSearch.campageSearch(this.data, this.filter, this.boolKeys).subscribe(cameras => {
               this.activeCamera = undefined;
               this.cameras = cameras;
+              this.camerasSuccessFn(this.cameras);
               this.camerasTable = this.preFilterCameraTable(cameras);
           });
       }

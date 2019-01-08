@@ -1,7 +1,7 @@
 <div class="nx-table-wrapper">
     <div class="nx-table-header">
-        <div class="col text-placeholder" *ngIf="results == 0; else camview">
-            <span translate>Nothing Found</span>
+        <div class="col text-placeholder d-flex align-items-center" *ngIf="results == 0; else camview" translate>
+            Nothing Found
         </div>
         <ng-template #camview>
             <div class="col-md-12 d-flex align-items-center p-0">

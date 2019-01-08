@@ -35,9 +35,13 @@
         </nx-block>
     </nx-layout-right>
 
-    <nx-pre-loader *ngIf="!vendors.length"></nx-pre-loader>
+    <nx-pre-loader *ngIf="vendors == undefined"></nx-pre-loader>
 
-    <div class="row p-3" *ngIf="!filterModel.query">
+    <div class="col text-placeholder d-flex align-items-center pl-3" *ngIf="vendors && !vendors.length" translate>
+        Nothing Found
+    </div>
+
+    <div class="row p-3" *ngIf="vendors && !filterModel.query">
         <ul class="pl-3 m-0 list-unstyled col-md-6 col-lg-4 col-xl-3" *ngFor="let n of [0, 1, 2, 3]">
             <li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
                 <a href (click)="setVendor(vendor)">
@@ -48,7 +52,8 @@
             </li>
         </ul>
     </div>
-    <div class="row pl-3 pr-3 pb-5">
+
+    <div class="row pl-2 pr-3 pb-5">
         <p class="pl-3 pr-3">This list is limited to actual devices auto-reporting data to {{company}}, as approved by anonymous system users.
             The complete list of supported manufacturers and models is greater in scope. Please <a href (click)="open()">submit a request</a> for additional
             questions/concerns regarding supported devices.
