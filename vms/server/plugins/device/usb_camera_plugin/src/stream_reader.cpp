@@ -182,5 +182,34 @@ void StreamReaderPrivate::removeConsumer()
     removeAudioConsumer();
 }
 
+bool StreamReaderPrivate::interrupted()
+{
+    if (m_interrupted)
+    {
+        m_interrupted = false;
+        return true;
+    }
+    return false;
+}
+
+int StreamReaderPrivate::handleNxError()
+{
+    removeConsumer();
+
+    if (interrupted())
+        return nxcip::NX_INTERRUPTED;
+
+
+    if (m_camera->ioError())
+        return nxcip::NX_IO_ERROR;
+
+    return nxcip::NX_OTHER_ERROR;
+}
+
+bool StreamReaderPrivate::shouldStopWaitingForData() const
+{
+    return m_interrupted || m_camera->ioError();
+}
+
 } // namespace usb_cam
 } // namespace nx

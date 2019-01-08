@@ -32,31 +32,14 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    auto t = m_camera->millisSinceEpoch();
-
     ensureConsumerAdded();
 
     auto packet = nextPacket();
 
     if (!packet)
-    {
-        removeConsumer();
-        if (m_interrupted)
-        {
-            m_interrupted = false;
-            return nxcip::NX_INTERRUPTED;
-        }
-
-        if (m_camera->ioError())
-            return nxcip::NX_IO_ERROR;
-
-        return nxcip::NX_OTHER_ERROR;
-    }
+        return handleNxError();
 
     *lpPacket = toNxPacket(packet.get()).release();
-
-    auto tt = m_camera->millisSinceEpoch();
-    std::cout << "native tpp: " << tt - t << std::endl;
 
     return nxcip::NX_NO_ERROR;
 }
@@ -92,23 +75,15 @@ void NativeStreamReader::ensureConsumerAdded()
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    //while (m_camera->audioEnabled())
-    for (;;)
-    {
-        // the time span keeps audio and video timestamps monotonic
-        //if (m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
-        if (m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
-            break;
-        if (m_interrupted || m_camera->ioError())
-                return nullptr;
-    }
+    if (m_camera->audioEnabled() && !m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
+        return nullptr;
 
     for (;;)
     {
         auto popped = m_avConsumer->popOldest(kWaitTimeout);
         if (!popped)
         {
-            if (m_interrupted || m_camera->ioError())
+            if (shouldStopWaitingForData())
                 return nullptr;
             continue;
         }
