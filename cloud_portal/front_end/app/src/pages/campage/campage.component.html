@@ -11,7 +11,7 @@
     </div>
     <div class="row pl-3 pb-3 m-0 campage-info" [hidden]="filterModel.query">
         <h4>
-            <ul class="list-inline text-muted text-placeholder" *ngIf="totalVendors">
+            <ul class="m-0 list-inline text-muted text-placeholder" *ngIf="totalVendors">
                 <li>{{ totalVendors }} manufacturers</li>
                 <li>{{ totalCameras }} devices</li>
             </ul>
@@ -38,7 +38,7 @@
     <nx-pre-loader *ngIf="!vendors.length"></nx-pre-loader>
 
     <div class="row p-3" *ngIf="!filterModel.query">
-        <ul class="pl-3 m-0 list-unstyled col-md-3" *ngFor="let n of [0, 1, 2, 3]">
+        <ul class="pl-3 m-0 list-unstyled col-md-6 col-lg-4 col-xl-3" *ngFor="let n of [0, 1, 2, 3]">
             <li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
                 <a href (click)="setVendor(vendor)">
                     <span>

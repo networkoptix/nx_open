@@ -157,6 +157,7 @@ header {
         
         .dropdown-item-container {
             position : relative;
+            height   : auto;
             
             .dropdown-item {
                 display     : flex;
@@ -240,15 +241,16 @@ header {
             background-color : transparentize($light5, 0.75) !important;
         }
     }
+    
+    &-divider {
+        height     : auto !important;
+        margin     : 4px 12px;
+        border-top : 1px solid $light6;
+    }
 }
 
 nx-select.ng-invalid:not(.ng-untouched) {
     .form-control {
         border-color : #d65029;
     }
-}
-
-.dropdown-divider {
-    margin     : 4px 12px;
-    border-top : 1px solid $light6;
 }

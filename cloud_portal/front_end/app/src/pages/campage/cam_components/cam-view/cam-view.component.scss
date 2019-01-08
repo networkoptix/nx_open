@@ -2,36 +2,49 @@
 @import '../../../../../styles/theme_variables';
 
 .camview {
-  padding: 0px;
-  margin-bottom: -16px;
-  hr {
-    border-top: 1px solid $light5;
-  }
+  padding: 0;
+  margin-bottom: -1rem;
+  
   h2 {
     font-size: 0.9375rem;
     color: $dark9;
   }
+  
   a {
     padding-bottom: 8px;
     text-decoration: underline;
   }
+  
   table th, table td {
-    padding: 0px;
+    padding: 0;
     height: 24px;
     width: 50%;
   }
+  
+  .active-camera-info, .firmware-info {
+    .row {
+      height : 24px;
+      & > div {
+        line-height : 24px;
+      }
+    }
+  }
+  
   .detailsClose {
     position: absolute;
-    right: 16px;
+    right: 1rem;
     cursor: pointer;
   }
+  
   .blue {
     color: $blue1;
   }
+  
   .firmware-line {
     stroke: $brand-primary;
     stroke-width: 2
   }
+  
   .icon {
     display: inline-block;
     height: 1em; /* default icon height */

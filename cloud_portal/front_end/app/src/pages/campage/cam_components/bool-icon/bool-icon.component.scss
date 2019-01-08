@@ -2,16 +2,17 @@
 @import '../../../../../styles/theme_variables';
 
 .icon-positive {
-    font-size: 1.125rem;
-    color: $dark9;
+    font-size : 1rem;
+    color     : $dark9;
 }
+
 .icon-negative {
-    font-size: 1.125rem;
-    color: $light10;
+    font-size : 1rem;
+    color     : $light10;
 }
 
 .icon-unknown {
-    font-size: 0.9375rem;
-    font-family: $font-family-medium;
-    color: $dark9;
+    font-size   : 1rem;
+    font-family : $font-family-medium;
+    color       : $dark9;
 }
