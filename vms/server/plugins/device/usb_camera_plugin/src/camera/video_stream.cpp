@@ -12,6 +12,8 @@
 #include "device/video/utils.h"
 #include "ffmpeg/utils.h"
 
+#include "timestamp_config.h"
+
 namespace nx {
 namespace usb_cam {
 
@@ -261,7 +263,6 @@ void VideoStream::run()
 {
     while (!m_terminated)
     {
-        auto t = m_timeProvider->millisSinceEpoch();
         if (!waitForConsumers())
             continue;
 
@@ -272,7 +273,7 @@ void VideoStream::run()
         if (!packet)
             continue;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(0));
+
 
         auto frame = maybeDecode(packet.get());
 
@@ -284,9 +285,6 @@ void VideoStream::run()
             if (frame)
                 m_frameConsumerManager.giveFrame(frame);
         }
-
-        auto tt = m_timeProvider->millisSinceEpoch();
-        std::cout << "video tpp: " << tt - t << std::endl;
     }
 
     uninitialize();
@@ -485,8 +483,8 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
     int result;
     if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
     {
-        using namespace std::chrono_literals;
-        result = m_inputFormat->readFrameNonBlock(packet->packet(), 1000ms);
+        static std::chrono::milliseconds kTimeout = std::chrono::milliseconds(1000);
+        result = m_inputFormat->readFrameNonBlock(packet->packet(), kTimeout);
         if (result == AVERROR(EAGAIN))
             result = AVERROR(EIO); //< Treating a one second timeout as an io error.
     }
@@ -512,7 +510,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 #endif
 
     // Setting timestamp here because primary stream needs it even if there is no decoding.
-    packet->setTimestamp(m_timeProvider->millisSinceEpoch());
+    packet->setTimestamp(usbGetTime());
 
     return packet;
 }
