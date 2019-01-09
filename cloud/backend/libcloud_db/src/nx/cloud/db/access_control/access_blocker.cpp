@@ -11,15 +11,21 @@ namespace nx::cloud::db {
 AccessBlocker::AccessBlocker(
     const conf::Settings& settings)
     :
-    m_settings(settings),
-    m_hostLockerPool(
-        settings.loginEnumerationProtectionSettings(),
-        std::max(
-            settings.loginEnumerationProtectionSettings().period,
-            settings.loginEnumerationProtectionSettings().maxBlockPeriod))
+    m_settings(settings)
 {
-    if (auto userLockerSettings = settings.loginLockout())
+    if (auto userLockerSettings = settings.security().loginLockout)
         m_userLocker = std::make_unique<CloudUserLockerPool>(*userLockerSettings);
+
+    const auto loginEnumerationProtectionSettings =
+        settings.security().loginEnumerationProtectionSettings;
+    if (loginEnumerationProtectionSettings)
+    {
+        m_hostLockerPool = std::make_unique<LoginEnumerationProtectorPool>(
+            *loginEnumerationProtectionSettings,
+            std::max(
+                loginEnumerationProtectionSettings->period,
+                loginEnumerationProtectionSettings->maxBlockPeriod));
+    }
 }
 
 bool AccessBlocker::isBlocked(
@@ -30,7 +36,10 @@ bool AccessBlocker::isBlocked(
     if (!login.empty() && m_userLocker && m_userLocker->isLocked(userLockKey))
         return true;
 
-    return m_hostLockerPool.isLocked(connection.clientEndpoint().address);
+    if (m_hostLockerPool && m_hostLockerPool->isLocked(connection.clientEndpoint().address))
+        return true;
+
+    return false;
 }
 
 void AccessBlocker::onAuthenticationSuccess(
@@ -143,14 +152,14 @@ void AccessBlocker::updateHostLockoutState(
     nx::network::server::AuthResult authResult,
     const std::string& login)
 {
-    if (login.empty())
+    if (login.empty() || !m_hostLockerPool)
         return;
 
     NX_VERBOSE(this, lm("Updating host %1 lockout state. Request %2, login %3, auth result %4")
         .args(host, request.requestLine.url.path(), login, toString(authResult)));
 
     std::chrono::milliseconds lockPeriod{0};
-    const auto result = m_hostLockerPool.updateLockoutState(
+    const auto result = m_hostLockerPool->updateLockoutState(
         host,
         authResult,
         request.requestLine.url.path().toStdString(),
@@ -160,7 +169,7 @@ void AccessBlocker::updateHostLockoutState(
     {
         case nx::network::server::LockUpdateResult::locked:
             NX_WARNING(this, lm("Host %1 blocked for %2").args(host, lockPeriod));
-            printLockReason(m_hostLockerPool, host);
+            printLockReason(*m_hostLockerPool, host);
             break;
 
         case nx::network::server::LockUpdateResult::unlocked:
