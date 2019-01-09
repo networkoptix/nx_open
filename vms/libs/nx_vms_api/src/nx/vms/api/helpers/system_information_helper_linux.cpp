@@ -41,6 +41,17 @@ QString ubuntuVersionFromCodeName(const QString& codeName)
     return QString();
 }
 
+static QString unquoteIfNeeded(const QString& s)
+{
+    if (s.size() < 2)
+        return s;
+
+    if (s[0] == '"' && s[s.size() - 1] == '"')
+        return s.mid(1, s.size() - 2);
+
+    return s;
+}
+
 QString osReleaseContentsValueByKey(const QByteArray& osReleaseContents, const QString& key)
 {
     if (osReleaseContents.isEmpty())
@@ -59,7 +70,7 @@ QString osReleaseContentsValueByKey(const QByteArray& osReleaseContents, const Q
             if (equalSignPos == -1 || line.size() == equalSignPos + 1)
                 return QString();
 
-            return line.mid(equalSignPos + 1);
+            return unquoteIfNeeded(line.mid(equalSignPos + 1));
         }
     }
 
