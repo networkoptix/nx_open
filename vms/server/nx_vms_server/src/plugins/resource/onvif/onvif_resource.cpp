@@ -3753,7 +3753,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memset(header, 0, sizeof(*header));
     soapWrapper->soap()->header = header;
 
-    if(!m_onvifNotificationSubscriptionID.isEmpty())
+    if (!m_onvifNotificationSubscriptionID.isEmpty())
     {
         QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
         char* SubscriptionIdBuf = (char*) malloc(512);
