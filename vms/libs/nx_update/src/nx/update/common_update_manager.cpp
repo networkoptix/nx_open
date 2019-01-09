@@ -253,6 +253,7 @@ update::FindPackageResult CommonUpdateManager::findPackage(
     QString* outMessage) const
 {
     return update::findPackage(
+        commonModule()->moduleGUID(),
         QnAppInfo::currentSystemInformation(),
         globalSettings()->updateInformation(),
         runtimeInfoManager()->localInfo().data.peer.isClient(),
@@ -262,7 +263,8 @@ update::FindPackageResult CommonUpdateManager::findPackage(
         outMessage);
 }
 
-bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outPackage,
+bool CommonUpdateManager::statusAppropriateForDownload(
+    nx::update::Package* outPackage,
     update::Status* outStatus)
 {
     QString message;
@@ -286,6 +288,12 @@ bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outP
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
                 update::Status::Code::latestUpdateInstalled,
+                message);
+            return false;
+        case update::FindPackageResult::notParticipant:
+            *outStatus = update::Status(
+            commonModule()->moduleGUID(),
+                update::Status::Code::idle,
                 message);
             return false;
     }

@@ -44,6 +44,7 @@ struct Information
     /** We need to be able to show this data without internet. */
     QString description;
     QList<Package> packages;
+    QList<QnUuid> participants;
 
     /** Release date - in msecs since epoch. */
     qint64 releaseDateMs = 0;
@@ -54,7 +55,9 @@ struct Information
     bool isEmpty() const { return packages.isEmpty(); }
 };
 
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(description)(packages)
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
+    (description)(packages)(participants)
+
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError

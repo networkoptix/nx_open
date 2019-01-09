@@ -18,7 +18,8 @@ enum class FindPackageResult
     ok,
     noInfo,
     otherError,
-    latestUpdateInstalled
+    latestUpdateInstalled,
+    notParticipant
 };
 
 Information updateInformation(
@@ -27,6 +28,7 @@ Information updateInformation(
     InformationError* error = nullptr);
 
 FindPackageResult findPackage(
+    const QnUuid& moduleGuid,
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
@@ -36,6 +38,7 @@ FindPackageResult findPackage(
     QString* outMessage);
 
 FindPackageResult findPackage(
+    const QnUuid& moduleGuid,
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,

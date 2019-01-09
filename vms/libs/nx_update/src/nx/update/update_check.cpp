@@ -421,6 +421,7 @@ static void setErrorMessage (const QString& message, QString* outMessage)
 };
 
 FindPackageResult findPackage(
+    const QnUuid& moduleGuid,
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
@@ -433,6 +434,13 @@ FindPackageResult findPackage(
     {
         setErrorMessage("Update information is empty", outMessage);
         return FindPackageResult::noInfo;
+    }
+
+    if (!updateInformation.participants.isEmpty()
+        && !updateInformation.participants.contains(moduleGuid))
+    {
+        setErrorMessage("This module is not listed in the update participants", outMessage);
+        return FindPackageResult::notParticipant;
     }
 
     if (updateInformation.cloudHost != cloudHost && boundToCloud)
@@ -495,6 +503,7 @@ FindPackageResult findPackage(
 }
 
 FindPackageResult findPackage(
+    const QnUuid& moduleGuid,
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
