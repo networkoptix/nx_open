@@ -55,6 +55,11 @@ utils::Url NxGlobalsObject::url(const QUrl& url) const
     return utils::Url::fromQUrl(url);
 }
 
+nx::utils::Url NxGlobalsObject::emptyUrl() const
+{
+    return utils::Url();
+}
+
 nx::vms::api::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& version) const
 {
     return nx::vms::api::SoftwareVersion(version);
