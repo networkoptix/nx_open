@@ -250,10 +250,13 @@ void StreamProxyChannel::setUpStreamConverter(
 }
 
 void StreamProxyChannel::setDownStreamConverter(
-    std::unique_ptr<nx::utils::bstream::AbstractInputConverter> converter)
+    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter)
 {
     m_downStreamConverter = std::move(converter);
-    m_converter.setInputConverter(m_downStreamConverter.get());
+    m_downStreamConverterAdapter =
+        std::make_unique<nx::utils::bstream::OutputToInputConverterAdapter>(
+            m_downStreamConverter.get());
+    m_converter.setInputConverter(m_downStreamConverterAdapter.get());
 }
 
 void StreamProxyChannel::start(ProxyCompletionHandler completionHandler)

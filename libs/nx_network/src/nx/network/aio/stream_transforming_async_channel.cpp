@@ -327,7 +327,7 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
     {
         scheduleNextRawSendTaskIfAny();
 
-        // NOTE: Not trying to complete user tasks added in send user handler 
+        // NOTE: Not trying to complete user tasks added in send user handler
         // (in completeRawSendTasks) because aio thread could have been changed by user.
         // So, we will complete user tasks in a proper aio thread on the next event.
         tryToCompleteUserTasks();
@@ -341,7 +341,7 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
 }
 
 template<typename Range>
-std::deque<StreamTransformingAsyncChannel::RawSendContext> 
+std::deque<StreamTransformingAsyncChannel::RawSendContext>
     StreamTransformingAsyncChannel::takeRawSendTasks(Range range)
 {
     decltype(m_rawWriteQueue) rawSendTasks;
