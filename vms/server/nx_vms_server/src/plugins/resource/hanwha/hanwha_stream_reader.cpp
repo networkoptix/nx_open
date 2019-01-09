@@ -250,8 +250,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
             .arg(*m_overlappedId));
 
         *outUrl = url.toString();
-        qDebug() << "============ GOT PLAYBACK URL!!! (EDGE RECORDING)" << *outUrl
-            << "Time Range:"
+        NX_VERBOSE(this) << *outUrl << "Time Range:"
             << QDateTime::fromMSecsSinceEpoch(m_startTimeUsec / 1000)
             << QDateTime::fromMSecsSinceEpoch(m_endTimeUsec / 1000);
     }

@@ -88,53 +88,59 @@ nx::update::Package* findPackageForOsVariant(
     return nullptr;
 }
 
-struct TranslationHelper
+QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info)
 {
-Q_DECLARE_TR_FUNCTIONS(MyClass)
-};
+    QString platform;
+    QString version = info.version;
 
-QString getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info)
-{
-    using TR = TranslationHelper;
-    if (info.modification == "bananapi")
+    if (info.platform == "linux")
     {
-        return QString("Debian %1 for Banana Pi is no longer supported").arg(info.version);
-    }
-    else if (info.modification == "rpi")
-    {
-        return QString("Raspbian %1 is no longer supported").arg(info.version);
-    }
-    else if (info.modification == "bpi")
-    {
-        if (!info.version.isEmpty())
-            return TR::tr("Nx1 %1 is no longer supported").arg(info.version);
+        if (info.modification == "ubuntu")
+            platform = "Ubuntu";
         else
-            return TR::tr("Nx1 is no longer supported");
+            return tr("This Linux platform is no longer supported"); //< Note "platform" wording.
+    }
+    else if (info.platform == "windows")
+    {
+        platform = "Windows";
+        version.clear();
+
+        const nx::utils::SoftwareVersion ver(info.version);
+        if (ver.major() == 6)
+        {
+            switch (ver.minor())
+            {
+                case 0: version = "Vista"; break;
+                case 1: version = "7"; break;
+                case 2: version = "8"; break;
+                case 3: version = "8.1"; break;
+                default: break;
+            }
+        }
+        else if (ver.major() == 10)
+        {
+            version = "10";
+        }
     }
     else if (info.modification == "mac")
     {
-        return TR::tr("Mac Os X %1 is no longer supported").arg(info.version);
+        platform = "Mac OS X";
     }
-    else if (info.modification == "ubuntu")
+    else
     {
-        if (info.version.isEmpty())
-            return TR::tr("Ubuntu is no longer supported");
-        else
-            return TR::tr("Ubuntu %1 is no longer supported").arg(info.version);
+        return tr("This OS version is no longer supported");
     }
-    else if (info.modification == "winxp")
+
+    if (version.isEmpty())
     {
-        // I guess we should use platform instead.
-        return TR::tr("This Windows version is no longer supported");
+        return tr("This %1 version is no longer supported", "%1 is OS name, e.g. Windows")
+            .arg(platform);
     }
-    else if (info.platform == "linux")
+    else
     {
-        if (info.arch == "arm")
-            return TR::tr("This version of ARM Linux is not supported");
-        else
-            return TR::tr("This version of Linux is not supported");
+        return tr("%1 %2 is no longer supported", "%1 %2 are OS name and version, e.g. Windows 7")
+            .arg(platform, version);
     }
-    return TR::tr("This OS version is unsupported");
 }
 
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
@@ -174,7 +180,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 {
                     contents.filesToUpload.push_back(pkg.file);
                     pkg.url = "";
-                    pkg.file = uploadDestination + file.fileName();
+                    // This was breaking offline updates for client.
+                    //pkg.file = uploadDestination + file.fileName();
                     checked.push_back(pkg);
                 }
                 else
@@ -218,7 +225,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         NX_ERROR(typeid(UpdateContents))
             << "verifyUpdateManifest(" << contents.info.version
-            << ")Error while trying to find client package:" << errorMessage;
+            << ") error while trying to find client package:" << errorMessage;
     }
 
     QSet<QnUuid> allServers;
@@ -235,9 +242,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         info.platform = package.platform;
 
         if (!contents.packageCache.count(info))
-        {
-            contents.packageCache.insert(std::make_pair(info, QList<nx::update::Package>()));
-        }
+            contents.packageCache.emplace(info, QList<nx::update::Package>());
         auto& record = contents.packageCache[info];
         record.append(package);
     }
@@ -277,8 +282,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << "verifyUpdateManifest(" << contents.info.version << ") server"
                 << server->getId() << " has unsupported os =" << serverInfo.modification
                 << "osversion =" << serverInfo.version;
-            QString message = getReportForUnsupportedServer(serverInfo);
-            contents.unsupportedSystem.insert(server->getId(), message);
+            QString message = UpdateStrings::getReportForUnsupportedServer(serverInfo);
+            contents.unsuportedSystemsReport.insert(server->getId(), message);
             package = findPackageForOsVariant(it->second, nx::update::kComponentServer, serverInfo.version);
         }
 
@@ -315,10 +320,10 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     contents.alreadyInstalled = alreadyInstalled;
     contents.cloudIsCompatible = checkCloudHost(commonModule, targetVersion, contents.info.cloudHost, allServers);
 
-    for (auto id: contents.unsupportedSystem.keys())
+    for (auto id: contents.unsuportedSystemsReport.keys())
         contents.missingUpdate.remove(id);
 
-    if (!contents.missingUpdate.empty() || !contents.unsupportedSystem.empty())
+    if (!contents.missingUpdate.empty() || !contents.unsuportedSystemsReport.empty())
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
             << contents.info.version << ") - detected missing server packages.";

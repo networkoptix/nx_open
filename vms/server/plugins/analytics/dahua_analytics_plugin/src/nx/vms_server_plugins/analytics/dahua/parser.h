@@ -8,10 +8,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 /**
  * Stateless namespace-like class, that contains functions for camera messages parsing.
@@ -47,10 +44,7 @@ public:
      * @param[in] event Event to check.
      * @return
      */
-    static bool isHartbeatEvent(const Event& event);
+    static bool isHeartbeatEvent(const Event& event);
 };
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

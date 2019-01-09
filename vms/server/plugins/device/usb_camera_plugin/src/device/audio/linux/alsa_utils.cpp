@@ -42,7 +42,7 @@ struct DeviceDescriptor
 
     // Can be Input, Output or both. Used to find input only devices.
     IOType ioType;
-    
+
     // Set to true if path contains the word "default", but not "sysdefault". 
     // Presumeably this is the systems default audio device, though ALSA has no explicit 
     // interface to get it.
@@ -56,7 +56,7 @@ struct DeviceDescriptor
         ioType(iotNone),
         isDefault(false),
         sysDefault(false)
-    {   
+    {
     }
 
     bool operator==(const DeviceDescriptor& rhs) const
@@ -66,7 +66,7 @@ struct DeviceDescriptor
             && name == rhs.name
             && cardIndex == rhs.cardIndex
             && ioType == rhs.ioType;
-    } 
+    }
 
     bool isCameraAudioInput(const nxcip::CameraInfo& info) const
     {
@@ -177,7 +177,6 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
         for (int j = 0; j < devices.size(); ++j)
         {
             DeviceDescriptor * device = &devices[j];
-            
             if (!audioTaken[device] && device->isCameraAudioInput(*camera) && device->sysDefault)
             {
                 mute = false;

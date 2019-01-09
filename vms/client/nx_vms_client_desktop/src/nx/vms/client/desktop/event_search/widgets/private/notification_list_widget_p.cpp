@@ -137,7 +137,8 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     connect(m_eventRibbon, &EventRibbon::countChanged,
         this, [this](int count)
         {
-            m_placeholder->setVisible(count < 1);
+            static constexpr int kMinimumCount = 1; //< Separator.
+            m_placeholder->setVisible(count <= kMinimumCount);
         });
 
     TileInteractionHandler::install(m_eventRibbon);

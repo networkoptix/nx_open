@@ -198,11 +198,6 @@ QString QnPlAxisResource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
-}
-
 QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
 {
     return new QnAxisStreamReader(toSharedPointer(this));

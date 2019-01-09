@@ -13,6 +13,8 @@
 NX_UTILS_API void PrintTo(const QByteArray& val, ::std::ostream* os);
 NX_UTILS_API void PrintTo(const QString& val, ::std::ostream* os);
 NX_UTILS_API void PrintTo(const QUrl& val, ::std::ostream* os);
+NX_UTILS_API void PrintTo(const QSize& val, ::std::ostream* os);
+NX_UTILS_API void PrintTo(const QSizeF& val, ::std::ostream* os);
 
 //-------------------------------------------------------------------------------------------------
 

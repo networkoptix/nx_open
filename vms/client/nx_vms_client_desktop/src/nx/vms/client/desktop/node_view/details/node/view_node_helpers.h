@@ -20,7 +20,14 @@ NX_VMS_DESKTOP_CLIENT_API bool isSeparator(const NodePtr& node);
 NX_VMS_DESKTOP_CLIENT_API bool isSeparator(const ViewNodeData& data);
 NX_VMS_DESKTOP_CLIENT_API bool isSeparator(const QModelIndex& index);
 
-NX_VMS_DESKTOP_CLIENT_API int siblingGroup(const QModelIndex& index);
+/**
+* Assuming that the sort order is ascending, nodes with lesser group sort order property will go
+*     before nodes with greater group sort order property regardless any other contents.
+*     Group sort order may be either positive or negative, default value is 0.
+*
+* @param index Model index representing node stored in NodeViewModel.
+*/
+NX_VMS_DESKTOP_CLIENT_API int groupSortOrder(const QModelIndex& index);
 
 NX_VMS_DESKTOP_CLIENT_API QString text(const NodePtr& node, int column);
 NX_VMS_DESKTOP_CLIENT_API QString text(const ViewNodeData& data, int column);
@@ -38,14 +45,14 @@ NX_VMS_DESKTOP_CLIENT_API NodePtr createSimpleNode(
     const QString& caption,
     const NodeList& children,
     int checkableColumn = -1,
-    int siblingGroup = 0);
+    int groupSortOrder = 0);
 
 NX_VMS_DESKTOP_CLIENT_API NodePtr createSimpleNode(
     const QString& caption,
     int checkableColumn = -1,
-    int siblingGroup = 0);
+    int groupSortOrder = 0);
 
-NX_VMS_DESKTOP_CLIENT_API NodePtr createSeparatorNode(int siblingGroup = 0);
+NX_VMS_DESKTOP_CLIENT_API NodePtr createSeparatorNode(int groupSortOrder = 0);
 
 } // namespace details
 } // namespace node_view

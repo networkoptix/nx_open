@@ -49,7 +49,6 @@ public:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
-    virtual void setIframeDistance(int, int) override;
     virtual bool  hasDualStreamingInternal() const override;
 
     virtual bool setOutputPortState(

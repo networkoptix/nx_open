@@ -9,6 +9,7 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 
 #include "redux/layout_settings_dialog_state.h"
+#include "redux/layout_settings_dialog_state_reducer.h"
 #include "redux/layout_settings_dialog_store.h"
 
 #include "widgets/layout_background_settings_widget.h"
@@ -118,6 +119,8 @@ void LayoutSettingsDialog::accept()
             if (background.canChangeAspectRatio() && background.cropToMonitorAspectRatio)
                 break;
             qnSettings->setLayoutKeepAspectRatio(background.keepImageAspectRatio);
+            LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(
+                qnSettings->layoutKeepAspectRatio());
             d->applyChanges();
             base_type::accept();
             return;

@@ -21,11 +21,6 @@ class DataOnlyCameraResource
 public:
     DataOnlyCameraResource( const QnUuid& resourceTypeId );
 
-    //!Implementation of QnSecurityCamResource::getDriverName
-    virtual QString getDriverName() const override;
-    //!Implementation of QnSecurityCamResource::setIframeDistance
-    virtual void setIframeDistance(int frames, int timems) override;
-
 protected:
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

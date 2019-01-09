@@ -68,6 +68,9 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     m_uploadManager.reset(new UploadManager());
     m_stateTracker.reset(new PeerStateTracker(this));
+
+    connect(this, &ServerUpdateTool::moduleInformationReceived,
+        m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
@@ -280,6 +283,12 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
         if (verifyUpdateManifest(contents, {}) && !contents.filesToUpload.empty())
         {
             contents.error = nx::update::InformationError::noError;
+            if (!contents.eulaPath.isEmpty())
+            {
+                QString eulaPath = contents.storageDir.filePath(contents.eulaPath);
+                NX_VERBOSE(this, "atExtractFilesFinished() fixing EULA path from %1 to %2", contents.eulaPath, eulaPath);
+                contents.eulaPath = eulaPath;
+            }
             changeUploadState(OfflineUpdateState::ready);
         }
         else
@@ -749,6 +758,23 @@ void ServerUpdateTool::requestInstallAction(
     }
 }
 
+void ServerUpdateTool::requestModuleInformation()
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        auto callback =
+            [tool=QPointer(this)](
+                bool success, rest::Handle /*handle*/,
+                const QList<nx::vms::api::ModuleInformation>& response)
+            {
+                if (success && tool)
+                    emit tool->moduleInformationReceived(response);
+            };
+        if (auto handle = connection->getModuleInformation(callback, thread()))
+            m_requestingInstall.insert(handle);
+    }
+}
+
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)
 {
@@ -778,7 +804,7 @@ rest::QnConnectionPtr ServerUpdateTool::getServerConnection(const QnMediaServerR
     return server ? server->restConnection() : rest::QnConnectionPtr();
 }
 
-void ServerUpdateTool::requestRemoteUpdateState()
+void ServerUpdateTool::requestRemoteUpdateStateAsync()
 {
     // Request another state only if there is no pending request.
     if (m_checkingRemoteUpdateStatus)
@@ -814,6 +840,30 @@ void ServerUpdateTool::requestRemoteUpdateState()
         m_activeRequests.insert(handle);
     }
 }
+
+std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpdateState()
+{
+    auto promise = std::make_shared<std::promise<std::vector<nx::update::Status>>>();
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        using UpdateStatusAll = std::vector<nx::update::Status>;
+        connection->getUpdateStatus(
+            [promise, tool=QPointer<ServerUpdateTool>(this)](
+                 bool success, rest::Handle handle, const UpdateStatusAll& response)
+            {
+                if (tool)
+                    tool->atUpdateStatusResponse(success, handle, response);
+                promise->set_value(response);
+            }, thread());
+    }
+    else
+    {
+        promise->set_value({});
+    }
+
+    return promise->get_future();
+}
+
 
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {

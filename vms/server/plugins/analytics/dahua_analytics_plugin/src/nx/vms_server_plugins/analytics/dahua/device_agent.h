@@ -14,10 +14,7 @@
 #include "engine.h"
 #include "metadata_monitor.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 class DeviceAgent:
     public QObject,
@@ -74,7 +71,4 @@ private:
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
 };
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

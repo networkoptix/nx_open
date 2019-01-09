@@ -17,7 +17,7 @@ Plugin::Plugin(
     CreateEngine createEngine)
     :
     m_name(std::move(pluginName)),
-    m_manifest(std::move(pluginManifest)),
+    m_jsonManifest(std::move(pluginManifest)),
     m_createEngine(std::move(createEngine))
 {
     NX_PRINT << "Created " << m_name << "[" << this << "]";
@@ -74,7 +74,7 @@ const IString* Plugin::manifest(nx::sdk::Error* outError) const
     if (outError)
         *outError = nx::sdk::Error::noError;
 
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::common::String(m_jsonManifest);
 }
 
 IEngine* Plugin::createEngine(Error* outError)

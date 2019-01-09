@@ -21,7 +21,7 @@ set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 
 add_custom_command(
     OUTPUT ${installer_output_list}
-    COMMAND ${script}
+    COMMAND /bin/bash ${script}
     DEPENDS ${script} ${depends} ${conf_configured_file}
     COMMENT "Creating mediaserver and desktop_client .tgz archive for Tegra"
 )

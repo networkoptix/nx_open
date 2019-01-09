@@ -555,7 +555,7 @@ void AudioStream::AudioStreamPrivate::run()
 // AudioStream
 
 AudioStream::AudioStream(
-    const std::string url,
+    const std::string& url,
     const std::weak_ptr<Camera>& camera,
     bool enabled) 
     :

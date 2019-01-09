@@ -31,6 +31,7 @@
             <Component><File Name="hikvision_analytics_plugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="axis_analytics_plugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="vca_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="dahua_analytics_plugin.dll" KeyPath="yes"/></Component>
             <?if $(var.enable_hanwha) = "true"?>
                 <Component><File Name="hanwha_analytics_plugin.dll" KeyPath="yes"/></Component>
             <?endif?>

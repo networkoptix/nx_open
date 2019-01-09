@@ -58,7 +58,7 @@ const char* kApiRequestPath = "/cgi-bin/cmd/";
 
 QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule),
-    m_desiredTransport(RtspTransport::autoDetect),
+    m_desiredTransport(RtspTransport::notDefined),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -130,11 +130,6 @@ int QnActiResource::eventPort() {
 QString QnActiResource::getDriverName() const
 {
     return MANUFACTURE;
-}
-
-void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
 }
 
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()

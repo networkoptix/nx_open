@@ -196,7 +196,6 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
 
     setSyncTimeInternal(value);
     emit timeChanged(value.count());
-
     return true;
 }
 

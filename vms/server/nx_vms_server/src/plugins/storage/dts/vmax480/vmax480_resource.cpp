@@ -45,10 +45,6 @@ QString QnPlVmax480Resource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnPlVmax480Resource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-}
-
 void QnPlVmax480Resource::setHostAddress(const QString &ip)
 {
     QString oldHostAddr = getHostAddress();

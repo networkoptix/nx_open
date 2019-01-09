@@ -37,7 +37,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return result;
 
     auto capabilities = primaryVideoCapabilities();
-    std::string confToken = capabilities.id.toStdString();
+    std::string confToken = capabilities.videoEncoderToken.toStdString();
     if (confToken.empty())
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
 

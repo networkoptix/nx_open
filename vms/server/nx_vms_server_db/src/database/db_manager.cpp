@@ -27,7 +27,6 @@
 #include <database/migrations/ptz_rotation_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
 #include <network/system_helpers.h>
-#include <settings.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
@@ -5495,19 +5494,18 @@ ErrorCode QnDbManagerAccess::readFullInfoDataForMobileClient(FullInfoData* data,
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
-    filterData(data->servers);
-    filterData(data->serversUserAttributesList);
-    filterData(data->cameras);
-    filterData(data->cameraUserAttributesList);
-    filterData(data->users);
-    filterData(data->userRoles);
-    filterData(data->userRoles);
-    filterData(data->accessRights);
-    filterData(data->layouts);
-    filterData(data->cameraHistory);
-    filterData(data->discoveryData);
-    filterData(data->allProperties);
-    filterData(data->resStatusList);
+    filterData(ApiCommand::getMediaServers, data->servers);
+    filterData(ApiCommand::getMediaServerUserAttributesList, data->serversUserAttributesList);
+    filterData(ApiCommand::getCameras, data->cameras);
+    filterData(ApiCommand::getCameraUserAttributesList, data->cameraUserAttributesList);
+    filterData(ApiCommand::getUsers, data->users);
+    filterData(ApiCommand::getUserRoles, data->userRoles);
+    filterData(ApiCommand::getAccessRights, data->accessRights);
+    filterData(ApiCommand::getLayouts, data->layouts);
+    filterData(ApiCommand::getCameraHistoryItems, data->cameraHistory);
+    filterData(ApiCommand::getDiscoveryData, data->discoveryData);
+    filterData(ApiCommand::getResourceParams, data->allProperties);
+    filterData(ApiCommand::getStatusList, data->resStatusList);
 
     return ErrorCode::ok;
 }

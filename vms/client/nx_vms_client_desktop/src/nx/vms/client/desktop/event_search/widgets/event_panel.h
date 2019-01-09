@@ -29,9 +29,23 @@ public:
 
     virtual ~EventPanel() override;
 
+    enum class Tab
+    {
+        notifications,
+        motion,
+        bookmarks,
+        events,
+        analytics
+    };
+    Q_ENUM(Tab);
+
+    Tab currentTab() const;
+    bool setCurrentTab(Tab tab);
+
 signals:
     void unreadCountChanged(int count, QnNotificationLevel::Value importance);
     void tileHovered(const QModelIndex& index, EventTile* tile);
+    void currentTabChanged(Tab current, QPrivateSignal);
 
 private:
     // We capture mouse press to cancel global context menu.

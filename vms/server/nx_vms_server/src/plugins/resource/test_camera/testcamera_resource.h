@@ -16,8 +16,6 @@ public:
 
     virtual int getMaxFps() const override;
     virtual QString getDriverName() const override;
-    virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
-
 
     virtual QString getHostAddress() const override;
     virtual void setHostAddress(const QString &ip) override;

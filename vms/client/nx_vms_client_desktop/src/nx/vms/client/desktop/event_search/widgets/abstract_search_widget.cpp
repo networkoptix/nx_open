@@ -118,9 +118,9 @@ bool AbstractSearchWidget::isAllowed() const
     return d->isAllowed();
 }
 
-void AbstractSearchWidget::updateIsAllowed()
+void AbstractSearchWidget::updateAllowance()
 {
-    d->setAllowed(calculateIsAllowed());
+    d->setAllowed(calculateAllowance());
 }
 
 } // namespace nx::vms::client::desktop
