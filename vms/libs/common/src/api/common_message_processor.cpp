@@ -1021,9 +1021,6 @@ void QnCommonMessageProcessor::updateResource(
             nx::vms::api::AnalyticsPluginData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsPluginResource>();
 
-    if (!pluginResource)
-        return;
-
     if (!NX_ASSERT(pluginResource, "Unable to create plugin resource."))
         return;
 
@@ -1044,9 +1041,6 @@ void QnCommonMessageProcessor::updateResource(
         ->createResource(
             nx::vms::api::AnalyticsEngineData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsEngineResource>();
-
-    if (!engineResource)
-        return;
 
     if (!NX_ASSERT(engineResource, "Unable to create engine resource."))
         return;
