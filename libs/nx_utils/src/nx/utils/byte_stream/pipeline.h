@@ -47,6 +47,7 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
+// Converters.
 
 /**
  * Output that converts byte stream and passes it to another output.
@@ -73,7 +74,7 @@ protected:
 };
 
 /**
- * Iterface of class that allows byte stream in both directions while converting it if needed.
+ * Interface of class that allows byte stream in both directions while converting it if needed.
  */
 class NX_UTILS_API AbstractTwoWayConverter:
     public AbstractInputConverter,
@@ -92,7 +93,7 @@ public:
 
 /**
  * By default, just forwards data without any conversion.
- * Conversion can be enabled by setting convertors with
+ * Conversion can be enabled by setting converters with
  * CompositeConverter::setInputConverter and CompositeConverter::setOutputConverter.
  */
 class NX_UTILS_API CompositeConverter:
@@ -116,6 +117,30 @@ public:
 private:
     AbstractInputConverter* m_inputConverter = nullptr;
     AbstractOutputConverter* m_outputConverter = nullptr;
+};
+
+// TODO: #ak Seems like "stream converter" and input/output entites should be decoupled.
+// The fact that stream converter is similar to AbstractOutput is accidental.
+
+/**
+ * Input stream that transfers all data through an output stream.
+ */
+class NX_UTILS_API OutputToInputConverterAdapter:
+    public AbstractInputConverter,
+    private AbstractOutput
+{
+public:
+    OutputToInputConverterAdapter(AbstractOutputConverter* converter);
+
+    virtual int read(void* data, size_t count) override;
+
+private:
+    AbstractOutputConverter* m_converter = nullptr;
+    std::string m_convertedData;
+
+    virtual int write(const void* data, size_t size) override;
+
+    int readCachedData(void* data, size_t count);
 };
 
 //-------------------------------------------------------------------------------------------------

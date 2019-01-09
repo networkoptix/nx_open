@@ -42,7 +42,7 @@ public:
     }
 
     template<typename T>
-    // requires std::is_base_of<T, nx::utils::bstream::AbstractInputConverter>::value
+    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
     void setDownStreamConverter()
     {
         m_downStreamConverterFactory = []() { return std::make_unique<T>(); };
@@ -70,7 +70,7 @@ private:
     std::chrono::milliseconds m_retryAcceptTimeout;
     std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
         m_upStreamConverterFactory;
-    std::function<std::unique_ptr<nx::utils::bstream::AbstractInputConverter>()>
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
         m_downStreamConverterFactory;
 
     void onAcceptCompletion(
@@ -158,7 +158,7 @@ public:
         std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter);
 
     void setDownStreamConverter(
-        std::unique_ptr<nx::utils::bstream::AbstractInputConverter> converter);
+        std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter);
 
     void start(ProxyCompletionHandler completionHandler);
 
@@ -174,7 +174,9 @@ private:
     std::optional<std::chrono::milliseconds> m_connectTimeout;
     nx::utils::bstream::CompositeConverter m_converter;
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_upStreamConverter;
-    std::unique_ptr<nx::utils::bstream::AbstractInputConverter> m_downStreamConverter;
+    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_downStreamConverter;
+    std::unique_ptr<nx::utils::bstream::OutputToInputConverterAdapter>
+        m_downStreamConverterAdapter;
 
     bool tuneDestinationConnectionAttributes();
 
