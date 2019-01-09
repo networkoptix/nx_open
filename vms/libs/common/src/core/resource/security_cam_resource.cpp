@@ -350,10 +350,7 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 
     // Since 3.2 Edge license type is used by any ARM server.
     if (QnMediaServerResource::isArmServer(getParentResource()))
-    {
-        const bool isProLicenseForced = resourceData().value<bool>(lit("useProLicenseOnArm"));
-        return isProLicenseForced ? Qn::LC_Professional : Qn::LC_Edge;
-    }
+        return Qn::LC_Edge;
 
     return Qn::LC_Professional;
 }
