@@ -72,6 +72,8 @@ public:
         m_timer.invalidate();
     }
 
+    std::chrono::milliseconds timeout() { return m_timeout; }
+
 private:
     const std::function<HanwhaResult<Value>()> m_getter;
     const std::chrono::milliseconds m_timeout;

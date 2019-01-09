@@ -469,7 +469,7 @@ void EventRibbon::Private::closeExpiredTiles()
         m_model->removeRows(index.row(), 1);
 
     NX_VERBOSE(q, "Expired %1 tiles", expired.size());
-    NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));
+    // NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));
 };
 
 nx::utils::Guard EventRibbon::Private::makeUnreadCountGuard()
@@ -900,7 +900,7 @@ void EventRibbon::Private::updateHighlightedTiles()
     for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
     {
         const auto& widget = m_tiles[i]->widget;
-        NX_ASSERT(widget);
+        // NX_ASSERT(widget);
         if (widget)
             widget->setHighlighted(shouldHighlightTile(i));
     }

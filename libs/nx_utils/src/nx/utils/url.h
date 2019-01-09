@@ -6,6 +6,8 @@
 #include <QtCore/QJsonValue>
 #include <QtXml/QtXml>
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace utils {
 
@@ -172,15 +174,38 @@ inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 }
 
 /**
-* First tries to parse strings like `hostname`, then
-* strings like `hostname:port` and uses the QUrl parser for other cases.
+* First tries to parse strings like `hostname`, then strings like `hostname:port` and uses the QUrl
+* parser for other cases.
 * @return URL which may not be a valid one, so it should be checked after the call.
 */
 NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme = "");
 
+/**
+ * Hides password if the string is a valid url with password. Otherwise returns original string.
+ * Note: the function MUST be used for any string which may contain URL when printing to logs.
+ */
+NX_UTILS_API QString hideUrlPassword(const QString& urlStr);
+
+NX_UTILS_API bool displayPasswordInLogs();
+
 } // namespace url
 } // namespace utils
 } // namespace nx
+
+/**
+* Used only to hide passwords from logs.
+*
+* NOTE: Implemented as template specialization as there is some unknown circumstances which does
+* not allow to just overload toString().
+*/
+template<>
+inline QString toString<nx::utils::Url>(const nx::utils::Url& value)
+{
+    if (nx::utils::url::displayPasswordInLogs())
+        return value.toString();
+
+    return value.toDisplayString();
+}
 
 Q_DECLARE_METATYPE(nx::utils::Url)
 

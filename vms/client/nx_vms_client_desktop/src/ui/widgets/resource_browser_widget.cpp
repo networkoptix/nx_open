@@ -38,7 +38,7 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>

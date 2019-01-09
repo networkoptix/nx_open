@@ -767,31 +767,35 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[action->getRuleId()];
 
-    vms::event::AggregationInfo aggregationInfo = aggregatedData.action
-        ? aggregatedData.action->aggregationInfo() //< adding event source (camera) to the existing aggregation info.
-        : vms::event::AggregationInfo();           //< creating new aggregation info.
+    auto ruleManager = serverModule()->commonModule()->eventRuleManager();
+    auto rule = ruleManager->rule(action->getRuleId());
+    std::chrono::seconds aggregationPeriod = kDefaultMailAggregationPeriod;
+    if (rule && rule->aggregationPeriod())
+        aggregationPeriod = std::chrono::seconds(rule->aggregationPeriod());
+
+    const bool dontGroupMail = !aggregatedData.periodicTaskID
+        && aggregatedData.lastMailTime.hasExpired(aggregationPeriod);
+    aggregatedData.lastMailTime.restart();
+    if (dontGroupMail)
+        return sendMailInternal(action, 1);
 
     if (!aggregatedData.action)
     {
-        auto ruleManager = serverModule()->commonModule()->eventRuleManager();
-        auto rule = ruleManager->rule(action->getRuleId());
-        std::chrono::seconds aggregationPeriod = kDefaultMailAggregationPeriod;
-        if (rule && rule->aggregationPeriod())
-            aggregationPeriod = std::chrono::seconds(rule->aggregationPeriod());
-
-        aggregatedData.action = vms::event::SendMailActionPtr(new vms::event::SendMailAction(*action));
-        using namespace std::placeholders;
+        aggregatedData.action =
+            vms::event::SendMailActionPtr(new vms::event::SendMailAction(*action));
+    }
+    if (!aggregatedData.periodicTaskID)
+    {
         aggregatedData.periodicTaskID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&ExtendedRuleProcessor::sendAggregationEmail, this, action->getRuleId()),
             aggregationPeriod);
     }
 
-    ++aggregatedData.eventCount;
-
+    auto aggregationInfo = aggregatedData.action->aggregationInfo();
     aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo());
     aggregatedData.action->setAggregationInfo(aggregationInfo);
 
-    return true;
+    return false; //< Don't write action to log so far.
 }
 
 void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
@@ -802,12 +806,26 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     if (aggregatedActionIter == m_aggregatedEmails.end())
         return;
 
-    if (!sendMailInternal(aggregatedActionIter->action, aggregatedActionIter->eventCount))
+    const int eventCount = aggregatedActionIter->action->aggregationInfo().totalCount();
+    if (sendMailInternal(aggregatedActionIter->action, eventCount))
+    {
+        auto actionCopy(aggregatedActionIter->action);
+        actionCopy->getRuntimeParams().eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
+        if (eventCount > 0)
+        {
+            actionCopy->getRuntimeParams().eventResourceId = QnUuid();
+            actionCopy->setAggregationCount(eventCount);
+        }
+        serverModule()->serverDb()->saveActionToDB(actionCopy);
+    }
+    else
     {
         NX_DEBUG(this, lit("Failed to send aggregated email"));
     }
 
-    m_aggregatedEmails.erase(aggregatedActionIter);
+
+    aggregatedActionIter->action.clear();
+    aggregatedActionIter->periodicTaskID = 0;
 }
 
 QVariantMap ExtendedRuleProcessor::eventDescriptionMap(

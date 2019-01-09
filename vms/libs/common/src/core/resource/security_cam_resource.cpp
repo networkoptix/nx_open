@@ -148,7 +148,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         this, &QnSecurityCamResource::at_motionRegionChanged,
         Qt::DirectConnection);
 
-    connect(this, &QnNetworkResource::propertyChanged, this,
+    connect(this, &QnNetworkResource::propertyChanged,
         [this](const QnResourcePtr& /*resource*/, const QString& key)
         {
             if (key == ResourcePropertyKey::kCameraCapabilities)

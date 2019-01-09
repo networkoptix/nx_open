@@ -388,6 +388,7 @@ void Appserver2Process::registerHttpHandlers(
             {
                 m_ecConnection.load()->addRemotePeer(
                     systemMergeProcessor.remoteModuleInformation().id,
+                    nx::vms::api::PeerType::server,
                     data.url);
             }
 
@@ -600,7 +601,7 @@ void Appserver2Process::connectTo(const Appserver2Process* dstServer)
     auto peerId = dstServer->commonModule()->moduleGUID();
 
     nx::utils::Url url = lit("http://%1:%2/").arg(addr.address.toString()).arg(addr.port);
-    ecConnection()->messageBus()-> addOutgoingConnectionToPeer(peerId, url);
+    ecConnection()->messageBus()-> addOutgoingConnectionToPeer(peerId, nx::vms::api::PeerType::server, url);
 }
 
 // ----------------------------- Appserver2Launcher ----------------------------------------------

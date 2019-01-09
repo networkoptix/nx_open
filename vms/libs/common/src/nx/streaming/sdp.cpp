@@ -68,6 +68,10 @@ Sdp::Media parseMedia(QStringList& lines)
     QString line = lines.front().trimmed().toLower();
     QStringList trackParams = line.mid(2).split(' ');
     media.mediaType = mediaTypeFromString(trackParams[0]);
+
+    if (trackParams.size() >= 2)
+        media.serverPort = trackParams[1].toInt();
+
     if (trackParams.size() >= 4)
         media.payloadType = trackParams[3].toInt();
 
@@ -110,6 +114,14 @@ Sdp::Media parseMedia(QStringList& lines)
     return media;
 }
 
+static QHostAddress parseServerAddress(const QString& line)
+{
+    auto fields = line.split(' ');
+    if (fields.size() >= 3 && fields[1].toUpper() == "IP4")
+        return QHostAddress(fields[2].split('/').front());
+    return QHostAddress();
+}
+
 void Sdp::parse(const QString& sdpData)
 {
     media.clear();
@@ -118,9 +130,15 @@ void Sdp::parse(const QString& sdpData)
     {
         QString line = lines.front().trimmed();
         if (line.startsWith("m=", Qt::CaseInsensitive))
+        {
             media.push_back(parseMedia(lines));
+        }
         else
+        {
+            if (line.startsWith("c=", Qt::CaseInsensitive))
+                serverAddress = parseServerAddress(line);
             lines.pop_front();
+        }
     }
 }
 

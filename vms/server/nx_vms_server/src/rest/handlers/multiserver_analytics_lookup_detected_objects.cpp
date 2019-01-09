@@ -145,7 +145,7 @@ nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects
     nx::utils::promise<std::tuple<ResultCode, LookupResult>> localLookupCompleted;
     m_eventStorage->lookup(
         filter,
-        [this, &localLookupCompleted](
+        [&localLookupCompleted](
             ResultCode resultCode,
             LookupResult lookupResult)
         {
@@ -216,7 +216,7 @@ nx::network::http::StatusCode::Value
         serverConnections.back()->lookupDetectedObjects(
             filter,
             true /*isLocal*/,
-            [this, &requestResultQueue](
+            [&requestResultQueue](
                 bool hasSucceded,
                 rest::Handle,
                 nx::analytics::storage::LookupResult lookupResult)

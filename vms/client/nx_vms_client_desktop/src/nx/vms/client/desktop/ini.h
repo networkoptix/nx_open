@@ -10,6 +10,8 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
     NX_INI_FLAG(0, developerMode, "Developer mode");
+    NX_INI_FLAG(0, developerGuiPanel, "Enable developer gui panel (WARNING: can be very slow)");
+
     NX_INI_FLAG(0, ignoreBetaWarning, "Hide beta version warning");
     NX_INI_FLAG(0, enableEntropixEnhancer, "Enable Entropix image enhancement controls.");
     NX_INI_STRING("http://96.64.226.250:8888/image",

@@ -96,7 +96,7 @@
 
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/utils/platform/autorun.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <utils/screen_utils.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 

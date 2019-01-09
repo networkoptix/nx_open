@@ -4,6 +4,7 @@
 #include <QtCore/QRegExp>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #include "url.h"
 
@@ -223,7 +224,8 @@ std::string Url::toStdString(QUrl::FormattingOptions options) const
 
 QString Url::toDisplayString(QUrl::FormattingOptions options) const
 {
-    return url(options);
+    // Always removes password from URL like it does QUrl.
+    return url(options | QUrl::RemovePassword);
 }
 
 QByteArray Url::toEncoded(QUrl::FormattingOptions options) const
@@ -591,6 +593,23 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
     if (result.scheme().isEmpty())
         result.setScheme(std::move(scheme));
     return result;
+}
+
+QString hideUrlPassword(const QString& urlStr)
+{
+    if (displayPasswordInLogs())
+        return urlStr;
+
+    nx::utils::Url url(urlStr);
+    if (url.isValid())
+        url.toDisplayString();
+
+    return urlStr;
+}
+
+bool displayPasswordInLogs()
+{
+    return nx::utils::ini().displayUrlPasswordInLogs;
 }
 
 } // namespace url

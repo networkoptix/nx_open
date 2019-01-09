@@ -56,6 +56,7 @@ private:
         std::int64_t sequence;
 
         bool operator<(const TransactionKey& rhs) const;
+        bool operator<=(const TransactionKey& rhs) const;
     };
 
     struct Transaction

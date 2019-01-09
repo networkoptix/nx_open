@@ -110,7 +110,7 @@ LocalConnectionFactory::LocalConnectionFactory(
 
 void LocalConnectionFactory::shutdown()
 {
-	m_serverQueryProcessor->waitForAsyncTasks();
+	m_serverQueryProcessor->stop();
 
 	pleaseStop();
 	join();

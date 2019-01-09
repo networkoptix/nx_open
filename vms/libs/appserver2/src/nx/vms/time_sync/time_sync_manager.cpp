@@ -96,7 +96,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 
     if (setSyncTime(newValue, kMaxJitterForLocalClock))
     {
-        NX_INFO(this, lm("Set time %1 from the local clock")
+        NX_DEBUG(this, lm("Set time %1 from the local clock")
             .arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
     }
     m_isTimeTakenFromInternet = false;
@@ -189,8 +189,14 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
     if (timeDelta < rtt / 2)
         return false;
 
+    NX_INFO(this,
+        lm("Set sync time to the new value %1. Difference between new and old value is %2")
+            .arg(value.count())
+            .arg(value - syncTime));
+
     setSyncTimeInternal(value);
     emit timeChanged(value.count());
+
     return true;
 }
 

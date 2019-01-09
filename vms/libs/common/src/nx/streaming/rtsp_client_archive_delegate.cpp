@@ -358,7 +358,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
         if (m_playNowModeAllowed)
         {
             // temporary solution
-            m_rtspDevice = std::make_unique<QnRtspIoDevice>(m_rtspSession.get(), true);
+            m_rtspDevice = std::make_unique<QnRtspIoDevice>(m_rtspSession.get(), RtspTransport::tcp);
             m_rtpData = m_rtspDevice.get();
         }
         else
@@ -1023,7 +1023,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
         session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 
-    session->setTransport(QLatin1String("TCP"));
+    session->setTransport(RtspTransport::tcp);
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

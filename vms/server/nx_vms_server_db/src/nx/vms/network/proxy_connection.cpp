@@ -294,6 +294,18 @@ void ProxyConnectionProcessor::cleanupProxyInfo(nx::network::http::Request* requ
 		QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
 }
 
+static void fixServerUrlSchemeSecurity(nx::utils::Url* url, const QnGlobalSettings* settings)
+{
+    namespace http = nx::network::http;
+    namespace rtsp = nx::network::rtsp;
+
+    if (settings->isTrafficEncriptionForced() && url->scheme() == http::kUrlSchemeName)
+        url->setScheme(http::kSecureUrlSchemeName);
+    else
+    if (settings->isVideoTrafficEncriptionForced() && url->scheme() == rtsp::kUrlSchemeName)
+        url->setScheme(rtsp::kSecureUrlSchemeName);
+}
+
 bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute)
 {
 	Q_D(ProxyConnectionProcessor);
@@ -421,6 +433,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		if (!replaceAuthHeader())
 			return false;
 	}
+
+    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
+        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
 
 	if (!dstRoute.addr.isNull())
 	{

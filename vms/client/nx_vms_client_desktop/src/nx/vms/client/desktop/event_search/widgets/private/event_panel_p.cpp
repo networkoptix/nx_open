@@ -105,14 +105,14 @@ EventPanel::Private::Private(EventPanel* q):
                 tab->goToLive();
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
-        this, &Private::rebuildTabs);
+    using Tabs = std::initializer_list<AbstractSearchWidget*>;
+    for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
+    {
+        connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+        connect(tab, &AbstractSearchWidget::isAllowedChanged, this, &Private::rebuildTabs);
+    }
 
     rebuildTabs();
-
-    using Tabs = std::initializer_list<AbstractSearchWidget*>;
-    for (auto tab: Tabs{ m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab })
-        connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     connect(m_notificationsTab, &NotificationListWidget::tileHovered,
         q, &EventPanel::tileHovered);
@@ -185,30 +185,24 @@ void EventPanel::Private::rebuildTabs()
         tr("Notifications", "Notifications tab title"));
 
     updateTab(m_motionTab,
-        true,
+        m_motionTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/motion.png")),
         tr("Motion", "Motion tab title"));
 
     updateTab(m_bookmarksTab,
-        accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks),
+        m_bookmarksTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/bookmarks.png")),
         tr("Bookmarks", "Bookmarks tab title"));
 
     updateTab(m_eventsTab,
-        accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs),
+        m_eventsTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/events.png")),
         tr("Events", "Events tab title"));
 
     updateTab(m_analyticsTab,
-        systemHasAnalytics(),
+        m_analyticsTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/analytics.png")),
         tr("Objects", "Analytics tab title"));
-}
-
-bool EventPanel::Private::systemHasAnalytics() const
-{
-    // TODO: #vkutin #GDM Implement when it becomes possible.
-    return true;
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)

@@ -30,7 +30,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/export/tools/export_layout_tool.h>

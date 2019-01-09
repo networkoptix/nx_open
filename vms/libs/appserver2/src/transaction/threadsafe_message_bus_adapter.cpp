@@ -35,10 +35,13 @@ int ThreadsafeMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
     return base_type::distanceToPeer(dstPeer);
 }
 
-void ThreadsafeMessageBusAdapter::addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url)
+void ThreadsafeMessageBusAdapter::addOutgoingConnectionToPeer(
+    const QnUuid& id,
+    nx::vms::api::PeerType peerType,
+    const nx::utils::Url& url)
 {
     QnMutexLocker guard(&m_mutex);
-    base_type::addOutgoingConnectionToPeer(id, url);
+    base_type::addOutgoingConnectionToPeer(id, peerType, url);
 }
 
 void ThreadsafeMessageBusAdapter::removeOutgoingConnectionFromPeer(const QnUuid& id)

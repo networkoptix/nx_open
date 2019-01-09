@@ -24,7 +24,8 @@ public:
         CameraManager * cameraManager,
         nxpl::TimeProvider * const timeProvider);
 
-    void initialize();
+    bool initialize();
+    bool isInitialized() const;
 
     std::shared_ptr<AudioStream> audioStream();
     std::shared_ptr<VideoStream> videoStream();
@@ -44,15 +45,15 @@ public:
 
     const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
 
-    /**
-     * Return the url used by ffmpeg to open the video stream
-     */
-    std::string url() const;
     CodecParameters defaultVideoParameters() const;
 
+    std::string ffmpegUrl() const;
+    
     std::vector<AVCodecID> ffmpegCodecPriorityList();
 
-    nxcip::CameraInfo info() const;
+    const nxcip::CameraInfo& info() const;
+
+    std::string toString() const;
 
 private:
     static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList;
@@ -64,10 +65,12 @@ private:
     std::shared_ptr<AudioStream> m_audioStream;
     std::shared_ptr<VideoStream> m_videoStream;
 
-    bool m_audioEnabled;
-    std::atomic_int m_lastError;
+    bool m_audioEnabled = false;
+    std::atomic_int m_lastError = 0;
 
     device::CompressionTypeDescriptorPtr m_compressionTypeDescriptor;
+
+    bool m_initialized = false;
 
 private:
     CodecParameters getDefaultVideoParameters();

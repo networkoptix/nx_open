@@ -40,7 +40,10 @@ public:
         const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual int distanceToPeer(const QnUuid& dstPeer) const = 0;
 
-    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) = 0;
+    virtual void addOutgoingConnectionToPeer(
+        const QnUuid& id,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& url) = 0;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) = 0;
 
     virtual void dropConnections() = 0;

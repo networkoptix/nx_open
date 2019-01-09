@@ -108,8 +108,8 @@ protected:
 private:
     struct RequestDescriptor
     {
-        nx::network::http::MimeProtoVersion httpVersion;
-        nx::network::http::StringType protocolToUpgradeTo;
+        http::RequestLine requestLine;
+        http::StringType protocolToUpgradeTo;
         std::int64_t sequence = 0;
     };
 

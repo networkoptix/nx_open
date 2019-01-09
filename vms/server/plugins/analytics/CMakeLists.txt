@@ -14,6 +14,8 @@ add_subdirectory(dw_mtt_analytics_plugin)
 
 add_subdirectory(ssc_analytics_plugin)
 
+add_subdirectory(dahua_analytics_plugin)
+
 if(targetDevice STREQUAL "tx1")
     add_subdirectory(deepstream_analytics_plugin)
 endif()

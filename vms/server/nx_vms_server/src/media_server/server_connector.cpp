@@ -7,6 +7,7 @@
 #include <nx/utils/log/log.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+#include <nx/vms/api/types/connection_types.h>
 
 QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
@@ -46,7 +47,8 @@ void QnServerConnector::addConnection(const nx::vms::discovery::ModuleEndpoint& 
     }
 
     NX_DEBUG(this, lm("Adding connection to module %1 by URL %2").args(module.id, newUrl));
-    commonModule()->ec2Connection()->addRemotePeer(module.id, newUrl);
+    commonModule()->ec2Connection()->addRemotePeer(
+        module.id, nx::vms::api::PeerType::server, newUrl);
 }
 
 void QnServerConnector::removeConnection(const QnUuid& id)

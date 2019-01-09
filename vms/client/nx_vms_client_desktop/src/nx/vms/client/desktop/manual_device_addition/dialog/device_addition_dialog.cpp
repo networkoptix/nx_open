@@ -170,7 +170,7 @@ void DeviceAdditionDialog::initializeControls()
             static constexpr int kStartSearchPage = 0;
             const bool enabled = currentPageIndex == kStartSearchPage;
             const QList<QWidget*> widgets =
-                { ui->searchParametersPanel, ui->addDevicesButtonPage, ui->serverChoosePanel };
+                {ui->searchParametersPanel, ui->addDevicesButtonPage, ui->serverChoosePanel};
             for (const auto widget: widgets)
                 widget->setEnabled(enabled);
             for (int i = 0; i < ui->tabWidget->count(); ++i)
@@ -462,8 +462,8 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
     m_model->setData(
         index, FoundDevicesModel::alreadyAddedState, FoundDevicesModel::presentedStateRole);
 
-    m_model->setData(
-        index.siblingAtColumn(FoundDevicesModel::checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
+    m_model->setData(index.siblingAtColumn(FoundDevicesModel::checkboxColumn),
+        Qt::Unchecked, Qt::CheckStateRole);
 }
 
 void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
@@ -687,8 +687,8 @@ void DeviceAdditionDialog::updateAddDevicesPanel()
             tr("%n devices are being added. You can close this dialog or start a new search",
                 nullptr, addingDevicesCount));
     }
-    else if (newDevicesCount != 0 &&
-        (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount ))
+    else if (newDevicesCount != 0
+        && (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount))
     {
         showAddDevicesButton(tr("Add all Devices"));
     }

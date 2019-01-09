@@ -10,6 +10,7 @@
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 #include "../websocket_transaction_transport.h"
+#include <nx/network/p2p_transport/p2p_websocket_transport.h>
 
 namespace nx::clusterdb::engine::transport {
 
@@ -102,8 +103,8 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     const std::string& userAgent)
 {
     const auto remoteAddress = connection->getForeignAddress();
-    auto webSocket = std::make_unique<network::websocket::WebSocket>(
-        std::move(connection));
+    auto p2pTransport = std::make_unique<network::P2PWebsocketTransport>(
+        std::move(connection), network::websocket::FrameType::binary);
 
     const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();
 
@@ -113,7 +114,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
         systemId.c_str(),
         m_outgoingCommandFilter,
         connectionId,
-        std::move(webSocket),
+        std::move(p2pTransport),
         localPeerInfo,
         remotePeerInfo);
 

@@ -33,16 +33,16 @@ public:
     //---------------------------------------------------------------------------------------------
     // asserts
 
-    void assertIfTransactionsWereNotSentInAscendingSequenceOrder();
+    void assertTransactionsAreSentInAscendingSequenceOrder();
 
     template<typename TransactionPtrContainer>
-    void assertIfNotAllTransactionsAreFound(const TransactionPtrContainer& container)
+    void assertAllTransactionsAreFound(const TransactionPtrContainer& container)
     {
         for (const auto& transactionPtr: container)
-            assertIfCouldNotFindTransactionWithHeader(transactionPtr->header());
+            assertTransactionWithHeaderIsFound(transactionPtr->header());
     }
 
-    void assertIfCouldNotFindTransactionWithHeader(
+    void assertTransactionWithHeaderIsFound(
         const CommandHeader& header);
 
 private:

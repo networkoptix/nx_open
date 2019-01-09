@@ -448,6 +448,16 @@ void AsyncClient::setUserName(const QString& userName)
     m_user.username = userName;
 }
 
+Credentials AsyncClient::credentials() const
+{
+    return m_user;
+}
+
+void AsyncClient::setCredentials(const Credentials& credentials)
+{
+    m_user = credentials;
+}
+
 void AsyncClient::setUserPassword(const QString& userPassword)
 {
     AuthToken authToken;
@@ -1376,7 +1386,7 @@ void AsyncClient::addBodyToRequest()
 
     // TODO: #ak Add support for any body.
     NX_CRITICAL(
-        dynamic_cast<BufferSource*>(m_requestBody.get()) != nullptr,
+        dynamic_cast<AbstractMsgBodySource*>(m_requestBody.get()) != nullptr,
         "Only fixed request body supported at the moment");
     auto contentLength = m_requestBody->contentLength();
     m_requestBody->readAsync(

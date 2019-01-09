@@ -89,6 +89,7 @@ private:
     TranId m_tranIdSequence;
     CommandTimestampCalculator m_timestampCalculator;
     VmsDataState m_committedData;
+    VmsDataState m_rawData;
 
     std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;
 

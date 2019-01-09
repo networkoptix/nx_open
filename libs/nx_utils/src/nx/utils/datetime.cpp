@@ -20,6 +20,12 @@ QString timestampToRfc2822(milliseconds timestamp)
     return timestampToRfc2822(timestamp.count());
 }
 
+QString timestampToRfc2822(std::chrono::system_clock::time_point timestamp)
+{
+    return timestampToRfc2822(
+        duration_cast<milliseconds>(timestamp.time_since_epoch()));
+}
+
 QString timestampToDebugString(qint64 timestampMs)
 {
     if (timestampMs == 0)

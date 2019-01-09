@@ -276,7 +276,7 @@ public:
 
     QString toString() const
     {
-        return toUrl().toDisplayString();
+        return toUrl().toString();
     }
 
     bool isNull() const

@@ -9,6 +9,7 @@
 
 #include "log.h"
 
+#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/unused.h>
 
 namespace nx::utils {
@@ -23,15 +24,13 @@ void setOnAssertHandler(std::function<void(const log::Message&)> handler)
     g_onAssertHandler = std::move(handler);
 }
 
-void crashProgram(const log::Message& message)
+void crashProgram([[maybe_unused]] const log::Message& message)
 {
     #if defined(_WIN32)
         // Copy error text to a stack variable so it is present in the mini-dump.
         char textOnStack[256] = {0};
         const auto text = lm("%1").arg(message).toStdString();
         snprintf(textOnStack, sizeof(textOnStack), "%s", text.c_str());
-    #else
-        unused(message);
     #endif
 
     #if defined(_DEBUG)
@@ -117,6 +116,11 @@ void disableQtMessageAsserts()
         qInstallMessageHandler(g_defaultQtMessageHandler);
     else
         NX_ASSERT(false, "Qt message asserts are not enabled");
+}
+
+bool isAssertHeavyConditionEnabled()
+{
+    return ini().assertHeavyCondition;
 }
 
 AssertTimer::TimeInfo::TimeInfo():

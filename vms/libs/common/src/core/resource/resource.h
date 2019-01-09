@@ -115,6 +115,7 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
     virtual bool isInitialized() const;
+    virtual bool isInitializationInProgress() const;
 
     bool hasDefaultProperty(const QString &name) const;
 
@@ -276,7 +277,7 @@ private:
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags = 0;
 
-    bool m_initialized = false;
+    std::atomic<bool> m_initialized{false};
     static QnMutex m_initAsyncMutex;
 
     qint64 m_lastInitTime = 0;
@@ -286,7 +287,7 @@ private:
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_initInProgress = false;
+    std::atomic<bool> m_initInProgress{false};
     QnCommonModule* m_commonModule;
 };
 

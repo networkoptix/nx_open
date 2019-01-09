@@ -1,0 +1,266 @@
+{
+    "capabilities": "deviceModelDependent",
+    "eventTypes": [
+        {
+            "id": "nx.dahua.VideoMotion",
+            "name": "Motion detection",
+            "internalName": "VideoMotion",
+            "description": "Video motion %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1",
+            "groupId": "nx.dahua.group.BasicEvents"
+        },
+        {
+            "id": "nx.dahua.VideoLoss",
+            "name": "Video loss detection",
+            "internalName": "VideoLoss",
+            "description": "Video loss %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.BasicEvents"
+        },
+        {
+            "id": "nx.dahua.VideoBlind",
+            "name": "Video blind detection",
+            "internalName": "VideoBlind",
+            "description": "Video blind %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.BasicEvents"
+        },
+        {
+            "id": "nx.dahua.VideoUnFocus",
+            "name": "Defocus detection",
+            "internalName": "VideoUnFocus",
+            "description": "Defocus %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.BasicEvents"
+        },
+        {
+            "id": "nx.dahua.VideoAbnormalDetection",
+            "name": "Scene change detection (Video abnormal detection)",
+            "internalName": "VideoAbnormalDetection",
+            "description": "Scene change %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.BasicEvents"
+        },
+        {
+            "id": "nx.dahua.CrossLineDetection",
+            "name": "Tripwire detection (Cross line detection)",
+            "internalName": "CrossLineDetection",
+            "description": "Cross line %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1",
+            "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.CrossRegionDetection",
+            "name": "Intrusion detection (Cross region detection)",
+            "internalName": "CrossRegionDetection",
+            "description": "Intrusion %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1",
+            "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.LeftDetection",
+            "name": "Abandoned object detection (Left object detection)",
+            "internalName": "LeftDetection",
+            "description": "Abandoned object %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1",
+            "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.TakenAwayDetection",
+            "name": "Missing object detection (Taken away detection)",
+            "internalName": "TakenAwayDetection",
+            "description": "Taken away object %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region#%1",
+            "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.FaceDetection",
+            "name": "Face detection",
+            "internalName": "FaceDetection",
+            "description": "Face %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.MoveDetection",
+            "name": "Fast moving detection",
+            "internalName": "Fast moving %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.WanderDetection",
+            "name": "Wander detection (Loitering detection)",
+            "internalName": "WanderDetection",
+            "description": "Loitering %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region #%1",
+            "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.RioterDetection",
+            "name": "Rioter detection (People gathering detection)",
+            "internalName": "RioterDetection",
+            "description": "People gathering %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.ParkingDetection",
+            "name": "Parking detection",
+            "internalName": "ParkingDetection",
+            "description": "Parking %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.CrowdDetection",
+            "name": "Crowd detection (Crowd dencity overrun detection)",
+            "internalName": "CrowdDetection",
+            "description": "Crowd dencity overrun %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.AudioMutation",
+            "name": "Audio intensity change detection (Audio mutation detection)",
+            "internalName": "AudioMutation",
+            "description": "Audio intensity change %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.AudioEvents"
+        },
+        {
+            "id": "nx.dahua.AudioAnomaly",
+            "name": "Audio anomaly detection (Audio input abnormal detection)",
+            "internalName": "AudioAnomaly",
+            "description": "Audio input abnormal %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.AudioEvents"
+        },
+        {
+            "id": "nx.dahua.StorageNotExist",
+            "name": "Storage absence detection",
+            "internalName": "StorageNotExist",
+            "description": "Storage absence %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SystemEvents"
+        } ,
+        {
+            "id": "nx.dahua.StorageFailure",
+            "name": "Storage failure detection",
+            "internalName": "StorageFailure",
+            "description": "Storage failure %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SystemEvents"
+        } ,
+        {
+            "id": "nx.dahua.StorageLowSpace",
+            "name": "Storage low space detection",
+            "internalName": "StorageLowSpace",
+            "description": "Storage low space %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SystemEvents"
+        } ,
+        {
+            "id": "nx.dahua.HeatImagingTemper",
+            "name": "High temperature detection",
+            "internalName": "HeatImagingTemper",
+            "description": "High temperature %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SystemEvents"
+        } ,
+        {
+            "id": "nx.dahua.AlarmLocal",
+            "name": "Alarm detection",
+            "internalName": "AlarmLocal",
+            "description": "Alarm local %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.AlarmEvents"
+        } ,
+        {
+            "id": "nx.dahua.AlarmOutput",
+            "name": "Alarm output detection",
+            "internalName": "AlarmOutput",
+            "description": "Alarm local %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "groupId": "nx.dahua.group.AlarmEvents"
+        }
+    ],
+    "groups": [
+        {
+            "id": "nx.dahua.group.BasicEvents",
+            "name": "Basic events"
+        },
+        {
+            "id": "nx.dahua.group.SimpleAnalyticsEvents",
+            "name": "Simple analytics events"
+        },
+        {
+            "id": "nx.dahua.group.ComplexAnalyticsEvents",
+            "name": "Complex analytics events"
+        },
+        {
+            "id": "nx.dahua.group.AudioEvents",
+            "name": "Audio events"
+        },
+        {
+            "id": "nx.dahua.group.AlarmEvents",
+            "name": "Alarm events"
+        },
+        {
+            "id": "nx.dahua.group.SystemEvents",
+            "name": "System events"
+        }
+    ]
+}

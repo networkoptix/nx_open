@@ -510,7 +510,7 @@ protected:
         m_sentData = nx::utils::generateRandomName(16*1024);
         m_connection->sendAsync(
             m_sentData,
-            [this](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
+            [](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
             {
             });
     }
@@ -1469,12 +1469,15 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
 {
-    this->givenSilentServer();
+    this->givenPingPongServer();
     this->givenConnectedSocket();
 
     this->whenReadSocketInBlockingWayWithFlags(MSG_DONTWAIT);
-
     this->thenClientSocketReported(SystemError::wouldBlock);
+
+    this->whenClientSendsPing();
+    this->whenReadSocketInBlockingWay();
+    this->thenServerMessageIsReceived();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)

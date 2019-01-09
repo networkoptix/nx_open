@@ -42,8 +42,6 @@ public:
      * If called from any other thread then returns after asynchronous handler completion.
      */
     virtual void cancelIOSync(nx::network::aio::EventType eventType) final;
-
-protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) = 0;
 };
 

@@ -197,6 +197,10 @@ endif()
 
 add_subdirectory(vms)
 
+if(withP2PConnectionTestingUtility)
+    add_subdirectory(p2p_connection_testing_utility)
+endif()
+
 if(withTests)
     add_subdirectory(tests)
 endif()

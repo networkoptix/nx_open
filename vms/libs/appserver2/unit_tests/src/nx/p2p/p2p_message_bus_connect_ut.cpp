@@ -18,6 +18,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/status_dictionary.h>
+#include <nx/p2p/p2p_server_message_bus.h>
 
 namespace nx {
 namespace p2p {
@@ -42,7 +43,7 @@ int getIntParam(const nx::utils::ArgumentParser& args, const QString& name, int 
     return result ? result->toInt() : defaultValue;
 }
 
-class P2pMessageBusTest: public P2pMessageBusTestBase
+class P2pMessageBusTest: public QObject, public P2pMessageBusTestBase
 {
 protected:
 
@@ -110,6 +111,45 @@ protected:
             .arg(connectionTries / k));
     }
 
+    void waitForLazyDataCommitDone()
+    {
+        std::vector<int> waitFlags;
+        waitFlags.resize(m_servers.size());
+        QnWaitCondition waitCondition;
+        QnMutex mutex;
+        for (int i = 0 ; i < m_servers.size(); ++i)
+        {
+            auto& server = m_servers[i];
+            auto connection = server->moduleInstance()->ecConnection();
+            const auto& bus = connection->messageBus()->dynamicCast<ServerMessageBus*>();
+            connect(
+                bus, &ServerMessageBus::lazyDataCommtDone,
+                this,
+                [i, &waitFlags, &mutex, &waitCondition]()
+                {
+                    QnMutexLocker lock(&mutex);
+                    ++waitFlags[i];
+                    waitCondition.wakeOne();
+                }, Qt::DirectConnection);
+        }
+        QnMutexLocker lock(&mutex);
+        while (!std::any_of(waitFlags.begin(), waitFlags.end(),
+            [&](const int value)
+            {
+                return value >= 2;
+            }))
+        {
+            waitCondition.wait(&mutex);
+        }
+
+        for (auto& server: m_servers)
+        {
+            auto connection = server->moduleInstance()->ecConnection();
+            const auto& bus = connection->messageBus()->dynamicCast<ServerMessageBus*>();
+            bus->disconnect(this);
+        }
+    }
+
     void addRuntimeData(const Appserver2Ptr& server)
     {
         auto commonModule = server->moduleInstance()->commonModule();
@@ -157,6 +197,10 @@ protected:
 
         waitForSync(keepDbAtServerIndex >= 0 ? cameraCount * 2 : cameraCount);
 
+        // Ensure all data are committed and server ready to process new requests quickly before set SF_P2pSyncDone flag.
+        if (args.get<QString>(kStandaloneModeParamName))
+            waitForLazyDataCommitDone();
+
         printReport();
 
         for (auto& server: m_servers)
@@ -172,7 +216,9 @@ protected:
 
         using namespace std::chrono;
         std::chrono::microseconds sleepInterval = 1s;
-        if (transactionsPerServerInSecond != boost::none)
+        const bool generateTransactions = transactionsPerServerInSecond != boost::none
+            && *transactionsPerServerInSecond > 0;
+        if (generateTransactions)
             sleepInterval = microseconds(int(1000000.0 / transactionsPerServerInSecond->toFloat()));
 
         auto cameras = m_servers[0]->moduleInstance()
@@ -181,7 +227,7 @@ protected:
 
         while (args.get<QString>(kStandaloneModeParamName))
         {
-            if (!cameras.isEmpty() && transactionsPerServerInSecond != boost::none)
+            if (!cameras.isEmpty() && generateTransactions)
             {
 
                 for (auto& server: m_servers)
@@ -196,7 +242,8 @@ protected:
                     auto status = oldStatus == Qn::Offline ? Qn::Online : Qn::Offline;
 
                     statusDict->setValue(resourceId, status);
-                    resourceManager->setResourceStatusSync(resourceId, status);
+                    resourceManager->setResourceStatus(resourceId, status,
+                        ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
                 }
             }
             std::this_thread::sleep_for(sleepInterval);

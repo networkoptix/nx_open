@@ -167,13 +167,16 @@ void MessageBus::stop()
     m_started = false;
 }
 
-void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Url &_url)
+void MessageBus::addOutgoingConnectionToPeer(
+    const QnUuid& peer,
+    nx::vms::api::PeerType peerType,
+    const utils::Url &_url)
 {
     QnMutexLocker lock(&m_mutex);
     deleteRemoveUrlById(peer);
 
     nx::utils::Url url(_url);
-    if (peer == ::ec2::kCloudPeerId)
+    if (peerType == nx::vms::api::PeerType::cloudServer)
     {
         url.setPath(nx::network::url::joinPath(
             kCloudPathPrefix.toStdString(), kUrlPath.toStdString()).c_str());

@@ -119,7 +119,6 @@ T fromHanwhaString(const QString& str)
         || std::is_same<T, HanwhaMediaType>::value
         || std::is_same<T, HanwhaStreamingMode>::value
         || std::is_same<T, HanwhaStreamingType>::value
-        || std::is_same<T, HanwhaTransportProtocol>::value
         || std::is_same<T, HanwhaClientType>::value,
         "No specialization for type");
 }
@@ -161,9 +160,6 @@ template<>
 HanwhaStreamingType fromHanwhaString(const QString& str);
 
 template<>
-HanwhaTransportProtocol fromHanwhaString(const QString& str);
-
-template<>
 HanwhaClientType fromHanwhaString(const QString& str);
 
 QString toHanwhaString(bool value);
@@ -185,8 +181,6 @@ QString toHanwhaString(HanwhaMediaType mediaType);
 QString toHanwhaString(HanwhaStreamingMode streamingMode);
 
 QString toHanwhaString(HanwhaStreamingType encodingPriority);
-
-QString toHanwhaString(HanwhaTransportProtocol codecId);
 
 QString toHanwhaString(HanwhaClientType entropyCoding);
 

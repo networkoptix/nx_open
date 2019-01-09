@@ -41,12 +41,12 @@ QnResource::QnResource(const QnResource& right):
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_initialized(right.m_initialized),
+    m_initialized(right.m_initialized.load()),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_initInProgress(right.m_initInProgress),
+    m_initInProgress(right.m_initInProgress.load()),
     m_commonModule(right.m_commonModule)
 {
 }
@@ -148,34 +148,6 @@ void QnResource::update(const QnResourcePtr& other)
 
     for (auto notifier : notifiers)
         notifier();
-
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!useLocalProperties() && !m_locallySavedProperties.empty() && commonModule())
-        {
-            std::map<QString, LocalPropertyValue> locallySavedProperties;
-            std::swap(locallySavedProperties, m_locallySavedProperties);
-            QnUuid id = m_id;
-            lk.unlock();
-
-            for (auto prop : locallySavedProperties)
-            {
-                if (commonModule()->propertyDictionary()->setValue(
-                    id,
-                    prop.first,
-                    prop.second.value,
-                    prop.second.markDirty,
-                    prop.second.replaceIfExists))   //isModified?
-                {
-                    emitPropertyChanged(prop.first);
-                }
-            }
-        }
-    }
-
-    //silently ignoring missing properties because of removeProperty method lack
-    for (const auto& param : other->getRuntimeProperties())
-        emitPropertyChanged(param.name);   //here "propertyChanged" will be called
 }
 
 QnUuid QnResource::getParentId() const
@@ -344,7 +316,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
 
     if (m_initialized && (newStatus == Qn::Offline || newStatus == Qn::Unauthorized))
     {
-        NX_VERBOSE(this, "Signal uninitialized");
+        NX_VERBOSE(this, "Signal initialized for status %1", newStatus);
         m_initialized = false;
         emit initializedChanged(toSharedPointer(this));
     }
@@ -352,7 +324,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
-        NX_VERBOSE(this, "Signal status change");
+        NX_VERBOSE(this, "Signal status change for %1", newStatus);
         emit statusChanged(sharedThis, reason);
     }
 }
@@ -551,7 +523,7 @@ void QnResource::emitPropertyChanged(const QString& key)
     if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
-    NX_VERBOSE(this, "Set property %1 = '%2'", key, getProperty(key));
+    NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
@@ -626,9 +598,10 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 bool QnResource::init()
 {
+    auto commonModule = this->commonModule();
     {
         QnMutexLocker lock(&m_initMutex);
-        if (commonModule() && commonModule()->isNeedToStop())
+        if (!commonModule || commonModule->isNeedToStop())
             return false;
 
         if (m_initialized)
@@ -638,24 +611,29 @@ bool QnResource::init()
         m_initInProgress = true;
     }
 
+    NX_DEBUG(this, "Initiatialize...");
     CameraDiagnostics::Result initResult = initInternal();
-    m_initMutex.lock();
-    m_initInProgress = false;
-    m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+    NX_DEBUG(this, "Initialization result: %1",
+        initResult.toString(commonModule->resourcePool()));
+
+    bool changed = false;
     {
-        QnMutexLocker lk(&m_mutex);
-        m_prevInitializationResult = initResult;
+        QnMutexLocker lock(&m_initMutex);
+        m_initInProgress = false;
+        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_prevInitializationResult = initResult;
+        }
+
+        m_initializationAttemptCount.fetchAndAddOrdered(1);
+
+        changed = m_initialized;
+        if (m_initialized)
+            initializationDone();
+        else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
+            setStatus(Qn::Offline);
     }
-
-    m_initializationAttemptCount.fetchAndAddOrdered(1);
-
-    bool changed = m_initialized;
-    if (m_initialized)
-        initializationDone();
-    else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
-        setStatus(Qn::Offline);
-
-    m_initMutex.unlock();
 
     if (changed)
         emit initializedChanged(toSharedPointer(this));
@@ -735,6 +713,11 @@ int QnResource::initializationAttemptCount() const
 bool QnResource::isInitialized() const
 {
     return m_initialized;
+}
+
+bool QnResource::isInitializationInProgress() const
+{
+    return m_initInProgress;
 }
 
 void QnResource::setUniqId(const QString& /*value*/)

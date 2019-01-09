@@ -20,7 +20,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/vms/client/desktop/utils/wearable_payload.h>

@@ -12,7 +12,7 @@ public:
         const QString& request = QString());
     virtual ~QnRtpStreamReader();
 
-    void setRtpTransport(const RtpTransport::Value& transport);
+    void setRtpTransport(const RtspTransport& transport);
     void setRequest(const QString& request);
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
@@ -28,7 +28,7 @@ protected:
 
 private:
     QString m_request;
-    RtpTransport::Value m_rtpTransport;
+    RtspTransport m_rtpTransport;
     size_t m_dataPassed = 0;
     nx::vms::server::resource::CameraPtr m_camera;
 };

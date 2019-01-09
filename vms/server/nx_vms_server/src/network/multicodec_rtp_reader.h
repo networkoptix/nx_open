@@ -20,19 +20,6 @@
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/streaming/rtp/camera_time_helper.h>
 
-namespace RtpTransport {
-
-typedef QString Value;
-
-// Server selects best suitable transport.
-static const QLatin1String _auto( "AUTO" );
-static const QLatin1String udp( "UDP" );
-static const QLatin1String tcp( "TCP" );
-
-Value fromString(const QString& str);
-
-} // namespace RtpTransport
-
 namespace nx::streaming::rtp  { class StreamParser; }
 
 class QnMulticodecRtpReader:
@@ -79,8 +66,8 @@ public:
     void setRole(Qn::ConnectionRole role);
     void setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
-    static void setDefaultTransport(const RtpTransport::Value& defaultTransportToUse);
-    void setRtpTransport(const RtpTransport::Value& value);
+    static void setDefaultTransport(const QString& defaultTransportToUse);
+    void setRtpTransport(RtspTransport value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
@@ -107,13 +94,15 @@ public:
     void setOnSocketReadTimeoutCallback(
         std::chrono::milliseconds timeout,
         OnSocketReadTimeoutCallback callback);
+
+    RtspTransport getRtpTransport() const;
+
 signals:
     void networkIssue(
         const QnResourcePtr&,
         qint64 timeStamp,
         nx::vms::api::EventReason reasonCode,
         const QString& reasonParamsEncoded);
-
 private:
 
     struct TrackInfo
@@ -136,7 +125,6 @@ private:
         quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
-    QnRtspClient::TransportType getRtpTransport() const;
 
     void calcStreamUrl();
 
@@ -174,7 +162,7 @@ private:
     bool m_rtpStarted;
     nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
     nx::utils::Url m_currentStreamUrl;
-    QString m_rtpTransport;
+    RtspTransport m_rtpTransport;
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
@@ -182,6 +170,9 @@ private:
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
+
+    static nx::utils::Mutex s_defaultTransportMutex;
+    static RtspTransport s_defaultTransportToUse;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

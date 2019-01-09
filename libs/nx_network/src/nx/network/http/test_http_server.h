@@ -77,6 +77,8 @@ public:
     bool bindAndListen(const SocketAddress& endpoint = SocketAddress::anyPrivateAddress);
     SocketAddress serverAddress() const;
 
+    void bindToAioThread(aio::AbstractAioThread* aioThread);
+
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
         const QString& path,
