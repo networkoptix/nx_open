@@ -37,7 +37,8 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     context->sample_rate = ffmpeg::utils::suggestSampleRate(codec);
     context->channel_layout = ffmpeg::utils::suggestChannelLayout(codec);
     context->channels = av_get_channel_layout_nb_channels(context->channel_layout);
-
+    context->time_base = {1, context->sample_rate};
+    context->codec_type = AVMEDIA_TYPE_AUDIO;
     int recommendedStereoBitrate = kDefaultAudioBitrate;
 
     // Formula found at: https://trac.ffmpeg.org/wiki/Encode/HighQualityAudio

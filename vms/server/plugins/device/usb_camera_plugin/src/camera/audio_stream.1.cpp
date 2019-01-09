@@ -48,8 +48,7 @@ AudioStream1::AudioStreamPrivate::AudioStreamPrivate(
     m_url(url),
     m_camera(camera),
     m_timeProvider(camera.lock()->timeProvider()),
-    m_packetConsumerManager(packetConsumerManager),
-    m_packetCount(std::make_shared<std::atomic_int>())
+    m_packetConsumerManager(packetConsumerManager)
 {
     if (!m_packetConsumerManager->empty())
         tryToStartIfNotStarted();
@@ -419,8 +418,6 @@ int AudioStream1::AudioStreamPrivate::transcodeAudio(ffmpeg::Packet * output)
         if (result == 0)
             break;
     }
-
-    lastPts = m_resampledFrame->pts();
 
     if (m_encoder->codecId() == AV_CODEC_ID_AAC)
     {

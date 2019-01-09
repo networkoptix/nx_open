@@ -47,8 +47,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_url(url),
     m_camera(camera),
     m_timeProvider(camera.lock()->timeProvider()),
-    m_packetConsumerManager(packetConsumerManager),
-    m_packetCount(std::make_shared<std::atomic_int>())
+    m_packetConsumerManager(packetConsumerManager)
 {
     if (!m_packetConsumerManager->empty())
         tryToStartIfNotStarted();
@@ -164,19 +163,6 @@ int AudioStream::AudioStreamPrivate::initialize()
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    //{
-    //    std::lock_guard<std::mutex> lock(m_mutex);
-    //    m_packetConsumerManager->flush();
-    //}
-
-    // while (*m_packetCount > 0)
-    // {
-    //     static constexpr std::chrono::milliseconds kSleep(30);
-    //     std::this_thread::sleep_for(kSleep);
-    // }
-
-    // if (m_decoder)
-    //     m_decoder->flush();
     m_decoder.reset(nullptr);
 
     if (m_resampleContext)
@@ -227,17 +213,11 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     inputFormat->formatContext()->flags |= AVFMT_FLAG_NONBLOCK;
 #endif // _WIN32
 
-    //inputFormat->setEntry("ar", 44100);
-    //inputFormat->setEntry("ac", 1);
-
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
-    // if (strstr(m_camera.lock()->info().modelName, "C920"))
-    //     result = inputFormat->open("hw:1");
     
     if (result < 0)
         return result;
 
-    std::cout << "Opened audio stream for " << m_camera.lock()->toString() << std::endl;
     inputFormat->dumpFormat();
 
     m_inputFormat = std::move(inputFormat);
@@ -289,17 +269,10 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
 
-    static constexpr int kDefaultFrameSize = 2000;
-
-    int nbSamples = context->frame_size ? context->frame_size : kDefaultFrameSize;
-
-    static constexpr int kDefaultAlignment =  32;
-
     int result = resampledFrame->getBuffer(
         context->sample_fmt,
-        nbSamples,
-        context->channel_layout,
-        kDefaultAlignment);
+        context->frame_size,
+        context->channel_layout);
     if (result < 0)
         return result;
 
@@ -421,8 +394,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
         m_encoder->codecId(),
-        AVMEDIA_TYPE_AUDIO,
-        m_packetCount);
+        AVMEDIA_TYPE_AUDIO);
 
     for(;;)
     {
