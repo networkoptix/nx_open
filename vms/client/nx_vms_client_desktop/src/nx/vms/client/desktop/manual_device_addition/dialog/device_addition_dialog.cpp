@@ -215,8 +215,12 @@ void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& val
 void DeviceAdditionDialog::handleStartAddressEditingFinished()
 {
     const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
-    if (startAddress % 256 == 0)
-        ui->endAddressEdit->setText(QHostAddress(startAddress + 255).toString());
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
+    if (!ui->endAddressEdit->isModified() && (startAddress / 256) != (endAddress / 256))
+    {
+        ui->endAddressEdit->setText(
+            QHostAddress(startAddress - startAddress % 256 + 255).toString());
+    }
 }
 
 void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value)
