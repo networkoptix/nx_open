@@ -28,7 +28,7 @@ void QnHistogramWidget::setHistogramData(const ImageCorrectionResult& data)
     }
 }
 
-void QnHistogramWidget::setHistogramParams(const ImageCorrectionParams& params)
+void QnHistogramWidget::setHistogramParams(const nx::vms::api::ImageCorrectionData& params)
 {
     m_params = params;
     update();

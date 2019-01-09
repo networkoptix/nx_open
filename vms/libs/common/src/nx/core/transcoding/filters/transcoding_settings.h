@@ -8,11 +8,12 @@
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
-#include <core/ptz/item_dewarping_params.h>
 #include <nx/core/watermark/watermark.h>
 
 #include <utils/common/aspect_ratio.h>
-#include <utils/color_space/image_correction.h>
+
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
 namespace nx {
 namespace core {
@@ -48,10 +49,10 @@ struct Settings
     QRectF zoomWindow;
 
     // Item dewarping, requires transcoding if enabled.
-    QnItemDewarpingParams dewarping;
+    nx::vms::api::DewarpingData dewarping;
 
     // Image enhancement, requires transcoding if enabled.
-    ImageCorrectionParams enhancement;
+    nx::vms::api::ImageCorrectionData enhancement;
 
     // Watermark; sometimes it behaves different from other overlays.
     Watermark watermark;

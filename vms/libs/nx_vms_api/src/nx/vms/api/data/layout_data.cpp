@@ -2,9 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 const QString LayoutData::kResourceTypeName = lit("Layout");
 const QnUuid LayoutData::kResourceTypeId =
@@ -15,6 +13,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api

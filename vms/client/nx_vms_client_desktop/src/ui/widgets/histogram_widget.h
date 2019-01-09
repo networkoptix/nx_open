@@ -19,14 +19,14 @@ public:
     void setColors(const QnHistogramColors &colors);
 
     virtual void setHistogramData(const ImageCorrectionResult &data) override;
-    void setHistogramParams(const ImageCorrectionParams &params);
+    void setHistogramParams(const nx::vms::api::ImageCorrectionData &params);
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
     ImageCorrectionResult m_data;
-    ImageCorrectionParams m_params;
+    nx::vms::api::ImageCorrectionData m_params;
     QnHistogramColors m_colors;
 };
 

@@ -392,8 +392,8 @@ void fromApiToResource(const LayoutItemData& src, QnLayoutItemData& dst)
     dst.resource.uniqueId = src.resourcePath;
     dst.zoomRect = QRectF(QPointF(src.zoomLeft, src.zoomTop), QPointF(src.zoomRight, src.zoomBottom));
     dst.zoomTargetUuid = src.zoomTargetId;
-    dst.contrastParams = ImageCorrectionParams::deserialize(src.contrastParams);
-    dst.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(src.dewarpingParams);
+    dst.contrastParams = src.contrastParams;
+    dst.dewarpingParams = src.dewarpingParams;
     dst.displayInfo = src.displayInfo;
 }
 
@@ -413,8 +413,8 @@ void fromResourceToApi(const QnLayoutItemData& src, LayoutItemData& dst)
     dst.zoomRight = src.zoomRect.bottomRight().x();
     dst.zoomBottom = src.zoomRect.bottomRight().y();
     dst.zoomTargetId = src.zoomTargetUuid;
-    dst.contrastParams = src.contrastParams.serialize();
-    dst.dewarpingParams = QJson::serialized(src.dewarpingParams);
+    dst.contrastParams = src.contrastParams;
+    dst.dewarpingParams = src.dewarpingParams;
     dst.displayInfo = src.displayInfo;
 }
 

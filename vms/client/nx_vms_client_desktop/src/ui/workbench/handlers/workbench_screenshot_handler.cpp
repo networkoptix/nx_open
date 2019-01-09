@@ -268,7 +268,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         rotations << rotation;
     count *= rotations.size();
 
-    QList<ImageCorrectionParams> imageCorrList;
+    QList<nx::vms::api::ImageCorrectionData> imageCorrList;
     {
         auto params = widget->item()->imageEnhancement();
         imageCorrList << params;
@@ -308,7 +308,8 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         parameters.resource = widget->resource();
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
-        for (const ImageCorrectionParams &imageCorr: imageCorrList) {
+        for (const auto& imageCorr: imageCorrList) 
+        {
             Key imageCorrKey(keyStack, imageCorr.enabled ? lit("_enh") : QString());
             parameters.imageCorrectionParams = imageCorr;
 

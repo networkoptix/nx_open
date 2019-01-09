@@ -132,7 +132,7 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, nx::vms::api::LayoutItemData* target) 
+    bool deserialize(const QnProtoValue &value, nx::vms::api::LayoutItemData* target)
     {
         QnProtoMessage message;
         if(!deserialize(value, &message))
@@ -207,13 +207,21 @@ namespace QnLayoutProto {
                     return false;
                 break;
             case LayoutItem::ContrastParamsField:
-                if(!deserialize(record.value(), &target->contrastParams))
+            {
+                QByteArray tmp;
+                if(!deserialize(record.value(), &tmp))
                     return false;
+                target->contrastParams = nx::vms::api::ImageCorrectionData::fromByteArray(tmp);
                 break;
+            }
             case LayoutItem::DewarpingParamsField:
-                if(!deserialize(record.value(), &target->dewarpingParams))
+            {
+                QByteArray tmp;
+                if(!deserialize(record.value(), &tmp))
                     return false;
+                target->dewarpingParams = nx::vms::api::DewarpingData::fromByteArray(tmp);
                 break;
+            }
             default:
                 break; /* Ignore other fields. */
             }
@@ -222,7 +230,7 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, nx::vms::api::LayoutData* target) 
+    bool deserialize(const QnProtoValue &value, nx::vms::api::LayoutData* target)
     {
         QnProtoMessage message;
         if(!deserialize(value, &message))

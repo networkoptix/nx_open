@@ -25,10 +25,10 @@ public:
     explicit QnAdjustVideoDialog(QWidget *parent);
     virtual ~QnAdjustVideoDialog();
 
-    ImageCorrectionParams params() const;
+    nx::vms::api::ImageCorrectionData params() const;
 
     QnHistogramConsumer *histogramConsumer() const;
-    
+
     void setWidget(QnMediaResourceWidget *widget);
 
     virtual bool tryClose(bool force) override;
@@ -36,7 +36,7 @@ protected:
     virtual void closeEvent(QCloseEvent *e) override;
 
 private:
-    void setParams(const ImageCorrectionParams &params);
+    void setParams(const nx::vms::api::ImageCorrectionData &params);
     void submit();
 
 private slots:
@@ -49,10 +49,10 @@ private:
     QScopedPointer<Ui::AdjustVideoDialog> ui;
 
     bool m_updateDisabled;
-    ImageCorrectionParams m_params;
+    nx::vms::api::ImageCorrectionData m_params;
     QPointer<QnMediaResourceWidget> m_widget;
 
-    ImageCorrectionParams m_backupParams;
+    nx::vms::api::ImageCorrectionData m_backupParams;
 };
 
 #endif // QN_ADJUST_VIDEO_DIALOG_H
