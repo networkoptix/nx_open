@@ -5,8 +5,11 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 #include <client_core/connection_context_aware.h>
+#include <core/resource/client_core_camera.h>
 
 class QnUuid;
+
+namespace nx::vms::client::core { class Camera; }
 
 namespace nx {
 namespace client {
@@ -35,7 +38,7 @@ private:
     void updateAvailability();
 
 private:
-    QnVirtualCameraResourcePtr m_camera;
+    nx::vms::client::core::CameraPtr m_camera;
     bool m_available = false;
 };
 
