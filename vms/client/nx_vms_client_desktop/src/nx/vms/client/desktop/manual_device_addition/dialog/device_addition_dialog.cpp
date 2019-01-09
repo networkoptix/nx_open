@@ -510,6 +510,9 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         m_model->setData(stateIndex, FoundDevicesModel::addingInProgressState,
             FoundDevicesModel::presentedStateRole);
 
+        m_model->setData(stateIndex.siblingAtColumn(FoundDevicesModel::checkboxColumn),
+            Qt::Unchecked, Qt::CheckStateRole);
+
         devices.append(device);
     }
 
