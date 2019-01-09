@@ -25,9 +25,16 @@ int QnUpdateStatusRestHandler::executeGet(
 
     QList<nx::update::Status> reply;
     if (request.isLocal)
+    {
         reply.append(serverModule()->updateManager()->status());
+    }
     else
-        detail::checkUpdateStatusRemotely(processor->commonModule(), path, &reply, &context);
+    {
+        detail::checkUpdateStatusRemotely(
+            serverModule()->updateManager()->participants(),
+            processor->commonModule(),
+            path, &reply, &context);
+    }
 
     QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
     return nx::network::http::StatusCode::ok;

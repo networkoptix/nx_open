@@ -263,6 +263,21 @@ update::FindPackageResult CommonUpdateManager::findPackage(
         outMessage);
 }
 
+QList<QnUuid> CommonUpdateManager::participants() const
+{
+    nx::update::Information updateInformation;
+    const auto deserializeResult = nx::update::fromByteArray(
+        globalSettings()->updateInformation(),
+        &updateInformation,
+        nullptr);
+    if (deserializeResult != nx::update::FindPackageResult::ok)
+    {
+        NX_DEBUG(this, "participants: Failed to deserialize");
+        return QList<QnUuid>();
+    }
+    return updateInformation.participants;
+}
+
 bool CommonUpdateManager::statusAppropriateForDownload(
     nx::update::Package* outPackage,
     update::Status* outStatus)

@@ -28,6 +28,7 @@ public:
     void cancel();
     void startUpdate(const QByteArray& content);
     void install(const QnAuthSession& authInfo);
+    QList<QnUuid> participants() const;
 
 private:
     std::atomic<bool> m_downloaderFailed = false;

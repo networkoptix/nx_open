@@ -47,6 +47,11 @@ FindPackageResult findPackage(
     nx::update::Package* outPackage,
     QString* outMessage);
 
+FindPackageResult fromByteArray(
+    const QByteArray& serializedUpdateInformation, 
+    Information* outInformation,
+    QString* outMessage);
+
 /**
  * Simple search for a package
  * @param component component string: {server, client}

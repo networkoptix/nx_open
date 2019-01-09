@@ -512,22 +512,33 @@ FindPackageResult findPackage(
     nx::update::Package* outPackage,
     QString* outMessage)
 {
+    update::Information updateInformation;
+    const auto deserializeResult = fromByteArray(serializedUpdateInformation,
+        &updateInformation, outMessage);
+    if (deserializeResult != FindPackageResult::ok)
+        return deserializeResult;
+    return findPackage(moduleGuid, systemInformation, updateInformation, isClient, cloudHost,
+        boundToCloud, outPackage, outMessage);
+}
+
+FindPackageResult fromByteArray(
+    const QByteArray& serializedUpdateInformation,
+    Information* outInformation,
+    QString* outMessage)
+{
     if (serializedUpdateInformation.isEmpty())
     {
         setErrorMessage("Update information is empty", outMessage);
         return FindPackageResult::noInfo;
     }
-
-    update::Information updateInformation;
-    if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
+    if (!QJson::deserialize(serializedUpdateInformation, outInformation))
     {
         setErrorMessage("Failed to deserialize update information JSON", outMessage);
         return FindPackageResult::otherError;
     }
-
-    return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,
-        outPackage, outMessage);
+    return FindPackageResult::ok;
 }
+
 
 nx::update::Package* findPackage(
     const QString& component,

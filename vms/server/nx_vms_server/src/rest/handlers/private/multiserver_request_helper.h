@@ -34,17 +34,15 @@ nx::utils::Url getServerApiUrl(
     return result;
 }
 
-QSet<QnMediaServerResourcePtr> allServers(QnCommonModule* commonModule);
+QSet<QnMediaServerResourcePtr> participantServers(const QList<QnUuid>& serverIdList,
+    QnCommonModule* commonModule);
 
 template<typename ReplyType, typename MergeFunction, typename RequestData>
-void requestRemotePeers(
-    QnCommonModule* commonModule,
-    const QString& path,
-    ReplyType& outputReply,
+void requestRemotePeers(QnCommonModule* commonModule, const QString& path, ReplyType& outputReply,
     QnMultiserverRequestContext<RequestData>* context,
-    const MergeFunction& mergeFunction)
+    const MergeFunction& mergeFunction, const QList<QnUuid>& serverIdList = QList<QnUuid>())
 {
-    for (const auto& server : allServers(commonModule))
+    for (const auto& server : participantServers(serverIdList, commonModule))
     {
         const auto completionFunc =
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
@@ -52,23 +50,23 @@ void requestRemotePeers(
                 int statusCode,
                 nx::network::http::BufferType body,
                 nx::network::http::HttpHeaders /*httpHeaders*/)
-        {
-            ReplyType reply;
-            bool success = false;
-
-            const auto httpCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
-            if (httpCode == nx::network::http::StatusCode::ok)
-                reply = QJson::deserialized(body, reply, &success);
-
-            const auto updateOutputDataCallback =
-                [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
             {
-                mergeFunction(serverId, success, reply, outputReply);
-                context->requestProcessed();
-            };
+                ReplyType reply;
+                bool success = false;
 
-            context->executeGuarded(updateOutputDataCallback);
-        };
+                const auto httpCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
+                if (httpCode == nx::network::http::StatusCode::ok)
+                    reply = QJson::deserialized(body, reply, &success);
+
+                const auto updateOutputDataCallback =
+                    [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
+                {
+                    mergeFunction(serverId, success, reply, outputReply);
+                    context->requestProcessed();
+                };
+
+                context->executeGuarded(updateOutputDataCallback);
+            };
 
         const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
         runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc, context);
@@ -76,10 +74,8 @@ void requestRemotePeers(
     }
 }
 
-void checkUpdateStatusRemotely(
-    QnCommonModule* commonModule,
-    const QString& path,
-    QList<nx::update::Status>* reply,
+void checkUpdateStatusRemotely(const QList<QnUuid>& participants, QnCommonModule* commonModule,
+    const QString& path, QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
 } // namespace detail

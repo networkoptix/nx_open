@@ -6,20 +6,24 @@
 
 namespace {
 
-bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
+bool allParticipantsAreReadyForInstall(
+    const QList<QnUuid>& participants,
+    const QnRestConnectionProcessor* processor)
 {
     auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),
         QnRequestParamList());
-
     request.isLocal = true;
-    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
+    QnMultiserverRequestContext<QnEmptyRequestData> context(
+        request,
         processor->owner()->getPort());
-
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply,
+    detail::checkUpdateStatusRemotely(
+        participants,
+        processor->commonModule(),
+        "/ec2/updateStatus",
+        &reply,
         &context);
-
     return std::all_of(reply.cbegin(), reply.cend(),
         [](const auto& status)
         {
@@ -31,12 +35,13 @@ bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
 }
 
 void sendInstallRequest(
+    const QList<QnUuid>& participants,
     QnCommonModule* commonModule,
     const QString& path,
     const QByteArray& contentType,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
-    auto allServers = detail::allServers(commonModule).toList();
+    auto allServers = detail::participantServers(participants, commonModule).toList();
     std::sort(
         allServers.begin(),
         allServers.end(),
@@ -98,24 +103,39 @@ int QnInstallUpdateRestHandler::executePost(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),
         params);
-
+    if (!params.contains("peers"))
+    {
+        return QnFusionRestHandler::makeError(
+            nx::network::http::StatusCode::ok,
+            "Missing required parameter 'peers'",
+            &result,
+            &resultContentType,
+            Qn::JsonFormat,
+            request.extraFormatting,
+            QnRestResult::MissingParameter);
+    }
+    QList<QnUuid> participants;
+    for (const auto& idString: params.value("peers").split(','))
+        participants.append(QnUuid::fromStringSafe(idString));
     if (!request.isLocal)
     {
-        if (!allServersAreReadyForInstall(processor))
+        if (!allParticipantsAreReadyForInstall(participants, processor))
         {
             return QnFusionRestHandler::makeError(
                 nx::network::http::StatusCode::ok,
                 "Not all servers in the system are ready for install",
                 &result, &resultContentType, Qn::JsonFormat);
         }
-
         QnMultiserverRequestContext<QnEmptyRequestData> context(
             request,
             processor->owner()->getPort());
-
-        sendInstallRequest(serverModule()->commonModule(), path, srcBodyContentType, &context);
+        sendInstallRequest(
+            participants,
+            serverModule()->commonModule(),
+            path,
+            srcBodyContentType,
+            &context);
     }
-
     return nx::network::http::StatusCode::ok;
 }
 
