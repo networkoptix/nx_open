@@ -237,10 +237,6 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString&
     }
 }
 
-void QnAdamResource::setIframeDistance(int /*frames*/, int /*timeMs*/)
-{
-}
-
 Qn::IOPortType QnAdamResource::portType(const QString& portId) const
 {
     const auto itr = m_portTypes.find(portId);

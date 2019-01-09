@@ -27,16 +27,14 @@
 * other case - 200 (OK).
 */
 
-#include <set>
-
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/resource/camera.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
 #include <rest/server/json_rest_handler.h>
 #include <utils/common/connective.h>
 
 class QnCachingCameraAdvancedParamsReader;
+
+struct QnCameraSettingsRestHandlerPostBody; //< Private - made public for Fusion.
 
 class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler>
 {
@@ -61,25 +59,40 @@ public:
         const QnRestConnectionProcessor* owner) override;
 
 private:
-    nx::network::http::StatusCode::Value obtainCamera(
-        const QnRequestParams& params,
+    using StatusCode = nx::network::http::StatusCode::Value;
+    using PostBody = QnCameraSettingsRestHandlerPostBody;
+
+    StatusCode obtainCameraFromRequestParams(
+        const QnRequestParams& requestParams,
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner,
         nx::vms::server::resource::CameraPtr* outCamera) const;
 
-    nx::network::http::StatusCode::Value obtainCameraParamValues(
+    StatusCode obtainCameraFromPostBody(
+        const PostBody& postBody,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner,
+        nx::vms::server::resource::CameraPtr* outCamera) const;
+
+    StatusCode obtainCameraParamValuesFromRequestParams(
         const nx::vms::server::resource::CameraPtr& camera,
         const QnRequestParams& params,
         QnJsonRestResult& result,
-        QnCameraAdvancedParamValueMap* outValues);
+        QnCameraAdvancedParamValueMap* outValues) const;
 
-    nx::network::http::StatusCode::Value handleGetParamsRequest(
+    StatusCode obtainCameraParamValuesFromPostBody(
+        const nx::vms::server::resource::CameraPtr& camera,
+        const PostBody& body,
+        QnJsonRestResult& result,
+        QnCameraAdvancedParamValueMap* outValues) const;
+
+    StatusCode handleGetParamsRequest(
         const QnRestConnectionProcessor* owner,
         const QnVirtualCameraResourcePtr& camera,
         const QSet<QString>& requestedParameterIds,
         QnCameraAdvancedParamValueMap* outParameterMap);
 
-    nx::network::http::StatusCode::Value handleSetParamsRequest(
+    StatusCode handleSetParamsRequest(
         const QnRestConnectionProcessor* owner,
         const QnVirtualCameraResourcePtr& camera,
         const QnCameraAdvancedParamValueMap& parametersToSet,

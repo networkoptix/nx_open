@@ -79,7 +79,7 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
         m_codecParams.toString());
 
     if (!m_streamReader)
-    {        
+    {
         static constexpr bool kForceTranscoding = true;
         m_streamReader.reset(new StreamReader(
             &m_refManager,

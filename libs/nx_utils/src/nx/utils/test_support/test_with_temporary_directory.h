@@ -13,7 +13,7 @@ public:
      * automatically cleared. Aternatively, global temp path variable will be used. If it is empty,
      * home folder will be used. In these cases module name will be used as a distinction subfolder.
      */
-    TestWithTemporaryDirectory(const QString& moduleName, const QString& tmpDir);
+    TestWithTemporaryDirectory(const QString& moduleName, const QString& tmpDir = QString());
     ~TestWithTemporaryDirectory();
 
     QString testDataDir() const;

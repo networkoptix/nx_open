@@ -191,7 +191,10 @@ void QnConnectToCloudWatcher::processFetchPeerIdResponse()
         return;
     }
 
-    connectToCloudPeer(cloudPeerInfo.id, m_cloudPeerCandidateUrl);
+    metaObject()->invokeMethod(
+        this,
+        [this, id = cloudPeerInfo.id]() { connectToCloudPeer(id, m_cloudPeerCandidateUrl); },
+        Qt::QueuedConnection);
 }
 
 void QnConnectToCloudWatcher::connectToCloudPeer(

@@ -193,12 +193,15 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return Qn::Empty_Help;
 
         case Qn::ResourceListRole:
+        case Qn::DisplayedResourceListRole:
         {
-            const auto resource = camera(object);
-            if (resource)
+            if (const auto resource = camera(object))
                 return QVariant::fromValue(QnResourceList({resource}));
 
-            return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+            if (role == Qn::DisplayedResourceListRole)
+                return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+
+            return {};
         }
 
         case Qn::ResourceRole:
@@ -212,7 +215,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         default:
             handled = false;
-            return QVariant();
+            return {};
     }
 }
 
@@ -528,7 +531,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
     NX_VERBOSE(q, "Processing %1 live metadata packets from %2 sources",
         totalPackets, packetsBySource.size());
 
-    QList<DetectedObject> newObjects;
+    std::vector<DetectedObject> newObjects;
+    newObjects.reserve(totalPackets);
+
     QHash<QnUuid, int> newObjectIndices;
 
     for (const auto& packets: packetsBySource)
@@ -542,13 +547,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
             if (!detectionMetadata || detectionMetadata->objects.empty())
                 continue;
 
-            ObjectPosition pos;
-            pos.deviceId = detectionMetadata->deviceId;
-            pos.timestampUsec = detectionMetadata->timestampUsec;
-            pos.durationUsec = detectionMetadata->durationUsec;
-
-            for (const auto& item: detectionMetadata->objects)
+            for (auto& item: detectionMetadata->objects)
             {
+                ObjectPosition pos;
+                pos.deviceId = detectionMetadata->deviceId;
+                pos.timestampUsec = detectionMetadata->timestampUsec;
+                pos.durationUsec = detectionMetadata->durationUsec;
                 pos.boundingBox = item.boundingBox;
 
                 auto index = newObjectIndices.value(item.objectId, -1);
@@ -582,7 +586,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 newObject.firstAppearanceTimeUsec = pos.timestampUsec;
                 newObject.lastAppearanceTimeUsec = pos.timestampUsec;
 
-                newObjectIndices[item.objectId] = newObjects.size();
+                newObjectIndices[item.objectId] = int(newObjects.size());
                 newObjects.push_back(std::move(newObject));
             }
         }

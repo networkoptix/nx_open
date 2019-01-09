@@ -157,7 +157,8 @@ public:
         dataProcessor(0),
         sessionTimeOut(0),
         useProprietaryFormat(false),
-        startTime(0),
+        startTime(DATETIME_NOW), //< Default value
+        startTimeTakenFromUrlQuery(false),
         endTime(0),
         rtspScale(1.0),
         lastPlayCSeq(0),
@@ -259,6 +260,7 @@ public:
     TranscodeParams prevTranscodeParams;
 
     qint64 startTime; // time from last range header
+    bool startTimeTakenFromUrlQuery;
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
     QnMutex mutex;
@@ -361,10 +363,16 @@ bool QnRtspConnectionProcessor::parseRequestParams()
     };
 
     const QString pos = urlQuery.queryItemValue(StreamingParams::START_POS_PARAM_NAME);
-    if (pos.isEmpty())
-        processRangeHeader();
-    else
+    if (!pos.isEmpty())
+    {
+        d->startTimeTakenFromUrlQuery = true;
         d->startTime = nx::utils::parseDateTime(pos);
+    }
+    else if (!d->startTimeTakenFromUrlQuery)
+    {
+        processRangeHeader();
+    }
+
 
     d->transcodeParams.resolution = QSize();
     QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers);
@@ -971,9 +979,15 @@ void QnRtspConnectionProcessor::processRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
     const auto rangeStr = nx::network::http::getHeaderValue(d->request.headers, "Range");
-    QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    if (!nx::network::rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
-        d->startTime = DATETIME_NOW;
+    if (!rangeStr.isEmpty())
+    {
+        QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
+        if (!nx::network::rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
+            d->startTime = DATETIME_NOW;
+
+        if (rangeStr.startsWith("npt=") && d->startTime == 0)
+            d->startTime = DATETIME_NOW; //< VLC/ffmpeg sends position 0 as a default value. Interpret it as Live position.
+    }
 }
 
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)

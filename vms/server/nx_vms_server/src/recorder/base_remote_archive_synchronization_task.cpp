@@ -388,9 +388,9 @@ void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
     m_importedDuration += duration;
     NX_VERBOSE(
         this,
-        lm("Resource %1. File has been written. Duration: %1,"
-            "Current duration of imported remote archive: %2,"
-            "Total duration to import: %3")
+        lm("Resource %1. File has been written. Duration: %2, "
+            "Current duration of imported remote archive: %3, "
+            "Total duration to import: %4")
             .args(
                 m_resource->getUserDefinedName(),
                 duration,

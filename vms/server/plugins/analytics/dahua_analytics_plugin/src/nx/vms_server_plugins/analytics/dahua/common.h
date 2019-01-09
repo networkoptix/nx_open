@@ -13,10 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 struct EventType: public nx::vms::api::analytics::EventType
 {
@@ -70,7 +67,4 @@ using EventList = std::vector<Event>;
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

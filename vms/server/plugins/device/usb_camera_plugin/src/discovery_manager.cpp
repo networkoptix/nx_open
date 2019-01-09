@@ -178,7 +178,6 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
             QCryptographicHash::Md5).toHex().constData();
 
         DeviceDataWithNxId nxDevice(device, nxId);
-        
         nxDevices.push_back(nxDevice);
         addOrUpdateCamera(nxDevice);
     }

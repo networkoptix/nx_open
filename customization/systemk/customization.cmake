@@ -35,7 +35,6 @@ set(android.keypass "systemk")
 
 set(customization.upgradeCode "{455EAAF8-2001-4F61-8597-72808294938D}")
 set(customization.clientUpgradeCode "{6B2CE83A-37A7-4576-BDA9-8CD4E13ECA9F}")
-set(customization.serverUpgradeCode "{85BEAEB4-F0F4-4C5E-8F95-B9354EC540D8}")
 
 set(customization.clientBundleUpgradeCode "{c9dfaf98-33d9-4ba0-8295-7c1942d11734}")
 set(customization.serverBundleUpgradeCode "{f0777de3-cc52-4a01-a203-c4af5aff6956}")

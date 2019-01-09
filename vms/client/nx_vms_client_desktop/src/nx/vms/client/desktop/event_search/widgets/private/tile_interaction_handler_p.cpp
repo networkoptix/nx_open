@@ -169,15 +169,16 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
             .withArgument(Qn::RaiseSelectionRole, ini().raiseCameraFromClickedTile));
     }
 
-    // If timeline is hidden, do no navigation.
-    if (!navigator()->isTimelineRelevant())
+    // If no relevant resource is open on current layout, do no navigation.
+    if (openResources.empty())
         return;
 
     // If requested time is outside timeline range, show proper message after double click delay.
     const auto timelineRange = navigator()->timelineRange();
     auto navigationTime = timestamp.value<microseconds>();
 
-    if (!timelineRange.contains(duration_cast<milliseconds>(navigationTime)))
+    if (!navigator()->isTimelineRelevant()
+        || !timelineRange.contains(duration_cast<milliseconds>(navigationTime)))
     {
         showMessageDelayed(tr("No available archive."), doubleClickInterval());
         return;

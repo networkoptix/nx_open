@@ -211,7 +211,7 @@ void StartupActionsHandler::handleStartupParameters()
 
     if (!data.delayedDrop.isEmpty())
     {
-        d->delayedDrops.raw = QByteArray::fromBase64(data.instantDrop.toLatin1());
+        d->delayedDrops.raw = QByteArray::fromBase64(data.delayedDrop.toLatin1());
     }
 
     if (data.customUri.isValid())

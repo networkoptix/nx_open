@@ -15,11 +15,6 @@ QString QnPlIqResource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-    // Do nothing.
-}
-
 QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
     if (isRtp())

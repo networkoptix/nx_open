@@ -53,7 +53,7 @@ private:
 template<class Service, class Request, class Response>
 bool makeSoapRequest(
     Service& service,
-    int(Service::*method)(Request*, Response&),
+    int (Service::*method)(Request*, Response&),
     Request& request,
     Response& response,
     const char* user,
@@ -122,9 +122,9 @@ std::string joinTags(const std::vector<const char*>& st, char separator = '/')
 }
 
 /**
-  * Recursively finds all events in subtree "element" (if any) and appends them to "events" vector.
-  * A "topic" member of every found event gets "topicName" value.
-  */
+ * Recursively finds all events in subtree "element" (if any) and appends them to "events" vector.
+ * A "topic" member of every found event gets "topicName" value.
+ */
 void replanishEventsFromElement(const soap_dom_element* element, const char* topicName,
     std::vector<const char*>& tagStack, std::vector<nx::axis::SupportedEventType>& events)
 {
@@ -181,7 +181,7 @@ bool startsWith(const std::string& name, const std::string& prefix)
     return it == name.cbegin();
 }
 
-/** Calculated how many namespaces are there in the array. */
+/** Calculate how many namespaces are there in the array. */
 int countNamespaces(const Namespace* start)
 {
     int count = 0;
@@ -511,7 +511,7 @@ int CameraController::addActiveAction(const ActiveAction& action)
         return 0;
 
     // If "response.ConfigurationID" is not an integer, atoi() returns 0. It suits us
-    // because 0 means that insertion failed.
+    // because 0 means that insertion has failed.
     return atoi(response.ConfigurationID.c_str());
 }
 

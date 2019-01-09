@@ -1,11 +1,15 @@
 #pragma once
 
-#include "core/resource_management/resource_searcher.h"
+#include <core/resource_management/resource_searcher.h>
 
-class QnPlC2pCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
+#include <nx/vms/server/server_module_aware.h>
+
+class QnPlC2pCameraResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::vms::server::ServerModuleAware
 {
 public:
-    QnPlC2pCameraResourceSearcher(QnCommonModule* commonModule);
+    QnPlC2pCameraResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual QnResourceList findResources(void) override;
 

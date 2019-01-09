@@ -13,7 +13,6 @@
 
 #include <nx_ec/ec_api.h>
 
-#include "settings.h"
 #include <transaction/threadsafe_message_bus_adapter.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
@@ -51,8 +50,6 @@ public:
         const nx::vms::api::ClientInfoData& clientInfo,
         impl::ConnectHandlerPtr handler) override;
 
-    virtual void setConfParams(std::map<QString, QVariant> confParams) override;
-
     virtual TransactionMessageBusAdapter* messageBus() const override;
     virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
 
@@ -60,7 +57,6 @@ public:
 
 private:
     QnMutex m_mutex;
-    Settings m_settingsInstance;
     std::unique_ptr<ThreadsafeMessageBusAdapter> m_bus;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;

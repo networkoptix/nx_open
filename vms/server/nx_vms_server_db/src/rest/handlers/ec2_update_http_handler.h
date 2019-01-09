@@ -389,7 +389,9 @@ private:
                 m_cond.wakeAll();
             };
 
-        m_connection->queryProcessor()->getAccess(owner->accessRights())
+        // This call is used to merge data with existing to partial object update.
+        // Access right to the object will be checked on a object update phase.
+        m_connection->queryProcessor()->getAccess(Qn::kSystemAccess)
             .template processQueryAsync<QnUuid, RequestDataList, decltype(queryDoneHandler)>(
                 /*unused*/ ApiCommand::NotDefined, uuid, queryDoneHandler);
 

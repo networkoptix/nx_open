@@ -977,8 +977,7 @@
     "nx::vms::client::desktop::AsyncImageWidget": {
         "palette": {
             "default": {
-                "shadow":        "dark7",
-                "window":        "dark9",
+                "window":        "dark6",
                 "windowText":    "light16",
                 "highlight":     "brand_core",
                 "alternateBase": "dark1.setAlpha(110)"

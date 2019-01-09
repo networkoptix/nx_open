@@ -109,7 +109,9 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return QVariant::fromValue(navigator()->currentResource());
 
         case Qn::ResourceListRole:
-            return QVariant::fromValue(QnResourceList({navigator()->currentResource()}));
+            if (auto resource = navigator()->currentResource())
+                return QVariant::fromValue(QnResourceList({resource}));
+            return {};
 
         case Qn::DescriptionTextRole:
         {
@@ -178,8 +180,9 @@ void SimpleMotionSearchListModel::requestFetch()
     const int oldCount = int(m_data.size());
     FetchResult result = FetchResult::complete;
 
-    QnTimePeriod fetchedPeriod(relevantTimePeriod());
+    ScopedFetchCommit scopedFetch(this, fetchDirection(), result /*by reference*/);
 
+    QnTimePeriod fetchedPeriod(relevantTimePeriod());
     if (periods.empty())
     {
         NX_VERBOSE(this, "Loader contains no chunks");
@@ -263,8 +266,6 @@ void SimpleMotionSearchListModel::requestFetch()
         NX_VERBOSE(this, "Truncating to maximum count");
         truncateToMaximumCount();
     }
-
-    emit fetchFinished(result, {});
 }
 
 void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)

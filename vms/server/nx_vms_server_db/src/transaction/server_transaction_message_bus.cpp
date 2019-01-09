@@ -319,7 +319,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
         QnTransaction<vms::api::MediaServerDataExList> tranServers;
         tranServers.command = ApiCommand::getMediaServersEx;
         tranServers.peerID = commonModule()->moduleGUID();
-        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranServers.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(tranServers.command, QnUuid(), tranServers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -329,7 +329,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
         tranCameras.command = ApiCommand::getCamerasEx;
         tranCameras.peerID = commonModule()->moduleGUID();
         if (dbManager(m_db, transport->getUserAccessData())
-            .doQuery(QnCameraDataExQuery(), tranCameras.params) != ErrorCode::ok)
+            .doQuery(tranCameras.command, QnCameraDataExQuery(), tranCameras.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -338,7 +338,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
         QnTransaction<vms::api::UserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
         tranUsers.peerID = commonModule()->moduleGUID();
-        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranUsers.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(tranUsers.command, QnUuid(), tranUsers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -347,7 +347,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
         QnTransaction<nx::vms::api::LayoutDataList> tranLayouts;
         tranLayouts.command = ApiCommand::getLayouts;
         tranLayouts.peerID = commonModule()->moduleGUID();
-        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranLayouts.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(tranLayouts.command, QnUuid(), tranLayouts.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -356,7 +356,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
         QnTransaction<nx::vms::api::ServerFootageDataList> tranCameraHistory;
         tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
         tranCameraHistory.peerID = commonModule()->moduleGUID();
-        if (dbManager(m_db, transport->getUserAccessData()).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(tranCameraHistory.command, nullptr, tranCameraHistory.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;

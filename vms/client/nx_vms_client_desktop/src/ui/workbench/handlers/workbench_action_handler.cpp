@@ -115,6 +115,7 @@
 
 #include <nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -400,7 +401,10 @@ ActionHandler::~ActionHandler()
     deleteDialogs();
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QnResourcePtr& resource,
+    const AddToLayoutParams& params)
 {
     if (!layout)
         return;
@@ -411,7 +415,14 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
     }
 
     if (layout->getItems().size() >= qnRuntime->maxSceneItems())
+    {
+        if (workbench()->currentLayout()->resource() == layout)
+        {
+            if (!m_layoutIsFullMessage)
+                m_layoutIsFullMessage = QnGraphicsMessageBox::information(tr("Layout is full"));
+        }
         return;
+    }
 
     if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
@@ -459,17 +470,29 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
     layout->addItem(data);
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const {
-    foreach(const QnResourcePtr &resource, resources)
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QnResourceList& resources,
+    const AddToLayoutParams& params)
+{
+    for (const QnResourcePtr& resource: resources)
         addToLayout(layout, resource, params);
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QnMediaResourcePtr>& resources, const AddToLayoutParams &params) const {
-    foreach(const QnMediaResourcePtr &resource, resources)
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QList<QnMediaResourcePtr>& resources,
+    const AddToLayoutParams& params)
+{
+    for (const QnMediaResourcePtr& resource: resources)
         addToLayout(layout, resource->toResourcePtr(), params);
 }
 
-void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const {
+void ActionHandler::addToLayout(
+    const QnLayoutResourcePtr& layout,
+    const QList<QString>& files,
+    const AddToLayoutParams& params)
+{
     addToLayout(layout, addToResourcePool(files), params);
 }
 
@@ -1233,7 +1256,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
         layouts.empty() &&
         videowalls.empty())
     {
-        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
+        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed"));
         return;
     }
 
@@ -1962,10 +1985,8 @@ void ActionHandler::at_deleteFromDiskAction_triggered()
 {
     auto resources = menu()->currentParameters(sender()).resources().toSet().toList();
 
-    /**
-     * #ynikitenkov According to specs this functionality is disabled
-     * Change texts and dialog when it is enabled
-     */
+    // TODO: #gdm allow to delete exported layouts.
+    // TODO: #ynikitenkov Change texts and dialog when it is enabled.
     QnMessageBox messageBox(
         QnMessageBoxIcon::Warning,
         tr("Confirm files deleting"),
@@ -2268,7 +2289,8 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
     progressDialog->exec();
 }
 
-void ActionHandler::setCurrentLayoutBackground(const QString &filename) {
+void ActionHandler::setCurrentLayoutBackground(const QString& filename)
+{
     QnWorkbenchLayout* wlayout = workbench()->currentLayout();
     QnLayoutResourcePtr layout = wlayout->resource();
 
@@ -2279,8 +2301,10 @@ void ActionHandler::setCurrentLayoutBackground(const QString &filename) {
     wlayout->centralizeItems();
     QRect brect = wlayout->boundingRect();
 
-    int minWidth = qMax(brect.width(), qnGlobals->layoutBackgroundMinSize().width());
-    int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
+    // TODO: #GDM Replace calculations by the corresponding reducer call.
+
+    int minWidth = qMax(brect.width(), LayoutSettingsDialogState::kBackgroundMinSize);
+    int minHeight = qMax(brect.height(), LayoutSettingsDialogState::kBackgroundMinSize);
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     if (layout->hasCellAspectRatio())
@@ -2295,20 +2319,25 @@ void ActionHandler::setCurrentLayoutBackground(const QString &filename) {
 
     int w, h;
     qreal targetAspectRatio = aspectRatio / cellAspectRatio;
-    if (targetAspectRatio >= 1.0) { // width is greater than height
+    if (targetAspectRatio >= 1.0)
+    {
+        // width is greater than height
         h = minHeight;
         w = qRound((qreal)h * targetAspectRatio);
-        if (w > qnGlobals->layoutBackgroundMaxSize().width()) {
-            w = qnGlobals->layoutBackgroundMaxSize().width();
+        if (w > LayoutSettingsDialogState::kBackgroundMaxSize)
+        {
+            w = LayoutSettingsDialogState::kBackgroundMaxSize;
             h = qRound((qreal)w / targetAspectRatio);
         }
 
     }
-    else {
+    else
+    {
         w = minWidth;
         h = qRound((qreal)w / targetAspectRatio);
-        if (h > qnGlobals->layoutBackgroundMaxSize().height()) {
-            h = qnGlobals->layoutBackgroundMaxSize().height();
+        if (h > LayoutSettingsDialogState::kBackgroundMaxSize)
+        {
+            h = LayoutSettingsDialogState::kBackgroundMaxSize;
             w = qRound((qreal)h * targetAspectRatio);
         }
     }

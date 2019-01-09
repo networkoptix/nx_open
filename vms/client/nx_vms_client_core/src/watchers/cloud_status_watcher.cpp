@@ -189,6 +189,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
                 case QnCloudStatusWatcher::LoggedOut:
                     d->setRecentCloudSystems(QnCloudSystemList());
                     d->cloudConnection.reset();
+                    resetCredentials(true);
                     break;
                 default:
                     break;
@@ -293,9 +294,20 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
         });
 }
 
-void QnCloudStatusWatcher::resetCredentials()
+void QnCloudStatusWatcher::resetCredentials(bool keepUser)
 {
-    setCredentials({});
+    if (keepUser)
+    {
+        nx::vms::client::core::settings()->cloudCredentials = {
+            nx::vms::client::core::settings()->cloudCredentials().user, QString()};
+
+        // Updating login if were logged under temporary credentials.
+        setCredentials({qnCloudStatusWatcher->effectiveUserName(), QString()});
+    }
+    else
+    {
+        setCredentials({});
+    }
 }
 
 bool QnCloudStatusWatcher::setCredentials(
@@ -586,6 +598,15 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
     errorCode = newErrorCode;
 
     Q_Q(QnCloudStatusWatcher);
+    // This should catch the case when user changes cloud password from browser.
+    if (isNewStatus
+        && status == QnCloudStatusWatcher::LoggedOut
+        && errorCode == QnCloudStatusWatcher::InvalidPassword)
+    {
+        NX_ERROR(this, "Detected invalid user password. Forcing logout. Could it be user has changed the password?");
+        emit q->forcedLogout();
+    }
+
     if (isNewStatus)
         emit q->statusChanged(status);
 

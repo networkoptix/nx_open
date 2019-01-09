@@ -133,8 +133,8 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
     if (!canArchiveBeSynchronized)
     {
         NX_DEBUG(this, lm(
-            "Archive for resource %1 can not be synchronized. "
-            "Resource belongs to this server %2"
+            "Archive for resource %1 can not be synchronized, "
+            "Resource belongs to this server %2, "
             "Resource status: %3, "
             "Resource has remote archive capability: %4, "
             "License is used for resource: %5, "
@@ -187,8 +187,8 @@ void RemoteArchiveSynchronizer::handleResourceTaskUnsafe(
     if (m_terminated)
         return;
 
-    NX_VERBOSE(this, lm("Remote Archive is going to be synchronized (%1) for resource %2")
-        .args(archiveCanBeSynchronized, resource->getUserDefinedName()));
+    NX_VERBOSE(this, lm("Remote Archive is %1 to be synchronized for resource %2")
+        .args(archiveCanBeSynchronized ? "about" : "not going", resource->getUserDefinedName()));
 
     auto id = resource->getId();
     if (!archiveCanBeSynchronized)

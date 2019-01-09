@@ -222,7 +222,12 @@ QMenu* Manager::integrateMenu(QMenu* menu, const Parameters& parameters)
 }
 
 
-QMenu* Manager::newMenu(ActionScope scope, QWidget* parent, const Parameters& parameters, CreationOptions options)
+QMenu* Manager::newMenu(
+    ActionScope scope,
+    QWidget* parent,
+    const Parameters& parameters,
+    CreationOptions options,
+    const QSet<IDType>& actionIds)
 {
     /*
      * This method is called when we are opening a brand new context menu.
@@ -230,7 +235,7 @@ QMenu* Manager::newMenu(ActionScope scope, QWidget* parent, const Parameters& pa
      */
     hideAllMenus();
 
-    return newMenu(NoAction, scope, parent, parameters, options);
+    return newMenu(NoAction, scope, parent, parameters, options, actionIds);
 }
 
 QMenu* Manager::newMenu(
@@ -238,14 +243,15 @@ QMenu* Manager::newMenu(
     ActionScope scope,
     QWidget* parent,
     const Parameters& parameters,
-    CreationOptions options)
+    CreationOptions options,
+    const QSet<IDType>& actionIds)
 {
     Action* rootAction = rootId == NoAction ? m_root : action(rootId);
     NX_ASSERT(rootAction);
     if (!rootAction)
         return nullptr;
 
-    auto result = newMenuRecursive(rootAction, scope, parameters, parent, options);
+    auto result = newMenuRecursive(rootAction, scope, parameters, parent, options, actionIds);
     if (!result)
         result = integrateMenu(new QnMenu(parent), parameters);
     return result;
@@ -280,8 +286,15 @@ void Manager::copyAction(QAction* dst, Action* src, bool forwardSignals)
     }
 }
 
-QMenu* Manager::newMenuRecursive(const Action* parent, ActionScope scope, const Parameters& parameters, QWidget* parentWidget, CreationOptions options)
+QMenu* Manager::newMenuRecursive(
+    const Action* parent,
+    ActionScope scope,
+    const Parameters& parameters,
+    QWidget* parentWidget,
+    CreationOptions options,
+    const QSet<IDType>& actionIds)
 {
+    // If the root node has its own childFactory that makes a menu, use it and return.
     if (parent->childFactory())
     {
         QMenu* childMenu = parent->childFactory()->newMenu(parameters, parentWidget);
@@ -303,6 +316,10 @@ QMenu* Manager::newMenuRecursive(const Action* parent, ActionScope scope, const 
     {
         foreach(Action* action, parent->children())
         {
+            // Skip actions not from actionIds set (if it exists).
+            if (!actionIds.empty() && !actionIds.contains(action->id()))
+                continue;
+
             ActionVisibility visibility;
             if (action->flags() & HotkeyOnly)
             {
@@ -315,7 +332,7 @@ QMenu* Manager::newMenuRecursive(const Action* parent, ActionScope scope, const 
             if (visibility == InvisibleAction)
                 continue;
 
-            auto menu = newMenuRecursive(action, scope, parameters, parentWidget, options);
+            auto menu = newMenuRecursive(action, scope, parameters, parentWidget, options, actionIds);
             if ((!menu || menu->isEmpty()) && (action->flags() & RequiresChildren))
                 continue;
 
@@ -344,7 +361,9 @@ QMenu* Manager::newMenuRecursive(const Action* parent, ActionScope scope, const 
                 replacedText = action->checkConditionalText(parameters);
 
             QAction* newAction = nullptr;
-            if (!replacedText.isEmpty() || visibility == DisabledAction || menu != nullptr || (options & DontReuseActions))
+            // Create QAction from the Action if needs to modify anything or by request.
+            if (!replacedText.isEmpty() || visibility == DisabledAction
+                || menu != nullptr || (options & DontReuseActions))
             {
                 newAction = new QAction(result);
                 copyAction(newAction, action);
@@ -364,6 +383,7 @@ QMenu* Manager::newMenuRecursive(const Action* parent, ActionScope scope, const 
         }
     }
 
+    // Add plain (non-menu) items from childFactory if any.
     if (parent->childFactory())
     {
         QList<QAction*> actions = parent->childFactory()->newActions(parameters, result);

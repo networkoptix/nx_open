@@ -56,20 +56,11 @@ public:
     virtual Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
 
-    //!Returns driver (built-in or external) name, used to manage camera
-    /*!
-        This can be "axis", "dlink", "onvif", etc.
-    */
-    virtual QString getDriverName() const = 0;
-
     virtual int getMaxFps() const;
 
     virtual void setMaxFps(int fps);
 
     virtual int reservedSecondStreamFps() const;
-
-    /** sets the distance between I frames */
-    virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
 
     QList<QnMotionRegion> getMotionRegionList() const;
     void setMotionRegionList(const QList<QnMotionRegion>& maskList);
@@ -435,17 +426,3 @@ private slots:
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
 Q_DECLARE_METATYPE(QnSecurityCamResourceList)
-
-class QnC2pCameraResource: public QnSecurityCamResource
-{
-public:
-    QnC2pCameraResource(QnCommonModule* commonModule = nullptr):
-        QnSecurityCamResource(commonModule)
-    {
-    }
-    virtual QString getDriverName() const override {return QnResourceTypePool::kC2pCameraTypeId;}
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override {return nullptr;}
-};
-
-Q_DECLARE_METATYPE(QnC2pCameraResourcePtr)
-Q_DECLARE_METATYPE(QnC2pCameraResourceList)

@@ -21,6 +21,7 @@ QFont selectionColumnFont()
 {
     QFont result;
     result.setPixelSize(13);
+    result.setWeight(40);
     return result;
 }
 
@@ -180,7 +181,6 @@ QVariant FoundDevicesModel::getForegroundColorData(const QModelIndex& index) con
 
     static const auto kCheckedColor = QPalette().color(QPalette::Text);
     static const auto kRegularTextColor = QPalette().color(QPalette::Light);
-    static const auto kRegularCheckboxColor = QPalette().color(QPalette::WindowText);
     static const auto kAddedDeviceTextColor = QPalette().color(QPalette::Midlight);
     static const auto kPresentedStateColor = QPalette().color(QPalette::WindowText);
 
@@ -208,11 +208,9 @@ QVariant FoundDevicesModel::getForegroundColorData(const QModelIndex& index) con
         {
             if (isChecked)
                 return kCheckedColor;
-            return kRegularCheckboxColor;
         }
     }
 
-    NX_ASSERT(false, "Unexpected column");
     return QVariant();
 }
 
@@ -352,6 +350,8 @@ Qt::ItemFlags FoundDevicesModel::flags(const QModelIndex& index) const
             const auto presentedState = presentedStateData.value<PresentedState>();
             if (presentedState == notPresentedState)
                 result.setFlag(Qt::ItemIsUserCheckable, true);
+            else if (presentedState == alreadyAddedState)
+                result.setFlag(Qt::ItemIsEnabled, false);
         }
     }
     return result;

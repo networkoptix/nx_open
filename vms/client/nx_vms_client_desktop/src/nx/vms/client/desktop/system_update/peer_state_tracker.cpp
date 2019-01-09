@@ -30,6 +30,15 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     m_items.clear();
     m_activeServers.clear();
 
+    if (!pool)
+    {
+        NX_DEBUG(this, "setResourceFeed() got nullptr resource pool");
+        return;
+    }
+
+    auto systemId = helpers::currentSystemLocalId(commonModule());
+    NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
+
     addItemForClient();
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
@@ -72,9 +81,13 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
 
 QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
 {
-    if (auto item = findItemById(id))
-        return getServer(item);
-    return QnMediaServerResourcePtr();
+    return getServer(findItemById(id));
+}
+
+QnUuid PeerStateTracker::getClientPeerId() const
+{
+    NX_ASSERT(m_clientItem);
+    return m_clientItem->id;
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -118,8 +131,10 @@ void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const Q
 void PeerStateTracker::setVerificationError(const QMap<QnUuid, QString>& errors)
 {
     for (auto& item: m_items)
+    {
         if (auto it = errors.find(item->id); it != errors.end())
             item->verificationMessage = it.value();
+    }
 }
 
 void PeerStateTracker::clearVerificationErrors()
@@ -131,8 +146,10 @@ void PeerStateTracker::clearVerificationErrors()
 bool PeerStateTracker::hasVerificationErrors() const
 {
     for (auto& item: m_items)
+    {
         if (!item->verificationMessage.isEmpty())
             return true;
+    }
     return false;
 }
 
@@ -149,6 +166,28 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
                 item->installing = false;
             item->offline = (status.second.code == StatusCode::offline);
             emit itemChanged(item);
+        }
+    }
+}
+
+void PeerStateTracker::setVersionInformation(
+    const QList<nx::vms::api::ModuleInformation>& moduleInformation)
+{
+    for (const auto& info: moduleInformation)
+    {
+        if (auto item = findItemById(info.id))
+        {
+            if (info.version != item->version)
+            {
+                item->version = info.version;
+
+                bool installed = (info.version == m_targetVersion)
+                    || item->state == StatusCode::latestUpdateInstalled;
+
+                if (installed != item->installed)
+                    item->installed = true;
+                emit itemChanged(item);
+            }
         }
     }
 }
@@ -175,8 +214,9 @@ void PeerStateTracker::clearState()
     {
         item->state = StatusCode::idle;
         item->progress = 0;
-        item->statusMessage = "Waiting for data";
+        item->statusMessage = "Waiting for peer data";
         item->verificationMessage = "";
+        item->installing = false;
         emit itemChanged(item);
     }
 }
@@ -187,9 +227,7 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
     std::map<QnUuid, nx::update::Status::Code> result;
 
     for (const auto& item: m_items)
-    {
-        result.insert(std::make_pair(item->id, item->state));
-    }
+        result.emplace(item->id, item->state);
     return result;
 }
 
@@ -265,7 +303,7 @@ QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
-        if (item->installed)
+        if (item->installed || item->state == StatusCode::latestUpdateInstalled)
             result.insert(item->id);
     return result;
 }
@@ -291,7 +329,14 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
 
     if (!helpers::serverBelongsToCurrentSystem(server))
+    {
+        //auto systemId = helpers::currentSystemLocalId(commonModule());
+        //NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
+        //     server->getName(), systemId);
         return;
+    }
+
+    //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
     if (status == Qn::Unauthorized)
         return;
@@ -299,7 +344,7 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     bool fake = server->hasFlags(Qn::fake_server);
     if (fake)
     {
-        NX_DEBUG(this) << "atResourceAdded() - server" << server->getName() << "seems to be fake";
+        NX_VERBOSE(this, "atResourceAdded(%1) - server is fake", server->getName());
         return;
     }
 
@@ -348,6 +393,7 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
     if (!server)
         return;
 
+    NX_VERBOSE(this, "atResourceChanged(%1)", resource->getName());
     bool changed = false;
 
     UpdateItemPtr item;
@@ -366,6 +412,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
 {
     NX_ASSERT(m_clientItem);
     using State = ClientUpdateTool::State;
+    NX_VERBOSE(this, "PeerStateTracker::atClientupdateStateChanged(%1, %2)",
+        ClientUpdateTool::toString(State(state)), percentComplete);
 
     m_clientItem->installing = false;
     m_clientItem->installed = false;
@@ -391,13 +439,18 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             m_clientItem->progress = 100;
             m_clientItem->statusMessage = "Client is ready to download update";
             break;
+        case State::readyRestart:
+            m_clientItem->statusMessage = "Client is ready to install and restart";
+            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->progress = 100;
+            break;
         case State::installing:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->installing = true;
             m_clientItem->statusMessage = "Client is installing update";
             break;
         case State::complete:
-            m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->state = StatusCode::latestUpdateInstalled;
             m_clientItem->installing = false;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
@@ -423,6 +476,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     NX_ASSERT(server);
     if (!server)
         return nullptr;
+    NX_VERBOSE(this, "addItemForServer(%1)", server->getName());
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = server->getId();
     item->component = UpdateItem::Component::server;
@@ -444,6 +498,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     item->id = commonModule()->globalSettings()->localSystemId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
+    NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
@@ -463,10 +518,10 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    const nx::utils::SoftwareVersion newUpdateSupportVersion(4, 0);
+    const nx::utils::SoftwareVersion kNewUpdateSupportVersion(4, 0);
 
     const auto& version = server->getVersion();
-    if (version < newUpdateSupportVersion && !item->onlyLegacyUpdate)
+    if (version < kNewUpdateSupportVersion && !item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = true;
         changed = true;
@@ -478,7 +533,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
-    bool installed = (version == m_targetVersion);
+    bool installed = (version == m_targetVersion) || item->state == StatusCode::latestUpdateInstalled;
     if (installed != item->installed)
     {
         item->installed = true;

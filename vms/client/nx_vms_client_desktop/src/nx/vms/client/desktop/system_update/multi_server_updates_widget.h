@@ -190,6 +190,7 @@ private:
     bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
     bool m_showStorageSettings = false;
+    bool m_gotServerData = false;
 
     /**
      * It will enable additional column for server status
@@ -211,6 +212,8 @@ private:
 
     /** This promise is used to get update info from mediaservers. */
     std::future<nx::update::UpdateContents> m_serverUpdateCheck;
+
+    std::future<std::vector<nx::update::Status>> m_serverStatusCheck;
 
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;

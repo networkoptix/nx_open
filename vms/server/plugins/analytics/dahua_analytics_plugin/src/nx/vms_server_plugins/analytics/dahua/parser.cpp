@@ -1,6 +1,4 @@
 #include <array>
-#include <iostream>
-#include <fstream>
 
 #include <QtCore/QByteArray>
 
@@ -10,10 +8,7 @@
 #include "string_helper.h"
 #include "parser.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 namespace {
 
@@ -26,7 +21,7 @@ static const QString kParseDetailsOkMessage = kParseOkMessage + "event details =
 static const QString kHeartbeat("Heartbeat");
 static const Event kHeartbeatEvent{ kHeartbeat };
 
-}
+} // namespace
 
 std::vector<QString> Parser::parseSupportedEventsMessage(const QByteArray& content)
 {
@@ -49,24 +44,22 @@ std::optional<Event> Parser::parseEventMessage(const QByteArray& content,
 {
     using namespace nx::sdk::analytics;
     using std::nullopt;
-    static std::ofstream* f = new std::ofstream("D:\\events.txt");
-    static int t = 0;
 
     QString contentAsString(content);
     contentAsString.replace("\r\n", "\n");
-    const QStringList Lines = contentAsString.split('\n');
+    const QStringList lines = contentAsString.split('\n');
 
     NX_VERBOSE(typeid(Parser),
         kParseOkMessage + "content string = " + contentAsString);
 
-    if (Lines.isEmpty())
+    if (lines.isEmpty())
     {
         NX_DEBUG(typeid(Parser),
             kParseErrorMessage + "content string has no data");
         return nullopt;
     }
 
-    contentAsString = Lines[0];
+    contentAsString = lines[0];
     // contentAsString should contain something like "Code=NewFile;action=Pulse;index=0;data={"
 
     const QStringList eventDetails = contentAsString.split(";");
@@ -79,7 +72,6 @@ std::optional<Event> Parser::parseEventMessage(const QByteArray& content,
     if (eventDetails[0] == kHeartbeat)
     {
         NX_VERBOSE(typeid(Parser), kParseOkMessage + "heartbeat message received");
-        *f << ++t << " " << eventDetails[0].toStdString().c_str() << std::endl;
         return kHeartbeatEvent;
     }
 
@@ -101,8 +93,6 @@ std::optional<Event> Parser::parseEventMessage(const QByteArray& content,
 
     NX_VERBOSE(typeid(Parser),
         kParseOkMessage + "code = %1, action = %2" , code[1], action[1]);
-    *f << ++t << " " << code[1].toStdString().c_str()
-              << " " << action[1].toStdString().c_str() << std::endl;
 
     Event result;
     const QString internalName = code[1];
@@ -115,12 +105,9 @@ std::optional<Event> Parser::parseEventMessage(const QByteArray& content,
     return result;
 }
 
-bool Parser::isHartbeatEvent(const Event& event)
+bool Parser::isHeartbeatEvent(const Event& event)
 {
     return event.typeId == kHeartbeat;
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua
