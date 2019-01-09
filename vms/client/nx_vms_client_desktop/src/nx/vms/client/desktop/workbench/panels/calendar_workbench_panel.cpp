@@ -1,6 +1,4 @@
-#include "buttons.h"
 #include "calendar_workbench_panel.h"
-#include "../workbench_animations.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsItem>
@@ -28,6 +26,9 @@
 
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
+#include "buttons.h"
+#include "../workbench_animations.h"
+
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -51,12 +52,15 @@ QnFramedWidget* setupFrame(QGraphicsWidget* widget)
     frame->setFrameColor(kFrameColor);
     frame->setPos(-frame->frameWidth(), -frame->frameWidth());
 
-    QObject::connect(widget, &QGraphicsWidget::geometryChanged, frame,
+    const auto updateFrameSize =
         [widget, frame]()
         {
             const int sizeDelta = frame->frameWidth();
             frame->resize(widget->size() + QSize(sizeDelta, sizeDelta));
-        });
+        };
+
+    QObject::connect(widget, &QGraphicsWidget::geometryChanged, frame, updateFrameSize);
+    updateFrameSize();
 
     return frame;
 }

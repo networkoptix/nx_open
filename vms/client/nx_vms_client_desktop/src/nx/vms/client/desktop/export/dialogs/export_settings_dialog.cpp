@@ -4,14 +4,13 @@
 
 #include <limits>
 
-#include <translation/datetime_formatter.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <nx/core/layout/layout_file_info.h>
+#include <translation/datetime_formatter.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -23,13 +22,15 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/math.h>
+
+#include <nx/client/core/watchers/server_time_watcher.h>
+#include <nx/core/layout/layout_file_info.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/vms/client/desktop/export/widgets/export_password_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
@@ -82,7 +83,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->mediaPreviewWidget->setBorderRole(QPalette::NoRole);
     ui->mediaPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->mediaPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
-    ui->layoutPreviewWidget->setBackgroundRole(QPalette::NoRole);
+    ui->layoutPreviewWidget->setAutoFillBackground(false);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
 

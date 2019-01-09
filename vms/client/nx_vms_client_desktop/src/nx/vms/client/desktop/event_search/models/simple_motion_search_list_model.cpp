@@ -180,8 +180,9 @@ void SimpleMotionSearchListModel::requestFetch()
     const int oldCount = int(m_data.size());
     FetchResult result = FetchResult::complete;
 
-    QnTimePeriod fetchedPeriod(relevantTimePeriod());
+    ScopedFetchCommit scopedFetch(this, fetchDirection(), result /*by reference*/);
 
+    QnTimePeriod fetchedPeriod(relevantTimePeriod());
     if (periods.empty())
     {
         NX_VERBOSE(this, "Loader contains no chunks");
@@ -265,8 +266,6 @@ void SimpleMotionSearchListModel::requestFetch()
         NX_VERBOSE(this, "Truncating to maximum count");
         truncateToMaximumCount();
     }
-
-    emit fetchFinished(result, {});
 }
 
 void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)

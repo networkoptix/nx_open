@@ -23,12 +23,11 @@ bool AbstractAsyncSearchListModel::Private::requestFetch()
     return prefetch(nx::utils::guarded(this,
         [this](const QnTimePeriod& fetchedPeriod, FetchResult result)
         {
+            ScopedFetchCommit scopedFetch(q, m_request.direction, result);
             q->addToFetchedTimeWindow(fetchedPeriod);
 
             if (result == FetchResult::complete || result == FetchResult::incomplete)
                 commit(fetchedPeriod);
-
-            q->finishFetch(result);
         }));
 }
 

@@ -341,19 +341,19 @@ void MultiServerUpdatesWidget::initDropdownActions()
     m_selectUpdateTypeMenu.reset(new QMenu(this));
     m_selectUpdateTypeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
 
-    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internet),
+    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internet) + "...",
         [this]()
         {
             setUpdateSourceMode(UpdateSourceType::internet);
         });
 
-    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internetSpecific),
+    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::internetSpecific) + "...",
         [this]()
         {
             setUpdateSourceMode(UpdateSourceType::internetSpecific);
         });
 
-    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::file),
+    m_selectUpdateTypeMenu->addAction(toString(UpdateSourceType::file) + "...",
         [this]()
         {
             setUpdateSourceMode(UpdateSourceType::file);
@@ -590,7 +590,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
     }
 
     // Maybe we should not call it right here.
-    m_serverUpdateTool->requestRemoteUpdateState();
+    m_serverUpdateTool->requestRemoteUpdateStateAsync();
 
     processRemoteChanges();
     processUploaderChanges();
@@ -1004,9 +1004,10 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     }
 
     if (!m_serverUpdateCheck.valid())
-    {
         m_serverUpdateCheck = m_serverUpdateTool->checkRemoteUpdateInfo();
-    }
+
+    if (!m_serverStatusCheck.valid())
+        m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
 
     setTargetState(WidgetUpdateState::checkingServers, {});
     // Maybe we should call loadDataToUi instead.
@@ -1024,9 +1025,18 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         return;
     }
 
-    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+    if (
+        m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready
+        && m_serverStatusCheck.valid()
+        && m_serverStatusCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
     {
         auto updateInfo = m_serverUpdateCheck.get();
+        auto serverStatus = m_serverStatusCheck.get();
+
+        ServerUpdateTool::RemoteStatus remoteStatus;
+        m_serverUpdateTool->getServersStatusChanges(remoteStatus);
+        m_stateTracker->setUpdateStatus(remoteStatus);
+
         /*
          * TODO: We should deal with starting client update.
          * There are two distinct situations:
@@ -1047,7 +1057,8 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
 
         NX_INFO(NX_SCOPE_TAG, "mediaservers have an active update process to version %1", updateInfo.info.version);
 
-        bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
+        m_clientUpdateTool->setUpdateTarget(updateInfo);
+        bool hasClientUpdate = m_clientUpdateTool->hasUpdate();
         if (updateInfo.alreadyInstalled && !hasClientUpdate)
         {
             // It seems like we should not change the state.
@@ -1062,9 +1073,6 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             m_updateInfo = updateInfo;
             m_haveValidUpdate = true;
         }
-
-        if (hasClientUpdate)
-            m_clientUpdateTool->setUpdateTarget(updateInfo);
 
         auto serversHaveDownloaded = m_stateTracker->getServersInState(StatusCode::readyToInstall);
         auto serversAreDownloading = m_stateTracker->getServersInState(StatusCode::downloading);
@@ -1081,6 +1089,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         }
         else if (!serversAreInstalling.empty())
         {
+            // How did we got 'installing' for any servers? We should have cleaned up this info.
             NX_INFO(this)
                 << "processRemoteUpdateInformation() - servers" << serversAreInstalling << " are installing an update";
             setTargetState(WidgetUpdateState::installing, serversAreInstalling);
@@ -1095,10 +1104,11 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         {
             NX_INFO(this)
                 << "processRemoteUpdateInformation() - servers" << serversHaveInstalled
-                << "have already downloaded an update";
-            // Should check if there are any servers not completed update
-            // Client could be there as well.
-            setTargetState(WidgetUpdateState::readyInstall, {});
+                << "have already installed an update";
+            // We are here only if there are some offline servers and the rest of peers
+            // have complete its update.
+            // TODO: This state will be fixed later
+            setTargetState(WidgetUpdateState::ready, {});
         }
         else
         {
@@ -1157,9 +1167,9 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
                         NX_VERBOSE(this)
                             << "processRemoteDownloading() - peer"
                             << id << "failed to download update package";
-                        m_peersFailed.insert(id);
                         m_peersActive.remove(id);
                     }
+                    m_peersFailed.insert(id);
                     break;
                 case StatusCode::preparing:
                 case StatusCode::downloading:
@@ -1417,6 +1427,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             }
         }
     }
+
+    // We need the most recent version information only in state 'installing'.
+    m_serverUpdateTool->requestModuleInformation();
 
     // No peers are doing anything right now. We should check if installation is complete.
     if (peersActive.empty())
@@ -2155,9 +2168,9 @@ QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
         case nx::update::UpdateSourceType::internet:
             return tr("Available Update");
         case nx::update::UpdateSourceType::internetSpecific:
-            return tr("Specific Build...");
+            return tr("Specific Build");
         case nx::update::UpdateSourceType::file:
-            return tr("Browse for Update File...");
+            return tr("Browse for Update File");
         case nx::update::UpdateSourceType::mediaservers:
             // This string should not appear at UI.
             return tr("Update from mediaservers");
