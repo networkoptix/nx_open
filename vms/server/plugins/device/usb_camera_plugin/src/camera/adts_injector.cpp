@@ -142,9 +142,13 @@ int AdtsInjector::writePacket(void *opaque, uint8_t *buffer, int bufferSize)
     if (!packet)
         return 0;
 
+    const AVPacket pkt = *packet->packet();
+
     packet->unreference();
     packet->newPacket(bufferSize);
     memcpy(packet->data(), buffer, bufferSize);
+
+    av_packet_copy_props(packet->packet(), &pkt);
 
     return bufferSize;
 }

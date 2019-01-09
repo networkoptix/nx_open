@@ -138,6 +138,10 @@ bool Server::launchHttpServerIfNeeded(
         &m_httpMessageDispatcher,
         registeredPeerPool);
 
+    m_maintenanceServer.registerRequestHandlers(
+        api::kMediatorApiPrefix,
+        &m_httpMessageDispatcher);
+
     return true;
 }
 

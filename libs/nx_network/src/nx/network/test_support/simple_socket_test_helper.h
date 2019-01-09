@@ -260,87 +260,6 @@ void socketTransferSync(
     clientThread.join();
 }
 
-template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketTransferSyncFlags(
-    const ServerSocketMaker& serverMaker,
-    const ClientSocketMaker& clientMaker,
-    boost::optional<SocketAddress> endpointToConnectTo = boost::none,
-    const QByteArray& testMessage = kTestMessage)
-{
-    auto server = serverMaker();
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))<< SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->listen((int)testClientCount())) << SystemError::getLastOSErrorText().toStdString();
-    if (!endpointToConnectTo)
-        endpointToConnectTo = server->getLocalAddress();
-
-    Buffer buffer(kTestMessage.size() * 2, Qt::Uninitialized);
-    const auto clientCount = testClientCount();
-    for (size_t i = 0; i != clientCount; ++i)
-    {
-        std::unique_ptr<AbstractStreamSocket> accepted;
-        nx::utils::thread acceptThread(
-            [&]()
-            {
-                accepted = server->accept();
-                ASSERT_TRUE(accepted.get());
-                EXPECT_EQ(readNBytes(accepted.get(), testMessage.size()), kTestMessage);
-            });
-        auto acceptThreadGuard = nx::utils::makeScopeGuard([&acceptThread]() { acceptThread.join(); });
-
-        auto client = clientMaker();
-        ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
-        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size())
-            << SystemError::getLastOSErrorText().toStdString();
-        acceptThreadGuard.fire();
-
-        // MSG_DONTWAIT does not block on server and client:
-        ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_DONTWAIT), -1);
-        auto sysErrorCode = SystemError::getLastOSErrorCode();
-        ASSERT_TRUE(sysErrorCode == SystemError::wouldBlock || sysErrorCode == SystemError::again)
-            << SystemError::toString(sysErrorCode).toStdString();
-
-        ASSERT_EQ(client->recv(buffer.data(), buffer.size(), MSG_DONTWAIT), -1);
-        sysErrorCode = SystemError::getLastOSErrorCode();
-        ASSERT_TRUE(sysErrorCode == SystemError::wouldBlock || sysErrorCode == SystemError::again)
-            << SystemError::toString(sysErrorCode).toStdString();
-
-// TODO: Should be enabled and fixed for UDT and SSL sockets
-#ifdef NX_TEST_MSG_WAITALL
-        // MSG_WAITALL blocks until buffer is full.
-        const auto recvWaitAll =
-            [&](AbstractStreamSocket* socket)
-            {
-                int ret = socket->recv(buffer.data(), buffer.size(), MSG_WAITALL);
-                if (ret == buffer.size())
-                    EXPECT_EQ(buffer, (kTestMessage + kTestMessage).left(buffer.size()));
-                else
-                    EXPECT_EQ(ret, buffer.size()) << SystemError::getLastOSErrorText().toStdString();
-            };
-
-        // Send 1st part of message and start ot recv:
-        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        nx::utils::thread serverRecvThread([&](){ recvWaitAll(accepted.get()); });
-        auto serverRecvThreadGuard =
-            nx::utils::makeScopeGuard([&serverRecvThread]() { serverRecvThread.join(); });
-
-        // Send 2nd part of message with delay:
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
-        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        serverRecvThreadGuard.fire();
-
-        // MSG_WAITALL works an client as well:
-        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        nx::utils::thread clientRecvThread([&](){ recvWaitAll(accepted.get()); });
-        auto clientRecvThreadGuard =
-            nx::utils::makeScopeGuard([&clientRecvThread]() { clientRecvThread.join(); });
-
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
-        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        clientRecvThreadGuard.fire();
-#endif
-    };
-}
-
 template<typename Sender, typename Receiver>
 inline void transferSyncAsync(Sender* sender, Receiver* receiver)
 {
@@ -1042,8 +961,6 @@ typedef nx::network::test::StopType StopType;
 #define NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, TransferSync) \
         { nx::network::test::socketTransferSync(mkServer, mkClient, endpointToConnectTo); } \
-    Type(Name, TransferSyncFlags) \
-        { nx::network::test::socketTransferSyncFlags(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, TransferSyncAsyncSwitch) \
         { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, true, endpointToConnectTo); } \
     Type(Name, TransferAsyncSyncSwitch) \

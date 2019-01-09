@@ -54,7 +54,7 @@ public:
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
 
-    std::string getFfmpegUrl() const;
+    std::string ffmpegUrl() const;
 
 protected:
     DiscoveryManager * m_discoveryManager;

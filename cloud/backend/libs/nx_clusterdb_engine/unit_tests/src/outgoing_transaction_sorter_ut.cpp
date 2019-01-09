@@ -195,12 +195,12 @@ protected:
 
     void thenTransactionsShouldBeSentInIncreasingSequenceOrder()
     {
-        m_testOutgoingTransactionDispatcher.assertIfTransactionsWereNotSentInAscendingSequenceOrder();
+        m_testOutgoingTransactionDispatcher.assertTransactionsAreSentInAscendingSequenceOrder();
     }
 
     void thenAllTransactionsWereSent()
     {
-        m_testOutgoingTransactionDispatcher.assertIfNotAllTransactionsAreFound(
+        m_testOutgoingTransactionDispatcher.assertAllTransactionsAreFound(
             m_transactionsCommitted);
 
         thenSorterShouldHoldNoTransactions();

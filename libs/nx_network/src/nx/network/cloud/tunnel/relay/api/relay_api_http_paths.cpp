@@ -21,6 +21,8 @@ const char* const kRelayClientPathPrefix = "/relay/client/";
 const char* const kRelayStatisticsMetricsPath = "/relay/statistics/metrics/";
 const char* const kRelayStatisticsSpecificMetricPath = "/relay/statistics/metrics/{metric}";
 
+const char* const kApiPrefix = "/relay";
+
 const char* const kServerIdName = "serverId";
 const char* const kSessionIdName = "sessionId";
 const char* const kSequenceName = "sequence";

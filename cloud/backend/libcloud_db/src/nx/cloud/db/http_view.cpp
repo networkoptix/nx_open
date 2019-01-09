@@ -53,6 +53,10 @@ HttpView::HttpView(
                     settings.http().connectionInactivityPeriod);
             });
     }
+
+    m_maintenanceServer.registerRequestHandlers(
+        kApiPrefix,
+        &m_httpMessageDispatcher);
 }
 
 HttpView::~HttpView()
@@ -338,7 +342,7 @@ void HttpView::registerHttpHandler(
     EntityType entityType,
     DataActionType dataActionType)
 {
-    using ActualOutputDataType = 
+    using ActualOutputDataType =
         typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type;
 
     using HttpHandlerType = FiniteMsgBodyHttpHandler<

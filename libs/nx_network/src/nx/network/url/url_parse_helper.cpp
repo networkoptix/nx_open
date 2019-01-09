@@ -56,10 +56,14 @@ std::string normalizePath(const char* path)
     return normalizePath(std::string(path));
 }
 
+namespace detail {
+
 std::string joinPath(const std::string& left, const std::string& right)
 {
     return normalizePath(left + "/" + right);
 }
+
+} // namespace detail
 
 } // namespace url
 } // namespace network

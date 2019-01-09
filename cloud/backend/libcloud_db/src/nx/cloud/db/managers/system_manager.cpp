@@ -466,7 +466,7 @@ void SystemManager::updateSystem(
     data::SystemAttributesUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_VERBOSE(this, lm("Updating system %1 sttributes").arg(data.systemId));
+    NX_VERBOSE(this, lm("Updating system %1 attributes").arg(data.systemId));
 
     // Validating data received.
     if (data.name && (data.name->empty() || data.name->size() > kMaxSystemNameLength))
