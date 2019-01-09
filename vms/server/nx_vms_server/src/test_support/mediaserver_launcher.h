@@ -23,6 +23,7 @@ public:
         none                = 0x00,
         noResourceDiscovery = 0x01,
         noMonitorStatistics = 0x02,
+        noStorageDiscovery  = 0x04,
 
         all = noResourceDiscovery | noMonitorStatistics
     };

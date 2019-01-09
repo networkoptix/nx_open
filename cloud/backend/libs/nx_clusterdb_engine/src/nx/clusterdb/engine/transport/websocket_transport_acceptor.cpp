@@ -106,6 +106,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     auto p2pTransport = std::make_unique<p2p::P2PWebsocketTransport>(
         std::move(connection), network::websocket::FrameType::binary);
 
+    p2pTransport->start();
     const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();
 
     auto transactionTransport = std::make_unique<WebsocketCommandTransport>(

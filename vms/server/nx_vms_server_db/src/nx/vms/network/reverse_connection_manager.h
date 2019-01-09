@@ -45,7 +45,7 @@ public:
         const QnUuid& guid, std::chrono::milliseconds timeout);
 
     virtual std::unique_ptr<nx::network::AbstractStreamSocket> connectTo(
-        const QnRoute& route, std::chrono::milliseconds timeout) override;
+        const QnRoute& route, bool sslRequired,std::chrono::milliseconds timeout) override;
 
 private slots:
     void at_reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& data);

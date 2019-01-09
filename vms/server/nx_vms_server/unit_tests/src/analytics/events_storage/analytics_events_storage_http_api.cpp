@@ -181,10 +181,6 @@ private:
         m_mediaServerLauncher = std::make_unique<MediaServerLauncher>();
         ASSERT_TRUE(m_mediaServerLauncher->start());
 
-        // TODO: #ak Remove it from here when mediaserver does it
-        // from QnMain::run, not from application's main thread.
-        m_mediaServerLauncher->commonModule()->messageProcessor()->init(
-            m_mediaServerLauncher->commonModule()->ec2Connection());
 
         m_mediaserverClient = prepareMediaServerClient();
     }

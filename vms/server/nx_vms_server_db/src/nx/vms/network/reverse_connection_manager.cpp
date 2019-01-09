@@ -230,7 +230,9 @@ void ReverseConnectionManager::at_socketReadTimeout(
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::connectTo(
-    const QnRoute& route, std::chrono::milliseconds timeout)
+    const QnRoute& route,
+    bool sslRequired,
+    std::chrono::milliseconds timeout)
 {
     if (route.reverseConnect)
     {
@@ -238,7 +240,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::con
         return getProxySocket(serverId, timeout);
     }
 
-    auto socket = nx::network::SocketFactory::createStreamSocket(false);
+    auto socket = nx::network::SocketFactory::createStreamSocket(sslRequired);
     if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))
         return socket;
     return std::unique_ptr<nx::network::AbstractStreamSocket>();

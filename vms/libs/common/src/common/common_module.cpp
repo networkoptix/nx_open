@@ -51,6 +51,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <nx/analytics/descriptor_list_manager.h>
+#include <core/resource/storage_plugin_factory.h>
 
 using namespace nx;
 
@@ -138,6 +139,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
 
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
+
+    m_storagePluginFactory = new QnStoragePluginFactory(this);
 
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
     m_httpClientPool.reset(new nx::network::http::ClientPool(this));

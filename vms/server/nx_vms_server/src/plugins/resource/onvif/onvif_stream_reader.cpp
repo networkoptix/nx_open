@@ -432,7 +432,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         outInfo->videoEncoderId = QString::fromStdString(currentVEConfig->token);
 
         auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
-        m_onvifRes->updateVideoEncoder(*currentVEConfig, streamIndex, params);
+        m_onvifRes->updateVideoEncoder1(*currentVEConfig, streamIndex, params);
 
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
         CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();

@@ -27,6 +27,7 @@
 #include <motion/light_motion_archive_connection.h>
 #include <export/sign_helper.h>
 #include <utils/media/nalUnits.h>
+#include <common/common_module.h>
 
 extern "C" {
 
@@ -416,7 +417,7 @@ bool QnAviArchiveDelegate::open(
         if (m_storage == nullptr)
         {
             m_storage = QnStorageResourcePtr(
-                QnStoragePluginFactory::instance()->createStorage(
+                resource->commonModule()->storagePluginFactory()->createStorage(
                     resource->commonModule(),
                     url));
 
