@@ -90,7 +90,7 @@ protected:
     void loadTimeFromLocalClock();
 
     virtual void updateTime() = 0;
-    virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route);
+    virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route, bool sslRequired);
     virtual bool setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds rtt);
     void setSyncTimeInternal(std::chrono::milliseconds value);
 

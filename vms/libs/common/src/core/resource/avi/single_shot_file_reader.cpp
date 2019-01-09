@@ -6,7 +6,7 @@
 #include <nx/streaming/config.h>
 #include "core/resource/storage_resource.h"
 #include <core/resource/storage_plugin_factory.h>
-
+#include <common/common_module.h>
 
 QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(const QnResourcePtr& resource):
     QnAbstractMediaStreamDataProvider(resource)
@@ -33,7 +33,8 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
         return QnAbstractMediaDataPtr();
 
     if (m_storage == 0)
-        m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
+        m_storage = QnStorageResourcePtr(
+            getResource()->commonModule()->storagePluginFactory()->createStorage(
             getResource()->commonModule(), getResource()->getUrl()));
     QIODevice* file = m_storage->open(getResource()->getUrl(), QIODevice::ReadOnly);
     if (file == 0)

@@ -14,8 +14,7 @@
 
 class QnMediaServerModule;
 
-namespace nx {
-namespace vms::server {
+namespace nx::vms::server {
 
 /**
  * Helper class to execute some system actions as root.
@@ -51,5 +50,4 @@ std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
     bool isRootToolEnabled,
     const QString& applicationPath);
 
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server

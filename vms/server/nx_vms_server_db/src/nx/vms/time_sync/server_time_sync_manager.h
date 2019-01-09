@@ -35,7 +35,8 @@ public:
     void setTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher);
 protected:
     virtual void updateTime() override;
-    virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route) override;
+    virtual AbstractStreamSocketPtr connectToRemoteHost(
+        const QnRoute& route, bool sslRequired) override;
 private:
     bool loadTimeFromInternet();
 

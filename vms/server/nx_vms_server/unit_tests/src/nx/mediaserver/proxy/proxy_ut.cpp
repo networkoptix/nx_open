@@ -11,6 +11,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/vms/api/data/module_information.h>
 #include <transaction/message_bus_adapter.h>
+#include <test_support/mediaserver_launcher.h>
 
 using namespace nx::utils::test;
 
@@ -33,29 +34,38 @@ public:
     }
 
 public:
-    std::vector<ec2::Appserver2Ptr> m_peers;
+    std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
 
     void startPeers(int peerCount)
     {
-        while(m_peers.size() < peerCount)
+        while (m_peers.size() < peerCount)
         {
-            auto peer = ec2::Appserver2Launcher::createAppserver();
+            auto peer = std::make_unique<MediaServerLauncher>();
             peer->start();
             m_peers.push_back(std::move(peer));
         }
-        for (const auto& peer: m_peers)
-            ASSERT_TRUE(peer->waitUntilStarted());
     }
 
     void connectPeers()
     {
         for (int i = 0; i < m_peers.size() - 1; ++i)
-            m_peers[i]->moduleInstance()->connectTo(m_peers[i + 1]->moduleInstance().get());
+        {
+            // TODO: Create function in MediaServerLauncher.
+            const auto& from = m_peers[i];
+            const auto& to = m_peers[i + 1];
+
+            const auto peerId = to->commonModule()->moduleGUID();
+            const auto url = nx::utils::url::parseUrlFields(
+                to->endpoint().toString(), nx::network::http::kUrlSchemeName);
+
+            from->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
+                peerId, nx::vms::api::PeerType::server, url);
+        }
     }
 
     nx::utils::Url serverUrl(int index, const QString& path)
     {
-        const auto endpoint = m_peers[index]->moduleInstance()->endpoint();
+        const auto endpoint = m_peers[index]->endpoint();
         nx::utils::Url url = nx::utils::Url(lit("http://") + endpoint.toString());
         url.setPath(path);
         return url;
@@ -67,8 +77,8 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
     startPeers(3);
     connectPeers();
 
-    auto messageBus = m_peers[0]->moduleInstance()->ecConnection()->messageBus();
-    auto server2Id = m_peers[2]->moduleInstance()->commonModule()->moduleGUID();
+    auto messageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
+    auto server2Id = m_peers[2]->commonModule()->moduleGUID();
     int distance = std::numeric_limits<int>::max();
     while (distance > m_peers.size())
     {
@@ -84,7 +94,7 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
 
     for (int i = m_peers.size()-1; i >=0; --i)
     {
-        const auto guid = m_peers[i]->moduleInstance()->commonModule()->moduleGUID();
+        const auto guid = m_peers[i]->commonModule()->moduleGUID();
         client->removeAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME);
         // Media server should proxy to itself if header is missing.
         if (i > 0)

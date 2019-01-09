@@ -189,8 +189,10 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 			return QString();
 		}
 
+        const bool useSsl = url.scheme() == nx::network::http::kSecureUrlSchemeName
+            || url.scheme() == nx::network::rtsp::kSecureUrlSchemeName;
         d->dstSocket =
-			nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"));
+			nx::network::SocketFactory::createStreamSocket(useSsl);
 		d->dstSocket->setRecvTimeout(d->connectTimeout.count());
 		d->dstSocket->setSendTimeout(d->connectTimeout.count());
 		if (!d->dstSocket->connect(

@@ -1,16 +1,14 @@
 #pragma once
 
 #include <nx/vms/server/fs/partitions/abstract_partitions_information_provider_linux.h>
-#include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/root_fs.h>
 
 namespace  nx::vms::server::fs {
 
-class PartitionsInformationProvider:
-    public AbstractPartitionsInformationProvider,
-    public nx::vms::server::ServerModuleAware
+class PartitionsInformationProvider: public AbstractPartitionsInformationProvider
 {
   public:
-    PartitionsInformationProvider(QnMediaServerModule* serverModule);
+    PartitionsInformationProvider(RootFileSystem* rootFs);
 
     virtual QByteArray mountsFileContent() const override;
     virtual bool isScanfLongPattern() const override;
@@ -26,6 +24,7 @@ class PartitionsInformationProvider:
         qint64 totalSpace = kUnknownValue;
     };
 
+    RootFileSystem* m_rootFs = nullptr;
     mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
     mutable QnMutex m_mutex;
     mutable int m_tries;

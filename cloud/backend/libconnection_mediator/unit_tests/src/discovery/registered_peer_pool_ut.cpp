@@ -49,6 +49,7 @@ protected:
         auto streamSocket = httpClient.takeSocket();
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
         auto peerConnection = std::make_unique<nx::network::WebSocket>(std::move(streamSocket));
+        peerConnection->start();
         m_registeredPeerPool.addPeerConnection(
             peerContext.id,
             std::move(peerConnection));

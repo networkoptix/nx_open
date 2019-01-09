@@ -421,13 +421,13 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_renewSubscriptionTimerID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_previousPullMessagesResponseTimeMs(0),
     m_inputPortCount(0),
     m_videoLayout(nullptr),
     m_advancedParametersProvider(this),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
+    OnvifIniConfig::instance().reload();
     m_tmpH264Conf.reset(new onvifXsd__H264Configuration());
     m_pullMessagesResponseElapsedTimer.start();
     m_advSettingsLastUpdated.restart();
@@ -651,7 +651,7 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto& capabilities = (streamIndex == Qn::StreamIndex::primary)
+    const auto& capabilitiesList = (streamIndex == Qn::StreamIndex::primary)
         ? m_primaryStreamCapabilitiesList : m_secondaryStreamCapabilitiesList;
 
     nx::vms::server::resource::StreamCapabilityMap result;
@@ -663,11 +663,18 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
         {UnderstandableVideoCodec::H265, QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC)},
     };
 
-    for (const auto& extension: capabilities)
+    for (const auto& capabilities: capabilitiesList)
     {
         nx::vms::server::resource::StreamCapabilityKey key;
-        key.codec = kEncoderNames[extension.encoding];
-        for (const auto& resolution: extension.resolutions)
+        key.codec = kEncoderNames[capabilities.encoding];
+        if (key.codec.isEmpty())
+        {
+            NX_DEBUG(this, "getStreamCapabilityMapFromDrives encountered unknown "
+                "UnderstandableVideoCodec value - %1. Value will be ignored.",
+                (int) capabilities.encoding);
+            continue;
+        }
+        for (const auto& resolution: capabilities.resolutions)
         {
             key.resolution = resolution;
             result.insert(key, nx::media::CameraStreamCapability());
@@ -978,43 +985,6 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
     }
-}
-
-QSize QnPlOnvifResource::findSecondaryResolution(
-    const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff)
-{
-    auto resData = resourceData();
-
-    auto forcedSecondaryResolution = resData.value<QString>(
-        ResourceDataKey::kForcedSecondaryStreamResolution);
-
-    if (!forcedSecondaryResolution.isEmpty())
-    {
-        auto split = forcedSecondaryResolution.split('x');
-        if (split.size() == 2)
-        {
-            QSize res;
-            res.setWidth(split[0].toInt());
-            res.setHeight(split[1].toInt());
-            return res;
-        }
-        else
-        {
-            NX_WARNING(this,
-                lm("findSecondaryResolution(): Wrong parameter format "
-                   "(ResourceDataKey::kForcedSecondaryStreamResolution) %1"),
-                forcedSecondaryResolution);
-        }
-    }
-
-    auto result = closestResolution(
-        SECONDARY_STREAM_DEFAULT_RESOLUTION,
-        getResolutionAspectRatio(primaryRes),
-        SECONDARY_STREAM_MAX_RESOLUTION,
-        secondaryResList,
-        matchCoeff);
-
-    return result;
 }
 
 const QString QnPlOnvifResource::getAudioEncoderId() const
@@ -3664,7 +3634,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if (response.SubscriptionReference.Address)
     {
         const bool updatePort =
-            nx::network::SocketGlobals::ini().doUpdatePortInSubscriptionAddress;
+            OnvifIniConfig::instance().doUpdatePortInSubscriptionAddress;
         m_onvifNotificationSubscriptionReference =
             fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, updatePort);
     }
@@ -3684,8 +3654,8 @@ bool QnPlOnvifResource::createPullPointSubscription()
     }
 
     m_eventMonitorType = emtPullPoint;
-    m_previousPullMessagesResponseTimeMs = m_pullMessagesResponseElapsedTimer.elapsed();
 
+    m_pullMessagesResponseElapsedTimer.restart();
     updateTimer(&m_nextPullMessagesTimerID,
         std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC * MS_PER_SECOND),
         std::bind(&QnPlOnvifResource::pullMessages, this, std::placeholders::_1));
@@ -3770,8 +3740,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     soapWrapper->soap()->imode |= SOAP_XML_IGNORENS;
 
     _onvifEvents__PullMessages request;
-    request.Timeout = (m_pullMessagesResponseElapsedTimer.elapsed() -
-        m_previousPullMessagesResponseTimeMs) / MS_PER_SECOND * MS_PER_SECOND;
+
+    request.Timeout = m_pullMessagesResponseElapsedTimer.elapsed(); //< milliseconds
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
 
     std::vector<void*> memToFreeOnResponseDone;
@@ -3783,7 +3753,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memset(header, 0, sizeof(*header));
     soapWrapper->soap()->header = header;
 
-    if(!m_onvifNotificationSubscriptionID.isEmpty())
+    if (!m_onvifNotificationSubscriptionID.isEmpty())
     {
         QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
         char* SubscriptionIdBuf = (char*) malloc(512);
@@ -3917,18 +3887,16 @@ void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
 
 void QnPlOnvifResource::handleAllNotifications(const _onvifEvents__PullMessagesResponse& response)
 {
-    const qint64 currentPullMessagesResponseTimeMs = m_pullMessagesResponseElapsedTimer.elapsed();
-    const time_t timeSinceLastResponseSec = roundUp<qint64>(currentPullMessagesResponseTimeMs -
-        m_previousPullMessagesResponseTimeMs, MS_PER_SECOND) / MS_PER_SECOND;
+    // Notifications with timestamps older then minNotificationTimeMs are ignored.
+    const time_t minNotificationTimeMs = response.CurrentTime
+        - m_pullMessagesResponseElapsedTimer.elapsed();
 
-    // Notifications with timestamps older then minNotificationTime are ignored.
-    const time_t minNotificationTime = response.CurrentTime - timeSinceLastResponseSec;
     for (const auto& notification: response.oasisWsnB2__NotificationMessage)
     {
         if (notification)
-            handleOneNotification(*notification, minNotificationTime);
+            handleOneNotification(*notification, minNotificationTimeMs);
     }
-    m_previousPullMessagesResponseTimeMs = currentPullMessagesResponseTimeMs;
+    m_pullMessagesResponseElapsedTimer.restart();
 }
 
 bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList)
@@ -4653,7 +4621,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
     return *it;
 }
 
-void QnPlOnvifResource::updateVideoEncoder(
+void QnPlOnvifResource::updateVideoEncoder1(
     onvifXsd__VideoEncoderConfiguration& encoder,
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
@@ -4716,7 +4684,7 @@ void QnPlOnvifResource::updateVideoEncoder(
 
     if (!encoder.RateControl)
     {
-        NX_DEBUG(this, makeFailMessage("updateVideoEncoder: encoder.RateControl is not set"));
+        NX_DEBUG(this, makeFailMessage("updateVideoEncoder1: encoder.RateControl is not set"));
     }
     else
     {
@@ -4742,7 +4710,7 @@ void QnPlOnvifResource::updateVideoEncoder(
 
     if (!encoder.Resolution)
     {
-        NX_DEBUG(this, makeFailMessage("updateVideoEncoder: encoder.Resolution is not set"));
+        NX_DEBUG(this, makeFailMessage("updateVideoEncoder1: encoder.Resolution is not set"));
     }
     else
     {
@@ -4886,7 +4854,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::secondaryVideoCap
 {
     QnMutexLocker lock(&m_mutex);
     return (!m_secondaryStreamCapabilitiesList.empty())
-        ? m_primaryStreamCapabilitiesList.front()
+        ? m_secondaryStreamCapabilitiesList.front()
         : VideoEncoderCapabilities();
 }
 

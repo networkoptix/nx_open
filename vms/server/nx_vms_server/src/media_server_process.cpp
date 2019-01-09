@@ -54,7 +54,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 
-#include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
@@ -279,6 +278,7 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -490,7 +490,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
-    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage(commonModule(), "ufile"));
+    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(commonModule(), "ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
@@ -3757,12 +3757,13 @@ void MediaServerProcess::doMigrationFrom_2_4()
 
 void MediaServerProcess::loadPlugins()
 {
+    auto storagePlugins = serverModule()->storagePluginFactory();
     auto pluginManager = serverModule()->pluginManager();
     for (nx_spl::StorageFactory* const storagePlugin:
     pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         auto settings = &serverModule()->settings();
-        QnStoragePluginFactory::instance()->registerStoragePlugin(
+        storagePlugins->registerStoragePlugin(
             storagePlugin->storageType(),
             std::bind(
                 &QnThirdPartyStorageResource::instance,
@@ -3774,18 +3775,18 @@ void MediaServerProcess::loadPlugins()
             false);
     }
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
+    storagePlugins->registerStoragePlugin(
         "file",
         [this](QnCommonModule*, const QString& path)
         {
             return QnFileStorageResource::instance(this->serverModule(), path);
         }, /*isDefaultProtocol*/ true);
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
+    storagePlugins->registerStoragePlugin(
         "dbfile",
         QnDbStorageResource::instance, /*isDefaultProtocol*/ false);
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
+    storagePlugins->registerStoragePlugin(
         "smb",
         [this](QnCommonModule*, const QString& path)
         {
@@ -4059,6 +4060,8 @@ void MediaServerProcess::startObjects()
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
         serverModule()->licenseWatcher()->start();
+
+    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
@@ -4268,16 +4271,16 @@ void MediaServerProcess::run()
         cmdLineArguments().configFilePath,
         cmdLineArguments().rwConfigFilePath);
 
-    auto serverSettingsRawPtr = serverSettings.get();
     if (m_serviceMode)
-        initializeLogging(serverSettingsRawPtr);
+        initializeLogging(serverSettings.get());
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
-        &m_cmdLineArguments, std::move(serverSettings)));
+        &m_cmdLineArguments,
+        std::move(serverSettings)));
+
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
-    serverSettingsRawPtr->setServerModule(serverModule.get());
     serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
@@ -4465,7 +4468,6 @@ void MediaServerProcess::at_appStarted()
     if (isStopping())
         return;
 
-    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(serverModule()->runTimeSettings());
 
     QString dataLocation = serverModule()->settings().dataDir();

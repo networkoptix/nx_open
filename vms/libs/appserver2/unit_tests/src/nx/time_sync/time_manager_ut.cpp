@@ -197,7 +197,7 @@ public:
 
         auto commonModule = m_appserver->moduleInstance()->commonModule();
         auto globalSettings = commonModule->globalSettings();
-        globalSettings->synchronizeNow();
+        globalSettings->synchronizeNowSync();
 
         if (result && m_hasInternetAccess)
         {

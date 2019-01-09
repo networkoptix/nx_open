@@ -23,6 +23,7 @@ AcceptConnectionHandler::AcceptConnectionHandler(
                 SendMode::singleMessage,
                 ReceiveMode::message,
                 Role::server);
+            webSocket->start();
             onConnectionCreated(std::move(webSocket), std::move(restParams));
         })
 {
