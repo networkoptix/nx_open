@@ -688,20 +688,24 @@ void DeviceAdditionDialog::updateAddDevicesPanel()
     {
         showAddDevicesPlaceholder(tr("All devices are already added"));
     }
-    else if (addingDevicesCount != 0 && newDevicesCheckedCount == 0)
+    else if (addingDevicesCount && !newDevicesCheckedCount)
     {
         showAddDevicesPlaceholder(
             tr("%n devices are being added. You can close this dialog or start a new search",
                 nullptr, addingDevicesCount));
     }
-    else if (newDevicesCount != 0
-        && (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount))
+    else if (newDevicesCount)
     {
-        showAddDevicesButton(tr("Add all Devices"));
-    }
-    else if (newDevicesCount != 0 && newDevicesCheckedCount != 0)
-    {
-        showAddDevicesButton(tr("Add %n Devices", nullptr, newDevicesCheckedCount));
+        if (newDevicesCheckedCount == devicesCount
+            || (!newDevicesCheckedCount && newDevicesCount == devicesCount))
+        {
+            showAddDevicesButton(tr("Add all Devices"));
+        }
+        else
+        {
+            showAddDevicesButton(tr("Add %n Devices", nullptr,
+                newDevicesCheckedCount ? newDevicesCheckedCount : newDevicesCount));
+        }
     }
 }
 
