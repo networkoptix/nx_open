@@ -148,6 +148,7 @@ void StreamProxy::stopProxyChannels(
 }
 
 //-------------------------------------------------------------------------------------------------
+// StreamProxyPool.
 
 StreamProxyPool::~StreamProxyPool()
 {
@@ -172,6 +173,11 @@ int StreamProxyPool::addProxy(
     auto it = m_proxies.emplace(
         proxyId,
         std::make_unique<StreamProxy>()).first;
+
+    if (m_upStreamConverterFactory)
+        it->second->setUpStreamConverterFactory(m_upStreamConverterFactory);
+    if (m_downStreamConverterFactory)
+        it->second->setDownStreamConverterFactory(m_downStreamConverterFactory);
 
     if (m_connectToDestinationTimeout)
         it->second->setConnectToDestinationTimeout(*m_connectToDestinationTimeout);
@@ -211,6 +217,7 @@ void StreamProxyPool::setConnectToDestinationTimeout(
 }
 
 //-------------------------------------------------------------------------------------------------
+// detail::StreamProxyChannel.
 
 namespace detail {
 
