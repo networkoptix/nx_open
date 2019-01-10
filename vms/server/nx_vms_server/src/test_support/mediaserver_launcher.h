@@ -18,14 +18,14 @@ class MediaServerLauncher: public QObject
     Q_OBJECT
 public:
 
-    enum class DisabledFeature
+    enum DisabledFeature
     {
         none                = 0x00,
         noResourceDiscovery = 0x01,
         noMonitorStatistics = 0x02,
         noStorageDiscovery  = 0x04,
 
-        all = noResourceDiscovery | noMonitorStatistics
+        all = noResourceDiscovery | noMonitorStatistics | noStorageDiscovery
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
 
