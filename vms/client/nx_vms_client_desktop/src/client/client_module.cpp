@@ -554,6 +554,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     const QString logConfigFile(iniFilesDir.absoluteFilePath(kLogConfig));
     if (QFileInfo(logConfigFile).exists())
     {
+        NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
+        NX_ALWAYS(this, "Log options from settings are ignored!", logConfigFile);
         QSettings logConfig(logConfigFile, QSettings::IniFormat);
         Settings logSettings(&logConfig);
         logSettings.updateDirectoryIfEmpty(
