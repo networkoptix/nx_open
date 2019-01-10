@@ -8,10 +8,14 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ImageCorrectionData: Data
 {
+    static constexpr qreal kDefaultBlackLevel = 0.001;
+    static constexpr qreal kDefaultWhiteLevel = 0.0005;
+    static constexpr qreal kDefaultGamma = 1.0;
+
     bool enabled = false;
-    qreal blackLevel = 0.001;
-    qreal whiteLevel = 0.0005;
-    qreal gamma = 1.0;
+    qreal blackLevel = kDefaultBlackLevel;
+    qreal whiteLevel = kDefaultWhiteLevel;
+    qreal gamma = kDefaultGamma;
 
     /**
      * Compatibility-layer function to maintain old way of (de)serializing. Used in the server sql

@@ -9,6 +9,8 @@ namespace nx::vms::api {
 
 struct NX_VMS_API DewarpingData: Data
 {
+    static constexpr qreal kDefaultFov = 70.0 * M_PI / 180.0;
+
     /** Whether dewarping is currently enabled. */
     bool enabled = false;
 
@@ -19,7 +21,7 @@ struct NX_VMS_API DewarpingData: Data
     qreal yAngle = 0;
 
     /** Fov in radians. */
-    qreal fov = 70.0 * M_PI / 180.0;
+    qreal fov = kDefaultFov;
 
     /**
      * Aspect ratio correction?
