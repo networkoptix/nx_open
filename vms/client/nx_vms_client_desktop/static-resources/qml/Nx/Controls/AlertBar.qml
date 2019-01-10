@@ -10,7 +10,7 @@ Item
     property alias background: backgroundControl
     property int horizontalPadding: 16
 
-    implicitHeight: 32
+    implicitHeight: labelControl.paintedHeight + 16
     implicitWidth: parent.width
 
     Rectangle
@@ -25,11 +25,13 @@ Item
     {
         id: labelControl
 
+        wrapMode: Label.WordWrap
         color: ColorTheme.text
         font.pixelSize: 13
-        width: control.width - control.horizontalPadding
+        width: control.width - control.horizontalPadding * 2
         anchors.left: parent.left
         anchors.leftMargin: control.horizontalPadding
+        anchors.rightMargin: control.horizontalPadding
         anchors.verticalCenter: parent.verticalCenter
     }
 }

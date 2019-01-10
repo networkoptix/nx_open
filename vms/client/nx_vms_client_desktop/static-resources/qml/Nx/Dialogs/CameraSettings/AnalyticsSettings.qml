@@ -132,7 +132,6 @@ Item
         visible: false
         anchors.bottom: parent.bottom
         label.text: qsTr("Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.")
-        height: 31 //< Adjusted to match other alerts in camera settings dialog.
     }
 
 }
