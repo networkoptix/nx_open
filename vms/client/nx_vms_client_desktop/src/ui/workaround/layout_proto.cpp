@@ -25,7 +25,7 @@ namespace QnLayoutProto {
         enum LayoutField {
             CellAspectRatioField = 1,
             CellSpacingWidthField = 2,
-            CellSpacingHeightField = 3,
+            // CellSpacingHeightField = 3,
             ItemField = 4,
             UserCanEditField = 5,
             LockedField = 6,
@@ -264,11 +264,7 @@ namespace QnLayoutProto {
                             return false;
                         break;
                     case Layout::CellSpacingWidthField:
-                        if(!deserialize(record.value(), &target->horizontalSpacing))
-                            return false;
-                        break;
-                    case Layout::CellSpacingHeightField:
-                        if(!deserialize(record.value(), &target->verticalSpacing))
+                        if(!deserialize(record.value(), &target->cellSpacing))
                             return false;
                         break;
                     case Layout::ItemField: {

@@ -44,8 +44,7 @@ struct NX_VMS_API LayoutData: ResourceData
     static constexpr float kDefaultBackgroundOpacity = 0.7f;
 
     float cellAspectRatio = 0;
-    float horizontalSpacing = kDefaultCellSpacing; //< TODO: #API Rename to cellSpacing.
-    float verticalSpacing = kDefaultCellSpacing; //< TODO: #API Remove this one.
+    float cellSpacing = kDefaultCellSpacing;
     LayoutItemDataList items;
     bool locked = false;
     qint32 fixedWidth = 0;
@@ -56,8 +55,8 @@ struct NX_VMS_API LayoutData: ResourceData
     qint32 backgroundHeight = 0;
     float backgroundOpacity = kDefaultBackgroundOpacity;
 };
-#define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(horizontalSpacing) \
-    (verticalSpacing)(items)(locked)(backgroundImageFilename)(backgroundWidth) \
+#define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(cellSpacing) \
+    (items)(locked)(backgroundImageFilename)(backgroundWidth) \
     (backgroundHeight)(backgroundOpacity) \
     (fixedWidth)(fixedHeight)(logicalId)
 

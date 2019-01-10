@@ -1393,10 +1393,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
-     * %param horizontalSpacing Horizontal spacing between layout items
-     *     (floating-point).
-     * %param verticalSpacing Vertical spacing between layout items
-     *     (floating-point).
+     * %param cellSpacing Cell spacing between layout items as percent of an item's size
+     *     (floating-point, 0..1).
      * %param items List of the layout items.
      *     %param items[].id Item unique id. Can be omitted when creating a new object.
      *     %param items[].flags Should have fixed value.
@@ -1475,10 +1473,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
-     * %param horizontalSpacing Horizontal spacing between layout items
-     *     (floating-point).
-     * %param verticalSpacing Vertical spacing between layout items
-     *     (floating-point).
+     * %param cellSpacing Cell spacing between layout items as percent of an item's size
+     *     (floating-point, 0..1).
      * %param items List of the layout items.
      *     %param items[].id Item unique id. Can be omitted when creating a new object.
      *     %param items[].flags Should have fixed value.
