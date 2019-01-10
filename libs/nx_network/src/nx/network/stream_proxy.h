@@ -35,17 +35,15 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     template<typename T>
-    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
-    void setUpStreamConverter()
+    void setUpStreamConverterFactory(T func)
     {
-        m_upStreamConverterFactory = []() { return std::make_unique<T>(); };
+        m_upStreamConverterFactory = std::move(func);
     }
 
     template<typename T>
-    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
-    void setDownStreamConverter()
+    void setDownStreamConverterFactory(T func)
     {
-        m_downStreamConverterFactory = []() { return std::make_unique<T>(); };
+        m_downStreamConverterFactory = std::move(func);
     }
 
     void startProxy(
@@ -125,11 +123,41 @@ public:
     void setConnectToDestinationTimeout(
         std::optional<std::chrono::milliseconds> timeout);
 
+    template<typename T>
+    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
+    void setUpStreamConverter()
+    {
+        m_upStreamConverterFactory = []() { return std::make_unique<T>(); };
+    }
+
+    template<typename Func>
+    void setUpStreamConverterFactory(Func func)
+    {
+        m_upStreamConverterFactory = std::move(func);
+    }
+
+    template<typename T>
+    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
+    void setDownStreamConverter()
+    {
+        m_downStreamConverterFactory = []() { return std::make_unique<T>(); };
+    }
+
+    template<typename Func>
+    void setDownStreamConverterFactory(Func func)
+    {
+        m_downStreamConverterFactory = std::move(func);
+    }
+
 private:
     std::map<int, std::unique_ptr<StreamProxy>> m_proxies;
     std::atomic<int> m_lastProxyId{0};
     mutable QnMutex m_mutex;
     std::optional<std::chrono::milliseconds> m_connectToDestinationTimeout;
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
+        m_upStreamConverterFactory;
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
+        m_downStreamConverterFactory;
 };
 
 //-------------------------------------------------------------------------------------------------
