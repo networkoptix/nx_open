@@ -4,7 +4,7 @@ ListView
 {
     id: control
 
-    readonly property bool denyPositionCorrection: true
+    readonly property bool denyFlickableVisibleAreaCorrection: true
 
     property int pressedStateFilterMs: 500
     property int emptyHeaderSize: 4

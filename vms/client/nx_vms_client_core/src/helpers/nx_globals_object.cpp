@@ -74,7 +74,7 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
     if (!flickable)
         return;
 
-    static const auto kDenyPositionCorrectionPropertyName = "denyPositionCorrection";
+    static const auto kDenyPositionCorrectionPropertyName = "denyFlickableVisibleAreaCorrection";
     const auto denyCorrection = flickable->property(kDenyPositionCorrectionPropertyName);
     if (denyCorrection.isValid() && denyCorrection.toBool())
         return;
