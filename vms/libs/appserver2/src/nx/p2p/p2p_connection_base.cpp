@@ -224,7 +224,7 @@ void ConnectionBase::onHttpClientDone()
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
         if (m_connectionLockGuard->tryAcquireConnecting())
             m_httpClient->doGet(
-                m_remotePeerUrl,
+                m_httpClient->url(),
                 std::bind(&ConnectionBase::onHttpClientDone, this));
         else
             cancelConnecting(State::Error, lm("tryAcquireConnecting failed"));
