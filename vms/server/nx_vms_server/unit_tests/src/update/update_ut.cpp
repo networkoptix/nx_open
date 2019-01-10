@@ -7,6 +7,7 @@
 #include <api/test_api_requests.h>
 #include <nx/update/update_information.h>
 #include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/network/http/test_http_server.h>
 
 namespace nx::vms::server::test {
 
@@ -66,9 +67,17 @@ protected:
 private:
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
+    network::http::TestHttpServer m_testHttpServer;
 
-    static update::Package preparePackage(const QString& dataDir)
+    update::Package preparePackage(const QString& dataDir)
     {
+        update::Package result;
+        result.arch = QnAppInfo::applicationArch();
+        result.component = "server";
+        result.file = result.arch + "_update.zip";
+
+        QDir().mkdir(dataDir + '/tmp');
+
     }
 };
 
