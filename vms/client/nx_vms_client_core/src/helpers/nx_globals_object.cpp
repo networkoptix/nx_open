@@ -74,6 +74,11 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
     if (!flickable)
         return;
 
+    static const auto kDenyPositionCorrectionPropertyName = "denyPositionCorrection";
+    const auto denyCorrection = flickable->property(kDenyPositionCorrectionPropertyName);
+    if (denyCorrection.isValid() && denyCorrection.toBool())
+        return;
+
     const auto contentItem = flickable->contentItem();
     if (!contentItem || !itemIsAncestorOf(item, contentItem))
         return;
