@@ -65,9 +65,6 @@ public:
     QSet<QnResourcePtr> highlightedResources() const;
     void setHighlightedResources(const QSet<QnResourcePtr>& value);
 
-    bool live() const;
-    void setLive(bool value);
-
     void setViewportMargins(int top, int bottom);
 
     QWidget* viewportHeader() const;
@@ -82,6 +79,9 @@ public:
 
     void updateHover();
 
+    void setInsertionMode(UpdateMode updateMode, bool scrollDown);
+    void setRemovalMode(UpdateMode updateMode);
+
 protected:
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
@@ -92,17 +92,13 @@ private:
 
     int calculateHeight(QWidget* widget) const;
 
-    enum class UpdateMode
-    {
-        instant,
-        animated
-    };
-
-    void insertNewTiles(int index, int count, UpdateMode updateMode);
+    void insertNewTiles(int index, int count, UpdateMode updateMode, bool scrollDown);
     void removeTiles(int first, int count, UpdateMode updateMode);
     void clear();
 
-    void highlightAppearance(EventTile* tile);
+    void fadeIn(EventTile* widget);
+    void fadeOut(EventTile* widget);
+    QWidget* createFadeCurtain(EventTile* widget, QVariantAnimation* animator);
 
     void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
 
@@ -119,7 +115,6 @@ private:
     void ensureWidget(int index);
     void reserveWidget(int index);
 
-    void handleWidgetChanged(int index);
     void closeExpiredTiles();
 
     int scrollValue() const;
@@ -189,6 +184,7 @@ private:
     nx::utils::Guard makeUnreadCountGuard();
 
     int m_endPosition = 0;
+    AnimationPtr m_endAnimation;
 
     Qt::ScrollBarPolicy m_scrollBarPolicy = Qt::ScrollBarAlwaysOn;
 
@@ -197,8 +193,11 @@ private:
     bool m_footersEnabled = true;
     bool m_headersEnabled = true;
     bool m_scrollBarRelevant = true;
-    bool m_live = true;
     bool m_updating = false;
+
+    UpdateMode m_insertionMode = UpdateMode::animated;
+    UpdateMode m_removalMode = UpdateMode::animated;
+    bool m_scrollDownAfterInsertion = false;
 
     QPointer<QWidget> m_viewportHeader;
 

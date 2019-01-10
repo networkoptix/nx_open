@@ -130,9 +130,10 @@ bool EventListModel::removeRows(int row, int count, const QModelIndex& parent)
 bool EventListModel::defaultAction(const QModelIndex& index)
 {
     const auto& event = getEvent(index.row());
-    if (event.actionId != ui::action::NoAction)
-        menu()->triggerIfPossible(event.actionId, event.actionParameters);
+    if (event.actionId == ui::action::NoAction)
+        return false;
 
+    menu()->triggerIfPossible(event.actionId, event.actionParameters);
     return true;
 }
 

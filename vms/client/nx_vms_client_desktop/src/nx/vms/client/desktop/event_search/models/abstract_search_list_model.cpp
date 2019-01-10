@@ -103,8 +103,8 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
     if (isFilterDegenerate())
     {
         NX_ASSERT(rowCount() == 0);
+        ScopedFetchCommit scopedFetch(this, fetchDirection(), FetchResult::complete);
         setFetchedTimeWindow(m_relevantTimePeriod);
-        finishFetch(FetchResult::complete);
     }
     else
     {
@@ -345,12 +345,6 @@ void AbstractSearchListModel::addToFetchedTimeWindow(const QnTimePeriod& period)
     auto timeWindow = m_fetchedTimeWindow;
     timeWindow.addPeriod(period);
     setFetchedTimeWindow(timeWindow);
-}
-
-void AbstractSearchListModel::finishFetch(FetchResult result)
-{
-    NX_VERBOSE(this, "Finish fetch, result: %1", QVariant::fromValue(result).toString());
-    emit fetchFinished(result, {});
 }
 
 void AbstractSearchListModel::clear()

@@ -80,6 +80,7 @@ nx_option(
     withP2PConnectionTestingUtility
     "Enable P2P connection testing utility"
     ${_withP2PConnectionTestingUtility})
+option(withDocumentation "Generate documentation" OFF)
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"

@@ -18,6 +18,16 @@ void PrintTo(const QUrl& val, ::std::ostream* os)
     *os << val.toString().toStdString();
 }
 
+void PrintTo(const QSize& val, ::std::ostream* os)
+{
+    *os << "QSize(" << val.width() << "x" << val.height() << ")";
+}
+
+void PrintTo(const QSizeF& val, ::std::ostream* os)
+{
+    *os << "QSizeF(" << val.width() << "x" << val.height() << ")";
+}
+
 //-------------------------------------------------------------------------------------------------
 
 namespace std {

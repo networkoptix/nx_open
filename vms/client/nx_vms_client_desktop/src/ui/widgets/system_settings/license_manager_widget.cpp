@@ -1035,7 +1035,8 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
             switch (errCode)
             {
                 case QnLicenseErrorCode::InvalidSignature:
-                    showMessageLater(QnMessageBoxIcon::Warning,
+                    showMessageLater(
+                        QnMessageBoxIcon::Warning,
                         tr("Invalid activation key file"),
                         tr("Select a valid activation key file to continue.")
                             + L'\n' +  getProblemPersistMessage(),
@@ -1049,9 +1050,13 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                     showIncompatibleLicenceMessageLater();
                     break;
                 case QnLicenseErrorCode::TooManyLicensesPerDevice:
-                    showMessageLater(QnMessageBoxIcon::Warning,
-                        tr("This device accepts single channel license only"),
-                        getContactSupportMessage(), CopyToClipboardButton::Hide);
+                    showMessageLater(
+                        QnMessageBoxIcon::Critical,
+                        tr("Failed to activate license"),
+                        tr("Only one starter license is allowed per System.")
+                            + '\n'
+                            + tr("You already have one active starter license."),
+                        CopyToClipboardButton::Hide);
                     break;
                 default:
                     break;
