@@ -6,6 +6,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <api/test_api_requests.h>
 #include <nx/update/update_information.h>
+#include <nx/utils/gzip/gzip_compressor.h>
 
 namespace nx::vms::server::test {
 
@@ -65,6 +66,10 @@ protected:
 private:
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
+
+    static update::Package preparePackage(const QString& dataDir)
+    {
+    }
 };
 
 TEST_F(Updates, updateInformation_onePeer_correctlySet)
