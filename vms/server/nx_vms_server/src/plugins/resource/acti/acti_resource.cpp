@@ -243,7 +243,17 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
 {
     QList<QSize> result;
     QList<QSize> availResolutions;
-    for(const QByteArray& r: resolutions.split(','))
+
+    /*
+        Usually ACTi cams resolution response is something like "N1024x768,N1280x1024".
+        ACTi-KCM3911 resolution response is "2VIDEO_RESOLUTION_CAP='N2032x1936".
+        pureResolutions - is a workaround for such cameras.
+    */
+    QByteArray pureResolutions = resolutions.split('=').last();
+    if (!pureResolutions.isEmpty() && pureResolutions.front() == '\'')
+        pureResolutions = pureResolutions.mid(1);
+
+    for(const QByteArray& r: pureResolutions.split(','))
         result << extractResolution(r);
     std::sort(result.begin(), result.end(), resolutionGreaterThan);
     return result;

@@ -189,8 +189,10 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 			return QString();
 		}
 
+        const bool useSsl = url.scheme() == nx::network::http::kSecureUrlSchemeName
+            || url.scheme() == nx::network::rtsp::kSecureUrlSchemeName;
         d->dstSocket =
-			nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"));
+			nx::network::SocketFactory::createStreamSocket(useSsl);
 		d->dstSocket->setRecvTimeout(d->connectTimeout.count());
 		d->dstSocket->setSendTimeout(d->connectTimeout.count());
 		if (!d->dstSocket->connect(
@@ -393,6 +395,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     else
         dstRoute.id = commonModule()->moduleGUID();
 
+    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
+        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
+
 	if (dstRoute.id == commonModule()->moduleGUID())
 	{
 		if (!cameraGuid.isNull())
@@ -404,8 +409,8 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		else if (isStandardProxyNeeded(commonModule(), d->request))
 		{
 			nx::utils::Url url = d->request.requestLine.url;
-			int defaultPort = getDefaultPortByProtocol(url.scheme());
-			dstRoute.addr = nx::network::SocketAddress(url.host(), url.port(defaultPort));
+			int defaultPort = getDefaultPortByProtocol(dstUrl.scheme());
+			dstRoute.addr = nx::network::SocketAddress(dstUrl.host(), dstUrl.port(defaultPort));
 		}
 		else
 		{
@@ -433,9 +438,6 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		if (!replaceAuthHeader())
 			return false;
 	}
-
-    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
-        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
 
 	if (!dstRoute.addr.isNull())
 	{
@@ -479,9 +481,12 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         // Destination host may be empty in case of reverse connection.
         auto hostIter = d->request.headers.find("Host");
         if (hostIter != d->request.headers.end())
+        {
+            int defaultPort = getDefaultPortByProtocol(dstUrl.scheme());
             hostIter->second = nx::network::SocketAddress(
                 dstUrl.host(),
-                dstUrl.port(nx::network::http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+                dstUrl.port(defaultPort)).toString().toLatin1();
+        }
     }
 
 	//NOTE next hop should accept Authorization header already present

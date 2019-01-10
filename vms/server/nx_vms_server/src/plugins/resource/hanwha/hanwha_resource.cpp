@@ -2738,10 +2738,8 @@ QSize HanwhaResource::bestSecondaryResolution(
     for (const auto& resolution: resolutionList)
         resolutions.push_back(resolution);
 
-    return closestResolution(
-        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+    return Camera::closestSecondaryResolution(
         getResolutionAspectRatio(primaryResolution),
-        SECONDARY_STREAM_MAX_RESOLUTION,
         resolutions);
 }
 

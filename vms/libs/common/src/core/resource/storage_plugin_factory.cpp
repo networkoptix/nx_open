@@ -1,19 +1,14 @@
 #include "storage_plugin_factory.h"
 
-Q_GLOBAL_STATIC(QnStoragePluginFactory, QnStoragePluginFactory_instance)
-
-QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory()
+QnStoragePluginFactory::QnStoragePluginFactory(QObject* parent):
+    QObject(parent),
+    m_defaultFactory()
 {
 }
 
 QnStoragePluginFactory::~QnStoragePluginFactory()
 {
 
-}
-
-QnStoragePluginFactory *QnStoragePluginFactory::instance()
-{
-    return QnStoragePluginFactory_instance();
 }
 
 void QnStoragePluginFactory::registerStoragePlugin(

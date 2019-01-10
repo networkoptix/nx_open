@@ -5,8 +5,8 @@
 
 namespace nx::vms::server::fs {
 
-PartitionsInformationProvider::PartitionsInformationProvider(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+PartitionsInformationProvider::PartitionsInformationProvider(RootFileSystem* rootFs):
+   m_rootFs(rootFs)
 {
     m_fileName = lit("/proc/mounts");
     if (nx::utils::AppInfo::isRaspberryPi())
@@ -32,7 +32,7 @@ QByteArray PartitionsInformationProvider::mountsFileContent() const
 {
     QFile mountsFile(m_fileName);
 
-    int fd = rootFileSystem()->open(m_fileName, QIODevice::ReadOnly);
+    int fd = m_rootFs->open(m_fileName, QIODevice::ReadOnly);
     if (fd > 0)
         mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
     else
@@ -55,7 +55,7 @@ qint64 PartitionsInformationProvider::totalSpace(const QByteArray& fsPath) const
     if (m_deviceSpacesCache[fsPath].totalSpace == kUnknownValue)
     {
         m_deviceSpacesCache[fsPath].totalSpace =
-            rootFileSystem()->totalSpace(QString::fromLatin1(fsPath));
+            m_rootFs->totalSpace(QString::fromLatin1(fsPath));
     }
     return m_deviceSpacesCache[fsPath].totalSpace;
 }
@@ -66,14 +66,14 @@ qint64 PartitionsInformationProvider::freeSpace(const QByteArray& fsPath) const
     if (m_deviceSpacesCache[fsPath].freeSpace == kUnknownValue)
     {
         m_deviceSpacesCache[fsPath].freeSpace =
-            rootFileSystem()->freeSpace(QString::fromLatin1(fsPath));
+            m_rootFs->freeSpace(QString::fromLatin1(fsPath));
     }
 
     bool freeSpaceIsInvalid = m_deviceSpacesCache[fsPath].freeSpace <= 0;
     if (m_tries++ % 10 == 0 || !freeSpaceIsInvalid)
     {
         m_deviceSpacesCache[fsPath].freeSpace =
-            rootFileSystem()->freeSpace(QString::fromLatin1(fsPath));
+            m_rootFs->freeSpace(QString::fromLatin1(fsPath));
     }
 
     // If free space becomes available and total space is invalid let's reset totalSpace to the
@@ -90,7 +90,7 @@ qint64 PartitionsInformationProvider::freeSpace(const QByteArray& fsPath) const
 
 bool PartitionsInformationProvider::isFolder(const QByteArray& fsPath) const
 {
-    auto fileStats = rootFileSystem()->stat(fsPath);
+    auto fileStats = m_rootFs->stat(fsPath);
     if (!fileStats.exists)
         return false;
 

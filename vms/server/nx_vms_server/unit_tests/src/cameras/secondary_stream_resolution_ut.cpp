@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
+
 #include <QtCore/QSize>
 #include <QtCore/QList>
 
 #include <nx/vms/server/resource/camera.h>
 
-namespace nx {
-namespace test {
+namespace nx::test {
 
 using namespace nx::vms::server;
 using R = QSize;
@@ -20,13 +21,23 @@ public:
     void whenResolutionListIs(const ResolutionList& resolutionList)
     {
         m_resolutionList = resolutionList;
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(),
+            [](R r1, R r2)
+            {
+                return r1.width() != r2.width()
+                    ? r1.width() < r2.width()
+                    : r1.height() < r2.height();
+            });
     }
 
     void thenSecondaryResolutionShouldBe(const Resolution& secondaryResolution)
     {
+        const float neededRatio =
+            resource::Camera::getResolutionAspectRatio(m_resolutionList.back());
+
         const auto closestResolution = resource::Camera::closestResolution(
             SECONDARY_STREAM_DEFAULT_RESOLUTION,
-            resource::Camera::getResolutionAspectRatio(m_resolutionList.front()),
+            neededRatio,
             SECONDARY_STREAM_MAX_RESOLUTION,
             m_resolutionList);
 
@@ -78,11 +89,22 @@ TEST_F(SecondaryStreamResolutionTest, chooseTheClosestToIdealResolutionWithTheSa
 
 TEST_F(SecondaryStreamResolutionTest, noResolutionWithTheSameAspectRatio_4_3)
 {
-    whenResolutionListIs({R(1280, 960), R(1280, 720), R(1152, 648), R(1024, 576), R(720, 567),
+    whenResolutionListIs({R(1280, 960), R(1280, 720), R(1152, 648), R(1024, 576), R(720, 576),
         R(640, 360)});
-    thenSecondaryResolutionShouldBe(R(640, 360));
+    thenSecondaryResolutionShouldBe(R(720, 576));
 }
 
-} // namespace test
-} // namespace nx
+TEST_F(SecondaryStreamResolutionTest, dahua22204TniResolutions)
+{
+    whenResolutionListIs({ R(1280, 720), R(704, 480), R(352, 240) });
+    thenSecondaryResolutionShouldBe(R(704, 480));
+}
 
+TEST_F(SecondaryStreamResolutionTest, dwcMd421D)
+{
+    whenResolutionListIs({ R(960, 544), R(800, 608), R(800, 448), R(704, 528), R(704, 400),
+        R(640,480), R(640, 352), R(480, 368), R(480, 272), R(320, 240) });
+    thenSecondaryResolutionShouldBe(R(640, 352));
+}
+
+} // namespace nx::test

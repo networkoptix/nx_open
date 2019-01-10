@@ -20,6 +20,8 @@
 #include <QElapsedTimer>
 #include <QtCore/QTimeZone>
 
+#include <nx/kit/ini_config.h>
+
 #include <nx/vms/server/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
@@ -88,6 +90,21 @@ struct QnOnvifServiceUrls
     //QString eventsServiceUrl;
 
     QString getUrl(OnvifWebService onvifWebService) const;
+};
+
+struct OnvifIniConfig: public nx::kit::IniConfig
+{
+    OnvifIniConfig(): IniConfig("server_onvif.ini") {}
+
+    NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
+        "Used in ONVIF event notification subscription.\n"
+        "Value 0 (false) may be used for debugging port forwarded devices.");
+
+    static OnvifIniConfig& instance()
+    {
+        static OnvifIniConfig ini;
+        return ini;
+    }
 };
 
 class QnPlOnvifResource:
@@ -331,9 +348,6 @@ public:
 
     double getClosestAvailableFps(double desiredFps);
 
-    QSize findSecondaryResolution(
-        const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
-
     static bool isCameraForcedToOnvif(
         QnResourceDataPool* dataPool,
         const QString& manufacturer, const QString& model);
@@ -341,7 +355,7 @@ public:
     VideoEncoderCapabilities primaryVideoCapabilities() const;
     VideoEncoderCapabilities secondaryVideoCapabilities() const;
 
-    void updateVideoEncoder(
+    void updateVideoEncoder1(
         onvifXsd__VideoEncoderConfiguration& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
@@ -595,7 +609,6 @@ private:
     QString m_onvifNotificationSubscriptionReference;
 
     QElapsedTimer m_pullMessagesResponseElapsedTimer;
-    qint64 m_previousPullMessagesResponseTimeMs;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;

@@ -154,7 +154,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 
     if (resourceTypeId == nx::vms::api::StorageData::kResourceTypeId)
     {
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), params.url));
+        result = QnResourcePtr(commonModule()->storagePluginFactory()->createStorage(commonModule(), params.url));
         NX_ASSERT(result); //storage can not be null
     }
     else if (resourceTypeId == nx::vms::api::AnalyticsPluginData::kResourceTypeId)
