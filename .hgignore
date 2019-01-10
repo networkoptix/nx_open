@@ -1,25 +1,27 @@
 syntax: glob
 
-*.pyc
+# IDE and misc software files.
 .idea
-*.swp
+.vscode
+*~*.TMP
 *.kdev4
 .DS_Store
+*.swp
+CMakeLists.txt.user
 
-*.orig
-*.rej
-.vscode
-
+# Precompiled files.
+*.pyc
 *.qmlc
 *.jsc
 
-CMakeLists.txt.user
+# Repository temp files.
+*.orig
+*.rej
 
-# Exclude project-specific items.
+# Project-specific items.
 subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
 
-# Exclude build folders in the repository root.
-syntax: regexp
-^build/
-^build-.*/
+# Build folders in the repository root.
+re:^build/
+re:^build-.*/
