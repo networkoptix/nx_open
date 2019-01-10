@@ -112,7 +112,7 @@ void QnAdjustVideoDialog::at_spinboxValueChanged()
 
 void QnAdjustVideoDialog::submit()
 {
-    ImageCorrectionParams newParams;
+    nx::vms::api::ImageCorrectionData newParams;
     newParams.enabled = ui->enableAdjustment->isChecked();
     newParams.gamma = ui->autoGammaCheckBox->isChecked() ? 0.0 : ui->gammaSpinBox->value();
     newParams.blackLevel = ui->blackLevelsSpinBox->value() / 100.0;
@@ -127,12 +127,12 @@ void QnAdjustVideoDialog::submit()
     }
 }
 
-ImageCorrectionParams QnAdjustVideoDialog::params() const
+nx::vms::api::ImageCorrectionData QnAdjustVideoDialog::params() const
 {
     return m_params;
 }
 
-void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
+void QnAdjustVideoDialog::setParams(const nx::vms::api::ImageCorrectionData& params)
 {
     m_updateDisabled = true;
 
@@ -157,7 +157,7 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
     {
         case QDialogButtonBox::ResetRole:
         {
-            ImageCorrectionParams defaultParams;
+            nx::vms::api::ImageCorrectionData defaultParams;
             defaultParams.enabled = true;
             setParams(defaultParams);
             break;

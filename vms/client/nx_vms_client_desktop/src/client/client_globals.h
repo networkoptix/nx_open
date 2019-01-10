@@ -99,8 +99,8 @@ namespace Qn
         ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemZoomWindowRectangleVisibleRole,         /**< Role for item's flag which controls if zoom window rectangle should be visible for the corresponding zoom window. */
-        ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
-        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
+        ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type nx::vms::api::ImageCorrectionData. */
+        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type nx::vms::api::DewarpingData. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
         ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */

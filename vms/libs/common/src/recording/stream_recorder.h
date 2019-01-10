@@ -17,8 +17,6 @@ extern "C"
 
 #include <nx/utils/cryptographic_hash.h>
 
-#include <core/ptz/item_dewarping_params.h>
-
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>

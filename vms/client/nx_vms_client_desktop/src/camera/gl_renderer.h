@@ -88,10 +88,10 @@ public:
     bool isYV12ToRgbaShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;
 
-    void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
+    void setImageCorrectionParams(const nx::vms::api::ImageCorrectionData& params) { m_imgCorrectParam = params; }
     void setFisheyeController(QnFisheyePtzController* controller);
     bool isFisheyeEnabled() const;
-    ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
+    nx::vms::api::ImageCorrectionData getImageCorrectionParams() const { return m_imgCorrectParam; }
 
     void setPaused(bool value) { m_paused = value; }
     bool isPaused() const { return m_paused; }
@@ -120,7 +120,7 @@ private:
     bool m_paused;
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
-    ImageCorrectionParams m_imgCorrectParam;
+    nx::vms::api::ImageCorrectionData m_imgCorrectParam;
     QnHistogramConsumer* m_histogramConsumer;
     QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;

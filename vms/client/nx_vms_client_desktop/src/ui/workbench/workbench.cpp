@@ -26,6 +26,8 @@
 #include <common/common_module.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
+#include <nx/utils/math/fuzzy.h>
+
 using namespace nx::vms::client::desktop;
 using namespace ui;
 using namespace workbench;
