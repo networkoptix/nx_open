@@ -16,7 +16,7 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     const std::string& systemId,
     const OutgoingCommandFilter& filter,
     const std::string& connectionId,
-    nx::network::P2pTransportPtr _p2pTransport,
+    nx::p2p::P2pTransportPtr _p2pTransport,
     vms::api::PeerDataEx localPeerData,
     vms::api::PeerDataEx remotePeerData)
     :

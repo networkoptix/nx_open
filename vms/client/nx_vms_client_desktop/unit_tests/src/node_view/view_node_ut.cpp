@@ -29,7 +29,7 @@ static const auto kTestId = QnUuid::createUuid();
 static const auto kAnotherTestId = QnUuid::createUuid();
 static const auto kTestText = QString("testText");
 static const auto kAnotherText = QString("anotherText");
-static constexpr int kTestSiblingGroup = 101;
+static constexpr int kTestGroupSortOrder = 101;
 static const bool kExpandedTestValue = true;
 static const auto kSomeTestFlag = Qt::ItemNeverHasChildren;
 static const auto kAnotherTestFlag = Qt::ItemIsUserTristate;
@@ -83,7 +83,7 @@ TEST(ViewNodeTest, base_data_fields_test)
         .withCheckedState(firstTestColumn, Qt::Checked)
         .withCheckedState(ColumnSet({secondTestColumn}), Qt::Unchecked)
         .withCheckedState(thirdTestColumn, OptionalCheckedState())
-        .withSiblingGroup(kTestSiblingGroup)
+        .withGroupSortOrder(kTestGroupSortOrder)
         .withExpanded(kExpandedTestValue)
         .withFlag(firstTestColumn, kInitialTestFlag)
         .withFlags(secondTestColumn, kSomeTestFlag | kAnotherTestFlag)

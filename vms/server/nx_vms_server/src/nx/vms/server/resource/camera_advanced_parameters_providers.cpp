@@ -592,6 +592,9 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
         }
     }
 
+    if (!recomendedOptions.empty())
+        return recomendedOptions.front();
+
     NX_ASSERT(false);
     return QnLiveStreamParams();
 }

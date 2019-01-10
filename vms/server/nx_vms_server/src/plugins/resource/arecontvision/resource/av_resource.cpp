@@ -258,10 +258,6 @@ QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, 
     return QImage();
 }
 
-void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-}
-
 bool QnPlAreconVisionResource::setOutputPortState(
     const QString& /*ouputID*/,
     bool activate,

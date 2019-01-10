@@ -57,7 +57,11 @@ public:
     virtual ~QnCloudStatusWatcher() override;
 
     nx::vms::common::Credentials credentials() const;
-    void resetCredentials();
+    /**
+     * Resets current cloud credentials.
+     * @param keepUser - should we keep username and reset only a password.
+     */
+    void resetCredentials(bool keepUser = false);
     bool setCredentials(const nx::vms::common::Credentials& credentials, bool initial = false);
 
     // These getters are for qml
@@ -111,6 +115,7 @@ signals:
     void credentialsChanged();
     void loginChanged();
     void passwordChanged();
+    void forcedLogout();
     void effectiveUserNameChanged();
     void statusChanged(Status status);
     void beforeCloudSystemsChanged(const QnCloudSystemList &newCloudSystems);

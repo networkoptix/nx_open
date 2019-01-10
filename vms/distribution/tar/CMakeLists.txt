@@ -31,7 +31,7 @@ set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 
 add_custom_command(
     OUTPUT ${installer_output_list}
-    COMMAND ${script} --no-client
+    COMMAND /bin/bash ${script} --no-client
     DEPENDS ${script} ${depends}
         ${common_configured_files} ${device_configured_files} ${conf_configured_file}
     COMMENT "Creating distribution archives"

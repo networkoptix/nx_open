@@ -4,6 +4,6 @@
 
 struct QnResourceCompareHelper
 {
-    static QnResourcePtr resource(const QModelIndex& index);
+    static QnResourcePtr getResource(const QModelIndex& index);
     static bool resourceLessThan(const QModelIndex& left, const QModelIndex& right);
 };

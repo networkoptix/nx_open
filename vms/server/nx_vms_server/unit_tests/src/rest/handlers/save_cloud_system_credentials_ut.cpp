@@ -12,7 +12,6 @@
 #include <nx/vms/auth/generic_user_data_provider.h>
 #include <nx/vms/auth/time_based_nonce_provider.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
-#include <settings.h>
 
 #include <media_server/settings.h>
 #include <cloud/cloud_integration_manager.h>
@@ -39,8 +38,6 @@ protected:
     QnMediaServerModule m_serverModule;
 
 private:
-    ec2::Settings m_ec2Settings;
-
     void insertSelfServerResource()
     {
         auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource(m_serverModule.commonModule()));

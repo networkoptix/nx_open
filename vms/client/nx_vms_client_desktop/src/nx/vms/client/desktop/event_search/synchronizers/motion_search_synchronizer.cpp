@@ -2,9 +2,12 @@
 
 #include <core/resource/media_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 
 namespace nx::vms::client::desktop {
 
@@ -18,31 +21,39 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
 {
     NX_CRITICAL(m_motionSearchWidget);
 
-    connect(this, &AbstractSearchSynchronizer::mediaWidgetAboutToBeChanged, this,
-        [this](QnMediaResourceWidget* mediaWidget)
+    const auto connectToDisplayWidget =
+        [this](QnResourceWidget* widget)
         {
-            if (!mediaWidget)
+            if (!isMediaAccepted(qobject_cast<QnMediaResourceWidget*>(widget)))
                 return;
 
-            mediaWidget->disconnect(this);
-            mediaWidget->setMotionSearchModeEnabled(false);
-        });
+            widget->setOption(QnResourceWidget::DisplayMotion, active());
 
-    connect(this, &AbstractSearchSynchronizer::mediaWidgetChanged, this,
-        [this](QnMediaResourceWidget* mediaWidget)
-        {
-            updateAreaSelection();
-            if (!mediaWidget)
-                return;
+            connect(widget, &QnResourceWidget::optionsChanged, this,
+                [this, widget]()
+                {
+                    setActive(widget->options().testFlag(QnResourceWidget::DisplayMotion));
+                });
 
-            mediaWidget->setMotionSearchModeEnabled(active());
+            const auto mediaWidget = static_cast<QnMediaResourceWidget*>(widget);
+            connect(mediaWidget, &QnMediaResourceWidget::motionSelectionChanged, this,
+                [this]
+                {
+                    if (sender() == this->mediaWidget())
+                        updateAreaSelection();
+                });
+        };
 
-            connect(mediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled,
-                this, &AbstractSearchSynchronizer::setActive);
+    for (auto widget: display()->widgets())
+        connectToDisplayWidget(widget);
 
-            connect(mediaWidget, &QnMediaResourceWidget::motionSelectionChanged,
-                this, &MotionSearchSynchronizer::updateAreaSelection);
-        });
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this, connectToDisplayWidget);
+
+    connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
+        [this](QnResourceWidget* widget) { widget->disconnect(this); });
+
+    connect(this, &AbstractSearchSynchronizer::mediaWidgetChanged,
+        this, &MotionSearchSynchronizer::updateAreaSelection);
 
     connect(this, &AbstractSearchSynchronizer::activeChanged, this,
         [this](bool isActive)
@@ -50,8 +61,11 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
             updateAreaSelection();
             setTimeContentDisplayed(Qn::MotionContent, isActive);
 
-            if (auto mediaWidget = this->mediaWidget())
-                mediaWidget->setMotionSearchModeEnabled(isActive);
+            const auto action = isActive
+                ? ui::action::StartSmartSearchAction
+                : ui::action::StopSmartSearchAction;
+
+            menu()->trigger(action, display()->widgets());
         });
 
     connect(m_motionSearchWidget.data(), &SimpleMotionSearchWidget::filterRegionsChanged, this,

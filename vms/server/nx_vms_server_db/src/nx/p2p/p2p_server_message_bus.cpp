@@ -5,7 +5,7 @@
 
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
-#include <nx/network/p2p_transport/i_p2p_transport.h>
+#include <nx/p2p/transport/i_p2p_transport.h>
 
 namespace {
 
@@ -447,17 +447,11 @@ bool ServerMessageBus::gotPostConnection(
 void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::P2pTransportPtr p2pTransport,
+    P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
-    if (!isStarted())
-    {
-        NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
-        return;
-    }
-
     P2pConnectionPtr connection(new Connection(
         commonModule(),
         remotePeer,
@@ -469,6 +463,13 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         std::move(connectionLockGuard)));
 
     QnMutexLocker lock(&m_mutex);
+
+    if (!isStarted())
+    {
+        NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
+        return;
+    }
+
     const auto remoteId = connection->remotePeer().id;
     m_peers->removePeer(connection->remotePeer());
     m_connections[remoteId] = connection;

@@ -1220,7 +1220,6 @@ public:
         return impl::doSyncCall<impl::ConnectHandler>(call, connection);
     }
 
-    virtual void setConfParams(std::map<QString, QVariant> confParams) = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
     virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
 

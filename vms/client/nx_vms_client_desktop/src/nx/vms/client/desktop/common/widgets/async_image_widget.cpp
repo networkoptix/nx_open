@@ -1,25 +1,21 @@
-
+#include "async_image_widget.h"
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStyle>
 
 #include <client/client_globals.h>
-
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
-#include <nx/vms/client/desktop/image_providers/image_provider.h>
-#include <nx/client/core/utils/geometry.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
+#include <utils/common/scoped_painter_rollback.h>
+
+#include <nx/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-
-#include <utils/common/scoped_painter_rollback.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/image_providers/image_provider.h>
 
 namespace nx::vms::client::desktop {
 
@@ -73,6 +69,7 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
 {
     retranslateUi();
     setBackgroundRole(QPalette::Window);
+    setAutoFillBackground(true);
     setAttribute(Qt::WA_Hover);
 
     m_placeholder->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -206,31 +203,15 @@ bool AsyncImageWidget::cropRequired() const
 void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
-    if (m_preview.isNull() || m_placeholder->isVisible())
-    {
-        QRectF paintRect = rect();
-        painter.setBrush(palette().brush(backgroundRole()));
+    painter.setRenderHints(QPainter::SmoothPixmapTransform);
 
-        if (m_borderRole == QPalette::NoRole)
-        {
-            painter.setPen(Qt::NoPen);
-        }
-        else
-        {
-            painter.setPen(palette().color(m_borderRole));
-            paintRect.adjust(0.5, 0.5, -0.5, -0.5);
-        }
+    QRect paintRect;
+    QRectF highlightSubRect;
 
-        painter.drawRect(paintRect);
-    }
-    else
+    if (!m_preview.isNull() && !m_placeholder->isVisible())
     {
         const auto paintSize = core::Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
-        const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-            paintSize.toSize(), rect());
-
-        QRectF highlightSubRect;
-        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+        paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter, paintSize.toSize(), rect());
 
         if (cropRequired())
         {
@@ -248,10 +229,18 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
             painter.drawPixmap(paintRect, m_preview);
             highlightSubRect = m_highlightRect;
         }
+    }
 
-        if (highlightSubRect.isEmpty())
-            return;
+    // For simplification, in current implementation the border covers 1-pixel frame boundary.
+    if (m_borderRole != QPalette::NoRole)
+    {
+        painter.setPen(palette().color(m_borderRole));
+        painter.setBrush(Qt::NoBrush);
+        painter.drawRect(QRectF(rect()).adjusted(0.5, 0.5, -0.5, -0.5));
+    }
 
+    if (!highlightSubRect.isEmpty())
+    {
         // Dim everything around highlighted area.
         const auto highlightRect = core::Geometry::subRect(paintRect, highlightSubRect)
             .toAlignedRect().intersected(paintRect);
@@ -263,7 +252,7 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
             painter.fillPath(path, palette().alternateBase());
         }
 
-        // Paint frame.
+        // Paint highlight frame.
         painter.setPen(QPen(palette().highlight(), 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         painter.drawRect(core::Geometry::eroded(QRectF(highlightRect), 0.5));
     }
@@ -292,9 +281,6 @@ QSize AsyncImageWidget::sizeHint() const
 {
     if (!m_cachedSizeHint.isValid())
     {
-        if (!m_preview.isNull())
-            m_cachedSizeHint = m_preview.size();
-
         if (m_cachedSizeHint.isEmpty())
         {
             if (m_imageProvider)

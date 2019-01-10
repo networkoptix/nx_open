@@ -54,7 +54,7 @@ private:
         network::server::UserLockerPool<std::string /*request name*/>;
 
     const conf::Settings& m_settings;
-    LoginEnumerationProtectorPool m_hostLockerPool;
+    std::unique_ptr<LoginEnumerationProtectorPool> m_hostLockerPool;
     std::unique_ptr<CloudUserLockerPool> m_userLocker;
 
     std::string tryFetchLoginFromRequest(const nx::network::http::Request& request);

@@ -79,14 +79,14 @@ void EventRibbon::setScrollBarPolicy(Qt::ScrollBarPolicy value)
     d->setScrollBarPolicy(value);
 }
 
-bool EventRibbon::live() const
+void EventRibbon::setInsertionMode(UpdateMode updateMode, bool scrollDown)
 {
-    return d->live();
+    d->setInsertionMode(updateMode, scrollDown);
 }
 
-void EventRibbon::setLive(bool value)
+void EventRibbon::setRemovalMode(UpdateMode updateMode)
 {
-    d->setLive(value);
+    d->setRemovalMode(updateMode);
 }
 
 std::chrono::microseconds EventRibbon::highlightedTimestamp() const

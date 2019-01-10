@@ -29,11 +29,14 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/vms/client/desktop/resource_properties/layout/layout_settings_dialog.h>
+#include <nx/vms/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/camera/export_schedule_resource_selection_dialog_delegate.h>
 #include <nx/vms/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
+#include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
+
 #include <nx/utils/scope_guard.h>
 
 using namespace nx::vms::client::desktop;
@@ -68,6 +71,10 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
 
     connect(action(action::UpdateLocalFilesAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered);
+
+    registerDebugAction(
+        "Tracing: Layout settings",
+        [] { LayoutSettingsDialogStateReducer::setTracingEnabled(true); });
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()

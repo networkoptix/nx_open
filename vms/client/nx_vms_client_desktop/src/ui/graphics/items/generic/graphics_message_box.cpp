@@ -154,8 +154,6 @@ void QnGraphicsMessageBox::showAnimated()
         setOpacity(1.0);
     else
         animator->animateTo(1.0);
-
-    //animator->setTimeLimit(200);
 }
 
 void QnGraphicsMessageBox::hideAnimated()
@@ -171,8 +169,6 @@ void QnGraphicsMessageBox::hideAnimated()
     animator->setEasingCurve(QEasingCurve::OutQuad);
     animator->animateTo(0.0);
     connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::hideImmideately);
-
-    //animator->setTimeLimit(200);
 }
 
 void QnGraphicsMessageBox::hideImmideately()

@@ -13,7 +13,7 @@
 #include <nx/vms/api/data/tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
 #include <transaction/abstract_transaction_transport.h>
-#include <nx/network/p2p_transport/i_p2p_transport.h>
+#include <nx/p2p/transport/i_p2p_transport.h>
 
 namespace ec2 {
 class QnAbstractTransaction;
@@ -61,7 +61,7 @@ public:
     ConnectionBase(
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
-        nx::network::P2pTransportPtr p2pTransport,
+        P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
@@ -110,7 +110,7 @@ signals:
 protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
-    const nx::network::P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
+    const P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
   private:
     void cancelConnecting(State state, const QString& reason);
 
@@ -143,7 +143,7 @@ private:
     vms::api::PeerDataEx m_remotePeer;
     vms::api::PeerDataEx m_localPeer;
 
-    nx::network::P2pTransportPtr m_p2pTransport;
+    P2pTransportPtr m_p2pTransport;
     std::atomic<State> m_state{State::Connecting};
 
     nx::utils::Url m_remotePeerUrl;

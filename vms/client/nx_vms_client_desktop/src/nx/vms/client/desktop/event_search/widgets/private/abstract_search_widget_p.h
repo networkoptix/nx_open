@@ -23,7 +23,6 @@ namespace nx::utils { class PendingOperation; }
 
 namespace nx::vms::client::desktop {
 
-class ToolButton;
 class SearchLineEdit;
 class BusyIndicatorModel;
 class ConcatenationListModel;
@@ -97,16 +96,14 @@ private:
 
     void updateDeviceDependentActions();
 
-    void updateRibbonLiveMode();
-
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;
     const QScopedPointer<BusyIndicatorModel> m_tailIndicatorModel;
     const QScopedPointer<ConcatenationListModel> m_visualModel;
 
-    ToolButton* const m_togglePreviewsButton;
-    ToolButton* const m_toggleFootersButton;
+    QToolButton* const m_togglePreviewsButton;
+    QToolButton* const m_toggleFootersButton;
     QLabel* const m_itemCounterLabel;
 
     SearchLineEdit* const m_textFilterEdit;

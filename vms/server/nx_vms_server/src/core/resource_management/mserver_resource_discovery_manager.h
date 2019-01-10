@@ -35,7 +35,7 @@ protected:
 
     virtual nx::vms::common::AnalyticsEngineResourcePtr
         createAnalyticsEngineResource(const QnResourceParams& params) override;
-
+    virtual void stop() override;
 private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceDeleted(const QnResourcePtr& resource);

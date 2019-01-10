@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+
 #include <QtCore>
 
 #include <client_core/connection_context_aware.h>
@@ -53,6 +54,8 @@ public:
         readyInstall,
         /** Installing update using applauncher. */
         installing,
+        /** Client is ready to reboot to new version. */
+        readyRestart,
         /** Installation is complete, client has newest version. */
         complete,
         /** Got some critical error and can not continue installation. */
@@ -69,10 +72,12 @@ public:
     bool shouldInstallThis(const UpdateContents& contents) const;
 
     /**
-     * Asks downloader to get update for client.
+     * Asks tool to get update for client.
+     * If client should download update - it will start downloading.
+     * If client already has this update - it goes to readyReboot.
      * @param info - update manifest
      */
-    void downloadUpdate(const UpdateContents& contents);
+    void setUpdateTarget(const UpdateContents& contents);
 
     /**
      * Returns a progress for downloading client package
@@ -119,6 +124,12 @@ public:
     bool restartClient();
 
     /**
+     * Check if client should be restarted to this version.
+     * @return True if it is really needed.
+     */
+    bool shouldRestartTo(const nx::utils::SoftwareVersion& version) const;
+
+    /**
      * Updates URL of the current mediaserver.
      */
     void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
@@ -136,8 +147,9 @@ public:
      * Get installed versions. It can block up to 500ms until applauncher check it complete.
      * The check is initiated when ClientUpdateTool is created, so there will be no block
      * most of the time.
+     * @param includeCurrentVersion Should we include a version of current client instance.
      */
-    std::set<nx::utils::SoftwareVersion> getInstalledVersions() const;
+    std::set<nx::utils::SoftwareVersion> getInstalledVersions(bool includeCurrentVersion = false) const;
 
     static QString toString(State state);
 

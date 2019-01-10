@@ -23,11 +23,12 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
-#include <utils/fs/dir.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx/utils/mac_address.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/fs/partitions/read_partitions_linux.h>
+#include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -35,90 +36,6 @@ static const int MS_PER_SEC = 1000;
 //!used, if interface speed cannot be read (noticed on vmware)
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
 static const size_t MAX_LINE_LENGTH = 512;
-
-class ServerSystemInfoProvider:
-    public AbstractSystemInfoProvider,
-    public nx::vms::server::ServerModuleAware
-{
-  public:
-    ServerSystemInfoProvider(QnMediaServerModule* serverModule):
-        nx::vms::server::ServerModuleAware(serverModule)
-    {
-    }
-
-    virtual QByteArray fileContent() const override
-    {
-        QFile mountsFile(m_commonSystemInfoProvider.fileName());
-        int fd = rootFileSystem()->open(m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
-
-        if (fd > 0) //< Root tool has successfully opened file
-            mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
-        else
-            mountsFile.open(QIODevice::ReadOnly);
-
-        if (!mountsFile.isOpen())
-            return QByteArray();
-
-        return mountsFile.readAll();
-    }
-
-    virtual bool scanfLongPattern() const override
-    {
-        return m_commonSystemInfoProvider.scanfLongPattern();
-    }
-
-    virtual qint64 totalSpace(const QByteArray& fsPath) const override
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (m_deviceSpacesCache[fsPath].totalSpace == kUnknownValue)
-        {
-            m_deviceSpacesCache[fsPath].totalSpace =
-                rootFileSystem()->totalSpace(QString::fromLatin1(fsPath));
-        }
-        return m_deviceSpacesCache[fsPath].totalSpace;
-    }
-
-    virtual qint64 freeSpace(const QByteArray& fsPath) const override
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (m_deviceSpacesCache[fsPath].freeSpace == kUnknownValue)
-        {
-            m_deviceSpacesCache[fsPath].freeSpace =
-                rootFileSystem()->freeSpace(QString::fromLatin1(fsPath));
-        }
-
-        bool freeSpaceIsInvalid = m_deviceSpacesCache[fsPath].freeSpace <= 0;
-        if (m_tries++ % 10 == 0 || !freeSpaceIsInvalid)
-        {
-            m_deviceSpacesCache[fsPath].freeSpace =
-                rootFileSystem()->freeSpace(QString::fromLatin1(fsPath));
-        }
-
-        // If free space becomes available and total space is invalid let's reset totalSpace to the
-        // initial value to let it be checked next iteration.
-        if (m_deviceSpacesCache[fsPath].freeSpace > 0 && freeSpaceIsInvalid &&
-            m_deviceSpacesCache[fsPath].totalSpace != kUnknownValue &&
-            m_deviceSpacesCache[fsPath].totalSpace <= 0)
-        {
-            m_deviceSpacesCache[fsPath].totalSpace = kUnknownValue;
-        }
-
-        return m_deviceSpacesCache[fsPath].freeSpace;
-    }
-
-  private:
-    static const qint64 kUnknownValue = std::numeric_limits<qint64>::min();
-    struct DeviceSpaces
-    {
-        qint64 freeSpace = kUnknownValue;
-        qint64 totalSpace = kUnknownValue;
-    };
-
-    CommonSystemInfoProvider m_commonSystemInfoProvider;
-    mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
-    mutable QnMutex m_mutex;
-    mutable int m_tries;
-};
 
 // -------------------------------------------------------------------------- //
 // QnLinuxMonitorPrivate
@@ -447,7 +364,7 @@ private:
 
     time_t lastPartitionsUpdateTime;
     struct timespec lastDiskUsageUpdateTime;
-    std::unique_ptr<ServerSystemInfoProvider> serverSystemInfoProvider;
+    std::unique_ptr<nx::vms::server::fs::PartitionsInformationProvider> partitionsInfoProvider;
 
 private:
     Q_DECLARE_PUBLIC(QnLinuxMonitor)
@@ -645,10 +562,12 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
 */
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
-    std::list<PartitionInfo> partitions;
+    std::list<nx::vms::server::fs::PartitionInfo> partitions;
     QList<QnPlatformMonitor::PartitionSpace> result;
 
-    const auto errCode = readPartitions(d_ptr->serverSystemInfoProvider.get(), &partitions);
+    const auto errCode = nx::vms::server::fs::readPartitionsInformation(
+        d_ptr->partitionsInfoProvider.get(),
+        &partitions);
     if (errCode != SystemError::noError)
         return result;
 
@@ -669,5 +588,6 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
 
 void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
 {
-    d_ptr->serverSystemInfoProvider.reset(new ServerSystemInfoProvider(serverModule));
+    d_ptr->partitionsInfoProvider.reset(
+        new nx::vms::server::fs::PartitionsInformationProvider(serverModule));
 }

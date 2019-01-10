@@ -3,6 +3,7 @@
 #include <nx/fusion/model_functions.h>
 
 MergeSystemData::MergeSystemData(const QnRequestParams& params):
+    CurrentPasswordData(params),
     url(params.value(lit("url"))),
     getKey(params.value(lit("getKey"))),
     postKey(params.value(lit("postKey"))),
@@ -12,6 +13,4 @@ MergeSystemData::MergeSystemData(const QnRequestParams& params):
 {
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    MergeSystemData, (json),
-    (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((MergeSystemData), (json), _Fields)

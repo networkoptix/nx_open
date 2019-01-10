@@ -480,7 +480,7 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
     QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
-    NX_VERBOSE(this, "%1 Processing directory %2", Q_FUNC_INFO, nx::utils::url::hideUrlPassword(folder));
+    NX_VERBOSE(this, "%1 Processing directory %2", Q_FUNC_INFO, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;
 
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
@@ -509,7 +509,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     if (files.empty())
         return;
 
-    NX_INFO(this, "[Scan] started for directory: %1", nx::utils::url::hideUrlPassword(folder));
+    NX_INFO(this, "[Scan] started for directory: %1", nx::utils::url::hidePassword(folder));
 
     QThreadPool tp;
     tp.setMaxThreadCount(4);
@@ -567,7 +567,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     tp.waitForDone();
 
     NX_INFO(this, "[Scan] finished for directory: %1, %2 files processed",
-        nx::utils::url::hideUrlPassword(folder), allChunks.size());
+        nx::utils::url::hidePassword(folder), allChunks.size());
 }
 
 void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter)

@@ -41,9 +41,12 @@ struct NX_VMS_API LayoutData: ResourceData
     static const QString kResourceTypeName;
     static const QnUuid kResourceTypeId;
 
+    static constexpr float kDefaultCellSpacing = 0.05f;
+    static constexpr float kDefaultBackgroundOpacity = 0.7f;
+
     float cellAspectRatio = 0;
-    float horizontalSpacing = 0;
-    float verticalSpacing = 0;
+    float horizontalSpacing = kDefaultCellSpacing; //< TODO: #API Rename to cellSpacing.
+    float verticalSpacing = kDefaultCellSpacing; //< TODO: #API Remove this one.
     LayoutItemDataList items;
     bool locked = false;
     qint32 fixedWidth = 0;
@@ -52,7 +55,7 @@ struct NX_VMS_API LayoutData: ResourceData
     QString backgroundImageFilename;
     qint32 backgroundWidth = 0;
     qint32 backgroundHeight = 0;
-    float backgroundOpacity = 0;
+    float backgroundOpacity = kDefaultBackgroundOpacity;
 };
 #define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(horizontalSpacing) \
     (verticalSpacing)(items)(locked)(backgroundImageFilename)(backgroundWidth) \

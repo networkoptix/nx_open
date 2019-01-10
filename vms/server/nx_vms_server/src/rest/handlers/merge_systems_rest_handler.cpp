@@ -4,22 +4,20 @@
 
 #include <QtCore/QRegExp>
 
-#include <nx/utils/log/log.h>
-
-#include <nx/vms/utils/vms_utils.h>
-#include <nx/vms/utils/system_merge_processor.h>
-
 #include <audit/audit_manager.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <media_server/media_server_module.h>
+#include <media_server/server_connector.h>
+#include <media_server/serverutil.h>
 #include <network/connection_validator.h>
+#include <network/universal_tcp_listener.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/utils/system_merge_processor.h>
+#include <nx/vms/utils/vms_utils.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
-
-#include "media_server/serverutil.h"
-#include "media_server/server_connector.h"
-#include <media_server/media_server_module.h>
 
 QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(QnMediaServerModule* serverModule):
     QnJsonRestHandler(),
@@ -51,6 +49,18 @@ int QnMergeSystemsRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
+    // TODO: Require password at all times when we support required password in client, cloud and
+    //     all tests, see VMS-12623.
+    if (!data.currentPassword.isEmpty())
+    {
+        const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+        if (!authenticator->isPasswordCorrect(owner->accessRights(), data.currentPassword))
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
+            return nx::network::http::StatusCode::ok;
+        }
+    }
+
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
     using MergeStatus = ::utils::MergeSystemsStatus::Value;
 

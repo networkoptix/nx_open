@@ -6,6 +6,7 @@
 #include <recording/time_period.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx::vms::client::desktop {
 
@@ -96,6 +97,7 @@ public:
     Q_ENUM(FetchResult)
 
 signals:
+    void fetchCommitStarted(FetchDirection direction, QPrivateSignal);
     void fetchFinished(FetchResult result, QPrivateSignal);
     void liveChanged(bool isLive, QPrivateSignal);
     void livePausedChanged(bool isPaused, QPrivateSignal);
@@ -103,6 +105,21 @@ signals:
     void camerasChanged(QPrivateSignal);
     void isOnlineChanged(bool isOnline, QPrivateSignal);
     void dataNeeded();
+
+protected:
+    // Fetch (non-live) commit must be guarded by this object.
+    // It emits fetchCommitStarted/fetchFinished signals.
+    struct ScopedFetchCommit: public nx::utils::SharedGuard
+    {
+        explicit ScopedFetchCommit(
+            AbstractSearchListModel* model, FetchDirection direction, const FetchResult& result)
+            :
+            nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
+                [model, &result]() { emit model->fetchFinished(result, {}); }))
+        {
+            emit model->fetchCommitStarted(direction, {});
+        }
+    };
 
 protected:
     // These functions must be overridden in derived classes.
@@ -152,9 +169,6 @@ protected:
     /** Should be called during every successful fetch to update fetched time window. */
     void setFetchedTimeWindow(const QnTimePeriod& value);
     void addToFetchedTimeWindow(const QnTimePeriod& period); //< Just a helper function.
-
-    /** Should be called at the end of every fetch to emit fetchFinished signal. */
-    void finishFetch(FetchResult result);
 
     /** Sets whether underlying data store can be populated with new items in live mode. */
     void setLiveSupported(bool value);

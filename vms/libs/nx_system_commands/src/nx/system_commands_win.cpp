@@ -125,15 +125,6 @@ int64_t totalSpaceImpl(const QString& root)
     return totalNumberOfBytes;
 }
 
-qint64 fileSizeImpl(const QString& fileName)
-{
-    struct _stat64 fstat;
-    int retCode = _wstat64((wchar_t*)fileName.utf16(), &fstat);
-    if (retCode != 0)
-        return -1;
-    return fstat.st_size;
-}
-
 } // namespace
 
 int64_t SystemCommands::freeSpace(const std::string& path)
@@ -148,7 +139,28 @@ int64_t SystemCommands::totalSpace(const std::string& path)
 
 bool SystemCommands::isPathExists(const std::string& path)
 {
-    return QFileInfo::exists(QString::fromStdString(path));
+    return stat(path).exists;
+}
+
+SystemCommands::Stats SystemCommands::stat(const std::string& path)
+{
+    Stats result;
+    const auto fileInfo = QFileInfo(QString::fromStdString(path));
+    result.exists = fileInfo.exists();
+
+    if (result.exists)
+    {
+        if (fileInfo.isDir())
+            result.type = Stats::FileType::directory;
+        else if (fileInfo.isFile())
+            result.type = Stats::FileType::regular;
+        else
+            result.type = Stats::FileType::other;
+
+        result.size = fileInfo.size();
+    }
+
+    return result;
 }
 
 std::string SystemCommands::serializedFileList(const std::string& /*path*/)
@@ -158,7 +170,7 @@ std::string SystemCommands::serializedFileList(const std::string& /*path*/)
 
 int64_t SystemCommands::fileSize(const std::string& path)
 {
-    return fileSizeImpl(QString::fromStdString(path));
+    return stat(path).size;
 }
 
 std::string SystemCommands::devicePath(const std::string& path)

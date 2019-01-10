@@ -284,6 +284,21 @@ bool RootFileSystem::isPathExists(const QString& path)
     return (bool) execViaRootTool("exists " + enquote(path), &receiveInt64Action);
 }
 
+static SystemCommands::Stats statsFromSerialized(const std::string& buffer)
+{
+    SystemCommands::Stats result;
+    memcpy(&result, buffer.data(), sizeof(SystemCommands::Stats));
+    return result;
+}
+
+SystemCommands::Stats RootFileSystem::stat(const QString& path)
+{
+    if (m_ignoreTool)
+        return SystemCommands().stat(path.toStdString());
+
+    return statsFromSerialized(execViaRootTool("stat " + enquote(path), &receiveBufferAction));
+}
+
 struct StringRef
 {
     const char* data;

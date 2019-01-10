@@ -45,7 +45,7 @@ nx::utils::SoftwareVersion UpdateContents::getVersion() const
 bool UpdateContents::isValid() const
 {
     return missingUpdate.empty()
-        && unsupportedSystem.empty()
+        && unsuportedSystemsReport.empty()
         && !info.version.isEmpty()
         && invalidVersion.empty()
         && clientPackage.isValid()
@@ -57,12 +57,12 @@ bool UpdateContents::isEmpty() const
     return info.packages.empty();
 }
 
-bool UpdateContents::compareUpdate(const UpdateContents& other) const
+bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
 {
-    // Prefere non-empty one.
+    // Prefer non-empty one.
     if (other.isEmpty())
         return false;
-    else if (isEmpty())
+    if (isEmpty())
         return true;
 
     // Prefere update from mediaservers.

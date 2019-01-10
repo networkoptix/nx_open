@@ -14,10 +14,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 /**
  * The purpose of ElapsedEvent is to store information when event of corresponding type happened
@@ -46,7 +43,6 @@ public:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
-
 
 private:
     Monitor* m_monitor;
@@ -101,7 +97,4 @@ public:
     mutable std::mutex m_elapsedTimerMutex;
 };
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

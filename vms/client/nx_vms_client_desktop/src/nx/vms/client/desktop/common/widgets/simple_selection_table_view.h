@@ -32,9 +32,9 @@ private:
 
     void handleSpacePressed();
 
-    QModelIndex checkboxIndex(const QModelIndex& index);
+    QModelIndex getCheckboxIndex(const QModelIndex& index) const;
 
-    bool isChecked(const QModelIndex& index);
+    bool isChecked(const QModelIndex& index) const;
 
     void handleHeaderCheckedStateChanged(Qt::CheckState state);
 

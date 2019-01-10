@@ -197,10 +197,6 @@ endif()
 
 add_subdirectory(vms)
 
-if(withP2PConnectionTestingUtility)
-    add_subdirectory(p2p_connection_testing_utility)
-endif()
-
 if(withTests)
     add_subdirectory(tests)
 endif()
@@ -221,6 +217,10 @@ if(withClouds)
         add_custom_target(cloud-frontend DEPENDS cloud_portal)
         add_dependencies(cloud cloud-frontend)
     endif()
+endif()
+
+if(withDocumentation)
+    add_subdirectory(doc)
 endif()
 
 nx_save_known_files()

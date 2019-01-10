@@ -93,7 +93,7 @@ void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& in
 {
     NX_VERBOSE(this, "%1: write camera info to %2. Data changed: %3",
             Q_FUNC_INFO,
-            nx::utils::url::hideUrlPassword(infoFilePath),
+            nx::utils::url::hidePassword(infoFilePath),
             isWriteNeeded(infoFilePath, infoFileData));
 
     if (isWriteNeeded(infoFilePath, infoFileData))

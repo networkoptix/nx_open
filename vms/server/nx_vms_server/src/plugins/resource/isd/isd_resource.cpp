@@ -78,10 +78,6 @@ QString QnPlIsdResource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-}
-
 nx::vms::server::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {

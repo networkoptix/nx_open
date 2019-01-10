@@ -169,10 +169,10 @@ struct UpdateContents
     /** A set of servers that can not accept update version. */
     QSet<QnUuid> invalidVersion;
     /**
-     * Maps a server id, which OS is no longer supported to error message.
+     * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.
      */
-    QMap<QnUuid, QString> unsupportedSystem;
+    QMap<QnUuid, QString> unsuportedSystemsReport;
     /** Path to eula file. */
     QString eulaPath;
     /** A folder with offline update packages. */
@@ -186,7 +186,7 @@ struct UpdateContents
         std::map<SystemInformation, QList<nx::update::Package>, SystemInformationComparator>;
     /**
      * Maps system information to a set of packages. We use this cache to find and check
-     * if specific OS variant is supported.
+     * if a specific OS variant is supported.
      */
     PackageCache packageCache;
 
@@ -221,7 +221,7 @@ struct UpdateContents
      * Compares this update info with 'other' and decides whether we should pick other one.
      * @return True if we need to pick 'other' update.
      */
-    bool compareUpdate(const UpdateContents& other) const;
+    bool preferOtherUpdate(const UpdateContents& other) const;
 };
 
 } // namespace nx::update

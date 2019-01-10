@@ -13,16 +13,12 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/network/http/http_client.h>
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/common/string.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 namespace {
 
@@ -40,11 +36,12 @@ bool Engine::DeviceData::hasExpired() const
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-namespace
-{
+namespace {
+
 const QString manifestFileName("plugins/dahua/manifest.json");
 const QString manifestResourceName(":/dahua/manifest.json");
-}
+
+} // namespace
 
 /*static*/ QByteArray Engine::loadManifest()
 {
@@ -75,8 +72,7 @@ const QString manifestResourceName(":/dahua/manifest.json");
 /*static*/ EngineManifest Engine::parseManifest(const QByteArray& manifest)
 {
     bool success = false;
-    // parsedManifest is not declared as const to allow copy elision on return
-    EngineManifest parsedManifest = QJson::deserialized<EngineManifest>(
+    const EngineManifest parsedManifest = QJson::deserialized<EngineManifest>(
         manifest, EngineManifest(), &success);
     if (!success)
         NX_WARNING(NX_SCOPE_TAG, "Can't deserialize Dahua engine manifest");
@@ -130,8 +126,7 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
         return nullptr;
 
-    DeviceAgent* agent = new DeviceAgent(this, *deviceInfo, deviceAgentParsedManifest);
-    return agent;
+    return new DeviceAgent(this, *deviceInfo, deviceAgentParsedManifest);
 }
 
 const nx::sdk::IString* Engine::manifest(Error* outError) const
@@ -234,10 +229,7 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
     return nx::sdk::Error::noError;
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua
 
 namespace {
 

@@ -11,10 +11,7 @@
 #include "common.h"
 #include "device_agent.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -55,7 +52,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
 {
-    // There are no DeviceAgent settings for this plugin.
+    // This plugin doesn't use DeviceAgent setting, it just ignores them.
 }
 
 nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
@@ -169,7 +166,4 @@ void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
     m_channel = deviceInfo.channel;
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

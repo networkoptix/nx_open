@@ -7,10 +7,7 @@
 
 #include "string_helper.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 QString buildCaption(const EngineManifest& manifest, const Event& event)
 {
@@ -43,7 +40,4 @@ QString buildDescription(const EngineManifest& manifest, const Event& event)
     return description;
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

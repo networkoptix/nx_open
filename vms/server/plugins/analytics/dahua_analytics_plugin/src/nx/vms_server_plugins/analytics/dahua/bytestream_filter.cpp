@@ -5,10 +5,7 @@
 #include "parser.h"
 #include "bytestream_filter.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 BytestreamFilter::BytestreamFilter(
     const EngineManifest& engineManifest,
@@ -24,13 +21,10 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     auto event = Parser::parseEventMessage(buffer, m_engineManifest);
     if (!event)
         return false;
-    if (Parser::isHartbeatEvent(*event))
+    if (Parser::isHeartbeatEvent(*event))
         return true;
 
     return m_metadataMonitor->processEvent(*event);
 }
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

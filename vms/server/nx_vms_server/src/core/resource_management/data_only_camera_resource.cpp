@@ -10,16 +10,6 @@ DataOnlyCameraResource::DataOnlyCameraResource( const QnUuid& resourceTypeId )
     setTypeId( resourceTypeId );
 }
 
-QString DataOnlyCameraResource::getDriverName() const
-{
-    return lit("DATA_ONLY");
-}
-
-void DataOnlyCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-    //TODO
-}
-
 QnAbstractStreamDataProvider* DataOnlyCameraResource::createLiveDataProvider()
 {
     return nullptr;

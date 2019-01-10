@@ -38,7 +38,7 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -216,13 +216,21 @@ bool tourIsRunning(QnWorkbenchContext* context)
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
     base_type(context, item, parent),
-    d(new MediaResourceWidgetPrivate(base_type::resource())),
+    d(new MediaResourceWidgetPrivate(base_type::resource(), accessController())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
+    d->isExportedLayout = item
+        && item->layout()
+        && item->layout()->resource()
+        && item->layout()->resource()->isFile();
+
+    d->isPreviewSearchLayout = item
+        && item->layout()
+        && item->layout()->isSearchLayout();
 
     initRenderer();
     initDisplay();
@@ -479,7 +487,7 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (!display()->camDisplay()->isRealTimeSource())
         return;
 
-    if (item()->layout()->isSearchLayout())
+    if (d->isPreviewSearchLayout)
         return;
 
     static const auto kUpdateTriggersInterval = 1000;
@@ -785,36 +793,56 @@ void QnMediaResourceWidget::updateTriggersAvailability()
 
 void QnMediaResourceWidget::createButtons()
 {
-    {
-        QnImageButtonWidget *screenshotButton = createStatisticAwareButton(lit("media_widget_screenshot"));
-        screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
-        screenshotButton->setCheckable(false);
-        screenshotButton->setToolTip(tr("Screenshot"));
-        setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
-        connect(screenshotButton, &QnImageButtonWidget::clicked, this,
-            &QnMediaResourceWidget::at_screenshotButton_clicked);
-        titleBar()->rightButtonsBar()->addButton(Qn::ScreenshotButton, screenshotButton);
-    }
+    auto screenshotButton = createStatisticAwareButton(lit("media_widget_screenshot"));
+    screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+    screenshotButton->setCheckable(false);
+    screenshotButton->setToolTip(tr("Screenshot"));
+    setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
+    connect(screenshotButton, &QnImageButtonWidget::clicked, this,
+        &QnMediaResourceWidget::at_screenshotButton_clicked);
 
-    {
-        QnImageButtonWidget *searchButton = createStatisticAwareButton(lit("media_widget_msearch"));
-        searchButton->setIcon(qnSkin->icon("item/search.png"));
-        searchButton->setCheckable(true);
-        searchButton->setToolTip(tr("Smart Search"));
-        setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
-        connect(searchButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::setMotionSearchModeEnabled);
-        titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
-    }
+    titleBar()->rightButtonsBar()->addButton(Qn::ScreenshotButton, screenshotButton);
 
-    createActionAndButton(
-        "item/ptz.png",
-        false,
-        lit("P"),
-        tr("PTZ"),
-        Qn::MainWindow_MediaItem_Ptz_Help,
-        Qn::PtzButton, lit("media_widget_ptz"),
-        &QnMediaResourceWidget::at_ptzButton_toggled);
+    auto searchButton = createStatisticAwareButton(lit("media_widget_msearch"));
+    searchButton->setIcon(qnSkin->icon("item/search.png"));
+    searchButton->setCheckable(true);
+    searchButton->setToolTip(tr("Smart Search"));
+    setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
+    connect(searchButton, &QnImageButtonWidget::toggled, this,
+        [this, searchButton](bool on)
+        {
+            if (searchButton->isClicked() && on)
+                selectThisWidget(true);
+
+            setMotionSearchModeEnabled(on);
+        });
+
+    titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
+
+    if (d->camera && d->camera->isPtzRedirected())
+    {
+        createActionAndButton(
+            /* icon*/ "item/area_zoom.png",
+            /* checked*/ false,
+            /* shortcut*/ {},
+            /* tooltip */ tr("Area Zoom"),
+            /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
+            /* internal id */ Qn::PtzButton,
+            /* statistics key */ "media_widget_area_zoom",
+            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+    }
+    else
+    {
+        createActionAndButton(
+            /* icon*/ "item/ptz.png",
+            /* checked*/ false,
+            /* shortcut*/ QKeySequence::fromString("P"),
+            /* tooltip */ tr("PTZ"),
+            /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
+            /* internal id */ Qn::PtzButton,
+            /* statistics key */ "media_widget_ptz",
+            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+    }
 
     createActionAndButton(
         "item/fisheye.png",
@@ -869,27 +897,23 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
 
-    {
-        auto analyticsButton =
-            createStatisticAwareButton(lit("media_widget_analytics"));
-        analyticsButton->setIcon(qnSkin->icon("item/analytics.png"));
-        analyticsButton->setCheckable(true);
-        analyticsButton->setToolTip(lit("Analytics"));
-        connect(analyticsButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_analyticsButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::AnalyticsButton, analyticsButton);
-    }
+    auto analyticsButton =
+        createStatisticAwareButton(lit("media_widget_analytics"));
+    analyticsButton->setIcon(qnSkin->icon("item/analytics.png"));
+    analyticsButton->setCheckable(true);
+    analyticsButton->setToolTip(lit("Analytics"));
+    connect(analyticsButton, &QnImageButtonWidget::toggled, this,
+        &QnMediaResourceWidget::at_analyticsButton_toggled);
+    titleBar()->rightButtonsBar()->addButton(Qn::AnalyticsButton, analyticsButton);
 
-    {
-        auto entropixEnhancementButton =
-            createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
-        entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
-        entropixEnhancementButton->setToolTip(lit("Entropix Image Enhancement"));
-        connect(entropixEnhancementButton, &QnImageButtonWidget::clicked, this,
-            &QnMediaResourceWidget::at_entropixEnhancementButton_clicked);
-        titleBar()->rightButtonsBar()->addButton(
-            Qn::EntropixEnhancementButton, entropixEnhancementButton);
-    }
+    auto entropixEnhancementButton =
+        createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
+    entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
+    entropixEnhancementButton->setToolTip(lit("Entropix Image Enhancement"));
+    connect(entropixEnhancementButton, &QnImageButtonWidget::clicked, this,
+        &QnMediaResourceWidget::at_entropixEnhancementButton_clicked);
+    titleBar()->rightButtonsBar()->addButton(
+        Qn::EntropixEnhancementButton, entropixEnhancementButton);
 }
 
 void QnMediaResourceWidget::updatePtzController()
@@ -2038,8 +2062,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
             action(action::ToggleTimelineAction)->setChecked(true);
             setAreaSelectionType(AreaType::motion);
-
-            selectThisWidget(true); //< Single-select this widget.
         }
         else
         {
@@ -2212,25 +2234,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result |= Qn::MotionSearchButton;
     }
 
-    bool isExportedLayout = item()
-        && item()->layout()
-        && item()->layout()->resource()
-        && item()->layout()->resource()->isFile();
-
-    bool isPreviewSearchLayout = item()
-        && item()->layout()
-        && item()->layout()->isSearchLayout();
-
-    if (d->camera
-        && d->camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities)
-        && !d->camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability)
-        && accessController()->hasPermissions(d->resource, Qn::WritePtzPermission)
-        && !isExportedLayout
-        && !isPreviewSearchLayout
-        )
-    {
+    if (d->canControlPtz())
         result |= Qn::PtzButton;
-    }
 
     if (m_dewarpingParams.enabled)
     {
@@ -2495,8 +2500,7 @@ void QnMediaResourceWidget::at_screenshotButton_clicked()
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 {
-    bool ptzEnabled =
-        checked && (d->camera && (d->camera->getPtzCapabilities() & Ptz::ContinuousPtzCapabilities));
+    bool ptzEnabled = checked && d->canControlPtz();
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
@@ -3075,7 +3079,7 @@ void QnMediaResourceWidget::updateWatermark()
 
 void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     bool checked,
-    const QString& shortcut,
+    const QKeySequence& shortcut,
     const QString& toolTip,
     Qn::HelpTopic helpTopic,
     Qn::WidgetButtons buttonId, const QString& buttonName,
