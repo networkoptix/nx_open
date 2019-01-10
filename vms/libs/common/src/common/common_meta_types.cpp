@@ -73,7 +73,6 @@
 #include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/media_dewarping_params.h>
-#include <core/ptz/item_dewarping_params.h>
 
 #include <nx/streaming/abstract_data_packet.h>
 
@@ -265,7 +264,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnAuditRecord*>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
-    qRegisterMetaType<QnItemDewarpingParams>();
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();

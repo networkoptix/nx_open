@@ -215,10 +215,10 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
     else
     {
         settings.rotation = 0;
-        settings.aspectRatio = QnAspectRatio();
-        settings.enhancement = ImageCorrectionParams();
-        settings.dewarping = QnItemDewarpingParams();
-        settings.zoomWindow = QRectF();
+        settings.aspectRatio = {};
+        settings.enhancement = {};
+        settings.dewarping = {};
+        settings.zoomWindow = {};
     }
 
     // Requesting base resource image. We will apply transcoding later.

@@ -1,17 +1,6 @@
 #include "layout_item_data.h"
 
-QnLayoutItemData::QnLayoutItemData():
-    uuid(),
-    flags(0),
-    combinedGeometry(),
-    zoomTargetUuid(),
-    zoomRect(),
-    rotation(0.0),
-    displayInfo(false),
-    contrastParams(),
-    dewarpingParams()
-{
-}
+#include <nx/utils/math/fuzzy.h>
 
 bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r)
 {

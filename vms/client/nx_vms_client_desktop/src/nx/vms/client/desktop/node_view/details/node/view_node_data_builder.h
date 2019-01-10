@@ -10,7 +10,7 @@ namespace details {
 /**
  * Helper class for convenient filling node data.
  */
-class NX_VMS_DESKTOP_CLIENT_API ViewNodeDataBuilder
+class NX_VMS_CLIENT_DESKTOP_API ViewNodeDataBuilder
 {
 public:
     explicit ViewNodeDataBuilder();

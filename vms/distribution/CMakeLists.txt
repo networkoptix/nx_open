@@ -33,6 +33,6 @@ elseif(box STREQUAL "tx1")
     add_subdirectory(tgz)
 endif()
 
-if(withTests)
+if(withUnitTestsArchive)
     add_subdirectory(unit_tests)
 endif()

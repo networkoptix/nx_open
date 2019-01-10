@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_DESKTOP_CLIENT_API TimeSynchronizationWidgetReducer
+class NX_VMS_CLIENT_DESKTOP_API TimeSynchronizationWidgetReducer
 {
 public:
     using State = TimeSynchronizationWidgetState;
