@@ -3,6 +3,9 @@
 #include <memory>
 
 #include <utils/math/math.h>
+
+#include <nx/vms/api/data/image_correction_data.h>
+
 #include <nx/fusion/model_functions.h>
 
 static const int MIN_GAMMA_RANGE = 6;

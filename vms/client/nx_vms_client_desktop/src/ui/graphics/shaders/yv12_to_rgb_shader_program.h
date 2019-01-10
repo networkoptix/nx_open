@@ -1,5 +1,4 @@
-#ifndef QN_YV12_TO_RGB_SHADER_PROGRAM_H
-#define QN_YV12_TO_RGB_SHADER_PROGRAM_H
+#pragma once
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
@@ -9,7 +8,9 @@
 #include "shader_source.h"
 #include "base_shader_program.h"
 
-#include "utils/color_space/image_correction.h"
+#include <nx/vms/api/data/dewarping_data.h>
+
+#include <utils/color_space/image_correction.h>
 
 class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram {
     Q_OBJECT
@@ -273,5 +274,3 @@ private:
     int m_aTextureLocation;
 };
 
-
-#endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H

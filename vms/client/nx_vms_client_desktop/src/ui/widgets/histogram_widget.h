@@ -5,6 +5,8 @@
 
 #include <client/client_color_types.h>
 
+#include <nx/vms/api/data/image_correction_data.h>
+
 #include <utils/color_space/image_correction.h>
 
 class QnHistogramWidget: public QWidget, public QnHistogramConsumer {

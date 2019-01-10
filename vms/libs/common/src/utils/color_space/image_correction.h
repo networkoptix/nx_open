@@ -3,7 +3,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QRectF>
 
-#include <nx/vms/api/data/image_correction_data.h>
+namespace nx::vms::api { struct ImageCorrectionData; }
 
 struct ImageCorrectionResult
 {

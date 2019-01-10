@@ -4,10 +4,10 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QAbstractButton>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
 #include <utils/color_space/image_correction.h>
-
+#include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnMediaResourceWidget;
