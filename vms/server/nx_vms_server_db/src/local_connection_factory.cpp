@@ -1424,11 +1424,24 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         (floating-point, 0..1).
      *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param items[].contrastParams Image enhancement parameters. The format
-     *         is proprietary and is likely to change in future API versions.
+     *     %param items[].contrastParams Image enhancement parameters.
+     *         %param items[].contrastParams.enabled Whether the image enhancement is enabled.
+     *             %value false
+     *             %value true
+     *         %param items[].contrastParams.blackLevel Level of the black color
+     *             (floating-point, 0..99).
+     *         %param items[].contrastParams.whiteLevel Level of the white color
+     *             (floating-point, 0.1..100).
+     *         %param items[].contrastParams.gamma Gamma enhancement value
+     *             (floating-point, 0.1..10).
      *     %param items[].dewarpingParams Image dewarping parameters.
-     *         The format is proprietary and is likely to change in future API
-     *         versions.
+     *         %param items[].dewarpingParams.enabled Whether the image dewarping is enabled.
+     *             %value false
+     *             %value true
+     *         %param items[].dewarpingParams.xAngle Pan in radians.
+     *         %param items[].dewarpingParams.yAngle Tilt in radians.
+     *         %param items[].dewarpingParams.fov FOV in radians.
+     *         %param items[].dewarpingParams.panoFactor Aspect ratio correction value (integer).
      *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
@@ -1493,11 +1506,24 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         (floating-point, 0..1).
      *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param items[].contrastParams Image enhancement parameters. The format
-     *         is proprietary and is likely to change in future API versions.
+     *     %param items[].contrastParams Image enhancement parameters.
+     *         %param items[].contrastParams.enabled Whether the image enhancement is enabled.
+     *             %value false
+     *             %value true
+     *         %param items[].contrastParams.blackLevel Level of the black color
+     *             (floating-point, 0..99).
+     *         %param items[].contrastParams.whiteLevel Level of the white color
+     *             (floating-point, 0.1..100).
+     *         %param items[].contrastParams.gamma Gamma enhancement value
+     *             (floating-point, 0.1..10).
      *     %param items[].dewarpingParams Image dewarping parameters.
-     *         The format is proprietary and is likely to change in future API
-     *         versions.
+     *         %param items[].dewarpingParams.enabled Whether the image dewarping is enabled.
+     *             %value false
+     *             %value true
+     *         %param items[].dewarpingParams.xAngle Pan in radians.
+     *         %param items[].dewarpingParams.yAngle Tilt in radians.
+     *         %param items[].dewarpingParams.fov FOV in radians.
+     *         %param items[].dewarpingParams.panoFactor Aspect ratio correction value (integer).
      *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
