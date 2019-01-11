@@ -25,7 +25,7 @@ protected:
     virtual void pleaseStop() override;
 
     /*
-     *
+     * This function checks if encryption is forced and does redirect to https scheme if need.
      */
     bool hasSecurityIssue();
     bool redirectToScheme(const char* scheme);
