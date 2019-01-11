@@ -35,7 +35,6 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/app_info.h>
-#include <utils/common/util.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include <core/resource/avi/avi_resource.h>
@@ -61,6 +60,8 @@ using namespace nx::vms::client::desktop::ui;
 namespace {
 
 static const QnUuid kCustomConnectionLocalId;
+
+static const QString kLocalHost("127.0.0.1");
 
 constexpr int kMinIntroWidth = 550;
 
@@ -445,8 +446,8 @@ void QnLoginDialog::resetSavedSessionsModel()
     if (!m_lastUsedItem || customConnections.isEmpty())
     {
         nx::utils::Url url;
-        url.setPort(kDefaultConnectionPort);
-        url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
+        url.setPort(helpers::kDefaultConnectionPort);
+        url.setHost(kLocalHost);
         url.setUserName(helpers::kFactorySystemUser);
 
         customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));

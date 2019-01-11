@@ -3,6 +3,7 @@
 #include <QtCore/QRegularExpression>
 
 #include <utils/common/util.h>
+#include <network/system_helpers.h>
 
 #include <nx/network/socket_common.h>
 #include <nx/network/http/http_types.h>
@@ -28,14 +29,14 @@ nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
         result.setHost(address.address.toString());
         result.setPort(address.port > 0
             ? address.port
-            : kDefaultConnectionPort);
+            : helpers::kDefaultConnectionPort);
     }
     else
     {
         const auto sourceUrl = nx::utils::Url::fromUserInput(input);
 
         result.setHost(sourceUrl.host());
-        result.setPort(sourceUrl.port(kDefaultConnectionPort));
+        result.setPort(sourceUrl.port(helpers::kDefaultConnectionPort));
         result.setScheme(input.startsWith("http://")
             ? nx::network::http::kUrlSchemeName
             : nx::network::http::kSecureUrlSchemeName);
