@@ -557,11 +557,6 @@ AudioStream::AudioStream(
     setEnabled(enabled);
 }
 
-std::string AudioStream::url() const
-{
-    return m_url;
-}
-
 void AudioStream::setEnabled(bool enabled)
 {
     if (enabled)

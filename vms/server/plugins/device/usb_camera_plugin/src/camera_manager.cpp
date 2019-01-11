@@ -213,7 +213,7 @@ nxpt::CommonRefManager* CameraManager::refManager()
     return &m_refManager;
 }
 
-std::string CameraManager::getFfmpegUrl() const
+std::string CameraManager::ffmpegUrl() const
 {
     return m_discoveryManager->getFfmpegUrl(m_info.uid);
 }

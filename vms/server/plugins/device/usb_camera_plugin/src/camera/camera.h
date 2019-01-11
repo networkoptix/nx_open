@@ -45,15 +45,13 @@ public:
 
     const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
 
-    /**
-     * Return the url used by ffmpeg to open the video stream
-     */
-    std::string url() const;
     CodecParameters defaultVideoParameters() const;
 
+    std::string ffmpegUrl() const;
+    
     std::vector<AVCodecID> ffmpegCodecPriorityList();
 
-    nxcip::CameraInfo info() const;
+    const nxcip::CameraInfo& info() const;
 
     std::string toString() const;
 
