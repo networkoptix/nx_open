@@ -307,6 +307,11 @@ TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
+TEST_F(Updates, installUpdate_timestampCorrectlySet)
+{
+    // #TODO #akulikov
+}
+
 TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
 {
     givenConnectedPeers(2);
@@ -351,6 +356,16 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
         {peerId(0), update::Status::Code::readyToInstall},
         {peerId(1), update::Status::Code::readyToInstall} };
     thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, finishUpdate_updateInformationCleared)
+{
+    // #TODO #akulikov
+}
+
+TEST_F(Updates, finishUpdate_updateInformationCleared_ignorePendingPeers)
+{
+    // #TODO #akulikov
 }
 
 } // namespace nx::vms::server::test
