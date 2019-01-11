@@ -94,7 +94,7 @@ private:
     CodecParameters m_codecParams;
     nxpl::TimeProvider * const m_timeProvider;
 
-    CameraState m_cameraState = csOff;
+    CameraState m_streamState = csOff;
 
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
@@ -121,8 +121,8 @@ private:
 
     TimestampMapper m_timestamps;    
 
-    mutable std::mutex m_cameraMutex;
-    std::condition_variable m_consumerWaitCondition;
+    mutable std::mutex m_mutex;
+    std::condition_variable m_wait;
     FrameConsumerManager m_frameConsumerManager;
     PacketConsumerManager m_packetConsumerManager;
 

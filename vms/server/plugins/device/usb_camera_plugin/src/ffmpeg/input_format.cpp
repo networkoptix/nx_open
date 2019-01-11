@@ -1,10 +1,21 @@
 #include "input_format.h"
 
 #include <string>
+#include <thread>
 
 namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
+
+namespace {
+
+static std::chrono::milliseconds now()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now().time_since_epoch());
+}
+
+}
 
 InputFormat::InputFormat():
     Options()
@@ -58,12 +69,25 @@ int InputFormat::readFrame(AVPacket * outPacket)
     return av_read_frame(m_formatContext, outPacket);
 }
 
-AVCodecID InputFormat::videoCodecID() const
+int InputFormat::readFrameNonBlock(AVPacket * packet, const std::chrono::milliseconds &timeout)
+{
+    int result = readFrame(packet);
+    std::chrono::milliseconds start = now();
+    while (result == AVERROR(EAGAIN) && now() - start < timeout)
+    {
+        static constexpr std::chrono::milliseconds kSleep(1);
+        std::this_thread::sleep_for(kSleep);
+        result = readFrame(packet);
+    }
+    return result;
+}
+
+AVCodecID InputFormat::videoCodecId() const
 {
     return m_formatContext->video_codec_id;
 }
 
-AVCodecID InputFormat::audioCodecID() const
+AVCodecID InputFormat::audioCodecId() const
 {
     return m_formatContext->audio_codec_id;
 }

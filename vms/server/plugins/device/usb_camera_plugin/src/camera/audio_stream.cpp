@@ -70,10 +70,10 @@ void AudioStream::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->addConsumer(consumer);
     }
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
 
     tryToStartIfNotStarted();
 }
@@ -82,10 +82,10 @@ void AudioStream::AudioStreamPrivate::removePacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     {
-        std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->removeConsumer(consumer);
     }
-    m_consumerWaitCondition.notify_all();
+    m_wait.notify_all();
 }
 
 std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
@@ -111,17 +111,17 @@ bool AudioStream::AudioStreamPrivate::waitForConsumers()
 {
     bool wait;
     {
-        std::lock_guard<std::mutex> lockGuard(m_consumerManagerMutex);
+        std::lock_guard<std::mutex> lockGuard(m_mutex);
         wait = m_packetConsumerManager->empty();
     }
     if (wait)
         uninitialize(); //< Don't stream the camera if there are no consumers.
     
     // Check again if there are no consumers. They could have been added during uninitialize().
-    std::unique_lock<std::mutex> lock(m_consumerManagerMutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
     if(m_packetConsumerManager->empty())
     {
-        m_consumerWaitCondition.wait(
+        m_wait.wait(
             lock, 
             [&]() { return m_terminated || !m_packetConsumerManager->empty(); });
         return !m_terminated;
@@ -161,7 +161,7 @@ int AudioStream::AudioStreamPrivate::initialize()
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
     {
-        std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->flush();
     }
 
@@ -326,21 +326,22 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
     for(;;)
     {
-        ffmpeg::Packet packet(m_inputFormat->audioCodecID(), AVMEDIA_TYPE_AUDIO);
-        int result = m_inputFormat->readFrame(packet.packet());
-
-#ifdef _WIN32 //< Corresponds to setting AVFMT_FLAG_NONBLOCK.
-        uint64_t start = m_timeProvider->millisSinceEpoch();
-        while (result == AVERROR(EAGAIN) && m_timeProvider->millisSinceEpoch() - start < kMsecInSec)
+        ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
+        
+        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see 
+        int result;
+        if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
         {
-            static constexpr std::chrono::milliseconds kSleep(1);
-            std::this_thread::sleep_for(kSleep);
+            static constexpr std::chrono::milliseconds kTimeout = 
+                std::chrono::milliseconds(1000);
+            result = m_inputFormat->readFrameNonBlock(packet.packet(), kTimeout);
+            if (result < AVERROR(EAGAIN)) //< Treaat a timeout as an error.
+                result = AVERROR(EIO);
+        }
+        else
+        {
             result = m_inputFormat->readFrame(packet.packet());
         }
-        // Assume if there was a timeout that there was an io error.
-        if (result == AVERROR(EAGAIN))
-            result = AVERROR(EIO);
-#endif _WIN32
 
         if (result < 0)
             return result;
@@ -512,7 +513,6 @@ void AudioStream::AudioStreamPrivate::start()
 void AudioStream::AudioStreamPrivate::stop()
 {
     terminate();
-    m_consumerWaitCondition.notify_all();
 
     if (m_audioThread.joinable())
         m_audioThread.join();
@@ -543,7 +543,7 @@ void AudioStream::AudioStreamPrivate::run()
         // In that case, packet is nullptr.
         if (packet)
         {
-            std::lock_guard<std::mutex> lock(m_consumerManagerMutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             m_packetConsumerManager->givePacket(packet);
         }
     }
