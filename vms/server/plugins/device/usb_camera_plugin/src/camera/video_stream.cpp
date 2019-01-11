@@ -251,12 +251,11 @@ void VideoStream::start()
 
 void VideoStream::stop()
 {
-    if (!m_terminated)
-    {
-        terminate();
-        if (m_videoThread.joinable())
-            m_videoThread.join();
-    }
+    terminate();
+    m_wait.notify_all();
+    
+    if (m_videoThread.joinable())
+        m_videoThread.join();
 }
 
 void VideoStream::run()
