@@ -16,15 +16,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
     config: any;
     data: any;
     company: any;
-    vendorGroups: number;
     vendors: string[];
     resolution: string;
     itemsPerPage: number;
     query: string;
     allCameras: any;
     cameras: any;
-    totalCameras: number;
-    totalVendors: number;
     activeCamera: any;
     showAll: boolean;
     hardwareTypes: any[];
@@ -51,7 +48,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.data = undefined;
       this.company = undefined;
 
-      this.vendorGroups = 4;
       this.resolution = '0';
 
       this.itemsPerPage = 15;
@@ -61,9 +57,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.cameras = [];
       this.camerasTable = [];
       this.vendors = undefined;
-
-      this.totalCameras = 0;
-      this.totalVendors = 0;
 
       this.activeCamera = undefined;
       this.showAll = false;
@@ -220,13 +213,9 @@ export class NxCampageComponent implements OnInit, DoCheck {
            });
        });
 
-       this.totalCameras = this.allCameras.length;
-
        this.vendors = Array.from(vendors).sort((a, b) => {
            return a.toLowerCase().localeCompare(b.toLowerCase());
        });
-
-       this.totalVendors = this.vendors.length;
   }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
@@ -265,28 +254,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
       return false;
   }
 
-  vendorGroup(n) {
-      function nstart(m) {
-          if (m === 0) {
-              return 0;
-          }
-
-          return nstart(m - 1) + ncol(m - 1);
-      }
-
-      function ncol(m) {
-          return m < (cols - (M * cols - total)) ? M : (M - 1);
-      }
-
-      const total = this.vendors.length,
-          cols = this.vendorGroups,
-          M = Math.ceil(total / cols),
-          n1 = nstart(n),
-          n2 = ncol(n);
-
-      return {start: n1, end: n1 + n2};
-  }
-
   activateCamera(elementSelected: any): void {
       if (this.activeCamera === this.cameras[elementSelected.key]) {
           return;
@@ -321,6 +288,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
           this.activeCamera.totalCameraCount = totalCameraCount;
           this.activeCamera.firmwares = firmwaresArray;
       }
+
       this.toggleCamview = 'on';
   }
 

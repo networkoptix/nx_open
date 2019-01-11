@@ -13,8 +13,8 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-wrap">
-                <div class="row vdivide mt-3 mr-0 mr-xl-3 flex-grow-1" *ngIf="showAdvancedOptions">
+            <div>
+                <div class="row mt-3 mr-0" *ngIf="showAdvancedOptions">
                     <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1">
                         <h4>Minimum Resolution</h4>
                         <nx-select name="resSelect"
@@ -45,7 +45,7 @@
                         </nx-multi-select>
                     </div>
                 </div>
-                <div class="row vdivide mt-3" [hidden]="!showAdvancedOptions">
+                <div class="row mt-3" [hidden]="!showAdvancedOptions">
                     <div class="form-group m-0">
                         <h4 class="m-0">Features</h4>
                         <nav aria-label="Cameras table navigation">

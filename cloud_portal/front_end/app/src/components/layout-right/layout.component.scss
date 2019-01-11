@@ -12,6 +12,10 @@
         &.toggle-on {
             width: 100%;
             columns: 2;
+    
+            @include media-breakpoint-down(md) {
+                columns : 1;
+            }
         }
         &.toggle-off {
             width: 100%;

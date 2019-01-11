@@ -1,5 +1,8 @@
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output, SimpleChange, SimpleChanges } from "@angular/core";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import {
+    Component, EventEmitter, forwardRef,
+    Input, OnInit, Output, SimpleChanges
+}                                                  from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
     selector: 'nx-tag',
@@ -17,7 +20,7 @@ export class NxTagComponent implements OnInit, ControlValueAccessor {
     @Output() onClick = new EventEmitter<boolean>();
     private badgeClass: string;
 
-    constructor(){}
+    constructor() {}
 
     ngOnInit() {
         this.badgeClass = this.type !== undefined ? `-${this.type}` : '';
@@ -39,15 +42,15 @@ export class NxTagComponent implements OnInit, ControlValueAccessor {
 
     deselectTag() {
         this.selected = false;
-        this.badgeClass = this.type ? `-${this.type}`: '';
+        this.badgeClass = this.type ? `-${this.type}` : '';
         this.changeState(false);
     }
 
     selectTag() {
         if (!this.selected) {
             this.selected = true;
-            this.badgeClass = this.type ? `-${this.type}-selected`: '-selected';
-            this.changeState(true)
+            this.badgeClass = this.type ? `-${this.type}-selected` : '-selected';
+            this.changeState(true);
         }
     }
 

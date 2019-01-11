@@ -79,7 +79,7 @@
         }
         
         td {
-          padding      : 0.25rem 0 0.25rem 1rem;
+          padding      : 0.25rem 1rem;
           font-family  : $font-family-regular;
           font-size    : $font-size-base;
           color        : $dark9;
@@ -121,6 +121,7 @@
       .page-item {
         cursor: pointer;
         margin: 0 3px;
+        height : auto;
 
         .page-link {
           font-family: $font-family-regular;

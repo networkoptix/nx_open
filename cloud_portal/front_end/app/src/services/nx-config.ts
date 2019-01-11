@@ -49,6 +49,7 @@ export class NxConfigService {
                 tableLarge: {
                     rows: 20
                 },
+                vendorGroups : 4
             },
 
             systemStatuses                : {

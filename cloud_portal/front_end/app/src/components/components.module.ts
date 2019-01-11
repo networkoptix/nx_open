@@ -18,6 +18,7 @@ import { NxTagComponent }                 from './tag/tag.component';
 import { NxCarouselComponent }            from './carousel/carousel.component';
 import { NxRibbonComponent }              from './ribbon/ribbon.component';
 import { NxRibbonService }                from './ribbon/ribbon.service';
+import { NxVendorListComponent }          from './vendor-list/vendor-list.component';
 
 @NgModule({
     imports        : [
@@ -39,6 +40,7 @@ import { NxRibbonService }                from './ribbon/ribbon.service';
         NxTagComponent,
         NxCarouselComponent,
         NxRibbonComponent,
+        NxVendorListComponent,
     ],
     entryComponents: [
         NxProcessButtonComponent,
@@ -53,6 +55,7 @@ import { NxRibbonService }                from './ribbon/ribbon.service';
         NxTagComponent,
         NxCarouselComponent,
         NxRibbonComponent,
+        NxVendorListComponent,
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -66,6 +69,7 @@ import { NxRibbonService }                from './ribbon/ribbon.service';
         NxTagComponent,
         NxCarouselComponent,
         NxRibbonComponent,
+        NxVendorListComponent,
 
         NxRibbonService,
     ],
@@ -82,6 +86,7 @@ import { NxRibbonService }                from './ribbon/ribbon.service';
         NxTagComponent,
         NxCarouselComponent,
         NxRibbonComponent,
+        NxVendorListComponent,
         MenuModule,
     ]
 })
@@ -90,10 +95,10 @@ export class ComponentsModule {
 
 declare var angular: angular.IAngularStatic;
 angular
-    .module('cloudApp.directives')
-    .directive('nxProcessButton', downgradeComponent({ component: NxProcessButtonComponent }) as angular.IDirectiveFactory)
-    .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory)
-    .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory);
+        .module('cloudApp.directives')
+        .directive('nxProcessButton', downgradeComponent({ component: NxProcessButtonComponent }) as angular.IDirectiveFactory)
+        .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory)
+        .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory);
 
 angular
         .module('cloudApp.services')

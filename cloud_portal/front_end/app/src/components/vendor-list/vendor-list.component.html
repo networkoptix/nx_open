@@ -1,0 +1,74 @@
+<nx-pre-loader *ngIf="vendors == undefined"></nx-pre-loader>
+
+<div class="row pl-3 pb-3 m-0 campage-info" [hidden]="filter.query" *ngIf="vendors && vendors.length">
+    <h4>{{ vendors.length }} manufacturers - {{ cameras.length }} devices</h4>
+</div>
+
+<div class="col text-placeholder d-flex align-items-center pl-3" *ngIf="vendors && !vendors.length" translate>
+    Nothing Found
+</div>
+
+<div class="row p-2" *ngIf="vendors && !filter.query">
+    <div class="col-12 col-sm-6 row row">
+        <div class="col-12 col-lg-6">
+            <ul class="pl-2 m-0 list-unstyled">
+                <li class="no-left-padding"
+                    *ngFor="let vendor of vendors.slice(vendorGroup(0).start, vendorGroup(0).end)">
+                    <a href (click)="setVendor(vendor); false">
+                    <span>
+                        {{ vendor }}
+                    </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-12 col-lg-6">
+            <ul class="pl-2 m-0 list-unstyled">
+                <li class="no-left-padding"
+                    *ngFor="let vendor of vendors.slice(vendorGroup(1).start, vendorGroup(1).end)">
+                    <a href (click)="setVendor(vendor); false">
+                    <span>
+                        {{ vendor }}
+                    </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 row row">
+        <div class="col-12 col-lg-6">
+            <ul class="pl-2 m-0 list-unstyled">
+                <li class="no-left-padding"
+                    *ngFor="let vendor of vendors.slice(vendorGroup(2).start, vendorGroup(2).end)">
+                    <a href (click)="setVendor(vendor); false">
+                    <span>
+                        {{ vendor }}
+                    </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-12 col-lg-6">
+            <ul class="pl-2 m-0 list-unstyled">
+                <li class="no-left-padding"
+                    *ngFor="let vendor of vendors.slice(vendorGroup(3).start, vendorGroup(3).end)">
+                    <a href (click)="setVendor(vendor); false">
+                    <span>
+                        {{ vendor }}
+                    </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!--<ul class="pl-3 m-0 list-unstyled col-md-6 col-lg-4 col-xl-3" *ngFor="let n of arrGridColumns">-->
+        <!--<li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">-->
+            <!--<a href (click)="setVendor(vendor); false">-->
+                    <!--<span>-->
+                        <!--{{ vendor }}-->
+                    <!--</span>-->
+            <!--</a>-->
+        <!--</li>-->
+    <!--</ul>-->
+</div>

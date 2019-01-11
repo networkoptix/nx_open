@@ -14,7 +14,7 @@
                     </h4>
                 </div>
 
-                <div class="col-md-3 text-right">
+                <div class="col-md-3 text-right p-0">
                     <nx-csv-button [data]="csvCameraData"
                                    filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
                                    [options]="csvOptions">{{ 'Export all to CSV' | translate }}
@@ -50,7 +50,7 @@
     </div>
 
     <div class="row vertical-align ml-0">
-        <nav aria-label="Cameras table navigation" class="pagination-nav pt-3">
+        <nav aria-label="Cameras table navigation" class="pagination-nav pt-3 pb-3">
             <ngb-pagination [collectionSize]="pager.totalItems" [maxSize]="3" [pageSize]="20" (pageChange)="setPage($event)"></ngb-pagination>
         </nav>
     </div>

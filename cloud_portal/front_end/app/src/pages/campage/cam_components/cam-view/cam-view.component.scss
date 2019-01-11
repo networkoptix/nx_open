@@ -2,8 +2,14 @@
 @import '../../../../../styles/theme_variables';
 
 .camview {
-  padding: 0;
-  margin-bottom: -1rem;
+  padding          : 0;
+  margin-bottom    : -1rem;
+  min-height       : 650px;
+  background-color : $light4;
+  
+  .card {
+    margin : 0 !important;
+  }
   
   h2 {
     font-size: 0.9375rem;

@@ -12,6 +12,7 @@
         h4 {
             margin      : 0;
             line-height : 2rem;
+            color       : $dark15;
         }
     }
     
@@ -23,6 +24,10 @@
                 padding-left : 0 !important;
             }
         }
+    }
+    
+    .card {
+        margin : 0;
     }
     
     .list-inline > li {

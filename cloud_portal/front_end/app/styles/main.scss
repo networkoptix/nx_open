@@ -843,8 +843,10 @@ h1 .badge {
 }
 
 .disabled{
-    color: $light10;
+    color  : $light10;
+    cursor : default !important;
 }
+
 .input-overlay{
     input{
         padding-right:30px;
