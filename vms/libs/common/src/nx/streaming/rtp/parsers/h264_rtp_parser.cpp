@@ -309,8 +309,10 @@ bool H264Parser::processData(
     if (curPtr >= bufferEnd)
         return clearInternalBuffer();
 
-    bool isPacketLost = m_prevSequenceNum != -1
-        && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
+    bool isPacketLost =
+        m_prevSequenceNum != -1 &&
+        quint16(m_prevSequenceNum) != quint16(sequenceNum-1) &&
+        m_prevSequenceNum != sequenceNum; // Some cameras send duplicate packets, ignore it
 
     if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
     {
