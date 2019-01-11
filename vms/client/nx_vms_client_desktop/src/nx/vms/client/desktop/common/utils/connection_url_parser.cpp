@@ -8,7 +8,6 @@
 #include <nx/network/http/http_types.h>
 
 namespace nx::vms::client::desktop {
-namespace helpers {
 
 nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
 {
@@ -44,5 +43,4 @@ nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
     return result;
 }
 
-} // namespace helpers
 } // namespace nx::vms::client::desktop
