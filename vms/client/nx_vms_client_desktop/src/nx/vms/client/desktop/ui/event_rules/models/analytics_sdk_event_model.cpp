@@ -31,7 +31,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     auto addItem = [this](
         QStandardItem* parent,
         const QString& name,
-        const QString& engineId,
+        const QnUuid& engineId,
         const QString& id)
     {
         auto item = new QStandardItem(name);
@@ -65,7 +65,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
         parentItem = addItem(
             nullptr,
             engineDescriptor->name,
-            engineId.toString(),
+            engineId,
             QString());
 
         for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
@@ -76,7 +76,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                 parentItem = addItem(
                     parentItem,
                     groupDescriptor->name,
-                    engineId.toString(),
+                    engineId,
                     groupDescriptor->id);
             }
 
@@ -91,7 +91,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                 addItem(
                     parentItem,
                     eventTypeDescriptor->name,
-                    engineId.toString(),
+                    engineId,
                     eventTypeDescriptor->id);
             }
         }

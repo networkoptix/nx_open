@@ -94,13 +94,13 @@ struct EventParameters
      */
     bool omitDbLogging = false;
 
-    QString analyticsPluginId;
+    QnUuid analyticsEngineId;
 
     // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.
     QString getAnalyticsEventTypeId() const;
     void setAnalyticsEventTypeId(const QString& id);
-    QString getAnalyticsPluginId() const;
-    void setAnalyticsPluginId(const QString& id);
+    QnUuid getAnalyticsEngineId() const;
+    void setAnalyticsEngineId(const QnUuid& id);
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
@@ -108,7 +108,7 @@ struct EventParameters
 
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsEngineId)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 bool checkForKeywords(const QString& value, const QString& keywords);

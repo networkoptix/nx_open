@@ -29,7 +29,7 @@ bool belongsToGroup(const EventTypeDescriptor& descriptor, const QString& groupI
 
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QnResourcePtr& resource,
-    const QString& pluginId,
+    const QnUuid& engineId,
     const QString& eventTypeId,
     EventState toggleState,
     const QString& caption,
@@ -38,7 +38,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     qint64 timeStampUsec)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
-    m_pluginId(pluginId),
+    m_engineId(engineId),
     m_eventTypeId(eventTypeId),
     m_caption(caption),
     m_description(description),
@@ -46,9 +46,9 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
 {
 }
 
-QString AnalyticsSdkEvent::pluginId() const
+QnUuid AnalyticsSdkEvent::engineId() const
 {
-    return m_pluginId;
+    return m_engineId;
 }
 
 const QString& AnalyticsSdkEvent::eventTypeId() const
@@ -59,7 +59,7 @@ const QString& AnalyticsSdkEvent::eventTypeId() const
 EventParameters AnalyticsSdkEvent::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
-    params.setAnalyticsPluginId(m_pluginId);
+    params.setAnalyticsEngineId(m_engineId);
     params.setAnalyticsEventTypeId(m_eventTypeId);
     return params;
 }
@@ -75,7 +75,7 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
-    if (!getResource() || m_pluginId != params.getAnalyticsPluginId())
+    if (!getResource() || m_engineId != params.getAnalyticsEngineId())
         return false;
 
     nx::analytics::EventTypeDescriptorManager descriptorManager(getResource()->commonModule());

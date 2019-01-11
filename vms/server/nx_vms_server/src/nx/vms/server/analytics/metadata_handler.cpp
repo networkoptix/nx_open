@@ -25,6 +25,7 @@ namespace analytics {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::vms::api::analytics;
 
 MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
@@ -34,17 +35,13 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::vms::api::analytics::EventTypeDescriptor MetadataHandler::eventTypeDescriptor(
+std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
     const QString& eventTypeId) const
 {
-    for (const auto& entry: m_eventTypeDescriptors)
-    {
-        const auto& id = entry.first;
-        const auto& descriptor = entry.second;
-        if (id == eventTypeId)
-            return descriptor;
-    }
-    return nx::vms::api::analytics::EventTypeDescriptor();
+    if (auto it = m_eventTypeDescriptors.find(eventTypeId); it != m_eventTypeDescriptors.cend())
+        return it->second;
+
+    return std::nullopt;
 }
 
 void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
@@ -159,7 +156,13 @@ void MetadataHandler::handleMetadataEvent(
     NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
     auto descriptor = eventTypeDescriptor(eventTypeId);
-    if (descriptor.flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
+    if (!descriptor)
+    {
+        NX_WARNING(this, "Unable to find descriptor for %1", eventTypeId);
+        return;
+    }
+
+    if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
     {
         eventState = eventData->isActive()
             ? nx::vms::api::EventState::active
@@ -179,7 +182,7 @@ void MetadataHandler::handleMetadataEvent(
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_pluginId,
+        m_engineId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -201,9 +204,9 @@ void MetadataHandler::setResource(QnVirtualCameraResourcePtr resource)
     m_resource = std::move(resource);
 }
 
-void MetadataHandler::setPluginId(QString pluginId)
+void MetadataHandler::setEngineId(QnUuid engineId)
 {
-    m_pluginId = std::move(pluginId);
+    m_engineId = std::move(engineId);
 }
 
 void MetadataHandler::setEventTypeDescriptors(DescriptorMap descriptors)

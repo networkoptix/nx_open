@@ -2,23 +2,26 @@
 
 #include <QtCore/QMap>
 
-#include <core/resource/resource_fwd.h>
-#include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
+#include <core/resource/resource_fwd.h>
+
+#include <nx/analytics/types.h>
+#include <nx/utils/std/optional.h>
+
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/sdk/analytics/i_device_agent.h>
+
+#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/events_fwd.h>
+
+#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
-
-#include <nx/vms/api/analytics/descriptors.h>
-
-#include <nx/analytics/types.h>
 
 class QnAbstractDataReceptor;
 
@@ -38,7 +41,7 @@ public:
     void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadata);
 
     void setResource(QnVirtualCameraResourcePtr resource);
-    void setPluginId(QString pluginId);
+    void setEngineId(QnUuid pluginId);
     void setEventTypeDescriptors(DescriptorMap descriptors);
     void setMetadataSink(QnAbstractDataReceptor* metadataSink);
     void removeMetadataSink(QnAbstractDataReceptor* metadataSink);
@@ -53,7 +56,7 @@ private:
 
     void setLastEventState(const QString& eventTypeId, nx::vms::api::EventState eventState);
 
-    nx::vms::api::analytics::EventTypeDescriptor eventTypeDescriptor(
+    std::optional<nx::vms::api::analytics::EventTypeDescriptor> eventTypeDescriptor(
         const QString& eventTypeId) const;
 
     void handleEventsPacket(
@@ -68,7 +71,7 @@ private:
 
 private:
     QnVirtualCameraResourcePtr m_resource;
-    QString m_pluginId;
+    QnUuid m_engineId;
     nx::analytics::EventTypeDescriptorMap m_eventTypeDescriptors;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_metadataSink = nullptr;

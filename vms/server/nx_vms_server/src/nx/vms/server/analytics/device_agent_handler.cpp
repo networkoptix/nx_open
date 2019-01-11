@@ -31,7 +31,7 @@ DeviceAgentHandler::DeviceAgentHandler(
         Qt::QueuedConnection);
 
     m_metadataHandler.setResource(m_device);
-    m_metadataHandler.setPluginId(m_engineResource->plugin()->manifest().id);
+    m_metadataHandler.setEngineId(m_engineResource->getId());
 
     nx::analytics::EventTypeDescriptorManager descriptorManager(serverModule->commonModule());
     m_metadataHandler.setEventTypeDescriptors(
