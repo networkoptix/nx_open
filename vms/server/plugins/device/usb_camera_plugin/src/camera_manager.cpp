@@ -82,15 +82,12 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (!m_camera)
-    {
         m_camera = std::make_shared<Camera>(this, m_timeProvider);
-        m_camera->initialize();
-    }
 
-    if (!m_camera->isInitialized())
-        return nxcip::NX_OTHER_ERROR;
-
-    switch(encoderIndex)
+    if (!m_camera->isInitialized() && !m_camera->initialize())
+        return nxcip::NX_IO_ERROR;
+    
+    switch (encoderIndex)
     {
         case 0:
         {

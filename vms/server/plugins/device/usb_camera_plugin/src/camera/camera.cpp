@@ -63,43 +63,42 @@ Camera::Camera(
 
 bool Camera::initialize()
 {
+    if (isInitialized())
+        return true;
+
     auto codecList = device::video::getSupportedCodecs(ffmpegUrl().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
 
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
-    if(m_compressionTypeDescriptor)
+    if(!m_compressionTypeDescriptor)
     {
-        m_defaultVideoParams = getDefaultVideoParameters();
-    }
-    else
-    {
-        setLastError(AVERROR(ENODEV));
         NX_DEBUG(
-            this, 
+            this,
             "%1: Failed to obtain a valid compression type descriptor for camera: %2",
             __func__,
             toString());
 
-        m_initialized = false;
+        setLastError(AVERROR(ENODEV));
         return false;
     }
 
-    m_audioStream = std::make_shared<AudioStream>(
-            info().auxiliaryData,
-            weak_from_this(),
-            m_audioEnabled);
+    m_defaultVideoParams = getDefaultVideoParameters();
 
     m_videoStream = std::make_shared<VideoStream>(
-            weak_from_this(),
-            m_defaultVideoParams);
+        weak_from_this(),
+        m_defaultVideoParams);
 
-    m_initialized = true;
-    return true;
+    m_audioStream = std::make_shared<AudioStream>(
+        info().auxiliaryData,
+        weak_from_this(),
+        m_audioEnabled);
+
+    return isInitialized();
 }
 
 bool Camera::isInitialized() const
 {
-    return m_initialized;
+    return m_compressionTypeDescriptor && m_videoStream && m_audioStream;
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
