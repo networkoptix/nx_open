@@ -8,6 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <nx/utils/scope_guard.h>
+
 class QnGraphicsMessageBox;
 namespace nx::utils { class PendingOperation; }
 
@@ -39,6 +41,8 @@ private:
     void hideMessages();
 
     QPixmap createDragPixmap(const QnResourceList& resources, int width) const;
+
+    utils::Guard scopedStartPlayback(bool baseCondition);
 
 private:
     const QPointer<EventRibbon> m_ribbon;
