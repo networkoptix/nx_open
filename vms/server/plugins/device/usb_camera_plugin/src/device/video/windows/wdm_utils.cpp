@@ -202,7 +202,7 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
     {
         // ERROR_INSUFFICIENT_BUFFER is expected: we want the size of buffer. If not, something
         // went wrong.
-        if(GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+        if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
             return -1;
     }
 
@@ -233,7 +233,9 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
     if(start == std::wstring::npos || end == std::wstring::npos || end < start)
         return -1;
 
-    start += kPortPrefix.size(); //< Shift backwards by "Port_#" length.
+    start += kPortPrefix.size(); //< Advance past "Port_#".
+    if (start >= registryProperty.size() || end < start)
+        return -1;
 
     // Dropping "Port_#" and ".Hub_#0001"
     std::wstring portIndex = registryProperty.substr(start, end - start);

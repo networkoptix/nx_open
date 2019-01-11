@@ -84,19 +84,25 @@ static std::string getUniqueId()
             continue;
 
         std::string keyValuePair(line);
-        size_t position = keyValuePair.find(delimitter);
-        if (position == std::string::npos)
+        size_t delimitterPosition = keyValuePair.find(delimitter);
+        if (delimitterPosition == std::string::npos)
             break;
 
-        position += delimitter.size(); //< Advance past ": ".
-        if (position >= keyValuePair.size())
-            return std::string();
+        delimitterPosition += delimitter.size(); //< Advance past ": ".
+        if (delimitterPosition >= keyValuePair.size())
+            return break;
 
         // Drop everything before ": " and "\n" at the end, if it has one.
-        if (keyValuePair[keyValuePair.size() - 1] == '\n')
-            serialNumber = keyValuePair.substr(position, keyValuePair.size() - 1);
+        size_t newLinePosition = keyValuePair.find("\n");
+        if (newLinePosition != std::string::npos)
+        {
+            serialNumber = 
+                keyValuePair.substr(delimitterPosition, newLinePosition - delimitterPosition);
+        }
         else
-            serialNumber = keyValuePair.substr(position);
+        {
+            serialNumber = keyValuePair.substr(delimitterPosition);
+        }
 
         break;
     }
