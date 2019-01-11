@@ -190,21 +190,17 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
         return result;
     }
 
+    // We hope self-updater will run only once per time and will not overflow log-file because
+    // qnClientInstanceManager is not initialized in self-update mode.
     if (startupParams.selfUpdateMode)
-    {
-        // we hope self-updater will run only once per time and will not overflow log-file
-        // qnClientInstanceManager is not initialized in self-update mode
         return "self_update";
-    }
 
-    if (qnRuntime->isAcsMode())
-    {
+    if (startupParams.acsMode)
         return "ax";
-    }
 
     if (qnClientInstanceManager && qnClientInstanceManager->isValid())
     {
-        int idx = qnClientInstanceManager->instanceIndex();
+        const int idx = qnClientInstanceManager->instanceIndex();
         if (idx > 0)
             return L'_' + QString::number(idx);
     }
@@ -224,7 +220,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initMetaInfo();
     initApplication();
     initSingletons(startupParams);
-    initLog(startupParams);
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
     if (startupParams.selfUpdateMode)
@@ -303,9 +298,8 @@ void QnClientModule::initApplication()
     QApplication::setDesktopSettingsAware(false);
     QApplication::setQuitOnLastWindowClosed(true);
 
-#ifdef Q_OS_MACX
-    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
-#endif
+    if (nx::utils::AppInfo::isMacOsX())
+        QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
 void QnClientModule::initDesktopCamera(QGLWidget* window)
@@ -356,9 +350,26 @@ void QnClientModule::initSurfaceFormat()
 
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 {
-    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? vms::api::PeerType::desktopClient
-        : vms::api::PeerType::videowallClient;
+    /* Just to feel safe */
+    auto clientSettingsPtr = std::make_unique<QnClientSettings>(startupParams.forceLocalSettings);
+
+    /* Init crash dumps as early as possible. */
+#ifdef Q_OS_WIN
+    win32_exception::setCreateFullCrashDump(clientSettingsPtr->createFullCrashDump());
+#endif
+
+    // Depends on QnClientSettings.
+    auto clientInstanceManagerPtr = std::make_unique<QnClientInstanceManager>();
+
+    // Log initialization depends on QnClientInstanceManager
+    initLog(startupParams);
+
+    // Depends on nothing.
+    auto clientRuntimeSettingsPtr = std::make_unique<QnClientRuntimeSettings>();
+
+    const auto clientPeerType = startupParams.videoWallGuid.isNull()
+        ? nx::vms::api::PeerType::desktopClient
+        : nx::vms::api::PeerType::videowallClient;
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
@@ -370,46 +381,38 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_clientCoreModule.reset(new QnClientCoreModule());
 
-    /* Just to feel safe */
-    QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
-    QnClientSettings* clientSettings = clientSettingsPtr.data();
+    // Settings migration depends on client core settings.
     nx::vms::client::desktop::settings::migrate();
 
-    /* Init crash dumps as early as possible. */
-#ifdef Q_OS_WIN
-    win32_exception::setCreateFullCrashDump(clientSettings->createFullCrashDump());
-#endif
-
-    /// We should load translations before major client's services are started to prevent races
-    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettings));
-
-    /* Init singletons. */
+    // We should load translations before major client's services are started to prevent races
+    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettingsPtr.get()));
 
     auto commonModule = m_clientCoreModule->commonModule();
 
     commonModule->store(new QnResourceRuntimeDataManager(commonModule));
+
+    // Pass ownership to the common module.
     commonModule->store(translationManager.release());
-    commonModule->store(new QnClientRuntimeSettings());
-    commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
+    commonModule->store(clientRuntimeSettingsPtr.release());
+    commonModule->store(clientSettingsPtr.release());
+    const auto clientInstanceManager = commonModule->store(clientInstanceManagerPtr.release());
 
     initRuntimeParams(startupParams);
 
-    /* Shorted initialization if run in self-update mode. */
+    // Shortened initialization if run in self-update mode.
     if (startupParams.selfUpdateMode)
         return;
 
     commonModule->store(new ApplauncherGuard());
 
-    /* Depends on QnClientSettings. */
-    auto clientInstanceManager = commonModule->store(new QnClientInstanceManager());
-
-    /* Depends on nothing. */
+    // Depends on nothing.
     commonModule->store(new QnClientShowOnceSettings());
 
-    /* Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, never used directly. */
+    // Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, is never
+    // used directly.
     commonModule->store(new QnClientSettingsWatcher());
 
-    /* Depends on QnClientSettings, never used directly. */
+    // Depends on QnClientSettings, is never used directly.
     commonModule->store(new QnClientAutoRunWatcher());
 
     commonModule->setModuleGUID(clientInstanceManager->instanceGuid());
@@ -442,9 +445,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Long runnables depend on QnCameraHistoryPool and other singletons. */
     commonModule->store(new QnLongRunnablePool());
 
-    /* Just to feel safe */
     commonModule->store(new QnCloudConnectionProvider());
-    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
+    m_cloudStatusWatcher = commonModule->store(
+        new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
@@ -468,10 +471,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new LayoutTemplateManager());
     commonModule->store(new ObjectDisplaySettings());
-
-    auto internetAccessWatcher = new nx::vms::client::desktop::SystemInternetAccessWatcher(commonModule);
-    commonModule->store(internetAccessWatcher);
-
+    commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
@@ -555,7 +555,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     if (QFileInfo(logConfigFile).exists())
     {
         NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
-        NX_ALWAYS(this, "Log options from settings are ignored!", logConfigFile);
+        NX_ALWAYS(this, "Log options from settings are ignored!");
         QSettings logConfig(logConfigFile, QSettings::IniFormat);
         Settings logSettings(&logConfig);
         logSettings.updateDirectoryIfEmpty(
