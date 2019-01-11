@@ -358,12 +358,17 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, finishUpdate_updateInformationCleared)
+TEST_F(Updates, finishUpdate_success_updateInformationCleared)
 {
     // #TODO #akulikov
 }
 
-TEST_F(Updates, finishUpdate_updateInformationCleared_ignorePendingPeers)
+TEST_F(Updates, finishUpdate_fail_notAllUpdated)
+{
+    // #TODO #akulikov
+}
+
+TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
 {
     // #TODO #akulikov
 }
