@@ -15,23 +15,10 @@
 namespace nx {
 namespace usb_cam {
 
-<<<<<<< local
-CameraManager::CameraManager(
-    DiscoveryManager* discoveryManager,
-    nxpl::TimeProvider* const timeProvider,
-    const nxcip::CameraInfo& info)
-:
-    m_discoveryManager(discoveryManager),
-    m_timeProvider(timeProvider),
-    m_info( info ),
-    m_refManager( this ),
-    m_pluginRef( Plugin::instance() ),
-=======
 CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
     m_camera(camera),
     m_refManager(this),
     m_pluginRef(Plugin::instance()),
->>>>>>> other
     m_capabilities(
             nxcip::BaseCameraManager::nativeMediaStreamCapability |
             nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
