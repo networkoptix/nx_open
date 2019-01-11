@@ -21,19 +21,22 @@
 
 namespace {
 
-static const QString kMediaPortParamName = lit("mediaPort");
+static const QString kMediaPortParamName = "mediaPort";
+
+QString calculateHostAddress(const QString& url)
+{
+    if (url.indexOf(QLatin1String("://")) == -1)
+        return url;
+    return QUrl(url).host();
+}
 
 } // namespace
 
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_authenticated(true),
-    m_networkStatus(0),
-    m_networkTimeout(1000 * 10),
     m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
-    m_probablyNeedToUpdateStatus(false)
+    m_cachedHostAddress([this] {return calculateHostAddress(getUrl()); }, &m_mutex )
 {
-    // TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
     addFlags(Qn::network);
 }
 
@@ -46,15 +49,15 @@ QString QnNetworkResource::getUniqueId() const
     return getPhysicalId();
 }
 
+void QnNetworkResource::setUrl(const QString& url)
+{
+    m_cachedHostAddress.reset();
+    base_type::setUrl(url);
+}
+
 QString QnNetworkResource::getHostAddress() const
 {
-    //QnMutexLocker mutex( &m_mutex );
-    //return m_hostAddr;
-    QString url = getUrl();
-    if (url.indexOf(QLatin1String("://")) == -1)
-        return url;
-    else
-        return QUrl(url).host();
+    return m_cachedHostAddress.get();
 }
 
 void QnNetworkResource::setHostAddress(const QString &ip)
@@ -242,12 +245,12 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
 
 void QnNetworkResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
+    m_cachedHostAddress.reset();
     base_type::updateInternal(other, notifiers);
-    QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
-    if (other_casted)
+    if (const auto otherNetwork = other.dynamicCast<QnNetworkResource>())
     {
-        m_macAddress = other_casted->m_macAddress;
-        m_lastDiscoveredTime = other_casted->m_lastDiscoveredTime;
+        m_macAddress = otherNetwork->m_macAddress;
+        m_lastDiscoveredTime = otherNetwork->m_lastDiscoveredTime;
     }
 }
 
