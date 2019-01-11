@@ -101,6 +101,8 @@ PageBase
         property real cameraUiOpacity: 1.0
 
         property int mode: VideoScreenUtils.VideoScreenMode.Navigation
+        readonly property bool ptzMode: mode === VideoScreenUtils.VideoScreenMode.Ptz
+        onPtzModeChanged: videoNavigation.motionSearchMode = false
 
         Timer
         {
@@ -278,7 +280,7 @@ PageBase
         mediaPlayer: videoScreenController.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
         motionController.motionSearchMode: videoNavigation.motionSearchMode
-        motionController.enabled: videoNavigation.hasArchive
+        motionController.enabled: videoNavigation.hasArchive && !d.ptzMode
 
         onClicked: toggleUi()
 
@@ -402,7 +404,7 @@ PageBase
 
             property real customHeight:
             {
-                if (d.mode == VideoScreenUtils.VideoScreenMode.Ptz || ptzPanel.moveOnTapMode)
+                if (d.ptzMode || ptzPanel.moveOnTapMode)
                     return getNavigationBarHeight()
 
                 return videoNavigation.buttonsPanelHeight + getNavigationBarHeight()
@@ -419,12 +421,11 @@ PageBase
 
             opacity:
             {
-                var ptzMode = d.mode == VideoScreenUtils.VideoScreenMode.Ptz
-                var visiblePtzControls = ptzMode && d.uiVisible
+                var visiblePtzControls = d.ptzMode && d.uiVisible
                 if (visiblePtzControls || ptzPanel.moveOnTapMode)
                     return 1
 
-                return ptzMode ? d.uiOpacity : videoNavigation.opacity
+                return d.ptzMode ? d.uiOpacity : videoNavigation.opacity
             }
         }
 
@@ -444,7 +445,7 @@ PageBase
             customRotation: videoScreenController.resourceHelper.customRotation
 
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
-            visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Ptz
+            visible: opacity > 0 && d.ptzMode
 
             onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
 
