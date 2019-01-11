@@ -23,8 +23,12 @@ public:
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
+
+    /*
+     *
+     */
     bool hasSecurityIssue();
-    bool redicrectToScheme(const char* scheme);
+    bool redirectToScheme(const char* scheme);
     bool processRequest(bool noAuth);
     bool authenticate(Qn::UserAccessData* accessRights, bool *noAuth);
 
