@@ -192,7 +192,7 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         navigationTime = microseconds(DATETIME_NOW);
     }
 
-    const auto playbackStarter = scopedStartPlayback(navigationTime != microseconds(DATETIME_NOW)
+    const auto playbackStarter = scopedPlaybackStarter(navigationTime != microseconds(DATETIME_NOW)
         && ini().startPlaybackOnTileNavigation);
 
     // Perform navigation.
@@ -220,7 +220,7 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
 
     hideMessages();
 
-    const auto playbackStarter = scopedStartPlayback(!inNewTab
+    const auto playbackStarter = scopedPlaybackStarter(!inNewTab
         && ini().startPlaybackOnTileNavigation);
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
@@ -352,7 +352,7 @@ void TileInteractionHandler::hideMessages()
     m_pendingMessages.clear();
 }
 
-utils::Guard TileInteractionHandler::scopedStartPlayback(bool baseCondition)
+utils::Guard TileInteractionHandler::scopedPlaybackStarter(bool baseCondition)
 {
     if (!baseCondition)
         return {};

@@ -42,7 +42,7 @@ private:
 
     QPixmap createDragPixmap(const QnResourceList& resources, int width) const;
 
-    utils::Guard scopedStartPlayback(bool baseCondition);
+    utils::Guard scopedPlaybackStarter(bool baseCondition);
 
 private:
     const QPointer<EventRibbon> m_ribbon;
