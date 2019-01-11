@@ -586,7 +586,7 @@ bool CLH264RtpParser::processData(
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if (rtpHeader->marker && m_frameExists)
+    if (rtpHeader->marker && m_frameExists && !gotData)
     {
         m_mediaData = createVideoData(
             rtpBufferBase,
