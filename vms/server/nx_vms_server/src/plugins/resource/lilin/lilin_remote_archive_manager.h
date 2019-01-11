@@ -36,6 +36,8 @@ public:
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
+    virtual nx::core::resource::ImportOrder overlappedIdImportOrder() const override;
+
     virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(
         const nx::core::resource::RemoteArchiveChunk& chunk) override;
 

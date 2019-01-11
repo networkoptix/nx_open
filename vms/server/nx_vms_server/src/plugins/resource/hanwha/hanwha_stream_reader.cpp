@@ -323,16 +323,6 @@ QnRtspClient& HanwhaStreamReader::rtspClient()
     return m_rtpReader.rtspClient();
 }
 
-QString HanwhaStreamReader::toHanwhaPlaybackTime(int64_t timestampUsec) const
-{
-    const auto timezoneShift = m_hanwhaResource
-        ->sharedContext()
-        ->timeZoneShift();
-
-    return toHanwhaDateTime(timestampUsec / 1000, timezoneShift)
-        .toString(lit("yyyyMMddhhmmss"));
-}
-
 void HanwhaStreamReader::setSessionType(HanwhaSessionType value)
 {
     m_sessionType = value;

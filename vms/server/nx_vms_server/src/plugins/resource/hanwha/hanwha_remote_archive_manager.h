@@ -22,6 +22,8 @@ public:
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
+    virtual nx::core::resource::ImportOrder overlappedIdImportOrder() const override;
+
     virtual bool fetchArchiveEntry(
         const QString& entryId,
         nx::core::resource::BufferType* outBuffer) override;

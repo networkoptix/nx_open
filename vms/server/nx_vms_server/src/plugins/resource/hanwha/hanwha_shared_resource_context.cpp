@@ -118,27 +118,24 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const Hanw
         if (m_timeSynchronizer)
             return; //< All members are already initialized.
 
-        m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
-
         if (hasVideoArchive)
         {
             m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this, m_chunkLoaderSettings);
+            m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
             m_timeSynchronizer->setTimeSynchronizationEnabled(false);
-            m_timeSynchronizer->setTimeZoneShiftHandler(
-                [this](std::chrono::seconds timeZoneShift)
-                {
-                    m_chunkLoader->setTimeZoneShift(timeZoneShift);
-                    m_timeZoneShift = timeZoneShift;
-                });
+            m_timeSynchronizer->setTimeShiftHandler(
+                [this](std::chrono::milliseconds value) { m_chunkLoader->setTimeShift(value); });
         }
     }
 
     NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
         .arg(info.deviceType == HanwhaDeviceType::nvr));
 
-    m_timeSynchronizer->start(this);
     if (hasVideoArchive)
+    {
+        m_timeSynchronizer->start(this);
         m_chunkLoader->start(info);
+    }
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
@@ -388,11 +385,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
     return {CameraDiagnostics::NoErrorResult(), std::move(videoProfiles)};
 }
 
-std::chrono::seconds HanwhaSharedResourceContext::timeZoneShift() const
-{
-    return m_timeZoneShift;
-}
-
 boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
 {
     QnMutexLocker lock(&m_servicesMutex);
@@ -402,9 +394,10 @@ boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
     return m_chunkLoader->overlappedId();
 }
 
-void HanwhaSharedResourceContext::setDateTime(const QDateTime& dateTime)
+std::chrono::milliseconds HanwhaSharedResourceContext::timeShift() const
 {
-    m_timeSynchronizer->setDateTime(dateTime);
+    QnMutexLocker lock(&m_servicesMutex);
+    return m_chunkLoader ? m_chunkLoader->timeShift() : std::chrono::milliseconds::zero();
 }
 
 void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings)

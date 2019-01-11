@@ -149,9 +149,7 @@ public:
     qint64 timelineStartUs(int channelNumber) const;
     qint64 timelineEndUs(int channelNumber) const;
     boost::optional<int> overlappedId() const;
-
-    std::chrono::seconds timeZoneShift() const;
-    void setDateTime(const QDateTime& dateTime);
+    std::chrono::milliseconds timeShift() const;
 
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
@@ -197,8 +195,6 @@ private:
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 
     HanwhaChunkLoaderSettings m_chunkLoaderSettings;
-
-    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
 
     // We care only about archive sesions because normally we use only one
     // live connection independently of the number of client connections.

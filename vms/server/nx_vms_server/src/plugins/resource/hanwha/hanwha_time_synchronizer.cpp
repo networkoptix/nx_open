@@ -11,7 +11,7 @@
 
 static constexpr std::chrono::minutes kRetryInterval(5); //< Used after failure.
 static constexpr std::chrono::hours kResyncInterval(1); //< Used after successful check.
-static constexpr qint64 kAcceptableTimeDiffSecs = 5; //< Diff between device and mediaserver.
+static constexpr std::chrono::seconds kAcceptableTimeDiff(5); //< Diff between device and mediaserver.
 
 static constexpr bool isTimeZoneSyncRequired = false;
 static QString getPosixTimeZone(const QTimeZone& timeZone)
@@ -67,8 +67,13 @@ void HanwhaTimeSyncronizer::start(HanwhaSharedResourceContext* resourceConext)
     m_timer.post(
         [this, resourceConext, &promise]() mutable
         {
-            if (m_resourceConext)
-                return promise.set_value(); // Already started.
+            if (m_resourceConext) // Already started.
+            {
+                if (!m_isAsyncClientInProgress)
+                    verifyDateTime();
+
+                return promise.set_value();
+            }
 
             m_resourceConext = resourceConext;
             NX_DEBUG(this, lm("Started by %1").args(resourceConext));
@@ -85,14 +90,14 @@ void HanwhaTimeSyncronizer::setTimeSynchronizationEnabled(bool enabled)
     m_timeSynchronizationEnabled = enabled;
 }
 
-void HanwhaTimeSyncronizer::setTimeZoneShiftHandler(TimeZoneShiftHandler handler)
+void HanwhaTimeSyncronizer::setTimeShiftHandler(UtcTimeShiftHandler handler)
 {
     m_timer.post(
         [this, handler = std::move(handler)]() mutable
         {
-            m_timeZoneHandler = std::move(handler);
-            if (m_timeZoneHandler)
-                m_timeZoneHandler(m_timeZoneShift);
+            m_utcTimeShiftHandler = std::move(handler);
+            if (m_utcTimeShiftHandler)
+                m_utcTimeShiftHandler(m_utcTimeShift);
         });
 }
 
@@ -105,6 +110,7 @@ static QDateTime toUtcDateTime(const QString& value)
 
 void HanwhaTimeSyncronizer::verifyDateTime()
 {
+    NX_VERBOSE(this, "Verify device date time");
     doRequest(lit("view"), {}, /*isList*/ false,
         [this](HanwhaResponse response)
         {
@@ -119,18 +125,20 @@ void HanwhaTimeSyncronizer::verifyDateTime()
                 const auto localDateTime = toUtcDateTime(response.getOrThrow("LocalTime"));
                 NX_VERBOSE(this, lm("Device local time: %1").args(localDateTime));
 
-                // We do not know time zone, so we use UTC to compare with real UTC time.
-                updateTimeZoneShift(std::chrono::seconds(utcDateTime.secsTo(localDateTime)));
-
                 const auto serverDateTime = qnSyncTime->currentDateTime();
-                const auto timeDiffSecs = std::abs((int) utcDateTime.secsTo(serverDateTime));
-                if (timeDiffSecs > kAcceptableTimeDiffSecs && m_timeSynchronizationEnabled)
+                updateTimeShift(
+                    std::chrono::milliseconds(utcDateTime.msecsTo(serverDateTime)),
+                    std::chrono::milliseconds(utcDateTime.msecsTo(localDateTime)));
+
+                const auto timeDiff = std::chrono::abs(m_utcTimeShift);
+                if (m_timeSynchronizationEnabled && timeDiff > kAcceptableTimeDiff)
                 {
                     NX_DEBUG(this, lm("Camera has %1 time which is %2 seconds different")
                         .args(utcDateTime, utcDateTime.secsTo(serverDateTime)));
 
                     return setDateTime(serverDateTime);
                 }
+
                 // TODO: Uncomment in case we need to synchronize time zone as well.
                 // if (response.getOrThrow("POSIXTimeZone") != getPosixTimeZone(dateTime.timeZone()))
                 // {
@@ -138,23 +146,23 @@ void HanwhaTimeSyncronizer::verifyDateTime()
                 //     return setDateTime(now);
                 // }
 
-                NX_VERBOSE(this, lm("Current time diff is %1 which is ok").arg(
-                    std::chrono::seconds(timeDiffSecs)));
-                retryVerificationIn(kResyncInterval);
             }
             catch (const std::runtime_error& exception)
             {
                 NX_WARNING(this, exception.what());
+                return retryVerificationIn(kRetryInterval);
             }
+
+            NX_VERBOSE(this, "Current time diff is %1, which is ok", m_utcTimeShift);
+            retryVerificationIn(kResyncInterval);
         });
 }
 
 void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 {
     const auto utc = dateTime.toUTC();
-    const auto local = utc.addSecs(std::chrono::seconds(m_timeZoneShift).count());
-    std::map<QString, QString> params =
-    {
+    const auto local = utc.addMSecs(std::chrono::milliseconds(m_timeZoneShift).count());
+    std::map<QString, QString> params = {
         {"SyncType", "Manual"},
 
         {"Year", QString::number(local.date().year())},
@@ -193,12 +201,17 @@ void HanwhaTimeSyncronizer::retryVerificationIn(std::chrono::milliseconds timeou
     m_timer.start(timeout, verify);
 }
 
-void HanwhaTimeSyncronizer::updateTimeZoneShift(std::chrono::seconds value)
+void HanwhaTimeSyncronizer::updateTimeShift(
+    std::chrono::milliseconds utcTimeShift,
+    std::chrono::milliseconds timeZoneShift)
 {
-    m_timeZoneShift = value;
-    NX_DEBUG(this, lm("Camera current time shift %1 secs from UTC").arg(value));
-    if (m_timeZoneHandler)
-        m_timeZoneHandler(value);
+    m_utcTimeShift = utcTimeShift;
+    m_timeZoneShift = timeZoneShift;
+    NX_DEBUG(this, "Camera current time shift is %1, time zone shift is %2",
+        utcTimeShift, timeZoneShift);
+
+    if (m_utcTimeShiftHandler)
+        m_utcTimeShiftHandler(utcTimeShift);
 }
 
 void HanwhaTimeSyncronizer::fireStartPromises()
@@ -221,9 +234,11 @@ void HanwhaTimeSyncronizer::doRequest(
     m_httpClient.pleaseStopSync();
     m_httpClient.setUserName(authenticator.user());
     m_httpClient.setUserPassword(authenticator.password());
+    m_isAsyncClientInProgress = true;
     m_httpClient.doGet(url,
         [this, url, isList, handler = std::move(handler)]()
         {
+            m_isAsyncClientInProgress = false;
             if (!m_httpClient.hasRequestSucceeded())
             {
                 NX_DEBUG(this, lm("Failed request: %1").arg(url));

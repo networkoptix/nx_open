@@ -573,27 +573,19 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
     return ((double) num1 / den1) > ((double) num2 / den2);
 }
 
-qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift)
+qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::milliseconds timeShift)
 {
-    QDateTime dateTime;
-    const bool isUtcTime = value.trimmed().endsWith(L'Z');
-
-    if (!isUtcTime)
-    {
-        dateTime = QDateTime::fromString(value, kHanwhaDateTimeFormat);
-        dateTime.setOffsetFromUtc(timeZoneShift.count());
-    }
-    else
-    {
-        dateTime = QDateTime::fromString(value, Qt::ISODate);
-    }
+    const auto dateTime =
+        QDateTime::fromString(value, Qt::ISODate)
+        .addMSecs(std::chrono::milliseconds(timeShift).count());
 
     return std::max(0LL, dateTime.toMSecsSinceEpoch());
 }
 
-QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift)
+QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::milliseconds timeShift)
 {
-    return QDateTime::fromMSecsSinceEpoch(valueMs, Qt::OffsetFromUTC, timeZoneShift.count());
+    return QDateTime::fromMSecsSinceEpoch(valueMs, Qt::OffsetFromUTC)
+        .addMSecs(-std::chrono::milliseconds(timeShift).count());
 }
 
 } // namespace plugins

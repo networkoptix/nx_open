@@ -54,6 +54,11 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     return true;
 }
 
+nx::core::resource::ImportOrder HanwhaRemoteArchiveManager::overlappedIdImportOrder() const
+{
+    return nx::core::resource::ImportOrder::Reverse;
+}
+
 bool HanwhaRemoteArchiveManager::fetchArchiveEntry(
     const QString& /*entryId*/,
     nx::core::resource::BufferType* /*outBuffer*/)
@@ -88,22 +93,9 @@ void HanwhaRemoteArchiveManager::beforeSynchronization()
     // Do nothing.
 }
 
-void HanwhaRemoteArchiveManager::afterSynchronization(bool isSynchronizationSuccessful)
+void HanwhaRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuccessful*/)
 {
-    if (!isSynchronizationSuccessful)
-    {
-        NX_INFO(
-            this,
-            lm("Synchronization for resource %1 was not successful. "
-                "Date and time synchronization will not be done.")
-                .arg(m_resource->getUserDefinedName()));
-        return;
-    }
-
-    const auto dateTime = qnSyncTime->currentDateTime();
-    NX_INFO(this, lm("Setting date and time (%1) for resource %2")
-        .args(dateTime, m_resource->getUserDefinedName()));
-    m_resource->sharedContext()->setDateTime(dateTime);
+    // Do nothing.
 }
 
 RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() const
