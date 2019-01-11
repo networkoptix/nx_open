@@ -138,7 +138,7 @@ void CommonUpdateManager::onGlobalUpdateSettingChanged()
 void CommonUpdateManager::startUpdate(const QByteArray& content)
 {
     commonModule()->globalSettings()->setUpdateInformation(content);
-    commonModule()->globalSettings()->synchronizeNow();
+    commonModule()->globalSettings()->synchronizeNowSync();
 }
 
 bool CommonUpdateManager::canDownloadFile(
@@ -266,16 +266,38 @@ update::FindPackageResult CommonUpdateManager::findPackage(
 QList<QnUuid> CommonUpdateManager::participants() const
 {
     nx::update::Information updateInformation;
-    const auto deserializeResult = nx::update::fromByteArray(
-        globalSettings()->updateInformation(),
-        &updateInformation,
-        nullptr);
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+        &updateInformation, nullptr);
+
     if (deserializeResult != nx::update::FindPackageResult::ok)
     {
         NX_DEBUG(this, "participants: Failed to deserialize");
         return QList<QnUuid>();
     }
+
     return updateInformation.participants;
+}
+
+bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
+{
+    nx::update::Information updateInformation;
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+        &updateInformation, nullptr);
+
+    if (deserializeResult != nx::update::FindPackageResult::ok)
+    {
+        NX_DEBUG(this, "setParticipants: Failed to deserialize");
+        return false;
+    }
+
+    updateInformation.participants = participants;
+    QByteArray serializedUpdateInformation;
+
+    QJson::serialize(updateInformation, &serializedUpdateInformation);
+    globalSettings()->setUpdateInformation(serializedUpdateInformation);
+    globalSettings()->synchronizeNowSync();
+
+    return true;
 }
 
 bool CommonUpdateManager::statusAppropriateForDownload(

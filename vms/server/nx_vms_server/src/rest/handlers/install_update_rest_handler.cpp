@@ -120,6 +120,18 @@ int QnInstallUpdateRestHandler::executePost(
     for (const auto& idString: params.value("peers").split(','))
         participants.append(QnUuid::fromStringSafe(idString));
 
+    if (!serverModule()->updateManager()->setParticipants(participants))
+    {
+        return QnFusionRestHandler::makeError(
+            nx::network::http::StatusCode::ok,
+            "Failed to set update participants list. Update information might not be valid",
+            &result,
+            &resultContentType,
+            Qn::JsonFormat,
+            request.extraFormatting,
+            QnRestResult::InternalServerError);
+    }
+
     if (!request.isLocal)
     {
         if (!allParticipantsAreReadyForInstall(participants, processor))

@@ -38,6 +38,7 @@ protected:
             ASSERT_TRUE(m_peers.back()->start());
         }
 
+
         for (int i = 0; i < count - 1; ++i)
         {
             const auto& to = m_peers[i + 1];
@@ -47,45 +48,84 @@ protected:
             m_peers[i]->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
                 to->commonModule()->moduleGUID(), vms::api::PeerType::server, toUrl);
         }
+
+        const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
+        int distance = std::numeric_limits<int>::max();
+        while (distance > m_peers.size())
+        {
+            distance = firstPeerMessageBus->distanceToPeer(
+                m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
 
-    void whenCorrectUpdateInformationSet()
+    void whenCorrectUpdateInformationWithEmptyParticipantListSet()
     {
-        prepareCorrectUpdateInformation();
-        QByteArray serializedUpdateInfo;
-        NX_TEST_API_POST(m_peers[0].get(), "/ec2/startUpdate", m_updateInformation);
+        setUpdateInformation();
     }
 
-    void thenItShouldBeRetrivable()
+    void whenCorrectUpdateInformationWithParticipantsSet(const QList<QnUuid>& participants)
+    {
+        setUpdateInformation(participants);
+    }
+
+    void thenItShouldBeRetrievable()
     {
         update::Information receivedUpdateInfo;
         NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
         ASSERT_EQ(m_updateInformation, receivedUpdateInfo);
+    }
 
+    void thenPeersUpdateStatusShouldBe(const QMap<QnUuid, update::Status::Code>& expectedStatuses)
+    {
         QList<nx::update::Status> updateStatusList;
         while (true)
         {
             NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateStatus", &updateStatusList);
-            if (updateStatusList.isEmpty()
-                || updateStatusList[0].code != update::Status::Code::readyToInstall)
+            bool ok = true;
+            if (updateStatusList.size() == expectedStatuses.size())
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                for (const auto& status: updateStatusList)
+                {
+                    if (!expectedStatuses.contains(status.serverId)
+                        || status.code != expectedStatuses[status.serverId])
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (ok)
+                    break;
             }
-            else
-            {
-                break;
-            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 
     void thenInstallUpdateWithoutPeersParameterShouldFail()
     {
-        QByteArray responseBuffer;
-        NX_TEST_API_POST(m_peers[0].get(), "/api/installUpdate", "", nullptr,
-            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
-        QnRestResult installResponse;
-        QJson::deserialize(responseBuffer, &installResponse);
-        ASSERT_EQ(QnRestResult::MissingParameter, installResponse.error);
+        issueInstallUpdateRequest(false, QnUuidList(), QnRestResult::MissingParameter);
+    }
+
+    QnUuid peerId(int index)
+    {
+        return m_peers[index]->commonModule()->moduleGUID();
+    }
+
+    void thenInstallUpdateWithPeersParameterShouldSucceed(const QList<QnUuid>& participants)
+    {
+        issueInstallUpdateRequest(true, participants, QnRestResult::NoError);
+    }
+
+    void thenGlobalUpdateInformationShouldContainParticipants(const QList<QnUuid>& participants)
+    {
+        update::Information receivedUpdateInfo;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
+
+        ASSERT_EQ(participants.size(), receivedUpdateInfo.participants.size());
+        for (const auto& participant: receivedUpdateInfo.participants)
+            ASSERT_TRUE(participants.contains(participant));
     }
 
 private:
@@ -104,11 +144,43 @@ private:
     nx::update::Information m_updateInformation;
     network::http::TestHttpServer m_testHttpServer;
 
-    void prepareCorrectUpdateInformation()
+    void setUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())
+    {
+        prepareCorrectUpdateInformation(participants);
+        QByteArray serializedUpdateInfo;
+        NX_TEST_API_POST(m_peers[0].get(), "/ec2/startUpdate", m_updateInformation);
+    }
+
+    void issueInstallUpdateRequest(bool hasPeers, const QList<QnUuid>& participants,
+        QnRestResult::Error expectedRestResult)
+    {
+        QByteArray responseBuffer;
+        QString path = "/api/installUpdate";
+
+        if (hasPeers)
+        {
+            path += "?peers=";
+            for (int i = 0; i < participants.size(); ++i)
+            {
+                path += participants[i].toString();
+                if (i != participants.size() - 1)
+                    path += ',';
+            }
+        }
+
+        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
+            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+        QnRestResult installResponse;
+        QJson::deserialize(responseBuffer, &installResponse);
+        ASSERT_EQ(expectedRestResult, installResponse.error);
+    }
+
+    void prepareCorrectUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())
     {
         m_updateInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         m_updateInformation.version = "4.0.0.1";
         m_updateInformation.packages.append(preparePackage(m_peers[0]->dataDir()));
+        m_updateInformation.participants = participants;
     }
 
     update::Package preparePackage(const QString& dataDir)
@@ -199,16 +271,86 @@ R"JSON({
 TEST_F(Updates, updateInformation_onePeer_correctlySet)
 {
     givenConnectedPeers(1);
-    whenCorrectUpdateInformationSet();
-    thenItShouldBeRetrivable();
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
 TEST_F(Updates, installUpdate_wontWorkWithoutPeersParameter)
 {
     givenConnectedPeers(1);
-    whenCorrectUpdateInformationSet();
-    thenItShouldBeRetrivable();
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+
     thenInstallUpdateWithoutPeersParameterShouldFail();
+}
+
+TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
+{
+    givenConnectedPeers(1);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+
+    QList<QnUuid> participants{peerId(0)};
+    thenInstallUpdateWithPeersParameterShouldSucceed(participants);
+    thenGlobalUpdateInformationShouldContainParticipants(participants);
+}
+
+TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
+{
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0)});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList)
+{
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0), peerId(1)});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonParticipant)
+{
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(1), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsEmpty)
+{
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
 } // namespace nx::vms::server::test

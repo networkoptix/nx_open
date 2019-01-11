@@ -16,12 +16,10 @@ int QnUpdateStatusRestHandler::executeGet(
     const QnRestConnectionProcessor* processor)
 {
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
-        processor->resourcePool(),
-        params);
+        processor->resourcePool(), params);
 
     QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request,
-        processor->owner()->getPort());
+        request, processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
     if (request.isLocal)
@@ -30,10 +28,8 @@ int QnUpdateStatusRestHandler::executeGet(
     }
     else
     {
-        detail::checkUpdateStatusRemotely(
-            serverModule()->updateManager()->participants(),
-            processor->commonModule(),
-            path, &reply, &context);
+        detail::checkUpdateStatusRemotely(serverModule()->updateManager()->participants(),
+            processor->commonModule(), path, &reply, &context);
     }
 
     QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
