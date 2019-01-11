@@ -70,8 +70,17 @@ public:
     const AbstractStreamSocket* socket() const { return m_socket.get(); }
 
 private:
-    using UserReadPair = std::pair<IoCompletionHandler, nx::Buffer* const>;
-    using UserReadPairPtr = std::unique_ptr<UserReadPair>;
+    struct UserReadContext
+    {
+        IoCompletionHandler handler;
+        nx::Buffer* const bufferPtr;
+
+        UserReadContext(IoCompletionHandler handler, nx::Buffer* const bufferPtr):
+            handler(std::move(handler)),
+            bufferPtr(bufferPtr)
+        {}
+    };
+    using UserReadContextPtr = std::unique_ptr<UserReadContext>;
 
     std::unique_ptr<AbstractStreamSocket> m_socket;
     Parser m_parser;
@@ -81,7 +90,7 @@ private:
     bool m_isLastFrame = false;
     bool m_isFirstFrame = true;
     std::queue<std::pair<IoCompletionHandler, nx::Buffer>> m_writeQueue;
-    UserReadPairPtr m_userReadPair;
+    UserReadContextPtr m_userReadContext;
     websocket::MultiBuffer m_incomingMessageQueue;
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
