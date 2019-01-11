@@ -335,7 +335,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         auto parser = m_tracks[trackNum].parser;
         QnRtspIoDevice* ioDevice = m_tracks[trackNum].ioDevice;
         if (m_tracks.size() < trackNum || !parser)
+        {
+            m_demuxedData[rtpChannelNum]->clear();
             continue;
+        }
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - bytesRead;
 
