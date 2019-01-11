@@ -299,47 +299,54 @@ PageBase
         }
     }
 
-    Image
+    Item
     {
-        id: screenshot
+        id: screenshotPlaceholder
 
-        function getAspect(value)
+        anchors.fill: video
+
+        Image
         {
-            return value.width > 0 && value.height > 0 ? value.width / value.height : 1
+            id: screenshot
+
+            function getAspect(value)
+            {
+                return value.width > 0 && value.height > 0 ? value.width / value.height : 1
+            }
+
+            function fitToBounds(value, bounds)
+            {
+                var aspect = getAspect(value)
+                return aspect < bounds.width / bounds.height
+                    ? Qt.size(bounds.height * aspect, bounds.height)
+                    : Qt.size(bounds.width, bounds.width / aspect)
+            }
+
+            function fillBounds(value, bounds)
+            {
+                var aspect = getAspect(value)
+                var minimalSize = Math.min(bounds.width, bounds.height)
+                return value.width < value.height
+                    ? Qt.size(minimalSize, minimalSize / aspect)
+                    : Qt.size(minimalSize * aspect, minimalSize)
+            }
+
+            readonly property size boundingSize:
+            {
+                var windowSize = Qt.size(parent.width, parent.height)
+                return video.fisheyeMode
+                    ? fillBounds(sourceSize, windowSize)
+                    : fitToBounds(sourceSize, windowSize)
+            }
+
+            width: boundingSize.width
+            height: boundingSize.height
+
+            y: (mainWindow.height - height) / 3
+            x: (mainWindow.width - width) / 2 - mainWindow.leftPadding
+            visible: status == Image.Ready && !dummyLoader.visible
+            opacity: d.cameraUiOpacity
         }
-
-        function fitToBounds(value, bounds)
-        {
-            var aspect = getAspect(value)
-            return aspect < bounds.width / bounds.height
-                ? Qt.size(bounds.height * aspect, bounds.height)
-                : Qt.size(bounds.width, bounds.width / aspect)
-        }
-
-        function fillBounds(value, bounds)
-        {
-            var aspect = getAspect(value)
-            var minimalSize = Math.min(bounds.width, bounds.height)
-            return value.width < value.height
-                ? Qt.size(minimalSize, minimalSize / aspect)
-                : Qt.size(minimalSize * aspect, minimalSize)
-        }
-
-        readonly property size boundingSize:
-        {
-            var windowSize = Qt.size(mainWindow.width, mainWindow.height)
-            return video.fisheyeMode
-                ? fillBounds(sourceSize, windowSize)
-                : fitToBounds(sourceSize, windowSize)
-        }
-
-        width: boundingSize.width
-        height: boundingSize.height
-
-        y: (mainWindow.height - height) / 3 - header.height
-        x: (mainWindow.width - width) / 2 - mainWindow.leftPadding
-        visible: status == Image.Ready && !dummyLoader.visible
-        opacity: d.cameraUiOpacity
     }
 
     Item
