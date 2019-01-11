@@ -46,6 +46,8 @@ public:
     Q_INVOKABLE bool setPresetById(const QString& id);
     Q_INVOKABLE int indexOfPreset(const QString& id) const;
 
+    Q_INVOKABLE bool continuousMove(const QVector3D& speed);
+
 signals:
     void resourceIdChanged();
     void availableChanged();
