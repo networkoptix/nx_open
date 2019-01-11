@@ -68,8 +68,9 @@ public:
                 {
                     TimeSynchronizationWidgetStore::TimeOffsetInfo offsetInfo;
                     offsetInfo.serverId = record.serverId;
-                    offsetInfo.osTimeOffset = record.timeSinceEpochMs - syncTime;
-                    offsetInfo.vmsTimeOffset = 0; // FIXME: use real value
+                    offsetInfo.osTimeOffset = milliseconds(record.timeSinceEpochMs - syncTime);
+                    offsetInfo.vmsTimeOffset = 0ms; // FIXME: use real value
+                    offsetInfo.timeZoneOffset = milliseconds(record.timeZoneOffsetMs);
                     offsetList += offsetInfo;
                 }
 

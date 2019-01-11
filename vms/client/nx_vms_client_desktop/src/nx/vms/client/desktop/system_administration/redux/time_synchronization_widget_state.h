@@ -9,6 +9,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 struct TimeSynchronizationWidgetState: AbstractReduxState
 {
     enum class Status
@@ -32,7 +34,7 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
     // Previous selected time server.
     QnUuid lastPrimaryServer;
 
-    std::chrono::milliseconds vmsTime = std::chrono::milliseconds(0);
+    milliseconds vmsTime = 0ms;
     Status status = Status::synchronizedWithInternet;
 
     struct ServerInfo
@@ -42,10 +44,10 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
         QString ipAddress;
         bool online = true;
         bool hasInternet = true;
-        qint64 osTimeOffset = 0;
-        qint64 vmsTimeOffset = 0;
+        milliseconds osTimeOffset = 0ms;
+        milliseconds vmsTimeOffset = 0ms;
         // QString timeZoneId;
-        qint64 timeZoneOffsetMs = 0;
+        milliseconds timeZoneOffset = 0ms;
     };
     QList<ServerInfo> servers;
 
