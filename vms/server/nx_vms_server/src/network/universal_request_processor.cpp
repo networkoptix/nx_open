@@ -265,7 +265,7 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
     Q_D(QnUniversalRequestProcessor);
 
     const auto listener = dynamic_cast<QnHttpConnectionListener*>(d->owner);
-    if (listener && listener->isProxy(d->request))
+    if (listener && listener->isProxy(d->request) && d->request.headers.count("Via"))
     {
         NX_ASSERT(false, lm("Unable to redirect sheme %1 for proxy").arg(schemeString));
         sendErrorResponse(nx::network::http::StatusCode::forbidden);
