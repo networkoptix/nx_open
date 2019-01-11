@@ -103,6 +103,7 @@ int QnInstallUpdateRestHandler::executePost(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),
         params);
+
     if (!params.contains("peers"))
     {
         return QnFusionRestHandler::makeError(
@@ -114,9 +115,11 @@ int QnInstallUpdateRestHandler::executePost(
             request.extraFormatting,
             QnRestResult::MissingParameter);
     }
+
     QList<QnUuid> participants;
     for (const auto& idString: params.value("peers").split(','))
         participants.append(QnUuid::fromStringSafe(idString));
+
     if (!request.isLocal)
     {
         if (!allParticipantsAreReadyForInstall(participants, processor))
@@ -126,9 +129,11 @@ int QnInstallUpdateRestHandler::executePost(
                 "Not all servers in the system are ready for install",
                 &result, &resultContentType, Qn::JsonFormat);
         }
+
         QnMultiserverRequestContext<QnEmptyRequestData> context(
             request,
             processor->owner()->getPort());
+
         sendInstallRequest(
             participants,
             serverModule()->commonModule(),
@@ -136,6 +141,7 @@ int QnInstallUpdateRestHandler::executePost(
             srcBodyContentType,
             &context);
     }
+
     return nx::network::http::StatusCode::ok;
 }
 
