@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <nx/utils/log/log.h>
+
 #include "camera_manager.h"
 #include "device/video/utils.h"
 
@@ -55,22 +57,33 @@ Camera::Camera(
     CameraManager * cameraManager,
     nxpl::TimeProvider* const timeProvider):
     m_cameraManager(cameraManager),
-    m_timeProvider(timeProvider),
-    m_audioEnabled(false),
-    m_lastError(0)
+    m_timeProvider(timeProvider)
+{
+}
+
+bool Camera::initialize()
 {
     auto codecList = device::video::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
 
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
     if(m_compressionTypeDescriptor)
+    {
         m_defaultVideoParams = getDefaultVideoParameters();
+    }
     else
+    {
         setLastError(AVERROR(ENODEV));
-}
+        NX_DEBUG(
+            this, 
+            "%1: Failed to obtain a valid compression type descriptor for camera: %2",
+            __func__,
+            toString());
 
-void Camera::initialize()
-{
+        m_initialized = false;
+        return false;
+    }
+
     m_audioStream = std::make_shared<AudioStream>(
             info().auxiliaryData,
             weak_from_this(),
@@ -79,6 +92,14 @@ void Camera::initialize()
     m_videoStream = std::make_shared<VideoStream>(
             weak_from_this(),
             m_defaultVideoParams);
+
+    m_initialized = true;
+    return true;
+}
+
+bool Camera::isInitialized() const
+{
+    return m_initialized;
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
@@ -162,8 +183,17 @@ nxcip::CameraInfo Camera::info() const
     return m_cameraManager->info();
 }
 
+std::string Camera::toString() const
+{
+    const nxcip::CameraInfo& cameraInfo = info();
+    return std::string("{ name: ") + cameraInfo.modelName + ", uid: " + cameraInfo.uid + "}";
+}
+
 CodecParameters Camera::getDefaultVideoParameters()
 {
+    if(!m_compressionTypeDescriptor)
+        return CodecParameters();
+
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
     AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecId(nxCodecID);
 
