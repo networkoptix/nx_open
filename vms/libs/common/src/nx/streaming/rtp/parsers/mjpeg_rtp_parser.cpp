@@ -545,11 +545,11 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
 
             if (length > 0)
             {
-                if (length < 64 * (lumaSize + chromaSize))
+                if (length < 64)
                     return false;
                 // RFC2435. Same table for each frame, make deep copy of tables.
                 lumaTable = curPtr;
-                chromaTable = curPtr + 64 * lumaSize;
+                chromaTable = curPtr + (length >= 128 ? 64 : 0);
                 if (jpegQ != 255)
                 {
                     // Make deep copy because the same table will be reused.
