@@ -93,8 +93,11 @@ void forgetPassword(const QnLayoutResourcePtr& layout)
 bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
     auto dialog = createPasswordDialog(
-        EncryptedLayoutStrings::tr("This file is encrypted. Please enter the password:"),
+        EncryptedLayoutStrings::tr("The file %1 is encrypted. Please enter the password:").
+            arg(QFileInfo(layout->getUrl()).fileName()),
         parent);
+
+
     dialog->setValidator(passwordValidator(layout));
 
     if (dialog->exec() == QDialog::Accepted)
@@ -109,7 +112,8 @@ bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 bool confirmPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
     auto dialog = createPasswordDialog(
-        EncryptedLayoutStrings::tr("Please re-enter password for this layout:"),
+        EncryptedLayoutStrings::tr("Please re-enter password for layout %1:").
+            arg(QFileInfo(layout->getUrl()).fileName()),
         parent);
     dialog->setValidator(passwordValidator(layout));
 

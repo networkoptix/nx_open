@@ -1129,7 +1129,7 @@ void SingleCameraSettingsWidget::at_fisheyeSettingsChanged()
         mediaWidget->setDewarpingParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();
-        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        auto itemParams = item->dewarpingParams();
         itemParams.enabled = dewarpingParams.enabled;
         item->setDewarpingParams(itemParams);
     }

@@ -5,7 +5,7 @@
 #include <utils/media/frame_info.h>
 #include <utils/math/math.h>
 
-QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
+QnContrastImageFilter::QnContrastImageFilter(const nx::vms::api::ImageCorrectionData& params):
     m_params(params),
     m_lastGamma(-1.0)
 {

@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
  * Manages radass state for resources (layout items), saves it locally. Connection entries are
  * saved by system id to make sure we will clean all non-existent layout items sometimes.
  */
-class NX_VMS_DESKTOP_CLIENT_API RadassResourceManager: public QObject
+class NX_VMS_CLIENT_DESKTOP_API RadassResourceManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

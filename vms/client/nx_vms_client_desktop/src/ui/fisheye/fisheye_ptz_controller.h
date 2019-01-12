@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/basic_ptz_controller.h>
 
-#include <core/ptz/item_dewarping_params.h>
+#include <nx/vms/api/data/dewarping_data.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/ptz_constants.h>
 
@@ -53,7 +53,7 @@ public:
         const nx::core::ptz::Options& options) const override;
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
-    QnItemDewarpingParams itemDewarpingParams() const;
+    nx::vms::api::DewarpingData itemDewarpingParams() const;
 
     static nx::core::ptz::Vector positionFromRect(
         const QnMediaDewarpingParams& dewarpingParams,
@@ -102,6 +102,6 @@ private:
     qreal m_progress;
 
     QnMediaDewarpingParams m_mediaDewarpingParams;
-    QnItemDewarpingParams m_itemDewarpingParams;
+    nx::vms::api::DewarpingData m_itemDewarpingParams;
 };
 

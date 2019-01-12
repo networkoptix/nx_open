@@ -580,7 +580,12 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
     return m_imgCorrection;
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
+void DecodedPictureToOpenGLUploader::UploadedPicture::processImage(
+    quint8* yPlane,
+    int width,
+    int height,
+    int stride,
+    const nx::vms::api::ImageCorrectionData& data)
 {
     m_imgCorrection.analyseImage(yPlane, width, height, stride, data, m_displayedRect);
 }
@@ -815,7 +820,7 @@ public:
             return;
         }
 
-        ImageCorrectionParams imCor = m_uploader->getImageCorrection();
+        nx::vms::api::ImageCorrectionData imCor = m_uploader->getImageCorrection();
         pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
 
 #ifdef GL_COPY_AGGREGATION
@@ -1173,7 +1178,7 @@ public:
         else
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
 
-        ImageCorrectionParams imCor = m_uploader->getImageCorrection();
+        nx::vms::api::ImageCorrectionData imCor = m_uploader->getImageCorrection();
         m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
 
         m_isRunning = false;
@@ -2006,12 +2011,12 @@ inline void memcpy_sse4_stream_store( __m128i* dst, __m128i* src, size_t sz )
 #endif
 
 //void DecodedPictureToOpenGLUploader::setImageCorrection( bool enabled, float blackLevel, float whiteLevel, float gamma)
-void DecodedPictureToOpenGLUploader::setImageCorrection(const ImageCorrectionParams& value)
+void DecodedPictureToOpenGLUploader::setImageCorrection(const nx::vms::api::ImageCorrectionData& value)
 {
     m_imageCorrection = value;
 }
 
-ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const {
+nx::vms::api::ImageCorrectionData DecodedPictureToOpenGLUploader::getImageCorrection() const {
     return m_imageCorrection;
 }
 

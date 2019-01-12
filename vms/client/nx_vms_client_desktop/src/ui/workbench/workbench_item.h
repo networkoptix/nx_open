@@ -11,8 +11,9 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <core/ptz/item_dewarping_params.h>
-#include <utils/color_space/image_correction.h>
+
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
 class QnWorkbenchLayout;
 
@@ -224,20 +225,20 @@ public:
     /**
      * \param                           New image enhancement params for this item.
      */
-    void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
+    void setImageEnhancement(const nx::vms::api::ImageCorrectionData& imageEnhancement);
 
     /**
      * \param                           New dewarping enhancement params for this item.
      */
-    void setDewarpingParams(const QnItemDewarpingParams& params);
+    void setDewarpingParams(const nx::vms::api::DewarpingData& params);
 
 
-    const ImageCorrectionParams &imageEnhancement() const
+    const nx::vms::api::ImageCorrectionData& imageEnhancement() const
     {
         return m_imageEnhancement;
     }
 
-    const QnItemDewarpingParams &dewarpingParams() const
+    const nx::vms::api::DewarpingData& dewarpingParams() const
     {
         return m_itemDewarpingParams;
     }
@@ -353,7 +354,7 @@ private:
     QRectF m_zoomRect;
 
     /** Item image enhancement params. */
-    ImageCorrectionParams m_imageEnhancement;
+    nx::vms::api::ImageCorrectionData m_imageEnhancement;
 
     /** Item flags. */
     Qn::ItemFlags m_flags = 0;
@@ -362,7 +363,7 @@ private:
     qreal m_rotation = 0.0;
 
     /** Current item dewarping parameters. */
-    QnItemDewarpingParams m_itemDewarpingParams;
+    nx::vms::api::DewarpingData m_itemDewarpingParams;
 
     /** Should the info be always displayed on the item. */
     bool m_displayInfo = false;

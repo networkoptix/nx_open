@@ -4,7 +4,6 @@
 #include "cam_display.h"
 
 #include <core/resource/resource_fwd.h>
-#include <core/ptz/item_dewarping_params.h>
 
 #include <recording/stream_recorder.h>
 #include <nx/streaming/config.h>

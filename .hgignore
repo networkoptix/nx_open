@@ -15,5 +15,11 @@ syntax: glob
 
 CMakeLists.txt.user
 
+# Exclude project-specific items.
 subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
+
+# Exclude build folders in the repository root.
+syntax: regexp
+^build/
+^build-.*/

@@ -18,7 +18,7 @@
  * Everything that is changeable is to be implemented at application settings
  * level.
  */
-class NX_VMS_DESKTOP_CLIENT_API QnGlobals:
+class NX_VMS_CLIENT_DESKTOP_API QnGlobals:
     public QnPropertyStorage,
     public Singleton<QnGlobals>
 {

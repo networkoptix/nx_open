@@ -3,7 +3,7 @@
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 
-class NX_VMS_DESKTOP_CLIENT_API QnClientRuntimeSettings:
+class NX_VMS_CLIENT_DESKTOP_API QnClientRuntimeSettings:
     public QnPropertyStorage,
     public Singleton<QnClientRuntimeSettings>
 {

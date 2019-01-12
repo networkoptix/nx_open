@@ -12,20 +12,19 @@
 #include <utils/common/id.h>
 
 namespace ec2 {
-
-struct ApiLayoutItemWithRefData: nx::vms::api::LayoutItemData
-{
-    QnUuid layoutId;
-};
-#define ApiLayoutItemWithRefData_Fields LayoutItemData_Fields (layoutId)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiLayoutItemWithRefData, (sql_record),
-    ApiLayoutItemWithRefData_Fields)
-
 namespace database {
 namespace api {
 
 namespace {
+
+struct LayoutItemWithRefData: nx::vms::api::LayoutItemData
+{
+    QnUuid layoutId;
+};
+#define LayoutItemWithRefData_Fields LayoutItemData_Fields (layoutId)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LayoutItemWithRefData, (sql_record),
+    LayoutItemWithRefData_Fields)
 
 bool deleteLayoutInternal(const QSqlDatabase& database, int internalId)
 {
@@ -55,7 +54,6 @@ bool insertOrReplaceLayout(
             locked,
             cell_aspect_ratio,
             cell_spacing_width,
-            cell_spacing_height,
             fixed_width,
             fixed_height,
             logical_id,
@@ -67,8 +65,7 @@ bool insertOrReplaceLayout(
             :internalId,
             :locked,
             :cellAspectRatio,
-            :horizontalSpacing,
-            :verticalSpacing,
+            :cellSpacing,
             :fixedWidth,
             :fixedHeight,
             :logicalId,
@@ -208,8 +205,7 @@ bool fetchLayouts(
             l.resource_ptr_id as id,
             l.locked,
             l.cell_aspect_ratio as cellAspectRatio,
-            l.cell_spacing_width as horizontalSpacing,
-            l.cell_spacing_height as verticalSpacing,
+            l.cell_spacing_width as cellSpacing,
             l.fixed_width as fixedWidth,
             l.fixed_height as fixedHeight,
             l.logical_id as logicalId,
@@ -264,13 +260,13 @@ bool fetchLayouts(
         return false;
 
     QnSql::fetch_many(query, &layouts);
-    std::vector<ApiLayoutItemWithRefData> items;
+    std::vector<LayoutItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
     QnDbHelper::mergeObjectListData(
         layouts,
         items,
         &nx::vms::api::LayoutData::items,
-        &ApiLayoutItemWithRefData::layoutId);
+        &LayoutItemWithRefData::layoutId);
 
     return true;
 }
@@ -293,7 +289,7 @@ bool removeLayout(
     ec2::database::api::QueryContext* resourceContext,
     const QnUuid& id)
 {
-    int internalId = api::getResourceInternalId(resourceContext, id);
+    const int internalId = api::getResourceInternalId(resourceContext, id);
     if (internalId == 0)
         return true;
 

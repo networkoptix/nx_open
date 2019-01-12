@@ -1,17 +1,16 @@
-#ifndef QN_YV12_TO_RGB_SHADER_PROGRAM_H
-#define QN_YV12_TO_RGB_SHADER_PROGRAM_H
+#pragma once
 
-
-
-#include "utils/color_space/image_correction.h"
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
-#include "shader_source.h"
 
-#include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
+#include "shader_source.h"
 #include "base_shader_program.h"
+
+#include <nx/vms/api/data/dewarping_data.h>
+
+#include <utils/color_space/image_correction.h>
 
 class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram {
     Q_OBJECT
@@ -32,7 +31,7 @@ public:
         setUniformValue(m_opacityLocation, opacity);
     }
 
-    virtual bool link() override; 
+    virtual bool link() override;
     bool wasLinked(){ return m_wasLinked; };
 private:
     bool m_wasLinked;
@@ -107,7 +106,7 @@ public:
     using base_type::addShaderFromSourceCode;
 
     void setDewarpingParams(const QnMediaDewarpingParams &mediaParams,
-                            const QnItemDewarpingParams &itemParams,
+                            const nx::vms::api::DewarpingData& itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
         if (itemParams.panoFactor == 1)
@@ -157,7 +156,7 @@ public:
         {
             addShaderFromSourceCode(QOpenGLShader::Fragment, getShaderText());
             m_add_shader = true;
-        }        
+        }
         bool rez = base_type::link();
         if (rez) {
             m_xShiftLocation = uniformLocation("xShift");
@@ -188,12 +187,12 @@ protected:
     int m_dstFovLocation;
     int m_aspectRatioLocation;
     int m_panoFactorLocation;
-    
+
     int m_yPos;
     int m_xCenterLocation;
     int m_radiusLocation;
     int m_yCenterLocation;
-    
+
     int m_maxXLocation;
     int m_maxYLocation;
     int m_xStretchLocation;
@@ -275,5 +274,3 @@ private:
     int m_aTextureLocation;
 };
 
-
-#endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H

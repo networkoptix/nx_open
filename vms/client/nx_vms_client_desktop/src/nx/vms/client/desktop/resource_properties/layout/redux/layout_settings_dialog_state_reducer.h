@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_DESKTOP_CLIENT_API LayoutSettingsDialogStateReducer
+class NX_VMS_CLIENT_DESKTOP_API LayoutSettingsDialogStateReducer
 {
 public:
     /** Debug-level state tracing. */

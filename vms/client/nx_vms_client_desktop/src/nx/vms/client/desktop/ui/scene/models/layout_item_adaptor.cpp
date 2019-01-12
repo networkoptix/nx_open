@@ -197,12 +197,12 @@ void LayoutItemAdaptor::setDisplayInfo(bool displayInfo)
     emit displayInfoChanged();
 }
 
-ImageCorrectionParams LayoutItemAdaptor::imageCorrectionParams() const
+nx::vms::api::ImageCorrectionData LayoutItemAdaptor::imageCorrectionParams() const
 {
     return d->itemData.contrastParams;
 }
 
-void LayoutItemAdaptor::setImageCorrectionParams(const ImageCorrectionParams& params)
+void LayoutItemAdaptor::setImageCorrectionParams(const nx::vms::api::ImageCorrectionData& params)
 {
     if (d->itemData.contrastParams == params)
         return;
@@ -213,12 +213,12 @@ void LayoutItemAdaptor::setImageCorrectionParams(const ImageCorrectionParams& pa
     emit imageCorrectionParamsChanged();
 }
 
-QnItemDewarpingParams LayoutItemAdaptor::dewarpingParams() const
+nx::vms::api::DewarpingData LayoutItemAdaptor::dewarpingParams() const
 {
     return d->itemData.dewarpingParams;
 }
 
-void LayoutItemAdaptor::setDewarpingParams(const QnItemDewarpingParams& params)
+void LayoutItemAdaptor::setDewarpingParams(const nx::vms::api::DewarpingData& params)
 {
     if (d->itemData.dewarpingParams == params)
         return;

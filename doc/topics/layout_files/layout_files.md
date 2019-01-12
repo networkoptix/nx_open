@@ -20,6 +20,7 @@ This document focuses on technical implementation of saved layout files in NX Wi
 There are some things important to know if you work with Layout files:
 
 ### Layout Files Properties
+- Layout File URL is always a plain file name including path. No protocol or parameters.
 - Only some streams (currently video and images) are encrypted in password-protected Layout Fules. Discrimination is done by `QnLayoutFileStorageResource::shouldCrypt`. Others are in plain format.
 
 ### Examining Layout File

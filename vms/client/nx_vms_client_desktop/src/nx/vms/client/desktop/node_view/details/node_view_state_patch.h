@@ -24,7 +24,7 @@ struct PatchStep
     ViewNodeData data;
 };
 
-struct NX_VMS_DESKTOP_CLIENT_API NodeViewStatePatch
+struct NX_VMS_CLIENT_DESKTOP_API NodeViewStatePatch
 {
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
     static NodeViewStatePatch clearNodeView();
