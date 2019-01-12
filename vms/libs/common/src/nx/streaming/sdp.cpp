@@ -127,7 +127,10 @@ static QHostAddress parseServerAddress(const QString& line)
 
 void Sdp::parse(const QString& sdpData)
 {
+    serverAddress.clear();
+    controlUrl.clear();
     media.clear();
+
     QStringList lines = sdpData.split('\n');
     while(!lines.isEmpty())
     {
