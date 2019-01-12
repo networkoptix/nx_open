@@ -2,7 +2,9 @@
 
 #include <nx/streaming/sdp.h>
 
-TEST(Sdp, parsing)
+using namespace nx::streaming;
+
+TEST(Sdp, h264AndMpa)
 {
     QString sdpString =
         "v=0\r\n"
@@ -15,7 +17,6 @@ TEST(Sdp, parsing)
         "m=audio 0 RTP/AVP 14\r\n"
         "a=control:trackID=1\r\n"
         "a=rtpmap:14 MPA/90000\r\n\r\n";
-    using namespace nx::streaming;
     Sdp sdp;
     sdp.parse(sdpString);
     ASSERT_EQ(sdp.media.size(), 2);
@@ -34,8 +35,28 @@ TEST(Sdp, parsing)
     ASSERT_EQ(sdp.media[1].rtpmap.codecName, "MPA");
     ASSERT_EQ(sdp.media[1].rtpmap.clockRate, 90000);
     ASSERT_EQ(sdp.media[1].rtpmap.channels, 0);
+}
 
+TEST(Sdp, jpeg)
+{
+    QString sdpString =
+        "v=0\r\n"
+        "s=PNO-9080R\r\n"
+        "c=IN IP4 127.0.0.1\r\n"
+        "m=video 0 RTP/AVP 26\r\n"
+        "a=control:trackID=0\r\n\r\n";
 
+    Sdp sdp;
+    sdp.parse(sdpString);
+    ASSERT_EQ(sdp.media.size(), 1);
+    ASSERT_EQ(sdp.media[0].payloadType, 26);
+    ASSERT_EQ(sdp.media[0].mediaType, Sdp::MediaType::Video);
+    ASSERT_EQ(sdp.media[0].control, "trackID=0");
+    ASSERT_EQ(sdp.media[0].rtpmap.codecName, "JPEG");
+}
+
+TEST(Sdp, h264AndMetadata)
+{
     QString sdpString1 = "v=0\r\n"
         "o=- 1533155478115363 1 IN IP4 192.168.0.123\r\n"
         "s=RTSP/RTP stream\r\n"
@@ -57,7 +78,11 @@ TEST(Sdp, parsing)
         "a=sendonly\r\n"
         "a=control:track2\r\n"
         "a=rtpmap:98 vnd.onvif.metadata/90000\r\n";
+
+    Sdp sdp;
     sdp.parse(sdpString1);
+    ASSERT_EQ("*", sdp.controlUrl);
+
     ASSERT_EQ(sdp.media.size(), 2);
     ASSERT_EQ(sdp.media[0].payloadType, 96);
     ASSERT_EQ(sdp.media[0].mediaType, Sdp::MediaType::Video);
@@ -79,7 +104,10 @@ TEST(Sdp, parsing)
     ASSERT_EQ(sdp.media[1].rtpmap.clockRate, 90000);
     ASSERT_EQ(sdp.media[1].rtpmap.channels, 0);
     ASSERT_EQ(sdp.media[1].fmtp.params.size(), 0);
+}
 
+TEST(Sdp, h264AndAudio)
+{
     QString sdpString2 =
         "v=0\r\n"
         "o=- 1357696464263190 1 IN IP4 192.168.0.30\r\n"
@@ -101,6 +129,8 @@ TEST(Sdp, parsing)
         "a=rtpmap:97 mpeg4-generic/8000/1\r\n"
         "a=fmtp:97 streamtype=5; profile-level-id=15; mode=AAC-hbr; sizeLength=13; indexLength=3; indexDeltaLength=3; profile=1; bitrate=12000; config=1588\r\n"
         "a=control:track2\r\n";
+
+    Sdp sdp;
     sdp.parse(sdpString2);
 
     ASSERT_EQ("127.0.0.1", sdp.serverAddress.toString());

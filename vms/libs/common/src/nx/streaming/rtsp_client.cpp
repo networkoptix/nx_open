@@ -409,18 +409,6 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
 
-    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
-    if (!tmp.isEmpty())
-    {
-        m_contentBase = tmp;
-    }
-    else
-    {
-        tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
-        if (!tmp.isEmpty())
-            m_contentBase = tmp;
-    }
-
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
     updateResponseStatus(response);
     switch( m_responseCode )
@@ -450,6 +438,24 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         stop();
         result = CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
+
+    /*
+     * RFC2326
+     * 1. The RTSP Content-Base field.
+     * 2. The RTSP Content-Location field.
+     * 3. The RTSP request URL.
+     * If this attribute contains only an asterisk (*), then the URL is
+     * treated as if it were an empty embedded URL, and thus inherits the
+     * entire base URL.
+    */
+
+    auto contentUrl = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
+    if (contentUrl.isEmpty())
+        contentUrl = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
+    if (contentUrl.isEmpty() && m_sdp.controlUrl != "*")
+        contentUrl = m_sdp.controlUrl;
+    if (!contentUrl.isEmpty())
+        m_contentBase = contentUrl;
 
     if( result )
     {
