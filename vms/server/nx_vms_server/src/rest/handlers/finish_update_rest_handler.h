@@ -10,12 +10,7 @@ class QnFinishUpdateRestHandler:
 public:
     QnFinishUpdateRestHandler(QnMediaServerModule* serverModule);
 
-    virtual int executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& result,
-        QByteArray& resultContentType,
-        const QnRestConnectionProcessor* processor) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params,
+        const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
+        QByteArray& resultContentType, const QnRestConnectionProcessor* processor) override;
 };

@@ -134,6 +134,18 @@ int QnInstallUpdateRestHandler::executePost(
 
     if (!request.isLocal)
     {
+        if (!serverModule()->updateManager()->updateLastInstallationRequestTime())
+        {
+            return QnFusionRestHandler::makeError(
+                nx::network::http::StatusCode::ok,
+                "Failed to set last installation request time. Update information might not be valid",
+                &result,
+                &resultContentType,
+                Qn::JsonFormat,
+                request.extraFormatting,
+                QnRestResult::InternalServerError);
+        }
+
         if (!allParticipantsAreReadyForInstall(participants, processor))
         {
             return QnFusionRestHandler::makeError(

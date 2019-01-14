@@ -142,6 +142,7 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
+#include <rest/handlers/finish_update_rest_handler.h>
 #include <rest/handlers/update_status_rest_handler.h>
 #include <rest/handlers/install_update_rest_handler.h>
 #include <rest/handlers/cancel_update_rest_handler.h>
@@ -2495,6 +2496,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
     reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
+    reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));

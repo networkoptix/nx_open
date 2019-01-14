@@ -30,6 +30,7 @@ public:
     void install(const QnAuthSession& authInfo);
     QList<QnUuid> participants() const;
     bool setParticipants(const QList<QnUuid>& participants);
+    bool updateLastInstallationRequestTime();
 
 private:
     std::atomic<bool> m_downloaderFailed = false;

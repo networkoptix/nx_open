@@ -8,6 +8,7 @@
 #include <api/runtime_info_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/update/common_update_installer.h>
+#include <utils/common/synctime.h>
 
 namespace nx {
 
@@ -291,6 +292,28 @@ bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
     }
 
     updateInformation.participants = participants;
+    QByteArray serializedUpdateInformation;
+
+    QJson::serialize(updateInformation, &serializedUpdateInformation);
+    globalSettings()->setUpdateInformation(serializedUpdateInformation);
+    globalSettings()->synchronizeNowSync();
+
+    return true;
+}
+
+bool CommonUpdateManager::updateLastInstallationRequestTime()
+{
+    nx::update::Information updateInformation;
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+        &updateInformation, nullptr);
+
+    if (deserializeResult != nx::update::FindPackageResult::ok)
+    {
+        NX_DEBUG(this, "updateLastInstallationRequestTime: Failed to deserialize");
+        return false;
+    }
+
+    updateInformation.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
     QByteArray serializedUpdateInformation;
 
     QJson::serialize(updateInformation, &serializedUpdateInformation);

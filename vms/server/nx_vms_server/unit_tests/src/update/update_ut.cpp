@@ -35,6 +35,7 @@ protected:
                     | MediaServerLauncher::noMonitorStatistics)));
 
             m_peers.back()->addSetting("--override-version", "4.0.0.0");
+            m_peers.back()->addSetting("--ignoreRootTool", "true");
             ASSERT_TRUE(m_peers.back()->start());
         }
 
@@ -134,6 +135,26 @@ protected:
         NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
 
         ASSERT_NE(-1, receivedUpdateInfo.lastInstallationRequestTime);
+    }
+
+    void whenServersRestartedWithNewVersions()
+    {
+        for (const auto& peer: m_peers)
+        {
+            peer->stop();
+            peer->addSetting("--override-version", "4.0.0.1");
+            peer->start();
+        }
+    }
+
+    void thenFinishUpdateShouldSucceed()
+    {
+        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "", nullptr);
+
+        update::Information receivedUpdateInfo;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
+
+        ASSERT_TRUE(receivedUpdateInfo.isEmpty());
     }
 
 private:
@@ -373,7 +394,13 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
 
 TEST_F(Updates, finishUpdate_success_updateInformationCleared)
 {
-    // #TODO #akulikov
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    thenInstallUpdateWithPeersParameterShouldSucceed({});
+    whenServersRestartedWithNewVersions();
+    thenFinishUpdateShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_fail_notAllUpdated)
