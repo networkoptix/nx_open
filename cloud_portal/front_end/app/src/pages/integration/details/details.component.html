@@ -53,6 +53,16 @@
             </nx-section>
         </nx-block>
 
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.information.companyName">
+            <header translate>
+                {{plugin.information.companyName}}
+            </header>
+
+            <nx-section *ngIf="plugin.information.companyInfo">
+                <div [innerHtml]="plugin.information.companyInfo"></div>
+            </nx-section>
+        </nx-block>
+
         <nx-block side-element type="gray" *ngIf="plugin && plugin.downloadFiles && plugin.downloadFiles.length > 0">
             <header translate>
                 Downloads
