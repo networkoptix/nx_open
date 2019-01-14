@@ -29,8 +29,8 @@ DeviceAgent::DeviceAgent(Engine* engine):
     VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
     m_objectId{{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}}
 {
-    // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
-    *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
+    // TODO: #mshevchenko: Rewrite creating a random nx::sdk::Uuid when implemented.
+    *reinterpret_cast<void**>(&m_objectId[0] + sizeof(m_objectId) - sizeof(void*)) = this;
 }
 
 DeviceAgent::~DeviceAgent()
@@ -304,8 +304,8 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
 
     if (m_currentObjectIndex != sequentialNumber)
     {
-        // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
-        std::time(reinterpret_cast<time_t*>(m_objectId.bytes)); //< Make ID pseudo-unique.
+        // TODO: #mshevchenko: Rewrite creating a random nx::sdk::Uuid when implemented.
+        std::time(reinterpret_cast<time_t*>(&m_objectId)); //< Make ID pseudo-unique.
         m_currentObjectIndex = sequentialNumber;
     }
 

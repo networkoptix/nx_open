@@ -5,6 +5,7 @@
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
@@ -270,8 +271,8 @@ void Engine::settingsReceived()
 
 void Engine::executeAction(
     const std::string& actionId,
-    nxpl::NX_GUID objectId,
-    nxpl::NX_GUID /*deviceId*/,
+    Uuid objectId,
+    Uuid /*deviceId*/,
     int64_t /*timestampUs*/,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
@@ -298,7 +299,8 @@ void Engine::executeAction(
     }
     else if (actionId == "nx.stub.addPerson")
     {
-        *outActionUrl = "http://internal.server/addPerson?objectId=" + nxpt::toStdString(objectId);
+        *outActionUrl =
+            "http://internal.server/addPerson?objectId=" + UuidHelper::toStdString(objectId);
         NX_PRINT << __func__ << "(): Returning URL: [" << *outActionUrl << "]";
     }
     else

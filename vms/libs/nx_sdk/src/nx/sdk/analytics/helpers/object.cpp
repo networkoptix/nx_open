@@ -38,7 +38,7 @@ float Object::confidence() const
     return m_confidence;
 }
 
-nxpl::NX_GUID Object::id() const
+Uuid Object::id() const
 {
     return m_id;
 }
@@ -78,7 +78,7 @@ void Object::setConfidence(float confidence)
     m_confidence = confidence;
 }
 
-void Object::setId(const nxpl::NX_GUID& value)
+void Object::setId(const Uuid& value)
 {
     m_id = value;
 }

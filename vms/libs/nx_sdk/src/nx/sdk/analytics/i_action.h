@@ -4,6 +4,7 @@
 
 #include <plugins/plugin_api.h>
 
+#include <nx/sdk/uuid.h>
 #include <nx/sdk/i_string_map.h>
 
 namespace nx {
@@ -27,10 +28,10 @@ public:
     virtual const char* actionId() = 0;
 
     /** Id of a metadata object for which the action has been triggered. */
-    virtual nxpl::NX_GUID objectId() = 0;
+    virtual Uuid objectId() = 0;
 
     /** Id of a device from which the action has been triggered. */
-    virtual nxpl::NX_GUID deviceId() = 0;
+    virtual Uuid deviceId() = 0;
 
     /** Timestamp of a video frame from which the action has been triggered. */
     virtual int64_t timestampUs() = 0;

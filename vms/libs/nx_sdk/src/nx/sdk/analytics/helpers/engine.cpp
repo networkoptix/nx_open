@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
+#include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>

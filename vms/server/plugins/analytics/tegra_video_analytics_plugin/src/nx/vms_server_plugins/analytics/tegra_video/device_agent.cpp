@@ -201,8 +201,9 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
     for (const auto& rect: rects)
     {
         auto object = new Object();
-        const auto objectId =
-            nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(QnUuid::createUuid());
+        // TODO: #mshevchenko: Rewrite creating a random nx::sdk::Uuid when implemented.
+        const nx::sdk::Uuid objectId =
+            nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(QnUuid::createUuid());
         object->setId(objectId);
         object->setTypeId(m_objectTypeId);
 

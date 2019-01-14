@@ -10,6 +10,7 @@
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
@@ -112,16 +113,16 @@ public:
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
-        m_objectId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
-        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.deviceId);
+        m_objectId = nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.objectId);
+        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.deviceId);
         m_timestampUs = actionData.timestampUs;
     }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
 
-    virtual nxpl::NX_GUID objectId() override { return m_objectId; }
+    virtual nx::sdk::Uuid objectId() override { return m_objectId; }
 
-    virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
+    virtual nx::sdk::Uuid deviceId() override { return m_deviceId; }
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
@@ -135,8 +136,8 @@ public:
 
 private:
     std::string m_actionId;
-    nxpl::NX_GUID m_objectId;
-    nxpl::NX_GUID m_deviceId;
+    nx::sdk::Uuid m_objectId;
+    nx::sdk::Uuid m_deviceId;
     int64_t m_timestampUs;
 
     const nx::sdk::Ptr<nx::sdk::IStringMap> m_params;

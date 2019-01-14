@@ -36,8 +36,8 @@ void trimRight(std::string* inOutStr)
 std::vector<std::string> split(const std::string& str, const std::string& delimiter)
 {
     std::vector<std::string> result;
-    auto current = 0;
-    auto previous = 0;
+    size_t current = 0;
+    size_t previous = 0;
 
     current = str.find(delimiter);
     while (current != std::string::npos)
@@ -70,11 +70,13 @@ std::string* trim(std::string* inOutStr)
     return inOutStr;
 }
 
-nxpl::NX_GUID makeGuid()
+nx::sdk::Uuid makeUuid()
 {
+    // TODO: #mshevchenko: Rewrite creating a random nx::sdk::Uuid when implemented.
+
     // Likely this method is not correct in the sense of randomness of output GUIDs.
-    nxpl::NX_GUID guid;
-    auto data = (int*) guid.bytes;
+    nx::sdk::Uuid uuid;
+    auto data = (int*) &uuid[0];
     std::mt19937 rng;
     rng.seed(std::random_device()());
     std::uniform_int_distribution<std::mt19937::result_type> dist(
@@ -85,12 +87,7 @@ nxpl::NX_GUID makeGuid()
     data[2] = dist(rng);
     data[3] = dist(rng);
 
-    return guid;
-}
-
-bool isNull(const nxpl::NX_GUID& guid)
-{
-    return memcmp(guid.bytes, kNullGuid.bytes, sizeof(nxpl::NX_GUID::bytes)) == 0;
+    return uuid;
 }
 
 std::string makeElementName(

@@ -12,6 +12,7 @@
 #include <nx/utils/uuid.h>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/object.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
@@ -206,7 +207,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         }
 
         object->setBoundingBox(toSdkRect(cached.rect));
-        object->setId(toSdkGuid(cached.id));
+        object->setId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(cached.id));
         object->setConfidence(1);
         object->setTypeId(m_objectTypeId.toStdString());
 
@@ -433,11 +434,6 @@ float NaiveObjectTracker::bottomRightY(const TegraVideo::Rect& rectangle)
 nx::sdk::analytics::IObject::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
 {
     return nx::sdk::analytics::IObject::Rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
-}
-
-nxpl::NX_GUID NaiveObjectTracker::toSdkGuid(const QnUuid& id)
-{
-    return nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(id);
 }
 
 } // namespace tegra_video

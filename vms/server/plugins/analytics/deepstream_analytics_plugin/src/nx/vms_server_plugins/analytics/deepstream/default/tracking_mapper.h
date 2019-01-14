@@ -10,6 +10,7 @@ extern "C" {
 
 } // extern "C"
 
+#include <nx/sdk/uuid.h>
 #include <plugins/plugin_api.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 #include <nx/vms_server_plugins/analytics/deepstream/utils.h>
@@ -34,20 +35,19 @@ using LabelMapping = std::map<LabelTypeIndex, LabelTypeMapping>;
 struct TrackedObject
 {
     TrackedObject():
-        guid(kNullGuid),
         lifetime(0),
         found(false)
     {
     }
 
-    TrackedObject(const nxpl::NX_GUID& guid, int lifetime = 1):
-        guid(guid),
+    TrackedObject(const nx::sdk::Uuid& uuid, int lifetime = 1):
+        uuid(uuid),
         lifetime(lifetime),
         found(true)
     {
     }
 
-    nxpl::NX_GUID guid;
+    nx::sdk::Uuid uuid;
     int lifetime;
     bool found;
     std::deque<nx::sdk::analytics::Attribute> attributes;
@@ -58,8 +58,8 @@ class TrackingMapper
 
 public:
     TrackingMapper(int objectLifetime);
-    nxpl::NX_GUID getMapping(int nvidiaTrackingId);
-    void addMapping(int nvidiaTrackingId, const nxpl::NX_GUID& nxObjectId);
+    nx::sdk::Uuid getMapping(int nvidiaTrackingId);
+    void addMapping(int nvidiaTrackingId, const nx::sdk::Uuid& nxObjectId);
 
     void setLabelMapping(std::map<LabelMappingId, LabelMapping> labelMapping);
     std::deque<nx::sdk::analytics::Attribute> attributes(const ROIMeta_Params& roiMeta);

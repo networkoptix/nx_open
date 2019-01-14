@@ -82,7 +82,6 @@ private:
     static float bottomRightX(const TegraVideo::Rect& rectangle);
     static float bottomRightY(const TegraVideo::Rect& rectangle);
     static nx::sdk::analytics::IObject::Rect toSdkRect(const TegraVideo::Rect& rectangle);
-    static nxpl::NX_GUID toSdkGuid(const QnUuid& id);
 
 private:
     std::map<QnUuid, CachedObject> m_cachedObjects;

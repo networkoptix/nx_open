@@ -5,6 +5,7 @@
 #include <mutex>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/analytics/i_engine.h>
@@ -66,8 +67,8 @@ protected:
      */
     virtual void executeAction(
         const std::string& /*actionId*/,
-        nxpl::NX_GUID /*objectId*/,
-        nxpl::NX_GUID /*deviceId*/,
+        Uuid /*objectId*/,
+        Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,

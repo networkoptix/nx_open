@@ -13,11 +13,11 @@ LicensePlateInfo SimpleLicensePlateTracker::licensePlateInfo(const std::string &
     auto itr = m_licensePlates.find(plateNumber);
     auto currentTime = now();
     if (itr == m_licensePlates.cend())
-        m_licensePlates[plateNumber] = LicensePlateInfo(plateNumber, makeGuid(), currentTime);
+        m_licensePlates[plateNumber] = LicensePlateInfo(plateNumber, makeUuid(), currentTime);
 
     auto& licensePlateInfo = m_licensePlates.at(plateNumber);
     if ((currentTime  - licensePlateInfo.lastAppearanceTime).count() > ini().licensePlateLifetimeMs)
-        licensePlateInfo.guid = makeGuid();
+        licensePlateInfo.uuid = makeUuid();
 
     licensePlateInfo.lastAppearanceTime = currentTime;
     return licensePlateInfo;

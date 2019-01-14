@@ -4,6 +4,7 @@
 #define NX_PRINT_PREFIX "deepstream::TrackingMapper::"
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/helpers/uuid_helper.h>
 #include <plugins/plugin_tools.h>
 
 namespace nx {
@@ -17,23 +18,23 @@ TrackingMapper::TrackingMapper(int objectLifetime):
     NX_OUTPUT << __func__ << " Creating tracking mapper, object lifetime is " << objectLifetime;
 }
 
-nxpl::NX_GUID TrackingMapper::getMapping(int nvidiaTrackingId)
+nx::sdk::Uuid TrackingMapper::getMapping(int nvidiaTrackingId)
 {
     NX_OUTPUT
         << __func__
         << " Getting a mapping for object with tracking id " << nvidiaTrackingId;
 
     auto itr = m_trackingMap.find(nvidiaTrackingId);
-    if(itr != m_trackingMap.cend())
+    if (itr != m_trackingMap.cend())
     {
         itr->second.found = true;
-        return itr->second.guid;
+        return itr->second.uuid;
     }
 
-    return kNullGuid;
+    return nx::sdk::Uuid();
 }
 
-void TrackingMapper::addMapping(int nvidiaTrackingId, const nxpl::NX_GUID& nxObjectId)
+void TrackingMapper::addMapping(int nvidiaTrackingId, const nx::sdk::Uuid& nxObjectId)
 {
     NX_OUTPUT
         << __func__

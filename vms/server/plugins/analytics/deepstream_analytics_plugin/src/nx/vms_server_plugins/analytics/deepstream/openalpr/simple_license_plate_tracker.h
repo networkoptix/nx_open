@@ -4,6 +4,7 @@
 #include <string>
 #include <chrono>
 
+#include <nx/sdk/uuid.h>
 #include <plugins/plugin_api.h>
 
 namespace nx {
@@ -16,17 +17,17 @@ struct LicensePlateInfo
     LicensePlateInfo() = default;
     LicensePlateInfo(
         const std::string& plateNumber,
-        const nxpl::NX_GUID& guid,
+        const nx::sdk::Uuid& uuid,
         const std::chrono::milliseconds& detectionTime)
         :
         plateNumber(plateNumber),
-        guid(guid),
+        uuid(uuid),
         lastAppearanceTime(detectionTime)
     {
     }
 
     std::string plateNumber;
-    nxpl::NX_GUID guid;
+    nx::sdk::Uuid uuid;
     std::chrono::milliseconds lastAppearanceTime;
 };
 

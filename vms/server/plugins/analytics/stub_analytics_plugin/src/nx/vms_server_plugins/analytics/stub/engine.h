@@ -6,6 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -36,8 +37,8 @@ protected:
 
     virtual void executeAction(
         const std::string& actionId,
-        nxpl::NX_GUID objectId,
-        nxpl::NX_GUID deviceId,
+        nx::sdk::Uuid objectId,
+        nx::sdk::Uuid deviceId,
         int64_t timestampUs,
         const std::map<std::string, std::string>& params,
         std::string* outActionUrl,

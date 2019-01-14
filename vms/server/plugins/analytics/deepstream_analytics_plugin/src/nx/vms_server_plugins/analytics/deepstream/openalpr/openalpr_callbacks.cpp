@@ -15,6 +15,7 @@ extern "C" {
 
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr/openalpr_pipeline.h>
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr_common.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include <nx/sdk/analytics/helpers/object.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
@@ -63,7 +64,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (frameHeight <= 0)
         frameHeight = ini().defaultFrameHeight;
 
-    for (auto i = 0; i < bboxes->num_rects; ++i)
+    for (int i = 0; i < (int) bboxes->num_rects; ++i)
     {
         const auto& roiMeta = bboxes->roi_meta[i];
         std::string displayText;
@@ -90,14 +91,12 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        nxpl::NX_GUID guid;
         std::deque<nx::sdk::analytics::Attribute> attributes;
 
-        auto info = licensePlateTracker->licensePlateInfo(displayText);
-        guid = info.guid;
+        const auto& info = licensePlateTracker->licensePlateInfo(displayText);
 
         auto encodedAttributes = split(displayText, '%');
-        for (auto i = 0; i < encodedAttributes.size(); ++i)
+        for (int i = 0; i < (int) encodedAttributes.size(); ++i)
         {
             switch (i)
             {
@@ -134,7 +133,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             }
         }
 
-        detectedObject->setId(guid);
+        detectedObject->setId(info.uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
         detectedObject->setTypeId(kLicensePlateGuid);
@@ -144,7 +143,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             attributes.emplace_front(
                 nx::sdk::IAttribute::Type::string,
                 "GUID",
-                nxpt::toStdString(guid));
+                nx::sdk::UuidHelper::toStdString(info.uuid));
         }
 
         detectedObject->setAttributes(

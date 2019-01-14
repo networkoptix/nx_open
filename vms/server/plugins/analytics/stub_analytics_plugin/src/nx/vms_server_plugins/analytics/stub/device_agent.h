@@ -5,6 +5,7 @@
 #include <memory>
 #include <condition_variable>
 
+#include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 
 #include "engine.h"
@@ -72,7 +73,7 @@ private:
     int m_counter = 0;
     int m_objectCounter = 0;
     int m_currentObjectIndex = -1;
-    nxpl::NX_GUID m_objectId;
+    nx::sdk::Uuid m_objectId;
     std::string m_eventTypeId;
     int64_t m_lastVideoFrameTimestampUsec = 0;
 };

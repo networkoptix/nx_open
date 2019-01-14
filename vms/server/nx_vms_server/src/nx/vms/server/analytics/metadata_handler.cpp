@@ -103,7 +103,6 @@ void MetadataHandler::handleEventsPacket(nx::sdk::Ptr<IEventMetadataPacket> pack
 
 void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> packet)
 {
-    using namespace nx::vms_server_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
@@ -112,7 +111,7 @@ void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> pa
             break;
         nx::common::metadata::DetectedObject object;
         object.objectTypeId = item->typeId();
-        object.objectId = fromPluginGuidToQnUuid(item->id());
+        object.objectId = nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 

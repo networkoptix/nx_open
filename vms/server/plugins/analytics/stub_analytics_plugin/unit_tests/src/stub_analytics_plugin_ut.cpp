@@ -6,6 +6,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/uuid.h>
 
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
@@ -99,12 +100,9 @@ static void testDeviceAgentSettings(nx::sdk::analytics::IDeviceAgent* deviceAgen
 class Action: public nx::sdk::analytics::IAction
 {
 public:
-    Action():
-        m_params(new nx::sdk::StringMap())
-    {
-    }
+    Action(): m_params(new nx::sdk::StringMap()) {}
 
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
+    virtual void* queryInterface(const nxpl::NX_GUID& /*interfaceId*/) override
     {
         ASSERT_TRUE(false);
         return nullptr;
@@ -114,8 +112,8 @@ public:
     virtual int releaseRef() const override { ASSERT_TRUE(false); return -1; }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
-    virtual nxpl::NX_GUID objectId() override { return m_objectId; }
-    virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
+    virtual nx::sdk::Uuid objectId() override { return m_objectId; }
+    virtual nx::sdk::Uuid deviceId() override { return m_deviceId; }
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
     virtual const nx::sdk::IStringMap* params() override
@@ -171,8 +169,8 @@ public:
 
 public:
     std::string m_actionId = "";
-    nxpl::NX_GUID m_objectId = {{0}};
-    nxpl::NX_GUID m_deviceId = {{0}};
+    nx::sdk::Uuid m_objectId;
+    nx::sdk::Uuid m_deviceId;
     int64_t m_timestampUs = 0;
     bool m_handleResultCalled = false;
     bool m_expectedNonNullActionUrl = false;
@@ -210,7 +208,7 @@ static void testExecuteActionAddPerson(nx::sdk::analytics::IEngine* plugin)
 {
     Action action;
     action.m_actionId = "nx.stub.addPerson";
-    action.m_objectId = {{0}};
+    action.m_objectId = nx::sdk::Uuid();
     action.m_expectedNonNullActionUrl = true;
 
     nx::sdk::Error error = nx::sdk::Error::noError;

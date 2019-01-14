@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/sdk/uuid.h>
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/i_metadata_item.h>
 
@@ -59,7 +60,7 @@ public:
      * Id of the object. If the object (e.g. a particular person) is detected on multiple frames,
      * this parameter should be the same each time.
      */
-    virtual nxpl::NX_GUID id() const = 0;
+    virtual Uuid id() const = 0;
 
     // TODO: #mshevchenko: Fix comments.
 
