@@ -5,7 +5,6 @@
 
 #include <nx/sdk/analytics/helpers/event.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
@@ -177,7 +176,7 @@ void Monitor::addRules(
                 actionId);
             const int ruleId = cameraController.addActiveRule(rule);
             if (actionId)
-                NX_PRINT << "Rule addition succeeded, ruleId = " << actionId;
+                NX_PRINT << "Rule addition succeeded, ruleId = " << ruleId;
             else
                 NX_PRINT << "Rule addition failed";
         }

@@ -2,7 +2,6 @@
 
 #include <nx/sdk/analytics/helpers/event.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 

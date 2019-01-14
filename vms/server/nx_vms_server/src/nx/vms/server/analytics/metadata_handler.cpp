@@ -219,7 +219,7 @@ void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)
     m_metadataSink = dataReceptor;
 }
 
-void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* /*dataReceptor*/)
 {
     m_metadataSink = nullptr;
 }

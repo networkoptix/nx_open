@@ -13,8 +13,6 @@
 
 #include <nx/sdk/helpers/string.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
 #include <nx/kit/ini_config.h>
 
 #include "device_agent.h"
@@ -65,7 +63,7 @@ void logReceivedBytes(const char* message, const QByteArray& data, int len)
 
 int extractLogicalId(const QByteArray& data)
 {
-    NX_ASSERT(data.size() >= kCommandLength);
+    NX_ASSERT((int) data.size() >= kCommandLength);
     return (data[1] - kMinDigitCode) * 10 + (data[2] - kMinDigitCode);
 };
 
@@ -313,7 +311,7 @@ void Engine::onDataReceived(int index)
 
     receivedData += dataChunk;
 
-    while (receivedData.size() >= kCommandLength)
+    while ((int) receivedData.size() >= kCommandLength)
     {
         while(receivedData.size() >= kCommandLength && !isCorrectCommand(receivedData))
             removeInvalidBytes(receivedData);
@@ -365,8 +363,7 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* /*outError*/)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))

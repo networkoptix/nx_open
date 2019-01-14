@@ -6,8 +6,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
 #include <nx/sdk/helpers/string.h>
 
 #include "device_agent.h"
@@ -64,7 +62,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const IStringMap* settings)
+void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
@@ -74,8 +72,7 @@ IStringMap* Engine::pluginSideSettings() const
     return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* /*outError*/)
 {
     if (isCompatible(deviceInfo))
         return new DeviceAgent(this, *deviceInfo, m_typedManifest);

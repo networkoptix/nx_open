@@ -15,8 +15,6 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
 #include <nx/utils/std/cppnx.h>
 
 #include "nx/vca/camera_controller.h"
@@ -107,7 +105,7 @@ EventMessage parseMessage(const char* message, int messageLength)
     const char* const end = message + messageLength;
     EventMessage eventMessage;
 
-    for (int i = 0; i < kEventMessageSearchKeys.size(); ++i)
+    for (int i = 0; i < (int) kEventMessageSearchKeys.size(); ++i)
     {
         const auto view = findString(current, end, kEventMessageSearchKeys[i]);
         const QByteArray value = QByteArray(view.first, view.second - view.first);
@@ -519,7 +517,7 @@ Error DeviceAgent::stopFetchingMetadata()
     return Error::noError;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+const IString* DeviceAgent::manifest(Error* /*error*/) const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();

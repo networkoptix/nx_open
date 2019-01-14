@@ -14,7 +14,6 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -50,11 +49,6 @@ using namespace nx::core;
 namespace {
 
 static const QString kBypassPrefix("Bypass");
-
-static bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
-{
-    return param && param->possibleValues().contains(kHanwhaTrue);
-}
 
 enum class PtzOperation
 {
@@ -133,6 +127,19 @@ struct RangeDescriptor
     QString name;
     QString cgiParameter;
     QString alternativeCgiParameter;
+
+    RangeDescriptor(
+        core::ptz::Types ptzTypes,
+        QString name,
+        QString cgiParameter,
+        QString alternativeCgiParameter = QString())
+        :
+        ptzTypes(ptzTypes),
+        name(name),
+        cgiParameter(cgiParameter),
+        alternativeCgiParameter(alternativeCgiParameter)
+    {
+    }
 };
 
 static const std::vector<RangeDescriptor> kRangeDescriptors = {
@@ -583,8 +590,6 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
 QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     using ParameterMap = std::map<QString, QString>;
-    using SubmenuMap = std::map<QString, ParameterMap>;
-    using CgiMap = std::map<QString, SubmenuMap>;
 
     bool reopenPrimaryStream = false;
     bool reopenSecondaryStream = false;
@@ -798,7 +803,7 @@ int HanwhaResource::maxProfileCount() const
 }
 
 nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex streamIndex)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::vms::server::resource::StreamCapabilityMap();
@@ -1670,8 +1675,6 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    const auto channel = getChannel();
-
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(
         lit("media/audiooutput"),
@@ -2348,9 +2351,6 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
         &outPtzLimits->maxFov,
         lit("ptzcontrol/absolute/Zoom"));
 
-    // TODO: #dmishin don't forget it
-    outPtzLimits->maxPresetNumber;
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2558,7 +2558,7 @@ int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile)
     return kHanwhaInvalidProfile;
 }
 
-AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole role) const
+AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole /*role*/) const
 {
     const auto& codecs = m_codecInfo.codecs(getChannel());
 
@@ -2593,7 +2593,8 @@ int HanwhaResource::defaultGovLengthForStream(Qn::ConnectionRole role) const
     return mediaCapabilityForRole(role).maxFps;
 }
 
-Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(Qn::ConnectionRole role) const
+Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(
+    Qn::ConnectionRole /*role*/) const
 {
     return Qn::BitrateControl::vbr;
 }
@@ -3101,7 +3102,7 @@ void HanwhaResource::updateToChannel(int value)
 
 QString HanwhaResource::toHanwhaAdvancedParameterValue(
     const QnCameraAdvancedParameter& parameter,
-    const HanwhaAdavancedParameterInfo& parameterInfo,
+    const HanwhaAdavancedParameterInfo& /*parameterInfo*/,
     const QString& str) const
 {
     const auto parameterType = parameter.dataType;
@@ -3124,7 +3125,7 @@ QString HanwhaResource::toHanwhaAdvancedParameterValue(
 
 QString HanwhaResource::fromHanwhaAdvancedParameterValue(
     const QnCameraAdvancedParameter& parameter,
-    const HanwhaAdavancedParameterInfo& parameterInfo,
+    const HanwhaAdavancedParameterInfo& /*parameterInfo*/,
     const QString& str) const
 {
     const auto parameterType = parameter.dataType;
@@ -3327,7 +3328,6 @@ QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
     for (const auto& entry: parameterValues)
     {
         const auto& id = entry.first;
-        const auto& value = entry.second;
 
         const auto info = advancedParameterInfo(id);
         if (!info)

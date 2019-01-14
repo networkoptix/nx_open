@@ -23,7 +23,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/debug_helpers.h>

@@ -20,8 +20,6 @@
 #include <nx/sdk/analytics/helpers/event.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
 #include <network/tcp_connection_processor.h>
 
 #include "parser.h"
@@ -178,10 +176,6 @@ void DeviceAgent::onSubsctiptionDone()
         makeDeferredSubscription();
         return;
     }
-
-    QString url = m_httpClient->contentLocationUrl().toString();
-    SystemError::ErrorCode err = m_httpClient->lastSysErrorCode();
-    nx::network::http::AsyncClient::State s = m_httpClient->state();
 
     NX_URL_PRINT << lm("Http request %1 succeeded with status code %2")
         .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()).toStdString();
@@ -487,12 +481,12 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+const IString* DeviceAgent::manifest(Error* /*error*/) const
 {
     return new nx::sdk::String(m_cameraManifest);
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

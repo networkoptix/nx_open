@@ -11,8 +11,6 @@
 #include <nx/sdk/analytics/helpers/event.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
 #include "log.h"
 
 #define NX_URL_PRINT NX_PRINT << m_url.host().toStdString() << " : "

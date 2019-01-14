@@ -11,7 +11,6 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/string.h>
