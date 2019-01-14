@@ -464,6 +464,26 @@
             }
           },
           {
+            "name": "companyName",
+            "label": "Company Name",
+            "value": "",
+            "description": "A company name.",
+            "type": "long_text",
+            "mata": {
+              "char_limit": 50
+            }
+          },
+          {
+            "name": "companyInfo",
+            "label": "Company Info",
+            "value": "",
+            "description": "A short description for the company.",
+            "type": "long_text",
+            "mata": {
+              "char_limit": 250
+            }
+          },
+          {
             "name": "testedVersions",
             "label": "Tested software (VMS) versions",
             "value": "",
