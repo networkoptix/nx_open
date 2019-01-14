@@ -9,7 +9,7 @@ namespace vms::server {
 namespace analytics {
 
 class GenericCompressedVideoPacket:
-    public GenericCompressedMediaPacket<nx::sdk::analytics::CompressedVideoPacket>
+    public GenericCompressedMediaPacket<nx::sdk::analytics::ICompressedVideoPacket>
 {
 public:
     GenericCompressedVideoPacket() {}

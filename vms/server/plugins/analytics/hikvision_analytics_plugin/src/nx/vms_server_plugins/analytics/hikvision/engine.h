@@ -44,7 +44,7 @@ public:
     const Hikvision::EngineManifest& engineManifest() const;
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
+        nx::sdk::analytics::IAction* action, nx::sdk::Error* outError) override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 

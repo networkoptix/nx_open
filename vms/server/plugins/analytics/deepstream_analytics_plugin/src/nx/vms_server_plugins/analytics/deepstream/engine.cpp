@@ -178,9 +178,8 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return m_deviceAgent;
 }
 
-void Engine::executeAction(Action*, Error*)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
-    // Do nothing.
 }
 
 std::vector<ObjectClassDescription> Engine::objectClassDescritions() const

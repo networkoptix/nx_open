@@ -161,7 +161,7 @@ IStringMap* Engine::pluginSideSettings() const
     return nullptr;
 }
 
-void Engine::executeAction(Action* action, Error* outError)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 

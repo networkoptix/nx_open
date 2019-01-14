@@ -99,7 +99,7 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
     return (it != m_typedManifest.eventTypes.cend()) ? &(*it) : nullptr;
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 

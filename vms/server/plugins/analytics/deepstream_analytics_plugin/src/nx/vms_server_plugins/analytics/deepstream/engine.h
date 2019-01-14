@@ -38,7 +38,7 @@ public:
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
-    virtual void executeAction(nx::sdk::analytics::Action*, nx::sdk::Error*) override;
+    virtual void executeAction(nx::sdk::analytics::IAction*, nx::sdk::Error*) override;
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 

@@ -20,7 +20,7 @@ static const nxpl::NX_GUID IID_Action =
 /**
  * Interface to an object supplied to IEngine::executeAction().
  */
-class Action: public nxpl::PluginInterface
+class IAction: public nxpl::PluginInterface
 {
 public:
     /** Id of the action being triggered. */

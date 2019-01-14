@@ -42,7 +42,7 @@ public:
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* action,
+        nx::sdk::analytics::IAction* action,
         nx::sdk::Error* outError) override;
 
     const Hanwha::EngineManifest& engineManifest() const;

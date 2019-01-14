@@ -381,9 +381,8 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_manifest);
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
-    // Do nothing.
 }
 
 Error Engine::setHandler(IHandler* /*handler*/)

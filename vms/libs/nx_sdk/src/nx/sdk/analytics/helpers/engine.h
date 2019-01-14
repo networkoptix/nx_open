@@ -113,7 +113,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
     virtual const IString* manifest(Error* error) const override;
 
-    virtual void executeAction(Action* action, Error* outError) override;
+    virtual void executeAction(IAction* action, Error* outError) override;
     virtual nx::sdk::Error setHandler(IEngine::IHandler* handler) override;
     virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
 

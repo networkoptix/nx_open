@@ -57,7 +57,7 @@ protected:
      *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
      *     addRef() or queryInterface() inside this method.
      */
-    virtual bool pushCompressedVideoFrame(const CompressedVideoPacket* /*videoFrame*/)
+    virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* /*videoFrame*/)
     {
         return true;
     }

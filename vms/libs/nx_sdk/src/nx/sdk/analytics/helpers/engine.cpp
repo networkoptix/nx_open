@@ -115,7 +115,7 @@ const IString* Engine::manifest(Error* /*error*/) const
     return new String(manifest());
 }
 
-void Engine::executeAction(Action* action, Error* outError)
+void Engine::executeAction(IAction* action, Error* outError)
 {
     if (!action)
     {

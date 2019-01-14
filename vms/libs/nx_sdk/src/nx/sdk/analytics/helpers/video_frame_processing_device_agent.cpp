@@ -105,7 +105,7 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
         return Error::unknownError;
     }
 
-    if (const auto compressedFrame = Ptr<CompressedVideoPacket>(
+    if (const auto compressedFrame = Ptr<ICompressedVideoPacket>(
         dataPacket->queryInterface(IID_CompressedVideoPacket)))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))

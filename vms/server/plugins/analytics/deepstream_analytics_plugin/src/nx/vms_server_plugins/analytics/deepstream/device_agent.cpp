@@ -102,7 +102,7 @@ Error DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
-    Ptr<CompressedVideoPacket> compressedVideo(
+    Ptr<ICompressedVideoPacket> compressedVideo(
         dataPacket->queryInterface(IID_CompressedVideoPacket));
 
     if (!compressedVideo)

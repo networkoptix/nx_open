@@ -31,14 +31,14 @@ protected:
     virtual std::string manifest() const override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;
+        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
     bool pushCompressedFrame(
-        const nx::sdk::analytics::CompressedVideoPacket* videoPacket);
+        const nx::sdk::analytics::ICompressedVideoPacket* videoPacket);
 
     bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 

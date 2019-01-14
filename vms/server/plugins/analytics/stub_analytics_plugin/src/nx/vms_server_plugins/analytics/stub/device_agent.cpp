@@ -91,7 +91,7 @@ void DeviceAgent::settingsReceived()
     }
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (engine()->needUncompressedVideoFrames())
     {

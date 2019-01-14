@@ -45,7 +45,7 @@ public:
     void unregisterCamera(int cameraLogicalId);
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/) override;
+        nx::sdk::analytics::IAction* /*action*/, sdk::Error* /*outError*/) override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 

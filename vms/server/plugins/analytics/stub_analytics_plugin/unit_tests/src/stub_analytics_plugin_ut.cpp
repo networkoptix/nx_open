@@ -96,7 +96,7 @@ static void testDeviceAgentSettings(nx::sdk::analytics::IDeviceAgent* deviceAgen
     deviceAgent->setSettings(settings); //< Test assigning some settings.
 }
 
-class Action: public nx::sdk::analytics::Action
+class Action: public nx::sdk::analytics::IAction
 {
 public:
     Action():

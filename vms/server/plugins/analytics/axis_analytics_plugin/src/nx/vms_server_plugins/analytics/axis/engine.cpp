@@ -130,9 +130,8 @@ EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
     return result;
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
-    // Do nothing.
 }
 
 Error Engine::setHandler(IHandler* /*handler*/)

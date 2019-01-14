@@ -31,7 +31,7 @@ protected:
     virtual void settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;
+        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
     virtual bool pushUncompressedVideoFrame(
         const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;

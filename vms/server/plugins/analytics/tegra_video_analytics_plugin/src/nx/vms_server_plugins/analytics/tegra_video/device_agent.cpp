@@ -88,7 +88,7 @@ std::string DeviceAgent::manifest() const
     )manifest";
 }
 
-bool DeviceAgent::pushCompressedFrame(const CompressedVideoPacket* videoPacket)
+bool DeviceAgent::pushCompressedFrame(const ICompressedVideoPacket* videoPacket)
 {
     TegraVideo::CompressedFrame compressedFrame;
     compressedFrame.dataSize = videoPacket->dataSize();
@@ -122,7 +122,7 @@ bool DeviceAgent::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_
     return true;
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;

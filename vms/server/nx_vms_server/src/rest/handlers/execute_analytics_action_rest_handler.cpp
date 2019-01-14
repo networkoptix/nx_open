@@ -87,7 +87,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
 
 namespace {
 
-class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::Action>
+class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::IAction>
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
@@ -95,7 +95,7 @@ public:
         if (interfaceId == nx::sdk::analytics::IID_Action)
         {
             addRef();
-            return static_cast<nx::sdk::analytics::Action*>(this);
+            return static_cast<nx::sdk::analytics::IAction*>(this);
         }
         if (interfaceId == nxpl::IID_PluginInterface)
         {

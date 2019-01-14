@@ -25,11 +25,11 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
         return;
     }
 
-    const nx::sdk::Ptr<nx::sdk::analytics::CompressedVideoPacket> video(
+    const nx::sdk::Ptr<nx::sdk::analytics::ICompressedVideoPacket> video(
         frame->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
     if (!video)
     {
-        NX_OUTPUT << __func__ << " Can not convert data packet to 'CompressedVideoPacket'";
+        NX_OUTPUT << __func__ << " Can not convert data packet to 'ICompressedVideoPacket'";
         return;
     }
 

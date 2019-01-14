@@ -192,7 +192,7 @@ const EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 

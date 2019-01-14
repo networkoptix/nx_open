@@ -104,7 +104,7 @@ public:
      *     should not be used after returning from this function.
      * @param outError Status of the operation; is set to noError before this call.
      */
-    virtual void executeAction(Action* action, Error* outError) = 0;
+    virtual void executeAction(IAction* action, Error* outError) = 0;
 
     /**
      * @param handler Generic Engine-related events (errors, warning, info messages)
