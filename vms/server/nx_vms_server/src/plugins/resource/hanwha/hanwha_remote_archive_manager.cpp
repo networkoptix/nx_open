@@ -2,6 +2,7 @@
 #include "hanwha_remote_archive_manager.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_time_synchronizer.h"
 
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
@@ -31,11 +32,18 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     int64_t /*startTimeMs*/,
     int64_t /*endTimeMs*/)
 {
-    // TODO: #dmishin Fix channel if needed
-    const auto overlappedPeriods = m_resource
-        ->sharedContext()
-        ->overlappedTimelineSync(m_resource->getChannel());
+    const auto context = m_resource->sharedContext();
 
+    std::optional<std::chrono::milliseconds> timeShift;
+    for (int i = 0; i < kTriesPerChunk && !timeShift; ++i)
+        timeShift = hanwhaUtcTimeShift(context);
+
+    // TODO: Change assert into something else if it happens.
+    if (NX_ASSERT(timeShift, "Unable to fetch timeshift before chunk loading"))
+        context->setTimeShift(*timeShift);
+
+    // TODO: #dmishin Fix channel if needed.
+    const auto overlappedPeriods = context->overlappedTimelineSync(m_resource->getChannel());
     for (const auto& entry: overlappedPeriods)
     {
         const auto overlappedId = entry.first;

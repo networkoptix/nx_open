@@ -7,6 +7,8 @@
 #include <core/ptz/ptz_constants.h>
 #include <nx/core/ptz/type.h>
 
+#include "hanwha_range.h"
+
 namespace nx {
 namespace vms::server {
 namespace plugins {
