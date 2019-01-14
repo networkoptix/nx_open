@@ -848,12 +848,12 @@
     <name>CameraSelectionDialog</name>
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.ui"/>
-        <source>Dialog</source>
+        <source>All Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>All Cameras</source>
+        <source>Select Devices…</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -988,11 +988,6 @@
     <name>DeviceAdditionDialog</name>
     <message>
         <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
-        <source>Device Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>to</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1069,6 +1064,11 @@
     <message>
         <location/>
         <source>Add all Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add Devices</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1660,7 +1660,7 @@
     </message>
     <message>
         <location/>
-        <source>Minimal Size</source>
+        <source>Minimum Grid Size</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2454,18 +2454,18 @@
     <name>NewWearableCameraDialog</name>
     <message>
         <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
-        <source>New Wearable Camera...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>To server</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-        <translation></translation>
+        <source>New Virtual Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2694,6 +2694,11 @@
         <location filename="../src/nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.ui"/>
         <source>Installing Compatibility Version...</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Restart to the updated version when ready</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3584,13 +3589,18 @@
     </message>
     <message>
         <location/>
-        <source>Additional storage:</source>
+        <source>Server is offline. Statistics are not available.</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Server is offline. Statistics are not available.</source>
-        <translation></translation>
+        <source>Base forecast on recording density for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Additional storage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3745,13 +3755,31 @@
     <name>TimeServerSelectionWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-        <source>System Time</source>
+        <source>Sync time with the Internet</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Sync time with the Internet</source>
-        <translation></translation>
+        <source>VMS Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TimeSynchronizationWidget</name>
+    <message>
+        <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
+        <source>Sync Time with the Internet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>VMS Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Do not sync time among servers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
