@@ -28,8 +28,6 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
 
     bool enabled = true;
     QnUuid primaryServer;
-    qint64 primaryOsTimeOffset = 0;
-    qint64 primaryVmsTimeOffset = 0;
 
     // Previous selected time server.
     QnUuid lastPrimaryServer;

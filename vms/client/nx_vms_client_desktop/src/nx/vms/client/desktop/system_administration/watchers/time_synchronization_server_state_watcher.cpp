@@ -64,6 +64,9 @@ private:
 
         connect(server.get(), &QnMediaServerResource::statusChanged,
             this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
+
+        connect(server.get(), &QnMediaServerResource::flagsChanged,
+            this, &TimeSynchronizationServerStateWatcher::Private::onFlagsChanged);
     }
 
     void onServerRemoved(const QnResourcePtr& resource)
@@ -82,7 +85,15 @@ private:
         NX_ASSERT(server && !server->hasFlags(Qn::fake));
 
         m_store->setServerOnline(server->getId(), server->getStatus() == Qn::Online);
-        // TODO: has internet?
+    }
+
+    void onFlagsChanged(const QnResourcePtr& resource)
+    {
+        const auto& server = resource.dynamicCast<QnMediaServerResource>();
+        NX_ASSERT(server && !server->hasFlags(Qn::fake));
+
+        m_store->setServerOnline(server->getId(),
+            server->getServerFlags().testFlag(vms::api::ServerFlag::SF_HasPublicIP));
     }
 
 private:

@@ -25,6 +25,7 @@ public:
     static Result addServer(State state, const State::ServerInfo& serverInfo);
     static Result removeServer(State state, const QnUuid& id);
     static Result setServerOnline(State state, const QnUuid& serverId, bool isOnline);
+    static Result setServerHasInternet(State state, const QnUuid& serverId, bool hasInternet);
 
     // Utility methods.
     static State::ServerInfo actualPrimaryServer(const State& state);
