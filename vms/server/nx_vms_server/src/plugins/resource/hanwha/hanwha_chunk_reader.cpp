@@ -181,14 +181,19 @@ OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineSync(int channelNumbe
     return overlappedTimelineThreadUnsafe(channelNumber);
 }
 
-void HanwhaChunkLoader::setTimeZoneShift(std::chrono::seconds timeZoneShift)
+std::chrono::milliseconds HanwhaChunkLoader::timeShift() const
 {
-    m_timeZoneShift = timeZoneShift;
+    return m_timeShift;
 }
 
-std::chrono::seconds HanwhaChunkLoader::timeZoneShift() const
+void HanwhaChunkLoader::setTimeShift(std::chrono::milliseconds value)
 {
-    return m_timeZoneShift;
+    // TODO: Find out if it's fine to use for NVR as well.
+    if (isEdge() && m_timeShift.load() != value)
+    {
+        NX_VERBOSE(this, "Device to server time shift has changed to %1", value);
+        m_timeShift = value;
+    }
 }
 
 boost::optional<int> HanwhaChunkLoader::overlappedId() const
@@ -202,11 +207,6 @@ boost::optional<int> HanwhaChunkLoader::overlappedId() const
     return boost::none;
 }
 
-void HanwhaChunkLoader::setEnableUtcTime(bool enableUtcTime)
-{
-    m_isUtcEnabled = enableUtcTime;
-}
-
 void HanwhaChunkLoader::setEnableSearchRecordingPeriodRetieval(bool enableRetrieval)
 {
     m_isSearchRecordingPeriodRetrievalEnabled = enableRetrieval;
@@ -214,7 +214,7 @@ void HanwhaChunkLoader::setEnableSearchRecordingPeriodRetieval(bool enableRetrie
 
 QString HanwhaChunkLoader::convertDateToString(const QDateTime& dateTime) const
 {
-    return dateTime.toString(m_isUtcEnabled ? kHanwhaUtcDateTimeFormat : kHanwhaDateTimeFormat);
+    return dateTime.toString(kHanwhaUtcDateTimeFormat);
 }
 
 bool HanwhaChunkLoader::hasBounds() const
@@ -262,7 +262,7 @@ void HanwhaChunkLoader::sendRecordingPeriodRequest()
         lit("recording/searchrecordingperiod/view"),
         {
             {kHanwhaRecordingTypeProperty, kHanwhaAll},
-            {kHanwhaResultsInUtcProperty, m_isUtcEnabled ? kHanwhaTrue : kHanwhaFalse}
+            {kHanwhaResultsInUtcProperty, kHanwhaTrue}
         });
 
     NX_DEBUG(this, lm("Sending recording period request. Url: %1").arg(recordingPeriodUrl));
@@ -422,9 +422,9 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
     }
 
     NX_DEBUG(this, lit("Handling successful timeline response."));
-    // In case of edge archive import we should load chunks for all existing overlapped IDs.
-    if (!m_isNvr)
+    if (isEdge())
     {
+        // In case of edge archive import we should load chunks for all existing overlapped IDs.
         ++m_currentOverlappedId;
         if (m_currentOverlappedId != m_overlappedIds.cend())
         {
@@ -436,10 +436,8 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
             sendTimelineRequest();
             return;
         }
-    }
 
-    if (isEdge()) //< Cameras sometimes send unordered list of chunks.
-    {
+        //< Cameras sometimes send unordered list of chunks.
         sortTimeline(&m_newChunks);
         m_chunks.swap(m_newChunks);
     }
@@ -516,9 +514,9 @@ void HanwhaChunkLoader::parseTimeRangeData(const nx::Buffer& data)
             const auto& fieldValue = params[1];
 
             if (fieldName == kStartTimeParamName)
-                startTimeUs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
+                startTimeUs = hanwhaDateTimeToMsec(fieldValue, m_timeShift) * 1000;
             else if (fieldName == kEndTimeParamName)
-                endTimeUs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
+                endTimeUs = hanwhaDateTimeToMsec(fieldValue, m_timeShift) * 1000;
         }
     }
 
@@ -584,11 +582,11 @@ bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 current
     QnTimePeriodList& chunks = chunksByChannel[channelNumber];
     if (fieldName == kStartTimeParamName)
     {
-        m_lastParsedStartTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
+        m_lastParsedStartTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeShift);
     }
     else if (fieldName == kEndTimeParamName)
     {
-        const auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
+        const auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeShift);
         if (m_lastParsedStartTimeMs > currentTimeMs)
         {
             NX_DEBUG(this, lm("Ignore period [%1, %2] from future on channel %3")
@@ -771,12 +769,8 @@ QString HanwhaChunkLoader::makeStartDateTimeString() const
     auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         kUpdateChunksDelay).count();
 
-    const auto timeZoneShift = m_isUtcEnabled
-        ? std::chrono::seconds::zero()
-        : std::chrono::seconds(m_timeZoneShift);
-
-    auto startDateTime = hasBounds()
-        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, timeZoneShift)
+    const auto startDateTime = hasBounds()
+        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs)
         : kMinDateTime;
 
     return convertDateToString(startDateTime);
@@ -905,8 +899,14 @@ void HanwhaChunkLoader::at_gotChunkData()
         .args(m_httpClient->contentLocationUrl(), lines.size()));
 
     const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    size_t parsedChunks = 0;
     for (const auto& line: lines)
-        parseTimelineData(line.trimmed(), currentTimeMs);
+    {
+        if (parseTimelineData(line.trimmed(), currentTimeMs))
+            parsedChunks++;
+    }
+
+    NX_VERBOSE(this, "Overlapped Id %1, parsed %2 chunks", *m_currentOverlappedId, parsedChunks);
 }
 
 bool HanwhaChunkLoader::isEdge() const

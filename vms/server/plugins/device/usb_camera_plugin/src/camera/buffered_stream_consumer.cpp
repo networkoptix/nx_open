@@ -8,7 +8,7 @@ namespace usb_cam {
 
 namespace {
 
-static constexpr std::chrono::milliseconds kBufferMaxTimeSpan(1000);
+static constexpr std::chrono::milliseconds kBufferMaxTimeSpan(3000);
 
 }
 
@@ -25,7 +25,7 @@ BufferedPacketConsumer::BufferedPacketConsumer(
 
 void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    if (m_buffer.timeSpan() > kBufferMaxTimeSpan)
+    if (m_buffer.timespan() > kBufferMaxTimeSpan)
         flush();
 
     if (packet->mediaType() == AVMEDIA_TYPE_VIDEO && m_dropUntilNextVideoKeyPacket)
@@ -61,16 +61,16 @@ void BufferedPacketConsumer::interrupt()
     m_buffer.interrupt();
 }
 
-bool BufferedPacketConsumer::waitForTimeSpan(
-    const std::chrono::milliseconds& timeSpan,
+bool BufferedPacketConsumer::waitForTimespan(
+    const std::chrono::milliseconds& timespan,
     const std::chrono::milliseconds& timeout)
 {
-    return m_buffer.waitForTimeSpan(timeSpan, timeout);
+    return m_buffer.waitForTimespan(timespan, timeout);
 }
 
-std::chrono::milliseconds BufferedPacketConsumer::timeSpan() const
+std::chrono::milliseconds BufferedPacketConsumer::timespan() const
 {
-    return m_buffer.timeSpan();
+    return m_buffer.timespan();
 }
 
 size_t BufferedPacketConsumer::size() const
@@ -106,7 +106,7 @@ void BufferedVideoFrameConsumer::flush()
 
 void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
-    if (m_buffer.timeSpan() > kBufferMaxTimeSpan)
+    if (m_buffer.timespan() > kBufferMaxTimeSpan)
         flush();
 
     m_buffer.insert(frame->timestamp(), frame);

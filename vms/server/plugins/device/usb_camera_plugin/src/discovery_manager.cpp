@@ -1,15 +1,14 @@
 #include "discovery_manager.h"
 
 #include <QCryptographicHash>
-#include <QNetworkInterface>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
 #include "plugin.h"
 #include "camera_manager.h"
+#include "camera/camera.h"
 #include "device/video/utils.h"
-#include "device/video/rpi/rpi_utils.h"
 #include "device/audio/utils.h"
 
 namespace nx {
@@ -20,27 +19,6 @@ namespace {
 static constexpr const char kVendorName[] = "usb_cam";
 static constexpr const char kQtMacAddressDelimiter[] = ":";
 static constexpr const char kNxMacAddressDelimiter[] = "-";
-
-static std::string getEthernetMacAddress()
-{
-    for (const auto & iFace : QNetworkInterface::allInterfaces())
-    {
-        if(iFace.type() == QNetworkInterface::Ethernet)
-        {
-            // The media server modifies the mac address delimiter from ":" to "-",
-            // so do it preemptively to avoid adding the unique id with the wrong delimiter.
-            return iFace.hardwareAddress().replace(
-                kQtMacAddressDelimiter, 
-                kNxMacAddressDelimiter).toStdString();
-        }
-    }
-    return {};
-}
-
-bool isRpiMmal(const std::string& deviceName)
-{
-   return device::video::rpi::isRpi() && device::video::rpi::isMmalCamera(deviceName);
-}
 
 }
 
@@ -136,7 +114,15 @@ int DiscoveryManager::fromUpnpData(
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)
 {
-    return new CameraManager(this, m_timeProvider, info);
+    CameraAndDeviceDataWithNxId * cameraData = getCameraAndDeviceData(info.uid);
+
+    if (!cameraData)
+        return nullptr;
+
+    if (!cameraData->camera)
+        cameraData->camera = std::make_shared<Camera>(this, info, m_timeProvider);
+
+    return new CameraManager(cameraData->camera);
 }
 
 int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
@@ -153,20 +139,19 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     if(it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
-        m_cameras.emplace(device.nxId, device);
+        m_cameras.emplace(device.nxId, CameraAndDeviceDataWithNxId(device));
     }
     else
     {
-        if (it->second != device)
+        if (it->second.deviceData != device)
         {
-            DeviceDataWithNxId old = it->second;
             NX_DEBUG(
                 this,
                 "Device with nxId already found but device changed: old: %1, new: %2",
-                old.toString(),
+                it->second.deviceData.toString(),
                 device.toString());
 
-            it->second = device;
+            it->second.deviceData = device;
         }
         else
         {
@@ -182,7 +167,7 @@ std::string DiscoveryManager::getFfmpegUrl(const std::string& nxId) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(nxId);
-    return it != m_cameras.end() ? it->second.device.path : std::string();
+    return it != m_cameras.end() ? it->second.deviceData.device.path : std::string();
 }
 
 std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasInternal()
@@ -192,20 +177,16 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
 
     for (auto & device: devices)
     {
-        std::string nxId;
+        std::string nxId = device.uniqueId;
 
-        // Convert camera uniqueId to one guaranteed to work with the media server.
-        // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
-        if (isRpiMmal(device.name))
-        {
-            nxId = getEthernetMacAddress();
-        }
-        else
-        {
-            nxId = QCryptographicHash::hash(
-                device.uniqueId.c_str(),
-                QCryptographicHash::Md5).toHex().constData();
-        }
+        // If nxId is still empty, fall back to volatile device path.
+        if (nxId.empty())
+            nxId = device.path;
+
+        // Convert the id to one guaranteed to work with the media server - no special characters.
+        nxId = QCryptographicHash::hash(
+            nxId.c_str(),
+            QCryptographicHash::Md5).toHex().constData();
 
         DeviceDataWithNxId nxDevice(device, nxId);
         nxDevices.push_back(nxDevice);
@@ -213,6 +194,14 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     }
 
     return nxDevices;
+}
+
+DiscoveryManager::CameraAndDeviceDataWithNxId* 
+DiscoveryManager::getCameraAndDeviceData(const std::string& nxId)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_cameras.find(nxId);
+    return it != m_cameras.end() ? &it->second : nullptr;
 }
 
 } // namespace nx 
