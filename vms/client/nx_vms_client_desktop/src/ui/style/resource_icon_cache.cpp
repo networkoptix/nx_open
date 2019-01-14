@@ -152,6 +152,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));
     m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.png"));
     m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.png"));
+
+    m_cache.insert(Client, loadIcon("tree/client.svg"));
 }
 
 QnResourceIconCache::~QnResourceIconCache()

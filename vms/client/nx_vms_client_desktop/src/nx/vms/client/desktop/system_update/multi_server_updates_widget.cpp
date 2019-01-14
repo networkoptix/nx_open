@@ -157,7 +157,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     setHelpTopic(this, Qn::Administration_Update_Help);
 
     m_sortedModel.reset(new SortedPeerUpdatesModel(this));
-    m_sortedModel->setShowClients(m_showDebugData);
     m_sortedModel->setSourceModel(m_updatesModel.get());
     ui->tableView->setModel(m_sortedModel.get());
     m_statusItemDelegate.reset(new ServerStatusItemDelegate(ui->tableView));
