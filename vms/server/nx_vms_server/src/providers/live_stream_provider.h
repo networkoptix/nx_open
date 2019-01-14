@@ -34,7 +34,6 @@ public:
     virtual ~QnLiveStreamProvider();
 
     virtual void setRole(Qn::ConnectionRole role) override;
-    Qn::ConnectionRole getRole() const;
     Qn::StreamIndex encoderIndex() const;
 
     void setPrimaryStreamParams(const QnLiveStreamParams& params);

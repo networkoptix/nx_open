@@ -83,7 +83,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
         m_motionEstimation[i].setChannelNum(i);
     }
 
-    m_role = Qn::CR_LiveVideo;
+    QnAbstractStreamDataProvider::setRole(Qn::CR_LiveVideo);
     m_timeSinceLastMetaData.restart();
     m_cameraRes = res.dynamicCast<QnVirtualCameraResource>();
     NX_CRITICAL(m_cameraRes && m_cameraRes->flags().testFlag(Qn::local_live_cam));
@@ -152,11 +152,6 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     }
 }
 
-Qn::ConnectionRole QnLiveStreamProvider::getRole() const
-{
-    return m_role;
-}
-
 Qn::StreamIndex QnLiveStreamProvider::encoderIndex() const
 {
     return getRole() == Qn::CR_LiveVideo
@@ -192,19 +187,19 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
         params.resolution = advancedLiveStreamParams.resolution;
     if (params.codec.isEmpty())
         params.codec = advancedLiveStreamParams.codec;
-    if (m_role == Qn::CR_SecondaryLiveVideo)
+    if (getRole() == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
 
     if (params.bitrateKbps == 0)
     {
-        const bool isSecondary = m_role == Qn::CR_SecondaryLiveVideo;
+        const bool isSecondary = getRole() == Qn::CR_SecondaryLiveVideo;
         if (params.quality == Qn::StreamQuality::undefined)
             params.quality = isSecondary ? Qn::StreamQuality::low : Qn::StreamQuality::normal;
 
         if (!params.resolution.isEmpty())
         {
             params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
-                params.quality, params.resolution, params.fps, m_role);
+                params.quality, params.resolution, params.fps, getRole());
         }
     }
 
@@ -313,7 +308,7 @@ float QnLiveStreamProvider::getDefaultFps() const
 
 bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
 {
-    return m_role == roleForMotionEstimation()
+    return getRole() == roleForMotionEstimation()
         && m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid;
 }
 
@@ -434,7 +429,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
     else
     {
         const bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming()
-            && m_role == Qn::CR_LiveVideo
+            && getRole() == Qn::CR_LiveVideo
             && (!m_resolutionCheckTimer.isValid()
                 || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
         if (updateResolutionFromPrimaryStream)
