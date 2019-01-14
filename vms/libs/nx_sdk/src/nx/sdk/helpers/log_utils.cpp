@@ -11,7 +11,7 @@ namespace sdk {
 
 bool LogUtils::convertAndOutputStringMap(
     std::map<std::string, std::string>* outMap,
-    const nx::sdk::IStringMap* stringMap,
+    const IStringMap* stringMap,
     const std::string& caption,
     int outputIndent) const
 {

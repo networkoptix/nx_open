@@ -11,7 +11,7 @@ enum class Error
     networkError = -22,
 };
 
-static inline const char* toString(Error error)
+inline const char* toString(Error error)
 {
     switch (error)
     {

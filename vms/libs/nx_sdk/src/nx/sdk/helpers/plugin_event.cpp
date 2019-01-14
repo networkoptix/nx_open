@@ -3,7 +3,7 @@
 namespace nx {
 namespace sdk {
 
-PluginEvent::PluginEvent(IPluginEvent::Level level, std::string caption, std::string description):
+PluginEvent::PluginEvent(Level level, std::string caption, std::string description):
     m_level(level),
     m_caption(std::move(caption)),
     m_description(std::move(description))
@@ -36,7 +36,7 @@ const char* PluginEvent::description() const
     return m_description.c_str();
 }
 
-void PluginEvent::setLevel(IPluginEvent::Level level)
+void PluginEvent::setLevel(Level level)
 {
     m_level = level;
 }
