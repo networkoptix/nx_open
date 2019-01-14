@@ -5,6 +5,6 @@ preserve_hierarchy: true
 
 files:
   -
-    source: '/wixsetup/translations/strings_en_US.wxl'
+    source: '/distribution/wix/translations/strings_en_US.wxl'
     dest: '/Installer/OptixTheme.wxl'
-    translation: '/wixsetup/translations/strings_%locale_with_underscore%.wxl'
+    translation: '/distribution/wix/translations/strings_%locale_with_underscore%.wxl'
