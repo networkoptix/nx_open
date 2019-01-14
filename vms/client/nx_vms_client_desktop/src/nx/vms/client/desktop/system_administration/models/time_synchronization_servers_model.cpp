@@ -187,9 +187,9 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
             switch (column)
             {
                 case OsTimeColumn:
-                    return server.osTimeOffset.count();
+                    return (qint64) server.osTimeOffset.count();
                 case VmsTimeColumn:
-                    return server.vmsTimeOffset.count();
+                    return (qint64) server.vmsTimeOffset.count();
 
                 default:
                     break;
