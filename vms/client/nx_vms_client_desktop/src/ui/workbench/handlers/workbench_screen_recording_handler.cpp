@@ -297,17 +297,17 @@ void QnWorkbenchScreenRecordingHandler::stopRecording()
 
 void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileName)
 {
-    QString suggetion = QFileInfo(fileName).fileName();
-    if (suggetion.isEmpty())
-        suggetion = tr("Recorded Video");
+    QString suggestion = QFileInfo(fileName).fileName();
+    if (suggestion.isEmpty())
+        suggestion = tr("Recorded Video");
 
     while (true)
     {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindowWidget(),
             tr("Save Recording As..."),
-            qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
-            tr("AVI (Audio/Video Interleaved) (*.avi)")));
+            qnSettings->lastRecordingDir() + QLatin1Char('/') + suggestion,
+            QnCustomFileDialog::createFilter(tr("AVI (Audio/Video Interleaved)"), "avi")));
 
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);

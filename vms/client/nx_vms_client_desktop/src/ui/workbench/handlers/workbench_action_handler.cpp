@@ -1276,18 +1276,25 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_openFileAction_triggered() {
-    QStringList filters;
-    filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
-    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("All files (*.*)");
+void ActionHandler::at_openFileAction_triggered()
+{
+    static const QStringList kProprietaryFormats{"nov"};
+    static const QStringList kVideoFormats = QnCustomFileDialog::kVideoFilter.second;
+    static const QStringList kPicturesFormats = QnCustomFileDialog::kPicturesFilter.second;
+    static const QStringList kAllSupportedFormats = kProprietaryFormats
+        + kVideoFormats
+        + kPicturesFormats;
 
     QStringList files = QFileDialog::getOpenFileNames(mainWindowWidget(),
         tr("Open File"),
         QString(),
-        filters.join(lit(";;")),
-        0,
+        QnCustomFileDialog::createFilter({
+            {tr("All Supported"), kAllSupportedFormats},
+            QnCustomFileDialog::kVideoFilter,
+            QnCustomFileDialog::kPicturesFilter,
+            QnCustomFileDialog::kAllFilesFilter
+            }),
+        nullptr,
         QnCustomFileDialog::fileDialogOptions());
 
     if (!files.isEmpty())

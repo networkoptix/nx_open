@@ -634,7 +634,7 @@ void MultiServerUpdatesWidget::pickLocalFile()
 {
     auto options = QnCustomFileDialog::fileDialogOptions();
     QString caption = tr("Select Update File...");
-    QString filter = tr("Update Files") + " (*.zip)";
+    QString filter = QnCustomFileDialog::createFilter(tr("Update Files"), "zip");
     QString fileName = QFileDialog::getOpenFileName(this, caption, QString(), filter, 0, options);
 
     if (fileName.isEmpty())

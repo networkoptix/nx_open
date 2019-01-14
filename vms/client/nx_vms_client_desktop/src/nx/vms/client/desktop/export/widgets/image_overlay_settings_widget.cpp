@@ -70,12 +70,11 @@ void ImageOverlaySettingsWidget::browseForFile()
     // TODO: #vkutin #common Implement image selection common dialog.
     // Currently there's code duplication with QnLayoutSettingsDialog
 
-    QByteArrayList filters;
-    for (const auto& format: QImageReader::supportedImageFormats())
-        filters << "*." + format;
-
-    QnSessionAwareFileDialog dialog(this, tr("Select file..."), m_lastImageDir,
-        tr("Pictures (%1)").arg(QString::fromLatin1(filters.join(" "))));
+    QnSessionAwareFileDialog dialog(
+        this,
+        tr("Select file..."),
+        m_lastImageDir,
+        QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter));
 
     dialog.setFileMode(QFileDialog::ExistingFile);
 
