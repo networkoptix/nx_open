@@ -128,6 +128,14 @@ protected:
             ASSERT_TRUE(participants.contains(participant));
     }
 
+    void thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime()
+    {
+        update::Information receivedUpdateInfo;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
+
+        ASSERT_NE(-1, receivedUpdateInfo.lastInstallationRequestTime);
+    }
+
 private:
     struct ZipContext
     {
@@ -309,7 +317,12 @@ TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
 
 TEST_F(Updates, installUpdate_timestampCorrectlySet)
 {
-    // #TODO #akulikov
+    givenConnectedPeers(1);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0) });
+    thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime();
 }
 
 TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)

@@ -45,6 +45,7 @@ struct Information
     QString description;
     QList<Package> packages;
     QList<QnUuid> participants;
+    qint64 lastInstallationRequestTime = -1;
 
     /** Release date - in msecs since epoch. */
     qint64 releaseDateMs = 0;
@@ -56,7 +57,7 @@ struct Information
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
-    (description)(packages)(participants)
+    (description)(packages)(participants)(lastInstallationRequestTime)
 
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
 
