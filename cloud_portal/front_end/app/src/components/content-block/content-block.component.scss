@@ -31,6 +31,10 @@
         padding          : 1rem;
         overflow         : hidden;
         background-color : $light1;
+        
+        h1 {
+            line-height : 1.5rem;
+        }
     }
     
     &--footer {

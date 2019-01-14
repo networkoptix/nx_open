@@ -468,7 +468,7 @@
             "label": "Company Name",
             "value": "",
             "description": "A company name.",
-            "type": "long_text",
+            "type": "text",
             "mata": {
               "char_limit": 50
             }

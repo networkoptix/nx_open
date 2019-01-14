@@ -49,7 +49,7 @@
             </header>
 
             <nx-section *ngIf="plugin.support.supportInformation">
-                <div [innerHtml]="sanitizer.bypassSecurityTrustHtml(plugin.support.supportInformation)"></div>
+                <div [innerHtml]="plugin.support.supportInformation"></div>
             </nx-section>
         </nx-block>
 
