@@ -1476,6 +1476,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
                     messageBox->setIcon(QnMessageBoxIcon::Critical);
                     messageBox->setText(tr("Failed to install client package"));
                     messageBox->addButton(tr("OK"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+                    messageBox->setInformativeText(m_clientUpdateTool->getErrorText());
                     messageBox->exec();
                 }
                 else

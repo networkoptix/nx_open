@@ -173,4 +173,21 @@ QStringList QnZipExtractor::fileList()
     return result;
 }
 
+size_t QnZipExtractor::estimateUnpackedSize() const
+{
+    size_t result = 0;
+    if (m_zip->open(QuaZip::mdUnzip))
+    {
+        auto fileList = m_zip->getFileInfoList64();
+        m_zip->close();
+
+        for (const auto& file: fileList)
+            result += file.uncompressedSize;
+    }
+    // It is quite hard to predict accurate size of unpacked data. This size will be
+    // affected by the block size of a filesystem.
+    auto constexpr padding = 1.2;
+    return result * padding;
+}
+
 #endif

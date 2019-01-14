@@ -372,7 +372,45 @@ QString InstallationManager::installationDirForVersion(
     return m_installationsDir.absoluteFilePath(versionToString(version));
 }
 
-bool InstallationManager::installZip(const nx::utils::SoftwareVersion& version,
+// We create a dummy file to test if we have enough space for unpacked data.
+// This trick is the easiest cross-platform way of checking for space.
+bool dummySpaceCheck(const QDir& dir, qint64 checkedSize, qint64* actuallyWritten = nullptr)
+{
+    if (actuallyWritten)
+        *actuallyWritten = 0;
+    QFile dummyFile(dir.filePath("dummytest.tmp"));
+    if (!dummyFile.open(QFile::OpenModeFlag::WriteOnly))
+        return false;
+
+    // QFile::resize does not suit this test. We should actually write some data to make sure
+    // we have this space available. I've tested QFile::resize with ext4 filesystem with 1GB
+    // limit: it is completely OK to dummyFile.resize(2GB). But consequental writing / of 2GB
+    // crearly fails on 1GB mark.
+    bool success = true;
+    qint64 bytesLeft = checkedSize;
+    constexpr int kBlockSize = 515;
+    std::vector<char> emptyData(kBlockSize, 0);
+    while (bytesLeft > 0)
+    {
+        qint64 writeSize = qMin<qint64>(bytesLeft, kBlockSize);
+        qint64 written = dummyFile.write(&emptyData.front(), writeSize);
+        if (written < 0)
+        {
+            success = false;
+            break;
+        }
+        bytesLeft -= written;
+    }
+
+    if (actuallyWritten)
+        *actuallyWritten = checkedSize - bytesLeft;
+    dummyFile.close();
+    dummyFile.remove();
+    return success;
+}
+
+InstallationManager::ResultType InstallationManager::installZip(
+    const nx::utils::SoftwareVersion& version,
     const QString& fileName)
 {
     NX_DEBUG(this, lm("InstallationManager: Installing update %1 from %2")
@@ -383,7 +421,7 @@ bool InstallationManager::installZip(const nx::utils::SoftwareVersion& version,
     {
         NX_INFO(this, lm("InstallationManager: Version %1 is already installed")
             .arg(version.toString()));
-        return true;
+        return ResultType::alreadyInstalled;
     }
 
     QDir targetDir(installationDirForVersion(version));
@@ -395,16 +433,26 @@ bool InstallationManager::installZip(const nx::utils::SoftwareVersion& version,
     {
         NX_ERROR(this, lm("InstallationManager: Cannot create directory %1")
             .arg(targetDir.absolutePath()));
-        return false;
+        return ResultType::ioError;
     }
 
     QnZipExtractor extractor(fileName, targetDir);
-    const int errorCode = extractor.extractZip();
+
+    qint64 spaceAvailable = 0;
+    if (!dummySpaceCheck(targetDir, extractor.estimateUnpackedSize(), &spaceAvailable))
+    {
+        NX_ERROR(this,
+            lm("InstallationManager: Not enough space to install %1. Only %2 bytes are available")
+            .args(fileName, QString::number(spaceAvailable)));
+        return ResultType::notEnoughSpace;
+    }
+
+    auto errorCode = extractor.extractZip();
     if (errorCode != QnZipExtractor::Ok)
     {
         NX_ERROR(this, lm("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3")
-            .args(fileName, targetDir.absolutePath(), errorCode));
-        return false;
+            .args(fileName, targetDir.absolutePath(), extractor.errorToString(errorCode)));
+        return ResultType::ioError;
     }
 
     installation = QnClientInstallation::installationForPath(targetDir.absolutePath());
@@ -413,7 +461,7 @@ bool InstallationManager::installZip(const nx::utils::SoftwareVersion& version,
         targetDir.removeRecursively();
         NX_ERROR(this, lm("InstallationManager: Update package %1 (%2) is invalid")
             .args(version.toString(), fileName));
-        return false;
+        return ResultType::brokenPackage;
     }
 
     installation->setVersion(version);
@@ -428,7 +476,7 @@ bool InstallationManager::installZip(const nx::utils::SoftwareVersion& version,
     NX_INFO(this, lm("InstallationManager: Version %1 has been installed successfully to %2")
         .args(version.toString(), targetDir.absolutePath()));
 
-    return true;
+    return ResultType::ok;
 }
 
 bool InstallationManager::isValidVersionName(const QString& version)
