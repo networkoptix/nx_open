@@ -10,9 +10,7 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui {
-class CameraAdvancedSettingsWidget;
-}
+namespace Ui { class LegacyAdvancedSettingsWidget; }
 
 class QNetworkReply;
 class QNetworkProxy;
@@ -22,15 +20,14 @@ namespace nx::vms::client::desktop {
 
 class CameraAdvancedSettingsWebPage;
 
-class CameraAdvancedSettingsWidget: public Connective<QWidget>, public QnConnectionContextAware
+class LegacyAdvancedSettingsWidget: public Connective<QWidget>, public QnConnectionContextAware
 {
     Q_OBJECT
-
     using base_type = Connective<QWidget>;
 
 public:
-    CameraAdvancedSettingsWidget(QWidget* parent = nullptr);
-    virtual ~CameraAdvancedSettingsWidget() override;
+    LegacyAdvancedSettingsWidget(QWidget* parent = nullptr);
+    virtual ~LegacyAdvancedSettingsWidget() override;
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
@@ -71,7 +68,7 @@ private:
     };
     //void setPage(Page page);
 
-    QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
+    QScopedPointer<Ui::LegacyAdvancedSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
     QnMutex m_cameraMutex;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
