@@ -516,24 +516,6 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     packageErrors << tr("Missing update package for some servers");
                 }
 
-                /*
-                if (!contents.missingUpdate.empty())
-                    packageErrors << tr("Missing update package for some servers");
-                if (packageErrors.empty() && !contents.unsuportedSystemsReport.empty())
-                {
-                    if (contents.unsuportedSystemsReport.size() > 1)
-                    {
-                        packageErrors << tr("Detected unsupported OS for some servers");
-                    }
-                    else
-                    {
-                        auto id = contents.unsuportedSystemsReport.firstKey();
-                        auto serverInfo = QnResourceDisplayInfo(m_stateTracker->getServer(id));
-                        QString serverName = serverInfo.toString(Qn::RI_WithUrl);
-                        packageErrors << tr("Detected unsupported OS for the server %1").arg(serverName);
-                    }
-                }*/
-
                 report.statusMessages << packageErrors;
                 break;
             }
