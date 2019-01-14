@@ -81,7 +81,21 @@ struct ResourceImageRequest: ImageRequest
 
 struct CameraImageRequest: ImageRequest
 {
+    enum class StreamSelectionMode
+    {
+        auto_,
+
+        forcedPrimaryIfAvailable,
+        forcedSecondaryIfAvailable,
+
+        /** If analytics/motion is not available it operates as "auto" mode. */
+        sameAsMotion,
+        sameAsAnalytics,
+    };
+
     QnVirtualCameraResourcePtr camera;
+
+    StreamSelectionMode streamSelectionMode = StreamSelectionMode::auto_;
 
     CameraImageRequest() = default;
 
@@ -97,6 +111,8 @@ struct CameraImageRequest: ImageRequest
     static const int kMinimumSize = 32;
     static const int kMaximumSize = 4096;
 };
+
+QString toString(CameraImageRequest::StreamSelectionMode value);
 
 inline QString toString(ImageRequest::RoundMethod value)
 {
@@ -118,3 +134,5 @@ inline QString toString(ImageRequest::RoundMethod value)
     (nx::api::ImageRequest::AspectRatio) \
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_THUMBNAIL_ENUM_TYPES, (lexical))
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::api::CameraImageRequest::StreamSelectionMode, (lexical))

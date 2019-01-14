@@ -30,7 +30,7 @@ static Qn::StreamIndex oppositeStreamIndex(Qn::StreamIndex streamIndex)
         case Qn::StreamIndex::primary: return Qn::StreamIndex::secondary;
         case Qn::StreamIndex::secondary: return Qn::StreamIndex::primary;
     }
-    NX_ASSERT(false, "Insupported StreamIndex %1", (int) streamIndex);
+    NX_ASSERT(false, "Unsupported StreamIndex %1", (int) streamIndex);
     return Qn::StreamIndex::undefined; //< Fallback for the failed assertion.
 }
 
@@ -339,19 +339,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
         return nullptr;
     }
 
-    const auto secondaryResolution =
-        request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
-    Qn::StreamIndex streamIndex = (
-            (request.size.width() <= 0 && request.size.height() <= 0)
-            || request.size.width() > secondaryResolution.width()
-            || request.size.height() > secondaryResolution.height())
-        ? Qn::StreamIndex::primary
-        : Qn::StreamIndex::secondary;
-
-    #if defined(EDGE_SERVER)
-        // On edge, we always try to use the secondary stream first.
-        streamIndex = Qn::StreamIndex::secondary;
-    #endif
+    const auto streamIndex = determineStreamIndex(request);
 
     if (auto frame = getImageWithCertainQuality(streamIndex, request))
     {
@@ -500,6 +488,52 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
 
     QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
     return result;
+}
+
+Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
+    const nx::api::CameraImageRequest &request) const
+{
+    NX_VERBOSE(this, "%1(%2)", __func__, request.streamSelectionMode);
+
+    using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
+    switch (request.streamSelectionMode) {
+    case StreamSelectionMode::forcedPrimaryIfAvailable: return Qn::StreamIndex::primary;
+    case StreamSelectionMode::forcedSecondaryIfAvailable: return Qn::StreamIndex::secondary;
+    case StreamSelectionMode::sameAsAnalytics:
+        NX_ASSERT(false); // TODO: ini().analyzeSecondaryStream
+        break;
+    case StreamSelectionMode::sameAsMotion:
+    {
+        NX_ASSERT(false); // TODO:
+//        const auto streamIndexStr =
+//            request.camera->getProperty(QnMediaResource::motionStreamKey()).toLower();
+//        if (streamIndexStr == QnMediaResource::primaryStreamValue())
+//            return Qn::StreamIndex::primary;
+//        else if (streamIndexStr == QnMediaResource::secondaryStreamValue())
+//            return Qn::StreamIndex::secondary;
+//        else
+//            NX_DEBUG(this, "Motion stream index is not available, falling back to auto mode.");
+        break;
+    }
+    }
+
+    #if defined(EDGE_SERVER)
+        // On edge, we always try to use the secondary stream first.
+        return Qn::StreamIndex::secondary;
+    #endif
+
+    const auto secondaryResolution =
+        request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
+    if ((request.size.width() <= 0 && request.size.height() <= 0)
+            || request.size.width() > secondaryResolution.width()
+            || request.size.height() > secondaryResolution.height())
+    {
+        return Qn::StreamIndex::primary;
+    }
+    else
+    {
+        return Qn::StreamIndex::secondary;
+    }
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
