@@ -14,7 +14,7 @@ namespace details {
  * Supports generic properties applied for whole node. Contains flags for visual item.
  * Used for node describing and construction.
  */
-class NX_VMS_DESKTOP_CLIENT_API ViewNodeData
+class NX_VMS_CLIENT_DESKTOP_API ViewNodeData
 {
 public:
     ViewNodeData();

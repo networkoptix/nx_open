@@ -33,7 +33,7 @@ private:
 /**
  * This class implements access control.
  */
-class NX_VMS_DESKTOP_CLIENT_API QnWorkbenchAccessController:
+class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
     public Connective<QObject>,
     public QnCommonModuleAware
 {

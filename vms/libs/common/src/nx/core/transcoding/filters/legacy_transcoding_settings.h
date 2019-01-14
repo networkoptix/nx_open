@@ -4,13 +4,14 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <core/ptz/item_dewarping_params.h>
 #include <transcoding/timestamp_params.h>
 
 #include <nx/core/watermark/watermark.h>
 
 #include <utils/common/aspect_ratio.h>
-#include <utils/color_space/image_correction.h>
+
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
 namespace nx {
 namespace core {
@@ -23,8 +24,8 @@ struct LegacyTranscodingSettings
     QnAspectRatio forcedAspectRatio;
     int rotation = 0;
     QRectF zoomWindow;
-    QnItemDewarpingParams itemDewarpingParams;
-    ImageCorrectionParams contrastParams;
+    nx::vms::api::ImageCorrectionData contrastParams;
+    nx::vms::api::DewarpingData itemDewarpingParams;
     QnTimeStampParams timestampParams;
     Watermark watermark;
 

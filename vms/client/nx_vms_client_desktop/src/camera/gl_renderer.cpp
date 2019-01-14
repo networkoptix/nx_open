@@ -535,7 +535,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
     QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>* fisheyeShader = 0;
     QnMediaDewarpingParams mediaParams;
-    QnItemDewarpingParams itemParams;
+    nx::vms::api::DewarpingData itemParams;
 
     float ar = 1.0;
     if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
@@ -633,14 +633,12 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
     };
 
     QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>* fisheyeShader = 0;
-    QnMediaDewarpingParams mediaParams;
-    QnItemDewarpingParams itemParams;
 
     float ar = 1.0;
     ar = picLock->width()/(float)picLock->height();
-    //m_fisheyeController->tick();
-    mediaParams = m_fisheyeController->mediaDewarpingParams();
-    itemParams = m_fisheyeController->itemDewarpingParams();
+
+    const auto mediaParams = m_fisheyeController->mediaDewarpingParams();
+    const auto itemParams = m_fisheyeController->itemDewarpingParams();
 
     if (itemParams.panoFactor > 1.0)
     {

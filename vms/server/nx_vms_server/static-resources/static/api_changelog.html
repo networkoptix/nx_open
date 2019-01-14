@@ -1,6 +1,11 @@
 <div class="api_changelog" >
 
 <!--
+Uncomment the following line to enable live-reload during editing this document.
+<meta http-equiv="refresh" content="1" >
+-->
+
+<!--
 Style conventions in this document:
 - This file will be embedded into a framing HTML to be shown to the user.
 - Preserve it both a valid XML and an HTML renderable in a browser.
@@ -56,6 +61,7 @@ but also additional parameter values affected by the set operation in the method
     /api/setCameraParam
 </pre>
 </p>
+
 <p>
 Params <strong><code>scheduleTask.<i>beforeThreshold</i></code></strong> and <strong><code>
 scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the new
@@ -68,6 +74,7 @@ scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the 
     /ec2/getCamerasEx
 </pre>
 </p>
+
 <p>
 Added optional param <strong><code><b>currentPassword</b></code></strong>, which is required if new
 <strong><code>password</code></strong> is provided in methods:
@@ -76,10 +83,33 @@ Added optional param <strong><code><b>currentPassword</b></code></strong>, which
     /api/detachFromCloud
 </pre>
 </p>
+
 <p>
 Added required param <strong><code><b>currentPassword</b></code></strong> in method
 <strong><code>/api/restoreState</code></strong>.
 </p>
+
+<p>
+Expanded <strong><code><b>dewarpingParams</b></code></strong> and <strong><code><b>contrastParams
+</b></code></strong> fields in the layout items description in methods:
+<pre>
+    /ec2/getLayouts
+    /ec2/saveLayout
+    /ec2/saveLayouts
+</pre>
+</p>
+
+<p>
+Parameters <strong><code>layout.<i>horizontalSpacing</i></code></strong> and <strong><code>
+layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
+<strong><code><b>cellSpacing</b></code></strong> parameter in methods:
+<pre>
+    /ec2/getLayouts
+    /ec2/saveLayout
+    /ec2/saveLayouts
+</pre>
+</p>
+
 <!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
 <p>

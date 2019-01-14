@@ -94,7 +94,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehaviour>();
-    qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<ui::action::IDType>();
     qRegisterMetaType<ui::action::Parameters>();
     qRegisterMetaType<QnUpdateInfo>();

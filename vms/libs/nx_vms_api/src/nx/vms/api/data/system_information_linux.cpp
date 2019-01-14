@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
 
-#include "../helpers/system_information_helper_linux.h"
+#include <nx/vms/api/helpers/system_information_helper_linux.h>
 
 namespace nx::vms::api {
 
@@ -32,8 +32,13 @@ QString SystemInformation::currentSystemRuntime()
 
 QString SystemInformation::runtimeOsVersion()
 {
-    return ubuntuVersionFromCodeName(
+    const auto codenameVersion = ubuntuVersionFromCodeName(
         osReleaseContentsValueByKey(osReleaseContents(), "ubuntu_codename"));
+
+    if (!codenameVersion.isEmpty())
+        return codenameVersion;
+
+    return osReleaseContentsValueByKey(osReleaseContents(), "version_id");
 }
 
 } // namespace nx::vms::api

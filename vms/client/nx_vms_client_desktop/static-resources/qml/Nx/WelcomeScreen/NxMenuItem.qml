@@ -9,6 +9,9 @@ MenuItem
     implicitWidth: label.implicitWidth + leftPadding + rightPadding;
     implicitHeight: 24;
 
+    anchors.left: parent ? parent.left : undefined
+    anchors.right: parent ? parent.right : undefined
+
     contentItem: Text
     {
         id: label;

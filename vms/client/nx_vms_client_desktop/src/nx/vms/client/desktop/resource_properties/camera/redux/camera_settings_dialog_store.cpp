@@ -454,6 +454,11 @@ void CameraSettingsDialogStore::resetDeviceAgentSettingsValues(
         });
 }
 
+bool CameraSettingsDialogStore::recordingEnabled() const
+{
+    return d->state.recording.enabled();
+}
+
 void CameraSettingsDialogStore::setWearableMotionDetectionEnabled(bool value)
 {
     d->executeAction(

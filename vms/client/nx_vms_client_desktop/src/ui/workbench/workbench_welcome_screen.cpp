@@ -326,7 +326,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
 {
     connectToSystemInternal(
         systemId,
-        helpers::parseConnectionUrlFromUserInput(serverUrl),
+        parseConnectionUrlFromUserInput(serverUrl),
         {userName, password},
         storePassword,
         autoLogin);

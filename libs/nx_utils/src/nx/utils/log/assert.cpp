@@ -73,6 +73,7 @@ static void handleQtMessage(
     if (message.contains("QString:")
         || message.contains("QObject:")
         || message.contains("unable to save")
+        || message.contains("unknown user type")
         )
     {
         assertFailure(/*isCritical*/ false, message);

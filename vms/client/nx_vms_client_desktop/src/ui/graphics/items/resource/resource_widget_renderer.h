@@ -80,7 +80,7 @@ public:
 
     bool isDisplaying(const QSharedPointer<CLVideoDecoderOutput>& image) const override;
 
-    void setImageCorrection(const ImageCorrectionParams& value);
+    void setImageCorrection(const nx::vms::api::ImageCorrectionData& value);
     void setFisheyeController(QnFisheyePtzController* controller);
 
     void setDisplayedRect(int channel, const QRectF& rect);

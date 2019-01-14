@@ -16,7 +16,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 
-#include <core/ptz/item_dewarping_params.h>
+#include <nx/vms/api/data/dewarping_data.h>
 #include <core/ptz/media_dewarping_params.h>
 
 #include <ui/animation/opacity_animator.h>
@@ -968,7 +968,7 @@ void PtzInstrument::at_modeButton_clicked()
     {
         ensureOverlayWidget(widget);
 
-        QnItemDewarpingParams iparams = widget->item()->dewarpingParams();
+        nx::vms::api::DewarpingData iparams = widget->item()->dewarpingParams();
         QnMediaDewarpingParams mparams = widget->dewarpingParams();
 
         const QList<int> allowed = mparams.allowedPanoFactorValues();

@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogStateReducer
+class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateReducer
 {
 public:
     using State = CameraSettingsDialogState;

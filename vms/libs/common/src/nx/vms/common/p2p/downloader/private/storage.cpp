@@ -631,12 +631,16 @@ QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 
     const int chunkCount = calculateChunkCount(fileSize, chunkSize);
     result.resize(chunkCount);
 
+    QByteArray data;
+    data.resize(chunkSize);
+
     for (int i = 0; i < chunkCount; ++i)
     {
-        const auto data = file.read(chunkSize);
-        if (data.size() != calculateChunkSize(fileSize, i, chunkSize))
-            return QVector<QByteArray>();
+        const auto size = file.read(data.data(), chunkSize);
+        if (size != calculateChunkSize(fileSize, i, chunkSize))
+            return {};
 
+        data.resize(size);
         result[i] = QCryptographicHash::hash(data, QCryptographicHash::Md5);
     }
 

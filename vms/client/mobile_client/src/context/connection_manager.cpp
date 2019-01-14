@@ -18,7 +18,6 @@
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <utils/common/synctime.h>
-#include <utils/common/util.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 #include <common/common_module.h>
@@ -179,7 +178,7 @@ QnConnectionManager::ConnectionType QnConnectionManager::connectionType() const
 
 int QnConnectionManager::defaultServerPort() const
 {
-    return kDefaultConnectionPort;
+    return helpers::kDefaultConnectionPort;
 }
 
 nx::utils::Url QnConnectionManager::currentUrl() const
@@ -245,7 +244,7 @@ bool QnConnectionManager::connectByUserInput(
 {
     nx::utils::Url url = nx::utils::Url::fromUserInput(address);
     if (url.port() <= 0)
-        url.setPort(kDefaultConnectionPort);
+        url.setPort(helpers::kDefaultConnectionPort);
 
     url.setUserName(userName);
     url.setPassword(password);

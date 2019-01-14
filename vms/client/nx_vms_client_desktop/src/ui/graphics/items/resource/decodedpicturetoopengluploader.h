@@ -92,7 +92,12 @@ public:
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
-        void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
+        void processImage(
+            quint8* yPlane,
+            int width,
+            int height,
+            int stride,
+            const nx::vms::api::ImageCorrectionData& data);
 
         const ImageCorrectionResult& imageCorrectionResult() const;
 
@@ -215,8 +220,8 @@ public:
     //!Uploader calles this method, if picture uploading has been cancelled from outside
     void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
 
-    void setImageCorrection(const ImageCorrectionParams& value);
-    ImageCorrectionParams getImageCorrection() const;
+    void setImageCorrection(const nx::vms::api::ImageCorrectionData& value);
+    nx::vms::api::ImageCorrectionData getImageCorrection() const;
 
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
@@ -274,7 +279,7 @@ private:
     bool m_asyncUploadUsed;
     QGLContext* m_initializedCtx;
 
-    ImageCorrectionParams m_imageCorrection;
+    nx::vms::api::ImageCorrectionData m_imageCorrection;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;

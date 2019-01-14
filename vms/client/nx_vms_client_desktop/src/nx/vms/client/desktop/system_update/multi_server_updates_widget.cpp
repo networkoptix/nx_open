@@ -240,6 +240,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
+    ui->releaseDescriptionLabel->setOpenExternalLinks(true);
+
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
         this, &MultiServerUpdatesWidget::checkForInternetUpdates);
 

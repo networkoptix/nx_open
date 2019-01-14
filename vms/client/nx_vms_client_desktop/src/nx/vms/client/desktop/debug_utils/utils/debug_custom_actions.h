@@ -7,7 +7,9 @@
 
 namespace nx::vms::client::desktop {
 
-void registerDebugAction(const QString& name, std::function<void(void)> handler);
-QMap<QString, std::function<void(void)>> debugActions();
+using DebugActionHandler = std::function<void()>;
+
+void registerDebugAction(const QString& name, DebugActionHandler handler);
+QMap<QString, DebugActionHandler> debugActions();
 
 } // namespace nx::vms::client::desktop

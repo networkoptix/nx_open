@@ -5,11 +5,10 @@
 #include <QtCore/QString>
 #include <QtCore/QtGlobal>
 
-#include <nx/utils/latin1_array.h>
+#include "dewarping_data.h"
+#include "image_correction_data.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 struct NX_VMS_API LayoutItemData: IdData
 {
@@ -26,8 +25,8 @@ struct NX_VMS_API LayoutItemData: IdData
     float zoomRight = 0;
     float zoomBottom = 0;
     QnUuid zoomTargetId;
-    QnLatin1Array contrastParams; //< TODO: #API Expand this one.
-    QnLatin1Array dewarpingParams; //< TODO: #API Expand this one.
+    ImageCorrectionData contrastParams;
+    DewarpingData dewarpingParams;
     bool displayInfo = false; /**< Should info be displayed on the item. */
 };
 #define LayoutItemData_Fields IdData_Fields (flags)(left)(top)(right)(bottom)(rotation) \
@@ -45,8 +44,7 @@ struct NX_VMS_API LayoutData: ResourceData
     static constexpr float kDefaultBackgroundOpacity = 0.7f;
 
     float cellAspectRatio = 0;
-    float horizontalSpacing = kDefaultCellSpacing; //< TODO: #API Rename to cellSpacing.
-    float verticalSpacing = kDefaultCellSpacing; //< TODO: #API Remove this one.
+    float cellSpacing = kDefaultCellSpacing;
     LayoutItemDataList items;
     bool locked = false;
     qint32 fixedWidth = 0;
@@ -57,14 +55,12 @@ struct NX_VMS_API LayoutData: ResourceData
     qint32 backgroundHeight = 0;
     float backgroundOpacity = kDefaultBackgroundOpacity;
 };
-#define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(horizontalSpacing) \
-    (verticalSpacing)(items)(locked)(backgroundImageFilename)(backgroundWidth) \
+#define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(cellSpacing) \
+    (items)(locked)(backgroundImageFilename)(backgroundWidth) \
     (backgroundHeight)(backgroundOpacity) \
     (fixedWidth)(fixedHeight)(logicalId)
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api
 
 Q_DECLARE_METATYPE(nx::vms::api::LayoutItemData)
 Q_DECLARE_METATYPE(nx::vms::api::LayoutItemDataList)
