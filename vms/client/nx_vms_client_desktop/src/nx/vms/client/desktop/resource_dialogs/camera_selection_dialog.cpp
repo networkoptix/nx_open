@@ -311,6 +311,10 @@ CameraSelectionDialog::CameraSelectionDialog(
         || d->data.invalidCameras.isEmpty());       //< We have no invalid cameras.
     if (!d->setShowInvalidCameras(!d->data.selectedInvalidCameras.isEmpty()))
         d->reloadViewData();
+
+    ui->filteredResourceSelectionWidget->view()->setMouseTracking(true);
+    connect(ui->filteredResourceSelectionWidget->view(), &QAbstractItemView::entered,
+        this, &CameraSelectionDialog::updateThumbnail);
 }
 
 CameraSelectionDialog::~CameraSelectionDialog()
@@ -336,6 +340,15 @@ bool CameraSelectionDialog::selectCamerasInternal(
 
     selectedCameras = dialog.d->selectedCameras;
     return true;
+}
+
+void CameraSelectionDialog::updateThumbnail(const QModelIndex& index)
+{
+    QModelIndex baseIndex = index.sibling(index.row(), ResourceNodeViewColumn::resourceNameColumn);
+    QString toolTip = baseIndex.data(Qt::DisplayRole).toString();
+    ui->detailsWidget->setName(toolTip);
+    ui->detailsWidget->setResource(
+        index.data(ResourceNodeDataRole::resourceRole).value<QnResourcePtr>());
 }
 
 } // namespace nx::vms::client::desktop
