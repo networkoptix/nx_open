@@ -545,16 +545,17 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
 
             if (length > 0)
             {
-                if (length < 64)
+                static const int kTableSize = 64;
+                if (length < kTableSize)
                     return false;
                 // RFC2435. Same table for each frame, make deep copy of tables.
                 lumaTable = curPtr;
-                chromaTable = curPtr + (length >= 128 ? 64 : 0);
+                chromaTable = curPtr + (length >= kTableSize*2 ? kTableSize : 0);
                 if (jpegQ != 255)
                 {
                     // Make deep copy because the same table will be reused.
-                    memcpy(m_lumaTable, curPtr, 64 * lumaSize);
-                    memcpy(m_chromaTable, curPtr + 64 * lumaSize, 64 * chromaSize);
+                    memcpy(m_lumaTable, lumaTable, kTableSize);
+                    memcpy(m_chromaTable, chromaTable, kTableSize);
                 }
             }
 
