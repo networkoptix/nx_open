@@ -352,14 +352,14 @@ QString QnResource::getUrl() const
     return m_url;
 }
 
-void QnResource::setUrl(const QString &url)
+void QnResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (m_url == url)
+        if (!setUrlInternal(url))
             return;
-        m_url = url;
     }
+
     emit urlChanged(toSharedPointer(this));
 }
 
@@ -525,6 +525,15 @@ void QnResource::emitPropertyChanged(const QString& key)
 
     NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
+}
+
+bool QnResource::setUrlInternal(const QString& value)
+{
+    if (m_url == value)
+        return false;
+
+    m_url = value;
+    return true;
 }
 
 nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
