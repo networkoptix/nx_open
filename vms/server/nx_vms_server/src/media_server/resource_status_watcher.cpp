@@ -140,7 +140,7 @@ void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode err
     const QnUuid& id)
 {
     if (errCode != ec2::ErrorCode::ok)
-        qCritical() << "Failed to update resource status" << id.toString();
+        NX_WARNING(this, "Failed to update resource %1 status. Is it just removed?", id);
 
     m_setStatusInProgress.remove(id);
     if (m_awaitingSetStatus.contains(id)) {

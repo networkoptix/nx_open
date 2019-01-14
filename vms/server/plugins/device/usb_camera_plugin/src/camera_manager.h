@@ -21,10 +21,7 @@ class MediaEncoder;
 class CameraManager: public nxcip::BaseCameraManager2
 {
 public:
-    CameraManager(
-        DiscoveryManager * discoveryManager,
-        nxpl::TimeProvider *const timeProvider,
-        const nxcip::CameraInfo& info);
+    CameraManager(const std::shared_ptr<Camera> camera);
     virtual ~CameraManager() = default;
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -51,23 +48,16 @@ public:
 
     virtual int setMotionMask( nxcip::Picture* motionMask ) override;
 
-    const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
 
-    std::string getFfmpegUrl() const;
-
 protected:
-    DiscoveryManager * m_discoveryManager;
-    nxpl::TimeProvider * const m_timeProvider;
-    nxcip::CameraInfo m_info;
+    std::shared_ptr<Camera> m_camera;
+
     nxpt::CommonRefManager m_refManager;
     nxpt::ScopedRef<Plugin> m_pluginRef;
     unsigned int m_capabilities;
     static int constexpr kEncoderCount = 2;
     std::unique_ptr<MediaEncoder> m_encoders[kEncoderCount];
-
-    bool m_audioEnabled = false;
-    std::shared_ptr<Camera> m_camera;
 
     std::mutex m_mutex;
 };

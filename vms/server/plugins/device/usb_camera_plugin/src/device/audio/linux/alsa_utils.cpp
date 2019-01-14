@@ -18,7 +18,7 @@ namespace {
 static const std::vector<std::string> kMotherBoardAudioList = 
 {
     "HDA Intel PCH"
-    // AMD? builtin audio card goes here
+    // AMD? built in audio card goes here
 };
 
 struct DeviceDescriptor
@@ -34,7 +34,8 @@ struct DeviceDescriptor
     // The unique name of the interface used to open the device for capture.
     std::string path;
 
-    // The name of the sound card, used to determine if it should be ignored or deprioritized.
+    // The name of the sound card, used to match a camera to its microphone and to 
+    //    determine if it should be ignored or deprioritized.
     std::string name;
 
     // The index of the sound card in the system as reported by ALSA.
@@ -70,7 +71,11 @@ struct DeviceDescriptor
 
     bool isCameraAudioInput(const nxcip::CameraInfo& info) const
     {
-        return name.find(info.modelName) != name.npos && isInput();
+        std::string modelName(info.modelName);
+        return 
+            (modelName.find(name) != std::string::npos
+            || name.find(modelName) != std::string::npos) 
+            && isInput();
     }
 
     bool isInput() const
@@ -124,12 +129,12 @@ static std::vector<DeviceDescriptor> getDevices()
 
             if ((device.isDefault || device.sysDefault))
             {
-                bool builtin = false;
+                bool isMotherBoardAudio = false;
                 for(const auto & motherBoardAudio : kMotherBoardAudioList)
-                    builtin = device.name.find(motherBoardAudio) != std::string::npos;
+                    isMotherBoardAudio = device.name.find(motherBoardAudio) != std::string::npos;
 
                 auto it = std::find(motherBoardDevices.begin(), motherBoardDevices.end(), device);
-                if(builtin && it == motherBoardDevices.end())
+                if(isMotherBoardAudio && it == motherBoardDevices.end())
                 {
                     motherBoardDevices.push_back(device);
                 }
@@ -145,7 +150,7 @@ static std::vector<DeviceDescriptor> getDevices()
             free(cardName);
     }
 
-    // We want builtin mother board audio devices at the back of the list because they are
+    // We want built in mother board audio devices at the back of the list because they are
     // registered even with nothing plugged into them. Audio capture devices that are actually
     // present should get priority.
     for(const auto motherBoardDevice : motherBoardDevices)

@@ -69,6 +69,9 @@ Sdp::Media parseMedia(QStringList& lines)
     QStringList trackParams = line.mid(2).split(' ');
     media.mediaType = mediaTypeFromString(trackParams[0]);
 
+    if (trackParams.size() >= 4)
+        media.rtpmap.codecName = findCodecById(trackParams[3].toInt());
+
     if (trackParams.size() >= 2)
         media.serverPort = trackParams[1].toInt();
 
@@ -124,7 +127,10 @@ static QHostAddress parseServerAddress(const QString& line)
 
 void Sdp::parse(const QString& sdpData)
 {
+    serverAddress.clear();
+    controlUrl.clear();
     media.clear();
+
     QStringList lines = sdpData.split('\n');
     while(!lines.isEmpty())
     {
@@ -135,8 +141,11 @@ void Sdp::parse(const QString& sdpData)
         }
         else
         {
+            const static QString kControlUrlPrefix = "a=control:";
             if (line.startsWith("c=", Qt::CaseInsensitive))
                 serverAddress = parseServerAddress(line);
+            else if (line.startsWith(kControlUrlPrefix, Qt::CaseInsensitive))
+                controlUrl = line.mid(kControlUrlPrefix.length());
             lines.pop_front();
         }
     }

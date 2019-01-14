@@ -26,16 +26,20 @@ public:
 
     void start(HanwhaSharedResourceContext* resourceConext);
     void setTimeSynchronizationEnabled(bool enabled);
-    using TimeZoneShiftHandler = utils::MoveOnlyFunc<void(std::chrono::seconds)>;
-    void setTimeZoneShiftHandler(TimeZoneShiftHandler handler);
-    void setDateTime(const QDateTime& dateTime);
+
+    /** Notifies value change (Server UTC time - camera UTC time). */
+    using UtcTimeShiftHandler = utils::MoveOnlyFunc<void(std::chrono::milliseconds)>;
+    void setTimeShiftHandler(UtcTimeShiftHandler handler);
 
 private:
     void verifyDateTime();
+    void setDateTime(const QDateTime& dateTime);
     void retryVerificationIn(std::chrono::milliseconds timeout);
-    void updateTimeZoneShift(std::chrono::seconds value);
-    void fireStartPromises();
+    void updateTimeShift(
+        std::chrono::milliseconds utcTimeShift,
+        std::chrono::milliseconds timeZoneShift);
 
+    void fireStartPromises();
     void doRequest(
         const QString& action, std::map<QString, QString> params,
         bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler);
@@ -46,9 +50,11 @@ private:
     nx::network::http::AsyncClient m_httpClient;
 
     std::list<utils::promise<void>*> m_startPromises;
-    TimeZoneShiftHandler m_timeZoneHandler;
-    std::chrono::seconds m_timeZoneShift{0};
+    UtcTimeShiftHandler m_utcTimeShiftHandler;
+    std::chrono::milliseconds m_utcTimeShift{0};
+    std::chrono::milliseconds m_timeZoneShift{0};
     std::atomic<bool> m_timeSynchronizationEnabled{true};
+    bool m_isAsyncClientInProgress{false};
 };
 
 } // namespace plugins

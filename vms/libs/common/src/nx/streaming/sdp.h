@@ -52,6 +52,7 @@ struct Sdp
     void parse(const QString& sdp);
 
     QHostAddress serverAddress;
+    QString controlUrl;
     std::vector<Media> media;
 };
 

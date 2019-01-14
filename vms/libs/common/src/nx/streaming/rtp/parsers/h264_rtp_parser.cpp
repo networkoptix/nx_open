@@ -457,7 +457,7 @@ bool H264Parser::processData(
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if (rtpHeader->marker && m_frameExists)
+    if (rtpHeader->marker && m_frameExists && !gotData)
     {
         m_mediaData = createVideoData(rtpBufferBase, m_lastRtpTime); // last packet
         gotData = true;

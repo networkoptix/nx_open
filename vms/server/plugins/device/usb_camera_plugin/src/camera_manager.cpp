@@ -15,23 +15,17 @@
 namespace nx {
 namespace usb_cam {
 
-CameraManager::CameraManager(
-    DiscoveryManager* discoveryManager,
-    nxpl::TimeProvider* const timeProvider,
-    const nxcip::CameraInfo& info)
-:
-    m_discoveryManager(discoveryManager),
-    m_timeProvider(timeProvider),
-    m_info( info ),
-    m_refManager( this ),
-    m_pluginRef( Plugin::instance() ),
+CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
+    m_camera(camera),
+    m_refManager(this),
+    m_pluginRef(Plugin::instance()),
     m_capabilities(
-        nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-        nxcip::BaseCameraManager::fixedQualityCapability),
-    m_audioEnabled(false)
+            nxcip::BaseCameraManager::nativeMediaStreamCapability |
+            nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
+            nxcip::BaseCameraManager::fixedQualityCapability |
+            nxcip::BaseCameraManager::cameraTimeCapability)
 {
-    if(m_info.auxiliaryData[0] != '\0')
+    if (m_camera->hasAudio())
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
 }
 
@@ -53,7 +47,7 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
         addRef();
         return static_cast<nxcip::BaseCameraManager*>(this);
     }
-    if( memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -81,13 +75,10 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (!m_camera)
-    {
-        m_camera = std::make_shared<Camera>(this, m_timeProvider);
-        m_camera->initialize();
-    }
-
-    switch(encoderIndex)
+    if (!m_camera->isInitialized() && !m_camera->initialize())
+        return nxcip::NX_IO_ERROR;
+    
+    switch (encoderIndex)
     {
         case 0:
         {
@@ -102,7 +93,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         }
         case 1:
         {
-            if(!m_encoders[encoderIndex])
+            if (!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     refManager(),
@@ -123,7 +114,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
 int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
 {
-    memcpy( info, &m_info, sizeof(m_info) );
+    memcpy(info, &m_camera->info(), sizeof(m_camera->info()));
     return nxcip::NX_NO_ERROR;
 }
 
@@ -135,15 +126,12 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 
 void CameraManager::setCredentials( const char* username, const char* password )
 {
-    strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
-    strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
+    m_camera->setCredentials(username, password);
 }
 
 int CameraManager::setAudioEnabled( int audioEnabled )
 {
-    m_audioEnabled = audioEnabled;
-    if (m_camera)
-        m_camera->setAudioEnabled(m_audioEnabled);
+    m_camera->setAudioEnabled((bool)audioEnabled);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -176,7 +164,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
             return error;
         };
 
-    if(m_camera && errorToString(m_camera->lastError()))
+    if (errorToString(m_camera->lastError()))
     {
         m_camera->setLastError(0);
         return;
@@ -200,19 +188,9 @@ int CameraManager::setMotionMask( nxcip::Picture* /*motionMask*/ )
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-const nxcip::CameraInfo& CameraManager::info() const
-{
-    return m_info;
-}
-
 nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
-}
-
-std::string CameraManager::getFfmpegUrl() const
-{
-    return m_discoveryManager->getFfmpegUrl(m_info.uid);
 }
 
 } // namespace nx
