@@ -9,10 +9,6 @@ QString strPadLeft(const QString &str, int len, char ch);
 QString closeDirPath(const QString &value);
 QString getPathSeparator(const QString& path);
 
-// TODO: #ynikitenkov move to cpp, get rid of define
-#define DEFAULT_APPSERVER_HOST "127.0.0.1"
-static constexpr int kDefaultConnectionPort = 7001;
-
 //#define MAX_RTSP_DATA_LEN (65535 - 16)
 
 #define BACKWARD_SEEK_STEP (1000ll * 1000)

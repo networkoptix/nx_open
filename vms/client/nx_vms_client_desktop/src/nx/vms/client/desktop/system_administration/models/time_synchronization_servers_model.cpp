@@ -114,10 +114,12 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
                     if (!server.online)
                         return kPlaceholder;
 
-                    const auto osTimestamp = m_vmsTime.count() + server.osTimeOffset;
-                    const auto vmsTimestamp = m_vmsTime.count() + server.vmsTimeOffset;
-                    auto osDateTime = QDateTime::fromMSecsSinceEpoch(osTimestamp);
-                    auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(vmsTimestamp);
+                    const auto offsetFromUtc = duration_cast<seconds>(server.timeZoneOffset).count();
+                    const auto osTimestamp = duration_cast<milliseconds>(m_vmsTime + server.osTimeOffset).count();
+                    const auto vmsTimestamp = duration_cast<milliseconds>(m_vmsTime + server.vmsTimeOffset).count();
+
+                    auto osDateTime = QDateTime::fromMSecsSinceEpoch(osTimestamp, Qt::OffsetFromUTC, offsetFromUtc);
+                    auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(vmsTimestamp, Qt::OffsetFromUTC, offsetFromUtc);
 
                     //if (sameTimezone())
                     //{
@@ -131,12 +133,6 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
 
                     //    dateTime = timeWatcher->serverTime(server, sinceEpochMs);
                     //}
-
-                    auto offsetFromUtc = osDateTime.offsetFromUtc();
-                    osDateTime.setTimeSpec(Qt::OffsetFromUTC);
-                    osDateTime.setOffsetFromUtc(offsetFromUtc);
-                    vmsDateTime.setTimeSpec(Qt::OffsetFromUTC);
-                    vmsDateTime.setOffsetFromUtc(offsetFromUtc);
 
                     switch (column)
                     {
@@ -191,9 +187,9 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
             switch (column)
             {
                 case OsTimeColumn:
-                    return server.osTimeOffset;
+                    return (qint64) server.osTimeOffset.count();
                 case VmsTimeColumn:
-                    return server.vmsTimeOffset;
+                    return (qint64) server.vmsTimeOffset.count();
 
                 default:
                     break;

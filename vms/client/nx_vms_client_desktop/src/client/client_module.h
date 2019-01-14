@@ -49,8 +49,8 @@ public:
 private:
     void initApplication();
     void initThread();
-    void initMetaInfo();
-    void initSurfaceFormat();
+    static void initMetaInfo();
+    static void initSurfaceFormat();
     void initSingletons     (const QnStartupParameters& startupParams);
     void initRuntimeParams  (const QnStartupParameters& startupParams);
     void initLog            (const QnStartupParameters& startupParams);

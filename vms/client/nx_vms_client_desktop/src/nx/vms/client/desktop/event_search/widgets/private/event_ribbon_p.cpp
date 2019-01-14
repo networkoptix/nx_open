@@ -540,9 +540,9 @@ void EventRibbon::Private::insertNewTiles(
 
     if (!m_visible.isEmpty() && index < m_visible.upper())
     {
-        if (index <= m_visible.lower())
+        if (index <= m_visible.lower()) //< Insertion before visible range.
             m_visible = m_visible.shifted(count);
-        else if (index < m_visible.upper())
+        else if (index < m_visible.upper()) //< Insertion inside visible range.
             m_visible = Interval(m_visible.lower(), m_visible.upper() + count);
     }
 
@@ -1057,6 +1057,21 @@ void EventRibbon::Private::doUpdateView()
     {
         for (auto animator: m_animations.keys())
             delete animator;
+
+        // After insertion inside visible range it is in temporarily incorrect state:
+        // widgets for newly inserted tiles are not created, it's like (w w 0 0 0 0 w w w).
+        // If the ribbon is invisible, just clip the range, leaving only significant beginning.
+        for (int index = m_visible.lower(); index < m_visible.upper(); ++index)
+        {
+            if (!m_tiles[index]->widget)
+            {
+                for (int i = index; i < m_visible.upper(); ++i)
+                    reserveWidget(i);
+
+                m_visible = m_visible.truncatedRight(index);
+                break;
+            }
+        }
 
         updateHover();
         return;

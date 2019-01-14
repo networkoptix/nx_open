@@ -115,8 +115,10 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
 
                 if (idx >= 0)
                 {
-                    server.osTimeOffset = offsetList[idx].osTimeOffset;
-                    server.vmsTimeOffset = offsetList[idx].vmsTimeOffset;
+                    const auto &offsetInfo = offsetList[idx];
+                    server.osTimeOffset = offsetInfo.osTimeOffset;
+                    server.vmsTimeOffset = offsetInfo.vmsTimeOffset;
+                    server.timeZoneOffset = offsetInfo.timeZoneOffset;
                 }
             }
             return state;
