@@ -15,7 +15,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.6",
+    "version": "1.0.1.8",
     "data": [
         {
             "keys": ["Hanwha|*"],
@@ -1197,6 +1197,12 @@
             	"DW|DWC-PB6M4T"
             ],
             "fixWrongInputPortNumber": true
+        },
+        {
+            "keys": [
+            	"DW|DWC-MV85DiA"
+            ],
+            "repeatIntervalForSendVideoEncoderMS": 1000
         },
         {
             "keys": [
