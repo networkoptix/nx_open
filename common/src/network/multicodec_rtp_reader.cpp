@@ -328,7 +328,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
 
         if (bytesRead < 1)
+        {
+            if (m_demuxedData[rtpChannelNum])
+                m_demuxedData[rtpChannelNum]->clear();
             break; // error
+        }
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
