@@ -498,8 +498,25 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::missingPackageError:
             {
                 QStringList packageErrors;
+                auto missing = contents.missingUpdate.size();
                 if (contents.missingClientPackage)
-                    packageErrors << tr("Missing update package for client");
+                {
+                    if (missing)
+                    {
+                        packageErrors << tr("Missing update package for client and %n server(s)",
+                            "", missing);
+                    }
+                    else
+                    {
+                        packageErrors << tr("Missing update package for client");
+                    }
+                }
+                else if (!missing)
+                {
+                    packageErrors << tr("Missing update package for some servers");
+                }
+
+                /*
                 if (!contents.missingUpdate.empty())
                     packageErrors << tr("Missing update package for some servers");
                 if (packageErrors.empty() && !contents.unsuportedSystemsReport.empty())
@@ -515,7 +532,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                         QString serverName = serverInfo.toString(Qn::RI_WithUrl);
                         packageErrors << tr("Detected unsupported OS for the server %1").arg(serverName);
                     }
-                }
+                }*/
 
                 report.statusMessages << packageErrors;
                 break;
@@ -2076,15 +2093,23 @@ void MultiServerUpdatesWidget::autoCheckForUpdates()
 
 void MultiServerUpdatesWidget::syncStatusVisibility()
 {
-    bool hideInfo = m_widgetState == WidgetUpdateState::initial
-        || m_widgetState == WidgetUpdateState::ready;
-    if (m_stateTracker->hasVerificationErrors())
-        hideInfo = false;
-    if (m_updateInfo.alreadyInstalled)
-        hideInfo = true;
+    using StatusMode = ServerStatusItemDelegate::StatusMode;
+    StatusMode statusMode = StatusMode::remoteStatus;
 
-    m_statusItemDelegate->setStatusVisible(!hideInfo);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, hideInfo);
+    if (m_widgetState == WidgetUpdateState::initial
+        || m_widgetState == WidgetUpdateState::ready)
+    {
+        statusMode = StatusMode::hidden;
+    }
+
+    if (m_stateTracker->hasVerificationErrors())
+        statusMode = StatusMode::reportErrors;
+    if (m_updateInfo.alreadyInstalled)
+        statusMode = StatusMode::hidden;
+
+    m_statusItemDelegate->setStatusMode(statusMode);
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn,
+        statusMode == StatusMode::hidden);
 }
 
 void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& /*unused*/)
