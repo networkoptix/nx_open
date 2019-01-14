@@ -94,7 +94,13 @@ Tag::Tag(const std::string& s):
 bool Tag::matches(const Tag& mask) const
 {
     const QRegularExpression re(mask.m_value, QRegularExpression::CaseInsensitiveOption);
-    NX_ASSERT(re.isValid());
+    if (!re.isValid())
+    {
+        static std::atomic_bool warned(false);
+        if (!warned.exchange(true))
+            NX_ASSERT(false, "Regular expression %1 is invalid", m_value);
+        return true;
+    }
     const auto match = re.match(m_value);
     return match.hasMatch();
 }
