@@ -219,15 +219,15 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initThread();
     initMetaInfo();
     initApplication();
-    initSingletons(startupParams);
+    initSingletons();
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return;
 
-    initNetwork(startupParams);
-    initSkin(startupParams);
-    initLocalResources(startupParams);
+    initNetwork();
+    initSkin();
+    initLocalResources();
     initSurfaceFormat();
 
     // WebKit initialization must occur only once per application run. Actual for ActiveX module.
@@ -337,47 +337,51 @@ void QnClientModule::initSurfaceFormat()
 {
     QSurfaceFormat format;
 
-    if (qnSettings->lightMode().testFlag(Qn::LightModeNoMultisampling))
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoMultisampling))
         format.setSamples(2);
     format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
-    format.setSwapInterval(qnSettings->isVSyncEnabled() ? 1 : 0);
+    format.setSwapInterval(qnRuntime->isVSyncEnabled() ? 1 : 0);
 
     QSurfaceFormat::setDefaultFormat(format);
     QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));
 }
 
-void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
+void QnClientModule::initSingletons()
 {
-    /* Just to feel safe */
-    auto clientSettingsPtr = std::make_unique<QnClientSettings>(startupParams.forceLocalSettings);
+    // Persistent settings are standalone.
+    auto clientSettings = std::make_unique<QnClientSettings>(m_startupParameters);
 
-    /* Init crash dumps as early as possible. */
 #ifdef Q_OS_WIN
-    win32_exception::setCreateFullCrashDump(clientSettingsPtr->createFullCrashDump());
+    // As soon as settings are ready, setup full crash dumps if needed.
+    win32_exception::setCreateFullCrashDump(clientSettings->createFullCrashDump());
 #endif
 
+    // Runtime settings are standalone, but some actual values are taken from persistent settings.
+    auto clientRuntimeSettings = std::make_unique<QnClientRuntimeSettings>(m_startupParameters);
+    clientRuntimeSettings->setGLDoubleBuffer(clientSettings->isGlDoubleBuffer());
+    clientRuntimeSettings->setLocale(clientSettings->locale());
+
     // Depends on QnClientSettings.
-    auto clientInstanceManagerPtr = std::make_unique<QnClientInstanceManager>();
+    auto clientInstanceManager = std::make_unique<QnClientInstanceManager>();
 
-    // Log initialization depends on QnClientInstanceManager
-    initLog(startupParams);
+    // Log initialization depends on QnClientInstanceManager.
+    initLog();
 
-    // Depends on nothing.
-    auto clientRuntimeSettingsPtr = std::make_unique<QnClientRuntimeSettings>();
-
-    const auto clientPeerType = startupParams.videoWallGuid.isNull()
+    const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
         : nx::vms::api::PeerType::videowallClient;
-    const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
-    const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
+    const auto brand = m_startupParameters.isDevMode() ? QString() : QnAppInfo::productNameShort();
+    const auto customization = m_startupParameters.isDevMode()
+        ? QString()
+        : QnAppInfo::customizationName();
 
     m_staticCommon.reset(new QnStaticCommonModule(
         clientPeerType,
         brand,
         customization,
-        QLatin1String(ini().cloudHost)));
+        ini().cloudHost));
 
     m_clientCoreModule.reset(new QnClientCoreModule());
 
@@ -385,22 +389,23 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     nx::vms::client::desktop::settings::migrate();
 
     // We should load translations before major client's services are started to prevent races
-    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettingsPtr.get()));
+    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettings.get()));
 
     auto commonModule = m_clientCoreModule->commonModule();
+    commonModule->setModuleGUID(clientInstanceManager->instanceGuid());
 
     commonModule->store(new QnResourceRuntimeDataManager(commonModule));
 
     // Pass ownership to the common module.
     commonModule->store(translationManager.release());
-    commonModule->store(clientRuntimeSettingsPtr.release());
-    commonModule->store(clientSettingsPtr.release());
-    const auto clientInstanceManager = commonModule->store(clientInstanceManagerPtr.release());
+    commonModule->store(clientRuntimeSettings.release());
+    commonModule->store(clientSettings.release());
+    commonModule->store(clientInstanceManager.release());
 
-    initRuntimeParams(startupParams);
+    initRuntimeParams();
 
     // Shortened initialization if run in self-update mode.
-    if (startupParams.selfUpdateMode)
+    if (m_startupParameters.selfUpdateMode)
         return;
 
     commonModule->store(new ApplauncherGuard());
@@ -415,14 +420,13 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     // Depends on QnClientSettings, is never used directly.
     commonModule->store(new QnClientAutoRunWatcher());
 
-    commonModule->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::cloud().outgoingTunnelPool()
         .assignOwnPeerId("dc", commonModule->moduleGUID());
 
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new nx::vms::client::desktop::MetadataAnalyticsController());
+    commonModule->store(new MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -438,7 +442,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new ResourceWidgetPixmapCache());
 
     // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
-    initLocalInfo(startupParams);
+    initLocalInfo();
 
     initializeStatisticsManager(commonModule);
 
@@ -453,8 +457,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
     QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
-    m_uploadManager = new nx::vms::client::desktop::UploadManager(commonModule);
-    m_wearableManager = new nx::vms::client::desktop::WearableManager(commonModule);
+    m_uploadManager = new UploadManager(commonModule);
+    m_wearableManager = new WearableManager(commonModule);
 
     commonModule->store(m_uploadManager);
     commonModule->store(m_wearableManager);
@@ -480,18 +484,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     registerResourceDataProviders();
 }
 
-void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
+void QnClientModule::initRuntimeParams()
 {
-    qnRuntime->setDevMode(startupParams.isDevMode());
-    qnRuntime->setGLDoubleBuffer(qnSettings->isGlDoubleBuffer());
-    qnRuntime->setLocale(qnSettings->locale());
-    qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
-    qnRuntime->setShowFullInfo(startupParams.showFullInfo);
-    qnRuntime->setProfilerMode(startupParams.profilerMode);
-
-    if (!startupParams.engineVersion.isEmpty())
+    if (!m_startupParameters.engineVersion.isEmpty())
     {
-        nx::utils::SoftwareVersion version(startupParams.engineVersion);
+        nx::utils::SoftwareVersion version(m_startupParameters.engineVersion);
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
@@ -499,39 +496,15 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         }
     }
 
-    // TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
-    qnSettings->setVSyncEnabled(!startupParams.vsyncDisabled);
-    qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
-
-    // TODO: #Elric why QString???
-    if (!startupParams.lightMode.isEmpty())
-    {
-        bool ok = false;
-        Qn::LightModeFlags lightModeOverride(startupParams.lightMode.toInt(&ok));
-        qnRuntime->setLightModeOverride(ok ? lightModeOverride : Qn::LightModeFull);
-    }
-
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        qnRuntime->setVideoWallMode(true);
-        qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
-    }
-
-    if (startupParams.acsMode)
-    {
-        qnRuntime->setAcsMode(true);
-        qnRuntime->setLightModeOverride(Qn::LightModeACS);
-    }
-
-    /* Here the value from LightModeOverride will be copied to LightMode */
-    PerformanceTest::detectLightMode();
+    if (qnRuntime->lightModeOverride() != -1)
+        PerformanceTest::detectLightMode();
 
 #ifdef Q_OS_MACX
     if (mac_isSandboxed())
-        qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
+        qnRuntime->setLightMode(qnRuntime->lightMode() | Qn::LightModeNoNewWindow);
 #endif
 
-    auto qmlRoot = startupParams.qmlRoot.isEmpty() ? kQmlRoot : startupParams.qmlRoot;
+    auto qmlRoot = m_startupParameters.qmlRoot.isEmpty() ? kQmlRoot : m_startupParameters.qmlRoot;
     if (!qmlRoot.endsWith(L'/'))
         qmlRoot.append(L'/');
     NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
@@ -543,11 +516,11 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
 }
 
-void QnClientModule::initLog(const QnStartupParameters& startupParams)
+void QnClientModule::initLog()
 {
     using namespace nx::utils::log;
 
-    const auto logFileNameSuffix = calculateLogNameSuffix(startupParams);
+    const auto logFileNameSuffix = calculateLogNameSuffix(m_startupParameters);
 
     static const QString kLogConfig("desktop_client_log.ini");
     const QDir iniFilesDir(nx::kit::IniConfig::iniFilesDir());
@@ -575,8 +548,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
         const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
 
-        auto logLevel = startupParams.logLevel;
-        auto logFile = startupParams.logFile;
+        auto logLevel = m_startupParameters.logLevel;
+        auto logFile = m_startupParameters.logFile;
 
         if (logLevel.isEmpty())
             logLevel = qnSettings->logLevel();
@@ -598,27 +571,24 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     nx::utils::enableQtMessageAsserts();
 }
 
-void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
+void QnClientModule::initNetwork()
 {
     auto commonModule = m_clientCoreModule->commonModule();
 
     //TODO #ak get rid of this class!
     commonModule->store(new ec2::DummyHandler());
-    if (!startupParams.enforceSocketType.isEmpty())
-        nx::network::SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
+    if (!m_startupParameters.enforceSocketType.isEmpty())
+        nx::network::SocketFactory::enforceStreamSocketType(m_startupParameters.enforceSocketType);
 
-    if (!startupParams.enforceMediatorEndpoint.isEmpty())
+    if (!m_startupParameters.enforceMediatorEndpoint.isEmpty())
     {
         nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
-            startupParams.enforceMediatorEndpoint,
-            startupParams.enforceMediatorEndpoint});
+            m_startupParameters.enforceMediatorEndpoint,
+            m_startupParameters.enforceMediatorEndpoint});
     }
 
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        commonModule->setVideowallGuid(startupParams.videoWallGuid);
-        //commonModule->setInstanceGuid(startupParams.videoWallItemGuid);
-    }
+    if (!m_startupParameters.videoWallGuid.isNull())
+        commonModule->setVideowallGuid(m_startupParameters.videoWallGuid);
 
     commonModule->moduleDiscoveryManager()->start();
 
@@ -631,21 +601,19 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 }
 
 //#define ENABLE_DYNAMIC_CUSTOMIZATION
-void QnClientModule::initSkin(const QnStartupParameters& startupParams)
+void QnClientModule::initSkin()
 {
     QStringList paths;
     paths << ":/skin";
     paths << ":/skin_dark";
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    if (!startupParams.dynamicCustomizationPath.isEmpty())
+    if (!m_startupParameters.dynamicCustomizationPath.isEmpty())
     {
         QDir base(startupParams.dynamicCustomizationPath);
         paths << base.absoluteFilePath("skin");
         paths << base.absoluteFilePath("skin_dark");
     }
-#else
-    Q_UNUSED(startupParams);
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QScopedPointer<QnSkin> skin(new QnSkin(paths));
@@ -674,7 +642,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     commonModule->store(new ColorTheme());
 }
 
-void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
+void QnClientModule::initLocalResources()
 {
     auto commonModule = m_clientCoreModule->commonModule();
     // client uses ordinary QT file to access file system
@@ -690,7 +658,7 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     resourceProcessor->moveToThread(resourceDiscoveryManager);
     resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
 
-    if (!startupParams.skipMediaFolderScan)
+    if (!m_startupParameters.skipMediaFolderScan)
     {
         auto localFilesSearcher = commonModule->store(new QnResourceDirectoryBrowser());
 
@@ -720,7 +688,7 @@ QnClientCoreModule* QnClientModule::clientCoreModule() const
     return m_clientCoreModule.data();
 }
 
-nx::vms::client::desktop::RadassController* QnClientModule::radassController() const
+RadassController* QnClientModule::radassController() const
 {
     return m_radassController;
 }
@@ -730,21 +698,21 @@ QnStartupParameters QnClientModule::startupParameters() const
     return m_startupParameters;
 }
 
-nx::vms::client::desktop::UploadManager* QnClientModule::uploadManager() const
+UploadManager* QnClientModule::uploadManager() const
 {
     return m_uploadManager;
 }
 
-nx::vms::client::desktop::WearableManager* QnClientModule::wearableManager() const
+WearableManager* QnClientModule::wearableManager() const
 {
     return m_wearableManager;
 }
 
-void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
+void QnClientModule::initLocalInfo()
 {
     auto commonModule = m_clientCoreModule->commonModule();
 
-    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+    vms::api::PeerType clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? vms::api::PeerType::desktopClient
         : vms::api::PeerType::videowallClient;
 
@@ -754,7 +722,7 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
     runtimeData.peer.peerType = clientPeerType;
     runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
     runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
-    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
+    runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }
 

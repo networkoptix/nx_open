@@ -8,7 +8,6 @@
 #include <client_core/client_core_settings.h>
 
 #include <client/client_meta_types.h>
-#include <client/client_runtime_settings.h>
 
 #include <translation/translation_manager.h>
 #include <ui/style/globals.h>
@@ -27,6 +26,8 @@
 #include <nx/utils/file_system.h>
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
+
+#include "client_startup_parameters.h"
 
 namespace {
 
@@ -111,14 +112,23 @@ QString getBackgroundsDirectory()
 
 } // namespace
 
-QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
+QnClientSettings::QnClientSettings(const QnStartupParameters& startupParameters, QObject* parent):
     base_type(parent),
-    m_loading(true)
+    m_readOnly(startupParameters.isVideoWallMode() || startupParameters.acsMode)
 {
-    if (forceLocalSettings)
-        m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName(), this);
+    if (startupParameters.forceLocalSettings)
+    {
+        m_settings = new QSettings(
+            QSettings::IniFormat,
+            QSettings::UserScope,
+            qApp->organizationName(),
+            qApp->applicationName(),
+            this);
+    }
     else
+    {
         m_settings = new QSettings(this);
+    }
 
     init();
 
@@ -205,14 +215,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
             settings->endGroup();
             return result;
         }
-        case LIGHT_MODE:
-        {
-            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-            if (baseValue.type() == QVariant::Int)  //compatibility mode
-                return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
-            return baseValue;
-        }
-
         case WORKBENCH_PANES:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
@@ -303,7 +305,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isAcsMode())
+    if (m_readOnly)
         return;
 
     switch(id)
@@ -349,9 +351,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 
         case UPDATE_FEED_URL:
         case UPDATE_COMBINER_URL:
-        case GL_VSYNC:
-        case LIGHT_MODE:
-        case NO_CLIENT_UPDATE:
             break; /* Not to be saved to settings. */
 
         case WORKBENCH_PANES:

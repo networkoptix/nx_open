@@ -143,6 +143,7 @@ Result TimeSynchronizationWidgetReducer::addServer(State state, const State::Ser
         [id](const auto& info) { return info.id == id; }) == servers.cend())
     {
         servers.push_back(serverInfo);
+        state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
         return {true, std::move(state)};
     }
 
@@ -158,6 +159,7 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid&
     {
         servers.erase(it);
         state.status = actualStatus(state);
+        state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
         return {true, std::move(state)};
     }
 
@@ -177,6 +179,7 @@ Result TimeSynchronizationWidgetReducer::setServerOnline(
             {
                 server.online = isOnline;
                 state.status = actualStatus(state);
+                state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
                 return {true, std::move(state)};
             }
 

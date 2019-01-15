@@ -128,6 +128,10 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
                     server.timeZoneOffset = offsetInfo.timeZoneOffset;
                 }
             }
+
+            // Update cached value
+            state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
+
             return state;
         });
 }

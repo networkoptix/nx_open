@@ -121,19 +121,6 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
                     auto osDateTime = QDateTime::fromMSecsSinceEpoch(osTimestamp, Qt::OffsetFromUTC, offsetFromUtc);
                     auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(vmsTimestamp, Qt::OffsetFromUTC, offsetFromUtc);
 
-                    //if (sameTimezone())
-                    //{
-                    //    dateTime.setTimeSpec(Qt::LocalTime);
-                    //    dateTime.setMSecsSinceEpoch(sinceEpochMs);
-                    //}
-                    //else
-                    //{
-                    //    const auto timeWatcher =
-                    //        context()->instance<nx::client::core::ServerTimeWatcher>();
-
-                    //    dateTime = timeWatcher->serverTime(server, sinceEpochMs);
-                    //}
-
                     switch (column)
                     {
                         case DateColumn:

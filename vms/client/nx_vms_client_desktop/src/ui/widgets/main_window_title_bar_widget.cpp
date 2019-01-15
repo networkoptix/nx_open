@@ -245,13 +245,10 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newActionButton(
         action::MinimizeAction,
         kControlButtonSize));
-    if (!nx::utils::AppInfo::isMacOsX()) // Remove me later, workaround for 4.0 beta (VMS-11557).
-    {
-        layout->addWidget(newActionButton(
-            action::EffectiveMaximizeAction,
-            Qn::MainWindow_Fullscreen_Help,
-            kControlButtonSize));
-    }
+    layout->addWidget(newActionButton(
+        action::EffectiveMaximizeAction,
+        Qn::MainWindow_Fullscreen_Help,
+        kControlButtonSize));
     layout->addWidget(newActionButton(
         action::ExitAction,
         kControlButtonSize));

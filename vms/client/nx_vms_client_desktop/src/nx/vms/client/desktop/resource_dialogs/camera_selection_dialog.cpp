@@ -348,7 +348,7 @@ void CameraSelectionDialog::updateThumbnail(const QModelIndex& index)
     QString toolTip = baseIndex.data(Qt::DisplayRole).toString();
     ui->detailsWidget->setName(toolTip);
     ui->detailsWidget->setResource(
-        index.data(ResourceNodeDataRole::resourceRole).value<QnResourcePtr>());
+        baseIndex.data(ResourceNodeDataRole::resourceRole).value<QnResourcePtr>());
 }
 
 } // namespace nx::vms::client::desktop
