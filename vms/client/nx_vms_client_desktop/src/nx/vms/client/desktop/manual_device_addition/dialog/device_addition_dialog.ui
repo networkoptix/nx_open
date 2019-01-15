@@ -355,7 +355,7 @@
                        <enum>Qt::NoFocus</enum>
                       </property>
                       <property name="text">
-                       <string>––––</string>
+                       <string notr="true">––––</string>
                       </property>
                       <property name="readOnly">
                        <bool>true</bool>
@@ -494,7 +494,7 @@
                        <enum>Qt::NoFocus</enum>
                       </property>
                       <property name="text">
-                       <string>––––</string>
+                       <string notr="true">––––</string>
                       </property>
                       <property name="readOnly">
                        <bool>true</bool>
