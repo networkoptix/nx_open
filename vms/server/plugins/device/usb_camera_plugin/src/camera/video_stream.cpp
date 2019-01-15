@@ -186,23 +186,6 @@ void VideoStream::updateActualFps(uint64_t now)
     }
 }
 
-void VideoStream::updateGopSize(ffmpeg::Packet * packet)
-{
-    if (m_gopSize)
-        return;
-
-    if (!m_calculatingGopSize && packet->keyPacket())
-    {
-        ++m_calculatingGopSize;
-        return;
-    }
-
-    if (packet->keyPacket())
-        m_gopSize = m_calculatingGopSize;
-    else
-        ++m_calculatingGopSize;
-}
-
 std::string VideoStream::ffmpegUrlPlatformDependent() const
 {
     return
@@ -288,12 +271,7 @@ void VideoStream::run()
         if (!packet)
             continue;
 
-
-
         auto frame = maybeDecode(packet.get());
-
-        if (!m_gopSize)
-            updateGopSize(packet.get());
 
         updateActualFps(m_timeProvider->millisSinceEpoch());
 
@@ -571,22 +549,10 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
 int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 {
     int result = m_decoder->sendPacket(packet->packet());
-    if (result < 0)
-    {
-        std::cout << m_camera.lock()->toString() << ", video stream sendPacket error: "
-            << result << ", " << ffmpeg::utils::errorToString(result) << std::endl;
-    }
-
     if (result < 0 && result != AVERROR(EAGAIN))
         return result;
 
     result = m_decoder->receiveFrame(frame->frame());
-
-    if (result < 0)
-    {
-        std::cout << m_camera.lock()->toString() << ", video stream receiveFrame error: "
-            << result << ", " << ffmpeg::utils::errorToString(result) << std::endl;
-    }
 
     return result;
 }
