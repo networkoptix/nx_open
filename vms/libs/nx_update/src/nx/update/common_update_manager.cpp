@@ -269,8 +269,8 @@ update::FindPackageResult CommonUpdateManager::findPackage(
         outMessage);
 }
 
-bool CommonUpdateManager::deserializedUpdateInformation(const QByteArray& data,
-    update::Information* outUpdateInformation, const QString& caller) const
+bool CommonUpdateManager::deserializedUpdateInformation(update::Information* outUpdateInformation,
+    const QString& caller) const
 {
     const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
         outUpdateInformation, nullptr);
@@ -287,11 +287,8 @@ bool CommonUpdateManager::deserializedUpdateInformation(const QByteArray& data,
 bool CommonUpdateManager::participants(QList<QnUuid>* outParticipants) const
 {
     nx::update::Information updateInformation;
-    if (!deserializedUpdateInformation(globalSettings()->updateInformation(), &updateInformation,
-            "participants"))
-    {
+    if (!deserializedUpdateInformation(&updateInformation, "participants"))
         return false;
-    }
 
     *outParticipants = updateInformation.participants;
     return true;
@@ -300,11 +297,8 @@ bool CommonUpdateManager::participants(QList<QnUuid>* outParticipants) const
 vms::api::SoftwareVersion CommonUpdateManager::targetVersion() const
 {
     nx::update::Information updateInformation;
-    if (!deserializedUpdateInformation(globalSettings()->updateInformation(), &updateInformation,
-            "participants"))
-    {
+    if (!deserializedUpdateInformation(&updateInformation, "targetVersion"))
         return vms::api::SoftwareVersion();
-    }
 
     return vms::api::SoftwareVersion(updateInformation.version);
 }
@@ -312,11 +306,8 @@ vms::api::SoftwareVersion CommonUpdateManager::targetVersion() const
 bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
 {
     nx::update::Information updateInformation;
-    if (!deserializedUpdateInformation(globalSettings()->updateInformation(), &updateInformation,
-            "setParticipants"))
-    {
+    if (!deserializedUpdateInformation(&updateInformation, "setParticipants"))
         return false;
-    }
 
     updateInformation.participants = participants;
     QByteArray serializedUpdateInformation;

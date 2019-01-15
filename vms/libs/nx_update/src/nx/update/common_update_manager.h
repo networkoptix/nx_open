@@ -49,8 +49,8 @@ private:
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);
     update::Status start();
-    bool deserializedUpdateInformation(const QByteArray& data,
-        update::Information* outUpdateInformation, const QString& caller) const;
+    bool deserializedUpdateInformation(update::Information* outUpdateInformation,
+        const QString& caller) const;
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
