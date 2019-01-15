@@ -1,4 +1,5 @@
 #include <vector>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -217,7 +218,7 @@ protected:
         httpClient->setSendTimeout(network::kNoTimeout);
         httpClient->setResponseReadTimeout(network::kNoTimeout);
         httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
-        
+
         httpClient->executeInAioThreadSync(
             [this, &httpClient, method, url]()
             {
@@ -812,9 +813,9 @@ private:
     int m_totalRequestCount = 0;
 };
 
-TEST_F(HttpProxyWithSslStress, DISABLED_stress_test)
+TEST_F(HttpProxyWithSslStress, stress_test)
 {
-    constexpr int kRequestCount = 101;
+    const auto kRequestCount = std::thread::hardware_concurrency() * 3;
 
     givenRegularRelay();
     startSendingConcurrentRequestsToUnknownPeer(kRequestCount);
