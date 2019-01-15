@@ -48,11 +48,11 @@ void DeviceAgentHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent
     nx::vms::event::PluginEventPtr pluginEvent(
         new nx::vms::event::PluginEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
-            m_engineResource->getId(),
+            m_engineResource,
             sdkPluginEvent->caption(),
             sdkPluginEvent->description(),
             nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),
-            {m_device->getId().toString()}));
+            m_device));
 
     emit pluginEventTriggered(pluginEvent);
 }
