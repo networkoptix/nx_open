@@ -43,8 +43,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::ImageRequest, AspectRatio,
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::CameraImageRequest, StreamSelectionMode,
     (nx::api::CameraImageRequest::StreamSelectionMode::auto_, "auto")
-    (nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimaryIfAvailable, "forcedPrimaryIfAvailable")
-    (nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondaryIfAvailable, "forcedSecondaryIfAvailable")
+    (nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary, "forcedPrimary")
+    (nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary, "forcedSecondary")
     (nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics, "sameAsAnalytics")
     (nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion, "sameAsMotion")
 )

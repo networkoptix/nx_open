@@ -85,8 +85,8 @@ struct CameraImageRequest: ImageRequest
     {
         auto_,
 
-        forcedPrimaryIfAvailable,
-        forcedSecondaryIfAvailable,
+        forcedPrimary,
+        forcedSecondary,
 
         /** If analytics/motion is not available it operates as "auto" mode. */
         sameAsMotion,
