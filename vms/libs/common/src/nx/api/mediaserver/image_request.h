@@ -84,11 +84,8 @@ struct CameraImageRequest: ImageRequest
     enum class StreamSelectionMode
     {
         auto_,
-
         forcedPrimary,
         forcedSecondary,
-
-        /** If analytics/motion is not available it operates as "auto" mode. */
         sameAsMotion,
         sameAsAnalytics,
     };
