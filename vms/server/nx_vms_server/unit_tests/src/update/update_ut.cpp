@@ -35,8 +35,8 @@ protected:
         const QnUuid systemId = QnUuid::createUuid();
         for (int i = 0; i < count; ++i)
         {
-            m_peers.emplace_back(std::make_unique<MediaServerLauncher>(
-                QString(), 0, disabledFeatures));
+            m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString(), 0,
+                disabledFeatures));
 
             m_peers.back()->addCmdOption("--override-version=4.0.0.0");
             m_peers.back()->addSetting("--ignoreRootTool", "true");
