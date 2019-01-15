@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/resource/resource.h>
+
 class QnCommonModule;
 
 namespace nx::core::resource {
