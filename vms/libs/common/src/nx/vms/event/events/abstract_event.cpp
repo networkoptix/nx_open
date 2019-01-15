@@ -181,7 +181,7 @@ bool requiresCameraResource(EventType eventType)
         case EventType::cameraDisconnectEvent: //< Think about moving out disconnect event.
         case EventType::softwareTriggerEvent:
         case EventType::analyticsSdkEvent:
-        //case EventType::pluginEvent: //< Temporary disabled #spanasenko
+        case EventType::pluginEvent:
             return true;
 
         default:
@@ -203,6 +203,9 @@ bool isSourceCameraRequired(EventType eventType)
     {
         case EventType::networkIssueEvent:
             return true;
+
+        case EventType::pluginEvent:
+            return false;
 
         default:
             return requiresCameraResource(eventType);

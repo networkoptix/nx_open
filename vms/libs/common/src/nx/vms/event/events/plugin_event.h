@@ -7,6 +7,8 @@
 
 namespace nx::vms::event {
 
+using namespace nx::vms::common;
+
 class PluginEvent: public InstantEvent
 {
     using base_type = InstantEvent;
@@ -14,11 +16,11 @@ class PluginEvent: public InstantEvent
 public:
     explicit PluginEvent(
         qint64 timeStamp,
-        const QnUuid& pluginInstance,
+        const AnalyticsEngineResourcePtr& pluginInstance,
         const QString& caption,
         const QString& description,
         nx::vms::api::EventLevel level,
-        const QStringList& cameraRefs);
+        const QnSecurityCamResourcePtr& camera);
 
     virtual bool checkEventParams(const EventParameters& params) const override;
     virtual EventParameters getRuntimeParams() const override;
