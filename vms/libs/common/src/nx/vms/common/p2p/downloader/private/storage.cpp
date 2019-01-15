@@ -742,7 +742,7 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
     }
 
     fileInfo.status = FileInformation::Status::downloaded;
-    fileInfo.chunkChecksums = calculateChecksums(path, fileInfo.size);
+    fileInfo.chunkChecksums = calculateChecksums(path, fileInfo.chunkSize);
 }
 
 ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
