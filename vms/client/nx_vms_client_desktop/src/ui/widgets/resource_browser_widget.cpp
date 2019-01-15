@@ -253,8 +253,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
                 setTooltipResource(QnResourcePtr());
         });
 
-    installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar()},
-        { QEvent::Show, QEvent::Hide },
+    installEventHandler({ui->scrollArea->verticalScrollBar()}, {QEvent::Show, QEvent::Hide},
         this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
     /* Run handlers. */
@@ -1051,7 +1050,7 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
 
 bool QnResourceBrowserWidget::isScrollBarVisible() const
 {
-    return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
+    return ui->scrollArea->verticalScrollBar()->isVisible();
 }
 
 action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScope scope) const
