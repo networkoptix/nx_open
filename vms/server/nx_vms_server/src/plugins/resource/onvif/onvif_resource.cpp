@@ -4745,8 +4745,8 @@ void QnPlOnvifResource::updateVideoEncoder2(
     const auto capabilities = findVideoEncoderCapabilities(codec, streamIndex);
 
     encoder.Encoding = (codec != SupportedVideoCodecFlavor::NONE)
-        ? streamParams.codec.toStdString()
-        : supportedVideoCodecFlavorToVmsString(SupportedVideoCodecFlavor::Default);
+        ? supportedVideoCodecFlavorToOnvifString(codec)
+        : supportedVideoCodecFlavorToOnvifString(SupportedVideoCodecFlavor::Default);
 
     if (!encoder.GovLength)
     {
