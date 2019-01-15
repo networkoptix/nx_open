@@ -57,8 +57,6 @@ public:
 
         LOCALE,
 
-        EXTRA_PTZ_MAPPINGS_PATH,
-
         /** Url for get to updates.json. */
         UPDATE_FEED_URL,
 
@@ -91,11 +89,6 @@ public:
         CREATE_FULL_CRASH_DUMP,
 
         WORKBENCH_PANES,
-
-        CLOCK_24HOUR,
-        CLOCK_WEEKDAY,
-        CLOCK_DATE,
-        CLOCK_SECONDS,
 
         POPUP_SYSTEM_HEALTH,
 
@@ -130,7 +123,6 @@ public:
         BACKGROUND_IMAGE,
 
         LOG_LEVEL,
-        EC2_TRAN_LOG_LEVEL,
 
         /** Initial and maximal live buffer lengths, in milliseconds. */
         INITIAL_LIVE_BUFFER_MSECS,
@@ -203,7 +195,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
         QN_DECLARE_RW_PROPERTY(QString,                     lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QString())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
-        QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     locale,                 setLocale,                  LOCALE,                     QnAppInfo::defaultLanguage())
 
         /* Updates-related settings */
@@ -220,10 +211,6 @@ private:
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
         // This was renamed in 4.0 to prevent reuse of 3.x settings (WORKBENCH_PANES : paneSettings -> paneStateSettings).
         QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneStateSettings,      setPaneStateSettings,       WORKBENCH_PANES,            Qn::defaultPaneSettings())
-        QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
         QN_DECLARE_RW_PROPERTY(QSet<QnSystemHealth::MessageType>, popupSystemHealth, setPopupSystemHealth,      POPUP_SYSTEM_HEALTH,        QnSystemHealth::allVisibleMessageTypes().toSet())
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        autoLogin,              setAutoLogin,               AUTO_LOGIN,                 false)
@@ -240,7 +227,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
-        QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMs,    setInitialLiveBufferMs,     INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMs,    setMaximumLiveBufferMs,     MAXIMUM_LIVE_BUFFER_MSECS,  500)
         QN_DECLARE_RW_PROPERTY(QString,                     detectedObjectDisplaySettings, setDetectedObjectDisplaySettings, DETECTED_OBJECT_DISPLAY_SETTINGS, QString())
