@@ -53,6 +53,7 @@ private:
             serverInfo.online = server->getStatus() == Qn::Online;
             serverInfo.hasInternet = server->getServerFlags().testFlag(
                 vms::api::ServerFlag::SF_HasPublicIP);
+            serverInfo.timeZoneOffset = milliseconds(server->utcOffset());
 
             m_store->addServer(serverInfo);
         }

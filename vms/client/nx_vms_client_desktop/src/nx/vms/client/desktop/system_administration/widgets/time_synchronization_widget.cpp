@@ -43,20 +43,6 @@ static constexpr int kDateFontWeight = QFont::Bold;
 static constexpr int kZoneFontPixelSize = 14;
 static constexpr int kZoneFontWeight = QFont::Normal;
 
-QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
-{
-    QDateTime result;
-    result.setTimeSpec(Qt::LocalTime);
-    result.setMSecsSinceEpoch(value.count());
-
-    const auto offsetFromUtc = result.offsetFromUtc();
-    result.setTimeSpec(Qt::OffsetFromUTC);
-    result.setOffsetFromUtc(offsetFromUtc);
-
-    return result;
-}
-
-
 } // namespace
 
 TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
@@ -175,6 +161,7 @@ void TimeSynchronizationWidget::loadDataToUi()
         serverInfo.online = server->getStatus() == Qn::Online;
         serverInfo.hasInternet = server->getServerFlags().testFlag(
             vms::api::ServerFlag::SF_HasPublicIP);
+        serverInfo.timeZoneOffset = milliseconds(server->utcOffset());
         servers.push_back(serverInfo);
     }
 
@@ -263,7 +250,11 @@ void TimeSynchronizationWidget::loadState(const State& state)
 {
     using ::setReadOnly;
 
-    const auto vmsDateTime = dateTimeFromMSecs(state.vmsTime);
+    const auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(
+        duration_cast<milliseconds>(state.vmsTime).count(),
+        Qt::OffsetFromUTC,
+        duration_cast<seconds>(state.commonTimezoneOffset).count());
+
     const bool isSyncWithInternet = state.syncTimeWithInternet();
 
     QString detailsText;
