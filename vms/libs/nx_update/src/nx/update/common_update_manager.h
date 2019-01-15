@@ -28,9 +28,11 @@ public:
     void cancel();
     void startUpdate(const QByteArray& content);
     void install(const QnAuthSession& authInfo);
-    QList<QnUuid> participants() const;
+    bool participants(QList<QnUuid>* outParticipants) const;
     bool setParticipants(const QList<QnUuid>& participants);
     bool updateLastInstallationRequestTime();
+    void finish();
+    vms::api::SoftwareVersion targetVersion() const;
 
 private:
     std::atomic<bool> m_downloaderFailed = false;
@@ -47,6 +49,8 @@ private:
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);
     update::Status start();
+    bool deserializedUpdateInformation(const QByteArray& data,
+        update::Information* outUpdateInformation, const QString& caller) const;
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;

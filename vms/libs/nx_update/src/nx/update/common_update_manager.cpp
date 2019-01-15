@@ -131,6 +131,11 @@ void CommonUpdateManager::cancel()
     startUpdate("{}");
 }
 
+void CommonUpdateManager::finish()
+{
+    startUpdate("{}");
+}
+
 void CommonUpdateManager::onGlobalUpdateSettingChanged()
 {
     start();
@@ -264,30 +269,52 @@ update::FindPackageResult CommonUpdateManager::findPackage(
         outMessage);
 }
 
-QList<QnUuid> CommonUpdateManager::participants() const
+bool CommonUpdateManager::deserializedUpdateInformation(const QByteArray& data,
+    update::Information* outUpdateInformation, const QString& caller) const
 {
-    nx::update::Information updateInformation;
     const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
-        &updateInformation, nullptr);
+        outUpdateInformation, nullptr);
 
     if (deserializeResult != nx::update::FindPackageResult::ok)
     {
-        NX_DEBUG(this, "participants: Failed to deserialize");
-        return QList<QnUuid>();
+        NX_DEBUG(this, lm("%1: Failed to deserialize").args(caller));
+        return false;
     }
 
-    return updateInformation.participants;
+    return true;
+}
+
+bool CommonUpdateManager::participants(QList<QnUuid>* outParticipants) const
+{
+    nx::update::Information updateInformation;
+    if (!deserializedUpdateInformation(globalSettings()->updateInformation(), &updateInformation,
+            "participants"))
+    {
+        return false;
+    }
+
+    *outParticipants = updateInformation.participants;
+    return true;
+}
+
+vms::api::SoftwareVersion CommonUpdateManager::targetVersion() const
+{
+    nx::update::Information updateInformation;
+    if (!deserializedUpdateInformation(globalSettings()->updateInformation(), &updateInformation,
+            "participants"))
+    {
+        return vms::api::SoftwareVersion();
+    }
+
+    return vms::api::SoftwareVersion(updateInformation.version);
 }
 
 bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
 {
     nx::update::Information updateInformation;
-    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
-        &updateInformation, nullptr);
-
-    if (deserializeResult != nx::update::FindPackageResult::ok)
+    if (!deserializedUpdateInformation(globalSettings()->updateInformation(), &updateInformation,
+            "setParticipants"))
     {
-        NX_DEBUG(this, "setParticipants: Failed to deserialize");
         return false;
     }
 

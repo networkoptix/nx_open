@@ -30,6 +30,9 @@ MediaServerLauncher::MediaServerLauncher(
 
     if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
         addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+
+    m_cmdOptions.push_back("");
+    m_cmdOptions.push_back("-e");
 }
 
 void MediaServerLauncher::fillDefaultSettings()
@@ -78,6 +81,11 @@ void MediaServerLauncher::addSetting(const std::string& name, const QVariant& va
     m_settings[name] = value.toString();
 }
 
+void MediaServerLauncher::addCmdOption(const std::string& option)
+{
+    m_cmdOptions.push_back(option);
+}
+
 void MediaServerLauncher::prepareToStart()
 {
     m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
@@ -87,16 +95,20 @@ void MediaServerLauncher::prepareToStart()
     for (const auto& p: m_settings)
         m_configFile << p.first << " = " << p.second.toStdString() << std::endl;
 
-    QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
-    const char* argv[] = { "", "-e", configFileOption.data() };
-    const int argc = 3;
+    m_cmdOptions.push_back("--conf-file=" + m_configFilePath.toUtf8().toStdString());
+
+    std::vector<const char*> argv;
+    std::transform(m_cmdOptions.cbegin(), m_cmdOptions.cend(), std::back_inserter(argv),
+        [](const std::string& s) { return s.data(); });
+    argv.push_back(nullptr);
 
     m_configFile.flush();
     m_configFile.close();
 
     m_mediaServerProcess.reset();
-    m_mediaServerProcess.reset(new MediaServerProcess(argc, (char**) argv));
-    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this, &MediaServerLauncher::started);
+    m_mediaServerProcess.reset(new MediaServerProcess(argv.size() - 1, (char**) argv.data()));
+    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this,
+        &MediaServerLauncher::started);
 
     m_firstStartup = false;
 }

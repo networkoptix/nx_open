@@ -28,8 +28,10 @@ int QnUpdateStatusRestHandler::executeGet(
     }
     else
     {
-        detail::checkUpdateStatusRemotely(serverModule()->updateManager()->participants(),
-            processor->commonModule(), path, &reply, &context);
+        QnUuidList participants;
+        serverModule()->updateManager()->participants(&participants);
+        detail::checkUpdateStatusRemotely(participants, processor->commonModule(), path, &reply,
+            &context);
     }
 
     QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);

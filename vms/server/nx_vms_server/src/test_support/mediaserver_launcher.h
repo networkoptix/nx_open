@@ -42,6 +42,7 @@ public:
     nx::vms::server::Authenticator* authenticator() const;
 
     void addSetting(const std::string& name, const QVariant& value);
+    void addCmdOption(const std::string& option);
 
     /**
      * Run media server at the current thread
@@ -85,5 +86,6 @@ private:
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
     bool m_firstStartup;
     std::map<std::string, QString> m_settings;
+    std::vector<std::string> m_cmdOptions;
     QnUuid m_serverGuid;
 };

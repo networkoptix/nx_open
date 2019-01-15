@@ -1076,20 +1076,23 @@ void MediaServerProcess::stopSync()
 
     const int kStopTimeoutMs = 100 * 1000;
 
-    if (serviceMainInstance) {
-        {
-            QnMutexLocker lock( &m_stopMutex );
-            m_stopping = true;
-        }
-        serviceMainInstance->pleaseStop();
-        serviceMainInstance->quit();
-        if (!serviceMainInstance->wait(kStopTimeoutMs))
-        {
-            serviceMainInstance->terminate();
-            serviceMainInstance->wait();
-        }
-        serviceMainInstance = 0;
+    {
+        QnMutexLocker lock( &m_stopMutex );
+        if (m_stopping)
+            return;
+
+        m_stopping = true;
     }
+
+    pleaseStop();
+    quit();
+
+    if (!wait(kStopTimeoutMs))
+    {
+        terminate();
+        wait();
+    }
+
     qApp->quit();
 }
 

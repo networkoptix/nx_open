@@ -13,4 +13,7 @@ public:
     virtual int executePost(const QString& path, const QnRequestParamList& params,
         const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
         QByteArray& resultContentType, const QnRestConnectionProcessor* processor) override;
+
+private:
+    bool allPeersUpdatedSuccessfully() const;
 };

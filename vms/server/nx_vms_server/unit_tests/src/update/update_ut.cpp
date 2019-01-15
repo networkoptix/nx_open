@@ -5,10 +5,12 @@
 #include <test_support/mediaserver_launcher.h>
 #include <transaction/message_bus_adapter.h>
 #include <api/test_api_requests.h>
+#include <api/global_settings.h>
 #include <nx/update/update_information.h>
 #include <nx/network/http/test_http_server.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
+#include <common/common_module.h>
 
 namespace nx::vms::server::test {
 
@@ -26,6 +28,7 @@ protected:
 
     void givenConnectedPeers(int count)
     {
+        const QnUuid systemId = QnUuid::createUuid();
         for (int i = 0; i < count; ++i)
         {
             m_peers.emplace_back(std::make_unique<MediaServerLauncher>(
@@ -34,30 +37,14 @@ protected:
                     MediaServerLauncher::noResourceDiscovery
                     | MediaServerLauncher::noMonitorStatistics)));
 
-            m_peers.back()->addSetting("--override-version", "4.0.0.0");
+            m_peers.back()->addCmdOption("--override-version=4.0.0.0");
             m_peers.back()->addSetting("--ignoreRootTool", "true");
             ASSERT_TRUE(m_peers.back()->start());
+            m_peers.back()->commonModule()->globalSettings()->setLocalSystemId(systemId);
+            m_peers.back()->commonModule()->globalSettings()->synchronizeNowSync();
         }
 
-
-        for (int i = 0; i < count - 1; ++i)
-        {
-            const auto& to = m_peers[i + 1];
-            const auto toUrl = utils::url::parseUrlFields(to->endpoint().toString(),
-                network::http::kUrlSchemeName);
-
-            m_peers[i]->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
-                to->commonModule()->moduleGUID(), vms::api::PeerType::server, toUrl);
-        }
-
-        const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
-        int distance = std::numeric_limits<int>::max();
-        while (distance > m_peers.size())
-        {
-            distance = firstPeerMessageBus->distanceToPeer(
-                m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+        connectPeers();
     }
 
     void whenCorrectUpdateInformationWithEmptyParticipantListSet()
@@ -140,21 +127,54 @@ protected:
     void whenServersRestartedWithNewVersions()
     {
         for (const auto& peer: m_peers)
-        {
             peer->stop();
-            peer->addSetting("--override-version", "4.0.0.1");
-            peer->start();
+
+        for (const auto& peer: m_peers)
+        {
+            peer->addCmdOption("--override-version=4.0.0.1");
+            ASSERT_TRUE(peer->start());
         }
+
+        connectPeers();
     }
 
     void thenFinishUpdateShouldSucceed()
     {
-        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "", nullptr);
+        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "");
 
         update::Information receivedUpdateInfo;
         NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
 
         ASSERT_TRUE(receivedUpdateInfo.isEmpty());
+    }
+
+    void whenServerRestartedWithNewVersion(int peerIndex)
+    {
+        m_peers[peerIndex]->stop();
+        m_peers[peerIndex]->addCmdOption("--override-version=4.0.0.1");
+        ASSERT_TRUE(m_peers[peerIndex]->start());
+    }
+
+    void whenServerRestartedWithOldVersion(int peerIndex)
+    {
+        m_peers[peerIndex]->stop();
+        m_peers[peerIndex]->addCmdOption("--override-version=4.0.0.0");
+        ASSERT_TRUE(m_peers[peerIndex]->start());
+    }
+
+    void whenServersConnected()
+    {
+        connectPeers();
+    }
+
+    void thenFinishUpdateShouldFail(QnRestResult::Error expectedCode)
+    {
+        issueFinishUpdateRequestAndAssertResponse(false, expectedCode);
+    }
+
+    void thenFinishUpdateWithignorePendingPeersShouldSucceed()
+    {
+        issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
 
 private:
@@ -172,6 +192,28 @@ private:
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
     network::http::TestHttpServer m_testHttpServer;
+
+    void connectPeers()
+    {
+        for (int i = 0; i < m_peers.size() - 1; ++i)
+        {
+            const auto& to = m_peers[i + 1];
+            const auto toUrl = utils::url::parseUrlFields(to->endpoint().toString(),
+                network::http::kUrlSchemeName);
+
+            m_peers[i]->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
+                to->commonModule()->moduleGUID(), vms::api::PeerType::server, toUrl);
+        }
+
+        const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
+        int distance = std::numeric_limits<int>::max();
+        while (distance > m_peers.size())
+        {
+            distance = firstPeerMessageBus->distanceToPeer(
+                m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
 
     void setUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())
     {
@@ -202,6 +244,22 @@ private:
         QnRestResult installResponse;
         QJson::deserialize(responseBuffer, &installResponse);
         ASSERT_EQ(expectedRestResult, installResponse.error);
+    }
+
+    void issueFinishUpdateRequestAndAssertResponse(bool ignorePendingPeers,
+        QnRestResult::Error expectedCode)
+    {
+        QString path = "/ec2/finishUpdate";
+        if (ignorePendingPeers)
+            path += "?ignorePendingPeers";
+
+        QByteArray responseBuffer;
+        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
+            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+
+        QnRestResult installResponse;
+        QJson::deserialize(responseBuffer, &installResponse);
+        ASSERT_EQ(expectedCode, installResponse.error);
     }
 
     void prepareCorrectUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())
@@ -342,6 +400,10 @@ TEST_F(Updates, installUpdate_timestampCorrectlySet)
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
     thenItShouldBeRetrievable();
 
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+
     thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0) });
     thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime();
 }
@@ -398,19 +460,50 @@ TEST_F(Updates, finishUpdate_success_updateInformationCleared)
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
     thenItShouldBeRetrievable();
 
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
     thenInstallUpdateWithPeersParameterShouldSucceed({});
+
     whenServersRestartedWithNewVersions();
     thenFinishUpdateShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_fail_notAllUpdated)
 {
-    // #TODO #akulikov
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+    thenInstallUpdateWithPeersParameterShouldSucceed({});
+
+    whenServerRestartedWithNewVersion(0);
+    whenServerRestartedWithOldVersion(1);
+    whenServersConnected();
+    thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
 TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
 {
-    // #TODO #akulikov
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+    thenInstallUpdateWithPeersParameterShouldSucceed({});
+
+    whenServerRestartedWithNewVersion(0);
+    whenServerRestartedWithOldVersion(1);
+    whenServersConnected();
+    thenFinishUpdateWithignorePendingPeersShouldSucceed();
 }
 
 } // namespace nx::vms::server::test

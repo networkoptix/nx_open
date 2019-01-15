@@ -70,19 +70,26 @@ QSet<QnMediaServerResourcePtr> participantServers(
             servers.insert(server);
     }
 
+    return filterOutNonParticipants(servers, serverIdList);
+}
+
+QSet<QnMediaServerResourcePtr> filterOutNonParticipants(
+    const QSet<QnMediaServerResourcePtr>& allServers, const QList<QnUuid>& serverIdList)
+{
+    QSet<QnMediaServerResourcePtr> resultServers = allServers;
     if (!serverIdList.isEmpty())
     {
         const auto serverIdSet = QSet<QnUuid>::fromList(serverIdList);
-        for (auto it = servers.cbegin(); it != servers.cend();)
+        for (auto it = resultServers.cbegin(); it != resultServers.cend();)
         {
             if (!serverIdSet.contains((*it)->getId()))
-                it = servers.erase(it);
+                it = resultServers.erase(it);
             else
                 ++it;
         }
     }
 
-    return servers;
+    return resultServers;
 }
 
 } // namespace detail

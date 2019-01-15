@@ -11,19 +11,16 @@ bool allParticipantsAreReadyForInstall(
     const QnRestConnectionProcessor* processor)
 {
     auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
-        processor->resourcePool(),
-        QnRequestParamList());
+        processor->resourcePool(), QnRequestParamList());
     request.isLocal = true;
-    QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request,
+
+    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
         processor->owner()->getPort());
+
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(
-        participants,
-        processor->commonModule(),
-        "/ec2/updateStatus",
-        &reply,
-        &context);
+    detail::checkUpdateStatusRemotely(participants, processor->commonModule(), "/ec2/updateStatus",
+        &reply, &context);
+
     return std::all_of(reply.cbegin(), reply.cend(),
         [](const auto& status)
         {
@@ -106,29 +103,23 @@ int QnInstallUpdateRestHandler::executePost(
 
     if (!params.contains("peers"))
     {
-        return QnFusionRestHandler::makeError(
-            nx::network::http::StatusCode::ok,
-            "Missing required parameter 'peers'",
-            &result,
-            &resultContentType,
-            Qn::JsonFormat,
-            request.extraFormatting,
-            QnRestResult::MissingParameter);
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+            "Missing required parameter 'peers'", &result, &resultContentType, Qn::JsonFormat,
+            request.extraFormatting, QnRestResult::MissingParameter);
     }
 
     QList<QnUuid> participants;
-    for (const auto& idString: params.value("peers").split(','))
-        participants.append(QnUuid::fromStringSafe(idString));
+    if (!params.value("peers").isEmpty())
+    {
+        for (const auto& idString: params.value("peers").split(','))
+            participants.append(QnUuid::fromStringSafe(idString));
+    }
 
     if (!serverModule()->updateManager()->setParticipants(participants))
     {
-        return QnFusionRestHandler::makeError(
-            nx::network::http::StatusCode::ok,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
             "Failed to set update participants list. Update information might not be valid",
-            &result,
-            &resultContentType,
-            Qn::JsonFormat,
-            request.extraFormatting,
+            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting,
             QnRestResult::InternalServerError);
     }
 
@@ -136,34 +127,24 @@ int QnInstallUpdateRestHandler::executePost(
     {
         if (!serverModule()->updateManager()->updateLastInstallationRequestTime())
         {
-            return QnFusionRestHandler::makeError(
-                nx::network::http::StatusCode::ok,
+            return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
                 "Failed to set last installation request time. Update information might not be valid",
-                &result,
-                &resultContentType,
-                Qn::JsonFormat,
-                request.extraFormatting,
+                &result, &resultContentType, Qn::JsonFormat, request.extraFormatting,
                 QnRestResult::InternalServerError);
         }
 
         if (!allParticipantsAreReadyForInstall(participants, processor))
         {
-            return QnFusionRestHandler::makeError(
-                nx::network::http::StatusCode::ok,
+            return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
                 "Not all servers in the system are ready for install",
                 &result, &resultContentType, Qn::JsonFormat);
         }
 
-        QnMultiserverRequestContext<QnEmptyRequestData> context(
-            request,
+        QnMultiserverRequestContext<QnEmptyRequestData> context(request,
             processor->owner()->getPort());
 
-        sendInstallRequest(
-            participants,
-            serverModule()->commonModule(),
-            path,
-            srcBodyContentType,
-            &context);
+        sendInstallRequest(participants, serverModule()->commonModule(), path,
+            srcBodyContentType, &context);
     }
 
     return nx::network::http::StatusCode::ok;

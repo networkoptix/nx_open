@@ -37,6 +37,9 @@ nx::utils::Url getServerApiUrl(
 QSet<QnMediaServerResourcePtr> participantServers(const QList<QnUuid>& serverIdList,
     QnCommonModule* commonModule);
 
+QSet<QnMediaServerResourcePtr> filterOutNonParticipants(
+    const QSet<QnMediaServerResourcePtr>& allServers, const QList<QnUuid>& serverIdList);
+
 template<typename ReplyType, typename MergeFunction, typename RequestData>
 void requestRemotePeers(QnCommonModule* commonModule, const QString& path, ReplyType& outputReply,
     QnMultiserverRequestContext<RequestData>* context,
