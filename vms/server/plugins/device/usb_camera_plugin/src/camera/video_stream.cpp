@@ -12,8 +12,6 @@
 #include "device/video/utils.h"
 #include "ffmpeg/utils.h"
 
-#include "timestamp_config.h"
-
 namespace nx {
 namespace usb_cam {
 
@@ -531,7 +529,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 #endif
 
     // Setting timestamp here because primary stream needs it even if there is no decoding.
-    packet->setTimestamp(usbGetTime());
+    packet->setTimestamp(m_timeProvider->millisSinceEpoch());
 
     return packet;
 }

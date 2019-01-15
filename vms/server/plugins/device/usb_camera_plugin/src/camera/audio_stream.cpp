@@ -1,8 +1,6 @@
 #include "audio_stream.h"
-#if defined (AUDIO_STREAM)
 
 #include <algorithm>
-#include <iostream>
 
 extern "C" {
 #include <libswresample/swresample.h>
@@ -14,8 +12,6 @@ extern "C" {
 #include "default_audio_encoder.h"
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
-
-#include "timestamp_config.h"
 
 namespace nx {
 namespace usb_cam {
@@ -312,11 +308,7 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
     for(;;)
     {
-        ffmpeg::Packet packet(
-            m_inputFormat->findStream(AVMEDIA_TYPE_AUDIO)->codecpar->codec_id,
-            AVMEDIA_TYPE_AUDIO);
-        
-        uint64_t start = usbGetTime();
+        ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
 
         // AVFMT_FLAG_NONBLOCK is set if running on Windows. see initializeInputFormat().
         int result;
@@ -332,8 +324,6 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
         {
             result = m_inputFormat->readFrame(packet.packet());
         }
-
-        std::cout << "rf: " <<  usbGetTime() - start << std::endl;
 
         if (result < 0)
             return result;
@@ -435,30 +425,20 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 
 uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
-        uint64_t now = usbGetTime();
+    uint64_t now = m_timeProvider->millisSinceEpoch();
 
     const AVRational sourceRate = { 1, m_encoder->sampleRate() };
-#if defined(USE_MSEC)
     static const AVRational kTargetRate = { 1, 1000 }; // < One millisecond
-#else
-    static const AVRational kTargetRate = { 1, 1000000 }; // < One microsecond
-#endif
-    int64_t offset = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate); 
 
-#if defined(USE_MSEC)
-    auto absolute = labs(now - m_baseTimestamp - offset);
-#else
-    auto absolute = labs(now - m_baseTimestamp - offset) / 1000;
-#endif   
-
-    if (absolute > kResyncThresholdMsec)
+    if (labs(now - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
     {
         m_offsetTicks = 0;
-        offset = 0;
+        offsetMsec = 0;
         m_baseTimestamp = now;
     }
 
-    uint64_t timestamp = m_baseTimestamp + offset;
+    uint64_t timestamp = m_baseTimestamp + offsetMsec;
     m_offsetTicks += duration;
 
     return timestamp;
@@ -523,8 +503,6 @@ void AudioStream::AudioStreamPrivate::run()
 {
     while (!m_terminated)
     {
-        auto start = usbGetTime();
-
         if (!waitForConsumers())
             continue;
 
@@ -547,8 +525,6 @@ void AudioStream::AudioStreamPrivate::run()
             std::lock_guard<std::mutex> lock(m_mutex);
             m_packetConsumerManager->givePacket(packet);
         }
-
-        std::cout << "total: " << usbGetTime() - start << std::endl;
     }
 
     uninitialize();
@@ -615,5 +591,3 @@ void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
 
 } //namespace usb_cam
 } //namespace nx 
-
-#endif // defined(AUDIO_STREAM)

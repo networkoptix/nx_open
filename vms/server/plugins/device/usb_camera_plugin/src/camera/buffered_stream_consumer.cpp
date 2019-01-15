@@ -3,8 +3,6 @@
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 
-#include "timestamp_config.h"
-
 namespace nx {
 namespace usb_cam {
 
@@ -70,7 +68,7 @@ bool BufferedPacketConsumer::waitForTimespan(
     return m_buffer.waitForTimespan(timespan, timeout);
 }
 
-duration_t BufferedPacketConsumer::timespan() const
+std::chrono::milliseconds BufferedPacketConsumer::timespan() const
 {
     return m_buffer.timespan();
 }

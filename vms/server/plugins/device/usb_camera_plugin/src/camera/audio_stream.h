@@ -1,8 +1,5 @@
 #pragma once
 
-#include "audio_common.h"
-#if defined(AUDIO_STREAM)
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -125,5 +122,3 @@ private:
 
 } //namespace usb_cam
 } //namespace nx
-
-#endif

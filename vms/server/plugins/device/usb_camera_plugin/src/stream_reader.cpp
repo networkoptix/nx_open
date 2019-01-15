@@ -8,8 +8,6 @@
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
 
-#include "timestamp_config.h"
-
 namespace nx {
 namespace usb_cam {
 
