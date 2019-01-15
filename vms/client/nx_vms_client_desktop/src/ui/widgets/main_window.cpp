@@ -723,10 +723,11 @@ bool MainWindow::event(QEvent* event)
 
     if (event->type() == QEvent::WindowActivate)
     {
+        // Workaround for QTBUG-34414
         if (m_welcomeScreen && m_welcomeScreenVisible)
         {
-            // Welcome screen looses focus after window deactivation. We restore it here.
-            m_welcomeScreen->forceActiveFocus();
+            activateWindow();
+            m_welcomeScreen->activateView();
         }
     }
     else if (event->type() == QnEvent::WinSystemMenu)
