@@ -48,7 +48,8 @@ public:
     virtual IEngine* engine() const = 0;
 
     /**
-     * Called before other methods. Server provides the set of settings stored in its database for
+     * Called before other methods. Server provides the set of settings stored in its database,
+     * combined with the values received from the plugin via pluginSideSettings() (if any), for
      * the combination of a device instance and an Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null. Valid only during
