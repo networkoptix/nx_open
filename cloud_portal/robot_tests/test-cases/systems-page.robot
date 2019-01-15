@@ -78,7 +78,6 @@ should show system name in header with no dropdown if user has only one system
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
     Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
@@ -97,7 +96,6 @@ should show the system page instead of all systems when user only has one
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
     Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}

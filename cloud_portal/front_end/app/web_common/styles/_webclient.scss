@@ -958,6 +958,7 @@ table.webclient-window>tbody>tr>td{
     position : absolute;
     width    : 100% !important;
     height   : 100% !important;
+    display  : none; // visible list messes up iPhone height calc
   }
   
   &.on-top {

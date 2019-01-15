@@ -226,7 +226,6 @@ should display same user data as user provided during registration (stress to cy
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
     Share To    ${random email}    ${ADMIN TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
 #verify user was added with appropriate name
@@ -248,7 +247,6 @@ should display same user data as showed in user account (stress to cyrillic)
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
     Share To    ${random email}    ${VIEWER TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
     Go To    ${url}/account

@@ -1,7 +1,6 @@
 *** Settings ***
 Resource          ../resource.robot
-Test Setup        Restart
-#Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+Test Teardown     Restart
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 

@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 MODULE=mediaserver
-VERSION=4.0.0.28077
+VERSION=4.0.0.28057
 
 function build ()
 {
@@ -23,6 +23,7 @@ function stage ()
 	#Recursive and hardlink instead of copy. f is force
     cp -Rlf build/opt/networkoptix/mediaserver/bin/{mediaserver-bin,mediaserver}
     cp -Rl build/opt/networkoptix/mediaserver/{bin,lib,plugins} stage/mediaserver
+    
 
 }
 
@@ -60,8 +61,6 @@ function main()
         fi
 
         $func $args
-    echo $args
-    echo ______________________________________
     done
 }
 main $@
