@@ -40,4 +40,4 @@ void EngineHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent)
     emit pluginEventTriggered(pluginEvent);
 }
 
-} // namespace nx::vms::server::analytlics
+} // namespace nx::vms::server::analytics
