@@ -349,7 +349,6 @@ BaseTile
                     tile.savePassword, tile.autoLogin);
 
                 tile.forcePasswordFocus()
-
             }
         }
     }
