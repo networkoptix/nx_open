@@ -74,7 +74,7 @@ public:
 protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    virtual Qn::ConnectionRole roleForMotionEstimation();
+    Qn::StreamIndex getMotionStreamIndexCached() const;
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
     bool needHardwareMotion();
 protected:
@@ -83,7 +83,7 @@ protected:
 private:
     float getDefaultFps() const;
 
-    bool needAnalyzeMotion(Qn::ConnectionRole role);
+    bool needAnalyzeMotion();
 
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
 
@@ -114,9 +114,10 @@ private:
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
 
-    QnMutex m_motionRoleMtx;
-    Qn::ConnectionRole m_softMotionRole;
-    QString m_forcedMotionStream;
+    mutable QnMutex m_motionRoleMtx;
+
+    mutable Qn::StreamIndex m_softMotionStreamIndexCache;
+    mutable bool m_isMotionStreamForced = false;
 
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 
