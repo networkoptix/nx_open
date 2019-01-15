@@ -4789,7 +4789,7 @@ void QnPlOnvifResource::updateVideoEncoder2(
                     m_profile.reset(new std::string);
                 encoder.Profile = m_profile.get();
             }
-            *encoder.Profile = VideoEncodingProfilesToString(capabilities.h265Profiles[0]);
+            *encoder.Profile = videoEncodingProfilesToString(capabilities.h265Profiles[0]);
         }
     }
 
