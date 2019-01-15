@@ -159,7 +159,7 @@ QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
 {
     if (options.H264)
     {
-        encoding = UnderstandableVideoCodec::H264;
+        encoding = SupportedVideoCodecFlavor::H264;
         for (const auto& resolution: options.H264->ResolutionsAvailable)
         {
             if (resolution)
@@ -186,7 +186,7 @@ QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
     }
     else if (options.JPEG)
     {
-        encoding = UnderstandableVideoCodec::JPEG;
+        encoding = SupportedVideoCodecFlavor::JPEG;
 
         for (const auto& resolution: options.JPEG->ResolutionsAvailable)
         {
@@ -228,7 +228,7 @@ QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
 
     this->encoding = options.encoder;
 
-    if (encoding == UnderstandableVideoCodec::H264)
+    if (encoding == SupportedVideoCodecFlavor::H264)
     {
         for (auto profile: options.encoderProfiles)
         {
@@ -252,7 +252,7 @@ QnPlOnvifResource::VideoEncoderCapabilities::VideoEncoderCapabilities(
         }
         std::sort(h264Profiles.begin(), h264Profiles.end());
     }
-    else if (encoding == UnderstandableVideoCodec::H265)
+    else if (encoding == SupportedVideoCodecFlavor::H265)
     {
         for (const auto profile: options.encoderProfiles)
             h265Profiles.push_back(profile);
@@ -656,21 +656,14 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 
     nx::vms::server::resource::StreamCapabilityMap result;
 
-    static const QMap<UnderstandableVideoCodec, QString> kEncoderNames =
-    {
-        {UnderstandableVideoCodec::JPEG, QnAvCodecHelper::codecIdToString(AV_CODEC_ID_MJPEG)},
-        {UnderstandableVideoCodec::H264, QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264)},
-        {UnderstandableVideoCodec::H265, QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC)},
-    };
-
     for (const auto& capabilities: capabilitiesList)
     {
         nx::vms::server::resource::StreamCapabilityKey key;
-        key.codec = kEncoderNames[capabilities.encoding];
+        key.codec = QString::fromStdString(supportedVideoCodecFlavorToVmsString(capabilities.encoding));
         if (key.codec.isEmpty())
         {
             NX_DEBUG(this, "getStreamCapabilityMapFromDrives encountered unknown "
-                "UnderstandableVideoCodec value - %1. Value will be ignored.",
+                "SupportedVideoCodecFlavor value - %1. Value will be ignored.",
                 (int) capabilities.encoding);
             continue;
         }
@@ -1868,12 +1861,12 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoEncoderCapabilities>& 
         qreal resCoeff = getBestSecondaryCoeff(optList[i].resolutions, aspectRatio);
         if (resCoeff < bestResCoeff
             || (resCoeff == bestResCoeff
-                && optList[i].encoding == UnderstandableVideoCodec::Desirable
+                && optList[i].encoding == SupportedVideoCodecFlavor::Desirable
                 && !bestIsDesirable))
         {
             bestResCoeff = resCoeff;
             bestResIndex = i;
-            bestIsDesirable = (optList[i].encoding == UnderstandableVideoCodec::Desirable);
+            bestIsDesirable = (optList[i].encoding == SupportedVideoCodecFlavor::Desirable);
         }
     }
 
@@ -2217,7 +2210,7 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
 
         for (const onvifXsd__VideoEncoder2ConfigurationOptions* options: optionsList)
         {
-            if (options && VideoCodecFromString(options->Encoding) != UnderstandableVideoCodec::NONE)
+            if (options && supportedVideoCodecFlavorFromOnvifString(options->Encoding) != SupportedVideoCodecFlavor::NONE)
             {
                 *dstOptionsList << VideoEncoderCapabilities(QString::fromStdString(token), *options, frameRateBounds);
             }
@@ -3753,7 +3746,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memset(header, 0, sizeof(*header));
     soapWrapper->soap()->header = header;
 
-    if(!m_onvifNotificationSubscriptionID.isEmpty())
+    if (!m_onvifNotificationSubscriptionID.isEmpty())
     {
         QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
         char* SubscriptionIdBuf = (char*) malloc(512);
@@ -4594,7 +4587,7 @@ void QnPlOnvifResource::setMaxChannels(int value)
 }
 
 QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderCapabilities(
-    UnderstandableVideoCodec encoding, Qn::StreamIndex streamIndex)
+    SupportedVideoCodecFlavor encoding, Qn::StreamIndex streamIndex)
 {
     const std::vector<VideoEncoderCapabilities>& list = (streamIndex == Qn::StreamIndex::primary)
         ? m_primaryStreamCapabilitiesList
@@ -4603,7 +4596,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
     if (list.empty())
         return VideoEncoderCapabilities();
 
-    if (encoding == UnderstandableVideoCodec::NONE)
+    if (encoding == SupportedVideoCodecFlavor::NONE)
         return list.front();
 
     const auto it = std::find_if(list.cbegin(), list.cend(),
@@ -4614,7 +4607,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
     if (it == list.cend())
     {
         NX_DEBUG(this, "Failed to find videoEncoderCapabilities for encoding = %1, streamIndex = %2",
-            QString::fromStdString(VideoCodecToString(encoding)), toString(streamIndex));
+            QString::fromStdString(supportedVideoCodecFlavorToOnvifString(encoding)), toString(streamIndex));
         return VideoEncoderCapabilities();
     }
 
@@ -4650,16 +4643,15 @@ void QnPlOnvifResource::updateVideoEncoder1(
         }
         saveProperties();
     }
-    const UnderstandableVideoCodec codec = VideoCodecFromString(streamParams.codec.toStdString());
+    const SupportedVideoCodecFlavor codec = supportedVideoCodecFlavorFromVmsString(streamParams.codec.toStdString());
     const auto capabilities = findVideoEncoderCapabilities(codec, streamIndex);
 
-    const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
-    switch (codecId)
+    switch (codec)
     {
-        case AV_CODEC_ID_MJPEG:
+        case SupportedVideoCodecFlavor::JPEG:
             encoder.Encoding = onvifXsd__VideoEncoding::JPEG;
             break;
-        case AV_CODEC_ID_H264:
+        case SupportedVideoCodecFlavor::H264:
             encoder.Encoding = onvifXsd__VideoEncoding::H264;
             break;
         default:
@@ -4748,16 +4740,13 @@ void QnPlOnvifResource::updateVideoEncoder2(
         saveProperties();
     }
 
-    const UnderstandableVideoCodec codec = VideoCodecFromString(streamParams.codec.toStdString());
+    const SupportedVideoCodecFlavor codec =
+        supportedVideoCodecFlavorFromVmsString(streamParams.codec.toStdString());
     const auto capabilities = findVideoEncoderCapabilities(codec, streamIndex);
 
-    const AVCodecID codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
-    static const std::map<AVCodecID,std::string> kMedia2EncodingMap =
-        { {AV_CODEC_ID_MJPEG, "JPEG"}, {AV_CODEC_ID_H264, "H264"}, {AV_CODEC_ID_HEVC, "H265"} };
-    static const std::string defaultCodec = "JPEG";
-    const auto it = kMedia2EncodingMap.find(codecId);
-
-    encoder.Encoding = (it != kMedia2EncodingMap.end()) ? it->second : defaultCodec;
+    encoder.Encoding = (codec != SupportedVideoCodecFlavor::NONE)
+        ? streamParams.codec.toStdString()
+        : supportedVideoCodecFlavorToVmsString(SupportedVideoCodecFlavor::Default);
 
     if (!encoder.GovLength)
     {
@@ -4767,7 +4756,7 @@ void QnPlOnvifResource::updateVideoEncoder2(
     }
     *encoder.GovLength = qBound(capabilities.govMin, DEFAULT_IFRAME_DISTANCE, capabilities.govMax);
 
-    if (codecId == AV_CODEC_ID_H264)
+    if (codec == SupportedVideoCodecFlavor::H264)
     {
         auto desiredH264Profile = resourceData.value<QString>(ResourceDataKey::kDesiredH264Profile);
 
@@ -4786,11 +4775,11 @@ void QnPlOnvifResource::updateVideoEncoder2(
         {
             if (capabilities.h264Profiles.size())
             {
-                *encoder.Profile = H264ProfileToString(capabilities.h264Profiles[0]);
+                *encoder.Profile = h264ProfileToOnvifString(capabilities.h264Profiles[0]);
             }
         }
     }
-    else if (codecId == AV_CODEC_ID_HEVC)
+    else if (codec == SupportedVideoCodecFlavor::H265)
     {
         if (capabilities.h265Profiles.size())
         {
@@ -4800,7 +4789,7 @@ void QnPlOnvifResource::updateVideoEncoder2(
                     m_profile.reset(new std::string);
                 encoder.Profile = m_profile.get();
             }
-            *encoder.Profile = VideoEncoderProfileToString(capabilities.h265Profiles[0]);
+            *encoder.Profile = VideoEncodingProfilesToString(capabilities.h265Profiles[0]);
         }
     }
 

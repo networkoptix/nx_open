@@ -205,6 +205,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
     if (FileTypeSupport::isImageFileExt(introPath))
         resource->addFlags(Qn::still_image);
+    resource->setCommonModule(commonModule());
 
     m_renderingWidget->setResource(resource);
 

@@ -10,6 +10,7 @@
 
 #include "workbench_layout.h"
 
+#include <nx/utils/math/fuzzy.h>
 
 QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uuid, QObject* parent):
     QObject(parent),
@@ -238,7 +239,7 @@ void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect)
     emit dataChanged(Qn::ItemZoomRectRole);
 }
 
-void QnWorkbenchItem::setImageEnhancement(const ImageCorrectionParams& imageEnhancement)
+void QnWorkbenchItem::setImageEnhancement(const nx::vms::api::ImageCorrectionData& imageEnhancement)
 {
     if (m_imageEnhancement == imageEnhancement)
         return;
@@ -249,7 +250,7 @@ void QnWorkbenchItem::setImageEnhancement(const ImageCorrectionParams& imageEnha
     emit dataChanged(Qn::ItemImageEnhancementRole);
 }
 
-void QnWorkbenchItem::setDewarpingParams(const QnItemDewarpingParams& params)
+void QnWorkbenchItem::setDewarpingParams(const nx::vms::api::DewarpingData& params)
 {
     if (m_itemDewarpingParams == params)
         return;
@@ -337,9 +338,9 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
         case Qn::ItemZoomRectRole:
             return zoomRect();
         case Qn::ItemImageEnhancementRole:
-            return QVariant::fromValue<ImageCorrectionParams>(imageEnhancement());
+            return QVariant::fromValue<nx::vms::api::ImageCorrectionData>(imageEnhancement());
         case Qn::ItemImageDewarpingRole:
-            return QVariant::fromValue<QnItemDewarpingParams>(dewarpingParams());
+            return QVariant::fromValue<nx::vms::api::DewarpingData>(dewarpingParams());
         case Qn::ItemFlagsRole:
             return static_cast<int>(flags());
         case Qn::ItemRotationRole:
@@ -374,12 +375,12 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
             setZoomRect(value.toRectF());
             break;
         case Qn::ItemImageEnhancementRole:
-            NX_ASSERT(value.canConvert<ImageCorrectionParams>());
-            setImageEnhancement(value.value<ImageCorrectionParams>());
+            NX_ASSERT(value.canConvert<nx::vms::api::ImageCorrectionData>());
+            setImageEnhancement(value.value<nx::vms::api::ImageCorrectionData>());
             break;
         case Qn::ItemImageDewarpingRole:
-            NX_ASSERT(value.canConvert<QnItemDewarpingParams>());
-            setDewarpingParams(value.value<QnItemDewarpingParams>());
+            NX_ASSERT(value.canConvert<nx::vms::api::DewarpingData>());
+            setDewarpingParams(value.value<nx::vms::api::DewarpingData>());
             break;
         case Qn::ItemFlagsRole:
         {

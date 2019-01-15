@@ -69,7 +69,9 @@ public:
      * cache. Data from consequent requests is integrated into this cache, for each server.
      * This data can be obtained by getServersStatusChanges method.
      */
-    void requestRemoteUpdateState();
+    void requestRemoteUpdateStateAsync();
+
+    std::future<std::vector<nx::update::Status>> requestRemoteUpdateState();
 
     using RemoteStatus = std::map<QnUuid, nx::update::Status>;
     /**
@@ -96,6 +98,12 @@ public:
      * Asks mediaservers to start installation process.
      */
     void requestInstallAction(const QSet<QnUuid>& targets);
+
+    /**
+     * Send request for moduleInformation from the server.
+     * Response arrives at moduleInformationReceived signal.
+     */
+    void requestModuleInformation();
 
     // State for uploading offline update package.
     enum class OfflineUpdateState
@@ -207,13 +215,13 @@ public:
 signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
+    void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
     void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void atExtractFilesFinished(int code);
-    void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.

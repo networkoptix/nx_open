@@ -2,6 +2,7 @@
 
 #include "v4l2_utils.h"
 
+#include <map>
 #include <cstring>
 #include <string>
 #include <algorithm>
@@ -182,6 +183,8 @@ std::vector<DeviceData> getDeviceList()
         return {};
 
     std::vector<DeviceData> deviceList;
+    std::map<std::string, int> duplicateCameras;
+
 
     for (const auto& devicePath : devicePaths)
     {
@@ -194,10 +197,25 @@ std::vector<DeviceData> getDeviceList()
             continue;
         }
 
-        deviceList.push_back(device::DeviceData(
-            getDeviceName(fileDescriptor),
-            devicePath,
-            getDeviceUniqueId(devicePath)));
+        std::string name = getDeviceName(fileDescriptor);
+
+        int nameIndex = 0;
+        auto it = duplicateCameras.find(name);
+        if(it == duplicateCameras.end())
+            duplicateCameras.emplace(name, 0);
+        else
+            nameIndex = ++it->second;
+
+        std::string uniqueId;
+        if(rpi::isRpi() && rpi::isMmalCamera(name))
+            uniqueId = rpi::getMmalUniqueId();
+        else
+            uniqueId = getDeviceUniqueId(devicePath);
+
+        if(uniqueId.empty())
+            uniqueId = std::to_string(nameIndex) + "-" + name;
+
+        deviceList.push_back(DeviceData(name, devicePath, uniqueId));
     }
 
     return deviceList;

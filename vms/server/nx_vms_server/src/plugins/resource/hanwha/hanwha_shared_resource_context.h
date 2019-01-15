@@ -12,7 +12,6 @@
 #include <nx/utils/thread/semaphore.h>
 #include <nx/utils/thread/rw_lock.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
-#include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <plugins/resource/hanwha/hanwha_chunk_reader.h>
@@ -149,9 +148,8 @@ public:
     qint64 timelineStartUs(int channelNumber) const;
     qint64 timelineEndUs(int channelNumber) const;
     boost::optional<int> overlappedId() const;
-
-    std::chrono::seconds timeZoneShift() const;
-    void setDateTime(const QDateTime& dateTime);
+    std::chrono::milliseconds timeShift() const;
+    void setTimeShift(std::chrono::milliseconds);
 
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
@@ -194,11 +192,8 @@ private:
 
     nx::utils::RwLock m_requestLock;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
-    std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 
     HanwhaChunkLoaderSettings m_chunkLoaderSettings;
-
-    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
 
     // We care only about archive sesions because normally we use only one
     // live connection independently of the number of client connections.

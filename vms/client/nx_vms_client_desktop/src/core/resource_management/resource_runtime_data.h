@@ -11,7 +11,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
-class NX_VMS_DESKTOP_CLIENT_API QnResourceRuntimeDataManager:
+class NX_VMS_CLIENT_DESKTOP_API QnResourceRuntimeDataManager:
     public QObject,
     public Singleton<QnResourceRuntimeDataManager>,
     public QnCommonModuleAware

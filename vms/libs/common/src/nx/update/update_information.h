@@ -225,7 +225,7 @@ struct UpdateContents
      * Compares this update info with 'other' and decides whether we should pick other one.
      * @return True if we need to pick 'other' update.
      */
-    bool compareUpdate(const UpdateContents& other) const;
+    bool preferOtherUpdate(const UpdateContents& other) const;
 };
 
 } // namespace nx::update

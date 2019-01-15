@@ -16,6 +16,8 @@
 #include "data/discovery_data.h"
 #include "data/event_rule_data.h"
 #include "data/full_info_data.h"
+#include "data/dewarping_data.h"
+#include "data/image_correction_data.h"
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
 #include "data/license_data.h"
@@ -68,6 +70,8 @@ void Metatypes::initialize()
 
     qRegisterMetaType<AccessRightsData>();
     qRegisterMetaType<AccessRightsDataList>();
+    qRegisterMetaType<AnalyticsEngineData>();
+    qRegisterMetaType<AnalyticsPluginData>();
     qRegisterMetaType<CameraAttributesData>();
     qRegisterMetaType<CameraData>();
     qRegisterMetaType<CameraHistoryData>();
@@ -80,6 +84,7 @@ void Metatypes::initialize()
     qRegisterMetaType<DatabaseDumpData>();
     qRegisterMetaType<DatabaseDumpToFileData>();
     qRegisterMetaType<DetailedLicenseData>();
+    qRegisterMetaType<DewarpingData>();
     qRegisterMetaType<DiscoveryData>();
     qRegisterMetaType<DiscoveryDataList>();
     qRegisterMetaType<DiscoverPeerData>();
@@ -88,6 +93,7 @@ void Metatypes::initialize()
     qRegisterMetaType<EventRuleData>();
     qRegisterMetaType<EventRuleDataList>();
     qRegisterMetaType<FullInfoData>();
+    qRegisterMetaType<ImageCorrectionData>();
     qRegisterMetaType<LayoutData>();
     qRegisterMetaType<LayoutItemData>();
     qRegisterMetaType<LayoutTourData>();
@@ -144,8 +150,6 @@ void Metatypes::initialize()
     qRegisterMetaType<VideowallData>();
     qRegisterMetaType<VideowallControlMessageData>();
     qRegisterMetaType<WebPageData>();
-    qRegisterMetaType<AnalyticsPluginData>();
-    qRegisterMetaType<AnalyticsEngineData>();
 };
 
 } // namespace api

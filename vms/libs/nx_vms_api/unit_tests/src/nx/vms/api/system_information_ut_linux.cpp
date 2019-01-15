@@ -4,9 +4,9 @@
 
 namespace nx::vms::api::test {
 
-TEST(ubuntuVersionFromCodeName, success)
+TEST(ubuntuVersion, fromCodeName_success)
 {
-    const auto validOsReleaseFiles = {
+    const auto ubuntuBasedOsReleaseFile =
 R"rel(
 NAME="Linux Mint"
 VERSION="18.3 (Sylvia)"
@@ -19,8 +19,9 @@ SUPPORT_URL="http://forums.linuxmint.com/"
 BUG_REPORT_URL="http://bugs.launchpad.net/linuxmint/"
 VERSION_CODENAME=sylvia
 UBUNTU_CODENAME=xenial
-)rel",
+)rel";
 
+const auto ubuntu1604OsReleaseFile =
 R"rel(
 NAME="Ubuntu"
 VERSION="16.04.5 LTS (Xenial Xerus)"
@@ -33,8 +34,9 @@ SUPPORT_URL="http://help.ubuntu.com/"
 BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
 VERSION_CODENAME=xenial
 UBUNTU_CODENAME=xenial
-)rel",
+)rel";
 
+const auto ubuntu1804OsReleaseFile =
 R"rel(
 NAME="Ubuntu"
 VERSION="18.04.1 LTS (Bionic Beaver)"
@@ -48,19 +50,26 @@ BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
 PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
 VERSION_CODENAME=bionic
 UBUNTU_CODENAME=bionic
-)rel"
-    };
+)rel";
 
-    for (const auto &contents: validOsReleaseFiles)
-    {
-        const auto version = ubuntuVersionFromCodeName(
-            osReleaseContentsValueByKey(contents, "ubuntu_codename"));
+    const auto codenameKeyName = "ubuntu_codename";
+    ASSERT_EQ(
+        ubuntuVersionFromCodeName(
+            osReleaseContentsValueByKey(ubuntuBasedOsReleaseFile, codenameKeyName)),
+        "16.04");
 
-        ASSERT_TRUE(version == "16.04" || version == "18.04");
-    }
+    ASSERT_EQ(
+        ubuntuVersionFromCodeName(
+            osReleaseContentsValueByKey(ubuntu1604OsReleaseFile, codenameKeyName)),
+        "16.04");
+
+    ASSERT_EQ(
+        ubuntuVersionFromCodeName(
+            osReleaseContentsValueByKey(ubuntu1804OsReleaseFile, codenameKeyName)),
+        "18.04");
 }
 
-TEST(ubuntuVersionFromCodeName, failure)
+TEST(ubuntuVersion, fromCodeName_failure)
 {
     const auto invalidOsReleaseFiles = {
 R"rel(
@@ -113,7 +122,7 @@ UBUNTU_CODENAME bionic
     }
 }
 
-TEST(osReleaseContentsValueByKey, success)
+TEST(ubuntuVersion, osReleaseContentsValueByKey_success)
 {
     const auto osReleaseContents =
 R"rel(
@@ -130,9 +139,34 @@ VERSION_CODENAME=sylvia
 UBUNTU_CODENAME=xenial
 )rel";
 
-    ASSERT_EQ("\"Linux Mint 18.3\"", osReleaseContentsValueByKey(osReleaseContents, "pretty_name"));
-    ASSERT_EQ("\"18.3\"", osReleaseContentsValueByKey(osReleaseContents, "VeRSiON_ID"));
+    ASSERT_EQ("Linux Mint 18.3", osReleaseContentsValueByKey(osReleaseContents, "pretty_name"));
+    ASSERT_EQ("18.3", osReleaseContentsValueByKey(osReleaseContents, "VeRSiON_ID"));
     ASSERT_EQ("sylvia", osReleaseContentsValueByKey(osReleaseContents, "VERSION_CODENAME"));
+}
+
+TEST(ubuntuVersion, ubuntuCodenameIsAbsent)
+{
+    const auto ubuntu1404OsReleaseContentsWithoutUbuntuCodename =
+R"rel(
+NAME="Ubuntu"
+VERSION="14.04.4 LTS, Trusty Tahr"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 14.04.4 LTS"
+VERSION_ID="14.04"
+HOME_URL="http://www.ubuntu.com/"
+SUPPORT_URL="http://help.ubuntu.com/"
+BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
+)rel";
+
+    const auto codenameValue = osReleaseContentsValueByKey(
+        ubuntu1404OsReleaseContentsWithoutUbuntuCodename,
+        "ubuntu_codename");
+    ASSERT_TRUE(ubuntuVersionFromCodeName(codenameValue).isEmpty());
+    const auto versionIdValue = osReleaseContentsValueByKey(
+        ubuntu1404OsReleaseContentsWithoutUbuntuCodename,
+        "version_id");
+    ASSERT_EQ("14.04", versionIdValue);
 }
 
 } // namespace nx::vms::api::test

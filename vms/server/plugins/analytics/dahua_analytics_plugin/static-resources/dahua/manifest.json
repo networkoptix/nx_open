@@ -110,7 +110,8 @@
         {
             "id": "nx.dahua.MoveDetection",
             "name": "Fast moving detection",
-            "internalName": "Fast moving %1",
+            "internalName": "MoveDetection",
+            "description": "Fast moving %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
             "flags": "stateDependent",
@@ -215,6 +216,14 @@
             "positiveState": "has been detected",
             "negativeState": "has ended",
             "flags": "stateDependent",
+            "groupId": "nx.dahua.group.SystemEvents"
+        } ,
+        {
+            "id": "nx.dahua.LoginFailure",
+            "name": "Login error detection",
+            "internalName": "LoginFailure",
+            "description": "Login error detected",
+            "flags": "noFlags",
             "groupId": "nx.dahua.group.SystemEvents"
         } ,
         {

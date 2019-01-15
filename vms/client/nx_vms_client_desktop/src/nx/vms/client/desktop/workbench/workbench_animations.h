@@ -49,6 +49,8 @@ public:
         NotificationsPanelCollapse,
         RightPanelTileInsertion,
         RightPanelTileRemoval,
+        RightPanelTileFadeIn,
+        RightPanelTileFadeOut,
 
         TitlePanelExpand,
         TitlePanelCollapse,

@@ -1,6 +1,7 @@
 #include "log_level.h"
 
 #include <QtCore/QStringBuilder>
+#include <QtCore/QRegularExpression>
 
 #include "assert.h"
 #include "log_message.h"
@@ -92,9 +93,10 @@ Tag::Tag(const std::string& s):
 
 bool Tag::matches(const Tag& mask) const
 {
-    // TODO: currently all tags are considered as prefixes, but it might be useful to support
-    // some king of regexp in future.
-    return m_value.startsWith(mask.m_value);
+    const QRegularExpression re(mask.m_value, QRegularExpression::CaseInsensitiveOption);
+    NX_ASSERT(re.isValid());
+    const auto match = re.match(m_value);
+    return match.hasMatch();
 }
 
 const QString& Tag::toString() const

@@ -132,20 +132,20 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
 
     if (!canArchiveBeSynchronized)
     {
-        NX_DEBUG(this, lm(
-            "Archive for resource %1 can not be synchronized, "
-            "Resource belongs to this server %2, "
-            "Resource status: %3, "
-            "Resource has remote archive capability: %4, "
-            "License is used for resource: %5, "
-            "Edge recording enabled: %6")
-                .args(
-                    camera->getUserDefinedName(),
-                    !camera->hasFlags(Qn::foreigner),
-                    status,
-                    camera->hasCameraCapabilities(Qn::RemoteArchiveCapability),
-                    camera->isLicenseUsed(),
-                    isEdgeRecordingEnabled));
+        NX_DEBUG(this, (
+                "Archive for resource %1 can not be synchronized, "
+                "resource belongs to %2 server, "
+                "resource status: %3, "
+                "resource has%4 remote archive capability, "
+                "license is%5 used for resource, "
+                "edge recording %6"
+            ),
+            camera->getUserDefinedName(),
+            camera->hasFlags(Qn::foreigner) ? "other" : "this",
+            status,
+            camera->hasCameraCapabilities(Qn::RemoteArchiveCapability) ? "" : " not",
+            camera->isLicenseUsed() ? "" : " not",
+            isEdgeRecordingEnabled ? "enabled" : "disabled");
     }
 
     const auto id = camera->getId();

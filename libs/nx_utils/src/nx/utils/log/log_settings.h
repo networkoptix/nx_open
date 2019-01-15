@@ -4,6 +4,7 @@
 
 #include "log_level.h"
 
+class QSettings;
 class QnSettings;
 
 namespace nx {
@@ -61,6 +62,7 @@ public:
     std::vector<LoggerSettings> loggers;
 
     Settings() = default;
+    explicit Settings(QSettings* settings);
 
     /** Rewrites values from settings if specified. */
     void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));

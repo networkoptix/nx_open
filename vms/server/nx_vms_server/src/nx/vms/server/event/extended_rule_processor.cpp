@@ -232,16 +232,19 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
     wait();
     m_emailThreadPool.waitForDone();
 
-    QnMutexLocker lk(&m_mutex);
-    while(!m_aggregatedEmails.isEmpty())
+    std::set<quint64> timersToRemove;
     {
-        const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
-        lk.unlock();
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(taskID);
-        lk.relock();
-        if (m_aggregatedEmails.begin()->periodicTaskID == taskID)  //task has not been removed in sendAggregationEmail while we were waiting
-            m_aggregatedEmails.erase(m_aggregatedEmails.begin());
+        QnMutexLocker lk(&m_mutex);
+        for (const auto& value: m_aggregatedEmails)
+        {
+            if (value.periodicTaskID)
+                timersToRemove.insert(value.periodicTaskID);
+        }
+        m_aggregatedEmails.clear();
     }
+
+    for (const auto& timerId: timersToRemove)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 
 void ExtendedRuleProcessor::onRemoveResource(const QnResourcePtr& resource)

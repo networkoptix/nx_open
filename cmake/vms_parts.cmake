@@ -80,6 +80,7 @@ nx_option(
     withP2PConnectionTestingUtility
     "Enable P2P connection testing utility"
     ${_withP2PConnectionTestingUtility})
+option(withDocumentation "Generate documentation" OFF)
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
@@ -89,6 +90,11 @@ cmake_dependent_option(withDistributions "Enable distributions build"
 cmake_dependent_option(withAnalyticsSdk "Enable nx_analytics_sdk build"
     OFF "NOT withDistributions"
     ON
+)
+
+cmake_dependent_option(withUnitTestsArchive "Enable distributions build"
+    OFF "withTests"
+    OFF
 )
 
 option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by default")

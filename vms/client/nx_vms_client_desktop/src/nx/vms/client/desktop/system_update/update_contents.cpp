@@ -90,44 +90,57 @@ nx::update::Package* findPackageForOsVariant(
 
 QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info)
 {
+    QString platform;
+    QString version = info.version;
+
     if (info.platform == "linux")
     {
-        if (info.modification == "bananapi")
-        {
-            return tr("Debian %1 for Banana Pi is no longer supported").arg(info.version);
-        }
-        else if (info.modification == "rpi")
-        {
-            return tr("Raspbian %1 is no longer supported").arg(info.version);
-        }
-        else if (info.modification == "bpi")
-        {
-            if (!info.version.isEmpty())
-                return tr("Nx1 %1 is no longer supported").arg(info.version);
-            else
-                return tr("Nx1 is no longer supported");
-        }
-        else if (info.modification == "ubuntu")
-        {
-            if (info.version.isEmpty())
-                return tr("Ubuntu is no longer supported");
-            else
-                return tr("Ubuntu %1 is no longer supported").arg(info.version);
-        }
-        else if (info.arch == "arm")
-            return tr("This version of ARM Linux is not supported");
+        if (info.modification == "ubuntu")
+            platform = "Ubuntu";
         else
-            return tr("This version of Linux is not supported");
+            return tr("This Linux platform is no longer supported"); //< Note "platform" wording.
     }
     else if (info.platform == "windows")
     {
-        return tr("This Windows version is no longer supported");
+        platform = "Windows";
+        version.clear();
+
+        const nx::utils::SoftwareVersion ver(info.version);
+        if (ver.major() == 6)
+        {
+            switch (ver.minor())
+            {
+                case 0: version = "Vista"; break;
+                case 1: version = "7"; break;
+                case 2: version = "8"; break;
+                case 3: version = "8.1"; break;
+                default: break;
+            }
+        }
+        else if (ver.major() == 10)
+        {
+            version = "10";
+        }
     }
     else if (info.modification == "mac")
     {
-        return tr("Mac Os X %1 is no longer supported").arg(info.version);
+        platform = "Mac OS X";
     }
-    return tr("This OS version is unsupported");
+    else
+    {
+        return tr("This OS version is no longer supported");
+    }
+
+    if (version.isEmpty())
+    {
+        return tr("This %1 version is no longer supported", "%1 is OS name, e.g. Windows")
+            .arg(platform);
+    }
+    else
+    {
+        return tr("%1 %2 is no longer supported", "%1 %2 are OS name and version, e.g. Windows 7")
+            .arg(platform, version);
+    }
 }
 
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
@@ -212,7 +225,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         NX_ERROR(typeid(UpdateContents))
             << "verifyUpdateManifest(" << contents.info.version
-            << ")Error while trying to find client package:" << errorMessage;
+            << ") error while trying to find client package:" << errorMessage;
     }
 
     QSet<QnUuid> allServers;

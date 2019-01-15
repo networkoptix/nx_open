@@ -20,14 +20,15 @@ public:
 
     enum DisabledFeature
     {
-        none                = 0x00,
-        noResourceDiscovery = 0x01,
-        noMonitorStatistics = 0x02,
-        noStorageDiscovery  = 0x04,
-
-        all = noResourceDiscovery | noMonitorStatistics | noStorageDiscovery
+        none                = 0,
+        noResourceDiscovery = 1 << 0,
+        noMonitorStatistics = 1 << 1,
+        noStorageDiscovery  = 1 << 2,
+        count = 1 << 3,
+        all = count - 1
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
+
 
     MediaServerLauncher(
         const QString& tmpDir = QString(),

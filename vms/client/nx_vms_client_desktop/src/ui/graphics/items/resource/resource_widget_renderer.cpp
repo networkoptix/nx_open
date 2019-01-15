@@ -341,7 +341,7 @@ bool QnResourceWidgetRenderer::isDisplaying(
     return ctx.uploader && ctx.uploader->isUsingFrame(image);
 }
 
-void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& params)
+void QnResourceWidgetRenderer::setImageCorrection(const nx::vms::api::ImageCorrectionData& params)
 {
     for (auto& ctx: m_renderingContexts)
     {

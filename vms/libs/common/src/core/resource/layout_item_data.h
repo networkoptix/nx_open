@@ -3,14 +3,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
-#include <nx/utils/uuid.h>
 #include <QtCore/QVariant>
 
-#include <core/ptz/item_dewarping_params.h>
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
-#include <nx/utils/math/fuzzy.h>
-#include <utils/common/id.h>
-#include <utils/color_space/image_correction.h>
+#include <nx/utils/uuid.h>
 
 struct QnLayoutItemResourceDescriptor
 {
@@ -20,20 +18,18 @@ struct QnLayoutItemResourceDescriptor
 
 struct QnLayoutItemData
 {
-    QnLayoutItemData();
-
     QnLayoutItemResourceDescriptor resource;
 
     QnUuid uuid;
-    int flags;
+    int flags = 0;
     QRectF combinedGeometry;
     QnUuid zoomTargetUuid;
     QRectF zoomRect;
-    qreal rotation;
-    bool displayInfo;
+    qreal rotation = 0.0;
+    bool displayInfo = false;
 
-    ImageCorrectionParams contrastParams;
-    QnItemDewarpingParams dewarpingParams;
+    nx::vms::api::ImageCorrectionData contrastParams;
+    nx::vms::api::DewarpingData dewarpingParams;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) ;
 };

@@ -24,7 +24,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
+struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 {
     template<class T>
     struct UserEditable

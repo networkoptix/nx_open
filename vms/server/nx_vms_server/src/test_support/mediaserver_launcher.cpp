@@ -35,6 +35,8 @@ MediaServerLauncher::MediaServerLauncher(
     m_cmdOptions.push_back("-e");
 }
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(MediaServerLauncher::DisabledFeatures)
+
 void MediaServerLauncher::fillDefaultSettings()
 {
     m_settings = {

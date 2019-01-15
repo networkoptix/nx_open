@@ -8,6 +8,7 @@ namespace websocket {
 
 static const auto kAliveTimeout = std::chrono::seconds(100);
 static const auto kDefaultPingTimeoutMultiplier = 0.5;
+static const auto kBufferSize = 4096;
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
@@ -32,7 +33,7 @@ WebSocket::WebSocket(
     m_socket->setSendTimeout(0);
     aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
-    m_readBuffer.reserve(4096);
+    m_readBuffer.reserve(kBufferSize);
 }
 
 WebSocket::WebSocket(
@@ -74,39 +75,35 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
 {
     if (m_failed)
     {
-        if (m_userReadPair)
-            callOnReadhandler(SystemError::connectionAbort, 0);
+        callOnReadhandler(SystemError::connectionAbort, 0);
         return;
     }
 
     if (ecode != SystemError::noError || transferred == 0)
     {
         m_failed = true;
-        if (m_userReadPair)
-            callOnReadhandler(SystemError::connectionAbort, 0);
+        callOnReadhandler(SystemError::connectionAbort, 0);
         return;
     }
 
     m_parser.consume(m_readBuffer.data(), (int)transferred);
     if (m_failed) //< Might be set while parsing
     {
-        if (m_userReadPair)
-            callOnReadhandler(SystemError::connectionAbort, 0);
+        callOnReadhandler(SystemError::connectionAbort, 0);
         return;
     }
 
     m_readBuffer.resize(0);
-    m_readBuffer.reserve(4096);
+    m_readBuffer.reserve(kBufferSize);
 
-    if (m_incomingMessageQueue.readySize() != 0 && m_userReadPair)
+    if (m_incomingMessageQueue.size() != 0 && m_userReadContext)
     {
         const auto incomingMessage = m_incomingMessageQueue.popFront();
-        *(m_userReadPair->second) = incomingMessage;
+        *(m_userReadContext->bufferPtr) = incomingMessage;
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
         callOnReadhandler(SystemError::noError, incomingMessage.size());
         if (watcher.objectDestroyed())
             return;
-        m_userReadPair.reset();
     }
 
     m_socket->readSomeAsync(
@@ -119,8 +116,11 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
 
 void WebSocket::callOnReadhandler(SystemError::ErrorCode error, size_t transferred)
 {
-    auto cb = std::move(m_userReadPair->first);
-    cb(error, transferred);
+    if (m_userReadContext)
+    {
+        auto userReadContext = std::move(m_userReadContext);
+        userReadContext->handler(error, transferred);
+    }
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -162,10 +162,10 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
             }
 
             NX_ASSERT(
-                !m_userReadPair,
+                !m_userReadContext,
                 "Read operation has been queued before previous handler fired");
 
-            if (m_incomingMessageQueue.readySize() != 0)
+            if (m_incomingMessageQueue.size() != 0)
             {
                 const auto incomingMessage = m_incomingMessageQueue.popFront();
                 *buffer = incomingMessage;
@@ -174,7 +174,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
                 return;
             }
 
-            m_userReadPair.reset(new UserReadPair(std::move(handler), buffer));
+            m_userReadContext.reset(new UserReadContext(std::move(handler), buffer));
         });
 }
 
@@ -246,6 +246,7 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
             if (watcher.objectDestroyed())
                 return;
         }
+        return;
     }
 
     if (error != SystemError::noError || transferred == 0)

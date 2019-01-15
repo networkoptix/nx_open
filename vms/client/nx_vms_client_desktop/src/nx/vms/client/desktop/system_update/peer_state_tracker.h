@@ -1,5 +1,7 @@
 #pragma once
+
 #include <memory> // for shared_ptr
+
 #include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
@@ -78,9 +80,21 @@ public:
      */
     QnMediaServerResourcePtr getServer(QnUuid id) const;
 
+    QnUuid getClientPeerId() const;
+
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    /**
+     * Forcing update for mediaserver versions.
+     * We have used direct api call to get this module information.
+     */
+    void setVersionInformation(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
+    /**
+     * Set 'installing' flag for specified peers. Mediaserver API provides no information about
+     * whether servers are installing anything or not, so client should speculate about it when
+     * 'Install update' button is clicked.
+     */
     void setPeersInstalling(const QSet<QnUuid>& targets, bool installing);
     void clearState();
 

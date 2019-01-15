@@ -29,12 +29,15 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
         NX_ERROR(this, "Bad response from server: %1", httpClient.response()->statusLine.toString());
         return false;
     }
-    QByteArray responseBody;
-    while (!httpClient.eof())
-        responseBody += httpClient.fetchMessageBodyBuffer();
+    auto responseBody = httpClient.fetchEntireMessageBody();
+    if (!responseBody.has_value())
+    {
+        NX_ERROR(this, "Failed to read response from server: %1", httpClient.lastSysErrorCode());
+        return false;
+    }
 
     nx::vms::api::CameraDataExList cameras =
-        QJson::deserialized<nx::vms::api::CameraDataExList>(responseBody);
+        QJson::deserialized<nx::vms::api::CameraDataExList>(responseBody.value());
 
     if (cameras.empty())
     {
@@ -45,13 +48,15 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
     for(const auto& camera: cameras)
     {
         urls.emplace_back(
-            QString(m_config.useSsl ? "rtsps://" : "rtsp://") + server + "/" + camera.mac);
+            QString(m_config.useSsl ? "rtsps://" : "rtsp://") + server + "/" + camera.id.toString());
     }
     return true;
 }
 
 void RtspPerf::run()
 {
+    static const std::chrono::milliseconds kSessionStartInterval(20);
+    static const std::chrono::seconds kStatisticPrintInterval(1);
     nx::network::SocketGlobals::InitGuard socketInitializationGuard;
     std::list<std::thread> workers;
     std::vector<QString> urls;
@@ -60,7 +65,7 @@ void RtspPerf::run()
 
     for (int32_t i = 0; i < m_config.count; ++i)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(kSessionStartInterval);
         bool live = i < m_config.count * m_config.livePercent / 100;
         QString url = urls[i % urls.size()];
         workers.emplace_back([url, live, this]() { startSession(url, live); } );
@@ -68,7 +73,7 @@ void RtspPerf::run()
 
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(kStatisticPrintInterval);
         NX_DEBUG(this, "Total bytesRead %1, success %2, failed %3",
             m_stat.totalBytesRead, m_stat.successStreams, m_stat.failedStreams);
     }

@@ -106,7 +106,8 @@ public:
      * \param scope                     Scope of the menu to create.
      * \param parameters                Action parameters for menu creation.
      * \param parent                    Parent widget for the new menu.
-     * \returns                         Newly created menu for the given paramters.
+     * \param actionIds                 If not empty, only allow actions from the list.
+     * \returns                         Newly created menu for the given parameters.
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
@@ -114,14 +115,16 @@ public:
         ActionScope scope,
         QWidget* parent = nullptr,
         const Parameters& parameters = Parameters(),
-        CreationOptions options = 0);
+        CreationOptions options = 0,
+        const QSet<IDType>& actionIds = {});
 
     QMenu* newMenu(
         IDType rootId,
         ActionScope scope,
         QWidget* parent = nullptr,
         const Parameters& parameters = Parameters(),
-        CreationOptions options = 0);
+        CreationOptions options = 0,
+        const QSet<IDType>& actionIds = {});
 
     /**
      * \returns                         Action target provider that is assigned to this
@@ -180,7 +183,8 @@ protected:
         ActionScope scope,
         const Parameters& parameters,
         QWidget* parentWidget,
-        CreationOptions options);
+        CreationOptions options,
+        const QSet<IDType>& actionIds);
 
     bool redirectActionRecursive(QMenu* menu, IDType targetId, QAction* targetAction);
 
