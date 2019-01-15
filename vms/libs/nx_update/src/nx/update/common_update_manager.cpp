@@ -310,13 +310,18 @@ bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
         return false;
 
     updateInformation.participants = participants;
+    setUpdateInformation(updateInformation);
+
+    return true;
+}
+
+void CommonUpdateManager::setUpdateInformation(const update::Information& updateInformation)
+{
     QByteArray serializedUpdateInformation;
 
     QJson::serialize(updateInformation, &serializedUpdateInformation);
     globalSettings()->setUpdateInformation(serializedUpdateInformation);
     globalSettings()->synchronizeNowSync();
-
-    return true;
 }
 
 bool CommonUpdateManager::updateLastInstallationRequestTime()
@@ -332,11 +337,7 @@ bool CommonUpdateManager::updateLastInstallationRequestTime()
     }
 
     updateInformation.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
-    QByteArray serializedUpdateInformation;
-
-    QJson::serialize(updateInformation, &serializedUpdateInformation);
-    globalSettings()->setUpdateInformation(serializedUpdateInformation);
-    globalSettings()->synchronizeNowSync();
+    setUpdateInformation(updateInformation);
 
     return true;
 }

@@ -51,6 +51,7 @@ private:
     update::Status start();
     bool deserializedUpdateInformation(update::Information* outUpdateInformation,
         const QString& caller) const;
+    void setUpdateInformation(const update::Information& updateInformation);
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
