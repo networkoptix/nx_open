@@ -250,8 +250,6 @@ import * as Hls from 'hls.js';
                         }
                         
                         function playerErrorHandler(error) {
-                            var err = angular.copy(error);
-                            
                             scope.loading = false; // Some error happended - stop loading
                             resetPlayer();
                             
@@ -261,9 +259,8 @@ import * as Hls from 'hls.js';
                                     scope.videoFlags.errorLoading = response;
                                     
                                     if (scope.videoFlags.errorLoading) {
-                                        var url = err.url || err.context.url;
                                         $http
-                                            .get(url)
+                                            .get(error.url)
                                             .then(function (response) {
                                                 scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                                 scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
@@ -273,8 +270,6 @@ import * as Hls from 'hls.js';
                                 }, function (error) {
                                     scope.videoFlags.errorLoading = error;
                                 });
-                            
-                            // console.error(error);
                         }
                         
                         function playerReadyHandler(api) {
@@ -347,15 +342,24 @@ import * as Hls from 'hls.js';
                                         //If the player stalls give it a chance to recover
                                         scope.vgApi.addEventListener('stalled', resetTimeout);
                                         scope.vgApi.addEventListener('error', function (e) {
-                                            if(!e.target){ // this is a special case - interrupted video
-                                                // (switch to another camera)
-                                                return;
-                                            }
-                                            $timeout(function () {
-                                                if (e.target.error.url === undefined) {
-                                                    e.target.error.url = e.target.currentSrc;
+                                            $timeout(() => {
+                                                if (e.target === null) {
+                                                    // this is a special case - interrupted video
+                                                    // (switch to another camera)
+                                                    return;
                                                 }
-                                                playerErrorHandler(e.target.error);
+        
+                                                var target = e.target;
+                                                if (target.error.url === undefined) {
+                                                    target.error.url = target.currentSrc;
+                                                }
+        
+                                                // sometimes Error is thrown with currentSrc as baseURI (Firefox)
+                                                if (target.error.url === e.target.baseURI) {
+                                                    return;
+                                                }
+        
+                                                playerErrorHandler(target.error);
                                             });
                                         });
                                     }
