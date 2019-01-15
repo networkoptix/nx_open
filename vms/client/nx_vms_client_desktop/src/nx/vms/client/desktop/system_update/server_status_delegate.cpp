@@ -50,12 +50,20 @@ public:
             m_left->setHidden(true);
             progressHidden = true;
         }
-        else if (!data->verificationMessage.isEmpty())
+        else if (m_owner->isVerificationErrorVisible())
         {
-            m_left->setText(data->verificationMessage);
-            m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
-            m_left->setHidden(false);
-            errorStyle = true;
+            // Not showing any other statuses if there are any verification errors.
+            if (!data->verificationMessage.isEmpty())
+            {
+                m_left->setText(data->verificationMessage);
+                m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
+                m_left->setHidden(false);
+                errorStyle = true;
+            }
+            else
+            {
+                m_left->setHidden(true);
+            }
         }
         else if (data->skipped)
         {
@@ -184,14 +192,19 @@ QPixmap ServerStatusItemDelegate::getCurrentAnimationFrame() const
     return m_updateAnimation ? m_updateAnimation->currentPixmap() : QPixmap();
 }
 
-void ServerStatusItemDelegate::setStatusVisible(bool value)
+void ServerStatusItemDelegate::setStatusMode(StatusMode mode)
 {
-    m_statusVisible = value;
+    m_statusMode = mode;
 }
 
 bool ServerStatusItemDelegate::isStatusVisible() const
 {
-    return m_statusVisible;
+    return m_statusMode != StatusMode::hidden;
+}
+
+bool ServerStatusItemDelegate::isVerificationErrorVisible() const
+{
+    return m_statusMode == StatusMode::reportErrors;
 }
 
 QWidget* ServerStatusItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
@@ -210,7 +223,7 @@ void ServerStatusItemDelegate::setEditorData(QWidget* editor, const QModelIndex&
     if (!data)
         return;
     statusWidget->setState(data);
-    statusWidget->setVisible(m_statusVisible);
+    statusWidget->setVisible(isStatusVisible());
 }
 
 } // namespace nx::vms::client::desktop

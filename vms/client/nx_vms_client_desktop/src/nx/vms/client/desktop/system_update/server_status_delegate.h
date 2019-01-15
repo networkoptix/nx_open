@@ -20,9 +20,17 @@ public:
     explicit ServerStatusItemDelegate(QWidget* parent = 0);
     ~ServerStatusItemDelegate();
 
+    enum class StatusMode
+    {
+        hidden,
+        remoteStatus,
+        reportErrors,
+    };
+
     QPixmap getCurrentAnimationFrame() const;
-    void setStatusVisible(bool value);
+    void setStatusMode(StatusMode mode);
     bool isStatusVisible() const;
+    bool isVerificationErrorVisible() const;
 
 protected:
     class ServerStatusWidget;
@@ -32,7 +40,7 @@ protected:
 
 private:
     QScopedPointer<QMovie> m_updateAnimation;
-    bool m_statusVisible = false;
+    StatusMode m_statusMode = StatusMode::hidden;
 };
 
 } // namespace nx::vms::client::desktop

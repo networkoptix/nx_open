@@ -2,7 +2,6 @@
 #include "ui_look_and_feel_preferences_widget.h"
 
 #include <QtCore/QDir>
-#include <QtGui/QImageReader>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -178,15 +177,6 @@ bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 
 void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
 {
-    QString nameFilter;
-    for (const QByteArray&format: QImageReader::supportedImageFormats())
-    {
-        if (!nameFilter.isEmpty())
-            nameFilter += L' ';
-        nameFilter += lit("*.") + QLatin1String(format);
-    }
-    nameFilter = L'(' + nameFilter + L')';
-
     QString prevOriginalName = qnSettings->backgroundImage().originalName;
     QString folder = QFileInfo(prevOriginalName).absolutePath();
     if (folder.isEmpty())
@@ -198,7 +188,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
         new QnCustomFileDialog(
             this, tr("Select File..."),
             folder,
-            tr("Pictures %1").arg(nameFilter)
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter)
         )
     );
     dialog->setFileMode(QFileDialog::ExistingFile);

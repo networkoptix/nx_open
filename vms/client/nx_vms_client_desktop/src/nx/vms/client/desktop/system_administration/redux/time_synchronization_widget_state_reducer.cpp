@@ -14,7 +14,7 @@ bool hasInternet(const State& state)
     return std::any_of(
         state.servers.cbegin(),
         state.servers.cend(),
-        [](const auto& info) { return info.hasInternet; });
+        [](const auto& info) { return info.online && info.hasInternet; });
 }
 
 } // namespace
@@ -164,7 +164,10 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid&
     return {false, std::move(state)};
 }
 
-Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUuid& serverId, bool isOnline)
+Result TimeSynchronizationWidgetReducer::setServerOnline(
+    State state,
+    const QnUuid& serverId,
+    bool isOnline)
 {
     for (auto& server: state.servers)
     {
@@ -173,6 +176,28 @@ Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUu
             if (server.online != isOnline)
             {
                 server.online = isOnline;
+                state.status = actualStatus(state);
+                return {true, std::move(state)};
+            }
+
+            return {false, std::move(state)};
+        }
+    }
+    return {false, std::move(state)};
+}
+
+Result TimeSynchronizationWidgetReducer::setServerHasInternet(
+    State state,
+    const QnUuid& serverId,
+    bool hasInternet)
+{
+    for (auto& server: state.servers)
+    {
+        if (server.id == serverId)
+        {
+            if (server.hasInternet != hasInternet)
+            {
+                server.hasInternet = hasInternet;
                 state.status = actualStatus(state);
                 return {true, std::move(state)};
             }

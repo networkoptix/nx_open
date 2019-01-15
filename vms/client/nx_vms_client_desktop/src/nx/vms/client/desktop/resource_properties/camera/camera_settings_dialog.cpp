@@ -38,7 +38,7 @@
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
-#include "camera_advanced_settings_widget.h"
+#include "legacy/legacy_advanced_settings_widget.h"
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -57,7 +57,7 @@ struct CameraSettingsDialog::Private: public QObject
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
-    QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
+    QPointer<LegacyAdvancedSettingsWidget> advancedSettingsWidget;
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdaptor;
 
     Private(CameraSettingsDialog* q): q(q) {}
@@ -70,14 +70,14 @@ struct CameraSettingsDialog::Private: public QObject
 
     void initializeAdvancedSettingsWidget()
     {
-        advancedSettingsWidget = new CameraAdvancedSettingsWidget(q->ui->tabWidget);
+        advancedSettingsWidget = new LegacyAdvancedSettingsWidget(q->ui->tabWidget);
         installEventHandler(q, QEvent::Show, advancedSettingsWidget,
             [this](QObject* /*watched*/, QEvent* /*event*/)
             {
                 advancedSettingsWidget->updateFromResource();
             });
 
-        connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
+        connect(advancedSettingsWidget, &LegacyAdvancedSettingsWidget::hasChangesChanged,
             q, &CameraSettingsDialog::updateButtonsAvailability);
         connect(q->ui->tabWidget, &QTabWidget::currentChanged,
             this, &Private::tryReloadAdvancedSettings);

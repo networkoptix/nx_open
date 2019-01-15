@@ -37,6 +37,8 @@ public:
     Error error() const;
     QDir dir() const;
 
+    size_t estimateUnpackedSize() const;
+
     Error extractZip();
     QStringList fileList();
 

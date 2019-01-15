@@ -37,8 +37,8 @@ class ProjectGroups:
 
 
 TRANSLATABLE_PROJECTS = [
-    TranslatableProject("common", groups=[ProjectGroups.MOBILE]),
-    TranslatableProject("traytool", groups=[ProjectGroups.VMS]),
+    TranslatableProject("vms/libs/common", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
+    TranslatableProject("vms/traytool", groups=[ProjectGroups.VMS]),
     TranslatableProject(
         "client_base", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]),
     TranslatableProject(

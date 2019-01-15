@@ -45,6 +45,8 @@ private:
         QnUuidSet& selectedCameras,
         QWidget* parent);
 
+    void updateThumbnail(const QModelIndex& index);
+
 private:
     struct Private;
     const QScopedPointer<Private> d;

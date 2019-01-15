@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>973</width>
-    <height>166</height>
+    <width>664</width>
+    <height>164</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,22 +21,25 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>16</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>16</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>16</number>
+    <number>0</number>
    </property>
-   <item row="3" column="0">
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="2" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -44,10 +47,28 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="nx::vms::client::desktop::InputField" name="primaryStreamUrlInputField" native="true"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="nx::vms::client::desktop::InputField" name="secondaryStreamUrlInputField" native="true"/>
+    <widget class="QWidget" name="contentWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>16</number>
+      </property>
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <property name="rightMargin">
+       <number>16</number>
+      </property>
+      <property name="bottomMargin">
+       <number>16</number>
+      </property>
+      <item>
+       <widget class="nx::vms::client::desktop::InputField" name="primaryStreamUrlInputField" native="true"/>
+      </item>
+      <item>
+       <widget class="nx::vms::client::desktop::InputField" name="secondaryStreamUrlInputField" native="true"/>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

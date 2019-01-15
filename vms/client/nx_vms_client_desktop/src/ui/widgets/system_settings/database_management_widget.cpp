@@ -19,8 +19,13 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace {
+
 const QLatin1String dbExtension(".db");
-}
+
+static const QString kDbFilesFilter = QnCustomFileDialog::createFilter(
+    QnDatabaseManagementWidget::tr("Database Backup Files"), "db");
+
+} // namespace
 
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     base_type(parent),
@@ -37,7 +42,6 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
 
 QnDatabaseManagementWidget::~QnDatabaseManagementWidget()
 {
-    return;
 }
 
 void QnDatabaseManagementWidget::backupDb()
@@ -47,7 +51,7 @@ void QnDatabaseManagementWidget::backupDb()
         this,
         tr("Save Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),
-        tr("Database Backup Files (*.db)")));
+        kDbFilesFilter));
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     if (!fileDialog->exec())
         return;
@@ -113,8 +117,8 @@ void QnDatabaseManagementWidget::restoreDb()
         this,
         tr("Open Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),
-        tr("Database Backup Files") + lit( "(*.db)"),
-        NULL,
+        kDbFilesFilter,
+        nullptr,
         QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())
         return;

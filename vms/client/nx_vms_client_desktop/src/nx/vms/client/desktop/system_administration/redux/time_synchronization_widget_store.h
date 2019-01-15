@@ -39,6 +39,7 @@ public:
     void addServer(const State::ServerInfo& serverInfo);
     void removeServer(const QnUuid& id);
     void setServerOnline(const QnUuid &id, bool isOnline);
+    void setServerHasInternet(const QnUuid &id, bool hasInternet);
 
     void applyChanges();
     void setReadOnly(bool value);
