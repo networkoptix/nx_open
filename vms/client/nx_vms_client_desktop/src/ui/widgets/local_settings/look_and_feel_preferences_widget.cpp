@@ -238,7 +238,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
 
 bool QnLookAndFeelPreferencesWidget::backgroundAllowed() const
 {
-    return !qnSettings->lightMode().testFlag(Qn::LightModeNoSceneBackground);
+    return !qnRuntime->lightMode().testFlag(Qn::LightModeNoSceneBackground);
 }
 
 QString QnLookAndFeelPreferencesWidget::selectedTranslation() const

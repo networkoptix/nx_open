@@ -10,6 +10,8 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
+#include <client/client_runtime_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
@@ -17,7 +19,6 @@
 #include <update/task/check_update_peer_task.h>
 #include <update/low_free_space_warning.h>
 
-#include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
 
 #include <utils/common/app_info.h>
@@ -228,36 +229,32 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(
 void QnMediaServerUpdateTool::checkForUpdates(const nx::utils::SoftwareVersion& version,
     std::function<void(const QnCheckForUpdateResult& result)> func)
 {
-    QnUpdateTarget target(actualTargetIds(), version,
-        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(actualTargetIds(), version, !isClientUpdateAllowed());
     checkForUpdates(target, func);
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QString& fileName,
     std::function<void(const QnCheckForUpdateResult &result)> func)
 {
-    QnUpdateTarget target(actualTargetIds(), fileName,
-        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(actualTargetIds(), fileName, !isClientUpdateAllowed());
     checkForUpdates(target, func);
 }
 
 
 void QnMediaServerUpdateTool::startUpdate(const nx::utils::SoftwareVersion& version /* = {}*/)
 {
-    QnUpdateTarget target(actualTargetIds(), version,
-        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(actualTargetIds(), version, !isClientUpdateAllowed());
     startUpdate(target);
 }
 
 void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
-    QnUpdateTarget target(actualTargetIds(), fileName, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(actualTargetIds(), fileName, !isClientUpdateAllowed());
     startUpdate(target);
 }
 
 void QnMediaServerUpdateTool::startOnlineClientUpdate(const nx::utils::SoftwareVersion& version)
 {
-    QnUpdateTarget target(QSet<QnUuid>(), version,
-        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(QSet<QnUuid>(), version, !isClientUpdateAllowed());
     startUpdate(target);
 }
 
@@ -324,6 +321,11 @@ void QnMediaServerUpdateTool::checkForUpdates(
 
     m_checkUpdatesTask->start();
     setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
+}
+
+bool QnMediaServerUpdateTool::isClientUpdateAllowed() const
+{
+    return m_enableClientUpdates && qnRuntime->isClientUpdateAllowed();
 }
 
 void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)

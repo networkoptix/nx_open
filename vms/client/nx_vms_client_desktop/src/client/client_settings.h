@@ -24,9 +24,11 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/update/update_information.h>
 
+struct QnStartupParameters;
 class QSettings;
 
-class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings> {
+class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings>
+{
     Q_OBJECT
     typedef QnPropertyStorage base_type;
 
@@ -76,9 +78,6 @@ public:
         /** Estimated update delivery date (in msecs since epoch). */
         UPDATE_DELIVERY_DATE,
 
-        /** Disable client updates. */
-        NO_CLIENT_UPDATE,
-
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
@@ -120,19 +119,9 @@ public:
         /** Allow blur on video items. */
         GL_BLUR,
 
-        /** Enable V-sync for OpenGL widgets */
-        GL_VSYNC,
-
         TIMESTAMP_CORNER,
 
         USER_IDLE_TIMEOUT_MSECS,
-
-        /** Light client mode - no animations, no background, no opacity, no notifications, 1 camera only allowed. */
-        LIGHT_MODE,
-
-        /** If does not equal -1 then its value will be copied to LIGHT_MODE.
-         *  It should be set from command-line and it disables light mode auto detection. */
-        LIGHT_MODE_OVERRIDE,
 
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
@@ -168,7 +157,7 @@ public:
         VARIABLE_COUNT
     };
 
-    QnClientSettings(bool forceLocalSettings, QObject *parent = NULL);
+    QnClientSettings(const QnStartupParameters& startupParameters, QObject* parent = nullptr);
     virtual ~QnClientSettings();
 
     void load();
@@ -225,7 +214,6 @@ private:
         QN_DECLARE_RW_PROPERTY(nx::update::Information,     latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         nx::update::Information())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
-        QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(Qn::ResourceInfoLevel,       extraInfoInTree,        setExtraInfoInTree,         EXTRA_INFO_IN_TREE,         Qn::RI_NameOnly)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
@@ -244,13 +232,11 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportMediaSettings,    setExportMediaSettings,     EXPORT_MEDIA_SETTINGS,      ExportMediaSettings())
         QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportBookmarkSettings, setExportBookmarkSettings,  EXPORT_BOOKMARK_SETTINGS,   ExportMediaSettings({nx::vms::client::desktop::ExportOverlayType::bookmark}))
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
-        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
@@ -270,8 +256,9 @@ private:
     void migrateKnownServerConnections();
 
 private:
-    QSettings *m_settings;
-    bool m_loading;
+    const bool m_readOnly;
+    QSettings* m_settings;
+    bool m_loading = true;
 };
 
 

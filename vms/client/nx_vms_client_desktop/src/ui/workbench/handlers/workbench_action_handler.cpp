@@ -409,7 +409,8 @@ void ActionHandler::addToLayout(
     if (!layout)
         return;
 
-    if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeSingleItem))
+    {
         while (!layout->getItems().isEmpty())
             layout->removeItem(*(layout->getItems().begin()));
     }

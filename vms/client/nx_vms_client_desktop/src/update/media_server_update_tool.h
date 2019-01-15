@@ -75,6 +75,8 @@ signals:
     void lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
 
 private:
+    bool isClientUpdateAllowed() const;
+
     void startUpdate(const QnUpdateTarget& target);
     void checkForUpdates(
         const QnUpdateTarget& target,
