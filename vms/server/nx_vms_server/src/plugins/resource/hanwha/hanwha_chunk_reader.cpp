@@ -80,7 +80,7 @@ void HanwhaChunkLoader::start(const HanwhaInformation& information)
     QnMutexLocker lock(&m_mutex);
     setUpThreadUnsafe(information);
 
-    if (m_isNvr)
+    if (m_isNvr && !m_started)
     {
         m_state = nextState(m_state);
         m_started = true;

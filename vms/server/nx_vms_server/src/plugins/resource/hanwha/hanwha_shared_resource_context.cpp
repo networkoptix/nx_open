@@ -111,9 +111,10 @@ nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
     return &m_requestLock;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const HanwhaInformation& info)
+void HanwhaSharedResourceContext::startServices()
 {
-    if (!hasVideoArchive)
+    const auto information = this->information();
+    if (!information)
         return;
 
     {
@@ -122,10 +123,10 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const Hanw
             m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this, m_chunkLoaderSettings);
     }
 
-    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
-        .arg(info.deviceType == HanwhaDeviceType::nvr));
+    NX_VERBOSE(this, "Starting services (is NVR: %1)...",
+        information->deviceType == HanwhaDeviceType::nvr);
 
-    m_chunkLoader->start(info);
+    m_chunkLoader->start(information.value);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
