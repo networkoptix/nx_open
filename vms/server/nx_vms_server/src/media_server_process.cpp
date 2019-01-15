@@ -2501,7 +2501,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
     reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
-    reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
+    reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule(),
+        [this]() { m_installUpdateRequestReceived = true; }));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/cameraThumbnail

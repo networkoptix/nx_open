@@ -83,8 +83,11 @@ void sendInstallRequest(
 
 } // namespace
 
-QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serverModule,
+    nx::utils::MoveOnlyFunc<void()> onTriggeredCallback)
+    :
+    nx::vms::server::ServerModuleAware(serverModule),
+    m_onTriggeredCallback(std::move(onTriggeredCallback))
 {
 }
 
@@ -100,6 +103,8 @@ int QnInstallUpdateRestHandler::executePost(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),
         params);
+
+    m_onTriggeredCallback();
 
     if (!params.contains("peers"))
     {

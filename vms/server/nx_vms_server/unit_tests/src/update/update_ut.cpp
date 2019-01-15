@@ -107,6 +107,16 @@ protected:
         issueInstallUpdateRequest(true, participants, QnRestResult::NoError);
     }
 
+    void thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest(
+        const QList<QnUuid>& participants)
+    {
+        for (const auto& peer: m_peers)
+        {
+            if (participants.contains(peer->commonModule()->moduleGUID()))
+                ASSERT_TRUE(peer->mediaServerProcess()->installUpdateRequestReceived());
+        }
+    }
+
     void thenGlobalUpdateInformationShouldContainParticipants(const QList<QnUuid>& participants)
     {
         update::Information receivedUpdateInfo;
@@ -405,8 +415,26 @@ TEST_F(Updates, installUpdate_timestampCorrectlySet)
         {peerId(0), update::Status::Code::readyToInstall} };
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 
-    thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0) });
+    thenInstallUpdateWithPeersParameterShouldSucceed({peerId(0)});
     thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime();
+}
+
+TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
+{
+    givenConnectedPeers(3);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall},
+        {peerId(2), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+
+    QList<QnUuid> participants{peerId(0), peerId(1)};
+    thenInstallUpdateWithPeersParameterShouldSucceed(participants);
+    thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest(participants);
+    thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
 TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)

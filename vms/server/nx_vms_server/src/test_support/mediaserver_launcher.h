@@ -72,6 +72,7 @@ public:
      */
     nx::utils::Url apiUrl() const;
     QString dataDir() const;
+    MediaServerProcess* mediaServerProcess() const { return m_mediaServerProcess.get(); }
 
 signals:
     void started();

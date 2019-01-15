@@ -2,13 +2,15 @@
 
 #include <rest/server/fusion_rest_handler.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/utils/move_only_func.h>
 
 class QnInstallUpdateRestHandler:
     public QnFusionRestHandler,
     public nx::vms::server::ServerModuleAware
 {
 public:
-    QnInstallUpdateRestHandler(QnMediaServerModule* serverModule);
+    QnInstallUpdateRestHandler(QnMediaServerModule* serverModule,
+        nx::utils::MoveOnlyFunc<void()> onTriggeredCallback);
 
     virtual int executePost(
         const QString& path,
@@ -24,4 +26,7 @@ public:
         const QnRequestParamList& params,
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
+
+private:
+    nx::utils::MoveOnlyFunc<void()> m_onTriggeredCallback;
 };
