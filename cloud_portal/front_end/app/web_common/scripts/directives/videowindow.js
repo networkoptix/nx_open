@@ -253,8 +253,6 @@ import * as Hls from 'hls.js';
                         }
                         
                         function playerErrorHandler(error) {
-                            var err = angular.copy(error);
-                            
                             scope.loading = false; // Some error happended - stop loading
                             resetPlayer();
                             
@@ -263,15 +261,13 @@ import * as Hls from 'hls.js';
                                 .then((response) => {
                                     scope.videoFlags.errorLoading = response;
                                     
-                                    if ((err.url === undefined || err.url === '') && err.context === undefined) {
+                                    if (error.url === undefined || error.url === '') {
                                         return;
                                     }
                                     
                                     if (scope.videoFlags.errorLoading) {
-                                        var url = err.url || err.context.url;
-                                        
                                         $http
-                                            .get(url)
+                                            .get(error.url)
                                             .then((response) => {
                                                 scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                                 scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
@@ -356,17 +352,22 @@ import * as Hls from 'hls.js';
                                         scope.vgApi.addEventListener('stalled', resetTimeout);
                                         scope.vgApi.addEventListener('error', (e) => {
                                             $timeout(() => {
-                                                if(e.target === null){ // this is a special case - interrupted video
-                                                // (switch to another camera)
-                                                return;
-                                            }
-                                            
-                                            var target = e.target;
-                                            if (target.error.url === undefined) {
-                                                target.error.url = target.currentSrc;
-                                            }
-                                            
-                                            
+                                                if (e.target === null) {
+                                                    // this is a special case - interrupted video
+                                                    // (switch to another camera)
+                                                    return;
+                                                }
+        
+                                                var target = e.target;
+                                                if (target.error.url === undefined) {
+                                                    target.error.url = target.currentSrc;
+                                                }
+    
+                                                // sometimes Error is thrown with currentSrc as baseURI (Firefox)
+                                                if (target.error.url === e.target.baseURI) {
+                                                    return;
+                                                }
+        
                                                 playerErrorHandler(target.error);
                                             });
                                         });
