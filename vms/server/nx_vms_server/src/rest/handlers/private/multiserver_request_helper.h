@@ -21,8 +21,8 @@
 namespace detail {
 
 template<typename ContextType>
-nx::utils::Url getServerApiUrl(
-    const QString& path, const QnMediaServerResourcePtr& server, ContextType context)
+nx::utils::Url getServerApiUrl(const QString& path, const QnMediaServerResourcePtr& server,
+    ContextType context)
 {
     nx::utils::Url result(server->getApiUrl());
     result.setPath(path);
@@ -42,17 +42,15 @@ QSet<QnMediaServerResourcePtr> filterOutNonParticipants(
 
 template<typename ReplyType, typename MergeFunction, typename RequestData>
 void requestRemotePeers(QnCommonModule* commonModule, const QString& path, ReplyType& outputReply,
-    QnMultiserverRequestContext<RequestData>* context,
-    const MergeFunction& mergeFunction, const QList<QnUuid>& serverIdList = QList<QnUuid>())
+    QnMultiserverRequestContext<RequestData>* context, const MergeFunction& mergeFunction,
+    const QList<QnUuid>& serverIdList = QList<QnUuid>())
 {
-    for (const auto& server : participantServers(serverIdList, commonModule))
+    for (const auto& server: participantServers(serverIdList, commonModule))
     {
         const auto completionFunc =
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
-                SystemError::ErrorCode /*osErrorCode*/,
-                int statusCode,
-                nx::network::http::BufferType body,
-                nx::network::http::HttpHeaders /*httpHeaders*/)
+                SystemError::ErrorCode /*osErrorCode*/, int statusCode,
+                nx::network::http::BufferType body, nx::network::http::HttpHeaders /*headers*/)
             {
                 ReplyType reply;
                 bool success = false;
@@ -63,16 +61,17 @@ void requestRemotePeers(QnCommonModule* commonModule, const QString& path, Reply
 
                 const auto updateOutputDataCallback =
                     [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
-                {
-                    mergeFunction(serverId, success, reply, outputReply);
-                    context->requestProcessed();
-                };
+                    {
+                        mergeFunction(serverId, success, reply, outputReply);
+                        context->requestProcessed();
+                    };
 
                 context->executeGuarded(updateOutputDataCallback);
             };
 
         const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
-        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc, context);
+        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc,
+            context);
         context->waitForDone();
     }
 }

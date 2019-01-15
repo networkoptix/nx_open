@@ -107,6 +107,11 @@ protected:
         issueInstallUpdateRequest(true, participants, QnRestResult::NoError);
     }
 
+    void thenInstallUpdateWithPeersParameterShouldFail(const QList<QnUuid>& participants)
+    {
+        issueInstallUpdateRequest(true, participants, QnRestResult::CantProcessRequest);
+    }
+
     void thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest(
         const QList<QnUuid>& participants)
     {
@@ -186,6 +191,13 @@ protected:
     void thenFinishUpdateWithignorePendingPeersShouldSucceed()
     {
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
+    }
+
+    void whenPeerGoesOffline(const QnUuid& peerId)
+    {
+        const auto peerToShutDownIt = std::find_if(m_peers.cbegin(), m_peers.cend(),
+            [&peerId](const auto& peer) { return peer->commonModule()->moduleGUID() == peerId; });
+        (*peerToShutDownIt)->stop();
     }
 
 private:
@@ -434,6 +446,25 @@ TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
     QList<QnUuid> participants{peerId(0), peerId(1)};
     thenInstallUpdateWithPeersParameterShouldSucceed(participants);
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest(participants);
+    thenGlobalUpdateInformationShouldContainParticipants(participants);
+}
+
+TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
+{
+    givenConnectedPeers(3);
+    whenCorrectUpdateInformationWithEmptyParticipantListSet();
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall},
+        {peerId(2), update::Status::Code::readyToInstall} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+
+    whenPeerGoesOffline(peerId(2));
+
+    QList<QnUuid> participants{ peerId(0), peerId(1), peerId(2) };
+    thenInstallUpdateWithPeersParameterShouldFail(participants);
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 

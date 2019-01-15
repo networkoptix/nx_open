@@ -14,17 +14,25 @@ QnFinishUpdateRestHandler::QnFinishUpdateRestHandler(QnMediaServerModule* server
 
 bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
 {
-    auto allServers = QSet<QnMediaServerResourcePtr>::fromList(
+    auto onlineServers = QSet<QnMediaServerResourcePtr>::fromList(
         serverModule()->commonModule()->resourcePool()->getAllServers(Qn::Online));
     const auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
         serverModule()->commonModule()->resourcePool()->getAllServers(Qn::Offline));
-    allServers.unite(offlineServers);
 
     QnUuidList participantsIds;
     if (!serverModule()->updateManager()->participants(&participantsIds))
         return false;
 
-    const auto participants = detail::filterOutNonParticipants(allServers, participantsIds);
+    const bool anyParticipantOffline = std::any_of(offlineServers.cbegin(), offlineServers.cend(),
+        [&participantsIds](const auto& server)
+        {
+            return participantsIds.contains(server->getId());
+        });
+
+    if (anyParticipantOffline)
+        return false;
+
+    const auto participants = detail::filterOutNonParticipants(onlineServers, participantsIds);
     const auto targetVersion = serverModule()->updateManager()->targetVersion();
     if (targetVersion.isNull())
         return false;
@@ -43,7 +51,6 @@ int QnFinishUpdateRestHandler::executePost(const QString& /*path*/,
 {
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);
-
 
     if (params.contains("ignorePendingPeers") || allPeersUpdatedSuccessfully())
     {

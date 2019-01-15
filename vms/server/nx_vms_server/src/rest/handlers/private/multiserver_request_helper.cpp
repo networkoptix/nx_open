@@ -2,11 +2,8 @@
 
 namespace detail {
 
-void checkUpdateStatusRemotely(
-    const QList<QnUuid>& participants,
-    QnCommonModule* commonModule,
-    const QString& path,
-    QList<nx::update::Status>* reply,
+void checkUpdateStatusRemotely(const QList<QnUuid>& participants, QnCommonModule* commonModule,
+    const QString& path, QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
     static const QString kOfflineMessage = "peer is offline";
@@ -26,12 +23,12 @@ void checkUpdateStatusRemotely(
             }
         };
 
-    detail::requestRemotePeers(commonModule, path, *reply, context, mergeFunction, participants);
+    requestRemotePeers(commonModule, path, *reply, context, mergeFunction, participants);
     auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
         commonModule->resourcePool()->getAllServers(Qn::Offline));
 
     const auto participantsSet = QSet<QnUuid>::fromList(participants);
-    for (const auto offlineServer : offlineServers)
+    for (const auto offlineServer: offlineServers)
     {
         if (!participantsSet.isEmpty() && !participantsSet.contains(offlineServer->getId()))
             continue;
@@ -50,8 +47,7 @@ void checkUpdateStatusRemotely(
     }
 }
 
-QSet<QnMediaServerResourcePtr> participantServers(
-    const QList<QnUuid>& serverIdList,
+QSet<QnMediaServerResourcePtr> participantServers(const QList<QnUuid>& serverIdList,
     QnCommonModule* commonModule)
 {
     const auto systemName = commonModule->globalSettings()->systemName();
