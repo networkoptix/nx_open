@@ -28,9 +28,9 @@
 
 // we need enough size for updates
 #ifdef __arm__
-    static const int MAX_REQUEST_SIZE = 1024*1024*16;
+    const int QnTCPConnectionProcessor::MAX_REQUEST_SIZE = 1024*1024*16;
 #else
-    static const int MAX_REQUEST_SIZE = 1024*1024*256;
+    const int QnTCPConnectionProcessor::MAX_REQUEST_SIZE = 1024*1024*256;
 #endif
 
 namespace {
