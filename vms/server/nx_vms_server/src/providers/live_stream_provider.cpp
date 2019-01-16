@@ -69,7 +69,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
     m_totalAudioFrames(0),
-    m_softMotionStreamIndexCache(Qn::StreamIndex::undefined),
+    m_cachedSoftMotionStreamIndex(
+        [this](){ return m_cameraRes->motionStreamIndex(); }, &m_motionStreamIndexMtx),
     m_softMotionLastChannel(0),
     m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
@@ -229,16 +230,6 @@ void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& para
     pleaseReopenStream();
 }
 
-Qn::StreamIndex QnLiveStreamProvider::getMotionStreamIndexCached() const
-{
-    QnMutexLocker lock(&m_motionRoleMtx);
-    if (m_softMotionStreamIndexCache == Qn::StreamIndex::undefined)
-        std::tie(m_softMotionStreamIndexCache, m_isMotionStreamForced) = m_cameraRes->motionStreamIndex();
-
-    NX_ASSERT(m_softMotionStreamIndexCache != Qn::StreamIndex::undefined);
-    return m_softMotionStreamIndexCache;
-}
-
 void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, const QSize& /*picSize*/ )
 {
 }
@@ -299,7 +290,7 @@ bool QnLiveStreamProvider::needAnalyzeMotion()
     if (m_cameraRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
         return false;
 
-    const auto motionStreamIndex = getMotionStreamIndexCached();
+    const auto motionStreamIndex = m_cachedSoftMotionStreamIndex.get().index;
     switch (getRole())
     {
         case Qn::CR_LiveVideo: return motionStreamIndex == Qn::StreamIndex::primary;
@@ -422,8 +413,8 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
             * SECONDARY_STREAM_MAX_RESOLUTION.height();
-        needToAnalyzeMotion =
-            m_isMotionStreamForced || compressedFrame->width * compressedFrame->height <= maxSquare;
+        needToAnalyzeMotion = compressedFrame->width * compressedFrame->height <= maxSquare
+            || m_cachedSoftMotionStreamIndex.get().isForced;
     }
     else
     {
@@ -599,15 +590,14 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
         m_cameraRes->saveProperties();
     }
 
-    m_softMotionStreamIndexCache = Qn::StreamIndex::undefined; // Invalidates cache to reload value.
+    m_cachedSoftMotionStreamIndex.reset();
     QnMutexLocker lock(&m_liveMutex);
     updateSoftwareMotion();
 }
 
 void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
 {
-    QnMutexLocker lock( &m_motionRoleMtx );
-    m_softMotionStreamIndexCache = Qn::StreamIndex::undefined; // Invalidates cache to reload value.
+    m_cachedSoftMotionStreamIndex.reset();
 }
 
 void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData)

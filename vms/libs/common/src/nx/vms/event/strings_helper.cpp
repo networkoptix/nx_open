@@ -483,6 +483,14 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 result = tr("RTP packet loss detected.");
             break;
         }
+        case EventReason::networkBadCameraTime:
+        {
+            return tr("Failed to force using camera time, it lags too much, system time will be used");
+        }
+        case EventReason::networkCameraTimeBackToNormal:
+        {
+            return tr("Camera time is back to normal");
+        }
         case EventReason::networkNoResponseFromDevice:
         {
             return tr("Device does not respond to network requests.");

@@ -1252,6 +1252,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<IdData>(p, ApiCommand::removeUser);
 
+    /**%apidoc POST /ec2/removeResourceParam
+     * Delete the specified property.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %param resourceId resource id.
+     * %param name property name to remove.
+     */
+    regUpdate<ResourceParamWithRefData>(p, ApiCommand::removeResourceParam);
+
     /**%apidoc POST /ec2/saveUserRole
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
