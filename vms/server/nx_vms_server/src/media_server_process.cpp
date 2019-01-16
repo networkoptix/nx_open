@@ -4193,6 +4193,7 @@ void MediaServerProcess::loadResourceParamsData()
     const auto builtinVersion = QnResourceDataPool::getVersion(loadDataFromFile(kBuiltinFileName));
     if (builtinVersion > dataVersion)
     {
+        dataVersion = builtinVersion;
         source = kBuiltinFileName;
         param.value = loadDataFromFile(source); //< Default value.
     }
