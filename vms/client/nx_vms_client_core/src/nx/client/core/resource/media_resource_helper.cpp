@@ -3,8 +3,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/fusion/model_functions.h>
+#include <core/resource/param.h>
 #include <utils/common/connective.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::client::core {
 
@@ -119,6 +121,10 @@ void MediaResourceHelper::Private::handlePropertyChanged(
     else if (key == QnMediaResource::rotationKey())
     {
         emit q->customRotationChanged();
+    }
+    else if (key == ResourcePropertyKey::kMediaStreams)
+    {
+        emit q->aspectRatioChanged();
     }
 }
 
