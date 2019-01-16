@@ -50,8 +50,10 @@ Rectangle
             var aspectRatio = helper ? helper.customAspectRatio : 0.0
             if (aspectRatio === 0.0)
             {
-                if (player)
+                if (player && player.loaded)
                     aspectRatio = player.aspectRatio
+                else if (helper)
+                    aspectRatio = helper.aspectRatio
                 else
                     aspectRatio = sourceSize.width / sourceSize.height
             }
@@ -293,6 +295,8 @@ Rectangle
         resourceId: cameraResourceId
         maxTextureSize: videoContainer.maxTextureSize
         audioEnabled: false
+
+        readonly property bool loaded: mediaStatus == MediaPlayer.MediaStatus.Loaded
 
         onResourceIdChanged: video.clear()
         onSourceChanged: videoContainer.updatePlayingState()

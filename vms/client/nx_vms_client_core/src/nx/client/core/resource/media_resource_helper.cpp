@@ -64,6 +64,15 @@ qreal MediaResourceHelper::customAspectRatio() const
     return customRatio.isValid() ? customRatio.toFloat() : 0.0;
 }
 
+qreal MediaResourceHelper::aspectRatio() const
+{
+    if (!d->camera)
+        return 0.0;
+
+    const auto ratio = d->camera->aspectRatio();
+    return ratio.isValid() ? ratio.toFloat() : 0.0;
+}
+
 int MediaResourceHelper::customRotation() const
 {
     return d->camera ? d->camera->getProperty(QnMediaResource::rotationKey()).toInt() : 0;
@@ -103,9 +112,14 @@ void MediaResourceHelper::Private::handlePropertyChanged(
         return;
 
     if (key == QnMediaResource::customAspectRatioKey())
+    {
         emit q->customAspectRatioChanged();
+        emit q->aspectRatioChanged();
+    }
     else if (key == QnMediaResource::rotationKey())
+    {
         emit q->customRotationChanged();
+    }
 }
 
 void MediaResourceHelper::Private::updateServer()
