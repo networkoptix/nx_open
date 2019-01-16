@@ -461,9 +461,10 @@ TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
         {peerId(2), update::Status::Code::readyToInstall} };
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 
-    whenPeerGoesOffline(peerId(2));
+    const auto peer2Id = peerId(2);
+    whenPeerGoesOffline(peer2Id);
 
-    QList<QnUuid> participants{ peerId(0), peerId(1), peerId(2) };
+    QList<QnUuid> participants{ peerId(0), peerId(1), peer2Id };
     thenInstallUpdateWithPeersParameterShouldFail(participants);
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
