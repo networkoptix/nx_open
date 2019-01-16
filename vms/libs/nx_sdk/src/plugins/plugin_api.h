@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: When Storage and Camera SDKs are merged into Analytics SDK, rename this file and keep
+// only Setting, Plugin and Plugin2 (renamed as `deprecated`) to be used when loading old plugins.
+
 //!VMS dynamic plugin API (c++)
 /*!
     - inspired by COM
@@ -84,14 +87,12 @@ namespace nxpl
      * Optional interface with general plugin features (name, settings). Server tries to cast
      * the initial pointer received from createNXPluginInstance() to this type right after the
      * plugin is loaded.
-    */
+     */
     class Plugin: public nxpl::PluginInterface
     {
     public:
         /** Prototype of a plugin entry point function. */
         typedef PluginInterface* (*EntryPoint)();
-
-        virtual ~Plugin() {}
 
         /** Name of the plugin, used for information purpose only. */
         virtual const char* name() const = 0;

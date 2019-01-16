@@ -4,6 +4,8 @@
  * Various tools for plugins. Header-only.
  */
 
+// TODO: Remove this file when Storage and Camera SDKs are merged into Analytics SDK.
+
 #if defined(_WIN32)
     #include <Windows.h>
     #undef min
@@ -20,13 +22,10 @@
 
 #include "plugin_api.h"
 
-// TODO: #mshevchenko: Split into nx::sdk::UuidHelper and nx::sdk::RefCountable.
-
 namespace nxpt {
 
 namespace atomic {
 
-    // TODO: #mshevchenko: Rewrite via atomic.
 #ifdef _WIN32
     typedef volatile LONG AtomicLong;
 #elif __GNUC__
