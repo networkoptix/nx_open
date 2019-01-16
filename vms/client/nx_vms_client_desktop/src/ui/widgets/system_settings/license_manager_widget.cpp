@@ -59,6 +59,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -662,6 +663,12 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
     QStringList extras;
     for (const auto& license: licenses)
         extras.push_back(getLicenseDescription(license));
+
+    static const auto kWarningText = tr("Every license can be deactivated only a few times.");
+    const auto warningColor = nx::vms::client::desktop::ColorTheme::instance()->color("red_l2").name();
+    const auto warningText = tr("<font color = \"%1\">%2</font>")
+        .arg(warningColor, kWarningText);
+    extras.push_back(warningText);
 
     using namespace nx::vms::client::desktop::ui;
     dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
