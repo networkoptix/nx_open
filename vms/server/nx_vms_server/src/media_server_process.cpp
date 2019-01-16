@@ -2240,7 +2240,7 @@ void MediaServerProcess::registerRestHandlers(
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string url URL of one Server in the System to join.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
