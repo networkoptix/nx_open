@@ -3390,8 +3390,10 @@ bool MediaServerProcess::setUpMediaServerResource(
     bool foundOwnServerInDb = false;
     const bool sslAllowed = serverModule->settings().allowSslConnections();
 
-    while (m_mediaServer.isNull() && !needToStop())
+    while (m_mediaServer.isNull())
     {
+        if (needToStop())
+            return false;
         QnMediaServerResourcePtr server = findServer(ec2Connection);
         nx::vms::api::MediaServerData prevServerData;
         if (server)
