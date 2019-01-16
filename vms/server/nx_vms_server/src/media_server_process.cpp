@@ -2530,6 +2530,14 @@ void MediaServerProcess::registerRestHandlers(
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
+     * %param[opt]:enum streamSelectionMode Policy for stream selection.
+     *     %value auto Chooses the most suitable stream automatically.
+     *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
+     *         primary one is not available.
+     *     %value forcedSecondary Secondary stream is forced. Primary stream will be used if the
+     *         secondary one is not available.
+     *     %value sameAsAnalytics Use the same stream as the one used by analytics engine.
+     *     %value sameAsMotion Use the same stream as the one used by software motion detection.
      * %param[opt]:enum aspectRatio Allows to avoid scaling the image to the aspect ratio from
      *     camera settings.
      *     %value auto Default value. Use aspect ratio from camera settings (if any).

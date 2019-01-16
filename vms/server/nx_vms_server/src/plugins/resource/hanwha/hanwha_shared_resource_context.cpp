@@ -4,11 +4,11 @@
 #include "hanwha_chunk_reader.h"
 #include "hanwha_common.h"
 
-#include <media_server/media_server_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/abstract_remote_archive_manager.h>
-#include <nx/utils/log/log.h>
+#include <core/resource_management/resource_pool.h>
+#include <media_server/media_server_module.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace vms::server {
@@ -111,31 +111,22 @@ nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
     return &m_requestLock;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const HanwhaInformation& info)
+void HanwhaSharedResourceContext::startServices()
 {
+    const auto information = this->information();
+    if (!information)
+        return;
+
     {
         QnMutexLocker lock(&m_servicesMutex);
-        if (m_timeSynchronizer)
-            return; //< All members are already initialized.
-
-        if (hasVideoArchive)
-        {
+        if (!m_chunkLoader)
             m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this, m_chunkLoaderSettings);
-            m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
-            m_timeSynchronizer->setTimeSynchronizationEnabled(false);
-            m_timeSynchronizer->setTimeShiftHandler(
-                [this](std::chrono::milliseconds value) { m_chunkLoader->setTimeShift(value); });
-        }
     }
 
-    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
-        .arg(info.deviceType == HanwhaDeviceType::nvr));
+    NX_VERBOSE(this, "Starting services (is NVR: %1)...",
+        information->deviceType == HanwhaDeviceType::nvr);
 
-    if (hasVideoArchive)
-    {
-        m_timeSynchronizer->start(this);
-        m_chunkLoader->start(info);
-    }
+    m_chunkLoader->start(information.value);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
@@ -398,6 +389,12 @@ std::chrono::milliseconds HanwhaSharedResourceContext::timeShift() const
 {
     QnMutexLocker lock(&m_servicesMutex);
     return m_chunkLoader ? m_chunkLoader->timeShift() : std::chrono::milliseconds::zero();
+}
+
+void HanwhaSharedResourceContext::setTimeShift(std::chrono::milliseconds value)
+{
+    QnMutexLocker lock(&m_servicesMutex);
+    m_chunkLoader->setTimeShift(value);
 }
 
 void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings)

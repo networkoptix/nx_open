@@ -12,7 +12,6 @@
 #include <nx/utils/thread/semaphore.h>
 #include <nx/utils/thread/rw_lock.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
-#include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <plugins/resource/hanwha/hanwha_chunk_reader.h>
@@ -137,7 +136,7 @@ public:
     QAuthenticator authenticator() const;
     nx::utils::RwLock* requestLock();
 
-    void startServices(bool hasVideoArchive, const HanwhaInformation& information);
+    void startServices();
 
     SessionContextPtr session(
         HanwhaSessionType sessionType,
@@ -150,6 +149,7 @@ public:
     qint64 timelineEndUs(int channelNumber) const;
     boost::optional<int> overlappedId() const;
     std::chrono::milliseconds timeShift() const;
+    void setTimeShift(std::chrono::milliseconds);
 
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
@@ -192,7 +192,6 @@ private:
 
     nx::utils::RwLock m_requestLock;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
-    std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 
     HanwhaChunkLoaderSettings m_chunkLoaderSettings;
 

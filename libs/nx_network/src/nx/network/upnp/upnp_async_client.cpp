@@ -126,6 +126,7 @@ public:
 
 AsyncClient::~AsyncClient()
 {
+    m_isTerminating = true;
     std::set<nx::network::http::AsyncHttpClientPtr> httpClients;
     {
         QnMutexLocker lk(&m_mutex);
@@ -204,6 +205,9 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
 
         callback(Message());
     };
+
+    if (m_isTerminating)
+        return;
 
     const auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->addAdditionalHeader("SOAPAction", action.toUtf8());

@@ -67,7 +67,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
         // QUrl isn't used here intentionally, since session parameter works correct
         // if it added to the end of URL only.
-        streamUrlString.append(lit("&session=%1").arg(m_sessionContext->sessionId));
+        streamUrlString.append(lit("/session=%1").arg(m_sessionContext->sessionId));
     }
 
     const auto role = getRole();

@@ -246,6 +246,23 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     return QnAspectRatio(realSensorSize);
 }
 
+std::pair<Qn::StreamIndex, bool> QnVirtualCameraResource::motionStreamIndex() const
+{
+    const auto forcedMotionStreamStr = getProperty(QnMediaResource::motionStreamKey()).toLower();
+    if (forcedMotionStreamStr.isEmpty())
+    {
+        if (hasDualStreaming() && (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+            return {Qn::StreamIndex::primary, /*isForced*/ false};
+
+        return {Qn::StreamIndex::secondary, /*isForced*/ false};
+    }
+
+    const auto forcedMotionStream =
+        QnLexical::deserialized<Qn::StreamIndex>(forcedMotionStreamStr, Qn::StreamIndex::undefined);
+    NX_ASSERT(forcedMotionStream != Qn::StreamIndex::undefined);
+    return {forcedMotionStream, /*isForced*/ true};
+}
+
 static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
 {
     if (newParams.codec != oldParams.codec)

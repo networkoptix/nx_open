@@ -194,6 +194,8 @@ namespace ResourceDataKey
     static const QString kIoSettings("ioSettings");
 
     static const QString kVideoLayout("videoLayout");
+
+    static const QString kRepeatIntervalForSendVideoEncoderMS("repeatIntervalForSendVideoEncoderMS");
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

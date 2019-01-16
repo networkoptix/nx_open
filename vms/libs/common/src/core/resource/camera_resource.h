@@ -65,6 +65,9 @@ public:
 
     virtual QnAspectRatio aspectRatio() const;
 
+    /** Returns which stream should be used for motion detection and is it forced. */
+    std::pair<Qn::StreamIndex, /*isForced*/ bool> motionStreamIndex() const;
+
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
     // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
 

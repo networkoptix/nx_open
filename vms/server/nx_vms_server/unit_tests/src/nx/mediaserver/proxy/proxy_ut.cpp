@@ -13,6 +13,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <test_support/mediaserver_launcher.h>
 #include <api/global_settings.h>
+#include <nx/network/url/url_builder.h>
 
 using namespace nx::utils::test;
 
@@ -67,7 +68,7 @@ public:
             const auto& from = m_peers[i];
             const auto& to = m_peers[i + 1];
 
-            auto urlScheme = sslMode != SslMode::noSsl
+            const auto urlScheme = sslMode != SslMode::noSsl
                 ? nx::network::http::kSecureUrlSchemeName : nx::network::http::kUrlSchemeName;
             const auto peerId = to->commonModule()->moduleGUID();
             const auto url = nx::utils::url::parseUrlFields(
@@ -83,17 +84,15 @@ public:
         const auto endpoint = m_peers[index]->endpoint();
         using namespace nx::network;
 
-        auto urlScheme = sslMode == SslMode::withSsl
+        const auto urlScheme = sslMode == SslMode::withSsl
             ? http::kSecureUrlSchemeName : http::kUrlSchemeName;
-        nx::utils::Url url = nx::utils::Url(urlScheme + lit("://") + endpoint.toString());
-        url.setPath(path);
-        return url;
+        return nx::network::url::Builder().setEndpoint(endpoint).setScheme(urlScheme).setPath(path);
     }
 };
 
 TEST_P(ProxyTest, proxyToAnotherThenToThemself)
 {
-    SslMode sslMode = GetParam();
+    const SslMode sslMode = GetParam();
     startPeers(3, sslMode);
     connectPeers(sslMode);
 
