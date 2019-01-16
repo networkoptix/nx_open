@@ -12,20 +12,20 @@ namespace event {
 
 PluginEvent::PluginEvent(
     qint64 timeStamp,
-    const AnalyticsEngineResourcePtr& pluginInstance,
+    const AnalyticsEngineResourcePtr& engineResource,
     const QString& caption,
     const QString& description,
     nx::vms::api::EventLevel level,
-    const QnSecurityCamResourcePtr& camera)
+    const QnSecurityCamResourcePtr& device)
     :
     base_type(EventType::pluginEvent, QnResourcePtr(), timeStamp),
-    m_resourceId(pluginInstance->getId()),
+    m_resourceId(engineResource->getId()),
     m_caption(caption),
     m_description(description)
 {
     m_metadata.level = level;
-    if (!camera.isNull())
-        m_metadata.cameraRefs.push_back(camera->getId().toString());
+    if (!device.isNull())
+        m_metadata.cameraRefs.push_back(device->getId().toString());
 }
 
 bool PluginEvent::checkEventParams(const EventParameters& params) const
@@ -35,15 +35,23 @@ bool PluginEvent::checkEventParams(const EventParameters& params) const
 
     const auto& ruleCameras = params.metadata.cameraRefs;
 
-    return (ruleLevels & m_metadata.level)
-        && ((m_resourceId == params.eventResourceId) || params.eventResourceId.isNull())
-        && (params.metadata.cameraRefs.empty()
-            || (m_metadata.cameraRefs.size() == 1
-                && std::find(
-                    ruleCameras.begin(),
-                    ruleCameras.end(),
-                    m_metadata.cameraRefs.front())
-                != ruleCameras.end()))
+    // Check Level flag
+    const bool isValidLevel = ruleLevels & m_metadata.level;
+
+    // Check Engine Resource id (null is used for 'Any Resource')
+    const bool isValidResource = params.eventResourceId.isNull()
+        || m_resourceId == params.eventResourceId;
+
+    // Check Camera id (empty list means 'Any Camera')
+    const bool isValidCamera = params.metadata.cameraRefs.empty()
+        || (m_metadata.cameraRefs.size() == 1
+            && std::find(
+                ruleCameras.begin(),
+                ruleCameras.end(),
+                m_metadata.cameraRefs.front())
+            != ruleCameras.end());
+
+    return isValidLevel && isValidResource && isValidCamera
         && checkForKeywords(m_caption, params.caption)
         && checkForKeywords(m_description, params.description);
 }

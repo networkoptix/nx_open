@@ -16,11 +16,11 @@ class PluginEvent: public InstantEvent
 public:
     explicit PluginEvent(
         qint64 timeStamp,
-        const AnalyticsEngineResourcePtr& pluginInstance,
+        const AnalyticsEngineResourcePtr& engineResource,
         const QString& caption,
         const QString& description,
         nx::vms::api::EventLevel level,
-        const QnSecurityCamResourcePtr& camera);
+        const QnSecurityCamResourcePtr& device);
 
     virtual bool checkEventParams(const EventParameters& params) const override;
     virtual EventParameters getRuntimeParams() const override;

@@ -156,7 +156,7 @@ nx::vms::event::EventParameters PluginEventWidget::createEventParameters()
     eventParams.description = ui->descriptionEdit->text();
 
     eventParams.metadata.cameraRefs.clear();
-    for (auto& camera : model()->eventResources())
+    for (const auto& camera: model()->eventResources())
         eventParams.metadata.cameraRefs.push_back(camera.toString());
 
     using namespace nx::vms::api;
