@@ -2247,7 +2247,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->hasVideo && d->isIoModule)
         result |= Qn::IoModuleButton;
 
-    if (d->hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
+    if (d->hasVideo && !qnRuntime->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
         if (item()
             && item()->layout()

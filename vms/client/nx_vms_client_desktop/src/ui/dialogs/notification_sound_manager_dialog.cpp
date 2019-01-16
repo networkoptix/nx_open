@@ -70,8 +70,9 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
 {
     // TODO: #GDM #Common progressbar required
 
-    QString supportedFormats = tr("Sound Files");
-    supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
+    const QString supportedFormats = QnCustomFileDialog::createFilter(
+        tr("Sound Files"),
+        {"wav", "mp3", "ogg", "wma"});
 
     QScopedPointer<QnSessionAwareFileDialog> dialog(
         new QnSessionAwareFileDialog(
@@ -85,7 +86,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
     QString title;
 
     dialog->addSpinBox(tr("Clip sound up to %1 seconds")
-        .arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
+        .arg(QnCustomFileDialog::spinBoxPlaceholder()), 1, 10, &cropSoundSecs);
     dialog->addLineEdit(tr("Custom title:"), &title);
     if (!dialog->exec())
         return;

@@ -101,6 +101,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    ui->resourcesWidget->treeView()->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     installEventHandler(scrollBar, { QEvent::Show, QEvent::Hide }, this,
         [this](QObject* watched, QEvent* event)

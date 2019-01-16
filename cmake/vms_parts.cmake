@@ -92,7 +92,7 @@ cmake_dependent_option(withAnalyticsSdk "Enable nx_analytics_sdk build"
     ON
 )
 
-cmake_dependent_option(withUnitTestsArchive "Enable distributions build"
+cmake_dependent_option(withUnitTestsArchive "Enable unit tests archive generation"
     OFF "withTests"
     OFF
 )

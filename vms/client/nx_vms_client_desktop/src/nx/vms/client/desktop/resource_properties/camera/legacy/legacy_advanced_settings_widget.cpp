@@ -1,5 +1,5 @@
-#include "camera_advanced_settings_widget.h"
-#include "ui_camera_advanced_settings_widget.h"
+#include "legacy_advanced_settings_widget.h"
+#include "ui_legacy_advanced_settings_widget.h"
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkReply>
@@ -7,25 +7,19 @@
 #include <QtWebKitWidgets/QWebFrame>
 
 #include <api/app_server_connection.h>
-
 #include <api/network_proxy_factory.h>
-
 #include <common/static_common_module.h>
 #include <common/common_module.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/param.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
-
+#include <ui/style/webview_style.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
-#include <ui/style/webview_style.h>
-#include <nx/vms/client/desktop/resource_properties/camera/camera_advanced_settings_web_page.h>
-
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
-#include "camera_advanced_settings_web_page.h"
+#include <nx/vms/client/desktop/resource_properties/camera/camera_advanced_settings_web_page.h>
 
 namespace {
 
@@ -38,9 +32,9 @@ bool isStatusValid(Qn::ResourceStatus status)
 
 namespace nx::vms::client::desktop {
 
-CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
+LegacyAdvancedSettingsWidget::LegacyAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
-    ui(new Ui::CameraAdvancedSettingsWidget)
+    ui(new Ui::LegacyAdvancedSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -49,22 +43,22 @@ CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 
     connect(ui->cameraAdvancedParamsWidget,
         &CameraAdvancedParamsWidget::hasChangesChanged,
         this,
-        &CameraAdvancedSettingsWidget::hasChangesChanged);
+        &LegacyAdvancedSettingsWidget::hasChangesChanged);
 
     connect(ui->streamsPanel,
         &nx::vms::client::desktop::LegacyCameraSettingsStreamsPanel::hasChangesChanged,
         this,
-        &CameraAdvancedSettingsWidget::hasChangesChanged);
+        &LegacyAdvancedSettingsWidget::hasChangesChanged);
 }
 
-CameraAdvancedSettingsWidget::~CameraAdvancedSettingsWidget() = default;
+LegacyAdvancedSettingsWidget::~LegacyAdvancedSettingsWidget() = default;
 
-QnVirtualCameraResourcePtr CameraAdvancedSettingsWidget::camera() const
+QnVirtualCameraResourcePtr LegacyAdvancedSettingsWidget::camera() const
 {
     return m_camera;
 }
 
-void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
+void LegacyAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
 {
     if (m_camera == camera)
         return;
@@ -80,7 +74,7 @@ void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         connect(m_camera, &QnResource::statusChanged, this,
-            &CameraAdvancedSettingsWidget::updatePage);
+            &LegacyAdvancedSettingsWidget::updatePage);
     }
 
     m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
@@ -88,7 +82,7 @@ void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->streamsPanel->setCamera(m_camera);
 }
 
-void CameraAdvancedSettingsWidget::updateFromResource()
+void LegacyAdvancedSettingsWidget::updateFromResource()
 {
     updatePage();
     ui->streamsPanel->updateFromResource();
@@ -101,7 +95,7 @@ void CameraAdvancedSettingsWidget::updateFromResource()
 }
 
 
-bool CameraAdvancedSettingsWidget::hasManualPage() const
+bool LegacyAdvancedSettingsWidget::hasManualPage() const
 {
     if (!m_camera)
         return false;
@@ -114,7 +108,7 @@ bool CameraAdvancedSettingsWidget::hasManualPage() const
         || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
 }
 
-bool CameraAdvancedSettingsWidget::hasWebPage() const
+bool LegacyAdvancedSettingsWidget::hasWebPage() const
 {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return false;
@@ -122,7 +116,7 @@ bool CameraAdvancedSettingsWidget::hasWebPage() const
     return resourceData.value<bool>(lit("showUrl"), false);
 }
 
-void CameraAdvancedSettingsWidget::updatePage()
+void LegacyAdvancedSettingsWidget::updatePage()
 {
 
     while (ui->tabWidget->count() > 0)
@@ -137,7 +131,7 @@ void CameraAdvancedSettingsWidget::updatePage()
 }
 
 
-void CameraAdvancedSettingsWidget::reloadData()
+void LegacyAdvancedSettingsWidget::reloadData()
 {
     updatePage();
 
@@ -190,13 +184,13 @@ void CameraAdvancedSettingsWidget::reloadData()
     }
 }
 
-bool CameraAdvancedSettingsWidget::hasChanges() const
+bool LegacyAdvancedSettingsWidget::hasChanges() const
 {
     return ui->streamsPanel->hasChanges()
         || (hasManualPage() && ui->cameraAdvancedParamsWidget->hasChanges());
 }
 
-void CameraAdvancedSettingsWidget::submitToResource()
+void LegacyAdvancedSettingsWidget::submitToResource()
 {
     if (!hasChanges())
         return;
@@ -205,7 +199,7 @@ void CameraAdvancedSettingsWidget::submitToResource()
     ui->streamsPanel->submitToResource();
 }
 
-void CameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
+void LegacyAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 {
     Q_UNUSED(event);
     if (!hasWebPage())
@@ -216,7 +210,7 @@ void CameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
     ui->webView->setContent(tr("Loading...").toUtf8());
 }
 
-bool CameraAdvancedSettingsWidget::eventFilter(QObject* watched, QEvent* event)
+bool LegacyAdvancedSettingsWidget::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched != ui->webView || event->type() != QEvent::ContextMenu)
         return base_type::eventFilter(watched, event);
@@ -243,7 +237,7 @@ bool CameraAdvancedSettingsWidget::eventFilter(QObject* watched, QEvent* event)
     return base_type::eventFilter(watched, event);
 }
 
-void CameraAdvancedSettingsWidget::initWebView()
+void LegacyAdvancedSettingsWidget::initWebView()
 {
     NxUi::setupWebViewStyle(ui->webView);
 
@@ -263,12 +257,12 @@ void CameraAdvancedSettingsWidget::initWebView()
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
         this, [](QNetworkReply* reply, const QList<QSslError> &) { reply->ignoreSslErrors(); });
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
-        this, &CameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection);
+        this, &LegacyAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection);
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
-        this, &CameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
+        this, &LegacyAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
 }
 
-void CameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator)
+void LegacyAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator)
 {
     Q_UNUSED(reply);
 
@@ -282,7 +276,7 @@ void CameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* repl
     authenticator->setPassword(auth.password());
 }
 
-void CameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy& proxy, QAuthenticator* authenticator)
+void LegacyAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy& proxy, QAuthenticator* authenticator)
 {
     Q_UNUSED(proxy);
 

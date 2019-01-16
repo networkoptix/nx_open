@@ -25,6 +25,7 @@ public:
         DiscoveryManager* m_discoveryManager,
         const nxcip::CameraInfo& cameraInfo,
         nxpl::TimeProvider * const timeProvider);
+    virtual ~Camera() = default;
 
     virtual void setCredentials( const char* username, const char* password );
 

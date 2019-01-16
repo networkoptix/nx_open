@@ -18,7 +18,12 @@ namespace nx
                 cameras.Add(camera);
             }
 
-            Console.ReadKey();
+            var keyInfo = Console.ReadKey();
+            if (keyInfo.Key >= ConsoleKey.D0 && keyInfo.Key <= ConsoleKey.D9)
+            {
+                var count = keyInfo.Key - ConsoleKey.D0;
+                cameras.RemoveRange(count, cameras.Count - count);
+            }
 
             PaxtonClient.playback(connectionInfo, new OemDvrFootageRequest(
                 DateTime.Now - TimeSpan.FromMinutes(5),

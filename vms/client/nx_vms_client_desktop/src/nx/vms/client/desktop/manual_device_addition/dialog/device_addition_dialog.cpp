@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -201,6 +202,9 @@ void DeviceAdditionDialog::initializeControls()
     ui->tabWidget->setCurrentIndex(0);
     handleTabClicked(ui->tabWidget->currentIndex());
     setupSearchResultsPlaceholder();
+
+    setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+    setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -694,14 +698,18 @@ void DeviceAdditionDialog::updateAddDevicesPanel()
             tr("%n devices are being added. You can close this dialog or start a new search",
                 nullptr, addingDevicesCount));
     }
-    else if (newDevicesCount != 0
-        && (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount))
+    else if (newDevicesCount != 0)
     {
-        showAddDevicesButton(tr("Add all Devices"));
-    }
-    else if (newDevicesCount != 0 && newDevicesCheckedCount != 0)
-    {
-        showAddDevicesButton(tr("Add %n Devices", nullptr, newDevicesCheckedCount));
+        if (newDevicesCheckedCount == devicesCount
+            || (newDevicesCheckedCount == 0 && newDevicesCount == devicesCount))
+        {
+            showAddDevicesButton(tr("Add all Devices"));
+        }
+        else
+        {
+            showAddDevicesButton(tr("Add %n Devices", nullptr,
+                newDevicesCheckedCount != 0 ? newDevicesCheckedCount : newDevicesCount));
+        }
     }
 }
 

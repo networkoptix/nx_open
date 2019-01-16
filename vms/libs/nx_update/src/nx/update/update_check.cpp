@@ -305,7 +305,11 @@ static InformationError fillUpdateInformation(
         return InformationError::jsonError;
 
     if (!QJson::deserialize(topLevelObject, kAlternativesServersKey, alternativeServers))
-        return InformationError::jsonError;
+    {
+        NX_VERBOSE(typeid(Information))
+            << "fillUpdateInformation no" << kAlternativesServersKey
+            << "key found. I will not check alternative servers.";
+    }
 
     CustomizationInfo customizationInfo;
     InformationError error = findCustomizationInfo(topLevelObject, &customizationInfo, result);
