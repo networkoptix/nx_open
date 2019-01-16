@@ -524,8 +524,7 @@ Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
         case StreamSelectionMode::sameAsAnalytics:
             return ini().analyzeSecondaryStream ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
         case StreamSelectionMode::sameAsMotion:
-            auto [motionStream, isForced] = request.camera->motionStreamIndex();
-            return motionStream;
+            return request.camera->motionStreamIndex().index;
     }
 
     NX_ASSERT(false);
