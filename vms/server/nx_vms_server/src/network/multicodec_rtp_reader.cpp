@@ -534,7 +534,7 @@ RtspTransport QnMulticodecRtpReader::getRtpTransport() const
     }
 
     if (s_defaultTransportToUse != RtspTransport::notDefined)
-        s_defaultTransportToUse;  //< System wide default setting
+        return s_defaultTransportToUse;  //< System wide default setting
 
     return RtspTransport::tcp;
 }
