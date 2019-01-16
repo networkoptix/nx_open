@@ -81,11 +81,6 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
-    if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
-    else
-        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
-
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx::network::http::HttpHeader("Rate-Control", "no"));
 
