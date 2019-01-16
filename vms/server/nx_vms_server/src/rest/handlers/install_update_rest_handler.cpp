@@ -26,8 +26,7 @@ bool allParticipantsAreReadyForInstall(
         {
             using nx::update::Status;
             return status.code == Status::Code::readyToInstall
-                || status.code == Status::Code::latestUpdateInstalled
-                || status.code == Status::Code::offline;
+                || status.code == Status::Code::latestUpdateInstalled;
         });
 }
 
