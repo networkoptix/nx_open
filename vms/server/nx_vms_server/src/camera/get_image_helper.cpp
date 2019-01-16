@@ -499,7 +499,8 @@ Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
     NX_VERBOSE(this, "%1(%2)", __func__, request.streamSelectionMode);
 
     using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
-    switch (request.streamSelectionMode) {
+    switch (request.streamSelectionMode)
+    {
         case StreamSelectionMode::auto_:
         {
             #if defined(EDGE_SERVER)
