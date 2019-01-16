@@ -203,7 +203,7 @@ private:
     nx::utils::bstream::CompositeConverter m_converter;
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_upStreamConverter;
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_downStreamConverter;
-    std::unique_ptr<nx::utils::bstream::OutputToInputConverterAdapter>
+    std::unique_ptr<nx::utils::bstream::OutputConverterToInputAdapter>
         m_downStreamConverterAdapter;
 
     bool tuneDestinationConnectionAttributes();

@@ -269,7 +269,7 @@ void StreamProxyChannel::setDownStreamConverter(
 {
     m_downStreamConverter = std::move(converter);
     m_downStreamConverterAdapter =
-        std::make_unique<nx::utils::bstream::OutputToInputConverterAdapter>(
+        std::make_unique<nx::utils::bstream::OutputConverterToInputAdapter>(
             m_downStreamConverter.get());
     m_converter.setInputConverter(m_downStreamConverterAdapter.get());
 }
