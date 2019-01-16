@@ -1,5 +1,6 @@
 #include "install_update_rest_handler.h"
 #include "private/multiserver_request_helper.h"
+#include "private/multiserver_update_request_helpers.h"
 #include <rest/server/rest_connection_processor.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
@@ -18,8 +19,12 @@ bool allParticipantsAreReadyForInstall(
         processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(participants, processor->commonModule(), "/ec2/updateStatus",
-        &reply, &context);
+    detail::checkUpdateStatusRemotely(
+        participants,
+        processor->commonModule(),
+        "/ec2/updateStatus",
+        &reply,
+        &context);
 
     return std::all_of(reply.cbegin(), reply.cend(),
         [](const auto& status)

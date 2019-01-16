@@ -13,7 +13,6 @@
 #include <nx/vms/api/types/resource_types.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/settings.h>
-#include <nx/update/common_update_manager.h>
 #include <api/helpers/empty_request_data.h>
 #include <nx/vms/server/server_update_manager.h>
 #include <rest/server/fusion_rest_handler.h>
@@ -41,16 +40,22 @@ QSet<QnMediaServerResourcePtr> filterOutNonParticipants(
     const QSet<QnMediaServerResourcePtr>& allServers, const QList<QnUuid>& serverIdList);
 
 template<typename ReplyType, typename MergeFunction, typename RequestData>
-void requestRemotePeers(QnCommonModule* commonModule, const QString& path, ReplyType& outputReply,
-    QnMultiserverRequestContext<RequestData>* context, const MergeFunction& mergeFunction,
+void requestRemotePeers(
+    QnCommonModule* commonModule,
+    const QString& path,
+    ReplyType& outputReply,
+    QnMultiserverRequestContext<RequestData>* context,
+    const MergeFunction& mergeFunction,
     const QList<QnUuid>& serverIdList = QList<QnUuid>())
 {
     for (const auto& server: participantServers(serverIdList, commonModule))
     {
         const auto completionFunc =
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
-                SystemError::ErrorCode /*osErrorCode*/, int statusCode,
-                nx::network::http::BufferType body, nx::network::http::HttpHeaders /*headers*/)
+                SystemError::ErrorCode /*osErrorCode*/,
+                int statusCode,
+                nx::network::http::BufferType body,
+                nx::network::http::HttpHeaders /*headers*/)
             {
                 ReplyType reply;
                 bool success = false;
@@ -75,9 +80,5 @@ void requestRemotePeers(QnCommonModule* commonModule, const QString& path, Reply
         context->waitForDone();
     }
 }
-
-void checkUpdateStatusRemotely(const QList<QnUuid>& participants, QnCommonModule* commonModule,
-    const QString& path, QList<nx::update::Status>* reply,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
 } // namespace detail
