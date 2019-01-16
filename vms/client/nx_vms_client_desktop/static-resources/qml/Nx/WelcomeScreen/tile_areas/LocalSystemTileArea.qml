@@ -34,6 +34,11 @@ Item
 
     signal connectRequested();
 
+    function forcePasswordFocus()
+    {
+        expandedArea.passwordTextField.forceActiveFocus()
+    }
+
     height: collapsedArea.height + expandedArea.height + collapsedArea.y
 
     anchors.left: (parent ? parent.left : undefined);

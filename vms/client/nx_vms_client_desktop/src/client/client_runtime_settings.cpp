@@ -41,7 +41,8 @@ QnClientRuntimeSettings::QnClientRuntimeSettings(
     }
 
     // Default value.
-    setLightMode(static_cast<Qn::LightModeFlags>(lightModeOverride()));
+    if (lightModeOverride() != -1)
+        setLightMode(static_cast<Qn::LightModeFlags>(lightModeOverride()));
 }
 
 QnClientRuntimeSettings::~QnClientRuntimeSettings()
