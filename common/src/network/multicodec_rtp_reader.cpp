@@ -313,6 +313,14 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
 
         int bytesRead = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
+        int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
+        bool hasTrack = trackNum < m_tracks.size() && m_tracks[trackNum].parser;
+        const auto bufferScopeGuard = makeScopeGuard([this, hasTrack, rtpChannelNum]()
+        {
+            // clear unprocessed track data
+            if (!hasTrack && m_demuxedData.size() > rtpChannelNum && m_demuxedData[rtpChannelNum])
+                m_demuxedData[rtpChannelNum]->clear();
+        });
         if (bytesRead < 0 &&
             (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
              SystemError::getLastOSErrorCode() == SystemError::again) &&
@@ -328,24 +336,13 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
 
         if (bytesRead < 1)
-        {
-            if (m_demuxedData[rtpChannelNum])
-                m_demuxedData[rtpChannelNum]->clear();
             break; // error
-        }
 
-        QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
-        int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
-        auto parser = m_tracks[trackNum].parser;
-        QnRtspIoDevice* ioDevice = m_tracks[trackNum].ioDevice;
-        if (m_tracks.size() < trackNum || !parser)
-        {
-            m_demuxedData[rtpChannelNum]->clear();
+        if (!hasTrack)
             continue;
-        }
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - bytesRead;
-
+        QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO)
         {
             const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
@@ -353,14 +350,14 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
             const auto rtcpStaticstics = rtspStatistics(offset, length, trackNum, rtpChannelNum);
 
-            if (!parser->processData(
+            if (!m_tracks[trackNum].parser->processData(
                 (quint8*)m_demuxedData[rtpChannelNum]->data(),
                 offset,
                 length,
                 rtcpStaticstics,
                 m_gotData))
             {
-                clearKeyData(parser->logicalChannelNum());
+                clearKeyData(m_tracks[trackNum].parser->logicalChannelNum());
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++errorRetryCnt > m_maxRtpRetryCount) {
                     qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
@@ -380,9 +377,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         else {
             m_demuxedData[rtpChannelNum]->clear();
         }
-
     }
-
     return  QnAbstractMediaDataPtr();
 }
 
@@ -542,7 +537,6 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
                       qnSyncTime->currentUSecsSinceEpoch(),
                       vms::event::EventReason::networkRtpPacketLoss,
                       vms::event::NetworkIssueEvent::encodePacketLossSequence(prev, next));
-
 }
 
 QnRtspClient::TransportType QnMulticodecRtpReader::getRtpTransport() const
