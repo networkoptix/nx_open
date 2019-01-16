@@ -63,6 +63,9 @@ protected:
     AbstractOutput* m_outputStream = nullptr;
 };
 
+// TODO: #ak It makes sense to remove AbstractInputConverter and make Converter implement only
+// AbstractOutput.
+
 class NX_UTILS_API AbstractInputConverter:
     public AbstractInput
 {
@@ -119,18 +122,15 @@ private:
     AbstractOutputConverter* m_outputConverter = nullptr;
 };
 
-// TODO: #ak Seems like "stream converter" and input/output entites should be decoupled.
-// The fact that stream converter is similar to AbstractOutput is accidental.
-
 /**
- * Input stream that transfers all data through an output stream.
+ * Input stream that transfers all data through a converter.
  */
-class NX_UTILS_API OutputToInputConverterAdapter:
+class NX_UTILS_API OutputConverterToInputAdapter:
     public AbstractInputConverter,
     private AbstractOutput
 {
 public:
-    OutputToInputConverterAdapter(AbstractOutputConverter* converter);
+    OutputConverterToInputAdapter(AbstractOutputConverter* converter);
 
     virtual int read(void* data, size_t count) override;
 

@@ -78,7 +78,7 @@ void CompositeConverter::setOutputConverter(AbstractOutputConverter* outputConve
 
 //-------------------------------------------------------------------------------------------------
 
-OutputToInputConverterAdapter::OutputToInputConverterAdapter(
+OutputConverterToInputAdapter::OutputConverterToInputAdapter(
     AbstractOutputConverter* converter)
     :
     m_converter(converter)
@@ -86,7 +86,7 @@ OutputToInputConverterAdapter::OutputToInputConverterAdapter(
     m_converter->setOutput(this);
 }
 
-int OutputToInputConverterAdapter::read(void* data, size_t count)
+int OutputConverterToInputAdapter::read(void* data, size_t count)
 {
     if (!m_convertedData.empty())
         return readCachedData(data, count);
@@ -105,13 +105,13 @@ int OutputToInputConverterAdapter::read(void* data, size_t count)
     return readCachedData(data, count);
 }
 
-int OutputToInputConverterAdapter::write(const void* data, size_t size)
+int OutputConverterToInputAdapter::write(const void* data, size_t size)
 {
     m_convertedData.append(static_cast<const char*>(data), size);
     return size;
 }
 
-int OutputToInputConverterAdapter::readCachedData(void* data, size_t count)
+int OutputConverterToInputAdapter::readCachedData(void* data, size_t count)
 {
     const auto bytesToCopy = std::min(count, m_convertedData.size());
     memcpy(data, m_convertedData.data(), bytesToCopy);
