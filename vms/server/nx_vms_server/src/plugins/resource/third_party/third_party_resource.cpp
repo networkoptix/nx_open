@@ -75,8 +75,11 @@ QnThirdPartyResource::QnThirdPartyResource(
 {
     setVendor( discoveryManager.getVendorName() );
 
-    if( m_camManager )
-        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
+    if (m_camManager)
+    {
+        m_cameraManager3 = static_cast<nxcip::BaseCameraManager3*>(
+            m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
+    }
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
@@ -265,7 +268,8 @@ QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
         return NULL;
     }
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     if( !camManager2 )
         return NULL;
 
@@ -294,7 +298,8 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !m_camManager )
         return QnTimePeriodList();
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     NX_ASSERT( camManager2 );
 
     QnTimePeriodList resultTimePeriods;
@@ -481,7 +486,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             return CameraDiagnostics::UnknownErrorResult();
         m_camManager.reset( new nxcip_qt::BaseCameraManager( cameraIntf ) );
 
-        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
+        m_cameraManager3 = static_cast<nxcip::BaseCameraManager3*>(
+            m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
     }
 
     m_camManager->setCredentials( auth.user(), auth.password() );

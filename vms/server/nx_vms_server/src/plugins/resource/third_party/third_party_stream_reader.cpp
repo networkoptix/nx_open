@@ -122,7 +122,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager.getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     if( !camManager2 )
         return;
 
@@ -192,7 +193,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     m_camManager.setCredentials( auth.user(), auth.password() );
 
     m_mediaEncoder2.reset();
-    m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
+    m_mediaEncoder2.reset(
+        static_cast<nxcip::CameraMediaEncoder2*>(
+            intf->queryInterface(nxcip::IID_CameraMediaEncoder2)),
+        refDeleter);
 
     nx::sdk::Ptr<nxcip::CameraMediaEncoder3> mediaEncoder3(
         intf->queryInterface(nxcip::IID_CameraMediaEncoder3));
@@ -658,7 +662,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
         case nxcip::dptVideo:
         {
             QnThirdPartyCompressedVideoData* videoPacket = nullptr;
-            nxcip::VideoDataPacket* srcVideoPacket = static_cast<nxcip::VideoDataPacket*>(packet->queryInterface(nxcip::IID_VideoDataPacket));
+            auto srcVideoPacket = static_cast<nxcip::VideoDataPacket*>(
+                packet->queryInterface(nxcip::IID_VideoDataPacket));
 
             if (srcVideoPacket)
             {

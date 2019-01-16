@@ -141,7 +141,7 @@ public:
 QnMediaServerModule::QnMediaServerModule(
     const nx::vms::server::CmdLineArguments* arguments,
     std::unique_ptr<MSSettings> serverSettings,
-    QObject* parent)
+    QObject* /*parent*/)
 {
     std::unique_ptr<CmdLineArguments> defaultArguments;
     if (!arguments)

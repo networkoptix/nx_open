@@ -219,7 +219,7 @@ void QnThirdPartyStorageResource::openStorage(
         );
 
     void* queryResult = nullptr;
-    if ((queryResult = sp->queryInterface(nx_spl::IID_Storage)))
+    if (queryResult = sp->queryInterface(nx_spl::IID_Storage))
     {
         m_storage.reset(
             static_cast<nx_spl::Storage*>(queryResult),
@@ -270,7 +270,7 @@ QIODevice *QnThirdPartyStorageResource::open(
         return nullptr;
     }
 
-    void *queryResult = ioRaw->queryInterface(nx_spl::IID_IODevice);
+    void* queryResult = ioRaw->queryInterface(nx_spl::IID_IODevice);
     if (queryResult == nullptr)
     {
         ioRaw->releaseRef();
@@ -431,7 +431,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
         return QnAbstractStorageResource::FileInfoList();
     }
 
-    void *queryResult = fitRaw->queryInterface(nx_spl::IID_FileInfoIterator);
+    void* queryResult = fitRaw->queryInterface(nx_spl::IID_FileInfoIterator);
     if (queryResult == nullptr)
     {
         fitRaw->releaseRef();

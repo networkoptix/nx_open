@@ -158,7 +158,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     return true;
 }
 
-GstPadProbeReturn processOpenAlprResult(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
+GstPadProbeReturn processOpenAlprResult(GstPad* /*pad*/, GstPadProbeInfo* info, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling OpenALPR process result probe";
     auto* buffer = (GstBuffer*) info->data;
@@ -167,7 +167,7 @@ GstPadProbeReturn processOpenAlprResult(GstPad* pad, GstPadProbeInfo* info, gpoi
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn dropOpenAlprFrames(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
+GstPadProbeReturn dropOpenAlprFrames(GstPad* /*pad*/, GstPadProbeInfo* info, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling OpenALPR drop frames probe";
     auto pipeline = (deepstream::OpenAlprPipeline*) userData;

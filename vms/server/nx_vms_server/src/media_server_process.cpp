@@ -94,9 +94,7 @@
 
 #include <camera_vendors.h>
 
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
-#include <core/resource/avi/avi_resource.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
