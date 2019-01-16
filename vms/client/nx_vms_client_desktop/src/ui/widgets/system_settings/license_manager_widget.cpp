@@ -663,6 +663,11 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
     for (const auto& license: licenses)
         extras.push_back(getLicenseDescription(license));
 
+    using namespace nx::vms::client::desktop::ui;
+    dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return false;
+
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
         tr("Deactivate licenses?", "", licenses.size()),
         QString(),
@@ -673,11 +678,6 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     if (confirmationDialog.exec() == QDialogButtonBox::Cancel)
-        return false;
-
-    using namespace nx::vms::client::desktop::ui;
-    dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
-    if (dialog.exec() == QDialogButtonBox::Cancel)
         return false;
 
     m_deactivationReason = dialog.info();
