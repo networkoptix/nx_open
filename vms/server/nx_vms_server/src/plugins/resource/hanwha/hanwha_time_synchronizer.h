@@ -8,7 +8,9 @@ namespace nx {
 namespace vms::server {
 namespace plugins {
 
-class HanwhaResource;
+/** Returns current time thift (Server UTC time - camera UTC time). */
+std::optional<std::chrono::milliseconds> hanwhaUtcTimeShift(
+    const std::shared_ptr<HanwhaSharedResourceContext>& context);
 
 /**
  * Synchronizes camera/NVR time with qSyncTime and keeps time zone shift updated.

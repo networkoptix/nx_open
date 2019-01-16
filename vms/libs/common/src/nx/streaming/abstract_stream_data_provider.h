@@ -39,6 +39,7 @@ public:
 
     /* One resource may have several providers used with different roles*/
     virtual void setRole(Qn::ConnectionRole role);
+    Qn::ConnectionRole getRole() const;
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
     virtual bool hasVideo() const { return true; }
@@ -57,6 +58,8 @@ protected:
 protected:
     QList<QnAbstractMediaDataReceptor*> m_dataprocessors;
     mutable QnMutex m_mutex;
+
+private:
     Qn::ConnectionRole m_role;
 };
 

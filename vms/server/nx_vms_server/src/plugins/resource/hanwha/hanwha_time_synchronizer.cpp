@@ -13,6 +13,13 @@ static constexpr std::chrono::minutes kRetryInterval(5); //< Used after failure.
 static constexpr std::chrono::hours kResyncInterval(1); //< Used after successful check.
 static constexpr std::chrono::seconds kAcceptableTimeDiff(5); //< Diff between device and mediaserver.
 
+static QDateTime toUtcDateTime(const QString& value)
+{
+    auto dt = QDateTime::fromString(value, "yyyy-MM-dd hh:mm:ss");
+    dt.setTimeSpec(Qt::UTC);
+    return dt;
+}
+
 static constexpr bool isTimeZoneSyncRequired = false;
 static QString getPosixTimeZone(const QTimeZone& timeZone)
 {
@@ -37,6 +44,25 @@ static QString getPosixTimeZone(const QTimeZone& timeZone)
 namespace nx {
 namespace vms::server {
 namespace plugins {
+
+std::optional<std::chrono::milliseconds> hanwhaUtcTimeShift(
+    const std::shared_ptr<HanwhaSharedResourceContext>& context)
+{
+    HanwhaRequestHelper client(context);
+    const auto response = client.view(lit("system/date"));
+    if (!response.isSuccessful())
+        return std::nullopt;
+
+    const auto utcTime = response.parameter<QString>("UTCTime");
+    if (!utcTime)
+        return std::nullopt;
+
+    const auto utcDateTime = toUtcDateTime(*utcTime);
+    if (!utcDateTime.isValid())
+        return std::nullopt;
+
+    return std::chrono::milliseconds(utcDateTime.msecsTo(qnSyncTime->currentDateTime()));
+}
 
 HanwhaTimeSyncronizer::HanwhaTimeSyncronizer()
 {
@@ -99,13 +125,6 @@ void HanwhaTimeSyncronizer::setTimeShiftHandler(UtcTimeShiftHandler handler)
             if (m_utcTimeShiftHandler)
                 m_utcTimeShiftHandler(m_utcTimeShift);
         });
-}
-
-static QDateTime toUtcDateTime(const QString& value)
-{
-    auto dt = QDateTime::fromString(value, "yyyy-MM-dd hh:mm:ss");
-    dt.setTimeSpec(Qt::UTC);
-    return dt;
 }
 
 void HanwhaTimeSyncronizer::verifyDateTime()

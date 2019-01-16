@@ -351,8 +351,6 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     m_SessionId.clear();
     m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
-    m_contentBase = m_url.toString();
-    NX_ASSERT(!m_contentBase.isEmpty());
     m_responseBufferLen = 0;
     m_rtspAuthCtx.clear();
     if (m_defaultAuthScheme == nx::network::http::header::AuthScheme::basic)
@@ -448,14 +446,11 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
      * treated as if it were an empty embedded URL, and thus inherits the
      * entire base URL.
     */
-
-    auto contentUrl = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
-    if (contentUrl.isEmpty())
-        contentUrl = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
-    if (contentUrl.isEmpty() && m_sdp.controlUrl != "*")
-        contentUrl = m_sdp.controlUrl;
-    if (!contentUrl.isEmpty())
-        m_contentBase = contentUrl;
+    m_contentBase = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
+    if (m_contentBase.isEmpty())
+        m_contentBase = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
+    if (m_contentBase.isEmpty())
+        m_contentBase = m_url.toString(); // TODO remove url params?
 
     if( result )
     {
