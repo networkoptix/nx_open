@@ -28,9 +28,9 @@
 
 // we need enough size for updates
 #ifdef __arm__
-    const int QnTCPConnectionProcessor::MAX_REQUEST_SIZE = 1024*1024*16;
+    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*16;
 #else
-    const int QnTCPConnectionProcessor::MAX_REQUEST_SIZE = 1024*1024*256;
+    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*256;
 #endif
 
 namespace {
@@ -437,10 +437,10 @@ bool QnTCPConnectionProcessor::readRequest()
                     arg(QString::fromLatin1(d->clientRequest)));
                 return true;
             }
-            else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
+            else if (d->clientRequest.size() > kMaxRequestSize)
             {
                 qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
-                    ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
+                    ", "<<kMaxRequestSize<<" allowed). Ignoring...";
                 return false;
             }
             if( fullHttpMessageSize )
@@ -505,10 +505,10 @@ bool QnTCPConnectionProcessor::readSingleRequest()
         d->currentRequestSize += bytesParsed;
         d->interleavedMessageDataPos += bytesParsed;
 
-        if( d->currentRequestSize > MAX_REQUEST_SIZE )
+        if( d->currentRequestSize > kMaxRequestSize )
         {
             qWarning() << "Too large HTTP client request ("<<d->currentRequestSize<<" bytes"
-                ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
+                ", "<<kMaxRequestSize<<" allowed). Ignoring...";
             return false;
         }
 

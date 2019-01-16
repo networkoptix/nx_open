@@ -685,7 +685,7 @@ void ProxyConnectionProcessor::doSmartProxy()
 			someBytesRead1 = true;
 
 			d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (d->clientRequest.size() > QnTCPConnectionProcessor::MAX_REQUEST_SIZE)
+            if (d->clientRequest.size() > QnTCPConnectionProcessor::kMaxRequestSize)
                 break;
             if (d->clientRequest.contains("\r\n\r\n"))
                 doProxyRequest();

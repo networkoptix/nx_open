@@ -79,7 +79,7 @@ public:
 
     QnTcpListener* owner() const;
 
-    static const int MAX_REQUEST_SIZE;
+    static const int kMaxRequestSize;
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
