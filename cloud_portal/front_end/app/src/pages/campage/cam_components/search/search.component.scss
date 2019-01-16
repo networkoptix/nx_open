@@ -31,6 +31,11 @@
             color: $dark9;
             border: 1px solid $brand_core;
         }
+        
+        &:hover:not(:active):not(:focus) {
+            border: 1px solid $light8;
+        }
+        
         &:-webkit-autofill,
         &:-webkit-autofill:hover,
         &:-webkit-autofill:active,
