@@ -9,15 +9,13 @@
 
 #include <nx/sdk/analytics/i_media_context.h>
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 template <class T>
 class GenericCompressedMediaPacket: public nxpt::CommonRefCounter<T>
 {
 public:
-    using MediaContext = nx::sdk::analytics::IMediaContext;
+    using IMediaContext = nx::sdk::analytics::IMediaContext;
     using MediaFlag = nx::sdk::analytics::MediaFlag;
     using MediaFlags = nx::sdk::analytics::MediaFlags;
 
@@ -50,7 +48,7 @@ public:
         m_ownedData.reset();
     }
 
-    virtual const MediaContext* context() const override { return nullptr; }
+    virtual const IMediaContext* context() const override { return nullptr; }
     virtual int64_t timestampUs() const override { return m_timestampUs; }
     virtual MediaFlags flags() const override { return m_mediaFlags; }
 
@@ -70,6 +68,4 @@ private:
     MediaFlags m_mediaFlags = 0;
 };
 
-} // namespace analytics
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

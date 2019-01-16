@@ -16,17 +16,17 @@ static const nxpl::NX_GUID IID_Object =
     {{0x0f,0xf4,0xa4,0x6f,0xfd,0x08,0x4f,0x4a,0x97,0x88,0x16,0xa0,0x8c,0xd6,0x4a,0x29}};
 
 /**
- * Represents a single object detected on the scene.
+ * A single object detected on the scene.
  */
 class IObject: public IMetadataItem
 {
 public:
     /**
-     * Bounding box of an analytics object.
+     * Bounding box of an object detected in a video frame.
      */
     struct Rect
     {
-        Rect() {}
+        Rect() = default;
 
         Rect(float x, float y, float width, float height):
             x(x), y(y), width(width), height(height)
@@ -62,31 +62,32 @@ public:
      */
     virtual Uuid id() const = 0;
 
-    // TODO: #mshevchenko: Fix comments.
-
-    // TODO: #mshevchenko: Rename to subtype.
     /**
-     * @brief (e.g. vehicle type: truck,  car, etc)
+     * @return Subclass of the object (e.g. vehicle type: truck, car, etc.).
      */
-    virtual const char* objectSubType() const = 0;
+    virtual const char* subtype() const = 0;
 
     /**
-     * @brief attributes array of object attributes (e.g. age, color).
+     * Provides values of so-called Object Attributes - typically, some object properties (e.g. age or
+     * color), represented as a name-value map.
+     * @param index 0-based index of the attribute.
+     * @return Item of an attribute array, or null if index is out of range.
      */
     virtual const IAttribute* attribute(int index) const = 0;
 
     /**
-     * @brief attributeCount count of attributes
+     * @return Number of items in the attribute array.
      */
     virtual int attributeCount() const = 0;
 
     /**
-     * @brief auxiliaryData user side data in json format. Null terminated UTF-8 string.
+     * Arbitrary data (in json format) associated with the object.
+     * @return JSON string in UTF-8.
      */
     virtual const char* auxiliaryData() const = 0;
 
     /**
-     * @brief boundingBox bounding box of detected object.
+     * @return Bounding box of an object detected in a video frame.
      */
     virtual Rect boundingBox() const = 0;
 };

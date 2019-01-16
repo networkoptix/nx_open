@@ -2,9 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 using namespace nx::sdk::analytics;
 
@@ -80,6 +78,4 @@ int Yuv420UncompressedVideoFrame::lineSize(int plane) const
     return m_frame->linesize[plane];
 }
 
-} // namespace analytics
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

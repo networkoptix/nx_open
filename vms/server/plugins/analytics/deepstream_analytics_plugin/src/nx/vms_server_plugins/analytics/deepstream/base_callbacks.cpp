@@ -58,7 +58,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
     }
 }
 
-void connectPads(GstElement* source, GstPad* newPad, gpointer userData)
+void connectPads(GstElement* /*source*/, GstPad* newPad, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Connecting pads on 'pad-added' signal";
     GstPad* sinkPad = (GstPad*) userData;
@@ -80,7 +80,7 @@ void connectPads(GstElement* source, GstPad* newPad, gpointer userData)
     NX_OUTPUT << "Pad succesfully linked" << std::endl;
 }
 
-gboolean busCallback(GstBus* bus, GstMessage* message, gpointer userData)
+gboolean busCallback(GstBus* /*bus*/, GstMessage* message, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling GStreamer bus callback";
     auto pipeline = (deepstream::BasePipeline*) userData;

@@ -281,6 +281,7 @@ void Engine::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
+        // TODO: #mshevchenko: Check proper action parameters.
         std::string valueA;
         auto paramAIt = params.find("paramA");
         if (paramAIt != params.cend())

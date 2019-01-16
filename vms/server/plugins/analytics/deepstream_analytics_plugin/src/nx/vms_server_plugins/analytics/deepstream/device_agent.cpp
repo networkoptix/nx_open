@@ -130,7 +130,7 @@ Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
     return startFetchingMetadata(metadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
     return Error::noError;

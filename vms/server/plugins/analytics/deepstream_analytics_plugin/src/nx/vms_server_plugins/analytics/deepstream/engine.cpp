@@ -133,7 +133,7 @@ const IString* Engine::manifest(Error* error) const
         for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
         {
             objectTypesManifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
-            if (i < m_objectClassDescritions.size() - 1)
+            if (i < (int) m_objectClassDescritions.size() - 1)
                 objectTypesManifest += ",\n";
         }
     }
@@ -226,7 +226,7 @@ std::vector<ObjectClassDescription> Engine::loadObjectClasses() const
     }
 
     std::vector<ObjectClassDescription> result;
-    for (auto i = 0; i < labels.size(); ++i)
+    for (int i = 0; i < (int) labels.size(); ++i)
         result.emplace_back(/*name*/ labels[i], /*description*/ "", /*typeId*/ guids[i]);
 
     return result;
@@ -282,7 +282,7 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-Error Engine::setHandler(IHandler* handler)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Implement.
     return Error::noError;

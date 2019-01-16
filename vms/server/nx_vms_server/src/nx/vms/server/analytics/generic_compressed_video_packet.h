@@ -4,9 +4,7 @@
 
 #include "generic_compressed_media_packet.h"
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 class GenericCompressedVideoPacket:
     public GenericCompressedMediaPacket<nx::sdk::analytics::ICompressedVideoPacket>
@@ -26,6 +24,4 @@ private:
     int m_height = 0;
 };
 
-} // namespace analytics
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

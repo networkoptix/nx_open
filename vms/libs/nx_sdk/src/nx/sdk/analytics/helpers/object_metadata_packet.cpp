@@ -59,10 +59,6 @@ void ObjectMetadataPacket::clear()
     m_currentIndex = 0;
 }
 
-ObjectMetadataPacket::~ObjectMetadataPacket()
-{
-}
-
 } // namespace analytics
 } // namespace sdk
 } // namespace nx

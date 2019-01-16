@@ -55,7 +55,7 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 }
 
 //-------------------------------------------------------------------------------------------------
-// Implementations of interface methods.
+// Implementation of interface methods.
 
 void* VideoFrameProcessingDeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 {

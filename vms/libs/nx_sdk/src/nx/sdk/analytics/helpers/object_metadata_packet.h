@@ -9,25 +9,17 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class NX_SDK_API ObjectMetadataPacket: public nxpt::CommonRefCounter<IObjectMetadataPacket>
+class ObjectMetadataPacket: public nxpt::CommonRefCounter<IObjectMetadataPacket>
 {
 public:
-    virtual ~ObjectMetadataPacket();
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual int64_t timestampUs() const override;
-
     virtual int64_t durationUs() const override;
-
     virtual IObject* nextItem() override;
-
     void setTimestampUs(int64_t timestampUs);
-
     void setDurationUs(int64_t durationUs);
-
     void addItem(IObject* object);
-
     void clear();
 
 private:

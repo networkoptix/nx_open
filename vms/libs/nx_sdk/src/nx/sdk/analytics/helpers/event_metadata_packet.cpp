@@ -59,10 +59,6 @@ void EventMetadataPacket::clear()
     m_currentIndex = 0;
 }
 
-EventMetadataPacket::~EventMetadataPacket()
-{
-}
-
 } // namespace analytics
 } // namespace sdk
 } // namespace nx

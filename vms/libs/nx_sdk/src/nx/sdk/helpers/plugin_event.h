@@ -1,8 +1,9 @@
 #pragma once
 
-#include <nx/sdk/i_plugin_event.h>
-#include <nx/sdk/i_string.h>
+#include <string>
+
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/i_plugin_event.h>
 
 namespace nx {
 namespace sdk {
@@ -10,7 +11,7 @@ namespace sdk {
 class PluginEvent: public nxpt::CommonRefCounter<IPluginEvent>
 {
 public:
-    PluginEvent(IPluginEvent::Level level, std::string caption, std::string description);
+    PluginEvent(Level level, std::string caption, std::string description);
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -23,7 +24,7 @@ public:
     void setDescription(std::string description);
 
 private:
-    IPluginEvent::Level m_level = IPluginEvent::Level::info;
+    Level m_level = Level::info;
     std::string m_caption;
     std::string m_description;
 };

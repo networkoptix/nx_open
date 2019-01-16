@@ -8,10 +8,10 @@
 #include <QtCore/QMutex>
 #include <QtSerialPort/QSerialPort>
 
+#include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
-#include <plugins/plugin_tools.h>
 
 #include "common.h"
 

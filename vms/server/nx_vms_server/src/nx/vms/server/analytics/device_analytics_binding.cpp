@@ -34,7 +34,6 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::vms::api::analytics;
 using namespace nx::sdk::analytics;
-using nx::sdk::analytics::MetadataTypes;
 
 namespace {
 
@@ -347,7 +346,7 @@ nx::sdk::Ptr<DeviceAnalyticsBinding::DeviceAgent>
     nx::sdk::Ptr<IConsumingDeviceAgent> streamConsumer(
         deviceAgent->queryInterface(IID_ConsumingDeviceAgent));
 
-    m_isStreamConsumer = !!streamConsumer;
+    m_isStreamConsumer = streamConsumer != nullptr;
 
     if (error != nx::sdk::Error::noError)
     {
@@ -497,6 +496,8 @@ void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)
 
 bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
 {
+    // Returning true means the data has been processed.
+
     if (!m_sdkDeviceAgent)
     {
         NX_WARNING(this, lm("Device agent is not created for device %1 (%2) and engine %3")
@@ -504,17 +505,14 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
 
         return true;
     }
-    // Returning true means the data has been processed.
     nx::sdk::Ptr<nx::sdk::analytics::IConsumingDeviceAgent> consumingDeviceAgent(
         m_sdkDeviceAgent->queryInterface(nx::sdk::analytics::IID_ConsumingDeviceAgent));
 
-    NX_ASSERT(consumingDeviceAgent);
-    if (!consumingDeviceAgent)
+    if (!NX_ASSERT(consumingDeviceAgent))
         return true;
 
     auto packetAdapter = std::dynamic_pointer_cast<DataPacketAdapter>(data);
-    NX_ASSERT(packetAdapter);
-    if (!packetAdapter)
+    if (!NX_ASSERT(packetAdapter))
         return true;
 
     const nx::sdk::Error error = consumingDeviceAgent->pushDataPacket(packetAdapter->packet());

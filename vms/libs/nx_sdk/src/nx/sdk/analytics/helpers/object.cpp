@@ -4,10 +4,6 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-Object::~Object()
-{
-}
-
 void* Object::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_Object)

@@ -15,8 +15,6 @@ namespace analytics {
 class Object: public nxpt::CommonRefCounter<IObject>
 {
 public:
-    virtual ~Object();
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual const char* typeId() const override;

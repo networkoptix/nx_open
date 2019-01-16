@@ -18,11 +18,13 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
-extern "C" {
+extern "C" nxpl::PluginInterface* createNxAnalyticsPlugin();
 
-nxpl::PluginInterface* createNxAnalyticsPlugin();
-
-} // extern "C"
+namespace nx {
+namespace vms_server_plugins {
+namespace analytics {
+namespace stub {
+namespace test {
 
 static std::string trimString(const std::string& s)
 {
@@ -193,6 +195,7 @@ static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
 
 static void testExecuteActionAddToList(nx::sdk::analytics::IEngine* plugin)
 {
+    // TODO: #mshevchenko: Add proper action parameters.
     Action action;
     action.m_actionId = "nx.stub.addToList";
     action.setParams({{"paramA", "1"}, {"paramB", "2"}});
@@ -346,6 +349,12 @@ TEST(stub_analytics_plugin, test)
     engine->releaseRef();
     plugin->releaseRef();
 }
+
+} // namespace test
+} // namespace stub
+} // namespace analytics
+} // namespace vms_server_plugins
+} // namespace nx
 
 int main(int argc, const char* const argv[])
 {

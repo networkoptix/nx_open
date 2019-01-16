@@ -28,7 +28,7 @@ static const nxpl::NX_GUID IID_DeviceAgent =
 class IEngine; //< Forward declaration for the parent object.
 
 /**
- * Interface used to control the process of fetching metadata from the resource.
+ * Used to control the process of fetching metadata from the resource.
  *
  * All methods are guaranteed to be called without overlappings, even if from different threads,
  * thus, no synchronization is required for the implementation.

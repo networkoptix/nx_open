@@ -14,6 +14,7 @@
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/uuid.h>
 
 #include <plugins/settings.h>
 #include <plugins/plugin_tools.h>
