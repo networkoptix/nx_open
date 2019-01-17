@@ -199,13 +199,13 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) = 0;
 
     /**
-     * Returns pointer to AIOThread this socket is bound to
+     * Returns pointer to AioThread this socket is bound to
      * NOTE: if socket is not bound to any thread yet, binds it automatically
      */
     virtual nx::network::aio::AbstractAioThread* getAioThread() const = 0;
 
     /**
-     * Binds current socket to specified AIOThread.
+     * Binds current socket to specified AioThread.
      * NOTE: Internal NX_ASSERT(false) in case if socket can not be bound to
      *   specified tread (e.g. it's already bound to different thread or
      *   certaind thread type is not the same).

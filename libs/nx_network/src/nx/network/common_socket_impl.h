@@ -14,7 +14,7 @@ namespace nx {
 namespace network {
 
 class Pollable;
-namespace aio { class AIOThread; }
+namespace aio { class AioThread; }
 
 class NX_NETWORK_API CommonSocketImpl
 {
@@ -26,7 +26,7 @@ public:
         void* userData = nullptr;
     };
 
-    std::atomic<nx::network::aio::AIOThread*> aioThread;
+    std::atomic<nx::network::aio::AioThread*> aioThread;
     std::array<MonitoringContext, nx::network::aio::etMax> monitoredEvents;
     std::atomic<int> terminated;
     /**

@@ -108,7 +108,7 @@ void AIOService::dispatch(
     aioThread->dispatch(sock, std::move(handler));
 }
 
-aio::AIOThread* AIOService::getSocketAioThread(Pollable* sock)
+aio::AioThread* AIOService::getSocketAioThread(Pollable* sock)
 {
     auto thread = sock->impl()->aioThread.load(std::memory_order_relaxed);
 
@@ -130,7 +130,7 @@ AbstractAioThread* AIOService::getCurrentAioThread() const
     const auto it = std::find_if(
         m_aioThreadPool.begin(),
         m_aioThreadPool.end(),
-        [thisThread](const std::unique_ptr<AIOThread>& aioThread)
+        [thisThread](const std::unique_ptr<AioThread>& aioThread)
         {
             return thisThread == aioThread.get();
         });
@@ -145,22 +145,22 @@ bool AIOService::isInAnyAioThread() const
 
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
-    const auto desiredThread = static_cast<aio::AIOThread*>(aioThread);
+    const auto desiredThread = static_cast<aio::AioThread*>(aioThread);
     if (sock->impl()->aioThread.load() == desiredThread)
         return;
 
     NX_ASSERT(!isSocketBeingMonitored(sock));
 
     // Socket can be bound to another aio thread, if it is not used at the moment.
-    sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
+    sock->impl()->aioThread.exchange(static_cast<aio::AioThread*>(desiredThread));
 }
 
-aio::AIOThread* AIOService::bindSocketToAioThread(Pollable* const sock)
+aio::AioThread* AIOService::bindSocketToAioThread(Pollable* const sock)
 {
-    aio::AIOThread* threadToUse = findLeastUsedAioThread();
+    aio::AioThread* threadToUse = findLeastUsedAioThread();
 
     // Assigning thread to socket once and for all.
-    aio::AIOThread* expectedSocketThread = nullptr;
+    aio::AioThread* expectedSocketThread = nullptr;
     if (!sock->impl()->aioThread.compare_exchange_strong(expectedSocketThread, threadToUse))
         threadToUse = expectedSocketThread;     //< Socket is already bound to some thread.
 
@@ -169,7 +169,7 @@ aio::AIOThread* AIOService::bindSocketToAioThread(Pollable* const sock)
 
 void AIOService::cancelPostedCalls(Pollable* const sock)
 {
-    AIOThread* aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
+    AioThread* aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
     if (!aioThread)
         return;
     aioThread->cancelPostedCalls(sock);
@@ -179,7 +179,7 @@ void AIOService::initializeAioThreadPool(unsigned int threadCount)
 {
     for (unsigned int i = 0; i < threadCount; ++i)
     {
-        auto thread = std::make_unique<AIOThread>();
+        auto thread = std::make_unique<AioThread>();
         thread->start();
         if (!thread->isRunning())
             continue;
@@ -187,9 +187,9 @@ void AIOService::initializeAioThreadPool(unsigned int threadCount)
     }
 }
 
-AIOThread* AIOService::findLeastUsedAioThread() const
+AioThread* AIOService::findLeastUsedAioThread() const
 {
-    aio::AIOThread* threadToUse = nullptr;
+    aio::AioThread* threadToUse = nullptr;
 
     for (auto
         threadIter = m_aioThreadPool.cbegin();

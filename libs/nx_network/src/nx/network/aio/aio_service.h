@@ -103,13 +103,13 @@ public:
      *   otherwise - queued like aio::AIOService::post does.
      */
     void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
-    aio::AIOThread* getSocketAioThread(Pollable* sock);
+    aio::AioThread* getSocketAioThread(Pollable* sock);
     AbstractAioThread* getRandomAioThread() const;
     AbstractAioThread* getCurrentAioThread() const;
     bool isInAnyAioThread() const;
 
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
-    aio::AIOThread* bindSocketToAioThread(Pollable* const sock);
+    aio::AioThread* bindSocketToAioThread(Pollable* const sock);
 
     /**
      * NOTE: If called within sock's aio thread then is non-blocking.
@@ -118,11 +118,11 @@ public:
     void cancelPostedCalls(Pollable* const sock);
 
 private:
-    std::vector<std::unique_ptr<AIOThread>> m_aioThreadPool;
+    std::vector<std::unique_ptr<AioThread>> m_aioThreadPool;
 
     void initializeAioThreadPool(unsigned int threadCount);
 
-    AIOThread* findLeastUsedAioThread() const;
+    AioThread* findLeastUsedAioThread() const;
 };
 
 } // namespace aio

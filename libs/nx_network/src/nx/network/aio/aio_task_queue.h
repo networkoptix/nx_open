@@ -13,10 +13,7 @@
 #include "pollable.h"
 #include "../detail/socket_sequence.h"
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace detail {
+namespace nx::network::aio::detail {
 
 // TODO: #ak Looks like a flags set, but somehow it is not.
 enum class TaskType
@@ -37,22 +34,17 @@ enum class TaskType
 class AioEventHandlingData
 {
 public:
-    std::atomic<int> beingProcessed;
-    std::atomic<int> markedForRemoval;
-    AIOEventHandler* eventHandler;
+    std::atomic<int> beingProcessed{0};
+    std::atomic<int> markedForRemoval{0};
+    AIOEventHandler* eventHandler = nullptr;
     /** 0 means no timeout. */
-    unsigned int timeout;
-    qint64 updatedPeriodicTaskClock;
+    unsigned int timeout = 0;
+    qint64 updatedPeriodicTaskClock = 0;
     /** Clock when timer will be triggered. 0 - no clock. */
-    qint64 nextTimeoutClock;
+    qint64 nextTimeoutClock = 0;
 
     AioEventHandlingData(AIOEventHandler* _eventHandler):
-        beingProcessed(0),
-        markedForRemoval(0),
-        eventHandler(_eventHandler),
-        timeout(0),
-        updatedPeriodicTaskClock(0),
-        nextTimeoutClock(0)
+        eventHandler(_eventHandler)
     {
     }
 };
@@ -64,12 +56,12 @@ public:
     std::shared_ptr<AioEventHandlingData> data;
 
     AioEventHandlingDataHolder(AIOEventHandler* _eventHandler):
-        data(new AioEventHandlingData(_eventHandler))
+        data(std::make_shared<AioEventHandlingData>(_eventHandler))
     {
     }
 };
 
-/** TODO: #ak better to split this class to multiple ones containing only desired data. */
+// TODO: #ak It makes sense to split this class to multiple ones containing only desired data.
 class SocketAddRemoveTask
 {
 public:
@@ -158,14 +150,10 @@ class PeriodicTaskData
 {
 public:
     std::shared_ptr<AioEventHandlingData> data;
-    Pollable* socket;
-    aio::EventType eventType;
+    Pollable* socket = nullptr;
+    aio::EventType eventType = aio::etNone;
 
-    PeriodicTaskData():
-        socket(NULL),
-        eventType(aio::etNone)
-    {
-    }
+    PeriodicTaskData() = default;
 
     PeriodicTaskData(
         const std::shared_ptr<AioEventHandlingData>& _data,
@@ -179,6 +167,8 @@ public:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * This class used to be AioThread private impl class,
  * so it contains different and unrelated data.
@@ -187,19 +177,15 @@ public:
 class NX_NETWORK_API AioTaskQueue
 {
 public:
-    // TODO: #ak too many mutexes here. Refactoring required
+    // TODO: #ak Move all these variables to the private section.
+    // TODO: #ak Too many mutexes here. Refactoring required.
 
-    std::unique_ptr<AbstractPollSet> pollSet;
-    unsigned int newReadMonitorTaskCount;
-    unsigned int newWriteMonitorTaskCount;
-    /** Used to make AIOThread public API thread-safe (to serialize access to internal structures). */
+    unsigned int newReadMonitorTaskCount = 0;
+    unsigned int newWriteMonitorTaskCount = 0;
+    // Used to make AioThread public API thread-safe (to serialize access to internal structures).
     mutable QnMutex mutex;
-    mutable QnMutex socketEventProcessingMutex;
-    // TODO" #ak get rid of map here to avoid undesired allocations
-    std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
-    std::atomic<int> processingPostedCalls;
 
-    AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSet);
+    AioTaskQueue(AbstractPollSet* pollSet);
 
     /**
      * Used as a clock for periodic events. Function introduced since implementation can be changed.
@@ -207,15 +193,18 @@ public:
     qint64 getSystemTimerVal() const;
 
     void addTask(SocketAddRemoveTask task);
+
     bool taskExists(
         Pollable* const sock,
         aio::EventType eventType,
         TaskType taskType) const;
+
     void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
 
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
+
     /**
      * This method introduced for optimization: if we fast call startMonitoring then removeSocket
      * (socket has not been added to pollset yet), then removeSocket can just cancel
@@ -229,13 +218,16 @@ public:
         TaskType taskType,
         AIOEventHandler* const eventHandler,
         unsigned int newTimeoutMS);
+
     /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
+    
     /**
      * @return true, if at least one task has been processed.
      */
     bool processPeriodicTasks(const qint64 curClock);
     void processPostedCalls();
+    
     /**
      * Moves elements to remove to a temporary container and returns it.
      * Elements may contain functor which may contain aio objects (sockets) which will be removed
@@ -243,20 +235,29 @@ public:
      */
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         SocketSequenceType socketSequence);
+    
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);
 
     std::size_t postedCallCount() const;
 
+    qint64 nextPeriodicEventClock() const;
+
+    void waitCurrentEventProcessingCompletion();
+
 private:
+    AbstractPollSet* m_pollSet = nullptr;
     QElapsedTimer m_monotonicClock;
-    // TODO #ak: use cyclic array here to minimize allocations
+    // TODO #ak: Use cyclic array here to minimize allocations.
     /**
      * NOTE: This variable can be accessed within aio thread only.
      */
     std::deque<SocketAddRemoveTask> m_postedCalls;
     std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;
+    // TODO: #ak Get rid of map here to avoid undesired allocations.
+    std::multimap<qint64, PeriodicTaskData> m_periodicTasksByClock;
+    mutable QnMutex m_socketEventProcessingMutex;
 
     void addSocketToPollset(
         Pollable* socket,
@@ -277,7 +278,4 @@ private:
         aio::EventType eventType);
 };
 
-} // namespace detail
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::detail

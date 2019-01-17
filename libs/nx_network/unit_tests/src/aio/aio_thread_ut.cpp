@@ -35,24 +35,24 @@ private:
     std::function<void(Pollable*, aio::EventType)> m_func;
 };
 
-class AIOThread:
+class AioThread:
     public ::testing::Test,
     public aio::AIOEventHandler
 {
 public:
-    AIOThread():
-        AIOThread(nullptr)
+    AioThread():
+        AioThread(nullptr)
     {
     }
 
-    AIOThread(std::unique_ptr<AbstractPollSet> pollSet):
+    AioThread(std::unique_ptr<AbstractPollSet> pollSet):
         m_aioThread(std::move(pollSet))
     {
         m_tcpSocket = std::make_unique<TCPSocket>(AF_INET);
         m_aioThread.start();
     }
 
-    ~AIOThread()
+    ~AioThread()
     {
         m_aioThread.pleaseStop();
         m_aioThread.wait();
@@ -80,7 +80,7 @@ protected:
     }
 
     std::unique_ptr<TCPSocket> m_tcpSocket;
-    aio::AIOThread m_aioThread;
+    aio::AioThread m_aioThread;
     nx::utils::SyncQueue<aio::EventType> m_eventsReported;
 
 private:
@@ -93,13 +93,13 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(AIOThread, unexpected_stop_polling)
+TEST_F(AioThread, unexpected_stop_polling)
 {
     whenStopPollingSocket();
     //thenProcessHasNotCrashed();
 }
 
-TEST_F(AIOThread, duplicate_start_polling)
+TEST_F(AioThread, duplicate_start_polling)
 {
     givenSocketBeingPolled();
 
@@ -109,7 +109,7 @@ TEST_F(AIOThread, duplicate_start_polling)
     //thenProcessHasNotCrashed();
 }
 
-TEST_F(AIOThread, socket_polled_notification)
+TEST_F(AioThread, socket_polled_notification)
 {
     UDPSocket socket(AF_INET);
     std::atomic<bool> handlerCalledFlag(false);
@@ -152,11 +152,11 @@ public:
 };
 
 class AIOThreadWithFailingPollSet:
-    public AIOThread
+    public AioThread
 {
 public:
     AIOThreadWithFailingPollSet():
-        AIOThread(std::make_unique<FailingPollSet>())
+        AioThread(std::make_unique<FailingPollSet>())
     {
     }
 

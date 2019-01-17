@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include <nx/utils/thread/thread.h>
@@ -8,12 +9,9 @@
 #include "aio_event_handler.h"
 #include "event_type.h"
 
-namespace nx {
-namespace network {
+namespace nx::network { class Pollable; }
 
-class Pollable;
-
-namespace aio {
+namespace nx::network::aio {
 
 namespace detail { class AioTaskQueue; }
 
@@ -28,7 +26,7 @@ public:
     virtual void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor) = 0;
 
     /**
-     * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
+     * Cancels calls scheduled with aio::AioThread::post and aio::AioThread::dispatch.
      */
     virtual void cancelPostedCalls(Pollable* const sock) = 0;
 };
@@ -36,10 +34,10 @@ public:
 /**
  * This class implements socket event loop using PollSet class to do actual polling.
  * Also supports:
- *   - Asynchronous functor execution via AIOThread::post or AIOThread::dispatch.
+ *   - Asynchronous functor execution via AioThread::post or AioThread::dispatch.
  *   - Maximum timeout to wait for desired event.
  */
-class NX_NETWORK_API AIOThread:
+class NX_NETWORK_API AioThread:
     public AbstractAioThread,
     public nx::utils::Thread
 {
@@ -47,8 +45,8 @@ public:
     /**
      * @param pollSet If null, will be created using PollSetFactory.
      */
-    AIOThread(std::unique_ptr<AbstractPollSet> pollSet = nullptr);
-    virtual ~AIOThread();
+    AioThread(std::unique_ptr<AbstractPollSet> pollSet = nullptr);
+    virtual ~AioThread();
 
     virtual void pleaseStop() override;
 
@@ -81,7 +79,7 @@ public:
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
     /**
      * If called in this aio thread, then calls functor immediately,
-     *   otherwise queues functor in same way as aio::AIOThread::post does.
+     *   otherwise queues functor in same way as aio::AioThread::post does.
      */
     void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
     /**
@@ -94,7 +92,9 @@ protected:
     virtual void run() override;
 
 private:
+    std::unique_ptr<AbstractPollSet> m_pollSet;
     std::unique_ptr<detail::AioTaskQueue> m_taskQueue;
+    std::atomic<int> m_processingPostedCalls{0};
 
     bool getSocketTimeout(
         Pollable* const sock,
@@ -133,6 +133,4 @@ private:
         nx::utils::MoveOnlyFunc<void()> functor);
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio
