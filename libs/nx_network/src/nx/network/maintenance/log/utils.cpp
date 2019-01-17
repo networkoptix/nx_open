@@ -100,7 +100,11 @@ Logger toLoggerInfo(
 
     auto filePath = logger->filePath();
     if (filePath.has_value())
-        loggerInfo.path = filePath.value().toStdString();
+    {
+        // Using * instead of .value() to avoid error on OSX
+        loggerInfo.path = (*filePath).toStdString();
+    }
+
 
     loggerInfo.filters = toEffectiveFilters(effectiveTags, logger->levelFilters());
 
