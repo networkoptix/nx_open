@@ -25,11 +25,11 @@ private:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler);
 
-    void serveDeleteLoggers(
+    void serveDeleteLogger(
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler);
 
-    void servePostLoggers(
+    void servePostLogger(
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler);
 

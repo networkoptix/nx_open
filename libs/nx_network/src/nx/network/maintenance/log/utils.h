@@ -14,7 +14,7 @@ std::set<nx::utils::log::Tag> toTags(const std::vector<Filter>& filters);
 nx::utils::log::LevelFilters toLevelFilters(const std::vector<Filter>& filters);
 
 std::vector<Filter> toEffectiveFilters(
-    const std::set<nx::utils::log::Tag>& tags,
+    const std::set<nx::utils::log::Tag>& effectiveTsags,
     const nx::utils::log::LevelFilters& levelFilters);
 
 Logger toLoggerInfo(

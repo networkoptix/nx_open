@@ -48,12 +48,12 @@ void Server::registerRequestHandlers(
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::delete_,
         url::joinPath(basePath, kLoggers, "/{id}"),
-        [this](auto&&... args) { serveDeleteLoggers(std::move(args)...); });
+        [this](auto&&... args) { serveDeleteLogger(std::move(args)...); });
 
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::post,
         url::joinPath(basePath, kLoggers),
-        [this](auto&&... args) { servePostLoggers(std::move(args)...); });
+        [this](auto&&... args) { servePostLogger(std::move(args)...); });
 }
 
 void Server::serveGetLoggers(
@@ -80,7 +80,7 @@ void Server::serveGetLoggers(
     completionHandler(std::move(result));
 }
 
-void Server::serveDeleteLoggers(
+void Server::serveDeleteLogger(
     http::RequestContext requestContext,
     http::RequestProcessedHandler completionHandler)
 {
@@ -102,7 +102,7 @@ void Server::serveDeleteLoggers(
     completionHandler(http::RequestResult(http::StatusCode::ok));
 }
 
-void Server::servePostLoggers(
+void Server::servePostLogger(
     http::RequestContext requestContext,
     http::RequestProcessedHandler completionHandler)
 {
@@ -113,8 +113,8 @@ void Server::servePostLoggers(
 
     auto newLogger = LoggerBuilder().buildLogger(
         logSettings,
-        QString(), // TODO: #nw get the application name
-        QString(), // TODO: #nw get the appliation binary path
+        QString(), //< TODO: #nw get the application name
+        QString(), //< TODO: #nw get the appliation binary path
         utils::toTags(newLoggerInfo.filters),
         nullptr);
 
