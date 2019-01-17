@@ -42,6 +42,8 @@
 
 #include <QtSingleApplication>
 
+#include <nx/kit/output_redirector.h>
+
 #include <common/static_common_module.h>
 
 #include <client/client_app_info.h>
@@ -279,6 +281,8 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
 int runApplication(int argc, char** argv)
 {
+	nx::kit::OutputRedirector::ensureOutputRedirection();
+	
 #ifdef Q_WS_X11
     XInitThreads();
 #endif
