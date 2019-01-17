@@ -353,9 +353,9 @@ import * as Hls from 'hls.js';
                                                 if (target.error.url === undefined) {
                                                     target.error.url = target.currentSrc;
                                                 }
-        
-                                                // sometimes Error is thrown with currentSrc as baseURI (Firefox)
-                                                if (target.error.url === e.target.baseURI) {
+    
+                                                // sometimes Error is thrown with currentSrc as host URL (Firefox)
+                                                if (target.error.url === window.location.origin + window.location.pathname) {
                                                     return;
                                                 }
         

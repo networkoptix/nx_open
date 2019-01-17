@@ -627,6 +627,7 @@ void ProxyConnectionProcessor::doProxyRequest()
 			NX_VERBOSE(this, lm("Failed to connect to destination %1 during \"smart\" proxying")
 				.args(dstUrl));
 			d->socket->close();
+            m_needStop = true;
 			return; // invalid dst address
 		}
 	}
