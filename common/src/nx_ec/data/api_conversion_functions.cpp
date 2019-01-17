@@ -420,7 +420,7 @@ void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setCellAspectRatio(src.cellAspectRatio);
-    dst->setCellSpacing(src.horizontalSpacing);
+    dst->setCellSpacing(src.cellSpacing);
     dst->setLocked(src.locked);
     dst->setLogicalId(src.logicalId);
     dst->setFixedSize({src.fixedWidth, src.fixedHeight});
@@ -443,8 +443,7 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.cellAspectRatio = src->cellAspectRatio();
-    dst.horizontalSpacing = src->cellSpacing();
-    dst.verticalSpacing = src->cellSpacing(); // TODO: #ynikitenkov Remove vertical spacing?
+    dst.cellSpacing = src->cellSpacing();
     dst.locked = src->locked();
     dst.logicalId = src->logicalId();
 
