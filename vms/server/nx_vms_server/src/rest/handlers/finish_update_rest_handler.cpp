@@ -14,14 +14,25 @@ QnFinishUpdateRestHandler::QnFinishUpdateRestHandler(QnMediaServerModule* server
 
 bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
 {
-    auto servers = QSet<QnMediaServerResourcePtr>::fromList(
-        serverModule()->commonModule()->resourcePool()->getAllServers(Qn::AnyStatus));
+    auto onlineServers = QSet<QnMediaServerResourcePtr>::fromList(
+        serverModule()->commonModule()->resourcePool()->getAllServers(Qn::Online));
+    const auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
+        serverModule()->commonModule()->resourcePool()->getAllServers(Qn::Offline));
 
     QnUuidList participantsIds;
     if (!serverModule()->updateManager()->participants(&participantsIds))
         return false;
 
-    const auto participants = detail::filterOutNonParticipants(servers, participantsIds);
+    const bool anyParticipantOffline = std::any_of(offlineServers.cbegin(), offlineServers.cend(),
+        [&participantsIds](const auto& server)
+        {
+            return participantsIds.contains(server->getId());
+        });
+
+    if (anyParticipantOffline)
+        return false;
+
+    const auto participants = detail::filterOutNonParticipants(onlineServers, participantsIds);
     const auto targetVersion = serverModule()->updateManager()->targetVersion();
     if (targetVersion.isNull())
         return false;

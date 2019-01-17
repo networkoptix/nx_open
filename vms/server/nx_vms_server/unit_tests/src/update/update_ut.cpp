@@ -193,9 +193,11 @@ protected:
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
 
-    void whenPeerGoesOffline(int peerIndex)
+    void whenPeerGoesOffline(const QnUuid& peerId)
     {
-        m_peers[peerIndex]->stop();
+        const auto peerToShutDownIt = std::find_if(m_peers.cbegin(), m_peers.cend(),
+            [&peerId](const auto& peer) { return peer->commonModule()->moduleGUID() == peerId; });
+        (*peerToShutDownIt)->stop();
     }
 
 private:
@@ -460,7 +462,7 @@ TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 
     const auto peer2Id = peerId(2);
-    whenPeerGoesOffline(2);
+    whenPeerGoesOffline(peer2Id);
 
     QList<QnUuid> participants{ peerId(0), peerId(1), peer2Id };
     thenInstallUpdateWithPeersParameterShouldFail(participants);
@@ -544,43 +546,6 @@ TEST_F(Updates, finishUpdate_fail_notAllUpdated)
     whenServerRestartedWithNewVersion(0);
     whenServerRestartedWithOldVersion(1);
     whenServersConnected();
-    thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
-}
-
-TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
-{
-    givenConnectedPeers(2);
-    whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
-
-    QMap<QnUuid, update::Status::Code> expectedStatuses{
-        {peerId(0), update::Status::Code::readyToInstall},
-        {peerId(1), update::Status::Code::readyToInstall} };
-    thenPeersUpdateStatusShouldBe(expectedStatuses);
-    thenInstallUpdateWithPeersParameterShouldSucceed({peerId(0), peerId(1)});
-
-    whenPeerGoesOffline(1);
-
-    whenServerRestartedWithNewVersion(0);
-    thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
-}
-
-TEST_F(Updates, finishUpdate_success_participantWithNewVersionIsOffline)
-{
-    givenConnectedPeers(2);
-    whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
-
-    QMap<QnUuid, update::Status::Code> expectedStatuses{
-        {peerId(0), update::Status::Code::readyToInstall},
-        {peerId(1), update::Status::Code::readyToInstall} };
-    thenPeersUpdateStatusShouldBe(expectedStatuses);
-    thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0), peerId(1) });
-
-    whenServerRestartedWithNewVersion(1);
-    whenPeerGoesOffline(1);
-
-    whenServerRestartedWithNewVersion(0);
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
