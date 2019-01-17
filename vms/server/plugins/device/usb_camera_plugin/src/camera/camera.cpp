@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "camera_manager.h"
+#include "discovery_manager.h"
 #include "device/video/utils.h"
 
 namespace nx {
@@ -48,17 +48,25 @@ static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
 
 const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList = 
 {
-    nxcip::AV_CODEC_ID_H263,
-    nxcip::AV_CODEC_ID_H264,
-    nxcip::AV_CODEC_ID_MJPEG
+    nxcip::AV_CODEC_ID_H263
+    ,nxcip::AV_CODEC_ID_H264
+    ,nxcip::AV_CODEC_ID_MJPEG
 };
 
 Camera::Camera(
-    CameraManager * cameraManager,
+    DiscoveryManager * discoveryManager,
+    const nxcip::CameraInfo& cameraInfo,
     nxpl::TimeProvider* const timeProvider):
-    m_cameraManager(cameraManager),
+    m_discoveryManager(discoveryManager),
+    m_cameraInfo(cameraInfo),
     m_timeProvider(timeProvider)
 {
+}
+
+void Camera::setCredentials(const char * username, const char * password)
+{
+    strncpy( m_cameraInfo.defaultLogin, username, sizeof(m_cameraInfo.defaultLogin)-1 );
+    strncpy( m_cameraInfo.defaultPassword, password, sizeof(m_cameraInfo.defaultPassword)-1 );
 }
 
 bool Camera::initialize()
@@ -116,6 +124,11 @@ std::vector<device::video::ResolutionData> Camera::resolutionList() const
     return device::video::getResolutionList(ffmpegUrl(), m_compressionTypeDescriptor);
 }
 
+bool Camera::hasAudio() const
+{
+    return strlen(m_cameraInfo.auxiliaryData) != 0;
+}
+
 void Camera::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
@@ -166,7 +179,8 @@ CodecParameters Camera::defaultVideoParameters() const
 
 std::string Camera::ffmpegUrl() const
 {
-    return m_cameraManager->ffmpegUrl();
+    //return m_cameraManager->ffmpegUrl();
+    return m_discoveryManager->getFfmpegUrl(m_cameraInfo.uid);
 }
 
 std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
@@ -179,13 +193,22 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
 
 const nxcip::CameraInfo& Camera::info() const
 {
-    return m_cameraManager->info();
+    //return m_cameraManager->info();
+    return m_cameraInfo;
 }
 
 std::string Camera::toString() const
 {
-    const nxcip::CameraInfo& cameraInfo = info();
-    return std::string("{ name: ") + cameraInfo.modelName + ", uid: " + cameraInfo.uid + "}";
+    static const std::string prefix = "{ ";
+    static const std::string suffix = " }";
+
+    return
+        prefix 
+        + "name: " + m_cameraInfo.modelName 
+        + ", uid: " + m_cameraInfo.uid 
+        + ", video:" + ffmpegUrl()
+        + ", audio: " + m_cameraInfo.auxiliaryData 
+        + suffix;
 }
 
 CodecParameters Camera::getDefaultVideoParameters()

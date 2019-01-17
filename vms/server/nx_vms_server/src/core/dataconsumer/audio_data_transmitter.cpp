@@ -84,7 +84,7 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr& data
             prepare();
         }
         if (!processAudioData(audioData))
-            return false;
+            return true; //< Skip audio data anyway. false means keep data to process it further again.
 
         makeRealTimeDelay(audioData);
     }

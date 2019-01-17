@@ -281,9 +281,8 @@ bool ApplauncherProcess::installZip(
     const std::shared_ptr<InstallZipTask>& request,
     Response* const response)
 {
-    const bool ok = m_installationManager->installZip(request->version, request->zipFileName);
-    response->result = ok ? ResultType::ok : ResultType::otherError;
-    return ok;
+    response->result = m_installationManager->installZip(request->version, request->zipFileName);
+    return response->result == ResultType::ok;
 }
 
 bool ApplauncherProcess::isVersionInstalled(

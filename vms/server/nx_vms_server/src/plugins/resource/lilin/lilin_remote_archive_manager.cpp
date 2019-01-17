@@ -93,6 +93,11 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
     return true;
 }
 
+nx::core::resource::ImportOrder LilinRemoteArchiveManager::overlappedIdImportOrder() const
+{
+    return nx::core::resource::ImportOrder::Direct;
+}
+
 bool LilinRemoteArchiveManager::fetchArchiveEntry(const QString& entryId, BufferType* outBuffer)
 {
     auto response = doRequest(kChunkDownloadTemplate.arg(entryId), true);

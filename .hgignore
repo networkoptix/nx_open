@@ -1,19 +1,27 @@
 syntax: glob
 
-*.pyc
+# IDE and misc software files.
 .idea
-*.swp
+.vscode
+*~*.TMP
 *.kdev4
 .DS_Store
+*.swp
+CMakeLists.txt.user
 
-*.orig
-*.rej
-.vscode
-
+# Precompiled files.
+*.pyc
 *.qmlc
 *.jsc
 
-CMakeLists.txt.user
+# Repository temp files.
+*.orig
+*.rej
 
+# Project-specific items.
 subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
+
+# Build folders in the repository root.
+re:^build/
+re:^build-.*/

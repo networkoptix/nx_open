@@ -14,7 +14,7 @@ bool hasInternet(const State& state)
     return std::any_of(
         state.servers.cbegin(),
         state.servers.cend(),
-        [](const auto& info) { return info.hasInternet; });
+        [](const auto& info) { return info.online && info.hasInternet; });
 }
 
 } // namespace
@@ -143,6 +143,7 @@ Result TimeSynchronizationWidgetReducer::addServer(State state, const State::Ser
         [id](const auto& info) { return info.id == id; }) == servers.cend())
     {
         servers.push_back(serverInfo);
+        state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
         return {true, std::move(state)};
     }
 
@@ -158,13 +159,17 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid&
     {
         servers.erase(it);
         state.status = actualStatus(state);
+        state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
         return {true, std::move(state)};
     }
 
     return {false, std::move(state)};
 }
 
-Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUuid& serverId, bool isOnline)
+Result TimeSynchronizationWidgetReducer::setServerOnline(
+    State state,
+    const QnUuid& serverId,
+    bool isOnline)
 {
     for (auto& server: state.servers)
     {
@@ -173,6 +178,29 @@ Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUu
             if (server.online != isOnline)
             {
                 server.online = isOnline;
+                state.status = actualStatus(state);
+                state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
+                return {true, std::move(state)};
+            }
+
+            return {false, std::move(state)};
+        }
+    }
+    return {false, std::move(state)};
+}
+
+Result TimeSynchronizationWidgetReducer::setServerHasInternet(
+    State state,
+    const QnUuid& serverId,
+    bool hasInternet)
+{
+    for (auto& server: state.servers)
+    {
+        if (server.id == serverId)
+        {
+            if (server.hasInternet != hasInternet)
+            {
+                server.hasInternet = hasInternet;
                 state.status = actualStatus(state);
                 return {true, std::move(state)};
             }

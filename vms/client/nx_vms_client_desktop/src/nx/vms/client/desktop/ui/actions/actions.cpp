@@ -506,7 +506,7 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .shortcut(lit("Alt+Enter"))
         .shortcut(lit("Alt+Return"))
-//        .shortcut(lit("Ctrl+F"), Builder::Mac, true) // Uncomment me later, workaround for 4.0 beta (VMS-11557).
+        .shortcut(lit("Ctrl+F"), Builder::Mac, true) // Uncomment me later, workaround for 4.0 beta (VMS-11557).
         .shortcutContext(Qt::ApplicationShortcut);
 
     factory(VersionMismatchMessageAction)

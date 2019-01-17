@@ -74,7 +74,7 @@ QnMediaDewarpingParams QnFisheyePtzController::mediaDewarpingParams() const
     return m_mediaDewarpingParams;
 }
 
-QnItemDewarpingParams QnFisheyePtzController::itemDewarpingParams() const
+nx::vms::api::DewarpingData QnFisheyePtzController::itemDewarpingParams() const
 {
     return m_itemDewarpingParams;
 }

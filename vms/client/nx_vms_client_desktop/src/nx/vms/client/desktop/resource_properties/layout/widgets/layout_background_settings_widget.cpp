@@ -7,7 +7,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
-#include <QtGui/QImageReader>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -361,17 +360,12 @@ void LayoutBackgroundSettingsWidget::viewFile()
 
 void LayoutBackgroundSettingsWidget::selectFile()
 {
-    QStringList extensions;
-    for (const QByteArray& format: QImageReader::supportedImageFormats())
-        extensions.push_back(lit("*.%1").arg(QString::fromLatin1(format)));
-
-    const QString nameFilter = L'(' + extensions.join(L' ') + L')';
     QScopedPointer<QnCustomFileDialog> dialog(
         new QnCustomFileDialog(
             this,
             tr("Select file..."),
             qnSettings->backgroundsFolder(),
-            tr("Pictures %1").arg(nameFilter)));
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter)));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     if (!dialog->exec())

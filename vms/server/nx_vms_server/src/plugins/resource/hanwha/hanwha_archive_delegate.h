@@ -49,9 +49,10 @@ public:
         const QSize& /*resolution*/) override;
 
     virtual CameraDiagnostics::Result lastError() const override;
+
 private:
     bool isForwardDirection() const;
-
+    qint64 timeShiftUsec() const;
     qint64 currentPositionUsec() const;
     void updateCurrentPositionUsec(
         qint64 positionUsec,
@@ -59,6 +60,7 @@ private:
         bool force);
 
 private:
+    const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
     std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
     bool m_rateControlEnabled = true;

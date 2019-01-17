@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include <plugins/resource/hanwha/hanwha_cgi_parameter.h>

@@ -8,6 +8,7 @@
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <media_server/media_server_module.h>
+#include <nx/network/buffered_stream_socket.h>
 
 namespace
 {
@@ -30,12 +31,30 @@ namespace
         return true;
     }
 
-    bool readHttpHeaders(nx::network::AbstractStreamSocket* socket)
+    bool readHttpHeaders(nx::network::AbstractStreamSocket* socket, QByteArray* outPayloadBuffer)
     {
-        int toRead = QnProxyAudioTransmitter::kFixedPostRequest.size();
-        QByteArray buffer;
-        buffer.resize(toRead);
-        return readBytes(socket, (quint8*) buffer.data(), toRead);
+        char headersBuffer[1024];
+        char* dst = headersBuffer;
+        int bytesRead = 0;
+        while (bytesRead < sizeof(headersBuffer))
+        {
+            int result = socket->recv(&headersBuffer[bytesRead], sizeof(headersBuffer) - bytesRead);
+            if (result < 1)
+                return false;
+            bytesRead += result;
+            static const QByteArray kDelimiter("\r\n\r\n");
+            int delimiterPos = QByteArray::fromRawData(headersBuffer, bytesRead).indexOf(kDelimiter);
+            if (delimiterPos > 0)
+            {
+                delimiterPos += kDelimiter.length();
+                int bytesLeft = bytesRead - delimiterPos;
+                outPayloadBuffer->resize(bytesLeft);
+                if (bytesLeft > 0)
+                    memcpy(outPayloadBuffer->data(), headersBuffer + delimiterPos, bytesLeft);
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -153,20 +172,20 @@ void QnAudioProxyReceiver::run()
     }
     sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
-    const QnUuid clientId(params[kClientIdParamName]);
-
     auto resourceId = params[kResourceIdParamName];
     QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
         ? QnAudioStreamerPool::Action::Start
         : QnAudioStreamerPool::Action::Stop;
 
     // process 2-nd POST request with unlimited length
-
-    if (!readHttpHeaders(d->socket.get()))
+    QByteArray payloadData;
+    if (!readHttpHeaders(d->socket.get(), &payloadData))
         return;
 
+    auto bufferedSocket = std::make_unique<nx::network::BufferedStreamSocket>(takeSocket(), payloadData);
+
     QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(QnUuid::fromStringSafe(resourceId)));
-    desktopDataProvider->setSocket(takeSocket());
+    desktopDataProvider->setSocket(std::move(bufferedSocket));
 
     QString errString;
     if (!m_serverModule->audioStreamPool()->startStopStreamToResource(desktopDataProvider, QnUuid(resourceId), action, errString))

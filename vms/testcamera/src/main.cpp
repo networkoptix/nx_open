@@ -100,9 +100,8 @@ int main(int argc, char *argv[])
     QnLongRunnablePool logRunnablePool;
     //common.instance<QnFfmpegInitializer>();
     //common.instance<QnLongRunnablePool>();
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file",
-        QnQtFileStorageResource::instance, true);
-
+    QnStoragePluginFactory pluginFactory;
+    pluginFactory.registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
 
     bool cameraForEachFile = false;
     bool includePts = false;

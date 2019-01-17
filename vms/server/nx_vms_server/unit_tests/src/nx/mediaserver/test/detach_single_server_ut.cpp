@@ -45,13 +45,10 @@ public:
         ASSERT_TRUE(mediaServerLauncher->start());
         ASSERT_TRUE(server2->startAndWaitUntilStarted());
 
-        mediaServerLauncher->commonModule()->ec2Connection()->startReceivingNotifications();
     }
 
     static void TearDownTestCase()
     {
-        mediaServerLauncher->commonModule()->ec2Connection()->stopReceivingNotifications();
-
         server2.reset();
         mediaServerLauncher.reset();
     }

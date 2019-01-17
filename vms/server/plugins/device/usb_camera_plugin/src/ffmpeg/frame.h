@@ -24,7 +24,8 @@ public:
 
     void unreference();
 
-    AVFrame * frame() const;
+    const AVFrame * frame() const;
+    AVFrame * frame();
     int64_t pts() const;
     int64_t packetPts() const;
     

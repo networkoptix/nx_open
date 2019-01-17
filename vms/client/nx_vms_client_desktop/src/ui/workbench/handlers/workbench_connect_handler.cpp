@@ -1165,6 +1165,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
         {
             stopReconnecting();
             disconnectFromServer(DisconnectFlag::Force);
+            if (!qnRuntime->isDesktopMode())
+                menu()->trigger(action::DelayedForcedExitAction);
         });
     QnDialog::show(m_reconnectDialog);
 

@@ -46,6 +46,8 @@ Item
                     }
                 }
             }
+
+            alertBar.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
     }
 
@@ -122,4 +124,14 @@ Item
             enabled: enableSwitch.checked
         }
     }
+
+    AlertBar
+    {
+        id: alertBar
+
+        visible: false
+        anchors.bottom: parent.bottom
+        label.text: qsTr("Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.")
+    }
+
 }

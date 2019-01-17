@@ -292,6 +292,7 @@ Rectangle
         id: player
         resourceId: cameraResourceId
         maxTextureSize: videoContainer.maxTextureSize
+        audioEnabled: false
 
         onResourceIdChanged: video.clear()
         onSourceChanged: videoContainer.updatePlayingState()

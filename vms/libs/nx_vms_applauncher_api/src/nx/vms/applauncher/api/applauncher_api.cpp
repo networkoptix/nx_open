@@ -227,6 +227,10 @@ Value fromString(const QnByteArrayConstRef& str)
         return notFound;
     if (str == "ioError")
         return ioError;
+    if (str == "notEnoughSpace")
+        return notEnoughSpace;
+    if (str == "brokenPackage")
+        return brokenPackage;
     return otherError;
 }
 
@@ -248,6 +252,10 @@ QByteArray toString(Value val)
             return "notFound";
         case ioError:
             return "ioError";
+        case notEnoughSpace:
+            return "notEnoughSpace";
+        case brokenPackage:
+            return "brokenPackage";
         default:
             return "otherError " + QByteArray::number(val);
     }

@@ -432,13 +432,31 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         outInfo->videoEncoderId = QString::fromStdString(currentVEConfig->token);
 
         auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
-        m_onvifRes->updateVideoEncoder(*currentVEConfig, streamIndex, params);
+        m_onvifRes->updateVideoEncoder1(*currentVEConfig, streamIndex, params);
 
+        // Usually getMaxOnvifRequestTries returns 1, but for some OnvifResource descendants it's
+        // larger. In case of failure request are repeated.
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+
+        // Some DW cameras need two same sendVideoEncoder requests with 1 second interval.
+        // Both responses are Ok, but only the second request really succeeds.
+        auto resourceData = m_onvifRes->resourceData();
+        const int repeatIntervalForSendVideoEncoderMS =
+            resourceData.value<int>(ResourceDataKey::kRepeatIntervalForSendVideoEncoderMS, 0);
+
+        bool b = resourceData.value<bool>("fixWrongInputPortNumber", false);
+
         CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
         while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
         {
             result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
+            if (repeatIntervalForSendVideoEncoderMS)
+            {
+                msleep(repeatIntervalForSendVideoEncoderMS);
+                result = m_onvifRes->sendVideoEncoderToCameraEx(
+                    *currentVEConfig, streamIndex, params);
+            }
+
             if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
                 msleep(300);
         }

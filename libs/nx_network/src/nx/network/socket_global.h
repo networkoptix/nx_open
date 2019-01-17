@@ -27,9 +27,6 @@ struct NX_NETWORK_API Ini:
 
     NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
-    NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
-        "Used in ONVIF event notification subscription.\n"
-        "Value 0 (false) may be used for debugging port forwarded devices.");
 };
 
 class NX_NETWORK_API SocketGlobals

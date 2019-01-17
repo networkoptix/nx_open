@@ -12,6 +12,13 @@ import subprocess
 import archiver
 import build_distribution_conf as conf
 
+WINDOWS_QT_PLUGINS = [
+    "audio",
+    "imageformats",
+    "mediaservice",
+    "platforms"
+]
+
 
 def get_unit_tests_list():
     test_regex = re.compile(r"\s+Test.+: (.+)")
@@ -76,6 +83,14 @@ def main():
             for plugin_group in ["sqldrivers"]:
                 archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
                     join(conf.QT_DIR, "plugins", plugin_group, lib_glob))
+
+        # Archive Qt for Windows build (only dlls).
+        if isWindows:
+            dll_glob = "*.dll"
+            for plugin_group in WINDOWS_QT_PLUGINS:
+                archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
+                    join(conf.QT_DIR, "plugins", plugin_group, dll_glob))
+            archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin", dll_glob))
 
         # Archive analytics_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"

@@ -12,12 +12,14 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/resource/resource_fwd.h>
+#include <utils/common/value_cache.h>
 
 static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
@@ -34,7 +36,6 @@ public:
     virtual ~QnLiveStreamProvider();
 
     virtual void setRole(Qn::ConnectionRole role) override;
-    Qn::ConnectionRole getRole() const;
     Qn::StreamIndex encoderIndex() const;
 
     void setPrimaryStreamParams(const QnLiveStreamParams& params);
@@ -75,7 +76,6 @@ public:
 protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    virtual Qn::ConnectionRole roleForMotionEstimation();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
     bool needHardwareMotion();
 protected:
@@ -84,7 +84,7 @@ protected:
 private:
     float getDefaultFps() const;
 
-    bool needAnalyzeMotion(Qn::ConnectionRole role);
+    bool needAnalyzeMotion();
 
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
 
@@ -115,9 +115,8 @@ private:
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
 
-    QnMutex m_motionRoleMtx;
-    Qn::ConnectionRole m_softMotionRole;
-    QString m_forcedMotionStream;
+    QnMutex m_motionStreamIndexMtx;
+    CachedValue<QnVirtualCameraResource::MotionStreamIndex> m_cachedSoftMotionStreamIndex;
 
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 

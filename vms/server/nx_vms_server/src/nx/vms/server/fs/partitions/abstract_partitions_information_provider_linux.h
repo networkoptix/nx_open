@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QByteArray>
+
 namespace nx::vms::server::fs {
 
 class AbstractPartitionsInformationProvider

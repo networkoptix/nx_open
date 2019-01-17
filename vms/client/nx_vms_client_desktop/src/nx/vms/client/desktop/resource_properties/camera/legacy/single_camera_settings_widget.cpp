@@ -177,7 +177,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->ioPortSettingsWidget, &LegacyIoPortSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
+    connect(ui->advancedSettingsWidget, &LegacyAdvancedSettingsWidget::hasChangesChanged,
         this, &SingleCameraSettingsWidget::hasChangesChanged);
 
     connect(ui->wearableProgressWidget, &QnWearableProgressWidget::activeChanged,
@@ -1129,7 +1129,7 @@ void SingleCameraSettingsWidget::at_fisheyeSettingsChanged()
         mediaWidget->setDewarpingParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();
-        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        auto itemParams = item->dewarpingParams();
         itemParams.enabled = dewarpingParams.enabled;
         item->setDewarpingParams(itemParams);
     }

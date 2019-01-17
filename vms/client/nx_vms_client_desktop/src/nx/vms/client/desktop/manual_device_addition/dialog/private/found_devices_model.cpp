@@ -350,7 +350,7 @@ Qt::ItemFlags FoundDevicesModel::flags(const QModelIndex& index) const
             const auto presentedState = presentedStateData.value<PresentedState>();
             if (presentedState == notPresentedState)
                 result.setFlag(Qt::ItemIsUserCheckable, true);
-            else if (presentedState == alreadyAddedState)
+            else
                 result.setFlag(Qt::ItemIsEnabled, false);
         }
     }

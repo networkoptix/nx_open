@@ -23,7 +23,7 @@ protected:
 
     void assertCorrectEmptyState()
     {
-        ASSERT_EQ(buffer.readySize(), 0);
+        ASSERT_EQ(buffer.size(), 0);
         ASSERT_EQ(buffer.locked(), false);
         ASSERT_EQ(buffer.popFront(), nx::Buffer());
 
@@ -54,7 +54,7 @@ TEST_F(WebsocketMultibuffer, InitialState)
 TEST_F(WebsocketMultibuffer, SingleBuffer_lockLast)
 {
     whenSomeBuffersAppended(1, kPerBufferWrites, Locked::yes);
-    ASSERT_EQ(buffer.readySize(), 1);
+    ASSERT_EQ(buffer.size(), 1);
 
     auto popResult = buffer.popFront();
     ASSERT_EQ(popResult.size(), kPerBufferWrites * (int)strlen(kPattern));
@@ -71,23 +71,23 @@ TEST_F(WebsocketMultibuffer, SingleBuffer_noLockLast)
 TEST_F(WebsocketMultibuffer, MultipleBuffer_lockLast)
 {
     whenSomeBuffersAppended(10, kPerBufferWrites, Locked::yes);
-    ASSERT_EQ(buffer.readySize(), 10);
+    ASSERT_EQ(buffer.size(), 10);
 
     auto popResult = buffer.popFront();
     ASSERT_EQ(popResult.size(), kPerBufferWrites * (int)strlen(kPattern));
-    ASSERT_EQ(buffer.readySize(), 9);
+    ASSERT_EQ(buffer.size(), 9);
 }
 
 TEST_F(WebsocketMultibuffer, MultipleBuffer_noLockLast)
 {
     whenSomeBuffersAppended(10, kPerBufferWrites, Locked::no);
-    ASSERT_EQ(buffer.readySize(), 9);
+    ASSERT_EQ(buffer.size(), 9);
 }
 
 TEST_F(WebsocketMultibuffer, clearLast)
 {
     whenSomeBuffersAppended(1, kPerBufferWrites, Locked::yes);
-    ASSERT_EQ(buffer.readySize(), 1);
+    ASSERT_EQ(buffer.size(), 1);
 
     buffer.clearLast();
     assertCorrectEmptyState();

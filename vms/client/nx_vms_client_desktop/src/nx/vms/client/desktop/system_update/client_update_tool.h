@@ -153,6 +153,11 @@ public:
 
     static QString toString(State state);
 
+    /**
+     * Get readable error text.
+     */
+    QString getErrorText() const;
+
 signals:
     /**
      * This event is emitted every time update state changes,
@@ -175,6 +180,10 @@ protected:
     void setError(const QString& error);
     void setApplauncherError(const QString& error);
     void clearDownloadFolder();
+    /**
+     * Converts applauncher::api::ResultType to a readable string.
+     */
+    static QString applauncherErrorToString(int result);
 
     std::unique_ptr<Downloader> m_downloader;
     /** Directory to store unpacked files. */

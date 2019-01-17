@@ -68,6 +68,15 @@ QString getConfiguredVideoLayout(const QnResourcePtr& resource)
     return configuredLayout;
 }
 
+nx::streaming::rtp::TimePolicy getTimePolicy(const QnResourcePtr& res)
+{
+    auto secResource = res.dynamicCast<QnSecurityCamResource>();
+    if (secResource && secResource->trustCameraTime())
+        return nx::streaming::rtp::TimePolicy::forceCameraTime;
+
+    return nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime;
+}
+
 } // namespace
 
 nx::utils::Mutex QnMulticodecRtpReader::s_defaultTransportMutex;
@@ -104,11 +113,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
     Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
 
-    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
-    if (secResource && secResource->trustCameraTime())
-        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
-    else
-        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
+    m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -231,30 +236,54 @@ void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
     }
 }
 
+void QnMulticodecRtpReader::processCameraTimeHelperEvent(
+    nx::streaming::rtp::CameraTimeHelper::EventType event)
+{
+    using namespace nx::streaming::rtp;
+    using namespace vms::api;
+    auto currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    auto res = getResource();
+    switch (event)
+    {
+        case CameraTimeHelper::EventType::BadCameraTime:
+            emit networkIssue(res, currentTime, EventReason::networkBadCameraTime, "");
+            return;
+        case CameraTimeHelper::EventType::CameraTimeBackToNormal:
+            emit networkIssue(res, currentTime, EventReason::networkCameraTimeBackToNormal, "");
+            return;
+        default:
+            return;
+    }
+}
+
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
 {
     for (auto& track: m_tracks)
     {
-        if (track.parser)
-        {
-            QnAbstractMediaDataPtr result = track.parser->nextData();
-            if (result) {
-                result->timestamp = m_timeHelper.getTime(
-                    qnSyncTime->currentTimePoint(),
-                    result->timestamp,
-                    track.ioDevice ? track.ioDevice->getSenderReport() : nx::streaming::rtp::RtcpSenderReport(),
-                    track.onvifExtensionTimestamp,
-                    track.parser->getFrequency(),
-                    m_role == Qn::CR_LiveVideo).count();
-                result->channelNumber = track.logicalChannelNum;
-                if (result->dataType == QnAbstractMediaData::VIDEO)
-                {
-                    result->channelNumber =
-                        std::min(result->channelNumber, (quint32) m_numberOfVideoChannels - 1);
-                }
-                return result;
+        if (!track.parser)
+            continue;
+        QnAbstractMediaDataPtr result = track.parser->nextData();
+        if (!result)
+            continue;
+
+        result->timestamp = m_timeHelper.getTime(
+            qnSyncTime->currentTimePoint(),
+            result->timestamp,
+            track.ioDevice ? track.ioDevice->getSenderReport() : nx::streaming::rtp::RtcpSenderReport(),
+            track.onvifExtensionTimestamp,
+            track.parser->getFrequency(),
+            m_role == Qn::CR_LiveVideo,
+            [this](nx::streaming::rtp::CameraTimeHelper::EventType event) {
+                processCameraTimeHelperEvent(event);
             }
+        ).count();
+        result->channelNumber = track.logicalChannelNum;
+        if (result->dataType == QnAbstractMediaData::VIDEO)
+        {
+            result->channelNumber =
+                std::min(result->channelNumber, (quint32) m_numberOfVideoChannels - 1);
         }
+        return result;
     }
     return QnAbstractMediaDataPtr();
 }
@@ -503,7 +532,7 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
         pleaseStop();
 
     if (key == ResourcePropertyKey::kTrustCameraTime)
-        updateTimePolicy();
+        m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
 }
 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
@@ -517,7 +546,6 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
                       qnSyncTime->currentUSecsSinceEpoch(),
                       vms::api::EventReason::networkRtpPacketLoss,
                       vms::event::NetworkIssueEvent::encodePacketLossSequence(prev, next));
-
 }
 
 RtspTransport QnMulticodecRtpReader::getRtpTransport() const
@@ -534,7 +562,7 @@ RtspTransport QnMulticodecRtpReader::getRtpTransport() const
     }
 
     if (s_defaultTransportToUse != RtspTransport::notDefined)
-        s_defaultTransportToUse;  //< System wide default setting
+        return s_defaultTransportToUse;  //< System wide default setting
 
     return RtspTransport::tcp;
 }
@@ -741,6 +769,12 @@ void QnMulticodecRtpReader::setDefaultTransport(const QString& value)
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
+
+    // Force camera time for NVR archives
+    if (role == Qn::ConnectionRole::CR_Archive)
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
+    else
+        m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
 }
 
 void QnMulticodecRtpReader::setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme){
@@ -804,20 +838,6 @@ void QnMulticodecRtpReader::setPositionUsec(qint64 value)
 void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat& format)
 {
     m_RtpSession.setDateTimeFormat(format);
-}
-
-void QnMulticodecRtpReader::setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy)
-{
-    m_timeHelper.setTimePolicy(timePolicy);
-}
-
-void QnMulticodecRtpReader::updateTimePolicy()
-{
-    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
-    if (secResource && secResource->trustCameraTime())
-        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
-    else
-        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
 }
 
 void QnMulticodecRtpReader::addRequestHeader(

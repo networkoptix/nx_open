@@ -4,7 +4,7 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-int MultiBuffer::readySize() const
+int MultiBuffer::size() const
 {
     if (m_buffers.empty())
         return 0;

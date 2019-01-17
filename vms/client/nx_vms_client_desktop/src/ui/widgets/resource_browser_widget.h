@@ -48,19 +48,8 @@ class QnResourceBrowserWidget:
     Q_OBJECT
 
 public:
-    enum Tab {
-        ResourcesTab,
-        SearchTab,
-        TabCount
-    };
-
     QnResourceBrowserWidget(QWidget* parent = nullptr, QnWorkbenchContext* context = nullptr);
-
-    virtual ~QnResourceBrowserWidget();
-
-    Tab currentTab() const;
-
-    void setCurrentTab(Tab tab);
+    virtual ~QnResourceBrowserWidget() override;
 
     void selectNodeByUuid(const QnUuid& id);
     void selectResource(const QnResourcePtr& resource);
@@ -74,8 +63,6 @@ public:
 
     virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
 
-    QComboBox* typeComboBox() const;
-
     virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(
         nx::vms::client::desktop::ui::action::ActionScope scope) const override;
 
@@ -88,7 +75,6 @@ public:
 
     void clearSelection();
 signals:
-    void currentTabChanged();
     void selectionChanged();
     void scrollBarVisibleChanged();
 
@@ -99,16 +85,11 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void keyReleaseEvent(QKeyEvent* event) override;
-    virtual void timerEvent(QTimerEvent* event) override;
-    virtual void paintEvent(QPaintEvent* event) override;
 
     virtual QString toolTipAt(const QPointF& pos) const override;
     virtual bool showOwnTooltip(const QPointF& pos) override;
 
 private:
-    QnResourceSearchQuery query() const;
-    void setQuery(const QnResourceSearchQuery& query);
-
     QnResourceTreeWidget* currentTreeWidget() const;
     QItemSelectionModel* currentSelectionModel() const;
     QModelIndex itemIndexAt(const QPoint& pos) const;
@@ -117,7 +98,6 @@ private:
     QnResourceSearchProxyModel* layoutModel(QnWorkbenchLayout* layout, bool create) const;
     QnResourceSearchSynchronizer* layoutSynchronizer(QnWorkbenchLayout* layout, bool create) const;
 
-    void killSearchTimer();
     void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
 
     void handleItemActivated(const QModelIndex& index, bool withMouse);
@@ -153,7 +133,6 @@ private:
     void updateHintVisibilityByFilterState();
 
 private slots:
-    void updateFilter(bool force = false);
     void updateToolTipPosition();
 
     void updateIcons();
@@ -171,9 +150,6 @@ private slots:
 
 private:
     QScopedPointer<Ui::ResourceBrowserWidget> ui;
-
-    bool m_ignoreFilterChanges;
-    int m_filterTimerId;
 
     QnResourceTreeModel* m_resourceModel;
     QnGraphicsToolTipWidget* m_tooltipWidget;

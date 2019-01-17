@@ -11,7 +11,6 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/ptz/item_dewarping_params.h>
 #include <nx_ec/ec_api.h>
 
 #include <client/client_globals.h>
@@ -26,9 +25,11 @@
 #include <ui/dialogs/search_bookmarks_dialog.h>
 #include "ui/dialogs/audit_log_dialog.h"
 
-#include <utils/color_space/image_correction.h>
 #include "api/model/camera_list_reply.h"
 #include <nx/network/http/async_http_client_reply.h>
+
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
 class QAction;
 class QMenu;
@@ -78,8 +79,8 @@ protected:
         QColor frameDistinctionColor;
         bool zoomWindowRectangleVisible = true;
         qreal rotation = 0.0;
-        ImageCorrectionParams contrastParams;
-        QnItemDewarpingParams dewarpingParams;
+        nx::vms::api::ImageCorrectionData contrastParams;
+        nx::vms::api::DewarpingData dewarpingParams;
     };
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params);

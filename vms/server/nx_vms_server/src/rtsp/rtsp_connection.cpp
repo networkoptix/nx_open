@@ -799,13 +799,15 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
 
     addResponseRangeHeader();
 
+    nx::utils::Url controlUrl = d->request.requestLine.url;
+    controlUrl.setQuery(QUrlQuery());
+    nx::network::http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx::network::http::HttpHeader("Content-Base", controlUrl.toString().toUtf8()));
 
     sdp << "v=0" << ENDL;
     sdp << "s=" << d->mediaRes->toResource()->getName() << ENDL;
     sdp << "c=IN IP4 " << d->socket->getLocalAddress().address.toString() << ENDL;
-    nx::utils::Url controlUrl = d->request.requestLine.url;
-    controlUrl.setQuery(QUrlQuery());
-    sdp << "a=control:" << controlUrl.toString() << ENDL;
 #if 0
     QUrl sessionControlUrl = d->request.requestLine.url;
     if( sessionControlUrl.port() == -1 )

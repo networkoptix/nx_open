@@ -167,6 +167,7 @@
     </message>
     <message>
         <source>%1 is temporary unavailable. Please try again later.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

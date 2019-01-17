@@ -65,6 +65,8 @@ DECLARE_STRUCT_AND_LIST(ResourceTypeData)
 
 DECLARE_STRUCT_AND_LIST(WebPageData)
 
+DECLARE_STRUCT_EX(DewarpingData, (eq)(ubjson)(json)(xml)(csv_record))
+DECLARE_STRUCT_EX(ImageCorrectionData, (eq)(ubjson)(json)(xml)(csv_record))
 DECLARE_STRUCT_AND_LIST(LayoutItemData)
 DECLARE_STRUCT_AND_LIST(LayoutData)
 

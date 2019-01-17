@@ -178,8 +178,9 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Initialize animations manager. */
     context->instance<workbench::Animations>();
 
-    if (!qnRuntime->isVideoWallMode()) {
-        bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
+    if (!qnRuntime->isVideoWallMode())
+    {
+        const bool smallWindow = qnRuntime->lightMode().testFlag(Qn::LightModeSmallWindow);
         setMinimumWidth(smallWindow ? kMinimalWindowWidth / 2 : kMinimalWindowWidth);
         setMinimumHeight(smallWindow ? kMinimalWindowHeight / 2 : kMinimalWindowHeight);
     }
@@ -210,7 +211,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_view->setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     /* Set up model & control machinery. */
-    display()->setLightMode(qnSettings->lightMode());
+    display()->setLightMode(qnRuntime->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
 
@@ -722,10 +723,11 @@ bool MainWindow::event(QEvent* event)
 
     if (event->type() == QEvent::WindowActivate)
     {
+        // Workaround for QTBUG-34414
         if (m_welcomeScreen && m_welcomeScreenVisible)
         {
-            // Welcome screen looses focus after window deactivation. We restore it here.
-            m_welcomeScreen->forceActiveFocus();
+            activateWindow();
+            m_welcomeScreen->activateView();
         }
     }
     else if (event->type() == QnEvent::WinSystemMenu)

@@ -201,7 +201,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 
     if (widget->dewarpingParams().enabled)
     {
-        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        auto params = widget->item()->dewarpingParams();
         params.enabled = true;
         widget->item()->setDewarpingParams(params);
     }
@@ -250,7 +250,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 
     if (widget->dewarpingParams().enabled)
     {
-        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        auto params = widget->item()->dewarpingParams();
         params.enabled = true;
         widget->item()->setDewarpingParams(params);
     }
