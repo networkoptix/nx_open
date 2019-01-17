@@ -218,7 +218,7 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
     if (!data.allCameras.contains(resourceId))
         return;
 
-    switch(checkedState)
+    switch (checkedState)
     {
         case Qt::Checked:
             selectedCameras.insert(resourceId);
@@ -226,15 +226,15 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
             {
                 data.selectedInvalidCameras.insert(resourceId);
                 setLockCurrentMode(true);
-                if (getText)
-                {
-                    QnResourceList selectedResources;
-                    for (const auto cameraId: selectedCameras)
-                        selectedResources.append(data.allCameras.value(cameraId));
+            }
+            if (!data.selectedInvalidCameras.isEmpty() && getText)
+            {
+                QnResourceList selectedResources;
+                for (const auto cameraId: selectedCameras)
+                    selectedResources.append(data.allCameras.value(cameraId));
 
-                    q->ui->filteredResourceSelectionWidget->setInvalidMessage(
-                        getText(selectedResources, true));
-                }
+                q->ui->filteredResourceSelectionWidget->setInvalidMessage(
+                    getText(selectedResources, true));
             }
             break;
         case Qt::Unchecked:
