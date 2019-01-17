@@ -2036,20 +2036,6 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler(serverModule()));
 
-    /**%apidoc[proprietary] POST /api/installUpdate
-     * Updates server by the package contained in POST body
-     * %return:object JSON object with an error code and error string.
-     *     %param:string error Error code, "0" means no error.
-     *     %param:string errorString Error token, or an empty string on success.
-     *         %value "UP_TO_DATE" The provided version is already installed.
-     *         %value "INVALID_FILE" The provided file cannot be opened as a ZIP archive.
-     *         %value "INCOMPATIBLE_SYSTEM" The update file is targeted for another system.
-     *         %value "EXTRACTION_ERROR" Some extraction problems were found (e.g. not enough
-     *             space).
-     *         %value "INSTALLATION_ERROR" The server could not execute installation script.
-     */
-    reg("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
-
     /**%apidoc POST /api/restart
      * Restarts the server.
      * %permissions Administrator.
