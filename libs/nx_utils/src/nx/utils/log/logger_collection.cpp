@@ -157,17 +157,6 @@ void LoggerCollection::onLevelChanged()
     updateMaxLevel();
 }
 
-std::shared_ptr<AbstractLogger> LoggerCollection::getInternal(int loggerId) const
-{
-    for (const auto& element : m_loggersByTags)
-    {
-        if (element.second.id == loggerId)
-            return element.second.logger;
-    }
-
-    return nullptr;
-}
-
 } // namespace nx
 } // namespace utils
 } // namespace log
