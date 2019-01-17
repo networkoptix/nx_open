@@ -85,7 +85,6 @@ private:
 private:
     mutable QnMutex m_mutex;
     std::shared_ptr<AbstractLogger> m_mainLogger;
-    //std::map<Tag, std::shared_ptr<AbstractLogger>> m_loggersByTags;
     std::map<Tag, Context> m_loggersByTags;
     std::atomic<Level> m_maxLevel{Level::none};
     int m_loggerId = 0;
