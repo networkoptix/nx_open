@@ -170,7 +170,10 @@ protected:
     {
         m_prevResponse = m_requestResults.pop();
 
-        ASSERT_NE(SystemError::noError, m_prevResponse->osResultCode);
+        // Connection can be closed gracefully without transferring any data. This is a failure too.
+        ASSERT_TRUE(
+            m_prevResponse->osResultCode != SystemError::noError ||
+            m_prevResponse->response.empty());
     }
 
     void andEndpointIsNotAvailable()
