@@ -29,8 +29,6 @@ public:
 
     virtual void setCredentials( const char* username, const char* password );
 
-    virtual void setCredentials( const char* username, const char* password );
-
     bool initialize();
     bool isInitialized() const;
 
