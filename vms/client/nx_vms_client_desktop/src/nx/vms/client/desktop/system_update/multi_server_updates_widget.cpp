@@ -65,6 +65,7 @@ const int kTooLateDayOfWeek = Qt::Thursday;
 const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 const int kVersionLabelFontSizePixels = 24;
 const int kVersionLabelFontWeight = QFont::DemiBold;
+const auto kExpectedInstallPeriodSec = 4.0;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;
@@ -840,7 +841,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_peersIssued;
         m_serverUpdateTool->requestStopAction();
         m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::initial, {});
+        setTargetState(WidgetUpdateState::ready, {});
     }
     else if (m_widgetState == WidgetUpdateState::installing)
     {
@@ -857,7 +858,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_stateTracker->getServersInState(StatusCode::readyToInstall);
         m_serverUpdateTool->requestStopAction();
         m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::initial, {});
+        setTargetState(WidgetUpdateState::ready, {});
     }
     else if (m_widgetState == WidgetUpdateState::pushing)
     {
@@ -868,12 +869,11 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     else
     {
         NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState) << ": not implemented";
+        clearUpdateInfo();
+        setUpdateSourceMode(UpdateSourceType::internet);
+        checkForInternetUpdates();
         return false;
     }
-
-    clearUpdateInfo();
-    setUpdateSourceMode(UpdateSourceType::internet);
-    checkForInternetUpdates();
 
     if (m_updateRemoteStateChanged)
         loadDataToUi();
@@ -980,20 +980,25 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         // the moment right before we pressed 'Install'.
         auto serversAreInstalling = m_stateTracker->getPeersInstalling();
         auto serversHaveInstalled = m_stateTracker->getPeersCompleteInstall();
+
         result.installingServers = !m_peersActive.empty();
 
         int total = m_peersIssued.size();
 
-        result.current += serversHaveInstalled.size()*100;
+        auto installDuration = std::chrono::duration_cast<std::chrono::seconds>(
+            m_serverUpdateTool->getInstallDuration());
+        double phase = (double)installDuration.count() / kExpectedInstallPeriodSec;
+        int fakeProgress = 85 * (1.0 - qPow(0.2, phase));
+        result.current += qMax(serversHaveInstalled.size()*100, fakeProgress*serversAreInstalling.size());
         result.max += 100*total;
 
         if (m_clientUpdateTool->hasUpdate())
         {
             bool complete = m_clientUpdateTool->getState() == ClientUpdateTool::State::complete;
             if (complete)
-                result.current += 100;
+                result.current += 10;
             result.installingClient = !complete;
-            result.max += 100;
+            result.max += 10;
         }
     }
 

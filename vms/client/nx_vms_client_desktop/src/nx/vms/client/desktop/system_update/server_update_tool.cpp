@@ -683,6 +683,11 @@ void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
     m_peerManager->setServerUrl(serverUrl, serverId);
 }
 
+ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
+{
+    return Clock::now() - m_timeStartedInstall;
+}
+
 void ServerUpdateTool::requestStopAction()
 {
     m_updateManifest = nx::update::Information();
@@ -741,6 +746,7 @@ void ServerUpdateTool::requestInstallAction(
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_remoteUpdateStatus = {};
 
+    m_timeStartedInstall = Clock::now();
     m_stateTracker->setPeersInstalling(targets, true);
 
     auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
@@ -820,7 +826,6 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     tool->atUpdateStatusResponse(success, handle, response);
             };
 
-        m_timeStartedInstall = Clock::now();
         // Requesting update status for mediaservers.
         rest::Handle handle = 0;
         m_checkingRemoteUpdateStatus = true;
