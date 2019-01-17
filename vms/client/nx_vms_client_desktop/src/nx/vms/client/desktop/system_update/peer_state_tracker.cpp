@@ -334,6 +334,7 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         //NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
         //     server->getName(), systemId);
         return;
+    }
 
     //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
