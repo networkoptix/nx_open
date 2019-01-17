@@ -1,10 +1,13 @@
 #pragma once
 
+#include <nx/utils/log/log_settings.h>
 #include <nx/utils/log/abstract_logger.h>
 
 #include "logger.h"
 
 namespace nx::network::maintenance::log::utils {
+
+nx::utils::log::LoggerSettings toLoggerSettings(const Logger& loggerInfo);
 
 std::set<nx::utils::log::Tag> toTags(const std::vector<Filter>& filters);
 

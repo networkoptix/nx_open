@@ -89,7 +89,7 @@ void Server::serveDeleteLoggers(
     {
         loggerId = std::stoi(requestContext.requestPathParams.getByName("id"));
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
     }
@@ -109,21 +109,14 @@ void Server::servePostLoggers(
     Logger newLoggerInfo = QJson::deserialized<Logger>(requestContext.request.messageBody);
 
     Settings logSettings;
-    LoggerSettings loggerSettings;
-
-    File::Settings fileSettings;
-    fileSettings.size = loggerSettings.maxFileSize;
-    fileSettings.count = loggerSettings.maxBackupCount;
-    fileSettings.name = QString::fromStdString(newLoggerInfo.path);
-
-    logSettings.loggers.push_back(loggerSettings);
+    logSettings.loggers.push_back(utils::toLoggerSettings(newLoggerInfo));
 
     auto newLogger = LoggerBuilder().buildLogger(
         logSettings,
         QString(), // TODO: #nw get the application name
         QString(), // TODO: #nw get the appliation binary path
         utils::toTags(newLoggerInfo.filters),
-        std::make_unique<File>(fileSettings));
+        nullptr);
 
     int id = m_loggerCollection->add(std::move(newLogger));
     if (id == LoggerCollection::invalidId)

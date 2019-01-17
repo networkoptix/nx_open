@@ -41,6 +41,29 @@ std::map<Level, std::vector<Tag>> getEffectiveTagsByLevel(
 
 } // namespace
 
+LoggerSettings toLoggerSettings(const Logger& loggerInfo)
+{
+    LoggerSettings settings;
+    settings.level.filters = toLevelFilters(loggerInfo.filters);
+    settings.level.primary = loggerInfo.defaultLevel.empty()
+        ? Level::none
+        : levelFromString(QString::fromStdString(loggerInfo.defaultLevel));
+
+    size_t finalSlash = loggerInfo.path.find_last_of('/');
+    if (finalSlash == std::string::npos)
+    {
+        settings.logBaseName = QString::fromStdString(loggerInfo.path);
+    }
+    else
+    {
+        settings.directory = QString::fromStdString(loggerInfo.path.substr(0, finalSlash));
+        if (finalSlash < loggerInfo.path.size())
+            settings.logBaseName = QString::fromStdString(loggerInfo.path.substr(finalSlash + 1));
+    }
+
+    return settings;
+}
+
 std::set<Tag> toTags(const std::vector<Filter>& filters)
 {
     std::set<Tag> tags;
@@ -62,7 +85,7 @@ LevelFilters toLevelFilters(const std::vector<Filter>& filters)
         {
             levelFilters.emplace(
                 tag, 
-                levelFromString(QString::fromStdString(tag)));
+                levelFromString(QString::fromStdString(filter.level)));
         }
     }
 
@@ -105,8 +128,9 @@ Logger toLoggerInfo(
         loggerInfo.path = (*filePath).toStdString();
     }
 
-
     loggerInfo.filters = toEffectiveFilters(effectiveTags, logger->levelFilters());
+
+    loggerInfo.defaultLevel = toString(logger->defaultLevel()).toStdString();
 
     return loggerInfo;
 }
