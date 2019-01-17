@@ -52,7 +52,13 @@ EventPanel::Private::Private(EventPanel* q):
     m_synchronizers({
         {m_motionTab, new MotionSearchSynchronizer(context(), m_motionTab, this)},
         {m_bookmarksTab, new BookmarkSearchSynchronizer(context(), m_bookmarksTab, this)},
-        {m_analyticsTab, new AnalyticsSearchSynchronizer(context(), m_analyticsTab, this)}})
+        {m_analyticsTab, new AnalyticsSearchSynchronizer(context(), m_analyticsTab, this)}}),
+    m_tabIds({
+        {m_notificationsTab, Tab::notifications},
+        {m_motionTab, Tab::motion},
+        {m_bookmarksTab, Tab::bookmarks},
+        {m_eventsTab, Tab::events},
+        {m_analyticsTab, Tab::analytics}})
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
@@ -85,6 +91,7 @@ EventPanel::Private::Private(EventPanel* q):
                 synchronizer->setActive(m_tabs->currentWidget() == tab);
 
             NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2", m_previousTab, m_lastTab);
+            emit this->q->currentTabChanged(m_tabIds.value(m_lastTab), {});
         });
 
     q->setAutoFillBackground(false);
@@ -105,14 +112,14 @@ EventPanel::Private::Private(EventPanel* q):
                 tab->goToLive();
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
-        this, &Private::rebuildTabs);
+    using Tabs = std::initializer_list<AbstractSearchWidget*>;
+    for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
+    {
+        connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+        connect(tab, &AbstractSearchWidget::allowanceChanged, this, &Private::rebuildTabs);
+    }
 
     rebuildTabs();
-
-    using Tabs = std::initializer_list<AbstractSearchWidget*>;
-    for (auto tab: Tabs{ m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab })
-        connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     connect(m_notificationsTab, &NotificationListWidget::tileHovered,
         q, &EventPanel::tileHovered);
@@ -128,6 +135,21 @@ EventPanel::Private::Private(EventPanel* q):
 EventPanel::Private::~Private()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+EventPanel::Tab EventPanel::Private::currentTab() const
+{
+    return m_tabIds.value(m_tabs->currentWidget());
+}
+
+bool EventPanel::Private::setCurrentTab(Tab tab)
+{
+    const int index = m_tabs->indexOf(m_tabIds.key(tab));
+    if (index < 0)
+        return false;
+
+    m_tabs->setCurrentIndex(index);
+    return true;
 }
 
 void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
@@ -185,30 +207,24 @@ void EventPanel::Private::rebuildTabs()
         tr("Notifications", "Notifications tab title"));
 
     updateTab(m_motionTab,
-        true,
+        m_motionTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/motion.png")),
         tr("Motion", "Motion tab title"));
 
     updateTab(m_bookmarksTab,
-        accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks),
+        m_bookmarksTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/bookmarks.png")),
         tr("Bookmarks", "Bookmarks tab title"));
 
     updateTab(m_eventsTab,
-        accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs),
+        m_eventsTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/events.png")),
         tr("Events", "Events tab title"));
 
     updateTab(m_analyticsTab,
-        systemHasAnalytics(),
+        m_analyticsTab->isAllowed(),
         qnSkin->icon(lit("events/tabs/analytics.png")),
         tr("Objects", "Analytics tab title"));
-}
-
-bool EventPanel::Private::systemHasAnalytics() const
-{
-    // TODO: #vkutin #GDM Implement when it becomes possible.
-    return true;
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)

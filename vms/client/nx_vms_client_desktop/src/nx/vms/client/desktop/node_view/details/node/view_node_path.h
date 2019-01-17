@@ -11,7 +11,7 @@ namespace details {
 /**
  * Relative path from one node to another. Consist of indexes for child items for each node.
  */
-class NX_VMS_DESKTOP_CLIENT_API ViewNodePath
+class NX_VMS_CLIENT_DESKTOP_API ViewNodePath
 {
 public:
     using Indices = QList<int>;
@@ -42,7 +42,7 @@ private:
     Indices m_indices;
 };
 
-NX_VMS_DESKTOP_CLIENT_API bool operator==(const ViewNodePath& left, const ViewNodePath& right);
+NX_VMS_CLIENT_DESKTOP_API bool operator==(const ViewNodePath& left, const ViewNodePath& right);
 
 } // namespace details
 } // namespace node_view

@@ -18,6 +18,7 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 
+class QnStoragePluginFactory;
 class QSettings;
 class QnSessionManager;
 class QnRouter;
@@ -86,6 +87,12 @@ public:
     using QnInstanceStorage::store;
 
     void bindModuleInformation(const QnMediaServerResourcePtr &server);
+
+    QnStoragePluginFactory* storagePluginFactory() const
+    {
+        return m_storagePluginFactory;
+    }
+
 
     QnSessionManager* sessionManager() const
     {
@@ -321,6 +328,7 @@ private:
     bool m_lowPriorityAdminPassword = false;
     QDateTime m_startupTime;
 
+    QnStoragePluginFactory* m_storagePluginFactory = nullptr;
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;

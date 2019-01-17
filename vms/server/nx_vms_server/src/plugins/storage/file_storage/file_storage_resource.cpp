@@ -247,10 +247,10 @@ qint64 QnFileStorageResource::calculateAndSetTotalSpaceWithoutInit()
     QString url = getUrl();
     qint64 result;
 
-    NX_VERBOSE(this, lit("%1 valid = %2, url = %3")
-           .arg(Q_FUNC_INFO)
-           .arg(m_valid)
-           .arg(url));
+    NX_VERBOSE(this, "%1 valid = %2, url = %3",
+           Q_FUNC_INFO,
+           m_valid,
+           nx::utils::url::hidePassword(url));
 
     if (url.isNull() || url.isEmpty())
         return -1;
@@ -522,7 +522,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
     {
         NX_DEBUG(this, lit("%1 Mounting remote drive %2. Result: %3")
                .arg(Q_FUNC_INFO)
-               .arg(getUrl())
+               .arg(nx::utils::url::hidePassword(getUrl()))
                .arg(message));
         return result;
     };
@@ -541,7 +541,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
         default:
             NX_WARNING(this, lit("%1 Mounting remote drive %2 error %3.")
                     .arg(Q_FUNC_INFO)
-                    .arg(getUrl())
+                    .arg(nx::utils::url::hidePassword(getUrl()))
                     .arg(errCode));
             return Qn::StorageInit_WrongPath;
     };
@@ -556,7 +556,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
     if (!url.startsWith("smb://"))
         return Qn::StorageInit_Ok;
 
-    NX_VERBOSE(this, lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()));
+    NX_VERBOSE(this, lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(nx::utils::url::hidePassword(getUrl())));
 
     QUrl storageUrl(url);
     NETRESOURCE netRes;
@@ -798,11 +798,11 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    NX_VERBOSE(this, lit("[initOrUpdate] for storage %1 begin").arg(getUrl()));
+    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
 
     if (!isMounted())
     {
-        NX_VERBOSE(this, lm("[initOrUpdate] storage %1 is not mounted").args(getUrl()));
+        NX_VERBOSE(this, "[initOrUpdate] storage %1 is not mounted", nx::utils::url::hidePassword(getUrl()));
         return Qn::StorageInitResult::StorageInit_CreateFailed;
     }
 
@@ -830,7 +830,8 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached.get())
     {
-        NX_ERROR(this, lm("[initOrUpdate, WriteTest] write test failed for %1").args(getUrl()));
+        NX_ERROR(this, "[initOrUpdate, WriteTest] write test failed for %1",
+            nx::utils::url::hidePassword(getUrl()));
         m_valid = false;
         return Qn::StorageInit_WrongPath;
     }
@@ -839,7 +840,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     m_cachedTotalSpace = rootTool()->totalSpace(path); // update cached value periodically
     NX_VERBOSE(
         this,
-        lm("initOrUpdate successfully completed for %1").args(getUrl()));
+        "initOrUpdate successfully completed for %1", nx::utils::url::hidePassword(getUrl()));
 
     return Qn::StorageInit_Ok;
 }

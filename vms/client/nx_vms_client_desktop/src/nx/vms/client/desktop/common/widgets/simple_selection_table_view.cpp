@@ -72,7 +72,13 @@ void SimpleSelectionTableView::setupHeader()
             if (!containsCheckedRole)
                 return;
 
-            const auto rowCount = currentModel->rowCount();
+            int rowCount = 0;
+            for (int row = 0; row < currentModel->rowCount(); ++row)
+            {
+                if (currentModel->index(row, m_checkboxColumn).flags().testFlag(Qt::ItemIsEnabled))
+                    ++rowCount;
+            }
+
             const auto checkedCount = getCheckedCount();
             if (rowCount == checkedCount &&  rowCount)
                 m_checkableHeader->setCheckState(Qt::Checked);
@@ -136,14 +142,14 @@ void SimpleSelectionTableView::handleClicked(const QModelIndex& index)
     if (!currentModel || !index.isValid())
         return;
 
-    if (index == checkboxIndex(index))
+    if (index == getCheckboxIndex(index))
         return; //< Click will be handled by base class implementation.
 
-    if (!checkboxIndex(index).flags().testFlag(Qt::ItemIsUserCheckable))
+    if (!getCheckboxIndex(index).flags().testFlag(Qt::ItemIsUserCheckable))
         return;
 
     const auto newCheckState = isChecked(index) ? Qt::Unchecked : Qt::Checked;
-    currentModel->setData(checkboxIndex(index), newCheckState, Qt::CheckStateRole);
+    currentModel->setData(getCheckboxIndex(index), newCheckState, Qt::CheckStateRole);
 }
 
 void SimpleSelectionTableView::handleSpacePressed()
@@ -156,15 +162,27 @@ void SimpleSelectionTableView::handleSpacePressed()
     if (indexes.empty())
         return;
 
-    const bool anyUnchecked = std::any_of(indexes.begin(), indexes.end(),
-        [this](const QModelIndex& index) { return !isChecked(index); });
+    QSet<QModelIndex> applicableCheckboxIndexes;
+    for (const auto& index: indexes)
+    {
+        auto checkboxIndex = getCheckboxIndex(index);
+        if (checkboxIndex.flags().testFlag(Qt::ItemIsEnabled)
+            && checkboxIndex.flags().testFlag(Qt::ItemIsUserCheckable))
+        {
+            applicableCheckboxIndexes.insert(checkboxIndex);
+        }
+    }
 
+    const bool anyUnchecked = std::any_of(applicableCheckboxIndexes.begin(),
+        applicableCheckboxIndexes.end(),
+        [this](const QModelIndex& index) { return !isChecked(index); });
     const auto newState = anyUnchecked ? Qt::Checked : Qt::Unchecked;
-    for (const auto index: indexes)
-        currentModel->setData(checkboxIndex(index), newState, Qt::CheckStateRole);
+
+    for (const auto index: applicableCheckboxIndexes)
+        currentModel->setData(getCheckboxIndex(index), newState, Qt::CheckStateRole);
 }
 
-QModelIndex SimpleSelectionTableView::checkboxIndex(const QModelIndex& index)
+QModelIndex SimpleSelectionTableView::getCheckboxIndex(const QModelIndex& index) const
 {
     const auto currentModel = model();
     return currentModel && index.isValid()
@@ -172,13 +190,13 @@ QModelIndex SimpleSelectionTableView::checkboxIndex(const QModelIndex& index)
         : QModelIndex();
 }
 
-bool SimpleSelectionTableView::isChecked(const QModelIndex& index)
+bool SimpleSelectionTableView::isChecked(const QModelIndex& index) const
 {
     const auto currentModel = model();
     if (!currentModel)
         return false;
 
-    const auto state = currentModel->data(checkboxIndex(index), Qt::CheckStateRole).toInt();
+    const auto state = currentModel->data(getCheckboxIndex(index), Qt::CheckStateRole).toInt();
 
     return state != Qt::Unchecked;
 }

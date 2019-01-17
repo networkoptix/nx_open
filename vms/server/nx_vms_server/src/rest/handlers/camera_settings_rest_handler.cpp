@@ -2,6 +2,9 @@
 
 #include <algorithm>
 
+#include <QString>
+#include <QMap>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -28,6 +31,17 @@ static const QString kDeprecatedResIdParam = "res_id";
 static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
+using PostBody = QnCameraSettingsRestHandlerPostBody;
+
+struct QnCameraSettingsRestHandlerPostBody
+{
+    QString cameraId;
+    QMap<QString, QString> paramValues; //< NOTE: Fusion does not support QMap.
+};
+#define QnCameraSettingsRestHandlerPostBody_Fields (cameraId)(paramValues)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraSettingsRestHandlerPostBody, (json),
+    QnCameraSettingsRestHandlerPostBody_Fields);
 
 namespace {
 
@@ -116,7 +130,7 @@ QnCameraSettingsRestHandler::~QnCameraSettingsRestHandler()
 {
 }
 
-StatusCode QnCameraSettingsRestHandler::obtainCamera(
+StatusCode QnCameraSettingsRestHandler::obtainCameraFromRequestParams(
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner,
@@ -136,7 +150,7 @@ StatusCode QnCameraSettingsRestHandler::obtainCamera(
         NX_WARNING(this, "Camera not found");
         if (notFoundCameraId.isNull())
         {
-            result.setError(QnRestResult::MissingParameter, lit("Camera is not specified"));
+            result.setError(QnRestResult::MissingParameter, "Camera is not specified");
             return StatusCode::unprocessableEntity;
         }
         else
@@ -149,11 +163,32 @@ StatusCode QnCameraSettingsRestHandler::obtainCamera(
     return StatusCode::ok;
 }
 
-StatusCode QnCameraSettingsRestHandler::obtainCameraParamValues(
+StatusCode QnCameraSettingsRestHandler::obtainCameraFromPostBody(
+    const PostBody& postBody,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner,
+    nx::vms::server::resource::CameraPtr* outCamera) const
+{
+    *outCamera = nx::camera_id_helper::findCameraByFlexibleId(
+        owner->resourcePool(),
+        postBody.cameraId
+    ).dynamicCast<nx::vms::server::resource::Camera>();
+
+    if (!*outCamera)
+    {
+        NX_WARNING(this, "Camera not found by cameraId %1", postBody.cameraId);
+        result.setError(QnRestResult::InvalidParameter, lm("No camera %1").arg(postBody.cameraId));
+        return StatusCode::unprocessableEntity;
+    }
+
+    return StatusCode::ok;
+}
+
+StatusCode QnCameraSettingsRestHandler::obtainCameraParamValuesFromRequestParams(
     const nx::vms::server::resource::CameraPtr& camera,
     const QnRequestParams& params,
     QnJsonRestResult& result,
-    QnCameraAdvancedParamValueMap* outValues)
+    QnCameraAdvancedParamValueMap* outValues) const
 {
     // Remove params that are not camera params.
     QnRequestParams cameraParams = params;
@@ -162,26 +197,43 @@ StatusCode QnCameraSettingsRestHandler::obtainCameraParamValues(
     cameraParams.remove(kDeprecatedResIdParam);
 
     // Filter allowed parameters.
-    QnCameraAdvancedParams cameraParameters = m_paramsReader->params(camera);
-    const auto allowedParams = cameraParameters.allParameterIds();
-
-    for (auto it = cameraParams.begin(); it != cameraParams.end();)
+    const auto allowedParams = m_paramsReader->params(camera).allParameterIds();
+    for (auto it = cameraParams.begin(); it != cameraParams.end(); ++it)
     {
         if (allowedParams.contains(it.key()))
-            ++it;
-        else
-            it = cameraParams.erase(it);
+            outValues->insert(it.key(), it.value());
     }
 
-    if (cameraParams.empty())
+    if (outValues->empty())
     {
         result.setError(QnRestResult::MissingParameter,
             "No valid camera parameters in the request");
         return StatusCode::unprocessableEntity;
     }
 
-    for (auto it = cameraParams.cbegin(); it != cameraParams.cend(); ++it)
-        outValues->insert(it.key(), it.value());
+    return StatusCode::ok;
+}
+
+StatusCode QnCameraSettingsRestHandler::obtainCameraParamValuesFromPostBody(
+    const nx::vms::server::resource::CameraPtr& camera,
+    const PostBody& postBody,
+    QnJsonRestResult& result,
+    QnCameraAdvancedParamValueMap* outValues) const
+{
+    // Filter allowed parameters.
+    const auto allowedParams = m_paramsReader->params(camera).allParameterIds();
+    for (auto it = postBody.paramValues.begin(); it != postBody.paramValues.end(); ++it)
+    {
+        if (allowedParams.contains(it.key()))
+            outValues->insert(it.key(), it.value());
+    }
+
+    if (outValues->empty())
+    {
+        result.setError(QnRestResult::MissingParameter,
+            "No valid camera parameters in the request");
+        return StatusCode::unprocessableEntity;
+    }
 
     return StatusCode::ok;
 }
@@ -197,12 +249,12 @@ int QnCameraSettingsRestHandler::executeGet(
     auto statusCode = StatusCode::undefined;
 
     nx::vms::server::resource::CameraPtr camera;
-    statusCode = obtainCamera(params, result, owner, &camera);
+    statusCode = obtainCameraFromRequestParams(params, result, owner, &camera);
     if (statusCode != StatusCode::ok)
         return statusCode;
 
     QnCameraAdvancedParamValueMap values;
-    statusCode = obtainCameraParamValues(camera, params, result, &values);
+    statusCode = obtainCameraParamValuesFromRequestParams(camera, params, result, &values);
     if (statusCode != StatusCode::ok)
         return statusCode;
 
@@ -243,22 +295,30 @@ int QnCameraSettingsRestHandler::executeGet(
 
 int QnCameraSettingsRestHandler::executePost(
     const QString& path,
-    const QnRequestParams& params,
+    const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     NX_DEBUG(this, "Received request POST %1", path);
 
+    bool success = false;
+    const auto postBody = QJson::deserialized<PostBody>(body, PostBody(), &success);
+    if (!success)
+    {
+        result.setError(QnJsonRestResult::InvalidParameter, "Invalid Json object provided");
+        return nx::network::http::StatusCode::ok;
+    }
+
     auto statusCode = StatusCode::undefined;
 
     nx::vms::server::resource::CameraPtr camera;
-    statusCode = obtainCamera(params, result, owner, &camera);
+    statusCode = obtainCameraFromPostBody(postBody, result, owner, &camera);
     if (statusCode != StatusCode::ok)
         return statusCode;
 
     QnCameraAdvancedParamValueMap values;
-    statusCode = obtainCameraParamValues(camera, params, result, &values);
+    statusCode = obtainCameraParamValuesFromPostBody(camera, postBody, result, &values);
     if (statusCode != StatusCode::ok)
         return statusCode;
 

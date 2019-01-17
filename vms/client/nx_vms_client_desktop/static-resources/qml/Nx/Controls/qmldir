@@ -12,6 +12,7 @@ GroupBox 1.0 GroupBox.qml
 Panel 1.0 Panel.qml
 ScrollView 1.0 ScrollView.qml
 ScrollBar 1.0 ScrollBar.qml
+AlertBar 1.0 AlertBar.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml

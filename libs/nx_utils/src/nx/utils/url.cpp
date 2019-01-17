@@ -4,6 +4,7 @@
 #include <QtCore/QRegExp>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #include "url.h"
 
@@ -309,7 +310,8 @@ QString Url::authority(QUrl::ComponentFormattingOptions options) const
 
 void Url::setUserInfo(const QString &userInfo, QUrl::ParsingMode mode)
 {
-    m_url.setUserInfo(userInfo, mode);
+    // NOTE: Make sure the QString is null, if it is empty.
+    m_url.setUserInfo(userInfo.isEmpty() ? QString() : userInfo, mode);
 }
 
 QString Url::userInfo(QUrl::ComponentFormattingOptions options) const
@@ -319,7 +321,8 @@ QString Url::userInfo(QUrl::ComponentFormattingOptions options) const
 
 void Url::setUserName(const QString &userName, QUrl::ParsingMode mode)
 {
-    m_url.setUserName(userName, mode);
+    // NOTE: Make sure the QString is null, if it is empty.
+    m_url.setUserName(userName.isEmpty() ? QString() : userName, mode);
 }
 
 QString Url::userName(QUrl::ComponentFormattingOptions options) const
@@ -329,7 +332,8 @@ QString Url::userName(QUrl::ComponentFormattingOptions options) const
 
 void Url::setPassword(const QString &password, QUrl::ParsingMode mode)
 {
-    m_url.setPassword(password, mode);
+    // NOTE: Make sure the QString is null, if it is empty.
+    m_url.setPassword(password.isEmpty() ? QString() : password, mode);
 }
 
 QString Url::password(QUrl::ComponentFormattingOptions options) const
@@ -594,13 +598,23 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
     return result;
 }
 
+QString hidePassword(const QString& urlStr)
+{
+    if (displayPasswordInLogs())
+        return urlStr;
+
+    nx::utils::Url url(urlStr);
+    if (url.isValid())
+        url.toDisplayString();
+
+    return urlStr;
+}
+
+bool displayPasswordInLogs()
+{
+    return nx::utils::ini().displayUrlPasswordInLogs;
+}
+
 } // namespace url
 } // namespace utils
 } // namespace nx
-
-QString toString(const nx::utils::Url &value)
-{
-    if (nx::utils::ini().displayUrlPasswordInLogs)
-        return value.toString();
-    return value.toDisplayString();
-}

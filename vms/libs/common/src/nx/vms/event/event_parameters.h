@@ -50,6 +50,7 @@ struct EventParameters
      * Name of the resource which caused the event. Used if no resource is actually registered in
      * the system. External custom event can provide some resource name with doesn't match
      * resourceId in the system. In this case resourceName is filled and resourceId remains empty.
+     * In GUI and API referred as `source`.
      */
     QString resourceName;
 

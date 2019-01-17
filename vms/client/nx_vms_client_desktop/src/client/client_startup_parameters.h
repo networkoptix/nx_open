@@ -27,6 +27,7 @@ struct QnStartupParameters
     nx::utils::Url parseAuthenticationString() const;
 
     bool isDevMode() const;
+    bool isVideoWallMode() const;
 
     int screen = kInvalidScreen;
     const static QString kScreenKey;
@@ -61,7 +62,6 @@ struct QnStartupParameters
     QString layoutRef;
     QString logLevel;
     QString logFile;
-    QString ec2TranLogLevel;
     QString lightMode;
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;

@@ -25,15 +25,15 @@ int localFlagsOrder(Qn::ResourceFlags flags)
 
 }
 
-QnResourcePtr QnResourceCompareHelper::resource(const QModelIndex& index)
+QnResourcePtr QnResourceCompareHelper::getResource(const QModelIndex& index)
 {
     return index.data(Qn::ResourceRole).value<QnResourcePtr>();
 }
 
 bool QnResourceCompareHelper::resourceLessThan(const QModelIndex& left, const QModelIndex& right)
 {
-    QnResourcePtr l = resource(left);
-    QnResourcePtr r = resource(right);
+    QnResourcePtr l = getResource(left);
+    QnResourcePtr r = getResource(right);
 
     if (l && r)
     {

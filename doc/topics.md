@@ -13,3 +13,5 @@
 @subpage widgets_lib
 
 @subpage layout_files
+
+@subpage watermarks

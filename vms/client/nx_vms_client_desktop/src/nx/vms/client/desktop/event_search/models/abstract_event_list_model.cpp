@@ -28,6 +28,9 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
         case Qn::TimestampTextRole:
             return timestampText(index.data(Qn::TimestampRole).value<microseconds>());
 
+        case Qn::DisplayedResourceListRole:
+            return index.data(Qn::ResourceListRole);
+
         case Qt::AccessibleTextRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
@@ -78,7 +81,7 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
         return datetime::toString(dateTime.time());
 }
 
-bool AbstractEventListModel::defaultAction(const QModelIndex& index)
+bool AbstractEventListModel::defaultAction(const QModelIndex& /*index*/)
 {
     return false;
 }

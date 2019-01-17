@@ -506,7 +506,7 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .shortcut(lit("Alt+Enter"))
         .shortcut(lit("Alt+Return"))
-//        .shortcut(lit("Ctrl+F"), Builder::Mac, true) // Uncomment me later, workaround for 4.0 beta (VMS-11557).
+        .shortcut(lit("Ctrl+F"), Builder::Mac, true) // Uncomment me later, workaround for 4.0 beta (VMS-11557).
         .shortcutContext(Qt::ApplicationShortcut);
 
     factory(VersionMismatchMessageAction)
@@ -1242,12 +1242,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree)
         .separator();
 
-    // TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(DeleteFromDiskAction)
-        //flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
+        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::local_media, MatchMode::All));
+        .condition(condition::hasFlags(Qn::local_media, MatchMode::All)
+            && condition::isTrue(ini().allowDeleteLocalFiles));
 
     factory(SetAsBackgroundAction)
         .flags(Scene | SingleTarget)

@@ -55,7 +55,7 @@ public:
 
 private:
     const std::string m_name;
-    const std::string m_manifest;
+    const std::string m_jsonManifest;
 
     CreateEngine m_createEngine;
     nxpl::PluginInterface* m_pluginContainer;

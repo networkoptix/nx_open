@@ -29,4 +29,14 @@ void EventPanel::mousePressEvent(QMouseEvent* event)
         event->accept();
 }
 
+EventPanel::Tab EventPanel::currentTab() const
+{
+    return d->currentTab();
+}
+
+bool EventPanel::setCurrentTab(Tab tab)
+{
+    return d->setCurrentTab(tab);
+}
+
 } // namespace nx::vms::client::desktop

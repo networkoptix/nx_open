@@ -71,9 +71,16 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     auto archiveManager = m_resource->remoteArchiveManager();
     NX_ASSERT(archiveManager);
     if (!archiveManager)
+    {
+        NX_WARNING(this, "Unable to get archive manager for resource %1",
+            m_resource->getUserDefinedName());
+
         return false;
+    }
 
     m_settings = archiveManager->settings();
+
+    NX_INFO(this, "Synchronization for resource %1 has started", m_resource->getUserDefinedName());
 
     archiveManager->beforeSynchronization();
     serverModule()->eventConnector()->at_remoteArchiveSyncStarted(m_resource);
@@ -97,6 +104,9 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
         result &= synchronizeArchive();
     }
 
+    NX_INFO(this, "Synchronization for resource %1 %2",
+        m_resource->getUserDefinedName(), result ? "is succesful" : "has failed");
+
     archiveManager->afterSynchronization(result);
     serverModule()->eventConnector()->at_remoteArchiveSyncFinished(m_resource);
     return result;
@@ -104,10 +114,10 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
 
 bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
 {
-    NX_INFO(
-        this,
-        lm("Starting archive synchronization. Resource: %1 %2")
-            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
+    const auto overlappedIdOrder = m_resource->remoteArchiveManager()->overlappedIdImportOrder();
+    NX_INFO(this, "Starting archive synchronization, resource: %1 %2, overlapped id order %3",
+        m_resource->getUserDefinedName(), m_resource->getUniqueId(),
+        static_cast<int>(overlappedIdOrder));
 
     if (!fetchChunks(&m_chunks))
         return false;
@@ -121,14 +131,27 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
         return true;
 
     bool result = true;
-    for (const auto& entry: m_chunks)
-    {
-        const auto overlappedId = entry.first;
-        const auto& chunks = entry.second;
+    const auto import =
+        [this, &result](const auto& iterator)
+        {
+            const auto overlappedId = iterator->first;
+            const auto& chunks = iterator->second;
 
-        if (!chunks.empty())
-            result &= synchronizeOverlappedTimeline(overlappedId);
-    }
+            if (!chunks.empty())
+                result &= synchronizeOverlappedTimeline(overlappedId);
+        };
+
+    switch (m_resource->remoteArchiveManager()->overlappedIdImportOrder())
+    {
+        case core::resource::ImportOrder::Direct:
+            for (auto iterator = m_chunks.begin(); iterator != m_chunks.end(); ++iterator)
+                import(iterator);
+            break;
+        case core::resource::ImportOrder::Reverse:
+            for (auto iterator = m_chunks.rbegin(); iterator != m_chunks.rend(); ++iterator)
+                import(iterator);
+            break;
+    };
 
     return result;
 }
@@ -388,9 +411,9 @@ void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
     m_importedDuration += duration;
     NX_VERBOSE(
         this,
-        lm("Resource %1. File has been written. Duration: %1,"
-            "Current duration of imported remote archive: %2,"
-            "Total duration to import: %3")
+        lm("Resource %1. File has been written. Duration: %2, "
+            "Current duration of imported remote archive: %3, "
+            "Total duration to import: %4")
             .args(
                 m_resource->getUserDefinedName(),
                 duration,

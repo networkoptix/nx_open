@@ -61,7 +61,7 @@ void QnMediaServerResourceSearchers::start()
     //NOTE plugins have higher priority than built-in drivers
     registerSearcher(new ThirdPartyResourceSearcher(serverModule()));
 
-    registerSearcher(new QnPlC2pCameraResourceSearcher(commonModule));
+    registerSearcher(new QnPlC2pCameraResourceSearcher(serverModule()));
 
 #ifdef ENABLE_DESKTOP_CAMERA
     registerSearcher(new QnDesktopCameraResourceSearcher(serverModule()));

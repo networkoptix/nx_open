@@ -69,7 +69,9 @@ public:
      * cache. Data from consequent requests is integrated into this cache, for each server.
      * This data can be obtained by getServersStatusChanges method.
      */
-    void requestRemoteUpdateState();
+    void requestRemoteUpdateStateAsync();
+
+    std::future<std::vector<nx::update::Status>> requestRemoteUpdateState();
 
     using RemoteStatus = std::map<QnUuid, nx::update::Status>;
     /**
@@ -97,6 +99,12 @@ public:
      */
     void requestInstallAction(const QSet<QnUuid>& targets);
 
+    /**
+     * Send request for moduleInformation from the server.
+     * Response arrives at moduleInformationReceived signal.
+     */
+    void requestModuleInformation();
+
     // State for uploading offline update package.
     enum class OfflineUpdateState
     {
@@ -120,9 +128,14 @@ public:
     // TODO: move all state restoration logic to widget.
     std::future<UpdateContents> getUpdateCheck();
 
-    // Check if update info contains all the packages necessary to update the system.
-    // @param contents - current update contents.
-    bool verifyUpdateManifest(UpdateContents& contents) const;
+    /**
+     * Check if update info contains all the packages necessary to update the system.
+     * @param contents - current update contents.
+     * @param clientVersions - current client versions installed.
+     */
+    bool verifyUpdateManifest(
+        UpdateContents& contents,
+        const std::set<nx::utils::SoftwareVersion>& clientVersions) const;
 
     // Start uploading local update packages to the server(s).
     bool startUpload(const UpdateContents& contents);
@@ -202,13 +215,13 @@ public:
 signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
+    void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
     void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void atExtractFilesFinished(int code);
-    void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.

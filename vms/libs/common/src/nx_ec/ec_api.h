@@ -991,7 +991,10 @@ public:
     virtual void startReceivingNotifications() = 0;
     virtual void stopReceivingNotifications() = 0;
 
-    virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) = 0;
+    virtual void addRemotePeer(
+        const QnUuid& id,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& _url) = 0;
     virtual void deleteRemotePeer(const QnUuid& id) = 0;
 
     virtual nx::vms::api::Timestamp getTransactionLogTime() const = 0;
@@ -1217,7 +1220,6 @@ public:
         return impl::doSyncCall<impl::ConnectHandler>(call, connection);
     }
 
-    virtual void setConfParams(std::map<QString, QVariant> confParams) = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
     virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
 

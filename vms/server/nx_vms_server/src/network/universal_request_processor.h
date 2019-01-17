@@ -23,8 +23,12 @@ public:
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
+
+    /*
+     * This function checks if encryption is forced and does redirect to https scheme if need.
+     */
     bool hasSecurityIssue();
-    bool redicrectToScheme(const char* scheme);
+    bool redirectToScheme(const char* scheme);
     bool processRequest(bool noAuth);
     bool authenticate(Qn::UserAccessData* accessRights, bool *noAuth);
 

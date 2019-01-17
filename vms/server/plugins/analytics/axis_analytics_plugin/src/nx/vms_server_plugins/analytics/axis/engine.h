@@ -16,10 +16,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
@@ -53,11 +50,10 @@ private:
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
-    EngineManifest m_typedManifest;
-    QByteArray m_manifest;
+
+    // Engine manifest is stored in serialized and deserialized states, since both of them needed.
+    QByteArray m_jsonManifest;
+    EngineManifest m_parsedManifest;
 };
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

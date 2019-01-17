@@ -519,7 +519,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 return true; //< Skip this frame.
 
             // Live stream has just been started. Let's wait for the first key frame before switch.
-            if (!m_isLive && !isKeyFrame)
+            if (!m_isLive && isVideo && !isKeyFrame)
                 return true;
 
             m_isLive = true;

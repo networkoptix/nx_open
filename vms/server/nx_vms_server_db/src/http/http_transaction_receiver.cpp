@@ -12,7 +12,6 @@
 #include <nx/network/http/custom_headers.h>
 #include "transaction/server_transaction_message_bus.h"
 #include "transaction/transaction_transport.h"
-#include "settings.h"
 
 
 namespace ec2
@@ -42,7 +41,7 @@ namespace ec2
     };
 
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
-		ServerTransactionMessageBus* messageBus,
+        ServerTransactionMessageBus* messageBus,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner )
     :

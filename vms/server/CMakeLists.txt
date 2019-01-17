@@ -7,6 +7,7 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+    add_subdirectory(rtsp_perf)
 
     if(withAnalyticsSdk)
         # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_analytics_sdk) into one like this.
@@ -20,4 +21,8 @@ if(withMediaServer)
     if(withRootTool)
         add_subdirectory(root_tool)
     endif()
+endif()
+
+if(withP2PConnectionTestingUtility)
+    add_subdirectory(p2p_connection_testing_utility)
 endif()

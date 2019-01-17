@@ -10,7 +10,7 @@ namespace details {
 /**
  * Helper class for convenient filling node data.
  */
-class NX_VMS_DESKTOP_CLIENT_API ViewNodeDataBuilder
+class NX_VMS_CLIENT_DESKTOP_API ViewNodeDataBuilder
 {
 public:
     explicit ViewNodeDataBuilder();
@@ -24,7 +24,14 @@ public:
     ViewNodeDataBuilder& withCheckedState(const ColumnSet& columns, Qt::CheckState value);
     ViewNodeDataBuilder& withCheckedState(int column, const OptionalCheckedState& value);
     ViewNodeDataBuilder& withIcon(int column, const QIcon& value);
-    ViewNodeDataBuilder& withSiblingGroup(int value);
+    /**
+    * Assuming that the sort order is ascending, nodes with lesser group sort order property will go
+    *     before nodes with greater group sort order property regardless any other contents.
+    *     Group sort order may be either positive or negative, default value is 0.
+    *
+    * @param value Custom group sort order.
+    */
+    ViewNodeDataBuilder& withGroupSortOrder(int value);
     ViewNodeDataBuilder& withExpanded(bool value);
 
     ViewNodeDataBuilder& withData(int column, int role, const QVariant& value);

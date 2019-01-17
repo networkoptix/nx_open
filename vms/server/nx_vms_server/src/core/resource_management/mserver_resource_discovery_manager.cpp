@@ -78,6 +78,14 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
+void QnMServerResourceDiscoveryManager::stop()
+{
+    base_type::stop();
+    resourcePool()->disconnect(this);
+    commonModule()->globalSettings()->disconnect(this);
+    this->disconnect(this);
+}
+
 QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& resourceTypeId,
     const QnResourceParams& params)
 {
@@ -400,7 +408,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
             return;
 
         if (!m_manualCameraByUniqueId.contains(camera->getUniqueId()))
-            newCameras.push_back(manualCameraInfo(camera));
+            newCameras.push_back(manualCameraInfoUnsafe(camera));
     }
 
     if (!newCameras.empty())

@@ -25,7 +25,7 @@
 static const int TCP_TIMEOUT = 1000 * 5;
 
 #ifdef Q_OS_LINUX
-#include "nx1/info.h"
+#include <nx/vms/server/system/nx1/info.h>
 #endif
 
 using namespace nx;

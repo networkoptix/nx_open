@@ -54,7 +54,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 
-#include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
@@ -277,6 +276,7 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -284,7 +284,7 @@
 #endif
 
 #if defined(__arm__)
-    #include "nx1/info.h"
+    #include "nx/vms/server/system/nx1/info.h"
 #endif
 
 using namespace nx::vms::server;
@@ -488,7 +488,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
-    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage(commonModule(), "ufile"));
+    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(commonModule(), "ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
@@ -1508,8 +1508,7 @@ void MediaServerProcess::registerRestHandlers(
      * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
-     *     or more parameters to set.
+     * %param:object paramValues Name-to-value map of camera parameters to set.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
@@ -2239,10 +2238,11 @@ void MediaServerProcess::registerRestHandlers(
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string url URL of one Server in the System to join.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
+     * %param:string currentPassword Current user password.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.
@@ -2528,6 +2528,14 @@ void MediaServerProcess::registerRestHandlers(
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
+     * %param[opt]:enum streamSelectionMode Policy for stream selection.
+     *     %value auto Chooses the most suitable stream automatically.
+     *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
+     *         primary one is not available.
+     *     %value forcedSecondary Secondary stream is forced. Primary stream will be used if the
+     *         secondary one is not available.
+     *     %value sameAsAnalytics Use the same stream as the one used by analytics engine.
+     *     %value sameAsMotion Use the same stream as the one used by software motion detection.
      * %param[opt]:enum aspectRatio Allows to avoid scaling the image to the aspect ratio from
      *     camera settings.
      *     %value auto Default value. Use aspect ratio from camera settings (if any).
@@ -3380,8 +3388,10 @@ bool MediaServerProcess::setUpMediaServerResource(
     bool foundOwnServerInDb = false;
     const bool sslAllowed = serverModule->settings().allowSslConnections();
 
-    while (m_mediaServer.isNull() && !needToStop())
+    while (m_mediaServer.isNull())
     {
+        if (needToStop())
+            return false;
         QnMediaServerResourcePtr server = findServer(ec2Connection);
         nx::vms::api::MediaServerData prevServerData;
         if (server)
@@ -3755,12 +3765,13 @@ void MediaServerProcess::doMigrationFrom_2_4()
 
 void MediaServerProcess::loadPlugins()
 {
+    auto storagePlugins = serverModule()->storagePluginFactory();
     auto pluginManager = serverModule()->pluginManager();
     for (nx_spl::StorageFactory* const storagePlugin:
     pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         auto settings = &serverModule()->settings();
-        QnStoragePluginFactory::instance()->registerStoragePlugin(
+        storagePlugins->registerStoragePlugin(
             storagePlugin->storageType(),
             std::bind(
                 &QnThirdPartyStorageResource::instance,
@@ -3772,18 +3783,18 @@ void MediaServerProcess::loadPlugins()
             false);
     }
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
+    storagePlugins->registerStoragePlugin(
         "file",
         [this](QnCommonModule*, const QString& path)
         {
             return QnFileStorageResource::instance(this->serverModule(), path);
         }, /*isDefaultProtocol*/ true);
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
+    storagePlugins->registerStoragePlugin(
         "dbfile",
         QnDbStorageResource::instance, /*isDefaultProtocol*/ false);
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
+    storagePlugins->registerStoragePlugin(
         "smb",
         [this](QnCommonModule*, const QString& path)
         {
@@ -3801,6 +3812,8 @@ void MediaServerProcess::connectStorageSignals(QnStorageManager* storage)
         &MediaServerProcess::at_storageManager_storageFailure);
     connect(storage, &QnStorageManager::rebuildFinished, this,
         &MediaServerProcess::at_storageManager_rebuildFinished);
+    connect(storage, &QnStorageManager::backupFinished, this,
+        &MediaServerProcess::at_archiveBackupFinished);
 }
 
 void MediaServerProcess::connectSignals()
@@ -4055,6 +4068,8 @@ void MediaServerProcess::startObjects()
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
         serverModule()->licenseWatcher()->start();
+
+    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
@@ -4178,6 +4193,7 @@ void MediaServerProcess::loadResourceParamsData()
     const auto builtinVersion = QnResourceDataPool::getVersion(loadDataFromFile(kBuiltinFileName));
     if (builtinVersion > dataVersion)
     {
+        dataVersion = builtinVersion;
         source = kBuiltinFileName;
         param.value = loadDataFromFile(source); //< Default value.
     }
@@ -4268,7 +4284,9 @@ void MediaServerProcess::run()
         initializeLogging(serverSettings.get());
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
-        &m_cmdLineArguments, std::move(serverSettings)));
+        &m_cmdLineArguments,
+        std::move(serverSettings)));
+
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
@@ -4303,6 +4321,7 @@ void MediaServerProcess::run()
         commonModule(),
         nx::vms::api::PeerType::server,
         serverModule->settings().p2pMode(),
+        serverModule->settings().ecDbReadOnly(),
         m_universalTcpListener.get());
 
     m_timeBasedNonceProvider = std::make_unique<TimeBasedNonceProvider>();
@@ -4312,8 +4331,6 @@ void MediaServerProcess::run()
         m_timeBasedNonceProvider.get());
 
     m_mediaServerStatusWatcher = std::make_unique<MediaServerStatusWatcher>(serverModule.get());
-
-    m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
 
     // If an exception is thrown by Qt event handler from within exec(), we want to do some cleanup
     // anyway.
@@ -4460,7 +4477,6 @@ void MediaServerProcess::at_appStarted()
     if (isStopping())
         return;
 
-    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(serverModule()->runTimeSettings());
 
     QString dataLocation = serverModule()->settings().dataDir();
@@ -4710,8 +4726,6 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow("/crossdomain.xml", nx::network::http::AuthMethod::noAuth);
     restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
-
-    restrictions->allow(webPrefix + "/ec2/getFullInfo", nx::network::http::AuthMethod::noAuth);
 
     // For open in new browser window.
     restrictions->allow(webPrefix + "/api/showLog.*",

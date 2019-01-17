@@ -4,6 +4,7 @@
 #include <common/static_common_module.h>
 
 #include <client/client_runtime_settings.h>
+#include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -33,9 +34,9 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
+        m_runtime.reset(new QnClientRuntimeSettings(QnStartupParameters()));
         m_staticCommon.reset(new QnStaticCommonModule());
         m_module.reset(new QnClientCoreModule());
-        m_runtime.reset(new QnClientRuntimeSettings());
         m_resourceRuntime.reset(new QnResourceRuntimeDataManager(m_module->commonModule()));
         m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
     }
@@ -46,9 +47,9 @@ protected:
         m_currentUser.clear();
         m_accessController.clear();
         m_resourceRuntime.clear();
-        m_runtime.clear();
         m_module.clear();
         m_staticCommon.reset();
+        m_runtime.clear();
     }
 
     QnCommonModule* commonModule() const { return m_module->commonModule(); }

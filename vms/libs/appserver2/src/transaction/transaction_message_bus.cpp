@@ -12,7 +12,6 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <common/common_module.h>
-#include <settings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>
@@ -897,10 +896,11 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(
 
 nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
     const QnUuid& peer,
+    nx::vms::api::PeerType peerType,
     const nx::utils::Url& srcUrl) const
 {
     nx::utils::Url url(srcUrl);
-    if (peer == ::ec2::kCloudPeerId)
+    if (peerType == nx::vms::api::PeerType::cloudServer)
         url.setPath(nx::cloud::db::api::kEc2EventsPath);
     else
         url.setPath("/ec2/events");
@@ -914,10 +914,12 @@ nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
 }
 
 void QnTransactionMessageBus::addOutgoingConnectionToPeer(
-    const QnUuid& id, const nx::utils::Url &_url)
+    const QnUuid& id,
+    nx::vms::api::PeerType peerType,
+    const nx::utils::Url &_url)
 {
     removeOutgoingConnectionFromPeer(id);
-    nx::utils::Url url = updateOutgoingUrl(id, _url);
+    nx::utils::Url url = updateOutgoingUrl(id, peerType, _url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
     {

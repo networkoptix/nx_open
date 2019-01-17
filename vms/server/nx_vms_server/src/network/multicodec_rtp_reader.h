@@ -79,9 +79,6 @@ public:
     void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
 
     QnRtspClient& rtspClient();
-
-    void setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy);
-
     void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
     void setRtpFrameTimeoutMs(int value);
 
@@ -115,7 +112,6 @@ private:
         int logicalChannelNum = 0;
     };
 
-    void updateTimePolicy();
     nx::streaming::rtp::StreamParser* createParser(const QString& codecName);
     bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
     void clearKeyData(int channelNum);
@@ -125,6 +121,7 @@ private:
         quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
+    void processCameraTimeHelperEvent(nx::streaming::rtp::CameraTimeHelper::EventType event);
 
     void calcStreamUrl();
 
@@ -138,6 +135,7 @@ private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
     void createTrackParsers();
+
 private:
     QnRtspClient m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
@@ -170,7 +168,9 @@ private:
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
-    static RtspTransport m_defaultTransportToUse;
+
+    static nx::utils::Mutex s_defaultTransportMutex;
+    static RtspTransport s_defaultTransportToUse;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

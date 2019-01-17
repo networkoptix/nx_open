@@ -28,8 +28,11 @@ private:
     }
 
     QString m_dataDirectory;
+    bool m_isBootedFromSdCard = false;
 
 public:
+    void setBootedFromSdCard(bool value) { m_isBootedFromSdCard = value; }
+
     // TODO: #lbusygin: Check int options for convertion to bool.
     Option<int> port{this, "port",
         7001,
@@ -136,7 +139,18 @@ public:
     Option<bool> ecDbReadOnly{this, "ecDbReadOnly",
         false,
         "If set to \a true, EC DB is opened in read-only mode. So, any "
-        "data modification operation except license activation will fail"
+        "data modification operation except license activation will fail",
+        [this](bool value)
+        {
+            if (ecDbReadOnly.present())
+                return value;
+
+            #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+                return m_isBootedFromSdCard;
+            #endif
+
+            return ecDbReadOnly.defaultValue();
+        }
     };
     Option<QString> cdbEndpoint{this, "cdbEndpoint", "", ""};
     Option<QString> onvifTimeouts{this, "onvifTimeouts", "", ""};

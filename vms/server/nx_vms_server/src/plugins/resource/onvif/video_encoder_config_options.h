@@ -12,33 +12,64 @@
 #include "soap_wrapper.h"
 
 /**
- * Server understands only limited number of videocodecs.
- * They are listed in UnderstandableVideoCodec enum.
+ * Server supports only limited number of videocodecs.
+ * They are all listed in SupportedVideoCodecFlavor enum.
  * Values are used while sorting configurationOptions, so the order of codecs is meaningful.
  * Desirable codec is the codec with the maximum value.
  */
-enum class UnderstandableVideoCodec
+enum class SupportedVideoCodecFlavor
 {
     NONE,
     JPEG,
     H264,
     H265,
+    Default = JPEG,
     Desirable = H265
 };
 /*
- FYI: is how video encoders are enumerated in onvif:
+ FYI: this is how video encoders are enumerated in onvif:
  enum class onvifXsd__VideoEncodingMimeNames
  { JPEG = 0, MPV4_ES = 1, H264 = 2, H265 = 3 };
 */
 
-UnderstandableVideoCodec VideoCodecFromString(const std::string& name);
-std::string VideoCodecToString(UnderstandableVideoCodec codec);
+/**
+ * Transfer video codec string to enum and backward.
+ * The string constants for video codec names are taken from onvid.xsd schema [version="18.06"]
+ * (https://www.onvif.org/ver10/schema/onvif.xsd)
+ * form the <xs:simpleType name="VideoEncodingMimeNames"> type description:
+ * "JPEG", "H264", "H265" - official video codecs names in onvif.
+ * There is one more name mentioned there - MPV4-ES - but our software doesn't support it.
+ */
+SupportedVideoCodecFlavor supportedVideoCodecFlavorFromOnvifString(const std::string& name);
+std::string supportedVideoCodecFlavorToOnvifString(SupportedVideoCodecFlavor codec);
 
-std::optional<onvifXsd__VideoEncodingProfiles> VideoEncoderProfileFromString(const std::string& name);
-std::string VideoEncoderProfileToString(onvifXsd__VideoEncodingProfiles profile);
+/**
+ * Transfer video codec string to enum and backward.
+ * The string constants for video codec names are that are used inside vms:
+ * "MJPEG", "H264", "H265".
+ */
+SupportedVideoCodecFlavor supportedVideoCodecFlavorFromVmsString(const std::string& name);
+std::string supportedVideoCodecFlavorToVmsString(SupportedVideoCodecFlavor codec);
 
-std::optional<onvifXsd__H264Profile> H264ProfileFromString(const std::string& name);
-std::string H264ProfileToString(onvifXsd__H264Profile profile);
+/**
+ * Transfer h264 profile string to enum and backward.
+ * The string constants for profiles are taken from onvid.xsd schema [version="18.06"]
+ * (https://www.onvif.org/ver10/schema/onvif.xsd)
+ * form the <xs:simpleType name="H264Profile"> type description.
+ * All other values are not correct and can not pass xsd validation.
+ */
+std::optional<onvifXsd__H264Profile> h264ProfileFromOnvifString(const std::string& name);
+std::string h264ProfileToOnvifString(onvifXsd__H264Profile profile);
+
+/**
+ * Transfer h264/h265 profile string to enum and backward.
+ * The string constants for profiles are taken from onvid.xsd schema [version="18.06"]
+ * (https://www.onvif.org/ver10/schema/onvif.xsd)
+ * form the <xs:simpleType name="VideoEncodingProfiles"> type description.
+ * All other values are not correct and can not pass xsd validation.
+ */
+std::optional<onvifXsd__VideoEncodingProfiles> videoEncodingProfilesFromOnvifString(const std::string& name);
+std::string videoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile);
 
 // This class should be moved somewhere into utils.
 template<class T>
@@ -55,7 +86,7 @@ struct VideoEncoderConfigOptions
 {
     //required elements
     int mediaWebserviseVersion = 0; // 0 - undefined, 1 - Media1, 2 - Media 2
-    UnderstandableVideoCodec encoder = UnderstandableVideoCodec::NONE;
+    SupportedVideoCodecFlavor encoder = SupportedVideoCodecFlavor::NONE;
     Range<float> qualityRange;
     Range<int> bitrateRange;
     std::optional<bool> constantBitrateSupported;
@@ -81,30 +112,3 @@ public:
     VideoEncoderConfigOptionsList(
         const _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse& response);
 };
-
-/*
-    class VideoOptionsLocal
-    {
-    public:
-        VideoOptionsLocal() = default;
-
-        VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp,
-            QnBounds frameRateBounds = QnBounds());
-
-        QVector<onvifXsd__H264Profile> h264Profiles;
-        QString id;
-        QList<QSize> resolutions;
-        bool isH264 = false;
-        int minQ = -1;
-        int maxQ = 1;
-        int frameRateMin = -1;
-        int frameRateMax = -1;
-        int govMin = -1;
-        int govMax = -1;
-        bool usedInProfiles = false;
-        QString currentProfile;
-
-    private:
-        int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const;
-    };
-*/

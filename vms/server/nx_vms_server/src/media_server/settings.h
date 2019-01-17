@@ -8,6 +8,8 @@
 #include <analytics/detected_objects_storage/analytics_events_storage_settings.h>
 #include <nx/vms/server/settings.h>
 
+class QnMediaServerModule;
+
 /**
  * QSettings instance is initialized in \a initializeROSettingsFromConfFile or
  * \a initializeRunTimeSettingsFromConfFile call or on first demand
@@ -36,6 +38,7 @@ public:
 
     static QString defaultConfigFileName;
     static QString defaultConfigFileNameRunTime;
+
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );
     void initializeROSettings();

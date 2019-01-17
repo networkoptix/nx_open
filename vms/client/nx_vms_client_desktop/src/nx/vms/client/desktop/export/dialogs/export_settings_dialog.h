@@ -4,9 +4,10 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/connective.h>
+
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 

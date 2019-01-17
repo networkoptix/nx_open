@@ -14,7 +14,7 @@ QnRtpStreamReader::QnRtpStreamReader(
     CLServerPushStreamReader(res),
     m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
-    m_rtpTransport(RtspTransport::autoDetect),
+    m_rtpTransport(RtspTransport::notDefined),
     m_camera(res)
 {
 }

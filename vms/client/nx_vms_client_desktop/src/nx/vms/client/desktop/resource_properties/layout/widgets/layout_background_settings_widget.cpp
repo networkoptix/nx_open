@@ -7,7 +7,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
-#include <QtGui/QImageReader>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -31,6 +30,7 @@
 
 #include "../redux/layout_settings_dialog_store.h"
 #include "../redux/layout_settings_dialog_state.h"
+#include "../redux/layout_settings_dialog_state_reducer.h"
 
 namespace nx::vms::client::desktop {
 
@@ -74,6 +74,10 @@ LayoutBackgroundSettingsWidget::LayoutBackgroundSettingsWidget(
     m_store(store)
 {
     setupUi();
+
+    LayoutSettingsDialogStateReducer::setScreenAspectRatio(screenAspectRatio());
+    LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(
+        qnSettings->layoutKeepAspectRatio());
 
     connect(
         ui->viewButton,
@@ -224,11 +228,11 @@ void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& 
     if (state.background.canStartDownloading())
         executeLater([this] { startDownloading(); }, this);
 
-    NX_ASSERT(background.width.max <= qnGlobals->layoutBackgroundMaxSize().width());
+    NX_ASSERT(background.width.max <= State::kBackgroundMaxSize);
     ui->widthSpinBox->setRange(background.width.min, background.width.max);
     ui->widthSpinBox->setValue(background.width.value);
 
-    NX_ASSERT(background.height.max <= qnGlobals->layoutBackgroundMaxSize().height());
+    NX_ASSERT(background.height.max <= State::kBackgroundMaxSize);
     ui->heightSpinBox->setRange(background.height.min, background.height.max);
     ui->heightSpinBox->setValue(background.height.value);
 
@@ -304,6 +308,9 @@ void LayoutBackgroundSettingsWidget::at_imageStored(const QString& filename, boo
     }
 
     qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
+    LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(
+        qnSettings->layoutKeepAspectRatio());
+
     m_store->imageUploaded(filename);
     emit newImageUploadedSuccessfully();
 }
@@ -353,17 +360,12 @@ void LayoutBackgroundSettingsWidget::viewFile()
 
 void LayoutBackgroundSettingsWidget::selectFile()
 {
-    QStringList extensions;
-    for (const QByteArray& format: QImageReader::supportedImageFormats())
-        extensions.push_back(lit("*.%1").arg(QString::fromLatin1(format)));
-
-    const QString nameFilter = L'(' + extensions.join(L' ') + L')';
     QScopedPointer<QnCustomFileDialog> dialog(
         new QnCustomFileDialog(
             this,
             tr("Select file..."),
             qnSettings->backgroundsFolder(),
-            tr("Pictures %1").arg(nameFilter)));
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter)));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     if (!dialog->exec())

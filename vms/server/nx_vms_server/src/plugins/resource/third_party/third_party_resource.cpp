@@ -208,11 +208,6 @@ QString QnThirdPartyResource::getDriverName() const
     return m_discoveryManager.getVendorName();
 }
 
-void QnThirdPartyResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
-}
-
 QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
 {
     if( !m_camManager )

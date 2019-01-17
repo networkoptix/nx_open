@@ -6,28 +6,28 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
 
-#include <common/common_module.h>
+#include <camera/thumbnails_loader.h>
 #include <client_core/client_core_module.h>
-
+#include <client/client_settings.h>
+#include <common/common_module.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <camera/thumbnails_loader.h>
-#include <client/client_settings.h>
-#include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <utils/common/html.h>
+
+#include <nx/core/transcoding/filters/timestamp_filter.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/image_providers/proxy_image_provider.h>
-#include <nx/vms/client/desktop/utils/transcoding_image_processor.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/desktop/utils/transcoding_image_processor.h>
 
 namespace {
 
@@ -215,10 +215,10 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
     else
     {
         settings.rotation = 0;
-        settings.aspectRatio = QnAspectRatio();
-        settings.enhancement = ImageCorrectionParams();
-        settings.dewarping = QnItemDewarpingParams();
-        settings.zoomWindow = QRectF();
+        settings.aspectRatio = {};
+        settings.enhancement = {};
+        settings.dewarping = {};
+        settings.zoomWindow = {};
     }
 
     // Requesting base resource image. We will apply transcoding later.

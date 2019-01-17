@@ -50,6 +50,8 @@
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <core/resource/storage_plugin_factory.h>
+
 using namespace nx;
 
 namespace {
@@ -137,6 +139,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
 
+    m_storagePluginFactory = new QnStoragePluginFactory(this);
+
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
     m_httpClientPool.reset(new nx::network::http::ClientPool(this));
     m_sessionManager.reset(new QnSessionManager(this));
@@ -218,6 +222,7 @@ QnCommonModule::~QnCommonModule()
     resourcePool()->threadPool()->waitForDone();
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
+    setResourceDiscoveryManager(nullptr);
 }
 
 void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)

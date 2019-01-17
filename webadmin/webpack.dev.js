@@ -15,7 +15,7 @@ module.exports = merge(common, {
         proxy: [
             {
                 context: ['/web/', '/api/', '/ec2/', '/hls/', '/media/', '/proxy/'],
-                target: 'https://10.1.5.111:7001',
+                target: 'https://10.1.5.115:7001',
                 changeOrigin: true,
                 secure      : false
             },

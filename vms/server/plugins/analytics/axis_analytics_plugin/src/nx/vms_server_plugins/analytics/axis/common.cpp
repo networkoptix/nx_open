@@ -5,11 +5,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
-
+namespace nx::vms_server_plugins::analytics::axis {
 namespace {
 
 using namespace nx::vms_server_plugins::analytics::axis;
@@ -39,20 +35,24 @@ QString ignoreNamespaces(const QString& tags)
 
 EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
 {
-    const QString eventTypeId = QString::fromLatin1(supportedEventType.fullName().c_str());
     name = supportedEventType.description.c_str();
     if (name.simplified().isEmpty())
     {
         name = supportedEventType.fullName().c_str();
         name = ignoreNamespaces(name);
     }
+
+    id = supportedEventType.fullName().c_str();
+    id = ignoreNamespaces(id);
+    id.replace(QChar('/'), QChar('-'));
+    id = QString("nx.axis.") + id;
+
     flags = (supportedEventType.stateful)
         ? nx::vms::api::analytics::EventTypeFlag::stateDependent
         : nx::vms::api::analytics::EventTypeFlag::noFlags;
 
     topic = supportedEventType.topic.c_str();
     caption = supportedEventType.name.c_str();
-    eventTypeIdExternal = eventTypeId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
@@ -60,7 +60,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json),
     AxisEngineManifest_Fields, (brief, true))
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

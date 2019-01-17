@@ -46,9 +46,6 @@ public:
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
-    bool live() const;
-    void setLive(bool value);
-
     std::chrono::microseconds highlightedTimestamp() const;
     void setHighlightedTimestamp(std::chrono::microseconds value);
 
@@ -72,6 +69,16 @@ public:
     int unreadCount() const;
 
     nx::utils::Interval<int> visibleRange() const;
+
+    enum class UpdateMode
+    {
+        instant,
+        animated
+    };
+    Q_ENUM(UpdateMode)
+
+    void setInsertionMode(UpdateMode updateMode, bool scrollDown);
+    void setRemovalMode(UpdateMode updateMode);
 
 signals:
     void countChanged(int count);

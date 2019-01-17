@@ -17,16 +17,15 @@ int64_t CameraTimeHelper::RptTimeLinearizer::linearize(uint32_t rtpTime)
     return m_highPart + rtpTime;
 }
 
-CameraTimeHelper::CameraTimeHelper(
-    const std::string& resourceId, const TimeOffsetPtr& offset):
+CameraTimeHelper::CameraTimeHelper(const std::string& resourceId, const TimeOffsetPtr& offset):
     m_primaryOffset(offset),
     m_resourceId(resourceId)
 {}
 
-std::chrono::microseconds CameraTimeHelper::getCameraTimestamp(
+microseconds CameraTimeHelper::getCameraTimestamp(
     uint32_t rtpTime,
     const RtcpSenderReport& senderReport,
-    const std::optional<std::chrono::microseconds>& onvifTime,
+    const std::optional<microseconds>& onvifTime,
     int frequency)
 {
     // onvif
@@ -45,42 +44,71 @@ std::chrono::microseconds CameraTimeHelper::getCameraTimestamp(
     return microseconds(m_linearizer.linearize(rtpTime) * 1000000LL / frequency);
 }
 
-std::chrono::microseconds CameraTimeHelper::getTime(
-    std::chrono::microseconds currentTime,
+microseconds CameraTimeHelper::getTime(
+    microseconds currentTime,
     uint32_t rtpTime,
     const RtcpSenderReport& senderReport,
-    const std::optional<std::chrono::microseconds>& onvifTime,
+    const std::optional<microseconds>& onvifTime,
     int rtpFrequency,
-    bool isPrimaryStream)
+    bool isPrimaryStream,
+    const EventCallback& callback)
 {
     bool hasAbsoluteTime = senderReport.ntpTimestamp != 0 || onvifTime.has_value();
     const microseconds cameraTime = getCameraTimestamp(
         rtpTime, senderReport, onvifTime, rtpFrequency);
-    if (m_timePolicy == TimePolicy::forceCameraTime && hasAbsoluteTime)
-        return cameraTime;
+    bool isCameraTimeAccurate = abs(cameraTime - currentTime) < m_forceCameraTimeThreshold;
+    if (m_timePolicy == TimePolicy::forceCameraTime)
+    {
+        if (hasAbsoluteTime && isCameraTimeAccurate)
+        {
+            if (m_badCameraTimeState)
+            {
+                NX_DEBUG(this, "Camera time is back to normal, camera time will used");
+                callback(EventType::CameraTimeBackToNormal);
+            }
+            m_badCameraTimeState = false;
+            return cameraTime;
+        }
+        else if (!m_badCameraTimeState)
+        {
+            NX_DEBUG(this,
+                "ResourceId: %1, camera time is not accurate: %2ms, system time: %3ms"
+                ", system time will used",
+                m_resourceId, cameraTime.count() / 1000, currentTime.count() / 1000);
+            callback(EventType::BadCameraTime);
+            m_badCameraTimeState = true;
+        }
+    }
 
-    bool hasPrimaryOffset = m_primaryOffset && m_primaryOffset->hasValue();
-    bool isStreamUnsync = !isPrimaryStream && hasPrimaryOffset &&
-        abs(m_primaryOffset->get() + cameraTime - currentTime) > m_streamsSyncThreshold;
+    bool hasPrimaryOffset = m_primaryOffset && m_primaryOffset->initialized;
+    bool isStreamDesync = !isPrimaryStream && hasPrimaryOffset &&
+        abs(microseconds(m_primaryOffset->value) + cameraTime - currentTime) > m_streamsSyncThreshold;
+
+    if (isStreamDesync)
+        callback(EventType::StreamDesync);
 
     bool useLocalOffset =
         !hasAbsoluteTime || // no absolute time -> can not sync streams
-        isStreamUnsync || // streams desync exceeds the threshold
+        isStreamDesync || // streams desync exceeds the threshold
         !m_primaryOffset || // primary offset not used
         (!hasPrimaryOffset && !isPrimaryStream); // primary stream not init offset yet
 
     TimeOffset& offset = useLocalOffset ? m_localOffset : *m_primaryOffset;
-    if (!offset.hasValue())
-        offset.reset(currentTime - cameraTime);
+    if (!offset.initialized)
+    {
+        offset.initialized = true;
+        offset.value = (currentTime - cameraTime).count();
+    }
 
-    const microseconds deviation = abs(offset.get() + cameraTime - currentTime);
+    const microseconds deviation = abs(microseconds(offset.value) + cameraTime - currentTime);
     if ((isPrimaryStream || useLocalOffset) && deviation >= m_resyncThreshold)
     {
         NX_DEBUG(this, "ResourceId: %1. Resync camera time, deviation %2ms, cameraTime: %3ms",
             m_resourceId, deviation.count() / 1000, cameraTime.count() / 1000);
-        offset.reset(currentTime - cameraTime);
+        offset.value = (currentTime - cameraTime).count();
+        callback(EventType::ResyncToLocalTime);
     }
-    return offset.get() + cameraTime;
+    return microseconds(offset.value) + cameraTime;
 }
 
 } //nx::streaming::rtp

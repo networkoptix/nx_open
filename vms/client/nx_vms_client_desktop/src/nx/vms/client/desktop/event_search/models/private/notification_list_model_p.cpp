@@ -238,9 +238,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             case EventType::analyticsSdkEvent:
             {
                 NX_ASSERT(hasViewPermission);
-                eventData.actionId = action::OpenInNewTabAction;
-                eventData.actionParameters = action::Parameters(camera)
-                    .withArgument(Qn::ItemTimeRole, timestampMs);
+                eventData.cameras = {camera};
                 eventData.previewCamera = camera;
                 eventData.previewTime = timestamp;
                 break;
@@ -249,8 +247,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             case EventType::cameraInputEvent:
             {
                 NX_ASSERT(hasViewPermission);
-                eventData.actionId = action::OpenInNewTabAction;
-                eventData.actionParameters = camera;
+                eventData.cameras = {camera};
                 eventData.previewCamera = camera;
                 break;
             }
@@ -298,9 +295,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
                 if (!sourceCameras.isEmpty())
                 {
-                    eventData.actionId = action::OpenInNewTabAction;
-                    eventData.actionParameters = action::Parameters(sourceCameras)
-                        .withArgument(Qn::ItemTimeRole, timestampMs);
                     if (sourceCameras.size() == 1)
                         eventData.previewCamera = sourceCameras[0];
                     eventData.cameras = sourceCameras;

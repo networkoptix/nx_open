@@ -169,15 +169,16 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
             .withArgument(Qn::RaiseSelectionRole, ini().raiseCameraFromClickedTile));
     }
 
-    // If timeline is hidden, do no navigation.
-    if (!navigator()->isTimelineRelevant())
+    // If no relevant resource is open on current layout, do no navigation.
+    if (openResources.empty())
         return;
 
     // If requested time is outside timeline range, show proper message after double click delay.
     const auto timelineRange = navigator()->timelineRange();
     auto navigationTime = timestamp.value<microseconds>();
 
-    if (!timelineRange.contains(duration_cast<milliseconds>(navigationTime)))
+    if (!navigator()->isTimelineRelevant()
+        || !timelineRange.contains(duration_cast<milliseconds>(navigationTime)))
     {
         showMessageDelayed(tr("No available archive."), doubleClickInterval());
         return;
@@ -190,6 +191,9 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     {
         navigationTime = microseconds(DATETIME_NOW);
     }
+
+    const auto playbackStarter = scopedPlaybackStarter(navigationTime != microseconds(DATETIME_NOW)
+        && ini().startPlaybackOnTileNavigation);
 
     // Perform navigation.
     menu()->triggerIfPossible(JumpToTimeAction,
@@ -215,6 +219,9 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
     }
 
     hideMessages();
+
+    const auto playbackStarter = scopedPlaybackStarter(!inNewTab
+        && ini().startPlaybackOnTileNavigation);
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
     menu()->trigger(action, parameters);
@@ -343,6 +350,22 @@ void TileInteractionHandler::hideMessages()
         box->hideAnimated();
 
     m_pendingMessages.clear();
+}
+
+utils::Guard TileInteractionHandler::scopedPlaybackStarter(bool baseCondition)
+{
+    if (!baseCondition)
+        return {};
+
+    return utils::Guard(
+        [this, oldPosition = navigator()->positionUsec()]()
+        {
+            if (oldPosition == navigator()->positionUsec())
+                return;
+
+            navigator()->setSpeed(1.0);
+            navigator()->setPlaying(true);
+        });
 }
 
 } // namespace nx::vms::client::desktop

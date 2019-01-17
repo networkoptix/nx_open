@@ -20,7 +20,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
-#include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/vms/client/desktop/utils/wearable_payload.h>
@@ -32,11 +32,10 @@ using namespace nx::vms::client::desktop::ui;
 using namespace nx::utils;
 
 namespace {
+
 const int kMaxLinesInExtendedErrorMessage = 10;
-const QStringList kVideoExtensions = {
-    lit("*.avi"), lit("*.mkv"), lit("*.mp4"), lit("*.mov"), lit("*.ts"), lit("*.m2ts"),
-    lit("*.mpeg"), lit("*.mpg"), lit("*.flv"), lit("*.wmv"), lit("*.3gp")};
-}
+
+} // namespace
 
 class QnWearableSessionDelegate:
     public QObject,
@@ -171,15 +170,14 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (!camera || !camera->getParentServer())
         return;
 
-    QStringList filters;
-    filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
-    filters << tr("All files (*.*)");
-
     QStringList paths = QFileDialog::getOpenFileNames(
         mainWindowWidget(),
         tr("Open Virtual Camera Recordings..."),
         QString(),
-        filters.join(lit(";;")),
+        QnCustomFileDialog::createFilter({
+            QnCustomFileDialog::kVideoFilter,
+            QnCustomFileDialog::kAllFilesFilter
+            }),
         /*selectedFilter*/ nullptr,
         QnCustomFileDialog::fileDialogOptions()
     );
@@ -214,8 +212,14 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     if (path.isEmpty())
         return;
 
+    static const QStringList kVideoFormats = QnCustomFileDialog::kVideoFilter.second;
+    QStringList videoExtensions;
+    std::transform(kVideoFormats.cbegin(), kVideoFormats.cend(),
+        std::back_inserter(videoExtensions),
+        [](const QString& extension) { return "*." + extension; });
+
     QStringList files;
-    QDirIterator iterator(path, kVideoExtensions, QDir::NoFilter, QDirIterator::Subdirectories);
+    QDirIterator iterator(path, videoExtensions, QDir::NoFilter, QDirIterator::Subdirectories);
     while (iterator.hasNext())
         files.push_back(iterator.next());
 

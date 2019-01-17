@@ -13,24 +13,23 @@
 
 bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 {
-    QByteArray extensionsString = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-    QByteArray versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-    QByteArray rendererString = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-    QByteArray vendorString = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    const QByteArray extensionsString = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    const QByteArray versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    const QByteArray rendererString = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    const QByteArray vendorString = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 
-    static const nx::utils::log::Tag kLogTag(typeid(QnGlHardwareChecker));
-    NX_INFO(kLogTag, lit("Extensions: %1.").arg(QLatin1String(extensionsString.constData())));
-    NX_INFO(kLogTag, lit("Version: %1.").arg(QLatin1String(versionString.constData())));
-    NX_INFO(kLogTag, lit("Renderer: %1.").arg(QLatin1String(rendererString.constData())));
-    NX_INFO(kLogTag, lit("Vendor: %1.").arg(QLatin1String(vendorString.constData())));
+    NX_INFO(NX_SCOPE_TAG, "Version: %1.", versionString);
+    NX_INFO(NX_SCOPE_TAG, "Renderer: %1.", rendererString);
+    NX_INFO(NX_SCOPE_TAG, "Vendor: %1.", vendorString);
+    NX_DEBUG(NX_SCOPE_TAG, "Extensions: %1.", extensionsString);
 
     bool contextIsValid = true;
 
     if (!versionString.contains("ES 2.0"))
-    { // TODO: #asinaisky more strict check required
-        if (nx::utils::SoftwareVersion(versionString) < nx::utils::SoftwareVersion(2, 0, 0, 0))
+    {
+        if (nx::utils::SoftwareVersion(versionString) < nx::utils::SoftwareVersion(2, 0))
         {
-            qnWarning("OpenGL version %1 is not supported.", versionString);
+            NX_ERROR(NX_SCOPE_TAG, "OpenGL version %1 is not supported.", versionString);
             contextIsValid = false;
         }
     }

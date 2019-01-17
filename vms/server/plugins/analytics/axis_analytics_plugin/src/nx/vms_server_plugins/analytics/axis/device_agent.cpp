@@ -12,10 +12,7 @@
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
+namespace nx::vms_server_plugins::analytics::axis {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -26,8 +23,8 @@ DeviceAgent::DeviceAgent(
     const EngineManifest& typedManifest)
     :
     m_engine(engine),
-    m_typedManifest(typedManifest),
-    m_manifest(QJson::serialized(typedManifest)),
+    m_parsedManifest(typedManifest),
+    m_jsonManifest(QJson::serialized(typedManifest)),
     m_url(deviceInfo.url)
 {
     m_auth.setUser(deviceInfo.login);
@@ -69,7 +66,7 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 Error DeviceAgent::setNeededMetadataTypes(
     const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->eventTypeIds()->count())
+    if (!metadataTypes->eventTypeIds()->count())
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -103,30 +100,25 @@ void DeviceAgent::stopFetchingMetadata()
 
 const IString* DeviceAgent::manifest(Error* error) const
 {
-    if (m_manifest.isEmpty())
+    if (m_jsonManifest.isEmpty())
     {
         *error = Error::unknownError;
         return nullptr;
     }
-    *error = Error::noError;
-    m_givenManifests.push_back(m_manifest);
-    return new nx::sdk::String(m_manifest);
+    return new nx::sdk::String(m_jsonManifest);
 }
 
 const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
-        m_typedManifest.eventTypes.cbegin(),
-        m_typedManifest.eventTypes.cend(),
+        m_parsedManifest.eventTypes.cbegin(),
+        m_parsedManifest.eventTypes.cend(),
         [&id](const EventType& eventType) { return eventType.id == id; });
 
-    if (it == m_typedManifest.eventTypes.cend())
+    if (it == m_parsedManifest.eventTypes.cend())
         return nullptr;
     else
         return &(*it);
 }
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis

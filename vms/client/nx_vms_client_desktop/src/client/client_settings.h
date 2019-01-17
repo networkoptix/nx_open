@@ -24,9 +24,11 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/update/update_information.h>
 
+struct QnStartupParameters;
 class QSettings;
 
-class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings> {
+class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings>
+{
     Q_OBJECT
     typedef QnPropertyStorage base_type;
 
@@ -55,8 +57,6 @@ public:
 
         LOCALE,
 
-        EXTRA_PTZ_MAPPINGS_PATH,
-
         /** Url for get to updates.json. */
         UPDATE_FEED_URL,
 
@@ -76,9 +76,6 @@ public:
         /** Estimated update delivery date (in msecs since epoch). */
         UPDATE_DELIVERY_DATE,
 
-        /** Disable client updates. */
-        NO_CLIENT_UPDATE,
-
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
@@ -92,11 +89,6 @@ public:
         CREATE_FULL_CRASH_DUMP,
 
         WORKBENCH_PANES,
-
-        CLOCK_24HOUR,
-        CLOCK_WEEKDAY,
-        CLOCK_DATE,
-        CLOCK_SECONDS,
 
         POPUP_SYSTEM_HEALTH,
 
@@ -120,19 +112,9 @@ public:
         /** Allow blur on video items. */
         GL_BLUR,
 
-        /** Enable V-sync for OpenGL widgets */
-        GL_VSYNC,
-
         TIMESTAMP_CORNER,
 
         USER_IDLE_TIMEOUT_MSECS,
-
-        /** Light client mode - no animations, no background, no opacity, no notifications, 1 camera only allowed. */
-        LIGHT_MODE,
-
-        /** If does not equal -1 then its value will be copied to LIGHT_MODE.
-         *  It should be set from command-line and it disables light mode auto detection. */
-        LIGHT_MODE_OVERRIDE,
 
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
@@ -141,7 +123,6 @@ public:
         BACKGROUND_IMAGE,
 
         LOG_LEVEL,
-        EC2_TRAN_LOG_LEVEL,
 
         /** Initial and maximal live buffer lengths, in milliseconds. */
         INITIAL_LIVE_BUFFER_MSECS,
@@ -168,7 +149,7 @@ public:
         VARIABLE_COUNT
     };
 
-    QnClientSettings(bool forceLocalSettings, QObject *parent = NULL);
+    QnClientSettings(const QnStartupParameters& startupParameters, QObject* parent = nullptr);
     virtual ~QnClientSettings();
 
     void load();
@@ -214,7 +195,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
         QN_DECLARE_RW_PROPERTY(QString,                     lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QString())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
-        QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     locale,                 setLocale,                  LOCALE,                     QnAppInfo::defaultLanguage())
 
         /* Updates-related settings */
@@ -225,16 +205,12 @@ private:
         QN_DECLARE_RW_PROPERTY(nx::update::Information,     latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         nx::update::Information())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
-        QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(Qn::ResourceInfoLevel,       extraInfoInTree,        setExtraInfoInTree,         EXTRA_INFO_IN_TREE,         Qn::RI_NameOnly)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
-        QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneSettings,           setPaneSettings,            WORKBENCH_PANES,            Qn::defaultPaneSettings())
-        QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
+        // This was renamed in 4.0 to prevent reuse of 3.x settings (WORKBENCH_PANES : paneSettings -> paneStateSettings).
+        QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneStateSettings,      setPaneStateSettings,       WORKBENCH_PANES,            Qn::defaultPaneSettings())
         QN_DECLARE_RW_PROPERTY(QSet<QnSystemHealth::MessageType>, popupSystemHealth, setPopupSystemHealth,      POPUP_SYSTEM_HEALTH,        QnSystemHealth::allVisibleMessageTypes().toSet())
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        autoLogin,              setAutoLogin,               AUTO_LOGIN,                 false)
@@ -243,17 +219,14 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportMediaSettings,    setExportMediaSettings,     EXPORT_MEDIA_SETTINGS,      ExportMediaSettings())
         QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportBookmarkSettings, setExportBookmarkSettings,  EXPORT_BOOKMARK_SETTINGS,   ExportMediaSettings({nx::vms::client::desktop::ExportOverlayType::bookmark}))
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
-        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
-        QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMs,    setInitialLiveBufferMs,     INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMs,    setMaximumLiveBufferMs,     MAXIMUM_LIVE_BUFFER_MSECS,  500)
         QN_DECLARE_RW_PROPERTY(QString,                     detectedObjectDisplaySettings, setDetectedObjectDisplaySettings, DETECTED_OBJECT_DISPLAY_SETTINGS, QString())
@@ -269,8 +242,9 @@ private:
     void migrateKnownServerConnections();
 
 private:
-    QSettings *m_settings;
-    bool m_loading;
+    const bool m_readOnly;
+    QSettings* m_settings;
+    bool m_loading = true;
 };
 
 

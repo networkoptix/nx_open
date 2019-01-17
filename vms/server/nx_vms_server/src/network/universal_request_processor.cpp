@@ -241,12 +241,12 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
         if (protocol == "HTTP")
         {
             if (settings->isTrafficEncriptionForced())
-                return redicrectToScheme(nx::network::http::kSecureUrlSchemeName);
+                return redirectToScheme(nx::network::http::kSecureUrlSchemeName);
         }
         else if (protocol == "RTSP")
         {
             if (settings->isVideoTrafficEncriptionForced())
-                return redicrectToScheme(nx::network::rtsp::kSecureUrlSchemeName);
+                return redirectToScheme(nx::network::rtsp::kSecureUrlSchemeName);
         }
         else if (settings->isTrafficEncriptionForced())
         {
@@ -259,15 +259,15 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
     return false;
 }
 
-bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
+bool QnUniversalRequestProcessor::redirectToScheme(const char* scheme)
 {
     const auto schemeString = QString::fromUtf8(scheme);
     Q_D(QnUniversalRequestProcessor);
 
     const auto listener = dynamic_cast<QnHttpConnectionListener*>(d->owner);
-    if (listener && listener->isProxy(d->request))
+    if (listener && d->request.headers.count("Via"))
     {
-        NX_ASSERT(false, lm("Unable to redirect sheme %1 for proxy").arg(schemeString));
+        NX_ASSERT(false, lm("Unable to redirect scheme %1 for proxy").arg(schemeString));
         sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }

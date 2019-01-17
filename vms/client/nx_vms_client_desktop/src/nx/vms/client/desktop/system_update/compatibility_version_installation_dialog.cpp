@@ -1,7 +1,9 @@
-#include "compatibility_version_installation_dialog.h"
-#include "ui_compatibility_version_installation_dialog.h"
+#include <chrono>
 
 #include <QtWidgets/QPushButton>
+
+#include "compatibility_version_installation_dialog.h"
+#include "ui_compatibility_version_installation_dialog.h"
 
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
@@ -10,9 +12,6 @@
 #include <nx/utils/guarded_callback.h>
 #include "update/media_server_update_tool.h"
 #include "ui/workbench/handlers/workbench_connect_handler.h"
-
-
-#include <chrono>
 
 using namespace std::chrono_literals;
 using ClientUpdateTool = nx::vms::client::desktop::ClientUpdateTool;
@@ -74,7 +73,7 @@ void CompatibilityVersionInstallationDialog::atReceivedUpdateContents(
     nx::update::UpdateContents verifiedContents = contents;
     if (nx::vms::client::desktop::verifyUpdateContents(commonModule, verifiedContents, {}))
     {
-        m_clientUpdateTool->downloadUpdate(verifiedContents);
+        m_clientUpdateTool->setUpdateTarget(verifiedContents);
     }
     else
     {
@@ -107,7 +106,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             finalProgress = 20;
             setMessage(tr("Downloading update package"));
             auto contents = m_clientUpdateTool->getRemoteUpdateInfo();
-            m_clientUpdateTool->downloadUpdate(contents);
+            m_clientUpdateTool->setUpdateTarget(contents);
             break;
         }
         case ClientUpdateTool::State::downloading:
@@ -124,6 +123,12 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             setMessage(tr("Installing"));
             m_installationResult = InstallResult::installing;
             finalProgress = 95;
+            break;
+        case ClientUpdateTool::State::readyRestart:
+            m_installationResult = InstallResult::complete;
+            setMessage(tr("Installation completed"));
+            finalProgress = 100;
+            done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::complete:
             m_installationResult = InstallResult::complete;

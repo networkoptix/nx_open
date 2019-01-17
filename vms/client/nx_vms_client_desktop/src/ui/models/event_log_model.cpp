@@ -388,6 +388,18 @@ QString QnEventLogModel::getResourceNameString(const QnUuid& id) const
         .toString(qnSettings->extraInfoInTree());
 }
 
+bool isAggregationDoneByCameras(const vms::event::ActionData& action)
+{
+    using namespace nx::vms::api;
+    auto eventType = action.eventParams.eventType;
+    if ((eventType == cameraDisconnectEvent || eventType == networkIssueEvent)
+        && action.actionType == sendMailAction)
+    {
+        return true;
+    }
+    return false;
+}
+
 QString QnEventLogModel::textData(Column column, const vms::event::ActionData& action) const
 {
     switch (column)
@@ -491,8 +503,17 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 int count = action.aggregationCount;
                 if (count > 1)
                 {
-                    const auto countString = tr("%1 (%n times)"
-                        , "%1 is description of event. Will be replaced in runtime", count);
+                    QString countString;
+                    if (isAggregationDoneByCameras(action))
+                    {
+                        countString = tr("%1 (%n cameras)",
+                            "%1 is description of event. Will be replaced in runtime", count);
+                    }
+                    else
+                    {
+                        countString = tr("%1 (%n times)",
+                            "%1 is description of event. Will be replaced in runtime", count);
+                    }
                     return countString.arg(result);
                 }
             }

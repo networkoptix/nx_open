@@ -57,8 +57,8 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
 )
 
 target_compile_definitions(nx_vms_client_desktop
-    PRIVATE NX_VMS_DESKTOP_CLIENT_API=${API_EXPORT_MACRO}
-    INTERFACE NX_VMS_DESKTOP_CLIENT_API=${API_IMPORT_MACRO})
+    PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}
+    INTERFACE NX_VMS_CLIENT_DESKTOP_API=${API_IMPORT_MACRO})
 
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)

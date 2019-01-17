@@ -7,20 +7,12 @@
 
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
-
-#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
-namespace {
+#include <nx/utils/log/assert.h>
+#include <nx/utils/string.h>
 
-void decompose(const QString& path, QString* prefix, QString* suffix)
-{
-    QFileInfo info(path);
-    *prefix = info.path() + L'/' + info.baseName();
-    *suffix = info.completeSuffix();
-    if (!suffix->isEmpty())
-        *suffix = L'.' + *suffix;
-}
+namespace {
 
 static const QnIcon::SuffixesList kDefaultSuffixes({
     {QnIcon::Active,   "hovered"},
@@ -31,6 +23,15 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
 });
 
 static constexpr QSize kBaseIconSize(20, 20);
+
+void decompose(const QString& path, QString* prefix, QString* suffix)
+{
+    QFileInfo info(path);
+    *prefix = info.path() + L'/' + info.baseName();
+    *suffix = info.completeSuffix();
+    if (!suffix->isEmpty())
+        *suffix = L'.' + *suffix;
+}
 
 class IconBuilder
 {
@@ -238,7 +239,7 @@ QIcon QnNoptixIconLoader::loadPixmapIconInternal(
     const QnIcon::SuffixesList* suffixes)
 {
     /* Create normal icon. */
-    IconBuilder builder(skin->isHiDpi());
+    IconBuilder builder(QnSkin::isHiDpi());
     const auto basePixmap = skin->pixmap(name, false);
     builder.add(basePixmap, QnIcon::Normal, QnIcon::Off);
     loadCustomIcons(skin, &builder, basePixmap, name, checkedName, suffixes);
@@ -262,27 +263,24 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
 
     const QByteArray baseData = source.readAll();
 
-    IconBuilder builder(skin->isHiDpi());
+    IconBuilder builder(QnSkin::isHiDpi());
     builder.addSvg(baseData, QnIcon::Normal, QnIcon::Off);
 
     auto color =
         [theme = nx::vms::client::desktop::colorTheme()](const QString& name)
         {
-            return theme->color(name).name().toUtf8();
+            return theme->color(name).name();
         };
-    const QByteArray primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
-    const QByteArray secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
+    const QString primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
+    const QString secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
 
-    auto colorized =
+    const auto colorized =
         [&](const QString& primary, const QString& secondary)
         {
-            QByteArray result = baseData;
-            // Order is fixed because one of the changed colors is light4 - which leads to confuse.
-            result.replace(secondaryColor, color(secondary));
-            result.replace(secondaryColor.toLower(), color(secondary));
-            result.replace(primaryColor, color(primary));
-            result.replace(primaryColor.toLower(), color(primary));
-            return result;
+            return nx::utils::replaceStrings(baseData, {
+                {primaryColor, color(primary)},
+                {secondaryColor, color(secondary)},
+                }).toLatin1();
         };
 
     builder.addSvg(colorized("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);

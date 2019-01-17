@@ -1,9 +1,11 @@
 #ifdef ENABLE_ISD
 
+#include <nx/utils/url.h>
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
+#include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_types.h>
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
@@ -19,9 +21,8 @@ extern QString getValueFromString(const QString& line);
 using DefaultCredentialsList = QList<Credentials>;
 
 namespace {
-unsigned int kDefaultIsdHttpTimeout = 4000;
-const QString kIsdModelInfoUrl("/api/param.cgi?req=General.Brand.CompanyName&req=General.Brand.ModelName");
-const QString kIsdMacAddressInfoUrl("/api/param.cgi?req=Network.1.MacAddress");
+const QString kParamUrlPath("/api/param.cgi");
+const QString kIsdMacAddressParamName("Network.1.MacAddress");
 const QString kIsdBrandParamName("General.Brand.CompanyName");
 const QString kIsdModelParamName("General.Brand.ModelName");
 const QString kIsdFullVendorName("Innovative Security Designs");
@@ -171,16 +172,32 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     QString name;
     QString vendor;
 
-    CLHttpStatus status;
-    QByteArray data = downloadFile(
-        status,
-        kIsdModelInfoUrl,
-        host,
-        port,
-        kDefaultIsdHttpTimeout,
-        auth);
+    QUrlQuery query;
+    query.addQueryItem("req", kIsdBrandParamName);
+    query.addQueryItem("req", kIsdModelParamName);
+    auto requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(host)
+        .setPort(port)
+        .setUserName(auth.user())
+        .setPassword(auth.password())
+        .setPath(kParamUrlPath)
+        .setQuery(std::move(query))
+        .toUrl();
 
-    for (const QByteArray& line: data.split(L'\n'))
+    NX_VERBOSE(this, "Sending request: %1", requestUrl);
+    nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::undefined;
+    nx::network::http::BufferType responseBuffer;
+    auto returnCode =
+        nx::network::http::downloadFileSync(requestUrl, (int*) &status, &responseBuffer);
+    if (returnCode != SystemError::noError || !nx::network::http::StatusCode::isSuccessCode(status))
+    {
+        NX_DEBUG(this, "Request %1 error, system error: %2, status code: %3", requestUrl,
+            SystemError::toString(returnCode), nx::network::http::StatusCode::toString(status));
+        return QList<QnResourcePtr>();
+    }
+
+    for (const QByteArray& line: responseBuffer.split(L'\n'))
     {
         if (line.startsWith(kIsdModelParamName.toLatin1())) {
             name = getValueFromString(QString::fromUtf8(line)).trimmed();
@@ -198,17 +215,25 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     if (shouldStop())
         return QList<QnResourcePtr>();
 
-    QString mac = QString(QLatin1String(
-        downloadFile(
-            status,
-            kIsdMacAddressInfoUrl,
-            host,
-            port,
-            kDefaultIsdHttpTimeout,
-            auth)));
+    query.clear();
+    query.addQueryItem("req", kIsdMacAddressParamName);
+    requestUrl = nx::network::url::Builder(requestUrl)
+        .setPath(kParamUrlPath)
+        .setQuery(std::move(query))
+        .toUrl();
 
+    NX_VERBOSE(this, "Sending request: %1", requestUrl);
+    responseBuffer.clear();
+    returnCode = nx::network::http::downloadFileSync(requestUrl, (int*) &status, &responseBuffer);
+    if (returnCode != SystemError::noError || !nx::network::http::StatusCode::isSuccessCode(status))
+    {
+        NX_DEBUG(this, "Request %1 error, system error: %2, status code: %3",
+            requestUrl, returnCode, nx::network::http::StatusCode::toString(status));
+        return QList<QnResourcePtr>();
+    }
+
+    QString mac = responseBuffer;
     cleanupSpaces(mac);
-
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
@@ -556,23 +581,34 @@ void QnPlISDResourceSearcher::createResource(
 
 bool QnPlISDResourceSearcher::testCredentials(const nx::utils::Url &url, const QAuthenticator &auth)
 {
+    QUrlQuery query;
+    query.addQueryItem("req", kIsdBrandParamName);
+    query.addQueryItem("req", kIsdModelParamName);
+    auto requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(url.host())
+        .setPort(url.port(nx::network::http::DEFAULT_HTTP_PORT))
+        .setUserName(auth.user())
+        .setPassword(auth.password())
+        .setPath(kParamUrlPath)
+        .setQuery(std::move(query))
+        .toUrl();
 
-    const auto host = url.host();
-    const auto port = url.port(nx::network::http::DEFAULT_HTTP_PORT);
-
-    if (host.isEmpty())
+    if (requestUrl.host().isEmpty())
+    {
+        NX_DEBUG(this, "Got URL %1 with empty host", requestUrl);
         return false;
+    }
 
-    CLHttpStatus status = CLHttpStatus::CL_HTTP_AUTH_REQUIRED;
-    auto data = downloadFile(
-        status,
-        kIsdModelInfoUrl,
-        host,
-        port,
-        kDefaultIsdHttpTimeout,
-        auth);
+    NX_VERBOSE(this, "Testing credentials: %1", requestUrl);
 
-    return status == CLHttpStatus::CL_HTTP_SUCCESS;
+    nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::undefined;
+    nx::network::http::BufferType responseBuffer;
+    auto returnCode =
+        nx::network::http::downloadFileSync(requestUrl, (int*) &status, &responseBuffer);
+
+    return returnCode == SystemError::noError
+        && nx::network::http::StatusCode::isSuccessCode(status);
 }
 
 bool QnPlISDResourceSearcher::isEnabled() const

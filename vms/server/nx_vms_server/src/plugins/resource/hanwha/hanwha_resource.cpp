@@ -502,6 +502,10 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
         if (!info || !info->isValid())
             continue;
 
+        const bool isProfileDependent = info->profileDependency() != Qn::CR_Default;
+        if (isProfileDependent && isCameraControlDisabled())
+            continue;
+
         const auto cgi = info->cgi();
         const auto submenu = info->submenu();
         const auto parameterName = info->parameterName();
@@ -861,6 +865,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
+    if (isNvr())
+        sharedContext->startServices();
+
     auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
@@ -896,8 +903,8 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive, info.value);
+    if (!isNvr() && hasCameraCapabilities(Qn::RemoteArchiveCapability))
+        sharedContext->startServices();
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -988,6 +995,9 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
 
     if (isNvr())
     {
+        // We always try to pull an audio stream if possible for NVRs.
+        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
+
         setCameraCapability(Qn::IsPlaybackSpeedSupported, true);
         setCameraCapability(Qn::DeviceBasedSync, true);
         setCameraCapability(Qn::DualStreamingForLiveOnly, true);
@@ -1103,10 +1113,6 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     if (isNvr() && !isVideoSourceActive())
         return CameraDiagnostics::CameraInvalidParams("Video source is not active");
-
-    // We always try to pull an audio stream if possible for NVRs
-    if (isNvr())
-        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
 
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
@@ -2546,6 +2552,9 @@ int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRa
 
 int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile) const
 {
+    if (isNvr() && role == Qn::CR_Archive)
+        return kHanwhaInvalidProfile;
+
     auto itr = m_profileByRole.find(role);
     if (itr != m_profileByRole.cend())
     {
@@ -2736,10 +2745,8 @@ QSize HanwhaResource::bestSecondaryResolution(
     for (const auto& resolution: resolutionList)
         resolutions.push_back(resolution);
 
-    return closestResolution(
-        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+    return Camera::closestSecondaryResolution(
         getResolutionAspectRatio(primaryResolution),
-        SECONDARY_STREAM_MAX_RESOLUTION,
         resolutions);
 }
 

@@ -14,6 +14,29 @@
 
 namespace nx::vms::client::desktop {
 
+bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
+{
+    using namespace applauncher::api;
+
+    /* Try to run applauncher if it is not running. */
+    if (!checkOnline())
+        return false;
+
+    const auto result = applauncher::api::getInstalledVersions(versions);
+    if (result == ResultType::ok)
+        return true;
+
+    static const int kMaxTries = 5;
+    for (int i = 0; i < kMaxTries; ++i)
+    {
+        QThread::msleep(100);
+        qApp->processEvents();
+        if (applauncher::api::getInstalledVersions(versions) == ResultType::ok)
+            return true;
+    }
+    return false;
+}
+
 ClientUpdateTool::ClientUpdateTool(QObject *parent):
     base_type(parent),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
@@ -41,6 +64,19 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
         this, &ClientUpdateTool::atDownloadFailed);
 
     m_downloader->startDownloads();
+
+    m_installedVersionsFuture = std::async(std::launch::async,
+        []()
+        {
+            std::set<nx::utils::SoftwareVersion> output;
+            QList<nx::utils::SoftwareVersion> versions;
+            if (requestInstalledVersions(&versions))
+            {
+                for (const auto& version: versions)
+                    output.insert(version);
+            }
+            return output;
+        });
 }
 
 ClientUpdateTool::~ClientUpdateTool()
@@ -73,6 +109,11 @@ void ClientUpdateTool::setApplauncherError(const QString& error)
     m_state = State::applauncherError;
     m_lastError = error;
     emit updateStateChanged((int)m_state, 0);
+}
+
+QString ClientUpdateTool::getErrorText() const
+{
+    return m_lastError;
 }
 
 std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
@@ -147,34 +188,83 @@ nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
     return m_remoteUpdateContents;
 }
 
+std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
+    bool includeCurrentVersion) const
+{
+    if (m_installedVersionsFuture.valid())
+        m_installedVersions = m_installedVersionsFuture.get();
+    auto result = m_installedVersions;
+    if (includeCurrentVersion)
+    {
+        QString clientVersion = nx::utils::AppInfo::applicationVersion();
+        result.insert(nx::utils::SoftwareVersion(clientVersion));
+    }
+    return result;
+}
+
 bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
 {
-    QString clientVersion = nx::utils::AppInfo::applicationVersion();
-
     if (!contents.clientPackage.isValid())
         return false;
 
-    return clientVersion.isEmpty()
-        || contents.getVersion() > nx::utils::SoftwareVersion(clientVersion);
+    auto version = contents.getVersion();
+    auto installedVersions = getInstalledVersions(true);
+
+    return !installedVersions.count(version);
 }
 
-void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
+void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 {
-    NX_VERBOSE(this) << "downloadUpdate() ver" << contents.info.version;
     m_clientPackage = contents.clientPackage;
     NX_ASSERT(m_clientPackage.isValid());
 
-    m_updateVersion = nx::utils::SoftwareVersion(contents.info.version);
+    m_updateVersion = contents.getVersion();
 
-    if (contents.sourceType == nx::update::UpdateSourceType::file)
+    auto installedVersions = getInstalledVersions(true);
+    if (installedVersions.count(m_updateVersion))
+    {
+        if (shouldRestartTo(m_updateVersion))
+        {
+            NX_INFO(this)
+                << "downloadUpdate(" << contents.info.version
+                << ") client already has this version installed"
+                << m_clientPackage.file;
+            setState(State::readyRestart);
+        }
+        else
+        {
+            NX_INFO(this)
+                << "downloadUpdate(" << contents.info.version
+                << ") client is already at this version"
+                << m_clientPackage.file;
+            setState(State::complete);
+        }
+    }
+    else if (contents.sourceType == nx::update::UpdateSourceType::file)
     {
         // Expecting that file is stored at:
+        NX_INFO(this)
+            << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
+            << m_clientPackage.file;
         QString path = contents.storageDir.filePath(m_clientPackage.file);
-        m_updateFile = path;
-        setState(State::readyInstall);
+        if (!QFileInfo::exists(path))
+        {
+            NX_INFO(this)
+                << "downloadUpdate(" << contents.info.version << ") the file"
+                << path << "does not exist!";
+            setError(QString("File %1 does not exist").arg(path));
+        }
+        else
+        {
+            m_updateFile = path;
+            setState(State::readyInstall);
+        }
     }
     else
     {
+        NX_INFO(this)
+            << "downloadUpdate(" << contents.info.version << ") this is an internet update";;
+
         FileInformation info;
         info.md5 = QByteArray::fromHex(m_clientPackage.md5.toLatin1());
         info.size = m_clientPackage.size;
@@ -312,7 +402,10 @@ int ClientUpdateTool::getDownloadProgress() const
 
 bool ClientUpdateTool::isDownloadComplete() const
 {
-    return !hasUpdate() || m_state == State::readyInstall;
+    return !hasUpdate()
+        || m_state == State::readyInstall
+        || m_state == State::readyRestart
+        || m_state == State::complete;
 }
 
 bool ClientUpdateTool::installUpdate()
@@ -338,18 +431,26 @@ bool ClientUpdateTool::installUpdate()
         switch (result)
         {
             case Result::alreadyInstalled:
-                setState(State::complete);
+                if (shouldRestartTo(m_updateVersion))
+                    setState(State::readyRestart);
+                else
+                    setState(State::complete);
                 return true;
-
             case Result::ok:
-                setState(State::complete);
+                if (shouldRestartTo(m_updateVersion))
+                    setState(State::readyRestart);
+                else
+                    setState(State::complete);
                 return true;
 
             case Result::otherError:
             case Result::versionNotInstalled:
             case Result::invalidVersionFormat:
+            case Result::notEnoughSpace:
+            case Result::notFound:
+            case Result::ioError:
             {
-                QString error = applauncher::api::ResultType::toString(result);
+                QString error = applauncherErrorToString(result);
                 NX_ERROR(this) << "Failed to run installation:" << error;
                 setApplauncherError(error);
                 return false;
@@ -377,6 +478,7 @@ bool ClientUpdateTool::isInstallComplete() const
         case State::installing:
             // We need to check applauncher to get a proper result
             break;
+        case State::readyRestart:
         case State::complete:
         case State::initial:
         // Though actual install is not successful, no further progress is possible.
@@ -400,7 +502,7 @@ bool ClientUpdateTool::isInstallComplete() const
         case Result::versionNotInstalled:
         case Result::invalidVersionFormat:
         {
-            QString error = applauncher::api::ResultType::toString(result);
+            QString error = applauncherErrorToString(result);
             NX_ERROR(this) << "Failed to check installation:" << error;
             //setApplauncherError(error);
             return false;
@@ -411,6 +513,12 @@ bool ClientUpdateTool::isInstallComplete() const
     }
 
     return installed;
+}
+
+bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version) const
+{
+    QString clientVersion = nx::utils::AppInfo::applicationVersion();
+    return version != nx::utils::SoftwareVersion(clientVersion);
 }
 
 bool ClientUpdateTool::restartClient()
@@ -474,7 +582,10 @@ ClientUpdateTool::State ClientUpdateTool::getState() const
 
 bool ClientUpdateTool::hasUpdate() const
 {
-    return m_state != State::initial && m_state != State::error && m_state != State::applauncherError;
+    return m_state != State::initial
+        && m_state != State::error
+        && m_state != State::applauncherError
+        && m_state != State::complete;
 }
 
 ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(
@@ -499,6 +610,8 @@ QString ClientUpdateTool::toString(State state)
             return "ReadyInstall";
         case State::installing:
             return "Installing";
+        case State::readyRestart:
+            return "ReadyRestart";
         case State::complete:
             return "Complete";
         case State::error:
@@ -507,6 +620,32 @@ QString ClientUpdateTool::toString(State state)
             return "applauncherError";
     }
     return QString();
+}
+
+QString ClientUpdateTool::applauncherErrorToString(int value)
+{
+    using Result = applauncher::api::ResultType::Value;
+    switch ((Result)value)
+    {
+        case Result::alreadyInstalled:
+            return tr("This update is already installed.");
+        case Result::otherError:
+            return tr("Internal applauncher error.");
+        case Result::versionNotInstalled:
+            return tr("This version is not installed.");
+        case Result::invalidVersionFormat:
+            return tr("Invalid version format.");
+        case Result::brokenPackage:
+            return tr("Broken update package.");
+        case Result::notEnoughSpace:
+            return tr("Not enough space on disk to install client update.");
+        case Result::notFound:
+            // Install package does not exists. Either we have broke the code and asking
+            // for a wrong file, or this file had been removed somehow.
+            return tr("Install package has been lost.");
+        default:
+            return applauncher::api::ResultType::toString((Result)value);
+    }
 }
 
 } // namespace nx::vms::client::desktop

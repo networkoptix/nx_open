@@ -72,7 +72,7 @@ protected:
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
 
-    void hideStatusColumns(bool value);
+    void syncStatusVisibility();
     void clearUpdateInfo();
     void pickLocalFile();
     void pickSpecificBuild();
@@ -136,12 +136,14 @@ private:
         bool hasLatestVersion = false;
         bool checking = false;
         QString version;
-        /** Status message. It is displayed under version when something went wrong. */
-        QString status;
+        /** Status messages. It is displayed under version when something went wrong. */
+        QStringList statusMessages;
         /** Should we display status with error style. */
         bool statusError = false;
         /** Should we display version with error style. */
         bool versionError = false;
+
+        void reset();
     };
 
     VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents);
@@ -153,6 +155,7 @@ private:
     void syncUpdateCheckToUi();
     void syncRemoteUpdateStateToUi();
     void syncProgress();
+    void syncReportToUi();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
@@ -187,6 +190,7 @@ private:
     bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
     bool m_showStorageSettings = false;
+    bool m_gotServerData = false;
 
     /**
      * It will enable additional column for server status
@@ -209,8 +213,10 @@ private:
     /** This promise is used to get update info from mediaservers. */
     std::future<nx::update::UpdateContents> m_serverUpdateCheck;
 
+    std::future<std::vector<nx::update::Status>> m_serverStatusCheck;
+
     nx::update::UpdateContents m_updateInfo;
-    QString m_updateCheckError;
+    VersionReport m_updateReport;
     nx::utils::SoftwareVersion m_targetVersion;
 
     WidgetUpdateState m_widgetState = WidgetUpdateState::initial;

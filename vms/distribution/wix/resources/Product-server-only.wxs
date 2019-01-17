@@ -113,7 +113,7 @@
 
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
-
+        <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="DeleteRegistryKeys_Cmd" Property="DeleteRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="DeleteRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="DeleteRegistryKeys" Execute="deferred" Impersonate="no"/>
@@ -163,6 +163,10 @@
             Return="ignore"
             Impersonate="no" />
 
+        <CustomAction Id="DeleteDatabaseFile_Cmd"
+            Property="DeleteDatabaseFile"
+            Execute="immediate"
+            Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)"/>
 
         <CustomAction Id="LaunchTrayTool"
             Execute="immediate"
@@ -220,11 +224,11 @@
                 <![CDATA[ (!ServerFeature=3 OR &ServerFeature = 3) AND REMOVE <> "ALL" ]]>
             </Custom>
 
-            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
-            <Custom Action="DeleteRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteAllRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="server.cab" EmbedCab="yes" />

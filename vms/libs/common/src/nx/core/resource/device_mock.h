@@ -10,8 +10,6 @@ class DeviceMock: public ResourceWithLocalPropertyStorage<QnVirtualCameraResourc
 public:
     DeviceMock(QnCommonModule* commonModule = nullptr): base_type(commonModule) {};
 
-    virtual QString getDriverName() const override;
-
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual bool saveProperties() override;

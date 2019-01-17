@@ -85,7 +85,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
     if (!item)
         return QVariant();
 
-    auto server = m_tracker->getServer(item.get());
+    auto server = m_tracker->getServer(item);
 
     int column = index.column();
 
@@ -155,7 +155,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
         {
             case Qt::DecorationRole:
                 if (column == NameColumn)
-                    return qnResIconCache->icon(QnResourceIconCache::User);
+                    return qnResIconCache->icon(QnResourceIconCache::Client);
                 break;
             default:
                 break;
@@ -242,36 +242,19 @@ SortedPeerUpdatesModel::SortedPeerUpdatesModel(QObject* parent):
 {
 }
 
-void SortedPeerUpdatesModel::setShowClients(bool show)
-{
-    if (show == m_showClients)
-        return;
-    m_showClients = show;
-    invalidateFilter();
-}
-
-bool SortedPeerUpdatesModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
-{
-    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    auto item = index.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
-    if (!m_showClients && item && item->component == UpdateItem::Component::client)
-        return false;
-    return true;
-}
-
 bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModelIndex& rightIndex) const
 {
     auto left = leftIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
     auto right = rightIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
+
+    if (left->component != right->component)
+        return left->component == UpdateItem::Component::client;
 
     if (!left || !right)
         return left < right;
 
     if (left->offline != right->offline)
         return !left->offline;
-
-    if (left->component != right->component)
-        return left->component == UpdateItem::Component::server;
 
     QString lname = leftIndex.data(Qt::DisplayRole).toString();
     QString rname = rightIndex.data(Qt::DisplayRole).toString();

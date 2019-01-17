@@ -9,20 +9,20 @@
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>
+#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/analytics/descriptor_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
-
-#include <nx/analytics/descriptor_manager.h>
-#include <nx/vms/api/analytics/descriptors.h>
-#include <common/common_module.h>
 
 namespace nx::vms::client::desktop {
 
@@ -119,6 +119,9 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
             if (isServerEvent)
                 resetType();
         });
+
+    connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+        q, &EventSearchWidget::updateAllowance);
 }
 
 void EventSearchWidget::Private::resetType()
@@ -339,6 +342,11 @@ QString EventSearchWidget::placeholderText(bool constrained) const
 QString EventSearchWidget::itemCounterText(int count) const
 {
     return tr("%n events", "", count);
+}
+
+bool EventSearchWidget::calculateAllowance() const
+{
+    return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs);
 }
 
 } // namespace nx::vms::client::desktop

@@ -22,7 +22,7 @@ public:
     AudioDevice(QObject* parent = nullptr);
     ~AudioDevice();
 
-    Sound* createSound(const QnAudioFormat& format);
+    Sound* createSound(const QnAudioFormat& format) const;
 
     /**
      * @return volume level in range [0..1].
@@ -45,7 +45,7 @@ public:
     void setMute(bool mute);
 
     QString versionString() const;
-    QString company() const;
+    static QString company();
 
 private:
     friend class Sound;
@@ -57,9 +57,9 @@ signals:
     void volumeChanged(float value);
 
 private:
-    ALCdevice* m_device;
-    ALCcontext* m_context;
-    float m_volume;
+    ALCdevice* m_device = nullptr;
+    ALCcontext* m_context = nullptr;
+    float m_volume = 1.0;
 };
 
 } // namespace audio

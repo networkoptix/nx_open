@@ -72,6 +72,7 @@
 #include <nx/vms/time_sync/server_time_sync_manager.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
+#include <nx/vms/server/system/nx1/info.h>
 #include "server_update_tool.h"
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
@@ -88,6 +89,7 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
+
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -244,7 +246,17 @@ QnMediaServerModule::QnMediaServerModule(
         ));
 
     const bool isRootToolEnabled = !settings().ignoreRootTool();
-    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(isRootToolEnabled, qApp->applicationFilePath());
+    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
+        isRootToolEnabled, 
+        qApp->applicationFilePath());
+
+    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+        if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+        {
+            m_settings->mutableSettings()->setBootedFromSdCard(
+                Nx1::isBootedFromSD(m_rootFileSystem.get()));
+        }
+    #endif
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
@@ -328,6 +340,8 @@ void QnMediaServerModule::stopStorages()
 
 void QnMediaServerModule::stop()
 {
+    // TODO: Find out why arent all of these are long runnables.
+
     m_upnpDeviceSearcher->pleaseStop();
     resourceDiscoveryManager()->pleaseStop();
 
@@ -340,6 +354,7 @@ void QnMediaServerModule::stop()
     resourceDiscoveryManager()->stop();
 
     m_licenseWatcher->stop();
+    m_resourceSearchers->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -646,4 +661,9 @@ nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() con
 nx::vms::server::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
 {
     return m_hlsSessionPool;
+}
+
+QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
+{
+    return m_commonModule->storagePluginFactory();
 }

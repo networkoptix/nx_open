@@ -10,6 +10,10 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/vms/api/data/module_information.h>
+#include <transaction/message_bus_adapter.h>
+#include <test_support/mediaserver_launcher.h>
+#include <api/global_settings.h>
+#include <nx/network/url/url_builder.h>
 
 using namespace nx::utils::test;
 
@@ -18,7 +22,14 @@ namespace vms::server {
 namespace proxy {
 namespace test {
 
-class ProxyTest: public ::testing::Test
+enum class SslMode
+{
+    noSsl,
+    withSsl,
+    withSslAndRedirect //< Turn on encryption but send HTTP request to cause redirect on 1-st host.
+};
+
+class ProxyTest: public ::testing::TestWithParam<SslMode>
 {
 public:
     ProxyTest()
@@ -32,60 +43,82 @@ public:
     }
 
 public:
-    std::vector<ec2::Appserver2Ptr> m_peers;
+    std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
 
-    void startPeers(int peerCount)
+    void startPeers(int peerCount, SslMode sslMode)
     {
-        while(m_peers.size() < peerCount)
+        while (m_peers.size() < peerCount)
         {
-            auto peer = ec2::Appserver2Launcher::createAppserver();
+            auto peer = std::make_unique<MediaServerLauncher>();
             peer->start();
+
+            auto settings = peer->serverModule()->globalSettings();
+            settings->setTrafficEncriptionForced(sslMode != SslMode::noSsl);
+            settings->synchronizeNowSync();
+
             m_peers.push_back(std::move(peer));
         }
-        for (const auto& peer: m_peers)
-            ASSERT_TRUE(peer->waitUntilStarted());
     }
 
-    void connectPeers()
+    void connectPeers(SslMode sslMode)
     {
-        for (int i = 0; i < m_peers.size(); ++i)
+        for (int i = 0; i < m_peers.size() - 1; ++i)
         {
-            for (int j = 0; j < m_peers.size(); ++j)
-            {
-                if (i != j)
-                    m_peers[i]->moduleInstance()->connectTo(m_peers[j]->moduleInstance().get());
-            }
+            // TODO: Create function in MediaServerLauncher.
+            const auto& from = m_peers[i];
+            const auto& to = m_peers[i + 1];
+
+            const auto urlScheme = sslMode != SslMode::noSsl
+                ? nx::network::http::kSecureUrlSchemeName : nx::network::http::kUrlSchemeName;
+            const auto peerId = to->commonModule()->moduleGUID();
+            const auto url = nx::utils::url::parseUrlFields(
+                to->endpoint().toString(), urlScheme);
+
+            from->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
+                peerId, nx::vms::api::PeerType::server, url);
         }
     }
 
-    nx::utils::Url serverUrl(int index, const QString& path)
+    nx::utils::Url serverUrl(int index, const QString& path, SslMode sslMode)
     {
-        const auto endpoint = m_peers[index]->moduleInstance()->endpoint();
-        nx::utils::Url url = nx::utils::Url(lit("http://") + endpoint.toString());
-        url.setPath(path);
-        return url;
+        const auto endpoint = m_peers[index]->endpoint();
+        using namespace nx::network;
+
+        const auto urlScheme = sslMode == SslMode::withSsl
+            ? http::kSecureUrlSchemeName : http::kUrlSchemeName;
+        return nx::network::url::Builder().setEndpoint(endpoint).setScheme(urlScheme).setPath(path);
     }
 };
 
-TEST_F(ProxyTest, proxyToAnotherThenToThemself)
+TEST_P(ProxyTest, proxyToAnotherThenToThemself)
 {
-    startPeers(2);
-    connectPeers();
+    const SslMode sslMode = GetParam();
+    startPeers(3, sslMode);
+    connectPeers(sslMode);
+
+    auto messageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
+    auto server2Id = m_peers[m_peers.size() - 1]->commonModule()->moduleGUID();
+    int distance = std::numeric_limits<int>::max();
+    while (distance > m_peers.size())
+    {
+        distance = messageBus->distanceToPeer(server2Id);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     auto client = std::make_unique<nx::network::http::HttpClient>();
 
-    ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation")));
+    ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation", sslMode)));
     ASSERT_TRUE(client->response());
     ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 
-    for (int i = m_peers.size()-1; i >=0; --i)
+    for (int i = m_peers.size() - 1; i >= 0; --i)
     {
-        const auto guid = m_peers[i]->moduleInstance()->commonModule()->moduleGUID();
+        const auto guid = m_peers[i]->commonModule()->moduleGUID();
         client->removeAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME);
         // Media server should proxy to itself if header is missing.
         if (i > 0)
             client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, guid.toByteArray());
-        ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation")));
+        ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation", sslMode)));
         ASSERT_TRUE(client->response());
         ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 
@@ -100,8 +133,14 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
     }
     int totalRequests = client->totalRequestsSent();
     int viaCurrentConnection = client->totalRequestsSentViaCurrentConnection();
-    ASSERT_EQ(totalRequests, viaCurrentConnection);
+
+    if (sslMode != SslMode::withSslAndRedirect)
+        ASSERT_EQ(totalRequests, viaCurrentConnection);
 }
+
+INSTANTIATE_TEST_CASE_P(SslMode, ProxyTest,
+    ::testing::Values(SslMode::noSsl, SslMode::withSsl, SslMode::withSslAndRedirect));
+
 } // namespace test
 } // namespace proxy
 } // namespace vms::server

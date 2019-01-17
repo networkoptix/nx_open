@@ -1,5 +1,7 @@
 #pragma once
+
 #include <memory> // for shared_ptr
+
 #include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
@@ -29,6 +31,7 @@ struct UpdateItem
     StatusCode state = StatusCode::offline;
     int progress = -1;
     QString statusMessage;
+    QString verificationMessage;
 
     /** Current version of the component. */
     nx::utils::SoftwareVersion version;
@@ -61,7 +64,7 @@ public:
     PeerStateTracker(QObject* parent = nullptr);
     void setResourceFeed(QnResourcePool* pool);
 
-    UpdateItemPtr findItemById(QnUuid id);
+    UpdateItemPtr findItemById(QnUuid id) const;
     UpdateItemPtr findItemByRow(int row) const;
 
     int peersCount() const;
@@ -69,13 +72,41 @@ public:
      * Get pointer to mediaserver from UpdateItem.
      * It will return nullptr if the item is not a server.
      */
-    QnMediaServerResourcePtr getServer(const UpdateItem* item) const;
+    QnMediaServerResourcePtr getServer(const UpdateItemPtr& item) const;
+
+    /**
+     * Get pointer to mediaserver from QnUuid.
+     * It will return nullptr if the item is not a server.
+     */
+    QnMediaServerResourcePtr getServer(QnUuid id) const;
+
+    QnUuid getClientPeerId() const;
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    /**
+     * Forcing update for mediaserver versions.
+     * We have used direct api call to get this module information.
+     */
+    void setVersionInformation(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
+    /**
+     * Set 'installing' flag for specified peers. Mediaserver API provides no information about
+     * whether servers are installing anything or not, so client should speculate about it when
+     * 'Install update' button is clicked.
+     */
     void setPeersInstalling(const QSet<QnUuid>& targets, bool installing);
     void clearState();
+
+    /** Set update check error for specified set of peers. */
+    void setVerificationError(const QMap<QnUuid, QString>& errors);
+
+    void setVerificationError(const QSet<QnUuid>& targets, const QString& message);
+
+    /** Clear update check errors for all the peers. */
+    void clearVerificationErrors();
+
+    bool hasVerificationErrors() const;
 
 public:
     std::map<QnUuid, nx::update::Status::Code> getAllPeerStates() const;

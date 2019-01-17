@@ -69,6 +69,8 @@ public:
 
     nx::vms::api::StreamDataFilters streamDataFilter() const;
     void setStreamDataFilter(nx::vms::api::StreamDataFilters filter);
+
+    virtual bool needConfigureProvider() const override { return true;  }
 protected:
     //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);

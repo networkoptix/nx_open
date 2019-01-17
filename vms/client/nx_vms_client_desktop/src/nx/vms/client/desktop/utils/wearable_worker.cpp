@@ -239,7 +239,7 @@ WearableState::Status WearableWorker::calculateNewStatus(WearableState::Error er
     }
 }
 
-QString WearableWorker::calculateErrorMessage(WearableState::Error error, const QString& errorMessage)
+QString WearableWorker::calculateErrorMessage(WearableState::Error /*error*/, const QString& errorMessage)
 {
     if (!errorMessage.isEmpty())
         return errorMessage;

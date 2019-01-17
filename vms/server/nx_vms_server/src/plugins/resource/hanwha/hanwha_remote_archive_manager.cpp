@@ -2,6 +2,7 @@
 #include "hanwha_remote_archive_manager.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_time_synchronizer.h"
 
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
@@ -31,11 +32,18 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     int64_t /*startTimeMs*/,
     int64_t /*endTimeMs*/)
 {
-    // TODO: #dmishin Fix channel if needed
-    const auto overlappedPeriods = m_resource
-        ->sharedContext()
-        ->overlappedTimelineSync(m_resource->getChannel());
+    const auto context = m_resource->sharedContext();
 
+    std::optional<std::chrono::milliseconds> timeShift;
+    for (int i = 0; i < kTriesPerChunk && !timeShift; ++i)
+        timeShift = hanwhaUtcTimeShift(context);
+
+    // TODO: Change assert into something else if it happens.
+    if (NX_ASSERT(timeShift, "Unable to fetch timeshift before chunk loading"))
+        context->setTimeShift(*timeShift);
+
+    // TODO: #dmishin Fix channel if needed.
+    const auto overlappedPeriods = context->overlappedTimelineSync(m_resource->getChannel());
     for (const auto& entry: overlappedPeriods)
     {
         const auto overlappedId = entry.first;
@@ -52,6 +60,11 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     }
 
     return true;
+}
+
+nx::core::resource::ImportOrder HanwhaRemoteArchiveManager::overlappedIdImportOrder() const
+{
+    return nx::core::resource::ImportOrder::Reverse;
 }
 
 bool HanwhaRemoteArchiveManager::fetchArchiveEntry(
@@ -88,22 +101,9 @@ void HanwhaRemoteArchiveManager::beforeSynchronization()
     // Do nothing.
 }
 
-void HanwhaRemoteArchiveManager::afterSynchronization(bool isSynchronizationSuccessful)
+void HanwhaRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuccessful*/)
 {
-    if (!isSynchronizationSuccessful)
-    {
-        NX_INFO(
-            this,
-            lm("Synchronization for resource %1 was not successful. "
-                "Date and time synchronization will not be done.")
-                .arg(m_resource->getUserDefinedName()));
-        return;
-    }
-
-    const auto dateTime = qnSyncTime->currentDateTime();
-    NX_INFO(this, lm("Setting date and time (%1) for resource %2")
-        .args(dateTime, m_resource->getUserDefinedName()));
-    m_resource->sharedContext()->setDateTime(dateTime);
+    // Do nothing.
 }
 
 RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() const

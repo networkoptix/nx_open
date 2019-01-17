@@ -14,7 +14,10 @@
 #include <core/resource/camera_bookmark_fwd.h>
 
 #include <core/ptz/ptz_fwd.h>
-#include <core/ptz/item_dewarping_params.h>
+
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
+
 #include <core/ptz/media_dewarping_params.h>
 
 #include <client/client_globals.h>
@@ -25,7 +28,6 @@
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/help/help_topics.h>
-#include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
 
 #include <nx/utils/uuid.h>
@@ -127,8 +129,8 @@ public:
 
     const QList<QnMotionRegion>& motionSensitivity() const;
 
-    ImageCorrectionParams imageEnhancement() const;
-    void setImageEnhancement(const ImageCorrectionParams& imageEnhancement);
+    nx::vms::api::ImageCorrectionData imageEnhancement() const;
+    void setImageEnhancement(const nx::vms::api::ImageCorrectionData& imageEnhancement);
 
     /**
      * @return PTZ controller associated with this widget. Never returns null.
@@ -414,7 +416,7 @@ private:
     void createActionAndButton(
         const char* iconName,
         bool checked,
-        const QString& shortcut,
+        const QKeySequence& shortcut,
         const QString& toolTip,
         Qn::HelpTopic helpTopic,
         Qn::WidgetButtons buttonId,

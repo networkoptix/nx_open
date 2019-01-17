@@ -8,10 +8,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dahua {
+namespace nx::vms_server_plugins::analytics::dahua {
 
 /**
  * Stateless namespace-like class, that contains functions for camera messages parsing.
@@ -32,7 +29,7 @@ public:
      * Extract the information about the event occurred from notification message and create
      * the corresponding Event object.
      * @param[in] content The content of the notification message.
-     * @param[in] engineManifest Manifest, that contains engine's possible event types and their
+     * @param[in] EngineManifest Manifest, that contains engine's possible event types and their
      * properties.
      * @return std::nullopt, if the message is incomplete or invalid, extracted Event object, if
      * message is complete and valid.
@@ -47,10 +44,7 @@ public:
      * @param[in] event Event to check.
      * @return
      */
-    static bool isHartbeatEvent(const Event& event);
+    static bool isHeartbeatEvent(const Event& event);
 };
 
-} // namespace dahua
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::dahua

@@ -41,7 +41,10 @@ public:
 
     //void addConnectionToPeer(const QUrl& url);
     //void removeConnectionFromPeer(const QUrl& url);
-    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
+    virtual void addOutgoingConnectionToPeer(
+        const QnUuid& id,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
@@ -257,7 +260,10 @@ private:
     void sendDelayedAliveTran();
 
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
-    nx::utils::Url updateOutgoingUrl(const QnUuid& peer, const nx::utils::Url& srcUrl) const;
+    nx::utils::Url updateOutgoingUrl(
+        const QnUuid& peer,
+        nx::vms::api::PeerType peerType,
+        const nx::utils::Url& srcUrl) const;
 
     static void printTransaction(
         const char* prefix,

@@ -71,6 +71,8 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
     if (m_updateInfo.valid())
         return;
     QString updateUrl = qnSettings->updateFeedUrl();
+    NX_ASSERT(!updateUrl.isEmpty());
+
     auto callback = nx::utils::guarded(this,
         [this](const UpdateContents& contents)
         {

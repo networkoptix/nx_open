@@ -36,7 +36,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     auto packet = nextPacket();
 
-    if(!packet)
+    if (!packet)
     {
         removeConsumer();
         if (m_interrupted)
@@ -87,19 +87,16 @@ void NativeStreamReader::ensureConsumerAdded()
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    if (m_camera->audioEnabled())
+    while (m_camera->audioEnabled())
     {
-        for(;;)
-        {
-            // the time span keeps audio and video timestamps monotonic
-            if (m_avConsumer->waitForTimeSpan(kStreamDelay, kWaitTimeout))
-                break;
-            else if (m_interrupted || m_camera->ioError())
-                    return nullptr;
-        }
+        // the time span keeps audio and video timestamps monotonic
+        if (m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
+            break;
+        else if (m_interrupted || m_camera->ioError())
+                return nullptr;
     }
 
-    for(;;)
+    for (;;)
     {
         auto popped = m_avConsumer->popOldest(kWaitTimeout);
         if (!popped)

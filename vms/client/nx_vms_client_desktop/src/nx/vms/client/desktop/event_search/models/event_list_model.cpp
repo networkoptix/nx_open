@@ -21,7 +21,7 @@ EventListModel::~EventListModel()
 {
 }
 
-int EventListModel::rowCount(const QModelIndex& parent) const
+int EventListModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->count();
 }
@@ -29,7 +29,7 @@ int EventListModel::rowCount(const QModelIndex& parent) const
 QVariant EventListModel::data(const QModelIndex& index, int role) const
 {
     if (!isValid(index))
-        return QVariant();
+        return {};
 
     const auto& event = d->getEvent(index.row());
     switch (role)
@@ -68,6 +68,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 
         case Qn::ResourceListRole:
             return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
+
+        case Qn::DisplayedResourceListRole:
+            return {};
 
         case Qn::RemovableRole:
             return event.removable;
@@ -127,9 +130,10 @@ bool EventListModel::removeRows(int row, int count, const QModelIndex& parent)
 bool EventListModel::defaultAction(const QModelIndex& index)
 {
     const auto& event = getEvent(index.row());
-    if (event.actionId != ui::action::NoAction)
-        menu()->triggerIfPossible(event.actionId, event.actionParameters);
+    if (event.actionId == ui::action::NoAction)
+        return false;
 
+    menu()->triggerIfPossible(event.actionId, event.actionParameters);
     return true;
 }
 

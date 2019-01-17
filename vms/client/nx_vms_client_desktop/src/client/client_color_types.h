@@ -54,7 +54,8 @@ public:
 };
 #define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
     (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
-    (pastBookmark)(futureBookmark)(pastBookmarkHover)(futureBookmarkHover)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastAnalytics)(futureAnalytics)(pastBookmark)(futureBookmark)\
+    (pastBookmarkHover)(futureBookmarkHover)(pastBookmarkBound)(futureBookmarkBound)\
     (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
     (noThumbnailsLabel)(separator)(dateBarBackgrounds)(dateBarText)(tickmarkLines)(tickmarkText)
 

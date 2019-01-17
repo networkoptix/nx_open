@@ -20,7 +20,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::jsonError, "json error")
     (nx::update::InformationError::brokenPackageError, "local update package is corrupted")
     (nx::update::InformationError::missingPackageError, "missing files in the update package")
-    (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
     (nx::update::InformationError::incompatibleVersion, "incompatible version")
     (nx::update::InformationError::notFoundError, "not found")
     (nx::update::InformationError::noNewVersion, "no new version"))
@@ -46,6 +45,7 @@ nx::utils::SoftwareVersion UpdateContents::getVersion() const
 bool UpdateContents::isValid() const
 {
     return missingUpdate.empty()
+        && unsuportedSystemsReport.empty()
         && !info.version.isEmpty()
         && invalidVersion.empty()
         && clientPackage.isValid()
@@ -57,12 +57,12 @@ bool UpdateContents::isEmpty() const
     return info.packages.empty();
 }
 
-bool UpdateContents::compareUpdate(const UpdateContents& other) const
+bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
 {
-    // Prefere non-empty one.
+    // Prefer non-empty one.
     if (other.isEmpty())
         return false;
-    else if (isEmpty())
+    if (isEmpty())
         return true;
 
     // Prefere update from mediaservers.

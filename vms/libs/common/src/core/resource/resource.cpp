@@ -148,34 +148,6 @@ void QnResource::update(const QnResourcePtr& other)
 
     for (auto notifier : notifiers)
         notifier();
-
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!useLocalProperties() && !m_locallySavedProperties.empty() && commonModule())
-        {
-            std::map<QString, LocalPropertyValue> locallySavedProperties;
-            std::swap(locallySavedProperties, m_locallySavedProperties);
-            QnUuid id = m_id;
-            lk.unlock();
-
-            for (auto prop : locallySavedProperties)
-            {
-                if (commonModule()->propertyDictionary()->setValue(
-                    id,
-                    prop.first,
-                    prop.second.value,
-                    prop.second.markDirty,
-                    prop.second.replaceIfExists))   //isModified?
-                {
-                    emitPropertyChanged(prop.first);
-                }
-            }
-        }
-    }
-
-    //silently ignoring missing properties because of removeProperty method lack
-    for (const auto& param : other->getRuntimeProperties())
-        emitPropertyChanged(param.name);   //here "propertyChanged" will be called
 }
 
 QnUuid QnResource::getParentId() const
@@ -336,7 +308,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
-        oldStatus, newStatus, reason, getName(), url());
+        oldStatus, newStatus, reason, getName(), getUrl());
 
     commonModule()->statusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
@@ -374,33 +346,20 @@ void QnResource::setId(const QnUuid& id)
     m_id = id;
 }
 
-nx::utils::Url QnResource::url() const
-{
-    return nx::utils::Url(getUrl());
-}
-
-void QnResource::setUrl(const nx::utils::Url &url)
-{
-    NX_ASSERT(url.isValid());
-    setUrl(url.toString());
-}
-
-// TODO: Should be made protected instead of public.
 QString QnResource::getUrl() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
     return m_url;
 }
 
-// TODO: Should be made protected instead of public.
-void QnResource::setUrl(const QString &url)
+void QnResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (m_url == url)
+        if (!setUrlInternal(url))
             return;
-        m_url = url;
     }
+
     emit urlChanged(toSharedPointer(this));
 }
 
@@ -566,6 +525,15 @@ void QnResource::emitPropertyChanged(const QString& key)
 
     NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
+}
+
+bool QnResource::setUrlInternal(const QString& value)
+{
+    if (m_url == value)
+        return false;
+
+    m_url = value;
+    return true;
 }
 
 nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const

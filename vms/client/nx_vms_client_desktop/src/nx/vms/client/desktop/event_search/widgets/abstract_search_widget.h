@@ -40,6 +40,9 @@ public:
 
     AbstractSearchListModel* model() const;
 
+    /** Whether the search widget should be visible. */
+    bool isAllowed() const;
+
     /** Rewind to live. Discards loaded archive if neccessary. */
     virtual void goToLive();
 
@@ -97,13 +100,15 @@ public:
 
 signals:
     /** This signal is for displaying external tooltips. */
-    void tileHovered(const QModelIndex& index, EventTile* tile);
+    void tileHovered(const QModelIndex& index, EventTile* tile, QPrivateSignal);
 
     /** This signal is sent when current camera selection type or actual camera set changes. */
-    void cameraSetChanged(const QnVirtualCameraResourceSet& value);
+    void cameraSetChanged(const QnVirtualCameraResourceSet& value, QPrivateSignal);
 
-    void textFilterChanged(const QString& value);
-    void timePeriodChanged(const QnTimePeriod& value);
+    void textFilterChanged(const QString& value, QPrivateSignal);
+    void timePeriodChanged(const QnTimePeriod& value, QPrivateSignal);
+
+    bool allowanceChanged(bool value, QPrivateSignal);
 
 protected:
     /** Sets an icon for no data placeholder. */
@@ -127,18 +132,24 @@ protected:
     /** Internal access to tiles view. */
     EventRibbon* view() const;
 
+    /** Should be called from descendants when isAllowed should be recalculated. */
+    void updateAllowance();
+
 private:
     /**
-     * Derived classes should override this method and return localized string for
+     * Derived classes must override this method and return localized string for
      * no data placeholder. When constrained is true it means there's no data matching
      * search criteria, when constrained is false it means there's no data in the system at all.
      */
     virtual QString placeholderText(bool constrained) const = 0;
 
     /**
-     * Derived classes should override this method and return localized string for item counter.
+     * Derived classes must override this method and return localized string for item counter.
      */
     virtual QString itemCounterText(int count) const = 0;
+
+    /** Derived classes should override this method if the widget is not always allowed. */
+    virtual bool calculateAllowance() const { return true; }
 
 private:
     class Private;

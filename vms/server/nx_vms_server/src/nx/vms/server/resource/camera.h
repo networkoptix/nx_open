@@ -74,6 +74,12 @@ public:
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
 
+    /**
+     * @return Driver (built-in or external) name, used to manage camera. This can be "axis",
+     * "dlink", "onvif", etc.
+    */
+    virtual QString getDriverName() const = 0;
+
     QnAbstractPtzController* createPtzController() const;
 
     /** Returns id-value pairs. */
@@ -103,7 +109,7 @@ public:
      */
     static QSize getNearestResolution(
         const QSize& resolution,
-        float aspectRatio,
+        float desiredAspectRatio,
         double maxResolutionArea,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
@@ -115,10 +121,14 @@ public:
      */
     static QSize closestResolution(
         const QSize& idealResolution,
-        float aspectRatio,
+        float desiredAspectRatio,
         const QSize& maxResolution,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
+
+    static QSize closestSecondaryResolution(
+        float desiredAspectRatio,
+        const QList<QSize>& resolutionList);
 
     class AdvancedParametersProvider
     {
@@ -170,7 +180,6 @@ public:
         bool keepSmalChunks,
         int limit,
         Qt::SortOrder sortOrder);
-
 
 signals:
     /** Emit on camera or IO module input change. */

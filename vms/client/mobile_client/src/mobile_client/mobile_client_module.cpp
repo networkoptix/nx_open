@@ -78,7 +78,6 @@ QnMobileClientModule::QnMobileClientModule(
     QObject(parent)
 {
     Q_INIT_RESOURCE(mobile_client);
-    Q_INIT_RESOURCE(nx_vms_client_core);
 
     QnMobileClientMetaTypes::initialize();
 

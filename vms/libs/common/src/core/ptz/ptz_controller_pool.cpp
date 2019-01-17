@@ -122,7 +122,7 @@ void QnPtzControllerPool::deinitialize()
             unregisterResource(resourcePtr);
         }
 
-        // Have to wait until all posted events have been processed, deleteLater() can be called
+        // Have to wait until all posted events are processed, deleteLater() can be called
         // within the event slot, that's why we specify the second parameter.
         WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
         waitingForObjectsToBeFreed.join();

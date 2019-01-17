@@ -3,6 +3,7 @@ import QtQuick.Controls 1.2
 
 import Nx 1.0
 import Nx.Core 1.0
+import Nx.Core.Items 1.0
 import Nx.Common 1.0
 import Nx.Media 1.0
 import Nx.Items 1.0
@@ -291,6 +292,7 @@ Rectangle
         id: player
         resourceId: cameraResourceId
         maxTextureSize: videoContainer.maxTextureSize
+        audioEnabled: false
 
         onResourceIdChanged: video.clear()
         onSourceChanged: videoContainer.updatePlayingState()

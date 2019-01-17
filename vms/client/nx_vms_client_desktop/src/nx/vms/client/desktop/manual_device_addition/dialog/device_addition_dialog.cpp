@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -170,7 +171,7 @@ void DeviceAdditionDialog::initializeControls()
             static constexpr int kStartSearchPage = 0;
             const bool enabled = currentPageIndex == kStartSearchPage;
             const QList<QWidget*> widgets =
-                { ui->searchParametersPanel, ui->addDevicesButtonPage, ui->serverChoosePanel };
+                {ui->searchParametersPanel, ui->addDevicesButtonPage, ui->serverChoosePanel};
             for (const auto widget: widgets)
                 widget->setEnabled(enabled);
             for (int i = 0; i < ui->tabWidget->count(); ++i)
@@ -201,6 +202,9 @@ void DeviceAdditionDialog::initializeControls()
     ui->tabWidget->setCurrentIndex(0);
     handleTabClicked(ui->tabWidget->currentIndex());
     setupSearchResultsPlaceholder();
+
+    setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+    setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -215,8 +219,12 @@ void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& val
 void DeviceAdditionDialog::handleStartAddressEditingFinished()
 {
     const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
-    if (startAddress % 256 == 0)
-        ui->endAddressEdit->setText(QHostAddress(startAddress + 255).toString());
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
+    if (!ui->endAddressEdit->isModified() && (startAddress / 256) != (endAddress / 256))
+    {
+        ui->endAddressEdit->setText(
+            QHostAddress(startAddress - startAddress % 256 + 255).toString());
+    }
 }
 
 void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value)
@@ -462,8 +470,8 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
     m_model->setData(
         index, FoundDevicesModel::alreadyAddedState, FoundDevicesModel::presentedStateRole);
 
-    m_model->setData(
-        index.siblingAtColumn(FoundDevicesModel::checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
+    m_model->setData(index.siblingAtColumn(FoundDevicesModel::checkboxColumn),
+        Qt::Unchecked, Qt::CheckStateRole);
 }
 
 void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
@@ -509,6 +517,9 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
         m_model->setData(stateIndex, FoundDevicesModel::addingInProgressState,
             FoundDevicesModel::presentedStateRole);
+
+        m_model->setData(stateIndex.siblingAtColumn(FoundDevicesModel::checkboxColumn),
+            Qt::Unchecked, Qt::CheckStateRole);
 
         devices.append(device);
     }
@@ -687,14 +698,18 @@ void DeviceAdditionDialog::updateAddDevicesPanel()
             tr("%n devices are being added. You can close this dialog or start a new search",
                 nullptr, addingDevicesCount));
     }
-    else if (newDevicesCount != 0 &&
-        (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount ))
+    else if (newDevicesCount != 0)
     {
-        showAddDevicesButton(tr("Add all Devices"));
-    }
-    else if (newDevicesCount != 0 && newDevicesCheckedCount != 0)
-    {
-        showAddDevicesButton(tr("Add %n Devices", nullptr, newDevicesCheckedCount));
+        if (newDevicesCheckedCount == devicesCount
+            || (newDevicesCheckedCount == 0 && newDevicesCount == devicesCount))
+        {
+            showAddDevicesButton(tr("Add all Devices"));
+        }
+        else
+        {
+            showAddDevicesButton(tr("Add %n Devices", nullptr,
+                newDevicesCheckedCount != 0 ? newDevicesCheckedCount : newDevicesCount));
+        }
     }
 }
 

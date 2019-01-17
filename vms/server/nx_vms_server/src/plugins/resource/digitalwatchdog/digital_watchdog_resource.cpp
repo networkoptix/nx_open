@@ -491,16 +491,11 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     const QnLiveStreamParams& streamParams)
 {
     auto result = base_type::sendVideoEncoderToCameraEx(encoder, streamIndex, streamParams);
-#if 0
-    // Switch here to test onvif-only videoencoders detection/setting.
-    return result;
-#else
-    if (!result)
-        return result;
+    if (result)
+        return result; //< Onvif videoencoder update was successful.
     if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
         NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
     return CameraDiagnostics::NoErrorResult();
-#endif
 }
 
 #endif //ENABLE_ONVIF

@@ -7,5 +7,5 @@ if(LINUX)
 endif()
 
 if(WINDOWS)
-    target_link_libraries(usb_camera_plugin PRIVATE strmiids strmbase comsuppw)
+    target_link_libraries(usb_camera_plugin PRIVATE strmiids strmbase comsuppw setupapi)
 endif()

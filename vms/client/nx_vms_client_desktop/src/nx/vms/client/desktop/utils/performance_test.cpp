@@ -11,7 +11,6 @@
 #include <nx/utils/app_info.h>
 
 #include <client/client_globals.h>
-#include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_app_info.h>
 #include <ui/dialogs/common/message_box.h>
@@ -20,12 +19,6 @@ namespace nx::vms::client::desktop {
 
 void PerformanceTest::detectLightMode()
 {
-    if (qnRuntime->lightModeOverride() != -1)
-    {
-        qnSettings->setLightMode(static_cast<Qn::LightModeFlags>(qnRuntime->lightModeOverride()));
-        return;
-    }
-
     bool poorCpu = false;
     bool poorGpu = false;
 
@@ -55,7 +48,7 @@ void PerformanceTest::detectLightMode()
 
     if (poorCpu && poorGpu)
     {
-        qnSettings->setLightMode(Qn::LightModeFull);
+        qnRuntime->setLightMode(Qn::LightModeFull);
 
         const auto text = QCoreApplication::translate(
             "QnPerformanceTest", "%1 can work in configuration mode only")

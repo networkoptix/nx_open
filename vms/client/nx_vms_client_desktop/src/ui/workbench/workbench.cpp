@@ -20,14 +20,17 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 
-#include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
-#include <nx/vms/client/desktop/ui/workbench/layouts/special_layout.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
 
 #include <common/common_module.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
-using namespace nx::vms::client::desktop::ui;
-using namespace nx::vms::client::desktop::ui::workbench;
+#include <nx/utils/math/fuzzy.h>
+
+using namespace nx::vms::client::desktop;
+using namespace ui;
+using namespace workbench;
 
 namespace {
 
@@ -211,10 +214,10 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
     if (layout) // layout == nullptr is ok in QnWorkbench destructor
     {
         auto resource = layout->resource();
-        if (resource && nx::vms::client::desktop::layout::requiresPassword(resource))
+        if (resource && layout::requiresPassword(resource))
         {
             // When opening encrypted layout, ask for the password and remove layout if unsuccessful.
-            if (!nx::vms::client::desktop::layout::askAndSetPassword(resource, mainWindowWidget()))
+            if (!layout::askAndSetPassword(resource, mainWindowWidget()))
             {
                 delete layout;
                 return;

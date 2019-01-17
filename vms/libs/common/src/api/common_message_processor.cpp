@@ -649,6 +649,8 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             cameraUserAttributesPool(),
             userAttributes->cameraId);
+        if ((*userAttributesLock)->licenseUsed && !attrs.scheduleEnabled)
+            NX_INFO(this, "Recording was turned off for camera %1", attrs.cameraId);
         (*userAttributesLock)->assign(*userAttributes, &modifiedFields);
     }
     const QnResourcePtr& res = resourcePool()->getResourceById(userAttributes->cameraId);

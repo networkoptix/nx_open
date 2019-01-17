@@ -20,18 +20,12 @@
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 
-namespace {
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
-static const QString kCacheDirectoryName("radass_manager_cache");
+namespace {
 
 static const QnUuid kSystemId1("{A85E63C4-D2F2-4CF4-BA6C-C7480ADCDD7F}");
 static const QnUuid kSystemId2("{B647474A-8354-4E7F-B98E-D5718B695F55}");
-
-QString getCacheDirectory()
-{
-    auto directory = QDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
-    return directory.absoluteFilePath(kCacheDirectoryName);
-}
 
 } // namespace
 
@@ -50,19 +44,25 @@ void PrintTo(const RadassMode& val, ::std::ostream* os)
     *os << mode.toStdString();
 }
 
-class RadassResourceManagerTest: public testing::Test
+class RadassResourceManagerTest:
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
-protected:
+public:
+    RadassResourceManagerTest():
+        TestWithTemporaryDirectory("nx_vms_client_desktop")
+    {}
 
+protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        QDir(getCacheDirectory()).removeRecursively();
+        QDir(testDataDir()).removeRecursively();
 
         m_staticCommon.reset(new QnStaticCommonModule());
         m_module.reset(new QnCommonModule(false, core::access::Mode::direct));
         m_manager.reset(new RadassResourceManager());
-        m_manager->setCacheDirectory(getCacheDirectory());
+        m_manager->setCacheDirectory(testDataDir());
         m_layout.reset(new QnLayoutResource());
         m_layout->setId(QnUuid::createUuid());
         resourcePool()->addResource(m_layout);
@@ -76,7 +76,7 @@ protected:
         m_module.reset();
         m_staticCommon.reset();
 
-        QDir(getCacheDirectory()).removeRecursively();
+        QDir(testDataDir()).removeRecursively();
     }
 
     QnLayoutItemIndex addCamera(bool hasDualStreaming = true)
@@ -296,7 +296,7 @@ TEST_F(RadassResourceManagerTest, addUnsupportedCameraToPresetLayout)
 
 TEST_F(RadassResourceManagerTest, checkCacheDirectory)
 {
-    ASSERT_EQ(getCacheDirectory(), manager()->cacheDirectory());
+    ASSERT_EQ(testDataDir(), manager()->cacheDirectory());
 }
 
 TEST_F(RadassResourceManagerTest, switchLocalId)

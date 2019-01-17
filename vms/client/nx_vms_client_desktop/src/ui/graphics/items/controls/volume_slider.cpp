@@ -5,7 +5,7 @@
 #include <nx/audio/audiodevice.h>
 
 #include <ui/style/helper.h>
-#include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 namespace {
 

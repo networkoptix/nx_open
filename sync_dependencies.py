@@ -28,9 +28,9 @@ def determine_package_versions(
     v = {
         "gcc": "8.1",
         "clang": "6.0.0",
-        "qt": "5.11.1",
+        "qt": "5.11.3",
         "boost": "1.67.0",
-        "openssl": "1.0.2o",
+        "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
         "openldap": "2.4.42",
@@ -85,7 +85,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg"] = "3.1.1-1"
+        v["ffmpeg"] = "3.1.9"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
@@ -106,7 +106,7 @@ def determine_package_versions(
 
 
 def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
-    have_mediaserver = platform not in ("android", "ios")
+    have_mediaserver = platform not in ("android", "ios", "macosx")
     have_desktop_client = platform in ("windows", "macosx") \
         or (platform == "linux" and box in ("none", "tx1"))
     have_mobile_client = have_desktop_client or platform in ("android", "ios")
@@ -201,7 +201,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("openldap")
             sync("sasl2")
 
-    if platform in ("linux", "windows"):
+    if have_mediaserver or have_desktop_client:
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
     sync("any/certificates", path_variable="certificates_path")

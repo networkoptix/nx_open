@@ -67,6 +67,13 @@ void TimeSynchronizationWidgetStore::setServerOnline(const QnUuid &id, bool isOn
         [&](State state) { return Reducer::setServerOnline(std::move(state), id, isOnline); });
 }
 
+void TimeSynchronizationWidgetStore::setServerHasInternet(const QnUuid &id, bool hasInternet)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setServerHasInternet(std::move(state), id, hasInternet);
+    });
+}
+
 void TimeSynchronizationWidgetStore::applyChanges()
 {
     d->executeAction([](State state) { return Reducer::applyChanges(std::move(state)); });
@@ -115,10 +122,16 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
 
                 if (idx >= 0)
                 {
-                    server.osTimeOffset = offsetList[idx].osTimeOffset;
-                    server.vmsTimeOffset = offsetList[idx].vmsTimeOffset;
+                    const auto &offsetInfo = offsetList[idx];
+                    server.osTimeOffset = offsetInfo.osTimeOffset;
+                    server.vmsTimeOffset = offsetInfo.vmsTimeOffset;
+                    server.timeZoneOffset = offsetInfo.timeZoneOffset;
                 }
             }
+
+            // Update cached value
+            state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
+
             return state;
         });
 }

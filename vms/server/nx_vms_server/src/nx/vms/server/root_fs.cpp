@@ -18,8 +18,7 @@
     #define ssize_t SSIZE_T
 #endif
 
-namespace nx {
-namespace vms::server {
+namespace nx::vms::server {
 
 namespace {
 
@@ -141,7 +140,7 @@ Qn::StorageInitResult RootFileSystem::mount(const QUrl& url, const QString& path
                 case SystemCommands::MountCode::wrongCredentials:
                     NX_WARNING(this, lm(
                         "[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials").args(
-                            url, path, viaString, systemCommands.lastError()));
+                            url, path, viaString));
                     break;
                 }
             };
@@ -284,6 +283,21 @@ bool RootFileSystem::isPathExists(const QString& path)
     return (bool) execViaRootTool("exists " + enquote(path), &receiveInt64Action);
 }
 
+static SystemCommands::Stats statsFromSerialized(const std::string& buffer)
+{
+    SystemCommands::Stats result;
+    memcpy(&result, buffer.data(), sizeof(SystemCommands::Stats));
+    return result;
+}
+
+SystemCommands::Stats RootFileSystem::stat(const QString& path)
+{
+    if (m_ignoreTool)
+        return SystemCommands().stat(path.toStdString());
+
+    return statsFromSerialized(execViaRootTool("stat " + enquote(path), &receiveBufferAction));
+}
+
 struct StringRef
 {
     const char* data;
@@ -416,6 +430,5 @@ std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
     return std::make_unique<RootFileSystem>(isRootToolUsed);
 }
 
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server
 

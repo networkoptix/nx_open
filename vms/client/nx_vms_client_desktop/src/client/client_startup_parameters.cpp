@@ -87,7 +87,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
     addParserParam(commandLineParser, &result.logFile, "--log-file");
-    addParserParam(commandLineParser, &result.ec2TranLogLevel, "--ec2-tran-log-level", lit("none"));
 
     addParserParam(commandLineParser, &result.clientUpdateDisabled, "--no-client-update");
     addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
@@ -174,4 +173,9 @@ bool QnStartupParameters::isDevMode() const
     using Hash = nx::utils::QnCryptographicHash;
     return nx::vms::client::desktop::ini().developerMode
         || Hash::hash(devModeKey.toLatin1(), Hash::Md5) == developerKey;
+}
+
+bool QnStartupParameters::isVideoWallMode() const
+{
+    return !videoWallGuid.isNull();
 }

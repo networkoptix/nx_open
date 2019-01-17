@@ -200,11 +200,9 @@ void RuleProcessor::doExecuteAction(const vms::event::AbstractActionPtr& action,
 
 void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 {
-    if (!action)
-    {
-        NX_ASSERT(0, Q_FUNC_INFO, "No action to execute");
+    if (!NX_ASSERT(action, Q_FUNC_INFO, "No action to execute"))
         return; //< Something is wrong.
-    }
+    NX_VERBOSE(this, "Executing action [%1]", action->getRuleId());
 
     prepareAdditionActionParams(action);
 
@@ -404,6 +402,8 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     // TODO: Introduce a thread pool so actions could do not block a single event queue.
     NX_CRITICAL(!nx::network::SocketGlobals::aioService().isInAnyAioThread(),
         "Processing event from an AIO thread will sooner or later lead to a deadlock!");
+
+    NX_VERBOSE(this, "Processing event [%1]", event->getEventType());
 
     QnMutexLocker lock(&m_mutex);
     // Get pairs of {rule, action} for event

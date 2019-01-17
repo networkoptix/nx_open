@@ -14,6 +14,14 @@ option(codeSigning "Enable code signing" OFF)
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 set(repositoryRootDir ${PROJECT_SOURCE_DIR}/..)
 
+if("${dotNetFramework}" STREQUAL "v4.0")
+    set(net2Version "Net2v5")
+elseif("${dotNetFramework}" STREQUAL "v4.6.2")
+    set(net2Version "Net2v6")
+else()
+    message(FATAL_ERROR "Unknown .Net framework version ${dotNetFramework}")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH
     ${repositoryRootDir}/cmake
 )

@@ -82,9 +82,11 @@ void TimeSyncManager::stop()
     m_thread->wait();
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRemoteHost(const QnRoute& route)
+std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRemoteHost(
+    const QnRoute& route,
+    bool sslRequired)
 {
-    auto socket = nx::network::SocketFactory::createStreamSocket(false);
+    auto socket = nx::network::SocketFactory::createStreamSocket(sslRequired);
     if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))
         return socket;
     return std::unique_ptr<nx::network::AbstractStreamSocket>();
@@ -104,20 +106,6 @@ void TimeSyncManager::loadTimeFromLocalClock()
 
 bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
-    auto socket = connectToRemoteHost(route);
-
-    if (!socket)
-    {
-        NX_WARNING(this,
-            lm("Can't read time from server %1. Can't establish connection to the remote host.")
-                .arg(qnStaticCommon->moduleDisplayName(route.id)));
-        return false;
-    }
-    auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
-
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>(std::move(socket));
-    httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
-    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
     {
@@ -125,10 +113,27 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
             lm("Server %1 is not known yet. Postpone time sync request").arg(qnStaticCommon->moduleDisplayName(route.id)));
         return false;
     }
+
     nx::utils::Url url(server->getApiUrl());
     url.setHost(route.addr.address.toString());
     url.setPort(route.addr.port);
     url.setPath(kTimeSyncUrlPath);
+
+    const bool sslRequired = url.scheme() == nx::network::http::kSecureUrlSchemeName;
+    auto socket = connectToRemoteHost(route, sslRequired);
+
+    if (!socket)
+    {
+        NX_WARNING(this,
+            lm("Can't read time from server %1. Can't establish connection to the remote host.")
+            .arg(qnStaticCommon->moduleDisplayName(route.id)));
+        return false;
+    }
+    auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
+
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>(std::move(socket));
+    httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
+    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
 
     nx::utils::ElapsedTimer rttTimer;
     // With gateway repeat request twice to make sure we have opened tunnel to the target server.
@@ -186,14 +191,16 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
 {
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
-    if (timeDelta < rtt / 2)
+    if (timeDelta < rtt)
         return false;
+
+    NX_INFO(this,
+        lm("Set sync time to the new value %1. Difference between new and old value is %2")
+            .arg(value.count())
+            .arg(value - syncTime));
 
     setSyncTimeInternal(value);
     emit timeChanged(value.count());
-
-    NX_INFO(this, lm("Set sync time to the new value %1").arg(value.count()));
-
     return true;
 }
 

@@ -58,7 +58,7 @@ const char* kApiRequestPath = "/cgi-bin/cmd/";
 
 QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule),
-    m_desiredTransport(RtspTransport::autoDetect),
+    m_desiredTransport(RtspTransport::notDefined),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -130,11 +130,6 @@ int QnActiResource::eventPort() {
 QString QnActiResource::getDriverName() const
 {
     return MANUFACTURE;
-}
-
-void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-
 }
 
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
@@ -248,7 +243,17 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
 {
     QList<QSize> result;
     QList<QSize> availResolutions;
-    for(const QByteArray& r: resolutions.split(','))
+
+    /*
+        Usually ACTi cams resolution response is something like "N1024x768,N1280x1024".
+        ACTi-KCM3911 resolution response is "2VIDEO_RESOLUTION_CAP='N2032x1936".
+        pureResolutions - is a workaround for such cameras.
+    */
+    QByteArray pureResolutions = resolutions.split('=').last();
+    if (!pureResolutions.isEmpty() && pureResolutions.front() == '\'')
+        pureResolutions = pureResolutions.mid(1);
+
+    for(const QByteArray& r: pureResolutions.split(','))
         result << extractResolution(r);
     std::sort(result.begin(), result.end(), resolutionGreaterThan);
     return result;

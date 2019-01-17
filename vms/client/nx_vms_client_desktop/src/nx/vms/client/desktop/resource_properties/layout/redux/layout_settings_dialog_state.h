@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QDebug>
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
@@ -7,10 +8,21 @@
 
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::vms::client::desktop {
 
 struct LayoutSettingsDialogState: AbstractReduxState
 {
+    /** Recommended area of the layout background - in square cells. */
+    static constexpr int kBackgroundRecommendedArea = 40 * 40;
+
+    /** Recommended size of the layout background - in cells. */
+    static constexpr int kBackgroundMinSize = 5;
+
+    /** Recommended size of the layout background - in cells. */
+    static constexpr int kBackgroundMaxSize = 64;
+
     bool locked = false;
     bool isLocalFile = false;
     float cellAspectRatio = 0.0;
@@ -24,8 +36,8 @@ struct LayoutSettingsDialogState: AbstractReduxState
 
     struct Range
     {
-        int min = 0;
-        int max = 0;
+        int min = kBackgroundMinSize;
+        int max = kBackgroundMaxSize;
         int value = 0;
 
         void setRange(int min, int max)
@@ -135,5 +147,30 @@ struct LayoutSettingsDialogState: AbstractReduxState
 
     Background background;
 };
+
+#define LayoutSettingsDialogState_Range_Fields (min)(max)(value)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Range,
+    (debug)(eq),
+    NX_VMS_CLIENT_DESKTOP_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::BackgroundImageStatus,
+    (debug)(lexical),
+    NX_VMS_CLIENT_DESKTOP_API)
+
+#define LayoutSettingsDialogState_Background_Fields (status)(errorText)(width)(height)\
+    (keepImageAspectRatio)(opacityPercent)(cropToMonitorAspectRatio)(filename)(imageSourcePath)\
+    (preview)(croppedPreview)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Background,
+    (debug)(eq),
+    NX_VMS_CLIENT_DESKTOP_API)
+
+#define LayoutSettingsDialogState_Fields (locked)(isLocalFile)(cellAspectRatio)(logicalId)\
+    (reservedLogicalId)(fixedSizeEnabled)(fixedSize)(background)
+
+QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState,
+    (debug)(eq),
+    NX_VMS_CLIENT_DESKTOP_API)
 
 } // namespace nx::vms::client::desktop

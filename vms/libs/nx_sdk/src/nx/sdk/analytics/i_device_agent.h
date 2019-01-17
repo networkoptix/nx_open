@@ -70,9 +70,10 @@ public:
 
     /**
      * Provides DeviceAgent manifest in JSON format.
+     * @param outError Status of the operation; is set to noError before this call.
      * @return JSON string in UTF-8.
      */
-    virtual const IString* manifest(Error* error) const = 0;
+    virtual const IString* manifest(Error* outError) const = 0;
 
     /**
      * @param handler Processes event metadata and object metadata fetched by DeviceAgent.

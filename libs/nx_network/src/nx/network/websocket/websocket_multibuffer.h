@@ -25,7 +25,7 @@ class NX_NETWORK_API MultiBuffer
     using BuffersType = std::deque<LockableBuffer>;
 
 public:
-    int readySize() const;
+    int size() const;
 
     void append(const nx::Buffer& buf);
     void append(const char* data, int size);

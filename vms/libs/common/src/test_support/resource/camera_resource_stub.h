@@ -13,7 +13,6 @@ class CameraResourceStub: public QnVirtualCameraResource
 public:
     CameraResourceStub(Qn::LicenseType licenseType = Qn::LC_Professional);
 
-    virtual QString getDriverName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
     virtual bool hasDualStreamingInternal() const override;

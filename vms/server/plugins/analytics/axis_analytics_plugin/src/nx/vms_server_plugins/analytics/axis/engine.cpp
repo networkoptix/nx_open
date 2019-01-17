@@ -17,11 +17,7 @@
 
 #include "device_agent.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace axis {
-
+namespace nx::vms_server_plugins::analytics::axis {
 namespace {
 
 const QString kAxisVendor("axis");
@@ -36,7 +32,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
-        m_manifest = f.readAll();
+        m_jsonManifest = f.readAll();
 
     {
         QFile file("plugins/axis/manifest.json");
@@ -44,10 +40,10 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         {
             NX_PRINT << "Switch to external manifest file "
                 << QFileInfo(file).absoluteFilePath().toStdString();
-            m_manifest = file.readAll();
+            m_jsonManifest = file.readAll();
         }
     }
-    m_typedManifest = QJson::deserialized<EngineManifest>(m_manifest);
+    m_parsedManifest = QJson::deserialized<EngineManifest>(m_jsonManifest);
 }
 
 void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -85,6 +81,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 
     EngineManifest events = fetchSupportedEvents(*deviceInfo);
+
     if (events.eventTypes.empty())
         return nullptr;
 
@@ -94,7 +91,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::String(m_manifest);
+    return new nx::sdk::String(m_jsonManifest);
 }
 
 EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
@@ -108,12 +105,12 @@ EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
 
     // Only some rules are useful.
     std::vector<std::string> allowedTopics;
-    for (const auto& topic: m_typedManifest.allowedTopics)
+    for (const auto& topic: m_parsedManifest.allowedTopics)
         allowedTopics.push_back(topic.toStdString());
     axisCameraController.filterSupportedEvents(allowedTopics);
 
     std::vector<std::string> forbiddenDescriptions;
-    for (const auto& description: m_typedManifest.forbiddenDescriptions)
+    for (const auto& description: m_parsedManifest.forbiddenDescriptions)
         forbiddenDescriptions.push_back(description.toStdString());
     axisCameraController.removeForbiddenEvents(forbiddenDescriptions);
 
@@ -145,10 +142,7 @@ bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
     return vendor.startsWith(kAxisVendor);
 }
 
-} // namespace axis
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::axis
 
 namespace {
 
