@@ -39,9 +39,9 @@ Uuid Object::id() const
     return m_id;
 }
 
-const char* Object::objectSubType() const
+const char* Object::subtype() const
 {
-    return m_objectSubType.data();
+    return m_subtype.data();
 }
 
 const IAttribute* Object::attribute(int index) const
@@ -79,9 +79,9 @@ void Object::setId(const Uuid& value)
     m_id = value;
 }
 
-void Object::setObjectSubType(const std::string& value)
+void Object::setSubtype(const std::string& value)
 {
-    m_objectSubType = value;
+    m_subtype = value;
 }
 
 void Object::setAttributes(const std::vector<Attribute>& value)

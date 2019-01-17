@@ -20,7 +20,7 @@ public:
     virtual const char* typeId() const override;
     virtual float confidence() const override;
     virtual Uuid id() const override;
-    virtual const char* objectSubType() const override;
+    virtual const char* subtype() const override;
     virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
     virtual const char* auxiliaryData() const override;
@@ -29,7 +29,7 @@ public:
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
     void setId(const Uuid& value);
-    void setObjectSubType(const std::string& value);
+    void setSubtype(const std::string& value);
     void setAttributes(const std::vector<Attribute>& value);
     void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
@@ -40,7 +40,7 @@ private:
     float m_confidence = 1.0;
 
     Uuid m_id;
-    std::string m_objectSubType;
+    std::string m_subtype;
     std::vector<Attribute> m_attributes;
     std::string m_auxiliaryData;
     Rect m_rect;
