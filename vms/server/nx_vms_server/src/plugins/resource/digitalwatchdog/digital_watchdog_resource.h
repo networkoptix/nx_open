@@ -17,6 +17,8 @@
 
 #include <QtXml/QDomDocument>
 
+class CproApiClient;
+
 class QnDigitalWatchdogResource : public QnPlOnvifResource
 {
     Q_OBJECT
@@ -25,7 +27,7 @@ class QnDigitalWatchdogResource : public QnPlOnvifResource
 
 public:
     QnDigitalWatchdogResource(QnMediaServerModule* serverModule);
-    ~QnDigitalWatchdogResource();
+    virtual ~QnDigitalWatchdogResource() override;
 
     std::unique_ptr<CLSimpleHTTPClient> httpClient() const;
 
@@ -63,7 +65,6 @@ private:
 
     QScopedPointer<DWAbstractCameraProxy> m_cameraProxy;
 
-    class CproApiClient;
     std::unique_ptr<CproApiClient> m_cproApiClient;
 };
 
