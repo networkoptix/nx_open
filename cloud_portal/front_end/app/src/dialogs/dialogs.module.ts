@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { ComponentsModule } from '../components/components.module';
 import { DirectivesModule } from '../directives/directives.module';
-import { DropdownsModule }  from '../dropdowns/dropdowns.module';
 
 import { NxDialogsService }                                   from './dialogs.service';
 import { NxModalLoginComponent, LoginModalContent }           from './login/login.component';
@@ -28,7 +27,6 @@ import { ClipboardModule }                                    from 'ngx-clipboar
         ClipboardModule,
         ComponentsModule,
         DirectivesModule,
-        DropdownsModule
     ],
     declarations   : [
         LoginModalContent, NxModalLoginComponent,

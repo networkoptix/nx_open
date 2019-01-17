@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, SimpleChanges, Inject, OnChanges } from '@angular/core';
 import { ActivatedRoute }                                             from '@angular/router';
 import { Location }                                                   from '@angular/common';
-import { Utils }                                                      from '../../utils/helpers';
-import { NxConfigService }                                            from '../../services/nx-config';
+import { Utils }                                                      from '../../../utils/helpers';
+import { NxConfigService }                                            from '../../../services/nx-config';
 
 @Component({
     selector: 'nx-systems',

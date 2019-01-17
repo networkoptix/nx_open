@@ -20,7 +20,7 @@ import {
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
 import { AppComponent }      from './app.component';
-import { DropdownsModule }   from './src/dropdowns/dropdowns.module';
+import { ComponentsModule }  from './src/components/components.module';
 import { DialogsModule }     from './src/dialogs/dialogs.module';
 import { PagesModule }       from './src/pages/pages.module';
 import { DirectivesModule }  from './src/directives/directives.module';
@@ -78,7 +78,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         ngToastModule,
         authorizationCheckServiceModule,
         locationProxyModule,
-        DropdownsModule,
+        ComponentsModule,
         DialogsModule,
         PagesModule,
         DirectivesModule,

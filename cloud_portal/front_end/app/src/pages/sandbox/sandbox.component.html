@@ -3,6 +3,31 @@
 
 
     <ngb-tabset #tabs>
+        <ngb-tab id="Search">
+            <ng-template ngbTabTitle>
+                <span class="tab-heading">Search</span>
+            </ng-template>
+            <ng-template ngbTabContent>
+                <div class="row p-3">
+                    <nx-search
+                            name="filter"
+                            [(ngModel)]="filter"
+                            expandable>
+                    </nx-search>
+
+                    <div class="pt-5">
+                        Search filter: {{filter.query}}
+                    </div>
+                    <div class="pt-3">
+                        Search selects: {{filter.selects | json}}
+                    </div>
+                    <div class="pt-3">
+                        Search tags: {{filter.tags | json}}
+                    </div>
+                </div>
+            </ng-template>
+        </ngb-tab>
+
         <ngb-tab id="Multi DD">
             <ng-template ngbTabTitle>
                 <span class="tab-heading">Multi DD</span>
