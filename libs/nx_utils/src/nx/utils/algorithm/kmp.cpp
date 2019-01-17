@@ -56,7 +56,7 @@ std::vector<int> KmpSearcher::computePrefixTable(const std::string_view& str)
     t[0] = -1;
 
     int cnd = 0;
-    for (int pos = 1; pos < len; ++pos)
+    for (std::size_t pos = 1; pos < len; ++pos)
     {
         if (str[pos] == str[cnd])
         {
