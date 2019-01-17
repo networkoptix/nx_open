@@ -185,7 +185,7 @@ ViewNodeData::Roles ViewNodeData::rolesForColumn(int column) const
 
 Qt::ItemFlags ViewNodeData::flags(int column) const
 {
-    static constexpr Qt::ItemFlags kCheckableFlags = Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+    static constexpr Qt::ItemFlags kCheckableFlags = Qt::ItemIsUserCheckable;
 
     const auto flagIt = d->flags.find(column);
     const auto flagsValue = flagIt == d->flags.end() ? Qt::ItemIsEnabled : flagIt.value();
