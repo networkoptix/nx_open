@@ -105,8 +105,8 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
         return Error::unknownError;
     }
 
-    if (const auto compressedFrame = Ptr<ICompressedVideoPacket>(
-        dataPacket->queryInterface(IID_CompressedVideoPacket)))
+    if (const auto compressedFrame = nxpt::queryInterfacePtr<ICompressedVideoPacket>(
+        dataPacket, IID_CompressedVideoPacket))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
         {
@@ -114,8 +114,8 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
             return Error::unknownError;
         }
     }
-    else if (const auto uncompressedFrame = Ptr<IUncompressedVideoFrame>(
-        dataPacket->queryInterface(IID_UncompressedVideoFrame)))
+    else if (const auto uncompressedFrame = nxpt::queryInterfacePtr<IUncompressedVideoFrame>(
+        dataPacket, IID_UncompressedVideoFrame))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
         {

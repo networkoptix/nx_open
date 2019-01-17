@@ -35,8 +35,8 @@ bool BasePipeline::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
     std::lock_guard<std::mutex> guard(m_mutex);
     NX_OUTPUT << __func__ << " Pushing data packet! Queue size is: " << m_packetQueue.size();
 
-    if (const auto video = nx::sdk::Ptr<nx::sdk::analytics::ICompressedVideoPacket>(
-        dataPacket->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket)))
+    if (const auto video = nxpt::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(
+        dataPacket, nx::sdk::analytics::IID_CompressedVideoPacket))
     {
         m_lastFrameTimestampUs = video->timestampUs();
         m_currentFrameWidth = video->width();

@@ -53,15 +53,15 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 
     bool handled = false;
-    if (const auto eventsPacket = nx::sdk::Ptr<IEventMetadataPacket>(
-        metadata->queryInterface(IID_EventMetadataPacket)))
+    if (const auto eventsPacket = nxpt::queryInterfacePtr<IEventMetadataPacket>(metadata,
+        IID_EventMetadataPacket))
     {
         handleEventsPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = nx::sdk::Ptr<IObjectMetadataPacket>(
-        metadata->queryInterface(IID_ObjectMetadataPacket)))
+    if (const auto objectsPacket = nxpt::queryInterfacePtr<IObjectMetadataPacket>(metadata,
+        IID_ObjectMetadataPacket))
     {
         handleObjectsPacket(objectsPacket);
         handled = true;
@@ -86,7 +86,7 @@ void MetadataHandler::handleEventsPacket(nx::sdk::Ptr<IEventMetadataPacket> pack
 
         ++eventsCount;
 
-        if (const auto event = nx::sdk::Ptr<IEvent>(item->queryInterface(IID_Event)))
+        if (const auto event = nxpt::queryInterfacePtr<IEvent>(item, IID_Event))
         {
             const int64_t timestampUsec = packet->timestampUs();
             handleMetadataEvent(event, timestampUsec);

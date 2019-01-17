@@ -6,6 +6,8 @@
 
 // TODO: Remove this file when Storage and Camera SDKs are merged into Analytics SDK.
 
+#include <nx/sdk/helpers/ptr.h>
+
 #if defined(_WIN32)
     #include <Windows.h>
     #undef min
@@ -162,6 +164,17 @@ int refCount(const nxpl::PluginInterface* object)
 
     (void) object->addRef();
     return object->releaseRef();
+}
+
+/**
+ * Calls queryInterface() and returns a smart pointer to its result, possibly null.
+ */
+template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
+static nx::sdk::Ptr<Interface> queryInterfacePtr(
+    RefCountablePtr refCountable, const nxpl::NX_GUID& interfaceId)
+{
+    return nx::sdk::Ptr<Interface>(
+        static_cast<Interface*>(refCountable->queryInterface(interfaceId)));
 }
 
 enum NxGuidFormatOption

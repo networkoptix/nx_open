@@ -8,6 +8,7 @@ extern "C" {
 
 } // extern "C"
 
+#include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
@@ -62,8 +63,8 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
 
-    if (const auto timeProvider = Ptr<nxpl::TimeProvider>(
-        m_plugin->pluginContainer()->queryInterface(nxpl::IID_TimeProvider)))
+    if (const auto timeProvider = nxpt::queryInterfacePtr<nxpl::TimeProvider>(
+        m_plugin->pluginContainer(), nxpl::IID_TimeProvider))
     {
         m_timeProvider = decltype(m_timeProvider)(
             timeProvider.get(),

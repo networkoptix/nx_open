@@ -7,7 +7,7 @@
 
 #include <QtCore/QTextStream>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <plugins/plugin_tools.h>
 #include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/utils/app_info.h>
@@ -122,8 +122,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
-        m_camManager.getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
+    auto camManager2 = nxpt::queryInterfacePtr<nxcip::BaseCameraManager2>(
+        m_camManager.getRef(), nxcip::IID_BaseCameraManager2);
     if( !camManager2 )
         return;
 
@@ -181,8 +181,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
-            if (const auto mediaEncoder4 = nx::sdk::Ptr<nxcip::CameraMediaEncoder4>(
-                intf->queryInterface(nxcip::IID_CameraMediaEncoder4)))
+            if (const auto mediaEncoder4 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
+                intf, nxcip::IID_CameraMediaEncoder4))
             {
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
             }
@@ -198,8 +198,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             intf->queryInterface(nxcip::IID_CameraMediaEncoder2)),
         refDeleter);
 
-    nx::sdk::Ptr<nxcip::CameraMediaEncoder3> mediaEncoder3(
-        intf->queryInterface(nxcip::IID_CameraMediaEncoder3));
+    auto mediaEncoder3 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder3>(
+        intf, nxcip::IID_CameraMediaEncoder3);
 
     if (mediaEncoder3) //< One-call config.
     {
@@ -623,8 +623,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
 
     QnAbstractMediaDataPtr mediaPacket;
 
-    if (const auto mediaDataPacket2 = nx::sdk::Ptr<nxcip::MediaDataPacket2>(
-        packet->queryInterface(nxcip::IID_MediaDataPacket2)))
+    if (const auto mediaDataPacket2 = nxpt::queryInterfacePtr<nxcip::MediaDataPacket2>(
+        packet, nxcip::IID_MediaDataPacket2))
     {
         auto extradataSize = mediaDataPacket2->extradataSize();
         outExtras->extradataBlob.resize(extradataSize);

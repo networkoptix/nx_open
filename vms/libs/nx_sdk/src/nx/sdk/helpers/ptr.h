@@ -19,14 +19,6 @@ public:
     /** Supports implicit conversion from nullptr. */
     Ptr(std::nullptr_t = nullptr) {}
 
-    // TODO: #mshevchenko: Remove when queryInterface returns IRefCountable*.
-    /** Intended to be applied to queryInterface(). */
-    explicit Ptr(void* ptr): Ptr(static_cast<RefCountable*>(ptr)) {}
-
-    // TODO: #mshevchenko: Remove when queryInterface returns IRefCountable*.
-    /** Intended to be applied to queryInterface(). */
-    explicit Ptr(const void* ptr): Ptr(static_cast<RefCountable*>(ptr)) {}
-
     /** Sfinae: Compiles if OtherRefCountable* is convertible to RefCountable*. */
     template<class OtherRefCountable>
     using IsConvertibleFrom =
@@ -179,9 +171,10 @@ static Ptr<RefCountable> makePtr(Args&&... args)
  * Calls queryInterface() and returns a smart pointer to its result, possibly null.
  */
 template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
-static auto queryInterfacePtr(RefCountablePtr refCountable)
+static Ptr<Interface> queryInterfacePtr(RefCountablePtr refCountable)
 {
-    return Ptr<Interface>(refCountable->queryInterface(Interface::interfaceId()));
+    return Ptr<Interface>(
+        static_cast<Interface*>(refCountable->queryInterface(Interface::interfaceId())));
 }
 
 /**
