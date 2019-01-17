@@ -6,7 +6,7 @@
 namespace nx::utils::algorithm {
 
 /**
- * Implements Knuth–Morris–Pratt substring search algorithm.
+ * Implements Knuth-Morris-Pratt substring search algorithm.
  */
 class NX_UTILS_API KmpSearcher
 {

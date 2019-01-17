@@ -8,8 +8,8 @@ namespace nx::utils::bstream {
 
 /**
  * Replaces given pattern with a given string.
- * Implements Knuth–Morris–Pratt algorithm.
- * NOTE: Some data can be cached inside. To flush the cache, invoke this StringReplacer::write with no data.
+ * NOTE: Some data may be cached inside. To flush the cache, invoke StringReplacer::write with 
+ * no data.
  */
 class NX_UTILS_API StringReplacer:
     public AbstractOutputConverter
