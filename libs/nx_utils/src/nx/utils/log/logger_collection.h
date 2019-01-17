@@ -58,9 +58,9 @@ public:
     std::shared_ptr<AbstractLogger> get(int loggerId) const;
 
     /**
-     * Get the effective tags for a logger with the given id.
+     * Get all the tags associated with the give logger id.
      * If multiple loggers are added with the same tag, only the first logger added is associated 
-     * with the tag.
+     * with that tag.
      */
     std::set<Tag> getEffectiveTags(int loggerId) const;
 
@@ -81,8 +81,6 @@ private:
     void updateMaxLevel();
 
     void onLevelChanged();
-
-    std::shared_ptr<AbstractLogger> getInternal(int loggerId) const;
 
 private:
     mutable QnMutex m_mutex;

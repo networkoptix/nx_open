@@ -89,23 +89,24 @@ std::shared_ptr<AbstractLogger> LoggerCollection::get(const Tag& tag, bool exact
 std::shared_ptr<AbstractLogger> LoggerCollection::get(int loggerId) const
 {
     QnMutexLocker lock(&m_mutex);
-    return getInternal(loggerId);
+    for (const auto& element : m_loggersByTags)
+    {
+        if (element.second.id == loggerId)
+            return element.second.logger;
+    }
+
+    return nullptr;
 }
 
 std::set<Tag> LoggerCollection::getEffectiveTags(int loggerId) const
 {
     QnMutexLocker lock(&m_mutex);
-    auto logger = getInternal(loggerId);
-    if (!logger)
-        return std::set<Tag>();
-
     std::set<Tag> effectiveTags;
 
-    for (const auto& tag : logger->tags())
+    for (const auto& element : m_loggersByTags)
     {
-        auto it = m_loggersByTags.find(tag);
-        if (it != m_loggersByTags.end() && it->second.logger == logger)
-            effectiveTags.emplace(tag);
+        if (element.second.id == loggerId)
+            effectiveTags.emplace(element.first);
     }
 
     return effectiveTags;
