@@ -126,12 +126,12 @@ void LoggerCollection::remove(const std::set<Tag>& filters)
     updateMaxLevel();
 }
 
-void LoggerCollection::remove(int id)
+void LoggerCollection::remove(int loggerId)
 {
     QnMutexLocker lock(&m_mutex);
     for (auto it = m_loggersByTags.begin(); it != m_loggersByTags.end();)
     {
-        if (it->second.id == id)
+        if (it->second.id == loggerId)
             it = m_loggersByTags.erase(it);
         else
             ++it;

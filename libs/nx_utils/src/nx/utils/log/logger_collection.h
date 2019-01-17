@@ -45,8 +45,8 @@ public:
     /**
      * Add a logger to the collection. 
      * If this logger has a tag that is already associated with another logger, the existing
-     *    logger/tag association is not overwritten and the new logger will not be associated with
-     *    the tag. To get the tags associated with a given logger, see getEffectiveTags().
+     * logger/tag association is not overwritten and the new logger will not be associated with
+     * the tag. To get the tags associated with a given logger, see getEffectiveTags().
      *
      * @return - The logger id if added successfully (at least one tag was not already taken), 
      * -1 otherwise.
@@ -64,16 +64,16 @@ public:
      */
     std::set<Tag> getEffectiveTags(int loggerId) const;
 
-    /*
-    * Get all the loggers in this collection.
-    * If a logger has multiple tags associated with it, the data structure will contain the same 
-    * logger multiple times. there are as many loggers as there are tags associated with it.
-    */
+    /**
+     * Get all the loggers in this collection.
+     * If a logger has multiple tags associated with it, the data structure will contain the same 
+     * logger multiple times. there are as many loggers as there are tags associated with it.
+     */
     LoggersByTag allLoggers() const;
 
     void remove(const std::set<Tag>& filters);
 
-    void remove(int id);
+    void remove(int loggerId);
 
     Level maxLevel() const;
 
