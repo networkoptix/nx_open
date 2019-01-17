@@ -58,7 +58,6 @@ public:
 
     /**
      * Start monitoring socket sock for event eventToWatch and trigger eventHandler when event happens.
-     * NOTE: MUST be called with mutex locked.
      */
     void startMonitoring(
         Pollable* const sock,
@@ -74,7 +73,6 @@ public:
      *   method blocks untill AIOEventHandler::eventTriggered had returned.
      * NOTE: Calling this method with same parameters simultaneously from
      *   multiple threads can cause undefined behavour.
-     * NOTE: MUST be called with mutex locked.
      */
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
     /**
