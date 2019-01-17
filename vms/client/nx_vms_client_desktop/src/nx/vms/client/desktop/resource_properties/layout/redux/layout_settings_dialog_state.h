@@ -152,11 +152,11 @@ struct LayoutSettingsDialogState: AbstractReduxState
 
 QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Range,
     (debug)(eq),
-    NX_VMS_DESKTOP_CLIENT_API)
+    NX_VMS_CLIENT_DESKTOP_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::BackgroundImageStatus,
     (debug)(lexical),
-    NX_VMS_DESKTOP_CLIENT_API)
+    NX_VMS_CLIENT_DESKTOP_API)
 
 #define LayoutSettingsDialogState_Background_Fields (status)(errorText)(width)(height)\
     (keepImageAspectRatio)(opacityPercent)(cropToMonitorAspectRatio)(filename)(imageSourcePath)\
@@ -164,13 +164,13 @@ QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::BackgroundImageStatus,
 
 QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Background,
     (debug)(eq),
-    NX_VMS_DESKTOP_CLIENT_API)
+    NX_VMS_CLIENT_DESKTOP_API)
 
 #define LayoutSettingsDialogState_Fields (locked)(isLocalFile)(cellAspectRatio)(logicalId)\
     (reservedLogicalId)(fixedSizeEnabled)(fixedSize)(background)
 
 QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState,
     (debug)(eq),
-    NX_VMS_DESKTOP_CLIENT_API)
+    NX_VMS_CLIENT_DESKTOP_API)
 
 } // namespace nx::vms::client::desktop

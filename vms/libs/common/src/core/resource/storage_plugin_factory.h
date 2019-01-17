@@ -6,14 +6,14 @@
 
 #include "storage_resource.h"
 
-class QnStoragePluginFactory
+class QnStoragePluginFactory: public QObject
 {
+    Q_OBJECT
 public:
     typedef std::function<QnStorageResource *(QnCommonModule*, const QString&)> StorageFactory;
 
-    QnStoragePluginFactory();
+    QnStoragePluginFactory(QObject* parent = nullptr);
     virtual ~QnStoragePluginFactory();
-    static QnStoragePluginFactory *instance();
 
     bool existsFactoryForProtocol(const QString &protocol);
     void registerStoragePlugin(const QString &protocol, const StorageFactory &factory, bool isDefaultProtocol = false);

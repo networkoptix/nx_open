@@ -1252,6 +1252,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<IdData>(p, ApiCommand::removeUser);
 
+    /**%apidoc POST /ec2/removeResourceParam
+     * Delete the specified property.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %param resourceId resource id.
+     * %param name property name to remove.
+     */
+    regUpdate<ResourceParamWithRefData>(p, ApiCommand::removeResourceParam);
+
     /**%apidoc POST /ec2/saveUserRole
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
@@ -1393,10 +1405,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
-     * %param horizontalSpacing Horizontal spacing between layout items
-     *     (floating-point).
-     * %param verticalSpacing Vertical spacing between layout items
-     *     (floating-point).
+     * %param cellSpacing Cell spacing between layout items as percent of an item's size
+     *     (floating-point, 0..1).
      * %param items List of the layout items.
      *     %param items[].id Item unique id. Can be omitted when creating a new object.
      *     %param items[].flags Should have fixed value.
@@ -1424,11 +1434,24 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         (floating-point, 0..1).
      *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param items[].contrastParams Image enhancement parameters. The format
-     *         is proprietary and is likely to change in future API versions.
+     *     %param items[].contrastParams Image enhancement parameters.
+     *         %param contrastParams.enabled Whether the image enhancement is enabled.
+     *             %value false
+     *             %value true
+     *         %param contrastParams.blackLevel Level of the black color
+     *             (floating-point, 0..99).
+     *         %param contrastParams.whiteLevel Level of the white color
+     *             (floating-point, 0.1..100).
+     *         %param contrastParams.gamma Gamma enhancement value
+     *             (floating-point, 0.1..10).
      *     %param items[].dewarpingParams Image dewarping parameters.
-     *         The format is proprietary and is likely to change in future API
-     *         versions.
+     *         %param dewarpingParams.enabled Whether the image dewarping is enabled.
+     *             %value false
+     *             %value true
+     *         %param dewarpingParams.xAngle Pan in radians.
+     *         %param dewarpingParams.yAngle Tilt in radians.
+     *         %param dewarpingParams.fov FOV in radians.
+     *         %param dewarpingParams.panoFactor Aspect ratio correction value (integer).
      *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
@@ -1462,10 +1485,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
-     * %param horizontalSpacing Horizontal spacing between layout items
-     *     (floating-point).
-     * %param verticalSpacing Vertical spacing between layout items
-     *     (floating-point).
+     * %param cellSpacing Cell spacing between layout items as percent of an item's size
+     *     (floating-point, 0..1).
      * %param items List of the layout items.
      *     %param items[].id Item unique id. Can be omitted when creating a new object.
      *     %param items[].flags Should have fixed value.
@@ -1493,11 +1514,24 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         (floating-point, 0..1).
      *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param items[].contrastParams Image enhancement parameters. The format
-     *         is proprietary and is likely to change in future API versions.
+     *     %param items[].contrastParams Image enhancement parameters.
+     *         %param contrastParams.enabled Whether the image enhancement is enabled.
+     *             %value false
+     *             %value true
+     *         %param contrastParams.blackLevel Level of the black color
+     *             (floating-point, 0..99).
+     *         %param contrastParams.whiteLevel Level of the white color
+     *             (floating-point, 0.1..100).
+     *         %param contrastParams.gamma Gamma enhancement value
+     *             (floating-point, 0.1..10).
      *     %param items[].dewarpingParams Image dewarping parameters.
-     *         The format is proprietary and is likely to change in future API
-     *         versions.
+     *         %param dewarpingParams.enabled Whether the image dewarping is enabled.
+     *             %value false
+     *             %value true
+     *         %param dewarpingParams.xAngle Pan in radians.
+     *         %param dewarpingParams.yAngle Tilt in radians.
+     *         %param dewarpingParams.fov FOV in radians.
+     *         %param dewarpingParams.panoFactor Aspect ratio correction value (integer).
      *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true

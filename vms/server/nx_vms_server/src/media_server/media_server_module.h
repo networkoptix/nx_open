@@ -104,6 +104,8 @@ public:
     const nx::vms::server::Settings& settings() const { return m_settings->settings(); }
     nx::vms::server::Settings* mutableSettings() { return m_settings->mutableSettings(); }
 
+    QnStoragePluginFactory* storagePluginFactory() const;
+
     void syncRoSettings() const;
     nx::vms::server::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::vms::server::LicenseWatcher* licenseWatcher() const;

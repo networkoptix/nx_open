@@ -19,9 +19,11 @@
 #include <ui/style/custom_style.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/util.h>
 
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
+
+#include <network/system_helpers.h>
+
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
@@ -413,13 +415,13 @@ quint16 QnRoutingManagementWidget::getCurrentServerPort()
 
     const auto addresses = m_serverAddressesModel->addressList();
     if (addresses.isEmpty())
-        return kDefaultConnectionPort;
+        return helpers::kDefaultConnectionPort;
 
     const auto currentPort = addresses.first().port();
     if (currentPort > 0)
         return currentPort;
 
-    return kDefaultConnectionPort;
+    return helpers::kDefaultConnectionPort;
 }
 
 void QnRoutingManagementWidget::at_addButton_clicked() {

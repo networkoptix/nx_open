@@ -272,16 +272,16 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
             switch( quality )
             {
                 case Qn::StreamQuality::lowest:
-                    qVal = 100;
+                    qVal = 8;
                     break;
                 case Qn::StreamQuality::low:
-                    qVal = 50;
+                    qVal = 4;
                     break;
                 case Qn::StreamQuality::normal:
-                    qVal = 20;
+                    qVal = 3;
                     break;
                 case Qn::StreamQuality::high:
-                    qVal = 5;
+                    qVal = 2;
                     break;
                 case Qn::StreamQuality::highest:
                     qVal = 1;
@@ -291,7 +291,7 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
             }
 
             params.insert( QnCodecParams::qmin, qVal );
-            params.insert( QnCodecParams::qmax, qVal );
+            params.insert( QnCodecParams::qmax, 20);
         }
         break;
         case AV_CODEC_ID_VP8:

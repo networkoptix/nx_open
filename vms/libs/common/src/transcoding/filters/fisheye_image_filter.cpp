@@ -149,7 +149,10 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y, int 
 
 // ------------ QnFisheyeImageFilter ----------------------
 
-QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping, const QnItemDewarpingParams& itemDewarping):
+QnFisheyeImageFilter::QnFisheyeImageFilter(
+    const QnMediaDewarpingParams& mediaDewarping,
+    const nx::vms::api::DewarpingData& itemDewarping)
+    :
     QnAbstractImageFilter(),
     m_mediaDewarping(mediaDewarping),
     m_itemDewarping(itemDewarping),
@@ -424,7 +427,9 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 }
 
-QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const QnItemDewarpingParams &itemDewarpingParams)
+QSize QnFisheyeImageFilter::getOptimalSize(
+    const QSize& srcResolution,
+    const nx::vms::api::DewarpingData& itemDewarpingParams)
 {
     if (!itemDewarpingParams.enabled || itemDewarpingParams.panoFactor == 1)
         return srcResolution;
@@ -432,7 +437,7 @@ QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const QnI
     int square = srcResolution.width() * srcResolution.height();
     float aspect = itemDewarpingParams.panoFactor;
     int x = int(sqrt(square * aspect) + 0.5);
-    int y = int(x /aspect + 0.5);
+    int y = int(x / aspect + 0.5);
     return QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
 }
 

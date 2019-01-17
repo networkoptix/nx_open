@@ -653,7 +653,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="nx::vms::client::desktop::CameraAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
+        <widget class="nx::vms::client::desktop::LegacyAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -727,9 +727,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::CameraAdvancedSettingsWidget</class>
+   <class>nx::vms::client::desktop::LegacyAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/resource_properties/camera/camera_advanced_settings_widget.h</header>
+   <header location="global">nx/vms/client/desktop/resource_properties/camera/legacy/legacy_advanced_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

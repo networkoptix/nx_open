@@ -4,6 +4,8 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QPointer>
+
 #include <QtQuick/QSGSimpleMaterialShader>
 
 #include <nx/client/core/motion/motion_grid.h>
@@ -85,7 +87,7 @@ private:
     };
 
 private:
-    core::CameraMotionHelper* m_motionHelper = nullptr;
+    QPointer<core::CameraMotionHelper> m_motionHelper;
     int m_channel = 0;
     QVector<QColor> m_sensitivityColors;
 

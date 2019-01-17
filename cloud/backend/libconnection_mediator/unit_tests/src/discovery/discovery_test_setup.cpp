@@ -46,6 +46,7 @@ void DiscoveryTestSetup::SetUp()
 void DiscoveryTestSetup::onWebSocketAccepted(
     std::unique_ptr<nx::network::WebSocket> connection)
 {
+    connection->start();
     m_acceptedConnections.push(std::move(connection));
 }
 

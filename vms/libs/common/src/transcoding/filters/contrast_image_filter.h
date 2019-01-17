@@ -3,22 +3,23 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <nx/vms/api/data/image_correction_data.h>
+
 #include <utils/color_space/image_correction.h>
 
 #include "abstract_image_filter.h"
 
-
 class QnContrastImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnContrastImageFilter(const ImageCorrectionParams& params);
+    QnContrastImageFilter(const nx::vms::api::ImageCorrectionData& params);
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
     virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
     bool isFormatSupported(CLVideoDecoderOutput* frame) const;
 
 private:
-    ImageCorrectionParams m_params;
+    nx::vms::api::ImageCorrectionData m_params;
     ImageCorrectionResult m_gamma;
     float m_lastGamma;
     quint8 m_gammaCorrection[256];

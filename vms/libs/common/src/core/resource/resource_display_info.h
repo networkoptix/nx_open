@@ -22,10 +22,10 @@ private:
     QnResourcePtr m_resource;
 
     /** How deep are have constructed the info. */
-    mutable Qn::ResourceInfoLevel m_detailLevel;
+    mutable Qn::ResourceInfoLevel m_detailLevel = Qn::RI_Invalid;
 
     mutable QString m_name;
     mutable QString m_host;
-    mutable int m_port;
+    mutable int m_port = 0;
     mutable QString m_extraInfo;
 };

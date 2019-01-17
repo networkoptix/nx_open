@@ -27,7 +27,6 @@ public:
     virtual bool isCompatible(const QnAudioFormat& /* format */) const { return true; }
     virtual void setOutputFormat(const QnAudioFormat& /* format */) override {}
 
-    static const QByteArray kFixedPostRequest;
 protected:
     virtual void endOfRun() override;
 private:

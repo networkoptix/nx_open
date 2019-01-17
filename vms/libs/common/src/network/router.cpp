@@ -44,21 +44,16 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
         return result;
     }
 
-    bool isknownServer = server != 0;
     bool isClient = !commonModule()->remoteGUID().isNull()
         && commonModule()->remoteGUID() != commonModule()->moduleGUID();
-    if (!isknownServer && isClient)
+    if (isClient)
     {
-        if (commonModule()->remoteGUID().isNull())
-            return result;
-
-        result.gatewayId = commonModule()->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
+        result.gatewayId = commonModule()->remoteGUID(); // proxy via current server to the other servers (client side only)
         if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
             result.addr = *endpoint;
         else
             NX_WARNING(this, "No primary interface found for current EC yet.");
 
-        // todo: add distance for camera route
         return result;
     }
 

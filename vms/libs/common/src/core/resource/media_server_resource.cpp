@@ -329,7 +329,7 @@ QString QnMediaServerResource::rtspUrl() const
 {
     const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     nx::network::url::Builder urlBuilder(getUrl());
-    urlBuilder.setScheme(nx::network::rtsp::urlSheme(isSslAllowed() && isSecure));
+    urlBuilder.setScheme(nx::network::rtsp::urlSheme(isSecure));
     return urlBuilder.toString();
 }
 

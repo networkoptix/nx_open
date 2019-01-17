@@ -5,8 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/color_space/image_correction.h>
-#include <core/ptz/item_dewarping_params.h>
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
 
 namespace nx::vms::client::desktop {
 
@@ -58,11 +58,11 @@ public:
     bool displayInfo() const;
     void setDisplayInfo(bool displayInfo);
 
-    ImageCorrectionParams imageCorrectionParams() const;
-    void setImageCorrectionParams(const ImageCorrectionParams& params);
+    nx::vms::api::ImageCorrectionData imageCorrectionParams() const;
+    void setImageCorrectionParams(const nx::vms::api::ImageCorrectionData& params);
 
-    QnItemDewarpingParams dewarpingParams() const;
-    void setDewarpingParams(const QnItemDewarpingParams& params);
+    nx::vms::api::DewarpingData dewarpingParams() const;
+    void setDewarpingParams(const nx::vms::api::DewarpingData& params);
 
 signals:
     void flagsChanged();

@@ -1,25 +1,21 @@
-#ifndef QN_NETWORK_RESOURCE_H
-#define QN_NETWORK_RESOURCE_H
+#pragma once
 
-#include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
-#include <QtNetwork/QHostAddress>
-#include <nx/utils/mac_address.h>
+
 #include "resource.h"
 
-class QnTimePeriodList;
-class QnCommonModule;
+#include <nx/utils/mac_address.h>
+#include <nx/utils/url.h>
+#include <utils/common/value_cache.h>
 
-class QnNetworkResource : public QnResource
+class QnNetworkResource: public QnResource
 {
     Q_OBJECT
-    //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
-    //Q_PROPERTY(nx::utils::MacAddress macAddress READ getMAC WRITE setMAC)
-    //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
     using base_type = QnResource;
 public:
-    enum NetworkStatusFlag {
+    enum NetworkStatusFlag 
+    {
         BadHostAddr = 0x01,
         Ready = 0x04
     };
@@ -29,6 +25,7 @@ public:
     virtual ~QnNetworkResource();
 
     virtual QString getUniqueId() const;
+    virtual void setUrl(const QString& url) override;
 
     virtual QString getHostAddress() const;
     virtual void setHostAddress(const QString &ip);
@@ -106,27 +103,28 @@ public:
     virtual QString idForToStringFromPtr() const override;
 
     static QString mediaPortKey();
+
 private:
     static QAuthenticator getAuthInternal(const QString& value);
 
 private:
-    //QAuthenticator m_auth;
-    bool m_authenticated;
+    bool m_authenticated = true;
 
-    //QHostAddress m_hostAddr;
     nx::utils::MacAddress m_macAddress;
     QString m_physicalId;
 
-    NetworkStatus m_networkStatus;
+    NetworkStatus m_networkStatus = {};
 
-    unsigned int m_networkTimeout;
+    unsigned int m_networkTimeout = 1000 * 10;
+
+    // Initialized in cpp to avoid transitional includes.
     int m_httpPort;
 
-    bool m_probablyNeedToUpdateStatus;
+    bool m_probablyNeedToUpdateStatus = false;
 
     QDateTime m_lastDiscoveredTime;
+
+    CachedValue<QString> m_cachedHostAddress;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnNetworkResource::NetworkStatus)
-
-#endif // QN_NETWORK_RESOURCE_H

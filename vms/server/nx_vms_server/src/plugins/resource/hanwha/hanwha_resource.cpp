@@ -860,6 +860,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
+    if (isNvr())
+        sharedContext->startServices();
+
     auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
@@ -895,8 +898,8 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive, info.value);
+    if (!isNvr() && hasCameraCapabilities(Qn::RemoteArchiveCapability))
+        sharedContext->startServices();
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -2549,6 +2552,9 @@ int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRa
 
 int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile) const
 {
+    if (isNvr() && role == Qn::CR_Archive)
+        return kHanwhaInvalidProfile;
+
     auto itr = m_profileByRole.find(role);
     if (itr != m_profileByRole.cend())
     {
@@ -2738,10 +2744,8 @@ QSize HanwhaResource::bestSecondaryResolution(
     for (const auto& resolution: resolutionList)
         resolutions.push_back(resolution);
 
-    return closestResolution(
-        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+    return Camera::closestSecondaryResolution(
         getResolutionAspectRatio(primaryResolution),
-        SECONDARY_STREAM_MAX_RESOLUTION,
         resolutions);
 }
 

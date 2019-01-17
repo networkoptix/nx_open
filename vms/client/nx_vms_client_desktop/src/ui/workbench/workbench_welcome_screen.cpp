@@ -301,6 +301,11 @@ QString QnWorkbenchWelcomeScreen::message() const
     return m_message;
 }
 
+void QnWorkbenchWelcomeScreen::activateView() const
+{
+    return m_view->requestActivate();
+}
+
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
     return !extractResources(urls).isEmpty();
@@ -326,7 +331,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
 {
     connectToSystemInternal(
         systemId,
-        helpers::parseConnectionUrlFromUserInput(serverUrl),
+        parseConnectionUrlFromUserInput(serverUrl),
         {userName, password},
         storePassword,
         autoLogin);

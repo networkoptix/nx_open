@@ -13,6 +13,7 @@ class QnCommonModule;
 
 namespace helpers {
 
+static constexpr int kDefaultConnectionPort = 7001;
 static const QString kFactorySystemUser = "admin";
 static const QString kFactorySystemPassword = "admin";
 

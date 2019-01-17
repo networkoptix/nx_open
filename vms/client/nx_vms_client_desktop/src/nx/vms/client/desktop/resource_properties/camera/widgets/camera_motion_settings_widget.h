@@ -7,6 +7,9 @@
 
 class QButtonGroup;
 class QQuickView;
+class QQuickItem;
+class QShowEvent;
+class QHideEvent;
 
 namespace Ui { class CameraMotionSettingsWidget; }
 
@@ -32,7 +35,12 @@ public:
     QVector<QColor> sensitivityColors() const;
     void setSensitivityColors(const QVector<QColor>& value);
 
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
+
 private:
+    QQuickItem* motionItem() const;
     void loadState(const CameraSettingsDialogState& state);
     void loadAlerts(const CameraSettingsDialogState& state);
     void resetMotionRegions();

@@ -174,3 +174,8 @@ bool QnStartupParameters::isDevMode() const
     return nx::vms::client::desktop::ini().developerMode
         || Hash::hash(devModeKey.toLatin1(), Hash::Md5) == developerKey;
 }
+
+bool QnStartupParameters::isVideoWallMode() const
+{
+    return !videoWallGuid.isNull();
+}

@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_DESKTOP_CLIENT_API TimeSynchronizationWidgetReducer
+class NX_VMS_CLIENT_DESKTOP_API TimeSynchronizationWidgetReducer
 {
 public:
     using State = TimeSynchronizationWidgetState;
@@ -25,6 +25,7 @@ public:
     static Result addServer(State state, const State::ServerInfo& serverInfo);
     static Result removeServer(State state, const QnUuid& id);
     static Result setServerOnline(State state, const QnUuid& serverId, bool isOnline);
+    static Result setServerHasInternet(State state, const QnUuid& serverId, bool hasInternet);
 
     // Utility methods.
     static State::ServerInfo actualPrimaryServer(const State& state);

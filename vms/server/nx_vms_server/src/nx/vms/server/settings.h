@@ -5,7 +5,6 @@
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
-#include <nx/vms/server/system/nx1/info.h>
 
 namespace nx {
 namespace vms::server {
@@ -29,13 +28,10 @@ private:
     }
 
     QString m_dataDirectory;
-    QnMediaServerModule* m_serverModule;
+    bool m_isBootedFromSdCard = false;
 
 public:
-    void setServerModule(QnMediaServerModule* serverModule)
-    {
-        m_serverModule = serverModule;
-    }
+    void setBootedFromSdCard(bool value) { m_isBootedFromSdCard = value; }
 
     // TODO: #lbusygin: Check int options for convertion to bool.
     Option<int> port{this, "port",
@@ -150,11 +146,10 @@ public:
                 return value;
 
             #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-                if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-                    return Nx1::isBootedFromSD(m_serverModule);
+                return m_isBootedFromSdCard;
             #endif
 
-            return false;
+            return ecDbReadOnly.defaultValue();
         }
     };
     Option<QString> cdbEndpoint{this, "cdbEndpoint", "", ""};

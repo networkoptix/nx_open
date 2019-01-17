@@ -1617,12 +1617,13 @@ void QnMediaResourceWidget::updateRendererEnabled()
         m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
 
-ImageCorrectionParams QnMediaResourceWidget::imageEnhancement() const
+nx::vms::api::ImageCorrectionData QnMediaResourceWidget::imageEnhancement() const
 {
     return item()->imageEnhancement();
 }
 
-void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &imageEnhancement)
+void QnMediaResourceWidget::setImageEnhancement(
+    const nx::vms::api::ImageCorrectionData& imageEnhancement)
 {
     titleBar()->rightButtonsBar()->button(Qn::EnhancementButton)->setChecked(imageEnhancement.enabled);
     item()->setImageEnhancement(imageEnhancement);
@@ -2246,7 +2247,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->hasVideo && d->isIoModule)
         result |= Qn::IoModuleButton;
 
-    if (d->hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
+    if (d->hasVideo && !qnRuntime->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
         if (item()
             && item()->layout()
@@ -2513,7 +2514,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
 {
-    QnItemDewarpingParams params = item()->dewarpingParams();
+    auto params = item()->dewarpingParams();
     params.enabled = checked;
     item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
 
@@ -2535,7 +2536,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
 
 void QnMediaResourceWidget::at_imageEnhancementButton_toggled(bool checked)
 {
-    ImageCorrectionParams params = item()->imageEnhancement();
+    auto params = item()->imageEnhancement();
     if (params.enabled == checked)
         return;
 
@@ -2617,7 +2618,7 @@ void QnMediaResourceWidget::updateDewarpingParams()
 
 void QnMediaResourceWidget::updateFisheye()
 {
-    QnItemDewarpingParams itemParams = item()->dewarpingParams();
+    auto itemParams = item()->dewarpingParams();
 
     // Zoom windows have no own "dewarping" button, so counting it always pressed.
     bool enabled = isZoomWindow() || itemParams.enabled;

@@ -122,6 +122,9 @@ enum Value
     notFound,
     badResponse,
     ioError,
+    notEnoughSpace,
+    // Zip with update data is broken and can not be installed.
+    brokenPackage,
     otherError
 };
 

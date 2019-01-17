@@ -10,7 +10,7 @@
  * Extension of the simple bookmark list.
  * Maintains the bookmark list in sorted order (by start time).
  */
-class NX_VMS_DESKTOP_CLIENT_API QnCameraBookmarkAggregation
+class NX_VMS_CLIENT_DESKTOP_API QnCameraBookmarkAggregation
 {
 public:
     QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList = QnCameraBookmarkList());

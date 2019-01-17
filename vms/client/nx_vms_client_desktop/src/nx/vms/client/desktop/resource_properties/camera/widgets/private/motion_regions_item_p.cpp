@@ -68,7 +68,7 @@ void MotionRegionsItem::Private::setMotionHelper(core::CameraMotionHelper* value
         connect(m_motionHelper, &QObject::destroyed, q,
             [this, channelUpdated]()
             {
-                m_motionHelper = nullptr;
+                m_motionHelper.clear();
                 channelUpdated(-1);
                 emit q->motionHelperChanged();
             });
@@ -396,6 +396,9 @@ void MotionRegionsItem::Private::ensureLabelsTexture()
 
 void MotionRegionsItem::Private::updateLabelPositions()
 {
+    if (!m_motionHelper)
+        return;
+
     const auto regions = m_motionHelper->motionRegionList();
     if (m_channel >= regions.size())
         return;

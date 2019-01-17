@@ -1,7 +1,9 @@
-#include "compatibility_version_installation_dialog.h"
-#include "ui_compatibility_version_installation_dialog.h"
+#include <chrono>
 
 #include <QtWidgets/QPushButton>
+
+#include "compatibility_version_installation_dialog.h"
+#include "ui_compatibility_version_installation_dialog.h"
 
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
@@ -10,9 +12,6 @@
 #include <nx/utils/guarded_callback.h>
 #include "update/media_server_update_tool.h"
 #include "ui/workbench/handlers/workbench_connect_handler.h"
-
-
-#include <chrono>
 
 using namespace std::chrono_literals;
 using ClientUpdateTool = nx::vms::client::desktop::ClientUpdateTool;

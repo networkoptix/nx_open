@@ -268,7 +268,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         rotations << rotation;
     count *= rotations.size();
 
-    QList<ImageCorrectionParams> imageCorrList;
+    QList<nx::vms::api::ImageCorrectionData> imageCorrList;
     {
         auto params = widget->item()->imageEnhancement();
         imageCorrList << params;
@@ -308,7 +308,8 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         parameters.resource = widget->resource();
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
-        for (const ImageCorrectionParams &imageCorr: imageCorrList) {
+        for (const auto& imageCorr: imageCorrList)
+        {
             Key imageCorrKey(keyStack, imageCorr.enabled ? lit("_enh") : QString());
             parameters.imageCorrectionParams = imageCorr;
 
@@ -398,16 +399,11 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
-    QString filterSeparator = lit(";;");
-    QString pngFileFilter = tr("PNG Image (*.png)");
-    QString jpegFileFilter = tr("JPEG Image (*.jpg)");
+    static const QnCustomFileDialog::FileFilter kPngFilter{tr("PNG Image"), "png"};
 
-    QString allowedFormatFilter = pngFileFilter;
-
-    if (QImageWriter::supportedImageFormats().contains("jpg") ) {
-        allowedFormatFilter += filterSeparator;
-        allowedFormatFilter += jpegFileFilter;
-    }
+    std::vector<QnCustomFileDialog::FileFilter> allowedFilters{kPngFilter};
+    if (QImageWriter::supportedImageFormats().contains("jpg"))
+        allowedFilters.push_back({tr("JPEG Image"), {"jpg", "jpeg"}});
 
     bool wasLoggedIn = !context()->user().isNull();
 
@@ -416,8 +412,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         mainWindowWidget(),
         tr("Save Screenshot As..."),
         suggestion,
-        allowedFormatFilter
-        ));
+        QnCustomFileDialog::createFilter(allowedFilters)));
 
     dialog->setFileMode(QFileDialog::AnyFile);
     dialog->setAcceptMode(QFileDialog::AcceptSave);
