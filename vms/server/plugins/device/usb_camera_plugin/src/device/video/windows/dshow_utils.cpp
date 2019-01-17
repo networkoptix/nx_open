@@ -424,7 +424,9 @@ HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** 
     while (S_OK == (result = pEnum->Next(1, &pMoniker, NULL)))
     {
         VARIANT var;
-        getDeviceProperty(pMoniker, L"DevicePath", &var);
+        result = getDeviceProperty(pMoniker, L"DevicePath", &var);
+        if (FAILED(result))
+            return result;
 
         // don't release the moniker in this case, it's the one we are looking for
         if (wcscmp(var.bstrVal, devicePathBstr) == 0)
