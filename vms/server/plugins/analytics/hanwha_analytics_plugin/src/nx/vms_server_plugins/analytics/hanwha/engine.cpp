@@ -205,7 +205,13 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
 
     QSet<QString> result;
 
-    const auto& supportedEvents = supportedEventsParameter->possibleValues();
+    auto supportedEvents = supportedEventsParameter->possibleValues();
+    const auto alarmInputParameter = parameters.parameter(
+        "eventstatus/eventstatus/monitor/AlarmInput");
+
+    if (alarmInputParameter)
+        supportedEvents.push_back(alarmInputParameter->name());
+
     NX_VERBOSE(this, lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEvents));
     for (const auto& eventName: supportedEvents)
     {
@@ -220,8 +226,8 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
             for (const auto& entry: responseParameters)
             {
                 const auto& fullEventName = entry.first;
-                const bool isMatched = fullEventName.startsWith(
-                    lm("Channel.%1.%2.").args(channel, altEventName));
+                const bool isMatched =
+                    fullEventName.startsWith(lm("Channel.%1.%2.").args(channel, altEventName));
 
                 if (isMatched)
                 {

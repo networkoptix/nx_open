@@ -337,7 +337,7 @@ static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
 // Taken from Hanwha metadata plugin manifest.json.
-static const QString kHanwhaInputPortEventTypeId = "nx.hanwha.inputPort";
+static const QString kHanwhaInputPortEventTypeId = "nx.hanwha.AlarmInput";
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
