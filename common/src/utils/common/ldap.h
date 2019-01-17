@@ -10,13 +10,14 @@ struct QnLdapSettings {
     QString adminPassword;
     QString searchBase;
     QString searchFilter;
+    int searchTimeoutS = 0;
 
     bool isValid() const;
 
     static int defaultPort(bool ssl = false);
 };
 
-#define QnLdapSettings_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)
+#define QnLdapSettings_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)(searchTimeoutS)
 
 struct QnLdapUser {
     QString dn;

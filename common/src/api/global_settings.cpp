@@ -207,6 +207,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors() {
     m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminPassword, QString(), this);
     m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchBase, QString(), this);
     m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchFilter, QString(), this);
+    m_ldapSearchTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<int>(ldapSearchTimeoutS, 0, this);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -215,6 +216,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors() {
         << m_ldapAdminPasswordAdaptor
         << m_ldapSearchBaseAdaptor
         << m_ldapSearchFilterAdaptor
+        << m_ldapSearchTimeoutSAdaptor
         ;
 
     for(QnAbstractResourcePropertyAdaptor* adaptor: result)
@@ -715,6 +717,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     result.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_ldapAdminPasswordAdaptor->value());
     result.searchBase = m_ldapSearchBaseAdaptor->value();
     result.searchFilter = m_ldapSearchFilterAdaptor->value();
+    result.searchTimeoutS = m_ldapSearchTimeoutSAdaptor->value();
     return result;
 }
 
@@ -728,6 +731,7 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings& settings)
         : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
+    m_ldapSearchTimeoutSAdaptor->setValue(settings.searchTimeoutS);
 }
 
 QnEmailSettings QnGlobalSettings::emailSettings() const
