@@ -39,7 +39,7 @@ std::map<Level, std::vector<Tag>> getEffectiveTagsByLevel(
     return effectiveTagsByLevel;
 }
 
-}
+} // namespace
 
 std::set<Tag> toTags(const std::vector<Filter>& filters)
 {

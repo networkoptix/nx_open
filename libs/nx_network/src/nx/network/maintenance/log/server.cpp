@@ -93,10 +93,10 @@ void Server::serveDeleteLoggers(
     {
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
     }
-
-    if (loggerId == LoggerCollection::invalidId)
-        return completionHandler(http::RequestResult(http::StatusCode::badRequest));
     
+    if (!m_loggerCollection->get(loggerId))
+        return completionHandler(http::RequestResult(http::StatusCode::notFound));
+
     m_loggerCollection->remove(loggerId);
 
     completionHandler(http::RequestResult(http::StatusCode::ok));
@@ -118,13 +118,11 @@ void Server::servePostLoggers(
 
     logSettings.loggers.push_back(loggerSettings);
 
-    std::set<Tag> tags = utils::toTags(newLoggerInfo.filters);
-
     auto newLogger = LoggerBuilder().buildLogger(
         logSettings,
         QString(), // TODO: #nw get the application name
         QString(), // TODO: #nw get the appliation binary path
-        tags,
+        utils::toTags(newLoggerInfo.filters),
         std::make_unique<File>(fileSettings));
 
     int id = m_loggerCollection->add(std::move(newLogger));
@@ -140,7 +138,7 @@ void Server::servePostLoggers(
         m_loggerCollection->getEffectiveTags(id),
         id);
     
-    http::RequestResult result(http::StatusCode::ok);
+    http::RequestResult result(http::StatusCode::created);
     result.dataSource = std::make_unique<http::BufferSource>(
         kApplicationType,
         QJson::serialized(loggerInfo));
