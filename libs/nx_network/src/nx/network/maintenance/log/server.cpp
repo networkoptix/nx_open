@@ -89,7 +89,7 @@ void Server::serveDeleteLoggers(
     {
         loggerId = std::stoi(requestContext.requestPathParams.getByName("id"));
     }
-    catch (std::exception e)
+    catch (const std::exception& e)
     {
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
     }
