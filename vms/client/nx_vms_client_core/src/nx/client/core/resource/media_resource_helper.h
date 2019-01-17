@@ -17,6 +17,7 @@ class MediaResourceHelper: public ResourceHelper
 
     Q_PROPERTY(QString serverName READ serverName NOTIFY serverNameChanged)
     Q_PROPERTY(qreal customAspectRatio READ customAspectRatio NOTIFY customAspectRatioChanged)
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
     Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
     Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
@@ -35,6 +36,7 @@ public:
 
     QString serverName() const;
     qreal customAspectRatio() const;
+    qreal aspectRatio() const; //< Effective aspect ratio, custom (if set) or native.
     int customRotation() const;
     int channelCount() const;
     QSize layoutSize() const;
@@ -45,6 +47,7 @@ public:
 
 signals:
     void serverNameChanged();
+    void aspectRatioChanged();
     void customAspectRatioChanged();
     void customRotationChanged();
     void videoLayoutChanged();

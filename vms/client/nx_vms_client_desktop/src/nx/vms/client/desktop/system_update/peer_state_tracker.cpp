@@ -339,7 +339,10 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
     if (status == Qn::Unauthorized)
+    {
+        NX_VERBOSE(this, "atResourceAdded(%1) - unauthorized", server->getName());
         return;
+    }
 
     bool fake = server->hasFlags(Qn::fake_server);
     if (fake)
