@@ -13,9 +13,9 @@ namespace nx::streaming::rtp {
 
 enum class TimePolicy
 {
-    bindCameraTimeToLocalTime, //< Use camera time, binded to system time.
+    bindCameraTimeToLocalTime, //< Use camera time, bound to the server time.
     forceCameraTime, //< Use camera time only.
-    useCameraTimeIfCorrect, //< Use camera time if it close to system time.
+    useCameraTimeIfCorrect, //< Use camera time if it's close to the server time.
 };
 
 struct TimeOffset
