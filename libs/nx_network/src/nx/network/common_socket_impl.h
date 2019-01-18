@@ -15,6 +15,7 @@ namespace network {
 
 class Pollable;
 namespace aio { class AioThread; }
+namespace aio::detail { class AioEventHandlingDataHolder; }
 
 class NX_NETWORK_API CommonSocketImpl
 {
@@ -23,7 +24,7 @@ public:
     {
         bool isUsed = false;
         boost::optional<std::chrono::milliseconds> timeout;
-        void* userData = nullptr;
+        aio::detail::AioEventHandlingDataHolder* userData = nullptr;
     };
 
     std::atomic<nx::network::aio::AioThread*> aioThread;

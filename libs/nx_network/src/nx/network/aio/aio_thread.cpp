@@ -310,11 +310,11 @@ void AioThread::stopMonitoringInternal(
     if (m_taskQueue->removeReverseTask(sock, eventType, detail::TaskType::tRemoving, NULL, 0))
         return;    //< Ignoring task.
 
-    void*& userData = sock->impl()->monitoredEvents[eventType].userData;
+    auto& userData = sock->impl()->monitoredEvents[eventType].userData;
     if (userData == nullptr)
         return; //< Socket is not polled.
 
-    auto handlingData = static_cast<detail::AioEventHandlingDataHolder*>(userData)->data;
+    auto handlingData = userData->data;
     if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
         return;   // Socket already marked for removal.
     ++handlingData->markedForRemoval;

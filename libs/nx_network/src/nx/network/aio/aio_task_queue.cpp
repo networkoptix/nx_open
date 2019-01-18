@@ -77,9 +77,8 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
 
             case TaskType::tChangingTimeout:
             {
-                void* userData = task.socket->impl()->monitoredEvents[task.eventType].userData;
                 AioEventHandlingDataHolder* handlingData =
-                    reinterpret_cast<AioEventHandlingDataHolder*>(userData);
+                    task.socket->impl()->monitoredEvents[task.eventType].userData;
                 // NOTE: We are in aio thread currently.
                 if (task.timeout > 0)
                 {
@@ -219,15 +218,14 @@ void AioTaskQueue::removeSocketFromPollSet(
     Pollable* sock,
     aio::EventType eventType)
 {
-    void*& userData = sock->impl()->monitoredEvents[eventType].userData;
-    if (userData)
+    auto& handlingData = sock->impl()->monitoredEvents[eventType].userData;
+    if (handlingData)
     {
-        auto handlingData = static_cast<AioEventHandlingDataHolder*>(userData);
         if (handlingData->data && handlingData->data->nextTimeoutClock != 0)
             cancelPeriodicTask(handlingData->data.get(), eventType);
 
         delete handlingData;
-        userData = nullptr;
+        handlingData = nullptr;
     }
     if (eventType == aio::etRead || eventType == aio::etWrite)
         m_pollSet->remove(sock, eventType);
@@ -260,10 +258,9 @@ bool AioTaskQueue::removeReverseTask(
             if (eventHandler != it->eventHandler)
                 continue;   //event handler changed, cannot ignore task
                             //cancelling remove task
-            void* userData = sock->impl()->monitoredEvents[eventType].userData;
-            NX_ASSERT(userData);
-            static_cast<AioEventHandlingDataHolder*>(userData)->data->timeout = newTimeoutMS;
-            static_cast<AioEventHandlingDataHolder*>(userData)->data->markedForRemoval.store(0);
+            NX_ASSERT(sock->impl()->monitoredEvents[eventType].userData);
+            sock->impl()->monitoredEvents[eventType].userData->data->timeout = newTimeoutMS;
+            sock->impl()->monitoredEvents[eventType].userData->data->markedForRemoval.store(0);
 
             m_pollSetModificationQueue.erase(it);
             return true;
@@ -328,8 +325,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
 
         //no need to lock mutex, since data is removed in this thread only
         std::shared_ptr<AioEventHandlingData> handlingData =
-            static_cast<AioEventHandlingDataHolder*>(
-                socket->impl()->monitoredEvents[handlerToInvokeType].userData)->data;
+            socket->impl()->monitoredEvents[handlerToInvokeType].userData->data;
 
         QnMutexLocker lk(&m_socketEventProcessingMutex);
         ++handlingData->beingProcessed;
