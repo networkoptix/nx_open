@@ -5,6 +5,7 @@
 #include <nx/network/stream_proxy.h>
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/byte_stream/string_replacer.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
@@ -233,6 +234,10 @@ protected:
         const auto serverEndpoint = tcpServerSocket->getLocalAddress();
 
         auto proxy = std::make_unique<nx::network::StreamProxy>();
+        proxy->setDownStreamConverterFactory(
+            []() { return std::make_unique<nx::utils::bstream::StringReplacer>(
+                "Connection: Upgrade\r\n", ""); });
+
         proxy->startProxy(
             std::make_unique<nx::network::StreamServerSocketToAcceptorWrapper>(
                 std::move(tcpServerSocket)),
@@ -244,7 +249,7 @@ protected:
     }
 };
 
-TEST_F(VmsCloudDataSynchronizationThroughFirewall, data_is_synchronized)
+TEST_F(VmsCloudDataSynchronizationThroughFirewall, DISABLED_data_is_synchronized)
 {
     givenCloudSystemWithServerCount(1);
 
