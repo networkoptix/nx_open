@@ -47,11 +47,6 @@ public:
         eventHandler(_eventHandler)
     {
     }
-
-    ~AioEventHandlingData()
-    {
-        int x = 0;
-    }
 };
 
 class AioEventHandlingDataHolder
