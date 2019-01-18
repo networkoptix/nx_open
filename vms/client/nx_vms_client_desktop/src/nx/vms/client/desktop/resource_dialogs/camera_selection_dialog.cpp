@@ -192,6 +192,7 @@ struct CameraSelectionDialog::Private: public QObject
      */
     bool setShowInvalidCameras(bool value);
     void setLockCurrentMode(bool force);
+    void updateAlertMessage();
 
     const CameraSelectionDialog* q;
     const GetText getText;
@@ -234,15 +235,6 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
                 data.selectedInvalidCameras.insert(resourceId);
                 setLockCurrentMode(true);
             }
-            if (!data.selectedInvalidCameras.isEmpty() && getText)
-            {
-                QnResourceList selectedResources;
-                for (const auto cameraId: selectedCameras)
-                    selectedResources.append(data.allCameras.value(cameraId));
-
-                q->ui->filteredResourceSelectionWidget->setInvalidMessage(
-                    getText(selectedResources, true));
-            }
             break;
         case Qt::Unchecked:
             selectedCameras.remove(resourceId);
@@ -250,7 +242,6 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
                 && data.selectedInvalidCameras.isEmpty())
             {
                 setLockCurrentMode(false);
-                q->ui->filteredResourceSelectionWidget->clearInvalidMessage();
             }
             break;
         default:
@@ -258,7 +249,7 @@ void CameraSelectionDialog::Private::handleSelectionChanged(
             break;
 
     }
-
+    updateAlertMessage();
 }
 
 void CameraSelectionDialog::Private::reloadViewData()
@@ -273,6 +264,7 @@ void CameraSelectionDialog::Private::reloadViewData()
     view->setLeafResourcesSelected(selectedCameras, true);
 
     view->expandToDepth(0);
+    updateAlertMessage();
 }
 
 bool CameraSelectionDialog::Private::setShowInvalidCameras(bool value)
@@ -291,6 +283,23 @@ void CameraSelectionDialog::Private::setLockCurrentMode(bool lock)
     q->ui->allCamerasSwitch->setEnabled(!lock);
 }
 
+void CameraSelectionDialog::Private::updateAlertMessage()
+{
+    if (getText)
+    {
+        QnResourceList selectedResources;
+        for (const auto cameraId: selectedCameras)
+            selectedResources.append(data.allCameras.value(cameraId));
+
+        q->ui->filteredResourceSelectionWidget->setInvalidMessage(
+            getText(selectedResources, true));
+    }
+    else
+    {
+        q->ui->filteredResourceSelectionWidget->setInvalidMessage(QString());
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 CameraSelectionDialog::CameraSelectionDialog(
@@ -304,7 +313,6 @@ CameraSelectionDialog::CameraSelectionDialog(
     ui(new Ui::CameraSelectionDialog())
 {
     ui->setupUi(this);
-//    ui->filteredResourceSelectionWidget->setDetailsVisible(true);
     const auto view = ui->filteredResourceSelectionWidget->view();
     view->setupHeader();
     view->sortByColumn(ResourceNodeViewColumn::resourceNameColumn, Qt::AscendingOrder);
