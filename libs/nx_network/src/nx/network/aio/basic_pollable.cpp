@@ -93,7 +93,8 @@ void BasicPollable::dispatch(nx::utils::MoveOnlyFunc<void()> func)
 
 bool BasicPollable::isInSelfAioThread() const
 {
-    return getAioThread() == m_aioService->getCurrentAioThread();
+    getAioThread(); //< This call will assign AIO thread, if not assigned yet.
+    return m_pollable.isInSelfAioThread();
 }
 
 void BasicPollable::cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler)
