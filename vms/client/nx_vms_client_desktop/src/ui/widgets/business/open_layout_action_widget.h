@@ -48,6 +48,7 @@ private:
     {
         NoWarning,
         LocalResource,  //< Selected local resource and multiple users
+        EmptyRoles  //< Selected some roles, but there are no users in them
     };
 
     void displayWarning(LayoutWarning warning);
@@ -60,7 +61,7 @@ private:
     // Can return nullptr.
     QnLayoutResourcePtr getSelectedLayout();
 
-    QnUserResourceList getSelectedUsers();
+    QnUserResourceList getSelectedUsers(bool& rolesSelected);
 
     // Updates button state according to selected layouts.
     void updateLayoutsButton();
