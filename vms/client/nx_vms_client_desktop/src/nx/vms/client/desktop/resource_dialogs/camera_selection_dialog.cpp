@@ -91,8 +91,12 @@ NodePtr createServerNode(
     const auto extraInfoText =
         showExtraInfo ? QnResourceDisplayInfo(serverResource).extraInfo() : QString();
 
+    const auto camerasCount = std::accumulate(children.cbegin(), children.cend(), 0,
+        [](int count, const NodePtr& node)
+        { return count + (node->childrenCount() ? node->childrenCount() : 1); });
+
     const auto extraText = lit("%1 - %2").arg(extraInfoText,
-        CameraSelectionDialog::tr("%n cameras", nullptr, children.size())).trimmed();
+        CameraSelectionDialog::tr("%n cameras", nullptr, camerasCount)).trimmed();
 
     return createResourceNode(serverResource, extraText, true);
 }
