@@ -30,30 +30,8 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="nx::vms::client::desktop::LegacyCameraSettingsStreamsPanel" name="streamsPanel" native="true"/>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>1</height>
-      </size>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="noSettingsPage">
-      <attribute name="title">
-       <string/>
-      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QLabel" name="noSettingsLabel">
@@ -107,12 +85,6 @@
    <class>nx::vms::client::desktop::CameraAdvancedParamsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/resource_properties/camera/camera_advanced_params_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::LegacyCameraSettingsStreamsPanel</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_streams_panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -59,9 +59,6 @@ bool UpdateContents::isEmpty() const
 
 bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
 {
-    // Prefer non-empty one.
-    if (other.isEmpty())
-        return false;
     if (isEmpty())
         return true;
 

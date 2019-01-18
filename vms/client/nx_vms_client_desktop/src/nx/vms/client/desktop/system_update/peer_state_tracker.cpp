@@ -27,6 +27,13 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 
     for (auto item: m_items)
         emit itemRemoved(item);
+
+    if (m_clientItem)
+    {
+        emit itemRemoved(m_clientItem);
+        m_clientItem.reset();
+    }
+
     m_items.clear();
     m_activeServers.clear();
 
@@ -37,6 +44,12 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     }
 
     auto systemId = helpers::currentSystemLocalId(commonModule());
+    if (systemId.isNull())
+    {
+        NX_DEBUG(this, "setResourceFeed() got null system id");
+        return;
+    }
+
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
 
     addItemForClient();
@@ -159,7 +172,7 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
     {
         if (auto item = findItemById(status.first))
         {
-            item->progress = status.second.progress * 100;
+            item->progress = status.second.progress;
             item->statusMessage = status.second.message;
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
@@ -293,7 +306,7 @@ QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
-        if (item->installing)
+        if (item->installing && !item->installed)
             result.insert(item->id);
     return result;
 }
@@ -339,7 +352,10 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
     if (status == Qn::Unauthorized)
+    {
+        NX_VERBOSE(this, "atResourceAdded(%1) - unauthorized", server->getName());
         return;
+    }
 
     bool fake = server->hasFlags(Qn::fake_server);
     if (fake)
