@@ -95,28 +95,28 @@ std::string toStdString(const Uuid& uuid, FormatOptions formatOptions)
 
 Uuid randomUuid()
 {
-    static_assert(sizeof(std::rand()) >= 4, "Uuid generation relies on rand() yielding >= 4 bytes");
-
     Uuid uuid;
     int index = 0;
-    const auto addDword =
-        [&uuid, &index](uint32_t value) //< Converts value to Big Endian.
+    const auto add16Bits =
+        [&uuid, &index](int value) //< Converts value to Big Endian.
         {
-            uuid[index * 4 + 0] = (value >> 24) & 0xFF;
-            uuid[index * 4 + 1] = (value >> 16) & 0xFF;
-            uuid[index * 4 + 2] = (value >> 8) & 0xFF;
-            uuid[index * 4 + 3] = (value >> 0) & 0xFF;
+            NX_KIT_ASSERT(index >= 0);
+            NX_KIT_ASSERT(index <= 7);
+            NX_KIT_ASSERT(value >= 0);
+            // NOTE: rand() only guarantees to yield 15 bits.
+            uuid[index * 2 + 0] = value >> 8;
+            uuid[index * 2 + 1] = value & 0xFF;
             ++index;
         };
 
-    addDword(std::rand());
-    addDword(std::rand());
-    addDword(std::rand());
-    addDword((std::rand() & 0x0FFF) | 0x4000); //< 32-bit of the form 4xxx (4 is UUID version).
-    addDword(std::rand() % 0x3FFF + 0x8000); //< 32-bit in range [0x8000, 0xBFFF].
-    addDword(std::rand());
-    addDword(std::rand());
-    addDword(std::rand());
+    add16Bits(std::rand());
+    add16Bits(std::rand());
+    add16Bits(std::rand());
+    add16Bits((std::rand() & 0x0FFF) | 0x4000); //< 16-bit of the form 4xxx (4 is UUID version).
+    add16Bits(std::rand() % 0x3FFF + 0x8000); //< 16-bit in range [0x8000, 0xBFFF].
+    add16Bits(std::rand());
+    add16Bits(std::rand());
+    add16Bits(std::rand());
 
     NX_KIT_ASSERT(index == 8);
     return uuid;
