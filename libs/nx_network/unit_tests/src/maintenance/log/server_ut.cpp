@@ -68,11 +68,11 @@ protected:
 
         ASSERT_EQ(loggers.loggers.size(), 2);
         
-        ASSERT_NE(loggers.loggers[0].id, LoggerCollection::invalidId);
+        ASSERT_NE(loggers.loggers[0].id, LoggerCollection::kInvalidId);
         ASSERT_FALSE(loggers.loggers[0].path.empty());
         ASSERT_FALSE(loggers.loggers[0].filters.empty());
 
-        ASSERT_NE(loggers.loggers[1].id, LoggerCollection::invalidId);
+        ASSERT_NE(loggers.loggers[1].id, LoggerCollection::kInvalidId);
         ASSERT_TRUE(loggers.loggers[1].path.empty()); //< should be stdout logger, no filename.
         ASSERT_FALSE(loggers.loggers[1].filters.empty());
     }
@@ -98,7 +98,7 @@ protected:
 
         ASSERT_TRUE(m_httpClient.doPost(
             createRequestUrl(kLoggers),
-            kApplicationType,
+            "application/json",
             QJson::serialized(loggerInfo)));
     }
 
@@ -118,7 +118,7 @@ protected:
 
         ASSERT_TRUE(m_httpClient.doPost(
             createRequestUrl(kLoggers),
-            kApplicationType,
+            "application/json",
             QJson::serialized(loggerInfo)));
     }
 

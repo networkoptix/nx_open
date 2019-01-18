@@ -11,7 +11,7 @@ LoggerCollection::LoggerCollection()
     updateMaxLevel();
 }
 
-LoggerCollection * LoggerCollection::instance()
+LoggerCollection* LoggerCollection::instance()
 {
     static LoggerCollection collection;
     return &collection;
@@ -40,7 +40,7 @@ void LoggerCollection::setMainLogger(std::unique_ptr<AbstractLogger> logger)
 int LoggerCollection::add(std::unique_ptr<AbstractLogger> logger)
 {
     if (!logger)
-        return invalidId;
+        return kInvalidId;
 
     QnMutexLocker lock(&m_mutex);
 
@@ -60,12 +60,9 @@ int LoggerCollection::add(std::unique_ptr<AbstractLogger> logger)
     updateMaxLevel();
 
     if (inserted)
-    {
-        ++m_loggerId;
-        return loggerContext.id;
-    }
+        return m_loggerId++;
 
-    return invalidId;
+    return kInvalidId;
 }
 
 std::shared_ptr<AbstractLogger> LoggerCollection::get(const Tag& tag, bool exactMatch) const

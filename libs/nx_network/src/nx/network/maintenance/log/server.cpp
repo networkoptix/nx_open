@@ -74,7 +74,7 @@ void Server::serveGetLoggers(
 
     http::RequestResult result(http::StatusCode::ok);
     result.dataSource = std::make_unique<http::BufferSource>(
-        kApplicationType,
+        "application/json",
         QJson::serialized(loggers));
 
     completionHandler(std::move(result));
@@ -84,7 +84,7 @@ void Server::serveDeleteLogger(
     http::RequestContext requestContext,
     http::RequestProcessedHandler completionHandler)
 {
-    int loggerId = LoggerCollection::invalidId;
+    int loggerId = LoggerCollection::kInvalidId;
     try
     {
         loggerId = std::stoi(requestContext.requestPathParams.getByName("id"));
@@ -119,7 +119,7 @@ void Server::servePostLogger(
         nullptr);
 
     int id = m_loggerCollection->add(std::move(newLogger));
-    if (id == LoggerCollection::invalidId)
+    if (id == LoggerCollection::kInvalidId)
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
 
     auto logger = m_loggerCollection->get(id);
@@ -133,7 +133,7 @@ void Server::servePostLogger(
     
     http::RequestResult result(http::StatusCode::created);
     result.dataSource = std::make_unique<http::BufferSource>(
-        kApplicationType,
+        "application/json",
         QJson::serialized(loggerInfo));
     
     completionHandler(std::move(result));
