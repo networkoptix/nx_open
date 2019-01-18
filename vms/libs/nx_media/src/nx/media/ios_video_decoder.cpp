@@ -308,8 +308,12 @@ bool IOSVideoDecoder::isCompatible(
         return false;
     }
     const QSize maxRes = maxResolution(codec);
-    return resolution.width() <= maxRes.width() &&
-           resolution.height() <= maxRes.height();
+    const bool horizontalStream = resolution.width() > resolution.height();
+    if (horizontalStream) // We suppose video stream is layed out horizontally.
+        return resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height();
+
+    // We suppose video stream could be layed out vertically (rotated).
+    return resolution.height() <= maxRes.width() && resolution.width() <= maxRes.height();
 }
 
 QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
