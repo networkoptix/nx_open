@@ -370,8 +370,9 @@ angular.module('nxCommon')
                             if (systemTime.data.reply) {
                                 return setServerOffsetTime(systemTime.data.reply.utcTimeMs);
                             }
-                            
-                            return $q.resolve({ message: 'Server does not support this API call' });
+    
+                            // Server does not support this API call
+                            return setServerOffsetTime();
                         });
                 }
                 return setServerOffsetTime();
