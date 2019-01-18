@@ -79,10 +79,6 @@ to view more bookmarks</source>
       <translation>安裝失敗</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>無法取消安裝</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>安裝完成</translation>
     </message>
@@ -895,6 +891,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>螢幕設定</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5401,6 +5401,10 @@ to %1</source>
       <source>Search</source>
       <translation>搜尋</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8396,6 +8400,16 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>所選的此攝影機時間段無法匯出.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>書籤 %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

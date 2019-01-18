@@ -679,11 +679,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable native presets, use system presets instead</source>
-      <translation>停用攝影機內建預設點, 改用系統預設點</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>警告! 攝影機內建預設點將無法使用.</translation>
     </message>
@@ -761,6 +756,31 @@
       <location/>
       <source>Logical ID</source>
       <translation>邏輯 ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Preferred PTZ preset type:</source>
+      <translation type="unfinished">Preferred PTZ preset type:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation type="unfinished">System</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native</source>
+      <translation type="unfinished">Native</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports pan and tilt</source>
+      <translation type="unfinished">This camera supports pan and tilt</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports zoom</source>
+      <translation type="unfinished">This camera supports zoom</translation>
     </message>
   </context>
   <context>

@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>Kurulum Başarısız Oldu</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Kurulum İptal Edilemedi</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Kurulum Tamamlandı</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>Ekran Ayarları...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5462,6 +5462,10 @@ to %1</source>
       <source>Search</source>
       <translation>Ara</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8506,6 +8510,17 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>Seçilen süre geçerli kamera için dışa aktarılamaz.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n yer işareti</numerusform>
+        <numerusform>%n yer işareti</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

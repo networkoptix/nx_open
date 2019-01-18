@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>ההתקנה נכשלה</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>לא ניתן לבטל את ההתקנה</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>ההתקנה הושלמה</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>הגדרות מסך...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5595,6 +5595,10 @@ to %1</source>
       <source>Search</source>
       <translation>חפש</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8740,6 +8744,19 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>לא ניתן לייצא את הזמן שנבחר.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n סימניות</numerusform>
+        <numerusform>%n סימניות</numerusform>
+        <numerusform>%n סימניות</numerusform>
+        <numerusform>%n סימניות</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

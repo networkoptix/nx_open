@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "Frissítések értesítései engedélyezve",
         "upnpPortMappingEnabled": "Az UPNP port hozzárendelés engedélyezve",
         "useTextEmailFormat": "Egyszerű szöveges e-mailek küldése",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Használja a Windows feed-et e-mailben"
     },
     "info": {
         "tabs": {

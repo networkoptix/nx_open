@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>설치오류</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>설치를 취소할 수 없습니다</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>설치 완료</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation type="unfinished">Screen Settings...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5396,6 +5396,10 @@ to %1</source>
       <source>Search</source>
       <translation>검색</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8391,6 +8395,16 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>현재 카메라는 선택한 기간동안 영상을 추출 할수 없습니다.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

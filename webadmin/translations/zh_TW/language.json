@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "更新通知啟動",
         "upnpPortMappingEnabled": "啟用 UPNP 埠映射",
         "useTextEmailFormat": "發送純文字電子郵件",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "在電子郵件中使用Windows換行字元"
     },
     "info": {
         "tabs": {
