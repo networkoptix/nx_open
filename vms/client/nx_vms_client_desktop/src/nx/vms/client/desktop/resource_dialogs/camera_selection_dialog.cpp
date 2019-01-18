@@ -114,7 +114,7 @@ NodePtr createCameraNodes(
         [pool, showExtraInfo](const QnUuid& cameraId, bool isInvalidCamera) -> NodePtr
         {
             auto resource = pool->getResourceById(cameraId);
-            QString extraText =
+            const QString extraText =
                 showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
             const auto cameraNode = createResourceNode(resource, extraText, true);
             if (isInvalidCamera)
