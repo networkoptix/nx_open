@@ -49,18 +49,6 @@ public:
     }
 };
 
-class AioEventHandlingDataHolder
-{
-public:
-    // TODO: #ak This shared_ptr is probably not needed. Need to review usages.
-    std::shared_ptr<AioEventHandlingData> data;
-
-    AioEventHandlingDataHolder(AIOEventHandler* _eventHandler):
-        data(std::make_shared<AioEventHandlingData>(_eventHandler))
-    {
-    }
-};
-
 // TODO: #ak It makes sense to split this class to multiple ones containing only desired data.
 class SocketAddRemoveTask
 {

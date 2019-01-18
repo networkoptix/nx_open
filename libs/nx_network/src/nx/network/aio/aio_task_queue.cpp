@@ -77,32 +77,32 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
 
             case TaskType::tChangingTimeout:
             {
-                AioEventHandlingDataHolder* handlingData =
+                const auto& handlingData =
                     task.socket->impl()->monitoredEvents[task.eventType].userData;
                 // NOTE: We are in aio thread currently.
                 if (task.timeout > 0)
                 {
                     // Adding/updating periodic task.
-                    if (handlingData->data->timeout > 0)
+                    if (handlingData->timeout > 0)
                     {
                         // Updating existing task.
                         const auto newClock = getSystemTimerVal() + task.timeout;
-                        if (handlingData->data->nextTimeoutClock == 0)
+                        if (handlingData->nextTimeoutClock == 0)
                         {
-                            handlingData->data->updatedPeriodicTaskClock = newClock;
+                            handlingData->updatedPeriodicTaskClock = newClock;
                         }
                         else
                         {
                             // Replacing timer record in m_periodicTasksByClock.
-                            for (auto it = m_periodicTasksByClock.lower_bound(handlingData->data->nextTimeoutClock);
-                                it != m_periodicTasksByClock.end() && it->first == handlingData->data->nextTimeoutClock;
+                            for (auto it = m_periodicTasksByClock.lower_bound(handlingData->nextTimeoutClock);
+                                it != m_periodicTasksByClock.end() && it->first == handlingData->nextTimeoutClock;
                                 ++it)
                             {
                                 if (it->second.socket == task.socket)
                                 {
                                     m_periodicTasksByClock.erase(it);
                                     addPeriodicTaskNonSafe(
-                                        newClock, handlingData->data, task.socket, task.eventType);
+                                        newClock, handlingData, task.socket, task.eventType);
                                     break;
                                 }
                             }
@@ -112,17 +112,17 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     {
                         addPeriodicTask(
                             getSystemTimerVal() + task.timeout,
-                            handlingData->data,
+                            handlingData,
                             task.socket,
                             task.eventType);
                     }
                 }
-                else if (handlingData->data->timeout > 0)  //&& timeout == 0
+                else if (handlingData->timeout > 0)  //&& timeout == 0
                 {
                     // Cancelling existing periodic task (there must be one).
-                    handlingData->data->updatedPeriodicTaskClock = -1;
+                    handlingData->updatedPeriodicTaskClock = -1;
                 }
-                handlingData->data->timeout = task.timeout;
+                handlingData->timeout = task.timeout;
                 break;
             }
 
@@ -177,10 +177,10 @@ void AioTaskQueue::addSocketToPollset(
     int timeout,
     AIOEventHandler* eventHandler)
 {
-    auto handlingData = std::make_unique<AioEventHandlingDataHolder>(eventHandler);
+    auto handlingData = std::make_shared<AioEventHandlingData>(eventHandler);
     if (eventType != aio::etTimedOut)
     {
-        if (!m_pollSet->add(socket, eventType, handlingData.get()))
+        if (!m_pollSet->add(socket, eventType))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
             NX_WARNING(this, lm("Failed to add %1 to pollset. %2")
@@ -200,18 +200,17 @@ void AioTaskQueue::addSocketToPollset(
         }
     }
 
-    socket->impl()->monitoredEvents[eventType].userData = handlingData.get();
     if (timeout > 0)
     {
         // Adding periodic task associated with socket.
-        handlingData->data->timeout = timeout;
+        handlingData->timeout = timeout;
         addPeriodicTask(
             getSystemTimerVal() + timeout,
-            handlingData.get()->data,
+            handlingData,
             socket,
             eventType);
     }
-    handlingData.release();
+    socket->impl()->monitoredEvents[eventType].userData = std::move(handlingData);
 }
 
 void AioTaskQueue::removeSocketFromPollSet(
@@ -221,10 +220,9 @@ void AioTaskQueue::removeSocketFromPollSet(
     auto& handlingData = sock->impl()->monitoredEvents[eventType].userData;
     if (handlingData)
     {
-        if (handlingData->data && handlingData->data->nextTimeoutClock != 0)
-            cancelPeriodicTask(handlingData->data.get(), eventType);
+        if (handlingData->nextTimeoutClock != 0)
+            cancelPeriodicTask(handlingData.get(), eventType);
 
-        delete handlingData;
         handlingData = nullptr;
     }
     if (eventType == aio::etRead || eventType == aio::etWrite)
@@ -259,13 +257,14 @@ bool AioTaskQueue::removeReverseTask(
                 continue;   //event handler changed, cannot ignore task
                             //cancelling remove task
             NX_ASSERT(sock->impl()->monitoredEvents[eventType].userData);
-            sock->impl()->monitoredEvents[eventType].userData->data->timeout = newTimeoutMS;
-            sock->impl()->monitoredEvents[eventType].userData->data->markedForRemoval.store(0);
+            sock->impl()->monitoredEvents[eventType].userData->timeout = newTimeoutMS;
+            sock->impl()->monitoredEvents[eventType].userData->markedForRemoval.store(0);
 
             m_pollSetModificationQueue.erase(it);
             return true;
         }
-        else if (taskType == TaskType::tRemoving && (it->type == TaskType::tAdding || it->type == TaskType::tChangingTimeout))
+        else if (taskType == TaskType::tRemoving && 
+            (it->type == TaskType::tAdding || it->type == TaskType::tChangingTimeout))
         {
             //if( it->type == TaskType::tChangingTimeout ) cancelling scheduled tasks, since socket removal from poll is requested
             const TaskType foundTaskType = it->type;
@@ -321,11 +320,9 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
 
         //TODO #ak notify second handler (if any) and if it not removed by first handler
 
-        //NX_DEBUG(this, QString::fromLatin1("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType));
-
-        //no need to lock mutex, since data is removed in this thread only
-        std::shared_ptr<AioEventHandlingData> handlingData =
-            socket->impl()->monitoredEvents[handlerToInvokeType].userData->data;
+        // No need to lock mutex, since data is removed in this thread only.
+        // Copying shared_ptr here because socket can be removed in eventTriggered call.
+        auto handlingData = socket->impl()->monitoredEvents[handlerToInvokeType].userData;
 
         QnMutexLocker lk(&m_socketEventProcessingMutex);
         ++handlingData->beingProcessed;

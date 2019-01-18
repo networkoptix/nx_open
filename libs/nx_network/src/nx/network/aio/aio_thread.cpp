@@ -310,11 +310,10 @@ void AioThread::stopMonitoringInternal(
     if (m_taskQueue->removeReverseTask(sock, eventType, detail::TaskType::tRemoving, NULL, 0))
         return;    //< Ignoring task.
 
-    auto& userData = sock->impl()->monitoredEvents[eventType].userData;
-    if (userData == nullptr)
+    auto& handlingData = sock->impl()->monitoredEvents[eventType].userData;
+    if (!handlingData)
         return; //< Socket is not polled.
 
-    auto handlingData = userData->data;
     if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
         return;   // Socket already marked for removal.
     ++handlingData->markedForRemoval;
@@ -327,7 +326,7 @@ void AioThread::stopMonitoringInternal(
         lock->unlock();
         // Removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack).
         m_taskQueue->removeSocketFromPollSet(sock, eventType);
-        userData = nullptr;
+        handlingData = nullptr;
         return;
     }
 
@@ -389,9 +388,8 @@ void AioThread::post(
     nx::utils::MoveOnlyFunc<void()> functor)
 {
     m_taskQueue->addTask(
-        detail::PostAsyncCallTask(
-            sock,
-            std::move(functor)));
+        detail::PostAsyncCallTask(sock, std::move(functor)));
+
     // If eventTriggered is lower on stack, socket will be added to pollset before the next poll call.
     if (currentThreadSystemId() != systemThreadId())
         m_pollSet->interrupt();

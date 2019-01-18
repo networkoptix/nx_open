@@ -3,6 +3,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <optional>
 
 #include <nx/network/aio/event_type.h>
@@ -14,7 +15,7 @@ namespace network {
 
 class Pollable;
 namespace aio { class AioThread; }
-namespace aio::detail { class AioEventHandlingDataHolder; }
+namespace aio::detail { class AioEventHandlingData; }
 
 class NX_NETWORK_API CommonSocketImpl
 {
@@ -23,7 +24,7 @@ public:
     {
         bool isUsed = false;
         std::optional<std::chrono::milliseconds> timeout;
-        aio::detail::AioEventHandlingDataHolder* userData = nullptr;
+        std::shared_ptr<aio::detail::AioEventHandlingData> userData;
     };
 
     std::atomic<nx::network::aio::AioThread*> aioThread;
