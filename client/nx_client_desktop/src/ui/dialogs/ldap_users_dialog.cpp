@@ -26,14 +26,7 @@
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
 
-namespace {
-
-// TODO: #GDM move timeout constant to more common module
-static const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
-
 static const int kUpdateFilterDelayMs = 200;
-
-}
 
 QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     base_type(parent),
@@ -92,7 +85,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     m_importButton->setVisible(false);
 
     ui->buttonBox->showProgress();
-    m_timeoutTimer->setInterval(testLdapTimeoutMSec);
+    m_timeoutTimer->setInterval(settings.searchTimeoutS * 1000);
     connect(m_timeoutTimer, &QTimer::timeout, this, [this]{
         stopTesting(tr("Timed Out"));
     });

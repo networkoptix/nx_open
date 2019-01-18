@@ -35,6 +35,7 @@ struct AsyncRequestInfo
     const char* slot;
     Qt::ConnectionType connectionType;
     nx::utils::promise<QnHTTPRawResponse>* requestedCompletedPromise;
+    std::optional<std::chrono::milliseconds> timeout;
 };
 Q_DECLARE_METATYPE(AsyncRequestInfo);
 
@@ -64,7 +65,9 @@ public:
         nx_http::HttpHeaders headers,
         const QnRequestParamList &params,
         QByteArray msgBody,
-        QnHTTPRawResponse& response);
+        QnHTTPRawResponse& response,
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+
     int sendSyncGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response);
     int sendSyncGetRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QnHTTPRawResponse& response);
     int sendSyncPostRequest(const QUrl& url, const QString &objectName, QByteArray msgBody, QnHTTPRawResponse& response);
@@ -86,7 +89,9 @@ public:
         QByteArray msgBody,
         QObject *target,
         const char *slot,
-        Qt::ConnectionType connectionType = Qt::AutoConnection);
+        Qt::ConnectionType connectionType = Qt::AutoConnection,
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+
     int sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
     int sendAsyncGetRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
     int sendAsyncPostRequest(const QUrl& url, const QString &objectName, QByteArray msgBody, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);

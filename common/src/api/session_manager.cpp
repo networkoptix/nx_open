@@ -90,11 +90,13 @@ QNetworkReply::NetworkError QnSessionManager::sendSyncRequest(
     nx_http::HttpHeaders headers,
     const QnRequestParamList &params,
     QByteArray msgBody,
-    QnHTTPRawResponse &response)
+    QnHTTPRawResponse &response,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     AsyncRequestInfo reqInfo;
     nx::utils::promise<QnHTTPRawResponse> requestedCompletedPromise;
     reqInfo.requestedCompletedPromise = &requestedCompletedPromise;
+    reqInfo.timeout = timeout;
 
     sendAsyncRequest(
         method,
@@ -138,7 +140,8 @@ int QnSessionManager::sendAsyncRequest(
     QByteArray msgBody,
     QObject *target,
     const char *slot,
-    Qt::ConnectionType connectionType)
+    Qt::ConnectionType connectionType,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     //if you want receive response make sure you have event loop in calling thread
     NX_ASSERT(qnHasEventLoop(QThread::currentThread()) || (!target));
@@ -154,6 +157,7 @@ int QnSessionManager::sendAsyncRequest(
     reqInfo.object = target;
     reqInfo.slot = slot;
     reqInfo.connectionType = connectionType;
+    reqInfo.timeout = timeout;
 
     return sendAsyncRequest(
         method,
@@ -264,9 +268,15 @@ int QnSessionManager::sendAsyncRequest(
     headers.emplace(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
 
     if (method == nx_http::Method::get)
-        requestInfo.handle = httpPool->doGet(requestUrl, std::move(headers));
+    {
+        requestInfo.handle = httpPool->doGet(
+            requestUrl, std::move(headers), requestInfo.timeout);
+    }
     else
-        requestInfo.handle = httpPool->doPost(requestUrl, msgBodyContentType, msgBody, std::move(headers));
+    {
+        requestInfo.handle = httpPool->doPost(
+            requestUrl, msgBodyContentType, msgBody, std::move(headers), requestInfo.timeout);
+    }
 
     QnMutexLocker lk(&m_mutex);
     m_requestInProgress.emplace(requestInfo.handle, requestInfo);
