@@ -387,6 +387,11 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
         result);
 }
 
+SystemError::ErrorCode MediaServerClient::prevRequestSysErrorCode() const
+{
+    return m_prevRequestSysErrorCode;
+}
+
 nx::network::http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
 {
     return m_prevResponseHttpStatusCode;

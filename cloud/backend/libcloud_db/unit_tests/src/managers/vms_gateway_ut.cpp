@@ -28,6 +28,7 @@ public:
     VmsGateway():
         m_idOfSystemToMergeTo(QnUuid::createUuid().toSimpleString().toStdString())
     {
+        m_vmsResponse.error = QnRestResult::Error::NoError;
     }
 
 protected:
@@ -41,6 +42,13 @@ protected:
         m_mediaserverEmulator->setAuthenticationEnabled(true);
         m_mediaserverEmulator->registerUserCredentials(
             m_ownerAccount.email.c_str(), m_ownerAccount.password.c_str());
+    }
+
+    void givenVmsThatFailsEachRequestWithApplicationLevelError(
+        const std::string& errorDescription)
+    {
+        m_vmsResponse.error = QnRestResult::Error::CantProcessRequest;
+        m_vmsResponse.errorString = errorDescription.c_str();
     }
 
     void whenIssueMergeRequest()
@@ -88,7 +96,8 @@ protected:
 
     void thenMergeRequestResultIs(VmsResultCode resultCode)
     {
-        ASSERT_EQ(resultCode, m_vmsRequestResults.pop().resultCode);
+        m_prevRequestResult = m_vmsRequestResults.pop();
+        ASSERT_EQ(resultCode, m_prevRequestResult->resultCode);
     }
 
     void thenRequestIsAuthenticatedWithCredentialsSpecified()
@@ -112,12 +121,19 @@ protected:
         thenMergeRequestResultIs(expectedCode);
     }
 
+    void andResponseErrorDescriptionIs(const std::string& expected)
+    {
+        ASSERT_EQ(expected, m_prevRequestResult->vmsErrorDescription);
+    }
+
 private:
     AccountManagerStub m_accountManagerStub;
     std::unique_ptr<nx::network::http::TestHttpServer> m_mediaserverEmulator;
     nx::utils::SyncQueue<nx::network::http::Request> m_vmsApiRequests;
     boost::optional<nx::network::http::Request> m_prevReceivedVmsApiRequest;
     nx::utils::SyncQueue<VmsRequestResult> m_vmsRequestResults;
+    std::optional<VmsRequestResult> m_prevRequestResult;
+    QnJsonRestResult m_vmsResponse;
     conf::Settings m_settings;
     std::unique_ptr<nx::cloud::db::VmsGateway> m_vmsGateway;
     std::string m_systemId;
@@ -157,13 +173,10 @@ private:
         if (m_forcedHttpResponseStatus)
             return completionHandler(*m_forcedHttpResponseStatus);
 
-        QnJsonRestResult response;
-        response.error = QnRestResult::Error::NoError;
-
         nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
         requestResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
-            QJson::serialized(response));
+            QJson::serialized(m_vmsResponse));
 
         completionHandler(std::move(requestResult));
     }
@@ -249,6 +262,17 @@ TEST_F(VmsGateway, proper_error_is_reported_when_vms_rejects_request)
     assertVmsResponseResultsIn(
         nx::network::http::StatusCode::forbidden,
         VmsResultCode::forbidden);
+}
+
+TEST_F(VmsGateway, vms_error_description_is_forwarded)
+{
+    givenVmsThatFailsEachRequestWithApplicationLevelError(
+        "VmsLogicalError");
+
+    whenIssueMergeRequest();
+
+    thenMergeRequestResultIs(VmsResultCode::logicalError);
+    andResponseErrorDescriptionIs("VmsLogicalError");
 }
 
 } // namespace test
