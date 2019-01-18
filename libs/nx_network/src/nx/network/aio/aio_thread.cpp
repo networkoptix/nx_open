@@ -274,7 +274,7 @@ void AioThread::startMonitoringInternal(
     Pollable* const sock,
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
-    std::chrono::milliseconds timeoutMs,
+    std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     // TODO: #ak Make following check complexity constant-time.
@@ -282,7 +282,7 @@ void AioThread::startMonitoringInternal(
         return;
 
     // Checking queue for reverse task for sock.
-    if (m_taskQueue->removeReverseTask(sock, eventToWatch, detail::TaskType::tAdding, eventHandler, timeoutMs.count()))
+    if (m_taskQueue->removeReverseTask(sock, eventToWatch, detail::TaskType::tAdding, eventHandler, timeout))
         return;    //< Ignoring task.
 
     m_taskQueue->addTask(detail::SocketAddRemoveTask(
@@ -290,7 +290,7 @@ void AioThread::startMonitoringInternal(
         sock,
         eventToWatch,
         eventHandler,
-        timeoutMs.count(),
+        timeout,
         nullptr,
         std::move(socketAddedToPollHandler)));
     if (eventToWatch == aio::etRead)
@@ -307,8 +307,12 @@ void AioThread::stopMonitoringInternal(
     aio::EventType eventType)
 {
     // Checking queue for reverse task for sock.
-    if (m_taskQueue->removeReverseTask(sock, eventType, detail::TaskType::tRemoving, NULL, 0))
+    if (m_taskQueue->removeReverseTask(
+            sock, eventType, detail::TaskType::tRemoving,
+            nullptr, std::chrono::milliseconds::zero()))
+    {
         return;    //< Ignoring task.
+    }
 
     auto& handlingData = sock->impl()->monitoredEvents[eventType].userData;
     if (!handlingData)
@@ -337,7 +341,7 @@ void AioThread::stopMonitoringInternal(
         sock,
         eventType,
         nullptr,
-        0,
+        std::chrono::milliseconds::zero(),
         &taskCompletedCondition));
 
     m_pollSet->interrupt();
@@ -366,7 +370,7 @@ void AioThread::changeSocketTimeout(
     Pollable* const sock,
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
-    std::chrono::milliseconds timeoutMs,
+    std::chrono::milliseconds timeout,
     std::function<void()> socketAddedToPollHandler)
 {
     m_taskQueue->addTask(detail::SocketAddRemoveTask(
@@ -374,7 +378,7 @@ void AioThread::changeSocketTimeout(
         sock,
         eventToWatch,
         eventHandler,
-        timeoutMs.count(),
+        timeout,
         nullptr,
         std::move(socketAddedToPollHandler)));
     // If eventTriggered call is down the stack, socket will be added to pollset before next poll call.

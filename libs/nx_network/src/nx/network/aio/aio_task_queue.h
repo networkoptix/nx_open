@@ -38,7 +38,7 @@ public:
     std::atomic<int> markedForRemoval{0};
     AIOEventHandler* eventHandler = nullptr;
     /** 0 means no timeout. */
-    unsigned int timeout = 0;
+    std::chrono::milliseconds timeout = std::chrono::milliseconds::zero();
     qint64 updatedPeriodicTaskClock = 0;
     /** Clock when timer will be triggered. 0 - no clock. */
     qint64 nextTimeoutClock = 0;
@@ -60,7 +60,7 @@ public:
     aio::EventType eventType;
     AIOEventHandler* eventHandler;
     /** 0 means no timeout. */
-    unsigned int timeout;
+    std::chrono::milliseconds timeout;
     std::atomic<int>* taskCompletionEvent;
     nx::utils::MoveOnlyFunc<void()> postHandler;
     nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
@@ -73,7 +73,7 @@ public:
         Pollable* const _socket,
         aio::EventType _eventType,
         AIOEventHandler* const _eventHandler,
-        unsigned int _timeout = 0,
+        std::chrono::milliseconds _timeout = std::chrono::milliseconds::zero(),
         std::atomic<int>* const _taskCompletionEvent = nullptr,
         nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
         :
@@ -105,7 +105,7 @@ public:
             _socket,
             aio::etNone,
             nullptr,
-            0,
+            std::chrono::milliseconds::zero(),
             nullptr)
     {
         this->postHandler = std::move(_postHandler);
@@ -127,7 +127,7 @@ public:
             nullptr,
             aio::etNone,
             nullptr,
-            0,
+            std::chrono::milliseconds::zero(),
             _taskCompletionEvent)
     {
         this->socketSequence = socketSequence;
@@ -205,7 +205,7 @@ public:
         aio::EventType eventType,
         TaskType taskType,
         AIOEventHandler* const eventHandler,
-        unsigned int newTimeoutMS);
+        std::chrono::milliseconds newTimeout);
 
     /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
@@ -252,7 +252,7 @@ private:
     void addSocketToPollset(
         Pollable* socket,
         aio::EventType eventType,
-        int timeout,
+        std::chrono::milliseconds timeout,
         AIOEventHandler* eventHandler);
 
     void addPeriodicTask(
