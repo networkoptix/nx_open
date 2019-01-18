@@ -24,7 +24,7 @@ public:
     {
         bool isUsed = false;
         std::optional<std::chrono::milliseconds> timeout;
-        std::shared_ptr<aio::detail::AioEventHandlingData> userData;
+        std::shared_ptr<aio::detail::AioEventHandlingData> aioHelperData;
         // TODO: #ak Remove this field. It is used by Pollset implementation on Macosx only.
         void* userData = nullptr;
     };

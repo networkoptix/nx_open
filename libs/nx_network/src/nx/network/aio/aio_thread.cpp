@@ -314,7 +314,7 @@ void AioThread::stopMonitoringInternal(
         return;    //< Ignoring task.
     }
 
-    auto& handlingData = sock->impl()->monitoredEvents[eventType].userData;
+    auto& handlingData = sock->impl()->monitoredEvents[eventType].aioHelperData;
     if (!handlingData)
         return; //< Socket is not polled.
 
