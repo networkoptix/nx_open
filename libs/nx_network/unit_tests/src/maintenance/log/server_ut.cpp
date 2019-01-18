@@ -87,12 +87,13 @@ protected:
         Filter f;
         f.level = "verbose";
         f.tags = { kTags[0] };
+        
         Filter f1;
         f1.level = "info";
         f.tags = { kTags[1], kTags[2] };
 
         Logger loggerInfo;
-        loggerInfo.filters = { f };
+        loggerInfo.filters = { f, f1 };
         loggerInfo.path = "C:/develop/file_log";
 
         ASSERT_TRUE(m_httpClient.doPost(
@@ -112,8 +113,8 @@ protected:
         f1.tags = { kTags[4], kTags[5] };
 
         Logger loggerInfo;
-        loggerInfo.filters = { f };
-        loggerInfo.path = "-"; // <std out logger
+        loggerInfo.filters = { f, f1 };
+        loggerInfo.path = "-"; // <stdout logger
 
         ASSERT_TRUE(m_httpClient.doPost(
             createRequestUrl(kLoggers),
