@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <optional>
 #include <memory>
 
 #include <nx/utils/thread/thread.h>
@@ -63,7 +64,7 @@ public:
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
-        boost::optional<std::chrono::milliseconds> timeoutMillis,
+        std::optional<std::chrono::milliseconds> timeoutMillis,
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler);
 
     /**

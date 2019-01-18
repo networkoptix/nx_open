@@ -1,8 +1,7 @@
 #pragma once
 
 #include <memory>
-
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "../abstract_socket.h"
 #include "../aio/event_type.h"
@@ -161,7 +160,7 @@ private:
     /**
      * @return false if failed to read socket options.
      */
-    bool checkIfRecvModeSwitchIsRequired(int flags, boost::optional<bool>* requiredRecvMode);
+    bool checkIfRecvModeSwitchIsRequired(int flags, std::optional<bool>* requiredRecvMode);
     bool setRecvMode(bool isRecvSync);
     int handleRecvResult(int recvResult);
 

@@ -187,7 +187,7 @@ void AioTaskQueue::addSocketToPollset(
                 .args(socket, SystemError::toString(errorCode)));
 
             socket->impl()->monitoredEvents[eventType].isUsed = false;
-            socket->impl()->monitoredEvents[eventType].timeout = boost::none;
+            socket->impl()->monitoredEvents[eventType].timeout = std::nullopt;
 
             m_postedCalls.push_back(
                 PostAsyncCallTask(

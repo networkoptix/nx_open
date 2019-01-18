@@ -37,7 +37,7 @@ void AioThread::startMonitoring(
     Pollable* const sock,
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
-    boost::optional<std::chrono::milliseconds> timeoutMillis,
+    std::optional<std::chrono::milliseconds> timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     if (!timeoutMillis)
@@ -64,7 +64,7 @@ void AioThread::startMonitoring(
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMillis.get());
+            *timeoutMillis);
     }
     else
     {
@@ -74,7 +74,7 @@ void AioThread::startMonitoring(
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMillis.get(),
+            *timeoutMillis,
             std::move(socketAddedToPollHandler));
     }
 }

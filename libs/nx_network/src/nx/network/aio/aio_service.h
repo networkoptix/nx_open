@@ -2,11 +2,7 @@
 
 #include <atomic>
 #include <memory>
-#include <atomic>
-
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
+#include <optional>
 
 #include <nx/utils/move_only_func.h>
 
@@ -57,8 +53,7 @@ public:
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
-        boost::optional<std::chrono::milliseconds> timeoutMillis
-            = boost::optional<std::chrono::milliseconds>(),
+        std::optional<std::chrono::milliseconds> timeoutMillis = std::nullopt,
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**

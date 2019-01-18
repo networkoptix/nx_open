@@ -43,7 +43,7 @@ void AIOService::startMonitoring(
     Pollable* const sock,
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
-    boost::optional<std::chrono::milliseconds> timeoutMillis,
+    std::optional<std::chrono::milliseconds> timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     auto aioThread = getSocketAioThread(sock);

@@ -3,8 +3,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
-
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <nx/network/aio/event_type.h>
 
@@ -23,7 +22,7 @@ public:
     struct MonitoringContext
     {
         bool isUsed = false;
-        boost::optional<std::chrono::milliseconds> timeout;
+        std::optional<std::chrono::milliseconds> timeout;
         aio::detail::AioEventHandlingDataHolder* userData = nullptr;
     };
 

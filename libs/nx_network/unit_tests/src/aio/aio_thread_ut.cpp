@@ -73,7 +73,7 @@ protected:
             m_tcpSocket.get(),
             aio::EventType::etRead,
             this,
-            boost::none,
+            std::nullopt,
             nullptr);
     }
 
@@ -231,7 +231,7 @@ protected:
             m_tcpSocket.get(),
             aio::etRead,
             this,
-            boost::none,
+            std::nullopt,
             [&done]()
             {
                 done.set_value();
