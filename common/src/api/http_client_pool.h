@@ -1,4 +1,7 @@
 #pragma once
+
+#include <optional>
+
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 

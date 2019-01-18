@@ -2,6 +2,7 @@
 #define __SESSION_MANAGER_H__
 
 #include <future>
+#include <optional>
 
 #include <boost/optional.hpp>
 

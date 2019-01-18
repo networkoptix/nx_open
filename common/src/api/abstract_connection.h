@@ -1,6 +1,7 @@
 #ifndef QN_CONNECTION_H
 #define QN_CONNECTION_H
 
+#include <optional>
 #include <cassert>
 
 #ifndef Q_MOC_RUN
