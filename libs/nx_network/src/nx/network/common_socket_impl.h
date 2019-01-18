@@ -10,8 +10,7 @@
 
 #include "detail/socket_sequence.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class Pollable;
 namespace aio { class AioThread; }
@@ -29,19 +28,18 @@ public:
         void* userData = nullptr;
     };
 
-    std::atomic<nx::network::aio::AioThread*> aioThread;
+    std::atomic<nx::network::aio::AioThread*> aioThread{nullptr};
     std::array<MonitoringContext, nx::network::aio::etMax> monitoredEvents;
-    std::atomic<int> terminated;
+    std::atomic<int> terminated{0};
     /**
      * This socket sequence is unique even after socket destruction
      * (socket pointer is not unique after delete call).
      */
     SocketSequenceType socketSequence;
-    bool isUdtSocket;
+    bool isUdtSocket = false;
 
     CommonSocketImpl();
     virtual ~CommonSocketImpl() = default;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network
