@@ -12,28 +12,12 @@ std::map<Level, std::vector<Tag>> getEffectiveTagsByLevel(
     const std::set<Tag>& effectiveTags,
     const LevelFilters& levelFilters)
 {
-    const auto hasTag = 
-        [&effectiveTags](const Tag& tag) -> bool
-        {
-            return effectiveTags.find(tag) != effectiveTags.end();
-        };
-
-    std::map<Level, std::vector<Tag>>effectiveTagsByLevel;
+    std::map<Level, std::vector<Tag>> effectiveTagsByLevel;
     for (const auto& filter : levelFilters)
     {
-        auto it = effectiveTagsByLevel.find(filter.second);
-        if (it == effectiveTagsByLevel.end())
-        {
-            std::vector<Tag> tags;
-            if (hasTag(filter.first))
-                tags.push_back(filter.first);
-
-            effectiveTagsByLevel.emplace(filter.second, tags);
-        }
-        else if(hasTag(filter.first))
-        {
-            it->second.push_back(filter.first);
-        }
+        auto& tags = effectiveTagsByLevel[filter.second];
+        if (effectiveTags.find(filter.first) != effectiveTags.end())
+            tags.push_back(filter.first);
     }
 
     return effectiveTagsByLevel;
@@ -47,7 +31,7 @@ LoggerSettings toLoggerSettings(const Logger& loggerInfo)
     settings.level.filters = toLevelFilters(loggerInfo.filters);
     settings.level.primary = loggerInfo.defaultLevel.empty()
         ? Level::none
-        : levelFromString(QString::fromStdString(loggerInfo.defaultLevel));
+        : levelFromString(loggerInfo.defaultLevel.c_str());
 
     size_t finalSlash = loggerInfo.path.find_last_of('/');
     if (finalSlash == std::string::npos)
@@ -57,7 +41,7 @@ LoggerSettings toLoggerSettings(const Logger& loggerInfo)
     else
     {
         settings.directory = QString::fromStdString(loggerInfo.path.substr(0, finalSlash));
-        if (finalSlash < loggerInfo.path.size())
+        if (finalSlash < loggerInfo.path.size() - 1)
             settings.logBaseName = QString::fromStdString(loggerInfo.path.substr(finalSlash + 1));
     }
 
@@ -82,11 +66,7 @@ LevelFilters toLevelFilters(const std::vector<Filter>& filters)
     for (const auto& filter : filters)
     {
         for (const auto& tag : filter.tags)
-        {
-            levelFilters.emplace(
-                tag, 
-                levelFromString(QString::fromStdString(filter.level)));
-        }
+            levelFilters.emplace(tag, levelFromString(filter.level.c_str()));
     }
 
     return levelFilters;
@@ -123,10 +103,7 @@ Logger toLoggerInfo(
 
     auto filePath = logger->filePath();
     if (filePath.has_value())
-    {
-        // Using * instead of .value() to avoid error on OSX
-        loggerInfo.path = (*filePath).toStdString();
-    }
+         loggerInfo.path = filePath->toStdString();
 
     loggerInfo.filters = toEffectiveFilters(effectiveTags, logger->levelFilters());
 

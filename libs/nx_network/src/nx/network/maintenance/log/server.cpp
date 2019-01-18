@@ -16,6 +16,8 @@ using namespace nx::utils::log;
 
 namespace {
 
+static constexpr char kJsonMimeType[] = "application/json";
+
 std::set<LoggerCollection::Context> removeDuplicates(
     const LoggerCollection::LoggersByTag& loggersByTag)
 {
@@ -60,10 +62,9 @@ void Server::serveGetLoggers(
     http::RequestContext /*requestContext*/,
     http::RequestProcessedHandler completionHandler)
 {
-    Loggers loggers;
-
     auto uniqueLoggers = removeDuplicates(m_loggerCollection->allLoggers());
 
+    Loggers loggers;
     for (const auto& loggerContext : uniqueLoggers)
     {
         loggers.loggers.push_back(utils::toLoggerInfo(
@@ -74,7 +75,7 @@ void Server::serveGetLoggers(
 
     http::RequestResult result(http::StatusCode::ok);
     result.dataSource = std::make_unique<http::BufferSource>(
-        "application/json",
+        kJsonMimeType,
         QJson::serialized(loggers));
 
     completionHandler(std::move(result));
@@ -106,7 +107,10 @@ void Server::servePostLogger(
     http::RequestContext requestContext,
     http::RequestProcessedHandler completionHandler)
 {
-    Logger newLoggerInfo = QJson::deserialized<Logger>(requestContext.request.messageBody);
+    bool ok = false;
+    Logger newLoggerInfo = QJson::deserialized(requestContext.request.messageBody, Logger(), &ok);
+    if (!ok)
+        return completionHandler(http::StatusCode::badRequest);
 
     Settings logSettings;
     logSettings.loggers.push_back(utils::toLoggerSettings(newLoggerInfo));
@@ -124,7 +128,7 @@ void Server::servePostLogger(
 
     auto logger = m_loggerCollection->get(id);
     if (!logger)
-        return completionHandler(http::RequestResult(http::StatusCode::badRequest));
+        return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
 
     Logger loggerInfo = utils::toLoggerInfo(
         logger,
@@ -133,7 +137,7 @@ void Server::servePostLogger(
     
     http::RequestResult result(http::StatusCode::created);
     result.dataSource = std::make_unique<http::BufferSource>(
-        "application/json",
+        kJsonMimeType,
         QJson::serialized(loggerInfo));
     
     completionHandler(std::move(result));
