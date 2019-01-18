@@ -3,6 +3,9 @@
 #include <limits>
 #include <sstream>
 #include <iomanip>
+#include <cstdlib>
+
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
@@ -64,56 +67,59 @@ std::string toStdString(const Uuid& uuid, FormatOptions formatOptions)
 
     if (formatOptions & FormatOptions::braces)
         ss << '{';
-
     if (formatOptions & FormatOptions::uppercase)
         ss << std::uppercase;
-
     for (int i = 0; i < 4; ++i)
-    {
-        ss << std::setw(2);
-        ss << static_cast<unsigned int>(uuid[i]);
-    }
-
+        ss << std::setw(2) << (int) uuid[i];
     if (formatOptions & FormatOptions::hyphens)
         ss << '-';
-
     for (int i = 0; i < 2; ++i)
-    {
-        ss << std::setw(2);
-        ss << static_cast<unsigned int>(uuid[4 + i]);
-    }
-
+        ss << std::setw(2) << (int) uuid[4 + i];
     if (formatOptions & FormatOptions::hyphens)
         ss << "-";
-
     for (int i = 0; i < 2; ++i)
-    {
-        ss << std::setw(2);
-        ss << static_cast<unsigned int>(uuid[6 + i]);
-    }
-
+        ss << std::setw(2) << (int) uuid[6 + i];
     if (formatOptions & FormatOptions::hyphens)
         ss << "-";
-
     for (int i = 0; i < 2; ++i)
-    {
-        ss << std::setw(2);
-        ss << static_cast<unsigned int>(uuid[8 + i]);
-    }
-
+        ss << std::setw(2) << (int) uuid[8 + i];
     if (formatOptions & FormatOptions::hyphens)
         ss << "-";
-
     for (int i = 0; i < 6; ++i)
-    {
-        ss << std::setw(2);
-        ss << static_cast<unsigned int>(uuid[10 + i]);
-    }
-
+        ss << std::setw(2) << (int) uuid[10 + i];
     if (formatOptions & FormatOptions::braces)
         ss << '}';
 
     return ss.str();
+}
+
+Uuid randomUuid()
+{
+    static_assert(sizeof(std::rand()) >= 4, "Uuid generation relies on rand() yielding >= 4 bytes");
+
+    Uuid uuid;
+    int index = 0;
+    const auto addDword =
+        [&uuid, &index](uint32_t value) //< Converts value to Big Endian.
+        {
+            uuid[index * 4 + 0] = (value >> 24) & 0xFF;
+            uuid[index * 4 + 1] = (value >> 16) & 0xFF;
+            uuid[index * 4 + 2] = (value >> 8) & 0xFF;
+            uuid[index * 4 + 3] = (value >> 0) & 0xFF;
+            ++index;
+        };
+
+    addDword(std::rand());
+    addDword(std::rand());
+    addDword(std::rand());
+    addDword((std::rand() & 0x0FFF) | 0x4000); //< 32-bit of the form 4xxx (4 is UUID version).
+    addDword(std::rand() % 0x3FFF + 0x8000); //< 32-bit in range [0x8000, 0xBFFF].
+    addDword(std::rand());
+    addDword(std::rand());
+    addDword(std::rand());
+
+    NX_KIT_ASSERT(index == 8);
+    return uuid;
 }
 
 } // namespace UuidHelper

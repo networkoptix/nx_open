@@ -3,6 +3,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <string>
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 
@@ -65,7 +66,7 @@ private:
     int64_t usSinceEpoch() const;
 
     void setTrackerAttributeOptions(
-        const std::map<QString, std::vector<QString>>& options);
+        const std::map<std::string, std::vector<std::string>>& options);
 
 private:
     int m_counter = 0;

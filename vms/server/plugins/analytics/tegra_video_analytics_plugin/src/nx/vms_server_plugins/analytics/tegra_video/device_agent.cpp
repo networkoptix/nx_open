@@ -8,7 +8,7 @@
 
 #include <nx/sdk/analytics/helpers/object.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
 #include "attribute_options.h"
@@ -196,15 +196,12 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
 
     auto objectPacket = new ObjectMetadataPacket();
     objectPacket->setTimestampUs(ptsUs);
-    objectPacket->setDurationUs(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
+    objectPacket->setDurationUs(1000000LL * 10);
 
     for (const auto& rect: rects)
     {
         auto object = new Object();
-        // TODO: #mshevchenko: Rewrite creating a random nx::sdk::Uuid when implemented.
-        const nx::sdk::Uuid objectId =
-            nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(QnUuid::createUuid());
-        object->setId(objectId);
+        object->setId(UuidHelper::randomUuid());
         object->setTypeId(m_objectTypeId);
 
         object->setBoundingBox(IObject::Rect(rect.x, rect.y, rect.w, rect.h));
@@ -247,7 +244,7 @@ int64_t DeviceAgent::usSinceEpoch() const
 }
 
 void DeviceAgent::setTrackerAttributeOptions(
-    const std::map<QString, std::vector<QString>>& options)
+    const std::map<std::string, std::vector<std::string>>& options)
 {
     for (const auto& entry : options)
     {

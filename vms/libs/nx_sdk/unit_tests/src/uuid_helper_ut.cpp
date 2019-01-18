@@ -23,7 +23,7 @@ static constexpr Uuid kNullUuid = Uuid(); //< default constructor
 TEST(UuidHelper, uuidBasics)
 {
     ASSERT_FALSE(kFixedUuid.isNull());
-    
+
     ASSERT_EQ(kFixedUuid, kFixedUuid); //< operator==() for identical arguments
     ASSERT_FALSE(kFixedUuid != kFixedUuid); //< operator!=() for identical arguments
 
@@ -52,6 +52,15 @@ TEST(UuidHelper, uuidBasics)
 
     for (int i = 0; i < Uuid::kSize; ++i)
         ASSERT_EQ(kFixedUuidBytes[i], kFixedUuid[i]);
+}
+
+TEST(UuidHelper, uuidRandom)
+{
+    const Uuid random1 = UuidHelper::randomUuid();
+    const Uuid random2 = UuidHelper::randomUuid();
+    ASSERT_FALSE(random1.isNull());
+    ASSERT_FALSE(random2.isNull());
+    ASSERT_FALSE(random1 == random2);
 }
 
 TEST(UuidHelper, uuidBinaryCompatibilityWithOldSdk)

@@ -70,26 +70,6 @@ std::string* trim(std::string* inOutStr)
     return inOutStr;
 }
 
-nx::sdk::Uuid makeUuid()
-{
-    // TODO: #mshevchenko: Rewrite creating a random nx::sdk::Uuid when implemented.
-
-    // Likely this method is not correct in the sense of randomness of output GUIDs.
-    nx::sdk::Uuid uuid;
-    auto data = (int*) &uuid[0];
-    std::mt19937 rng;
-    rng.seed(std::random_device()());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(
-        0, std::numeric_limits<int>::max());
-
-    data[0] = dist(rng);
-    data[1] = dist(rng);
-    data[2] = dist(rng);
-    data[3] = dist(rng);
-
-    return uuid;
-}
-
 std::string makeElementName(
     const std::string& pipelineName,
     const std::string& factoryName,

@@ -34,6 +34,8 @@ namespace UuidHelper
 
     /** @return String representation according to RFC-1422. */
     std::string toStdString(const Uuid& uuid, FormatOptions formatOptions = FormatOptions::all);
+
+    Uuid randomUuid();
 }
 
 } // namespace sdk

@@ -141,7 +141,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
         nx::sdk::Uuid uuid = trackingMapper->getMapping(roiMeta.tracking_id);
         if (uuid.isNull())
         {
-            uuid = makeUuid();
+            uuid = nx::sdk::UuidHelper::randomUuid();
             trackingMapper->addMapping(roiMeta.tracking_id, uuid);
         }
 

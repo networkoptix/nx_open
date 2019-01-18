@@ -1,24 +1,19 @@
 #include "naive_object_tracker.h"
 
 #include <cmath>
+#include <cstdlib>
 
 #include <boost/optional/optional.hpp>
 
 #define NX_PRINT_PREFIX "metadata::tegra_video::NaiveObjectTracker::"
 #include <nx/kit/debug.h>
 
-#include <nx/utils/log/assert.h>
-#include <nx/utils/random.h>
-#include <nx/utils/uuid.h>
-
-#include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/object.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
-#include <nx/vms_server_plugins/utils/uuid.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -38,7 +33,7 @@ void NaiveObjectTracker::filterAndTrack(
         if (auto sameObject = findAndMarkSameObjectInCache(rect))
             updateObjectInCache(sameObject->id, rect);
         else
-            addObjectToCache(QnUuid::createUuid(), rect);
+            addObjectToCache(nx::sdk::UuidHelper::randomUuid(), rect);
     }
 
     auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
@@ -52,14 +47,14 @@ void NaiveObjectTracker::filterAndTrack(
     outMetadataPackets->push_back(packet);
 }
 
-void NaiveObjectTracker::setObjectTypeId(const QString& objectTypeId)
+void NaiveObjectTracker::setObjectTypeId(const std::string& objectTypeId)
 {
     m_objectTypeId = objectTypeId;
 }
 
 void NaiveObjectTracker::setAttributeOptions(
-    const QString& attributeName,
-    const std::vector<QString>& attributeValues)
+    const std::string& attributeName,
+    const std::vector<std::string>& attributeValues)
 {
     m_attributeOptions[attributeName] = attributeValues;
 }
@@ -122,7 +117,8 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const TegraVideo::Rect& boundin
     return boost::none;
 }
 
-void NaiveObjectTracker::addObjectToCache(const QnUuid& id, const TegraVideo::Rect& boundingBox)
+void NaiveObjectTracker::addObjectToCache(
+    const nx::sdk::Uuid& id, const TegraVideo::Rect& boundingBox)
 {
     CachedObject object;
     object.id = id;
@@ -138,7 +134,8 @@ void NaiveObjectTracker::addObjectToCache(const QnUuid& id, const TegraVideo::Re
     m_cachedObjects[id] = object;
 }
 
-void NaiveObjectTracker::updateObjectInCache(const QnUuid& id, const TegraVideo::Rect& boundingBox)
+void NaiveObjectTracker::updateObjectInCache(
+    const nx::sdk::Uuid& id, const TegraVideo::Rect& boundingBox)
 {
     auto itr = m_cachedObjects.find(id);
     if (itr == m_cachedObjects.cend())
@@ -199,7 +196,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
             cached.rect = applySpeedToRectangle(cached.rect, speed);
 
             NX_OUTPUT << "(addNonExpiredObjects) "
-                << cached.id.toString().toStdString() << " ("
+                << nx::sdk::UuidHelper::toStdString(cached.id) << " ("
                 << cached.rect.x << " "
                 << cached.rect.y << ") ("
                 << bottomRightX(cached.rect) << " "
@@ -207,9 +204,9 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         }
 
         object->setBoundingBox(toSdkRect(cached.rect));
-        object->setId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(cached.id));
+        object->setId(cached.id);
         object->setConfidence(1);
-        object->setTypeId(m_objectTypeId.toStdString());
+        object->setTypeId(m_objectTypeId);
 
         std::vector<nx::sdk::analytics::Attribute> attributes;
         for (const auto& entry: cached.attributes)
@@ -219,8 +216,8 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
 
             nx::sdk::analytics::Attribute attribute(
                 nx::sdk::IAttribute::Type::string,
-                attributeName.toStdString(),
-                attributeValue.toStdString());
+                attributeName,
+                attributeValue);
 
             attributes.push_back(attribute);
         }
@@ -355,7 +352,7 @@ double NaiveObjectTracker::predictXSpeedForRectangle(const TegraVideo::Rect& rec
 
 void NaiveObjectTracker::assignRandomAttributes(CachedObject* outCachedObject)
 {
-    NX_ASSERT(outCachedObject);
+    NX_KIT_ASSERT(outCachedObject);
     if (!outCachedObject)
         return;
 
@@ -364,24 +361,24 @@ void NaiveObjectTracker::assignRandomAttributes(CachedObject* outCachedObject)
         const auto attributeName = entry.first;
         const auto attributeValue = randomAttributeValue(attributeName);
 
-        if (attributeValue.isEmpty())
+        if (attributeValue.empty())
             return;
 
         outCachedObject->attributes[attributeName] = attributeValue;
     }
 }
 
-QString NaiveObjectTracker::randomAttributeValue(const QString& attributeName) const
+std::string NaiveObjectTracker::randomAttributeValue(const std::string& attributeName) const
 {
     auto itr = m_attributeOptions.find(attributeName);
     if (itr == m_attributeOptions.cend() || itr->second.empty())
-        return QString();
+        return std::string();
 
     const auto& options = itr->second;
-    const auto index = nx::utils::random::number<int>(0, (int) options.size() - 1);
-    NX_ASSERT(index >= 0 && index < options.size());
+    const auto index = std::rand() % options.size();
+    NX_KIT_ASSERT(index >= 0 && index < options.size());
     if (index < 0 && index >= options.size())
-        return QString();
+        return std::string();
 
     return options[index];
 }

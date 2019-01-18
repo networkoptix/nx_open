@@ -37,7 +37,7 @@ public:
     }
 
     constexpr Uuid(): base_type{} {} //< All zeros.
-    
+
     bool isNull() const { return *this == Uuid(); }
 };
 

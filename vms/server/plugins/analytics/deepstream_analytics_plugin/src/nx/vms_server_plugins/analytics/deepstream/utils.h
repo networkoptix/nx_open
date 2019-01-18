@@ -20,8 +20,6 @@ std::string trimCopy(std::string str);
 
 std::string* trim(std::string* inOutStr);
 
-nx::sdk::Uuid makeUuid();
-
 std::string makeElementName(
     const std::string& pipelineName,
     const std::string& factoryName,
