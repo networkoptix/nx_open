@@ -900,7 +900,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>สตรีมที่อยู่</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>เปิดในหน้าต่างใหม่</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1211,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>เปิดในหน้าต่างใหม่</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>กล้อง</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>แหล่งที่มาของกล้อง</translation>
     </message>
   </context>
   <context>
@@ -1422,17 +1422,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>ล็อค</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>ความกว้าง</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>ความสูง</translation>
     </message>
     <message>
       <location/>
@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>ขนาดต่ำสุด</translation>
     </message>
   </context>
   <context>
@@ -1460,17 +1460,17 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>เลือกเค้าโครง</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>แชร์เค้าโครง</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>เลือกผู้ใช้เพียงรายเดียวใน &quot;แสดงเป็น&quot; บรรทัดเพื่อแสดงเค้าโครงในเครื่องของเขาในรายการนี้</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>แก้ไขสตรีม</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2310,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>เปิดใช้ไทม์ไลน์บน video wall</translation>
     </message>
   </context>
   <context>
@@ -2991,12 +2991,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>แสดงลายน้ำพร้อมชื่อผู้ใช้ผ่านวิดีโอ</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>ดูตัวอย่างลายน้ำ</translation>
     </message>
   </context>
   <context>
@@ -3179,7 +3179,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>หน้าเว็บนี้สำหรับการรวม C2P</translation>
     </message>
   </context>
   <context>
@@ -3215,7 +3215,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>ดูตัวอย่างลายน้ำ</translation>
     </message>
     <message>
       <location/>
@@ -3225,7 +3225,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>ความถี่</translation>
     </message>
   </context>
 </TS>

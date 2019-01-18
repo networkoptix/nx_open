@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>הגדרות מסך...</translation>
     </message>
   </context>
   <context>
@@ -990,15 +990,15 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>בחר פריסה...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n פריסות</numerusform>
+        <numerusform>%n פריסות</numerusform>
+        <numerusform>%n פריסות</numerusform>
+        <numerusform>%n פריסות</numerusform>
       </translation>
     </message>
   </context>
@@ -1068,29 +1068,29 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>בחר התקן...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>בחר מצלמה...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>בחר פריסה...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n פריסות</numerusform>
+        <numerusform>%n פריסות</numerusform>
+        <numerusform>%n פריסות</numerusform>
+        <numerusform>%n פריסות</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 ב- %2</translation>
     </message>
   </context>
   <context>
@@ -2670,7 +2670,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation>סיסמא לא יכולה להיות זהה לשם מצלמה&amp;;apos; או לשם משתמש</translation>
+      <translation>סיסמא לא יכולה להיות זהה לשם מצלמה או לשם משתמש</translation>
     </message>
   </context>
   <context>
@@ -3710,11 +3710,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>תמונה לא תקינה.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>שגיאה פנימית.</translation>
     </message>
   </context>
   <context>
@@ -3728,11 +3728,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>מצלמה זו אינה נמצאת כעת בחלק מהפריסות שנבחרו. הפעולה תעבוד אם המצלמה תתווסף לפני תחילת הפעולה.</numerusform>
+        <numerusform>מצלמה זו אינה נמצאת כעת בחלק מהפריסות שנבחרו. הפעולה תעבוד אם המצלמה תתווסף לפני תחילת הפעולה.</numerusform>
+        <numerusform>מצלמה זו אינה נמצאת כעת בחלק מהפריסות שנבחרו. הפעולה תעבוד אם המצלמה תתווסף לפני תחילת הפעולה.</numerusform>
+        <numerusform>מצלמה זו אינה נמצאת כעת בחלק מהפריסות שנבחרו. הפעולה תעבוד אם המצלמה תתווסף לפני תחילת הפעולה.</numerusform>
       </translation>
     </message>
   </context>
@@ -4978,7 +4978,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>סיבוב</translation>
     </message>
   </context>
   <context>
@@ -6056,11 +6056,11 @@ to %1</source>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation>מאמת את העדכון ...</translation>
+      <translation>מאמת את העדכון...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation>בודק מקום פנוי ...</translation>
+      <translation>בודק מקום פנוי...</translation>
     </message>
   </context>
   <context>
@@ -7904,7 +7904,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>לא ניתן להתחיל בהעלאה כאשר משתמש &amp;; quot;%1&amp;; quot; מעלה כעת צילומים למצלמה זו.</translation>
+      <translation>לא ניתן להתחיל בהעלאה כאשר משתמש '%1' מעלה כעת צילומים למצלמה זו.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
@@ -8062,7 +8062,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>אין מספיק מקום בשטח האחסון בשרת</translation>
     </message>
   </context>
   <context>
@@ -8363,7 +8363,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>אין זרם משני</translation>
     </message>
   </context>
   <context>
@@ -8560,7 +8560,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>מספר מותאם אישית שניתן להקצות לפריסה לצורך גישה מהירה וזיהוי</translation>
     </message>
   </context>
   <context>
@@ -8571,7 +8571,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>רקע</translation>
     </message>
   </context>
   <context>
@@ -8677,11 +8677,11 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation>לא ניתן לפתוח את הקובץ &amp;; quot;%1&amp;; quot;</translation>
+      <translation>לא ניתן לפתוח את הקובץ '%1'</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>לא ניתן לחשב md5 עבור הקובץ &amp;; quot;%1&amp;; quot;</translation>
+      <translation>לא ניתן לחשב md5 עבור הקובץ '%1'</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
@@ -9229,11 +9229,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>אזהרה! גרסה זו היא למטרות בדיקה בלבד!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>שדרג לגרסה או לתיקון הבא ברגע שהם יהפכו לזמינים.</translation>
     </message>
   </context>
   <context>

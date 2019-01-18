@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>最小尺寸</translation>
     </message>
   </context>
   <context>

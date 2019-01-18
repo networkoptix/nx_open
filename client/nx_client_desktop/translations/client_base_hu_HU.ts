@@ -991,12 +991,12 @@ több könyvjelző megjelenítéséhez</translation>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Elrendezés kiválasztása...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
     </message>
@@ -1067,27 +1067,27 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Eszközök kiválasztása...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Kamerák kiválasztása...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Elrendezés kiválasztása...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 a %2-ból</translation>
     </message>
   </context>
   <context>
@@ -3632,11 +3632,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>Érvénytelen beviteli kép.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Belső hiba.</translation>
     </message>
   </context>
   <context>
@@ -3651,7 +3651,7 @@ to %1</source>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
       <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>Ez a kamera jelenleg nem része a kijelölt elrendezések. A művelet akkor fog működni, ha a kamera hozzáadódik a művelet megindításához.</numerusform>
         <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
       </translation>
     </message>
@@ -4864,7 +4864,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Elforgatás</translation>
     </message>
   </context>
   <context>
@@ -7872,7 +7872,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Nincs elég hely a szerver adattárán</translation>
     </message>
   </context>
   <context>
@@ -8135,7 +8135,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Nincs másodlagos stream</translation>
     </message>
   </context>
   <context>
@@ -8332,7 +8332,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Egy egyéni szám, amelyet egy elrendezéshez lehet hozzárendelni, a gyors azonosítás és hozzáférés érdekében</translation>
     </message>
   </context>
   <context>
@@ -8343,7 +8343,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Háttér</translation>
     </message>
   </context>
   <context>
@@ -8985,11 +8985,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Figyelem! Ez a kiadás csak tesztelési célokat szolgál!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Kérjük, frissítse a következő rendelkezésre álló javításra vagy a rendelkezésre álló verzióra.</translation>
     </message>
   </context>
   <context>

@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>最小尺寸</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2310,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation>在電視牆上啟用時間軸</translation>
+      <translation>在電視牆上顯示時間軸</translation>
     </message>
   </context>
   <context>
@@ -2991,7 +2991,7 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>在影像上顯示用戶名的浮水印</translation>
+      <translation>在影像上顯示帶有用戶名稱的浮水印</translation>
     </message>
     <message>
       <location/>

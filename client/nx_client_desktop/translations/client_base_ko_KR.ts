@@ -990,12 +990,12 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>레이아웃 선택...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n 레이아웃</numerusform>
       </translation>
     </message>
   </context>
@@ -1065,26 +1065,26 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>장치 선택...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>카메라 선택...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>레이아웃 선택...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n 레이아웃</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%2 에서 %1</translation>
     </message>
   </context>
   <context>
@@ -3589,11 +3589,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>잘못된 입력된 이미지.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>내부 오류</translation>
     </message>
   </context>
   <context>
@@ -3607,8 +3607,8 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>이 카메라는 현재 선택된 일부 레이아웃들에 포함되어 있지 않습니다. 액션은 카메라가 액션이 시행되기전에 추가되어야 작동합니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -4803,7 +4803,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>회전</translation>
     </message>
   </context>
   <context>
@@ -7773,7 +7773,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>서버의 저장공간이 부족합니다.</translation>
     </message>
   </context>
   <context>
@@ -8017,7 +8017,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>보조 스트림 없음</translation>
     </message>
   </context>
   <context>
@@ -8214,7 +8214,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>빠른 식별 및 액세스를 위해 레이아웃에 할당 할 수있는 사용자 지정 번호</translation>
     </message>
   </context>
   <context>
@@ -8225,7 +8225,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>배경</translation>
     </message>
   </context>
   <context>
@@ -8859,11 +8859,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>경고! 이 빌드는 테스트 용입니다!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>다음 패치 또는 릴리스 버전이 제공되면 업그레이드하십시오.</translation>
     </message>
   </context>
   <context>

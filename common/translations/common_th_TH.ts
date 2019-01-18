@@ -1494,19 +1494,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>พื้นที่จัดเก็บมีปัญหา</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>พื้นที่จัดเก็บข้อมูลที่ %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>ตั้งค่าเป็นแบบเต็มหน้าจอ</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>ออกจากโหมดเต็มหน้าจอ</translation>
     </message>
   </context>
   <context>

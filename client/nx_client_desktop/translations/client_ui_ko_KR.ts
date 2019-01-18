@@ -900,7 +900,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>스트림 주소</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>레이아웃에</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1211,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>레이아웃에</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>카메라</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>선택된 카메라</translation>
     </message>
   </context>
   <context>
@@ -1422,17 +1422,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>잠김</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>너비</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>높이</translation>
     </message>
     <message>
       <location/>
@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>최소 크기</translation>
     </message>
   </context>
   <context>
@@ -1460,17 +1460,17 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>레이아웃 선택</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>공유된 레이아웃</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>자신의 로컬 레이아웃을 보여지게 하려면 &quot;Show to&quot;에서 한 사용자를 선택</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>스트림 편집...</translation>
     </message>
   </context>
   <context>
@@ -3179,7 +3179,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>이 웹 페이지는 C2P 연동 용입니다.</translation>
     </message>
   </context>
   <context>

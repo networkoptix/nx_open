@@ -900,7 +900,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Akış Adresi</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Ekranda</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1211,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Ekranda</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kaynak Kamera</translation>
     </message>
   </context>
   <context>
@@ -1422,17 +1422,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Kilitli</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Genişlik</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Yükseklik</translation>
     </message>
     <message>
       <location/>
@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>Minimum Boyut</translation>
     </message>
   </context>
   <context>
@@ -1460,17 +1460,17 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Düzen seç</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Paylaşılan ekran düzenleri</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>&quot;göstermek onun yerel düzenleri bu listede görüntülemek için&quot; satır için tek bir kullanıcı seçin</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Akışları Düzenle...</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2310,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Video duvarındaki zaman çizelgesini etkinleştir</translation>
     </message>
   </context>
   <context>
@@ -2991,12 +2991,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Filigranı video üzerinden kullanıcı adıyla göster</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Filigran Önizlemesi</translation>
     </message>
   </context>
   <context>
@@ -3179,7 +3179,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Bu web sayfası C2P entegrasyonu içindir</translation>
     </message>
   </context>
   <context>
@@ -3215,7 +3215,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Filigran Önizlemesi</translation>
     </message>
     <message>
       <location/>
@@ -3225,7 +3225,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Frekans</translation>
     </message>
   </context>
 </TS>

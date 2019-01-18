@@ -894,7 +894,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Paramètres d'écran...</translation>
     </message>
   </context>
   <context>
@@ -991,13 +991,13 @@ pour afficher plus de signets</translation>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Sélectionner mise en page...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n mises en page</numerusform>
+        <numerusform>%n mises en page</numerusform>
       </translation>
     </message>
   </context>
@@ -1067,27 +1067,27 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Sélectionner Périphérique...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Sélectionner caméra...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Sélectionner mise en page...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n mises en page</numerusform>
+        <numerusform>%n mises en page</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 sur %2</translation>
     </message>
   </context>
   <context>
@@ -3634,11 +3634,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>Image d'entrée invalide.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Erreur interne.</translation>
     </message>
   </context>
   <context>
@@ -3652,9 +3652,9 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>Cette caméra ne figure pas sur certaines des mises en page sélectionnées. L'action fonctionnera si la caméra est ajoutée avant les déclencheurs d'action.</numerusform>
+        <numerusform>Cette caméra ne figure pas sur certaines des mises en page sélectionnées. L'action fonctionnera si la caméra est ajoutée avant les déclencheurs d'action.</numerusform>
       </translation>
     </message>
   </context>
@@ -4866,7 +4866,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -7874,7 +7874,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Espace insuffisant sur le stockage du serveur</translation>
     </message>
   </context>
   <context>
@@ -8137,7 +8137,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Pas de flux secondaire</translation>
     </message>
   </context>
   <context>
@@ -8334,7 +8334,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Numéro personnalisé peut être attribué à une mise en page pour une identification et accès rapides</translation>
     </message>
   </context>
   <context>
@@ -8345,7 +8345,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Arrière plan</translation>
     </message>
   </context>
   <context>
@@ -8987,11 +8987,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Attention! Cette version est uniquement à des fins de test!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Veuillez effectuer une mise à niveau avec un patch ou une version officielle une fois disponible.</translation>
     </message>
   </context>
   <context>

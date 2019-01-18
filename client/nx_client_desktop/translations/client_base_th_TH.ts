@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>การตั้งค่าหน้าจอ</translation>
     </message>
   </context>
   <context>
@@ -990,12 +990,12 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>เลือกเค้าโครง</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n เค้าโครง</numerusform>
       </translation>
     </message>
   </context>
@@ -1065,26 +1065,26 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>เลือกอุปกรณ์</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>เลือกกล้อง</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>เลือกเค้าโครง</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n เค้าโครง</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 ใน %2</translation>
     </message>
   </context>
   <context>
@@ -3589,11 +3589,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>รูปภาพสำหรับป้อนข้อมูลไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
   </context>
   <context>
@@ -3607,8 +3607,8 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>กล้องนี้ไม่ได้อยู่ในรูปแบบที่เลือก การดำเนินการจะทำงานถ้ากล้องถูกทริกเกอร์ดำเนินการก่อน</numerusform>
       </translation>
     </message>
   </context>
@@ -3836,7 +3836,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>การเปลี่ยนการตั้งค่า LDAP อื่นที่ไม่ใช่ &quot;ตัวกรองการค้นหา&quot; จะทำให้สูญเสียการเชื่อมต่อสำหรับผู้ใช้ที่เรียกใช้ LDAP ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -4803,7 +4803,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>หมุนหน้าจอ</translation>
     </message>
   </context>
   <context>
@@ -6326,7 +6326,7 @@ to %1</source>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>การทำ Reindexing สามารถแก้ไขปัญหาเกี่ยวกับที่เก็บถาวรหรือสำรองข้อมูลได้หากสูญหายหรือเสียหายหรือหากมีการเปลี่ยนฮาร์ดแวร์บางส่วน</translation>
     </message>
   </context>
   <context>
@@ -7772,7 +7772,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>พื้นที่ว่างไม่เพียงพอในการจัดเก็บข้อมูลไปยังเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -8016,7 +8016,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>ไม่มีสตรีมรอง</translation>
     </message>
   </context>
   <context>
@@ -8213,7 +8213,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>หมายเลขที่กำหนดเองซึ่งสามารถกำหนดรูปแบบเพื่อระบุและเข้าถึงได้อย่างรวดเร็ว</translation>
     </message>
   </context>
   <context>
@@ -8224,7 +8224,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>พื้นหลัง</translation>
     </message>
   </context>
   <context>
@@ -8515,7 +8515,7 @@ to %1</source>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>ฟิลด์นี้เป็นตัวพิมพ์เล็กและใหญ่</translation>
     </message>
   </context>
   <context>
@@ -8858,11 +8858,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>คำเตือน! โครงสร้างนี้มีไว้เพื่อการทดสอบเท่านั้น!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>โปรดอัพเดทเป็นแพทช์หรือรุ่นที่พร้อมใช้งานถัดไปเมื่อพร้อมใช้งาน</translation>
     </message>
   </context>
   <context>

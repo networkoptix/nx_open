@@ -1237,7 +1237,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hasło musi zawierać co najmniej %n znak.</numerusform>
         <numerusform>Hasło musi zawierać co najmniej %n znaki.</numerusform>
         <numerusform>Hasło musi zawierać co najmniej %n znaków.</numerusform>
@@ -1250,7 +1250,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hasło nie może być dłuższe niż %n znak.</numerusform>
         <numerusform>Hasło nie może być dłuższe niż %n znaki.</numerusform>
         <numerusform>Hasło nie może być dłuższe niż %n znaków.</numerusform>
@@ -1259,7 +1259,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
@@ -1268,7 +1268,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>

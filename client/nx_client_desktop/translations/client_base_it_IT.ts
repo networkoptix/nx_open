@@ -4593,7 +4593,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http (s): // host: porta</translation>
+      <translation>http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>

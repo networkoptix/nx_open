@@ -894,7 +894,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Skärminställningar...</translation>
     </message>
   </context>
   <context>
