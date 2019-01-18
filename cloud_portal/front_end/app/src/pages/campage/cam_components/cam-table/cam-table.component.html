@@ -1,17 +1,20 @@
 <div class="nx-table-wrapper">
-    <div class="nx-table-header">
-        <div class="col text-placeholder d-flex align-items-center" *ngIf="results == 0; else camview" translate>
-            Nothing Found
-        </div>
-        <ng-template #camview>
+    <div class="col text-placeholder d-flex align-items-center"
+         *ngIf="results == 0; else camview"
+         translate>
+        Nothing Found
+    </div>
+
+    <ng-template #camview>
+        <div class="nx-table-header">
             <div class="col-md-12 d-flex align-items-center p-0">
 
                 <div class="flex-grow-1">
-                    <h4 class="m-0">
+                    <div class="results m-0">
                         {{results}}
                         <span *ngIf="results != 1" translate>results</span>
                         <span *ngIf="results == 1" translate>result</span>
-                    </h4>
+                    </div>
                 </div>
 
                 <div class="col-md-3 text-right p-0">
@@ -21,8 +24,8 @@
                     </nx-csv-button>
                 </div>
             </div>
-        </ng-template>
-    </div>
+        </div>
+    </ng-template>
 
     <div class="table-wrapper">
         <table class="table table-hover nx-table">

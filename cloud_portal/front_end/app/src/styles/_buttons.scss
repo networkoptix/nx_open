@@ -156,13 +156,32 @@ button, .btn {
         }
     }
     
+    &.has-icon {
+        padding-left : 20px;
+    }
+    
     span {
         line-height: 20px;
+        
+        &.close {
+            left : 10px;
+            top  : 1px;
+    
+            &:before, &:after {
+                background-color: $light16;
+            }
+        }
     }
     
     &:hover {
         color           : $dark15;
         text-decoration : none;
+    
+        span.close {
+            &:before, &:after {
+                background-color : $dark15;
+            }
+        }
     }
     
     &:active, &:focus {

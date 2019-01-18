@@ -8,20 +8,13 @@
 
 .campage {
     
-    &-info {
-        h4 {
-            margin      : 0;
-            line-height : 2rem;
-            color       : $dark15;
-        }
-    }
-    
     nx-layout-right {
         .layout {
             padding : 0 1rem 1rem !important;
             
             .card-columns {
-                padding-left : 0 !important;
+                padding-left  : 0 !important;
+                padding-right : 0 !important;
             }
         }
     }
@@ -41,22 +34,6 @@
         font-family : $font-family-regular;
         font-size   : 20px;
         height      : 32px;
-    }
-    
-    li {
-        height : 24px;
-        
-        a {
-            color           : $light16;
-            height          : 24px;
-            font-family     : $font-family-regular;
-            font-size       : 15px;
-            text-decoration : none;
-            
-            &:hover {
-                color : $dark15;
-            }
-        }
     }
     
     /*** overwrite default table of component cam-table ***/

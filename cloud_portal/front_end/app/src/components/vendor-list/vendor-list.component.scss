@@ -2,3 +2,27 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 
+.campage-info {
+    span {
+        margin      : 0;
+        line-height : 2rem;
+        color       : $light16;
+        font-size   : rem(20px);
+    }
+}
+
+li {
+    height : 24px;
+    
+    a {
+        color           : $light16;
+        height          : 24px;
+        font-family     : $font-family-regular;
+        font-size       : 15px;
+        text-decoration : none;
+        
+        &:hover {
+            color : $dark15;
+        }
+    }
+}

@@ -3,8 +3,6 @@
 
 .camview {
   padding          : 0;
-  margin-bottom    : -1rem;
-  min-height       : 650px;
   background-color : $light4;
   
   .card {
@@ -19,6 +17,10 @@
   a {
     padding-bottom: 8px;
     text-decoration: underline;
+  }
+  
+  .no-linewrap {
+    overflow: hidden;
   }
   
   table th, table td {

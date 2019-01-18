@@ -36,7 +36,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     differ: any;
     vendorDiffer: any;
     hardwareDiffer: any;
-    toggleCamview: any;
+    toggleCamview: boolean;
     multiselectOptions: any;
 
   private setupDefaults() {
@@ -60,7 +60,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
       this.activeCamera = undefined;
       this.showAll = false;
-      this.toggleCamview = 'off';
+      this.toggleCamview = false;
 
       // format to fit the multiselect component
       this.hardwareTypes = [
@@ -289,7 +289,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
           this.activeCamera.firmwares = firmwaresArray;
       }
 
-      this.toggleCamview = 'on';
+      this.toggleCamview = true;
   }
 
   open(activeCamera) {
@@ -299,6 +299,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   resetActiveCamera() {
       this.activeCamera = undefined;
-      this.toggleCamview = 'off';
+      this.toggleCamview = false;
   }
 }

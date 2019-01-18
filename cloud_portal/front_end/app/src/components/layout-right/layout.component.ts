@@ -2,7 +2,7 @@ import { Component, Input, OnInit, SimpleChange, SimpleChanges, ViewEncapsulatio
 
 /* Usage
  <nx-right-layout>
-    <nx-block first>
+    <nx-block first-element>
          <header>
             Some data (TOP)
          </header>
@@ -12,7 +12,7 @@ import { Component, Input, OnInit, SimpleChange, SimpleChanges, ViewEncapsulatio
          </nx-section>
     </nx-block>
 
-    <nx-block side>
+    <nx-block side-element>
          <header>
             Menu (SIDE)
          </header>

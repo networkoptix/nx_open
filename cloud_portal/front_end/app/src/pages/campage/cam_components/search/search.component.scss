@@ -3,15 +3,38 @@
 @import '../../../../styles/_mixins';
 
 .nx-search {
-    .nav-arrow {
-        position: relative;
+    .btn-text {
+        &:hover {
+            .nav-arrow span {
+                background-color : $dark15 !important;
+            }
+        }
+        
+        .nav-arrow {
+            position : relative;
+        
+            span {
+                height : 1px;
+            
+                &:nth-child(1) {
+                    top  : 10px;
+                    left : 1px;
+                }
+            
+                &:nth-child(2) {
+                    top  : 9px;
+                    left : 8px;
+                }
+            }
+        }
     }
+    
     .icon-search {
         position: absolute;
-        margin: 10px 0px 0px 10px;
+        margin: 10px 0 0 10px;
     }
 
-    .searchinput {
+    .search-input {
         width: 200px;
         height: 40px;
         padding-left: 40px;
@@ -26,7 +49,7 @@
             @include placeholder();
         }
 
-        &:active, &:focus{
+        &:active, &:focus, &.non-empty {
             background-color: $light1;
             color: $dark9;
             border: 1px solid $brand_core;
@@ -47,7 +70,7 @@
         }
     }
 
-    .searchclear {
+    .search-clear {
         position: absolute;
         right: 10px;
         top: 0;
@@ -61,11 +84,10 @@
         flex-wrap: wrap;
 
         li {
-            margin: 0.5rem 5px 4px 0;
+            margin: 0 4px 4px 0;
             cursor: pointer;
             text-align: center;
             width: auto;
         }
     }
-
 }

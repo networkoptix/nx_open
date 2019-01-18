@@ -44,8 +44,9 @@
       background-color : $additional_light1;
       border-bottom    : 1px solid $light3;
       color            : $dark9;
-      font-family      : $font-family-regular;
-      font-size        : 0.8125rem;
+      font-family      : $font-family-medium;
+      font-weight      : 500 !important;
+      font-size        : $line-height-ssm;
       line-height      : 16px;
       text-transform   : none;
       overflow-wrap    : break-word;
@@ -107,6 +108,14 @@
       line-height      : 16px;
       text-transform   : none;
       overflow-wrap    : break-word;
+      
+      .results {
+        color       : $dark9;
+        font-family : $font-family-medium;
+        font-weight : 500 !important;
+        font-size   : $line-height-ssm;
+        line-height : 16px;
+      }
     }
   }
 

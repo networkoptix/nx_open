@@ -100,6 +100,7 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
         // deep copy
         this.filter = {...this.emptyfilters, minResolution: {value: '0', name: 'All'}, hardwareTypes: [], vendors: []};
         this.onChangeCallback(this.filter);
+        this.numberOfOptionsSelected();
         return false;
     }
 
