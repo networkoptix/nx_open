@@ -4,14 +4,14 @@
 </div>
 <form class="form" name="loginForm" novalidate ng-controller="LoginCtrl">
     <div class="modal-body" uib-collapse="!authorized">
-        Authorization ...
+        Autorização ...
     </div>
     <div class="modal-body" ng-if="!authorized" uib-collapse="authorized">
         <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
-            <label for="username" class="control-label">User Name</label>
+            <label for="username" class="control-label">Nome do Utilizador</label>
             <input type="text" id="username" name="username" class="form-control" ng-model="user.username" required auto-fill-sync>
             <p class="help-block" ng-show="loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)">
-                Username is required
+                O nome de utilizador é necessário
             </p>
         </div>
 
@@ -19,7 +19,7 @@
             <label for="password" class="control-label">Password</label>
             <input type="password" id="password" name="password" class="form-control" ng-model="user.password" required auto-fill-sync>
             <p class="help-block" ng-show="loginForm.password.$invalid && (loginForm.password.$dirty || loginForm.submitted)">
-                Password is required
+                A senha é obrigatória
             </p>
         </div>
     </div>
