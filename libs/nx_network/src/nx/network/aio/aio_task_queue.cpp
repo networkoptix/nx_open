@@ -215,14 +215,20 @@ void AioTaskQueue::addSocketToPollset(
     handlingData.release();
 }
 
-void AioTaskQueue::removeSocketFromPollSet(Pollable* sock, aio::EventType eventType)
+void AioTaskQueue::removeSocketFromPollSet(
+    Pollable* sock,
+    aio::EventType eventType)
 {
-    //NX_DEBUG(this, QString::fromLatin1("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType));
-
     void*& userData = sock->impl()->monitoredEvents[eventType].userData;
     if (userData)
-        delete static_cast<AioEventHandlingDataHolder*>(userData);
-    userData = nullptr;
+    {
+        auto handlingData = static_cast<AioEventHandlingDataHolder*>(userData);
+        if (handlingData->data && handlingData->data->nextTimeoutClock != 0)
+            cancelPeriodicTask(handlingData->data.get(), eventType);
+
+        delete handlingData;
+        userData = nullptr;
+    }
     if (eventType == aio::etRead || eventType == aio::etWrite)
         m_pollSet->remove(sock, eventType);
 }
@@ -455,6 +461,22 @@ void AioTaskQueue::addPeriodicTaskNonSafe(
         PeriodicTaskData(handlingData, _socket, eventType));
 }
 
+void AioTaskQueue::cancelPeriodicTask(
+    AioEventHandlingData* handlingData,
+    aio::EventType eventType)
+{
+    for (auto it = m_periodicTasksByClock.lower_bound(handlingData->nextTimeoutClock);
+        it != m_periodicTasksByClock.end() && it->first == handlingData->nextTimeoutClock;
+        ++it)
+    {
+        if (it->second.data.get() == handlingData && it->second.eventType == eventType)
+        {
+            m_periodicTasksByClock.erase(it);
+            return;
+        }
+    }
+}
+
 std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
     SocketSequenceType socketSequence)
 {
@@ -515,6 +537,12 @@ void AioTaskQueue::waitCurrentEventProcessingCompletion()
 {
     m_socketEventProcessingMutex.lock();
     m_socketEventProcessingMutex.unlock();
+}
+
+std::size_t AioTaskQueue::periodicTasksCount() const
+{
+    QnMutexLocker lock(&m_socketEventProcessingMutex);
+    return m_periodicTasksByClock.size();
 }
 
 } // namespace nx::network::aio::detail

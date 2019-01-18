@@ -47,6 +47,11 @@ public:
         eventHandler(_eventHandler)
     {
     }
+
+    ~AioEventHandlingData()
+    {
+        int x = 0;
+    }
 };
 
 class AioEventHandlingDataHolder
@@ -246,6 +251,8 @@ public:
 
     void waitCurrentEventProcessingCompletion();
 
+    std::size_t periodicTasksCount() const;
+
 private:
     AbstractPollSet* m_pollSet = nullptr;
     QElapsedTimer m_monotonicClock;
@@ -275,6 +282,10 @@ private:
         const qint64 taskClock,
         const std::shared_ptr<AioEventHandlingData>& handlingData,
         Pollable* _socket,
+        aio::EventType eventType);
+
+    void cancelPeriodicTask(
+        AioEventHandlingData* eventHandlingData,
         aio::EventType eventType);
 };
 

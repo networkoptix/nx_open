@@ -86,6 +86,8 @@ public:
     size_t socketsHandled() const;
     bool isSocketBeingMonitored(Pollable* sock) const;
 
+    const detail::AioTaskQueue& taskQueue() const;
+
 protected:
     virtual void run() override;
 

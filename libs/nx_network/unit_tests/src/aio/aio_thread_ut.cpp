@@ -1,3 +1,4 @@
+#include <future>
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -6,16 +7,14 @@
 #include <nx/network/aio/pollset.h>
 #include <nx/network/aio/aio_thread.h>
 #include <nx/network/aio/aio_event_handler.h>
+#include <nx/network/aio/aio_task_queue.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 class DummyEventHandler:
     public AIOEventHandler
@@ -35,6 +34,8 @@ private:
     std::function<void(Pollable*, aio::EventType)> m_func;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class AioThread:
     public ::testing::Test,
     public aio::AIOEventHandler
@@ -46,9 +47,11 @@ public:
     }
 
     AioThread(std::unique_ptr<AbstractPollSet> pollSet):
-        m_aioThread(std::move(pollSet))
+        m_aioThread(std::move(pollSet)),
+        m_pollable(&m_aioThread)
     {
         m_tcpSocket = std::make_unique<TCPSocket>(AF_INET);
+        m_tcpSocket->bindToAioThread(&m_aioThread);
         m_aioThread.start();
     }
 
@@ -79,11 +82,42 @@ protected:
         m_aioThread.stopMonitoring(m_tcpSocket.get(), aio::EventType::etRead);
     }
 
+    void whenReadingSocketWithTimeout()
+    {
+        std::promise<void> added;
+
+        m_aioThread.startMonitoring(
+            m_tcpSocket.get(),
+            aio::EventType::etRead,
+            this,
+            std::chrono::milliseconds(std::chrono::hours(1)),
+            [&added]() { added.set_value(); });
+
+        added.get_future().wait();
+    }
+
+    void whenRegisterSocketTimer()
+    {
+        m_tcpSocket->registerTimer(std::chrono::hours(1), nullptr);
+    }
+
+    void whenDeleteSocket()
+    {
+        m_pollable.executeInAioThreadSync([this]() { m_tcpSocket.reset(); });
+    }
+
+    void thenTimerTaskIsRemovedFromAio()
+    {
+        ASSERT_EQ(0U, m_aioThread.taskQueue().periodicTasksCount());
+    }
+
     std::unique_ptr<TCPSocket> m_tcpSocket;
     aio::AioThread m_aioThread;
     nx::utils::SyncQueue<aio::EventType> m_eventsReported;
 
 private:
+    BasicPollable m_pollable;
+
     virtual void eventTriggered(Pollable* /*sock*/, aio::EventType eventType) throw() override
     {
         m_eventsReported.push(eventType);
@@ -134,6 +168,30 @@ TEST_F(AioThread, socket_polled_notification)
     ASSERT_FALSE(handlerCalledFlag);
 
     m_aioThread.stopMonitoring(&socket, aio::etRead);
+}
+
+TEST_F(AioThread, socket_timer_task_is_removed_when_stop_monitoring_socket)
+{
+    whenReadingSocketWithTimeout();
+    whenStopPollingSocket();
+
+    thenTimerTaskIsRemovedFromAio();
+}
+
+TEST_F(AioThread, socket_timer_task_is_removed_when_deleting_socket)
+{
+    whenReadingSocketWithTimeout();
+    whenDeleteSocket();
+
+    thenTimerTaskIsRemovedFromAio();
+}
+
+TEST_F(AioThread, socket_timer_is_removed_when_deleting_socket)
+{
+    whenRegisterSocketTimer();
+    whenDeleteSocket();
+
+    thenTimerTaskIsRemovedFromAio();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -226,7 +284,4 @@ TEST_F(AIOThreadWithFailingPollSet, stop_monitoring_does_nothing_after_failed_st
     thenStopMonitoringCompletedSuccessfully();
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

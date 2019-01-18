@@ -171,6 +171,11 @@ bool AioThread::isSocketBeingMonitored(Pollable* sock) const
     return false;
 }
 
+const detail::AioTaskQueue& AioThread::taskQueue() const
+{
+    return *m_taskQueue;
+}
+
 static constexpr std::chrono::milliseconds kErrorResetTimeout(1);
 
 void AioThread::run()
