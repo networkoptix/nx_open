@@ -90,7 +90,7 @@ protected:
         
         Filter f1;
         f1.level = "info";
-        f.tags = { kTags[1], kTags[2] };
+        f1.tags = { kTags[1], kTags[2] };
 
         Logger loggerInfo;
         loggerInfo.filters = { f, f1 };
