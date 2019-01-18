@@ -20,15 +20,21 @@ import { _ }                    from '@biesbjerg/ngx-translate-extract';
 })
 export class CamTableComponent implements OnChanges, OnInit {
 
-  @Input() headers: string[];
+  // @Input() headers: string[];
   @Input() elements: any[];
   @Input() allowedParameters: string[];
+  @Input() activeCamera: any;
 
   @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
 
   private _elements: any[];
   private selectedRow;
   private results;
+  private cameraHeaders;
+  private showParameters;
+  private showHeaders;
+  private paramsShown;
+
   pager: any = {};
   pagedItems: any[];
   CONFIG: any = {};
@@ -51,18 +57,28 @@ export class CamTableComponent implements OnChanges, OnInit {
   constructor(private pagerService: PagerService,
               translate: TranslateService,
               config: NxConfigService) {
-      this._elements = this.elements;
+
       this.CONFIG = config.getConfig();
+      this._elements = this.elements;
+
+      this.paramsShown = 6;
+      this.cameraHeaders = ['Manufacturer', 'Model', 'Type', 'Max Resolution', 'Max FPS', 'Codec', 'Audio', 'PTZ', 'Fisheye', 'Motion', 'I/O'];
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    const elements: SimpleChange = changes.elements;
-    this._elements = elements.currentValue;
-    this.results = this._elements.length;
-    this.setPage(1);
-  }
+    ngOnChanges(changes: SimpleChanges) {
+        // debugger;
+        if (changes.elements) {
+            this._elements = changes.elements.currentValue;
+            this.results = this._elements.length;
+            this.setPage(1);
+        }
+
+        this.showParameters = (changes.activeCamera.currentValue) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
+        this.showHeaders = (changes.activeCamera.currentValue) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
+    }
 
   ngOnInit() {
+      this.showParameters = this.allowedParameters;
       this.results = this._elements.length;
       this.setPage(1);
       this.csvFilename = this.getCurrentDate();

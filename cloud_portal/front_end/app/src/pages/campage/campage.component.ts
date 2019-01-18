@@ -29,7 +29,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     filter: any;
     emptyFilter: any;
     boolKeys: string[];
-    cameraHeaders: string[];
+    // cameraHeaders: string[];
     camerasTable: any;
     allowedParameters: string[];
     filterModel: any;
@@ -41,7 +41,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   private setupDefaults() {
       this.config = this.configService.getConfig();
-      this.cameraHeaders = ['Manufacturer', 'Model', 'Type', 'Max Resolution', 'Max FPS', 'Codec', 'Audio', 'PTZ', 'Fisheye', 'Motion', 'I/O'];
       this.camerasTable = [];
       this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isTwAudioSupported', 'isAptzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 

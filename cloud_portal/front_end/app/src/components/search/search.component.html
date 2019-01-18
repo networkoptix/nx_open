@@ -33,6 +33,16 @@
                        [selected]="select.selected ? select.selected : null">
             </nx-select>
         </div>
+
+        <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let multiselect of localFilter.multiselects">
+            <label>{{ multiselect.label }}</label>
+            <nx-multi-select name="vdMultiSelect"
+                             [items]="multiselectOptions.vendors"
+                             [ngModel]="filter.vendors"
+                             (ngModelChange)="modelChanged('vendors', $event)"
+                             canSelectAll>
+            </nx-multi-select>
+        </div>
     </div>
 
     <div class="row mt-3" [hidden]="!showAdvancedOptions">

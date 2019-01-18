@@ -13,9 +13,9 @@
     <div class="row pl-3 pr-3 d-flex" *ngIf="filterModel.query">
         <div class="order-1 order-lg-0" [ngClass]="{'col-12': !toggleCamview, 'col-lg-8 col-xl-9' : toggleCamview}">
             <nx-cam-table
-                    [headers]="cameraHeaders"
                     [elements]="camerasTable"
                     [allowedParameters]="allowedParameters"
+                    [activeCamera]="activeCamera"
                     (onRowClick)="activateCamera($event)">
             </nx-cam-table>
 

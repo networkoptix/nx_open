@@ -31,7 +31,7 @@
         <table class="table table-hover nx-table">
             <thead>
                 <tr *ngIf="results > 0">
-                    <th *ngFor="let header of headers" class="align-bottom">
+                    <th *ngFor="let header of showHeaders" class="align-bottom">
                         {{header}}
                     </th>
                 </tr>
@@ -39,7 +39,7 @@
             <tbody>
                 <tr *ngFor="let element of pagedItems  | keyvalue; let i = index" [ngClass]="{'selected': i == selectedRow}"
                     (click)="setClickedRow(i, element);">
-                    <td *ngFor="let p of allowedParameters" class="text-left">
+                    <td *ngFor="let p of showParameters" class="text-left">
                         <span *ngIf="isString(element.value[p]); else icon">
                             {{ element.value[p] }}
                         </span>
