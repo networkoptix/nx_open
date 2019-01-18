@@ -78,10 +78,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Could not cancel installation</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Installation completed</source>
         <translation></translation>
     </message>
@@ -893,6 +889,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Screen Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Bookmarks...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5462,6 +5462,10 @@ to %1</source>
         <source>Search</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Export Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSearchBookmarksModel</name>
@@ -8506,6 +8510,17 @@ to %1</source>
     <message>
         <source>Selected period cannot be exported for the current camera.</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n bookmarks</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Several bookmarks can be exported as layout only.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
