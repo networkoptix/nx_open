@@ -106,6 +106,18 @@ NodePtr createCameraNodes(
     const NodePtr root = ViewNode::create();
     const bool showExtraInfo = qnSettings->extraInfoInTree() == Qn::RI_FullInfo;
 
+    const auto createCameraNode =
+        [pool, showExtraInfo](const QnUuid& cameraId, bool isInvalidCamera) -> NodePtr
+        {
+            auto resource = pool->getResourceById(cameraId);
+            QString extraText =
+                showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
+            const auto cameraNode = createResourceNode(resource, extraText, true);
+            if (isInvalidCamera)
+                setNodeValidState(cameraNode, false);
+            return cameraNode;
+        };
+
     for (auto serverId: data.serverIds)
     {
         NodeList children;
@@ -118,12 +130,11 @@ NodePtr createCameraNodes(
                 NodeList groupChildren;
                 for (const auto cameraId: data.singleCamerasByGroupId.value(groupId))
                 {
-                    auto resource = pool->getResourceById(cameraId);
-                    QString extraText =
-                        showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
-                    const auto cameraNode = createResourceNode(resource, extraText, true);
-                    groupChildren.append(cameraNode);
+                    auto isInvalidCamera = data.invalidCameras.contains(cameraId);
+                    if (showInvalidCameras || !isInvalidCamera)
+                        groupChildren.append(createCameraNode(cameraId, isInvalidCamera));
                 }
+
                 auto groupResource =
                     data.allCameras.value(pool->getResourcesBySharedId(groupId).first()->getId());
                 QString groupExtraText =
@@ -138,18 +149,9 @@ NodePtr createCameraNodes(
         auto singleCameraIds = data.singleCamerasByServerId.value(serverId);
         for (const auto cameraId: singleCameraIds)
         {
-            const auto invalidCamera = data.invalidCameras.contains(cameraId);
-            if (invalidCamera && !showInvalidCameras)
-                continue;
-
-            auto resource = pool->getResourceById(cameraId);
-            QString extraText =
-                showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
-            const auto cameraNode = createResourceNode(resource, extraText, true);
-            if (invalidCamera)
-                setNodeValidState(cameraNode, false);
-
-            children.append(cameraNode);
+            auto isInvalidCamera = data.invalidCameras.contains(cameraId);
+            if (showInvalidCameras || !isInvalidCamera)
+                children.append(createCameraNode(cameraId, isInvalidCamera));
         }
 
         if (children.isEmpty())
