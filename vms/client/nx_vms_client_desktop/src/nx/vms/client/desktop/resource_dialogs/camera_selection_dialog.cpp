@@ -146,7 +146,8 @@ NodePtr createCameraNodes(
                 const auto groupNode = createGroupNode(groupResource, groupExtraText, true);
                 groupNode->addChildren(groupChildren);
 
-                children.append(groupNode);
+                if (groupNode->childrenCount())
+                    children.append(groupNode);
             }
         }
 
