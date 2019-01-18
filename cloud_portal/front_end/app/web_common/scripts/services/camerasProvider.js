@@ -365,9 +365,14 @@ angular.module('nxCommon')
                 }
         
                 if (Config.webclient.useSystemTime) {
-                    return self.systemAPI.getSystemTime().then(function (systemTime) {
-                        return setServerOffsetTime(systemTime.data.reply.utcTimeMs);
-                    });
+                    return self.systemAPI.getSystemTime()
+                        .then(function (systemTime) {
+                            if (systemTime.data.reply) {
+                                return setServerOffsetTime(systemTime.data.reply.utcTimeMs);
+                            }
+                            
+                            return $q.resolve({ message: 'Server does not support this API call' });
+                        });
                 }
                 return setServerOffsetTime();
             });
