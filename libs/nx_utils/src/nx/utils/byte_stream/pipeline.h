@@ -35,22 +35,6 @@ public:
     virtual int write(const void* data, size_t count) = 0;
 };
 
-/**
- * Output that converts byte stream and passes it to another output.
- * Can be used to organize chains of converters.
- */
-class NX_UTILS_API AbstractOutputConverter:
-    public AbstractOutput
-{
-public:
-    AbstractOutputConverter();
-
-    virtual void setOutput(AbstractOutput*);
-
-protected:
-    AbstractOutput* m_outputStream;
-};
-
 class NX_UTILS_API AbstractInput
 {
 public:
@@ -62,21 +46,38 @@ public:
     virtual int read(void* data, size_t count) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+// Converters.
+
+/**
+ * Output that converts byte stream and passes it to another output.
+ * Can be used to organize chains of converters.
+ */
+class NX_UTILS_API AbstractOutputConverter:
+    public AbstractOutput
+{
+public:
+    virtual void setOutput(AbstractOutput*);
+
+protected:
+    AbstractOutput* m_outputStream = nullptr;
+};
+
+// TODO: #ak It makes sense to remove AbstractInputConverter and make Converter implement only
+// AbstractOutput.
+
 class NX_UTILS_API AbstractInputConverter:
     public AbstractInput
 {
 public:
-    AbstractInputConverter();
-    virtual ~AbstractInputConverter() = default;
-
     virtual void setInput(AbstractInput*);
 
 protected:
-    AbstractInput* m_inputStream;
+    AbstractInput* m_inputStream = nullptr;
 };
 
 /**
- * Iterface of class that allows byte stream in both directions while converting it if needed.
+ * Interface of class that allows byte stream in both directions while converting it if needed.
  */
 class NX_UTILS_API AbstractTwoWayConverter:
     public AbstractInputConverter,
@@ -91,6 +92,55 @@ class NX_UTILS_API Converter:
 public:
     virtual bool eof() const = 0;
     virtual bool failed() const = 0;
+};
+
+/**
+ * By default, just forwards data without any conversion.
+ * Conversion can be enabled by setting converters with
+ * CompositeConverter::setInputConverter and CompositeConverter::setOutputConverter.
+ */
+class NX_UTILS_API CompositeConverter:
+    public Converter
+{
+    using base_type = Converter;
+
+public:
+    virtual int write(const void* data, size_t size) override;
+    virtual int read(void* data, size_t size) override;
+
+    virtual void setOutput(AbstractOutput*) override;
+    virtual void setInput(AbstractInput*) override;
+
+    virtual bool eof() const override;
+    virtual bool failed() const override;
+
+    void setInputConverter(AbstractInputConverter* inputConverter);
+    void setOutputConverter(AbstractOutputConverter* outputConverter);
+
+private:
+    AbstractInputConverter* m_inputConverter = nullptr;
+    AbstractOutputConverter* m_outputConverter = nullptr;
+};
+
+/**
+ * Input stream that transfers all data through a converter.
+ */
+class NX_UTILS_API OutputConverterToInputAdapter:
+    public AbstractInputConverter,
+    private AbstractOutput
+{
+public:
+    OutputConverterToInputAdapter(AbstractOutputConverter* converter);
+
+    virtual int read(void* data, size_t count) override;
+
+private:
+    AbstractOutputConverter* m_converter = nullptr;
+    std::string m_convertedData;
+
+    virtual int write(const void* data, size_t size) override;
+
+    int readCachedData(void* data, size_t count);
 };
 
 //-------------------------------------------------------------------------------------------------

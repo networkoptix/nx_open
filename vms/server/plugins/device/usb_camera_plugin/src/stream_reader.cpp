@@ -8,7 +8,6 @@
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
 
-
 namespace nx {
 namespace usb_cam {
 
@@ -148,15 +147,18 @@ void StreamReaderPrivate::ensureConsumerAdded()
 
 std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Packet *packet)
 {
-    int keyPacket = packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0;
-
+    uint64_t timestamp = packet->timestamp();
+#if defined(USE_MSEC)
+    timestamp *= kUsecInMsec;
+#endif
+ 
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
         packet->mediaType() == AVMEDIA_TYPE_VIDEO ? 0 : 1,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
         ffmpeg::utils::toNxCompressionType(packet->codecId()),
-        packet->timestamp() * kUsecInMsec,
-        keyPacket,
+        timestamp,
+        packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0,
         0));
 
     nxPacket->resizeBuffer(packet->size());
@@ -176,6 +178,35 @@ void StreamReaderPrivate::removeConsumer()
 {
     removeVideoConsumer();
     removeAudioConsumer();
+}
+
+bool StreamReaderPrivate::interrupted()
+{
+    if (m_interrupted)
+    {
+        m_interrupted = false;
+        return true;
+    }
+    return false;
+}
+
+int StreamReaderPrivate::handleNxError()
+{
+    removeConsumer();
+
+    if (interrupted())
+        return nxcip::NX_INTERRUPTED;
+
+
+    if (m_camera->ioError())
+        return nxcip::NX_IO_ERROR;
+
+    return nxcip::NX_OTHER_ERROR;
+}
+
+bool StreamReaderPrivate::shouldStopWaitingForData() const
+{
+    return m_interrupted || m_camera->ioError();
 }
 
 } // namespace usb_cam

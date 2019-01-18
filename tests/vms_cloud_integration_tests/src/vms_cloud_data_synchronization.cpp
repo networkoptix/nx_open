@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/db/ec2/data_conversion.h>
+
+#include <nx/network/stream_proxy.h>
+#include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
@@ -36,6 +40,11 @@ protected:
     virtual void SetUp() override
     {
         ASSERT_TRUE(initializeCloud());
+        registerOwnerAccount();
+    }
+
+    void registerOwnerAccount()
+    {
         m_ownerAccount = cloud().registerCloudAccount();
     }
 
@@ -142,6 +151,16 @@ private:
 
 std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommonModule;
 
+TEST_F(VmsCloudDataSynchronization, data_is_synchronized)
+{
+    givenCloudSystemWithServerCount(1);
+
+    addCloudUserOnServer(0);
+    addCloudUserOnCloud();
+
+    waitForDataSynchronized(cloud(), server(0));
+}
+
 TEST_F(
     VmsCloudDataSynchronization,
     data_added_while_mediaserver_is_offline_is_synchronized_when_back_online)
@@ -192,6 +211,47 @@ TEST_F(VmsCloudDataSynchronization, using_cloud_does_not_trim_data)
         server(1).process().moduleInstance().get());
 
     waitForDataSynchronized(server(0), server(1));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class VmsCloudDataSynchronizationThroughFirewall:
+    public VmsCloudDataSynchronization
+{
+    using base_type = VmsCloudDataSynchronization;
+
+protected:
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(initializeCloud());
+
+        auto tcpServerSocket = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+        ASSERT_TRUE(tcpServerSocket->bind(nx::network::SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(tcpServerSocket->listen());
+        ASSERT_TRUE(tcpServerSocket->setNonBlockingMode(true));
+
+        const auto serverEndpoint = tcpServerSocket->getLocalAddress();
+
+        auto proxy = std::make_unique<nx::network::StreamProxy>();
+        proxy->startProxy(
+            std::make_unique<nx::network::StreamServerSocketToAcceptorWrapper>(
+                std::move(tcpServerSocket)),
+            cloud().cdbEndpoint());
+
+        cloud().installProxyBeforeCdb(std::move(proxy), serverEndpoint);
+
+        registerOwnerAccount();
+    }
+};
+
+TEST_F(VmsCloudDataSynchronizationThroughFirewall, data_is_synchronized)
+{
+    givenCloudSystemWithServerCount(1);
+
+    addCloudUserOnServer(0);
+    addCloudUserOnCloud();
+
+    waitForDataSynchronized(cloud(), server(0));
 }
 
 } // namespace tests

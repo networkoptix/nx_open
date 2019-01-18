@@ -482,7 +482,7 @@ private:
                     this->m_socket,
                     aio::etWrite,
                     this,
-                    boost::none,
+                    std::nullopt,
                     [this, resolvedAddress, sendTimeout]()
                     {
                         this->m_socket->connect(
