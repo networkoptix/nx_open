@@ -83,7 +83,8 @@ public:
         if (m_dataToParse.isEmpty())
         {
             // Reporting end of file to the parser.
-            invokeMessageParser();
+            if (!invokeMessageParser())
+                return; //< "false" signals object removal.
         }
         else
         {
