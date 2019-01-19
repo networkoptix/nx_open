@@ -39,19 +39,19 @@ void SystemMergeManager::startMergingSystems(
     const AuthorizationInfo& authzInfo,
     const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemToBeMerged,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     NX_VERBOSE(this, lm("Requested merge of system %1 into %2")
         .args(idOfSystemToBeMerged, idOfSystemToMergeTo));
 
-    const auto resultCode = validateRequestInput(
+    const auto result = validateRequestInput(
         idOfSystemToMergeTo,
         idOfSystemToBeMerged);
-    if (resultCode != api::ResultCode::ok)
+    if (result != api::ResultCode::ok)
     {
         NX_DEBUG(this, lm("Merge system %1 into %2 request failed input check. %3")
-            .args(idOfSystemToBeMerged, idOfSystemToMergeTo, QnLexical::serialized(resultCode)));
-        return completionHandler(resultCode);
+            .args(idOfSystemToBeMerged, idOfSystemToMergeTo, QnLexical::serialized(result.code)));
+        return completionHandler(result);
     }
 
     auto mergeRequestContext = std::make_unique<MergeRequestContext>();
@@ -69,7 +69,7 @@ void SystemMergeManager::startMergingSystems(
 
 void SystemMergeManager::processMergeHistoryRecord(
     const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     m_queryExecutor->executeUpdate(
         [this, mergeHistoryRecord](
@@ -202,7 +202,7 @@ void SystemMergeManager::loadSystemMergeInfo()
     NX_DEBUG(this, lm("Loaded %1 ongoing merges").args(ongoingMerges.size()));
 }
 
-api::ResultCode SystemMergeManager::validateRequestInput(
+api::Result SystemMergeManager::validateRequestInput(
     const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemToBeMerged)
 {
@@ -276,7 +276,9 @@ void SystemMergeManager::processVmsMergeRequestResult(
             .args(mergeRequestContext->idOfSystemToBeMerged,
                 mergeRequestContext->idOfSystemToMergeTo,
                 QnLexical::serialized(vmsRequestResult.resultCode)));
-        finishMerge(mergeRequestContext, api::ResultCode::vmsRequestFailure);
+        finishMerge(
+            mergeRequestContext,
+            api::Result(api::ResultCode::vmsRequestFailure, vmsRequestResult.vmsErrorDescription));
         return;
     }
 
@@ -332,12 +334,12 @@ void SystemMergeManager::saveSystemMergeInfoToCache(const dao::MergeInfo& mergeI
 
 void SystemMergeManager::finishMerge(
     MergeRequestContext* mergeRequestContextPtr,
-    api::ResultCode resultCode)
+    api::Result result)
 {
     NX_VERBOSE(this, lm("Merge %1 into %2. Reporting %3")
         .args(mergeRequestContextPtr->idOfSystemToBeMerged,
             mergeRequestContextPtr->idOfSystemToMergeTo,
-            QnLexical::serialized(resultCode)));
+            QnLexical::serialized(result.code)));
 
     std::unique_ptr<MergeRequestContext> mergeRequestContext;
     {
@@ -347,7 +349,7 @@ void SystemMergeManager::finishMerge(
         mergeRequestContext.swap(it->second);
     }
 
-    mergeRequestContext->completionHandler(resultCode);
+    mergeRequestContext->completionHandler(result);
 }
 
 } // namespace nx::cloud::db

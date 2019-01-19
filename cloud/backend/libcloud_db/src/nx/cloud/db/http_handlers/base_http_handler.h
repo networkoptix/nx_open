@@ -129,14 +129,14 @@ public:
         processRequest(
             std::move(requestContext),
             std::move(inputData),
-            [this](api::ResultCode resultCode, Output... outData)
+            [this](api::Result result, Output... outData)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
-                    QnLexical::serialized(resultCode).toLatin1());
+                    QnLexical::serialized(result.code).toLatin1());
 
                 this->requestCompleted(
-                    resultCodeToFusionRequestResult(resultCode),
+                    apiResultToFusionRequestResult(result),
                     std::move(outData)...);
             });
     }
@@ -145,7 +145,7 @@ protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         Input inputData,
-        std::function<void(api::ResultCode, Output...)> completionHandler) = 0;
+        std::function<void(api::Result, Output...)> completionHandler) = 0;
 };
 
 /**
@@ -161,7 +161,7 @@ public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
         Input inputData,
-        std::function<void(api::ResultCode resultCode, Output... outData)>&& completionHandler)
+        std::function<void(api::Result result, Output... outData)>&& completionHandler)
     > ExecuteRequestFunc;
 
     FiniteMsgBodyHttpHandler(
@@ -182,7 +182,7 @@ protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         Input inputData,
-        std::function<void(api::ResultCode, Output...)> completionHandler) override
+        std::function<void(api::Result, Output...)> completionHandler) override
     {
         m_requestFunc(
             AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
@@ -231,14 +231,14 @@ public:
 
         processRequest(
             std::move(requestContext),
-            [this](api::ResultCode resultCode, Output... outData)
+            [this](api::Result result, Output... outData)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
-                    QnLexical::serialized(resultCode).toLatin1());
+                    QnLexical::serialized(result.code).toLatin1());
 
                 this->requestCompleted(
-                    resultCodeToFusionRequestResult(resultCode),
+                    apiResultToFusionRequestResult(result),
                     std::move(outData)...);
             });
     }
@@ -246,7 +246,7 @@ public:
 protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
-        std::function<void(api::ResultCode, Output...)> completionHandler) = 0;
+        std::function<void(api::Result, Output...)> completionHandler) = 0;
 };
 
 template<typename... Output>
@@ -256,7 +256,7 @@ class FiniteMsgBodyHttpHandler<void, Output...>:
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode resultCode, Output... outData)> completionHandler)
+        std::function<void(api::Result /*result*/, Output... /*outData*/)> completionHandler)
     > ExecuteRequestFunc;
 
     FiniteMsgBodyHttpHandler(
@@ -276,7 +276,7 @@ public:
 protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
-        std::function<void(api::ResultCode, Output...)> completionHandler) override
+        std::function<void(api::Result, Output...)> completionHandler) override
     {
         m_requestFunc(
             AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
@@ -301,7 +301,7 @@ public:
         const AuthorizationInfo& authzInfo,
         InputData... inputData,
         nx::utils::MoveOnlyFunc<
-        void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)>
+        void(api::Result, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)>
             completionHandler)> ExecuteRequestFunc;
 
     AbstractFreeMsgBodyHttpHandler(
@@ -335,14 +335,14 @@ public:
             AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
             std::move(inputData)...,
             [this](
-                api::ResultCode resultCode,
+                api::Result result,
                 std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
-                    QnLexical::serialized(resultCode).toLatin1());
+                    QnLexical::serialized(result.code).toLatin1());
 
-                if (resultCode == api::ResultCode::ok)
+                if (result == api::ResultCode::ok)
                 {
                     this->requestCompleted(
                         nx::network::http::StatusCode::ok,
@@ -351,7 +351,7 @@ public:
                 else
                 {
                     this->requestCompleted(
-                        resultCodeToFusionRequestResult(resultCode));
+                        apiResultToFusionRequestResult(result));
                 }
             });
     }

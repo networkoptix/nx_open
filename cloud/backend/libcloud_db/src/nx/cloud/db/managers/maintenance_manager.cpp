@@ -29,7 +29,7 @@ MaintenanceManager::~MaintenanceManager()
 void MaintenanceManager::getVmsConnections(
     const AuthorizationInfo& /*authzInfo*/,
     std::function<void(
-        api::ResultCode,
+        api::Result,
         api::VmsConnectionDataList)> completionHandler)
 {
     m_timer.post(
@@ -55,7 +55,7 @@ void MaintenanceManager::getTransactionLog(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemId systemId,
     std::function<void(
-        api::ResultCode,
+        api::Result,
         ::ec2::ApiTransactionDataList)> completionHandler)
 {
     using namespace std::placeholders;
@@ -71,7 +71,7 @@ void MaintenanceManager::getTransactionLog(
 
 void MaintenanceManager::getStatistics(
     const AuthorizationInfo& /*authzInfo*/,
-    std::function<void(api::ResultCode, data::Statistics)> completionHandler)
+    std::function<void(api::Result, data::Statistics)> completionHandler)
 {
     m_timer.post(
         [this,
@@ -97,7 +97,7 @@ void MaintenanceManager::onTransactionLogRead(
     std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
     vms::api::TranState /*readedUpTo*/,
     std::function<void(
-        api::ResultCode,
+        api::Result,
         ::ec2::ApiTransactionDataList)> completionHandler)
 {
     api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);

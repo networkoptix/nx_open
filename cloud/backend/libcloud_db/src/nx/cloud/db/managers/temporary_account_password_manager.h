@@ -36,7 +36,7 @@ public:
     virtual void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountCredentials tmpPasswordData,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::Result)> completionHandler) = 0;
 
     virtual void addRandomCredentials(
         const std::string& accountEmail,
@@ -90,12 +90,12 @@ public:
         const nx::network::http::StringType& username,
         const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler) override;
 
     virtual void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountCredentials tmpPasswordData,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::Result)> completionHandler) override;
 
     /**
      * Adds password and password digest.
@@ -189,7 +189,7 @@ private:
         const QnMutexLockerBase& lk,
         const std::string& username,
         std::function<bool(const nx::Buffer&)> checkPasswordHash,
-        api::ResultCode* authResultCode);
+        api::Result* authResultCode);
 
     void runExpirationRulesOnSuccessfulLogin(
         const QnMutexLockerBase& lk,

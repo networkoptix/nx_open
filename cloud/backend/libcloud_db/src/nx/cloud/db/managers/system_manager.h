@@ -125,17 +125,18 @@ public:
         const nx::network::http::StringType& username,
         const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler) override;
 
     /** Binds system to an account associated with authzInfo. */
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
         data::SystemRegistrationData registrationData,
-        std::function<void(api::ResultCode, data::SystemData)> completionHandler);
+        std::function<void(api::Result, data::SystemData)> completionHandler);
+
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
     /**
      * Fetches systems satisfying specified filter.
      * @param eventReceiver Events related to returned data are reported to this functor
@@ -146,31 +147,33 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
-        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler);
+        std::function<void(api::Result, api::SystemDataExList)> completionHandler);
+
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
+
     /** Provides list of cloud accounts who have access to this system. */
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler);
+        std::function<void(api::Result, api::SystemSharingExList)> completionHandler);
 
     void getAccessRoleList(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
+        std::function<void(api::Result, api::SystemAccessRoleList)> completionHandler);
 
     void updateSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemAttributesUpdate data,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     void recordUserSessionStart(
         const AuthorizationInfo& authzInfo,
         data::UserSessionDescriptor userSessionDescriptor,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
 
@@ -325,7 +328,7 @@ private:
         nx::sql::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
         InsertNewSystemToDbResult systemData,
-        std::function<void(api::ResultCode, data::SystemData)> completionHandler);
+        std::function<void(api::Result, data::SystemData)> completionHandler);
 
     void markSystemForDeletionInCache(const std::string& systemId);
 
@@ -337,7 +340,7 @@ private:
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::sql::DBResult dbResult,
         data::SystemId systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     //---------------------------------------------------------------------------------------------
     // System sharing methods. TODO: #ak: move to a separate class
@@ -469,7 +472,7 @@ private:
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::sql::DBResult dbResult,
         data::SystemAttributesUpdate data,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     template<typename SystemDictionary>
     void activateSystemIfNeeded(
