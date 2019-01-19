@@ -15,34 +15,37 @@ class AccountManager:
     public AsyncRequestsExecutor
 {
 public:
-    AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
+    AccountManager(network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher);
 
-    //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(
         api::AccountRegistrationData accountData,
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;
-    //!Implementation of api::AccountManager::activateAccount
+    
     virtual void activateAccount(
         api::AccountConfirmationCode activationCode,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler) override;
-    //!Implementation of api::AccountManager::getAccount
+    
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
+    
     virtual void updateAccount(
         api::AccountUpdateData accountData,
         std::function<void(api::ResultCode)> completionHandler) override;
+    
     virtual void resetPassword(
         api::AccountEmail accountEmail,
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;
+    
     virtual void reactivateAccount(
         api::AccountEmail accountEmail,
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;
+    
     virtual void createTemporaryCredentials(
         api::TemporaryCredentialsParams params,
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) override;
