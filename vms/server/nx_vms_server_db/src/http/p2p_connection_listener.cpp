@@ -320,7 +320,8 @@ void ConnectionProcessor::run()
         return;
 
     bool useWebSocket = false;
-    if (remotePeer.transport != P2pTransportMode::http)
+    if (remotePeer.transport != P2pTransportMode::http
+        && !d->request.requestLine.url.path().contains(ConnectionBase::kHttpUrlPath))
     {
         auto error = websocket::validateRequest(d->request, &d->response);
         if (error != websocket::Error::noError && remotePeer.transport == P2pTransportMode::websocket)

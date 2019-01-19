@@ -23,6 +23,11 @@ namespace p2p {
 
 SendCounters ConnectionBase::m_sendCounters = {};
 
+const QString ConnectionBase::kDeprecatedUrlPath(lit("/ec2/messageBus"));
+const QString ConnectionBase::kWebsocketUrlPath(lit("/ec2/transactionBus"));
+const QString ConnectionBase::kHttpUrlPath(lit("/ec2/httpTransactionBus"));
+
+
 #if defined(CHECK_SEQUENCE)
     const int kMessageOffset = 8;
 #else
@@ -307,9 +312,15 @@ void ConnectionBase::onHttpClientDone()
     }
     else
     {
+        auto url = m_httpClient->url();
+        auto urlPath = url.path().replace(kWebsocketUrlPath, kHttpUrlPath);
+        url.setPath(urlPath);
+
         m_p2pTransport.reset(new P2PHttpClientTransport(
             std::move(m_httpClient),
-            remotePeer.connectionGuid.toByteArray()));
+            remotePeer.connectionGuid.toByteArray(),
+            network::websocket::FrameType::binary,
+            url));
     }
 
     m_p2pTransport->start();
