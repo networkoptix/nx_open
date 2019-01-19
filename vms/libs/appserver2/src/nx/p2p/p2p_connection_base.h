@@ -168,6 +168,7 @@ private:
     nx::network::http::HttpHeaders m_additionalRequestHeaders;
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
+    QByteArray m_connectionGuid;
 };
 
 QString toString(ConnectionBase::State value);

@@ -318,7 +318,7 @@ void ConnectionBase::onHttpClientDone()
 
         m_p2pTransport.reset(new P2PHttpClientTransport(
             std::move(m_httpClient),
-            remotePeer.connectionGuid.toByteArray(),
+            m_connectionGuid,
             network::websocket::FrameType::binary,
             url));
     }
@@ -332,7 +332,8 @@ void ConnectionBase::startConnection()
 {
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
-    headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray());
+    m_connectionGuid = QnUuid::createUuid().toByteArray();
+    headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_httpClient->addRequestHeaders(headers);
 
     auto requestUrl = m_remotePeerUrl;

@@ -46,7 +46,7 @@ ConnectionProcessor::~ConnectionProcessor()
     stop();
 }
 
-vms::api::PeerDataEx ConnectionProcessor::localPeer() const
+vms::api::PeerDataEx ConnectionProcessor::localPeer(const vms::api::PeerDataEx& remotePeer) const
 {
     vms::api::PeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
@@ -59,6 +59,7 @@ vms::api::PeerDataEx ConnectionProcessor::localPeer() const
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
     localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    localPeer.connectionGuid = remotePeer.connectionGuid;
     return localPeer;
 }
 
@@ -334,7 +335,7 @@ void ConnectionProcessor::run()
         useWebSocket = (error == websocket::Error::noError);
     }
 
-    serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
+    serializePeerData(d->response, localPeer(remotePeer), remotePeer.dataFormat);
     sendResponse(
         useWebSocket ? http::StatusCode::switchingProtocols : http::StatusCode::ok,
         nx::network::http::StringType());
