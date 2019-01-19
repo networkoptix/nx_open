@@ -59,7 +59,7 @@ protected:
         m_systemManager->unbindSystem(
             authorizationInfo,
             systemIdHolder,
-            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+            [&done](api::Result result) { done.set_value(result.code); });
         m_prevResultCode = done.get_future().get();
     }
 
@@ -75,7 +75,7 @@ protected:
         m_systemManager->shareSystem(
             authorizationInfo,
             systemSharing,
-            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+            [&done](api::Result result) { done.set_value(result.code); });
         m_prevResultCode = done.get_future().get();
     }
 
@@ -90,7 +90,7 @@ protected:
         m_systemManager->updateSystem(
             authorizationInfo,
             systemUpdate,
-            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+            [&done](api::Result result) { done.set_value(result.code); });
         m_prevResultCode = done.get_future().get();
     }
 

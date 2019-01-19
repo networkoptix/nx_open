@@ -254,7 +254,7 @@ protected:
     void thenAuthenticationResponseIsProvided()
     {
         auto authResponse = m_authResponses.pop();
-        ASSERT_EQ(api::ResultCode::ok, std::get<0>(authResponse));
+        ASSERT_EQ(api::ResultCode::ok, std::get<0>(authResponse).code);
     }
 
     void thenSystemNonceIsValidForAuthentication()
@@ -307,7 +307,7 @@ private:
     std::map<
         std::pair<std::string, QnUuid>,
         api::AuthInfo> m_updateUserAuthInfoTransactions;
-    nx::utils::SyncQueue<std::tuple<api::ResultCode, api::AuthResponse>> m_authResponses;
+    nx::utils::SyncQueue<std::tuple<api::Result, api::AuthResponse>> m_authResponses;
     std::map<std::string /*email*/, api::AuthInfo> m_accountToUserAuthInfo;
 
     std::unique_ptr<dao::AbstractUserAuthentication> createUserAuthenticationDao()
@@ -414,10 +414,10 @@ private:
     }
 
     void saveAuthenticationResponse(
-        api::ResultCode resultCode,
+        api::Result result,
         api::AuthResponse authResponse)
     {
-        m_authResponses.push(std::make_tuple(resultCode, authResponse));
+        m_authResponses.push(std::make_tuple(result, authResponse));
     }
 };
 

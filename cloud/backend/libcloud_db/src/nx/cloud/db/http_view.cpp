@@ -226,7 +226,7 @@ void HttpView::registerApiHandlers(
             const AuthorizationInfo& authzInfo,
             const network::http::RequestPathParams& restPathParams,
             data::SystemId inputData,
-            std::function<void(api::ResultCode)> completionHandler)
+            std::function<void(api::Result)> completionHandler)
         {
             m_controller->systemMergeManager().startMergingSystems(
                 authzInfo,
@@ -308,7 +308,7 @@ void HttpView::registerHttpHandler(
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
         InputData inputData,
-        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+        std::function<void(api::Result, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
@@ -337,7 +337,7 @@ void HttpView::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+        std::function<void(api::Result, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
@@ -379,7 +379,7 @@ public:
     //    void(const AuthorizationInfo& authzInfo,
     //        const std::vector<nx::network::http::StringType>& restPathParams,
     //        Input inputData,
-    //        std::function<void(api::ResultCode)> completionHandler);
+    //        std::function<void(api::Result)> completionHandler);
 
     WriteOnlyRestHandler(
         EntityType entityType,
@@ -396,7 +396,7 @@ protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         Input inputData,
-        std::function<void(api::ResultCode)> completionHandler) override
+        std::function<void(api::Result)> completionHandler) override
     {
         m_func(
             AuthorizationInfo(std::exchange(requestContext.authInfo, {})),

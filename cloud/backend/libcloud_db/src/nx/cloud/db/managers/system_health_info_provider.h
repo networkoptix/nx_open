@@ -29,7 +29,7 @@ public:
     virtual void getSystemHealthHistory(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) = 0;
+        std::function<void(api::Result, api::SystemHealthHistory)> completionHandler) = 0;
 };
 
 /**
@@ -49,7 +49,7 @@ public:
     virtual void getSystemHealthHistory(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) override;
+        std::function<void(api::Result, api::SystemHealthHistory)> completionHandler) override;
 
 private:
     clusterdb::engine::ConnectionManager* m_ec2ConnectionManager;

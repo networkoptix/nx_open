@@ -76,13 +76,14 @@ ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statu
     }
 }
 
-nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCode)
+nx::network::http::FusionRequestResult apiResultToFusionRequestResult(Result result)
 {
-    if (resultCode == ResultCode::ok)
+    if (result == ResultCode::ok)
         return nx::network::http::FusionRequestResult();
 
-    nx::network::http::FusionRequestErrorClass requestResultCode = nx::network::http::FusionRequestErrorClass::noError;
-    switch (resultCode)
+    nx::network::http::FusionRequestErrorClass requestResultCode = 
+        nx::network::http::FusionRequestErrorClass::noError;
+    switch (result.code)
     {
         case ResultCode::notAuthorized:
         case ResultCode::forbidden:
@@ -115,9 +116,11 @@ nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(ResultCod
 
     return nx::network::http::FusionRequestResult(
         requestResultCode,
-        QnLexical::serialized(resultCode),
-        static_cast<int>(resultCode),
-        QnLexical::serialized(resultCode));
+        QnLexical::serialized(result.code),
+        static_cast<int>(result.code),
+        result.description.empty()
+            ? QnLexical::serialized(result.code)
+            : QString::fromStdString(result.description));
 }
 
 ResultCode fusionRequestResultToResultCode(nx::network::http::FusionRequestResult result)

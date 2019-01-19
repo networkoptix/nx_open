@@ -58,11 +58,11 @@ void TemporaryAccountPasswordManager::authenticateByName(
     const nx::network::http::StringType& username,
     const std::function<bool(const nx::Buffer&)>& checkPasswordHash,
     nx::utils::stree::ResourceContainer* const authProperties,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler)
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto authResultCode = api::ResultCode::notAuthorized;
+    api::Result authResultCode(api::ResultCode::notAuthorized);
     const data::TemporaryAccountCredentialsEx* credentials =
         findMatchingCredentials(lock, username.toStdString(), checkPasswordHash, &authResultCode);
 
@@ -84,7 +84,7 @@ void TemporaryAccountPasswordManager::authenticateByName(
 void TemporaryAccountPasswordManager::registerTemporaryCredentials(
     const AuthorizationInfo& /*authzInfo*/,
     data::TemporaryAccountCredentials tmpPasswordData,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     data::TemporaryAccountCredentialsEx tmpPasswordDataInternal(std::move(tmpPasswordData));
     tmpPasswordDataInternal.id = QnUuid::createUuid().toSimpleString().toStdString();
@@ -330,7 +330,7 @@ const data::TemporaryAccountCredentialsEx*
         const QnMutexLockerBase& /*lock*/,
         const std::string& username,
         std::function<bool(const nx::Buffer&)> checkPasswordHash,
-        api::ResultCode* authResultCode)
+        api::Result* authResultCode)
 {
     *authResultCode = api::ResultCode::badUsername;
 

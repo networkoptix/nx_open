@@ -39,6 +39,7 @@ public:
     virtual void afterUpdatingAccountPassword(
         nx::sql::QueryContext* const /*queryContext*/,
         const api::AccountData& /*account*/) {}
+
     virtual void afterUpdatingAccount(
         nx::sql::QueryContext*,
         const data::AccountUpdateDataWithEmail&) {}
@@ -104,7 +105,7 @@ public:
         const nx::network::http::StringType& username,
         const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler) override;
 
     //---------------------------------------------------------------------------------------------
     // Public API methods
@@ -115,38 +116,41 @@ public:
     void registerAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountRegistrationData accountData,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
+        std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler );
     /**
      * On success, account moved to "activated" state.
      */
     void activate(
         const AuthorizationInfo& authzInfo,
         data::AccountConfirmationCode emailVerificationCode,
-        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
+        std::function<void(api::Result, api::AccountEmail)> completionHandler );
 
     /**
      * Retrieves account corresponding to authorization data \a authzInfo.
      */
     void getAccount(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, data::AccountData)> completionHandler);
+        std::function<void(api::Result, data::AccountData)> completionHandler);
+
     void updateAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountUpdateData accountData,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
+
     void resetPassword(
         const AuthorizationInfo& authzInfo,
         data::AccountEmail accountEmail,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+        std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler);
+
     void reactivateAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountEmail accountEmail,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+        std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler);
 
     void createTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryCredentialsParams params,
-        std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
+        std::function<void(api::Result, api::TemporaryCredentials)> completionHandler);
 
     //---------------------------------------------------------------------------------------------
 
@@ -219,7 +223,7 @@ private:
         nx::sql::DBResult resultCode,
         std::string email,
         data::AccountConfirmationCode resultData,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+        std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler);
 
     nx::sql::DBResult verifyAccount(
         nx::sql::QueryContext* const tran,
@@ -231,7 +235,7 @@ private:
         nx::sql::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         std::string accountEmail,
-        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler);
+        std::function<void(api::Result, api::AccountEmail)> completionHandler);
 
     void activateAccountInCache(
         std::string accountEmail,
@@ -251,10 +255,10 @@ private:
 
     void temporaryCredentialsSaved(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        api::ResultCode resultCode,
+        api::Result result,
         const std::string& accountEmail,
         api::TemporaryCredentials temporaryCredentials,
-        std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
+        std::function<void(api::Result, api::TemporaryCredentials)> completionHandler);
 };
 
 } // namespace nx::cloud::db

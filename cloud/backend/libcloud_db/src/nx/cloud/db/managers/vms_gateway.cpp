@@ -182,6 +182,15 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
 {
     VmsRequestResult result;
     result.resultCode = VmsResultCode::networkError;
+    result.vmsErrorDescription = vmsResult.errorString.toStdString();
+
+    if (clientPtr->prevRequestSysErrorCode() != SystemError::noError)
+    {
+        result.resultCode = VmsResultCode::networkError;
+        result.vmsErrorDescription = 
+            SystemError::toString(clientPtr->prevRequestSysErrorCode()).toStdString();
+        return result;
+    }
 
     if (vmsResult.error == QnRestResult::Error::CantProcessRequest)
     {
@@ -202,7 +211,7 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
                 break;
 
             default:
-                result.resultCode = VmsResultCode::networkError;
+                result.resultCode = VmsResultCode::logicalError;
                 break;
         }
     }

@@ -77,7 +77,7 @@ protected:
         using F = void (nx::cloud::db::AccountManager::*)(
             const AuthorizationInfo& authzInfo,
             data::AccountUpdateData accountData,
-            std::function<void(api::ResultCode)> completionHandler);
+            std::function<void(api::Result)> completionHandler);
 
         nx::utils::stree::ResourceContainer authorizationResources;
         authorizationResources.put(attr::secureSource, true);
@@ -89,12 +89,10 @@ protected:
         data::AccountUpdateData accountData;
         accountData.passwordHa1 = nx::utils::generateRandomName(7).toStdString();
 
-        api::ResultCode resultCode = api::ResultCode::ok;
-        std::tie(resultCode) =
-            makeSyncCall<api::ResultCode>(
-                std::bind(static_cast<F>(&nx::cloud::db::AccountManager::updateAccount),
-                    m_accountManager.get(), authzInfo, accountData, _1));
-        ASSERT_EQ(api::ResultCode::ok, resultCode);
+        auto [result] = makeSyncCall<api::Result>(
+            std::bind(static_cast<F>(&nx::cloud::db::AccountManager::updateAccount),
+                m_accountManager.get(), authzInfo, accountData, _1));
+        ASSERT_EQ(api::ResultCode::ok, result.code);
     }
 
     void whenResetPassword()
@@ -104,7 +102,7 @@ protected:
         using ResetPasswordFunc = void(nx::cloud::db::AccountManager::*)(
             const AuthorizationInfo&,
             data::AccountEmail,
-            std::function<void(api::ResultCode, data::AccountConfirmationCode)>);
+            std::function<void(api::Result, data::AccountConfirmationCode)>);
 
         nx::utils::stree::ResourceContainer authorizationResources;
         authorizationResources.put(attr::secureSource, true);
@@ -113,11 +111,11 @@ protected:
         data::AccountEmail accountEmail;
         accountEmail.email = m_account.email;
 
-        const std::tuple<api::ResultCode, data::AccountConfirmationCode> result =
-            makeSyncCall<api::ResultCode, data::AccountConfirmationCode>(
+        auto [result, accountConfirmationCode] = 
+            makeSyncCall<api::Result, data::AccountConfirmationCode>(
                 std::bind(static_cast<ResetPasswordFunc>(&nx::cloud::db::AccountManager::resetPassword),
                     m_accountManager.get(), authzInfo, accountEmail, _1));
-        ASSERT_EQ(api::ResultCode::ok, std::get<0>(result));
+        ASSERT_EQ(api::ResultCode::ok, result.code);
     }
 
     void thenExtensionHasBeenInvoked()
@@ -195,12 +193,12 @@ private:
         accountRegistrationData.fullName = "H Z";
         accountRegistrationData.passwordHa1 = nx::utils::generateRandomName(22).toStdString();
 
-        api::ResultCode resultCode = api::ResultCode::ok;
-        std::tie(resultCode, *accountConfirmationCode) =
-            makeSyncCall<api::ResultCode, data::AccountConfirmationCode>(
+        api::Result result;
+        std::tie(result, *accountConfirmationCode) =
+            makeSyncCall<api::Result, data::AccountConfirmationCode>(
                 std::bind(&nx::cloud::db::AccountManager::registerAccount, m_accountManager.get(),
                     authzInfo, accountRegistrationData, _1));
-        ASSERT_EQ(api::ResultCode::ok, resultCode);
+        ASSERT_EQ(api::ResultCode::ok, result.code);
     }
 
     void activateAccount(const data::AccountConfirmationCode& accountConfirmationCode)
@@ -211,13 +209,11 @@ private:
         authorizationResources.put(attr::secureSource, true);
         AuthorizationInfo authzInfo(std::move(authorizationResources));
 
-        api::ResultCode resultCode = api::ResultCode::ok;
-        api::AccountEmail accountEmail;
-        std::tie(resultCode, accountEmail) =
-            makeSyncCall<api::ResultCode, api::AccountEmail>(
+        auto [result, accountEmail] =
+            makeSyncCall<api::Result, api::AccountEmail>(
                 std::bind(&nx::cloud::db::AccountManager::activate, m_accountManager.get(),
                     authzInfo, accountConfirmationCode, _1));
-        ASSERT_EQ(api::ResultCode::ok, resultCode);
+        ASSERT_EQ(api::ResultCode::ok, result.code);
     }
 
     void getAccount(const std::string& accountEmail, data::AccountData* account)
@@ -228,12 +224,12 @@ private:
         authorizationResources.put(attr::authAccountEmail, QString::fromStdString(accountEmail));
         AuthorizationInfo authzInfo(std::move(authorizationResources));
 
-        api::ResultCode resultCode = api::ResultCode::ok;
-        std::tie(resultCode, *account) =
-            makeSyncCall<api::ResultCode, api::AccountData>(
+        api::Result result;
+        std::tie(result, *account) =
+            makeSyncCall<api::Result, api::AccountData>(
                 std::bind(&nx::cloud::db::AccountManager::getAccount, m_accountManager.get(),
                     authzInfo, _1));
-        ASSERT_EQ(api::ResultCode::ok, resultCode);
+        ASSERT_EQ(api::ResultCode::ok, result.code);
     }
 };
 

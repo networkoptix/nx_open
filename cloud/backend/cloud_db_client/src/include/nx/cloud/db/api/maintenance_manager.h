@@ -46,6 +46,7 @@ public:
      */
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) = 0;
+
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) = 0;
 };

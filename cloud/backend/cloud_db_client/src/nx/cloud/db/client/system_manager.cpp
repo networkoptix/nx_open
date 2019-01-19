@@ -9,9 +9,9 @@
 namespace nx::cloud::db::client {
 
 SystemManager::SystemManager(
-    network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher)
+    network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher)
     :
-    AsyncRequestsExecutor(cloudModuleEndPointFetcher)
+    AsyncRequestsExecutor(cloudModuleUrlFetcher)
 {
 }
 
