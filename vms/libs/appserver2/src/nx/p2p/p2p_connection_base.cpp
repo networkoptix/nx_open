@@ -274,22 +274,12 @@ void ConnectionBase::onHttpClientDone()
     using namespace nx::network;
     using namespace nx::vms::api;
 
-    bool useWebsocketMode = m_remotePeer.transport != P2pTransportMode::http;
-    if (useWebsocketMode)
+    auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
+    auto useWebsocketMode = error == websocket::Error::noError;
+    if (!useWebsocketMode)
     {
-        auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
-        if (error != websocket::Error::noError)
-        {
-            NX_WARNING(this,
-                lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
-            if (m_remotePeer.transport == P2pTransportMode::websocket)
-            {
-                setState(State::Error);
-                m_httpClient.reset();
-                return;
-            }
-            useWebsocketMode = false;
-        }
+        NX_WARNING(this,
+            lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
     }
 
     //saving credentials we used to authorize request

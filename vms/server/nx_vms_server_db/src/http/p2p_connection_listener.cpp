@@ -320,19 +320,16 @@ void ConnectionProcessor::run()
     if (!tryAcquireConnected(sameDirectionConnectionLockGuard, remotePeer))
         return;
 
-    bool useWebSocket = false;
-    if (remotePeer.transport != P2pTransportMode::http
-        && !d->request.requestLine.url.path().contains(ConnectionBase::kHttpUrlPath))
+    bool useWebSocket = d->request.requestLine.url.path().contains(ConnectionBase::kWebsocketUrlPath);
+    if (useWebSocket)
     {
         auto error = websocket::validateRequest(d->request, &d->response);
-        if (error != websocket::Error::noError && remotePeer.transport == P2pTransportMode::websocket)
+        if (error != websocket::Error::noError)
         {
             auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
-            sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
-            NX_ERROR(this, errorMessage);
-            return;
+            NX_WARNING(this, errorMessage);
+            useWebSocket = false;
         }
-        useWebSocket = (error == websocket::Error::noError);
     }
 
     serializePeerData(d->response, localPeer(remotePeer), remotePeer.dataFormat);
