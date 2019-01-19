@@ -24,7 +24,7 @@ public:
         const nx::network::http::StringType& username,
         const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode /*authResult*/)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(api::Result /*authResult*/)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db

@@ -40,7 +40,7 @@ bool SystemHealthInfoProvider::isSystemOnline(
 void SystemHealthInfoProvider::getSystemHealthHistory(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemId systemId,
-    std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
+    std::function<void(api::Result, api::SystemHealthHistory)> completionHandler)
 {
     using namespace std::placeholders;
 

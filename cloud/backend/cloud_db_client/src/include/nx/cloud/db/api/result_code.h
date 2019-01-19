@@ -48,4 +48,35 @@ enum class ResultCode
 
 std::string toString(ResultCode resultCode);
 
+struct Result
+{
+    ResultCode code = ResultCode::ok;
+    std::string description;
+
+    Result() = default;
+
+    Result(ResultCode code, std::string description = std::string()):
+        code(code),
+        description(description)
+    {
+    }
+
+    Result& operator=(ResultCode newCode)
+    {
+        code = newCode;
+        description = toString(code);
+        return *this;
+    }
+
+    bool operator==(ResultCode rightCode) const
+    {
+        return code == rightCode;
+    }
+
+    bool operator!=(ResultCode rightCode) const
+    {
+        return !(*this == rightCode);
+    }
+};
+
 } // namespace nx::cloud::db::api

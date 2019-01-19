@@ -33,11 +33,11 @@ public:
         const AuthorizationInfo& authzInfo,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::Result)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
         const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::Result)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
         nx::sql::QueryContext* queryContext,
@@ -60,11 +60,11 @@ public:
         const AuthorizationInfo& authzInfo,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::Result)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
         const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::Result)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
         nx::sql::QueryContext* queryContext,
@@ -77,7 +77,7 @@ private:
     {
         std::string idOfSystemToMergeTo;
         std::string idOfSystemToBeMerged;
-        std::function<void(api::ResultCode)> completionHandler;
+        std::function<void(api::Result)> completionHandler;
         nx::utils::Counter::ScopedIncrement callLock;
     };
 
@@ -95,7 +95,7 @@ private:
 
     void loadSystemMergeInfo();
 
-    api::ResultCode validateRequestInput(
+    api::Result validateRequestInput(
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged);
 
@@ -131,7 +131,7 @@ private:
 
     void finishMerge(
         MergeRequestContext* mergeRequestContextPtr,
-        api::ResultCode resultCode);
+        api::Result result);
 };
 
 } // namespace nx::cloud::db
