@@ -440,7 +440,7 @@ FindPackageResult findPackage(
         return FindPackageResult::noInfo;
     }
 
-    if (!updateInformation.participants.isEmpty()
+    if (!isClient && !updateInformation.participants.isEmpty()
         && !updateInformation.participants.contains(moduleGuid))
     {
         setErrorMessage("This module is not listed in the update participants", outMessage);

@@ -860,6 +860,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
+    if (isNvr())
+        sharedContext->startServices();
+
     auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
@@ -895,8 +898,8 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive, info.value);
+    if (!isNvr() && hasCameraCapabilities(Qn::RemoteArchiveCapability))
+        sharedContext->startServices();
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -2549,6 +2552,9 @@ int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRa
 
 int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile) const
 {
+    if (isNvr() && role == Qn::CR_Archive)
+        return kHanwhaInvalidProfile;
+
     auto itr = m_profileByRole.find(role);
     if (itr != m_profileByRole.cend())
     {

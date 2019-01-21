@@ -1,6 +1,6 @@
 #include "abstract_workbench_panel.h"
 
-#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <ui/animation/animation_timer.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -42,7 +42,7 @@ void AbstractWorkbenchPanel::updateOpacity(bool animate)
 
 void AbstractWorkbenchPanel::ensureAnimationAllowed(bool* animate)
 {
-    if (animate && qnSettings->lightMode().testFlag(Qn::LightModeNoAnimation))
+    if (animate && qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation))
         *animate = false;
 }
 

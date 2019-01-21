@@ -177,7 +177,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->ioPortSettingsWidget, &LegacyIoPortSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
+    connect(ui->advancedSettingsWidget, &LegacyAdvancedSettingsWidget::hasChangesChanged,
         this, &SingleCameraSettingsWidget::hasChangesChanged);
 
     connect(ui->wearableProgressWidget, &QnWearableProgressWidget::activeChanged,

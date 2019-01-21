@@ -8,6 +8,9 @@
 
 #include <network/router.h>
 
+#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -29,8 +32,6 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
 #include <camera/resource_display.h>
-
-#include <client/client_settings.h>
 
 #include <network/cloud_url_validator.h>
 
@@ -65,7 +66,6 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
-
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -1508,7 +1508,7 @@ LightModeCondition::LightModeCondition(Qn::LightModeFlags flags):
 
 ActionVisibility LightModeCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
 {
-    if (qnSettings->lightMode() & m_lightModeFlags)
+    if (qnRuntime->lightMode() & m_lightModeFlags)
         return InvisibleAction;
     return EnabledAction;
 }

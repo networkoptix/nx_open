@@ -669,9 +669,10 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::findPackage(
+        QnUuid(),
         systemInfo,
         m_updateManifest,
-        true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
+        /*isClient=*/true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
     // TODO: Should move this to Widget somehow.
     verifyUpdateManifest(contents, {});
     return contents;
@@ -681,6 +682,11 @@ void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
     m_peerManager->setServerUrl(serverUrl, serverId);
+}
+
+ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
+{
+    return Clock::now() - m_timeStartedInstall;
 }
 
 void ServerUpdateTool::requestStopAction()
@@ -741,6 +747,7 @@ void ServerUpdateTool::requestInstallAction(
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_remoteUpdateStatus = {};
 
+    m_timeStartedInstall = Clock::now();
     m_stateTracker->setPeersInstalling(targets, true);
 
     auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
@@ -753,7 +760,7 @@ void ServerUpdateTool::requestInstallAction(
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        if (auto handle = connection->updateActionInstall(callback, thread()))
+        if (auto handle = connection->updateActionInstall(targets, callback, thread()))
             m_requestingInstall.insert(handle);
     }
 }
@@ -820,7 +827,6 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     tool->atUpdateStatusResponse(success, handle, response);
             };
 
-        m_timeStartedInstall = Clock::now();
         // Requesting update status for mediaservers.
         rest::Handle handle = 0;
         m_checkingRemoteUpdateStatus = true;

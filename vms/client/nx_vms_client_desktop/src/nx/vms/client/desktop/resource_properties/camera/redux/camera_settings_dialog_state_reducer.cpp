@@ -196,11 +196,14 @@ State loadNetworkInfo(State state, const Camera& camera)
     const bool isIoModule = camera->isIOModule();
     const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
     if (hasPrimaryStream)
-        state.singleCameraProperties.primaryStream = camera->sourceUrl(Qn::CR_LiveVideo);
+        state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
 
     const bool hasSecondaryStream = camera->hasDualStreaming();
     if (hasSecondaryStream)
-        state.singleCameraProperties.secondaryStream = camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
+    {
+        state.singleCameraSettings.secondaryStream.setBase(
+            camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
+    }
 
     return state;
 }
@@ -548,6 +551,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
         singleProperties.hasVideo = firstCamera->hasVideo();
+        singleProperties.editableStreamUrls =
+            firstCamera->hasCameraCapabilities(Qn::CustomMediaUrlCapability);
 
         const auto macAddress = firstCamera->getMAC();
         singleProperties.macAddress = macAddress.isNull() ? QString() : macAddress.toString();
@@ -1408,6 +1413,18 @@ State CameraSettingsDialogStateReducer::setCredentials(
     if (password)
         state.credentials.password.setUser(password->trimmed());
 
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setStreamUrls(
+    State state, const QString& primary, const QString& secondary)
+{
+    if (!state.isSingleCamera() || !state.singleCameraProperties.editableStreamUrls)
+        return state;
+
+    state.singleCameraSettings.primaryStream.setUser(primary);
+    state.singleCameraSettings.secondaryStream.setUser(secondary);
     state.hasChanges = true;
     return state;
 }

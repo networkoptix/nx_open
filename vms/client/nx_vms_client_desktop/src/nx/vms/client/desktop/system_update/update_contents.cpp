@@ -149,7 +149,12 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 {
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
+    {
+        NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
+            << contents.info.version << ") has an error before verification:"
+            << nx::update::toString(contents.error);
         return false;
+    }
     // Hack to prevent double verification of update package.
     if (contents.verified)
         return contents.error != nx::update::InformationError::noError;
@@ -217,7 +222,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         alreadyInstalled = false;
 
     auto systemInfo = QnAppInfo::currentSystemInformation();
-    if (nx::update::findPackage(
+    if (nx::update::findPackage(QnUuid(),
             systemInfo,
             contents.info,
             true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)

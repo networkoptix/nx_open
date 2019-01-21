@@ -225,63 +225,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="searchTab">
-      <attribute name="title">
-       <string>Search</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalSearchTabLayout_1" stretch="0,0,1">
-       <property name="spacing">
-        <number>8</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <layout class="QVBoxLayout" name="verticalSearchTabLayout_2">
-         <property name="spacing">
-          <number>8</number>
-         </property>
-         <property name="leftMargin">
-          <number>16</number>
-         </property>
-         <property name="topMargin">
-          <number>8</number>
-         </property>
-         <property name="rightMargin">
-          <number>16</number>
-         </property>
-         <property name="bottomMargin">
-          <number>8</number>
-         </property>
-         <item>
-          <widget class="QComboBox" name="typeComboBox"/>
-         </item>
-         <item>
-          <widget class="nx::vms::client::desktop::SearchLineEdit" name="filterLineEdit" native="true"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="horizontalLine">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QnResourceTreeWidget" name="searchTreeWidget" native="true"/>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
@@ -296,12 +239,6 @@
    <class>nx::vms::client::desktop::ShortcutHintWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/shortcut_hint_widget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::SearchLineEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/search_line_edit.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnResourceTreeWidget</class>

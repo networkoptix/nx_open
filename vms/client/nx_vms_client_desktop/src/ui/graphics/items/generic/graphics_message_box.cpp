@@ -7,7 +7,7 @@
 #include <QtGui/QPainterPath>
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <ui/common/palette.h>
 #include <ui/animation/opacity_animator.h>
@@ -150,7 +150,7 @@ void QnGraphicsMessageBox::showAnimated()
     auto animator = opacityAnimator(this);
     animator->setEasingCurve(QEasingCurve::InQuad);
     animator->stop();
-    if (qnSettings->lightMode().testFlag(Qn::LightModeNoAnimation))
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation))
         setOpacity(1.0);
     else
         animator->animateTo(1.0);
@@ -158,7 +158,7 @@ void QnGraphicsMessageBox::showAnimated()
 
 void QnGraphicsMessageBox::hideAnimated()
 {
-    if (qnSettings->lightMode().testFlag(Qn::LightModeNoAnimation))
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation))
     {
         hideImmideately();
         return;

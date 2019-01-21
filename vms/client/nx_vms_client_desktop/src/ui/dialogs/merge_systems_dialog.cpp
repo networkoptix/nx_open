@@ -31,6 +31,7 @@
 #include <network/system_helpers.h>
 #include <nx/network/http/http_types.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -156,7 +157,7 @@ void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
 
 void QnMergeSystemsDialog::at_urlComboBox_editingFinished()
 {
-    auto url = nx::vms::client::desktop::helpers::parseConnectionUrlFromUserInput(
+    auto url = parseConnectionUrlFromUserInput(
         ui->urlComboBox->currentText());
     url.setScheme(nx::network::http::kSecureUrlSchemeName);
     ui->urlComboBox->setCurrentText(url.toString());

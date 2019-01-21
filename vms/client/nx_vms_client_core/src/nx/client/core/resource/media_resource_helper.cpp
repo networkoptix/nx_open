@@ -3,8 +3,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/fusion/model_functions.h>
+#include <core/resource/param.h>
 #include <utils/common/connective.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::client::core {
 
@@ -64,6 +66,15 @@ qreal MediaResourceHelper::customAspectRatio() const
     return customRatio.isValid() ? customRatio.toFloat() : 0.0;
 }
 
+qreal MediaResourceHelper::aspectRatio() const
+{
+    if (!d->camera)
+        return 0.0;
+
+    const auto ratio = d->camera->aspectRatio();
+    return ratio.isValid() ? ratio.toFloat() : 0.0;
+}
+
 int MediaResourceHelper::customRotation() const
 {
     return d->camera ? d->camera->getProperty(QnMediaResource::rotationKey()).toInt() : 0;
@@ -103,9 +114,18 @@ void MediaResourceHelper::Private::handlePropertyChanged(
         return;
 
     if (key == QnMediaResource::customAspectRatioKey())
+    {
         emit q->customAspectRatioChanged();
+        emit q->aspectRatioChanged();
+    }
     else if (key == QnMediaResource::rotationKey())
+    {
         emit q->customRotationChanged();
+    }
+    else if (key == ResourcePropertyKey::kMediaStreams)
+    {
+        emit q->aspectRatioChanged();
+    }
 }
 
 void MediaResourceHelper::Private::updateServer()

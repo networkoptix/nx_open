@@ -432,11 +432,7 @@ void ExportSettingsDialog::initSettingsWidgets()
 
 void ExportSettingsDialog::updateTabWidgetSize()
 {
-    // Stupid QTabWidget sizeHint workarounds.
-    auto size = ui->tabWidget->minimumSizeHint();
-    if (ui->tabWidget->tabBar()->isHidden())
-        size.setHeight(size.height() - ui->tabWidget->tabBar()->sizeHint().height());
-    ui->tabWidget->setFixedSize(size);
+    ui->tabWidget->setFixedSize(ui->tabWidget->minimumSizeHint());
 }
 
 void ExportSettingsDialog::updateMode()

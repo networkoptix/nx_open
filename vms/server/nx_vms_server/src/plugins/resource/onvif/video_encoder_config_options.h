@@ -69,7 +69,7 @@ std::string h264ProfileToOnvifString(onvifXsd__H264Profile profile);
  * All other values are not correct and can not pass xsd validation.
  */
 std::optional<onvifXsd__VideoEncodingProfiles> videoEncodingProfilesFromOnvifString(const std::string& name);
-std::string VideoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile);
+std::string videoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile);
 
 // This class should be moved somewhere into utils.
 template<class T>

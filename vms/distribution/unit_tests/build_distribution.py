@@ -92,7 +92,6 @@ def main():
                     join(conf.QT_DIR, "plugins", plugin_group, dll_glob))
             archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin", dll_glob))
 
-
         # Archive analytics_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
         ut_lib_globs = {

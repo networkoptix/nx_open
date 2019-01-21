@@ -48,6 +48,6 @@ struct NX_VMS_API DewarpingData: Data
 
 Q_DECLARE_METATYPE(nx::vms::api::DewarpingData)
 
-//Compatibility-layer functions to maintain old way of (de)serializing in the server sql database.
+// Compatibility-layer functions to maintain old way of (de)serializing in the server sql database.
 void NX_VMS_API serialize_field(const nx::vms::api::DewarpingData& data, QVariant* target);
 void NX_VMS_API deserialize_field(const QVariant& value, nx::vms::api::DewarpingData* target);

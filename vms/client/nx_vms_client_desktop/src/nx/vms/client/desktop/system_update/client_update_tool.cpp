@@ -111,6 +111,11 @@ void ClientUpdateTool::setApplauncherError(const QString& error)
     emit updateStateChanged((int)m_state, 0);
 }
 
+QString ClientUpdateTool::getErrorText() const
+{
+    return m_lastError;
+}
+
 std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
 {
     m_remoteUpdateInfoRequest = std::promise<UpdateContents>();
@@ -152,9 +157,10 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 
     nx::update::Package clientPackage;
     nx::update::findPackage(
+        QnUuid(),
         systemInfo,
         updateInformation,
-        true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
+        /*isClient=*/true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
 
     if (getState() == State::initial)
     {
@@ -441,8 +447,11 @@ bool ClientUpdateTool::installUpdate()
             case Result::otherError:
             case Result::versionNotInstalled:
             case Result::invalidVersionFormat:
+            case Result::notEnoughSpace:
+            case Result::notFound:
+            case Result::ioError:
             {
-                QString error = applauncher::api::ResultType::toString(result);
+                QString error = applauncherErrorToString(result);
                 NX_ERROR(this) << "Failed to run installation:" << error;
                 setApplauncherError(error);
                 return false;
@@ -494,7 +503,7 @@ bool ClientUpdateTool::isInstallComplete() const
         case Result::versionNotInstalled:
         case Result::invalidVersionFormat:
         {
-            QString error = applauncher::api::ResultType::toString(result);
+            QString error = applauncherErrorToString(result);
             NX_ERROR(this) << "Failed to check installation:" << error;
             //setApplauncherError(error);
             return false;
@@ -612,6 +621,32 @@ QString ClientUpdateTool::toString(State state)
             return "applauncherError";
     }
     return QString();
+}
+
+QString ClientUpdateTool::applauncherErrorToString(int value)
+{
+    using Result = applauncher::api::ResultType::Value;
+    switch ((Result)value)
+    {
+        case Result::alreadyInstalled:
+            return tr("This update is already installed.");
+        case Result::otherError:
+            return tr("Internal applauncher error.");
+        case Result::versionNotInstalled:
+            return tr("This version is not installed.");
+        case Result::invalidVersionFormat:
+            return tr("Invalid version format.");
+        case Result::brokenPackage:
+            return tr("Broken update package.");
+        case Result::notEnoughSpace:
+            return tr("Not enough space on disk to install client update.");
+        case Result::notFound:
+            // Install package does not exists. Either we have broke the code and asking
+            // for a wrong file, or this file had been removed somehow.
+            return tr("Install package has been lost.");
+        default:
+            return applauncher::api::ResultType::toString((Result)value);
+    }
 }
 
 } // namespace nx::vms::client::desktop

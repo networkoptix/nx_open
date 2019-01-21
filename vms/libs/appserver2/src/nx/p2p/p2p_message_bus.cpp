@@ -537,6 +537,10 @@ void MessageBus::at_gotMessage(
         return;
 
     QnMutexLocker lock(&m_mutex);
+
+    if (!isStarted())
+        return;
+
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
 

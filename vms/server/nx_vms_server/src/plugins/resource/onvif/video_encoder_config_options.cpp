@@ -109,7 +109,7 @@ std::optional<onvifXsd__VideoEncodingProfiles> videoEncodingProfilesFromOnvifStr
     return std::nullopt;
 }
 
-std::string VideoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile)
+std::string videoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile)
 {
     for (const auto& pair : kVideoEncoderProfilesOnvifMap)
     {

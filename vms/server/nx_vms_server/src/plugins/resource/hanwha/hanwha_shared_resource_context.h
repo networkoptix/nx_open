@@ -136,7 +136,7 @@ public:
     QAuthenticator authenticator() const;
     nx::utils::RwLock* requestLock();
 
-    void startServices(bool hasVideoArchive, const HanwhaInformation& information);
+    void startServices();
 
     SessionContextPtr session(
         HanwhaSessionType sessionType,

@@ -514,7 +514,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                         packageErrors << tr("Missing update package for client");
                     }
                 }
-                else if (!missing)
+                else if (missing)
                 {
                     packageErrors << tr("Missing update package for some servers");
                 }

@@ -417,7 +417,7 @@ public:
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
-    Handle updateActionInstall(
+    Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 

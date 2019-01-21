@@ -72,7 +72,7 @@ qint64 HanwhaArchiveDelegate::startTime() const
     // because with current interface we need to get both channel number and shared context.
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
-        if (resource->getStatus() >= Qn::Online)
+        if (resource->getStatus() >= Qn::Online || resource->isNvr())
         {
             if (const auto context = resource->sharedContext())
                 return context->timelineStartUs(resource->getChannel());
@@ -89,7 +89,7 @@ qint64 HanwhaArchiveDelegate::endTime() const
 
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
-        if (resource->getStatus() >= Qn::Online)
+        if (resource->getStatus() >= Qn::Online || resource->isNvr())
         {
             if (const auto context = resource->sharedContext())
                 return context->timelineEndUs(resource->getChannel());

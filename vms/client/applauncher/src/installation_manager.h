@@ -10,6 +10,7 @@
 
 #include <nx/utils/software_version.h>
 #include <client_installation.h>
+#include <nx/vms/applauncher/api/applauncher_api.h>
 
 //!Provides access to installed versions information
 /*!
@@ -21,6 +22,7 @@ class InstallationManager: public QObject
 
     //!Number of installed application versions
     Q_PROPERTY(int count READ count)
+    using ResultType = applauncher::api::ResultType::Value;
 
 public:
     InstallationManager(QObject* parent = nullptr);
@@ -56,7 +58,7 @@ public:
     //!Returns path to install \a version to or empty string writable paths for installations is not known
     QString installationDirForVersion(const nx::utils::SoftwareVersion &version) const;
 
-    bool installZip(const nx::utils::SoftwareVersion &version, const QString &fileName);
+    ResultType installZip(const nx::utils::SoftwareVersion &version, const QString &fileName);
 
     static bool isValidVersionName(const QString &version);
 

@@ -27,6 +27,8 @@ enum class EventReason
     networkConnectionClosed = 2,
     networkRtpPacketLoss = 3,
     networkNoResponseFromDevice = 19,
+    networkBadCameraTime = 20,
+    networkCameraTimeBackToNormal = 21,
 
     // Server Failure event
     serverTerminated = 4,
