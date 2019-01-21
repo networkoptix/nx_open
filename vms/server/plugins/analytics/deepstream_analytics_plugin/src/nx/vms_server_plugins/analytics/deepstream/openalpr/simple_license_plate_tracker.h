@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include <nx/sdk/uuid.h>
-#include <plugins/plugin_api.h>
 
 namespace nx {
 namespace vms_server_plugins {

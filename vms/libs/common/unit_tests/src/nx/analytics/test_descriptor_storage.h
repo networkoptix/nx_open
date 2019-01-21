@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/data_structures/map_helper.h>
 
 namespace nx::analytics {

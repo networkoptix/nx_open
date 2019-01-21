@@ -9,7 +9,6 @@
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/compressed_video_packet.h>
 #include <nx/sdk/helpers/ptr.h>
-#include <plugins/plugin_tools.h>
 
 namespace nx {
 namespace vms::server {

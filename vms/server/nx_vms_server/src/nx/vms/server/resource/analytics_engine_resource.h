@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
@@ -10,8 +12,6 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 #include <nx/vms/server/server_module_aware.h>
-
-#include <nx/utils/std/optional.h>
 
 namespace nx::vms::server::resource {
 

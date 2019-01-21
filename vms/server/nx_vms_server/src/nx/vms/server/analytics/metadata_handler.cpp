@@ -13,7 +13,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <analytics/common/object_detection_metadata.h>
-#include <nx/fusion/model_functions.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
 
@@ -38,8 +37,11 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
 std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
     const QString& eventTypeId) const
 {
-    if (auto it = m_eventTypeDescriptors.find(eventTypeId); it != m_eventTypeDescriptors.cend())
+    if (const auto it = m_eventTypeDescriptors.find(eventTypeId);
+        it != m_eventTypeDescriptors.cend())
+    {
         return it->second;
+    }
 
     return std::nullopt;
 }

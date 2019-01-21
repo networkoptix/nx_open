@@ -1,7 +1,5 @@
 #include "device_agent.h"
 
-#include <plugins/plugin_tools.h>
-
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string.h>
 

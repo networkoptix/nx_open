@@ -1,17 +1,13 @@
 #pragma once
 
 #include <map>
-#include <vector>
 #include <deque>
 
 extern "C" {
-
 #include <gstnvivameta_api.h>
-
 } // extern "C"
 
 #include <nx/sdk/uuid.h>
-#include <plugins/plugin_api.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 #include <nx/vms_server_plugins/analytics/deepstream/utils.h>
 

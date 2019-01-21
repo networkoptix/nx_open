@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/std/optional.h>
+#include <optional>
 
 namespace nx::analytics {
 

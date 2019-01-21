@@ -27,7 +27,6 @@
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
-#include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 
 namespace nx::vms::server::analytics {

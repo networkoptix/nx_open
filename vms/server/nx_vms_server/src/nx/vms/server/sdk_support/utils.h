@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource_fwd.h>
@@ -7,7 +9,6 @@
 
 #include <media_server/media_server_module.h>
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/member_detector.h>
 

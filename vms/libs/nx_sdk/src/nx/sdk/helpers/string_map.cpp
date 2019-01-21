@@ -2,7 +2,6 @@
 
 #include <iterator>
 
-#include <plugins/plugin_tools.h>
 #include <nx/kit/debug.h>
 
 namespace nx {

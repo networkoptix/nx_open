@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include <plugins/plugin_api.h>
 #include <nx/sdk/error.h>
 #include <nx/sdk/i_string.h>

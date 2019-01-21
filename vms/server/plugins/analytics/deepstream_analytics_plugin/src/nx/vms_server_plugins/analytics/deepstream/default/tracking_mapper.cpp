@@ -1,11 +1,10 @@
 #include "tracking_mapper.h"
 
-#include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
 #define NX_PRINT_PREFIX "deepstream::TrackingMapper::"
 #include <nx/kit/debug.h>
 
+#include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <plugins/plugin_tools.h>
 
 namespace nx {
 namespace vms_server_plugins {

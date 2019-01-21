@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nx/utils/data_structures/map_helper.h>
-#include <nx/utils/std/optional.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/model_functions.h>

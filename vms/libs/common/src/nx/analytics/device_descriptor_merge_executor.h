@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nx/vms/api/analytics/descriptors.h>
+#include <optional>
 
-#include <nx/utils/std/optional.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics {
 

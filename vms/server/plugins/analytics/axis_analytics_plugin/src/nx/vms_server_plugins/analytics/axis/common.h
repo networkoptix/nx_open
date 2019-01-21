@@ -1,18 +1,12 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtCore/QFlag>
-#include <QElapsedTimer>
-
-#include <boost/optional/optional.hpp>
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <plugins/plugin_api.h>
-#include <plugins/plugin_tools.h>
 #include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
 
-#include "nx/axis/camera_controller.h"
+#include <nx/axis/camera_controller.h>
 
 namespace nx::vms_server_plugins::analytics::axis {
 

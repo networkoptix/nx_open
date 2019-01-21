@@ -1,15 +1,14 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QMap>
 
-#include <plugins/plugin_tools.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/analytics/types.h>
-#include <nx/utils/std/optional.h>
 
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/analytics/i_device_agent.h>
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/events_fwd.h>
