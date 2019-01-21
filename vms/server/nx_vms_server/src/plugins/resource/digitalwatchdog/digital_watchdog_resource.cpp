@@ -315,7 +315,7 @@ nx::vms::server::resource::StreamCapabilityMap
 {
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
 
-    if (!this->m_serviceUrls.media2ServiceUrl.isEmpty())
+    if (!this->getMedia2Url().isEmpty())
     {
         // Media2 webService allows to detect H265 encoders, so we don't need to use
         // additional dw-specific detection.

@@ -299,10 +299,9 @@ bool HikvisionResource::findDefaultPtzProfileToken()
     {
         if (!profile || !profile->PTZConfiguration)
             continue;
-        QString ptzConfiguration = QString::fromStdString(profile->PTZConfiguration->token);
-        if (ptzConfiguration == getPtzConfigurationToken())
+        if (profile->PTZConfiguration->token == ptzConfigurationToken())
         {
-            setPtzProfileToken(QString::fromStdString(profile->token));
+            setPtzProfileToken(profile->token);
             return true;
         }
     }
