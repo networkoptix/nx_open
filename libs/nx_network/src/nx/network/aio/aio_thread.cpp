@@ -314,7 +314,7 @@ void AioThread::stopMonitoringInternal(
         return;    //< Ignoring task.
     }
 
-    auto& handlingData = sock->impl()->monitoredEvents[eventType].aioHelperData;
+    auto handlingData = sock->impl()->monitoredEvents[eventType].aioHelperData.get();
     if (!handlingData)
         return; //< Socket is not polled.
 
@@ -330,7 +330,6 @@ void AioThread::stopMonitoringInternal(
         lock->unlock();
         // Removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack).
         m_taskQueue->removeSocketFromPollSet(sock, eventType);
-        handlingData = nullptr;
         return;
     }
 
@@ -352,10 +351,6 @@ void AioThread::stopMonitoringInternal(
 
     // TODO #ak maybe we just have to wait for remove completion, but not for running handler completion?
     // I.e., is it possible that handler was launched (or still running) after removal task completion?
-
-    // Waiting for event handler completion (if it running).
-    while (handlingData->beingProcessed.load() > 0)
-        m_taskQueue->waitCurrentEventProcessingCompletion();
 
     // Waiting for socket to be removed from pollset.
     while (taskCompletedCondition.load(std::memory_order_relaxed) == 0)
