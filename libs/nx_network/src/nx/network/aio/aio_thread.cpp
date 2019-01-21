@@ -349,13 +349,9 @@ void AioThread::stopMonitoringInternal(
 
     lock->unlock();
 
-    // TODO #ak maybe we just have to wait for remove completion, but not for running handler completion?
-    // I.e., is it possible that handler was launched (or still running) after removal task completion?
-
     // Waiting for socket to be removed from pollset.
     while (taskCompletedCondition.load(std::memory_order_relaxed) == 0)
-        msleep(0);    // Yield. TODO #ak Better replace it with conditional_variable.
-                        // TODO #ak if remove task completed, doesn't it mean handler is not running and never be launched?
+        msleep(0); // Yield. TODO #ak Probably, it is better to replace it with conditional_variable.
 
     lock->relock();
 }
