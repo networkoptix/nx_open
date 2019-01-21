@@ -212,16 +212,17 @@ void ConnectionBase::onHttpClientDone()
         }
         return;
     }
-    else if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
-    {
-        cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
-        return;
-    }
 
     const auto& headers = m_httpClient->response()->headers;
     if (m_connectionLockGuard && headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
     {
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
+        if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
+        {
+            cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
+            return;
+        }
+
         if (m_connectionLockGuard->tryAcquireConnecting())
             m_httpClient->doGet(
                 m_httpClient->url(),
