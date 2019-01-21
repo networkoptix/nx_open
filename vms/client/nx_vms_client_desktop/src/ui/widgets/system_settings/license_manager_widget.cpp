@@ -666,7 +666,7 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 
     static const auto kWarningText = tr("Every license can be deactivated only a few times.");
     const auto warningColor = nx::vms::client::desktop::ColorTheme::instance()->color("red_l2").name();
-    const auto warningText = tr("<font color = \"%1\">%2</font>")
+    const auto warningText = QString("<font color = \"%1\">%2</font>")
         .arg(warningColor, kWarningText);
     extras.push_back(warningText);
 
