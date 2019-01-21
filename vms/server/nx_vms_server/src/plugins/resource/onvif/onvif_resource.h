@@ -173,7 +173,7 @@ public:
             QnBounds frameRateBounds);
 
         std::string videoEncoderToken;
-        SupportedVideoCodecFlavor encoding = SupportedVideoCodecFlavor::NONE;
+        SupportedVideoEncoding encoding = SupportedVideoEncoding::NONE;
 
         // Profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
         // or by Media2 (from onvifXsd__VideoEncodingProfiles).
@@ -482,7 +482,7 @@ private:
     void fillStreamCapabilityLists(const QList<VideoEncoderCapabilities>& capabilitiesList);
 
     VideoEncoderCapabilities findVideoEncoderCapabilities(
-        SupportedVideoCodecFlavor encoding, Qn::StreamIndex streamIndex);
+        SupportedVideoEncoding encoding, Qn::StreamIndex streamIndex);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;

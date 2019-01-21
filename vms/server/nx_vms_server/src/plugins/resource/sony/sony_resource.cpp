@@ -59,10 +59,10 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     request.Configuration = confResponse.Configuration;
     switch (capabilities.encoding)
     {
-        case SupportedVideoCodecFlavor::JPEG:
+        case SupportedVideoEncoding::JPEG:
             request.Configuration->Encoding = onvifXsd__VideoEncoding::JPEG;
             break;
-        case SupportedVideoCodecFlavor::H264:
+        case SupportedVideoEncoding::H264:
             request.Configuration->Encoding = onvifXsd__VideoEncoding::H264;
             break;
         default:

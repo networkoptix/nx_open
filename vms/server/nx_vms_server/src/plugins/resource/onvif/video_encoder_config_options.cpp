@@ -3,18 +3,18 @@
 namespace
 {
 
-static const std::vector<std::pair<std::string, SupportedVideoCodecFlavor>>
+static const std::vector<std::pair<std::string, SupportedVideoEncoding>>
     kSupportedVideoCodecFlavorOnvifMap = {
-        { "JPEG", SupportedVideoCodecFlavor::JPEG },
-        { "H264", SupportedVideoCodecFlavor::H264 },
-        { "H265", SupportedVideoCodecFlavor::H265 }
+        { "JPEG", SupportedVideoEncoding::JPEG },
+        { "H264", SupportedVideoEncoding::H264 },
+        { "H265", SupportedVideoEncoding::H265 }
     };
 
-static const std::vector<std::pair<std::string, SupportedVideoCodecFlavor>>
+static const std::vector<std::pair<std::string, SupportedVideoEncoding>>
     kSupportedVideoCodecFlavorVmsMap = {
-        { "MJPEG", SupportedVideoCodecFlavor::JPEG },
-        { "H264", SupportedVideoCodecFlavor::H264 },
-        { "H265", SupportedVideoCodecFlavor::H265 }
+        { "MJPEG", SupportedVideoEncoding::JPEG },
+        { "H264", SupportedVideoEncoding::H264 },
+        { "H265", SupportedVideoEncoding::H265 }
     };
 
 static const std::vector<std::pair<std::string, onvifXsd__H264Profile>>
@@ -38,17 +38,17 @@ static const std::vector<std::pair<std::string, onvifXsd__VideoEncodingProfiles>
 
 } //namespace
 
-SupportedVideoCodecFlavor supportedVideoCodecFlavorFromOnvifString(const std::string& name)
+SupportedVideoEncoding supportedVideoCodecFlavorFromOnvifString(const std::string& name)
 {
     for (const auto& pair: kSupportedVideoCodecFlavorOnvifMap)
     {
         if (pair.first == name)
             return pair.second;
     }
-    return SupportedVideoCodecFlavor::NONE;
+    return SupportedVideoEncoding::NONE;
 }
 
-std::string supportedVideoCodecFlavorToOnvifString(SupportedVideoCodecFlavor codec)
+std::string supportedVideoCodecFlavorToOnvifString(SupportedVideoEncoding codec)
 {
     for (const auto& pair: kSupportedVideoCodecFlavorOnvifMap)
     {
@@ -58,17 +58,17 @@ std::string supportedVideoCodecFlavorToOnvifString(SupportedVideoCodecFlavor cod
     return std::string();
 }
 
-SupportedVideoCodecFlavor supportedVideoCodecFlavorFromVmsString(const std::string& name)
+SupportedVideoEncoding supportedVideoCodecFlavorFromVmsString(const std::string& name)
 {
     for (const auto& pair: kSupportedVideoCodecFlavorVmsMap)
     {
         if (pair.first == name)
             return pair.second;
     }
-    return SupportedVideoCodecFlavor::NONE;
+    return SupportedVideoEncoding::NONE;
 }
 
-std::string supportedVideoCodecFlavorToVmsString(SupportedVideoCodecFlavor codec)
+std::string supportedVideoCodecFlavorToVmsString(SupportedVideoEncoding codec)
 {
     for (const auto& pair: kSupportedVideoCodecFlavorVmsMap)
     {
@@ -123,7 +123,7 @@ std::string videoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profil
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__JpegOptions& options)
 {
     mediaWebserviseVersion = 1;
-    encoder = SupportedVideoCodecFlavor::JPEG;
+    encoder = SupportedVideoEncoding::JPEG;
     // qualityRange: onvifXsd__JpegOptions contains no such information
     // bitrateRange: onvifXsd__JpegOptions contains no such information
     // ConstantBitRateSupported: onvifXsd__JpegOptions contains no such information
@@ -146,7 +146,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__Mpeg4Option
 {
     NX_ASSERT(0); //< Mgeg4 is not supported.
     mediaWebserviseVersion = 1;
-    //encoder = SupportedVideoCodecFlavor::MPEG4;
+    //encoder = SupportedVideoEncoding::MPEG4;
     // qualityRange: onvifXsd__Mpeg4Options contains no such information
     // bitrateRange: onvifXsd__Mpeg4Options contains no such information
     // ConstantBitRateSupported: onvifXsd__Mpeg4Options contains no such information
@@ -185,7 +185,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__Mpeg4Option
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__H264Options& options)
 {
     mediaWebserviseVersion = 1;
-    encoder = SupportedVideoCodecFlavor::H264;
+    encoder = SupportedVideoEncoding::H264;
     // qualityRange: onvifXsd__Mpeg4Options contains no such information
     // bitrateRange: onvifXsd__Mpeg4Options contains no such information
     // ConstantBitRateSupported: onvifXsd__Mpeg4Options contains no such information

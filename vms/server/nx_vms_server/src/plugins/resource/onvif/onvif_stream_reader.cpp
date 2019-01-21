@@ -449,18 +449,16 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         // Some DW cameras need two same sendVideoEncoder requests with 1 second interval.
         // Both responses are Ok, but only the second request really succeeds.
         auto resourceData = m_onvifRes->resourceData();
-        const int repeatIntervalForSendVideoEncoderMS =
+        const int repeatIntervalForSendVideoEncoderMs =
             resourceData.value<int>(ResourceDataKey::kRepeatIntervalForSendVideoEncoderMS, 0);
-
-        bool b = resourceData.value<bool>("fixWrongInputPortNumber", false);
 
         CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
         while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
         {
             result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
-            if (repeatIntervalForSendVideoEncoderMS)
+            if (repeatIntervalForSendVideoEncoderMs)
             {
-                msleep(repeatIntervalForSendVideoEncoderMS);
+                msleep(repeatIntervalForSendVideoEncoderMs);
                 result = m_onvifRes->sendVideoEncoderToCameraEx(
                     *currentVEConfig, streamIndex, params);
             }
