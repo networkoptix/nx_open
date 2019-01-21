@@ -10,6 +10,7 @@
 
 #include <client/client_runtime_settings.h>
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/style/helper.h>
@@ -248,18 +249,27 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         const auto engineDescriptors = engineDescriptorManager.descriptors();
         analyticsMenu->clear();
 
+        QSet<QnUuid> enabledEngines;
+        const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
+        for (const auto& camera: cameras)
+            enabledEngines += camera->enabledAnalyticsEngines();
+
         if (!eventTypeDescriptors.empty())
         {
             QHash<QnUuid, EngineInfo> engineById;
             for (const auto& [engineId, engineDescriptor]: engineDescriptors)
-                engineById[engineId].name = engineDescriptor.name;
+            {
+                if (enabledEngines.contains(engineId))
+                    engineById[engineId].name = engineDescriptor.name;
+            }
 
             for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
             {
                 for (const auto& scope: eventTypeDescriptor.scopes)
                 {
-                    engineById[scope.engineId].eventTypes
-                        .emplace(eventTypeId, eventTypeDescriptor);
+                    if (enabledEngines.contains(scope.engineId))
+                        engineById[scope.engineId].eventTypes
+                            .emplace(eventTypeId, eventTypeDescriptor);
                 }
             }
 

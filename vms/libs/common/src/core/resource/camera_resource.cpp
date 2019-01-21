@@ -59,8 +59,12 @@ const QString QnVirtualCameraResource::kSupportedAnalyticsObjectsProperty(
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
-    m_lastIssueTimer()
-{}
+    m_lastIssueTimer(),
+    m_cachedAnalyticsEngines([this] { return calculateEnabledAnalyticsEngines(); }, &m_cacheMutex)
+{
+    connect(this, &QnResource::propertyChanged,
+        this, [&]{ m_cachedAnalyticsEngines.reset(); });
+}
 
 QString QnVirtualCameraResource::getUniqueId() const
 {
@@ -510,29 +514,13 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::enabledAnalyticsEngineResources() const
 {
-    using namespace nx::vms::common;
-    auto enabledEngines = QJson::deserialized<std::set<QnUuid>>(
-        getProperty(kEnabledAnalyticsEnginesProperty).toLatin1());
-
-    AnalyticsEngineResourceList result;
-    if (enabledEngines.empty())
-        return AnalyticsEngineResourceList();
-
-    auto common = commonModule();
-    if (!NX_ASSERT(common, "Can't access common module"))
-        return AnalyticsEngineResourceList();
-
-    return common->resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>(
-        [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
-        {
-            return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
-        });
+    auto enabledEngines = enabledAnalyticsEngines();
+    return resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
 }
 
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
-    return QJson::deserialized<QSet<QnUuid>>(
-        getProperty(kEnabledAnalyticsEnginesProperty).toUtf8());
+    return m_cachedAnalyticsEngines.get();
 }
 
 void QnVirtualCameraResource::setEnabledAnalyticsEngines(const QSet<QnUuid>& engines)
@@ -682,4 +670,10 @@ QSet<QString> QnVirtualCameraResource::supportedAnalyticsItemTypeIds(
     const auto supportedItemMap = QJson::deserialized(serialized.toUtf8(), SupportedItemMap());
 
     return supportedItemMap.value(engineId);
+}
+
+QSet<QnUuid> QnVirtualCameraResource::calculateEnabledAnalyticsEngines()
+{
+    return QJson::deserialized<QSet<QnUuid>>(
+        getProperty(kEnabledAnalyticsEnginesProperty).toUtf8());
 }

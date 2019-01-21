@@ -245,18 +245,27 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
 
+    QSet<QnUuid> enabledEngines;
+    const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
+    for (const auto& camera: cameras)
+        enabledEngines += camera->enabledAnalyticsEngines();
+
     if (!objectTypeDescriptors.empty())
     {
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
-            engineById[engineId].name = engineDescriptor.name;
+        {
+            if (enabledEngines.contains(engineId))
+                engineById[engineId].name = engineDescriptor.name;
+        }
 
         for (const auto&[eventTypeId, objectTypeDescriptor]: objectTypeDescriptors)
         {
             for (const auto& scope: objectTypeDescriptor.scopes)
             {
-                engineById[scope.engineId].objectTypes
-                    .emplace(eventTypeId, objectTypeDescriptor);
+                if (enabledEngines.contains(scope.engineId))
+                    engineById[scope.engineId].objectTypes
+                        .emplace(eventTypeId, objectTypeDescriptor);
             }
         }
 
