@@ -339,7 +339,7 @@ nx::vms::server::resource::StreamCapabilityMap
     }
 
     const auto resourceUrl = nx::utils::Url(getUrl());
-    JsonApiClient jsonClient({resourceUrl.host(), resourceUrl.port()}, getAuth());
+    JsonApiClient jsonClient({resourceUrl.host(), static_cast<quint16>(resourceUrl.port())}, getAuth());
     const auto codecsFromJson = jsonClient.getSupportedVideoCodecs(streamIndex);
     if (codecsFromJson.empty())
         return onvifResult;
@@ -357,7 +357,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     if (streamParams.codec == "H265" && m_isJsonApiSupported)
     {
         const auto resourceUrl = nx::utils::Url(getUrl());
-        JsonApiClient jsonClient({resourceUrl.host(), resourceUrl.port()}, getAuth());
+        JsonApiClient jsonClient({resourceUrl.host(), static_cast<quint16>(resourceUrl.port())}, getAuth());
         if (!jsonClient.sendStreamParams(streamIndex, streamParams))
             return CameraDiagnostics::CannotConfigureMediaStreamResult("Codec");
 
