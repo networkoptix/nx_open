@@ -51,7 +51,6 @@
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <core/dataconsumer/basic_audio_transmitter.h>
 
-#include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/media/av_codec_helper.h>
 
@@ -636,13 +635,6 @@ void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODEC c)
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
-    auto resData = resourceData();
-    auto shouldAppearAsSingleChannel = resData.value<bool>(
-        ResourceDataKey::kShouldAppearAsSingleChannel);
-
-    if (shouldAppearAsSingleChannel)
-        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
-
     return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
@@ -679,6 +671,16 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 
 CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
 {
+    if (getRole() == Role::subchannel)
+    {
+        // TODO: moved from MultisensorDataProvider. It seems we need to remove this
+        const int kDefaultReceiveTimout = 30;
+        const int kDefaultSendTimeout = 30;
+
+        setOnvifRequestsRecieveTimeout(kDefaultReceiveTimout);
+        setOnvifRequestsSendTimeout(kDefaultSendTimeout);
+    }
+
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -723,24 +725,27 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    initializeAdvancedParameters(capabilitiesResponse); //< step 3
+    if (getRole() != Role::subchannel)
+    {
+        initializeAdvancedParameters(capabilitiesResponse); //< step 3
 
-    if (commonModule()->isNeedToStop())
-        return CameraDiagnostics::ServerTerminatedResult();
+        if (commonModule()->isNeedToStop())
+            return CameraDiagnostics::ServerTerminatedResult();
 
-    initializeIo(capabilitiesResponse); //< step 4
+        initializeIo(capabilitiesResponse); //< step 4
 
-    if (commonModule()->isNeedToStop())
-        return CameraDiagnostics::ServerTerminatedResult();
+        if (commonModule()->isNeedToStop())
+            return CameraDiagnostics::ServerTerminatedResult();
 
-    initializePtz(capabilitiesResponse); //< step 5
+        initializePtz(capabilitiesResponse); //< step 5
 
-    if (commonModule()->isNeedToStop())
-        return CameraDiagnostics::ServerTerminatedResult();
+        if (commonModule()->isNeedToStop())
+            return CameraDiagnostics::ServerTerminatedResult();
 
-    result = customInitialization(capabilitiesResponse);
-    if (!checkResultAndSetStatus(result))
-        return result;
+        result = customInitialization(capabilitiesResponse);
+        if (!checkResultAndSetStatus(result))
+            return result;
+    }
 
     saveProperties();
 
@@ -795,9 +800,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     if (!result)
         return result;
 
-    m_audioTransmitter = initializeTwoWayAudio();
-    if (m_audioTransmitter)
-        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+    if (getRole() != Role::subchannel)
+    {
+        m_audioTransmitter = initializeTwoWayAudio();
+        if (m_audioTransmitter)
+            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+    }
 
     return result;
 }
