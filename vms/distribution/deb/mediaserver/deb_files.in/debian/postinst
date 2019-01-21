@@ -30,10 +30,6 @@ EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
 DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
 CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
-# This is necessary because changed configuration options should take effect
-# immediately.
-service $COMPANY_NAME-mediaserver stop || true
-
 # Default MS parameters
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
@@ -166,6 +162,9 @@ function display_complete_setup_hint {
     fi
 }
 
+# This is necessary because changed configuration options should take effect immediately.
+service $COMPANY_NAME-mediaserver stop || true
+
 case "$1" in
     configure)
         ECS_GUID="$($EC_CFG_HELPER ecsGuid)"
@@ -274,23 +273,25 @@ case "$1" in
   ;;
 esac
 
-# Dirty huck to prevent apport to catch our crash dumps
+# Dirty hack to prevent apport from catching our crash dumps.
 echo manual > /etc/init/apport.override
 systemctl disable apport >/dev/null 2>&1 || true
 service apport stop >/dev/null 2>&1 || true
 
 if [ $(which systemctl) ]; then
-    # Systemd has a recursion problem with forwarding init.d script
-    rm /etc/init.d/$COMPANY_NAME-mediaserver
-    rm /etc/init.d/$COMPANY_NAME-root-tool
+    # Systemd has a recursion problem with forwarding init.d script.
+    # The script in init.d is for Ubuntu < 16.04 (with Upstart initialization system).
+    [ -f "/etc/init.d/$COMPANY_NAME-mediaserver" ] && rm "/etc/init.d/$COMPANY_NAME-mediaserver"
+    [ -f "/etc/init.d/$COMPANY_NAME-root-tool" ] && rm "/etc/init.d/$COMPANY_NAME-root-tool"
 
-    # Systemd requires explicit enable for service to start it on boot
+    # Systemd requires explicit enabling of the service to start it on boot.
     systemctl enable $COMPANY_NAME-root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-service $COMPANY_NAME-root-tool start;
-if service $COMPANY_NAME-mediaserver start; then
+service $COMPANY_NAME-root-tool start
+if service $COMPANY_NAME-mediaserver start
+then
     sleep 1
     echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 else
