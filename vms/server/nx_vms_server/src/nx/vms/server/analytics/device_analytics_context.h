@@ -60,8 +60,6 @@ private:
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
-    void issueMissingUncompressedFrameWarningOnce();
-
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
@@ -70,7 +68,7 @@ private:
 
     bool m_cachedNeedCompressedFrames{false};
     AbstractVideoDataReceptor::NeededUncompressedPixelFormats m_cachedUncompressedPixelFormats;
-    bool m_uncompressedFrameWarningIssued{false};
+    bool m_missingUncompressedFrameWarningIssued = false;
 };
 
 } // namespace nx::vms::server::analytics

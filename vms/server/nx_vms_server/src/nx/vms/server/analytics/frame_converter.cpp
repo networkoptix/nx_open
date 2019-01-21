@@ -65,33 +65,37 @@ static IUncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutp
 
 IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat)
 {
-    if (!pixelFormat)
+    if (!pixelFormat) //< Compressed frame requested.
     {
-        if (const auto compressedFrame = m_getCompressedFrame())
-        {
-            if (!m_compressedFrame)
-                m_compressedFrame.reset(new WrappingCompressedVideoPacket(compressedFrame));
-
+        if (m_compressedFrame)
             return m_compressedFrame.get();
-        }
+
         return nullptr;
     }
 
-    if (const auto uncompressedFrame = m_getUncompressedFrame())
+    if (!m_uncompressedFrame) //< Uncompressed frame requested, but is not available.
     {
-        auto it = m_uncompressedFrames.find(*pixelFormat);
-        if (it == m_uncompressedFrames.cend())
+        // First time log as Warning, other times log as Verbose.
+        auto logLevel = nx::utils::log::Level::verbose;
+        if (!*m_missingUncompressedFrameWarningIssued)
         {
-            auto insertResult = m_uncompressedFrames.emplace(
-                *pixelFormat,
-                nx::sdk::Ptr<IUncompressedVideoFrame>(
-                    createUncompressedVideoFrameFromVideoDecoderOutput(
-                        uncompressedFrame, *pixelFormat)));
-            it = insertResult.first;
+            *m_missingUncompressedFrameWarningIssued = true;
+            logLevel = nx::utils::log::Level::warning;
         }
-        return it->second.get();
+        NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
+
+        return nullptr;
     }
-    return nullptr;
+
+    auto it = m_cachedUncompressedFrames.find(*pixelFormat);
+    if (it == m_cachedUncompressedFrames.cend()) //< Not found in the cache.
+    {
+        const auto insertResult = m_cachedUncompressedFrames.emplace(
+            *pixelFormat,
+            createUncompressedVideoFrameFromVideoDecoderOutput(m_uncompressedFrame, *pixelFormat));
+        it = insertResult.first;
+    }
+    return it->second.get();
 }
 
 } // namespace analytics

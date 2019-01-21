@@ -44,20 +44,12 @@
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/i_string_map.h>
 
-#include "yuv420_uncompressed_video_frame.h"
-#include "generic_uncompressed_video_frame.h"
-#include "wrapping_compressed_video_packet.h"
-#include "data_packet_adapter.h"
-#include "frame_converter.h"
-
 namespace nx::vms::server::analytics {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::debugging;
 using namespace nx::vms::common;
-
-using PixelFormat = IUncompressedVideoFrame::PixelFormat;
 
 Manager::Manager(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule),

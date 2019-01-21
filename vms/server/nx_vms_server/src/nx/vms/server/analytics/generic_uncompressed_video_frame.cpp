@@ -31,12 +31,8 @@ void* GenericUncompressedVideoFrame::queryInterface(const nxpl::NX_GUID& interfa
 
 bool GenericUncompressedVideoFrame::validatePlane(int plane) const
 {
-    if (plane >= (int) m_data.size())
-    {
-        NX_ASSERT(false, lm("Requested plane %1 of %2").args(plane, m_data.size()));
-        return false;
-    }
-    return true;
+    return NX_ASSERT(plane >= 0 && plane < (int) m_data.size(),
+        lm("Requested plane %1 of %2").args(plane, m_data.size()));
 }
 
 int GenericUncompressedVideoFrame::dataSize(int plane) const
