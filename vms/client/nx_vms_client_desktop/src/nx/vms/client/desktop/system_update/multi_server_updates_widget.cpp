@@ -514,7 +514,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                         packageErrors << tr("Missing update package for the client");
                     }
                 }
-                else if (!missing)
+                else if (missing)
                 {
                     packageErrors << tr("Missing update package for some servers");
                 }
@@ -1491,6 +1491,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
                     messageBox->addButton(tr("OK"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
                     messageBox->setInformativeText(m_clientUpdateTool->getErrorText());
                     messageBox->exec();
+                    setTargetState(WidgetUpdateState::ready);
                 }
                 else
                 {
@@ -1839,6 +1840,8 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     bool showButton = m_updateSourceMode != UpdateSourceType::file &&
         (m_widgetState == WidgetUpdateState::ready || m_widgetState != WidgetUpdateState::initial);
+    if (hasLatestVersion)
+        showButton = false;
     ui->manualDownloadButton->setVisible(showButton);
 
     syncVersionReport(m_updateReport);
@@ -1936,9 +1939,12 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
     }
 
-    ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
-        !storageSettingsVisible || !m_showStorageSettings);
+    // Making this button invisible for now, until a proper mediaserver selection is impelemented.
+    //ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
+    //ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
+    //    !storageSettingsVisible || !m_showStorageSettings);
+    ui->advancedUpdateSettings->setVisible(false);
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, true);
 
     ui->cancelUpdateButton->setVisible(m_widgetState == WidgetUpdateState::readyInstall);
 
@@ -2034,6 +2040,10 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         };
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
+
+        debugState << QString("size(peers)=%1").arg(m_stateTracker->peersCount());
+        debugState << QString("size(model)=%1").arg(m_updatesModel->rowCount());
+        debugState << QString("size(sorted)=%1").arg(m_sortedModel->rowCount());
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {
