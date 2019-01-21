@@ -3022,6 +3022,26 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
     return mapper;
 }
 
+static bool isDwBlackJackMini()
+{
+    // The only way we know to find out is to detct their web-server presence on device.
+    const QString filePath = "/usr/local/bin/main-server";
+    QFile file(filePath);
+    if (!file.open(QFile::ReadOnly))
+    {
+        NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - unable to open file").args(filePath));
+        return false;
+    }
+
+    const auto content = file.readAll();
+    NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - contains:\n%2").args(filePath, content));
+    if (!content.contains("SteelBox"))
+        return false;
+
+    NX_ALWAYS(typeid(MediaServerProcess), "This server is DW BlackJack MINI");
+    return true;
+}
+
 Qn::ServerFlags MediaServerProcess::calcServerFlags()
 {
     Qn::ServerFlags serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
@@ -3057,6 +3077,11 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
 #else
     serverFlags |= Qn::SF_Has_HDD;
 #endif
+
+    // DW requested to accept professional licenses on their BlackJack MINI, see VMS-12693.
+    // This code should be removed as soon as we accept professional licenses on all arm devices.
+    if (serverFlags && Qn::SF_ArmServer && !isDwBlackJackMini())
+        serverFlags |= Qn::SF_RequireEdgeLicense;
 
     if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
         serverFlags |= Qn::SF_SupportsTranscoding;

@@ -374,8 +374,7 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (isAnalog())
         return Qn::LC_Analog;
 
-    // Since 3.2 Edge license type is used by any ARM server.
-    if (QnMediaServerResource::isArmServer(getParentResource()))
+    if (QnMediaServerResource::requiresEdgeLicense(getParentResource()))
         return Qn::LC_Edge;
 
     return Qn::LC_Professional;
