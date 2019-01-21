@@ -66,6 +66,8 @@ private:
     QScopedPointer<DWAbstractCameraProxy> m_cameraProxy;
 
     std::unique_ptr<CproApiClient> m_cproApiClient;
+
+    bool m_isJsonApiSupported = false;
 };
 
 #endif //ENABLE_ONVIF

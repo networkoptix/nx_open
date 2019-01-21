@@ -13,6 +13,7 @@
 #include <utils/media/av_codec_helper.h>
 #include <plugins/utils/multisensor_data_provider.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <plugins/resource/digitalwatchdog/helpers.h>
 
 bool modelHasZoom(const QString& cameraModel) {
@@ -320,22 +321,32 @@ nx::vms::server::resource::StreamCapabilityMap
         // additional dw-specific detection.
         return onvifResult;
     }
-
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
-    if (!codecs)
-        return onvifResult;
-    nx::vms::server::resource::StreamCapabilityMap result;
-    for (const auto& codec: *codecs)
+    if (codecs)
     {
-        for (const auto& onvifKeys: onvifResult.keys())
+        nx::vms::server::resource::StreamCapabilityMap result;
+        for (const auto& codec: *codecs)
         {
-            nx::vms::server::resource::StreamCapabilityKey key;
-            key.codec = codec.toUpper();
-            key.resolution = onvifKeys.resolution;
-            result.insert(key, nx::media::CameraStreamCapability());
+            for (const auto& onvifKeys: onvifResult.keys())
+            {
+                nx::vms::server::resource::StreamCapabilityKey key;
+                key.codec = codec.toUpper();
+                key.resolution = onvifKeys.resolution;
+                result.insert(key, nx::media::CameraStreamCapability());
+            }
         }
+        return result;
     }
-    return result;
+
+    const auto resourceUrl = nx::utils::Url(getUrl());
+    JsonApiClient jsonClient({resourceUrl.host(), resourceUrl.port()}, getAuth());
+    const auto codecsFromJson = jsonClient.getSupportedVideoCodecs(streamIndex);
+    if (codecsFromJson.empty())
+        return onvifResult;
+
+    m_isJsonApiSupported = true;
+    return codecsFromJson;
+
 }
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
@@ -343,9 +354,20 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
+    if (streamParams.codec == "H265" && m_isJsonApiSupported)
+    {
+        const auto resourceUrl = nx::utils::Url(getUrl());
+        JsonApiClient jsonClient({resourceUrl.host(), resourceUrl.port()}, getAuth());
+        if (!jsonClient.sendStreamParams(streamIndex, streamParams))
+            return CameraDiagnostics::CannotConfigureMediaStreamResult("Codec");
+
+        return CameraDiagnostics::NoErrorResult();
+    }
+
     auto result = base_type::sendVideoEncoderToCameraEx(encoder, streamIndex, streamParams);
     if (result)
         return result; //< Onvif videoencoder update was successful.
+
     if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
         NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
     return CameraDiagnostics::NoErrorResult();

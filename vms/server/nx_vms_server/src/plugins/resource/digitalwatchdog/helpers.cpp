@@ -1,5 +1,8 @@
 #include "helpers.h"
 
+#include <nx/network/url/url_builder.h>
+#include <nx/network/http/http_client.h>
+
 #include <nx/fusion/model_functions.h>
 #include <plugins/utils/xml_request_helper.h>
 #include <plugins/resource/digitalwatchdog/digital_watchdog_resource.h>
@@ -8,7 +11,41 @@ namespace {
 
 const std::chrono::seconds kCproApiCacheTimeout(5);
 
+const char* kJsonApiRequestDataTemplate =
+    "{\"jsonData\": { \"data\" : %1, \"file\" : \"param\", \"password\": \"%2\", \"username\": \"%3\"}}";
+
+QSize jsonApiResolutionToQSize(QString resolution)
+{
+    if (resolution == "vga")
+        return QSize(640, 480);
+    if (resolution == "cif")
+        return QSize(352, 240);
+    if (resolution == "4cif")
+        return QSize(704, 480);
+    if (resolution == "d1")
+        return QSize(720, 480);
+    if (resolution == "720p")
+        return QSize(1280, 720);
+    if (resolution == "1080p")
+        return QSize(1920, 1080);
+
+    const auto sizeComponents = resolution.split('x');
+    if (sizeComponents.size() != 2)
+    {
+        NX_DEBUG(typeid(QJsonObject), "Unknown resolution string format");
+        return {};
+    }
+
+    return QSize(sizeComponents[0].toInt(), sizeComponents[1].toInt());
+}
+
+QString QSizeToJsonApiResolution(QSize resolution)
+{
+    return QString::number(resolution.width()) + "x" + QString::number(resolution.height());
+}
+
 } // namespace
+
 
 CproApiClient::CproApiClient(QnDigitalWatchdogResource* resource):
     m_resource(resource)
@@ -136,5 +173,128 @@ boost::optional<std::pair<int, int> > CproApiClient::rangeOfTag(
     return std::pair<int, int>{start, end - start};
 }
 
+/* ============================================================================================== */
 
+JsonApiClient::JsonApiClient(nx::network::SocketAddress address, QAuthenticator auth):
+    m_address(std::move(address)),
+    m_auth(std::move(auth))
+{
+}
 
+nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoCodecs(
+    Qn::StreamIndex streamIndex)
+{
+    NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
+    const QJsonObject params =  getParams(QString("All.VideoInput._1.")
+        + (streamIndex == Qn::StreamIndex::primary ? "_1" : "_2"));
+    if (params.isEmpty())
+        return {};
+
+    const QStringList codecs = params["Codec"]["PVALUES"].toString().split(',');
+    nx::vms::server::resource::StreamCapabilityMap result;
+    for (const auto& codec: codecs)
+    {
+        const auto resolutions = params[codec]["Resolution"]["PVALUES"].toString().split(',');
+        for (const auto& resolution: resolutions)
+        {
+            nx::vms::server::resource::StreamCapabilityKey key;
+            key.codec = codec.toUpper();
+            key.resolution = jsonApiResolutionToQSize(resolution);
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+
+    return result;
+}
+
+bool JsonApiClient::sendStreamParams(Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams)
+{
+    NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
+
+    QString paramBasename =  QString("All.VideoInput._1.")
+        + (streamIndex == Qn::StreamIndex::primary ? "_1." : "_2.");
+
+    const QString codec = streamParams.codec.toLower();
+    const auto response = setParams({
+        {paramBasename + "Codec", codec},
+        {paramBasename + codec + ".Cbr", QString::number(streamParams.bitrateKbps)},
+        {paramBasename + codec + ".FrameRate", QString::number(int(streamParams.fps))},
+        {paramBasename + codec + ".Resolution", QSizeToJsonApiResolution(streamParams.resolution)}
+    });
+
+    if (response.isEmpty())
+        return false;
+    return true;
+}
+
+QJsonObject JsonApiClient::getParams(QString paramName)
+{
+    const auto requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setEndpoint(m_address)
+        .setPath("/cgi-bin/GetJsonValue.cgi")
+        .setQuery("TYPE=json")
+        .toUrl();
+
+    const auto response = doRequest(requestUrl,
+        lm(kJsonApiRequestDataTemplate)
+            .args('"' + paramName + '"', m_auth.password(), m_auth.user()).toUtf8());
+    if (!response.has_value())
+        return {};
+
+    NX_VERBOSE(this, "Response: [%1]", *response);
+    return *response;
+}
+
+QJsonObject JsonApiClient::setParams(const std::map<QString, QString>& keyValueParams)
+{
+    const auto requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setEndpoint(m_address)
+        .setPath("/cgi-bin/SetJsonValue.cgi")
+        .setQuery("TYPE=json")
+        .toUrl();
+
+    QJsonObject paramsJson;
+    for (const auto&[param, value]: keyValueParams)
+        paramsJson.insert(param, value.toLower());
+    QString params = QJsonDocument(paramsJson).toJson(QJsonDocument::Compact);
+
+    const auto response = doRequest(requestUrl,
+        lm(kJsonApiRequestDataTemplate).args(std::move(params), m_auth.password(), m_auth.user()).toUtf8());
+    if (!response.has_value())
+        return {};
+
+    NX_VERBOSE(this, "Response: [%1]", *response);
+    return *response;
+}
+
+std::optional<QJsonObject> JsonApiClient::doRequest(const nx::utils::Url& url, QByteArray data)
+{
+    NX_VERBOSE(this, "Sending request [%1] with data [%2]", url, data);
+
+    nx::network::http::HttpClient client;
+    if (!client.doPost(url, "application/json", std::move(data))
+        || !nx::network::http::StatusCode::isSuccessCode(client.response()->statusLine.statusCode))
+    {
+        NX_DEBUG(this, "Error with request [%1]: errno: [%2], HTTP code: [%3]",
+            url, SystemError::getLastOSErrorText(), client.response()->statusLine.statusCode);
+        return {};
+    }
+
+    const auto response = client.fetchEntireMessageBody();
+    if (!response)
+    {
+        NX_VERBOSE(this, "Error fetching value for request [%1]", url);
+        return {};
+    }
+
+    QJsonParseError error;
+    const auto jsonDoc = QJsonDocument::fromJson(*response, &error);
+    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    {
+        NX_VERBOSE(this, "Error parsing JSON response: [%1]; [%2]", error.errorString(), response);
+        return {};
+    }
+    return jsonDoc.object();
+}
