@@ -2,10 +2,6 @@
 
 #include <nx/utils/data_structures/map_helper.h>
 
-#include <nx/fusion/model_functions_fwd.h>
-#include <nx/fusion/model_functions.h>
-
-#include <nx/analytics/property_descriptor_storage.h>
 #include <nx/analytics/replacement_merge_executor.h>
 
 namespace nx::analytics {

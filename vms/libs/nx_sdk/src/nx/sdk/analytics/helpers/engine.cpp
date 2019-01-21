@@ -10,9 +10,7 @@
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
-
 #include <nx/sdk/helpers/plugin_event.h>
-
 #include <nx/sdk/analytics/i_plugin.h>
 
 namespace nx {

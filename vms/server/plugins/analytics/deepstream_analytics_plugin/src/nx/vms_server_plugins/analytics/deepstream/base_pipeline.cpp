@@ -1,13 +1,14 @@
 #include "base_pipeline.h"
 
+#define NX_PRINT_PREFIX "deepstream::BasePipeline::"
+#include <nx/kit/debug.h>
+
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_data_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
-#define NX_PRINT_PREFIX "deepstream::BasePipeline::"
-#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {

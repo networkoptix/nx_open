@@ -4,7 +4,6 @@
 #include <functional>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/error.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
