@@ -2,6 +2,7 @@ from os import system, path, remove, listdir
 import json
 import codecs
 import time
+from threads import threadedTestRun
 from datetime import datetime
 from check_server import ping
 import sys
@@ -43,8 +44,13 @@ def runTest(key, langList):
             # start testing.
             map(remove, (path.join(loc, 'combined-results', file) for file in listdir(path.join(loc, 'combined-results'))
                          if file.endswith('.png') and file.find(key) > -1))
+            
+            threadedTestRun(loc, key)
+            system('rebot -o output.xml -d {} -N {}_{} multi*'.format(path.join(loc, key),langList[key], key))
+            '''
             system('robot -N {}_{} -v SCREENSHOTDIRECTORY:{} -v BROWSER:headlesschrome -d {} -e not-ready -V getvars.py:{} test-cases'.format(
                 langList[key], key, path.join(loc, 'combined-results'), path.join(loc, key), key))
+            '''
             # ping the server at the end to make sure it didn't go down
             if ping().ok:
                 break
