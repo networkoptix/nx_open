@@ -34,6 +34,7 @@ struct CameraInfoParams
     CameraInfoParams() {}
     QString videoEncoderId;
     QString videoSourceId;
+    QString videoSourceToken;
     QString audioEncoderId;
     QString audioSourceId;
 
@@ -207,6 +208,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if( !result  )
         return result;
     info.videoSourceId = m_onvifRes->getVideoSourceId();
+    info.videoSourceToken = m_onvifRes->getVideoSourceToken();
 
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
@@ -434,6 +436,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params) const
 {
+    info.videoEncoderId = isPrimary
+        ? m_onvifRes->primaryVideoCapabilities().id
+        : m_onvifRes->secondaryVideoCapabilities().id;
+
     VideoConfigsReq request;
     VideoConfigsResp response;
 
@@ -462,9 +468,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         return CameraDiagnostics::RequestFailedResult(
             QLatin1String("fetchVideoEncoder"), QString());
     }
-
-    // TODO: #vasilenko UTF unuse std::string
-    info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
     if (!isCameraControlRequired || m_mustNotConfigureResource)
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
@@ -606,7 +609,7 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(
         if (!profile || !availableProfiles.contains(QString::fromStdString(profile->token)))
             continue;
         bool vSourceMatched = profile->VideoSourceConfiguration
-            && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();
+            && profile->VideoSourceConfiguration->SourceToken == info.videoSourceToken.toStdString();
         bool vEncoderMatched = profile->VideoEncoderConfiguration
             && profile->VideoEncoderConfiguration->token == info.videoEncoderId.toStdString();
         if (vSourceMatched && vEncoderMatched)
@@ -687,7 +690,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
         return CameraDiagnostics::NoErrorResult();
 
     bool vSourceMatched = profile && profile->VideoSourceConfiguration
-        && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();
+        && profile->VideoSourceConfiguration->SourceToken == info.videoSourceToken.toStdString();
     if (!vSourceMatched)
     {
         AddVideoSrcConfigReq request;
