@@ -28,16 +28,15 @@ export class NxCampageComponent implements OnInit, DoCheck {
     resolutions: any;
     filter: any;
     emptyFilter: any;
-    boolKeys: string[];
-    // cameraHeaders: string[];
     camerasTable: any;
     allowedParameters: string[];
     filterModel: any;
     differ: any;
+    tagDiffer: any;
+    resolutionDiffer: any;
     vendorDiffer: any;
     hardwareDiffer: any;
     toggleCamview: boolean;
-    multiselectOptions: any;
 
   private setupDefaults() {
       this.config = this.configService.getConfig();
@@ -88,15 +87,15 @@ export class NxCampageComponent implements OnInit, DoCheck {
             {value: '15824256', name: '16mp'}
         ];
       this.filter = {};
-      this.multiselectOptions = {
-          resolutions: this.resolutions,
-          hardwareTypes: this.hardwareTypes
-      };
+      // this.multiselectOptions = {
+      //     resolutions: this.resolutions,
+      //     hardwareTypes: this.hardwareTypes
+      // };
       this.emptyFilter = {
             query: '',
-            minResolution: this.resolutions[0],
-            hardwareTypes: [],
-            vendors: [],
+            // minResolution: this.resolutions[0],
+            // hardwareTypes: [],
+            // vendors: [],
             isPtzSupported: false,
             isAptzSupported: false,
             isAudioSupported: false,
@@ -108,9 +107,71 @@ export class NxCampageComponent implements OnInit, DoCheck {
             isMultiSensor: false
         };
       this.filterModel = this.emptyFilter;
-      this.boolKeys = Object.keys(this.emptyFilter).filter(key => {
-          return key.startsWith('is');
-      });
+
+      this.filterModel.tags = [
+          {
+              id  : 'isAudioSupported',
+              label: 'Audio',
+              value: false
+          },
+          {
+              id  : 'isTwAudioSupported',
+              label: '2-Way Audio',
+              value: false
+          },
+          {
+              id: 'isPtzSupported',
+              label: 'PTZ',
+              value: false
+          },
+          {
+              id  : 'isAptzSupported',
+              label: 'Advanced PTZ',
+              value: false
+          },
+          {
+              id  : 'isFisheye',
+              label: 'Fisheye',
+              value: false
+          },
+          {
+              id  : 'isMdSupported',
+              label: 'Motion',
+              value: false
+          },
+          {
+              id  : 'isIoSupported',
+              label: 'I/O',
+              value: false
+          },
+          {
+              id  : 'isH265',
+              label: 'H.265',
+              value: false
+          },
+          {
+              id  : 'isMultiSensor',
+              label: 'Multi Sensor',
+              value: false
+          }
+      ];
+      this.filterModel.selects = [
+          {
+              id      : 'resolution',
+              label   : 'Minimum Resolution',
+              items   : this.resolutions,
+              selected: this.resolutions[0]
+          }
+          // vendors will be added later
+      ];
+      this.filterModel.multiselects = [
+          {
+              id      : 'hardwareTypes',
+              label   : 'Types',
+              items   : this.hardwareTypes,
+              selected: []
+          }
+      ];
   }
 
   constructor(private configService: NxConfigService,
@@ -122,6 +183,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
       this.setupDefaults();
       this.differ = this.differs.find({}).create();
+      this.tagDiffer = this.differs.find([]).create();
+      this.resolutionDiffer = this.differs.find([]).create();
       this.vendorDiffer = this.differs.find([]).create();
       this.hardwareDiffer = this.differs.find([]).create();
 
@@ -133,28 +196,44 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
     ngDoCheck() {
         const filterChanges = this.differ.diff(this.filterModel);
-        const vendorChanges = this.vendorDiffer.diff(this.filterModel.vendors);
-        const hardwareChanges = this.hardwareDiffer.diff(this.filterModel.hardwareTypes);
+        let vendorChanges;
 
-        if (filterChanges || vendorChanges || hardwareChanges) {
+        if (this.filterModel.multiselects.find(x => x.id === 'vendors') !== undefined) {
+            vendorChanges = this.vendorDiffer.diff(this.filterModel.multiselects.find(x => x.id === 'vendors').selected);
+        }
+
+        const tagChanges = this.tagDiffer.diff(this.filterModel.tags.map(tag => tag.value));
+        const resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => x.id === 'resolution').selected);
+        const hardwareChanges = this.hardwareDiffer.diff(this.filterModel.multiselects.find(x => x.id === 'hardwareTypes').selected);
+
+        if (filterChanges || tagChanges || resolutionChanges || vendorChanges || hardwareChanges) {
             this.searchVendor(this.filterModel);
         }
     }
 
-  activate() {
-      this.resetFilters();
-      this.cameraService
-          .getAllCameras(this.company)
-          .subscribe(data => {
-              this.data = data;
-              this.camerasSuccessFn(this.data);
+    activate() {
+        this.resetFilters();
+        this.cameraService
+            .getAllCameras(this.company)
+            .subscribe(data => {
+                this.data = data;
+                this.camerasSuccessFn(this.data);
 
-              // reformat to fit the multiselect component
-              this.multiselectOptions.vendors = this.vendors.map(v => (
-                      { id: v, label: v }
-              ));
-          });
-  }
+                // reformat to fit the multiselect component
+                this.filterModel.multiselects.unshift(
+                        {
+                            id: 'vendors',
+                            label: 'Manufacturers',
+                            items: this.vendors.map(v => (
+                                    { id: v, label: v }
+                            )),
+                            selected: []
+                        });
+                // this.multiselectOptions.vendors = this.vendors.map(v => (
+                //         { id: v, label: v }
+                // ));
+            });
+    }
 
   resetFilters() {
       this.filter = {...this.emptyFilter};
@@ -238,7 +317,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.filter = filter;
 
       if (this.data) {
-          this.camSearch.campageSearch(this.data, this.filter, this.boolKeys).subscribe(cameras => {
+          this.camSearch.campageSearch(this.data, this.filter).subscribe(cameras => {
               this.activeCamera = undefined;
               this.cameras = cameras;
               this.camerasSuccessFn(this.cameras);

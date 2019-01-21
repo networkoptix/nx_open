@@ -92,8 +92,14 @@ export class NxSearchComponent implements OnInit, AfterViewInit, ControlValueAcc
         });
 
         this.localFilter.selects.forEach((filter) => {
-            if (filter.selected) {
+            if (filter.selected && filter.selected.value !== '0') { // not default value
                 this.numberFilters++;
+            }
+        });
+
+        this.localFilter.multiselects.forEach((filter) => {
+            if (filter.selected) { // not default value
+                this.numberFilters += filter.selected.length;
             }
         });
     }
@@ -110,7 +116,11 @@ export class NxSearchComponent implements OnInit, AfterViewInit, ControlValueAcc
         });
 
         this.localFilter.selects.forEach((filter) => {
-            filter.selected = undefined;
+            filter.selected = filter.items[0];
+        });
+
+        this.localFilter.multiselects.forEach((filter) => {
+            filter.selected = [];
         });
 
         this.numberFilters = 0;

@@ -59,6 +59,19 @@ export class NxSandboxComponent {
                     selected: undefined
                 }
             ],
+            multiselects: [
+                {
+                    label: 'Types',
+                    items: [
+                        { id: 'Camera', label: 'Camera' },
+                        { id: 'Multi-Sensor Camera', label: 'Multi-Sensor Camera' },
+                        { id: 'Encoder', label: 'Encoder' },
+                        { id: 'DVR', label: 'DVR' },
+                        { id: 'Other', label: 'Other' }
+                    ],
+                    selected: undefined
+                }
+            ],
             tags   : [
                 {
                     label: 'Access Control',

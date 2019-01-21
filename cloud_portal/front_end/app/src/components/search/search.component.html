@@ -1,97 +1,99 @@
-<div class="nx-search-container">
+<div class="nx-search container">
 
     <div class="row">
-        <div class="col-12">
-            <div class="row vertical-align">
-                <div class="col-12 pl-0">
-                    <div class="btn-group w-100">
-                        <span class="glyphicon glyphicon-search icon-search"></span>
-                        <input type="text"
-                               class="form-control w-100 search-input"
-                               name="query"
-                               placeholder="Search"
-                               [ngClass]="{'non-empty': localFilter.query != ''}"
-                               [(ngModel)]="localFilter.query"
-                               autocomplete="off" />
-                        <span class="glyphicon close-icon search-clear"
-                              [hidden]="!localFilter.query" (click)="resetQuery()"></span>
+        <div class="col-12 p-0">
+            <div class="btn-group w-100">
+                <span class="glyphicon glyphicon-search icon-search"></span>
+                <input [(ngModel)]="localFilter.query"
+                       type="text"
+                       class="form-control w-100 search-input"
+                       [ngClass]="{'non-empty': localFilter.query != ''}"
+                       name="query"
+                       autocomplete="off"
+                       placeholder="Search"/>
+                <span class="glyphicon close-icon search-clear"
+                      [hidden]="!localFilter.query" (click)="resetQuery()"></span>
+            </div>
+        </div>
+
+        <div class="col-12 p-0" *ngIf="showAdvancedOptions">
+            <div class="row mt-3 m-0">
+                <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let select of localFilter.selects">
+                    <label>{{ select.label }}</label>
+                    <nx-select [name]="select.label"
+                               [items]="select.items"
+                               label="optionLabel"
+                               [(ngModel)]="select.selected"
+                               (onSelected)="modelChanged('resolutions', $event)"
+                               [selected]="select.selected ? select.selected : null">
+                    </nx-select>
+                </div>
+
+                <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let multiselect of localFilter.multiselects">
+                    <label>{{ multiselect.label }}</label>
+                    <nx-multi-select [name]="multiselect.label"
+                                     [items]="multiselect.items"
+                                     [(ngModel)]="multiselect.selected"
+                                     (ngModelChange)="modelChanged('vendors', $event)"
+                                     canSelectAll>
+                    </nx-multi-select>
+                </div>
+            </div>
+
+            <div class="row mt-3 mb-2 m-0" [hidden]="!showAdvancedOptions">
+                <div class="col-12 p-0">
+                    <div class="form-group m-0">
+                        <label>Features</label>
+                        <nav aria-label="Cameras table navigation">
+                            <ul class="pagination m-0">
+                                <li class="tags ml-0" *ngFor="let tag of localFilter.tags">
+                                    <nx-tag
+                                            [name]="tag.label"
+                                            [(ngModel)]="tag.value"
+                                            (onClick)="selectBooleanFilter($event)"
+                                            [value]="tag.value === null ? false : tag.value">
+                                        {{ tag.label }}
+                                    </nx-tag>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-
-    <div class="row mt-3 mr-0" *ngIf="showAdvancedOptions">
-        <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let select of localFilter.selects">
-            <label>{{ select.label }}</label>
-            <nx-select [name]="select.label"
-                       [items]="select.items"
-                       label="optionLabel"
-                       [(ngModel)]="select.selected"
-                       (onSelected)="modelChanged('resolutions', $event)"
-                       [selected]="select.selected ? select.selected : null">
-            </nx-select>
-        </div>
-
-        <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let multiselect of localFilter.multiselects">
-            <label>{{ multiselect.label }}</label>
-            <nx-multi-select name="vdMultiSelect"
-                             [items]="multiselectOptions.vendors"
-                             [ngModel]="filter.vendors"
-                             (ngModelChange)="modelChanged('vendors', $event)"
-                             canSelectAll>
-            </nx-multi-select>
-        </div>
-    </div>
-
-    <div class="row mt-3" [hidden]="!showAdvancedOptions">
-        <div class="form-group m-0">
-            <nav aria-label="Cameras table navigation">
-                <ul class="pagination m-0">
-                    <li class="tags ml-0" *ngFor="let tag of localFilter.tags">
-                        <nx-tag
-                                [name]="tag.label"
-                                [(ngModel)]="tag.value"
-                                (onClick)="selectBooleanFilter($event)"
-                                [value]="tag.value === null ? false : tag.value">
-                            {{ tag.label }}
-                        </nx-tag>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-
-    <div class="row mt-3" *ngIf="expandable">
-        <div class="col-12 dropdown p-0"
+        <div class="col-12 dropdown p-0 mt-2" *ngIf="expandable"
              [ngClass]="{'show': showAdvancedOptions}" (nxClickElsewhere)="show = false">
-            <div class="area d-flex justify-content-between">
-                <div class="d-flex justify-content-start">
+            <div class="area clearfix">
+                <div class="float-left">
                     <a href class="btn-text" (click)="toggleOptions()">
-                        <div class="nav-arrow position-relative">
+                        <div class="nav-arrow">
                             <span></span>
                             <span></span>
                         </div>
                         <span translete>Advanced search</span>
                     </a>
                 </div>
-                <div *ngIf="numberFilters != 0">
-                    <span [ngSwitch]="numberFilters">
-                            <span *ngSwitchCase="1">
-                            1 filter applied
-                        </span>
-                            <span *ngSwitchDefault>
-                            {{numberFilters}} filters applied
-                        </span>
+                <div *ngIf="numberFilters != 0" class="float-right">
+                    <div [ngSwitch]="numberFilters" class="float-left">
+                        <span *ngSwitchCase="1">
+                        1 filter applied
                     </span>
-                    <span class="btn-text ml-2">
-                        <a href (click)="resetFilters()">&#9587; <span translete>Clear All</span></a>
+                        <span *ngSwitchDefault>
+                        {{numberFilters}} filters applied
                     </span>
+                    </div>
+                    <div class="ml-2 float-left">
+                        <a href class="btn-text has-icon position-relative"
+                           (click)="resetFilters()">
+                            <span class="close"></span>
+                            <span translete>Clear All</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <hr class="mb-0 w-100" [hidden]="!showAdvancedOptions">
+            <hr class="mb-0 mt-2 w-100" [hidden]="!showAdvancedOptions">
         </div>
-    </div>
 
+    </div>
 </div>

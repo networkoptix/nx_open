@@ -12,7 +12,7 @@ export class CampageSearchService {
 
   constructor() { }
 
-    campageSearch (allCameras, filter, boolKeys): Observable<any> {
+    campageSearch (allCameras, filter): Observable<any> {
       const query = filter.query;
       const queryTerms = query.trim().split(' ');
       const preferredVendors = '';
@@ -30,22 +30,26 @@ export class CampageSearchService {
               || c.maxResolution.includes(query));
       }
 
+      const resolution = filter.selects.find(x => x.id === 'resolution').selected;
+      const vendors = filter.multiselects.find(x => x.id === 'vendors').selected;
+      const types = filter.multiselects.find(x => x.id === 'hardwareTypes').selected;
+
       const cameras = allCameras.filter(camera => {
-          if (boolKeys.some(key => {
-              return filter[key] === true && camera[key] !== true;
+          if (filter.tags.some(key => {
+              return key.value === true && camera[key.id] !== true;
           })) {
               return false;
           }
 
-          if (filter.minResolution.value !== 0 && camera.resolutionArea <= filter.minResolution.value * 0.9) {
+          if (resolution.value !== 0 && camera.resolutionArea <= resolution.value * 0.9) {
               return false;
           }
 
-          if (filter.vendors.length > 0 && filter.vendors.indexOf(camera.vendor) === -1) {
+          if (vendors.length > 0 && vendors.indexOf(camera.vendor) === -1) {
               return false;
           }
 
-          if (filter.hardwareTypes.length > 0 && filter.hardwareTypes.indexOf(camera.hardwareType) === -1) {
+          if (types.length > 0 && types.indexOf(camera.hardwareType) === -1) {
               return false;
           }
 

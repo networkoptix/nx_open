@@ -1,12 +1,18 @@
 <div class="container campage">
     <div class="row p-3">
         <div class="col">
-            <nx-camera-search
-                name="filterModel"
-                [(ngModel)]="filterModel"
-                [multiselectOptions] = "multiselectOptions"
-                ngDefaultControl>
-            </nx-camera-search>
+            <nx-search
+                    name="filterModel"
+                    [(ngModel)]="filterModel"
+                    expandable
+                    ngDefaultControl>
+            </nx-search>
+            <!--<nx-camera-search-->
+                <!--name="filterModel"-->
+                <!--[(ngModel)]="filterModel"-->
+                <!--[multiselectOptions] = "multiselectOptions"-->
+                <!--ngDefaultControl>-->
+            <!--</nx-camera-search>-->
         </div>
     </div>
 
