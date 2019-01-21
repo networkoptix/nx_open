@@ -65,12 +65,18 @@ protected:
         ASSERT_EQ(m_updateInformation, receivedUpdateInfo);
     }
 
-    void thenPeersUpdateStatusShouldBe(const QMap<QnUuid, update::Status::Code>& expectedStatuses)
+    void thenPeersUpdateStatusShouldBe(
+        const QMap<QnUuid, update::Status::Code>& expectedStatuses,
+        bool isRequestLocal = false)
     {
         QList<nx::update::Status> updateStatusList;
         while (true)
         {
-            NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateStatus", &updateStatusList);
+            QString path = "/ec2/updateStatus";
+            if (isRequestLocal)
+                path += "?local";
+
+            NX_TEST_API_GET(m_peers[0].get(), path, &updateStatusList);
             bool ok = true;
             if (updateStatusList.size() == expectedStatuses.size())
             {
@@ -164,10 +170,10 @@ protected:
         ASSERT_TRUE(receivedUpdateInfo.isEmpty());
     }
 
-    void whenServerRestartedWithNewVersion(int peerIndex)
+    void whenServerRestartedWithNewVersion(int peerIndex, const std::string& version = "4.0.0.1")
     {
         m_peers[peerIndex]->stop();
-        m_peers[peerIndex]->addCmdOption("--override-version=4.0.0.1");
+        m_peers[peerIndex]->addCmdOption("--override-version=" + version);
         ASSERT_TRUE(m_peers[peerIndex]->start());
     }
 
@@ -447,6 +453,11 @@ TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
+TEST_F(Updates, installUpdate_participantWithNewerVersionDoesNotReveiveRequest)
+{
+    // #TODO #akulikov
+}
+
 TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
 {
     givenConnectedPeers(3);
@@ -465,6 +476,11 @@ TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
     QList<QnUuid> participants{ peerId(0), peerId(1), peer2Id };
     thenInstallUpdateWithPeersParameterShouldFail(participants);
     thenGlobalUpdateInformationShouldContainParticipants(participants);
+}
+
+TEST_F(Updates, installUpdate_fail_emptyUpdateInformation)
+{
+    // #TODO #akulikov
 }
 
 TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
@@ -501,6 +517,17 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonPartic
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
+TEST_F(Updates, updateStatus_nonParticipantInList_requestisLocal)
+{
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::idle} };
+    thenPeersUpdateStatusShouldBe(expectedStatuses, /*isRequestLocal*/ true);
+}
+
 TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsEmpty)
 {
     givenConnectedPeers(2);
@@ -511,6 +538,54 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
         {peerId(0), update::Status::Code::readyToInstall},
         {peerId(1), update::Status::Code::readyToInstall} };
     thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, updateStatus_participantHasNewerVersionAndBecomesOffline_partcipantsListIsEmpty)
+{
+    givenConnectedPeers(2);
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
+    thenItShouldBeRetrievable();
+
+    whenServerRestartedWithNewVersion(1, "4.0.0.2");
+    whenServersConnected();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
+{
+    givenConnectedPeers(2);
+    whenServerRestartedWithNewVersion(0, "4.0.0.2");
+    whenServerRestartedWithNewVersion(1, "4.0.0.2");
+    whenServersConnected();
+
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+}
+
+TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLocal)
+{
+    givenConnectedPeers(2);
+    whenServerRestartedWithNewVersion(0, "4.0.0.2");
+    whenServerRestartedWithNewVersion(1, "4.0.0.2");
+    whenServersConnected();
+
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
+    thenItShouldBeRetrievable();
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::error}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses, /*isLocal*/ true);
+}
+
+TEST_F(Updates, updateStatus_emptyUpdateInformation_allShouldBeInList)
+{
+    // #TODO #akulikov
 }
 
 TEST_F(Updates, finishUpdate_success_updateInformationCleared)
@@ -600,6 +675,10 @@ TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
     whenServerRestartedWithOldVersion(1);
     whenServersConnected();
     thenFinishUpdateWithignorePendingPeersShouldSucceed();
+}
+TEST_F(Updates, finishUpdate_success_participantHasVersionNewerThanTarget)
+{
+    // #TODO #akulikov
 }
 
 } // namespace nx::vms::server::test

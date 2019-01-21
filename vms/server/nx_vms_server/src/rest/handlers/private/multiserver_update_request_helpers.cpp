@@ -1,12 +1,10 @@
 #include "multiserver_update_request_helpers.h"
-#include "multiserver_request_helper.h"
-
 #include <nx/update/update_information.h>
 
 namespace detail {
 
 void checkUpdateStatusRemotely(
-    const QList<QnUuid>& participants,
+    const IfParticipantPredicate& ifParticipantPredicate,
     QnCommonModule* commonModule,
     const QString& path,
     QList<nx::update::Status>* reply,
@@ -32,15 +30,21 @@ void checkUpdateStatusRemotely(
             }
         };
 
-    requestRemotePeers(commonModule, path, *reply, context, mergeFunction, participants);
+    requestRemotePeers(commonModule, path, *reply, context, mergeFunction, ifParticipantPredicate);
     auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
         commonModule->resourcePool()->getAllServers(Qn::Offline));
 
-    const auto participantsSet = QSet<QnUuid>::fromList(participants);
     for (const auto offlineServer: offlineServers)
     {
-        if (!participantsSet.isEmpty() && !participantsSet.contains(offlineServer->getId()))
-            continue;
+        if (ifParticipantPredicate)
+        {
+            const auto participationStatus = ifParticipantPredicate(
+                offlineServer->getId(),
+                offlineServer->getModuleInformation().version);
+
+            if (participationStatus != ParticipationStatus::participant)
+                continue;
+        }
 
         if (std::find_if(reply->cbegin(), reply->cend(),
             [&offlineServer](const nx::update::Status& updateStatus)
@@ -54,6 +58,29 @@ void checkUpdateStatusRemotely(
         reply->append(nx::update::Status(offlineServer->getId(), nx::update::Status::Code::offline,
             kOfflineMessage));
     }
+}
+
+IfParticipantPredicate makeIfParticipantPredicate(nx::CommonUpdateManager* updateManager)
+{
+    QnUuidList participants;
+    if (!updateManager->participants(&participants))
+        return nullptr;
+
+    const auto targetVersion = updateManager->targetVersion();
+    if (targetVersion.isNull())
+        return nullptr;
+
+    return
+        [participants = QSet<QnUuid>::fromList(participants), targetVersion](
+            const QnUuid& id,
+            const nx::vms::api::SoftwareVersion& version)
+        {
+            if (!participants.isEmpty() && !participants.contains(id))
+                return ParticipationStatus::notInList;
+
+            return version <= targetVersion
+                ? ParticipationStatus::participant : ParticipationStatus::incompatibleVersion;
+        };
 }
 
 } // namespace detail

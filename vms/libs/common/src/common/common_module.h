@@ -277,6 +277,10 @@ public:
     void setStandAloneMode(bool value);
     bool isStandAloneMode() const;
 
+    nx::utils::SoftwareVersion engineVersion() const;
+    void setEngineVersion(const nx::utils::SoftwareVersion& version);
+
+
     nx::metrics::Storage* metrics() const;
 
     void setAuditManager(QnAuditManager* auditManager);
@@ -319,7 +323,6 @@ private:
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
-    nx::vms::api::SoftwareVersion m_engineVersion;
     nx::vms::api::ModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled = false;
@@ -356,4 +359,5 @@ private:
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};
+    nx::utils::SoftwareVersion m_engineVersion;
 };

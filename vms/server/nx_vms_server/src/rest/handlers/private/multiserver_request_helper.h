@@ -33,11 +33,21 @@ nx::utils::Url getServerApiUrl(const QString& path, const QnMediaServerResourceP
     return result;
 }
 
-QSet<QnMediaServerResourcePtr> participantServers(const QList<QnUuid>& serverIdList,
-    QnCommonModule* commonModule);
+enum class ParticipationStatus
+{
+    participant,
+    notInList,
+    incompatibleVersion
+};
 
-QSet<QnMediaServerResourcePtr> filterOutNonParticipants(
-    const QSet<QnMediaServerResourcePtr>& allServers, const QList<QnUuid>& serverIdList);
+using IfParticipantPredicate =
+    nx::utils::MoveOnlyFunc<ParticipationStatus(
+        const QnUuid&,
+        const nx::vms::api::SoftwareVersion&)>;
+
+QSet<QnMediaServerResourcePtr> participantServers(
+    const IfParticipantPredicate& ifPartcipantPredicate,
+    QnCommonModule* commonModule);
 
 template<typename ReplyType, typename MergeFunction, typename RequestData>
 void requestRemotePeers(
@@ -46,9 +56,9 @@ void requestRemotePeers(
     ReplyType& outputReply,
     QnMultiserverRequestContext<RequestData>* context,
     const MergeFunction& mergeFunction,
-    const QList<QnUuid>& serverIdList = QList<QnUuid>())
+    const IfParticipantPredicate& ifPartcipantPredicate = nullptr)
 {
-    for (const auto& server: participantServers(serverIdList, commonModule))
+    for (const auto& server: participantServers(ifPartcipantPredicate, commonModule))
     {
         const auto completionFunc =
             [&outputReply, context, serverId = server->getId(), &mergeFunction](

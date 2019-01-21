@@ -3,7 +3,7 @@
 namespace detail {
 
 QSet<QnMediaServerResourcePtr> participantServers(
-    const QList<QnUuid>& serverIdList,
+    const IfParticipantPredicate& ifPartcipantPredicate,
     QnCommonModule* commonModule)
 {
     const auto systemName = commonModule->globalSettings()->systemName();
@@ -22,27 +22,21 @@ QSet<QnMediaServerResourcePtr> participantServers(
             servers.insert(server);
     }
 
-    return filterOutNonParticipants(servers, serverIdList);
-}
-
-QSet<QnMediaServerResourcePtr> filterOutNonParticipants(
-    const QSet<QnMediaServerResourcePtr>& allServers,
-    const QList<QnUuid>& serverIdList)
-{
-    QSet<QnMediaServerResourcePtr> resultServers = allServers;
-    if (!serverIdList.isEmpty())
+    if (ifPartcipantPredicate)
     {
-        const auto serverIdSet = QSet<QnUuid>::fromList(serverIdList);
-        for (auto it = resultServers.cbegin(); it != resultServers.cend();)
+        for (auto it = servers.cbegin(); it != servers.cend();)
         {
-            if (!serverIdSet.contains((*it)->getId()))
-                it = resultServers.erase(it);
+            const auto participationStatus =
+                ifPartcipantPredicate((*it)->getId(), (*it)->getModuleInformation().version);
+
+            if (participationStatus != ParticipationStatus::participant)
+                it = servers.erase(it);
             else
                 ++it;
         }
     }
 
-    return resultServers;
+    return servers;
 }
 
 } // namespace detail

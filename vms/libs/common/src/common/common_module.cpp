@@ -209,6 +209,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_dataPool = instance<QnResourceDataPool>();
 
     m_analyticsDescriptorListManager = new nx::analytics::DescriptorListManager(this);
+    m_engineVersion = nx::vms::api::SoftwareVersion(QnAppInfo::engineVersion());
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -218,6 +219,16 @@ void QnCommonModule::setModuleGUID(const QnUuid& guid)
         m_uuid = guid;
     }
     resetCachedValue(); //< Update module information
+}
+
+nx::utils::SoftwareVersion QnCommonModule::engineVersion() const
+{
+    return m_engineVersion;
+}
+
+void QnCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
+{
+    m_engineVersion = version;
 }
 
 QnCommonModule::~QnCommonModule()

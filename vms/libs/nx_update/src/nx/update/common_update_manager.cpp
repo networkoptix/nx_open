@@ -260,6 +260,7 @@ update::FindPackageResult CommonUpdateManager::findPackage(
 {
     return update::findPackage(
         commonModule()->moduleGUID(),
+        commonModule()->engineVersion(),
         QnAppInfo::currentSystemInformation(),
         globalSettings()->updateInformation(),
         runtimeInfoManager()->localInfo().data.peer.isClient(),

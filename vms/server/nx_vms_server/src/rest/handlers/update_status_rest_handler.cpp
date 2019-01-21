@@ -18,8 +18,8 @@ int QnUpdateStatusRestHandler::executeGet(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);
 
-    QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request, processor->owner()->getPort());
+    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
+        processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
     if (request.isLocal)
@@ -28,10 +28,9 @@ int QnUpdateStatusRestHandler::executeGet(
     }
     else
     {
-        QnUuidList participants;
-        serverModule()->updateManager()->participants(&participants);
-        detail::checkUpdateStatusRemotely(participants, processor->commonModule(), path, &reply,
-            &context);
+        detail::checkUpdateStatusRemotely(
+            detail::makeIfParticipantPredicate(serverModule()->updateManager()),
+            processor->commonModule(), path, &reply, &context);
     }
 
     QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);

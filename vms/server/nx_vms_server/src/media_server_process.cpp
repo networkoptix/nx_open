@@ -2483,7 +2483,8 @@ void MediaServerProcess::registerRestHandlers(
      * %return The amount of free space available for update files in bytes for each online server
      *     in the system, in the specified format.
      */
-    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
+    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
+        commonModule()->engineVersion()));
     reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
     reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
@@ -3427,7 +3428,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 
         // used for statistics reported
         server->setSystemInfo(QnAppInfo::currentSystemInformation());
-        server->setVersion(qnStaticCommon->engineVersion());
+        server->setVersion(commonModule()->engineVersion());
 
         SettingsHelper settingsHelper(this->serverModule());
         QByteArray settingsAuthKey = settingsHelper.getAuthKey();
@@ -3471,7 +3472,7 @@ bool MediaServerProcess::setUpMediaServerResource(
         moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
 
     nx::vms::api::ModuleInformation selfInformation = commonModule()->moduleInformation();
-    selfInformation.version = qnStaticCommon->engineVersion();
+    selfInformation.version = commonModule()->engineVersion();
     selfInformation.sslAllowed = serverModule->settings().allowSslConnections();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
@@ -3917,7 +3918,7 @@ void MediaServerProcess::setUpDataFromSettings()
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
         qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
-        qnStaticCommon->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
+        commonModule()->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
     if (!m_cmdLineArguments.allowedDiscoveryPeers.isEmpty())

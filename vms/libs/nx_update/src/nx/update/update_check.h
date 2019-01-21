@@ -24,11 +24,13 @@ enum class FindPackageResult
 
 Information updateInformation(
     const QString& url,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);
 
 FindPackageResult findPackage(
     const QnUuid& moduleGuid,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
@@ -39,6 +41,7 @@ FindPackageResult findPackage(
 
 FindPackageResult findPackage(
     const QnUuid& moduleGuid,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
@@ -48,7 +51,7 @@ FindPackageResult findPackage(
     QString* outMessage);
 
 FindPackageResult fromByteArray(
-    const QByteArray& serializedUpdateInformation, 
+    const QByteArray& serializedUpdateInformation,
     Information* outInformation,
     QString* outMessage);
 
@@ -76,6 +79,7 @@ using UpdateCheckCallback = std::function<void (const UpdateContents&)>;
  */
 std::future<UpdateContents> checkLatestUpdate(
     const QString& updateUrl,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     UpdateCheckCallback&& callback = {});
 
 /**
@@ -88,6 +92,7 @@ std::future<UpdateContents> checkLatestUpdate(
  */
 std::future<UpdateContents> checkSpecificChangeset(
     const QString& updateUrl,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const QString& build,
     UpdateCheckCallback&& callback = {});
 

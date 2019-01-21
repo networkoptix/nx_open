@@ -1,7 +1,7 @@
 #include "finish_update_rest_handler.h"
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/server_update_manager.h>
-#include "private/multiserver_request_helper.h"
+#include "private/multiserver_update_request_helpers.h"
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -14,29 +14,37 @@ QnFinishUpdateRestHandler::QnFinishUpdateRestHandler(QnMediaServerModule* server
 
 bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
 {
+    using namespace detail;
     auto servers = QSet<QnMediaServerResourcePtr>::fromList(
         serverModule()->commonModule()->resourcePool()->getAllServers(Qn::AnyStatus));
+    const auto ifParticipantPredicate =
+        makeIfParticipantPredicate(serverModule()->updateManager());
 
-    QnUuidList participantsIds;
-    if (!serverModule()->updateManager()->participants(&participantsIds))
-        return false;
-
-    const auto participants = detail::filterOutNonParticipants(servers, participantsIds);
-    const auto targetVersion = serverModule()->updateManager()->targetVersion();
-    if (targetVersion.isNull())
-        return false;
-
-    return std::all_of(participants.cbegin(), participants.cend(),
-        [&targetVersion](const auto& server)
+    return ifParticipantPredicate && std::all_of(servers.cbegin(), servers.cend(),
+        [&ifParticipantPredicate,
+        targetVersion = serverModule()->updateManager()->targetVersion()](const auto& server)
         {
-            return server->getModuleInformation().version >= targetVersion;
+            const auto serverVersion = server->getModuleInformation().version;
+            switch (ifParticipantPredicate(server->getId(), serverVersion))
+            {
+                case ParticipationStatus::participant:
+                    return serverVersion == targetVersion;
+                case ParticipationStatus::notInList:
+                case ParticipationStatus::incompatibleVersion:
+                    return true;
+            }
+            return false;
         });
 }
 
-int QnFinishUpdateRestHandler::executePost(const QString& /*path*/,
-    const QnRequestParamList& params, const QByteArray& body,
-    const QByteArray& /*srcBodyContentType*/, QByteArray& result,
-    QByteArray& resultContentType, const QnRestConnectionProcessor* processor)
+int QnFinishUpdateRestHandler::executePost(
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QByteArray& /*srcBodyContentType*/,
+    QByteArray& result,
+    QByteArray& resultContentType,
+    const QnRestConnectionProcessor* processor)
 {
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);

@@ -8,7 +8,7 @@
 namespace {
 
 bool allParticipantsAreReadyForInstall(
-    const QList<QnUuid>& participants,
+    const detail::IfParticipantPredicate& ifParticipantPredicate,
     const QnRestConnectionProcessor* processor)
 {
     auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
@@ -19,33 +19,26 @@ bool allParticipantsAreReadyForInstall(
         processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(
-        participants,
-        processor->commonModule(),
-        "/ec2/updateStatus",
-        &reply,
-        &context);
+    detail::checkUpdateStatusRemotely(ifParticipantPredicate,processor->commonModule(),
+        "/ec2/updateStatus", &reply, &context);
 
     return std::all_of(reply.cbegin(), reply.cend(),
         [](const auto& status)
         {
-            using nx::update::Status;
-            return status.code == Status::Code::readyToInstall
-                || status.code == Status::Code::latestUpdateInstalled;
+            return status.code == nx::update::Status::Code::readyToInstall
+                || status.code == nx::update::Status::Code::latestUpdateInstalled;
         });
 }
 
 void sendInstallRequest(
-    const QList<QnUuid>& participants,
+    const detail::IfParticipantPredicate& ifParticipantPredicate,
     QnCommonModule* commonModule,
     const QString& path,
     const QByteArray& contentType,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
-    auto allServers = detail::participantServers(participants, commonModule).toList();
-    std::sort(
-        allServers.begin(),
-        allServers.end(),
+    auto allServers = detail::participantServers(ifParticipantPredicate, commonModule).toList();
+    std::sort(allServers.begin(), allServers.end(),
         [commonModule](const auto& server1, const auto& server2)
         {
             return commonModule->router()->routeTo(server1->getId()).distance
@@ -57,10 +50,9 @@ void sendInstallRequest(
         if (server->getId() == commonModule->moduleGUID())
             continue;
 
-        const nx::utils::Url apiUrl = detail::getServerApiUrl(path, server, context);
-        runMultiserverUploadRequest(
-            commonModule->router(), apiUrl, QByteArray(),
-            contentType, QString(), QString(), server,
+        runMultiserverUploadRequest(commonModule->router(),
+            detail::getServerApiUrl(path, server, context),
+            QByteArray(), contentType, QString(), QString(), server,
             [server, context](SystemError::ErrorCode errorCode, int httpStatusCode)
             {
                 if (errorCode != SystemError::noError)
@@ -142,7 +134,18 @@ int QnInstallUpdateRestHandler::executePost(
                 QnRestResult::InternalServerError);
         }
 
-        if (!allParticipantsAreReadyForInstall(participants, processor))
+        const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
+            serverModule()->updateManager());
+
+        if (!ifParticipantPredicate)
+        {
+            return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+                "Failed to determine update participants. Update information might not be valid",
+                &result, &resultContentType, Qn::JsonFormat, request.extraFormatting,
+                QnRestResult::InternalServerError);
+        }
+
+        if (!allParticipantsAreReadyForInstall(ifParticipantPredicate, processor))
         {
             return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
                 "Not all servers in the system are ready for install",
@@ -152,7 +155,7 @@ int QnInstallUpdateRestHandler::executePost(
         QnMultiserverRequestContext<QnEmptyRequestData> context(request,
             processor->owner()->getPort());
 
-        sendInstallRequest(participants, serverModule()->commonModule(), path,
+        sendInstallRequest(ifParticipantPredicate, serverModule()->commonModule(), path,
             srcBodyContentType, &context);
     }
 
