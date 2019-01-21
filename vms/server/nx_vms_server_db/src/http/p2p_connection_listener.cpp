@@ -320,7 +320,7 @@ void ConnectionProcessor::run()
     if (!tryAcquireConnected(sameDirectionConnectionLockGuard, remotePeer))
         return;
 
-    bool useWebSocket = d->request.requestLine.url.path().contains(ConnectionBase::kWebsocketUrlPath);
+    bool useWebSocket = !d->request.requestLine.url.path().contains(ConnectionBase::kHttpUrlPath);
     if (useWebSocket)
     {
         auto error = websocket::validateRequest(d->request, &d->response);
