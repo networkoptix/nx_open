@@ -48,8 +48,7 @@ export class NxConfigService {
                 },
                 tableLarge: {
                     rows: 20
-                },
-                vendorGroups : 4
+                }
             },
 
             systemStatuses                : {
@@ -296,6 +295,9 @@ export class NxConfigService {
             animation: {
                 carouselImageEnter: '0.25s ease-in',
                 carouselImageLeave: '0.25s ease-out'
+            },
+            campage: {
+                vendorGroups: 4
             }
         };
     }

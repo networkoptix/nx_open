@@ -34,7 +34,7 @@ export class NxVendorListComponent implements OnInit {
     constructor(CONFIG: NxConfigService) {
         this.CONFIG = CONFIG.getConfig();
 
-        this.arrGridColumns = Array.apply(undefined, Array(this.CONFIG.layout.vendorGroups)).map((x, i) => i);
+        this.arrGridColumns = Array.apply(undefined, Array(this.CONFIG.campage.vendorGroups)).map((x, i) => i);
     }
 
     ngOnInit() {}
@@ -53,7 +53,7 @@ export class NxVendorListComponent implements OnInit {
         }
 
         const total = this.vendors.length,
-              cols  = this.CONFIG.layout.vendorGroups,
+              cols  = this.CONFIG.campage.vendorGroups,
               M     = Math.ceil(total / cols),
               n1    = nstart(n),
               n2    = ncol(n);
