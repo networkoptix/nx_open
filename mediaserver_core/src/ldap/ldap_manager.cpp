@@ -6,7 +6,6 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QBuffer>
-#include <QCryptographicHash>
 #include <QtCore/QCryptographicHash>
 
 #ifdef Q_OS_WIN
@@ -218,7 +217,9 @@ namespace
 QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
-    connect(commonModule->globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapManager::clearCache);
+    connect(
+        globalSettings(), &QnGlobalSettings::ldapSettingsChanged,
+        this, &QnLdapManager::clearCache);
 }
 
 QnLdapManager::~QnLdapManager()
@@ -568,12 +569,12 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
 
 Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users)
 {
-    return fetchUsers(users, globalSettings());
+    return fetchUsers(users, globalSettings()->ldapSettings());
 }
 
 Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &password)
 {
-    LdapSession session(globalSettings());
+    LdapSession session(globalSettings()->ldapSettings());
     if (!session.connect())
     {
         NX_WARNING(this, lm("connect: %1").arg(session.lastErrorString()));
@@ -601,11 +602,6 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
         NX_WARNING(this, lm("authenticate: %1").arg(session.lastErrorString()));
 
     return authResult;
-}
-
-QnLdapSettings QnLdapManager::globalSettings() const
-{
-    return commonModule()->globalSettings()->ldapSettings();
 }
 
 QString QnLdapManager::errorMessage(Qn::LdapResult ldapResult)

@@ -11,9 +11,8 @@ static SocketAddress toSocketAddress(const QUrl& url)
     return SocketAddress(url.host(), url.port(80));
 }
 
-static unsigned int httpTimeout(std::chrono::milliseconds value)
+static unsigned int httpTimeoutMs(std::chrono::milliseconds value)
 {
-
     return (unsigned int) value.count();
 }
 
@@ -118,13 +117,13 @@ void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr ht
 {
     if (request.timeout)
     {
-        httpClient->setResponseReadTimeoutMs(httpTimeout(*request.timeout));
-        httpClient->setMessageBodyReadTimeoutMs(httpTimeout(*request.timeout));
+        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(*request.timeout));
+        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(*request.timeout));
     }
     else
     {
-        httpClient->setResponseReadTimeoutMs(httpTimeout(kResponseReadTimeout));
-        httpClient->setMessageBodyReadTimeoutMs(httpTimeout(kMessageBodyReadTimeout));
+        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(kResponseReadTimeout));
+        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(kMessageBodyReadTimeout));
     }
 
     httpClient->setAdditionalHeaders(request.headers);
@@ -221,9 +220,9 @@ AsyncHttpClientPtr ClientPool::createHttpConnection()
 
     //setting appropriate timeouts
     using namespace std::chrono;
-    result->setSendTimeoutMs(httpTimeout(kRequestSendTimeout));
-    result->setResponseReadTimeoutMs(httpTimeout(kResponseReadTimeout));
-    result->setMessageBodyReadTimeoutMs(httpTimeout(kMessageBodyReadTimeout));
+    result->setSendTimeoutMs(httpTimeoutMs(kRequestSendTimeout));
+    result->setResponseReadTimeoutMs(httpTimeoutMs(kResponseReadTimeout));
+    result->setMessageBodyReadTimeoutMs(httpTimeoutMs(kMessageBodyReadTimeout));
 
     connect(
         result.get(), &nx_http::AsyncHttpClient::done,

@@ -37,7 +37,6 @@ public:
     Qn::LdapResult fetchUsers(QnLdapUsers &users);
 
     Qn::AuthResult authenticate(const QString &login, const QString &password);
-    QnLdapSettings globalSettings() const;
 
 private slots:
     void clearCache();

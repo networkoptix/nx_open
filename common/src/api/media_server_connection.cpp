@@ -984,10 +984,9 @@ int QnMediaServerConnection::testLdapSettingsAsync(
     nx_http::HttpHeaders headers;
     headers.emplace(nx_http::header::kContentType, "application/json");
     std::chrono::seconds timeout(settings.searchTimeoutS);
-    std::optional<std::chrono::milliseconds> t2(timeout);
     return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
         QnRequestParamList(), QJson::serialized(settings),
-        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, t2);
+        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
