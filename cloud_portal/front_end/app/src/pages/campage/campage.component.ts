@@ -40,8 +40,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   private setupDefaults() {
       this.config = this.configService.getConfig();
-      this.camerasTable = [];
-      this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isTwAudioSupported', 'isAptzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
+      this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported', 'isPtzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 
       this.data = undefined;
       this.company = undefined;
@@ -194,6 +193,16 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.activate();
   }
 
+    toggleAllowedParameters(param, label1, label2) {
+        const paramLookup = this.filterModel.tags.find(x => x.id === param);
+        const paramLabel = this.allowedParameters.findIndex(x => x === label1 || x === label2);
+        if (paramLookup.value) {
+            this.allowedParameters[paramLabel] = label2;
+        } else {
+            this.allowedParameters[paramLabel] = label1;
+        }
+    }
+
     ngDoCheck() {
         const filterChanges = this.differ.diff(this.filterModel);
         let vendorChanges;
@@ -203,6 +212,14 @@ export class NxCampageComponent implements OnInit, DoCheck {
         }
 
         const tagChanges = this.tagDiffer.diff(this.filterModel.tags.map(tag => tag.value));
+        if (tagChanges) {
+            this.toggleAllowedParameters('isAptzSupported', 'isPtzSupported', 'isAptzSupported');
+            this.toggleAllowedParameters('isTwAudioSupported', 'isAudioSupported', 'isTwAudioSupported');
+
+            // make sure cam-table gets the new params
+            this.allowedParameters = [...this.allowedParameters];
+        }
+
         const resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => x.id === 'resolution').selected);
         const hardwareChanges = this.hardwareDiffer.diff(this.filterModel.multiselects.find(x => x.id === 'hardwareTypes').selected);
 
@@ -229,9 +246,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
                             )),
                             selected: []
                         });
-                // this.multiselectOptions.vendors = this.vendors.map(v => (
-                //         { id: v, label: v }
-                // ));
             });
     }
 

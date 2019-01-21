@@ -65,16 +65,34 @@ export class CamTableComponent implements OnChanges, OnInit {
       this.cameraHeaders = ['Manufacturer', 'Model', 'Type', 'Max Resolution', 'Max FPS', 'Codec', 'Audio', 'PTZ', 'Fisheye', 'Motion', 'I/O'];
   }
 
+    toggleHeaderCaption(param, label1, label2) {
+        const paramLookup = this.allowedParameters.find(x => x === param);
+        const paramLabel = this.cameraHeaders.findIndex(x => x === label1 || x === label2);
+        if (paramLookup) {
+            this.cameraHeaders[paramLabel] = label2;
+        } else {
+            this.cameraHeaders[paramLabel] = label1;
+        }
+    }
+
     ngOnChanges(changes: SimpleChanges) {
-        // debugger;
         if (changes.elements) {
             this._elements = changes.elements.currentValue;
             this.results = this._elements.length;
             this.setPage(1);
         }
 
-        this.showParameters = (changes.activeCamera.currentValue) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
-        this.showHeaders = (changes.activeCamera.currentValue) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
+        if (changes.activeCamera) {
+            this.showParameters = (changes.activeCamera.currentValue) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
+            this.showHeaders = (changes.activeCamera.currentValue) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
+        }
+
+        if (changes.allowedParameters) {
+            this.toggleHeaderCaption('isTwAudioSupported', 'Audio', '2-way Audio');
+            this.toggleHeaderCaption('isAptzSupported', 'PTZ', 'Adv. PTZ');
+
+            this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
+        }
     }
 
   ngOnInit() {

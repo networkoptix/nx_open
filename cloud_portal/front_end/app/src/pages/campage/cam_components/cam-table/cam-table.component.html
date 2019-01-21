@@ -27,7 +27,7 @@
         </div>
     </ng-template>
 
-    <div class="table-wrapper">
+    <div class="table-wrapper">{{showParameters | json}}
         <table class="table table-hover nx-table">
             <thead>
                 <tr *ngIf="results > 0">
@@ -45,6 +45,7 @@
                         </span>
                         <ng-template #icon>
                             <nx-bool-icon [value]="element.value[p]"></nx-bool-icon>
+                            {{element.value[p]}}
                         </ng-template>
                     </td>
                 </tr>
