@@ -68,18 +68,22 @@ void WearableCameraUploadWidget::loadState(const CameraSettingsDialogState& stat
         case WearableState::Consuming:
         {
             const auto calculateFileName =
-                [this](const WearableState& state)
+                [](const WearableState& state)
                 {
                     return QFileInfo(state.currentFile().path).fileName();
                 };
 
             const auto queueMessage = lit(" %1\t%p%").arg((wearableState.queue.size() > 1
-                ? tr("(%1 of %2)").arg(wearableState.currentIndex + 1).arg(wearableState.queue.size())
+                ? tr("(%1 of %2)", "Uploaded and total number of files will be substituted")
+                    .arg(wearableState.currentIndex + 1)
+                    .arg(wearableState.queue.size())
                 : QString()));
 
             ui->uploadProgressBar->setFormat(wearableState.status == WearableState::Consuming
-                ? tr("Finalizing %1...").arg(calculateFileName(wearableState)) + queueMessage
-                : tr("Uploading %1...").arg(calculateFileName(wearableState)) + queueMessage);
+                ? tr("Finalizing %1...", "Filename will be substituted")
+                    .arg(calculateFileName(wearableState)) + queueMessage
+                : tr("Uploading %1...", "Filename will be substituted")
+                    .arg(calculateFileName(wearableState)) + queueMessage);
 
             ui->cancelButton->setEnabled(wearableState.isCancellable());
             ui->uploadProgressBar->setValue(wearableState.progress());

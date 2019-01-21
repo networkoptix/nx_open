@@ -155,7 +155,7 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     // If not all cameras are opened, show proper message after double click delay.
     if (openResources.size() != resourceList.size())
     {
-        const auto message = tr("Double click to add camera(s) to current layout "
+        const auto message = tr("Double click to add cameras to the current layout "
             "or ctrl+click to open in a new tab.", "", resourceList.size());
 
         showMessageDelayed(message, doubleClickInterval());

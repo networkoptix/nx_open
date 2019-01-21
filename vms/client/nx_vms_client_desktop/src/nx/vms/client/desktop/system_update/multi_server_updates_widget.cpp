@@ -506,12 +506,12 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 {
                     if (missing)
                     {
-                        packageErrors << tr("Missing update package for client and %n server(s)",
+                        packageErrors << tr("Missing update package for the client and %n servers",
                             "", missing);
                     }
                     else
                     {
-                        packageErrors << tr("Missing update package for client");
+                        packageErrors << tr("Missing update package for the client");
                     }
                 }
                 else if (!missing)

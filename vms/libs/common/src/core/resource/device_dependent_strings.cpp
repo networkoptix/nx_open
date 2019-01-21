@@ -17,17 +17,17 @@ class QnResourceNameStrings
 public:
     static QString numericCameras(int count, bool capitalize)
     {
-        return capitalize ? tr("%n Camera(s)", 0, count) : tr("%n camera(s)", 0, count);
+        return capitalize ? tr("%n Cameras", "", count) : tr("%n cameras", "", count);
     }
 
     static QString numericIoModules(int count, bool capitalize)
     {
-        return capitalize ? tr("%n I/O Module(s)", 0, count) : tr("%n I/O module(s)", 0, count);
+        return capitalize ? tr("%n I/O Modules", "", count) : tr("%n I/O modules", "", count);
     }
 
     static QString numericDevices(int count, bool capitalize)
     {
-        return capitalize ? tr("%n Device(s)", 0, count) : tr("%n device(s)", 0, count);
+        return capitalize ? tr("%n Devices", "", count) : tr("%n devices", "", count);
     }
 
     static QString defaultCameras(bool plural, bool capitalize)
@@ -79,8 +79,8 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(
     setString(Camera, false, cameraString);
 
     // I/O Module string can be absent in cases where we are selecting default names.
-    setString(IOModule, true, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
-    setString(IOModule, false, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
+    setString(IOModule, true, ioModuleString.isEmpty() ? "<invalid>" : ioModuleString);
+    setString(IOModule, false, ioModuleString.isEmpty() ? "<invalid>" : ioModuleString);
 
     NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
 }

@@ -179,7 +179,7 @@ void SocketGlobals::init(
 
     if (++s_counter == 1) //< First in.
     {
-        s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
+        s_initState = InitState::inintializing; //< Allow creating Pollables in constructor.
         s_instance = new SocketGlobals(initializationFlags);
 
         s_instance->initializeNetworking();
@@ -202,7 +202,7 @@ void SocketGlobals::deinit()
             QnMutexUnlocker unlock(&lock);
             delete s_instance;
         }
-        s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
+        s_initState = InitState::deinitializing; //< Allow creating Pollables in destructor.
         s_instance = nullptr;
         s_initState = InitState::none;
     }

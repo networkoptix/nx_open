@@ -1239,7 +1239,7 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
         if (resources.isEmpty())
             return braced(tr("Any Server"));
 
-        return tr("%n Server(s)", "", resources.size());
+        return tr("%n Servers", "", resources.size());
     }
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();

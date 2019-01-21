@@ -879,6 +879,11 @@
         <source>Enable audio</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Edit Streams...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraStreamsDialog</name>
@@ -1018,11 +1023,6 @@
     </message>
     <message>
         <location/>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Hint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1069,6 +1069,11 @@
     <message>
         <location/>
         <source>Add Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1249,11 +1254,6 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
         <source>Nothing matches your search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Invalid message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1686,11 +1686,6 @@
     <name>LdapSettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
-        <source>ldap(s)://host:port</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Optional</source>
         <translation></translation>
     </message>
@@ -3092,11 +3087,6 @@
     </message>
     <message>
         <location/>
-        <source>Search</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Filter TEST</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3594,12 +3584,12 @@
     </message>
     <message>
         <location/>
-        <source>Base forecast on recording density for</source>
+        <source>Additional storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Additional storage</source>
+        <source>Base forecast on data recorded during</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

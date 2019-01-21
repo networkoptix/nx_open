@@ -362,7 +362,7 @@ void initialize(Manager* manager, Action* root)
             .flags(Main | Scene | NoTarget | GlobalHotkey)
             .mode(DesktopMode)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            .text(ContextMenu::tr("File(s)..."))
+            .text(ContextMenu::tr("Files..."))
             .shortcut(lit("Ctrl+O"))
             .condition(!condition::tourIsRunning())
             .autoRepeat(false);
