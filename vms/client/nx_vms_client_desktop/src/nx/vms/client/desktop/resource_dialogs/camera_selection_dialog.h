@@ -5,6 +5,7 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 #include <nx/vms/client/desktop/node_view/details/node_view_fwd.h>
+#include <business/business_resource_validation.h>
 
 namespace Ui { class CameraSelectionDialog; }
 
