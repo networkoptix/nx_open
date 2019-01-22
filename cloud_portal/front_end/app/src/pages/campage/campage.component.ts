@@ -228,6 +228,18 @@ export class NxCampageComponent implements OnInit, DoCheck {
             .subscribe(data => {
                 this.data = data;
                 this.camerasSuccessFn(this.data);
+
+                // reformat vendors to fit the multiselect component
+                this.filterModel
+                    .multiselects.unshift(
+                        {
+                            id      : 'vendors',
+                            label   : 'Manufacturers',
+                            items   : this.vendors.map(v => (
+                                    { id: v, label: v }
+                            )),
+                            selected: []
+                        });
             });
     }
 
@@ -290,18 +302,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
        this.vendors = Array.from(vendors).sort((a, b) => {
            return a.toLowerCase().localeCompare(b.toLowerCase());
        });
-
-      // reformat to fit the multiselect component
-      this.filterModel
-          .multiselects.unshift(
-              {
-                  id      : 'vendors',
-                  label   : 'Manufacturers',
-                  items   : this.vendors.map(v => (
-                          { id: v, label: v }
-                  )),
-                  selected: []
-              });
   }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
