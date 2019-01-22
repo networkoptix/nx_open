@@ -67,7 +67,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
         // QUrl isn't used here intentionally, since session parameter works correct
         // if it added to the end of URL only.
-        streamUrlString.append(lit("&session=%1").arg(m_sessionContext->sessionId));
+        streamUrlString.append(lit("/session=%1").arg(m_sessionContext->sessionId));
     }
 
     const auto role = getRole();
@@ -80,11 +80,6 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
             [this](){ return createEmptyPacket(); });
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
-
-    if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
-    else
-        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
 
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx::network::http::HttpHeader("Rate-Control", "no"));
@@ -321,16 +316,6 @@ SessionContextPtr HanwhaStreamReader::sessionContext()
 QnRtspClient& HanwhaStreamReader::rtspClient()
 {
     return m_rtpReader.rtspClient();
-}
-
-QString HanwhaStreamReader::toHanwhaPlaybackTime(int64_t timestampUsec) const
-{
-    const auto timezoneShift = m_hanwhaResource
-        ->sharedContext()
-        ->timeZoneShift();
-
-    return toHanwhaDateTime(timestampUsec / 1000, timezoneShift)
-        .toString(lit("yyyyMMddhhmmss"));
 }
 
 void HanwhaStreamReader::setSessionType(HanwhaSessionType value)

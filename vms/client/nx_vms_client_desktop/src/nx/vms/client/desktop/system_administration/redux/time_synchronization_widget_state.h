@@ -5,6 +5,7 @@
 
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 
+#include <common/common_globals.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
@@ -28,12 +29,11 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
 
     bool enabled = true;
     QnUuid primaryServer;
-    qint64 primaryOsTimeOffset = 0;
-    qint64 primaryVmsTimeOffset = 0;
 
     // Previous selected time server.
     QnUuid lastPrimaryServer;
 
+    milliseconds commonTimezoneOffset = 0ms;
     milliseconds vmsTime = 0ms;
     Status status = Status::synchronizedWithInternet;
 
@@ -55,6 +55,32 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
     {
         return status == Status::synchronizedWithInternet
             || status == Status::noInternetConnection;
+    }
+
+    milliseconds calcCommonTimezoneOffset() const
+    {
+        milliseconds commonUtcOffset = 0ms;
+        bool initialized = false;
+
+        for (const auto& server: servers)
+        {
+            if (!server.online)
+                continue;
+
+            const auto utcOffset = server.timeZoneOffset;
+            if (utcOffset == milliseconds(Qn::InvalidUtcOffset))
+                continue;
+
+            if (!initialized)
+            {
+                commonUtcOffset = utcOffset;
+                initialized = true;
+            }
+            else if (commonUtcOffset != utcOffset)
+                return 0ms; //< Show time in UTC when time zones are different
+        }
+
+        return commonUtcOffset;
     }
 };
 

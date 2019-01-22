@@ -60,6 +60,8 @@ public:
 
         C2P,
 
+        Client,
+
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

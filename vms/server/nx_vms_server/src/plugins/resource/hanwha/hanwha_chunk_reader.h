@@ -84,8 +84,8 @@ public:
      */
     nx::core::resource::OverlappedTimePeriods overlappedTimelineSync(int channelNumber);
 
-    void setTimeZoneShift(std::chrono::seconds timeZoneShift);
-    std::chrono::seconds timeZoneShift() const;
+    std::chrono::milliseconds timeShift() const;
+    void setTimeShift(std::chrono::milliseconds value);
 
     /**
      * Returns a default overlapped ID for a device (the highest one).
@@ -95,7 +95,6 @@ public:
      */
     boost::optional<int> overlappedId() const;
 
-    void setEnableUtcTime(bool enableUtcTime);
     void setEnableSearchRecordingPeriodRetieval(bool enableRetrieval);
 
     QString convertDateToString(const QDateTime& dateTime) const;
@@ -166,7 +165,7 @@ private:
     HanwhaSharedResourceContext* m_resourceContext = nullptr;
     mutable QnMutex m_mutex;
 
-    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
+    std::atomic<std::chrono::milliseconds> m_timeShift{std::chrono::milliseconds(0)};
     std::atomic<bool> m_terminated{false};
 
     std::atomic<bool> m_started{false};
@@ -177,7 +176,6 @@ private:
     bool m_isNvr = false;
     bool m_hasSearchRecordingPeriodSubmenu = false;
     bool m_isSearchRecordingPeriodRetrievalEnabled = true;
-    bool m_isUtcEnabled = true;
 
     std::chrono::milliseconds m_lastTimelineUpdate{0};
 

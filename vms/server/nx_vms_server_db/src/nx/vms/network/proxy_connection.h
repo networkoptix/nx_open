@@ -43,7 +43,7 @@ private:
         nx::network::AbstractStreamSocket* dstSocket,
         char* buffer,
         int bufferSize,
-        bool* outSomeBytesRead);
+        qint64* outBytesRead);
     static int getDefaultPortByProtocol(const QString& protocol);
     QString connectToRemoteHost(const QnRoute& route, const nx::utils::Url& url); // return new client request buffer size or -1 if error
     bool isProtocol(const QString& protocol) const;

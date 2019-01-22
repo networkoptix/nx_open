@@ -32,6 +32,7 @@ signals:
 private:
     void loadState(const CameraSettingsDialogState& state);
     void editCredentials(CameraSettingsDialogStore* store);
+    void editCameraStreams(CameraSettingsDialogStore* store);
 
 private:
     const QScopedPointer<Ui::CameraSettingsGeneralTabWidget> ui;

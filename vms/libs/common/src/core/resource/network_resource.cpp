@@ -51,16 +51,24 @@ QString QnNetworkResource::getUniqueId() const
 
 void QnNetworkResource::setUrl(const QString& url)
 {
-    m_cachedHostAddress.reset();
-    base_type::setUrl(url);
+    {
+        QnMutexLocker mutexLocker(&m_mutex);
+        if (!setUrlInternal(url))
+            return;
+
+        m_cachedHostAddress.reset();
+    }
+
+    emit urlChanged(toSharedPointer(this));
 }
 
 QString QnNetworkResource::getHostAddress() const
 {
+    // Secured by the same mutex as ::setUrl(), so thread-safe.
     return m_cachedHostAddress.get();
 }
 
-void QnNetworkResource::setHostAddress(const QString &ip)
+void QnNetworkResource::setHostAddress(const QString& ip)
 {
     //QnMutexLocker mutex( &m_mutex );
     //m_hostAddr = ip;

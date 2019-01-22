@@ -181,6 +181,15 @@ public:
         int limit,
         Qt::SortOrder sortOrder);
 
+    enum class Role
+    {
+        regular,
+        subchannel
+    };
+    void setRole(Role role) { m_role = role; }
+    Role getRole() const { return m_role; }
+
+
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -250,6 +259,7 @@ private:
     bool m_inputPortListeningInProgress = false;
     QnMutex m_ioPortStatesMutex;
     std::map<QString, QnIOStateData> m_ioPortStatesCache;
+    Role m_role = Role::regular;
 };
 
 } // namespace resource

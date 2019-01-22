@@ -89,14 +89,9 @@ class SortedPeerUpdatesModel:
 
 public:
     explicit SortedPeerUpdatesModel(QObject* parent = nullptr);
-    void setShowClients(bool show);
 
 protected:
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
-
-private:
-    bool m_showClients = false;
 };
 
 } // namespace nx::vms::client::desktop

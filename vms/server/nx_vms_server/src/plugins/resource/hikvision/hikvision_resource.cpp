@@ -173,7 +173,7 @@ void HikvisionResource::setResolutionList(
         ? secondaryVideoCapabilities() : primaryVideoCapabilities();
     capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
         channelCapabilities.resolutions));
-    capabilities.encoding = UnderstandableVideoCodec::H264;
+    capabilities.encoding = SupportedVideoEncoding::H264;
     if (role == Qn::CR_SecondaryLiveVideo)
         setSecondaryVideoCapabilities(capabilities);
     else
@@ -299,10 +299,9 @@ bool HikvisionResource::findDefaultPtzProfileToken()
     {
         if (!profile || !profile->PTZConfiguration)
             continue;
-        QString ptzConfiguration = QString::fromStdString(profile->PTZConfiguration->token);
-        if (ptzConfiguration == getPtzConfigurationToken())
+        if (profile->PTZConfiguration->token == ptzConfigurationToken())
         {
-            setPtzProfileToken(QString::fromStdString(profile->token));
+            setPtzProfileToken(profile->token);
             return true;
         }
     }

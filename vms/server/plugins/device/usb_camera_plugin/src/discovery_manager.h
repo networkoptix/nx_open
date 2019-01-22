@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vector>
-#include <mutex>
 #include <map>
+#include <mutex>
+#include <vector>
+#include <memory>
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -12,6 +13,8 @@
 
 namespace nx {
 namespace usb_cam {
+
+class Camera;
 
 class DiscoveryManager: public nxcip::CameraDiscoveryManager
 {
@@ -51,6 +54,18 @@ private:
         }
     };
 
+    struct CameraAndDeviceDataWithNxId
+    {
+        DeviceDataWithNxId deviceData;
+        std::shared_ptr<Camera> camera;
+
+        CameraAndDeviceDataWithNxId(const DeviceDataWithNxId& deviceData):
+            deviceData(deviceData)
+        {
+        }
+        ~CameraAndDeviceDataWithNxId() = default;
+    };
+
 public:
     DiscoveryManager(nxpt::CommonRefManager* const refManager,
                      nxpl::TimeProvider *const timeProvider);
@@ -86,10 +101,11 @@ private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
     mutable std::mutex m_mutex;
-    std::map<std::string/*nxId*/, DeviceDataWithNxId> m_cameras;
+    std::map<std::string/*nxId*/, CameraAndDeviceDataWithNxId> m_cameras;
 
 private:
     std::vector<DeviceDataWithNxId> findCamerasInternal();
+    CameraAndDeviceDataWithNxId* getCameraAndDeviceData(const std::string& nxId);
 };
 
 } // namespace nx 

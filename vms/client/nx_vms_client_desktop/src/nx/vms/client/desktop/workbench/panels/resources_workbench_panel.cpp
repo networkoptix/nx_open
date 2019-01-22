@@ -93,7 +93,6 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     QPalette defaultPalette = widget->palette();
     setPaletteColor(widget, QPalette::Window, Qt::transparent);
     setPaletteColor(widget, QPalette::Base, Qt::transparent);
-    setPaletteColor(widget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
     m_backgroundItem->setFrameBorders(Qt::RightEdge);
     m_backgroundItem->setZValue(BackgroundItemZOrder);

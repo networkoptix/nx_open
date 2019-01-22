@@ -1,8 +1,5 @@
 #include "media_server_process.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
 #include <functional>
 #include <signal.h>
 #if defined(__linux__)
@@ -90,6 +87,8 @@
 #include <nx/network/socket.h>
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
+
+#include <nx/kit/output_redirector.h>
 
 #include <camera_vendors.h>
 
@@ -2240,7 +2239,7 @@ void MediaServerProcess::registerRestHandlers(
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string url URL of one Server in the System to join.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
@@ -2530,6 +2529,14 @@ void MediaServerProcess::registerRestHandlers(
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
+     * %param[opt]:enum streamSelectionMode Policy for stream selection.
+     *     %value auto Chooses the most suitable stream automatically.
+     *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
+     *         primary one is not available.
+     *     %value forcedSecondary Secondary stream is forced. Primary stream will be used if the
+     *         secondary one is not available.
+     *     %value sameAsAnalytics Use the same stream as the one used by analytics engine.
+     *     %value sameAsMotion Use the same stream as the one used by software motion detection.
      * %param[opt]:enum aspectRatio Allows to avoid scaling the image to the aspect ratio from
      *     camera settings.
      *     %value auto Default value. Use aspect ratio from camera settings (if any).
@@ -3382,8 +3389,10 @@ bool MediaServerProcess::setUpMediaServerResource(
     bool foundOwnServerInDb = false;
     const bool sslAllowed = serverModule->settings().allowSslConnections();
 
-    while (m_mediaServer.isNull() && !needToStop())
+    while (m_mediaServer.isNull())
     {
+        if (needToStop())
+            return false;
         QnMediaServerResourcePtr server = findServer(ec2Connection);
         nx::vms::api::MediaServerData prevServerData;
         if (server)
@@ -4185,6 +4194,7 @@ void MediaServerProcess::loadResourceParamsData()
     const auto builtinVersion = QnResourceDataPool::getVersion(loadDataFromFile(kBuiltinFileName));
     if (builtinVersion > dataVersion)
     {
+        dataVersion = builtinVersion;
         source = kBuiltinFileName;
         param.value = loadDataFromFile(source); //< Default value.
     }
@@ -4635,34 +4645,9 @@ void SIGUSR1_handler(int)
 }
 #endif
 
-static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
-{
-    if (freopen(filename.c_str(), "w", stream))
-        fprintf(stream, "%s of mediaserver is redirected to this file\n", streamName);
-    // Ignore possible errors because it is not clear where to print an error message.
-}
-
-static bool fileExists(const std::string& filename)
-{
-    return static_cast<bool>(std::ifstream(filename.c_str()));
-}
-
-static void redirectStdoutAndStderrIfNeeded(int argc, char* argv[])
-{
-    static const std::string kFilePrefix = nx::kit::IniConfig::iniFilesDir();
-    static const std::string kStdoutFilename = "mediaserver_stdout.log";
-    static const std::string kStderrFilename = "mediaserver_stderr.log";
-
-    if (fileExists(kFilePrefix + kStdoutFilename))
-        redirectOutput(stdout, "stdout", kFilePrefix + kStdoutFilename);
-
-    if (fileExists(kFilePrefix + kStderrFilename))
-        redirectOutput(stderr, "stderr", kFilePrefix + kStderrFilename);
-}
-
 int MediaServerProcess::main(int argc, char* argv[])
 {
-    redirectStdoutAndStderrIfNeeded(argc, argv);
+    nx::kit::OutputRedirector::ensureOutputRedirection();
 
     nx::utils::rlimit::setMaxFileDescriptors(32000);
 

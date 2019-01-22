@@ -305,7 +305,11 @@ static InformationError fillUpdateInformation(
         return InformationError::jsonError;
 
     if (!QJson::deserialize(topLevelObject, kAlternativesServersKey, alternativeServers))
-        return InformationError::jsonError;
+    {
+        NX_VERBOSE(typeid(Information))
+            << "fillUpdateInformation no" << kAlternativesServersKey
+            << "key found. I will not check alternative servers.";
+    }
 
     CustomizationInfo customizationInfo;
     InformationError error = findCustomizationInfo(topLevelObject, &customizationInfo, result);
@@ -574,6 +578,9 @@ std::future<UpdateContents> checkSpecificChangeset(
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
+            if (result.info.version.isEmpty())
+                result.info.version = build;
+
             if (callback)
             {
                 executeInThread(thread,

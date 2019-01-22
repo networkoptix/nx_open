@@ -29,7 +29,7 @@ class QnClientModule: public QObject, public Singleton<QnClientModule>
     Q_OBJECT
 
 public:
-    QnClientModule(const QnStartupParameters &startupParams = QnStartupParameters(), QObject *parent = NULL);
+    explicit QnClientModule(const QnStartupParameters& startupParams, QObject* parent = nullptr);
     virtual ~QnClientModule();
 
     void initDesktopCamera(QGLWidget* window);
@@ -51,13 +51,13 @@ private:
     void initThread();
     static void initMetaInfo();
     static void initSurfaceFormat();
-    void initSingletons     (const QnStartupParameters& startupParams);
-    void initRuntimeParams  (const QnStartupParameters& startupParams);
-    void initLog            (const QnStartupParameters& startupParams);
-    void initNetwork        (const QnStartupParameters& startupParams);
-    void initSkin           (const QnStartupParameters& startupParams);
-    void initLocalResources (const QnStartupParameters& startupParams);
-    void initLocalInfo(const QnStartupParameters& startupParams);
+    void initSingletons();
+    void initRuntimeParams();
+    void initLog();
+    void initNetwork();
+    void initSkin();
+    void initLocalResources();
+    void initLocalInfo();
     void registerResourceDataProviders();
 
 private:

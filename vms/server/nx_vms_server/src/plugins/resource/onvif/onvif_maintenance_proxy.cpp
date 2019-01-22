@@ -19,12 +19,10 @@ QnOnvifMaintenanceProxy::QnOnvifMaintenanceProxy(
     const SoapTimeouts& timeouts,
     const QString& maintenanceUrl,
     const QAuthenticator& auth,
-    const QString& videoSrcToken,
     int timeDrift)
     :
     m_maintenanceUrl(maintenanceUrl),
     m_auth(auth),
-    m_videoSrcToken(videoSrcToken),
     m_timeDrift(timeDrift),
     m_deviceSoapWrapper(new DeviceSoapWrapper(
         timeouts, maintenanceUrl.toLatin1().data(), auth.user(), auth.password(), timeDrift))

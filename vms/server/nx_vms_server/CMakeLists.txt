@@ -88,6 +88,7 @@ nx_add_target(nx_vms_server LIBRARY
         ${static_resources}
         ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json
     PUBLIC_LIBS
+        nx_kit #< This dependency should come first to satisfy OutputRedirector.
         Qt5::WebSockets
         appserver2
         nx_vms_server_db

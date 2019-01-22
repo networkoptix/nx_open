@@ -25,7 +25,6 @@ set(eulaVersion 1)
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
 set(updateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
-set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 
 set(mac_certificate_file_password "qweasd123")
 

@@ -12,6 +12,8 @@
 
 #include <time.h>
 
+#include <nx/kit/output_redirector.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
 #include <api/app_server_connection.h>
@@ -378,6 +380,8 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
 int main(int argc, char *argv[])
 {
+	nx::kit::OutputRedirector::ensureOutputRedirection();
+	
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
     #if defined(Q_OS_WIN)
         AllowSetForegroundWindow(ASFW_ANY);

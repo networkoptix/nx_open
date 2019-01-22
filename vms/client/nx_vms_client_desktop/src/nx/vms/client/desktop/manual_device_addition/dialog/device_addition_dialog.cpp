@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -201,6 +202,9 @@ void DeviceAdditionDialog::initializeControls()
     ui->tabWidget->setCurrentIndex(0);
     handleTabClicked(ui->tabWidget->currentIndex());
     setupSearchResultsPlaceholder();
+
+    setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+    setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -209,14 +213,20 @@ void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& val
         return;
 
     QScopedValueRollback<bool> rollback(m_addressEditing, true);
-    ui->endAddressEdit->setText(fixedAddress(ui->startAddressEdit).toString());
+
+    const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
+
+    ui->endAddressEdit->setText(
+        QHostAddress(startAddress - startAddress % 256 + endAddress % 256).toString());
 }
 
 void DeviceAdditionDialog::handleStartAddressEditingFinished()
 {
     const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
     const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
-    if (!ui->endAddressEdit->isModified() && (startAddress / 256) != (endAddress / 256))
+
+    if (startAddress % 256 > endAddress % 256)
     {
         ui->endAddressEdit->setText(
             QHostAddress(startAddress - startAddress % 256 + 255).toString());
@@ -230,16 +240,11 @@ void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value
 
     QScopedValueRollback<bool> rollback(m_addressEditing, true);
 
-    const auto startAddress = fixedAddress(ui->startAddressEdit);
-    const auto endAddress = fixedAddress(ui->endAddressEdit);
+    const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
 
-    const quint32 startSubnet = startAddress.toIPv4Address() >> 8;
-    const quint32 endSubnet = endAddress.toIPv4Address() >> 8;
-    if (startSubnet != endSubnet)
-    {
-        const QHostAddress fixed(startAddress.toIPv4Address() + ((endSubnet - startSubnet) << 8));
-        ui->startAddressEdit->setText(fixed.toString());
-    }
+    ui->startAddressEdit->setText(
+        QHostAddress(endAddress - endAddress % 256 + startAddress % 256).toString());
 }
 
 void DeviceAdditionDialog::handleTabClicked(int index)

@@ -9,24 +9,26 @@
 #include <network/router.h>
 #include <nx/network/http/http_client.h>
 #include <nx/streaming/config.h>
+#include <api/global_settings.h>
 
 namespace
 {
-    static const std::chrono::seconds kRequestTimeout(3);
 
-    QUrlQuery toUrlQuery(const QnRequestParams& params)
-    {
-        QUrlQuery result;
-        for (auto itr = params.begin(); itr != params.end(); ++itr)
-            result.addQueryItem(itr.key(), itr.value());
-        return result;
-    }
+static const std::chrono::seconds kRequestTimeout(3);
+
+QUrlQuery toUrlQuery(const QnRequestParams& params)
+{
+    QUrlQuery result;
+    for (auto itr = params.begin(); itr != params.end(); ++itr)
+        result.addQueryItem(itr.key(), itr.value());
+    return result;
 }
 
-const QByteArray QnProxyAudioTransmitter::kFixedPostRequest(
-    "POST /upload_audio HTTP/1.1\r\n"
-    "Content-Length: 999999999\r\n\r\n");
+const QString kFixedPostRequest = (
+        "POST /upload_audio HTTP/1.1\r\n"
+        "%1\r\n"); //< Headers
 
+}
 
 QnProxyAudioTransmitter::QnProxyAudioTransmitter(
     QnCommonModule* commonModule,
@@ -74,11 +76,14 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
             return false;
 
         nx::network::http::HttpClient httpClient;
-        httpClient.addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, m_camera->getParentId().toByteArray());
+        const auto dstServerId = m_camera->getParentId().toByteArray();
+        httpClient.addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, dstServerId);
         httpClient.addAdditionalHeader("Connection", "Keep-Alive");
 
+        auto urlScheme = nx::network::http::urlSheme(
+            commonModule()->globalSettings()->isTrafficEncriptionForced());
         nx::utils::Url url;
-        url.setScheme("http");
+        url.setScheme(urlScheme);
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);
         url.setPath("/proxy-2wayaudio");
@@ -96,8 +101,14 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
 
         m_socket = httpClient.takeSocket();
 
+        nx::network::http::HttpHeaders headers;
+        headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstServerId);
+        headers.emplace("Content-Length", "999999999");
+        QByteArray headersData;
+        nx::network::http::serializeHeaders(headers, &headersData);
+
         // send fixed data to be similar to standard HTTP post request
-        m_socket->send(kFixedPostRequest);
+        m_socket->send(kFixedPostRequest.arg(QLatin1String(headersData)).toUtf8());
     }
 
     m_serializer->setDataPacket(data);

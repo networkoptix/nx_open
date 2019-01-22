@@ -188,9 +188,8 @@ bool areaComparator(const QString& lhs, const QString& rhs);
 
 bool ratioComparator(const QString& lhs, const QString& rhs);
 
-qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift);
-
-QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift);
+qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::milliseconds timeShift = {});
+QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::milliseconds timeShift = {});
 
 } // namespace plugins
 } // namespace vms::server

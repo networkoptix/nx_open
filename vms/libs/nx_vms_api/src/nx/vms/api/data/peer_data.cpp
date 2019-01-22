@@ -99,9 +99,3 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 } // namespace api
 } // namespace vms
 } // namespace nx
-
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::P2pTransportMode, (numeric)(debug))
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, P2pTransportMode,
-    (nx::vms::api::P2pTransportMode::automatic, "automatic")
-    (nx::vms::api::P2pTransportMode::websocket, "websocket")
-    (nx::vms::api::P2pTransportMode::http, "http"))

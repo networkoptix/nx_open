@@ -619,11 +619,12 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
     const auto exeExtension = lit(".exe");
     const auto tmpExtension = lit(".tmp");
 
+    // Lines are intentionally untranslatable.
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
         mainWindowWidget(),
-        lit("Export Standalone Client"),
+        "Export Standalone Client",
         QnAppInfo::clientExecutableName(),
-        lit("*") + exeExtension
+        QnCustomFileDialog::createFilter("Executable file", "exe")
     ));
     dialog->setFileMode(QFileDialog::AnyFile);
     dialog->setAcceptMode(QFileDialog::AcceptSave);

@@ -138,15 +138,32 @@ private:
         QString version;
         /** Status messages. It is displayed under version when something went wrong. */
         QStringList statusMessages;
-        /** Should we display status with error style. */
-        bool statusError = false;
-        /** Should we display version with error style. */
-        bool versionError = false;
+        /** Modes for displaying version number. */
+        enum class VersionMode
+        {
+            /** No version is available. We display '-----'.*/
+            empty,
+            /** Only build number is displayed. */
+            build,
+            /** Display full version. */
+            full,
+        };
 
-        void reset();
+        VersionMode versionMode = VersionMode::full;
+        enum class HighlightMode
+        {
+            regular,
+            bright,
+            red,
+        };
+
+        HighlightMode versionHighlight = HighlightMode::regular;
+        HighlightMode statusHighlight = HighlightMode::regular;
     };
 
     VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents);
+
+    void syncVersionReport(const VersionReport& report);
 
     /**
      * UI synhronization. This functions are ment to be called from loadDataToUi.

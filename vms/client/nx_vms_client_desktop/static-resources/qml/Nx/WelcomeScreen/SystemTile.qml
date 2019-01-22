@@ -347,6 +347,8 @@ BaseTile
                     control.systemId, tile.selectedHost,
                     tile.selectedUser, tile.selectedPassword,
                     tile.savePassword, tile.autoLogin);
+
+                tile.forcePasswordFocus()
             }
         }
     }

@@ -122,11 +122,11 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->ipAddressDetailLabel->setText(single.ipAddress);
     ui->webPageLabel->setText(single.webPage);
 
-    const auto primaryStreamUrl = single.primaryStream.value_or(QString());
+    const auto primaryStreamUrl = state.singleCameraSettings.primaryStream();
     ui->primaryStreamLabel->setText(primaryStreamUrl);
     ui->primaryStreamCopyButton->setHidden(primaryStreamUrl.isEmpty());
 
-    const auto secondaryStreamUrl = single.secondaryStream.value_or(QString());
+    const auto secondaryStreamUrl = state.singleCameraSettings.secondaryStream();
     ui->secondaryStreamLabel->setText(secondaryStreamUrl);
     ui->secondaryStreamCopyButton->setHidden(secondaryStreamUrl.isEmpty());
 }

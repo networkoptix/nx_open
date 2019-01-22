@@ -2,6 +2,8 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
+#include <nx/kit/output_redirector.h>
+
 #include <nx/kit/debug.h>
 
 #include "core/storage/file_storage/qtfile_storage_resource.h"
@@ -76,6 +78,8 @@ void showUsage(char* exeName)
 
 int main(int argc, char *argv[])
 {
+	nx::kit::OutputRedirector::ensureOutputRedirection();
+	
     QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
     QCoreApplication::setApplicationName("Nx Witness Test Camera");
     QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());

@@ -423,26 +423,6 @@ void ThirdPartyStreamReader::afterRun()
     closeStream();
 }
 
-Qn::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
-{
-    const Qn::ConnectionRole softMotionRole = CLServerPushStreamReader::roleForMotionEstimation();
-    if( softMotionRole != Qn::CR_LiveVideo)  //primary stream
-        return softMotionRole;
-
-    //checking stream resolution
-    auto forcedMotionDetection = m_thirdPartyRes->getProperty(QnMediaResource::motionStreamKey());
-    auto forcedPrimaryStreamMotionDetection =
-        forcedMotionDetection == QnMediaResource::primaryStreamValue();
-
-    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION
-        && !forcedPrimaryStreamMotionDetection)
-    {
-        return Qn::CR_SecondaryLiveVideo;
-    }
-
-    return softMotionRole;
-}
-
 void ThirdPartyStreamReader::onStreamResolutionChanged( int /*channelNumber*/, const QSize& picSize )
 {
     m_videoResolution = picSize;

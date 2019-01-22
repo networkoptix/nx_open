@@ -23,8 +23,6 @@
 namespace nx {
 namespace p2p {
 
-const QString MessageBus::kDeprecatedUrlPath(lit("/ec2/messageBus"));
-const QString MessageBus::kUrlPath(lit("/ec2/transactionBus"));
 const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
 
 using namespace ec2;
@@ -180,11 +178,11 @@ void MessageBus::addOutgoingConnectionToPeer(
     if (peerType == nx::vms::api::PeerType::cloudServer)
     {
         url.setPath(nx::network::url::joinPath(
-            kCloudPathPrefix.toStdString(), kUrlPath.toStdString()).c_str());
+            kCloudPathPrefix.toStdString(), ConnectionBase::kWebsocketUrlPath.toStdString()).c_str());
     }
     else
     {
-        url.setPath(kUrlPath);
+        url.setPath(ConnectionBase::kWebsocketUrlPath);
     }
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
@@ -537,6 +535,10 @@ void MessageBus::at_gotMessage(
         return;
 
     QnMutexLocker lock(&m_mutex);
+
+    if (!isStarted())
+        return;
+
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
 

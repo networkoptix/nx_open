@@ -174,9 +174,11 @@ void LocalConnectionFactory::registerTransactionListener(
     else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kDeprecatedUrlPath));
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kDeprecatedUrlPath));
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kWebsocketUrlPath));
+        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kHttpUrlPath));
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
@@ -1251,6 +1253,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractUserManager::remove
      */
     regUpdate<IdData>(p, ApiCommand::removeUser);
+
+    /**%apidoc POST /ec2/removeResourceParam
+     * Delete the specified property.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %param resourceId resource id.
+     * %param name property name to remove.
+     */
+    regUpdate<ResourceParamWithRefData>(p, ApiCommand::removeResourceParam);
 
     /**%apidoc POST /ec2/saveUserRole
      * <p>

@@ -10,8 +10,8 @@
 #include <client/client_color_types.h>
 
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
+#include <nx/vms/client/desktop/resource_properties/camera/data/schedule_cell_params.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/schedule_paint_functions.h>
-#include <nx/vms/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 
 namespace nx::vms::client::desktop {
 
@@ -25,7 +25,7 @@ class ScheduleGridWidget: public QWidget
     static constexpr int kHoursPerDay = 24;
 
 public:
-    using CellParams = nx::vms::client::desktop::ScheduleCellParams;
+    using CellParams = ScheduleCellParams;
 
     explicit ScheduleGridWidget(QWidget* parent = nullptr);
     virtual ~ScheduleGridWidget();

@@ -38,6 +38,8 @@ public:
         const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const;
 
 private:
+    Qn::StreamIndex determineStreamIndex(const nx::api::CameraImageRequest& request) const;
+
     CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,
         Qn::StreamIndex streamIndex,

@@ -22,11 +22,17 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
     QString fileName;
     while (true)
     {
+        const QString filters = QnCustomFileDialog::createFilter(
+            {
+                {tr("HTML file"), {"html"}},
+                {tr("Spread Sheet (CSV) File"), {"csv"}}
+            });
+
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             parent,
             caption,
             previousDir,
-            tr("HTML file (*.html);;Spread Sheet (CSV) File (*.csv)")));
+            filters));
         dialog->setAcceptMode(QFileDialog::AcceptSave);
         if (dialog->exec() != QDialog::Accepted)
             return;
