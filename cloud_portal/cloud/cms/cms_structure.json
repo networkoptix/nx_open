@@ -116,6 +116,13 @@
             "description": "The name of the company itself"
           },
           {
+            "label": "Copyright Year",
+            "name": "%COPYRIGHT_YEAR%",
+            "old_name": "",
+            "value": "2019",
+            "description": "Copyright information"
+          },
+          {
             "label": "Client Protocol",
             "name": "%CLIENT_PROTOCOL%",
             "old_name": "{{CLIENT_PROTOCOL}}",
