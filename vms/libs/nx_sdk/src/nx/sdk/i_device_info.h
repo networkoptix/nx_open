@@ -3,7 +3,7 @@
 namespace nx {
 namespace sdk {
 
-// TODO: Split into IDeviceInfo and common::DeviceInfo.
+// TODO: Split into IDeviceInfo and DeviceInfo.
 struct DeviceInfo
 {
     DeviceInfo()

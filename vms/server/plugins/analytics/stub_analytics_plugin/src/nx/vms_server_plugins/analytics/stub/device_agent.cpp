@@ -5,12 +5,12 @@
 #include <ctime>
 #include <cmath>
 
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
-#include <nx/sdk/common/string_map.h>
+#include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/helpers/string_map.h>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -27,10 +27,8 @@ using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine):
     VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
-    m_objectId{{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}}
+    m_objectId(nx::sdk::UuidHelper::randomUuid())
 {
-    // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
-    *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
 }
 
 DeviceAgent::~DeviceAgent()
@@ -53,20 +51,25 @@ std::string DeviceAgent::manifest() const
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
-        ")json" + kObjectInTheAreaEventType + R"json("
+        ")json" + kSuspiciousNoiseEventType + R"json("
     ],
     "supportedObjectTypeIds": [
         ")json" + kCarObjectType + R"json("
     ],
     "eventTypes": [
         {
-            "id": ")json" + kLineCrossingEventType + R"json(",
-            "name": "Line crossing"
+            "id": ")json" + kLoiteringEventType + R"json(",
+            "name": "Loitering"
         },
         {
-            "id": ")json" + kObjectInTheAreaEventType + R"json(",
-            "name": "Object in the area",
+            "id": ")json" + kIntrusionEventType + R"json(",
+            "name": "Intrusion",
             "flags": "stateDependent|regionDependent"
+        },
+        {
+            "id": ")json" + kGunshotEventType + R"json(",
+            "name": "Gunshot",
+            "groupId": ")json" + kSoundRelatedEventGroup + R"json("
         }
     ]
 }
@@ -86,7 +89,7 @@ void DeviceAgent::settingsReceived()
     }
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (engine()->needUncompressedVideoFrames())
     {
@@ -236,9 +239,9 @@ void DeviceAgent::processPluginEvents()
     }
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
-    auto settings = new nx::sdk::common::StringMap();
+    auto settings = new StringMap();
     settings->addItem("plugin_side_number", "100");
 
     return settings;
@@ -260,14 +263,14 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
         m_counter = 0;
     }
 
-    auto event = new nx::sdk::analytics::common::Event();
+    auto event = new nx::sdk::analytics::Event();
     event->setCaption("Line crossing (caption)");
     event->setDescription("Line crossing (description)");
     event->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
     event->setIsActive(m_counter == 1);
     event->setTypeId(m_eventTypeId);
 
-    auto eventPacket = new nx::sdk::analytics::common::EventMetadataPacket();
+    auto eventPacket = new EventMetadataPacket();
     eventPacket->setTimestampUs(usSinceEpoch());
     eventPacket->setDurationUs(0);
     eventPacket->addItem(event);
@@ -286,7 +289,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
 
-    auto object = new nx::sdk::analytics::common::Object();
+    auto object = new Object();
 
     object->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     object->setTypeId(kCarObjectType);
@@ -299,8 +302,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
 
     if (m_currentObjectIndex != sequentialNumber)
     {
-        // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
-        std::time(reinterpret_cast<time_t*>(m_objectId.bytes)); //< Make ID pseudo-unique.
+        m_objectId = UuidHelper::randomUuid();
         m_currentObjectIndex = sequentialNumber;
     }
 
@@ -326,7 +328,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
         });
     }
 
-    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto objectPacket = new ObjectMetadataPacket();
 
     objectPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
     objectPacket->setDurationUs(0);
@@ -346,14 +348,13 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
     if (frame->pixelFormat() != engine()->pixelFormat())
     {
         NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
-            << nx::sdk::analytics::common::pixelFormatToStdString(frame->pixelFormat())
+            << pixelFormatToStdString(frame->pixelFormat())
             << " instead of "
-            << nx::sdk::analytics::common::pixelFormatToStdString(engine()->pixelFormat());
+            << pixelFormatToStdString(engine()->pixelFormat());
         return false;
     }
 
-    const auto* const pixelFormatDescriptor =
-        nx::sdk::analytics::common::getPixelFormatDescriptor(frame->pixelFormat());
+    const auto* const pixelFormatDescriptor = getPixelFormatDescriptor(frame->pixelFormat());
     if (!pixelFormatDescriptor)
         return false; //< Error is already logged.
 
@@ -399,7 +400,7 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
             else
             {
                 NX_PRINT_HEX_DUMP(
-                    nx::kit::debug::format("Plane %d bytes %d..%d of %d",
+                    nx::kit::utils::format("Plane %d bytes %d..%d of %d",
                         plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
                     frame->data(plane) + dumpOffset, dumpSize);
             }

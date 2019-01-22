@@ -31,13 +31,13 @@ void EngineHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent)
     nx::vms::event::PluginEventPtr pluginEvent(
         new PluginEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
-            m_engineResource->getId(),
+            m_engineResource,
             sdkPluginEvent->caption(),
             sdkPluginEvent->description(),
             nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),
-            QStringList()));
+            QnSecurityCamResourcePtr()));
 
     emit pluginEventTriggered(pluginEvent);
 }
 
-} // namespace nx::vms::server::analytlics
+} // namespace nx::vms::server::analytics

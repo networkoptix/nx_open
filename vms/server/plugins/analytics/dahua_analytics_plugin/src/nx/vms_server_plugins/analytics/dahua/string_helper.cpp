@@ -1,11 +1,6 @@
-#include <nx/fusion/serialization/lexical_enum.h>
-#include <plugins/plugin_tools.h>
-
-#include <nx/utils/literal.h>
-#include <nx/utils/std/hashes.h>
-#include <nx/utils/thread/mutex.h>
-
 #include "string_helper.h"
+
+#include <nx/fusion/serialization/lexical_enum.h>
 
 namespace nx::vms_server_plugins::analytics::dahua {
 

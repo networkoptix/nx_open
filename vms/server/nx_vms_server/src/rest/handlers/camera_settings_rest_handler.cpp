@@ -1,4 +1,4 @@
-﻿#include "camera_settings_rest_handler.h"
+#include "camera_settings_rest_handler.h"
 
 #include <algorithm>
 

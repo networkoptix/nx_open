@@ -58,12 +58,12 @@ void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int StreamReader::addRef()
+int StreamReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int StreamReader::releaseRef()
+int StreamReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

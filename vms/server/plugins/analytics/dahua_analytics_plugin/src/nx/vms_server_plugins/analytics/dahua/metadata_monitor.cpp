@@ -174,7 +174,6 @@ bool MetadataMonitor::processEvent(const Event& event)
     };
 
     auto eventTypeDescriptor = m_parsedEngineManifest.eventTypeDescriptorById(event.typeId);
-    using namespace nx::sdk::analytics;
     if (eventTypeDescriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {
         const QString key = getEventKey(event);

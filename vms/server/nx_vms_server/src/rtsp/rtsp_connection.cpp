@@ -1233,7 +1233,8 @@ PlaybackMode QnRtspConnectionProcessor::getStreamingMode() const
     return isExport ? PlaybackMode::Export : PlaybackMode::Archive;
 }
 
-StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders() const
+StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders(
+    StreamDataFilters oldFilters) const
 {
     Q_D(const QnRtspConnectionProcessor);
     QString deprecatedSendMotion = nx::network::http::getHeaderValue(
@@ -1241,9 +1242,9 @@ StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders() const
     QString dataFilterStr = nx::network::http::getHeaderValue(
         d->request.headers, Qn::RTSP_DATA_FILTER_HEADER_NAME);
 
-    StreamDataFilters filter = StreamDataFilter::mediaOnly;
+    StreamDataFilters filter = oldFilters ? oldFilters : StreamDataFilter::media;
     if (deprecatedSendMotion == "1" || deprecatedSendMotion == "true")
-        filter |= StreamDataFilter::media | StreamDataFilter::motion;
+        filter.setFlag(StreamDataFilter::motion, true);
     else
         filter = QnLexical::deserialized<StreamDataFilters>(dataFilterStr);
     return filter;
@@ -1372,7 +1373,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
         d->archiveDP->lock();
-        d->archiveDP->setStreamDataFilter(streamFilterFromHeaders());
+        d->archiveDP->setStreamDataFilter(
+            streamFilterFromHeaders(d->archiveDP->streamDataFilter()));
 
         d->archiveDP->setSpeed(d->rtspScale);
         d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
@@ -1401,7 +1403,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
     }
 
     d->dataProcessor->setUseUTCTime(d->useProprietaryFormat);
-    d->dataProcessor->setStreamDataFilter(streamFilterFromHeaders());
+    d->dataProcessor->setStreamDataFilter(
+        streamFilterFromHeaders(d->dataProcessor->streamDataFilter()));
     d->dataProcessor->start();
 
 
@@ -1496,10 +1499,12 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
         }
         else if (normParam.startsWith(kSendMotionHeaderName))
         {
-            QByteArray value = vals[1].trimmed();
-            StreamDataFilters filter = StreamDataFilter::mediaOnly;
-            if (value == "1" || value == "true")
-                filter |= StreamDataFilter::media | StreamDataFilter::motion;
+            QByteArray value = vals[1].trimmed().toLower();
+            const bool sendMotion = value == "1" || value == "true";
+
+            StreamDataFilters filter = d->dataProcessor->streamDataFilter();
+            filter.setFlag(StreamDataFilter::motion, sendMotion);
+
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
             d->dataProcessor->setStreamDataFilter(filter);

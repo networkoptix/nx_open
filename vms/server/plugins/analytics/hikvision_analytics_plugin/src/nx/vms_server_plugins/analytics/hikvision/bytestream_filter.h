@@ -1,13 +1,9 @@
 #pragma once
 
-#include <boost/optional/optional.hpp>
-
 #include "metadata_monitor.h"
 #include "common.h"
 
-#include <plugins/plugin_api.h>
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
-#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace vms_server_plugins {

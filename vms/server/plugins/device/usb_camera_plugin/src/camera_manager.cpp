@@ -55,12 +55,12 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraManager::addRef()
+int CameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraManager::releaseRef()
+int CameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -152,7 +152,7 @@ nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 
 void CameraManager::getLastErrorString( char* errorString ) const
 {
-    const auto errorToString = 
+    const auto errorToString =
         [&errorString](int ffmpegError) -> bool
         {
             bool error = ffmpegError < 0;

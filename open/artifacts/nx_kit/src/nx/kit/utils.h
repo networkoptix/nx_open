@@ -2,14 +2,25 @@
 #pragma once
 
 /**@file
- * Variuos utilities.
+ * Variuos utilities. Used by other nx_kit components.
  *
- * This unit can be compiled in the context of any C++ project.
+ * This unit can be compiled in the context of any C++ project. If Qt headers are included before
+ * this one, some Qt support is enabled via "#if defined(QT_CORE_LIB)".
  */
 
+#include <cstddef>
 #include <cstring>
 #include <cstdlib>
 #include <memory>
+#include <string>
+#include <sstream>
+
+#if defined(QT_CORE_LIB)
+    // To be supported in toString().
+    #include <QtCore/QByteArray>
+    #include <QtCore/QString>
+    #include <QtCore/QUrl>
+#endif
 
 #if !defined(NX_KIT_API)
     #define NX_KIT_API /*empty*/
@@ -18,6 +29,24 @@
 namespace nx {
 namespace kit {
 namespace utils {
+
+//-------------------------------------------------------------------------------------------------
+// Strings.
+
+NX_KIT_API bool isAsciiPrintable(int c);
+
+/**
+ * Convert various values to their accurate text representation, e.g. quoted and escaped strings.
+ */
+template<typename T>
+std::string toString(T value);
+
+NX_KIT_API std::string format(std::string formatStr, ...);
+
+//-------------------------------------------------------------------------------------------------
+// Aligned allocation.
+
+NX_KIT_API uint8_t* unalignedPtr(void* data);
 
 /** Alignes val up to alignment boundary. */
 inline size_t alignUp(size_t val, size_t alignment)
@@ -83,6 +112,52 @@ void freeAligned(void* ptr, FreeFunc freeFunc)
 inline void freeAligned(void* ptr)
 {
     return freeAligned<>(ptr, ::free);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Implementation.
+
+template<typename T>
+std::string toString(T value)
+{
+    std::ostringstream outputString;
+    outputString << value;
+    return outputString.str();
+}
+
+NX_KIT_API std::string toString(std::string s); //< By value to avoid calling the template impl.
+NX_KIT_API std::string toString(uint8_t i); //< Otherwise, uint8_t would be printed as char.
+NX_KIT_API std::string toString(char c);
+NX_KIT_API std::string toString(const char* s);
+NX_KIT_API std::string toString(char* s);
+NX_KIT_API std::string toString(const void* ptr);
+NX_KIT_API std::string toString(void* ptr);
+NX_KIT_API std::string toString(std::nullptr_t ptr);
+NX_KIT_API std::string toString(bool b);
+
+#if defined(QT_CORE_LIB)
+
+static inline std::string toString(const QByteArray& b)
+{
+    return toString(b.toStdString());
+}
+
+static inline std::string toString(const QString& s)
+{
+    return toString(s.toUtf8().constData());
+}
+
+static inline std::string toString(const QUrl& u)
+{
+    return toString(u.toEncoded().toStdString());
+}
+
+#endif // defined(QT_CORE_LIB)
+
+template<typename P>
+std::string toString(P* ptr)
+{
+    return toString((const void*) ptr);
 }
 
 } // namespace utils

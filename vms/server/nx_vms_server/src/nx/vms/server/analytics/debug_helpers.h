@@ -5,25 +5,25 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
-#include <nx/sdk/common/string_map.h>
+#include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/vms/server/sdk_support/pointers.h>
+#include <nx/sdk/helpers/ptr.h>
 
 namespace nx::vms::server::analytics::debug_helpers {
 
 /** @return Null if the file does not exist, or on error. */
-sdk_support::UniquePtr<nx::sdk::IStringMap> loadSettingsFromFile(
+nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename);
 
-sdk_support::UniquePtr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
+nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
 
-sdk_support::UniquePtr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
+nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
 
 QString filename(

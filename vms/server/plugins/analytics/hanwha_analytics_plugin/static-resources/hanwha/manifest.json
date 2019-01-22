@@ -101,9 +101,9 @@
             "flags": "stateDependent"
         },
         {
-            "id": "nx.hanwha.AlarmInput.,NetworkAlarmInput",
+            "id": "nx.hanwha.AlarmInput",
             "name": "Dry contact input",
-            "internalName": "AlarmInput.,NetworkAlarmInput",
+            "internalName": "AlarmInput,NetworkAlarmInput",
             "description": "Dry contact input has been %1",
             "positiveState": "activated",
             "negativeState": "deactivated",

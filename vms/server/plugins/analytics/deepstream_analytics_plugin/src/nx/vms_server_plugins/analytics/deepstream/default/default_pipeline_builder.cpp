@@ -70,7 +70,7 @@ std::unique_ptr<nx::gstreamer::Pipeline> DefaultPipelineBuilder::build(
 
 std::unique_ptr<nx::gstreamer::Bin> DefaultPipelineBuilder::buildTrackerBin(
     const nx::gstreamer::ElementName& pipelineName,
-    DefaultPipeline* pipeline)
+    DefaultPipeline* /*pipeline*/)
 {
     NX_OUTPUT << __func__ << " Creating tracker bin for " << pipelineName;
     auto tracker = std::make_unique<nx::gstreamer::Element>(
@@ -113,11 +113,11 @@ std::map<LabelMappingId, LabelMapping> DefaultPipelineBuilder::makeLabelMapping(
         auto rawLabels = parseLabelFile(labelFile);
         NX_OUTPUT << __func__ << " Making label mapping from label files files";
         LabelMapping labelMapping;
-        for (auto j = 0; j < rawLabels.size(); ++j)
+        for (int j = 0; j < (int) rawLabels.size(); ++j)
         {
             LabelTypeMapping labelTypeMapping;
             labelTypeMapping.labelTypeString = labelTypeByIndex(i);
-            for (auto k = 0; k < rawLabels[j].size(); ++k)
+            for (int k = 0; k < (int) rawLabels[j].size(); ++k)
                 labelTypeMapping.labelValueMapping.emplace(k, rawLabels[j][k]);
 
             labelMapping.emplace(j, labelTypeMapping);

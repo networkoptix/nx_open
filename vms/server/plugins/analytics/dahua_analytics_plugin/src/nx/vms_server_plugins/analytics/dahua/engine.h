@@ -12,16 +12,16 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/utils/elapsed_timer.h>
-#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::common::Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -38,9 +38,11 @@ public:
     const EngineManifest& parsedManifest() const;
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
+        nx::sdk::analytics::IAction* action, nx::sdk::Error* outError) override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
+
+    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
 
 private:
     nx::vms::api::analytics::DeviceAgentManifest fetchDeviceAgentParsedManifest(
@@ -50,7 +52,7 @@ private:
     static QByteArray loadManifest();
     static EngineManifest parseManifest(const QByteArray& manifest);
 private:
-    nx::sdk::analytics::common::Plugin* const m_plugin;
+    nx::sdk::analytics::Plugin* const m_plugin;
 
     mutable QnMutex m_mutex;
 

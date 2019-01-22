@@ -4,6 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
@@ -12,7 +13,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <analytics/common/object_detection_metadata.h>
-#include <nx/fusion/model_functions.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
 
@@ -24,6 +24,7 @@ namespace analytics {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::vms::api::analytics;
 
 MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
@@ -33,17 +34,16 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
+std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
     const QString& eventTypeId) const
 {
-    for (const auto& entry: m_eventTypeDescriptors)
+    if (const auto it = m_eventTypeDescriptors.find(eventTypeId);
+        it != m_eventTypeDescriptors.cend())
     {
-        const auto& id = entry.first;
-        const auto& descriptor = entry.second;
-        if (id == eventTypeId)
-            return descriptor.item;
+        return it->second;
     }
-    return nx::vms::api::analytics::EventType();
+
+    return std::nullopt;
 }
 
 void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
@@ -55,19 +55,17 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 
     bool handled = false;
-    nxpt::ScopedRef<IEventMetadataPacket> eventsPacket(
-        metadata->queryInterface(IID_EventMetadataPacket));
-    if (eventsPacket)
+    if (const auto eventsPacket = nxpt::queryInterfacePtr<IEventMetadataPacket>(metadata,
+        IID_EventMetadataPacket))
     {
-        handleEventsPacket(std::move(eventsPacket));
+        handleEventsPacket(eventsPacket);
         handled = true;
     }
 
-    nxpt::ScopedRef<IObjectMetadataPacket> objectsPacket(
-        metadata->queryInterface(IID_ObjectMetadataPacket));
-    if (objectsPacket)
+    if (const auto objectsPacket = nxpt::queryInterfacePtr<IObjectMetadataPacket>(metadata,
+        IID_ObjectMetadataPacket))
     {
-        handleObjectsPacket(std::move(objectsPacket));
+        handleObjectsPacket(objectsPacket);
         handled = true;
     }
 
@@ -79,22 +77,21 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
     }
 }
 
-void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> packet)
+void MetadataHandler::handleEventsPacket(nx::sdk::Ptr<IEventMetadataPacket> packet)
 {
     int eventsCount = 0;
     while (true)
     {
-        nxpt::ScopedRef<IMetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
+        nx::sdk::Ptr<IMetadataItem> item(packet->nextItem());
         if (!item)
             break;
 
         ++eventsCount;
 
-        nxpt::ScopedRef<IEvent> eventData(item->queryInterface(IID_Event));
-        if (eventData)
+        if (const auto event = nxpt::queryInterfacePtr<IEvent>(item, IID_Event))
         {
             const int64_t timestampUsec = packet->timestampUs();
-            handleMetadataEvent(std::move(eventData), timestampUsec);
+            handleMetadataEvent(event, timestampUsec);
         }
         else
         {
@@ -106,18 +103,17 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<IEventMetadataPacket> p
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
-void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket> packet)
+void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> packet)
 {
-    using namespace nx::vms_server_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<IObject> item(packet->nextItem(), /*increaseRef*/ false);
+        nx::sdk::Ptr<IObject> item(packet->nextItem());
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
         object.objectTypeId = item->typeId();
-        object.objectId = fromPluginGuidToQnUuid(item->id());
+        object.objectId = nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
@@ -152,7 +148,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<IObjectMetadataPacket>
 }
 
 void MetadataHandler::handleMetadataEvent(
-    nxpt::ScopedRef<IEvent> eventData,
+    nx::sdk::Ptr<IEvent> eventData,
     qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;
@@ -161,7 +157,13 @@ void MetadataHandler::handleMetadataEvent(
     NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
     auto descriptor = eventTypeDescriptor(eventTypeId);
-    if (descriptor.flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
+    if (!descriptor)
+    {
+        NX_WARNING(this, "Unable to find descriptor for %1", eventTypeId);
+        return;
+    }
+
+    if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
     {
         eventState = eventData->isActive()
             ? nx::vms::api::EventState::active
@@ -181,7 +183,7 @@ void MetadataHandler::handleMetadataEvent(
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_pluginId,
+        m_engineId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -203,9 +205,9 @@ void MetadataHandler::setResource(QnVirtualCameraResourcePtr resource)
     m_resource = std::move(resource);
 }
 
-void MetadataHandler::setPluginId(QString pluginId)
+void MetadataHandler::setEngineId(QnUuid engineId)
 {
-    m_pluginId = std::move(pluginId);
+    m_engineId = std::move(engineId);
 }
 
 void MetadataHandler::setEventTypeDescriptors(DescriptorMap descriptors)
@@ -218,7 +220,7 @@ void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)
     m_metadataSink = dataReceptor;
 }
 
-void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* /*dataReceptor*/)
 {
     m_metadataSink = nullptr;
 }

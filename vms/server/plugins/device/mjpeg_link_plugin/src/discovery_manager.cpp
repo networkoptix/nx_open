@@ -17,6 +17,7 @@
 #include "camera_manager.h"
 #include "plugin.h"
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/log/log_main.h>
@@ -69,12 +70,12 @@ void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int DiscoveryManager::addRef()
+int DiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int DiscoveryManager::releaseRef()
+int DiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -101,7 +102,7 @@ static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
 
 bool DiscoveryManager::validateUrl(const nx::utils::Url& url)
 {
-    nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+    const nx::sdk::Ptr<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
     if (!plugin)
         return false;
 

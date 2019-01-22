@@ -3,7 +3,7 @@
 #include <unordered_set>
 #include <string>
 #include <mutex>
-#include <third_party_storage.h>
+#include <storage/third_party_storage.h>
 #include <common.h>
 #include <vfs.h>
 #include <url.h>
@@ -12,7 +12,7 @@
 static const nxpl::NX_GUID IID_StorageFactory =
 { { 0x2e, 0x2c, 0x7a, 0x3d, 0x25, 0x6d, 0x40, 0x18, 0xb4, 0xe, 0x51, 0x2d, 0x72, 0x51, 0xb, 0xec } };
 
-class TestStorageFactory :
+class NX_TEST_STORAGE_PLUGIN_API TestStorageFactory :
     public nx_spl::StorageFactory,
     public PluginRefCounter<TestStorageFactory>
 {
@@ -31,8 +31,8 @@ public:
 public: // plugin interface implementation
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
 private:
     virtual bool readConfig(const std::string& path, std::string* outContent);

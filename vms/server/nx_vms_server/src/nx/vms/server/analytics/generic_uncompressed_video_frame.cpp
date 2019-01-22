@@ -1,8 +1,6 @@
 #include "generic_uncompressed_video_frame.h"
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 using namespace nx::sdk::analytics;
 
@@ -33,12 +31,8 @@ void* GenericUncompressedVideoFrame::queryInterface(const nxpl::NX_GUID& interfa
 
 bool GenericUncompressedVideoFrame::validatePlane(int plane) const
 {
-    if (plane >= m_data.size())
-    {
-        NX_ASSERT(false, lm("Requested plane %1 of %2").args(plane, m_data.size()));
-        return false;
-    }
-    return true;
+    return NX_ASSERT(plane >= 0 && plane < (int) m_data.size(),
+        lm("Requested plane %1 of %2").args(plane, m_data.size()));
 }
 
 int GenericUncompressedVideoFrame::dataSize(int plane) const
@@ -66,6 +60,4 @@ int GenericUncompressedVideoFrame::lineSize(int plane) const
     return m_lineSizes.at(plane);
 }
 
-} // namespace analytics
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

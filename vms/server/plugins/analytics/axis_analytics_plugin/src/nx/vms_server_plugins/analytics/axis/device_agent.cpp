@@ -7,16 +7,19 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/serialization/json.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
 
 namespace nx::vms_server_plugins::analytics::axis {
 
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
+
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const nx::sdk::DeviceInfo& deviceInfo,
+    const DeviceInfo& deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(engine),
@@ -41,7 +44,7 @@ DeviceAgent::~DeviceAgent()
 
 void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
+    if (interfaceId == IID_DeviceAgent)
     {
         addRef();
         return static_cast<DeviceAgent*>(this);
@@ -54,36 +57,36 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(
+    const IMetadataTypes* metadataTypes)
 {
     if (!metadataTypes->eventTypeIds()->count())
     {
         stopFetchingMetadata();
-        return nx::sdk::Error::noError;
+        return Error::noError;
     }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(
+    const IMetadataTypes* metadataTypes)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler);
     return m_monitor->startMonitoring(metadataTypes);
@@ -95,14 +98,14 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
+const IString* DeviceAgent::manifest(Error* error) const
 {
     if (m_jsonManifest.isEmpty())
     {
-        *error = nx::sdk::Error::unknownError;
+        *error = Error::unknownError;
         return nullptr;
     }
-    return new nx::sdk::common::String(m_jsonManifest);
+    return new nx::sdk::String(m_jsonManifest);
 }
 
 const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept

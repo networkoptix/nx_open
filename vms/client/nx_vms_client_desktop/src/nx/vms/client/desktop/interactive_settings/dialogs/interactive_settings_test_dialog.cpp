@@ -40,8 +40,8 @@ InteractiveSettingsTestDialog::InteractiveSettingsTestDialog(QWidget* parent):
 
 void InteractiveSettingsTestDialog::loadManifest()
 {
-    const QString serializedManifest = ui->manifestTextEdit->toPlainText().trimmed();
-    const QJsonObject manifest = QJsonDocument::fromJson(serializedManifest.toUtf8()).object();
+    const QString serializedModel = ui->manifestTextEdit->toPlainText().trimmed();
+    const QJsonObject model = QJsonDocument::fromJson(serializedModel.toUtf8()).object();
 
     if (const auto rootObject = m_settingsWidget->rootObject())
     {
@@ -49,7 +49,7 @@ void InteractiveSettingsTestDialog::loadManifest()
             m_settingsWidget->rootObject(),
             "loadModel",
             Qt::DirectConnection,
-            Q_ARG(QVariant, manifest.toVariantMap()),
+            Q_ARG(QVariant, model.toVariantMap()),
             Q_ARG(QVariant, {}));
 
         refreshValues();
