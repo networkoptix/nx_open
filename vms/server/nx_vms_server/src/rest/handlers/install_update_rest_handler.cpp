@@ -22,7 +22,7 @@ bool allParticipantsAreReadyForInstall(
     detail::checkUpdateStatusRemotely(ifParticipantPredicate,processor->commonModule(),
         "/ec2/updateStatus", &reply, &context);
 
-    return std::all_of(reply.cbegin(), reply.cend(),
+    return !reply.isEmpty() && std::all_of(reply.cbegin(), reply.cend(),
         [](const auto& status)
         {
             return status.code == nx::update::Status::Code::readyToInstall
@@ -102,6 +102,9 @@ int QnInstallUpdateRestHandler::executePost(
 
     m_onTriggeredCallback();
 
+    if (request.isLocal)
+        return nx::network::http::StatusCode::ok;
+
     if (!params.contains("peers"))
     {
         return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
@@ -112,7 +115,7 @@ int QnInstallUpdateRestHandler::executePost(
     QList<QnUuid> participants;
     if (!params.value("peers").isEmpty())
     {
-        for (const auto& idString: params.value("peers").split(','))
+        for (const auto& idString : params.value("peers").split(','))
             participants.append(QnUuid::fromStringSafe(idString));
     }
 
@@ -120,44 +123,38 @@ int QnInstallUpdateRestHandler::executePost(
     {
         return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
             "Failed to set update participants list. Update information might not be valid",
-            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting,
-            QnRestResult::InternalServerError);
+            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
     }
 
-    if (!request.isLocal)
+    if (!serverModule()->updateManager()->updateLastInstallationRequestTime())
     {
-        if (!serverModule()->updateManager()->updateLastInstallationRequestTime())
-        {
-            return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-                "Failed to set last installation request time. Update information might not be valid",
-                &result, &resultContentType, Qn::JsonFormat, request.extraFormatting,
-                QnRestResult::InternalServerError);
-        }
-
-        const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
-            serverModule()->updateManager());
-
-        if (!ifParticipantPredicate)
-        {
-            return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-                "Failed to determine update participants. Update information might not be valid",
-                &result, &resultContentType, Qn::JsonFormat, request.extraFormatting,
-                QnRestResult::InternalServerError);
-        }
-
-        if (!allParticipantsAreReadyForInstall(ifParticipantPredicate, processor))
-        {
-            return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-                "Not all servers in the system are ready for install",
-                &result, &resultContentType, Qn::JsonFormat);
-        }
-
-        QnMultiserverRequestContext<QnEmptyRequestData> context(request,
-            processor->owner()->getPort());
-
-        sendInstallRequest(ifParticipantPredicate, serverModule()->commonModule(), path,
-            srcBodyContentType, &context);
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+            "Failed to set last installation request time. Update information might not be valid",
+            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
     }
+
+    const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
+        serverModule()->updateManager());
+
+    if (!ifParticipantPredicate)
+    {
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+            "Failed to determine update participants. Update information might not be valid",
+            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
+    }
+
+    if (!allParticipantsAreReadyForInstall(ifParticipantPredicate, processor))
+    {
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+            "Not all servers in the system are ready for install",
+            &result, &resultContentType, Qn::JsonFormat);
+    }
+
+    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
+        processor->owner()->getPort());
+
+    sendInstallRequest(ifParticipantPredicate, serverModule()->commonModule(), path,
+        srcBodyContentType, &context);
 
     return nx::network::http::StatusCode::ok;
 }
