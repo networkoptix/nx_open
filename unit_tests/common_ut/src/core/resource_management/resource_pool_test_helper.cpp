@@ -111,11 +111,13 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
     return layout;
 }
 
-QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
+QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(Qn::ServerFlags flags)
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
     server->setId(QnUuid::createUuid());
     resourcePool()->addResource(server);
+    server->setStatus(Qn::Online);
+    server->setServerFlags(server->getServerFlags() | flags);
     return server;
 }
 

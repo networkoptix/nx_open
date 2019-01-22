@@ -617,7 +617,7 @@ bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
 bool QnMediaServerResource::requiresEdgeLicense(const QnResourcePtr &resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags().testFlag(Qn::SF_RequireEdgeLicense));
+        return (server->getServerFlags().testFlag(Qn::SF_RequiresEdgeLicense));
     return false;
 }
 

@@ -3024,17 +3024,17 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
 
 static bool isDwBlackJackMini()
 {
-    // The only way we know to find out is to detct their web-server presence on device.
-    const QString filePath = "/usr/local/bin/main-server";
-    QFile file(filePath);
+    // The only way we know to find out is to detect their web-server presence on device.
+    const QString kWebServerPath = "/usr/local/bin/main-server";
+    QFile file(kWebServerPath);
     if (!file.open(QFile::ReadOnly))
     {
-        NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - unable to open file").args(filePath));
+        NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - unable to open file").args(kWebServerPath));
         return false;
     }
 
     const auto content = file.readAll();
-    NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - contains:\n%2").args(filePath, content));
+    NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - contains:\n%2").args(kWebServerPath, content));
     if (!content.contains("SteelBox"))
         return false;
 
@@ -3080,8 +3080,8 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
 
     // DW requested to accept professional licenses on their BlackJack MINI, see VMS-12693.
     // This code should be removed as soon as we accept professional licenses on all arm devices.
-    if (serverFlags && Qn::SF_ArmServer && !isDwBlackJackMini())
-        serverFlags |= Qn::SF_RequireEdgeLicense;
+    if ((serverFlags & Qn::SF_ArmServer) && !isDwBlackJackMini())
+        serverFlags |= Qn::SF_RequiresEdgeLicense;
 
     if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
         serverFlags |= Qn::SF_SupportsTranscoding;
