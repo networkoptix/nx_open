@@ -375,12 +375,21 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             return false;
         }
 
-        serverControls[0] = pControl; serverControls[1] = NULL;
+        serverControls[0] = pControl;
+        serverControls[1] = NULL;
 
         rc = ldap_search_ext_s(
-            m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE,
-            filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, serverControls, NULL, NULL,
-            LDAP_NO_LIMIT, &result);
+            /* ld */ m_ld,
+            /* base */ QSTOCW(m_settings.searchBase),
+            /* scope */ LDAP_SCOPE_SUBTREE,
+            /* filter */ filter.isEmpty() ? 0 : QSTOCW(filter),
+            /* attrs */ NULL,
+            /* attrsonly */ 0,
+            /* serverctrls */ serverControls,
+            /* clientctrls */ NULL,
+            /* timeout */ NULL,
+            /* sizelimit */ LDAP_NO_LIMIT,
+            /* res */ &result);
         if (rc != LDAP_SUCCESS)
         {
             if (pControl)
@@ -477,8 +486,17 @@ bool LdapSession::testSettings()
 
     QString filter = QnLdapFilter(m_dType->Filter()) & m_settings.searchFilter;
     rc = ldap_search_ext_s(
-        m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE,
-        filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, NULL, LDAP_NO_LIMIT, &result);
+        /* ld */ m_ld,
+        /* base */ QSTOCW(m_settings.searchBase),
+        /* scope */ LDAP_SCOPE_SUBTREE,
+        /* filter */ filter.isEmpty() ? 0 : QSTOCW(filter),
+        /* attrs */ NULL,
+        /* attrsonly */ 0,
+        /* serverctrls */ NULL,
+        /* clientctrls */ NULL,
+        /* timeout */ NULL,
+        /* sizelimit */ LDAP_NO_LIMIT,
+        /* res */ &result);
     if (rc != LDAP_SUCCESS)
     {
         m_lastErrorCode = rc;
@@ -524,7 +542,18 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     LDAPMessage *result, *e;
 
     QString forestFunctionality(lit("forestFunctionality"));
-    rc = ldap_search_ext_s(m_ld, NULL, LDAP_SCOPE_BASE, NULL, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
+    rc = ldap_search_ext_s(
+        /* ld */ m_ld,
+        /* base */ NULL,
+        /* scope */ LDAP_SCOPE_BASE,
+        /* filter */ NULL,
+        /* attrs */ NULL,
+        /* attrsonly */ 0,
+        /* serverctrls */ NULL,
+        /* clientctrls */ NULL,
+        /* timeout */ NULL,
+        /* sizelimit */ LDAP_NO_LIMIT,
+        /* res */ &result);
     if (rc != LDAP_SUCCESS)
     {
         m_lastErrorCode = rc;
