@@ -1007,39 +1007,6 @@
         ]
       },
       {
-        "name": "Additional Information",
-        "translatable": false,
-        "values": [
-          {
-            "name": "additionalVideo",
-            "label": "Additional Video",
-            "value": "",
-            "description": "<br><br><br>A youtube or vimeo link for a support video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
-            "type": "text",
-            "optional": true,
-            "meta": {
-              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
-            }
-          },
-          {
-            "name": "usefulLinks",
-            "label": "Useful Links",
-            "value": "",
-            "description": "",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "additionalInformation",
-            "label": "Additional Information",
-            "value": "",
-            "description": "",
-            "type": "html",
-            "optional": true
-          }
-        ]
-      },
-      {
         "name": "Support",
         "translatable": false,
         "values": [
