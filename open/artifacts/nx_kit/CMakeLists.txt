@@ -22,6 +22,8 @@ add_library(nx_kit ${nxKitLibraryType}
     src/nx/kit/debug.cpp
     src/nx/kit/ini_config.h
     src/nx/kit/ini_config.cpp
+    src/nx/kit/output_redirector.h
+    src/nx/kit/output_redirector.cpp
     src/nx/kit/test.h
     src/nx/kit/test.cpp
     src/ini_config_c.h

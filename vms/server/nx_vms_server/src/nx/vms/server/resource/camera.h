@@ -155,6 +155,8 @@ public:
     static QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
+    int getMaxChannels() const;
+    virtual int getMaxChannelsPhysical() const { return 1; }
 
     void inputPortListenerAttached();
     void inputPortListenerDetached();
@@ -180,6 +182,15 @@ public:
         bool keepSmalChunks,
         int limit,
         Qt::SortOrder sortOrder);
+
+    enum class Role
+    {
+        regular,
+        subchannel
+    };
+    void setRole(Role role) { m_role = role; }
+    Role getRole() const { return m_role; }
+
 
 signals:
     /** Emit on camera or IO module input change. */
@@ -250,6 +261,7 @@ private:
     bool m_inputPortListeningInProgress = false;
     QnMutex m_ioPortStatesMutex;
     std::map<QString, QnIOStateData> m_ioPortStatesCache;
+    Role m_role = Role::regular;
 };
 
 } // namespace resource

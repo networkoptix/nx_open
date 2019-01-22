@@ -468,7 +468,7 @@ void CameraAdvancedParamsWidget::at_advancedSettingsLoaded(int status, const QnC
         m_currentValues.remove(value.id);
 
     /* Display values. */
-    m_advancedParamWidgetsManager->loadValues(params);
+    m_advancedParamWidgetsManager->loadValues(params, /*packetMode*/ true);
 
     /* Update state. */
     setState(State::Init);

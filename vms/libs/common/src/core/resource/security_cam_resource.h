@@ -351,6 +351,7 @@ public:
     QnResourceData resourceData() const;
 
     virtual void setCommonModule(QnCommonModule* commonModule) override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -392,8 +393,6 @@ protected:
 
     virtual void initializationDone() override;
 
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-
     virtual void setMotionMaskPhysical(int /*channel*/) {}
 
     virtual Qn::LicenseType calculateLicenseType() const;
@@ -419,7 +418,6 @@ private:
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;
-
 private slots:
     void resetCachedValues();
 };

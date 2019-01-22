@@ -513,9 +513,6 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
     result.dataFormat = dataFormat;
 
-    if (query.hasQueryItem(QString::fromLatin1("transport")))
-        QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("transport")), &result.transport);
-
     return result;
 }
 

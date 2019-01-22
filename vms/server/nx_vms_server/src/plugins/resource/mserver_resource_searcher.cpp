@@ -22,7 +22,6 @@ using nx::network::UDPSocket;
 static quint16 DISCOVERY_PORT = 54013;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
 static const QString kGroupAddress("224.0.1.243");
-static const QString kLocalHost("127.0.0.1");
 static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
@@ -31,7 +30,7 @@ QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
     if (serverModule->settings().appserverHost.present())
         host = serverModule->settings().appserverHost();
     else
-        host = kLocalHost;
+        host = nx::network::HostAddress::localhost.toString();
     QByteArray result = host.toUtf8();
     if (nx::vms::server::Utils::isLocalAppServer(result))
     {

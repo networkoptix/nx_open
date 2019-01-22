@@ -290,9 +290,14 @@ void QnRtspClient::parseSDP(const QByteArray& data)
     }
     if (m_config.backChannelAudioOnly)
     {
-        std::remove_if(m_sdpTracks.begin(), m_sdpTracks.end(),
-            [](const QnRtspClient::SDPTrackInfo& track) { return !track.sdpMedia.sendOnly; });
-        m_sdpTracks.resize(1);
+        m_sdpTracks.erase(std::remove_if(
+            m_sdpTracks.begin(), m_sdpTracks.end(),
+            [](const QnRtspClient::SDPTrackInfo& track)
+            {
+                return !track.sdpMedia.sendOnly
+                    || track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Audio;
+            }),
+            m_sdpTracks.end());
     }
 }
 
