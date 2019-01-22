@@ -138,7 +138,7 @@
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system",
     "oldSafariNotSupported": "Versions of Safari older than 10 are not supported",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each systems that you are trying to merge and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again."
   },
   "passwordRequirements": {
     "good": "good",
