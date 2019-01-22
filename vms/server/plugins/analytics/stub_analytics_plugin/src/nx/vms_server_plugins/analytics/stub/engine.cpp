@@ -141,7 +141,7 @@ std::string Engine::manifest() const
                 "items": [
                     {
                         "type": "TextField",
-                        "name": "test_text_field",
+                        "name": "testTextField",
                         "caption": "Text Field Parameter",
                         "description": "A text field",
                         "defaultValue": "a text"
@@ -153,7 +153,7 @@ std::string Engine::manifest() const
                             {
                                 "type": "SpinBox",
                                 "caption": "SpinBox Parameter",
-                                "name": "test_spin_box",
+                                "name": "testSpinBox",
                                 "defaultValue": 42,
                                 "minValue": 0,
                                 "maxValue": 100
@@ -161,14 +161,14 @@ std::string Engine::manifest() const
                             {
                                 "type": "DoubleSpinBox",
                                 "caption": "DoubleSpinBox Parameter",
-                                "name": "test_double_spin_box",
+                                "name": "testDoubleSpinBox",
                                 "defaultValue": 3.1415,
                                 "minValue": 0.0,
                                 "maxValue": 100.0
                             },
                             {
                                 "type": "ComboBox",
-                                "name": "test_combo_box",
+                                "name": "testComboBox",
                                 "caption": "ComboBox Parameter",
                                 "defaultValue": "value2",
                                 "range": ["value1", "value2", "value3"]
@@ -179,7 +179,7 @@ std::string Engine::manifest() const
                                     {
                                         "type": "CheckBox",
                                         "caption": "CheckBox Parameter",
-                                        "name": "test_check_box",
+                                        "name": "testCheckBox",
                                         "defaultValue": true,
                                         "value": true
                                     }
@@ -203,7 +203,7 @@ std::string Engine::manifest() const
         "items": [
             {
                 "type": "TextField",
-                "name": "test_text_field",
+                "name": "testTextField",
                 "caption": "Device Agent Text Field",
                 "description": "A text field",
                 "defaultValue": "a text"
@@ -215,7 +215,7 @@ std::string Engine::manifest() const
                     {
                         "type": "SpinBox",
                         "caption": "Device Agent SpinBox",
-                        "name": "test_spin_box",
+                        "name": "testSpinBox",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
@@ -223,14 +223,14 @@ std::string Engine::manifest() const
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Device Agent DoubleSpinBox",
-                        "name": "test_double_spin_box",
+                        "name": "testDoubleSpinBox",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "test_combo_box",
+                        "name": "testComboBox",
                         "caption": "Device Agent ComboBox",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
@@ -241,7 +241,7 @@ std::string Engine::manifest() const
                             {
                                 "type": "CheckBox",
                                 "caption": "Device Agent CheckBox",
-                                "name": "test_check_box",
+                                "name": "testCheckBox",
                                 "defaultValue": true,
                                 "value": true
                             }
@@ -340,21 +340,21 @@ static const std::string kPluginManifest = R"json(
                 "items": [
                     {
                         "type": "SpinBox",
-                        "name": "test_spin_box",
+                        "name": "testSpinBox",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
                     },
                     {
                         "type": "DoubleSpinBox",
-                        "name": "test_double_spin_box",
+                        "name": "testDoubleSpinBox",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "test_double_combo_box",
+                        "name": "testComboBox",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
                     },
@@ -363,7 +363,7 @@ static const std::string kPluginManifest = R"json(
                         "items": [
                             {
                                 "type": "CheckBox",
-                                "name": "test_check_box",
+                                "name": "testCheckBox",
                                 "defaultValue": true,
                                 "value": true
                             }
