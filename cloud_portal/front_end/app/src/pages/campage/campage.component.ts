@@ -86,15 +86,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
             {value: '15824256', name: '16mp'}
         ];
       this.filter = {};
-      // this.multiselectOptions = {
-      //     resolutions: this.resolutions,
-      //     hardwareTypes: this.hardwareTypes
-      // };
       this.emptyFilter = {
             query: '',
-            // minResolution: this.resolutions[0],
-            // hardwareTypes: [],
-            // vendors: [],
             isPtzSupported: false,
             isAptzSupported: false,
             isAudioSupported: false,
@@ -161,7 +154,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
               items   : this.resolutions,
               selected: this.resolutions[0]
           }
-          // vendors will be added later
       ];
       this.filterModel.multiselects = [
           {
@@ -170,28 +162,29 @@ export class NxCampageComponent implements OnInit, DoCheck {
               items   : this.hardwareTypes,
               selected: []
           }
+          // vendors will be added later
       ];
   }
 
-  constructor(private configService: NxConfigService,
-              private cameraService: CamerasService,
-              private camSearch: CampageSearchService,
-              // TODO: Use dialog service when it is not being downgraded
-              private messageDialog: NxModalMessageComponent,
-              private differs: KeyValueDiffers) {
+    constructor(private configService: NxConfigService,
+                private cameraService: CamerasService,
+                private camSearch: CampageSearchService,
+                // TODO: Use dialog service when it is not being downgraded
+                private messageDialog: NxModalMessageComponent,
+                private differs: KeyValueDiffers) {
 
-      this.setupDefaults();
-      this.differ = this.differs.find({}).create();
-      this.tagDiffer = this.differs.find([]).create();
-      this.resolutionDiffer = this.differs.find([]).create();
-      this.vendorDiffer = this.differs.find([]).create();
-      this.hardwareDiffer = this.differs.find([]).create();
+        this.setupDefaults();
+        this.differ = this.differs.find({}).create();
+        this.tagDiffer = this.differs.find([]).create();
+        this.resolutionDiffer = this.differs.find([]).create();
+        this.vendorDiffer = this.differs.find([]).create();
+        this.hardwareDiffer = this.differs.find([]).create();
 
-  }
+    }
 
-  ngOnInit() {
-      this.activate();
-  }
+    ngOnInit() {
+        this.activate();
+    }
 
     toggleAllowedParameters(param, label1, label2) {
         const paramLookup = this.filterModel.tags.find(x => x.id === param);
@@ -235,17 +228,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
             .subscribe(data => {
                 this.data = data;
                 this.camerasSuccessFn(this.data);
-
-                // reformat to fit the multiselect component
-                this.filterModel.multiselects.unshift(
-                        {
-                            id: 'vendors',
-                            label: 'Manufacturers',
-                            items: this.vendors.map(v => (
-                                    { id: v, label: v }
-                            )),
-                            selected: []
-                        });
             });
     }
 
@@ -308,6 +290,18 @@ export class NxCampageComponent implements OnInit, DoCheck {
        this.vendors = Array.from(vendors).sort((a, b) => {
            return a.toLowerCase().localeCompare(b.toLowerCase());
        });
+
+      // reformat to fit the multiselect component
+      this.filterModel
+          .multiselects.unshift(
+              {
+                  id      : 'vendors',
+                  label   : 'Manufacturers',
+                  items   : this.vendors.map(v => (
+                          { id: v, label: v }
+                  )),
+                  selected: []
+              });
   }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)

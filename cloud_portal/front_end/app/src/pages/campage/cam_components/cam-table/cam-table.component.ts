@@ -91,6 +91,7 @@ export class CamTableComponent implements OnChanges, OnInit {
             this.toggleHeaderCaption('isTwAudioSupported', 'Audio', '2-way Audio');
             this.toggleHeaderCaption('isAptzSupported', 'PTZ', 'Adv. PTZ');
 
+            this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
             this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
         }
     }
