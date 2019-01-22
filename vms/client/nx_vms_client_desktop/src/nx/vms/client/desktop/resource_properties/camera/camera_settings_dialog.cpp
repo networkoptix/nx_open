@@ -16,6 +16,7 @@
 #include <utils/common/html.h>
 #include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
+#include <utils/xml/camera_advanced_param_reader.h>
 #include <client_core/client_core_module.h>
 
 #include "camera_settings_tab.h"
@@ -38,7 +39,7 @@
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
-#include "legacy/legacy_advanced_settings_widget.h"
+#include "camera_advanced_settings_widget.h"
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -57,7 +58,7 @@ struct CameraSettingsDialog::Private: public QObject
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
-    QPointer<LegacyAdvancedSettingsWidget> advancedSettingsWidget;
+    QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdaptor;
 
     Private(CameraSettingsDialog* q): q(q) {}
@@ -70,14 +71,14 @@ struct CameraSettingsDialog::Private: public QObject
 
     void initializeAdvancedSettingsWidget()
     {
-        advancedSettingsWidget = new LegacyAdvancedSettingsWidget(q->ui->tabWidget);
+        advancedSettingsWidget = new CameraAdvancedSettingsWidget(q->ui->tabWidget);
         installEventHandler(q, QEvent::Show, advancedSettingsWidget,
             [this](QObject* /*watched*/, QEvent* /*event*/)
             {
                 advancedSettingsWidget->updateFromResource();
             });
 
-        connect(advancedSettingsWidget, &LegacyAdvancedSettingsWidget::hasChangesChanged,
+        connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
             q, &CameraSettingsDialog::updateButtonsAvailability);
         connect(q->ui->tabWidget, &QTabWidget::currentChanged,
             this, &Private::tryReloadAdvancedSettings);

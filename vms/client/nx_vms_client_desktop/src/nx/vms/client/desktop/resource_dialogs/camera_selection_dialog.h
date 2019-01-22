@@ -5,6 +5,7 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 #include <nx/vms/client/desktop/node_view/details/node_view_fwd.h>
+#include <business/business_resource_validation.h>
 
 namespace Ui { class CameraSelectionDialog; }
 
@@ -24,7 +25,9 @@ public:
     {
         using resource_type = QnResource;
         static bool isResourceValid(const QnResourcePtr&) { return true; }
-        static QString getText(const QnResourceList&, bool) { return QString(); }
+        static QString getText(const QnResourceList&, bool = true) { return QString(); }
+        static inline bool emptyListIsValid() { return true; }
+        static bool multiChoiceListIsValid() { return true; }
     };
 
     template<typename ResourcePolicy>
@@ -66,9 +69,10 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     const auto getText =
-        [](const QnResourceList &resources, bool detailed)
+        [](const QnResourceList& resources, bool detailed)
         {
-            return ResourcePolicy::getText(resources, detailed);
+            const bool isValid = isResourcesListValid<ResourcePolicy>(resources);
+            return isValid ? QString() : ResourcePolicy::getText(resources);
         };
 
     return selectCamerasInternal(validResourceCheck, getText, selectedCameras, parent);

@@ -538,31 +538,43 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     }
     else
     {
-        QnResourceSelectionDialog dialog(target, this);
+        bool dialogAccepted = false;
+        QnUuidSet selectedCameras = m_model->actionResources();
 
-        vms::api::ActionType actionType = m_model->actionType();
-        if (actionType == ActionType::cameraRecordingAction)
-            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
-        if (actionType == ActionType::bookmarkAction)
-            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
-        else if (actionType == ActionType::cameraOutputAction)
-            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
-        else if (actionType == ActionType::executePtzPresetAction)
-            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
-        else if (actionType == ActionType::sendMailAction)
-            dialog.setDelegate(new QnSendEmailActionDelegate(this));
-        else if (actionType == ActionType::playSoundAction
-            || actionType == ActionType::playSoundOnceAction
-            || actionType == ActionType::sayTextAction)
+        switch (m_model->actionType())
         {
-            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
+            case ActionType::cameraRecordingAction:
+                dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraRecordingPolicy>(
+                    selectedCameras, this);
+                break;
+            case ActionType::bookmarkAction:
+                dialogAccepted = CameraSelectionDialog::selectCameras<QnBookmarkActionPolicy>(
+                    selectedCameras, this);
+                break;
+            case ActionType::cameraOutputAction:
+                dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraOutputPolicy>(
+                    selectedCameras, this);
+                break;
+            case ActionType::executePtzPresetAction:
+                dialogAccepted = CameraSelectionDialog::selectCameras<QnExecPtzPresetPolicy>(
+                    selectedCameras, this);
+                break;
+            case ActionType::showTextOverlayAction:
+                dialogAccepted = CameraSelectionDialog::selectCameras
+                    <CameraSelectionDialog::DummyPolicy>(selectedCameras, this);
+                break;
+            case ActionType::playSoundAction:
+            case ActionType::playSoundOnceAction:
+            case ActionType::sayTextAction:
+                dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraAudioTransmitPolicy>(
+                    selectedCameras, this);
+                break;
+            default:
+                NX_ASSERT(false);
         }
 
-        dialog.setSelectedResources(m_model->actionResources());
-
-        if (dialog.exec() != QDialog::Accepted)
-            return;
-        m_model->setActionResources(dialog.selectedResources());
+        if (dialogAccepted)
+            m_model->setActionResources(selectedCameras);
     }
 }
 

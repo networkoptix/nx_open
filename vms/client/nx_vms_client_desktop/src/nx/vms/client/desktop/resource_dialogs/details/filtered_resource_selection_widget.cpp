@@ -16,7 +16,6 @@ FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent
     ui->setupUi(this);
 
     ui->detailsArea->setVisible(false);
-    setWarningStyle(ui->invalidTextLabel);
     clearInvalidMessage();
 
     const auto stackedWidget =  ui->stackedWidget;
@@ -36,7 +35,6 @@ FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent
 
     const auto scrollBar = new SnappedScrollBar(ui->holder);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
-    scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 }
 
@@ -51,7 +49,7 @@ node_view::ResourceSelectionNodeView* FilteredResourceSelectionWidget::view()
 
 QString FilteredResourceSelectionWidget::invalidMessage() const
 {
-    return ui->invalidTextLabel->text();
+    return ui->alertBar->text();
 }
 
 void FilteredResourceSelectionWidget::clearInvalidMessage()
@@ -61,11 +59,7 @@ void FilteredResourceSelectionWidget::clearInvalidMessage()
 
 void FilteredResourceSelectionWidget::setInvalidMessage(const QString& text)
 {
-    if (ui->invalidTextLabel->text() == text)
-        return;
-
-    ui->invalidTextLabel->setText(text);
-    ui->invalidTextLabel->setVisible(!text.trimmed().isEmpty());
+    ui->alertBar->setText(text);
 }
 
 bool FilteredResourceSelectionWidget::detailsVisible() const

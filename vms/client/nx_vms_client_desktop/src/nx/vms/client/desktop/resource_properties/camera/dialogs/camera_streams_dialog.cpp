@@ -19,22 +19,23 @@ CameraStreamsDialog::CameraStreamsDialog(QWidget* parent):
 
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
-    aligner->addWidgets({
-        ui->primaryStreamUrlInputField,
-        ui->secondaryStreamUrlInputField });
+    aligner->addWidgets({ui->primaryStreamUrlInputField, ui->secondaryStreamUrlInputField});
 }
 
-CameraStreamsDialog::~CameraStreamsDialog() = default;
-
-CameraStreamsModel CameraStreamsDialog::model() const
+CameraStreamsDialog::~CameraStreamsDialog()
 {
-    return {ui->primaryStreamUrlInputField->text(), ui->secondaryStreamUrlInputField->text()};
 }
 
-void CameraStreamsDialog::setModel(const CameraStreamsModel& model)
+CameraStreamUrls CameraStreamsDialog::streams() const
 {
-    ui->primaryStreamUrlInputField->setText(model.primaryStreamUrl);
-    ui->secondaryStreamUrlInputField->setText(model.secondaryStreamUrl);
+    return CameraStreamUrls{ui->primaryStreamUrlInputField->text().trimmed(),
+        ui->secondaryStreamUrlInputField->text().trimmed()};
+}
+
+void CameraStreamsDialog::setStreams(const CameraStreamUrls& value)
+{
+    ui->primaryStreamUrlInputField->setText(value.primaryStreamUrl);
+    ui->secondaryStreamUrlInputField->setText(value.secondaryStreamUrl);
 }
 
 } // namespace nx::vms::client::desktop

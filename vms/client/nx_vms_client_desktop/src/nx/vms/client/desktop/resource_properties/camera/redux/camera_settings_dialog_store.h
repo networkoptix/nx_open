@@ -102,6 +102,7 @@ public:
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
     void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);
+    void setStreamUrls(const QString& primary, const QString& secondary);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);
