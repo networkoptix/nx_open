@@ -33,6 +33,10 @@ private:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler);
 
+    void serveGetStreamingLogger(
+        http::RequestContext requestContext,
+        http::RequestProcessedHandler completionHandler);
+
 private:
     nx::utils::log::LoggerCollection* m_loggerCollection = nullptr;
 };

@@ -60,6 +60,15 @@ std::set<Tag> toTags(const std::vector<Filter>& filters)
     return tags;
 }
 
+std::set<nx::utils::log::Tag> toTags(const nx::utils::log::LevelFilters& levelFilters)
+{
+    std::set<Tag> tags;
+    for (const auto& element : levelFilters)
+        tags.emplace(element.first);
+
+    return tags;
+}
+
 LevelFilters toLevelFilters(const std::vector<Filter>& filters)
 {
     LevelFilters levelFilters;
