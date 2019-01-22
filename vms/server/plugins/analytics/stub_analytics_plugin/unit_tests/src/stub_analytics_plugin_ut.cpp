@@ -195,7 +195,6 @@ static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
 
 static void testExecuteActionAddToList(nx::sdk::analytics::IEngine* engine)
 {
-    // TODO: #mshevchenko: Add proper action parameters.
     Action action;
     action.m_actionId = "nx.stub.addToList";
     action.setParams({
