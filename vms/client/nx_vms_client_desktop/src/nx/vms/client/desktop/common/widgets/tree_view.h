@@ -23,8 +23,8 @@ public:
     using base_type::rowHeight;
 
     /** Sometimes we need to disable default selection behavior by space key and handle it manually. */
-    bool ignoreDefaultSpace() const;
-    void setIgnoreDefaultSpace(bool value);
+    bool isDefaultSpacePressIgnored() const;
+    void setDefaultSpacePressIgnored(bool isIgnored);
 
     /** Fix to allow drop something in the space left of the node icon. Default: true. */
     bool dropOnBranchesAllowed() const;
@@ -74,7 +74,7 @@ protected:
 private:
     QBasicTimer m_openTimer;
     QPoint m_dragMovePos;
-    bool m_ignoreDefaultSpace = false;
+    bool m_isDefauldSpacePressIgnored = false;
     bool m_dropOnBranchesAllowed = true;
     bool m_inDragDropEvent = false;
     ConfirmExpandDelegate m_confirmExpand;
