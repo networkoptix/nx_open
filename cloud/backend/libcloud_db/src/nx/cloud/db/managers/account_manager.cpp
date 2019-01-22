@@ -56,7 +56,7 @@ void AccountManager::authenticateByName(
     const nx::network::http::StringType& username,
     const std::function<bool(const nx::Buffer&)>& validateHa1Func,
     nx::utils::stree::ResourceContainer* const authProperties,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler)
 {
     api::ResultCode accountAuthResult = api::ResultCode::notAuthorized;
 
@@ -88,7 +88,7 @@ void AccountManager::authenticateByName(
         authProperties,
         [this, username, authProperties, accountAuthResult,
             completionHandler = std::move(completionHandler)](
-                api::ResultCode tempPwdAuthResult) mutable
+                api::Result tempPwdAuthResult) mutable
         {
             if (tempPwdAuthResult == api::ResultCode::ok)
             {
@@ -124,7 +124,7 @@ void AccountManager::authenticateByName(
 void AccountManager::registerAccount(
     const AuthorizationInfo& authzInfo,
     data::AccountRegistrationData accountRegistrationData,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+    std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler)
 {
     data::AccountData account(std::move(accountRegistrationData));
     account.statusCode = api::AccountStatus::awaitingActivation;
@@ -155,7 +155,7 @@ void AccountManager::registerAccount(
 void AccountManager::activate(
     const AuthorizationInfo& /*authzInfo*/,
     data::AccountConfirmationCode emailVerificationCode,
-    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler )
+    std::function<void(api::Result, api::AccountEmail)> completionHandler )
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountConfirmationCode, std::string>(
@@ -168,7 +168,7 @@ void AccountManager::activate(
 
 void AccountManager::getAccount(
     const AuthorizationInfo& authzInfo,
-    std::function<void(api::ResultCode, data::AccountData)> completionHandler )
+    std::function<void(api::Result, data::AccountData)> completionHandler )
 {
     QString accountEmail;
     if (!authzInfo.get( attr::authAccountEmail, &accountEmail))
@@ -191,7 +191,7 @@ void AccountManager::getAccount(
 void AccountManager::updateAccount(
     const AuthorizationInfo& authzInfo,
     data::AccountUpdateData accountData,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
@@ -228,7 +228,7 @@ void AccountManager::updateAccount(
 void AccountManager::resetPassword(
     const AuthorizationInfo& authzInfo,
     data::AccountEmail accountEmail,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+    std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler)
 {
     using namespace std::placeholders;
 
@@ -266,7 +266,7 @@ void AccountManager::resetPassword(
 void AccountManager::reactivateAccount(
     const AuthorizationInfo& authzInfo,
     data::AccountEmail accountEmail,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+    std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler)
 {
     const auto existingAccount = m_cache.find(accountEmail.email);
     if (!existingAccount)
@@ -317,7 +317,7 @@ void AccountManager::reactivateAccount(
 void AccountManager::createTemporaryCredentials(
     const AuthorizationInfo& authzInfo,
     data::TemporaryCredentialsParams params,
-    std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler)
+    std::function<void(api::Result, api::TemporaryCredentials)> completionHandler)
 {
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
@@ -718,7 +718,7 @@ void AccountManager::accountReactivated(
     nx::sql::DBResult resultCode,
     std::string /*email*/,
     data::AccountConfirmationCode resultData,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+    std::function<void(api::Result, data::AccountConfirmationCode)> completionHandler)
 {
     //adding activation code only in response to portal
     completionHandler(
@@ -790,7 +790,7 @@ void AccountManager::sendActivateAccountResponse(
     nx::sql::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     std::string accountEmail,
-    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler)
+    std::function<void(api::Result, api::AccountEmail)> completionHandler)
 {
     if (resultCode != nx::sql::DBResult::ok)
     {
@@ -949,18 +949,18 @@ nx::sql::DBResult AccountManager::issueRestorePasswordCode(
 
 void AccountManager::temporaryCredentialsSaved(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-    api::ResultCode resultCode,
+    api::Result result,
     const std::string& accountEmail,
     api::TemporaryCredentials temporaryCredentials,
-    std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler)
+    std::function<void(api::Result, api::TemporaryCredentials)> completionHandler)
 {
-    if (resultCode != api::ResultCode::ok)
+    if (result != api::ResultCode::ok)
     {
         NX_DEBUG(this, lm("%1 (%2). Failed to save temporary credentials (%3)")
-            .arg(kAccountCreateTemporaryCredentialsPath).arg(accountEmail)
-            .arg((int)resultCode));
+            .args(kAccountCreateTemporaryCredentialsPath, accountEmail,
+                api::toString(result.code)));
         return completionHandler(
-            resultCode,
+            result,
             api::TemporaryCredentials());
     }
 

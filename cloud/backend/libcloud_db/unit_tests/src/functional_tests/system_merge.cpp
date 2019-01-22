@@ -1,15 +1,19 @@
 #include <future>
+#include <optional>
 #include <set>
-
-#include <boost/optional.hpp>
 
 #include <gtest/gtest.h>
 
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/http/rest/http_rest_client.h>
+#include <nx/network/http/server/fusion_request_result.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/algorithm.h>
 
 #include <nx/cloud/db/cloud_db_service.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
+#include <nx/cloud/db/client/data/types.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/managers/system_health_info_provider.h>
 
@@ -34,7 +38,7 @@ public:
     virtual void getSystemHealthHistory(
         const AuthorizationInfo& /*authzInfo*/,
         data::SystemId /*systemId*/,
-        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) override
+        std::function<void(api::Result, api::SystemHealthHistory)> completionHandler) override
     {
         m_aioThreadBinder.post(
             std::bind(completionHandler, api::ResultCode::ok, api::SystemHealthHistory()));
@@ -60,10 +64,10 @@ class SystemMerge:
 public:
     SystemMerge()
     {
-        using namespace std::placeholders;
-
         m_factoryBak = SystemHealthInfoProviderFactory::instance().setCustomFunc(
-            std::bind(&SystemMerge::createSystemHealthInfoProvider, this, _1, _2));
+            [this](auto&&... args) { return createSystemHealthInfoProvider(std::move(args)...); });
+
+        m_vmsResponse.error = QnRestResult::Error::NoError;
     }
 
     ~SystemMerge()
@@ -94,6 +98,12 @@ protected:
         m_vmsGatewayEmulator.registerUserCredentials(
             m_ownerAccount.email.c_str(),
             m_ownerAccount.password.c_str());
+    }
+
+    void givenVmsThatReturnsLogicalError(const std::string& errorText)
+    {
+        m_vmsResponse.error = QnRestResult::Error::CantProcessRequest;
+        m_vmsResponse.errorString = errorText.c_str();
     }
 
     void givenTwoSystemsWithSameOwner()
@@ -136,7 +146,35 @@ protected:
 
     void whenMergeSystems()
     {
-        m_prevResultCode = mergeSystems(m_ownerAccount, m_masterSystem.id, m_slaveSystem.id);
+        // Sending HTTP request because we need access to the response error text.
+        // Otherwise, it could be as simple as:
+        // m_prevResult.code = mergeSystems(m_ownerAccount, m_masterSystem.id, m_slaveSystem.id);
+
+        const auto url = nx::network::url::Builder()
+            .setScheme(nx::network::http::kUrlSchemeName)
+            .setEndpoint(endpoint()).setPath(
+                nx::network::http::rest::substituteParameters(
+                    kSystemsMergedToASpecificSystem, {m_masterSystem.id}));
+
+        nx::network::http::HttpClient httpClient;
+        httpClient.setUserName(m_ownerAccount.email.c_str());
+        httpClient.setUserPassword(m_ownerAccount.password.c_str());
+        httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+        httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
+        ASSERT_TRUE(httpClient.doPost(
+            url,
+            "application/json",
+            QJson::serialized(api::SystemId(m_slaveSystem.id))));
+
+        const auto resultCodeStr = nx::network::http::getHeaderValue(
+            httpClient.response()->headers,
+            Qn::API_RESULT_CODE_HEADER_NAME);
+        const auto responseBody = httpClient.fetchEntireMessageBody();
+
+        m_prevResult.code = QnLexical::deserialized<api::ResultCode>(resultCodeStr);
+        m_prevResult.description = 
+            QJson::deserialized<nx::network::http::FusionRequestResult>(*responseBody)
+                .errorText.toStdString();
     }
 
     void whenSlaveSystemFailsEveryRequest()
@@ -153,18 +191,28 @@ protected:
         std::promise<api::ResultCode> done;
         moduleInstance()->impl()->controller().systemMergeManager().processMergeHistoryRecord(
             mergeHistoryRecord,
-            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+            [&done](api::Result result) { done.set_value(result.code); });
         ASSERT_EQ(api::ResultCode::ok, done.get_future().get());
     }
 
     void thenResultCodeIs(api::ResultCode resultCode)
     {
-        ASSERT_EQ(resultCode, m_prevResultCode);
+        ASSERT_EQ(resultCode, m_prevResult.code);
     }
 
     void thenMergeSucceeded()
     {
         thenResultCodeIs(api::ResultCode::ok);
+    }
+
+    void thenMergeFailed()
+    {
+        ASSERT_NE(api::ResultCode::ok, m_prevResult.code);
+    }
+
+    void andResponseErrorTextIs(const std::string& expected)
+    {
+        ASSERT_EQ(expected, m_prevResult.description);
     }
 
     void andSlaveSystemIsMovedToBeingMergedState()
@@ -254,13 +302,14 @@ private:
     AccountWithPassword m_ownerAccount;
     api::SystemData m_masterSystem;
     api::SystemData m_slaveSystem;
-    api::ResultCode m_prevResultCode = api::ResultCode::ok;
+    api::Result m_prevResult;
     SystemHealthInfoProviderStub* m_systemHealthInfoProviderStub = nullptr;
     SystemHealthInfoProviderFactory::Function m_factoryBak;
     nx::network::http::TestHttpServer m_vmsGatewayEmulator;
     nx::utils::SyncQueue<nx::network::http::Request> m_vmsApiRequests;
-    boost::optional<nx::network::http::Request> m_prevVmsApiRequest;
-    boost::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;
+    std::optional<nx::network::http::Request> m_prevVmsApiRequest;
+    std::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;
+    QnJsonRestResult m_vmsResponse;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         clusterdb::engine::ConnectionManager*,
@@ -277,14 +326,11 @@ private:
     {
         m_vmsApiRequests.push(std::move(requestContext.request));
 
-        QnJsonRestResult response;
-        response.error = QnRestResult::Error::NoError;
-
         nx::network::http::RequestResult requestResult(
             m_vmsApiResult ? *m_vmsApiResult : nx::network::http::StatusCode::ok);
         requestResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
-            QJson::serialized(response));
+            QJson::serialized(m_vmsResponse));
 
         completionHandler(std::move(requestResult));
     }
@@ -405,6 +451,19 @@ TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
     whenMergeSystems();
 
     thenResultCodeIs(api::ResultCode::vmsRequestFailure);
+}
+
+TEST_F(SystemMerge, vms_response_error_text_is_forwarded)
+{
+    constexpr char kErrorText[] = "raz-raz-raz";
+
+    givenVmsThatReturnsLogicalError(kErrorText);
+    givenTwoOnlineSystemsWithSameOwner();
+
+    whenMergeSystems();
+
+    thenMergeFailed();
+    andResponseErrorTextIs(kErrorText);
 }
 
 } // namespace test

@@ -63,7 +63,7 @@ AuthenticationProvider::~AuthenticationProvider()
 void AuthenticationProvider::getCdbNonce(
     const AuthorizationInfo& authzInfo,
     const data::DataFilter& filter,
-    std::function<void(api::ResultCode, api::NonceData)> completionHandler)
+    std::function<void(api::Result, api::NonceData)> completionHandler)
 {
     std::string systemId;
     std::string accountEmail;
@@ -71,8 +71,10 @@ void AuthenticationProvider::getCdbNonce(
     {
         if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
             return completionHandler(api::ResultCode::forbidden, api::NonceData());
+
         if (!filter.get(attr::systemId, &systemId))
             return completionHandler(api::ResultCode::badRequest, api::NonceData());
+
         const auto accessRole = m_systemSharingManager->getAccountRightsForSystem(
             accountEmail, systemId);
         if (accessRole == api::SystemAccessRole::none)
@@ -91,7 +93,7 @@ void AuthenticationProvider::getCdbNonce(
 void AuthenticationProvider::getAuthenticationResponse(
     const AuthorizationInfo& authzInfo,
     const data::AuthRequest& authRequest,
-    std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
+    std::function<void(api::Result, api::AuthResponse)> completionHandler)
 {
     using namespace std::placeholders;
 
@@ -232,7 +234,7 @@ nx::sql::DBResult AuthenticationProvider::validateNonce(
     return nx::sql::DBResult::ok;
 }
 
-std::tuple<api::ResultCode, api::AuthResponse>
+std::tuple<api::Result, api::AuthResponse>
 AuthenticationProvider::prepareAuthenticationResponse(
     const std::string& systemId,
     const data::AuthRequest& authRequest)

@@ -18,7 +18,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 MEDIASERVER_VERSION = '3.1.0.17256'
 CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
-RETRY_TIMEOUT = 5  # seconds
+RETRY_TIMEOUT = 10  # seconds
 
 log = logging.getLogger('simple_cloud_test')
 

@@ -60,12 +60,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(SettingsConfiguration, statistics_enabled_by_default)
-{
-    whenStartedMediator();
-    thenStatisticsEnabled();
-}
-
 TEST_F(SettingsConfiguration, statistics_enabled_explicitly)
 {
     addArg("--stats/enabled=true");

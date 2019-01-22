@@ -383,9 +383,9 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
             m_username.c_str(),
             m_validateHa1Func,
             authProperties,
-            [&authPromise](api::ResultCode authResult)
+            [&authPromise](api::Result authResult)
             {
-                authPromise.set_value(authResult);
+                authPromise.set_value(authResult.code);
             });
         authFuture.wait();
         const auto result = authFuture.get();

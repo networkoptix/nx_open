@@ -8,7 +8,6 @@
 #include <atomic>
 #include <chrono>
 #include <vector>
-#include <deque>
 #include <map>
 
 namespace nx {

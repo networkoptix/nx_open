@@ -170,7 +170,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
 
     for (int i = 0; i < devices.size(); ++i)
     {
-        audioTaken.insert(std::pair<DeviceDescriptor*, bool>(&devices[i], false));
+        audioTaken.emplace(&devices[i], false);
 
         if ((devices[i].isDefault || devices[i].sysDefault) && devices[i].isInput())
             defaults.push_back(&devices[i]);

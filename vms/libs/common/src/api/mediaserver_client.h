@@ -145,6 +145,8 @@ public:
         const nx::analytics::storage::Filter& request,
         nx::analytics::storage::LookupResult* result);
 
+    SystemError::ErrorCode prevRequestSysErrorCode() const;
+
     /**
      * NOTE: Can only be called within request completion handler.
      *   Otherwise, result is not defined.
@@ -259,6 +261,7 @@ protected:
                 auto client = std::move(*fusionClientIter);
                 m_activeClients.erase(fusionClientIter);
 
+                m_prevRequestSysErrorCode = errorCode;
                 m_prevResponseHttpStatusCode =
                     response
                     ? (nx::network::http::StatusCode::Value)response->statusLine.statusCode
@@ -424,6 +427,7 @@ private:
     const nx::utils::Url m_baseRequestUrl;
     boost::optional<nx::network::http::Credentials> m_userCredentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
+    SystemError::ErrorCode m_prevRequestSysErrorCode = SystemError::noError;
     nx::network::http::StatusCode::Value m_prevResponseHttpStatusCode =
         nx::network::http::StatusCode::undefined;
     QString m_authenticationKey;

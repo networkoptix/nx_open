@@ -170,7 +170,7 @@ public:
     }
 
     /**
-     * @return Object, that can be used directly with AIOThread::startMonitoring.
+     * @return Object, that can be used directly with AioThread::startMonitoring.
      * NOTE: If you think you need it, consider it one more time.
      * If you still think you need it, go and talk to someone about it.
      */

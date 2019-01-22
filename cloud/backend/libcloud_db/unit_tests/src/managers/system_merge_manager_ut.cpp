@@ -83,8 +83,6 @@ protected:
 
     void whenStartMerge()
     {
-        using namespace std::placeholders;
-
         nx::utils::stree::ResourceContainer rc;
         rc.put(attr::authAccountEmail, QString::fromStdString(m_ownerAccount.email));
         AuthorizationInfo authorizationInfo(std::move(rc));
@@ -92,7 +90,7 @@ protected:
             authorizationInfo,
             m_masterSystem.id,
             m_slaveSystem.id,
-            std::bind(&SystemMergeManager::saveMergeResult, this, _1));
+            [this](auto&&... args) { saveMergeResult(std::move(args)...); });
     }
 
     void whenDestroySystemMergeManagerAsync()
@@ -215,9 +213,9 @@ private:
             &queryExecutor());
     }
 
-    void saveMergeResult(api::ResultCode resultCode)
+    void saveMergeResult(api::Result result)
     {
-        m_mergeResults.push(resultCode);
+        m_mergeResults.push(result.code);
     }
 
     void deliverMergeHistoryRecord(const std::string& authKey)

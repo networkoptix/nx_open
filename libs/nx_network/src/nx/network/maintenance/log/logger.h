@@ -25,9 +25,10 @@ struct Logger
     int id = -1;
     std::string path;
     std::vector<Filter> filters;
+    std::string defaultLevel;
 };
 
-#define Logger_Fields (id)(path)(filters)
+#define Logger_Fields (id)(path)(filters)(defaultLevel)
 
 QN_FUSION_DECLARE_FUNCTIONS(Logger, (json), NX_NETWORK_API)
 

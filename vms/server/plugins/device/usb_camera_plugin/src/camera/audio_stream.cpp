@@ -43,8 +43,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_url(url),
     m_camera(camera),
     m_timeProvider(camera.lock()->timeProvider()),
-    m_packetConsumerManager(packetConsumerManager),
-    m_packetCount(std::make_shared<std::atomic_int>())
+    m_packetConsumerManager(packetConsumerManager)
 {
     if (!m_packetConsumerManager->empty())
         tryToStartIfNotStarted();
@@ -160,19 +159,6 @@ int AudioStream::AudioStreamPrivate::initialize()
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->flush();
-    }
-
-    while (*m_packetCount > 0)
-    {
-        static constexpr std::chrono::milliseconds kSleep(30);
-        std::this_thread::sleep_for(kSleep);
-    }
-
-    if (m_decoder)
-        m_decoder->flush();
     m_decoder.reset(nullptr);
 
     if (m_resampleContext)
@@ -224,8 +210,11 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
 #endif // _WIN32
 
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
+    
     if (result < 0)
         return result;
+
+    inputFormat->dumpFormat();
 
     m_inputFormat = std::move(inputFormat);
 
@@ -276,17 +265,10 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
 
-    static constexpr int kDefaultFrameSize = 2000;
-
-    int nbSamples = context->frame_size ? context->frame_size : kDefaultFrameSize;
-
-    static constexpr int kDefaultAlignment =  32;
-
     int result = resampledFrame->getBuffer(
         context->sample_fmt,
-        nbSamples,
-        context->channel_layout,
-        kDefaultAlignment);
+        context->frame_size,
+        context->channel_layout);
     if (result < 0)
         return result;
 
@@ -307,7 +289,7 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fram
         encoder->sample_fmt,
         encoder->sample_rate,
         frame->channelLayout(),
-        (AVSampleFormat)frame->sampleFormat(),
+        frame->sampleFormat(),
         frame->sampleRate(),
         0,
         nullptr);
@@ -327,15 +309,15 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
     for(;;)
     {
         ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
-        
-        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see 
+
+        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see initializeInputFormat().
         int result;
         if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
         {
             static constexpr std::chrono::milliseconds kTimeout = 
                 std::chrono::milliseconds(1000);
             result = m_inputFormat->readFrameNonBlock(packet.packet(), kTimeout);
-            if (result < AVERROR(EAGAIN)) //< Treaat a timeout as an error.
+            if (result < AVERROR(EAGAIN)) //< Treat a timeout as an error.
                 result = AVERROR(EIO);
         }
         else
@@ -402,13 +384,12 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
         m_encoder->codecId(),
-        AVMEDIA_TYPE_AUDIO,
-        m_packetCount);
+        AVMEDIA_TYPE_AUDIO);
 
     for(;;)
     {
         // need to drain the the resampler periodically to avoid increasing audio delay
-        if(m_resampleContext && resampleDelay() > timePerVideoFrame())
+        if (m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
             *outFfmpegError = resample(nullptr, m_resampledFrame.get());
             if (*outFfmpegError < 0)
@@ -447,8 +428,8 @@ uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
     uint64_t now = m_timeProvider->millisSinceEpoch();
 
     const AVRational sourceRate = { 1, m_encoder->sampleRate() };
-    static const AVRational kTargetRate = { 1, 1000 };
-    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate);
+    static const AVRational kTargetRate = { 1, 1000 }; // < One millisecond
+    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, kTargetRate); 
 
     if (labs(now - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
     {
@@ -539,8 +520,6 @@ void AudioStream::AudioStreamPrivate::run()
             continue;
         }
 
-        // If the encoder is AAC, some packets are buffered and copied before delivering.
-        // In that case, packet is nullptr.
         if (packet)
         {
             std::lock_guard<std::mutex> lock(m_mutex);

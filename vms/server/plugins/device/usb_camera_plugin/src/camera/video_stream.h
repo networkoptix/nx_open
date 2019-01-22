@@ -89,7 +89,6 @@ private:
         csModified
     };
 
-    //std::string m_url;
     std::weak_ptr<Camera> m_camera;
     CodecParameters m_codecParams;
     nxpl::TimeProvider * const m_timeProvider;
@@ -134,6 +133,7 @@ private:
 
 private:
     void updateActualFps(uint64_t now);
+
     /**
      * Get the url of the video stream, modified appropriately based on platform.
      */

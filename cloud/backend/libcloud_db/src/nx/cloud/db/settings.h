@@ -113,6 +113,13 @@ public:
     VmsGateway();
 };
 
+class Security
+{
+public:
+    std::optional<network::server::UserLockerSettings> loginLockout;
+    std::optional<LoginEnumerationProtectionSettings> loginEnumerationProtectionSettings;
+};
+
 /**
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
@@ -137,7 +144,6 @@ public:
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
-    std::optional<network::server::UserLockerSettings> loginLockout() const;
     const Notification& notification() const;
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
@@ -147,7 +153,7 @@ public:
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
     const VmsGateway& vmsGateway() const;
-    const LoginEnumerationProtectionSettings& loginEnumerationProtectionSettings() const;
+    const Security& security() const;
 
     void setDbConnectionOptions(const nx::sql::ConnectionOptions& options);
 
@@ -156,7 +162,6 @@ private:
     nx::utils::log::Settings m_vmsSynchronizationLogging;
     nx::sql::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
-    std::optional<network::server::UserLockerSettings> m_loginLockout;
     Notification m_notification;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
@@ -166,12 +171,15 @@ private:
     ModuleFinder m_moduleFinder;
     Http m_http;
     VmsGateway m_vmsGateway;
-    LoginEnumerationProtectionSettings m_loginEnumerationProtectionSettings;
+    Security m_security;
 
     virtual void loadSettings() override;
 
     void loadAuth();
+
+    void loadSecurity();
     void loadLoginLockout();
+    void loadHostLockout();
 };
 
 } // namespace conf

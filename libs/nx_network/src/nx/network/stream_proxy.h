@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <nx/network/aio/timer.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_stream_socket_acceptor.h"
@@ -33,6 +34,18 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
+    template<typename T>
+    void setUpStreamConverterFactory(T func)
+    {
+        m_upStreamConverterFactory = std::move(func);
+    }
+
+    template<typename T>
+    void setDownStreamConverterFactory(T func)
+    {
+        m_downStreamConverterFactory = std::move(func);
+    }
+
     void startProxy(
         std::unique_ptr<AbstractStreamSocketAcceptor> source,
         const SocketAddress& destinationEndpoint);
@@ -53,6 +66,10 @@ private:
     StreamProxyChannels m_proxyChannels;
     std::optional<std::chrono::milliseconds> m_connectToDestinationTimeout;
     std::chrono::milliseconds m_retryAcceptTimeout;
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
+        m_upStreamConverterFactory;
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
+        m_downStreamConverterFactory;
 
     void onAcceptCompletion(
         SystemError::ErrorCode systemErrorCode,
@@ -106,11 +123,41 @@ public:
     void setConnectToDestinationTimeout(
         std::optional<std::chrono::milliseconds> timeout);
 
+    template<typename T>
+    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
+    void setUpStreamConverter()
+    {
+        m_upStreamConverterFactory = []() { return std::make_unique<T>(); };
+    }
+
+    template<typename Func>
+    void setUpStreamConverterFactory(Func func)
+    {
+        m_upStreamConverterFactory = std::move(func);
+    }
+
+    template<typename T>
+    // requires std::is_base_of<T, nx::utils::bstream::AbstractOutputConverter>::value
+    void setDownStreamConverter()
+    {
+        m_downStreamConverterFactory = []() { return std::make_unique<T>(); };
+    }
+
+    template<typename Func>
+    void setDownStreamConverterFactory(Func func)
+    {
+        m_downStreamConverterFactory = std::move(func);
+    }
+
 private:
     std::map<int, std::unique_ptr<StreamProxy>> m_proxies;
     std::atomic<int> m_lastProxyId{0};
     mutable QnMutex m_mutex;
     std::optional<std::chrono::milliseconds> m_connectToDestinationTimeout;
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
+        m_upStreamConverterFactory;
+    std::function<std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>()>
+        m_downStreamConverterFactory;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -135,6 +182,12 @@ public:
     void setConnectTimeout(
         std::optional<std::chrono::milliseconds> timeout);
 
+    void setUpStreamConverter(
+        std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter);
+
+    void setDownStreamConverter(
+        std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter);
+
     void start(ProxyCompletionHandler completionHandler);
 
 protected:
@@ -147,6 +200,11 @@ private:
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     ProxyCompletionHandler m_completionHandler;
     std::optional<std::chrono::milliseconds> m_connectTimeout;
+    nx::utils::bstream::CompositeConverter m_converter;
+    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_upStreamConverter;
+    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_downStreamConverter;
+    std::unique_ptr<nx::utils::bstream::OutputConverterToInputAdapter>
+        m_downStreamConverterAdapter;
 
     bool tuneDestinationConnectionAttributes();
 

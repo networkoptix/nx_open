@@ -80,19 +80,13 @@ public:
     {
         m_dataToParse = buf;
 
-        if (m_dataToParse.isEmpty())
+        do
         {
-            // Reporting end of file to the parser.
-            invokeMessageParser();
+            // If m_dataToParse is empty we report end of file to the parser.
+            if (!invokeMessageParser())
+                return; //< TODO: #ak Ignore all following data and close the connection?
         }
-        else
-        {
-            while (!m_dataToParse.isEmpty())
-            {
-                if (!invokeMessageParser())
-                    return; //< TODO: #ak Ignore all following data and close connection?
-            }
-        }
+        while (!m_dataToParse.isEmpty());
 
         m_dataToParse.clear();
     }
