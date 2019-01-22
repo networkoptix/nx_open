@@ -37,7 +37,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return result;
 
     auto capabilities = primaryVideoCapabilities();
-    std::string confToken = capabilities.videoEncoderToken.toStdString();
+    const std::string confToken = capabilities.videoEncoderToken;
     if (confToken.empty())
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
 
@@ -59,10 +59,10 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     request.Configuration = confResponse.Configuration;
     switch (capabilities.encoding)
     {
-        case SupportedVideoCodecFlavor::JPEG:
+        case SupportedVideoEncoding::JPEG:
             request.Configuration->Encoding = onvifXsd__VideoEncoding::JPEG;
             break;
-        case SupportedVideoCodecFlavor::H264:
+        case SupportedVideoEncoding::H264:
             request.Configuration->Encoding = onvifXsd__VideoEncoding::H264;
             break;
         default:

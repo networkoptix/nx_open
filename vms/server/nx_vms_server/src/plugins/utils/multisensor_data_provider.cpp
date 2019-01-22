@@ -1,18 +1,18 @@
 #ifdef ENABLE_ONVIF
 
 #include "multisensor_data_provider.h"
-#include "isolated_stream_reader_resource.h"
 
-#include <plugins/resource/onvif/onvif_resource.h>
-#include <plugins/resource/onvif/onvif_stream_reader.h>
 #include <utils/common/sleep.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
+#include <core/resource/resource_factory.h>
+#include <nx/vms/server/resource/camera.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <core/resource/security_cam_resource.h>
 
 namespace
 {
-    const int kDefaultReceiveTimout = 30;
-    const int kDefaultSendTimeout = 30;
     const quint16 kStreamOpenWaitingTimeMs = 40000;
     const quint16 kSingleWaitingIterationMs = 20;
 }
@@ -21,13 +21,11 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(
-    const QnPlOnvifResourcePtr& res)
+MultisensorDataProvider::MultisensorDataProvider(const nx::vms::server::resource::CameraPtr& res)
     :
     CLServerPushStreamReader(res),
-    m_onvifRes(res)
+    m_cameraResource(res)
 {
-
 }
 
 MultisensorDataProvider::~MultisensorDataProvider()
@@ -78,17 +76,16 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         auto resource = initSubChannelResource(
             resourceChannelMapping.resourceChannel);
 
-        resource->setOnvifRequestsRecieveTimeout(kDefaultReceiveTimout);
-        resource->setOnvifRequestsSendTimeout(kDefaultSendTimeout);
-
-        auto reader = new QnOnvifStreamReader(resource);
-        reader->setMustNotConfigureResource(!configureSensor);
-
+        auto reader = resource->createLiveDataProvider();
         QnAbstractStreamDataProviderPtr source(reader);
-        if (getRole() == Qn::CR_LiveVideo)
-            reader->setPrimaryStreamParams(params);
+        auto liveStreamReader = dynamic_cast<QnLiveStreamProvider*> (reader);
+        if (!liveStreamReader)
+            CameraDiagnostics::LiveVideoIsNotSupportedResult();
 
-        reader->setRole(getRole());
+        liveStreamReader->setDoNotConfigureCamera(!configureSensor);
+        liveStreamReader->setRole(getRole());
+        if (getRole() != Qn::CR_SecondaryLiveVideo)
+            liveStreamReader->setPrimaryStreamParams(params);
 
         configureSensor = configureEachSensor;
         m_dataSource.addDataSource(source);
@@ -124,10 +121,9 @@ void MultisensorDataProvider::pleaseStop()
     m_needStop = true;
 }
 
-QnPlOnvifResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 channelNumber)
+QnSecurityCamResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 channelNumber)
 {
-    QUrl url(m_onvifRes->getUrl());
-    QUrl onvifUrl = url;
+    QUrl url(m_cameraResource->getUrl());
 
     QUrlQuery urlQuery(url);
     urlQuery.addQueryItem(
@@ -136,23 +132,28 @@ QnPlOnvifResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 cha
 
     url.setQuery(urlQuery);
 
-    QnPlOnvifResourcePtr subChannelResource(
-        new nx::plugins::utils::IsolatedStreamReaderResource(serverModule()));
+    const auto typeId = m_cameraResource->getTypeId();
+    auto resourceFactory = m_resource->commonModule()->resourceDiscoveryManager();
+    QnResourceParams params(QnUuid::createUuid(), url.toString(), m_cameraResource->getVendor());
+    auto resource = resourceFactory->createResource(typeId, params)
+        .dynamicCast<nx::vms::server::resource::Camera>();
+    resource->setCommonModule(m_resource->commonModule());
+    resource->setForceUseLocalProperties(true);
+    resource->setRole(nx::vms::server::resource::Camera::Role::subchannel);
 
-    subChannelResource->setId(QnUuid::createUuid());
-    subChannelResource->setTypeId(m_onvifRes->getTypeId());
-    subChannelResource->setMAC(m_onvifRes->getMAC());;
-
-    subChannelResource->setUrl(url.toString());
-    subChannelResource->setDeviceOnvifUrl(onvifUrl.toString());
-    subChannelResource->setModel(m_onvifRes->getModel());
-    subChannelResource->setVendor(m_onvifRes->getVendor());
-    subChannelResource->setAuth(m_onvifRes->getAuth());
-
-    subChannelResource->setName(
+    resource->setId(params.resID);
+    resource->setUrl(params.url);
+    resource->setVendor(params.vendor);
+    resource->setMAC(m_cameraResource->getMAC());;
+    resource->setModel(m_cameraResource->getModel());
+    resource->setAuth(m_cameraResource->getAuth());
+    resource->setName(
         QString("channel-%1").arg(channelNumber));
 
-    return subChannelResource;
+    for (const auto& p: m_cameraResource->getRuntimeProperties())
+        resource->setProperty(p.name, p.value);
+
+    return resource;
 }
 
 QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping()

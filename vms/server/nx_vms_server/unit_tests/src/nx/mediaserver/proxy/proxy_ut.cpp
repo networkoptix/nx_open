@@ -63,20 +63,7 @@ public:
     void connectPeers(SslMode sslMode)
     {
         for (int i = 0; i < m_peers.size() - 1; ++i)
-        {
-            // TODO: Create function in MediaServerLauncher.
-            const auto& from = m_peers[i];
-            const auto& to = m_peers[i + 1];
-
-            const auto urlScheme = sslMode != SslMode::noSsl
-                ? nx::network::http::kSecureUrlSchemeName : nx::network::http::kUrlSchemeName;
-            const auto peerId = to->commonModule()->moduleGUID();
-            const auto url = nx::utils::url::parseUrlFields(
-                to->endpoint().toString(), urlScheme);
-
-            from->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
-                peerId, nx::vms::api::PeerType::server, url);
-        }
+            m_peers[i]->connectTo(m_peers[i + 1].get(), sslMode != SslMode::noSsl);
     }
 
     nx::utils::Url serverUrl(int index, const QString& path, SslMode sslMode)

@@ -72,7 +72,7 @@ nx::streaming::rtp::TimePolicy getTimePolicy(const QnResourcePtr& res)
 {
     auto secResource = res.dynamicCast<QnSecurityCamResource>();
     if (secResource && secResource->trustCameraTime())
-        return nx::streaming::rtp::TimePolicy::forceCameraTime;
+        return nx::streaming::rtp::TimePolicy::useCameraTimeIfCorrect;
 
     return nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime;
 }
@@ -531,7 +531,7 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
     if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 
-    if (key == ResourcePropertyKey::kTrustCameraTime)
+    if (key == ResourcePropertyKey::kTrustCameraTime && m_role != Qn::ConnectionRole::CR_Archive)
         m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
 }
 

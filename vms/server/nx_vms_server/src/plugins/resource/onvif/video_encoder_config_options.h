@@ -13,11 +13,11 @@
 
 /**
  * Server supports only limited number of videocodecs.
- * They are all listed in SupportedVideoCodecFlavor enum.
+ * They are all listed in SupportedVideoEncoding enum.
  * Values are used while sorting configurationOptions, so the order of codecs is meaningful.
  * Desirable codec is the codec with the maximum value.
  */
-enum class SupportedVideoCodecFlavor
+enum class SupportedVideoEncoding
 {
     NONE,
     JPEG,
@@ -40,16 +40,16 @@ enum class SupportedVideoCodecFlavor
  * "JPEG", "H264", "H265" - official video codecs names in onvif.
  * There is one more name mentioned there - MPV4-ES - but our software doesn't support it.
  */
-SupportedVideoCodecFlavor supportedVideoCodecFlavorFromOnvifString(const std::string& name);
-std::string supportedVideoCodecFlavorToOnvifString(SupportedVideoCodecFlavor codec);
+SupportedVideoEncoding supportedVideoCodecFlavorFromOnvifString(const std::string& name);
+std::string supportedVideoCodecFlavorToOnvifString(SupportedVideoEncoding codec);
 
 /**
  * Transfer video codec string to enum and backward.
  * The string constants for video codec names are that are used inside vms:
  * "MJPEG", "H264", "H265".
  */
-SupportedVideoCodecFlavor supportedVideoCodecFlavorFromVmsString(const std::string& name);
-std::string supportedVideoCodecFlavorToVmsString(SupportedVideoCodecFlavor codec);
+SupportedVideoEncoding supportedVideoCodecFlavorFromVmsString(const std::string& name);
+std::string supportedVideoCodecFlavorToVmsString(SupportedVideoEncoding codec);
 
 /**
  * Transfer h264 profile string to enum and backward.
@@ -86,7 +86,7 @@ struct VideoEncoderConfigOptions
 {
     //required elements
     int mediaWebserviseVersion = 0; // 0 - undefined, 1 - Media1, 2 - Media 2
-    SupportedVideoCodecFlavor encoder = SupportedVideoCodecFlavor::NONE;
+    SupportedVideoEncoding encoder = SupportedVideoEncoding::NONE;
     Range<float> qualityRange;
     Range<int> bitrateRange;
     std::optional<bool> constantBitrateSupported;
