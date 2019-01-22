@@ -4,8 +4,6 @@
 
 namespace nx::network::maintenance::log {
 
-using namespace nx::utils::log;
-
 StreamingMessageBody::StreamingMessageBody(nx::utils::log::LoggerCollection* collection)
     :
     WritableMessageBody("text/plain"),

@@ -22,4 +22,4 @@ private:
     StreamingMessageBody* m_messageBody = nullptr;
 };
 
-} 
+} // namespace nx::network::maintenance::log
