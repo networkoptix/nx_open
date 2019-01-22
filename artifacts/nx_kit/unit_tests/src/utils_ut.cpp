@@ -11,12 +11,23 @@ namespace kit {
 namespace utils {
 namespace test {
 
-TEST(utils, unalignedPtr)
+TEST(utils, alignUp)
 {
-    char data[1024];
-    uint8_t* ptr = unalignedPtr(&data);
-    intptr_t ptrInt = (intptr_t) ptr;
-    ASSERT_TRUE(ptrInt % 32 != 0);
+    ASSERT_EQ(0, alignUp(0, 0));
+    ASSERT_EQ(17, alignUp(17, 0));
+    ASSERT_EQ(48, alignUp(48, 16));
+    ASSERT_EQ(48, alignUp(42, 16));
+    ASSERT_EQ(7, alignUp(7, 7));
+    ASSERT_EQ(8, alignUp(7, 8));
+}
+
+TEST(utils, misalignedPtr)
+{
+    uint8_t data[1024];
+    const auto aligned = (uint8_t*) alignUp((intptr_t) data, 32);
+    ASSERT_EQ(0, (intptr_t) aligned % 32);
+    uint8_t* const misaligned = misalignedPtr(data);
+    ASSERT_TRUE((intptr_t) misaligned % 32 != 0);
 }
 
 TEST(utils, toString_string)

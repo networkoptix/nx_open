@@ -2,7 +2,7 @@
 #pragma once
 
 /**@file
- * Variuos utilities. Used by other nx_kit components.
+ * Various utilities. Used by other nx_kit components.
  *
  * This unit can be compiled in the context of any C++ project. If Qt headers are included before
  * this one, some Qt support is enabled via "#if defined(QT_CORE_LIB)".
@@ -33,36 +33,57 @@ namespace utils {
 //-------------------------------------------------------------------------------------------------
 // Strings.
 
-NX_KIT_API bool isAsciiPrintable(int c);
+inline bool isAsciiPrintable(int c)
+{
+    return c >= 32 && c <= 126;
+}
 
 /**
- * Convert various values to their accurate text representation, e.g. quoted and escaped strings.
+ * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
  */
 template<typename T>
 std::string toString(T value);
 
-NX_KIT_API std::string format(std::string formatStr, ...);
+template<typename... Args>
+std::string format(const std::string& formatStr, Args... args)
+{
+    const size_t size = snprintf(nullptr, 0, formatStr.c_str(), args...) + /* space for '\0' */ 1;
+    if (size < 0)
+        return formatStr; //< No better way to handle out-of-memory-like errors.
+    std::string result(size, '\0');
+    snprintf(&result[0], size, formatStr.c_str(), args...);
+    result.resize(size - /* trailing '\0' */ 1);
+    return result;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Aligned allocation.
 
-NX_KIT_API uint8_t* unalignedPtr(void* data);
-
-/** Alignes val up to alignment boundary. */
-inline size_t alignUp(size_t val, size_t alignment)
+/**
+ * Aligns value up to alignment boundary.
+ * @param alignment If zero, value is returned unchanged.
+ */
+inline size_t alignUp(size_t value, size_t alignment)
 {
-    const size_t remainder = val % alignment;
+    if (alignment == 0)
+        return value;
+    const size_t remainder = value % alignment;
     if (remainder == 0)
-        return val;
-    return val + (alignment - remainder);
+        return value;
+    return value + alignment - remainder;
+}
+
+/** Shifts the pointer up to deliberately misalign it to an odd address - intended for tests. */
+inline uint8_t* misalignedPtr(void* data)
+{
+    return (uint8_t*) (17 + alignUp((uintptr_t) data, 32));
 }
 
 /**
- * Allocate size bytes of data, aligned to alignment boundary.
+ * Allocates size bytes of data, aligned to alignment boundary.
  *
  * NOTE: Allocated memory must be freed with a call to freeAligned().
- *
- * NOTE: This function is as safe as ::malloc().
+ * NOTE: This function is as safe as malloc().
  *
  * @param mallocFunc Function with the signature void*(size_t), which is called to allocate memory.
  */
@@ -75,13 +96,13 @@ void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
     if (!ptr) //< allocation error
         return ptr;
 
-    void* aligned_ptr = (char*) ptr + sizeof(alignment); //< Leaving place to save unalignment.
-    const size_t unalignment = alignment - (((size_t) aligned_ptr) % alignment);
-    memcpy((char*) ptr+unalignment, &unalignment, sizeof(unalignment));
-    return (char*) aligned_ptr + unalignment;
+    void* aligned_ptr = (char*) ptr + sizeof(alignment); //< Leaving place to save misalignment.
+    const size_t misalignment = alignment - (((uintptr_t) aligned_ptr) % alignment);
+    memcpy((char*) ptr + misalignment, &misalignment, sizeof(misalignment)); //< Save misalignment.
+    return (char*) aligned_ptr + misalignment;
 }
 
-/** Calls mallocAligned() passing ::malloc as mallocFunc. */
+/** Calls mallocAligned() passing standard malloc() as mallocFunc. */
 inline void* mallocAligned(size_t size, size_t alignment)
 {
     return mallocAligned<>(size, alignment, ::malloc);
@@ -101,14 +122,14 @@ void freeAligned(void* ptr, FreeFunc freeFunc)
         return freeFunc(ptr);
 
     ptr = (char*) ptr - sizeof(size_t);
-    size_t unalignment = 0;
-    memcpy(&unalignment, ptr, sizeof(unalignment));
-    ptr = (char*) ptr - unalignment;
+    size_t misalignment = 0;
+    memcpy(&misalignment, ptr, sizeof(misalignment)); //< Retrieve saved misalignment.
+    ptr = (char*) ptr - misalignment;
 
     freeFunc(ptr);
 }
 
-/** Calls freeAligned() passing ::free as freeFunc. */
+/** Calls freeAligned() passing standard free() as freeFunc. */
 inline void freeAligned(void* ptr)
 {
     return freeAligned<>(ptr, ::free);
@@ -137,17 +158,17 @@ NX_KIT_API std::string toString(bool b);
 
 #if defined(QT_CORE_LIB)
 
-static inline std::string toString(const QByteArray& b)
+static inline std::string toString(QByteArray b) //< By value to avoid calling the template impl.
 {
     return toString(b.toStdString());
 }
 
-static inline std::string toString(const QString& s)
+static inline std::string toString(QString s) //< By value to avoid calling the template impl.
 {
     return toString(s.toUtf8().constData());
 }
 
-static inline std::string toString(const QUrl& u)
+static inline std::string toString(QUrl u) //< By value to avoid calling the template impl.
 {
     return toString(u.toEncoded().toStdString());
 }
