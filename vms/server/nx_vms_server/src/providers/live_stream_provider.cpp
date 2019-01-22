@@ -554,6 +554,8 @@ void QnLiveStreamProvider::startIfNotRunning()
 
 bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
+    if (m_doNotConfigureCamera)
+        return true;
     const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(m_resource.data());
     return camRes && camRes->isCameraControlDisabled();
 }

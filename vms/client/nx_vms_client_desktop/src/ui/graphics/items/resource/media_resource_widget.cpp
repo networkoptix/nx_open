@@ -239,10 +239,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(base_type::resource(), &QnResource::propertyChanged, this,
         &QnMediaResourceWidget::at_resource_propertyChanged);
+
     connect(base_type::resource(), &QnResource::mediaDewarpingParamsChanged, this,
-        &QnMediaResourceWidget::handleDewarpingParamsChanged);
+        &QnMediaResourceWidget::updateDewarpingParams);
+
     connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
         &QnMediaResourceWidget::handleDewarpingParamsChanged);
+
     connect(this, &QnResourceWidget::zoomTargetWidgetChanged, this,
         &QnMediaResourceWidget::updateDisplay);
 
@@ -1945,8 +1948,11 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
 {
     if (m_dewarpingParams == params)
         return;
+
     m_dewarpingParams = params;
     handleDewarpingParamsChanged();
+
+    emit dewarpingParamsChanged();
 }
 
 // -------------------------------------------------------------------------- //
@@ -2609,11 +2615,7 @@ void QnMediaResourceWidget::at_entropixImageLoaded(const QImage& image)
 
 void QnMediaResourceWidget::updateDewarpingParams()
 {
-    if (m_dewarpingParams == d->mediaResource->getDewarpingParams())
-        return;
-
-    m_dewarpingParams = d->mediaResource->getDewarpingParams();
-    emit dewarpingParamsChanged();
+    setDewarpingParams(d->mediaResource->getDewarpingParams());
 }
 
 void QnMediaResourceWidget::updateFisheye()

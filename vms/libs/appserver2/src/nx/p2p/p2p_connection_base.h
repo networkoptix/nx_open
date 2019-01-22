@@ -35,6 +35,10 @@ class ConnectionBase:
     Q_OBJECT
 public:
 
+    const static QString kDeprecatedUrlPath;
+    const static QString kWebsocketUrlPath;
+    const static QString kHttpUrlPath;
+
     enum class State
     {
         NotDefined,
@@ -164,6 +168,7 @@ private:
     nx::network::http::HttpHeaders m_additionalRequestHeaders;
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
+    QByteArray m_connectionGuid;
 };
 
 QString toString(ConnectionBase::State value);

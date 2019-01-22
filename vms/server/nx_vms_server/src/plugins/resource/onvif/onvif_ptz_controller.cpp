@@ -216,7 +216,7 @@ bool QnOnvifPtzController::readBuiltinPresets()
     ptz.soap()->double_format = m_doubleFormat;
 
     GetPresetsReq request;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     GetPresetsResp response;
     if (ptz.getPresets(request, response) != SOAP_OK)
     {
@@ -257,7 +257,7 @@ Ptz::Capabilities QnOnvifPtzController::initContinuousFocus() {
     imaging.soap()->double_format = m_doubleFormat;
 
     _onvifImg__GetMoveOptions moveOptionsRequest;
-    moveOptionsRequest.VideoSourceToken = m_resource->getVideoSourceToken().toStdString();
+    moveOptionsRequest.VideoSourceToken = m_resource->videoSourceToken();
 
     _onvifImg__GetMoveOptionsResponse moveOptionsResponse;
     if (imaging.getMoveOptions(moveOptionsRequest, moveOptionsResponse) != SOAP_OK)
@@ -299,7 +299,7 @@ bool QnOnvifPtzController::stopInternal()
     bool stopValue = true;
 
     _onvifPtz__Stop request;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     request.PanTilt = &stopValue;
     request.Zoom = &stopValue;
 
@@ -338,7 +338,7 @@ bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector
     onvifSpeed.Zoom = &onvifZoomSpeed;
 
     _onvifPtz__ContinuousMove request;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     request.Velocity = &onvifSpeed;
 
     _onvifPtz__ContinuousMoveResponse response;
@@ -405,7 +405,7 @@ bool QnOnvifPtzController::continuousFocus(
     onvifFocus.Continuous = &onvifContinuousFocus;
 
     _onvifImg__Move request;
-    request.VideoSourceToken = m_resource->getVideoSourceToken().toStdString();
+    request.VideoSourceToken = m_resource->videoSourceToken();
     request.Focus = &onvifFocus;
 
     _onvifImg__MoveResponse response;
@@ -458,7 +458,7 @@ bool QnOnvifPtzController::absoluteMove(
     onvifPosition.Zoom = &onvifZoom;
 
     _onvifPtz__AbsoluteMove request;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     request.Position = &onvifPosition;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
@@ -523,7 +523,7 @@ bool QnOnvifPtzController::relativeMove(
     translation.Zoom = &zoom;
 
     RelativeMoveReq request;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     request.Speed = nullptr; //< Always use the default speed.
     request.Translation = &translation;
 
@@ -575,7 +575,7 @@ bool QnOnvifPtzController::getPosition(
     ptz.soap()->double_format = m_doubleFormat;
 
     _onvifPtz__GetStatus request;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
 
     _onvifPtz__GetStatusResponse response;
     if (ptz.doGetStatus(request, response) != SOAP_OK) {
@@ -703,7 +703,7 @@ bool QnOnvifPtzController::removePreset(const QString &presetId)
 
     RemovePresetReq request;
     RemovePresetResp response;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     request.PresetToken = presetToken(presetId).toStdString();
     if (ptz.removePreset(request, response) != SOAP_OK) {
         qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
@@ -751,7 +751,7 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
 
     GotoPresetReq request;
     GotoPresetResp response;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     request.PresetToken = presetToken(presetId).toStdString();
     if (!m_speedBroken)
     {
@@ -801,7 +801,7 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
 
     SetPresetReq request;
     SetPresetResp response;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.ProfileToken = m_resource->ptzProfileToken();
     std::string stdPresetName = toLatinStdString(preset.name);
     request.PresetName = &stdPresetName;
 

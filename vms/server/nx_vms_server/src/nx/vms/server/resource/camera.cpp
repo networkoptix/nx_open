@@ -16,6 +16,7 @@
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <plugins/utils/multisensor_data_provider.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -606,7 +607,12 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
         case Qn::CR_Default:
         case Qn::CR_LiveVideo:
         {
-            QnAbstractStreamDataProvider* result = camera->createLiveDataProvider();
+            auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
+                ResourceDataKey::kShouldAppearAsSingleChannel);
+
+            QnAbstractStreamDataProvider* result = shouldAppearAsSingleChannel
+                ? new nx::plugins::utils::MultisensorDataProvider(camera)
+                : camera->createLiveDataProvider();
             if (result)
                 result->setRole(role);
             return result;

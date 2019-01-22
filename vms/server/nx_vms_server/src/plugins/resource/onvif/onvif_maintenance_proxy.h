@@ -18,7 +18,6 @@ public:
         const SoapTimeouts& timeouts,
         const QString& maintenanceUrl,
         const QAuthenticator& auth,
-        const QString& videoSrcToken,
         int timeDrift);
     ~QnOnvifMaintenanceProxy() = default;
 
@@ -28,7 +27,6 @@ public:
 private:
     const QString m_maintenanceUrl;
     const QAuthenticator m_auth;
-    const QString m_videoSrcToken;
     const int m_timeDrift;
     QSet<QString> m_supportedOperations;
     QScopedPointer<DeviceSoapWrapper> m_deviceSoapWrapper;

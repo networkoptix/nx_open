@@ -481,7 +481,6 @@
             "keys": [
                 "DW|*"
             ],
-            "sendBackChannelAttribute": false,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",

@@ -46,8 +46,6 @@ class MessageBus: public ec2::TransactionMessageBusBase
     using base_type = ec2::TransactionMessageBusBase;
 
 public:
-    const static QString kDeprecatedUrlPath;
-    const static QString kUrlPath;
     const static QString kCloudPathPrefix;
 
     MessageBus(

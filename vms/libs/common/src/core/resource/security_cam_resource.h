@@ -351,6 +351,8 @@ public:
     QnResourceData resourceData() const;
 
     virtual void setCommonModule(QnCommonModule* commonModule) override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
+
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -391,8 +393,6 @@ protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
     virtual void initializationDone() override;
-
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
     virtual void setMotionMaskPhysical(int /*channel*/) {}
 

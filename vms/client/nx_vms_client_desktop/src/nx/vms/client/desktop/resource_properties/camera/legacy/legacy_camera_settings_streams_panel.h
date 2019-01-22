@@ -4,7 +4,7 @@
 
 #include <nx/vms/client/desktop/common/widgets/panel.h>
 
-#include "../models/camera_streams_model.h"
+#include "../data/camera_stream_urls.h"
 
 namespace Ui { class LegacyCameraSettingsStreamsPanel; }
 
@@ -36,7 +36,7 @@ private:
 private:
     QScopedPointer<Ui::LegacyCameraSettingsStreamsPanel> ui;
     QnVirtualCameraResourcePtr m_camera;
-    CameraStreamsModel m_model;
+    CameraStreamUrls m_streams;
 };
 
 } // namespace nx::vms::client::desktop

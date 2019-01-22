@@ -73,6 +73,7 @@ public:
     virtual void pleaseReopenStream() = 0;
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    void setDoNotConfigureCamera(bool value) { m_doNotConfigureCamera = value; }
 protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -133,6 +134,7 @@ private:
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;
+    bool m_doNotConfigureCamera = false;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct CameraStreamsModel
+struct CameraStreamUrls
 {
     QString primaryStreamUrl;
     QString secondaryStreamUrl;

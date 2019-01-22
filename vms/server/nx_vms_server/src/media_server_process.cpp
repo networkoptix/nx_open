@@ -1,8 +1,5 @@
 #include "media_server_process.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
 #include <functional>
 #include <signal.h>
 #if defined(__linux__)
@@ -90,6 +87,8 @@
 #include <nx/network/socket.h>
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
+
+#include <nx/kit/output_redirector.h>
 
 #include <camera_vendors.h>
 
@@ -4646,34 +4645,9 @@ void SIGUSR1_handler(int)
 }
 #endif
 
-static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
-{
-    if (freopen(filename.c_str(), "w", stream))
-        fprintf(stream, "%s of mediaserver is redirected to this file\n", streamName);
-    // Ignore possible errors because it is not clear where to print an error message.
-}
-
-static bool fileExists(const std::string& filename)
-{
-    return static_cast<bool>(std::ifstream(filename.c_str()));
-}
-
-static void redirectStdoutAndStderrIfNeeded(int argc, char* argv[])
-{
-    static const std::string kFilePrefix = nx::kit::IniConfig::iniFilesDir();
-    static const std::string kStdoutFilename = "mediaserver_stdout.log";
-    static const std::string kStderrFilename = "mediaserver_stderr.log";
-
-    if (fileExists(kFilePrefix + kStdoutFilename))
-        redirectOutput(stdout, "stdout", kFilePrefix + kStdoutFilename);
-
-    if (fileExists(kFilePrefix + kStderrFilename))
-        redirectOutput(stderr, "stderr", kFilePrefix + kStderrFilename);
-}
-
 int MediaServerProcess::main(int argc, char* argv[])
 {
-    redirectStdoutAndStderrIfNeeded(argc, argv);
+    nx::kit::OutputRedirector::ensureOutputRedirection();
 
     nx::utils::rlimit::setMaxFileDescriptors(32000);
 

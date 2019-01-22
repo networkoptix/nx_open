@@ -63,8 +63,8 @@ bool LegacyCameraSettingsStreamsPanel::hasChanges() const
 {
     return m_camera
         && m_camera->hasCameraCapabilities(Qn::CustomMediaUrlCapability)
-        && (m_camera->sourceUrl(Qn::CR_LiveVideo) != m_model.primaryStreamUrl
-            || m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo) != m_model.secondaryStreamUrl);
+        && (m_camera->sourceUrl(Qn::CR_LiveVideo) != m_streams.primaryStreamUrl
+            || m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo) != m_streams.secondaryStreamUrl);
 }
 
 void LegacyCameraSettingsStreamsPanel::updateFromResource()
@@ -87,7 +87,7 @@ void LegacyCameraSettingsStreamsPanel::updateFromResource()
 
     ui->primaryStreamUrlInputField->setPlaceholderText(urlPlaceholder);
     ui->secondaryStreamUrlInputField->setPlaceholderText(urlPlaceholder);
-    m_model = {};
+    m_streams = {};
 
     if (!m_camera)
     {
@@ -98,8 +98,8 @@ void LegacyCameraSettingsStreamsPanel::updateFromResource()
     else
     {
         ui->cameraIdInputField->setText(m_camera->getId().toSimpleString());
-        m_model.primaryStreamUrl = m_camera->sourceUrl(Qn::CR_LiveVideo);
-        m_model.secondaryStreamUrl = m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
+        m_streams.primaryStreamUrl = m_camera->sourceUrl(Qn::CR_LiveVideo);
+        m_streams.secondaryStreamUrl = m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
     }
 
     ui->editStreamsButton->setVisible(m_camera
@@ -111,8 +111,8 @@ void LegacyCameraSettingsStreamsPanel::submitToResource()
 {
     if (hasChanges())
     {
-        m_camera->updateSourceUrl(m_model.primaryStreamUrl, Qn::CR_LiveVideo, /*save*/ false);
-        m_camera->updateSourceUrl(m_model.secondaryStreamUrl, Qn::CR_SecondaryLiveVideo, false);
+        m_camera->updateSourceUrl(m_streams.primaryStreamUrl, Qn::CR_LiveVideo, /*save*/ false);
+        m_camera->updateSourceUrl(m_streams.secondaryStreamUrl, Qn::CR_SecondaryLiveVideo, false);
     }
 }
 
@@ -123,11 +123,11 @@ void LegacyCameraSettingsStreamsPanel::editCameraStreams()
         return;
 
     QScopedPointer<CameraStreamsDialog> dialog(new CameraStreamsDialog(this));
-    dialog->setModel(m_model);
+    dialog->setStreams(m_streams);
     if (!dialog->exec())
         return;
 
-    m_model = dialog->model();
+    m_streams = dialog->streams();
     updateFields();
     emit hasChangesChanged();
 }
@@ -140,16 +140,16 @@ void LegacyCameraSettingsStreamsPanel::updateFields()
 
     const bool hasPrimaryStream = !isIoModule
         || hasAudio
-        || !m_model.primaryStreamUrl.isEmpty();
+        || !m_streams.primaryStreamUrl.isEmpty();
     ui->primaryStreamUrlInputField->setEnabled(hasPrimaryStream);
     ui->primaryStreamUrlInputField->setText(hasPrimaryStream
-        ? m_model.primaryStreamUrl
+        ? m_streams.primaryStreamUrl
         : tr("I/O module has no audio stream"));
 
-    const bool hasSecondaryStream = hasDualStreaming || !m_model.secondaryStreamUrl.isEmpty();
+    const bool hasSecondaryStream = hasDualStreaming || !m_streams.secondaryStreamUrl.isEmpty();
     ui->secondaryStreamUrlInputField->setEnabled(hasSecondaryStream);
     ui->secondaryStreamUrlInputField->setText(hasSecondaryStream
-        ? m_model.secondaryStreamUrl
+        ? m_streams.secondaryStreamUrl
         : tr("Camera has no secondary stream"));
 }
 
