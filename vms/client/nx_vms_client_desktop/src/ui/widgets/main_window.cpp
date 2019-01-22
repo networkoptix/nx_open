@@ -644,20 +644,18 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Left:
         case Qt::Key_Up:
         case Qt::Key_PageUp:
-        {
             menu()->trigger(action::PreviousLayoutAction);
             break;
-        }
+
         case Qt::Key_Enter:
         case Qt::Key_Return:
         case Qt::Key_Space:
         case Qt::Key_Right:
         case Qt::Key_Down:
         case Qt::Key_PageDown:
-        {
             menu()->trigger(action::NextLayoutAction);
             break;
-        }
+
         default:
             // Stop layout tour if it is running.
             menu()->trigger(action::ToggleLayoutTourModeAction);
@@ -672,18 +670,9 @@ void MainWindow::updateContentsMargins()
     {
         /* Full screen mode. */
         m_drawCustomFrame = false;
-        m_frameMargins = QMargins(0, 0, 0, 0);
-
-        /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
-         * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
-#ifdef Q_OS_WIN
-        // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
-        setContentsMargins(1, 0, 0, 0); //FIXME
-#else
-        setContentsMargins(0, 0, 0, 0);
-#endif
-
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+        m_frameMargins = QMargins{};
+        setContentsMargins({});
+        m_viewLayout->setContentsMargins({});
     }
     else
     {
@@ -693,7 +682,7 @@ void MainWindow::updateContentsMargins()
         if (isMaximized())
         {
             m_drawCustomFrame = false;
-            m_frameMargins = QMargins(0, 0, 0, 0);
+            m_frameMargins = QMargins{};
         }
         else
         {
@@ -702,10 +691,10 @@ void MainWindow::updateContentsMargins()
         }
 #else
         m_drawCustomFrame = false;
-        m_frameMargins = QMargins(0, 0, 0, 0);
+        m_frameMargins = QMargins{};
 #endif
 
-        setContentsMargins(0, 0, 0, 0);
+        setContentsMargins({});
 
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
@@ -819,5 +808,24 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
     else
         handleOpenFile(fileEvent->file());
 }
+
+#ifdef Q_OS_WIN
+
+// Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to
+// turn desktop composition off and enter fullscreen mode. To avoid this behavior, an artificial
+// delta is added to make the client area differ from the screen dimensions.
+bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    const auto msg = static_cast<MSG*>(message);
+    if (msg->message != WM_NCCALCSIZE || !isFullScreen())
+        return false;
+
+    auto rect = LPRECT(msg->lParam);
+    ++rect->right;
+    *result = 0;
+    return true;
+}
+
+#endif // Q_OS_WIN
 
 } // namespace nx::vms::client::desktop
