@@ -445,6 +445,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         // Usually getMaxOnvifRequestTries returns 1, but for some OnvifResource descendants it's
         // larger. In case of failure request are repeated.
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+        constexpr std::chrono::milliseconds kTryIntervalMs(300);
 
         // Some DW cameras need two same sendVideoEncoder requests with 1 second interval.
         // Both responses are Ok, but only the second request really succeeds.
@@ -458,13 +459,13 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
             result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
             if (repeatIntervalForSendVideoEncoderMs)
             {
-                msleep(repeatIntervalForSendVideoEncoderMs);
+                std::this_thread::sleep_for(std::chrono::milliseconds(repeatIntervalForSendVideoEncoderMs));
                 result = m_onvifRes->sendVideoEncoderToCameraEx(
                     *currentVEConfig, streamIndex, params);
             }
 
             if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-                msleep(300);
+                std::this_thread::sleep_for(kTryIntervalMs);
         }
 
         return result;
