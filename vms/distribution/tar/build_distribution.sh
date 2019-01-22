@@ -152,8 +152,8 @@ copyBuildLibs()
     if [ "$BOX" = "edge1" ]
     then
         LIBS_TO_COPY+=(
-            liblber
-            libldap
+            liblber-2.4
+            libldap-2.4
             libsasl2
         )
     fi
