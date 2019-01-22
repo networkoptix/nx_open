@@ -13,9 +13,6 @@ namespace nx::vms::client::desktop {
 TreeView::TreeView(QWidget* parent): base_type(parent)
 {
     setDragDropOverwriteMode(true);
-
-    verticalScrollBar()->installEventFilter(this);
-    handleVerticalScrollbarVisibilityChanged();
 }
 
 void TreeView::scrollContentsBy(int dx, int dy)
@@ -56,33 +53,6 @@ void TreeView::keyPressEvent(QKeyEvent* event)
     }
 
     base_type::keyPressEvent(event);
-}
-
-bool TreeView::eventFilter(QObject* object, QEvent* event)
-{
-    if ((event->type() == QEvent::Show || event->type() == QEvent::Hide)
-        && object == verticalScrollBar())
-    {
-        handleVerticalScrollbarVisibilityChanged();
-    }
-
-    return base_type::eventFilter(object, event);
-}
-
-void TreeView::handleVerticalScrollbarVisibilityChanged()
-{
-    const auto scrollBar = verticalScrollBar();
-    const bool visible = scrollBar && scrollBar->isVisible();
-    if (visible == m_verticalScrollBarVisible)
-        return;
-
-    m_verticalScrollBarVisible = visible;
-    emit verticalScrollbarVisibilityChanged();
-}
-
-bool TreeView::verticalScrollBarIsVisible() const
-{
-    return m_verticalScrollBarVisible;
 }
 
 void TreeView::dragMoveEvent(QDragMoveEvent* event)

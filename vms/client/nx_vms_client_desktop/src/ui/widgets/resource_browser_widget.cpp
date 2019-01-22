@@ -256,6 +256,15 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     installEventHandler({ui->scrollArea->verticalScrollBar()}, {QEvent::Show, QEvent::Hide},
         this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
+    m_connections << connect(this, &QnResourceBrowserWidget::scrollBarVisibleChanged, this,
+        [this]()
+        {
+            auto margins = ui->scrollAreaWidgetContents->contentsMargins();
+            margins.setRight(isScrollBarVisible() ?
+                style()->pixelMetric(QStyle::PM_ScrollBarExtent) : 0);
+            ui->scrollAreaWidgetContents->setContentsMargins(margins);
+        });
+
     /* Run handlers. */
     updateIcons();
 
