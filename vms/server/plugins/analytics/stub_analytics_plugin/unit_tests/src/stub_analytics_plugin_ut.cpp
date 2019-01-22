@@ -329,11 +329,15 @@ TEST(stub_analytics_plugin, test)
     auto baseDeviceAgent = engine->obtainDeviceAgent(&deviceInfo, &error);
     ASSERT_EQ(noError, (int) error);
     ASSERT_TRUE(baseDeviceAgent != nullptr);
+
     ASSERT_TRUE(
         baseDeviceAgent->queryInterface(nx::sdk::analytics::IID_DeviceAgent) != nullptr);
+    baseDeviceAgent->releaseRef();
+
     auto deviceAgent = static_cast<nx::sdk::analytics::IConsumingDeviceAgent*>(
         baseDeviceAgent->queryInterface(nx::sdk::analytics::IID_ConsumingDeviceAgent));
     ASSERT_TRUE(deviceAgent != nullptr);
+    baseDeviceAgent->releaseRef();
 
     testDeviceAgentManifest(deviceAgent);
     testDeviceAgentSettings(deviceAgent);
