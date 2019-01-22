@@ -193,16 +193,22 @@ static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
     action.assertExpectedState();
 }
 
-static void testExecuteActionAddToList(nx::sdk::analytics::IEngine* plugin)
+static void testExecuteActionAddToList(nx::sdk::analytics::IEngine* engine)
 {
     // TODO: #mshevchenko: Add proper action parameters.
     Action action;
     action.m_actionId = "nx.stub.addToList";
-    action.setParams({{"paramA", "1"}, {"paramB", "2"}});
+    action.setParams({
+        {"testTextField", "Some text"},
+        {"testSpinBox", "20"},
+        {"testDoubleSpinBox", "13.5"},
+        {"testComboBox", "value1"},
+        {"testCheckBox", "false"}
+    });
     action.m_expectedNonNullMessageToUser = true;
 
     nx::sdk::Error error = nx::sdk::Error::noError;
-    plugin->executeAction(&action, &error);
+    engine->executeAction(&action, &error);
     ASSERT_EQ(noError, (int) error);
     action.assertExpectedState();
 }
