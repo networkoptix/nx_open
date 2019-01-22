@@ -245,7 +245,7 @@ template<typename Map>
 using DeepestMappedType = typename DeepestMappedType_Helper<Map>::Type;
 
 template<
-    template<typename, typename> typename Container,
+    template<typename...> typename Container,
     typename KeysHead,
     typename... KeysAndValue
 >
@@ -256,13 +256,13 @@ struct NestedMap_Helper
         typename NestedMap_Helper<Container, KeysAndValue...>::Type>;
 };
 
-template<template<typename, typename> typename Container, typename Key, typename Value>
+template<template<typename...> typename Container, typename Key, typename Value>
 struct NestedMap_Helper<Container, Key, Value>
 {
     using Type = Container<Key, Value>;
 };
 
-template<template<typename, typename> typename Container, typename... Args>
+template<template<typename...> typename Container, typename... Args>
 using NestedMap = typename NestedMap_Helper<Container, Args...>::Type;
 
 template<typename EdgeValue, typename = void>
@@ -329,7 +329,7 @@ namespace MapHelper
      * Helper for declaring nested maps. First template parameter is a container type, other
      * parameters are series of key and value types.
      */
-    template<template<typename, typename> typename Container, typename... KeysAndValueTypes>
+    template<template<typename...> typename Container, typename... KeysAndValueTypes>
     using NestedMap = detail::NestedMap<Container, KeysAndValueTypes...>;
 
     /**
