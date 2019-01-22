@@ -55,6 +55,8 @@ class ServerUpdateTool:
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<Clock>;
 
 public:
     ServerUpdateTool(QObject* parent = nullptr);
@@ -137,7 +139,7 @@ public:
         UpdateContents& contents,
         const std::set<nx::utils::SoftwareVersion>& clientVersions) const;
 
-    // Start uploading local update packages to the server(s).
+    // Start uploading local update packages to the servers.
     bool startUpload(const UpdateContents& contents);
     void startUpload(
         const QnMediaServerResourcePtr& server,
@@ -211,6 +213,8 @@ public:
      * Updates URL of the current mediaserver.
      */
     void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
+
+    TimePoint::duration getInstallDuration() const;
 
 signals:
     void packageDownloaded(const nx::update::Package& package);
@@ -286,8 +290,6 @@ private:
     std::shared_ptr<PeerStateTracker> m_stateTracker;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
 
-    using Clock = std::chrono::steady_clock;
-    using TimePoint = std::chrono::time_point<Clock>;
     // Time at which install command was issued.
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;

@@ -201,7 +201,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(
     hint->setFont(f);
     hint->setOpacity(kHidden);
 
-    button->setIcon(qnSkin->icon("item/mic.png"));
+    button->setIcon(qnSkin->icon("soft_triggers/user_selectable/mic.png"));
     button->setCheckable(false);
 
     connect(button, &QnImageButtonWidget::pressed,  this, &QnTwoWayAudioWidgetPrivate::startStreaming);

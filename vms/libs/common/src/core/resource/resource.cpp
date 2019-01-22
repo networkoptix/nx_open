@@ -84,9 +84,14 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
+void QnResource::setForceUseLocalProperties(bool value)
+{
+    m_forceUseLocalProperties = value;
+}
+
 bool QnResource::useLocalProperties() const
 {
-    return m_id.isNull();
+    return m_forceUseLocalProperties || m_id.isNull();
 }
 
 void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
@@ -426,6 +431,14 @@ bool QnResource::hasProperty(const QString &key) const
     if (!commonModule())
         return false;
 
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (useLocalProperties()
+            && m_locallySavedProperties.find(key) != m_locallySavedProperties.end())
+        {
+            return true;
+        }
+    }
     return commonModule()->propertyDictionary()->hasProperty(getId(), key);
 }
 

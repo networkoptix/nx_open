@@ -28,6 +28,23 @@ set(common_depends
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 set(arch.depends ", syslinux")
 
+if(cloudGroup STREQUAL "prod")
+    set(cloud_group_suffix)
+else()
+    set(cloud_group_suffix "-${cloudGroup}")
+endif()
+
+set(conflicting_packages
+    "${deb.customization.company.name}-mediaserver-1.2 (<< VERSION)")
+string(APPEND conflicting_packages
+    ",\n ${deb.customization.company.name}-entcontroller (<< VERSION)")
+foreach(suffix "" "-test" "-demo" "-dev")
+    if(NOT "${suffix}" STREQUAL "${cloud_group_suffix}")
+        string(APPEND conflicting_packages
+            ",\n ${deb.customization.company.name}-mediaserver${suffix}")
+    endif()
+endforeach()
+
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/deb_files.in
     ${CMAKE_CURRENT_BINARY_DIR}

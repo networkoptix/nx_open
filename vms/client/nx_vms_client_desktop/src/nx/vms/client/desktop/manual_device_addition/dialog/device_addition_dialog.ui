@@ -369,7 +369,7 @@
                 <item>
                  <widget class="QCheckBox" name="knownAddressAutoPortCheckBox">
                   <property name="text">
-                   <string>Auto</string>
+                   <string>Default</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -508,7 +508,7 @@
                 <item>
                  <widget class="QCheckBox" name="subnetScanAutoPortCheckBox">
                   <property name="text">
-                   <string>Auto</string>
+                   <string>Default</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>

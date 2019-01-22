@@ -2,7 +2,7 @@
 
 #include <ui/dialogs/common/button_box_dialog.h>
 
-#include "../models/camera_streams_model.h"
+#include "../data/camera_stream_urls.h"
 
 namespace Ui { class CameraStreamsDialog; }
 
@@ -17,8 +17,8 @@ public:
     explicit CameraStreamsDialog(QWidget* parent = nullptr);
     virtual ~CameraStreamsDialog() override;
 
-    CameraStreamsModel model() const;
-    void setModel(const CameraStreamsModel& model);
+    CameraStreamUrls streams() const;
+    void setStreams(const CameraStreamUrls& value);
 
 private:
     const QScopedPointer<Ui::CameraStreamsDialog> ui;

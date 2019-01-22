@@ -121,7 +121,7 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx::network::http::AsyncHttp
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
         //unexpected content type
-        NX_WARNING(this, lit("Error monitoring IO port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
+        NX_WARNING(this, lit("Error monitoring IO ports on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
             arg(m_camera->getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)));
         return;
     }

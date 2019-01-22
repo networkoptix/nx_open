@@ -165,6 +165,7 @@ public:
 
     virtual bool saveProperties();
     virtual int savePropertiesAsync();
+    void setForceUseLocalProperties(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
@@ -295,6 +296,7 @@ private:
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     std::atomic<bool> m_initInProgress{false};
     QnCommonModule* m_commonModule;
+    bool m_forceUseLocalProperties = false;
 };
 
 template<class Resource>

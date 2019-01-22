@@ -4,6 +4,7 @@
 
 #include <providers/stream_mixer.h>
 #include <providers/spush_media_stream_provider.h>
+#include <core/resource/resource_fwd.h>
 
 class QnOnvifStreamReader;
 
@@ -14,7 +15,7 @@ namespace utils {
 class MultisensorDataProvider : public CLServerPushStreamReader
 {
 public:
-    MultisensorDataProvider(const QnPlOnvifResourcePtr& res);
+    MultisensorDataProvider(const nx::vms::server::resource::CameraPtr& res);
     virtual ~MultisensorDataProvider();
 
 protected:
@@ -32,12 +33,11 @@ protected:
     virtual void pleaseStop() override;
 
 private:
-    QnPlOnvifResourcePtr m_onvifRes;
+    nx::vms::server::resource::CameraPtr m_cameraResource;
     QnStreamMixer m_dataSource;
 private:
-    void initSubChannels();
 
-    QnPlOnvifResourcePtr initSubChannelResource(quint32 channelNumber);
+    QnSecurityCamResourcePtr initSubChannelResource(quint32 channelNumber);
     QList<QnResourceChannelMapping> getVideoChannelMapping();
 };
 
