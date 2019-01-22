@@ -13,6 +13,7 @@
 #include <ui/style/helper.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/range_adapters.h>
 
 #include "camera_advanced_param_widget_factory.h"
 
@@ -86,8 +87,14 @@ void CameraAdvancedParamWidgetsManager::loadValues(
     if (packetMode)
     {
         // Disable all parameter widgets, we'll enable only those that are on the list.
-        for (auto widget: m_paramWidgetsById)
-            widget->setEnabled(false);
+        for (auto [parameterId, widget]: nx::utils::constKeyValueRange(m_paramWidgetsById))
+        {
+            const bool isButton = m_parametersById[parameterId].dataType
+                == QnCameraAdvancedParameter::DataType::Button;
+
+            // We always show buttons since their "values" don't arrive from server.
+            widget->setEnabled(isButton);
+        }
     }
 
     // Disconnect all watches to not trigger handler chains.

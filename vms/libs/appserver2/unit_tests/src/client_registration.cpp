@@ -69,7 +69,7 @@ protected:
         const auto url = url::Builder()
             .setScheme(http::kUrlSchemeName)
             .setEndpoint(m_process.moduleInstance()->endpoint())
-            .setPath(nx::p2p::MessageBus::kUrlPath)
+            .setPath(nx::p2p::ConnectionBase::kWebsocketUrlPath)
             .setQuery(query.toString()).toUrl();
 
         m_httpClient->doUpgrade(

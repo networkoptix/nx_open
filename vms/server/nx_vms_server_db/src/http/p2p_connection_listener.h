@@ -29,7 +29,7 @@ protected:
     virtual void run() override;
 
 private:
-    vms::api::PeerDataEx localPeer() const;
+    vms::api::PeerDataEx localPeer(const vms::api::PeerDataEx& remotePeer) const;
     bool isDisabledPeer(const vms::api::PeerData& remotePeer) const;
     bool isPeerCompatible(const vms::api::PeerDataEx& remotePeer) const;
     Qn::UserAccessData userAccessData(const vms::api::PeerDataEx& remotePeer) const;

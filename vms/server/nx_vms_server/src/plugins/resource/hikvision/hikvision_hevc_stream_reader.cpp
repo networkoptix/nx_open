@@ -35,8 +35,8 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
 
     auto role = getRole();
     if (role == Qn::CR_LiveVideo &&
-        !m_hikvisionResource->getPtzConfigurationToken().isEmpty() &&
-        m_hikvisionResource->getPtzProfileToken().isEmpty())
+        !m_hikvisionResource->ptzConfigurationToken().empty() &&
+        m_hikvisionResource->ptzProfileToken().empty())
     {
         // Need to assign some Onvif profile to execute PTZ commands
         m_hikvisionResource->findDefaultPtzProfileToken();

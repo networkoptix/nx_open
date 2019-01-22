@@ -3,7 +3,7 @@
         "JSON format should correspond to nx::vms::analytics::EngineManifest",
         "The list of supported event types for an Axis camera is loaded dynamically from that camera.",
         "No predefined event types exist, so the 'eventTypes' element in this JSON is empty.",
-        "Event types with the topics not from AlowedTopics are filtered out."
+        "Event types with the topics not from AllowedTopics are filtered out."
         "Event types with the descriptions equal to one of the forbiddenDescriptions list are filtered out".
     ],
     "capabilities": "deviceModelDependent",

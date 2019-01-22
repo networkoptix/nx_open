@@ -137,16 +137,12 @@ bool QnMaskedProxyWidget::ensurePixmap(const QSize& logicalSize, int devicePixel
     const QSize targetSize = logicalSize * devicePixelRatio;
 
     if (targetSize.width() > m_pixmap.size().width()
-        || targetSize.height() > m_pixmap.size().height())
+        || targetSize.height() > m_pixmap.size().height()
+        || m_pixmap.devicePixelRatio() != devicePixelRatio)
     {
         m_pixmap = QPixmap(targetSize);
         m_pixmap.setDevicePixelRatio(devicePixelRatio);
         m_pixmapRect = QRect(QPoint(), logicalSize);
-        return true;
-    }
-    else if (m_pixmap.devicePixelRatio() != devicePixelRatio)
-    {
-        m_pixmap.setDevicePixelRatio(devicePixelRatio);
         return true;
     }
 

@@ -160,7 +160,6 @@ size_t PacketConsumerManager::addConsumer(
                 m_consumerKeyPacketStates.begin() + index,
                 waitForKeyPacket);
     }
-
     return index;
 }
 

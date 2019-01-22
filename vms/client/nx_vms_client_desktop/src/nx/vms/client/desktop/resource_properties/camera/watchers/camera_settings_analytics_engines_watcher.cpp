@@ -8,7 +8,7 @@
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
-#include "../utils/analytics_engine_info.h"
+#include "../data/analytics_engine_info.h"
 
 using namespace nx::vms::common;
 

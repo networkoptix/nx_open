@@ -40,8 +40,7 @@ void OnvifAudioTransmitter::prepare()
 
     // DW cameras have issues with this attribute in current firmware. It change channel URL in SETUP response
     // if this attribute is specified.
-    if (m_resource->resourceData().value<bool>("sendBackChannelAttribute", true))
-        m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
+    m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
     m_rtspConnection->setTransport(RtspTransport::tcp);
 
     const QString url = m_resource->sourceUrl(Qn::CR_LiveVideo);
