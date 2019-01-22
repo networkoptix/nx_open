@@ -137,7 +137,8 @@
     "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each systems that you are trying to merge and try again."
   },
   "passwordRequirements": {
     "good": "good",
@@ -183,7 +184,7 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "successMerge":"System {{systemName}} has been merged with {{systemName}}",
+    "successMerge":"System merge completed",
     "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {

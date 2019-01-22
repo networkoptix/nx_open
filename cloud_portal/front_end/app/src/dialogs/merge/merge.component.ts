@@ -1,7 +1,5 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { Location }                                            from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
+import { Component, Inject, Input, ViewEncapsulation } from '@angular/core';
+import { NgbModal, NgbActiveModal, NgbModalRef }       from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'nx-modal-merge-content',
@@ -99,9 +97,13 @@ export class MergeModalContent {
                 masterSystemId = this.targetSystem.id;
                 slaveSystemId = this.system.id;
             }
-            // return this.cloudApi.systems(); //In for testing purposes with merging things
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
+            errorCodes: {
+                vmsRequestFailure: (error) => {
+                    return this.language.errorCodes[error.errorText];
+                }
+            },
             successMessage: this.language.system.mergeSystemSuccess
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();

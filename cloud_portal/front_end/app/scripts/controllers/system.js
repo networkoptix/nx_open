@@ -7,6 +7,7 @@ angular.module('cloudApp')
                   account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider) {
 
             var systemId = $routeParams.systemId;
+            $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
 
             authorizationCheckService.requireLogin().then(function (account) {
@@ -21,11 +22,14 @@ angular.module('cloudApp')
                 
                 $scope.$watch('system.mergeInfo', function(mergeInfo){
                     if (mergeInfo) {
-                        setMergeStatus(mergeInfo)
+                        setMergeStatus(mergeInfo);
                     } else{
+                        if($scope.currentlyMerging) {
+                            dialogs.notify(L.system.successMerge, 'success', true);
+                        }
                         $scope.currentlyMerging = false;
                     }
-                })
+                });
             });
 
             function getMergeTarget(targetSystemId) {
