@@ -328,7 +328,7 @@ public:
     void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
-    int getMaxChannels() const;
+    virtual int getMaxChannelsPhysical() const override;
 
     void updateToChannel(int value);
 
