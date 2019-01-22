@@ -40,6 +40,7 @@ public:
     QnCommonModule* commonModule() const;
     QnMediaServerModule* serverModule() const;
     nx::vms::server::Authenticator* authenticator() const;
+    void connectTo(MediaServerLauncher* target, bool isSecure = true);
 
     void addSetting(const std::string& name, const QVariant& value);
 

@@ -17,7 +17,6 @@ class onvifXsd__AudioSourceConfiguration;
 class onvifXsd__H264Configuration;
 
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
-typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
 class QnOnvifStreamReader: public CLServerPushStreamReader
 {
@@ -74,7 +73,7 @@ private:
     onvifXsd__Profile* selectExistingProfile(
         std::vector<onvifXsd__Profile *>& profiles, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, onvifXsd__Profile* profile) const;
-    CameraDiagnostics::Result createNewProfile(const QString& name, const QString& token) const;
+    CameraDiagnostics::Result createNewProfile(std::string name, std::string token) const;
 
     // Returned pointers are valid while response object is living.
     // (For all functions in the following block.)
@@ -85,28 +84,20 @@ private:
 
     onvifXsd__AudioEncoderConfiguration* selectAudioEncoderConfig(
         std::vector<onvifXsd__AudioEncoderConfiguration *>& configs, bool isPrimary) const;
-    void fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const;
-    AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 
     void updateAudioEncoder(AudioEncoder& encoder) const;
 
-    //CameraDiagnostics::Result sendProfileToCamera(
-    //    CameraInfoParams& info, onvifXsd__Profile& profile, bool create = false) const; //< unused
-    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource& source) const;
     CameraDiagnostics::Result sendAudioEncoderToCamera(
         onvifXsd__AudioEncoderConfiguration& encoderConfig) const;
 
     CameraDiagnostics::Result fetchStreamUrl(MediaSoapWrapper& soapWrapper,
-        const QString& profileToken, bool isPrimary, QString* const mediaUrl) const;
-
-    void updateVideoEncoderParams(
-        onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
+        const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const;
 
     void printProfile(const onvifXsd__Profile& profile, bool isPrimary) const;
 
     bool executePreConfigurationRequests();
     CameraDiagnostics::Result bindTwoWayAudioToProfile(
-        MediaSoapWrapper& soapWrapper, const QString& profileToken) const;
+        MediaSoapWrapper& soapWrapper, const std::string& profileToken) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;
