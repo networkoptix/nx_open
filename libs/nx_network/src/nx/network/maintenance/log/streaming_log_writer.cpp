@@ -6,7 +6,6 @@ namespace nx::network::maintenance::log {
 
 StreamingLogWriter::StreamingLogWriter(StreamingMessageBody* messageBody)
     :
-    AbstractWriter(),
     m_messageBody(messageBody)
 {
     m_messageBody->setOnBeforeDestructionHandler(
@@ -21,7 +20,7 @@ void StreamingLogWriter::write(nx::utils::log::Level /*level*/, const QString& m
 {
     QnMutexLocker lock(&m_mutex);
     if (m_messageBody)
-        m_messageBody->writeBodyData(QByteArray().append(message));
+        m_messageBody->writeBodyData(message.toUtf8());
 }
 
 } // namespace nx::network::maintenance::log
