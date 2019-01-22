@@ -155,6 +155,8 @@ public:
     static QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
+    int getMaxChannels() const;
+    virtual int getMaxChannelsPhysical() const { return 1; }
 
     void inputPortListenerAttached();
     void inputPortListenerDetached();

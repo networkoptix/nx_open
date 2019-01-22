@@ -68,9 +68,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
 
-    int channels = 1;
-    if (m_axisRes->hasDefaultProperty(QLatin1String("channelsAmount")))
-        channels = m_axisRes->getProperty(lit("channelsAmount")).toUInt();
+    int channels = m_axisRes->getMaxChannelsPhysical();
 
     QByteArray profileNumber("S");
     QByteArray profileName;
@@ -81,7 +79,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     if (channels > 1)
     {
         // multiple channel encoder
-        profileSufix = QString::number(m_axisRes->getChannelNumAxis());
+        profileSufix = QString::number(m_axisRes->getChannel() + 1);
     }
 
     if (m_axisRes->hasVideo(this))
@@ -242,7 +240,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     if (!profileName.isEmpty())
         query.addQueryItem("streamprofile", profileName);
     if (channels > 1)
-        query.addQueryItem("camera", QString::number( m_axisRes->getChannelNumAxis()));
+        query.addQueryItem("camera", QString::number( m_axisRes->getChannel() + 1));
 
     QUrl streamUrl(m_resource->getUrl());
     streamUrl.setScheme("rtsp");

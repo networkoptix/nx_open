@@ -29,7 +29,6 @@ protected:
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
 private:
     CLHttpStatus makeGetStitchingModeRequest(CLSimpleHTTPClient& client, QByteArray& response) const;

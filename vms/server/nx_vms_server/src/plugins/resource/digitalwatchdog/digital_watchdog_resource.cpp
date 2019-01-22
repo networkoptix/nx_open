@@ -92,18 +92,20 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
 {
-    bool unauth = false;
-    if (!isDualStreamingEnabled(unauth) && unauth==false)
+    if (getRole() != Role::subchannel)
     {
-        if (commonModule()->isNeedToStop())
+        bool unauth = false;
+        if (!isDualStreamingEnabled(unauth) && unauth == false)
+        {
+            if (commonModule()->isNeedToStop())
+                return CameraDiagnostics::UnknownErrorResult();
+
+            // The camera most likely is going to reset after enabling dual streaming
+            enableOnvifSecondStream();
             return CameraDiagnostics::UnknownErrorResult();
-
-        // The camera most likely is going to reset after enabling dual streaming
-        enableOnvifSecondStream();
-        return CameraDiagnostics::UnknownErrorResult();
+        }
+        disableB2FramesForActiDW();
     }
-    disableB2FramesForActiDW();
-
     const CameraDiagnostics::Result result = QnPlOnvifResource::initializeCameraDriver();
     return result;
 }

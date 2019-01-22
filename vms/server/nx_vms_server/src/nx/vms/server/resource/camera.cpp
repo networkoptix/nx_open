@@ -640,6 +640,14 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
     return nullptr;
 }
 
+int Camera::getMaxChannels() const
+{
+    bool shouldAppearAsSingleChannel = resourceData().value<bool>(
+        ResourceDataKey::kShouldAppearAsSingleChannel);
+    if (shouldAppearAsSingleChannel)
+        return 1;
+    return getMaxChannelsPhysical();
+}
 void Camera::inputPortListenerAttached()
 {
     QnMutexLocker lk(&m_initMutex);

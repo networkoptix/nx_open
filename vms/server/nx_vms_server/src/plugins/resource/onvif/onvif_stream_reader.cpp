@@ -749,7 +749,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                     "current vSourceID=" << profile->VideoSourceConfiguration->token.data()
                     << "requested vSourceID=" << info.videoSourceToken;
             #endif
-            if (m_onvifRes->getMaxChannels() > 1)
+            if (m_onvifRes->getMaxChannelsPhysical() > 1)
             {
                     return CameraDiagnostics::RequestFailedResult(
                         QLatin1String("addVideoSourceConfiguration"), soapWrapper.getLastErrorDescription());
@@ -1005,16 +1005,6 @@ void QnOnvifStreamReader::pleaseStop()
 QnConstResourceVideoLayoutPtr QnOnvifStreamReader::getVideoLayout() const
 {
     return m_multiCodec.getVideoLayout();
-}
-
-void QnOnvifStreamReader::setMustNotConfigureResource(bool mustNotConfigureResource)
-{
-    m_mustNotConfigureResource = mustNotConfigureResource;
-}
-
-bool QnOnvifStreamReader::needConfigureProvider() const
-{
-    return CLServerPushStreamReader::needConfigureProvider() && !m_mustNotConfigureResource;
 }
 
 #endif //ENABLE_ONVIF

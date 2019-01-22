@@ -137,14 +137,6 @@ CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
     return CameraDiagnostics::InitializationInProgress();
 }
 
-QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
-}
-
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const
 {
     QFile tpl(kGetStitchingModeQueryTpl);

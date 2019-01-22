@@ -519,6 +519,9 @@ int QnPlAxisResource::rtspPort() const
 
 CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 {
+    if (getRole() == Role::subchannel)
+        return CameraDiagnostics::Result();
+
     setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
     QAuthenticator auth = getAuth();
@@ -1450,7 +1453,13 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() const
 
 int QnPlAxisResource::getChannel() const
 {
-    return getChannelNumAxis() - 1;
+    auto channel = base_type::getChannel();
+    if (channel > 0)
+        return channel;
+    auto axisChannel = getChannelNumAxis();
+    if (axisChannel)
+        return axisChannel - 1;
+    return 0;
 }
 
 bool QnPlAxisResource::readCurrentIOStateAsync()
@@ -1816,4 +1825,13 @@ QString QnPlAxisResource::resolutionToString(const QSize& resolution)
     return lm("%1x%2").args(resolution.width(), resolution.height());
 }
 
+int QnPlAxisResource::getMaxChannelsPhysical() const
+{
+    QString val = getProperty(QLatin1String("channelsAmount"));
+    if (!val.isEmpty())
+        return val.toUInt();
+    return 1;
+}
+
 #endif // #ifdef ENABLE_AXIS
+

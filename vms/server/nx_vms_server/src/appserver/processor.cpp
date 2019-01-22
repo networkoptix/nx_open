@@ -68,10 +68,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        QString urlStr = camera->getUrl();
         const QnResourceData resourceData = camera->resourceData();
-        if (resourceData.contains(QString("ignoreMultisensors")))
-            urlStr = urlStr.left(urlStr.indexOf('?'));
 
         if (camera->isManuallyAdded() &&
             !serverModule()->commonModule()->resourceDiscoveryManager()->isManuallyAdded(camera))

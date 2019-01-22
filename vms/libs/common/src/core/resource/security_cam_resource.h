@@ -352,7 +352,6 @@ public:
 
     virtual void setCommonModule(QnCommonModule* commonModule) override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -419,7 +418,6 @@ private:
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;
-
 private slots:
     void resetCachedValues();
 };
