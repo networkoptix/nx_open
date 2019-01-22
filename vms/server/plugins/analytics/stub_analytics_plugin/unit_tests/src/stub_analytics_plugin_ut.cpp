@@ -6,9 +6,11 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/uuid.h>
 
-#include <nx/sdk/common/string_map.h>
-#include <nx/sdk/analytics/common/metadata_types.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/analytics/helpers/metadata_types.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
@@ -16,11 +18,13 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
-extern "C" {
+extern "C" nxpl::PluginInterface* createNxAnalyticsPlugin();
 
-nxpl::PluginInterface* createNxAnalyticsPlugin();
-
-} // extern "C"
+namespace nx {
+namespace vms_server_plugins {
+namespace analytics {
+namespace stub {
+namespace test {
 
 static std::string trimString(const std::string& s)
 {
@@ -40,8 +44,7 @@ static const int noError = (int) nx::sdk::Error::noError;
 static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    nxpt::ScopedRef<const nx::sdk::IString> manifest(
-        engine->manifest(&error), false);
+    const nx::sdk::Ptr<const nx::sdk::IString> manifest(engine->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -62,8 +65,7 @@ static void testEngineManifest(nx::sdk::analytics::IEngine* engine)
 static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    nxpt::ScopedRef<const nx::sdk::IString> manifest(
-        deviceAgent->manifest(&error), false);
+    const nx::sdk::Ptr<const nx::sdk::IString> manifest(deviceAgent->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -79,7 +81,7 @@ static void testDeviceAgentManifest(nx::sdk::analytics::IDeviceAgent* deviceAgen
 
 static void testEngineSettings(nx::sdk::analytics::IEngine* plugin)
 {
-    const auto settings = new nx::sdk::common::StringMap();
+    const auto settings = new nx::sdk::StringMap();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
@@ -89,7 +91,7 @@ static void testEngineSettings(nx::sdk::analytics::IEngine* plugin)
 
 static void testDeviceAgentSettings(nx::sdk::analytics::IDeviceAgent* deviceAgent)
 {
-    const auto settings = new nx::sdk::common::StringMap();
+    const auto settings = new nx::sdk::StringMap();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
@@ -97,26 +99,23 @@ static void testDeviceAgentSettings(nx::sdk::analytics::IDeviceAgent* deviceAgen
     deviceAgent->setSettings(settings); //< Test assigning some settings.
 }
 
-class Action: public nx::sdk::analytics::Action
+class Action: public nx::sdk::analytics::IAction
 {
 public:
-    Action():
-        m_params(new nx::sdk::common::StringMap())
-    {
-    }
+    Action(): m_params(new nx::sdk::StringMap()) {}
 
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
+    virtual void* queryInterface(const nxpl::NX_GUID& /*interfaceId*/) override
     {
         ASSERT_TRUE(false);
         return nullptr;
     }
 
-    virtual unsigned int addRef() override { ASSERT_TRUE(false); return -1; }
-    virtual unsigned int releaseRef() override { ASSERT_TRUE(false); return -1; }
+    virtual int addRef() const override { ASSERT_TRUE(false); return -1; }
+    virtual int releaseRef() const override { ASSERT_TRUE(false); return -1; }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
-    virtual nxpl::NX_GUID objectId() override { return m_objectId; }
-    virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
+    virtual nx::sdk::Uuid objectId() override { return m_objectId; }
+    virtual nx::sdk::Uuid deviceId() override { return m_deviceId; }
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
     virtual const nx::sdk::IStringMap* params() override
@@ -126,14 +125,6 @@ public:
 
         m_params->addRef();
         return m_params.get();
-    }
-
-    virtual int paramCount() override
-    {
-        if (!m_params)
-            return 0;
-
-        return (int) m_params->count();
     }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
@@ -173,22 +164,22 @@ public:
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
-        m_params.reset(new nx::sdk::common::StringMap());
+        m_params.reset(new nx::sdk::StringMap());
         for (const auto& param: params)
             m_params->addItem(param.first, param.second);
     }
 
 public:
     std::string m_actionId = "";
-    nxpl::NX_GUID m_objectId = {{0}};
-    nxpl::NX_GUID m_deviceId = {{0}};
+    nx::sdk::Uuid m_objectId;
+    nx::sdk::Uuid m_deviceId;
     int64_t m_timestampUs = 0;
     bool m_handleResultCalled = false;
     bool m_expectedNonNullActionUrl = false;
     bool m_expectedNonNullMessageToUser = false;
 
 private:
-    nxpt::ScopedRef<nx::sdk::common::StringMap> m_params;
+    nx::sdk::Ptr<nx::sdk::StringMap> m_params;
 };
 
 static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
@@ -204,6 +195,7 @@ static void testExecuteActionNonExisting(nx::sdk::analytics::IEngine* plugin)
 
 static void testExecuteActionAddToList(nx::sdk::analytics::IEngine* plugin)
 {
+    // TODO: #mshevchenko: Add proper action parameters.
     Action action;
     action.m_actionId = "nx.stub.addToList";
     action.setParams({{"paramA", "1"}, {"paramB", "2"}});
@@ -219,7 +211,7 @@ static void testExecuteActionAddPerson(nx::sdk::analytics::IEngine* plugin)
 {
     Action action;
     action.m_actionId = "nx.stub.addPerson";
-    action.m_objectId = {{0}};
+    action.m_objectId = nx::sdk::Uuid();
     action.m_expectedNonNullActionUrl = true;
 
     nx::sdk::Error error = nx::sdk::Error::noError;
@@ -246,8 +238,8 @@ public:
     {
         NX_PRINT << "DeviceAgentHandler: Received plugin event: "
             << "level " << (int) event->level() << ", "
-            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
-            << "description " << nx::kit::debug::toString(event->description());
+            << "caption " << nx::kit::utils::toString(event->caption()) << ", "
+            << "description " << nx::kit::utils::toString(event->description());
     }
 };
 
@@ -258,8 +250,8 @@ public:
     {
         NX_PRINT << "EngineHandler: Received plugin event: "
             << "level " << (int) event->level() << ", "
-            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
-            << "description " << nx::kit::debug::toString(event->description());
+            << "caption " << nx::kit::utils::toString(event->caption()) << ", "
+            << "description " << nx::kit::utils::toString(event->description());
     }
 };
 
@@ -276,13 +268,18 @@ public:
         return nullptr;
     }
 
-    virtual unsigned int addRef() { return ++m_refCounter; }
-    virtual unsigned int releaseRef() { ASSERT_TRUE(m_refCounter > 1); return --m_refCounter; }
+    virtual int addRef() const override { return ++m_refCounter; }
+
+    virtual int releaseRef() const override
+    {
+        ASSERT_TRUE(m_refCounter > 1);
+        return --m_refCounter;
+    }
 
     virtual int64_t timestampUs() const override { return /*dummy*/ 42; }
 
 private:
-    int m_refCounter = 1;
+    mutable int m_refCounter = 1;
 };
 
 TEST(stub_analytics_plugin, test)
@@ -338,8 +335,8 @@ TEST(stub_analytics_plugin, test)
     DeviceAgentHandler deviceAgentHandler;
     ASSERT_EQ(noError, (int) deviceAgent->setHandler(&deviceAgentHandler));
 
-    nxpt::ScopedRef<nx::sdk::analytics::common::MetadataTypes> metadataTypes(
-        new nx::sdk::analytics::common::MetadataTypes());
+    const nx::sdk::Ptr<nx::sdk::analytics::MetadataTypes> metadataTypes(
+        new nx::sdk::analytics::MetadataTypes());
 
     ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
@@ -352,6 +349,12 @@ TEST(stub_analytics_plugin, test)
     engine->releaseRef();
     plugin->releaseRef();
 }
+
+} // namespace test
+} // namespace stub
+} // namespace analytics
+} // namespace vms_server_plugins
+} // namespace nx
 
 int main(int argc, const char* const argv[])
 {

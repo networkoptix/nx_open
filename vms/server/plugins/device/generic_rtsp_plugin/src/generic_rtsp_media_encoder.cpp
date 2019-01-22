@@ -54,12 +54,12 @@ void* GenericRTSPMediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
-unsigned int GenericRTSPMediaEncoder::addRef()
+int GenericRTSPMediaEncoder::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericRTSPMediaEncoder::releaseRef()
+int GenericRTSPMediaEncoder::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

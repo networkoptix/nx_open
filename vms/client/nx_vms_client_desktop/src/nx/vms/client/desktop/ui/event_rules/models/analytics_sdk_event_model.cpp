@@ -7,7 +7,7 @@
 
 #include <nx/vms/api/analytics/manifest_items.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
 
@@ -31,12 +31,12 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     auto addItem = [this](
         QStandardItem* parent,
         const QString& name,
-        const QString& pluginId,
+        const QnUuid& engineId,
         const QString& id)
     {
         auto item = new QStandardItem(name);
         item->setData(qVariantFromValue(id), EventTypeIdRole);
-        item->setData(qVariantFromValue(pluginId), DriverIdRole);
+        item->setData(qVariantFromValue(engineId), DriverIdRole);
         if (parent)
             parent->appendRow(item);
         else
@@ -45,87 +45,55 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     };
 
     using namespace nx::vms::event;
-
-    const auto descriptorListManager = commonModule()->analyticsDescriptorListManager();
     clear();
 
-    const auto deviceEventTypes = descriptorListManager->deviceDescriptors<
-        nx::vms::api::analytics::EventTypeDescriptor>(cameras);
+    nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
+    nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule());
+    nx::analytics::GroupDescriptorManager groupDescriptorManager(commonModule());
 
-    const auto plugins = descriptorListManager->allDescriptorsInTheSystem<
-        nx::vms::api::analytics::PluginDescriptor>();
+    const auto scopedEventTypeIds = eventTypeDescriptorManager
+        .compatibleEventTypeIdsIntersection(cameras);
 
-    const auto groups = descriptorListManager->allDescriptorsInTheSystem<
-        nx::vms::api::analytics::GroupDescriptor>();
-
-// TODO: #dmishin return to this code when device dependent analytics will work properly on the
-// server side
-#if 0
-    cameras.empty()
-        ? helper.systemCameraIndependentAnalyticsEvents()
-        : helper.supportedAnalyticsEvents(cameras);
-#endif
-
-    const bool usePluginName = descriptorListManager->pluginIds(deviceEventTypes).size() > 1;
-    struct PluginNode
+    for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
     {
-        QStandardItem* item = nullptr;
-        QMap<QString, QStandardItem*> groups;
-    };
+        const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
+        QStandardItem* parentItem = nullptr;
 
-    PluginNode defaultPluginNode;
-    QMap<QString, PluginNode> items;
-    for (const auto& entry: deviceEventTypes)
-    {
-        const auto& descriptor = entry.second;
-        for (const auto& path: descriptor.paths)
+        if (!engineDescriptor)
+            continue;
+
+        parentItem = addItem(
+            nullptr,
+            engineDescriptor->name,
+            engineId,
+            QString());
+
+        for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
         {
-            QStandardItem* parentItem = nullptr;
-            const auto& pluginId = path.pluginId;
-            const auto& groupId = path.groupId;
-            if (usePluginName && !items.contains(pluginId))
+            const auto groupDescriptor = groupDescriptorManager.descriptor(groupId);
+            if (groupDescriptor)
             {
-                auto itr = plugins.find(pluginId);
-                if (itr == plugins.cend())
-                    continue;
-
-                const auto& pluginDescriptor = itr->second;
-                auto item = addItem(
-                    nullptr,
-                    pluginDescriptor.name,
-                    pluginDescriptor.id,
-                    QString());
-
-                item->setFlags(item->flags().setFlag(Qt::ItemIsEnabled, false));
-                items.insert(pluginId, {item, {}});
+                parentItem = addItem(
+                    parentItem,
+                    groupDescriptor->name,
+                    engineId,
+                    groupDescriptor->id);
             }
 
-            if (items.contains(pluginId))
-                parentItem = items.value(pluginId).item;
-
-            auto& pluginNode = usePluginName ? items[pluginId] : defaultPluginNode;
-            if (!groupId.isEmpty() && !pluginNode.groups.contains(groupId))
+            for (const auto& eventTypeId: eventTypeIds)
             {
-                auto itr = groups.find(groupId);
-                if (itr == groups.cend())
+                const auto eventTypeDescriptor =
+                    eventTypeDescriptorManager.descriptor(eventTypeId);
+
+                if (!eventTypeDescriptor)
                     continue;
 
-                const auto& groupDescriptor = itr->second;
-                auto item = addItem(
-                    pluginNode.item,
-                    groupDescriptor.name,
-                    pluginId,
-                    groupDescriptor.id);
-
-                item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
-                pluginNode.groups.insert(groupId, item);
-                parentItem = item;
+                addItem(
+                    parentItem,
+                    eventTypeDescriptor->name,
+                    engineId,
+                    eventTypeDescriptor->id);
             }
-
-            if (!groupId.isEmpty() && pluginNode.groups.contains(groupId))
-                parentItem = pluginNode.groups.value(groupId);
-
-            addItem(parentItem, descriptor.item.name, pluginId, descriptor.getId());
         }
     }
 

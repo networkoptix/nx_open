@@ -8,7 +8,7 @@
 #include <boost/optional/optional.hpp>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
@@ -25,9 +25,9 @@ namespace hanwha {
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::common::Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -42,7 +42,7 @@ public:
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* action,
+        nx::sdk::analytics::IAction* action,
         nx::sdk::Error* outError) override;
 
     const Hanwha::EngineManifest& engineManifest() const;
@@ -57,6 +57,8 @@ public:
     void deviceAgentIsAboutToBeDestroyed(const QString& sharedId);
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
+
+    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
 
 private:
     struct SharedResources
@@ -89,7 +91,7 @@ private:
         const nx::sdk::DeviceInfo& deviceInfo);
 
 private:
-    nx::sdk::analytics::common::Plugin* const m_plugin;
+    nx::sdk::analytics::Plugin* const m_plugin;
 
     mutable QnMutex m_mutex;
     QByteArray m_manifest;

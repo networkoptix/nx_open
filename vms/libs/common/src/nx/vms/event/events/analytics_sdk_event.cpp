@@ -3,16 +3,33 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/event_type_descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx {
 namespace vms {
 namespace event {
 
+using namespace nx::vms::api::analytics;
+
+namespace {
+
+bool belongsToGroup(const EventTypeDescriptor& descriptor, const QString& groupId)
+{
+    for (const auto& scope: descriptor.scopes)
+    {
+        if (scope.groupId == groupId)
+            return true;
+    }
+
+    return false;
+};
+
+} // namespace
+
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QnResourcePtr& resource,
-    const QString& pluginId,
+    const QnUuid& engineId,
     const QString& eventTypeId,
     EventState toggleState,
     const QString& caption,
@@ -21,7 +38,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     qint64 timeStampUsec)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
-    m_pluginId(pluginId),
+    m_engineId(engineId),
     m_eventTypeId(eventTypeId),
     m_caption(caption),
     m_description(description),
@@ -29,9 +46,9 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
 {
 }
 
-QString AnalyticsSdkEvent::pluginId() const
+QnUuid AnalyticsSdkEvent::engineId() const
 {
-    return m_pluginId;
+    return m_engineId;
 }
 
 const QString& AnalyticsSdkEvent::eventTypeId() const
@@ -42,7 +59,7 @@ const QString& AnalyticsSdkEvent::eventTypeId() const
 EventParameters AnalyticsSdkEvent::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
-    params.setAnalyticsPluginId(m_pluginId);
+    params.setAnalyticsEngineId(m_engineId);
     params.setAnalyticsEventTypeId(m_eventTypeId);
     return params;
 }
@@ -58,20 +75,18 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
-    if (!getResource() || m_pluginId != params.getAnalyticsPluginId())
+    if (!getResource() || m_engineId != params.getAnalyticsEngineId())
         return false;
 
-    const auto descriptorListManager =
-        getResource()->commonModule()->analyticsDescriptorListManager();
-
-    const auto descriptor = descriptorListManager
-        ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(m_eventTypeId);
+    nx::analytics::EventTypeDescriptorManager descriptorManager(getResource()->commonModule());
+    const auto descriptor = descriptorManager.descriptor(m_eventTypeId);
 
     if (!descriptor)
         return false;
 
-    const bool isEventTypeMatched = m_eventTypeId == params.getAnalyticsEventTypeId()
-        || descriptor->hasGroup(params.getAnalyticsEventTypeId());
+    const bool isEventTypeMatched =
+        m_eventTypeId == params.getAnalyticsEventTypeId()
+        || belongsToGroup(*descriptor, params.getAnalyticsEventTypeId());
 
     return isEventTypeMatched
         && checkForKeywords(m_caption, params.caption)

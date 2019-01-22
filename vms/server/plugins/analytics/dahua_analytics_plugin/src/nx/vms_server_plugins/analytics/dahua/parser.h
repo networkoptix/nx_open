@@ -1,10 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include <QtCore/QString>
-
-#include <nx/utils/std/optional.h>
 
 #include "common.h"
 

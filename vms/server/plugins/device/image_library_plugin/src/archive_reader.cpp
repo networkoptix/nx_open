@@ -49,13 +49,13 @@ void* ArchiveReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int ArchiveReader::addRef()
+int ArchiveReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int ArchiveReader::releaseRef()
+int ArchiveReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

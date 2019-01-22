@@ -1,13 +1,13 @@
 #pragma once
 
-#include <nx/sdk/analytics/common/engine.h>
+#include <nx/sdk/analytics/helpers/engine.h>
 
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace tegra_video {
 
-class Engine: public nx::sdk::analytics::common::Engine
+class Engine: public nx::sdk::analytics::Engine
 {
 public:
     Engine(nx::sdk::analytics::IPlugin* plugin);

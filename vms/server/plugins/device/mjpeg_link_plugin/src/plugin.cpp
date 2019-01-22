@@ -77,12 +77,12 @@ void* HttpLinkPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int HttpLinkPlugin::addRef()
+int HttpLinkPlugin::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int HttpLinkPlugin::releaseRef()
+int HttpLinkPlugin::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -109,6 +109,7 @@ nxpt::CommonRefManager* HttpLinkPlugin::refManager()
 
 HttpLinkPlugin* HttpLinkPlugin::instance()
 {
+    httpLinkPluginInstance->addRef();
     return httpLinkPluginInstance;
 }
 

@@ -6,9 +6,9 @@
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
 #include "attribute_options.h"
@@ -70,11 +70,10 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     NX_OUTPUT << __func__ << "() -> noError";
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
 std::string DeviceAgent::manifest() const
@@ -89,7 +88,7 @@ std::string DeviceAgent::manifest() const
     )manifest";
 }
 
-bool DeviceAgent::pushCompressedFrame(const CompressedVideoPacket* videoPacket)
+bool DeviceAgent::pushCompressedFrame(const ICompressedVideoPacket* videoPacket)
 {
     TegraVideo::CompressedFrame compressedFrame;
     compressedFrame.dataSize = videoPacket->dataSize();
@@ -123,7 +122,7 @@ bool DeviceAgent::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_
     return true;
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;
@@ -147,7 +146,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
         {
             const int64_t dPts = ptsUs - m_lastFramePtsUs;
             const std::string dPtsMsStr =
-                (dPts >= 0 ? "+" : "-") + nx::kit::debug::format("%lld", (500 + abs(dPts)) / 1000);
+                (dPts >= 0 ? "+" : "-") + nx::kit::utils::format("%lld", (500 + abs(dPts)) / 1000);
 
             NX_OUTPUT << "Got " << rects.size() << " rect(s) for PTS " << ptsUs
                 << " (" << dPtsMsStr << " ms):";
@@ -169,7 +168,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
 // private
 
 bool DeviceAgent::makeMetadataPacketsFromRects(
-    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
+    std::vector<IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -189,22 +188,20 @@ bool DeviceAgent::makeMetadataPacketsFromRects(
 }
 
 bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
-    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
+    std::vector<IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
     // Create metadata Objects directly from the rects; create no events.
 
-    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto objectPacket = new ObjectMetadataPacket();
     objectPacket->setTimestampUs(ptsUs);
-    objectPacket->setDurationUs(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
+    objectPacket->setDurationUs(1000000LL * 10);
 
     for (const auto& rect: rects)
     {
-        auto object = new nx::sdk::analytics::common::Object();
-        const auto objectId =
-            nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(QnUuid::createUuid());
-        object->setId(objectId);
+        auto object = new Object();
+        object->setId(UuidHelper::randomUuid());
         object->setTypeId(m_objectTypeId);
 
         object->setBoundingBox(IObject::Rect(rect.x, rect.y, rect.w, rect.h));
@@ -217,7 +214,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
 }
 
 bool DeviceAgent::makeMetadataPacketsFromRectsPostprocPed(
-    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
+    std::vector<IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -226,11 +223,11 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocPed(
 }
 
 bool DeviceAgent::makeMetadataPacketsFromRectsPostprocCar(
-    std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
+    std::vector<IMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
-    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto objectPacket = new ObjectMetadataPacket();
     objectPacket->setTimestampUs(ptsUs);
     objectPacket->setDurationUs(0);
 
@@ -247,7 +244,7 @@ int64_t DeviceAgent::usSinceEpoch() const
 }
 
 void DeviceAgent::setTrackerAttributeOptions(
-    const std::map<QString, std::vector<QString>>& options)
+    const std::map<std::string, std::vector<std::string>>& options)
 {
     for (const auto& entry : options)
     {

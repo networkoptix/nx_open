@@ -8,7 +8,6 @@
 #include <nx/vms/server/analytics/event_type_mapping.h>
 
 #include <common/common_module.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -74,7 +73,7 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
     return handleChanges();
 }
 
-RuleHolder::AffectedResources RuleHolder::addResource(const QnResourcePtr& resourcePtr)
+RuleHolder::AffectedResources RuleHolder::addResource(const QnResourcePtr& /*resourcePtr*/)
 {
     QnMutexLocker lock(&m_mutex);
     return handleChanges();

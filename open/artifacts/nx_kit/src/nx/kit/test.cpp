@@ -281,7 +281,7 @@ static void processArgs(int argc, const char* const argv[])
         return; //< Do nothing if no args were specified.
 
     const std::vector<std::string> args{argv, argv + argc};
-    const auto arg = [&args](int i) { return (args.size() <= i) ? "" : args[i]; };
+    const auto arg = [&args](int i) { return ((int) args.size() <= i) ? "" : args[i]; };
 
     if (args.size() == 2 && (arg(1) == "-h" || arg(1) == "--help"))
     {
@@ -388,10 +388,10 @@ int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
         std::string("suite ") + testSuiteName + " [" + suiteId() + "]";
 
     std::cerr << std::endl
-        << "Running " << allTests().size() << " tests from " << fullSuiteName << std::endl;
+        << "Running " << allTests().size() << " test(s) from " << fullSuiteName << std::endl;
 
     std::vector<int> failedTests;
-    for (int i = 1; i <= allTests().size(); ++i)
+    for (int i = 1; i <= (int) allTests().size(); ++i)
     {
         if (!runTest(allTests()[i - 1], i))
             failedTests.push_back(i);
@@ -399,7 +399,7 @@ int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
 
     if (failedTests.size() == allTests().size())
     {
-        printSectionHeader("All %lu tests FAILED in %s. See messages above.",
+        printSectionHeader("All %lu test(s) FAILED in %s. See messages above.",
             failedTests.size(), fullSuiteName.c_str());
         return (int) failedTests.size();
     }
@@ -415,7 +415,7 @@ int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
             failedTests.front(), fullSuiteName.c_str());
         return 1;
     }
-    printSectionHeader("SUCCESS: All %lu tests PASSED in %s.",
+    printSectionHeader("SUCCESS: All %lu test(s) PASSED in %s.",
         allTests().size(), fullSuiteName.c_str());
     return 0;
 }

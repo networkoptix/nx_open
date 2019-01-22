@@ -52,7 +52,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 using namespace nx;
@@ -238,56 +238,34 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    const auto descriptorListManager = commonModule()->analyticsDescriptorListManager();
-
-    const auto allEventTypes = m_filterCameraList.empty()
-        ? descriptorListManager->allDescriptorsInTheSystem<
-            nx::vms::api::analytics::EventTypeDescriptor>()
-        : descriptorListManager->deviceDescriptors<
-            nx::vms::api::analytics::EventTypeDescriptor>(cameras(m_filterCameraList));
-
+    const nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
+    // We don't filter by cameras since we don't know if an event was supported by some device
+    // before.
+    const auto allEventTypes = eventTypeDescriptorManager.descriptors();
     if (allEventTypes.empty())
         return;
 
-    const auto pluginIds = descriptorListManager->pluginIds(allEventTypes);
-
-    auto eventNames =
-        [hasDifferentDrivers = pluginIds.size() > 1, descriptorListManager](
-            const nx::vms::api::analytics::EventTypeDescriptor& descriptor)
+    const nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule());
+    auto buildEventTypeName =
+        [this, &engineDescriptorManager](const QnUuid& engineId, const QString& eventTypeName)
         {
-            if (!hasDifferentDrivers)
-                return QStringList(descriptor.item.name);
+            const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
+            if (!engineDescriptor)
+                return eventTypeName;
 
-            QStringList names;
-            for (const auto& path: descriptor.paths)
-            {
-                auto pluginDescriptor = descriptorListManager
-                    ->descriptor<nx::vms::api::analytics::PluginDescriptor>(path.pluginId);
-
-                if (!pluginDescriptor)
-                    continue;
-
-                names.push_back(
-                    lm("%1 - %2").args(pluginDescriptor->name, descriptor.item.name));
-            }
-
-            return names;
+            return lm("%1 - %2").args(engineDescriptor->name, eventTypeName).toQString();
         };
 
-    for (const auto& entry: allEventTypes)
+    for (const auto& [eventTypeId, eventTypeDescriptor]: allEventTypes)
     {
-        const auto& descriptor = entry.second;
-        const auto names = eventNames(descriptor);
-
-        for (const auto& name: names)
+        for (const auto& scope: eventTypeDescriptor.scopes)
         {
-            auto item = new QStandardItem(name);
+            auto item = new QStandardItem(
+                buildEventTypeName(scope.engineId, eventTypeDescriptor.name));
             item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-            // TODO: #dmishin Pass plugin id somehow.
-            item->setData(qVariantFromValue(descriptor.getId()), EventSubtypeRole);
+            item->setData(qVariantFromValue(eventTypeDescriptor.id), EventSubtypeRole);
             rootItem->appendRow(item);
         }
-
     }
 
     rootItem->sortChildren(0);

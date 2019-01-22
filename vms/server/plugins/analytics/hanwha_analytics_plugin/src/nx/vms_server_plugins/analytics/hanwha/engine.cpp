@@ -13,7 +13,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "device_agent.h"
 #include "common.h"
@@ -79,7 +79,7 @@ void Engine::SharedResources::setResourceAccess(
     monitor->setResourceAccess(url, auth);
 }
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -111,15 +111,13 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
+IDeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const QString vendor = QString(deviceInfo->vendor).toLower();
-
-    if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
+    if (!isCompatible(deviceInfo))
         return nullptr;
 
     auto sharedRes = sharedResources(*deviceInfo);
@@ -150,20 +148,20 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-void Engine::executeAction(Action* action, Error* outError)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 
@@ -207,7 +205,13 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
 
     QSet<QString> result;
 
-    const auto& supportedEvents = supportedEventsParameter->possibleValues();
+    auto supportedEvents = supportedEventsParameter->possibleValues();
+    const auto alarmInputParameter = parameters.parameter(
+        "eventstatus/eventstatus/monitor/AlarmInput");
+
+    if (alarmInputParameter)
+        supportedEvents.push_back(alarmInputParameter->name());
+
     NX_VERBOSE(this, lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEvents));
     for (const auto& eventName: supportedEvents)
     {
@@ -222,8 +226,8 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
             for (const auto& entry: responseParameters)
             {
                 const auto& fullEventName = entry.first;
-                const bool isMatched = fullEventName.startsWith(
-                    lm("Channel.%1.%2.").args(channel, altEventName));
+                const bool isMatched =
+                    fullEventName.startsWith(lm("Channel.%1.%2.").args(channel, altEventName));
 
                 if (isMatched)
                 {
@@ -298,7 +302,7 @@ void Engine::deviceAgentIsAboutToBeDestroyed(const QString& sharedId)
 }
 
 std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
-    const nx::sdk::DeviceInfo& deviceInfo)
+    const DeviceInfo& deviceInfo)
 {
     const nx::utils::Url url(deviceInfo.url);
 
@@ -326,10 +330,16 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
     return sharedResourcesItr.value();
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IEngine::IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
+}
+
+bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+{
+    const QString vendor = QString(deviceInfo->vendor).toLower();
+    return vendor.startsWith(kHanwhaTechwinVendor) || vendor.startsWith(kSamsungTechwinVendor);
 }
 
 } // namespace hanwha
@@ -354,13 +364,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::hanwha::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

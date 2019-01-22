@@ -53,7 +53,7 @@ extern "C" {
 
 #include <nx/kit/debug.h>
 
-using nx::kit::debug::format;
+using nx::kit::utils::format;
 
 /**
  * Draw a colored checkerboard in RGB.

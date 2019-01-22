@@ -5,8 +5,7 @@
  * Utilities for debugging: measuring execution time and FPS, working with strings, logging values
  * and messages.
  *
- * This unit can be compiled in the context of any C++ project. If Qt headers are included before
- * this one, some Qt support is enabled via "#if defined(QT_CORE_LIB)".
+ * This unit can be compiled in the context of any C++ project.
  */
 
 #include <iostream>
@@ -15,12 +14,7 @@
 #include <sstream>
 #include <memory>
 
-#if defined(QT_CORE_LIB)
-    // To be supported in toString() and NX_PRINT_VALUE.
-    #include <QtCore/QByteArray>
-    #include <QtCore/QString>
-    #include <QtCore/QUrl>
-#endif
+#include <nx/kit/utils.h>
 
 #if !defined(NX_KIT_API)
     #define NX_KIT_API /*empty*/
@@ -32,12 +26,6 @@ namespace debug {
 
 //-------------------------------------------------------------------------------------------------
 // Tools
-
-NX_KIT_API uint8_t* unalignedPtr(void* data);
-
-NX_KIT_API std::string format(std::string formatStr, ...);
-
-NX_KIT_API bool isAsciiPrintable(int c);
 
 /** @return Separator in __FILE__ - slash or backslash, or '\0' if unknown. Cached in static. */
 NX_KIT_API char pathSeparator();
@@ -141,23 +129,17 @@ NX_KIT_API std::ostream*& stream();
         << ", file " << nx::kit::debug::relativeSrcFilename(__FILE__);
 
 /**
- * Convert various values to their accurate text representation, e.g. quoted and escaped strings.
- */
-template<typename T>
-std::string toString(T value);
-
-/**
  * Print the expression text and its value via toString().
  */
 #define NX_PRINT_VALUE(VALUE) \
-    NX_PRINT << "####### " #VALUE ": " << nx::kit::debug::toString((VALUE))
+    NX_PRINT << "####### " #VALUE ": " << nx::kit::utils::toString((VALUE))
 
 /**
  * Hex-dump binary data using NX_PRINT.
  */
-#define NX_PRINT_HEX_DUMP(TAG, BYTES, SIZE) \
+#define NX_PRINT_HEX_DUMP(CAPTION, BYTES, SIZE) \
     nx::kit::debug::detail::printHexDump( \
-        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (TAG), (const char*) (BYTES), (int) (SIZE))
+        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (CAPTION), (const char*) (BYTES), (int) (SIZE))
 
 //-------------------------------------------------------------------------------------------------
 // Time
@@ -245,46 +227,6 @@ std::string toString(T value);
 #define NX_KIT_DEBUG_DETAIL_CONCAT(X, Y) NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y)
 #define NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y) X##Y
 
-template<typename T>
-std::string toString(T value)
-{
-    std::ostringstream outputString;
-    outputString << value;
-    return outputString.str();
-}
-
-NX_KIT_API std::string toString(std::string s);
-NX_KIT_API std::string toString(char c);
-NX_KIT_API std::string toString(const char* s);
-NX_KIT_API std::string toString(char* s);
-NX_KIT_API std::string toString(const void* ptr);
-NX_KIT_API std::string toString(bool b);
-
-#if defined(QT_CORE_LIB)
-
-static inline std::string toString(const QByteArray& b)
-{
-    return toString(b.toStdString());
-}
-
-static inline std::string toString(const QString& s)
-{
-    return toString(s.toUtf8().constData());
-}
-
-static inline std::string toString(const QUrl& u)
-{
-    return toString(u.toEncoded().toStdString());
-}
-
-#endif // defined(QT_CORE_LIB)
-
-template<typename P>
-std::string toString(P* ptr)
-{
-    return toString((const void*) ptr);
-}
-
 namespace detail {
 
 typedef std::function<void(const char*)> PrintFunc;
@@ -335,11 +277,11 @@ NX_KIT_API void printHexDump(
 #if defined(__linux__)
     #include <pthread.h>
     #define NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        nx::kit::debug::format(", thread %llx", (long long) pthread_self())
+        nx::kit::utils::format(", thread %llx", (long long) pthread_self())
 #elif defined(QT_CORE_LIB)
     #include <QtCore/QThread>
     #define NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        nx::kit::debug::format(", thread %llx", (long long) QThread::currentThreadId())
+        nx::kit::utils::format(", thread %llx", (long long) QThread::currentThreadId())
 #else
     // No threading libs available - do not print thread id.
     #define NX_KIT_DEBUG_DETAIL_THREAD_ID() ""

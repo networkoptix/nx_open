@@ -9,13 +9,11 @@
 
 #include <nx/fusion/serialization/json.h>
 
-#include <nx/sdk/common/string.h>
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
+#include <nx/sdk/helpers/string.h>
+#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
-
-#include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/utils/std/cppnx.h>
 
@@ -27,6 +25,9 @@ namespace analytics {
 namespace vca {
 
 namespace {
+
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 static const std::chrono::seconds kReconnectTimeout(30);
 static const std::chrono::seconds kSendTimeout(15);
@@ -42,10 +43,9 @@ struct EventMessage
     std::map<QByteArray, QByteArray> parameters;
 };
 
-nx::sdk::analytics::common::Event* createCommonEvent(
-    const EventType& eventType, bool active)
+Event* createCommonEvent(const EventType& eventType, bool active)
 {
-    auto commonEvent = new nx::sdk::analytics::common::Event();
+    auto commonEvent = new Event();
     commonEvent->setTypeId(eventType.id.toStdString());
     commonEvent->setDescription(eventType.name.toStdString());
     commonEvent->setIsActive(active);
@@ -54,12 +54,12 @@ nx::sdk::analytics::common::Event* createCommonEvent(
     return commonEvent;
 }
 
-nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket(
+EventMetadataPacket* createCommonEventMetadataPacket(
     const EventType& event, bool active = true)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+    auto packet = new EventMetadataPacket();
     const auto commonEvent = createCommonEvent(event, active);
     packet->addItem(commonEvent);
     packet->setTimestampUs(
@@ -105,7 +105,7 @@ EventMessage parseMessage(const char* message, int messageLength)
     const char* const end = message + messageLength;
     EventMessage eventMessage;
 
-    for (int i = 0; i < kEventMessageSearchKeys.size(); ++i)
+    for (int i = 0; i < (int) kEventMessageSearchKeys.size(); ++i)
     {
         const auto view = findString(current, end, kEventMessageSearchKeys[i]);
         const QByteArray value = QByteArray(view.first, view.second - view.first);
@@ -142,12 +142,12 @@ bool switchOnEnabledRulesNotification(nx::vca::CameraController& vcaCameraConrto
     return noErrorsOccurred;
 }
 
-nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
+Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 {
     if (!vcaCameraConrtoller.readSupportedRules2())
     {
         NX_PRINT << "Failed to get VCA-camera analytic rules.";
-        return nx::sdk::Error::networkError;
+        return Error::networkError;
     }
 
     switchOnEnabledRulesNotification(vcaCameraConrtoller);
@@ -158,7 +158,7 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
         [](const std::pair<int, nx::vca::SupportedRule>& rule) { return rule.second.isActive(); }))
     {
         NX_PRINT << "No enabled rules.";
-        return nx::sdk::Error::networkError;
+        return Error::networkError;
     }
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
@@ -166,17 +166,17 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
         nx::vca::Heartbeat{ kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true }))
     {
         NX_PRINT << "Failed to set VCA-camera heartbeat.";
-        return nx::sdk::Error::networkError;
+        return Error::networkError;
     }
 
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
 } // namespace
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const nx::sdk::DeviceInfo& deviceInfo,
+    const DeviceInfo& deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(engine)
@@ -205,7 +205,7 @@ DeviceAgent::~DeviceAgent()
 
 void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
+    if (interfaceId == IID_DeviceAgent)
     {
         addRef();
         return static_cast<DeviceAgent*>(this);
@@ -437,34 +437,31 @@ void DeviceAgent::reconnectSocket()
     });
 }
 
-nx::sdk::Error DeviceAgent::setHandler(
-    nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
-        return nx::sdk::Error::noError;
+        return Error::noError;
     }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
 
     const auto error = prepare(vcaCameraConrtoller);
-    if (error != nx::sdk::Error::noError)
+    if (error != Error::noError)
         return error;
 
     const auto eventTypeIds = metadataTypes->eventTypeIds();
@@ -488,7 +485,7 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
     if (!vcaCameraConrtoller.readTcpServerPort())
     {
         NX_PRINT << "Failed to get VCA-camera tcp notification server port.";
-        return nx::sdk::Error::networkError;
+        return Error::networkError;
     }
 
     static const QString kAddressPattern("%1:%2");
@@ -499,10 +496,10 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
 
     reconnectSocket();
 
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::stopFetchingMetadata()
+Error DeviceAgent::stopFetchingMetadata()
 {
     if (m_tcpSocket)
     {
@@ -517,10 +514,10 @@ nx::sdk::Error DeviceAgent::stopFetchingMetadata()
             });
         promise.get_future().wait();
     }
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
+const IString* DeviceAgent::manifest(Error* /*error*/) const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();
@@ -532,17 +529,17 @@ const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
     for (const auto& rule: vcaCameraConrtoller.suppotedRules())
     {
         if (rule.second.ruleEnabled) //< At least one enabled rule.
-            return new nx::sdk::common::String(m_cameraManifest);
+            return new nx::sdk::String(m_cameraManifest);
     }
-    return new nx::sdk::common::String();
+    return new nx::sdk::String();
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
