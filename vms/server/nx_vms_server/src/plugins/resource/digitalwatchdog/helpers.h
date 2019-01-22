@@ -1,4 +1,5 @@
 #pragma once
+#if defined(ENABLE_ONNVIF)
 
 #include <nx/vms/server/resource/camera.h>
 #include <common/common_globals.h>
@@ -53,3 +54,5 @@ private:
     nx::network::SocketAddress m_address;
     QAuthenticator m_auth;
 };
+
+#endif // defined(ENABLE_ONNVIF)

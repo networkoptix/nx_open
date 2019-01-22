@@ -607,12 +607,18 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
         case Qn::CR_Default:
         case Qn::CR_LiveVideo:
         {
-            auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
-                ResourceDataKey::kShouldAppearAsSingleChannel);
+            QnAbstractStreamDataProvider* result = nullptr;
 
-            QnAbstractStreamDataProvider* result = shouldAppearAsSingleChannel
-                ? new nx::plugins::utils::MultisensorDataProvider(camera)
-                : camera->createLiveDataProvider();
+            #if defined(ENABLE_ONVIF)
+                auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
+                    ResourceDataKey::kShouldAppearAsSingleChannel);
+
+                result = shouldAppearAsSingleChannel
+                    ? new nx::plugins::utils::MultisensorDataProvider(camera)
+                    : camera->createLiveDataProvider();
+            #else
+                result = camera->createLiveDataProvider();
+            #endif
             if (result)
                 result->setRole(role);
             return result;

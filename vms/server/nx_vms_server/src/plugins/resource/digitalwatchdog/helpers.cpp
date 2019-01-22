@@ -1,4 +1,5 @@
 #include "helpers.h"
+#if defined(ENABLE_ONNVIF)
 
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_client.h>
@@ -298,3 +299,5 @@ std::optional<QJsonObject> JsonApiClient::doRequest(const nx::utils::Url& url, Q
     }
     return jsonDoc.object();
 }
+
+#endif // defined(ENABLE_ONNVIF)
