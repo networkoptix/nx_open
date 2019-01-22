@@ -66,7 +66,7 @@ void HanwhaArchiveDelegate::close()
 qint64 HanwhaArchiveDelegate::startTime() const
 {
     if (m_playbackMode == PlaybackMode::Edge)
-        return m_startTimeUsec;
+        return m_startTimeUsec + timeShiftUsec();
 
     // TODO: This copy-paste should probably be moved into helper function, but it is not easy
     // because with current interface we need to get both channel number and shared context.
@@ -85,7 +85,7 @@ qint64 HanwhaArchiveDelegate::startTime() const
 qint64 HanwhaArchiveDelegate::endTime() const
 {
     if (m_playbackMode == PlaybackMode::Edge)
-        return m_endTimeUsec;
+        return m_endTimeUsec + timeShiftUsec();
 
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
