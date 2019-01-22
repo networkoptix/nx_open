@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <vector>
 
 #include <nx/sdk/helpers/uuid_helper.h>
 
