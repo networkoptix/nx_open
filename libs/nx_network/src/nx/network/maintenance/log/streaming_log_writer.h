@@ -11,11 +11,8 @@ class NX_NETWORK_API StreamingLogWriter:
 {
 public:
     StreamingLogWriter(StreamingMessageBody* mediator);
-    ~StreamingLogWriter() = default;
 
     virtual void write(nx::utils::log::Level level, const QString& message) override;
-
-    void setMessageBody(StreamingMessageBody* messageBody);
 
 private:
     QnMutex m_mutex;

@@ -160,7 +160,6 @@ void Server::serveGetStreamingLogger(
 
     auto messageBody = std::make_unique<StreamingMessageBody>(m_loggerCollection);
     auto logWriter = std::make_unique<StreamingLogWriter>(messageBody.get());
-    messageBody->setLogWriter(logWriter.get());
     
     Settings logSettings;
     logSettings.loggers.push_back(loggerSettings);

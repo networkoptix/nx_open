@@ -17,12 +17,9 @@ public:
 
     void setLoggerId(int loggerId);
 
-    void setLogWriter(StreamingLogWriter* logWriter);
-
 private:
     int m_loggerId = nx::utils::log::LoggerCollection::kInvalidId;
     nx::utils::log::LoggerCollection* m_loggerCollection = nullptr;
-    StreamingLogWriter* m_logWriter = nullptr;
 };
 
 } // namespace nx::network::maintenance::log
