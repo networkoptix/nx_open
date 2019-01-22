@@ -222,7 +222,7 @@ protected:
      * For each key optional CameraStreamCapability could be provided.
      * CameraStreamCapability could be null. That case it is auto-filled with default values.
      */
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex) = 0;
 
     /**
      * @return stream capability traits

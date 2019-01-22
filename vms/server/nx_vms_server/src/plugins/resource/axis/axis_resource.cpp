@@ -425,7 +425,7 @@ bool resolutionGreaterThan(
     return square1 > square2;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
     using namespace nx::vms::server::resource;

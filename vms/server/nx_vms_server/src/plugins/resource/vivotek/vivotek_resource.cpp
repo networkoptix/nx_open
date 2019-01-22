@@ -271,13 +271,13 @@ bool VivotekResource::setVivotekParameter(
     return true;
 }
 
-nx::vms::server::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
     using namespace nx::vms::server::resource;
 
-    auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    auto onvifResult = base_type::getStreamCapabilityMapFromDriver(streamIndex);
     QSet<QPair<int,int>> resolutions;
     for (const auto key: onvifResult.keys())
         resolutions.insert(QPair<int, int>(key.resolution.width(), key.resolution.height()));
