@@ -84,7 +84,7 @@ const std::string kLoiteringEventType = "nx.stub.loitering";
 const std::string kIntrusionEventType = "nx.stub.intrusion";
 const std::string kGunshotEventType = "nx.stub.gunshot";
 const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
-const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEventGroup";
+const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
 const std::string kCarObjectType = "nx.stub.car";
 const std::string kHumanFaceObjectType = "nx.stub.humanFace";
 

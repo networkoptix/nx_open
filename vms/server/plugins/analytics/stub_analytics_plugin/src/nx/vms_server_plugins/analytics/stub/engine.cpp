@@ -281,20 +281,24 @@ void Engine::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
-        // TODO: #mshevchenko: Check proper action parameters.
-        std::string valueA;
-        auto paramAIt = params.find("paramA");
-        if (paramAIt != params.cend())
-            valueA = paramAIt->second;
+        if (!params.empty())
+        {
+            *outMessageToUser = std::string("Your param values are:\n");
+            for (const auto& entry : params)
+            {
+                const auto& parameterName = entry.first;
+                const auto& parameterValue = entry.second;
 
-        std::string valueB;
-        auto paramBIt = params.find("paramB");
-        if (paramBIt != params.cend())
-            valueB = paramBIt->second;
+                *outMessageToUser += parameterName + ": [" + parameterValue + "],\n";
+            }
 
-        *outMessageToUser = std::string("Your param values are: ")
-            + "paramA: [" + valueA + "], "
-            + "paramB: [" + valueB + "]";
+            // Remove a trailing comma and a newline character.
+            *outMessageToUser = outMessageToUser->substr(0, outMessageToUser->size() - 2);
+        }
+        else
+        {
+            *outMessageToUser = "No action parameters have been provided";
+        }
 
         NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
     }
