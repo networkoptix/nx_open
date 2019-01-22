@@ -25,8 +25,9 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
 
-    for (auto item: m_items)
-        emit itemRemoved(item);
+    /// Reversing item list just to make sure we remove rows from the table from last to first.
+    for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
+        emit itemRemoved(*it);
     m_items.clear();
     m_activeServers.clear();
 
@@ -37,6 +38,12 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     }
 
     auto systemId = helpers::currentSystemLocalId(commonModule());
+    if (systemId.isNull())
+    {
+        NX_DEBUG(this, "setResourceFeed() got null system id");
+        return;
+    }
+
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
 
     addItemForClient();
@@ -505,7 +512,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
-    emit itemChanged(m_clientItem);
+    emit itemAdded(m_clientItem);
     return m_clientItem;
 }
 
