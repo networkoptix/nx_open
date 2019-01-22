@@ -7,7 +7,7 @@
     "okButton": "Ok",
     "cancelButton": "Cancelar",
     "loginTitle": "Logar em %PRODUCT_NAME%",
-    "loginButton": "Log in",
+    "loginButton": "Entrar",
     "logoutAuthorisedTitle": "Já tem sessão iniciada",
     "logoutAuthorisedContinueButton": "Continuar",
     "logoutAuthorisedLogoutButton": "Terminar sessão"
@@ -31,7 +31,7 @@
     "restorePasswordCode": "Reset de Senha -",
     "view": "Visualizar câmaras - ",
     "debug": "Depurar",
-    "login": "Log in -",
+    "login": "Entrar -",
     "download": "Baixar %VMS_NAME%",
     "downloadPlatform": "Baixar %VMS_NAME% para ",
     "pageNotFound": "Página não encontrada"

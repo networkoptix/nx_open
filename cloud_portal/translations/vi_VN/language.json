@@ -180,7 +180,7 @@
     "confirmUnshareFromMeAction": "Ngắt kết nối",
     "confirmUnshare": "Người dùng này sẽ không thể truy cập vào Hệ thống. Bạn có chắc không?",
     "confirmUnshareTitle": "Xóa người dùng?",
-    "confirmUnshareAction": "Xóa bỏ",
+    "confirmUnshareAction": "Xoá",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
     "successMerge": "Hệ thống {{systemName}} đã được hợp nhất với {{systemName}}",
