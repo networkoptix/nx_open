@@ -153,6 +153,7 @@ QnSecurityCamResourcePtr MultisensorDataProvider::initSubChannelResource(quint32
     for (const auto& p: m_cameraResource->getRuntimeProperties())
         resource->setProperty(p.name, p.value);
 
+    NX_VERBOSE(this, "Created subchannel resource with id [%1]", resource->getId());
     return resource;
 }
 

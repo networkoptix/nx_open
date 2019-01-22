@@ -41,8 +41,10 @@ class JsonApiClient
 public:
     JsonApiClient(nx::network::SocketAddress address, QAuthenticator auth);
 
-    nx::vms::server::resource::StreamCapabilityMap getSupportedVideoCodecs(Qn::StreamIndex streamIndex);
-    bool sendStreamParams(Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams);
+    nx::vms::server::resource::StreamCapabilityMap getSupportedVideoCodecs(
+        int channelNumber, Qn::StreamIndex streamIndex);
+    bool sendStreamParams(
+        int channelNumber, Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams);
 
 private:
     QJsonObject getParams(QString paramName);
