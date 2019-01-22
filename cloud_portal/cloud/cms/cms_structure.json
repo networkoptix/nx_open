@@ -118,7 +118,6 @@
           {
             "label": "Copyright Year",
             "name": "%COPYRIGHT_YEAR%",
-            "old_name": "",
             "value": "2019",
             "description": "Copyright information"
           },
