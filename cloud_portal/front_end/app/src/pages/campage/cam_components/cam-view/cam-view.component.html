@@ -2,8 +2,10 @@
     <nx-block type='gray'>
 
         <header>
-            <span>{{ activeCamera.vendor }}</span>
-            <span> {{ activeCamera.model }}</span>
+            <div class="camera-vendor-model">
+                <span>{{ activeCamera.vendor }}</span>
+                <span class="ml-1">{{ activeCamera.model }}</span>
+            </div>
             <span class="glyphicon close-icon detailsClose"
                   (click)="activeCamera = undefined; onCloseView.emit(activeCamera)">
             </span>
@@ -21,88 +23,88 @@
 
             <div class="active-camera-info">
                 <div class="row">
-                    <div class="col-6" translate>Max Resolution</div>
-                    <div class="col-6">{{ activeCamera.maxResolution }}</div>
+                    <div class="col-7" translate>Max Resolution</div>
+                    <div class="col-5">{{ activeCamera.maxResolution }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Max FPS</div>
-                    <div class="col-6">{{ activeCamera.maxFps }}</div>
+                    <div class="col-7" translate>Max FPS</div>
+                    <div class="col-5">{{ activeCamera.maxFps }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Codec</div>
-                    <div class="col-6">{{ activeCamera.primaryCodec }}</div>
+                    <div class="col-7" translate>Codec</div>
+                    <div class="col-5">{{ activeCamera.primaryCodec }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Audio</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>Audio</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isAudioSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>2-Way Audio</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>2-Way Audio</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isTwAudioSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>PTZ</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>PTZ</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isPtzSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Advanced PTZ</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>Advanced PTZ</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isAptzSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Motion Detection</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>Motion Detection</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isMdSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Fisheye</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>Fisheye</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isFisheye">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>I/O</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>I/O</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isIoSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Dual Streaming</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>Dual Streaming</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isDualStreamingSupported">
                         </nx-bool-icon>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Secondary Stream</div>
-                    <div class="col-6">{{ activeCamera.sndResolution }}</div>
+                    <div class="col-7" translate>Secondary Stream</div>
+                    <div class="col-5">{{ activeCamera.sndResolution }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-6" translate>Multi Sensor</div>
-                    <div class="col-6">
+                    <div class="col-7" translate>Multi Sensor</div>
+                    <div class="col-5">
                         <nx-bool-icon
                                 [value]="activeCamera.isMultiSensor">
                         </nx-bool-icon>
@@ -114,14 +116,14 @@
         <nx-section>
             <div class="firmware-info">
                 <div class="row">
-                    <div class="col-6"><h4 class="m-0" translate>Firmware version</h4></div>
-                    <div class="col-6"><h4 class="m-0" translate>Popularity</h4></div>
+                    <div class="col-7"><h4 class="m-0" translate>Firmware version</h4></div>
+                    <div class="col-5"><h4 class="m-0" translate>Popularity</h4></div>
                 </div>
 
                 <ng-container *ngFor="let firmware of activeCamera.firmwares | slice:0:5">
                     <div class="row" *ngIf="firmware.name">
-                        <div class="col-6 no-linewrap" title="{{ firmware.name }}">{{ firmware.name }}</div>
-                        <div class="col-6" title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
+                        <div class="col-7 no-linewrap" title="{{ firmware.name }}">{{ firmware.name }}</div>
+                        <div class="col-5" title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
                             <div class="icon w-100" role="img" >
                                 <canvas class="icon-canvas" height="4"></canvas>
                                 <svg class="img-responsive icon-svg" height="4">
@@ -143,8 +145,8 @@
 
                 <ng-container *ngFor="let firmware of activeCamera.firmwares | slice:5:100">
                     <div class="row" *ngIf="firmware.name && showAll">
-                        <div class="col-6">{{ firmware.name }}</div>
-                        <div class="col-6" title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
+                        <div class="col-7">{{ firmware.name }}</div>
+                        <div class="col-5" title="{{ firmwarePercentage(firmware.count, activeCamera.totalCameraCount) }}">
                             <div class="icon blue" role="img" style="width: 100%">
                                 <canvas class="icon-canvas" height="4"></canvas>
                                 <svg class="img-responsive icon-svg" height="4">

@@ -25,3 +25,11 @@
         font-family: $font-family-regular;
     }
 }
+
+@mixin ellipsis {
+    overflow      : hidden;
+    text-overflow : ellipsis;
+    white-space   : nowrap;
+    max-width     : 100%;
+    line-height   : initial;
+}

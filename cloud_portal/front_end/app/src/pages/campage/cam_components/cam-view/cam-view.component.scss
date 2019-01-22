@@ -1,5 +1,6 @@
 @import '../../../../../styles/theme_palette';
 @import '../../../../../styles/theme_variables';
+@import '../../../../styles/mixins';
 
 .camview {
   padding          : 0;
@@ -38,10 +39,21 @@
     }
   }
   
-  .detailsClose {
-    position: absolute;
-    right: 1rem;
-    cursor: pointer;
+  header {
+    position : relative;
+    
+    .camera-vendor-model {
+      @include ellipsis;
+      width : 90%;
+    }
+    
+    .detailsClose {
+      position     : absolute;
+      top          : 4px;
+      right        : 0;
+      cursor       : pointer;
+      margin-right : 0;
+    }
   }
   
   .blue {
