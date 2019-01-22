@@ -68,7 +68,7 @@ void QnDownloadUpdatesPeerTask::doCancel()
 }
 
 void QnDownloadUpdatesPeerTask::doStart() {
-    NX_DEBUG(this, lit("Update: Starting download %1 file(s).").arg(m_targets.size()));
+    NX_DEBUG(this, lit("Update: Starting download %1 files.").arg(m_targets.size()));
 
     m_resultingFiles.clear();
     m_pendingDownloads = m_targets.keys();

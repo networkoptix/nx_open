@@ -547,14 +547,15 @@ void QnEventLogDialog::requestFinished()
     if (start != end)
     {
         ui->statusLabel->setText(
-            tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
+            tr("Event log for period from %1 to %2 - %n events found",
+                "Dates are substituted", m_model->rowCount())
             .arg(start.toString(Qt::DefaultLocaleLongDate))
             .arg(end.toString(Qt::DefaultLocaleLongDate)));
     }
     else
     {
         ui->statusLabel->setText(
-            tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
+            tr("Event log for %1 - %n events found", "Date is substituted", m_model->rowCount())
             .arg(start.toString(Qt::DefaultLocaleLongDate)));
     }
 

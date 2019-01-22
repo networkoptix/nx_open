@@ -36,11 +36,7 @@ public:
     using ConfirmExpandDelegate = std::function<bool(const QModelIndex& index)>;
     void setConfirmExpandDelegate(ConfirmExpandDelegate value);
 
-    bool verticalScrollBarIsVisible() const;
-
 signals:
-    void verticalScrollbarVisibilityChanged();
-
     /**
      * This signal is emitted whenever the user presses enter on one of the
      * tree's items.
@@ -64,8 +60,6 @@ signals:
         const QModelIndex& index, const QEvent* event) const;
 
 protected:
-    virtual bool eventFilter(QObject* object, QEvent* event) override;
-
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void dragMoveEvent(QDragMoveEvent* event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent* event) override;
@@ -78,15 +72,11 @@ protected:
         const QModelIndex& index, const QEvent* event = nullptr) const override;
 
 private:
-    void handleVerticalScrollbarVisibilityChanged();
-
-private:
     QBasicTimer m_openTimer;
     QPoint m_dragMovePos;
     bool m_ignoreDefaultSpace = false;
     bool m_dropOnBranchesAllowed = true;
     bool m_inDragDropEvent = false;
-    bool m_verticalScrollBarVisible = false;
     ConfirmExpandDelegate m_confirmExpand;
 };
 
