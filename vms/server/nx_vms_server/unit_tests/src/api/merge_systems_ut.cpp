@@ -11,8 +11,10 @@
 
 #include "test_api_requests.h"
 #include <utils/merge_systems_common.h>
+#include <core/resource_management/resource_pool.h>
 
 using MergeStatus = utils::MergeSystemsStatus::Value;
+using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
 
 namespace nx {
 namespace test {
@@ -25,8 +27,6 @@ protected:
         on,
         off
     };
-
-    using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
 
     void assertMergeRequestReturn(
         const LauncherPtr& requestTarget,
@@ -139,6 +139,52 @@ TEST_F(MergeSystems, SafeMode_To)
         /* requestTarget */ server1,
         /* serverToMerge */ server2,
         /* expectedCode */ MergeStatus::safeMode);
+}
+
+void waitForMergeFinished(const std::vector<LauncherPtr>& servers, int size, int mergeNumber)
+{
+    int success = 0;
+    do
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        success = 0;
+        for (int i = 0; i < size; ++i)
+        {
+            auto connection = servers[i]->serverModule()->ec2Connection();
+            nx::vms::api::SystemMergeHistoryRecordList mergeData;
+            connection->getMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
+            if (mergeData.size() == mergeNumber)
+                ++success;
+
+        }
+    } while (success != size);
+}
+
+TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
+{
+    std::vector<LauncherPtr> servers;
+    for (int i = 0; i < 3; ++i)
+    {
+        auto server = givenServer();
+        whenServerLaunched(server, SafeMode::off);
+        whenServerIsConfigured(server);
+        servers.push_back(std::move(server));
+    }
+
+    assertMergeRequestReturn(
+        /* requestTarget */ servers[0],
+        /* serverToMerge */ servers[1],
+        /* expectedCode */ MergeStatus::ok);
+
+    waitForMergeFinished(servers, 2, 1);
+
+    assertMergeRequestReturn(
+        /* requestTarget */ servers[2],
+        /* serverToMerge */ servers[1],
+        /* expectedCode */ MergeStatus::ok);
+
+    waitForMergeFinished(servers, 3, 2);
+
 }
 
 } // namespace test

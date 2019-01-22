@@ -257,7 +257,8 @@ namespace detail
         }
 
         ErrorCode doQueryNoLock(const QByteArray &paramName, nx::vms::api::MiscData& miscData);
-        ErrorCode doQueryNoLock(const QByteArray& /*dummy*/,
+        ErrorCode doQueryNoLock(
+            const std::nullptr_t& /*dummy*/,
             nx::vms::api::SystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
         ErrorCode doQueryNoLock(

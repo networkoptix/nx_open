@@ -199,6 +199,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
+    /**%apidoc[proprietary] GET /ec2/getSystemMergeHistory
+     * Return information about previous system merges.
+     */
+    regGet<std::nullptr_t, SystemMergeHistoryRecordList>(p, ApiCommand::getSystemMergeHistory);
+
     /**%apidoc[proprietary] POST /ec2/setResourceStatus
      * Change a resource status.
      * <p>
