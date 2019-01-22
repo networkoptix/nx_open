@@ -145,6 +145,9 @@ ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* paren
     // If exporting layout, create new guid. If layout just renamed, keep guid
     if (d->settings.mode != ExportLayoutSettings::Mode::LocalSave)
         m_layout->setId(QnUuid::createUuid());
+
+    m_isExportToExe = nx::utils::AppInfo::isWindows()
+        && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
 }
 
 ExportLayoutTool::~ExportLayoutTool()
@@ -153,14 +156,11 @@ ExportLayoutTool::~ExportLayoutTool()
 
 bool ExportLayoutTool::prepareStorage()
 {
-    const auto isExeFile = nx::utils::AppInfo::isWindows()
-        && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
-
     // Save to tmp file, then rename.
     d->actualFilename += lit(".tmp");
 
 #ifdef Q_OS_WIN
-    if (isExeFile)
+    if (m_isExportToExe)
     {
         // TODO: #GDM handle other errors
         if (QnNovLauncher::createLaunchingFile(d->actualFilename) != QnNovLauncher::ErrorCode::Ok)
