@@ -222,7 +222,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         alreadyInstalled = false;
 
     auto systemInfo = QnAppInfo::currentSystemInformation();
-    if (nx::update::findPackage(QnUuid(),
+    if (nx::update::findPackage(
             commonModule->moduleGUID(),
             commonModule->engineVersion(),
             systemInfo,

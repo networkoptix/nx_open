@@ -402,7 +402,7 @@ void QnClientModule::initSingletons()
     commonModule->store(clientSettings.release());
     commonModule->store(clientInstanceManager.release());
 
-    initRuntimeParams(commonModule, startupParams);
+    initRuntimeParams(commonModule, m_startupParameters);
 
     // Shortened initialization if run in self-update mode.
     if (m_startupParameters.selfUpdateMode)
