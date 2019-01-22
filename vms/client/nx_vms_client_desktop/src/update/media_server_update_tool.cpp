@@ -30,9 +30,11 @@ namespace {
 
     const bool defaultEnableClientUpdates = true;
 
-    nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+    nx::utils::SoftwareVersion getCurrentVersion(
+        QnResourcePool* resourcePool,
+        const nx::vms::api::SoftwareVersion& engineVersion)
     {
-        nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+        nx::utils::SoftwareVersion minimalVersion = engineVersion;
         const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
         for(const auto& server: allServers)
         {
@@ -183,7 +185,9 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(
     if (targetVersion.isNull())
     {
         query.addQueryItem(lit("version"), lit("latest"));
-        query.addQueryItem(lit("current"), getCurrentVersion(resourcePool()).toString());
+        query.addQueryItem(lit("current"), getCurrentVersion(
+            resourcePool(),
+            commonModule()->engineVersion()).toString());
     }
     else
     {

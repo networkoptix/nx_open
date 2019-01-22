@@ -311,6 +311,7 @@ private:
  * to a single zip archive.
  */
 QUrl generateUpdatePackageUrl(
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const nx::update::UpdateContents& contents,
     const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 

@@ -14,12 +14,14 @@
 
 namespace nx::vms::client::desktop {
 
-bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
+bool requestInstalledVersions(
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    QList<nx::utils::SoftwareVersion>* versions)
 {
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline())
+    if (!checkOnline(engineVersion))
         return false;
 
     const auto result = applauncher::api::getInstalledVersions(versions);
@@ -66,11 +68,11 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     m_downloader->startDownloads();
 
     m_installedVersionsFuture = std::async(std::launch::async,
-        []()
+        [this]()
         {
             std::set<nx::utils::SoftwareVersion> output;
             QList<nx::utils::SoftwareVersion> versions;
-            if (requestInstalledVersions(&versions))
+            if (requestInstalledVersions(commonModule()->engineVersion(), &versions))
             {
                 for (const auto& version: versions)
                     output.insert(version);
@@ -157,7 +159,8 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 
     nx::update::Package clientPackage;
     nx::update::findPackage(
-        QnUuid(),
+        commonModule()->moduleGUID(),
+        commonModule()->engineVersion(),
         systemInfo,
         updateInformation,
         /*isClient=*/true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
@@ -412,7 +415,7 @@ bool ClientUpdateTool::isDownloadComplete() const
 bool ClientUpdateTool::installUpdate()
 {
     // Try to run applauncher if it is not running.
-    if (!applauncher::api::checkOnline())
+    if (!applauncher::api::checkOnline(commonModule()->engineVersion()))
     {
         NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
         setApplauncherError("applauncher is offline");
@@ -490,7 +493,10 @@ bool ClientUpdateTool::isInstallComplete() const
 
     bool installed = false;
     using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::isVersionInstalled(m_updateVersion, &installed);
+    Result result = applauncher::api::isVersionInstalled(
+        m_updateVersion,
+        commonModule()->engineVersion(),
+        &installed);
 
     switch (result)
     {
@@ -525,7 +531,7 @@ bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version
 bool ClientUpdateTool::restartClient()
 {
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::api::checkOnline())
+    if (!applauncher::api::checkOnline(commonModule()->engineVersion()))
         return false;
 
     using Result = applauncher::api::ResultType::Value;

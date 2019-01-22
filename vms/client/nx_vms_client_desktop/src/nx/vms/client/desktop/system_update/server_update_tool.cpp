@@ -669,7 +669,8 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::findPackage(
-        QnUuid(),
+        commonModule()->moduleGUID(),
+        commonModule()->engineVersion(),
         systemInfo,
         m_updateManifest,
         /*isClient=*/true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
@@ -1000,9 +1001,11 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
     return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
 }
 
-nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+nx::utils::SoftwareVersion getCurrentVersion(
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    QnResourcePool* resourcePool)
 {
-    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+    nx::utils::SoftwareVersion minimalVersion = engineVersion;
     const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
     {
@@ -1012,7 +1015,11 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     return minimalVersion;
 }
 
-QUrl generateUpdatePackageUrl(const nx::update::UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
+QUrl generateUpdatePackageUrl(
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::update::UpdateContents& contents,
+    const QSet<QnUuid>& targets,
+    QnResourcePool* resourcePool)
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
     auto changeset = contents.info.version;
@@ -1023,7 +1030,7 @@ QUrl generateUpdatePackageUrl(const nx::update::UpdateContents& contents, const 
     if (targetVersion.isNull())
     {
         query.addQueryItem("version", "latest");
-        query.addQueryItem("current", getCurrentVersion(resourcePool).toString());
+        query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());
     }
     else
     {

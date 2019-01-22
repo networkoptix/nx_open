@@ -396,7 +396,10 @@ void MultiServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QSet<QnUuid> targets = m_stateTracker->getAllPeers();
-            auto url = generateUpdatePackageUrl(m_updateInfo, targets, resourcePool()).toString();
+            auto url = generateUpdatePackageUrl(
+                commonModule()->engineVersion(),
+                m_updateInfo, targets,
+                resourcePool()).toString();
 
             QDesktopServices::openUrl(url);
         });
@@ -405,7 +408,11 @@ void MultiServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QSet<QnUuid> targets = m_stateTracker->getAllPeers();
-            auto url = generateUpdatePackageUrl(m_updateInfo, targets, resourcePool()).toString();
+            auto url = generateUpdatePackageUrl(
+                commonModule()->engineVersion(),
+                m_updateInfo,
+                targets,
+                resourcePool()).toString();
             qApp->clipboard()->setText(url);
 
             ui->linkCopiedWidget->show();
@@ -666,13 +673,16 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     m_updateLocalStateChanged = true;
 
     clearUpdateInfo();
-    nx::utils::SoftwareVersion version = qnStaticCommon->engineVersion();
+    nx::utils::SoftwareVersion version = commonModule()->engineVersion();
     auto buildNumber = dialog.buildNumber();
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
     QString updateUrl = qnSettings->updateFeedUrl();
-    m_updateCheck = nx::update::checkSpecificChangeset(updateUrl, dialog.changeset());
+    m_updateCheck = nx::update::checkSpecificChangeset(
+        updateUrl,
+        commonModule()->engineVersion(),
+        dialog.changeset());
     loadDataToUi();
 }
 
@@ -691,7 +701,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
+        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
         // Maybe we should call loadDataToUi instead.
         syncUpdateCheckToUi();
     }
@@ -1014,7 +1024,7 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
+        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
     }
 
     if (!m_serverUpdateCheck.valid())

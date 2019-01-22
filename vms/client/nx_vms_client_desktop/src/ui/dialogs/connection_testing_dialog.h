@@ -22,7 +22,8 @@ class QnConnectionTestingDialog : public QnButtonBoxDialog {
     Q_OBJECT
 
 public:
-    explicit QnConnectionTestingDialog(QWidget *parent);
+    explicit QnConnectionTestingDialog(
+        QWidget *parent, const nx::vms::api::SoftwareVersion& engineVersion);
     virtual ~QnConnectionTestingDialog();
 
     void testConnection(const nx::utils::Url &url);
@@ -48,6 +49,7 @@ private:
     QTimer* m_timeoutTimer;
     QUrl m_url;
     QPushButton* m_connectButton;
+    const nx::vms::api::SoftwareVersion m_engineVersion;
 };
 
 #endif // CONNECTION_TESTING_DIALOG_H

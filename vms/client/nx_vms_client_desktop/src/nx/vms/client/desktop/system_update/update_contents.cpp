@@ -223,6 +223,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     auto systemInfo = QnAppInfo::currentSystemInformation();
     if (nx::update::findPackage(QnUuid(),
+            commonModule->moduleGUID(),
+            commonModule->engineVersion(),
             systemInfo,
             contents.info,
             true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)
