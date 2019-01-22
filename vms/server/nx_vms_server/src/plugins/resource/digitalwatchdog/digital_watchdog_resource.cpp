@@ -313,9 +313,9 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
 }
 
 nx::vms::server::resource::StreamCapabilityMap
-    QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+    QnDigitalWatchdogResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
 {
-    auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    auto onvifResult = base_type::getStreamCapabilityMapFromDriver(streamIndex);
 
     if (!this->getMedia2Url().isEmpty())
     {

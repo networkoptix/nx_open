@@ -524,7 +524,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
             dst = src;
     };
 
-    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    StreamCapabilityMap result = getStreamCapabilityMapFromDriver(streamIndex);
     for (auto itr = result.begin(); itr != result.end();)
     {
         if (kSupportedCodecs.count(itr.key().codec))

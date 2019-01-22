@@ -638,7 +638,7 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
@@ -654,7 +654,7 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
         key.codec = QString::fromStdString(supportedVideoCodecFlavorToVmsString(capabilities.encoding));
         if (key.codec.isEmpty())
         {
-            NX_DEBUG(this, "getStreamCapabilityMapFromDrives encountered unknown "
+            NX_DEBUG(this, "getStreamCapabilityMapFromDriver encountered unknown "
                 "SupportedVideoEncoding value - %1. Value will be ignored.",
                 (int) capabilities.encoding);
             continue;

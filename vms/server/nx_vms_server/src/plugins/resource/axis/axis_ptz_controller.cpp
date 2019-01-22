@@ -404,8 +404,8 @@ bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParam
 
 int QnAxisPtzController::channel() const
 {
-    QString channelCount = m_resource->getMaxChannelsPhysical();
-    return channelCount.toInt() > 1 ? m_resource->getChannelNumAxis() : -1;
+    int channelCount = m_resource->getMaxChannelsPhysical();
+    return channelCount > 1 ? m_resource->getChannelNumAxis() : -1;
 }
 
 Ptz::Capabilities QnAxisPtzController::getCapabilities(const nx::core::ptz::Options& options) const

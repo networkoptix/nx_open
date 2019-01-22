@@ -434,7 +434,7 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
     return CameraDiagnostics::NoErrorResult();
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
 {
     using namespace nx::vms::server::resource;
 
