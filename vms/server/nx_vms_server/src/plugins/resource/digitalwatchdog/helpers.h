@@ -1,5 +1,5 @@
 #pragma once
-#if defined(ENABLE_ONNVIF)
+#if defined(ENABLE_ONVIF)
 
 #include <nx/vms/server/resource/camera.h>
 #include <common/common_globals.h>
@@ -55,4 +55,4 @@ private:
     QAuthenticator m_auth;
 };
 
-#endif // defined(ENABLE_ONNVIF)
+#endif // defined(ENABLE_ONVIF)
