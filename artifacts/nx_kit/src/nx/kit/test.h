@@ -20,6 +20,8 @@ namespace nx {
 namespace kit {
 namespace test {
 
+extern bool NX_KIT_API verbose; //< Use to control additional output of the unit test framework.
+
 #define TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
     static const nx::kit::test::detail::Test testDescriptor_##TEST_CASE##_##TEST_NAME = \
@@ -60,12 +62,22 @@ namespace test {
         nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, (LINE))
 
 /**
+ * Should be called for regular tests, from the TEST() body.
  * @return Path to the directory to create temp files in, including the trailing path separator:
  *     "base-temp-dir/case.test/", where "base-temp-dir" can be assigned with "--tmp" command line
  *     option and by default is "system-temp-dir/nx_kit_test_#", where # is a random number. The
  *     directory is created (if already exists - a fatal error is produced).
  */
 NX_KIT_API const char* tempDir();
+
+/**
+ * Should be called for tests that require temp dir outside the TEST() body, e.g. from a static
+ * initialization code.
+ * @return Path to the directory to create temp files in, including the trailing path separator:
+ *     "base-temp-dir/static/", where "base-temp-dir" is the same as for tempDir(). The directory
+ *     is created (if already exists - a fatal error is produced).
+ */
+NX_KIT_API const char* staticTempDir();
 
 /**
  * Usage: call from main():

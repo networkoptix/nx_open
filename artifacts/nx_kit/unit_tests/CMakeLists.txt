@@ -8,6 +8,8 @@ add_library(disabled_ini_config_ut SHARED
     ../src/nx/kit/test.cpp
     ../src/nx/kit/utils.h
     ../src/nx/kit/utils.cpp
+    ../src/nx/kit/output_redirector.h
+    ../src/nx/kit/output_redirector.cpp
     src/ini_config_ut.cpp
     src/disabled_ini_config_ut.h
     src/disabled_ini_config_ut.cpp
@@ -35,6 +37,7 @@ target_compile_definitions(disabled_ini_config_ut
 
 add_executable(nx_kit_ut
     src/utils_ut.cpp
+    src/output_redirector_ut.cpp
     src/debug_ut.cpp
     src/test_ut.cpp
     src/ini_config_ut.cpp
