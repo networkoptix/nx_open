@@ -181,15 +181,8 @@ void Server::serveGetStreamingLogger(
     if (!logger)
         return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
 
-    Logger loggerInfo = utils::toLoggerInfo(
-        logger,
-        m_loggerCollection->getEffectiveTags(loggerId),
-        loggerId);
-
-    http::RequestResult result(http::StatusCode::created);
-    result.dataSource = std::make_unique<http::BufferSource>(
-        "application/json",
-        QJson::serialized(loggerInfo));
+    http::RequestResult result(http::StatusCode::ok);
+    result.dataSource = std::move(messageBody);
 
     completionHandler(std::move(result));
 }

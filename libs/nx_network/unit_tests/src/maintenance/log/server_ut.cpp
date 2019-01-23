@@ -200,10 +200,12 @@ protected:
     {
         Tag tag(tagName);
 
-        for (int i = 0; i < count; ++i)
-            loggerCollection()->get(tag, false)->log(level, tag, QString::number(i) + '\n');
+        auto logger = loggerCollection()->get(tag, false);
 
-        loggerCollection()->get(tag, false)->log(level, tag, QString(logThisString.c_str()) + '\n');
+        for (int i = 0; i < count; ++i)
+            logger->log(level, tag, QString::number(i) + '\n');
+
+        logger->log(level, tag, QString(logThisString.c_str()) + '\n');
     }
 
     void andLogStreamIsProvided(const std::string& stringToFind)
@@ -359,7 +361,7 @@ TEST_F(LogServer, server_streams_logs)
 
     whenAddLoggerStreamingConfiguration(level, tag);
 
-    thenRequestSucceeded(http::StatusCode::created);
+    thenRequestSucceeded(http::StatusCode::ok);
     thenLogsAreProduced(level, tag, logsToProduce, targetString);
     andLogStreamIsProvided(targetString);
 }
@@ -384,17 +386,14 @@ TEST_F(LogServer, DISABLED_server_crashes_when_logger_is_removed_during_stream)
     std::string tag("nx::network");
 
     whenAddLoggerStreamingConfiguration(level, tag);
-    
-    thenRequestSucceeded(http::StatusCode::created);
-    Logger newLogger;
-    andNewLoggerConfigurationIsProvided(&newLogger);
+    thenRequestSucceeded(http::StatusCode::ok);
 
     std::thread thread([&]()
     {
-        thenLogsAreProduced(level, tag, 100);
+        thenLogsAreProduced(level, tag, 10000);
     });
 
-    andLoggerIsRemoved(newLogger.id); //<should crash
+    andLoggerIsRemoved(0); //<should crash
 
     thread.join();
 }
