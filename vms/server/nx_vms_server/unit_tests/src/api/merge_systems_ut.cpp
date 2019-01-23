@@ -31,7 +31,8 @@ protected:
     void assertMergeRequestReturn(
         const LauncherPtr& requestTarget,
         const LauncherPtr& serverToMerge,
-        MergeStatus mergeStatus)
+        MergeStatus mergeStatus,
+        nx::vms::api::SystemMergeHistoryRecord* outMergeResult = nullptr)
     {
         QnGetNonceReply nonceReply;
         issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
@@ -55,6 +56,9 @@ protected:
         auto result = QJson::deserialized<QnJsonRestResult>(responseBody, QnJsonRestResult(), &success);
         ASSERT_TRUE(success);
         ASSERT_EQ(toString(mergeStatus), result.errorString);
+
+        if (outMergeResult)
+            *outMergeResult = result.deserialized<nx::vms::api::SystemMergeHistoryRecord>();
     }
 
     LauncherPtr givenServer()
@@ -141,7 +145,10 @@ TEST_F(MergeSystems, SafeMode_To)
         /* expectedCode */ MergeStatus::safeMode);
 }
 
-void waitForMergeFinished(const std::vector<LauncherPtr>& servers, int size, int mergeNumber)
+void waitForMergeFinished(
+    const std::vector<LauncherPtr>& servers,
+    int size,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeResult)
 {
     int success = 0;
     do
@@ -153,7 +160,14 @@ void waitForMergeFinished(const std::vector<LauncherPtr>& servers, int size, int
             auto connection = servers[i]->serverModule()->ec2Connection();
             nx::vms::api::SystemMergeHistoryRecordList mergeData;
             connection->getMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
-            if (mergeData.size() == mergeNumber)
+
+            auto itr = std::find_if(
+                mergeData.begin(), mergeData.end(),
+                [&mergeResult](const nx::vms::api::SystemMergeHistoryRecord& record)
+                {
+                    return mergeResult == record;
+                });
+            if (itr != mergeData.end())
                 ++success;
 
         }
@@ -163,6 +177,7 @@ void waitForMergeFinished(const std::vector<LauncherPtr>& servers, int size, int
 TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
 {
     std::vector<LauncherPtr> servers;
+    nx::vms::api::SystemMergeHistoryRecord mergeResult;
     for (int i = 0; i < 3; ++i)
     {
         auto server = givenServer();
@@ -174,16 +189,18 @@ TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
     assertMergeRequestReturn(
         /* requestTarget */ servers[0],
         /* serverToMerge */ servers[1],
-        /* expectedCode */ MergeStatus::ok);
+        /* expectedCode */ MergeStatus::ok,
+        &mergeResult);
 
-    waitForMergeFinished(servers, 2, 1);
+    waitForMergeFinished(servers, 2, mergeResult);
 
     assertMergeRequestReturn(
         /* requestTarget */ servers[2],
         /* serverToMerge */ servers[1],
-        /* expectedCode */ MergeStatus::ok);
+        /* expectedCode */ MergeStatus::ok,
+        &mergeResult);
 
-    waitForMergeFinished(servers, 3, 2);
+    waitForMergeFinished(servers, 3, mergeResult);
 
 }
 

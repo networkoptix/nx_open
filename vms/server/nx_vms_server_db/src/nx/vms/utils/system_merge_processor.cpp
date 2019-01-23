@@ -111,7 +111,7 @@ QnJsonRestResult SystemMergeProcessor::merge(
         setMergeError(&result, MergeStatus::unknownError);
         return result;
     }
-    result.reply = QLatin1String(QJson::serialized(mergeHistoryRecord));
+    QJson::serialize(mergeHistoryRecord, &result.reply);
 
     NX_DEBUG(this, "Merge succeeded");
     return result;
