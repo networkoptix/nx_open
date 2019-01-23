@@ -245,7 +245,7 @@ protected:
     }
 };
 
-TEST_F(VmsCloudDataSynchronizationThroughFirewall, DISABLED_data_is_synchronized)
+TEST_F(VmsCloudDataSynchronizationThroughFirewall, data_is_synchronized)
 {
     givenCloudSystemWithServerCount(1);
 
