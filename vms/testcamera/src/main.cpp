@@ -79,7 +79,7 @@ void showUsage(char* exeName)
 int main(int argc, char *argv[])
 {
 	nx::kit::OutputRedirector::ensureOutputRedirection();
-	
+
     QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
     QCoreApplication::setApplicationName("Nx Witness Test Camera");
     QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
@@ -104,8 +104,6 @@ int main(int argc, char *argv[])
     QnLongRunnablePool logRunnablePool;
     //common.instance<QnFfmpegInitializer>();
     //common.instance<QnLongRunnablePool>();
-    QnStoragePluginFactory pluginFactory;
-    pluginFactory.registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
 
     bool cameraForEachFile = false;
     bool includePts = false;
@@ -159,6 +157,10 @@ int main(int argc, char *argv[])
 
     std::unique_ptr<QnCommonModule> commonModule(
         new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+
+    auto storagePlugins = commonModule->storagePluginFactory();
+    storagePlugins->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
+
     QnCameraPool::initGlobalInstance(new QnCameraPool(
         localInterfacesToListen, commonModule.get(), noSecondaryStream, fps));
     QnCameraPool::instance()->start();
