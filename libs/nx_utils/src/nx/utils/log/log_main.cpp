@@ -67,7 +67,7 @@ std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag)
     return loggerCollection()->get(tag, /*exactMatch*/ true);
 }
 
-void removeLoggers(const std::set<Tag>& filters)
+void removeLoggers(const std::set<Filter>& filters)
 {
     loggerCollection()->remove(filters);
 }

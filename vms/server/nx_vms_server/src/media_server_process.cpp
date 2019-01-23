@@ -3192,6 +3192,8 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
 
 void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 {
+    using namespace nx::utils::log;
+
     auto& settings = serverSettings->settings();
     auto roSettings = serverSettings->roSettings();
 
@@ -3203,62 +3205,62 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
     logSettings.loggers.front().logBaseName = "log_file";
-    nx::utils::log::setMainLogger(
-        nx::utils::log::buildLogger(
+    setMainLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath));
 
-    if (auto path = nx::utils::log::mainLogger()->filePath())
+    if (auto path = mainLogger()->filePath())
         roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
-        settings.httpLogLevel(), toString(nx::utils::log::Level::none));
+        settings.httpLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings, qApp->applicationName(), binaryPath,
-            {QnLog::HTTP_LOG_INDEX}));
+            {Filter(QnLog::HTTP_LOG_INDEX)}));
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
             {
-                QnLog::HWID_LOG,
-                nx::utils::log::Tag(typeid(nx::vms::server::LicenseWatcher))
+                Filter(QnLog::HWID_LOG),
+                Filter(Tag(typeid(nx::vms::server::LicenseWatcher)))
             }),
         /*writeLogHeader*/ false);
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
-        settings.tranLogLevel(), toString(nx::utils::log::Level::none));
+        settings.tranLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "ec2_tran";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
-            {QnLog::EC2_TRAN_LOG}));
+            {Filter(QnLog::EC2_TRAN_LOG)}));
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
-        settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
+        settings.permissionsLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "permissions";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
-            {QnLog::PERMISSIONS_LOG}));
+            {Filter(QnLog::PERMISSIONS_LOG)}));
 
     nx::utils::enableQtMessageAsserts();
 }
@@ -3269,17 +3271,18 @@ void MediaServerProcess::initializeHardwareId()
 
     auto logSettings = makeLogSettings(serverModule()->settings());
 
+    using namespace nx::utils::log;
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
-        serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
+        serverModule()->settings().systemLogLevel(), toString(Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
             {
-                QnLog::HWID_LOG,
-                nx::utils::log::Tag(toString(typeid(nx::vms::server::LicenseWatcher)))
+                Filter(QnLog::HWID_LOG),
+                Filter(Tag(typeid(nx::vms::server::LicenseWatcher)))
             }));
 
     LLUtil::initHardwareId(serverModule());

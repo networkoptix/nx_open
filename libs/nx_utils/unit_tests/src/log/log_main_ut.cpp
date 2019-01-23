@@ -18,7 +18,8 @@ namespace log {
 namespace test {
 
 static const Tag kTestTag(QLatin1String("TestTag"));
-static const Tag kNamespaceTag(QLatin1String("nx"));
+static const Filter kTestFilter(kTestTag);
+static const Filter kNamespaceFilter(QLatin1String("nx"));
 
 class LogMainTest: public ::testing::Test
 {
@@ -33,7 +34,7 @@ public:
         log::Settings settings;
         settings.loggers.resize(1);
         settings.loggers.front().level.primary = levelFromString("INFO");
-        settings.loggers.front().level.filters = LevelFilters{{kNamespaceTag, Level::verbose}};
+        settings.loggers.front().level.filters = LevelFilters{{kNamespaceFilter, Level::verbose}};
 
         if (!logWriter)
             logWriter = std::unique_ptr<AbstractWriter>(buffer = new Buffer);
@@ -42,7 +43,7 @@ public:
             settings,
             QString("log_ut"),
             QString(),
-            {kTestTag, kNamespaceTag},
+            {kTestFilter, kNamespaceFilter},
             std::move(logWriter)));
 
         // Ignoring initialization messages.
@@ -54,7 +55,7 @@ public:
 
     ~LogMainTest()
     {
-        removeLoggers({kTestTag, kNamespaceTag});
+        removeLoggers({kTestFilter, kNamespaceFilter});
         mainLogger()->setDefaultLevel(initialLevel);
 
         log::lockConfiguration();

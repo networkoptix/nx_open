@@ -71,7 +71,7 @@ void testParsing(const QString& s, Level p, std::map<const char*, Level> fs = {}
 
     LevelFilters filters;
     for (const auto& f: fs)
-        filters.emplace(Tag(QString::fromUtf8(f.first)), f.second);
+        filters.emplace(QString::fromUtf8(f.first), f.second);
 
     EXPECT_EQ(LevelSettings(p, filters), settings) << s.toStdString();
 }
