@@ -67,7 +67,11 @@ protected:
         ASSERT_EQ(loggers.size(), loggersReturnedByServer.loggers.size());
         for (int i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
         {
-            assertLoggerEquality(loggers[i], loggersReturnedByServer.loggers[i], true, true);
+            assertLoggerEquality(
+                loggers[i], 
+                loggersReturnedByServer.loggers[i],
+                /*compareId*/ true,
+                /*comparePath*/ true);
         }
     }
 
@@ -107,10 +111,14 @@ protected:
     void assertLoggerEquality(const Logger& a, const Logger& b, bool compareId, bool comparePath)
     {
         if (compareId)
+        {
             ASSERT_EQ(a.id, b.id);
+        }
 
         if (comparePath)
+        {
             ASSERT_EQ(a.path, b.path);
+        }
 
         assertDefaultLevelEquality(a, b);
         assertFiltersEquality(a, b);
@@ -118,12 +126,15 @@ protected:
 
     void assertDefaultLevelEquality(const Logger& loggerToAdd, const Logger& loggerReturnedByServer)
     {
-        // Ignoring id and path, as id is not used when adding, and loggers can modify path names.
         // When adding a logger, empty defaultLevel is interpreted as Level::none by server.
         if (loggerReturnedByServer.defaultLevel == "none")
+        {
             ASSERT_TRUE(loggerToAdd.defaultLevel == "none" || loggerToAdd.defaultLevel.empty());
+        }
         else
+        {
             ASSERT_EQ(loggerReturnedByServer.defaultLevel, loggerToAdd.defaultLevel);
+        }
     }
 
     void assertFiltersEquality(const Logger& a, const Logger& b)
