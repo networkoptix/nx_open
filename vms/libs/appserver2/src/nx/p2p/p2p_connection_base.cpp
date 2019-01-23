@@ -224,7 +224,7 @@ void ConnectionBase::onHttpClientDone()
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
         if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
         {
-            cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
+            cancelConnecting(State::Error, lm("Not a successful HTTP status code %1").arg(statusCode));
             return;
         }
 
