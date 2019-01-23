@@ -13,8 +13,7 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace {
 
@@ -46,8 +45,8 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_packetConsumerManager(packetConsumerManager),
     m_packetCount(std::make_shared<std::atomic_int>())
 {
-    if (!m_packetConsumerManager->empty())
-        tryToStartIfNotStarted();
+    if (!m_packetConsumerManager->empty() && pluggedIn())
+        start();
 }
 
 AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
@@ -69,30 +68,29 @@ bool AudioStream::AudioStreamPrivate::ioError() const
 void AudioStream::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_packetConsumerManager->addConsumer(consumer);
+    if (m_terminated)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->addConsumer(consumer);
+        if (pluggedIn())
+            start();
     }
-    m_wait.notify_all();
-
-    tryToStartIfNotStarted();
 }
 
 void AudioStream::AudioStreamPrivate::removePacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->removeConsumer(consumer);
-    }
-    m_wait.notify_all();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_packetConsumerManager->removeConsumer(consumer);
+    if (m_packetConsumerManager->empty())
+        stop();
 }
 
 std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 {
 #ifdef _WIN32
     static const std::string kWindowsAudioPrefix = "audio=";
-    
+
     // ffmpeg replaces all ":" with "_" in the audio devices alternative name.
     // It expects the modified alternative name or it will not open.
     static constexpr const char kWindowsAudioDelimitter = ':';
@@ -105,29 +103,6 @@ std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 #else
     return m_url;
 #endif
-}
-
-bool AudioStream::AudioStreamPrivate::waitForConsumers()
-{
-    bool wait;
-    {
-        std::lock_guard<std::mutex> lockGuard(m_mutex);
-        wait = m_packetConsumerManager->empty();
-    }
-    if (wait)
-        uninitialize(); //< Don't stream the camera if there are no consumers.
-    
-    // Check again if there are no consumers. They could have been added during uninitialize().
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if(m_packetConsumerManager->empty())
-    {
-        m_wait.wait(
-            lock, 
-            [&]() { return m_terminated || !m_packetConsumerManager->empty(); });
-        return !m_terminated;
-    }
-
-    return true;
 }
 
 int AudioStream::AudioStreamPrivate::initialize()
@@ -160,10 +135,7 @@ int AudioStream::AudioStreamPrivate::initialize()
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->flush();
-    }
+    m_packetConsumerManager->flush();
 
     while (*m_packetCount > 0)
     {
@@ -199,7 +171,7 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
         {
             setLastError(m_initCode);
             if (m_ioError)
-                terminate();
+                m_terminated = true;
         }
     }
     return m_initialized;
@@ -327,7 +299,7 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
     for(;;)
     {
         ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
-        
+
         // AVFMT_FLAG_NONBLOCK is set if running on Windows. see 
         int result;
         if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
@@ -367,7 +339,7 @@ int AudioStream::AudioStreamPrivate::resample(
         m_initCode = initalizeResampleContext(frame);
         if(m_initCode < 0)
         {
-            terminate();
+            m_terminated = true;
             setLastError(m_initCode);
             return m_initCode;
         }
@@ -484,27 +456,9 @@ void AudioStream::AudioStreamPrivate::setLastError(int ffmpegError)
         cam->setLastError(ffmpegError);
 }
 
-void AudioStream::AudioStreamPrivate::terminate()
-{
-    std::unique_lock<std::mutex> lock(m_mutex);
-    m_terminated = true;
-    m_wait.notify_all();
-}
-
-void AudioStream::AudioStreamPrivate::tryToStartIfNotStarted()
-{
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    if (m_terminated)
-    {
-        if (pluggedIn())
-            start();
-    }
-}
-
 void AudioStream::AudioStreamPrivate::start()
 {
-    if (m_audioThread.joinable())
-        m_audioThread.join();
+    stop();
 
     m_terminated = false;
     m_audioThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
@@ -512,8 +466,7 @@ void AudioStream::AudioStreamPrivate::start()
 
 void AudioStream::AudioStreamPrivate::stop()
 {
-    terminate();
-
+    m_terminated = true;
     if (m_audioThread.joinable())
         m_audioThread.join();
 }
@@ -522,9 +475,6 @@ void AudioStream::AudioStreamPrivate::run()
 {
     while (!m_terminated)
     {
-        if (!waitForConsumers())
-            continue;
-
         if (!ensureInitialized())
             continue;
 
@@ -535,19 +485,15 @@ void AudioStream::AudioStreamPrivate::run()
         {
             setLastError(result);
             if (m_ioError)
-                terminate();
+                m_terminated = true;
             continue;
         }
 
         // If the encoder is AAC, some packets are buffered and copied before delivering.
         // In that case, packet is nullptr.
         if (packet)
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
             m_packetConsumerManager->givePacket(packet);
-        }
     }
-
     uninitialize();
 }
 
@@ -610,5 +556,4 @@ void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
         m_packetConsumerManager->removeConsumer(consumer);
 }
 
-} //namespace usb_cam
-} //namespace nx 
+} // namespace nx::usb_cam

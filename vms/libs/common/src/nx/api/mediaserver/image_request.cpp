@@ -14,7 +14,7 @@ bool CameraImageRequest::isSpecialTimeValue(qint64 value)
 
 QString toString(CameraImageRequest::StreamSelectionMode value)
 {
-    return QnLexical::serialized(value) ;
+    return QnLexical::serialized(value);
 }
 
 } // namespace api

@@ -395,12 +395,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 {
     QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();
 
-    uint channels = 1;
-    if (firstResource->hasDefaultProperty(QLatin1String("channelsAmount")))
-    {
-        QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
-        channels = val.toUInt();
-    }
+    uint channels = firstResource->getMaxChannels();
     if (channels > 1)
     {
         QString physicalId = firstResource->getPhysicalId();

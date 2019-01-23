@@ -38,7 +38,7 @@ QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
         0x01);
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

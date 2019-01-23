@@ -1,4 +1,5 @@
 #include "helpers.h"
+#if defined(ENABLE_ONVIF)
 
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_client.h>
@@ -12,7 +13,7 @@ namespace {
 const std::chrono::seconds kCproApiCacheTimeout(5);
 
 const char* kJsonApiRequestDataTemplate =
-    "{\"jsonData\": { \"data\" : %1, \"file\" : \"param\", \"password\": \"%2\", \"username\": \"%3\"}}";
+    R"json({"jsonData":{"data":%1,"file":"param","password":"%2","username":"%3"}})json";
 
 QSize jsonApiResolutionToQSize(QString resolution)
 {
@@ -182,11 +183,14 @@ JsonApiClient::JsonApiClient(nx::network::SocketAddress address, QAuthenticator 
 }
 
 nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoCodecs(
-    Qn::StreamIndex streamIndex)
+    int channelNumber, Qn::StreamIndex streamIndex)
 {
     NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
-    const QJsonObject params =  getParams(QString("All.VideoInput._1.")
-        + (streamIndex == Qn::StreamIndex::primary ? "_1" : "_2"));
+
+    ++channelNumber; //< Camera API channel numbers start with 1.
+    const QJsonObject params = getParams(QString("All.VideoInput._%1._%2")
+        .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2));
+
     if (params.isEmpty())
         return {};
 
@@ -207,12 +211,14 @@ nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoC
     return result;
 }
 
-bool JsonApiClient::sendStreamParams(Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams)
+bool JsonApiClient::sendStreamParams(
+    int channelNumber, Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams)
 {
     NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
 
-    QString paramBasename =  QString("All.VideoInput._1.")
-        + (streamIndex == Qn::StreamIndex::primary ? "_1." : "_2.");
+    ++channelNumber; //< Camera API channel numbers start with 1.
+    QString paramBasename =  QString("All.VideoInput._%1._%2.")
+        .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2);
 
     const QString codec = streamParams.codec.toLower();
     const auto response = setParams({
@@ -309,3 +315,5 @@ std::optional<QJsonObject> JsonApiClient::doRequest(const nx::utils::Url& url, Q
     }
     return jsonDoc.object();
 }
+
+#endif // defined(ENABLE_ONVIF)

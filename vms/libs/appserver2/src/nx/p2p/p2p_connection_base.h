@@ -35,7 +35,6 @@ class ConnectionBase:
     Q_OBJECT
 public:
 
-    const static QString kDeprecatedUrlPath;
     const static QString kWebsocketUrlPath;
     const static QString kHttpUrlPath;
 

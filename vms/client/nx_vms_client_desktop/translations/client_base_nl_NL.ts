@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>Installatie mislukt</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Kan de installatie niet annuleren</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Installatie voltooid</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>Scherminstellingen...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5462,6 +5462,10 @@ to %1</source>
       <source>Search</source>
       <translation>Zoeken</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -7869,7 +7873,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Onvoldoende vrije ruimte op de server opslag</translation>
     </message>
   </context>
   <context>
@@ -8508,6 +8512,17 @@ to %1</source>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>De geselecteerde periode kan niet worden geëxporteerd voor de huidige camera.</translation>
     </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bladwijzer</numerusform>
+        <numerusform>%n bladwijzers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
@@ -8982,11 +8997,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>

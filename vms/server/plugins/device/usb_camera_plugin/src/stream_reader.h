@@ -58,7 +58,6 @@ class StreamReaderPrivate
 public:
     StreamReaderPrivate(
         int encoderIndex,
-        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~StreamReaderPrivate();
@@ -66,9 +65,9 @@ public:
     virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
     virtual void interrupt();
 
-    virtual void setFps(float fps);
-    virtual void setResolution(const nxcip::Resolution& resolution);
-    virtual void setBitrate(int bitrate);
+    virtual void setFps(float fps) = 0;
+    virtual void setResolution(const nxcip::Resolution& resolution) = 0;
+    virtual void setBitrate(int bitrate) = 0;
 
     virtual void ensureConsumerAdded();
 
@@ -78,7 +77,6 @@ protected:
     static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(3000);
 
     int m_encoderIndex;
-    CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
     std::shared_ptr<BufferedPacketConsumer> m_avConsumer;
 
