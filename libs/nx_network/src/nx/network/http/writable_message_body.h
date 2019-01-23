@@ -18,6 +18,7 @@ public:
     WritableMessageBody(
         const std::string& mimeType,
         boost::optional<uint64_t> contentLength = boost::none);
+    ~WritableMessageBody();
 
     virtual void stopWhileInAioThread() override;
 

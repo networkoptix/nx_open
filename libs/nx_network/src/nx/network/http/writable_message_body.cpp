@@ -13,6 +13,15 @@ WritableMessageBody::WritableMessageBody(
 {
 }
 
+WritableMessageBody::~WritableMessageBody()
+{
+    if (m_onBeforeDestructionHandler)
+    {
+        NX_ASSERT(isInSelfAioThread());
+        nx::utils::swapAndCall(m_onBeforeDestructionHandler);
+    }
+}
+
 void WritableMessageBody::stopWhileInAioThread()
 {
     if (m_onBeforeDestructionHandler)
