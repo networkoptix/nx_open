@@ -37,21 +37,19 @@ void LoggerCollection::setMainLogger(std::unique_ptr<AbstractLogger> logger)
     updateMaxLevel();
 }
 
-int LoggerCollection::add(std::unique_ptr<AbstractLogger> logger)
+int LoggerCollection::add(std::shared_ptr<AbstractLogger> logger)
 {
     if (!logger)
         return kInvalidId;
 
     QnMutexLocker lock(&m_mutex);
 
-    std::shared_ptr<AbstractLogger> sharedLogger(std::move(logger));
+    logger->setOnLevelChanged([this]() { onLevelChanged(); });
 
-    sharedLogger->setOnLevelChanged([this]() { onLevelChanged(); });
-
-    Context loggerContext(m_loggerId, sharedLogger);
+    Context loggerContext(m_loggerId, logger);
 
     bool inserted = false;
-    for (const auto& tag : sharedLogger->tags())
+    for (const auto& tag : logger->tags())
     {
         if (m_loggersByTags.emplace(tag, loggerContext).second)
             inserted = true;

@@ -51,7 +51,7 @@ public:
      * @return The logger id if added successfully (at least one tag was not already taken), 
      * -1 otherwise.
      */
-    int add(std::unique_ptr<AbstractLogger> logger);
+    int add(std::shared_ptr<AbstractLogger> logger);
 
     std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const;
 
