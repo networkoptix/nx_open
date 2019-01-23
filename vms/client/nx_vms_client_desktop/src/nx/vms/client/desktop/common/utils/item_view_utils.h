@@ -6,8 +6,6 @@ class QAbstractItemView;
 
 namespace nx::vms::client::desktop {
 
-class TreeView;
-
 enum class BatchToggleMode
 {
     unify,  //< If at least one check box was unchecked, check all, otherwise uncheck all.
@@ -45,23 +43,26 @@ void autoToggleOnRowClick(
     IsCheckable isCheckable = {});
 
 /** Sets up automatic toggle of check boxes at selected rows when Space key is pressed. */
+template <class T>
 void autoToggleOnSpaceKey(
-    TreeView* view,
+    T* view,
     int checkBoxColumn,
     BatchToggleMode toggleMode = BatchToggleMode::unify,
     IsCheckable isCheckable = {});
 
 /** Sets up automatic toggle of check boxes when shift-click selection is performed:
  * check boxes in all affected rows are set to the state of originating row check box. */
+template <class T>
 void autoToggleOnShiftClick(
-    TreeView* view,
+    T* view,
     int checkBoxColumn,
     IsCheckable isCheckable = {});
 
 /** Default setup for automatic check box toggle.
  * Takes view's selection mode into consideration. */
+template <class T>
 void setupDefaultAutoToggle(
-    TreeView* view,
+    T* view,
     int checkBoxColumn,
     IsCheckable isCheckable = {});
 

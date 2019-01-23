@@ -8,7 +8,11 @@
 
 #include <fstream>
 #include <string>
-#include <cstring>
+
+namespace nx {
+namespace kit {
+namespace test {
+namespace test {
 
 TEST(test, tempDir)
 {
@@ -39,3 +43,8 @@ TEST(test, createFile)
 
     ASSERT_EQ(contents, dataFromFile);
 }
+
+} // namespace test
+} // namespace test
+} // namespace kit
+} // namespace nx

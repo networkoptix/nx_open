@@ -92,7 +92,7 @@ public:
     static const FileFilter kAllFilesFilter;
 
     /**
-     * Create a filter string, which will be expanded to the list of allowed file formats.
+     * Creates a filter string, which will be expanded to the list of allowed file formats.
      * @param filters Each value represents a separate filter line, where first element is a
      *      textual description, and the second is the list of extensions (without dot).
      * @return Filter string in the QFileDialog format.
@@ -100,14 +100,14 @@ public:
     static QString createFilter(std::vector<FileFilter> filters);
 
  /**
-     * Create a filter string, which will be expanded to the list of allowed file formats.
+     * Creates a filter string, which will be expanded to the list of allowed file formats.
      * @param filter A pair of textual description and the list of extensions (without dot).
      * @return Filter string in the QFileDialog format.
      */
     static QString createFilter(FileFilter filter);
 
     /**
-     * Create a filter string, which will be expanded to the list of allowed file formats.
+     * Creates a filter string, which will be expanded to the list of allowed file formats.
      * @param title Textual description for the file formats.
      * @param extensions List of extensions (without dot).
      * @return Filter string in the QFileDialog format.
@@ -115,7 +115,7 @@ public:
     static QString createFilter(QString title, QStringList extensions);
 
     /**
-     * Create a filter string, which will be expanded to the list of allowed file formats.
+     * Creates a filter string, which will be expanded to the list of allowed file formats.
      * @param title Textual description for the file formats.
      * @param extension Single extension (without dot).
      * @return Filter string in the QFileDialog format.

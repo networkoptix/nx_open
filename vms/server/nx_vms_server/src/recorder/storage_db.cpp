@@ -13,8 +13,8 @@
 
 const uint8_t kDbVersion = 1;
 
-/*	It is ok to have at most 2 read errors per storage at mediaserver start.
-*	In most cases this means that we've read all data and hit the eof.
+/*    It is ok to have at most 2 read errors per storage at mediaserver start.
+*    In most cases this means that we've read all data and hit the eof.
 */
 const int kMaxReadErrorCount = 2;
 

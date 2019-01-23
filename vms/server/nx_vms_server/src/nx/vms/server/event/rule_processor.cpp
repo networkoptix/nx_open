@@ -61,7 +61,7 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, true),
-    	Qt::QueuedConnection);
+        Qt::QueuedConnection);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, false),

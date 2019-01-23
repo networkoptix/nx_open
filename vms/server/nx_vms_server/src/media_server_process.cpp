@@ -92,9 +92,7 @@
 
 #include <camera_vendors.h>
 
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
-#include <core/resource/avi/avi_resource.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -2599,14 +2597,14 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
-     * %param pluginId Id of an analytics plugin which offers the action.
-     * %param actionId Id of an action to execute.
-     * %param objectId Id of a metadata object to which the action is applied.
-     * %param cameraId Id of a camera from which the action was triggered.
+     * %param engineId Id of an Analytics Engine which offers the Action.
+     * %param actionId Id of an Action to execute.
+     * %param objectId Id of an Analytics Object to which the Action is applied.
+     * %param deviceId Id of a Device from which the Action was triggered.
      * %param timestampUs Timestamp (microseconds) of the video frame from which the action was
      *     triggered.
-     * %param params JSON object with key-value pairs containing values for the action params
-     *     described in the plugin manifest.
+     * %param params JSON object with key-value pairs containing values for the Action params
+     *     described in the Engine manifest.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.

@@ -27,8 +27,6 @@ namespace ite
     public:
         CameraManager(const RxDevicePtr &rxDev);
 
-        // nxcip::PluginInterface
-
         virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::BaseCameraManager

@@ -302,7 +302,6 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
-    void at_analyticsButton_toggled(bool checked);
 
     void at_entropixEnhancementButton_clicked();
     void at_entropixImageLoaded(const QImage& image);

@@ -8,7 +8,7 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx {
 namespace vms {
@@ -140,15 +140,14 @@ bool hasToggleState(
         if (runtimeParams.getAnalyticsEventTypeId().isNull())
             return true;
 
-        auto descriptorListManager = commonModule->analyticsDescriptorListManager();
-        const auto descriptor = descriptorListManager
-            ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(
-                runtimeParams.getAnalyticsEventTypeId());
+        nx::analytics::EventTypeDescriptorManager descriptorManager(commonModule);
+        const auto descriptor = descriptorManager.descriptor(
+            runtimeParams.getAnalyticsEventTypeId());
 
         if (!descriptor)
             return false;
 
-        return descriptor->item.flags.testFlag(nx::vms::api::analytics::stateDependent);
+        return descriptor->flags.testFlag(nx::vms::api::analytics::stateDependent);
     }
     default:
         return false;
@@ -182,7 +181,7 @@ bool requiresCameraResource(EventType eventType)
         case EventType::cameraDisconnectEvent: //< Think about moving out disconnect event.
         case EventType::softwareTriggerEvent:
         case EventType::analyticsSdkEvent:
-        //case EventType::pluginEvent: //< Temporary disabled #spanasenko
+        case EventType::pluginEvent:
             return true;
 
         default:
@@ -204,6 +203,9 @@ bool isSourceCameraRequired(EventType eventType)
     {
         case EventType::networkIssueEvent:
             return true;
+
+        case EventType::pluginEvent:
+            return false;
 
         default:
             return requiresCameraResource(eventType);

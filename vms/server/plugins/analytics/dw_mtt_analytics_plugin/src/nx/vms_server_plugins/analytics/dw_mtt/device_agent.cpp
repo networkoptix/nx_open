@@ -15,12 +15,10 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
-
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include <network/tcp_connection_processor.h>
 
@@ -36,6 +34,9 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace dw_mtt {
 
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
+
 namespace {
 
 static const std::chrono::seconds kSendTimeout(15);
@@ -47,10 +48,9 @@ static const int kBufferCapacity = 512 * 1024;
 
 static const QByteArray kXmlContentType = "application/xml";
 
-nx::sdk::analytics::common::Event* createCommonEvent(
-    const EventType& eventType, bool active)
+Event* createCommonEvent(const EventType& eventType, bool active)
 {
-    auto commonEvent = new nx::sdk::analytics::common::Event();
+    auto commonEvent = new Event();
     commonEvent->setTypeId(eventType.id.toStdString());
     commonEvent->setDescription(eventType.name.toStdString());
     commonEvent->setIsActive(active);
@@ -59,12 +59,11 @@ nx::sdk::analytics::common::Event* createCommonEvent(
     return commonEvent;
 }
 
-nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket(
-    const EventType& event, bool active = true)
+EventMetadataPacket* createCommonEventMetadataPacket(const EventType& event, bool active = true)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+    auto packet = new EventMetadataPacket();
     auto commonEvent = createCommonEvent(event, active);
     packet->addItem(commonEvent);
     packet->setTimestampUs(
@@ -77,7 +76,7 @@ nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const nx::sdk::DeviceInfo& deviceInfo,
+    const DeviceInfo& deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(engine)
@@ -178,10 +177,6 @@ void DeviceAgent::onSubsctiptionDone()
         return;
     }
 
-    QString url = m_httpClient->contentLocationUrl().toString();
-    SystemError::ErrorCode err = m_httpClient->lastSysErrorCode();
-    nx::network::http::AsyncClient::State s = m_httpClient->state();
-
     NX_URL_PRINT << lm("Http request %1 succeeded with status code %2")
         .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()).toStdString();
 
@@ -272,7 +267,7 @@ void DeviceAgent::onReceive(SystemError::ErrorCode code, size_t size)
 
 void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
+    if (interfaceId == IID_DeviceAgent)
     {
         addRef();
         return static_cast<DeviceAgent*>(this);
@@ -405,26 +400,24 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     return request;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->eventTypeIds()->count() == 0)
     {
         stopFetchingMetadata();
-        return sdk::Error::noError;
+        return Error::noError;
     }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIp(m_url.host().toLatin1());
@@ -455,14 +448,14 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
     if (!m_cameraController.readPortConfiguration())
     {
         NX_URL_PRINT << "Failed to get DW MTT-camera tcp notification server port.";
-        return nx::sdk::Error::networkError;
+        return Error::networkError;
     }
     NX_URL_PRINT << "DW MTT-camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
     makeSubscription();
 
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -488,17 +481,17 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
+const IString* DeviceAgent::manifest(Error* /*error*/) const
 {
-    return new nx::sdk::common::String(m_cameraManifest);
+    return new nx::sdk::String(m_cameraManifest);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

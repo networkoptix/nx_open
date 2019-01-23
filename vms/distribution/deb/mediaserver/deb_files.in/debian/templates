@@ -25,7 +25,7 @@ Description: System name:
 Template: @deb.customization.company.name@-mediaserver/removeDatabase
 Type: select
 Choices: ${choices}
-Description: Keep the database, remove or revert to previous version (if any)
+Description: Keep or remove the database
 
 Template: @deb.customization.company.name@-mediaserver/cameraSettingsOptimization
 Type: boolean

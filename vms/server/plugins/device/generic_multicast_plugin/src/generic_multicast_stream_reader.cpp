@@ -47,12 +47,12 @@ void* GenericMulticastStreamReader::queryInterface(const nxpl::NX_GUID& interfac
     return NULL;
 }
 
-unsigned int GenericMulticastStreamReader::addRef()
+int GenericMulticastStreamReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastStreamReader::releaseRef()
+int GenericMulticastStreamReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

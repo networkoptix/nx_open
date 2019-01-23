@@ -23,7 +23,7 @@ public:
     /** @return Null if the index is invalid. */
     virtual const char* value(int i) const = 0;
 
-    /** @return Null if not found or key is null. */
+    /** @return Null if not found or the key is null. */
     virtual const char* value(const char* key) const = 0;
 };
 

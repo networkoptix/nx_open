@@ -77,8 +77,8 @@ public:
 
     /**
      * Use the specified directory for .ini files. If iniFilesDir is null or empty, and also before
-     * this call, a platform-dependent system temp directory is used, which can be changed defining
-     * a macro at compiling ini_config.cpp:
+     * this call, a platform-dependent directory is used (described in this class comment), which
+     * can be changed defining a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DEFAULT_INI_FILES_DIR=<enquoted-path-with-trailing-slash-or-backslash>
      */
     static void setIniFilesDir(const char* iniFilesDir);

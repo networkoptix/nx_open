@@ -1,4 +1,4 @@
-﻿#include "camera_controller.h"
+#include "camera_controller.h"
 
 #include <QDomDocument>
 #include <QMap>

@@ -167,7 +167,8 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
 
     // TODO: Help topic for PTZ stuff.
 
-    ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, it will receive and use camera stream as-is."));
+    ui->settingsDisableControlHint->setHint(
+        tr("Server will not change any cameras settings, it will receive and use camera stream as-is."));
     setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
 
     ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; for others will cause significant bitrate increase."));

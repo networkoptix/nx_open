@@ -1,23 +1,15 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QThread>
-
 #include <map>
 #include <memory>
+
+#include <QtCore/QObject>
+#include <QtCore/QThread>
 
 #include <utils/common/connective.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
-
-#include <nx/sdk/analytics/i_engine.h>
-#include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
-
-#include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/vms/server/analytics/device_analytics_context.h>
 #include <nx/vms/server/analytics/proxy_video_data_receptor.h>
@@ -27,7 +19,6 @@
 #include <nx/vms/server/analytics/rule_holder.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/streaming/video_data_packet.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 
@@ -55,7 +46,7 @@ public:
     void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
 
     void registerMetadataSink(
-        const QnResourcePtr& device,
+        const QnResourcePtr& deviceResource,
         QWeakPointer<QnAbstractDataReceptor> metadataSink);
 
     QWeakPointer<AbstractVideoDataReceptor> registerMediaSource(const QnUuid& deviceId);
@@ -74,6 +65,8 @@ public slots:
     void initExistingResources();
 
 private:
+    using AnalyticsEngineResourcePtr = nx::vms::server::resource::AnalyticsEngineResourcePtr;
+
     QSharedPointer<DeviceAnalyticsContext> context(const QnUuid& deviceId) const;
     QSharedPointer<DeviceAnalyticsContext> context(const QnVirtualCameraResourcePtr& device) const;
 
@@ -86,21 +79,34 @@ private:
         const QnVirtualCameraResourcePtr& device,
         const QString& propertyName);
 
+    void at_deviceStatusChanged(const QnResourcePtr& deviceResource);
+
     void handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device);
     void handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device);
 
-    void at_engineAdded(const resource::AnalyticsEngineResourcePtr& engine);
-    void at_engineRemoved(const resource::AnalyticsEngineResourcePtr& engine);
+    void at_engineAdded(const AnalyticsEngineResourcePtr& engine);
+    void at_engineRemoved(const AnalyticsEngineResourcePtr& engine);
     void at_enginePropertyChanged(
-        const resource::AnalyticsEngineResourcePtr& engine,
+        const AnalyticsEngineResourcePtr& engine,
         const QString& propertyName);
+
+    void at_engineInitializationStateChanged(const AnalyticsEngineResourcePtr& engine);
 
     QWeakPointer<QnAbstractDataReceptor> metadataSink(
         const QnVirtualCameraResourcePtr& device) const;
-    QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& device) const;
+    QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& deviceId) const;
     QWeakPointer<ProxyVideoDataReceptor> mediaSource(
         const QnVirtualCameraResourcePtr& device) const;
-    QWeakPointer<ProxyVideoDataReceptor> mediaSource(const QnUuid& device) const;
+    QWeakPointer<ProxyVideoDataReceptor> mediaSource(const QnUuid& deviceId) const;
+
+    nx::vms::server::resource::AnalyticsEngineResourceList localEngines() const;
+    std::set<QnUuid> compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const;
+
+    void updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device);
+    void updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& engine);
+
+    void removeDeviceDescriptor(const QnVirtualCameraResourcePtr& device) const;
+    void removeEngineFromCompatible(const AnalyticsEngineResourcePtr& engine) const;
 
 private:
     mutable QnMutex m_contextMutex;

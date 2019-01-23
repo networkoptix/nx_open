@@ -37,15 +37,14 @@ public:
     TestWorker(
         const QString& fileName,
         Storage* storage,
-        AbstractPeerManager* peerManager,
-        QObject* parent = nullptr)
+        AbstractPeerManager* peerManager)
         :
-        Worker(fileName, storage, peerManager, parent)
+        Worker(fileName, storage, peerManager)
     {
         setPrintSelfPeerInLogs();
     }
 
-    ~TestWorker()
+    virtual ~TestWorker() override
     {
         stop();
     }

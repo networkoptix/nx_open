@@ -1337,7 +1337,7 @@ void LegacyCameraScheduleWidget::updateAlert(AlertReason when)
             break;
         }
 
-        /* Some cell(s) in the schedule were changed: */
+        /* Some cells in the schedule were changed: */
         case ScheduleChange:
         {
             if (isRecordingScheduled())

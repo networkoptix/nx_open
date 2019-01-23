@@ -370,13 +370,13 @@ RuleList Rule::getPluginEventUpdateRules()
 {
     using namespace nx::vms::api;
     RulePtr rule(new Rule(
-            /*internalId*/ 900025,
-            /*aggregationPeriod*/ 0,
-            /*isSystem*/ false,
-            ActionType::showPopupAction,
-            EventType::pluginEvent,
-            /*subjects*/ {},
-            /*allUsers*/ true));
+        /*internalId*/ 900025,
+        /*aggregationPeriod*/ 0,
+        /*isSystem*/ false,
+        ActionType::showPopupAction,
+        EventType::pluginEvent,
+        /*subjects*/ {},
+        /*allUsers*/ true));
 
     EventParameters parameters;
     parameters.inputPortId = QnLexical::serialized(
@@ -386,7 +386,6 @@ RuleList Rule::getPluginEventUpdateRules()
 
     rule->setEventParams(parameters);
     return {rule};
-
 }
 
 } // namespace event

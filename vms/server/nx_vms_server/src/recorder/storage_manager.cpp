@@ -2202,7 +2202,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         qint64 oldToDelete = toDelete;
         toDelete = targetFreeSpace - freeSpace;
         if (oldToDelete == toDelete && deletedChunk.startTimeMs != -1)
-        {	// Non-empty chunk's been found and delete attempt's been made.
+        {    // Non-empty chunk's been found and delete attempt's been made.
             // But ToDelete is still the same. This might mean that storage went offline.
             // Let's check it.
             if (storage->getStatus() == Qn::ResourceStatus::Offline)

@@ -14,8 +14,8 @@ static const nxpl::NX_GUID IID_MetadataItem =
     {{0xb3,0x23,0x89,0x1d,0x19,0x62,0x44,0x3c,0x84,0x2a,0x07,0x50,0x7d,0x87,0xab,0x4e}};
 
 /**
- * Interface for particular item of metadata (e.g. event, detected object) which is contained in a
- * metadata packet.
+ * A particular item of metadata (e.g. event, detected object) which is contained in a metadata
+ * packet.
  */
 class IMetadataItem: public nxpl::PluginInterface
 {

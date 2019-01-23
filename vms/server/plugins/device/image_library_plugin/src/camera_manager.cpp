@@ -19,8 +19,8 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_refManager( this ),
     m_pluginRef( ImageLibraryPlugin::instance() ),
     m_info( info ),
-    m_capabilities( 
-        nxcip::BaseCameraManager::dtsArchiveCapability | 
+    m_capabilities(
+        nxcip::BaseCameraManager::dtsArchiveCapability |
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::hardwareMotionCapability |
         nxcip::BaseCameraManager::fixedQualityCapability ),
@@ -54,12 +54,12 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraManager::addRef()
+int CameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraManager::releaseRef()
+int CameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

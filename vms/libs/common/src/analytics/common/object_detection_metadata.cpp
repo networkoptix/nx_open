@@ -81,7 +81,7 @@ QString toString(const DetectionMetadataPacket& packet)
             s += label.name + lit("=\"")
                 + QString::fromStdString(
                     //< Properly escape the value string.
-                    nx::kit::debug::toString(label.value.toUtf8().constData()))
+                    nx::kit::utils::toString(label.value.toUtf8().constData()))
                 + lit("\"");
         }
 

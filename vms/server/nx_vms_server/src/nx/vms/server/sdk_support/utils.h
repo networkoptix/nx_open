@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource_fwd.h>
@@ -7,7 +9,6 @@
 
 #include <media_server/media_server_module.h>
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/member_detector.h>
 
@@ -28,12 +29,6 @@
 
 class QnMediaServerModule;
 
-namespace nx::analytics {
-
-class DescriptorListManager;
-
-} // namespace nx::analytics
-
 namespace nx::vms::server::analytics {
 
 class SdkObjectFactory;
@@ -45,7 +40,8 @@ namespace nx::vms::server::sdk_support {
 namespace detail {
 
 NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths,
+    std::set<nx::vms::api::analytics::DescriptorScope>);
 NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace detail
@@ -56,7 +52,7 @@ std::optional<ManifestType> manifest(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    UniquePtr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    const nx::sdk::Ptr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](
@@ -96,12 +92,6 @@ std::optional<ManifestType> manifest(
     return deserializedManifest;
 }
 
-template<typename Interface, typename SdkObject>
-Interface* queryInterface(SdkObject sdkObject, const nxpl::NX_GUID& guid)
-{
-    return static_cast<Interface*>(sdkObject->queryInterface(guid));
-}
-
 template<typename ResourceType>
 QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, const QString& id)
 {
@@ -122,7 +112,6 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
 }
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule);
-nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(
     const QnVirtualCameraResourcePtr& device,
@@ -130,9 +119,15 @@ bool deviceInfoFromResource(
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
 
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
+
+/**
+ * @param mapJson Json array of objects with string fields "name" and "value".
+ * @return Null if the json is invalid, has unexpected structure (besides potentially added
+ * unknown fields) or there are duplicate keys.
+ */
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
 
@@ -143,42 +138,6 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
 
 resource::AnalyticsEngineResourceList toServerEngineList(
     const nx::vms::common::AnalyticsEngineResourceList engineList);
-
-template <typename Descriptor, typename Item>
-std::map<QString, Descriptor> descriptorsFromItemList(
-    const QString& pluginId,
-    const QList<Item>& itemList)
-{
-    std::map<QString, Descriptor> result;
-    for (const auto& item: itemList)
-    {
-        Descriptor descriptor;
-        if constexpr(detail::hasItem<Descriptor>::value)
-        {
-            descriptor.item = item;
-        }
-        else
-        {
-            descriptor.id = item.id;
-            descriptor.name = item.name;
-        }
-
-        if constexpr (detail::hasPaths<Descriptor>::value)
-        {
-            nx::vms::api::analytics::HierarchyPath path;
-            path.pluginId = pluginId;
-
-            if constexpr (detail::hasGroupId<Item>::value)
-                path.groupId = item.groupId;
-
-            descriptor.paths.insert(path);
-        }
-
-        result[item.id] = std::move(descriptor);
-    }
-
-    return result;
-}
 
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 

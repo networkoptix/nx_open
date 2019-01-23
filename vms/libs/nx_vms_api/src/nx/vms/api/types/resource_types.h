@@ -118,7 +118,6 @@ enum class IoModuleVisualStyle
 
 enum class StreamDataFilter
 {
-    mediaOnly = 0, //< Send audio/video but not other metadata.
     media = 1 << 0, //< Send media data.
     motion = 1 << 1, //< Send motion data.
     objectDetection = 1 << 2, //< Send analytics events.
