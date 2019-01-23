@@ -2,6 +2,8 @@
 #include <gmock/gmock.h>
 #include <ostream>
 
+#include <mediaserver_ini.h>
+#include <common/common_globals.h>
 #include <camera/get_image_helper.h>
 #include <core/resource/camera_resource.h>
 #include <utils/media/frame_info.h>
@@ -24,6 +26,7 @@ class MockCameraResource: public QnVirtualCameraResource
 {
 public:
     MOCK_CONST_METHOD0(aspectRatio, QnAspectRatio());
+    MOCK_CONST_METHOD0(hasDualStreaming, bool());
 
 protected:
     MOCK_METHOD0(createLiveDataProvider, QnAbstractStreamDataProvider*());
@@ -116,5 +119,54 @@ TEST(GetImageHelper, updateDstSize_maxSize)
         updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
 }
 
+#ifndef EDGE_SERVER
+
+TEST(GetImageHelper, determineStreamIndex)
+{
+    QnGetImageHelper helper(nullptr);
+    nx::api::CameraImageRequest request;
+    auto camera = QnSharedResourcePointer(new MockCameraResource());
+    request.camera = camera;
+
+    // Specify secondary stream resolution for requests with auto_.
+    EXPECT_CALL(*camera, hasDualStreaming()).WillRepeatedly(Return(true));
+    const QSize kSecondaryStreamSize(100, 100);
+    request.camera->saveMediaStreamInfoIfNeeded(
+        CameraMediaStreamInfo(Qn::StreamIndex::secondary, kSecondaryStreamSize));
+
+    request.size = {0,0};
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::auto_;
+    EXPECT_EQ(Qn::StreamIndex::primary, helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
+    EXPECT_EQ(Qn::StreamIndex::primary, helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary;
+    EXPECT_EQ(Qn::StreamIndex::secondary, helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+    EXPECT_EQ(ini().analyzeSecondaryStream ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary,
+        helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion;
+    EXPECT_EQ(request.camera->motionStreamIndex().index, helper.determineStreamIndex(request));
+
+    request.size = {kSecondaryStreamSize.width() / 2, kSecondaryStreamSize.height() / 2};
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::auto_;
+    EXPECT_EQ(Qn::StreamIndex::secondary, helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
+    EXPECT_EQ(Qn::StreamIndex::primary, helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary;
+    EXPECT_EQ(Qn::StreamIndex::secondary, helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+    EXPECT_EQ(ini().analyzeSecondaryStream ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary,
+        helper.determineStreamIndex(request));
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion;
+    EXPECT_EQ(request.camera->motionStreamIndex().index, helper.determineStreamIndex(request));
+
+    request.streamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode::auto_;
+    request.size = {kSecondaryStreamSize.width() * 2, kSecondaryStreamSize.height() / 2};
+    EXPECT_EQ(Qn::StreamIndex::primary, helper.determineStreamIndex(request));
+    request.size = {kSecondaryStreamSize.width() / 2, kSecondaryStreamSize.height() * 2};
+    EXPECT_EQ(Qn::StreamIndex::primary, helper.determineStreamIndex(request));
+}
+
+#endif // #ifndef EDGE_SERVER
 
 } // namespace nx::test
