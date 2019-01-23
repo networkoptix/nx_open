@@ -135,7 +135,7 @@ import * as Hls from 'hls.js';
     
                             // Should catch Mobile Devices
                             if ($window.jscd.mobile) {
-                                return 'native-hls';
+                                return 'jshls';
                             }
                             
                             // Hardcode native support
@@ -287,7 +287,7 @@ import * as Hls from 'hls.js';
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 
-                                scope.vgApi.addEventListener('loadeddata', function () {
+                                scope.vgApi.addEventListener('canplaythrough', function () {
                                     scope.loading = false;  // Video is ready - disable loading
                                     scope.playerHandler();
                                 });
@@ -328,10 +328,14 @@ import * as Hls from 'hls.js';
                                             });
                                         });
                                         
-                                        scope.vgApi.addEventListener('loadeddata', function (event) {
-                                            scope.loading = false; // Video is playing - disable loading
+                                        scope.vgApi.addEventListener('canplaythrough', function (event) {
+                                            $timeout(() => scope.loading = false ); // Video is playing - disable loading
                                             scope.playerHandler();
                                             cancelTimeoutNativeLoad();
+                                        });
+                                        
+                                        scope.vgApi.addEventListener('waiting', function (event) {
+                                            $timeout(() => scope.loading = true );
                                         });
                                         
                                         scope.vgApi.addEventListener('ended', function (event) {

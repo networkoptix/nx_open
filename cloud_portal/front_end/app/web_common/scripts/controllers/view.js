@@ -167,7 +167,7 @@
                             
                             for (var i = 0; i < availableFormats.length; i++) {
                                 if (availableFormats[i].encoderIndex === 0) {
-                                    if (window.jscd.os !== 'iOS' || (window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera))) {
+                                    if (window.jscd.os !== 'iOS' || (window.jscd.os === 'iOS' && !checkiOSResolution($scope.activeCamera))) {
                                         streams.push(LANG.common.resolution.high);
                                     }
                                 }
