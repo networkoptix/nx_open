@@ -151,12 +151,9 @@ private:
     void makeRectangles(Rect outRects[], int maxRectCount, int* outRectCount)
     {
         *outRectCount = 0;
-        const auto width = (float) ini().stubRectangleWidth / 100;
-        const auto height = (float) ini().stubRectangleWidth / 100;
         const auto rectangleCount = std::min(ini().stubNumberOfRectangles, maxRectCount);
         const int frequencyCoefficient =
             ini().stubMetadataFrequency ? ini().stubMetadataFrequency : 1;
-
 
         for (int i = 0; i < rectangleCount; ++i)
         {

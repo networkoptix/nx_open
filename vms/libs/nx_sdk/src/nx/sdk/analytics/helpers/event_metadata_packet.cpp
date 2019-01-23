@@ -32,7 +32,7 @@ int64_t EventMetadataPacket::durationUs() const
 
 IEvent* EventMetadataPacket::nextItem()
 {
-    if (m_currentIndex < m_events.size())
+    if (m_currentIndex < (int) m_events.size())
         return m_events[m_currentIndex++];
 
     return nullptr;

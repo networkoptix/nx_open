@@ -70,7 +70,7 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() -> noError";
     return Error::noError;

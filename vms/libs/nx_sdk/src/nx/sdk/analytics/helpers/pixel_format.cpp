@@ -40,7 +40,7 @@ static const PixelFormatDescriptors pixelFormatDescriptors = initPixelFormatDesc
 
 const PixelFormatDescriptor* getPixelFormatDescriptor(PixelFormat pixelFormat)
 {
-    if ((int) pixelFormat < 0 || (int) pixelFormat >= pixelFormatDescriptors.size())
+    if ((int) pixelFormat < 0 || (int) pixelFormat >= (int) pixelFormatDescriptors.size())
     {
         NX_PRINT << "INTERNAL ERROR: PixelFormat value " << (int) pixelFormat << " not registered";
         return nullptr;
