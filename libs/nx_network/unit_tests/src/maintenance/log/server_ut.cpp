@@ -65,7 +65,7 @@ protected:
         ASSERT_TRUE(parseSucceeded);
 
         ASSERT_EQ(loggers.size(), loggersReturnedByServer.loggers.size());
-        for (int i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
+        for (std::size_t i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
         {
             assertLoggerEquality(
                 loggers[i], 
