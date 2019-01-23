@@ -34,6 +34,8 @@ export class CamTableComponent implements OnChanges, OnInit {
   private showParameters;
   private showHeaders;
   private paramsShown;
+  private lang;
+
 
   pager: any = {};
   pagedItems: any[];
@@ -55,14 +57,28 @@ export class CamTableComponent implements OnChanges, OnInit {
   };
 
   constructor(private pagerService: PagerService,
-              translate: TranslateService,
+              private translate: TranslateService,
               config: NxConfigService) {
+
+      this.lang = this.translate.translations[this.translate.currentLang];
 
       this.CONFIG = config.getConfig();
       this._elements = this.elements;
 
       this.paramsShown = 6;
-      this.cameraHeaders = ['Manufacturer', 'Model', 'Type', 'Max Resolution', 'Max FPS', 'Codec', 'Audio', 'PTZ', 'Fisheye', 'Motion', 'I/O'];
+      this.cameraHeaders = [
+          this.lang.manufacturer,
+          this.lang.model,
+          this.lang.type,
+          this.lang.max_resolution,
+          this.lang.max_fps,
+          this.lang.codec,
+          this.lang.audio,
+          this.lang.ptz,
+          this.lang.fisheye,
+          this.lang.motion,
+          this.lang.io
+      ];
   }
 
     toggleHeaderCaption(param, label1, label2) {
@@ -88,8 +104,8 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         if (changes.allowedParameters) {
-            this.toggleHeaderCaption('isTwAudioSupported', 'Audio', '2-way Audio');
-            this.toggleHeaderCaption('isAptzSupported', 'PTZ', 'Adv. PTZ');
+            this.toggleHeaderCaption('isTwAudioSupported', this.lang.audio, this.lang.tw_audio);
+            this.toggleHeaderCaption('isAptzSupported', this.lang.ptz, this.lang.aptz);
 
             this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
             this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;

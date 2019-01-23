@@ -1,0 +1,15 @@
+{
+	"manufacturer" : "Manufacturer",
+	"model" : "Model",
+	"type" : "Type",
+	"max_resolution": "Max Resolution",
+	"max_fps": "Max FPS",
+	"codec": "Codec",
+	"audio": "Audio",
+	"tw_audio": "2-way Audio",
+	"ptz": "PTZ",
+	"aptz": "Adv. PTZ",
+	"fisheye": "Fisheye",
+	"motion": "Motion",
+	"io": "I/O"
+}
