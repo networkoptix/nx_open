@@ -45,6 +45,12 @@ void WebSocketTransportAcceptor::registerHandlers(
         nx::network::http::Method::get,
         nx::network::url::joinPath(rootPath, kCommandPath),
         [this](auto&&... args) { return createConnection(std::move(args)...); });
+
+    // TODO: #ak Remove in ~ 3 months after 4.0 release.
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::Method::get,
+        nx::network::url::joinPath(rootPath, kDeprecatedCommandPath),
+        [this](auto&&... args) { return createConnection(std::move(args)...); });
 }
 
 void WebSocketTransportAcceptor::createConnection(
