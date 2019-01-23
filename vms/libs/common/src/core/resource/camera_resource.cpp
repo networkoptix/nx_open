@@ -70,6 +70,8 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
         {
             if (key == kEnabledAnalyticsEnginesProperty)
                 m_cachedAnalyticsEngines.reset();
+
+            emit enabledAnalyticsEnginesChanged(toSharedPointer(this));
         });
 }
 

@@ -178,13 +178,6 @@ void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 
 void Manager::at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName)
 {
-    const auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (device)
-    {
-        at_devicePropertyChanged(device, propertyName);
-        return;
-    }
-
     auto engine = resource.dynamicCast<nx::vms::server::resource::AnalyticsEngineResource>();
     if (!NX_ASSERT(engine))
         return;
@@ -229,23 +222,18 @@ void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
     }
 }
 
-void Manager::at_devicePropertyChanged(
-    const QnVirtualCameraResourcePtr& device,
-    const QString& propertyName)
+void Manager::at_deviceEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device)
 {
-    if (propertyName == QnVirtualCameraResource::kEnabledAnalyticsEnginesProperty)
+    auto analyticsContext = context(device);
+    if (!analyticsContext)
     {
-        auto analyticsContext = context(device);
-        if (!analyticsContext)
-        {
-            NX_DEBUG(this, "Can't find analytics context for device %1 (%2)",
-                device->getUserDefinedName(), device->getId());
-            return;
-        }
-
-        analyticsContext->setEnabledAnalyticsEngines(
-            sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
+        NX_DEBUG(this, "Can't find analytics context for device %1 (%2)",
+            device->getUserDefinedName(), device->getId());
+        return;
     }
+
+    analyticsContext->setEnabledAnalyticsEngines(
+        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
 }
 
 void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
@@ -264,6 +252,10 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
     connect(
         device, &QnResource::propertyChanged,
         this, &Manager::at_resourcePropertyChanged);
+
+    connect(
+        device, &QnVirtualCameraResource::enabledAnalyticsEnginesChanged,
+        this, &Manager::at_deviceEnabledAnalyticsEnginesChanged);
 
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(
