@@ -2529,7 +2529,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
-     * %param[opt]:enum streamSelectionMode Policy for stream selection.
+     * %param[opt]:enum streamSelectionMode Policy for stream selection. Default value is "auto".
      *     %value auto Chooses the most suitable stream automatically.
      *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
      *         primary one is not available.
