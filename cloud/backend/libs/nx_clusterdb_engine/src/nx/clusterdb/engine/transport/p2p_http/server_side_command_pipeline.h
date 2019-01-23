@@ -39,9 +39,9 @@ public:
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
     /**
-     * @param command Will be reported as read by ServerSideCommandPipeline::readSomeAsync.
+     * @param message Will be reported as read by ServerSideCommandPipeline::readSomeAsync.
      */
-    void saveReceivedCommandBuffer(nx::Buffer command);
+    void saveReceivedMessage(nx::Buffer message);
 
 protected:
     virtual void stopWhileInAioThread() override;

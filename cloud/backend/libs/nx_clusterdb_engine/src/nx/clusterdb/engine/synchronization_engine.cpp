@@ -171,12 +171,7 @@ void SyncronizationEngine::registerHttpApi(
         &m_httpTransportAcceptor,
         dispatcher);
 
-    registerHttpHandler(
-        nx::network::http::Method::get,
-        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2P2pTransactionConnectionPath),
-        &transport::WebSocketTransportAcceptor::createConnection,
-        &m_webSocketAcceptor,
-        dispatcher);
+    m_webSocketAcceptor.registerHandlers(pathPrefix, dispatcher);
 
     m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
 }

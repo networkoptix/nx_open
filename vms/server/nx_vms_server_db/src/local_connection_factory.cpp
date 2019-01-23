@@ -173,8 +173,18 @@ void LocalConnectionFactory::registerTransactionListener(
     }
     else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
-        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kDeprecatedUrlPath));
+        // For compatibility with clients from previous versions.
+        static const QString deprecatedUrls[] = {
+            "/ec2/messageBus",
+            "/ec2/transactionBus"
+        };
+
+        for (const auto& path: deprecatedUrls)
+        {
+            httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+                "HTTP", QnTcpListener::normalizedPath(path));
+        }
+
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
             "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kWebsocketUrlPath));
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(

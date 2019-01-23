@@ -3,10 +3,9 @@
 #include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
 
-#include "compatible_ec2_protocol_version.h"
-#include "transaction_log.h"
+#include "../../transaction_log.h"
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 static constexpr int kMaxTransactionsPerIteration = 17;
 
@@ -36,7 +35,7 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(p2pTransport()->getAioThread());
+    bindToAioThread(p2pTransport().getAioThread());
 
     m_commonTransactionHeader.systemId = systemId;
     m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
@@ -191,7 +190,7 @@ void WebsocketCommandTransport::onTransactionsReadFromLog(
 
 network::SocketAddress WebsocketCommandTransport::remotePeerEndpoint() const
 {
-    return p2pTransport()->getForeignAddress();
+    return p2pTransport().getForeignAddress();
 }
 
 ConnectionClosedSubscription& WebsocketCommandTransport::connectionClosedSubscription()
@@ -205,7 +204,7 @@ void WebsocketCommandTransport::setState(State state)
     {
         SystemError::ErrorCode errorCode = SystemError::connectionAbort;
         // TODO: pass correct error code here
-        //p2pTransport()->socket()->getLastError(&errorCode);
+        //p2pTransport().socket()->getLastError(&errorCode);
         m_connectionClosedSubscription.notify(errorCode);
     }
     nx::p2p::ConnectionBase::setState(state);
@@ -258,4 +257,4 @@ void WebsocketCommandTransport::fillAuthInfo(
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
 }
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::p2p::websocket

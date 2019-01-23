@@ -23,9 +23,8 @@ namespace p2p {
 
 SendCounters ConnectionBase::m_sendCounters = {};
 
-const QString ConnectionBase::kDeprecatedUrlPath(lit("/ec2/messageBus"));
-const QString ConnectionBase::kWebsocketUrlPath(lit("/ec2/transactionBus"));
-const QString ConnectionBase::kHttpUrlPath(lit("/ec2/httpTransactionBus"));
+const QString ConnectionBase::kWebsocketUrlPath(lit("/ec2/transactionBus/websocket"));
+const QString ConnectionBase::kHttpUrlPath(lit("/ec2/transactionBus/http"));
 
 
 #if defined(CHECK_SEQUENCE)

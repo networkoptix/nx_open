@@ -11,10 +11,10 @@
 
 #include "request_path.h"
 #include "server_side_command_pipeline.h"
+#include "../p2p_websocket/websocket_transaction_transport.h"
 #include "../../compatible_ec2_protocol_version.h"
 #include "../../connection_manager.h"
 #include "../../http/sync_connection_request_handler.h"
-#include "../../websocket_transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
@@ -35,7 +35,6 @@ Acceptor::Acceptor(
         nx::vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat)
 {
-    // TODO
 }
 
 void Acceptor::registerHandlers(
@@ -115,8 +114,54 @@ void Acceptor::processClientCommand(
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    // TODO
-    completionHandler(nx::network::http::StatusCode::notImplemented);
+    const auto resultCode = forwardMessageToConnection(
+        connectionId,
+        std::exchange(requestContext.request.messageBody, {}));
+
+    if (resultCode == nx::network::http::StatusCode::ok)
+    {
+        NX_VERBOSE(this, "Received message from %1 for connection %2",
+            requestContext.connection->socket()->getForeignAddress(), connectionId);
+    }
+    else
+    {
+        NX_DEBUG(this, "Failed to process message from %1 for connection %2. %3",
+            requestContext.connection->socket()->getForeignAddress(), connectionId,
+                nx::network::http::StatusCode::toString(resultCode));
+    }
+
+    completionHandler(resultCode);
+}
+
+nx::network::http::StatusCode::Value Acceptor::forwardMessageToConnection(
+    const std::string& connectionId,
+    nx::Buffer message)
+{
+    bool messageProcessed = false;
+    const bool connectionFound = m_connectionManager->modifyConnectionByIdSafe(
+        connectionId,
+        [message = std::move(message), &messageProcessed](
+            AbstractConnection* connection) mutable
+        {
+            auto p2pConnection = dynamic_cast<websocket::WebsocketCommandTransport*>(connection);
+            if (!p2pConnection)
+                return;
+
+            auto commandPipeline = 
+                dynamic_cast<ServerSideCommandPipeline*>(&p2pConnection->p2pTransport());
+            if (!commandPipeline)
+                return;
+
+            commandPipeline->saveReceivedMessage(std::move(message));
+            messageProcessed = true;
+        });
+
+    if (!connectionFound)
+        return nx::network::http::StatusCode::notFound;
+    if (!messageProcessed)
+        return nx::network::http::StatusCode::forbidden;
+
+    return nx::network::http::StatusCode::ok;
 }
 
 bool Acceptor::validateRequest(
@@ -166,7 +211,7 @@ bool Acceptor::registerNewConnection(
     const auto userAgent = nx::network::http::getHeaderValue(
         requestContext.request.headers, "User-Agent").toStdString();
 
-    auto connection = std::make_unique<WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
         m_protocolVersionRange,
         m_commandLog,
         systemId,

@@ -48,6 +48,10 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
+    nx::network::http::StatusCode::Value forwardMessageToConnection(
+        const std::string& connectionId,
+        nx::Buffer message);
+
     bool validateRequest(
         const nx::network::http::RequestContext& requestContext,
         const std::string& connectionId,
