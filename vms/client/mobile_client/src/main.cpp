@@ -341,19 +341,6 @@ void initLog(const QString& logLevel)
                 std::set<nx::utils::log::Tag>(),
                 std::move(logWriter)));
     }
-
-    if (ini().enableEc2TranLog)
-    {
-        logSettings.loggers.front().logBaseName = QnAppInfo::isAndroid()
-            ? lit("-")
-            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran"));
-        nx::utils::log::addLogger(
-            nx::utils::log::buildLogger(
-                logSettings,
-                /*applicationName*/ lit("mobile_client"),
-                /*binaryPath*/ QString(),
-                {QnLog::EC2_TRAN_LOG}));
-    }
 }
 
 void processStartupParams(const QnMobileClientStartupParameters& startupParameters)
@@ -381,7 +368,7 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 int main(int argc, char *argv[])
 {
 	nx::kit::OutputRedirector::ensureOutputRedirection();
-	
+
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
     #if defined(Q_OS_WIN)
         AllowSetForegroundWindow(ASFW_ANY);
