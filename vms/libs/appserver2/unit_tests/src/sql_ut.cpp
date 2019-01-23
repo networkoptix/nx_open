@@ -19,12 +19,18 @@ class DataBase:
 
 public:
     DataBase():
-        base_type("DataBase", nx::utils::TestOptions::temporaryDirectoryPath()),
-        m_file(nx::utils::TestOptions::temporaryDirectoryPath() + QLatin1String("/db.sqlite")),
-        m_db(QSqlDatabase::addDatabase("QSQLITE", "db"))
+        base_type("sql"),
+        m_file(testDataDir() + QLatin1String("/db.sqlite"))
     {
+
+    }
+
+    virtual void SetUp() override
+    {
+        m_db = QSqlDatabase::addDatabase("QSQLITE", "db");
+
         NX_INFO(this) << "Database" << m_file;
-        QDir(".").remove(m_file);
+        QDir().remove(m_file);
 
         m_db.setDatabaseName(m_file);
         NX_ASSERT(m_db.open(), m_db.lastError().text());
@@ -40,11 +46,12 @@ public:
         logSize();
     }
 
-    ~DataBase()
+    virtual void TearDown() override
     {
         m_db.close();
+        m_db = QSqlDatabase(); //< m_db object must be cleared before call to removeDatabase.
         QSqlDatabase::removeDatabase("db");
-        QDir(".").remove(m_file);
+        QDir().remove(m_file);
     }
 
     QSqlQuery query(const QString& s)
