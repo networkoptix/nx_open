@@ -108,9 +108,10 @@
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Для подключения системы к {{Config.cloud.productName}} необходимо подключение к сети Интернет</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
-                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Подключиться к {{Config.cloud.productName}}</button>                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Подключиться к {{Config.cloud.productName}}</button>
+                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
-                                   target="_blank">Создать учётную запись {{Config.cloud.productName}}</a></p>
+                                   target="_blank">Зарегистрироваться в {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
 

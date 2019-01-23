@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Seleccionar Tudo</translation>
+      <translation>&amp;Selecionar Tudo</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -62,19 +62,19 @@
     </message>
     <message>
       <source>Increase</source>
-      <translation type="unfinished">Increase</translation>
+      <translation>Aumentar</translation>
     </message>
     <message>
       <source>Decrease</source>
-      <translation type="unfinished">Decrease</translation>
+      <translation>Diminuir</translation>
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation type="unfinished">ShowMenu</translation>
+      <translation>MostrarMenu</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation type="unfinished">SetFocus</translation>
+      <translation>DefinirFoco</translation>
     </message>
     <message>
       <source>Toggle</source>
@@ -98,59 +98,59 @@
     </message>
     <message>
       <source>Previous Page</source>
-      <translation type="unfinished">Previous Page</translation>
+      <translation>Página anterior</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation type="unfinished">Next Page</translation>
+      <translation>Próxima Página</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation type="unfinished">Triggers the action</translation>
+      <translation>Desencadeia a ação</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation type="unfinished">Increase the value</translation>
+      <translation>Aumentar o valor</translation>
     </message>
     <message>
       <source>Decrease the value</source>
-      <translation type="unfinished">Decrease the value</translation>
+      <translation>Diminuir o valor</translation>
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation type="unfinished">Shows the menu</translation>
+      <translation>Mostrar o menu</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation type="unfinished">Sets the focus</translation>
+      <translation>Define o foco</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation type="unfinished">Toggles the state</translation>
+      <translation>Alterna o estado</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation type="unfinished">Scrolls to the left</translation>
+      <translation>Desloca para a esquerda</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation type="unfinished">Scrolls to the right</translation>
+      <translation>Desloca para a direita</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation type="unfinished">Scrolls up</translation>
+      <translation>Desloca para cima</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation type="unfinished">Scrolls down</translation>
+      <translation>Desloca para baixo</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation type="unfinished">Goes back a page</translation>
+      <translation>Volta uma página atrás</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation type="unfinished">Goes to the next page</translation>
+      <translation>Vai para a próxima página</translation>
     </message>
   </context>
   <context>
@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>Yes to All</source>
-      <translation type="unfinished">Yes to All</translation>
+      <translation>Sim para tudo</translation>
     </message>
     <message>
       <source>No</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>No to All</source>
-      <translation type="unfinished">No to All</translation>
+      <translation>Não para tudo</translation>
     </message>
   </context>
   <context>
@@ -224,14 +224,14 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar todos</translation>
+      <translation>Selecionar todos</translation>
     </message>
   </context>
   <context>
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation type="unfinished">Don&apos;t Save</translation>
+      <translation>Não guardar</translation>
     </message>
   </context>
   <context>
@@ -271,16 +271,16 @@
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation type="unfinished">Cursor at %1, %2
-Press ESC to cancel</translation>
+      <translation>Cursor em %1, %2
+Pressione ESC para cancelar</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp;Escolher cor da tela</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation>Seleccione a Cor</translation>
+      <translation>Selecione a Cor</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
@@ -288,7 +288,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation>Cores c&amp;ostumizadas</translation>
+      <translation>Cores c&amp;ustomizadas</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
@@ -307,33 +307,33 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>Abra o pop-up de seleção</translation>
     </message>
   </context>
   <context>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>O que é isto?</translation>
     </message>
   </context>
   <context>
@@ -372,11 +372,11 @@ Press ESC to cancel</translation>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>O ficheiro de destino é o mesmo ficheiro.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation type="unfinished">Source file does not exist.</translation>
+      <translation>O ficheiro de origem não existe.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
@@ -384,15 +384,15 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation type="unfinished">Error while renaming.</translation>
+      <translation>Erro ao renomear.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation type="unfinished">Unable to restore from %1: %2</translation>
+      <translation>Não é possível restaurar a partir de %1: %2</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>Não irá renomear o ficheiro sequencial usando a cópia de bloco</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
@@ -427,7 +427,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation type="unfinished">Go back</translation>
+      <translation>Retroceder</translation>
     </message>
     <message>
       <source>Forward</source>
@@ -435,7 +435,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation type="unfinished">Go forward</translation>
+      <translation>Avançar</translation>
     </message>
     <message>
       <source>Parent Directory</source>
@@ -443,7 +443,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation type="unfinished">Go to the parent directory</translation>
+      <translation>Ir para diretório anterior</translation>
     </message>
     <message>
       <source>Create New Folder</source>
@@ -451,7 +451,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation type="unfinished">Create a New Folder</translation>
+      <translation>Criar uma nova Pasta</translation>
     </message>
     <message>
       <source>List View</source>
@@ -459,7 +459,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation type="unfinished">Change to list view mode</translation>
+      <translation>Alterar para modo de visualização em lista</translation>
     </message>
     <message>
       <source>Detail View</source>
@@ -467,7 +467,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation type="unfinished">Change to detail view mode</translation>
+      <translation>Alterar para modo de visualização em detalhe</translation>
     </message>
     <message>
       <source>Files of type:</source>
@@ -475,7 +475,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation>Procurar Directoria</translation>
+      <translation>Procurar Diretório</translation>
     </message>
     <message>
       <source>Open</source>
@@ -487,7 +487,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation>Directoria:</translation>
+      <translation>Diretório:</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
@@ -531,19 +531,19 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>Todos (*)</translation>
+      <translation>Todos ficheiros (*)</translation>
     </message>
     <message>
       <source>Directories</source>
-      <translation>Directorias</translation>
+      <translation>Diretórios</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
       <translation>%1
-Directoria não encontrada.
-Por favor verifique o nome da directoria.</translation>
+Diretório não encontrado.
+Por favor verifique o nome do diretório.</translation>
     </message>
     <message>
       <source>%1 already exists.
@@ -570,16 +570,16 @@ Por favor verifique o nome do ficheiro.</translation>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation>&apos;%1&apos; está protegido contra escrita.
+Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
+      <translation>Tem a certeza de que deseja apagar &apos;%1&apos;?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation>Não foi possível apagar a directoria.</translation>
+      <translation>Não foi possível apagar o diretório.</translation>
     </message>
     <message>
       <source>Recent Places</source>
@@ -600,7 +600,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation type="unfinished">%1 File</translation>
+      <translation>Ficheiro %1</translation>
     </message>
     <message>
       <source>File</source>
@@ -609,7 +609,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation type="unfinished">File Folder</translation>
+      <translation>Pasta de Ficheiros</translation>
     </message>
     <message>
       <source>Folder</source>
@@ -619,12 +619,12 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>Alias</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Shortcut</translation>
+      <translation>Atalho</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -632,27 +632,27 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation type="unfinished">Sidebar</translation>
+      <translation>Barra Lateral</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation type="unfinished">List of places and bookmarks</translation>
+      <translation>Lista de lugares e marcadores</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation type="unfinished">Files</translation>
+      <translation>Ficheiros</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation type="unfinished">Alt+Left</translation>
+      <translation>Alt + Esquerda</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation type="unfinished">Alt+Right</translation>
+      <translation>Alt+Direita</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation type="unfinished">Alt+Up</translation>
+      <translation>Alt+Cima</translation>
     </message>
   </context>
   <context>
@@ -667,15 +667,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
@@ -683,7 +683,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>&lt;b&gt;O nome &quot;%1&quot; não pode ser usado.&lt;/b&gt;&lt;p&gt;Tente usar outro nome, com menos caracteres ou sem pontuação.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -717,7 +717,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 byte(s)</translation>
     </message>
   </context>
   <context>
@@ -748,7 +748,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>LTR</translation>
     </message>
   </context>
   <context>
@@ -775,26 +775,26 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>ficheiro a abrir é um diretório</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation type="unfinished">Invalid device</translation>
+      <translation>Dispositivo inválido</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation type="unfinished">File not found</translation>
+      <translation>Ficheiro não encontrado</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Formato de imagem não suportado</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation type="unfinished">Unable to read image data</translation>
+      <translation>Não foi possível ler dados de imagem</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -809,15 +809,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation type="unfinished">Device is not set</translation>
+      <translation>O dispositivo não está definido</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation type="unfinished">Device not writable</translation>
+      <translation>Dispositivo não gravável</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Formato de imagem não suportado</translation>
     </message>
   </context>
   <context>
@@ -831,7 +831,7 @@ Do you want to delete it anyway?</translation>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation type="unfinished">Press shortcut</translation>
+      <translation>Pressione o atalho</translation>
     </message>
     <message>
       <source>%1, ...</source>
@@ -867,7 +867,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar todos</translation>
+      <translation>Selecionar todos</translation>
     </message>
   </context>
   <context>
@@ -975,22 +975,22 @@ Do you want to delete it anyway?</translation>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation>Todos (*.*)</translation>
+      <translation>Todos ficheiros (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation type="unfinished">Existing file %1 is not writable</translation>
+      <translation>O ficheiro existente %1 não é gravável</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation type="unfinished">Filename refers to a directory</translation>
+      <translation>Nome do ficheiro refere-se a um diretório</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation type="unfinished">Writing canceled by application</translation>
+      <translation>Escrita cancelada pela aplicação</translation>
     </message>
   </context>
   <context>
@@ -1052,11 +1052,11 @@ Do you want to delete it anyway?</translation>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation type="unfinished">Desktop</translation>
+      <translation>Desktop</translation>
     </message>
     <message>
       <source>Documents</source>
-      <translation type="unfinished">Documents</translation>
+      <translation>Documentos</translation>
     </message>
     <message>
       <source>Fonts</source>
@@ -1064,7 +1064,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Applications</source>
-      <translation type="unfinished">Applications</translation>
+      <translation>Aplicações</translation>
     </message>
     <message>
       <source>Music</source>
@@ -1072,7 +1072,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Movies</source>
-      <translation type="unfinished">Movies</translation>
+      <translation>Filmes</translation>
     </message>
     <message>
       <source>Pictures</source>
@@ -1080,7 +1080,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation type="unfinished">Temporary Directory</translation>
+      <translation>Diretório temporário</translation>
     </message>
     <message>
       <source>Home</source>
@@ -1088,35 +1088,35 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Application Data</source>
-      <translation type="unfinished">Application Data</translation>
+      <translation>Dados de Aplicação</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation type="unfinished">Application Configuration</translation>
+      <translation>Configuração da Aplicação</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>Cache</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation type="unfinished">Shared Data</translation>
+      <translation>Dados Partilhados</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>Runtime</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation type="unfinished">Configuration</translation>
+      <translation>Configuração</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation type="unfinished">Shared Configuration</translation>
+      <translation>Configuração Partilhada</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation type="unfinished">Shared Cache</translation>
+      <translation>Cache Partilhada</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1138,7 +1138,7 @@ Do you want to delete it anyway?</translation>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>O que é isto?</translation>
     </message>
   </context>
   <context>
@@ -1161,7 +1161,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation>Copiar &amp;Localização da Link</translation>
+      <translation>Copiar &amp;Localização do Link</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar todos</translation>
+      <translation>Selecionar todos</translation>
     </message>
   </context>
 </TS>

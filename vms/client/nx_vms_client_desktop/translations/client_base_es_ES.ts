@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>La Instalación falló</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>No se puede cancelar la instalación</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Instalación finalizada</translation>
     </message>
@@ -893,7 +889,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Configuración de pantalla...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -990,13 +990,13 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar diseño...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n diseños</numerusform>
+        <numerusform>%n diseños</numerusform>
       </translation>
     </message>
   </context>
@@ -1066,27 +1066,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Seleccione el dispositivo...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Seleccione cámara...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar diseño...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n diseños</numerusform>
+        <numerusform>%n diseños</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 en %2</translation>
     </message>
   </context>
   <context>
@@ -3632,11 +3632,11 @@ a %1</translation>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>Imagen de entrada no válida.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Error interno.</translation>
     </message>
   </context>
   <context>
@@ -3650,9 +3650,9 @@ a %1</translation>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>Esta cámara no se encuentra actualmente en algunos de los diseños seleccionados. La acción funcionará si se agrega la cámara antes de que se active la acción.</numerusform>
+        <numerusform>Esta cámara no se encuentra actualmente en algunos de los diseños seleccionados. La acción funcionará si se agrega la cámara antes de que se active la acción.</numerusform>
       </translation>
     </message>
   </context>
@@ -4864,7 +4864,7 @@ a %1</translation>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotación</translation>
     </message>
   </context>
   <context>
@@ -5464,6 +5464,10 @@ a %1</translation>
     <message>
       <source>Search</source>
       <translation>Búsqueda</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -7871,7 +7875,7 @@ a %1</translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>No hay espacio suficiente en el almacenamiento del servidor</translation>
     </message>
   </context>
   <context>
@@ -8134,7 +8138,7 @@ a %1</translation>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>No hay flujo secundario</translation>
     </message>
   </context>
   <context>
@@ -8331,7 +8335,7 @@ a %1</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Número personalizado que se puede asignar a un diseño para una rápida identificación y acceso</translation>
     </message>
   </context>
   <context>
@@ -8342,7 +8346,7 @@ a %1</translation>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Imagen de fondo</translation>
     </message>
   </context>
   <context>
@@ -8509,6 +8513,17 @@ a %1</translation>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>El período seleccionado no se puede exportar para la cámara actual.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n marcadores</numerusform>
+        <numerusform>%n marcadores</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>
@@ -8984,11 +8999,11 @@ a %1</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>¡Advertencia! Esta compilación es sólo para fines de prueba!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Actualice al siguiente parche o versión una vez que esté disponible.</translation>
     </message>
   </context>
   <context>

@@ -679,11 +679,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable native presets, use system presets instead</source>
-      <translation>השבת פריסטים במצלמה, השתמש בפריסטים של המערכת במקום</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>אזהרה! פריסטים של המצלמה לא יהיו זמינים.</translation>
     </message>
@@ -761,6 +756,31 @@
       <location/>
       <source>Logical ID</source>
       <translation>זיהוי ID לוגי</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Preferred PTZ preset type:</source>
+      <translation type="unfinished">Preferred PTZ preset type:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation type="unfinished">System</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native</source>
+      <translation type="unfinished">Native</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports pan and tilt</source>
+      <translation type="unfinished">This camera supports pan and tilt</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports zoom</source>
+      <translation type="unfinished">This camera supports zoom</translation>
     </message>
   </context>
   <context>
@@ -900,7 +920,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>כתובות זרמים</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1103,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>בפריסה</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1231,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>בפריסה</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>מצלמה</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>מצלמת מקור</translation>
     </message>
   </context>
   <context>
@@ -1422,17 +1442,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>נעול</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>רוחב</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>גובה</translation>
     </message>
     <message>
       <location/>
@@ -1452,7 +1472,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>גודל מינימלי</translation>
     </message>
   </context>
   <context>
@@ -1460,17 +1480,17 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>בחר פריסה</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>פריסות משותפת</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>בחר משתמש יחיד בשורה &quot;הצג ל&quot; כדי להציג את הפריסות המקומיות שלו ברשימה זו</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1574,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>ערוך זרמים...</translation>
     </message>
   </context>
   <context>
@@ -1882,7 +1902,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&amp;;quot;מצלמה לבישה&amp;;quot; היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
+      <translation>'מצלמה לבישה" היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2330,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>אפשר ציר זמן על קיר וידאו</translation>
     </message>
   </context>
   <context>
@@ -2991,12 +3011,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>הצג סימן מים עם שם משתמש על הוידאו</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>תצוגה מקדימה של סימן מים</translation>
     </message>
   </context>
   <context>
@@ -3109,7 +3129,7 @@
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>לחץ על לחצן &amp;;quot;תפקיד הרשאות חדש&amp;;quot; כדי ליצור אחד.</translation>
+      <translation>לחץ על לחצן 'תפקיד הרשאות חדש' כדי ליצור אחד.</translation>
     </message>
   </context>
   <context>
@@ -3179,7 +3199,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>דף אינטרנט זה נועד לאינטגרצית C2P</translation>
     </message>
   </context>
   <context>
@@ -3215,7 +3235,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>תצוגה מקדימה של סימן מים</translation>
     </message>
     <message>
       <location/>
@@ -3225,7 +3245,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>תדירות</translation>
     </message>
   </context>
 </TS>
