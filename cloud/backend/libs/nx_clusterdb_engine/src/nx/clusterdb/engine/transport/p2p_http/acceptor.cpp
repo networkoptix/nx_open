@@ -78,7 +78,9 @@ void Acceptor::openServerCommandChannel(
         std::make_unique<nx::network::http::MultipartMessageBodySource>(
             "28cc020ef6044ccaa9a524d3303a4cd2");
     auto commandPipeline = std::make_unique<ServerSideCommandPipeline>(
-        multipartMessageBodySource.get());
+        multipartMessageBodySource.get(),
+        "application/ubjson",
+        requestContext.connection->socket()->getForeignAddress());
     commandPipeline->start();
 
     if (!registerNewConnection(
@@ -101,9 +103,18 @@ void Acceptor::openServerCommandChannel(
 }
 
 void Acceptor::processClientCommand(
-    nx::network::http::RequestContext /*requestContext*/,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
+    const auto connectionId = nx::network::http::getHeaderValue(
+        requestContext.request.headers, Qn::EC2_CONNECTION_GUID_HEADER_NAME).toStdString();
+    if (connectionId.empty())
+    {
+        NX_DEBUG(this, "Received request from %1 without connection id",
+            requestContext.connection->socket()->getForeignAddress());
+        return completionHandler(nx::network::http::StatusCode::badRequest);
+    }
+
     // TODO
     completionHandler(nx::network::http::StatusCode::notImplemented);
 }
