@@ -45,7 +45,7 @@ class Helper
 public:
     Helper() {} //< Constructing a helper which does not log anything.
 
-    Helper(Level level, const Tag& tag):
+    Helper(Level level, Tag tag):
         m_level(level),
         m_tag(std::move(tag)),
         m_logger(getLogger(m_tag))
@@ -73,7 +73,7 @@ public:
     Stream(const Stream&) = delete;
     Stream(Stream&&) = default;
     Stream& operator=(const Stream&) = delete;
-    Stream& operator=(Stream&&) = default;
+    Stream& operator=(Stream&&) = delete;
 
     Stream& setDelimiter(const QString& delimiter)
     {
