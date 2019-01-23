@@ -83,7 +83,7 @@ void ServerSideCommandPipeline::start(
     if (!handler)
         return;
 
-    post([this, handler = std::move(handler)]() { handler(SystemError::noError); });
+    post([handler = std::move(handler)]() { handler(SystemError::noError); });
 }
 
 void ServerSideCommandPipeline::saveReceivedCommandBuffer(nx::Buffer command)
