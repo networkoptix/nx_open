@@ -33,7 +33,7 @@ private:
 };
 
 
-/** Some cameras does not support Cpro API and Onvif2, so that class is used in such cases to
+/** Some cameras does not support Cpro API and Onvif::Media2, so that class is used in such cases to
  * configure H265 codec.
  */
 class JsonApiClient

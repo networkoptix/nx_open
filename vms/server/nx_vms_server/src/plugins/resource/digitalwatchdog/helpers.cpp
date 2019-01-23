@@ -13,7 +13,7 @@ namespace {
 const std::chrono::seconds kCproApiCacheTimeout(5);
 
 const char* kJsonApiRequestDataTemplate =
-    "{\"jsonData\": { \"data\" : %1, \"file\" : \"param\", \"password\": \"%2\", \"username\": \"%3\"}}";
+    R"json({"jsonData":{"data":%1,"file":"param","password":"%2","username":"%3"}})json";
 
 QSize jsonApiResolutionToQSize(QString resolution)
 {
@@ -187,7 +187,7 @@ nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoC
 {
     NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
 
-    channelNumber += 1; //< Camera API channel numbers start with 1.
+    ++channelNumber; //< Camera API channel numbers start with 1.
     const QJsonObject params = getParams(QString("All.VideoInput._%1._%2")
         .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2));
 
@@ -216,7 +216,7 @@ bool JsonApiClient::sendStreamParams(
 {
     NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
 
-    channelNumber += 1; //< Camera API channel numbers start with 1.
+    ++channelNumber; //< Camera API channel numbers start with 1.
     QString paramBasename =  QString("All.VideoInput._%1._%2.")
         .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2);
 
