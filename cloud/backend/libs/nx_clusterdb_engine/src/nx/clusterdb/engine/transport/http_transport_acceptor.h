@@ -7,6 +7,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/vms/api/data/peer_data.h>
@@ -39,18 +40,9 @@ public:
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
-    /**
-     * Mediaserver calls this method to open 2-way transaction exchange channel.
-     */
-    void createConnection(
-        nx::network::http::RequestContext requestContext,
-        const std::string& systemId,
-        nx::network::http::RequestProcessedHandler completionHandler);
-
-    void pushTransaction(
-        nx::network::http::RequestContext requestContext,
-        const std::string& systemId,
-        nx::network::http::RequestProcessedHandler completionHandler);
+    void registerHandlers(
+        const std::string& rootPath,
+        nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
 
 private:
     const ProtocolVersionRange& m_protocolVersionRange;
@@ -60,6 +52,17 @@ private:
     const vms::api::PeerData m_localPeerData;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
     std::atomic<int> m_connectionSeq{0};
+
+    /**
+     * Mediaserver calls this method to open 2-way transaction exchange channel.
+     */
+    void createConnection(
+        nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    void pushTransaction(
+        nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,

@@ -158,21 +158,8 @@ void SyncronizationEngine::registerHttpApi(
 {
     m_httpServer.registerHandlers(pathPrefix, dispatcher);
 
-    // TODO: #ak Move folowing to m_httpServer.registerHandlers.
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2TransactionConnectionPath),
-        &transport::CommonHttpAcceptor::createConnection,
-        &m_httpTransportAcceptor,
-        dispatcher);
-
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, transport::kPushEc2TransactionPath),
-        &transport::CommonHttpAcceptor::pushTransaction,
-        &m_httpTransportAcceptor,
-        dispatcher);
-
+    m_httpTransportAcceptor.registerHandlers(pathPrefix, dispatcher);
     m_webSocketAcceptor.registerHandlers(pathPrefix, dispatcher);
-
     m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
 }
 

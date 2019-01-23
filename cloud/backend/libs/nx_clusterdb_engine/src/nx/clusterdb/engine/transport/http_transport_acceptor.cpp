@@ -5,11 +5,14 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/api/types/connection_types.h>
 
 #include "generic_transport.h"
+#include "http_transport_paths.h"
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
+#include "../http/sync_connection_request_handler.h"
 
 namespace nx::clusterdb::engine::transport {
 
@@ -58,9 +61,23 @@ CommonHttpAcceptor::CommonHttpAcceptor(
 {
 }
 
+void CommonHttpAcceptor::registerHandlers(
+    const std::string& rootPath,
+    nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
+{
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::kAnyMethod,
+        nx::network::url::joinPath(rootPath, kEstablishEc2TransactionConnectionPath),
+        [this](auto&&... args) { return createConnection(std::forward<decltype(args)>(args)...); });
+
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::kAnyMethod,
+        nx::network::url::joinPath(rootPath, kPushEc2TransactionPath),
+        [this](auto&&... args) { return pushTransaction(std::forward<decltype(args)>(args)...); });
+}
+
 void CommonHttpAcceptor::createConnection(
     nx::network::http::RequestContext requestContext,
-    const std::string& systemId,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     // GET /ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
@@ -69,6 +86,7 @@ void CommonHttpAcceptor::createConnection(
 
     auto httpConnection = requestContext.connection;
 
+    const auto systemId = extractSystemIdFromHttpRequest(requestContext);
     if (systemId.empty())
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
@@ -166,7 +184,6 @@ void CommonHttpAcceptor::createConnection(
 
 void CommonHttpAcceptor::pushTransaction(
     nx::network::http::RequestContext requestContext,
-    const std::string& /*systemId*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     const auto& request = requestContext.request;
