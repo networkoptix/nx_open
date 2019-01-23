@@ -392,9 +392,9 @@ SystemError::ErrorCode MediaServerClient::prevRequestSysErrorCode() const
     return m_prevRequestSysErrorCode;
 }
 
-nx::network::http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
+nx::network::http::StatusLine MediaServerClient::lastResponseHttpStatusLine() const
 {
-    return m_prevResponseHttpStatusCode;
+    return m_prevResponseHttpStatusLine;
 }
 
 void MediaServerClient::stopWhileInAioThread()
