@@ -41,7 +41,7 @@ public:
     QnVideoWallResourcePtr addVideoWall();
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall);
 
-    QnMediaServerResourcePtr addServer(Qn::ServerFlags flags = Qn::SF_None);
+    QnMediaServerResourcePtr addServer(Qn::ServerFlags additionalFlags = Qn::SF_None);
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 

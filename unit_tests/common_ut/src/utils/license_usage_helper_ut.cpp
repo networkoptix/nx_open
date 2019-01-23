@@ -72,6 +72,13 @@ protected:
         return result;
     }
 
+    QnVirtualCameraResourcePtr addDefaultRecordingCamera()
+    {
+        // Camera stub should not replace license type.
+        const auto kDefaultLicenseType = Qn::LC_Count;
+        return addRecordingCamera(kDefaultLicenseType, /* licenseRequired */ false);
+    }
+
     void setArmMode(bool isArm = true)
     {
         m_licenses->setArmMode(isArm);
@@ -669,7 +676,7 @@ TEST_F(QnLicenseUsageHelperTest, licenseTypeChanged)
 
 TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
 {
-    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 
     addLicense(Qn::LC_Professional);
@@ -681,7 +688,7 @@ TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
 
 TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
 {
-    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 
     addLicense(Qn::LC_Edge);
@@ -693,7 +700,7 @@ TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
 
 TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToBjMiniServer)
 {
-    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 
     addLicense(Qn::LC_Professional);
@@ -705,7 +712,7 @@ TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToBjMiniServer)
 
 TEST_F(QnLicenseUsageHelperTest, moveArmCameraToBjMiniServer)
 {
-    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 
     addLicense(Qn::LC_Edge);
