@@ -29,18 +29,19 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
     m_readHttpClient->bindToAioThread(getAioThread());
-    m_readHttpClient->setAdditionalHeaders(network::http::HttpHeaders());
 
     m_writeHttpClient->bindToAioThread(getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
-
-    post([this]() { startReading(); });
 }
 
 void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
 {
-    if (onStart)
-        post([onStart = std::move(onStart)] { onStart(SystemError::noError); });
+    post(
+        [this, onStart = std::move(onStart)]() mutable
+        {
+            m_onStartHandler = std::move(onStart);
+            startReading();
+        });
 }
 
 P2PHttpClientTransport::~P2PHttpClientTransport()
@@ -159,14 +160,8 @@ network::aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
 
 network::SocketAddress P2PHttpClientTransport::getForeignAddress() const
 {
-    nx::utils::promise<network::SocketAddress> p;
-    auto f = p.get_future();
-    m_readHttpClient->post(
-        [this, &p]() mutable
-        {
-            p.set_value(m_readHttpClient->socket()->getForeignAddress());
-        });
-    return f.get();
+    return m_readHttpClient->executeInAioThreadSync(
+        [this]() { return m_readHttpClient->socket()->getForeignAddress(); });
 }
 
 void P2PHttpClientTransport::startReading()
@@ -174,6 +169,14 @@ void P2PHttpClientTransport::startReading()
     m_readHttpClient->setOnResponseReceived(
         [this]()
         {
+            if (m_onStartHandler)
+            {
+                utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                reportStartResult();
+                if (watcher.objectDestroyed())
+                    return;
+            }
+
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const QnByteArrayConstRef& data)
                 {
@@ -232,6 +235,14 @@ void P2PHttpClientTransport::startReading()
                  this,
                  "The read (GET) http client emitted 'onDone'. Moving to a failed state.");
 
+             if (m_onStartHandler)
+             {
+                 utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                 reportStartResult();
+                 if (watcher.objectDestroyed())
+                     return;
+             }
+
              m_failed = true;
 
              if (m_userReadHandlerPair)
@@ -262,6 +273,23 @@ void P2PHttpClientTransport::startReading()
          });
 
     m_readHttpClient->doGet(m_url ? *m_url : m_readHttpClient->url());
+}
+
+void P2PHttpClientTransport::reportStartResult()
+{
+    if (!m_onStartHandler)
+        return;
+
+    if (m_readHttpClient->failed())
+        return nx::utils::swapAndCall(m_onStartHandler, m_readHttpClient->lastSysErrorCode());
+
+    if (!nx::network::http::StatusCode::isSuccessCode(
+            m_readHttpClient->response()->statusLine.statusCode))
+    {
+        return nx::utils::swapAndCall(m_onStartHandler, SystemError::connectionReset);
+    }
+
+    nx::utils::swapAndCall(m_onStartHandler, SystemError::noError);
 }
 
 P2PHttpClientTransport::PostBodySource::PostBodySource(
