@@ -62,6 +62,7 @@ protected:
             QnUuid::createUuid().toByteArray(),
             network::websocket::binary,
             utils::Url("http://" + m_acceptor->getLocalAddress().toString() + kPath)));
+        m_client->start(nullptr);
 
         utils::promise<void> startedPromise;
         auto startedFuture = startedPromise.get_future();

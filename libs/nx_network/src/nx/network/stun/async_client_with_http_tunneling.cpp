@@ -155,7 +155,11 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
         [this, reason]()
         {
             decltype(m_stunClient) stunClient;
-            stunClient.swap(m_stunClient);
+            {
+                QnMutexLocker lock(&m_mutex);
+                stunClient.swap(m_stunClient);
+            }
+            
             if (stunClient)
             {
                 stunClient->closeConnection(reason);
@@ -210,7 +214,12 @@ void AsyncClientWithHttpTunneling::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_reconnectTimer.pleaseStopSync();
-    m_stunClient.reset();
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_stunClient.reset();
+    }
+
     m_httpTunnelingClient.reset();
 }
 

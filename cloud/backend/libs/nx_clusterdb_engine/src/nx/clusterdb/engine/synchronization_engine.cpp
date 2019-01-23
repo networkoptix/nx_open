@@ -51,6 +51,12 @@ SyncronizationEngine::SyncronizationEngine(
         &m_commandLog,
         &m_connectionManager,
         m_outgoingCommandFilter),
+    m_p2pHttpAcceptor(
+        peerId.toSimpleString().toStdString(),
+        m_supportedProtocolRange,
+        &m_commandLog,
+        &m_connectionManager,
+        m_outgoingCommandFilter),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
@@ -171,6 +177,8 @@ void SyncronizationEngine::registerHttpApi(
         &transport::WebSocketTransportAcceptor::createConnection,
         &m_webSocketAcceptor,
         dispatcher);
+
+    m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
 }
 
 template<typename ManagerType>

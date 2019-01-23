@@ -5,6 +5,7 @@
 #include <nx/network/stream_proxy.h>
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/squid_proxy_emulator.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
@@ -232,7 +233,7 @@ protected:
 
         const auto serverEndpoint = tcpServerSocket->getLocalAddress();
 
-        auto proxy = std::make_unique<nx::network::StreamProxy>();
+        auto proxy = std::make_unique<nx::network::test::SquidProxyEmulator>();
         proxy->startProxy(
             std::make_unique<nx::network::StreamServerSocketToAcceptorWrapper>(
                 std::move(tcpServerSocket)),
@@ -244,7 +245,7 @@ protected:
     }
 };
 
-TEST_F(VmsCloudDataSynchronizationThroughFirewall, data_is_synchronized)
+TEST_F(VmsCloudDataSynchronizationThroughFirewall, DISABLED_data_is_synchronized)
 {
     givenCloudSystemWithServerCount(1);
 

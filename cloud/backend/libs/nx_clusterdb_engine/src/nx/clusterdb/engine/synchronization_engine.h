@@ -18,6 +18,7 @@
 #include "statistics/provider.h"
 #include "transaction_log.h"
 #include "transport/http_transport_acceptor.h"
+#include "transport/p2p_http/acceptor.h"
 #include "transport/transport_manager.h"
 #include "transport/websocket_transport_acceptor.h"
 
@@ -83,6 +84,7 @@ private:
     Connector m_connector;
     transport::CommonHttpAcceptor m_httpTransportAcceptor;
     transport::WebSocketTransportAcceptor m_webSocketAcceptor;
+    transport::p2p::http::Acceptor m_p2pHttpAcceptor;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;

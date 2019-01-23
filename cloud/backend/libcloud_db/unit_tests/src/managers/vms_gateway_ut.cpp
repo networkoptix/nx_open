@@ -51,6 +51,12 @@ protected:
         m_vmsResponse.errorString = errorDescription.c_str();
     }
 
+    void givenVmsThatFailsEachRequestWithHttpStatusCode(
+        nx::network::http::StatusCode::Value statusCode)
+    {
+        forceVmsApiResponseStatus(statusCode);
+    }
+
     void whenIssueMergeRequest()
     {
         using namespace std::placeholders;
@@ -138,20 +144,18 @@ private:
     std::unique_ptr<nx::cloud::db::VmsGateway> m_vmsGateway;
     std::string m_systemId;
     std::string m_idOfSystemToMergeTo;
-    boost::optional<nx::network::http::StatusCode::Value> m_forcedHttpResponseStatus;
+    std::optional<nx::network::http::StatusCode::Value> m_forcedHttpResponseStatus;
     AccountWithPassword m_ownerAccount;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
         m_accountManagerStub.addAccount(m_ownerAccount);
 
         m_mediaserverEmulator = std::make_unique<nx::network::http::TestHttpServer>();
         m_mediaserverEmulator->registerRequestProcessorFunc(
             "/gateway/{systemId}/api/mergeSystems",
-            std::bind(&VmsGateway::vmsApiRequestStub, this, _1, _2));
+            [this](auto&&... args) { vmsApiRequestStub(std::move(args)...); });
         ASSERT_TRUE(m_mediaserverEmulator->bindAndListen());
 
         std::string vmsUrl = lm("http://%1/gateway/{systemId}/")
@@ -159,7 +163,8 @@ private:
         std::array<const char*, 2> args{"-vmsGateway/url", vmsUrl.c_str()};
 
         m_settings.load((int)args.size(), args.data());
-        m_vmsGateway = std::make_unique<nx::cloud::db::VmsGateway>(m_settings, m_accountManagerStub);
+        m_vmsGateway = std::make_unique<nx::cloud::db::VmsGateway>(
+            m_settings, m_accountManagerStub);
 
         m_systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
     }
@@ -264,7 +269,7 @@ TEST_F(VmsGateway, proper_error_is_reported_when_vms_rejects_request)
         VmsResultCode::forbidden);
 }
 
-TEST_F(VmsGateway, vms_error_description_is_forwarded)
+TEST_F(VmsGateway, application_error_text_from_vms_is_forwarded)
 {
     givenVmsThatFailsEachRequestWithApplicationLevelError(
         "VmsLogicalError");
@@ -273,6 +278,19 @@ TEST_F(VmsGateway, vms_error_description_is_forwarded)
 
     thenMergeRequestResultIs(VmsResultCode::logicalError);
     andResponseErrorDescriptionIs("VmsLogicalError");
+}
+
+TEST_F(VmsGateway, http_reason_is_forwarded_when_vms_error_text_is_absent)
+{
+    using namespace nx::network::http;
+
+    givenVmsThatFailsEachRequestWithHttpStatusCode(StatusCode::badGateway);
+
+    whenIssueMergeRequest();
+
+    thenMergeRequestResultIs(VmsResultCode::unreachable);
+    andResponseErrorDescriptionIs(
+        StatusCode::toString(StatusCode::badGateway).toStdString());
 }
 
 } // namespace test

@@ -1,27 +1,11 @@
 #include <nx/clusterdb/engine/transport/connector_factory.h>
-#include <nx/clusterdb/engine/transport/http_transport_acceptor.h>
-#include <nx/clusterdb/engine/transport/http_transport_connector.h>
+#include <nx/clusterdb/engine/transport/p2p_http/connector.h>
 
 #include "connection_acceptance_tests.h"
-#include "transport_acceptance_tests.h"
 
 namespace nx::clusterdb::engine::transport::test {
 
-struct HttpTransportTypes
-{
-    using Acceptor = CommonHttpAcceptor;
-    using CommandPipeline = CommonHttpConnection;
-    using Connector = HttpCommandPipelineConnector;
-};
-
-INSTANTIATE_TYPED_TEST_CASE_P(
-    Http,
-    CommandPipelineAcceptance,
-    HttpTransportTypes);
-
-//-------------------------------------------------------------------------------------------------
-
-class HttpTransportInstaller
+class P2pHttpTransportInstaller
 {
 public:
     static ConnectorFactory::Function configureFactory(ConnectorFactory* factory)
@@ -34,7 +18,7 @@ public:
                 const std::string& systemId,
                 const std::string& nodeId)
             {
-                return std::make_unique<HttpTransportConnector>(
+                return std::make_unique<p2p::http::Connector>(
                     protocolVersionRange,
                     commandLog,
                     outgoingCommandFilter,
@@ -45,9 +29,9 @@ public:
     }
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(
-    Http,
-    ConnectionAcceptance,
-    HttpTransportInstaller);
+//INSTANTIATE_TYPED_TEST_CASE_P(
+//    P2pHttp,
+//    ConnectionAcceptance,
+//    P2pHttpTransportInstaller);
 
 } // namespace nx::clusterdb::engine::transport::test
