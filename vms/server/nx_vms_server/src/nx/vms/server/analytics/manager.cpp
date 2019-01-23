@@ -456,9 +456,8 @@ std::set<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& 
         if (!NX_ASSERT(sdkEngine))
             continue;
 
-        nx::sdk::DeviceInfo deviceInfo;
-        const bool success = sdk_support::deviceInfoFromResource(device, &deviceInfo);
-        if (!success)
+        auto deviceInfo = sdk_support::deviceInfoFromResource(device);
+        if (!deviceInfo)
         {
             NX_WARNING(this, "Unable to build device info for device %1 (%2)",
                 device->getUserDefinedName(), device->getId());
@@ -466,7 +465,7 @@ std::set<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& 
             continue;
         }
 
-        if (sdkEngine->isCompatible(&deviceInfo))
+        if (sdkEngine->isCompatible(deviceInfo.get()))
             result.insert(engine->getId());
     }
 
@@ -496,15 +495,15 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
 
     for (auto& device: devices)
     {
-        nx::sdk::DeviceInfo deviceInfo;
-        if (!sdk_support::deviceInfoFromResource(device, &deviceInfo))
+        auto deviceInfo = sdk_support::deviceInfoFromResource(device);
+        if (!deviceInfo)
         {
             NX_WARNING(this, "Unable to build device info for device %1 (%2)",
                 device->getUserDefinedName(), device->getId());
             continue;
         }
 
-        if (sdkEngine->isCompatible(&deviceInfo))
+        if (sdkEngine->isCompatible(deviceInfo.get()))
             descriptorManager.addCompatibleAnalyticsEngines(device->getId(), {engine->getId()});
     }
 }

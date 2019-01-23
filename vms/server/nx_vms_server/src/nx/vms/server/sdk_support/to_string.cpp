@@ -2,18 +2,21 @@
 
 namespace nx::sdk {
 
-QString toString(const nx::sdk::DeviceInfo& deviceInfo)
+QString toString(const nx::sdk::IDeviceInfo* deviceInfo)
 {
     return lm(
-        "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
+        "Id: % 1, Vendor: %2, Model: %3, Firmware: %4, Name: %5, URL: %6, Channel: %7, "
+        "Shared Id: %8, Logical Id: %9")
         .args(
-            deviceInfo.vendor,
-            deviceInfo.model,
-            deviceInfo.firmware,
-            deviceInfo.uid,
-            deviceInfo.sharedId,
-            deviceInfo.url,
-            deviceInfo.channel
+            deviceInfo->id(),
+            deviceInfo->vendor(),
+            deviceInfo->model(),
+            deviceInfo->firmware(),
+            deviceInfo->name(),
+            deviceInfo->url(),
+            deviceInfo->channelNumber(),
+            deviceInfo->sharedId(),
+            deviceInfo->logicalId()
         ).toQString();
 }
 

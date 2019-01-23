@@ -116,7 +116,7 @@ public:
 
     virtual void executeAction(IAction* action, Error* outError) override;
     virtual nx::sdk::Error setHandler(IEngine::IHandler* handler) override;
-    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     void assertPluginCasted(void* plugin) const;

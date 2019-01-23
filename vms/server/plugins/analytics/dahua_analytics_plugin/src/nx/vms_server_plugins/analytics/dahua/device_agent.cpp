@@ -17,7 +17,7 @@ using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest)
     :
     m_engine(engine),
@@ -151,16 +151,16 @@ const IString* DeviceAgent::manifest(Error* error) const
     return new nx::sdk::String(m_jsonManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
-    m_url = deviceInfo.url;
-    m_model = deviceInfo.model;
-    m_firmware = deviceInfo.firmware;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
-    m_uniqueId = deviceInfo.uid;
-    m_sharedId = deviceInfo.sharedId;
-    m_channel = deviceInfo.channel;
+    m_url = deviceInfo->url();
+    m_model = deviceInfo->model();
+    m_firmware = deviceInfo->firmware();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
+    m_uniqueId = deviceInfo->id();
+    m_sharedId = deviceInfo->sharedId();
+    m_channel = deviceInfo->channelNumber();
 }
 
 } // namespace nx::vms_server_plugins::analytics::dahua

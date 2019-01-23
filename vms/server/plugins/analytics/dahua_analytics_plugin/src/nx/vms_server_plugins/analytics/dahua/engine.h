@@ -30,7 +30,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         nx::sdk::Error* outError) override;
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* outError) const override;
@@ -42,11 +42,11 @@ public:
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
-    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     nx::vms::api::analytics::DeviceAgentManifest fetchDeviceAgentParsedManifest(
-        const nx::sdk::DeviceInfo& deviceInfo);
+        const nx::sdk::IDeviceInfo* deviceInfo);
     QList<QString> parseSupportedEvents(const QByteArray& data);
 
     static QByteArray loadManifest();

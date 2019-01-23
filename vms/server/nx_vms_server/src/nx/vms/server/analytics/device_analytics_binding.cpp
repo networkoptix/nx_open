@@ -311,9 +311,8 @@ nx::sdk::Ptr<DeviceAnalyticsBinding::DeviceAgent>
         lm("Creating DeviceAgent for device %1 (%2).")
             .args(m_device->getUserDefinedName(), m_device->getId()));
 
-    nx::sdk::DeviceInfo deviceInfo;
-    bool success = sdk_support::deviceInfoFromResource(m_device, &deviceInfo);
-    if (!success)
+    auto deviceInfo = sdk_support::deviceInfoFromResource(m_device);
+    if (!deviceInfo)
     {
         NX_WARNING(this, lm("Cannot create device info from device %1 (%2)")
             .args(m_device->getUserDefinedName(), m_device->getId()));
@@ -332,8 +331,7 @@ nx::sdk::Ptr<DeviceAnalyticsBinding::DeviceAgent>
     }
 
     nx::sdk::Error error = nx::sdk::Error::noError;
-    nx::sdk::Ptr<DeviceAgent> deviceAgent(
-        sdkEngine->obtainDeviceAgent(&deviceInfo, &error));
+    nx::sdk::Ptr<DeviceAgent> deviceAgent(sdkEngine->obtainDeviceAgent(deviceInfo.get(), &error));
 
     if (!deviceAgent)
     {

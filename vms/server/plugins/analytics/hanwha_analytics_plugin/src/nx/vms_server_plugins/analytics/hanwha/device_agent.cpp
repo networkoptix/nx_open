@@ -157,16 +157,16 @@ const IString* DeviceAgent::manifest(Error* error) const
     return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
-    m_url = deviceInfo.url;
-    m_model = deviceInfo.model;
-    m_firmware = deviceInfo.firmware;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
-    m_uniqueId = deviceInfo.uid;
-    m_sharedId = deviceInfo.sharedId;
-    m_channel = deviceInfo.channel;
+    m_url = deviceInfo->url();
+    m_model = deviceInfo->model();
+    m_firmware = deviceInfo->firmware();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
+    m_uniqueId = deviceInfo->id();
+    m_sharedId = deviceInfo->sharedId();
+    m_channel = deviceInfo->channelNumber();
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

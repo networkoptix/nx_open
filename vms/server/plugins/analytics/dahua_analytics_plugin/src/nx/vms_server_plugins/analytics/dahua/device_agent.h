@@ -22,7 +22,7 @@ class DeviceAgent:
 {
 public:
     DeviceAgent(Engine* engine,
-        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest);
 
     virtual ~DeviceAgent();
@@ -44,7 +44,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
-    void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
+    void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);

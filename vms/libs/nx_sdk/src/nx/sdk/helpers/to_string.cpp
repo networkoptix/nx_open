@@ -36,7 +36,7 @@ std::string toJsonString(const IStringMap* map, int overallIndent)
     return result;
 }
 
-std::string toJsonString(const DeviceInfo* deviceInfo, int overallIndent)
+std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent)
 {
     using nx::kit::utils::toString;
 
@@ -44,16 +44,17 @@ std::string toJsonString(const DeviceInfo* deviceInfo, int overallIndent)
 
     const std::string innerIndent = indent(overallIndent, 1);
 
-    result += innerIndent + "\"vendor\": " + toString(deviceInfo->vendor) + ",\n";
-    result += innerIndent + "\"model\": " + toString(deviceInfo->model) + ",\n";
-    result += innerIndent + "\"firmware\": " + toString(deviceInfo->firmware) + ",\n";
-    result += innerIndent + "\"uid\": " + toString(deviceInfo->uid) + ",\n";
-    result += innerIndent + "\"sharedId\": " + toString(deviceInfo->sharedId) + ",\n";
-    result += innerIndent + "\"url\": " + toString(deviceInfo->url) + ",\n";
-    result += innerIndent + "\"login\": " + toString(deviceInfo->login) + ",\n";
-    result += innerIndent + "\"password\": " + toString(deviceInfo->password) + ",\n";
-    result += innerIndent + "\"channel\": " + toString(deviceInfo->channel) + ",\n";
-    result += innerIndent + "\"logicalId\": " + toString(deviceInfo->logicalId) + "\n";
+    result += innerIndent + "\"id\": " + toString(deviceInfo->id()) + ",\n";
+    result += innerIndent + "\"vendor\": " + toString(deviceInfo->vendor()) + ",\n";
+    result += innerIndent + "\"model\": " + toString(deviceInfo->model()) + ",\n";
+    result += innerIndent + "\"firmware\": " + toString(deviceInfo->firmware()) + ",\n";
+    result += innerIndent + "\"name\": " + toString(deviceInfo->name()) + ",\n";
+    result += innerIndent + "\"url\": " + toString(deviceInfo->url()) + ",\n";
+    result += innerIndent + "\"login\": " + toString(deviceInfo->login()) + ",\n";
+    result += innerIndent + "\"password\": " + toString(deviceInfo->password()) + ",\n";
+    result += innerIndent + "\"channel\": " + toString(deviceInfo->channelNumber()) + ",\n";
+    result += innerIndent + "\"sharedId\": " + toString(deviceInfo->sharedId()) + ",\n";
+    result += innerIndent + "\"logicalId\": " + toString(deviceInfo->logicalId()) + "\n";
 
     result += indent(overallIndent, 0) + "}";
     return result;
