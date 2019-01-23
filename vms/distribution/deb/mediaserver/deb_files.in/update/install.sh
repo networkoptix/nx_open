@@ -18,7 +18,7 @@ installDeb()
     else
         if [ $FORCE = "force-conflicts" ]
         then
-            ARGS="$ARGS -B --force-conflicts"
+            ARGS="$ARGS --auto-deconfigure --force-conflicts"
         fi
         dpkg $ARGS "$DEB"
     fi

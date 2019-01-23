@@ -59,6 +59,7 @@
 #include <nx/utils/collection.h>
 
 #include <nx/client/core/motion/motion_grid.h>
+#include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
 #include <nx/vms/client/desktop/utils/entropix_image_enhancer.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
@@ -1557,6 +1558,22 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
                 this, &QnMediaResourceWidget::updateButtonsVisibility);
             connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
                 this, &QnMediaResourceWidget::clearEntropixEnhancedImage);
+
+            if (const auto m = context()->findInstance<AnalyticsObjectsVisualizationManager>())
+            {
+                NX_ASSERT(item() && item()->layout());
+                if (item() && item()->layout() && item()->layout()->resource())
+                {
+                    QnLayoutItemIndex index(item()->layout()->resource(), item()->uuid());
+                    if (m->mode(index) == AnalyticsObjectsVisualizationMode::always)
+                    {
+                        StreamDataFilters filter = archiveReader->streamDataFilter();
+                        filter.setFlag(StreamDataFilter::objectDetection, true);
+                        filter.setFlag(StreamDataFilter::media);
+                        archiveReader->setStreamDataFilter(filter);
+                    }
+                }
+            }
         }
 
         setChannelLayout(display->videoLayout());

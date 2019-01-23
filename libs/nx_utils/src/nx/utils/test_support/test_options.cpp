@@ -38,6 +38,16 @@ bool TestOptions::areTimeAssertsDisabled()
     return s_disableTimeAsserts;
 }
 
+bool TestOptions::keepTemporaryDirectory()
+{
+    return s_keepTemporaryDirectory;
+}
+
+void TestOptions::setKeepTemporaryDirectory(bool value)
+{
+    TEST_OPTIONS_SET_VALUE(s_keepTemporaryDirectory, value);
+}
+
 void TestOptions::setTemporaryDirectoryPath(const QString& path)
 {
     s_temporaryDirectory.setPath(path);
@@ -79,6 +89,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
     if (const auto value = arguments.get("tmp"))
         setTemporaryDirectoryPath(*value);
 
+    if (arguments.get("keep-temporary-directory"))
+        setKeepTemporaryDirectory(true);
+
     if (const auto value = arguments.get("load-mode"))
         setLoadMode(*value);
 
@@ -108,7 +121,8 @@ TestOptions::TemporaryDirectory::TemporaryDirectory()
 
 TestOptions::TemporaryDirectory::~TemporaryDirectory()
 {
-    QDir(m_path).removeRecursively();
+    if (!keepTemporaryDirectory())
+        QDir(m_path).removeRecursively();
 }
 
 QString TestOptions::TemporaryDirectory::path(bool canCreate) const
@@ -131,6 +145,7 @@ void TestOptions::TemporaryDirectory::setPath(const QString& path)
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);
 std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
+std::atomic<bool> TestOptions::s_keepTemporaryDirectory(false);
 std::atomic<size_t> TestOptions::s_loadMode(1);
 
 TestOptions::TemporaryDirectory TestOptions::s_temporaryDirectory;

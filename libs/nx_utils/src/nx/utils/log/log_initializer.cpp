@@ -16,14 +16,14 @@ std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath,
-    const std::set<Tag>& tags,
+    std::set<Filter> filters,
     std::unique_ptr<AbstractWriter> writer)
 {
     return LoggerBuilder::buildLogger(
         settings,
         applicationName,
         binaryPath,
-        tags,
+        std::move(filters),
         std::move(writer));
 }
 

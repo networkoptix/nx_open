@@ -17,6 +17,8 @@ public:
     static void disableTimeAsserts(bool areDisabled = true);
     static bool areTimeAssertsDisabled();
 
+    static bool keepTemporaryDirectory();
+    static void setKeepTemporaryDirectory(bool value);
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath(bool canCreate = false);
 
@@ -30,6 +32,7 @@ public:
 private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
+    static std::atomic<bool> s_keepTemporaryDirectory;
     static std::atomic<size_t> s_loadMode;
 
     struct TemporaryDirectory
