@@ -204,16 +204,14 @@ void P2PHttpClientTransport::startReading()
                     }
                 });
 
-            m_multipartContentParser.setBoundary("ec2boundary");
             m_multipartContentParser.setNextFilter(nextFilter);
 
             const auto& headers = m_readHttpClient->response()->headers;
             const auto contentTypeIt = headers.find("Content-Type");
-            const bool isResponseMultiPart = contentTypeIt != headers.cend()
-                && contentTypeIt->second.contains("multipart");
 
-            NX_ASSERT(isResponseMultiPart);
-            if (!isResponseMultiPart)
+            NX_ASSERT(contentTypeIt != headers.end());
+            if (contentTypeIt == headers.end() ||
+                !m_multipartContentParser.setContentType(contentTypeIt->second))
             {
                 NX_WARNING(this, "Expected a multipart response. It is not.");
                 m_failed = true;
