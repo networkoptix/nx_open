@@ -3,20 +3,20 @@
 #include <optional>
 #include <memory>
 
-#include "abstract_transaction_transport.h"
-#include "dao/abstract_transaction_data_object.h"
-#include "transaction_log_reader.h"
-
 #include <nx/network/websocket/websocket.h>
+
 #include <nx/p2p/p2p_connection_base.h>
 #include <nx/p2p/connection_context.h>
 #include <nx/vms/api/data/tran_state_data.h>
 
-#include "compatible_ec2_protocol_version.h"
+#include "../../abstract_transaction_transport.h"
+#include "../../compatible_ec2_protocol_version.h"
+#include "../../dao/abstract_transaction_data_object.h"
+#include "../../transaction_log_reader.h"
 
 namespace nx::clusterdb::engine { class CommandLog; }
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 class WebsocketCommandTransport:
     public AbstractConnection,
@@ -81,4 +81,4 @@ private:
     std::string m_connectionGuid;
 };
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::p2p::websocket

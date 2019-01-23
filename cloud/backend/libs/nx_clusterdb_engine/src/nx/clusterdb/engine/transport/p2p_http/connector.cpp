@@ -12,7 +12,7 @@
 #include <nx/vms/api/types/connection_types.h>
 
 #include "request_path.h"
-#include "../../websocket_transaction_transport.h"
+#include "../p2p_websocket/websocket_transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
@@ -100,7 +100,7 @@ void Connector::handlePipelineStart(SystemError::ErrorCode resultCode)
 
     NX_DEBUG(this, "Established connection to %1", m_remoteNodeUrl);
 
-    auto connection = std::make_unique<WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
         m_protocolVersionRange,
         m_commandLog,
         m_systemId,

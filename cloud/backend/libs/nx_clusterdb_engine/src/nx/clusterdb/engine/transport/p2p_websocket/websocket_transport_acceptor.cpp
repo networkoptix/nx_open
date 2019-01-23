@@ -1,18 +1,22 @@
 #include "websocket_transport_acceptor.h"
 
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/websocket/websocket_handshake.h>
-#include <nx/network/socket_global.h>
+
 #include <nx/p2p/p2p_serialization.h>
+#include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/vms/api/types/connection_types.h>
 
-#include "../connection_manager.h"
-#include "../compatible_ec2_protocol_version.h"
-#include "../websocket_transaction_transport.h"
-#include <nx/p2p/transport/p2p_websocket_transport.h>
+#include "../../connection_manager.h"
+#include "../../compatible_ec2_protocol_version.h"
+#include "../../http/sync_connection_request_handler.h"
+#include "request_path.h"
+#include "websocket_transaction_transport.h"
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 WebSocketTransportAcceptor::WebSocketTransportAcceptor(
     const QnUuid& moduleGuid,
@@ -33,19 +37,29 @@ WebSocketTransportAcceptor::WebSocketTransportAcceptor(
 {
 }
 
+void WebSocketTransportAcceptor::registerHandlers(
+    const std::string& rootPath,
+    nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
+{
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::Method::get,
+        nx::network::url::joinPath(rootPath, kCommandPath),
+        [this](auto&&... args) { return createConnection(std::move(args)...); });
+}
+
 void WebSocketTransportAcceptor::createConnection(
     nx::network::http::RequestContext requestContext,
-    const std::string& systemId,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    using namespace std::placeholders;
     using namespace nx::network;
+
+    const auto systemId = extractSystemIdFromHttpRequest(requestContext);
 
     const auto& request = requestContext.request;
     auto connection = requestContext.connection;
     auto response = requestContext.response;
 
-    auto remotePeerInfo = p2p::deserializePeerData(request);
+    auto remotePeerInfo = nx::p2p::deserializePeerData(request);
 
     if (systemId.empty())
     {
@@ -68,10 +82,10 @@ void WebSocketTransportAcceptor::createConnection(
     localPeer.assign(m_localPeerData);
     localPeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     localPeer.protoVersion = remotePeerInfo.protoVersion;
-    p2p::serializePeerData(*response, localPeer, remotePeerInfo.dataFormat);
+    nx::p2p::serializePeerData(*response, localPeer, remotePeerInfo.dataFormat);
 
-    auto error = websocket::validateRequest(request, response);
-    if (error != websocket::Error::noError)
+    auto error = nx::network::websocket::validateRequest(request, response);
+    if (error != nx::network::websocket::Error::noError)
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Can't upgrade request from peer %1 to webSocket. Error: %2")
@@ -103,7 +117,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     const std::string& userAgent)
 {
     const auto remoteAddress = connection->getForeignAddress();
-    auto p2pTransport = std::make_unique<p2p::P2PWebsocketTransport>(
+    auto p2pTransport = std::make_unique<nx::p2p::P2PWebsocketTransport>(
         std::move(connection), network::websocket::FrameType::binary);
 
     p2pTransport->start();
@@ -133,4 +147,4 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     }
 }
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::p2p::websocket

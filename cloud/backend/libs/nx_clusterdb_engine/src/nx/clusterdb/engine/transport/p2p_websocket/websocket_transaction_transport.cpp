@@ -3,10 +3,9 @@
 #include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
 
-#include "compatible_ec2_protocol_version.h"
-#include "transaction_log.h"
+#include "../../transaction_log.h"
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 static constexpr int kMaxTransactionsPerIteration = 17;
 
@@ -258,4 +257,4 @@ void WebsocketCommandTransport::fillAuthInfo(
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
 }
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::p2p::websocket
