@@ -241,7 +241,7 @@ int QnAbstractConnection::sendSyncGetRequest(
     int object, const QnRequestParamList &params, QVariant *reply,
     std::optional<std::chrono::milliseconds> timeout)
 {
-    return sendSyncGetRequest(object, nx::network::http::HttpHeaders(), params, reply);
+    return sendSyncGetRequest(object, nx::network::http::HttpHeaders(), params, reply, timeout);
 }
 
 int QnAbstractConnection::sendSyncPostRequest(
