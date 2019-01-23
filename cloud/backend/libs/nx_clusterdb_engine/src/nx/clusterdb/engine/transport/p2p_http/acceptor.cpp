@@ -140,7 +140,7 @@ nx::network::http::StatusCode::Value Acceptor::forwardMessageToConnection(
     bool messageProcessed = false;
     const bool connectionFound = m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        [this, message = std::move(message), &messageProcessed](
+        [message = std::move(message), &messageProcessed](
             AbstractConnection* connection) mutable
         {
             auto p2pConnection = dynamic_cast<websocket::WebsocketCommandTransport*>(connection);
