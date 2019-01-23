@@ -90,9 +90,9 @@ private:
         exactMatch,
         regexp
     };
-    const Mode m_mode;
-    const QString m_value;
-    const QRegularExpression m_filter;
+    Mode m_mode;
+    QString m_value;
+    QRegularExpression m_filter;
 };
 using LevelFilters = std::map<Filter, Level>;
 
