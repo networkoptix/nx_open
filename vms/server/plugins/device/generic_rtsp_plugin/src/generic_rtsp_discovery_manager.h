@@ -12,7 +12,7 @@
 
 
 /*!
-    Supports only url check. Also, instansiates camera manager
+    Supports only url check. Also, instantiates camera manager
 */
 class GenericRTSPDiscoveryManager
 :
