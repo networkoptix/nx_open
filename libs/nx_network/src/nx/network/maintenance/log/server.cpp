@@ -129,18 +129,18 @@ void Server::servePostLogger(
     if (!newLogger)
         return completionHandler(http::StatusCode::internalServerError);
 
-    int id = m_loggerCollection->add(std::move(newLogger));
-    if (id == LoggerCollection::kInvalidId)
+    int loggerId = m_loggerCollection->add(std::move(newLogger));
+    if (loggerId == LoggerCollection::kInvalidId)
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
 
-    auto logger = m_loggerCollection->get(id);
+    auto logger = m_loggerCollection->get(loggerId);
     if (!logger)
         return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
 
     Logger loggerInfo = utils::toLoggerInfo(
         logger,
-        m_loggerCollection->getEffectiveTags(id),
-        id);
+        m_loggerCollection->getEffectiveTags(loggerId),
+        loggerId);
     
     http::RequestResult result(http::StatusCode::created);
     result.dataSource = std::make_unique<http::BufferSource>(
@@ -164,23 +164,32 @@ void Server::serveGetStreamingLogger(
     Settings logSettings;
     logSettings.loggers.push_back(loggerSettings);
 
-    auto logger = LoggerBuilder::buildLogger(
+    auto newLogger = LoggerBuilder::buildLogger(
         logSettings,
         QString(), //< TODO: #nw get the application name
         QString(), //< TODO: #nw get the appliation binary path
         utils::toTags(loggerSettings.level.filters),
         std::move(logWriter));
-    if (!logger)
+    if (!newLogger)
         return completionHandler(http::StatusCode::internalServerError);
 
-    int loggerId = m_loggerCollection->add(std::move(logger));
+    int loggerId = m_loggerCollection->add(std::move(newLogger));
     if (loggerId == LoggerCollection::kInvalidId)
-        return completionHandler(http::StatusCode::badRequest);
+        return completionHandler(http::RequestResult(http::StatusCode::badRequest));
 
-    messageBody->setLoggerId(loggerId);
+    auto logger = m_loggerCollection->get(loggerId);
+    if (!logger)
+        return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
 
-    http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::move(messageBody);
+    Logger loggerInfo = utils::toLoggerInfo(
+        logger,
+        m_loggerCollection->getEffectiveTags(loggerId),
+        loggerId);
+
+    http::RequestResult result(http::StatusCode::created);
+    result.dataSource = std::make_unique<http::BufferSource>(
+        "application/json",
+        QJson::serialized(loggerInfo));
 
     completionHandler(std::move(result));
 }
