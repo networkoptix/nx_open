@@ -3,8 +3,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
 
-#include "http_tunnel_transport_connector.h"
-#include "http_transport_connector.h"
+#include "connector_factory.h"
 #include "../http/http_paths.h"
 
 namespace nx::clusterdb::engine::transport {
@@ -32,20 +31,15 @@ std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createC
     const auto syncApiTargetUrl = url::Builder(targetUrl).appendPath(
         http::rest::substituteParameters(kBaseSynchronizationPath, {systemId})).toUrl();
 
-#if 0
-    return std::make_unique<HttpTunnelTransportConnector>(
-        systemId,
-        connectionId,
-        syncApiTargetUrl);
-#else
-    return std::make_unique<HttpTransportConnector>(
+    // TODO: #ak Is this class really needed?
+
+    return ConnectorFactory::instance().create(
         m_protocolVersionRange,
         m_commandLog,
         m_outgoingCommandFilter,
         syncApiTargetUrl,
         systemId,
         m_nodeId);
-#endif
 }
 
 } // namespace nx::clusterdb::engine::transport
