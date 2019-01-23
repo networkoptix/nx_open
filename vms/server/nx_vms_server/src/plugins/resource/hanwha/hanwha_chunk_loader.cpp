@@ -1,3 +1,5 @@
+#include "hanwha_chunk_loader.h"
+
 #include <QtCore/QDateTime>
 #include <QtCore/QUrlQuery>
 
@@ -7,7 +9,6 @@
 #include <utils/common/synctime.h>
 #include <core/resource/network_resource.h>
 
-#include "hanwha_chunk_reader.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_utils.h"
@@ -586,7 +587,11 @@ bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 current
     }
     else if (fieldName == kEndTimeParamName)
     {
-        const auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeShift);
+        // Hanwha API reports closed periods: [a, b - 1s], [b, c - 1s], ...,
+        // while our VMS and the rest of the world uses open ended periods: [a, b), [b, c), ....
+        static const qint64 kEndTimeFixMs = 1000;
+
+        const auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeShift) + kEndTimeFixMs;
         if (m_lastParsedStartTimeMs > currentTimeMs)
         {
             NX_DEBUG(this, lm("Ignore period [%1, %2] from future on channel %3")

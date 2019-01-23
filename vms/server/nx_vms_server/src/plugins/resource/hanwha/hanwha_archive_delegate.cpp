@@ -6,7 +6,7 @@
 #include "hanwha_stream_reader.h"
 #include "hanwha_resource.h"
 #include "hanwha_shared_resource_context.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/server/resource/camera.h>
 

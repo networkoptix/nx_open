@@ -7,7 +7,7 @@
 #include "hanwha_resource_searcher.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include "hanwha_firmware.h"
 #include "hanwha_ini_config.h"
 
