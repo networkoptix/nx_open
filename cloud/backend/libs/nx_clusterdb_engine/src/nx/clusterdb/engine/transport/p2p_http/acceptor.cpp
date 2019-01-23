@@ -153,7 +153,7 @@ bool Acceptor::registerNewConnection(
     const vms::api::PeerDataEx& remotePeer)
 {
     const auto userAgent = nx::network::http::getHeaderValue(
-        requestContext.request.headers, "User-Agent");
+        requestContext.request.headers, "User-Agent").toStdString();
 
     auto connection = std::make_unique<WebsocketCommandTransport>(
         m_protocolVersionRange,

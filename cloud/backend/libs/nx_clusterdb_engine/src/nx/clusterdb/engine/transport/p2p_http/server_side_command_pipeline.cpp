@@ -10,20 +10,22 @@ ServerSideCommandPipeline::ServerSideCommandPipeline(
 }
 
 void ServerSideCommandPipeline::readSomeAsync(
-    nx::Buffer* const buffer,
+    nx::Buffer* const /*buffer*/,
     nx::network::IoCompletionHandler handler)
 {
+    handler(SystemError::notImplemented, -1);
     // TODO
 }
 
 void ServerSideCommandPipeline::sendAsync(
-    const nx::Buffer& buffer,
+    const nx::Buffer& /*buffer*/,
     nx::network::IoCompletionHandler handler)
 {
+    handler(SystemError::notImplemented, -1);
     // TODO
 }
 
-void ServerSideCommandPipeline::cancelIoInAioThread(nx::network::aio::EventType eventType)
+void ServerSideCommandPipeline::cancelIoInAioThread(nx::network::aio::EventType /*eventType*/)
 {
     // TODO
 }
@@ -35,8 +37,9 @@ network::SocketAddress ServerSideCommandPipeline::getForeignAddress() const
 }
 
 void ServerSideCommandPipeline::start(
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*onStart*/)
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
 {
+    onStart(SystemError::notImplemented);
     // TODO
 }
 

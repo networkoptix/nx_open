@@ -57,9 +57,9 @@ TYPED_TEST_CASE_P(ConnectionAcceptance);
 
 TYPED_TEST_P(ConnectionAcceptance, data_can_be_exchanged_over_connection)
 {
-    whenConnectPeers();
+    this->whenConnectPeers();
 
-    thenPeersSynchronizedEventually();
+    this->thenPeersSynchronizedEventually();
 }
 
 REGISTER_TYPED_TEST_CASE_P(ConnectionAcceptance,
