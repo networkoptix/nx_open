@@ -206,7 +206,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
              std::stringstream commandStream;
              commandStream << "dpkg -i";
              if (force && *force == "force-conflicts")
-                commandStream << " -B --force-conflicts";
+                commandStream << " --auto-deconfigure --force-conflicts";
              commandStream << " '" << debPath << "'";
              int result = ::system(commandStream.str().c_str());
              return result == 0 ? Result::ok : Result::execFailed;
