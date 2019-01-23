@@ -91,10 +91,10 @@ private:
         {
             return !operator==(rhs);
         }
-            
     };
 
 private:
+    CodecParameters m_codecParams;
     std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
 
     int m_initCode = 0;

@@ -14,7 +14,7 @@ namespace detail {
 
 void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
 {
-    std::vector<video::detail::AudioDeviceDescriptor> devices = 
+    std::vector<video::detail::AudioDeviceDescriptor> devices =
         video::detail::getAudioDeviceList();
     if (devices.empty())
         return;

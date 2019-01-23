@@ -54,7 +54,7 @@ public:
     CodecParameters defaultVideoParameters() const;
 
     std::string ffmpegUrl() const;
-    
+
     std::vector<AVCodecID> ffmpegCodecPriorityList();
 
     const nxcip::CameraInfo& info() const;
