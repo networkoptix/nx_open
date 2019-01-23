@@ -521,20 +521,6 @@ copySystemLibs()
 
     local LIBS_TO_COPY=()
 
-    if [ "$BOX" = "rpi" ]
-    then
-        LIBS_TO_COPY+=(
-            libasound.so.2
-            libmmal_core.so
-            libmmal_util.so
-            libmmal_vc_client.so
-            libvchiq_arm.so
-            libvcos.so
-            libvcsm.so
-            libbcm_host.so
-        )
-    fi
-
     for LIB in "${LIBS_TO_COPY[@]}"
     do
         echo "  Copying $LIB"
