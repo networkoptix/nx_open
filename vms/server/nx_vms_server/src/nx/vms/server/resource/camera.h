@@ -156,7 +156,6 @@ public:
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
     int getMaxChannels() const;
-    virtual int getMaxChannelsPhysical() const { return 1; }
 
     void inputPortListenerAttached();
     void inputPortListenerDetached();
@@ -208,6 +207,8 @@ signals:
         qint64 timestamp);
 
 protected:
+    virtual int getMaxChannelsFromDriver() const { return 1; }
+
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void initializationDone() override;
 

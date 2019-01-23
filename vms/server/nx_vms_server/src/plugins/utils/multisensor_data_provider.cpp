@@ -21,10 +21,11 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(const nx::vms::server::resource::CameraPtr& res)
+MultisensorDataProvider::MultisensorDataProvider(
+    const nx::vms::server::resource::CameraPtr& resource)
     :
-    CLServerPushStreamReader(res),
-    m_cameraResource(res)
+    CLServerPushStreamReader(resource),
+    m_cameraResource(resource)
 {
 }
 

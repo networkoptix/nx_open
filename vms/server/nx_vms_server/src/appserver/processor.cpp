@@ -68,8 +68,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        const QnResourceData resourceData = camera->resourceData();
-
         if (camera->isManuallyAdded() &&
             !serverModule()->commonModule()->resourceDiscoveryManager()->isManuallyAdded(camera))
         {

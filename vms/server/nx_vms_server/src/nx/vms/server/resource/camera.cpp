@@ -652,7 +652,7 @@ int Camera::getMaxChannels() const
         ResourceDataKey::kShouldAppearAsSingleChannel);
     if (shouldAppearAsSingleChannel)
         return 1;
-    return getMaxChannelsPhysical();
+    return getMaxChannelsFromDriver();
 }
 void Camera::inputPortListenerAttached()
 {

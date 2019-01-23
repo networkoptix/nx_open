@@ -807,7 +807,7 @@ int HanwhaResource::maxProfileCount() const
 }
 
 nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex *streamIndex*/)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::vms::server::resource::StreamCapabilityMap();

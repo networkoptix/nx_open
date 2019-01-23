@@ -750,7 +750,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                     "current vSourceID=" << profile->VideoSourceConfiguration->token.data()
                     << "requested vSourceID=" << info.videoSourceToken;
             #endif
-            if (m_onvifRes->getMaxChannelsPhysical() > 1)
+            if (m_onvifRes->getMaxChannels() > 1)
             {
                     return CameraDiagnostics::RequestFailedResult(
                         QLatin1String("addVideoSourceConfiguration"), soapWrapper.getLastErrorDescription());

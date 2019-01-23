@@ -4044,7 +4044,7 @@ bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInf
     return true;
 }
 
-int QnPlOnvifResource::getMaxChannelsPhysical() const
+int QnPlOnvifResource::getMaxChannelsFromDriver() const
 {
     return m_maxChannels;
 }
