@@ -76,7 +76,18 @@ import * as Hls from 'hls.js';
                         }
                         
                         function detectBestFormat() {
-                            //1. Hide all informers
+                            // Set iOS
+                            if ($window.jscd.os === 'iOS') {
+                                return 'native-hls'; // jshls have problems with iOS
+                            }
+    
+                            // Set Android
+                            if ($window.jscd.os === 'Android') {
+                                return 'jshls';
+                            }
+                            
+                            // ELSE
+                            // 1. Hide all informers
                             scope.videoFlags = {
                                 flashRequired: false,
                                 flashOrWebmRequired: false,
@@ -94,11 +105,10 @@ import * as Hls from 'hls.js';
                                 return scope.activeFormat;
                             }
                             
-                            //This function gets available sources for camera and chooses the best player for this browser
+                            // This function gets available sources for camera and chooses the best player for this browser
+                            // return 'rtsp'; // To debug some format - force it to work
                             
-                            //return 'rtsp'; // To debug some format - force it to work
-                            
-                            //We have options:
+                            // We have options:
                             // webm - for good desktop browsers
                             // webm-codec - for IE. Detectf
                             // native-hls - for mobile browsers
@@ -130,27 +140,8 @@ import * as Hls from 'hls.js';
                             });
                             var jsHlsSupported = Hls.isSupported();
                             
-                            // Should Catch MS edge, Safari, Mobile Devices
-                            // if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
-    
-                            // Should catch Mobile Devices
-                            if ($window.jscd.mobile) {
-                                return 'jshls';
-                            }
-                            
-                            // Hardcode native support
-                            if ($window.jscd.os === 'Android') {
-                                if (weHaveWebm) {
-                                    return 'webm';
-                                    // TODO: Try removing this line.
-                                } else {
-                                    scope.videoFlags.noArmSupport = true;
-                                    return false;
-                                }
-                            }
-                            
                             // No native support
-                            //Presume we are on desktop:
+                            // Presume we are on desktop:
                             switch ($window.jscd.browser) {
                                 case 'Microsoft Internet Explorer':
                                     // Check version here
@@ -229,7 +220,7 @@ import * as Hls from 'hls.js';
                             scope.jsHls = false;
                         }
                         
-                        //For the native player. Handles webm's long loading times
+                        // For the native player. Handles webm's long loading times
                         function loadingTimeout() {
                             scope.videoFlags.errorLoading = true;
                             scope.loading = false;
