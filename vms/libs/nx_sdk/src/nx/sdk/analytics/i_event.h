@@ -14,22 +14,22 @@ class IEvent: public IMetadataItem
 {
 public:
     /**
-     * @return Null terminated UTF8 string containing the caption of the event.
+     * @return Caption of the event, in UTF-8.
      */
     virtual const char* caption() const = 0;
 
     /**
-     * @return Null terminated UTF8 string containing the description of the event.
+     * @return Description of the event, in UTF-8.
      */
     virtual const char* description() const = 0;
 
     /**
-     * @brief auxiliaryData user side data in json format. Null terminated UTF-8 string.
+     * @return User-side data in json format, in UTF-8.
      */
     virtual const char* auxiliaryData() const = 0;
 
     /**
-     * @brief Is an event in active state.
+     * @return Whether the event is in active state.
      */
     virtual bool isActive() const = 0;
 };
