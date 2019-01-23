@@ -182,7 +182,7 @@ int runUi(QtSingleGuiApplication* application)
         #else
             false;
         #endif
-    
+
     if (maxFfmpegResolution.isEmpty())
     {
         // Use platform-dependent defaults.
@@ -338,7 +338,7 @@ void initLog(const QString& logLevel)
                 logSettings,
                 /*applicationName*/ lit("mobile_client"),
                 QString(),
-                std::set<nx::utils::log::Tag>(),
+                std::set<nx::utils::log::Filter>(),
                 std::move(logWriter)));
     }
 }

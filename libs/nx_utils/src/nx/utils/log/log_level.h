@@ -3,6 +3,8 @@
 #include <map>
 #include <set>
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/utils/log/to_string.h>
 
 namespace nx {
@@ -57,7 +59,6 @@ public:
     template<typename T>
     Tag join(const T* pointer) const { return Tag(m_value + "::" + ::toString(pointer)); }
 
-    bool matches(const Tag& mask) const;
     const QString& toString() const;
     Tag operator+(const Tag& rhs) const;
 
@@ -69,7 +70,31 @@ private:
     QString m_value;
 };
 
-using LevelFilters = std::map<Tag, Level>;
+class NX_UTILS_API Filter
+{
+public:
+    explicit Filter(const QString& source, bool regexp = true);
+    explicit Filter(const Tag& tag);
+    explicit Filter(const QRegularExpression& source);
+
+    bool isValid() const;
+    bool accepts(const Tag& tag) const;
+    QString toString() const;
+
+    bool operator<(const Filter& rhs) const;
+    bool operator==(const Filter& rhs) const;
+    bool operator!=(const Filter& rhs) const;
+private:
+    enum class Mode
+    {
+        exactMatch,
+        regexp
+    };
+    const Mode m_mode;
+    const QString m_value;
+    const QRegularExpression m_filter;
+};
+using LevelFilters = std::map<Filter, Level>;
 
 struct NX_UTILS_API LevelSettings
 {

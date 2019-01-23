@@ -13,7 +13,7 @@ class LoggerCollection
 public:
     LoggerCollection()
     {
-        m_mainLogger = std::make_unique<Logger>(std::set<Tag>(), kDefaultLevel);
+        m_mainLogger = std::make_unique<Logger>(std::set<Filter>(), kDefaultLevel);
         m_mainLogger->setOnLevelChanged([this]() { onLevelChanged(); });
         updateMaxLevel();
     }
@@ -48,8 +48,8 @@ public:
         std::shared_ptr<AbstractLogger> sharedLogger(std::move(logger));
 
         sharedLogger->setOnLevelChanged([this]() { onLevelChanged(); });
-        for (auto& f: sharedLogger->tags())
-            m_loggersByTags.emplace(f, sharedLogger);
+        for (auto& f: sharedLogger->filters())
+            m_loggersByFilters.emplace(f, sharedLogger);
 
         updateMaxLevel();
     }
@@ -57,26 +57,28 @@ public:
     std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const
     {
         QnMutexLocker lock(&m_mutex);
-        if (exactMatch)
+        for (auto& it: m_loggersByFilters)
         {
-            const auto it = m_loggersByTags.find(tag);
-            return (it == m_loggersByTags.end()) ? std::shared_ptr<AbstractLogger>() : it->second;
-        }
-
-        for (auto& it: m_loggersByTags)
-        {
-            if (tag.matches(it.first))
-                return it.second;
+            if (exactMatch)
+            {
+                if (it.first.toString() == tag.toString())
+                    return it.second;
+            }
+            else
+            {
+                if (it.first.accepts(tag))
+                    return it.second;
+            }
         }
 
         return m_mainLogger;
     }
 
-    void remove(const std::set<Tag>& filters)
+    void remove(const std::set<Filter>& filters)
     {
         QnMutexLocker lock(&m_mutex);
         for (const auto f: filters)
-            m_loggersByTags.erase(f);
+            m_loggersByFilters.erase(f);
 
         updateMaxLevel();
     }
@@ -95,14 +97,14 @@ private:
 private:
     mutable QnMutex m_mutex;
     std::shared_ptr<AbstractLogger> m_mainLogger;
-    std::map<Tag, std::shared_ptr<AbstractLogger>> m_loggersByTags;
+    std::map<Filter, std::shared_ptr<AbstractLogger>> m_loggersByFilters;
     std::atomic<Level> m_maxLevel{Level::none};
 };
 
 void LoggerCollection::updateMaxLevel()
 {
     m_maxLevel = m_mainLogger->maxLevel();
-    for (const auto& element: m_loggersByTags)
+    for (const auto& element: m_loggersByFilters)
         m_maxLevel = std::max(element.second->maxLevel(), m_maxLevel.load());
 }
 
@@ -164,7 +166,7 @@ std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag)
     return loggerCollection()->get(tag, /*exactMatch*/ true);
 }
 
-void removeLoggers(const std::set<Tag>& filters)
+void removeLoggers(const std::set<Filter>& filters)
 {
     loggerCollection()->remove(filters);
 }

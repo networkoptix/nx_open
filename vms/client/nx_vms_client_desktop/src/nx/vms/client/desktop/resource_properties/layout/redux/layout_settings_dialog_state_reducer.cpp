@@ -30,7 +30,8 @@ constexpr int kDefaultBackgroundOpacityPercent = 70;
 
 static bool tracingEnabled(false);
 
-static const nx::utils::log::Tag kTag(typeid(LayoutSettingsDialogStateReducer));
+static const nx::utils::log::Tag kLogTag(typeid(LayoutSettingsDialogStateReducer));
+static const nx::utils::log::Filter kLogFilter(kLogTag);
 
 // Default screen aspect ratio. Actual for screens of 1920*1080 and so on.
 static QnAspectRatio screenAspectRatioValue{16, 9};
@@ -171,8 +172,8 @@ void trace(const State& state, nx::utils::log::Message message)
 {
     if (tracingEnabled)
     {
-        NX_DEBUG(kTag, message);
-        NX_DEBUG(kTag, state);
+        NX_DEBUG(kLogTag, message);
+        NX_DEBUG(kLogTag, state);
     }
 }
 
@@ -194,11 +195,11 @@ void LayoutSettingsDialogStateReducer::setTracingEnabled(bool value)
     if (value)
     {
         addLogger(std::make_unique<Logger>(
-            std::set<Tag>{kTag}, Level::verbose, std::make_unique<StdOut>()));
+            std::set<Filter>{kLogFilter}, Level::verbose, std::make_unique<StdOut>()));
     }
     else
     {
-         removeLoggers({kTag});
+         removeLoggers({kLogFilter});
     }
 }
 
