@@ -3,6 +3,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_parse_helper.h>            
+#include <nx/network/http/writable_message_body.h>
 #include <nx/utils/log/logger_builder.h>
 #include <nx/utils/log/logger_collection.h>
 
@@ -10,11 +11,11 @@
 #include "logger.h"
 #include "request_path.h"
 #include "streaming_log_writer.h"
-#include "streaming_message_body.h"
 
 namespace nx::network::maintenance::log {
 
 using namespace nx::utils::log;
+using namespace nx::network::http;
 
 namespace {
 
@@ -158,8 +159,9 @@ void Server::serveGetStreamingLogger(
     if (!loggerSettings.parse(requestContext.request.requestLine.url.query()))
         return completionHandler(http::StatusCode::badRequest);
 
-    auto messageBody = std::make_unique<StreamingMessageBody>(m_loggerCollection);
+    auto messageBody = std::make_unique<WritableMessageBody>("text/plain");
     auto logWriter = std::make_unique<StreamingLogWriter>(messageBody.get());
+    auto logWriterPtr = logWriter.get();
     
     Settings logSettings;
     logSettings.loggers.push_back(loggerSettings);
@@ -172,14 +174,23 @@ void Server::serveGetStreamingLogger(
         std::move(logWriter));
     if (!newLogger)
         return completionHandler(http::StatusCode::internalServerError);
+    
+    std::shared_ptr<AbstractLogger> sharedNewLogger(std::move(newLogger));
 
-    int loggerId = m_loggerCollection->add(std::move(newLogger));
+    int loggerId = m_loggerCollection->add(sharedNewLogger);
     if (loggerId == LoggerCollection::kInvalidId)
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
 
     auto logger = m_loggerCollection->get(loggerId);
     if (!logger)
         return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
+
+    messageBody->setOnBeforeDestructionHandler(
+        [this, sharedNewLogger, logWriterPtr, loggerId]()
+        {
+            logWriterPtr->setMessageBody(nullptr);
+            m_loggerCollection->remove(loggerId);
+        });
 
     http::RequestResult result(http::StatusCode::ok);
     result.dataSource = std::move(messageBody);
