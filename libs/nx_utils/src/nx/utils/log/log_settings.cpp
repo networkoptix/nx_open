@@ -90,7 +90,7 @@ Settings::Settings(QSettings* settings)
             if (value == '*')
                 logger.level.primary = level;
             else
-                logger.level.filters[Tag(value)] = level;
+                logger.level.filters[Filter(value)] = level;
         }
         settings->endGroup();
 

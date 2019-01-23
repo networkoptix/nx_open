@@ -32,7 +32,7 @@ protected:
 
     virtual bool filterAcceptsRow(
         int sourceRow,
-        const QModelIndex &sourceParent) const override;
+        const QModelIndex& sourceParent) const override;
 
 private:
     struct Private;

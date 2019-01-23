@@ -42,8 +42,11 @@ TestWithTemporaryDirectory::TestWithTemporaryDirectory(
 
 TestWithTemporaryDirectory::~TestWithTemporaryDirectory()
 {
-    const bool removed = m_tmpDir.removeRecursively();
-    NX_ASSERT(removed);
+    if (!TestOptions::keepTemporaryDirectory())
+    {
+        const bool removed = m_tmpDir.removeRecursively();
+        NX_ASSERT(removed);
+    }
 }
 
 QString TestWithTemporaryDirectory::testDataDir() const

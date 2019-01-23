@@ -1,10 +1,10 @@
 #include "log_level.h"
 
 #include <QtCore/QStringBuilder>
-#include <QtCore/QRegularExpression>
 
 #include "assert.h"
 #include "log_message.h"
+#include "log_main.h"
 
 namespace nx {
 namespace utils {
@@ -91,20 +91,6 @@ Tag::Tag(const std::string& s):
 {
 }
 
-bool Tag::matches(const Tag& mask) const
-{
-    const QRegularExpression re(mask.m_value, QRegularExpression::CaseInsensitiveOption);
-    if (!re.isValid())
-    {
-        static std::atomic_bool warned(false);
-        if (!warned.exchange(true))
-            NX_ASSERT(false, "Regular expression %1 is invalid", m_value);
-        return true;
-    }
-    const auto match = re.match(m_value);
-    return match.hasMatch();
-}
-
 const QString& Tag::toString() const
 {
     return m_value;
@@ -128,6 +114,66 @@ bool Tag::operator==(const Tag& rhs) const
 bool Tag::operator!=(const Tag& rhs) const
 {
     return m_value != rhs.m_value;
+}
+
+Filter::Filter(const QString& source, bool regexp):
+    m_mode(regexp ? Mode::regexp : Mode::exactMatch),
+    m_value(source),
+    m_filter(regexp
+        ? QRegularExpression(source, QRegularExpression::CaseInsensitiveOption)
+        : QRegularExpression())
+{
+}
+
+Filter::Filter(const Tag& tag):
+    m_mode(Mode::exactMatch),
+    m_value(tag.toString())
+{
+}
+
+Filter::Filter(const QRegularExpression& source):
+    m_mode(Mode::regexp),
+    m_value(source.pattern()),
+    m_filter(source)
+{
+}
+
+bool Filter::isValid() const
+{
+    return m_mode == Mode::regexp
+        ? m_filter.isValid()
+        : !m_value.isEmpty();
+}
+
+bool Filter::accepts(const Tag& tag) const
+{
+    if (!isValid())
+        return false;
+
+    // Actual tag value may contain object address, etc, so checking tag match with `startsWith`.
+    return m_mode == Mode::regexp
+        ? m_filter.match(tag.toString()).hasMatch()
+        : tag.toString().startsWith(m_value);
+}
+
+QString Filter::toString() const
+{
+    return m_filter.pattern();
+}
+
+bool Filter::operator<(const Filter& rhs) const
+{
+    return m_mode < rhs.m_mode || m_value < rhs.m_value;
+}
+
+bool Filter::operator==(const Filter& rhs) const
+{
+    return m_mode == rhs.m_mode && m_value == rhs.m_value;
+}
+
+bool Filter::operator!=(const Filter& rhs) const
+{
+    return !(*this == rhs);
 }
 
 LevelSettings::LevelSettings(Level primary, LevelFilters filters):
@@ -251,14 +297,14 @@ bool LevelSettings::parse(const QString& s)
 
         for (auto& t: filtersTokens)
         {
-            Tag tag(std::move(t));
-            if (filters.find(tag) != filters.end())
+            Filter filter(t);
+            if (filters.find(filter) != filters.end())
             {
-                qWarning() << Q_FUNC_INFO << "redefine filter" << tag.toString();
+                qWarning() << Q_FUNC_INFO << "redefine filter" << filter.toString();
                 hasErrors = true;
             }
 
-            filters.emplace(std::move(tag), level);
+            filters.emplace(std::move(filter), level);
         }
     }
 
