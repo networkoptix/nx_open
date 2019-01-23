@@ -18,7 +18,7 @@ public:
     static bool areTimeAssertsDisabled();
 
     static void setTemporaryDirectoryPath(const QString& path);
-    static QString temporaryDirectoryPath();
+    static QString temporaryDirectoryPath(bool canCreate = false);
 
     static void setLoadMode(const QString& mode);
 
@@ -32,8 +32,19 @@ private:
     static std::atomic<bool> s_disableTimeAsserts;
     static std::atomic<size_t> s_loadMode;
 
-    static QnMutex s_mutex;
-    static QString s_temporaryDirectoryPath;
+    struct TemporaryDirectory
+    {
+        TemporaryDirectory();
+        ~TemporaryDirectory();
+
+        QString path(bool canCreate = false) const;
+        void setPath(const QString& path);
+
+    private:
+        mutable QnMutex m_mutex;
+        QString m_path;
+    };
+    static TemporaryDirectory s_temporaryDirectory;
 };
 
 template<typename Count>

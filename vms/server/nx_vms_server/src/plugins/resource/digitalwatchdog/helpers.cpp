@@ -274,11 +274,22 @@ std::optional<QJsonObject> JsonApiClient::doRequest(const nx::utils::Url& url, Q
     NX_VERBOSE(this, "Sending request [%1] with data [%2]", url, data);
 
     nx::network::http::HttpClient client;
-    if (!client.doPost(url, "application/json", std::move(data))
-        || !nx::network::http::StatusCode::isSuccessCode(client.response()->statusLine.statusCode))
+    if (!client.doPost(url, "application/json", std::move(data)))
     {
-        NX_DEBUG(this, "Error with request [%1]: errno: [%2], HTTP code: [%3]",
-            url, SystemError::getLastOSErrorText(), client.response()->statusLine.statusCode);
+        NX_DEBUG(this, "Error posting request [%1]: errno: [%2]",
+            url, SystemError::getLastOSErrorText());
+        return {};
+    }
+
+    const auto httpResponse = client.response();
+    NX_ASSERT(httpResponse);
+    if (!httpResponse)
+        return {};
+
+    if (!nx::network::http::StatusCode::isSuccessCode(httpResponse->statusLine.statusCode))
+    {
+        NX_DEBUG(this, "Error with request [%1]: HTTP code: [%2]",
+            url, httpResponse->statusLine.statusCode);
         return {};
     }
 

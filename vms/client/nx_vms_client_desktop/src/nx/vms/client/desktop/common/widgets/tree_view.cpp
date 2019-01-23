@@ -46,7 +46,7 @@ void TreeView::keyPressEvent(QKeyEvent* event)
             if (currentIndex().isValid())
             {
                 emit spacePressed(currentIndex());
-                if (m_ignoreDefaultSpace)
+                if (m_isDefauldSpacePressIgnored)
                     return;
             }
         }
@@ -125,14 +125,14 @@ QSize TreeView::viewportSizeHint() const
     return base_type::viewportSizeHint() + QSize(horizontalOffset(), verticalOffset());
 }
 
-bool TreeView::ignoreDefaultSpace() const
+bool TreeView::isDefaultSpacePressIgnored() const
 {
-    return m_ignoreDefaultSpace;
+    return m_isDefauldSpacePressIgnored;
 }
 
-void TreeView::setIgnoreDefaultSpace(bool value)
+void TreeView::setDefaultSpacePressIgnored(bool isIgnored)
 {
-    m_ignoreDefaultSpace = value;
+    m_isDefauldSpacePressIgnored = isIgnored;
 }
 
 bool TreeView::dropOnBranchesAllowed() const

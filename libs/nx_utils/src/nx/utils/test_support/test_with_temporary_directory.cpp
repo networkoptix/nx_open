@@ -4,6 +4,8 @@
 
 #include "test_options.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::utils::test {
 
 namespace {
@@ -40,7 +42,8 @@ TestWithTemporaryDirectory::TestWithTemporaryDirectory(
 
 TestWithTemporaryDirectory::~TestWithTemporaryDirectory()
 {
-    m_tmpDir.removeRecursively();
+    const bool removed = m_tmpDir.removeRecursively();
+    NX_ASSERT(removed);
 }
 
 QString TestWithTemporaryDirectory::testDataDir() const

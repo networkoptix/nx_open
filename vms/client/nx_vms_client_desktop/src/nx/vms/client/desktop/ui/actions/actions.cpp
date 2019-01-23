@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
+#include <nx/vms/client/desktop/analytics/analytics_menu_action_factory.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
@@ -1126,6 +1127,14 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+J"))
         .autoRepeat(false)
         .condition(ConditionWrapper(new AdjustVideoCondition())
+            && !condition::isLayoutTourReviewMode());
+
+    factory(AnalyticsObjectsVisualizationModeAction)
+        .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Objects Frames and Info..."))
+        .childFactory(new AnalyticsMenuActionFactory(manager))
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::All)
+            && condition::hasVideo(MatchMode::All)
             && !condition::isLayoutTourReviewMode());
 
     factory(CreateZoomWindowAction)

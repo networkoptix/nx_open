@@ -1167,6 +1167,11 @@ enum IDType
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
 
+    /**
+     * Control in which mode analytics objects must be displayed for the selected cameras.
+     */
+    AnalyticsObjectsVisualizationModeAction,
+
     ActionCount,
 
     NoAction = -1
