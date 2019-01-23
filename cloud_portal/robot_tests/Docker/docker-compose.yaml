@@ -1,10 +1,10 @@
 version: '3'
 services:
   webapp:
-    image: dockermediaserver
+    image: dockermediaserver1
     ports:
       - "7001:7001"
     network_mode: "host"
     volumes:
-      - ./data:/dock
-      - ./opt/networkoptix/mediaserver/var
+      - ./video:/dock2
+      - ./data/:/opt/networkoptix/mediaserver/var
