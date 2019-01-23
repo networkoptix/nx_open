@@ -1,5 +1,6 @@
 #include "connector.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -54,14 +55,23 @@ void Connector::connect(Handler completionHandler)
     auto httpClient = std::make_unique<network::http::AsyncClient>();
     httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionId.c_str());
+    httpClient->addAdditionalHeader(
+        Qn::EC2_PEER_DATA, QnUbjson::serialized(m_localPeer).toBase64());
+    httpClient->addAdditionalHeader(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_localPeer.instanceId.toByteArray());
     // TODO: Credentials
     // httpClient->setCredentials();
+
+    auto url = m_remoteNodeUrl;
+    QUrlQuery query;
+    query.addQueryItem("format", QnLexical::serialized(m_localPeer.dataFormat));
+    url.setQuery(query.toString());
 
     m_commandPipeline = std::make_unique<nx::p2p::P2PHttpClientTransport>(
         std::move(httpClient),
         m_connectionId.c_str(),
         network::websocket::FrameType::binary,
-        m_remoteNodeUrl);
+        url);
     m_commandPipeline->bindToAioThread(getAioThread());
 
     m_commandPipeline->start(

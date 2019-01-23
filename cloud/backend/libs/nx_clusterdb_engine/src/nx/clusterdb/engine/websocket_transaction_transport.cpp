@@ -36,7 +36,7 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(p2pTransport()->getAioThread());
+    bindToAioThread(p2pTransport().getAioThread());
 
     m_commonTransactionHeader.systemId = systemId;
     m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
@@ -191,7 +191,7 @@ void WebsocketCommandTransport::onTransactionsReadFromLog(
 
 network::SocketAddress WebsocketCommandTransport::remotePeerEndpoint() const
 {
-    return p2pTransport()->getForeignAddress();
+    return p2pTransport().getForeignAddress();
 }
 
 ConnectionClosedSubscription& WebsocketCommandTransport::connectionClosedSubscription()
@@ -205,7 +205,7 @@ void WebsocketCommandTransport::setState(State state)
     {
         SystemError::ErrorCode errorCode = SystemError::connectionAbort;
         // TODO: pass correct error code here
-        //p2pTransport()->socket()->getLastError(&errorCode);
+        //p2pTransport().socket()->getLastError(&errorCode);
         m_connectionClosedSubscription.notify(errorCode);
     }
     nx::p2p::ConnectionBase::setState(state);

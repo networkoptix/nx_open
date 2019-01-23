@@ -29,9 +29,9 @@ public:
     }
 };
 
-//INSTANTIATE_TYPED_TEST_CASE_P(
-//    P2pHttp,
-//    ConnectionAcceptance,
-//    P2pHttpTransportInstaller);
+INSTANTIATE_TYPED_TEST_CASE_P(
+    P2pHttp,
+    ConnectionAcceptance,
+    P2pHttpTransportInstaller);
 
 } // namespace nx::clusterdb::engine::transport::test

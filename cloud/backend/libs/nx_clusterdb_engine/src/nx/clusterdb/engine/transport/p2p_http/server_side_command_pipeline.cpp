@@ -86,12 +86,12 @@ void ServerSideCommandPipeline::start(
     post([handler = std::move(handler)]() { handler(SystemError::noError); });
 }
 
-void ServerSideCommandPipeline::saveReceivedCommandBuffer(nx::Buffer command)
+void ServerSideCommandPipeline::saveReceivedMessage(nx::Buffer message)
 {
     post(
-        [this, command = std::move(command)]()
+        [this, message = std::move(message)]() mutable
         {
-            m_readQueue.push_back(std::move(command));
+            m_readQueue.push_back(nx::Buffer::fromBase64(std::move(message)));
 
             if (m_pendingRead)
                 reportNextCommand();
