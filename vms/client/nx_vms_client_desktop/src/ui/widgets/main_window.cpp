@@ -112,6 +112,10 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/app_info.h>
 
+#ifdef Q_OS_WIN
+#include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
+#endif
+
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
 
@@ -786,19 +790,70 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
 
 #ifdef Q_OS_WIN
 
-// Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to
-// turn desktop composition off and enter fullscreen mode. To avoid this behavior, an artificial
-// delta is added to make the client area differ from the screen dimensions.
 bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
     const auto msg = static_cast<MSG*>(message);
-    if (msg->message != WM_NCCALCSIZE || !isFullScreen())
-        return false;
+    switch (msg->message)
+    {
+        // Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to
+        // turn desktop composition off and enter fullscreen mode. To avoid this behavior,
+        // an artificial delta is added to make the client area differ from the screen dimensions.
+        case WM_NCCALCSIZE:
+        {
+            if (!isFullScreen())
+                return false;
 
-    auto rect = LPRECT(msg->lParam);
-    ++rect->right;
-    *result = 0;
-    return true;
+            auto rect = LPRECT(msg->lParam);
+            ++rect->right;
+            *result = WVR_REDRAW;
+            return true;
+        }
+
+        // Paint background to avoid white window background flashing when switched from the scene
+        // to the welcome screen and back.
+        case WM_ERASEBKGND:
+        {
+            const auto context = HDC(msg->wParam);
+            gdi::SolidBrush brush(palette().color(QPalette::Window));
+
+            RECT rect;
+            GetWindowRect(msg->hwnd, &rect);
+            OffsetRect(&rect, -rect.left, -rect.top);
+            FillRect(context, &rect, brush);
+
+            *result = TRUE;
+            return true;
+        }
+
+        // Filling non-client area in fullscreen with the background color also improves visual
+        // behavior.
+        case WM_NCPAINT:
+        {
+            if (!isFullScreen())
+                return false;
+
+            gdi::WindowDC context(msg->hwnd);
+            gdi::SolidBrush brush(palette().color(QPalette::Window));
+
+            RECT rect;
+            GetWindowRect(msg->hwnd, &rect);
+
+            if (GetObjectType(HGDIOBJ(msg->wParam)) == OBJ_REGION)
+            {
+                OffsetRgn(HRGN(msg->wParam), -rect.left, -rect.top);
+                SelectClipRgn(context, HRGN(msg->wParam));
+            }
+
+            OffsetRect(&rect, -rect.left, -rect.top);
+            FillRect(context, &rect, brush);
+
+            *result = 0;
+            return true;
+        }
+
+        default:
+            return false;
+    }
 }
 
 #endif // Q_OS_WIN
