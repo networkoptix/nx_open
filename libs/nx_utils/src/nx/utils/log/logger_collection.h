@@ -11,9 +11,11 @@ namespace log {
 class NX_UTILS_API LoggerCollection
 {
 public:
+    static constexpr int kInvalidId = -1;
+
     struct Context
     {
-        int id;
+        int id = kInvalidId;
         std::shared_ptr<AbstractLogger> logger;
 
         Context(int id, const std::shared_ptr<AbstractLogger>& logger):
@@ -30,13 +32,11 @@ public:
 
     using LoggersByTag = std::map<Tag, Context>;
 
-    static constexpr int invalidId = -1;
-
 public:
     LoggerCollection();
     ~LoggerCollection() = default;
 
-    static LoggerCollection * instance();
+    static LoggerCollection* instance();
 
     std::shared_ptr<AbstractLogger> main();
 
@@ -48,17 +48,17 @@ public:
      * logger/tag association is not overwritten and the new logger will not be associated with
      * the tag. To get the tags associated with a given logger, see getEffectiveTags().
      *
-     * @return - The logger id if added successfully (at least one tag was not already taken), 
+     * @return The logger id if added successfully (at least one tag was not already taken), 
      * -1 otherwise.
      */
-    int add(std::unique_ptr<AbstractLogger> logger);
+    int add(std::shared_ptr<AbstractLogger> logger);
 
     std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const;
 
     std::shared_ptr<AbstractLogger> get(int loggerId) const;
 
     /**
-     * Get all the tags associated with the give logger id.
+     * Get all the tags associated with the given logger id.
      * If multiple loggers are added with the same tag, only the first logger added is associated 
      * with that tag.
      */

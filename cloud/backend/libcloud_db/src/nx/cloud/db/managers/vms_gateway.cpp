@@ -180,6 +180,8 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
     MediaServerClient* clientPtr,
     const QnJsonRestResult& vmsResult)
 {
+    using namespace nx::network::http;
+
     VmsRequestResult result;
     result.resultCode = VmsResultCode::networkError;
     result.vmsErrorDescription = vmsResult.errorString.toStdString();
@@ -194,25 +196,37 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
 
     if (vmsResult.error == QnRestResult::Error::CantProcessRequest)
     {
-        switch (clientPtr->lastResponseHttpStatusCode())
+        switch (clientPtr->lastResponseHttpStatusLine().statusCode)
         {
-            case nx::network::http::StatusCode::serviceUnavailable:
-            case nx::network::http::StatusCode::notFound:
+            case StatusCode::serviceUnavailable:
+            case StatusCode::notFound:
                 result.resultCode = VmsResultCode::unreachable;
                 break;
 
-            case nx::network::http::StatusCode::badRequest:
+            case StatusCode::badRequest:
                 result.resultCode = VmsResultCode::invalidData;
                 break;
 
-            case nx::network::http::StatusCode::unauthorized:
-            case nx::network::http::StatusCode::forbidden:
+            case StatusCode::unauthorized:
+            case StatusCode::forbidden:
                 result.resultCode = VmsResultCode::forbidden;
+                break;
+
+            case StatusCode::badGateway:
+            case StatusCode::gatewayTimeOut:
+                result.resultCode = VmsResultCode::unreachable;
                 break;
 
             default:
                 result.resultCode = VmsResultCode::logicalError;
                 break;
+        }
+
+        if (result.vmsErrorDescription.empty() && 
+            !StatusCode::isSuccessCode(clientPtr->lastResponseHttpStatusLine().statusCode))
+        {
+            result.vmsErrorDescription =
+                clientPtr->lastResponseHttpStatusLine().reasonPhrase.toStdString();
         }
     }
 

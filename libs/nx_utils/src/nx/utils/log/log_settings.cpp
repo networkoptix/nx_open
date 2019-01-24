@@ -13,8 +13,9 @@ namespace nx {
 namespace utils {
 namespace log {
 
-void LoggerSettings::parse(const QString& str)
+bool LoggerSettings::parse(const QString& str)
 {
+    bool parseSucceeded = true;
     const auto params = parseNameValuePairs<std::multimap>(
         str.toUtf8(),
         ',',
@@ -31,7 +32,7 @@ void LoggerSettings::parse(const QString& str)
         }
         else if (param.first == "level")
         {
-            level.parse(param.second);
+            parseSucceeded = parseSucceeded && level.parse(param.second);
         }
         else if (param.first == "dir")
         {
@@ -39,13 +40,19 @@ void LoggerSettings::parse(const QString& str)
         }
         else if (param.first == "maxBackupCount")
         {
-            maxBackupCount = param.second.toInt();
+            bool ok = false;
+            maxBackupCount = param.second.toInt(&ok);
+            parseSucceeded = parseSucceeded && ok;
         }
         else if (param.first == "maxFileSize")
         {
-            maxFileSize = stringToBytes(param.second);
+            bool ok = false;
+            maxFileSize = stringToBytes(param.second, &ok);
+            parseSucceeded = parseSucceeded && ok;
         }
     }
+
+    return parseSucceeded;
 }
 
 void LoggerSettings::updateDirectoryIfEmpty(const QString& dataDirectory)

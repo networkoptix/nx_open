@@ -151,7 +151,7 @@ public:
      * NOTE: Can only be called within request completion handler.
      *   Otherwise, result is not defined.
      */
-    nx::network::http::StatusCode::Value lastResponseHttpStatusCode() const;
+    nx::network::http::StatusLine lastResponseHttpStatusLine() const;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -262,14 +262,13 @@ protected:
                 m_activeClients.erase(fusionClientIter);
 
                 m_prevRequestSysErrorCode = errorCode;
-                m_prevResponseHttpStatusCode =
-                    response
-                    ? (nx::network::http::StatusCode::Value)response->statusLine.statusCode
-                    : nx::network::http::StatusCode::undefined;
+                m_prevResponseHttpStatusLine =
+                    response ? response->statusLine : nx::network::http::StatusLine();
 
                 return completionHandler(
                     errorCode,
-                    m_prevResponseHttpStatusCode,
+                    static_cast<nx::network::http::StatusCode::Value>(
+                        m_prevResponseHttpStatusLine.statusCode),
                     std::move(outData)...);
             });
     }
@@ -428,7 +427,6 @@ private:
     boost::optional<nx::network::http::Credentials> m_userCredentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
     SystemError::ErrorCode m_prevRequestSysErrorCode = SystemError::noError;
-    nx::network::http::StatusCode::Value m_prevResponseHttpStatusCode =
-        nx::network::http::StatusCode::undefined;
+    nx::network::http::StatusLine m_prevResponseHttpStatusLine;
     QString m_authenticationKey;
 };

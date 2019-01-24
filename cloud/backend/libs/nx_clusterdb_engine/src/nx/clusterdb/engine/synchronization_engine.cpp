@@ -51,6 +51,12 @@ SyncronizationEngine::SyncronizationEngine(
         &m_commandLog,
         &m_connectionManager,
         m_outgoingCommandFilter),
+    m_p2pHttpAcceptor(
+        peerId.toSimpleString().toStdString(),
+        m_supportedProtocolRange,
+        &m_commandLog,
+        &m_connectionManager,
+        m_outgoingCommandFilter),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
@@ -165,12 +171,9 @@ void SyncronizationEngine::registerHttpApi(
         &m_httpTransportAcceptor,
         dispatcher);
 
-    registerHttpHandler(
-        nx::network::http::Method::get,
-        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2P2pTransactionConnectionPath),
-        &transport::WebSocketTransportAcceptor::createConnection,
-        &m_webSocketAcceptor,
-        dispatcher);
+    m_webSocketAcceptor.registerHandlers(pathPrefix, dispatcher);
+
+    m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
 }
 
 template<typename ManagerType>
