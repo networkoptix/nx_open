@@ -12,6 +12,7 @@
     #include <shellapi.h>
     #include <atlstr.h>
     #include <codecvt>
+    #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
 #elif defined(__linux__)
     #include <libgen.h>
     #include <memory.h>

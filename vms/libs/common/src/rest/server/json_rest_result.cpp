@@ -102,11 +102,11 @@ QnUbjsonRestResult::QnUbjsonRestResult(const QnRestResult& base): QnRestResult(b
 
 void serialize(const QJsonValue& /*value*/, QnUbjsonWriter<QByteArray>* /*stream*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    NX_ASSERT(false, "We should not serialize QJsonValue to UBJson.");
 }
 
 bool deserialize(QnUbjsonReader<QByteArray>* /*stream*/, QJsonValue* /*target*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    NX_ASSERT(false, "We should not serialize QJsonValue to UBJson.");
     return true;
 }

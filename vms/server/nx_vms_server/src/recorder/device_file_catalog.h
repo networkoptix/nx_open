@@ -45,7 +45,7 @@ public:
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) :
             startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
         {
-            //NX_ASSERT(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
+            //NX_ASSERT(startTimeMs == -1 || startTimeMs > 0, "Invalid startTime value");
         }
 
         qint64 distanceToTime(qint64 timeMs) const;

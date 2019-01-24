@@ -98,7 +98,7 @@ AbstractActionPtr ActionFactory::createAction(
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, "All action types must be handled.");
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
     }
 }

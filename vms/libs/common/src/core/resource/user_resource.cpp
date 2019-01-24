@@ -401,7 +401,7 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if (localOther)
     {
-        NX_ASSERT(m_userType == localOther->m_userType, Q_FUNC_INFO, "User type was designed to be read-only");
+        NX_ASSERT(m_userType == localOther->m_userType, "User type was designed to be read-only");
         bool hashesChanged = false;
         if (m_password != localOther->m_password)
         {

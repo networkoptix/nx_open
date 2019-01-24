@@ -499,7 +499,7 @@ void QnStorageConfigWidget::loadDataToUi()
 
 void QnStorageConfigWidget::loadStoragesFromResources()
 {
-    NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
+    NX_ASSERT(m_server, "Server must exist here");
 
     QnStorageModelInfoList storages;
     for (const QnStorageResourcePtr& storage: m_server->getStorages())
@@ -613,7 +613,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
         else
         {
             QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(m_server, storageData.url);
-            NX_ASSERT(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
+            NX_ASSERT(storage->getId() == storageData.id, "Id's must be equal");
 
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
@@ -840,7 +840,7 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
             return scheduledTimeMs;
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+    NX_ASSERT(false, "Should never get here");
     return 0;
 }
 

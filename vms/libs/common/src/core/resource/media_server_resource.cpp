@@ -625,13 +625,6 @@ bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
     return false;
 }
 
-bool QnMediaServerResource::requiresEdgeLicense(const QnResourcePtr &resource)
-{
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags().testFlag(nx::vms::api::SF_RequiresEdgeLicense));
-    return false;
-}
-
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())

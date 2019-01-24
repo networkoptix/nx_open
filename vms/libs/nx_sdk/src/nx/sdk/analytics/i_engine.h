@@ -84,7 +84,7 @@ public:
      * @return True if the Engine is able to create DeviceAgents for the provided device, false
      *     otherwise.
      */
-    virtual bool isCompatible(const DeviceInfo* deviceInfo) const = 0;
+    virtual bool isCompatible(const IDeviceInfo* deviceInfo) const = 0;
 
     /**
      * Creates, or returns an already existing, a DeviceAgent instance intended to work with the
@@ -95,7 +95,7 @@ public:
      * @return Pointer to an object that implements DeviceAgent interface, or null in case of
      *     failure.
      */
-    virtual IDeviceAgent* obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* outError) = 0;
+    virtual IDeviceAgent* obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* outError) = 0;
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.

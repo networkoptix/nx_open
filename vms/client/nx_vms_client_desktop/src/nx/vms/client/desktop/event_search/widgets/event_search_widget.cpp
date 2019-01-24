@@ -268,8 +268,10 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                 for (const auto& scope: eventTypeDescriptor.scopes)
                 {
                     if (enabledEngines.contains(scope.engineId))
+                    {
                         engineById[scope.engineId].eventTypes
                             .emplace(eventTypeId, eventTypeDescriptor);
+                    }
                 }
             }
 

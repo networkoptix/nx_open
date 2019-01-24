@@ -2166,7 +2166,7 @@ void ActionHandler::at_renameAction_triggered()
     }
     else
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, "Invalid resource type to rename");
     }
 }
 

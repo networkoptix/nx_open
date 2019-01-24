@@ -61,19 +61,19 @@ SocketAddress CloudServerSocket::getLocalAddress() const
 
 bool CloudServerSocket::close()
 {
-    //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    //NX_ASSERT(false, "Not implemented...");
     return true;
 }
 
 bool CloudServerSocket::isClosed() const
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, "Not implemented...");
     return false;
 }
 
 bool CloudServerSocket::shutdown()
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, "Not implemented...");
     return true;
 }
 

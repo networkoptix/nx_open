@@ -264,8 +264,10 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
             for (const auto& scope: objectTypeDescriptor.scopes)
             {
                 if (enabledEngines.contains(scope.engineId))
+                {
                     engineById[scope.engineId].objectTypes
                         .emplace(eventTypeId, objectTypeDescriptor);
+                }
             }
         }
 

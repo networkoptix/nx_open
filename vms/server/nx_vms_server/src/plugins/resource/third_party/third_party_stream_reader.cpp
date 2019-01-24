@@ -35,7 +35,8 @@ namespace
     {
         AVCodecID codecId = packet->compressionType;
 
-        NX_ASSERT( codecId == AV_CODEC_ID_H264, "IFrame detection", "only AV_CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == AV_CODEC_ID_H264,
+            "IFrame detection: only AV_CODEC_ID_H264 is supported" );
 
         if( !packet || codecId != AV_CODEC_ID_H264 )
             return false;

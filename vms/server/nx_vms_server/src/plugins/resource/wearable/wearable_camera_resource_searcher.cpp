@@ -29,7 +29,7 @@ QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &res
     QnWearableCameraResourcePtr result;
 
     auto resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    NX_ASSERT(resourceType, Q_FUNC_INFO, "Wearable camera resource type not found");
+    NX_ASSERT(resourceType, "Wearable camera resource type not found");
     if (!resourceType)
         return result;
 

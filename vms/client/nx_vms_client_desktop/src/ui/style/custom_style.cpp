@@ -127,19 +127,19 @@ void fadeWidget(
     std::function<void()> finishHandler,
     int animationFps)
 {
-    NX_ASSERT(widget, Q_FUNC_INFO, "No widget is specified");
+    NX_ASSERT(widget, "No widget is specified");
     if (!widget)
         return;
 
     auto oldEffect = widget->graphicsEffect();
     auto oldOpacityEffect = qobject_cast<QGraphicsOpacityEffect*>(oldEffect);
 
-    NX_ASSERT(!oldEffect || oldOpacityEffect, Q_FUNC_INFO, "Widget already has a graphics effect");
+    NX_ASSERT(!oldEffect || oldOpacityEffect, "Widget already has a graphics effect");
     if (oldEffect && !oldOpacityEffect)
         return;
 
     bool zeroSpeed = qFuzzyIsNull(fadeSpeed);
-    NX_ASSERT(!zeroSpeed, Q_FUNC_INFO, "Opacity speed should not be this low");
+    NX_ASSERT(!zeroSpeed, "Opacity speed should not be this low");
     if (zeroSpeed)
         return;
 

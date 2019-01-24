@@ -363,11 +363,11 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))
-        return new DeviceAgent(this, *deviceInfo, m_typedManifest);
+        return new DeviceAgent(this, deviceInfo, m_typedManifest);
     else
         return nullptr;
 }
@@ -388,9 +388,11 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    return deviceInfo->logicalId != 0;
+    bool success = false;
+    int logicalId = QString(deviceInfo->logicalId()).toInt(&success);
+    return success && logicalId != 0;
 }
 
 } // namespace ssc

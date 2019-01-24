@@ -159,21 +159,21 @@ const IString* Engine::manifest(Error* error) const
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+    const IDeviceInfo* deviceInfo, Error* outError)
 {
     NX_OUTPUT
         << __func__
         << " Obtaining DeviceAgent for the device "
-        << deviceInfo->vendor << ", "
-        << deviceInfo->model << ", "
-        << deviceInfo->uid;
+        << deviceInfo->vendor() << ", "
+        << deviceInfo->model() << ", "
+        << deviceInfo->id();
 
     *outError = Error::noError;
 
     // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
     // It's not a production-ready solution, but is OK for demos.
     if (!m_deviceAgent)
-        m_deviceAgent = new DeviceAgent(this, std::string(deviceInfo->uid));
+        m_deviceAgent = new DeviceAgent(this, deviceInfo->id());
 
     m_deviceAgent->addRef();
     return m_deviceAgent;
@@ -289,7 +289,7 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* /*deviceInfo*/) const
+bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 {
     return true;
 }

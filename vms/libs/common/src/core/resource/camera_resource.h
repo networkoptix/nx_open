@@ -117,6 +117,7 @@ public:
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
+    void enabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void emitPropertyChanged(const QString& key) override;

@@ -24,7 +24,7 @@ public:
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }

@@ -312,7 +312,7 @@ void QnResourceTreeWidget::setCustomColumnDelegate(QnResourceTreeModelCustomColu
         sourceModel = proxy->sourceModel();
 
     QnResourceTreeModel* resourceModel = qobject_cast<QnResourceTreeModel*>(sourceModel);
-    NX_ASSERT(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
+    NX_ASSERT(resourceModel != nullptr, "Invalid model");
 
     if (!resourceModel)
         return;

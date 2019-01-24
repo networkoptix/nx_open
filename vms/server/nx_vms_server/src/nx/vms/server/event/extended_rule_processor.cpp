@@ -207,11 +207,11 @@ struct EmailAttachmentData
                 templatePath = lit(":/email_templates/software_trigger.mustache");
                 break;
             default:
-                NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
+                NX_ASSERT(false, "All cases must be implemented.");
                 break;
         }
 
-        NX_ASSERT(!templatePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty(), "Template path must be filled");
     }
 
     QString templatePath;
@@ -918,7 +918,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
             const auto& userId = params.metadata.instigators[0];
             const auto user = resourcePool()->getResourceById(userId);
-            NX_ASSERT(user, Q_FUNC_INFO, "Unknown user id as soft trigger instigator");
+            NX_ASSERT(user, "Unknown user id as soft trigger instigator");
 
             contextMap[tpUser] = user ? user->getName() : userId.toString();
             break;
