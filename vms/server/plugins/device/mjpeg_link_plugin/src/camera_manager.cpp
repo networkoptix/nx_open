@@ -20,6 +20,7 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info,
         nxcip::BaseCameraManager::fixedQualityCapability),
     m_timeProvider(timeProvider)
 {
+    m_pluginRef->addRef();
 }
 
 CameraManager::~CameraManager()

@@ -25,6 +25,7 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
             nxcip::BaseCameraManager::fixedQualityCapability |
             nxcip::BaseCameraManager::cameraTimeCapability)
 {
+    m_pluginRef->addRef();
     if (m_camera->hasAudio())
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
 }

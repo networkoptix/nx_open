@@ -90,8 +90,10 @@ function display_complete_setup_hint {
 
 if [ $(which systemctl) ]; then
     systemctl stop $COMPANY_NAME-mediaserver || true
+    systemctl stop $COMPANY_NAME-root-tool || true
 else
     service $COMPANY_NAME-mediaserver stop || true
+    service $COMPANY_NAME-root-tool stop || true
 fi
 
 case "$1" in
