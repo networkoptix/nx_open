@@ -21,8 +21,6 @@ public:
 
 private:
     void handleAnalyticsObjectsModeActionAction();
-    void handleItemModeChanged(const QnLayoutItemIndex& item,
-        AnalyticsObjectsVisualizationMode mode);
     void handleLocalSystemIdChanged();
 
 private:

@@ -17,8 +17,8 @@ class MiscManager:
 
 public:
     MiscManager():
-        base_type("MiscManager", nx::utils::TestOptions::temporaryDirectoryPath()),
-        m_appserver2(nx::utils::TestOptions::temporaryDirectoryPath())
+        base_type("MiscManager"),
+        m_appserver2(testDataDir())
     {
     }
 

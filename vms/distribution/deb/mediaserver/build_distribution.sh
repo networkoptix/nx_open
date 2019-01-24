@@ -127,24 +127,6 @@ copyQtLibs()
     done
 }
 
-# [in] STAGE_SHARE
-# [in] STAGE_MODULE
-copyDbSyncIfNeeded()
-{
-    if [ "$ARCH" != "arm" ]
-    then
-        echo ""
-        echo "Copying dbsync 2.2"
-        local -r STAGE_SHARE="$STAGE_MODULE/share"
-        mkdir -p "$STAGE_SHARE"
-        cp -r "$PLATFORM_PACKAGES_DIR/appserver-2.2.1/share/dbsync-2.2" "$STAGE_SHARE/"
-        cp "$BUILD_DIR/version.py" "$STAGE_SHARE/dbsync-2.2/bin/"
-        find "$STAGE_SHARE" -type d -print0 |xargs -0 chmod 755
-        find "$STAGE_SHARE" -type f -print0 |xargs -0 chmod 644
-        chmod 755 "$STAGE_SHARE/dbsync-2.2/bin"/{dbsync,certgen}
-    fi
-}
-
 # [in] STAGE_BIN
 copyBins()
 {
@@ -275,7 +257,6 @@ buildDistribution()
     find "$STAGE" -type f -print0 |xargs -0 chmod 644
     chmod -R 755 "$STAGE_BIN" #< Restore executable permission for the files in "bin" recursively.
 
-    copyDbSyncIfNeeded
     copyBins
     copyStartupScripts
 

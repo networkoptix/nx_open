@@ -155,7 +155,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     if platform == "linux" and box == "none":
         sync("cifs-utils")
-        sync("appserver-2.2.1")
 
     if platform == "windows":
         sync("icu", path_variable="icu_directory")

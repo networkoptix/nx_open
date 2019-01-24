@@ -45,7 +45,7 @@ public:
     void saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool) const;
 
 signals:
-    void modeChanged(const QnLayoutItemIndex& item, Mode value);
+    void modeChanged(const QnLayoutItemIndex& index, Mode value);
 
 private:
     struct Private;
