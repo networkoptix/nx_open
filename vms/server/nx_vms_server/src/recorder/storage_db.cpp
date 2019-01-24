@@ -546,24 +546,26 @@ QByteArray QnStorageDb::serializeData() const
         AV_WRITE_BUFFER(&dst, camOp.cameraUniqueId.data(), it->second.size());
     }
 
+    nx::media_db::MediaFileOperation mediaFileOp;
+
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
+        const auto cameraIdIt = m_readUuidToHash.left.find(it->first);
+        NX_ASSERT(cameraIdIt != m_readUuidToHash.left.end());
+        if (cameraIdIt == m_readUuidToHash.left.end())
+        {
+            NX_DEBUG(this, lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first));
+            continue;
+        }
+        mediaFileOp.setCameraId(cameraIdIt->second);
+
         for (size_t i = 0; i < kCatalogsCount; ++i)
         {
+            mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
+                QnServer::ChunksCatalog::HiQualityCatalog);
+
             for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
             {
-                nx::media_db::MediaFileOperation mediaFileOp;
-                auto cameraIdIt = m_readUuidToHash.left.find(it->first);
-                NX_ASSERT(cameraIdIt != m_readUuidToHash.left.end());
-                if (cameraIdIt == m_readUuidToHash.left.end())
-                {
-                    NX_DEBUG(this, lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first));
-                    continue;
-                }
-
-                mediaFileOp.setCameraId(cameraIdIt->second);
-                mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
-                    QnServer::ChunksCatalog::HiQualityCatalog);
                 mediaFileOp.setDuration(chunkIt->durationMs);
                 mediaFileOp.setFileSize(chunkIt->getFileSize());
                 mediaFileOp.setFileTypeIndex(chunkIt->fileIndex);
@@ -709,7 +711,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
         if (newChunk.startTimeMs == -1)
             currentChunkSet->clear();
         else
-            ;// currentChunkSet->erase(newChunk);
+            currentChunkSet->erase(newChunk);
         break;
     }
     default:

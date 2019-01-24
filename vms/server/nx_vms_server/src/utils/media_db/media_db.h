@@ -11,6 +11,8 @@
 #include <nx/utils/log/log.h>
 #include "nx/utils/thread/wait_condition.h"
 #include "nx/utils/thread/long_runnable.h"
+#include <recorder/device_file_catalog.h>
+#include "media_file_operation.h"
 
 // Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format
 // for DB records format details.
@@ -33,59 +35,10 @@ struct FileHeader
     void setDbVersion(uint8_t dbVersion) { part1 |= (dbVersion & 0xff); }
 };
 
-enum class RecordType
-{
-    FileOperationAdd = 0,
-    FileOperationDelete = 1,
-    CameraOperationAdd = 2,
-};
-
 enum class Mode
 {
     Read,
     Write
-};
-
-inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
-
-struct RecordBase
-{
-    quint64 part1;
-
-    static const int kSerializedRecordSize = sizeof(part1);
-
-    RecordBase(quint64 i = 0) : part1(i) {}
-    RecordType getRecordType() const;
-    void setRecordType(RecordType recordType);
-};
-
-struct MediaFileOperation : RecordBase
-{
-    quint64 part2;
-
-    static const int kSerializedRecordSize = sizeof(part1) + sizeof(part2);
-
-    MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part2(i2) {}
-    int getCameraId() const;
-    void setCameraId(int cameraId);
-
-    qint64 getStartTime() const;
-    void setStartTime(qint64 startTime);
-
-    int getDuration() const;
-    void setDuration(int duration);
-
-    int getTimeZone() const;
-    void setTimeZone(int timeZone);
-
-    qint64 getFileSize() const;
-    void setFileSize(qint64 fileSize);
-
-    int getFileTypeIndex() const;
-    void setFileTypeIndex(int fileTypeIndex);
-
-    int getCatalog() const;
-    void setCatalog(int catalog);
 };
 
 struct CameraOperation : RecordBase
