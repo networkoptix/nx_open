@@ -8,9 +8,12 @@
 
 namespace nx::network::maintenance::log {
 
+// TODO: #Nate add documentation please. What's that? Third way to setup the same logs?
 struct Filter
 {
     std::string level;
+
+    // TODO: #Nate Actually regexps can be written here. Suggesting to rename to 'filters'.
     std::vector<std::string> tags;
 };
 

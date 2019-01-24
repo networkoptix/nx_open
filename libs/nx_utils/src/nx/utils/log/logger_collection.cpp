@@ -6,7 +6,7 @@ namespace log {
 
 LoggerCollection::LoggerCollection()
 {
-    m_mainLogger = std::make_unique<Logger>(std::set<Tag>(), kDefaultLevel);
+    m_mainLogger = std::make_unique<Logger>(std::set<Filter>(), kDefaultLevel);
     m_mainLogger->setOnLevelChanged([this]() { onLevelChanged(); });
     updateMaxLevel();
 }
@@ -49,9 +49,9 @@ int LoggerCollection::add(std::shared_ptr<AbstractLogger> logger)
     Context loggerContext(m_loggerId, logger);
 
     bool inserted = false;
-    for (const auto& tag : logger->tags())
+    for (const auto& filter: logger->filters())
     {
-        if (m_loggersByTags.emplace(tag, loggerContext).second)
+        if (m_loggersByFilter.emplace(filter, loggerContext).second)
             inserted = true;
     }
 
@@ -66,16 +66,18 @@ int LoggerCollection::add(std::shared_ptr<AbstractLogger> logger)
 std::shared_ptr<AbstractLogger> LoggerCollection::get(const Tag& tag, bool exactMatch) const
 {
     QnMutexLocker lock(&m_mutex);
-    if (exactMatch)
+    for (auto& it: m_loggersByFilter)
     {
-        const auto it = m_loggersByTags.find(tag);
-        return (it == m_loggersByTags.end()) ? nullptr : it->second.logger;
-    }
-
-    for (const auto& it : m_loggersByTags)
-    {
-        if (tag.matches(it.first))
-            return it.second.logger;
+        if (exactMatch)
+        {
+            if (it.first.toString() == tag.toString())
+                return it.second.logger;
+        }
+        else
+        {
+            if (it.first.accepts(tag))
+                return it.second.logger;
+        }
     }
 
     return m_mainLogger;
@@ -84,7 +86,7 @@ std::shared_ptr<AbstractLogger> LoggerCollection::get(const Tag& tag, bool exact
 std::shared_ptr<AbstractLogger> LoggerCollection::get(int loggerId) const
 {
     QnMutexLocker lock(&m_mutex);
-    for (const auto& element : m_loggersByTags)
+    for (const auto& element : m_loggersByFilter)
     {
         if (element.second.id == loggerId)
             return element.second.logger;
@@ -93,31 +95,31 @@ std::shared_ptr<AbstractLogger> LoggerCollection::get(int loggerId) const
     return nullptr;
 }
 
-std::set<Tag> LoggerCollection::getEffectiveTags(int loggerId) const
+std::set<Filter> LoggerCollection::getEffectiveFilters(int loggerId) const
 {
     QnMutexLocker lock(&m_mutex);
-    std::set<Tag> effectiveTags;
+    std::set<Filter> effectiveFilters;
 
-    for (const auto& element : m_loggersByTags)
+    for (const auto& element: m_loggersByFilter)
     {
         if (element.second.id == loggerId)
-            effectiveTags.emplace(element.first);
+            effectiveFilters.emplace(element.first);
     }
 
-    return effectiveTags;
+    return effectiveFilters;
 }
 
-LoggerCollection::LoggersByTag LoggerCollection::allLoggers() const
+LoggerCollection::LoggersByFilter LoggerCollection::allLoggers() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_loggersByTags;
+    return m_loggersByFilter;
 }
 
-void LoggerCollection::remove(const std::set<Tag>& filters)
+void LoggerCollection::remove(const std::set<Filter>& filters)
 {
     QnMutexLocker lock(&m_mutex);
     for (const auto& f: filters)
-        m_loggersByTags.erase(f);
+        m_loggersByFilter.erase(f);
 
     updateMaxLevel();
 }
@@ -125,10 +127,10 @@ void LoggerCollection::remove(const std::set<Tag>& filters)
 void LoggerCollection::remove(int loggerId)
 {
     QnMutexLocker lock(&m_mutex);
-    for (auto it = m_loggersByTags.begin(); it != m_loggersByTags.end();)
+    for (auto it = m_loggersByFilter.begin(); it != m_loggersByFilter.end();)
     {
         if (it->second.id == loggerId)
-            it = m_loggersByTags.erase(it);
+            it = m_loggersByFilter.erase(it);
         else
             ++it;
     }
@@ -142,7 +144,7 @@ Level LoggerCollection::maxLevel() const
 void LoggerCollection::updateMaxLevel()
 {
     m_maxLevel = m_mainLogger->maxLevel();
-    for (const auto& element: m_loggersByTags)
+    for (const auto& element: m_loggersByFilter)
         m_maxLevel = std::max(element.second.logger->maxLevel(), m_maxLevel.load());
 }
 
