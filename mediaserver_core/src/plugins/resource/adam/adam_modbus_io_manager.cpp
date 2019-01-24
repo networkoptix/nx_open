@@ -131,7 +131,7 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
             &status);
 
         if (!status)
-            qDebug() << "Failed to set port state" << outputId << "tries left:" << triesLeft;
+            NX_DEBUG(this, lm("Failed to set port [%1] state, tries left: [%2]").args(outputId, triesLeft));
     }
 
     if (!status && m_networkIssueCallback)
@@ -295,9 +295,8 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx::modbus::Modbu
 
     if (response.isException())
     {
-        qDebug()
-            << lit("QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1")
-            .arg(m_client.getLastErrorString());
+        NX_DEBUG(this, lm("QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1")
+            .args(m_client.getLastErrorString()));
         return;
     }
 
@@ -457,10 +456,7 @@ void QnAdamModbusIOManager::handleMonitoringError()
 {
     auto error = m_client.getLastErrorString();
 
-    qDebug() << "Error occured << " << error;
-
-    NX_LOG(error, cl_logDEBUG2);
-
+    NX_DEBUG(this, lm("%1() error: %2").args(__func__, error));
     if (++m_networkFaultsCounter >= kMaxNetworkFaultsNumber)
     {
         m_networkFaultsCounter = 0;
