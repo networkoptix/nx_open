@@ -163,6 +163,7 @@ public:
 
     bool isLicenseUsed() const;
 
+    bool isAnalyticsSupported() const;
     bool isAnalyticsEnabled() const;
     void setAnalyticsEnabled(bool analyticsEnabled);
 

@@ -69,8 +69,6 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
     m_totalAudioFrames(0),
-    m_cachedSoftMotionStreamIndex(
-        [this](){ return m_cameraRes->motionStreamIndex(); }, &m_motionStreamIndexMtx),
     m_softMotionLastChannel(0),
     m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
@@ -290,7 +288,7 @@ bool QnLiveStreamProvider::needAnalyzeMotion()
     if (m_cameraRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
         return false;
 
-    const auto motionStreamIndex = m_cachedSoftMotionStreamIndex.get().index;
+    const auto motionStreamIndex = m_cameraRes->motionStreamIndex().index;
     switch (getRole())
     {
         case Qn::CR_LiveVideo: return motionStreamIndex == Qn::StreamIndex::primary;
@@ -414,7 +412,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
         static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
             * SECONDARY_STREAM_MAX_RESOLUTION.height();
         needToAnalyzeMotion = compressedFrame->width * compressedFrame->height <= maxSquare
-            || m_cachedSoftMotionStreamIndex.get().isForced;
+            || m_cameraRes->motionStreamIndex().isForced;
     }
     else
     {
@@ -592,14 +590,8 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
         m_cameraRes->saveProperties();
     }
 
-    m_cachedSoftMotionStreamIndex.reset();
     QnMutexLocker lock(&m_liveMutex);
     updateSoftwareMotion();
-}
-
-void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
-{
-    m_cachedSoftMotionStreamIndex.reset();
 }
 
 void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData)

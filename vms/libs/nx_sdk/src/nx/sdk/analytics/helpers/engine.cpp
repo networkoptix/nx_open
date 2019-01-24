@@ -167,7 +167,7 @@ Error Engine::setHandler(IEngine::IHandler* handler)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* /*deviceInfo*/) const
+bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 {
     return true;
 }

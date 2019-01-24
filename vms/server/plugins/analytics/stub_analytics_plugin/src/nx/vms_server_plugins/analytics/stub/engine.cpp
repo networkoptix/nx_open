@@ -32,7 +32,7 @@ Engine::~Engine()
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* /*deviceInfo*/, Error* /*outError*/)
+    const IDeviceInfo* /*deviceInfo*/, Error* /*outError*/)
 {
     return new DeviceAgent(this);
 }

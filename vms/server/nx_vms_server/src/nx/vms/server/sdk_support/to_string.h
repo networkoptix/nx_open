@@ -4,6 +4,6 @@
 
 namespace nx::sdk {
 
-QString toString(const nx::sdk::DeviceInfo& cameraInfo);
+QString toString(const nx::sdk::IDeviceInfo* cameraInfo);
 
 } // namespace nx::sdk

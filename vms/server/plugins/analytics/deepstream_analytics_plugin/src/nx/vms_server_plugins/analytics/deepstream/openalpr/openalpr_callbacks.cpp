@@ -17,7 +17,7 @@ extern "C" {
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr_common.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
-#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
@@ -76,8 +76,8 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::Object();
-        nx::sdk::analytics::IObject::Rect rectangle;
+        auto detectedObject = new nx::sdk::analytics::ObjectMetadata();
+        nx::sdk::analytics::IObjectMetadata::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;

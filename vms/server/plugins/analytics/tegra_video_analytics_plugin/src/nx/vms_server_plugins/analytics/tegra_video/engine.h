@@ -13,7 +13,7 @@ public:
     Engine(nx::sdk::analytics::IPlugin* plugin);
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
 protected:
     virtual std::string manifest() const override;

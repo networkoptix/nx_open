@@ -178,13 +178,6 @@ void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 
 void Manager::at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName)
 {
-    const auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (device)
-    {
-        at_devicePropertyChanged(device, propertyName);
-        return;
-    }
-
     auto engine = resource.dynamicCast<nx::vms::server::resource::AnalyticsEngineResource>();
     if (!NX_ASSERT(engine))
         return;
@@ -229,23 +222,18 @@ void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
     }
 }
 
-void Manager::at_devicePropertyChanged(
-    const QnVirtualCameraResourcePtr& device,
-    const QString& propertyName)
+void Manager::at_deviceEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device)
 {
-    if (propertyName == QnVirtualCameraResource::kEnabledAnalyticsEnginesProperty)
+    auto analyticsContext = context(device);
+    if (!analyticsContext)
     {
-        auto analyticsContext = context(device);
-        if (!analyticsContext)
-        {
-            NX_DEBUG(this, "Can't find analytics context for device %1 (%2)",
-                device->getUserDefinedName(), device->getId());
-            return;
-        }
-
-        analyticsContext->setEnabledAnalyticsEngines(
-            sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
+        NX_DEBUG(this, "Can't find analytics context for device %1 (%2)",
+            device->getUserDefinedName(), device->getId());
+        return;
     }
+
+    analyticsContext->setEnabledAnalyticsEngines(
+        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
 }
 
 void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
@@ -262,8 +250,8 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
 void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
 {
     connect(
-        device, &QnResource::propertyChanged,
-        this, &Manager::at_resourcePropertyChanged);
+        device, &QnVirtualCameraResource::enabledAnalyticsEnginesChanged,
+        this, &Manager::at_deviceEnabledAnalyticsEnginesChanged);
 
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(
@@ -456,9 +444,8 @@ std::set<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& 
         if (!NX_ASSERT(sdkEngine))
             continue;
 
-        nx::sdk::DeviceInfo deviceInfo;
-        const bool success = sdk_support::deviceInfoFromResource(device, &deviceInfo);
-        if (!success)
+        auto deviceInfo = sdk_support::deviceInfoFromResource(device);
+        if (!deviceInfo)
         {
             NX_WARNING(this, "Unable to build device info for device %1 (%2)",
                 device->getUserDefinedName(), device->getId());
@@ -466,7 +453,7 @@ std::set<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& 
             continue;
         }
 
-        if (sdkEngine->isCompatible(&deviceInfo))
+        if (sdkEngine->isCompatible(deviceInfo.get()))
             result.insert(engine->getId());
     }
 
@@ -496,15 +483,15 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
 
     for (auto& device: devices)
     {
-        nx::sdk::DeviceInfo deviceInfo;
-        if (!sdk_support::deviceInfoFromResource(device, &deviceInfo))
+        auto deviceInfo = sdk_support::deviceInfoFromResource(device);
+        if (!deviceInfo)
         {
             NX_WARNING(this, "Unable to build device info for device %1 (%2)",
                 device->getUserDefinedName(), device->getId());
             continue;
         }
 
-        if (sdkEngine->isCompatible(&deviceInfo))
+        if (sdkEngine->isCompatible(deviceInfo.get()))
             descriptorManager.addCompatibleAnalyticsEngines(device->getId(), {engine->getId()});
     }
 }

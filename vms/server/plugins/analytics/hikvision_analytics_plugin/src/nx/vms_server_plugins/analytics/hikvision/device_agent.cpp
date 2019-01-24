@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
@@ -82,25 +82,28 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
             for (const auto& hikvisionEvent: events)
             {
-                if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
+                const bool wrongChannel = hikvisionEvent.channel.is_initialized()
+                    && hikvisionEvent.channel != m_channelNumber;
+
+                if (wrongChannel)
                     return;
 
-                auto event = new nx::sdk::analytics::Event();
+                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
-                    .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
+                    .args(hikvisionEvent.caption, hikvisionEvent.description, m_channelNumber));
 
-                event->setTypeId(hikvisionEvent.typeId.toStdString());
-                event->setCaption(hikvisionEvent.caption.toStdString());
-                event->setDescription(hikvisionEvent.description.toStdString());
-                event->setIsActive(hikvisionEvent.isActive);
-                event->setConfidence(1.0);
-                //event->setAuxiliaryData(hikvisionEvent.fullEventName.toStdString());
+                eventMetadata->setTypeId(hikvisionEvent.typeId.toStdString());
+                eventMetadata->setCaption(hikvisionEvent.caption.toStdString());
+                eventMetadata->setDescription(hikvisionEvent.description.toStdString());
+                eventMetadata->setIsActive(hikvisionEvent.isActive);
+                eventMetadata->setConfidence(1.0);
+                //eventMetadata->setAuxiliaryData(hikvisionEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUs(-1);
-                packet->addItem(event);
+                packet->addItem(eventMetadata);
             }
 
             m_handler->handleMetadata(packet);
@@ -150,16 +153,16 @@ const IString* DeviceAgent::manifest(Error* error) const
     return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
-    m_url = deviceInfo.url;
-    m_model = deviceInfo.model;
-    m_firmware = deviceInfo.firmware;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
-    m_uniqueId = deviceInfo.uid;
-    m_sharedId = deviceInfo.sharedId;
-    m_channel = deviceInfo.channel;
+    m_url = deviceInfo->url();
+    m_model = deviceInfo->model();
+    m_firmware = deviceInfo->firmware();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
+    m_uniqueId = deviceInfo->id();
+    m_sharedId = deviceInfo->sharedId();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

@@ -11,8 +11,12 @@ namespace nx::vms::server::analytics {
 class DataPacketAdapter: public QnAbstractDataPacket
 {
 public:
-    DataPacketAdapter(nx::sdk::analytics::IDataPacket* packet): m_packet(
-        [packet]() { packet->addRef(); return packet; }()) {}
+    DataPacketAdapter(nx::sdk::analytics::IDataPacket* packet):
+        m_packet(packet)
+    {
+        packet->addRef();
+    }
+
     nx::sdk::analytics::IDataPacket* packet() { return m_packet.get(); }
     const nx::sdk::analytics::IDataPacket* packet() const { return m_packet.get(); }
 
