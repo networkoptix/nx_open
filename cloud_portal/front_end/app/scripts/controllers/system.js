@@ -181,7 +181,7 @@ angular.module('cloudApp')
                     .merge($scope.system)
                     .then(function (mergeInfo) {
                         if (mergeInfo) {
-                           setMergeStatus(mergeInfo);
+                           $scope.system.mergeInfo = mergeInfo;
                         }
                     });
             };
