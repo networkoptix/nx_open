@@ -361,7 +361,7 @@ void QnResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (!setUrlInternal(url))
+        if (!setUrlUnsafe(url))
             return;
     }
 
@@ -540,7 +540,7 @@ void QnResource::emitPropertyChanged(const QString& key)
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-bool QnResource::setUrlInternal(const QString& value)
+bool QnResource::setUrlUnsafe(const QString& value)
 {
     if (m_url == value)
         return false;
