@@ -14,8 +14,8 @@
 
 #include <transaction/connection_guard_shared_state.h>
 
-#include "../transaction_transport.h"
-#include "command_transport_delegate.h"
+#include "../command_transport_delegate.h"
+#include "../../transaction_transport.h"
 
 namespace nx::clusterdb::engine {
 

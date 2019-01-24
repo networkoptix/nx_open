@@ -1,9 +1,6 @@
 #include "synchronization_engine.h"
 
-#include <nx/network/url/url_parse_helper.h>
-
 #include "statistics/provider.h"
-#include "transport/http_transport_paths.h"
 
 namespace nx::clusterdb::engine {
 

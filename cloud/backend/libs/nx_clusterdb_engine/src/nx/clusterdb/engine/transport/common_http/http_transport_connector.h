@@ -4,8 +4,8 @@
 
 #include <transaction/transaction_transport_base.h>
 
-#include "abstract_transaction_transport_connector.h"
-#include "../compatible_ec2_protocol_version.h"
+#include "../abstract_transaction_transport_connector.h"
+#include "../../compatible_ec2_protocol_version.h"
 
 namespace nx::clusterdb::engine {
 

@@ -5,8 +5,8 @@
 
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
-#include "../abstract_transaction_transport.h"
-#include "../compatible_ec2_protocol_version.h"
+#include "../../abstract_transaction_transport.h"
+#include "../../compatible_ec2_protocol_version.h"
 
 namespace nx::clusterdb::engine::transport {
 

@@ -5,7 +5,7 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/utils/url.h>
 
-#include "abstract_transaction_transport_connector.h"
+#include "../abstract_transaction_transport_connector.h"
 
 namespace nx::clusterdb::engine::transport {
 

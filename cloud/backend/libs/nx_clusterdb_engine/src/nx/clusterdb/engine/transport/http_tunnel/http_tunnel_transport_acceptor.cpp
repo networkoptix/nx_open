@@ -2,9 +2,9 @@
 
 #include <nx/vms/api/types/connection_types.h>
 
-#include "generic_transport.h"
 #include "http_tunnel_transport_connection.h"
-#include "../connection_manager.h"
+#include "../generic_transport.h"
+#include "../../connection_manager.h"
 
 namespace nx::clusterdb::engine::transport {
 

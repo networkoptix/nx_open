@@ -8,11 +8,11 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/api/types/connection_types.h>
 
-#include "generic_transport.h"
 #include "http_transport_paths.h"
-#include "../connection_manager.h"
-#include "../compatible_ec2_protocol_version.h"
-#include "../http/sync_connection_request_handler.h"
+#include "../generic_transport.h"
+#include "../../connection_manager.h"
+#include "../../compatible_ec2_protocol_version.h"
+#include "../../http/sync_connection_request_handler.h"
 
 namespace nx::clusterdb::engine::transport {
 

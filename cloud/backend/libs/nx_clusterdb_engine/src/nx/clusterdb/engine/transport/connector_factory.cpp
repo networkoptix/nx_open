@@ -1,7 +1,7 @@
 #include "connector_factory.h"
 
-#include "http_tunnel_transport_connector.h"
-#include "http_transport_connector.h"
+#include "common_http/http_transport_connector.h"
+#include "http_tunnel/http_tunnel_transport_connector.h"
 
 namespace nx::clusterdb::engine::transport {
 

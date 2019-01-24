@@ -17,7 +17,7 @@
 #include "outgoing_command_filter.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
-#include "transport/http_transport_acceptor.h"
+#include "transport/common_http/http_transport_acceptor.h"
 #include "transport/p2p_http/acceptor.h"
 #include "transport/p2p_websocket/websocket_transport_acceptor.h"
 #include "transport/transport_manager.h"
