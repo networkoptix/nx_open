@@ -86,7 +86,7 @@ void MetadataHandler::handleEventMetadataPacket(
         return;
     }
 
-    for (auto i = 0; i < eventMetadataPacket->count(); ++i)
+    for (int i = 0; i < eventMetadataPacket->count(); ++i)
     {
         nx::sdk::Ptr<const IEventMetadata> eventMetadata(eventMetadataPacket->at(i));
         if (!eventMetadata)
@@ -101,7 +101,7 @@ void MetadataHandler::handleObjectMetadataPacket(
     nx::sdk::Ptr<IObjectMetadataPacket> objectMetadataPacket)
 {
     nx::common::metadata::DetectionMetadataPacket data;
-    for (auto i = 0; i < objectMetadataPacket->count(); ++i)
+    for (int i = 0; i < objectMetadataPacket->count(); ++i)
     {
         nx::sdk::Ptr<const IObjectMetadata> item(objectMetadataPacket->at(i));
         if (!item)
