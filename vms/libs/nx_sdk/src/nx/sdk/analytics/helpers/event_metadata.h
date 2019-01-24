@@ -3,17 +3,15 @@
 #include <string>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/i_event.h>
+#include <nx/sdk/analytics/i_event_metadata.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class NX_SDK_API Event: public nxpt::CommonRefCounter<IEvent>
+class NX_SDK_API EventMetadata: public nxpt::CommonRefCounter<IEventMetadata>
 {
 public:
-    virtual ~Event();
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual const char* typeId() const override;
     virtual float confidence() const override;

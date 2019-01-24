@@ -1,16 +1,16 @@
 #pragma once
 
-#include "i_metadata_item.h"
+#include "i_metadata.h"
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-/** Each class implementing IEvent should handle this GUID in queryInterface(). */
-static const nxpl::NX_GUID IID_Event =
+/** Each class implementing IEventMetadata should handle this GUID in queryInterface(). */
+static const nxpl::NX_GUID IID_EventMetadata =
   {{0xd5,0xe1,0x49,0x96,0x63,0x33,0x42,0x5a,0x8f,0xee,0xbc,0x23,0x50,0x03,0xc8,0x0f}};
 
-class IEvent: public IMetadataItem
+class IEventMetadata: public IMetadata
 {
 public:
     /**

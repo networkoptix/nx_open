@@ -1,7 +1,7 @@
 #pragma once
 
-#include "i_object.h"
-#include "i_iterable_metadata_packet.h"
+#include "i_object_metadata.h"
+#include "i_metadata_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -17,14 +17,12 @@ static const nxpl::NX_GUID IID_ObjectMetadataPacket =
 /**
  * Metadata packet that contains data about objects detected on the scene.
  */
-class IObjectMetadataPacket: public IIterableMetadataPacket
+class IObjectMetadataPacket: public IMetadataPacket
 {
 public:
-    /**
-     * Should not modify the object, and should behave like a constant iterator.
-     * @return Next item in the list, or null if no more.
-     */
-    virtual IObject* nextItem() override = 0;
+    virtual int count() const override = 0;
+
+    virtual const IObjectMetadata* at(int index) const override = 0;
 };
 
 } // namespace analytics

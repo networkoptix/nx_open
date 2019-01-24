@@ -9,7 +9,7 @@
 
 #include <nx/sdk/helpers/string.h>
 
-#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log.h>
 
@@ -84,14 +84,14 @@ Error DeviceAgent::startFetchingMetadata(
         [this](const EventList& events)
         {
             using namespace std::chrono;
-            auto packet = new EventMetadataPacket();
+            auto eventMetadataPacket = new EventMetadataPacket();
 
             for (const auto& hanwhaEvent: events)
             {
                 if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channelNumber)
                     return;
 
-                auto event = new nx::sdk::analytics::Event();
+                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
                 NX_PRINT
                     << "Got event: caption ["
                     << hanwhaEvent.caption.toStdString() << "], description ["
@@ -101,25 +101,25 @@ Error DeviceAgent::startFetchingMetadata(
                 NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
                     hanwhaEvent.caption, hanwhaEvent.description, m_channelNumber));
 
-                event->setTypeId(hanwhaEvent.typeId.toStdString());
-                event->setCaption(hanwhaEvent.caption.toStdString());
-                event->setDescription(hanwhaEvent.caption.toStdString());
-                event->setIsActive(hanwhaEvent.isActive);
-                event->setConfidence(1.0);
-                event->setAuxiliaryData(hanwhaEvent.fullEventName.toStdString());
+                eventMetadata->setTypeId(hanwhaEvent.typeId.toStdString());
+                eventMetadata->setCaption(hanwhaEvent.caption.toStdString());
+                eventMetadata->setDescription(hanwhaEvent.caption.toStdString());
+                eventMetadata->setIsActive(hanwhaEvent.isActive);
+                eventMetadata->setConfidence(1.0);
+                eventMetadata->setAuxiliaryData(hanwhaEvent.fullEventName.toStdString());
 
-                packet->setTimestampUs(
+                eventMetadataPacket->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
-                packet->setDurationUs(-1);
-                packet->addItem(event);
+                eventMetadataPacket->setDurationUs(-1);
+                eventMetadataPacket->addItem(eventMetadata);
             }
 
             NX_ASSERT(m_handler, "Handler should exist");
             if (m_handler)
-                m_handler->handleMetadata(packet);
+                m_handler->handleMetadata(eventMetadataPacket);
 
-            packet->releaseRef();
+            eventMetadataPacket->releaseRef();
         };
 
     NX_ASSERT(m_engine);

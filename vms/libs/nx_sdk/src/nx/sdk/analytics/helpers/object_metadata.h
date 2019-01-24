@@ -5,14 +5,14 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/uuid.h>
-#include <nx/sdk/analytics/i_object.h>
+#include <nx/sdk/analytics/i_object_metadata.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class Object: public nxpt::CommonRefCounter<IObject>
+class ObjectMetadata: public nxpt::CommonRefCounter<IObjectMetadata>
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;

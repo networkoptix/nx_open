@@ -9,7 +9,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 
@@ -180,7 +180,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
 {
     for (auto& item: m_cachedObjects)
     {
-        auto object = new nx::sdk::analytics::Object();
+        auto objectMetadata = new nx::sdk::analytics::ObjectMetadata();
         auto& cached = item.second;
 
         bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles
@@ -203,10 +203,10 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
                 << bottomRightY(cached.rect) << ")";
         }
 
-        object->setBoundingBox(toSdkRect(cached.rect));
-        object->setId(cached.id);
-        object->setConfidence(1);
-        object->setTypeId(m_objectTypeId);
+        objectMetadata->setBoundingBox(toSdkRect(cached.rect));
+        objectMetadata->setId(cached.id);
+        objectMetadata->setConfidence(1);
+        objectMetadata->setTypeId(m_objectTypeId);
 
         std::vector<nx::sdk::analytics::Attribute> attributes;
         for (const auto& entry: cached.attributes)
@@ -222,8 +222,8 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
             attributes.push_back(attribute);
         }
 
-        object->setAttributes(attributes);
-        outPacket->addItem(object);
+        objectMetadata->setAttributes(attributes);
+        outPacket->addItem(objectMetadata);
     }
 }
 
@@ -428,9 +428,14 @@ float NaiveObjectTracker::bottomRightY(const TegraVideo::Rect& rectangle)
     return rectangle.y + rectangle.h;
 }
 
-nx::sdk::analytics::IObject::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
+nx::sdk::analytics::IObjectMetadata::Rect NaiveObjectTracker::toSdkRect(
+    const TegraVideo::Rect& rectangle)
 {
-    return nx::sdk::analytics::IObject::Rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
+    return nx::sdk::analytics::IObjectMetadata::Rect(
+        rectangle.x,
+        rectangle.y,
+        rectangle.w,
+        rectangle.h);
 }
 
 } // namespace tegra_video
