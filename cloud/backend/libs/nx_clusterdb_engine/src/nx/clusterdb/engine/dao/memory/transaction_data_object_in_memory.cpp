@@ -92,7 +92,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     const TransactionKey from{{systemId, peerId, dbInstanceId}, minSequence};
     const TransactionKey to{{systemId, peerId, dbInstanceId}, maxSequence};
     const auto& indexBySourceAndSequence = m_transactions.get<kIndexBySourceAndSequence>();
-    auto tranIter = indexBySourceAndSequence.lower_bound(from);
+    auto tranIter = indexBySourceAndSequence.upper_bound(from);
     for (;
          (tranIter != indexBySourceAndSequence.end()) && (tranIter->uniqueKey <= to);
          ++tranIter)

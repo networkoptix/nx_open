@@ -55,4 +55,7 @@ private:
         TransactionsReadHandler completionHandler);
 };
 
+// TODO: #ak Move this function somewhere.
+std::string stateToString(const vms::api::TranState& tranState);
+
 } // namespace nx::clusterdb::engine
