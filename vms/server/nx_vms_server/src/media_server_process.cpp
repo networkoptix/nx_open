@@ -1459,6 +1459,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /ec2/forcePrimaryTimeServer
      * Set primary time server. Requires a JSON object with optional "id" field in the message
      * body. If "id" field is missing, the primary time server is turned off.
+     * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("ec2/forcePrimaryTimeServer",
@@ -1772,6 +1773,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
+     * %permissions Owner.
      * Return audit log information in the requested format.
      * %param:string from Start time of a time interval (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
@@ -1806,7 +1808,7 @@ void MediaServerProcess::registerRestHandlers(
      * Change password for already existing user on a camera.
      * This method is allowed for cameras with 'SetUserPasswordCapability' capability only.
      * Otherwise it returns an error in the JSON result.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
      * %param:string user User name.
@@ -2045,7 +2047,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/restart
      * Restarts the server.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
@@ -2098,7 +2100,7 @@ void MediaServerProcess::registerRestHandlers(
      * in "flags" field). <p> Parameters should be passed as a JSON array of objects in POST
      * message body with content type "application/json". Example of such object can be seen in
      * the result of GET /api/iflist function. </p>
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string name Interface name.
      * %param:string ipAddr IP address with dot-separated decimal components.
      * %param:string netMask Network mask with dot-separated decimal components.
@@ -2122,7 +2124,7 @@ void MediaServerProcess::registerRestHandlers(
      * Set current time on the server machine. Can be called only if server flags include
      * "SF_timeCtrl" (server flags can be obtained via /ec2/getMediaServersEx in "flags"
      * field).
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string timezone Time zone identifier, can be obtained via /api/getTimeZones.
      * %param:string datetime System date and time (as a string containing time in milliseconds
      *     since epoch, or a local time formatted like
@@ -2146,7 +2148,7 @@ void MediaServerProcess::registerRestHandlers(
      * </code>
      * </pre>
      * </p>
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string timeZoneId Time zone identifier, can be obtained via /api/getTimeZones.
      * %param:string dateTime Date and time (as string containing time in milliseconds since
      *     epoch, or a local time formatted like
@@ -2163,7 +2165,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/configure
      * Configure various server parameters.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string systemName System display name. It affects all servers in the system.
      * %param[opt]:integer port Server API port. It affects the current server only.
      * %param[opt]:string password Set new admin password.
@@ -2178,7 +2180,7 @@ void MediaServerProcess::registerRestHandlers(
      * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
      * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
      * be called either via GET or POST method. POST data should be a json object.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string password Set new admin password after detach.
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
@@ -2187,7 +2189,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/detachFromSystem
      * Detaches the Server from the System and resets its state to the initial one.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
      */
@@ -2197,7 +2199,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc[proprietary] POST /api/restoreState
      * Restore initial server state, i.e. <b>delete server's database</b>.
      * <br/>Server will restart after executing this command.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string currentPassword Current admin password
      * %return:object JSON object with error message and error code (0 means OK).
      */
@@ -2207,7 +2209,7 @@ void MediaServerProcess::registerRestHandlers(
      * Configure server system name and password. This function can be called for server with
      * default system name. Otherwise function returns error. This method requires owner
      * permissions.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string password New password for admin user
      * %param:string systemName New system name
      * %return:object JSON object with error message and error code (0 means OK).
@@ -2218,7 +2220,7 @@ void MediaServerProcess::registerRestHandlers(
      * Configure server system name and attach it to cloud. This function can be called for server
      * with default system name. Otherwise function returns error. This method requires owner
      * permissions.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string systemName New system name
      * %param:string cloudAuthKey could authentication key
      * %param:string cloudSystemID could system id
@@ -2306,14 +2308,14 @@ void MediaServerProcess::registerRestHandlers(
      * Execute any script from subfolder "scripts" of media server. Script name provides directly
      * in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
      * a script as an parameters.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/execute", new QnExecScript(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc[proprietary] GET /api/scriptList
      * Return list of scripts to execute.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %return:object JSON object with string list.
      */
     reg("api/scriptList", new QnScriptListRestHandler(serverModule()->settings().dataDir()), kAdmin);
@@ -2918,26 +2920,6 @@ void MediaServerProcess::initializeUpnpPortMapper()
 
 }
 
-static bool isDwBlackJackMini()
-{
-    // The only way we know to find out is to detect their web-server presence on device.
-    const QString kWebServerPath = "/usr/local/bin/main-server";
-    QFile file(kWebServerPath);
-    if (!file.open(QFile::ReadOnly))
-    {
-        NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - unable to open file").args(kWebServerPath));
-        return false;
-    }
-
-    const auto content = file.readAll();
-    NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - contains:\n%2").args(kWebServerPath, content));
-    if (!content.contains("SteelBox"))
-        return false;
-
-    NX_ALWAYS(typeid(MediaServerProcess), "This server is DW BlackJack MINI");
-    return true;
-}
-
 nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
@@ -2976,11 +2958,6 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 #else
     serverFlags |= nx::vms::api::SF_Has_HDD;
 #endif
-
-    // DW requested to accept professional licenses on their BlackJack MINI, see VMS-12693.
-    // This code should be removed as soon as we accept professional licenses on all arm devices.
-    if ((serverFlags & nx::vms::api::SF_ArmServer) && !isDwBlackJackMini())
-        serverFlags |= nx::vms::api::SF_RequiresEdgeLicense;
 
     if (!(serverFlags & (nx::vms::api::SF_ArmServer | nx::vms::api::SF_Edge)))
         serverFlags |= nx::vms::api::SF_SupportsTranscoding;
@@ -4120,7 +4097,7 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->mutableSettings()->obsoleteServerGuid.remove();
     serverModule()->mutableSettings()->appserverPassword.set("");
 #ifdef _DEBUG
-    NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(), Q_FUNC_INFO,
+    NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(),
         "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 

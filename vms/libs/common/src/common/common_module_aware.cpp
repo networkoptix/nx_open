@@ -20,7 +20,7 @@ void QnCommonModuleAware::init(QObject* parent)
         if (moduleAware != nullptr)
         {
             m_commonModule = moduleAware->commonModule();
-            NX_ASSERT(m_commonModule, Q_FUNC_INFO, "Invalid context");
+            NX_ASSERT(m_commonModule, "Invalid context");
             break;
         }
 

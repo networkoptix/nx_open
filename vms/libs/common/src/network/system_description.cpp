@@ -114,7 +114,7 @@ void QnSystemDescription::addServer(const nx::vms::api::ModuleInformation& serve
     int priority, bool online)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
-    NX_ASSERT(!containsServer, Q_FUNC_INFO, "System contains specified server");
+    NX_ASSERT(!containsServer, "System contains specified server");
 
     if (containsServer)
     {
@@ -139,7 +139,7 @@ bool QnSystemDescription::containsServer(const QnUuid& serverId) const
 
 nx::vms::api::ModuleInformation QnSystemDescription::getServer(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
+    NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
     return m_servers.value(serverId);
 }
@@ -148,7 +148,7 @@ QnServerFields QnSystemDescription::updateServer(const nx::vms::api::ModuleInfor
 {
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
-    NX_ASSERT(containsServer, Q_FUNC_INFO,
+    NX_ASSERT(containsServer,
         "System does not contain specified server");
 
     if (!containsServer)
@@ -203,7 +203,7 @@ void QnSystemDescription::handleServerRemoved(const QnUuid& serverId)
 void QnSystemDescription::removeServer(const QnUuid& serverId)
 {
     const bool containsServer = m_servers.contains(serverId);
-    NX_ASSERT(containsServer, Q_FUNC_INFO,
+    NX_ASSERT(containsServer,
         "System does not contain specified server");
     if (!containsServer)
         return;
@@ -235,7 +235,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const nx::utils:
 {
     const bool containsServer = m_servers.contains(serverId);
 
-    NX_ASSERT(containsServer, Q_FUNC_INFO,
+    NX_ASSERT(containsServer,
         "System does not contain specified server");
 
     if (!containsServer)
@@ -254,7 +254,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const nx::utils:
 
 nx::utils::Url QnSystemDescription::getServerHost(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
+    NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
 
     return m_hosts.value(serverId);
@@ -262,7 +262,7 @@ nx::utils::Url QnSystemDescription::getServerHost(const QnUuid& serverId) const
 
 qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
+    NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
 
     return m_serverTimestamps.value(serverId).elapsed();

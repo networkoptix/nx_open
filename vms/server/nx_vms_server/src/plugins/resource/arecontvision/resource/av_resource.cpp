@@ -541,7 +541,7 @@ bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
+    NX_ASSERT(false, "QnPlAreconVisionResource is abstract.");
     return 0;
 }
 

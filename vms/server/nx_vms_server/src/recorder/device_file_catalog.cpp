@@ -480,7 +480,7 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
     QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
-    NX_VERBOSE(this, "%1 Processing directory %2", Q_FUNC_INFO, nx::utils::url::hidePassword(folder));
+    NX_VERBOSE(this, "%1 Processing directory %2", __func__, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;
 
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))

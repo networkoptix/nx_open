@@ -230,7 +230,7 @@ int QnSessionManager::sendAsyncRequest(
         }
         else if (proxy.type() != QNetworkProxy::NoProxy)
         {
-            NX_ASSERT(0, Q_FUNC_INFO, "Not implemented!");
+            NX_ASSERT(0, "Not implemented!");
             return -1;
         }
     }
@@ -238,16 +238,14 @@ int QnSessionManager::sendAsyncRequest(
     if (method != nx::network::http::Method::get &&
         method != nx::network::http::Method::post)
     {
-        NX_ASSERT(false, Q_FUNC_INFO,
-            lit("Unknown HTTP operation '%1'.").arg(QString::fromLatin1(method)));
+        NX_ASSERT(false, lm("Unknown HTTP operation '%1'").arg(method));
         return -1;
     }
 
     const auto& connection = commonModule()->ec2Connection();
     if (!connection)
     {
-        NX_ASSERT(false, Q_FUNC_INFO,
-            lit("Not connected to ec2 database."));
+        NX_ASSERT(false, "Not connected to ec2 database");
         return -1;
     }
 

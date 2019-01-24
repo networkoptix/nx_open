@@ -97,7 +97,7 @@ enum ServerFlag
     SF_SupportsTranscoding = 0x200,
     SF_HasLiteClient = 0x400,
     SF_P2pSyncDone = 0x1000000, //< For UT purpose only
-    SF_RequiresEdgeLicense = 0x2000000, //< Will be removed as soon as all arm server use professional licenses.
+    SF_RequiresEdgeLicense = 0x2000000, //< Remove when we are sure EDGE only licenses are gone.
 };
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)

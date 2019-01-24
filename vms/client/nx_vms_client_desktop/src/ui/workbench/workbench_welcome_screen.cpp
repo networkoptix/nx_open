@@ -78,15 +78,15 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
     {
         for (const auto& error: m_view->errors())
             NX_ERROR(this, error.toString());
-        NX_CRITICAL(false, Q_FUNC_INFO, "Welcome screen loading failed.");
+        NX_CRITICAL(false, "Welcome screen loading failed.");
     }
 
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
     layout->addWidget(QWidget::createWindowContainer(m_view), 1);
 
-    NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
-    NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
+    NX_CRITICAL(qnStartupTileManager, "Startup tile manager does not exists");
+    NX_CRITICAL(qnCloudStatusWatcher, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,

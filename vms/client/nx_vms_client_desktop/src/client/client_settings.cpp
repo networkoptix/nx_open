@@ -155,7 +155,7 @@ QnClientSettings::QnClientSettings(const QnStartupParameters& startupParameters,
         QJsonObject jsonObject;
         if (!QJson::deserialize(file.readAll(), &jsonObject))
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "Client settings file could not be parsed!");
+            NX_ASSERT(false, "Client settings file could not be parsed!");
         }
         else
         {

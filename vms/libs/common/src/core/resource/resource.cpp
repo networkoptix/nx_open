@@ -477,7 +477,7 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceTypeId)
 {
     // TODO: #GDM think about code duplication
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is required.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), "Invalid input, reading from local data is required.");
 
     NX_ASSERT(commonModule);
     QString value = commonModule
@@ -744,7 +744,7 @@ bool QnResource::isInitializationInProgress() const
 
 void QnResource::setUniqId(const QString& /*value*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

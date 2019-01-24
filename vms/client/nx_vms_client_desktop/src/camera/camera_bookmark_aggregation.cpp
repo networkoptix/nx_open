@@ -91,7 +91,7 @@ bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId)
         return bookmark.guid == bookmarkId;
     });
 
-    NX_ASSERT(it != m_bookmarkList.end(), Q_FUNC_INFO, "Bookmark should be present in both id set and list");
+    NX_ASSERT(it != m_bookmarkList.end(), "Bookmark should be present in both id set and list");
     if (it == m_bookmarkList.end())
         return false;
 

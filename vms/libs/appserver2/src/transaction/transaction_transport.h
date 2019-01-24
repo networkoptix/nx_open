@@ -111,7 +111,7 @@ public:
             //NX_ASSERT(peer != localPeer().id);
         }
 #endif
-        NX_ASSERT(!transaction.isLocal() || remotePeer().isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
+        NX_ASSERT(!transaction.isLocal() || remotePeer().isClient(), "Invalid transaction type to send!");
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()));
 
         switch (remotePeer().dataFormat)

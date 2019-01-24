@@ -19,7 +19,7 @@ ServerModuleAware::ServerModuleAware(QObject* parent)
         if (moduleAware != nullptr)
         {
             m_serverModule = moduleAware->serverModule();
-            NX_ASSERT(m_serverModule, Q_FUNC_INFO, "Invalid context");
+            NX_ASSERT(m_serverModule, "Invalid context");
             break;
         }
 
