@@ -1727,7 +1727,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleMuteAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("M"))
+        .shortcut(lit("U"))
         .text(ContextMenu::tr("Toggle Mute"))
         .checkable()
         .condition(new TimelineVisibleCondition());
