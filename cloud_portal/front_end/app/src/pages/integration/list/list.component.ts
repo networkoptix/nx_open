@@ -19,9 +19,11 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
 
     defaultLogo: string;
     config: any;
+    lang: any;
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
+        this.lang = this.translate.translations[this.translate.currentLang];
     }
 
     constructor(private configService: NxConfigService,
@@ -74,18 +76,11 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
             });
 
             if (haveInReview) {
-                this.translate
-                        .get([
-                                'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
-                                'Back to the editing interfaces'
-                        ])
-                        .subscribe(res => {
-                            this.ribbonService.show(
-                                    res['This page is a preview of the latest changes, and it doesn\'t match publicly available version.'],
-                                    res['Back to the editing interfaces'],
-                                    this.config.links.admin.product
-                            );
-                        });
+                this.ribbonService.show(
+                        this.lang.integration_preview,
+                        this.lang.integration_back_to_edit,
+                        this.config.links.admin.product
+                );
             }
         }
     }
