@@ -58,14 +58,14 @@ protected:
 
     void whenCreateAuthenticationProviderWithValidInputStream()
     {
-        m_authenticationProvider = std::make_unique <HtDigestAuthenticationProvider>(
-            getDefaultInputStream());
+        std::stringstream input = getDefaultInputStream();
+        m_authenticationProvider = std::make_unique <HtDigestAuthenticationProvider>(input);
     }
 
     void whenCreateAuthenticationProviderWithMalformedInputStream()
     {
-        m_authenticationProvider = std::make_unique <HtDigestAuthenticationProvider>(
-            getMalformedInputStream());
+        std::stringstream input = getMalformedInputStream();
+        m_authenticationProvider = std::make_unique <HtDigestAuthenticationProvider>(input);
     }
 
     void andPasswordLookupSucceeds(const std::pair<nx::String, nx::String>& user)
