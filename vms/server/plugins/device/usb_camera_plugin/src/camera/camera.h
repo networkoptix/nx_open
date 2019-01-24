@@ -15,7 +15,6 @@
 namespace nx {
 namespace usb_cam {
 
-class CameraManager;
 class DiscoveryManager;
 
 class Camera: public std::enable_shared_from_this<Camera>
@@ -66,7 +65,6 @@ private:
 
     DiscoveryManager * m_discoveryManager;
     nxcip::CameraInfo m_cameraInfo;
-    //CameraManager * m_cameraManager;
     nxpl::TimeProvider * const m_timeProvider;
     CodecParameters m_defaultVideoParams;
 
