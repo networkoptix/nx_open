@@ -2,8 +2,6 @@
 
 namespace nx::network::http::server {
 
-using namespace nx::network::http;
-
 HtDigestAuthenticationProvider::HtDigestAuthenticationProvider(const std::string& filePath)
 {
     std::ifstream file(filePath);
@@ -58,11 +56,11 @@ void HtDigestAuthenticationProvider::load(std::istream& input)
         if (colon == std::string::npos || colon >= line.size() - 1)
             continue;
 
-        std::string password = line.substr(colon + 1);
+        std::string digest = line.substr(colon + 1);
 
         {
             QnMutexLocker lock(&m_mutex);
-            m_credentials.emplace(QByteArray(userName.c_str()), QByteArray(password.c_str()));
+            m_credentials.emplace(userName.c_str(), digest.c_str());
         }
     }
 }

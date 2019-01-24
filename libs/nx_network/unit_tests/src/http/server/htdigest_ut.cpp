@@ -10,30 +10,32 @@ namespace nx::network::http::server::test {
 namespace
 {
 
-static std::pair<nx::String, nx::String> kUser1("user1", "7ab592129c1345326c0cea345e71170a");
-static std::pair<nx::String, nx::String> kUser2("user2", "3064acea7f7be21564a2a9cac41e1807");
-static std::pair<nx::String, nx::String> kUser3("user3", "4e4860fd5eca841bde1f477f5ae3345b");
-static std::pair<nx::String, nx::String> kUser4("user4", "231c6918f64d96d861009a3ee5e22421");
-static std::pair<nx::String, nx::String> kUnknownUser("user5", "");
+static const std::vector<std::pair<const char*, const char*>> kUserAndPassword =
+{
+    {"user1", "7ab592129c1345326c0cea345e71170a"},
+    {"user2", "3064acea7f7be21564a2a9cac41e1807"},
+    {"user3", "4e4860fd5eca841bde1f477f5ae3345b"},
+    {"user4", "231c6918f64d96d861009a3ee5e22421"},
+};
+
+static const std::pair<const char*, const char*> kUnknownUserAndPassword("unknown_user", "");
 
 } // namespace
 
-class HtDigest:
+class HtDigestAuthenticationProvider:
     public ::testing::Test
 {
 protected:
-    void SetUp() override
-    {
-    }
-
-    std::stringstream getDefaultInputStream()
+    std::stringstream getValidInputStream()
     {
         std::stringstream input;
-        input << kUser1.first.toStdString() << ":admin:" << kUser1.second.toStdString() << '\n';
-        input << kUser2.first.toStdString() << ":owner:" << kUser2.second.toStdString() << '\n';
-        input << kUser3.first.toStdString() << ":manager:" << kUser3.second.toStdString() << '\n';
-        input << kUser4.first.toStdString() << ":basic_user:" << kUser4.second.toStdString()
-            << '\n';
+        for (std::size_t i = 0; i < kUserAndPassword.size(); ++i)
+        {
+            input << kUserAndPassword[i].first
+                << std::string(":realm") + std::to_string(i) + ":"
+                << kUserAndPassword[i].second
+                << '\n';
+        }
         return input;
     }
 
@@ -42,45 +44,45 @@ protected:
         std::stringstream input;
 
         // OK.
-        input << kUser1.first.toStdString() << ":admin:" << kUser1.second.toStdString() << '\n';
+        input << kUserAndPassword[0].first << ":administrator:" << kUserAndPassword[0].second
+            << '\n';
 
         // Missing first ":".
-        input << kUser2.first.toStdString() << "owner:" << kUser2.second.toStdString() << '\n';
+        input << kUserAndPassword[1].first << "owner:" << kUserAndPassword[1].second << '\n';
 
         // Missing second ":".
-        input << kUser3.first.toStdString() << ":manager" << kUser3.second.toStdString() << '\n';
+        input << kUserAndPassword[2].first << ":manager" << kUserAndPassword[2].second << '\n';
 
         // Missing username.
-        input << ":basic_user:" << kUser4.second.toStdString() << '\n';
+        input << ":basic_user:" << kUserAndPassword[3].second << '\n';
 
         return input;
     }
 
     void whenCreateAuthenticationProviderWithValidInputStream()
     {
-        std::stringstream input = getDefaultInputStream();
-        m_authenticationProvider = std::make_unique <HtDigestAuthenticationProvider>(input);
+        std::stringstream input = getValidInputStream();
+        m_authenticationProvider = std::make_unique<server::HtDigestAuthenticationProvider>(input);
     }
 
     void whenCreateAuthenticationProviderWithMalformedInputStream()
     {
         std::stringstream input = getMalformedInputStream();
-        m_authenticationProvider = std::make_unique <HtDigestAuthenticationProvider>(input);
+        m_authenticationProvider = std::make_unique<server::HtDigestAuthenticationProvider>(input);
     }
 
-    void andPasswordLookupSucceeds(const std::pair<nx::String, nx::String>& user)
+    void thenPasswordLookupSucceeds(const std::pair<const char*, const char*>& userAndPassword)
     {
-        m_authenticationProvider->getPasswordByUserName(user.first,
-            [user](PasswordLookupResult result)
+        m_authenticationProvider->getPasswordByUserName(userAndPassword.first,
+            [userAndPassword](PasswordLookupResult result)
             {
-                ASSERT_EQ(result.code, PasswordLookupResult::Code::ok);
-                ASSERT_EQ(result.type, PasswordLookupResult::DataType::ha1);
-                ASSERT_TRUE(result.ha1().is_initialized());
-                ASSERT_EQ(*result.ha1(), user.second);
+                ASSERT_EQ(PasswordLookupResult::Code::ok, result.code);
+                ASSERT_EQ(PasswordLookupResult::DataType::ha1, result.type);
+                ASSERT_EQ(userAndPassword.second, *result.ha1());
             });
     }
 
-    void andPasswordLookupFails(const std::pair<nx::String, nx::String>& user)
+    void thenPasswordLookupFails(const std::pair<const char*, const char*>& user)
     {
         m_authenticationProvider->getPasswordByUserName(user.first,
             [](PasswordLookupResult result)
@@ -89,63 +91,60 @@ protected:
             });
     }
 
-    void andValidPasswordLookupsSucceed()
+    void thenValidPasswordLookupsSucceed()
     {
-        andPasswordLookupSucceeds(kUser1);
+        thenPasswordLookupSucceeds(kUserAndPassword[0]);
     }
 
-    void andAllPasswordLookupsSucceed()
+    void thenAllPasswordLookupsSucceed()
     {
-        andPasswordLookupSucceeds(kUser1);
-        andPasswordLookupSucceeds(kUser2);
-        andPasswordLookupSucceeds(kUser3);
-        andPasswordLookupSucceeds(kUser4);
+        for(const auto& element : kUserAndPassword)
+            thenPasswordLookupSucceeds(element);
     }
 
-    void andPasswordLookupFailsForUnknownUser()
+    void thenPasswordLookupFailsForUnknownUser()
     {
-        andPasswordLookupFails(kUnknownUser);
+        thenPasswordLookupFails(kUnknownUserAndPassword);
     }
 
-    void andAllMalformedUserPasswordCombinationLookupsFail()
+    void thenAllMalformedUserPasswordCombinationLookupsFail()
     {
-        andPasswordLookupFails(kUser2);
-        andPasswordLookupFails(kUser3);
-        andPasswordLookupFails(kUser4);
+        // Skipping user 0 as they are OK.
+        for (std::size_t i = 1; i < kUserAndPassword.size(); ++i)
+            thenPasswordLookupFails(kUserAndPassword[i]);
     }
 
 protected:
-    std::unique_ptr <HtDigestAuthenticationProvider> m_authenticationProvider;
+    std::unique_ptr <server::HtDigestAuthenticationProvider> m_authenticationProvider;
 };
 
-TEST_F(HtDigest, htdigest_authentication_provider_provides_passwords_for_all_known_users)
+TEST_F(HtDigestAuthenticationProvider, provides_passwords_for_all_known_users)
 {
     whenCreateAuthenticationProviderWithValidInputStream();
 
-    andAllPasswordLookupsSucceed();
+    thenAllPasswordLookupsSucceed();
 }
 
-TEST_F(HtDigest, htdigest_authentication_provider_rejects_password_lookup_for_unknown_user)
+TEST_F(HtDigestAuthenticationProvider, rejects_password_lookup_for_unknown_user)
 {
     whenCreateAuthenticationProviderWithValidInputStream();
 
-    andPasswordLookupFailsForUnknownUser();
+    thenPasswordLookupFailsForUnknownUser();
 }
 
-TEST_F(HtDigest,
-    htdigest_authenticatin_provider_provides_password_for_valid_user_password_combination_after_loading_malformed_input_stream)
+TEST_F(HtDigestAuthenticationProvider,
+    provides_password_for_valid_user_after_loading_malformed_input_stream)
 {
     whenCreateAuthenticationProviderWithMalformedInputStream();
 
-    andValidPasswordLookupsSucceed();
+    thenValidPasswordLookupsSucceed();
 }
 
-TEST_F(HtDigest,
-    htdigest_authentication_provider_rejects_password_lookups_for_malformed_user_password_combinations_after_loading_malformed_input_stream)
+TEST_F(HtDigestAuthenticationProvider, rejects_malformed_input)
 {
     whenCreateAuthenticationProviderWithMalformedInputStream();
 
-    andAllMalformedUserPasswordCombinationLookupsFail();
+    thenAllMalformedUserPasswordCombinationLookupsFail();
 }
 
 } // namespace nx::network::http::server::test
