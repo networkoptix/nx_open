@@ -1,6 +1,8 @@
-#include "sync_connection_request_handler.h"
+#include "util.h"
 
-namespace nx::clusterdb::engine {
+namespace nx::clusterdb::engine::transport {
+
+static constexpr char kSystemIdParamName[] = "systemId";
 
 std::string extractSystemIdFromHttpRequest(
     const nx::network::http::RequestContext& requestContext)
@@ -25,4 +27,4 @@ std::string extractSystemIdFromHttpRequest(
     return authorization.userid().toStdString();
 }
 
-} // namespace nx::clusterdb::engine
+} // namespace nx::clusterdb::engine::transport

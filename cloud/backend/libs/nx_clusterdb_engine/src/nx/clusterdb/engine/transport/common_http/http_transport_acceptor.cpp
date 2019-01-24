@@ -10,9 +10,9 @@
 
 #include "http_transport_paths.h"
 #include "../generic_transport.h"
+#include "../util.h"
 #include "../../connection_manager.h"
 #include "../../compatible_ec2_protocol_version.h"
-#include "../../http/sync_connection_request_handler.h"
 
 namespace nx::clusterdb::engine::transport {
 

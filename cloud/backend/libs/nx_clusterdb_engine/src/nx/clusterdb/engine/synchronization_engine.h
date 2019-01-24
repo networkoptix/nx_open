@@ -10,7 +10,6 @@
 #include "connection_manager.h"
 #include "connector.h"
 #include "dao/rdb/structure_updater.h"
-#include "http/sync_connection_request_handler.h"
 #include "http_server.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
@@ -89,21 +88,6 @@ private:
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
     HttpServer m_httpServer;
-
-    template<typename ManagerType>
-    void registerHttpHandler(
-        const std::string& handlerPath,
-        typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-        ManagerType* manager,
-        nx::network::http::server::rest::MessageDispatcher* dispatcher);
-
-    template<typename ManagerType>
-    void registerHttpHandler(
-        nx::network::http::Method::ValueType method,
-        const std::string& handlerPath,
-        typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-        ManagerType* manager,
-        nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
     void onSystemDeleted(const std::string& systemId);
 };

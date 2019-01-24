@@ -160,42 +160,6 @@ void SyncronizationEngine::registerHttpApi(
     m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
 }
 
-template<typename ManagerType>
-void SyncronizationEngine::registerHttpHandler(
-    const std::string& handlerPath,
-    typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    typedef SyncConnectionRequestHandler<ManagerType> RequestHandlerType;
-
-    dispatcher->registerRequestProcessor<RequestHandlerType>(
-        handlerPath.c_str(),
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        });
-}
-
-template<typename ManagerType>
-void SyncronizationEngine::registerHttpHandler(
-    nx::network::http::Method::ValueType method,
-    const std::string& handlerPath,
-    typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    typedef SyncConnectionRequestHandler<ManagerType> RequestHandlerType;
-
-    dispatcher->registerRequestProcessor<RequestHandlerType>(
-        handlerPath.c_str(),
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        },
-        method);
-}
-
 void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
 {
     // New connections will not be authorized since system is deleted,

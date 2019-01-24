@@ -10,11 +10,11 @@
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/vms/api/types/connection_types.h>
 
-#include "../../connection_manager.h"
-#include "../../compatible_ec2_protocol_version.h"
-#include "../../http/sync_connection_request_handler.h"
 #include "request_path.h"
 #include "websocket_transaction_transport.h"
+#include "../util.h"
+#include "../../connection_manager.h"
+#include "../../compatible_ec2_protocol_version.h"
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 

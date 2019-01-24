@@ -12,9 +12,9 @@
 #include "request_path.h"
 #include "server_side_command_pipeline.h"
 #include "../p2p_websocket/websocket_transaction_transport.h"
+#include "../util.h"
 #include "../../compatible_ec2_protocol_version.h"
 #include "../../connection_manager.h"
-#include "../../http/sync_connection_request_handler.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
