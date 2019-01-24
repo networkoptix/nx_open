@@ -46,71 +46,67 @@ std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
     return std::nullopt;
 }
 
-void MetadataHandler::handleMetadata(IMetadataPacket* metadata)
+void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 {
-    if (metadata == nullptr)
+    if (metadataPacket == nullptr)
     {
         NX_VERBOSE(this) << "WARNING: Received null metadata packet; ignoring";
         return;
     }
 
     bool handled = false;
-    if (const auto eventsPacket = nxpt::queryInterfacePtr<IEventMetadataPacket>(metadata,
+    if (const auto eventsPacket = nxpt::queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
         IID_EventMetadataPacket))
     {
-        handleEventsPacket(eventsPacket);
+        handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = nxpt::queryInterfacePtr<IObjectMetadataPacket>(metadata,
+    if (const auto objectsPacket = nxpt::queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
         IID_ObjectMetadataPacket))
     {
-        handleObjectsPacket(objectsPacket);
+        handleObjectMetadataPacket(objectsPacket);
         handled = true;
     }
 
     if (!handled)
     {
         NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUs "
-            << metadata->timestampUs() << ", durationUs " << metadata->durationUs()
+            << metadataPacket->timestampUs() << ", durationUs " << metadataPacket->durationUs()
             << "; ignoring";
     }
 }
 
-void MetadataHandler::handleEventsPacket(nx::sdk::Ptr<IEventMetadataPacket> packet)
+void MetadataHandler::handleEventMetadataPacket(
+    nx::sdk::Ptr<IEventMetadataPacket> eventMetadataPacket)
 {
-    int eventsCount = 0;
-    while (true)
+    if (eventMetadataPacket->count() <= 0)
     {
-        nx::sdk::Ptr<IMetadataItem> item(packet->nextItem());
-        if (!item)
-            break;
-
-        ++eventsCount;
-
-        if (const auto event = nxpt::queryInterfacePtr<IEvent>(item, IID_Event))
-        {
-            const int64_t timestampUsec = packet->timestampUs();
-            handleMetadataEvent(event, timestampUsec);
-        }
-        else
-        {
-            NX_VERBOSE(this) << __func__ << "(): ERROR: Received event does not implement Event";
-        }
+        NX_VERBOSE(this, "WARNING: Received empty event packet; ignoring");
+        return;
     }
 
-    if (eventsCount == 0)
-        NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
+    for (auto i = 0; i < eventMetadataPacket->count(); ++i)
+    {
+        nx::sdk::Ptr<const IEventMetadata> eventMetadata(eventMetadataPacket->at(i));
+        if (!eventMetadata)
+            break;
+
+        const int64_t timestampUsec = eventMetadataPacket->timestampUs();
+        handleEventMetadata(eventMetadata, timestampUsec);
+    }
 }
 
-void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> packet)
+void MetadataHandler::handleObjectMetadataPacket(
+    nx::sdk::Ptr<IObjectMetadataPacket> objectMetadataPacket)
 {
     nx::common::metadata::DetectionMetadataPacket data;
-    while (true)
+    for (auto i = 0; i < objectMetadataPacket->count(); ++i)
     {
-        nx::sdk::Ptr<IObject> item(packet->nextItem());
+        nx::sdk::Ptr<const IObjectMetadata> item(objectMetadataPacket->at(i));
         if (!item)
             break;
+
         nx::common::metadata::DetectedObject object;
         object.objectTypeId = item->typeId();
         object.objectId = nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(item->id());
@@ -131,10 +127,12 @@ void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> pa
         }
         data.objects.push_back(std::move(object));
     }
+
     if (data.objects.empty())
         NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
-    data.timestampUsec = packet->timestampUs();
-    data.durationUsec = packet->durationUs();
+
+    data.timestampUsec = objectMetadataPacket->timestampUs();
+    data.durationUsec = objectMetadataPacket->durationUs();
     data.deviceId = m_resource->getId();
 
     if (data.timestampUsec <= 0)
@@ -147,13 +145,13 @@ void MetadataHandler::handleObjectsPacket(nx::sdk::Ptr<IObjectMetadataPacket> pa
         m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
 }
 
-void MetadataHandler::handleMetadataEvent(
-    nx::sdk::Ptr<IEvent> eventData,
+void MetadataHandler::handleEventMetadata(
+    nx::sdk::Ptr<const IEventMetadata> eventMetadata,
     qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;
 
-    const auto eventTypeId = eventData->typeId();
+    const auto eventTypeId = eventMetadata->typeId();
     NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
     auto descriptor = eventTypeDescriptor(eventTypeId);
@@ -165,7 +163,7 @@ void MetadataHandler::handleMetadataEvent(
 
     if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
     {
-        eventState = eventData->isActive()
+        eventState = eventMetadata->isActive()
             ? nx::vms::api::EventState::active
             : nx::vms::api::EventState::inactive;
 
@@ -186,9 +184,9 @@ void MetadataHandler::handleMetadataEvent(
         m_engineId,
         eventTypeId,
         eventState,
-        eventData->caption(),
-        eventData->description(),
-        eventData->auxiliaryData(),
+        eventMetadata->caption(),
+        eventMetadata->description(),
+        eventMetadata->auxiliaryData(),
         timestampUsec);
 
     if (m_resource->captureEvent(sdkEvent))

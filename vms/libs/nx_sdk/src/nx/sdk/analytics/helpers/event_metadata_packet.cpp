@@ -30,12 +30,17 @@ int64_t EventMetadataPacket::durationUs() const
     return m_durationUs;
 }
 
-IEvent* EventMetadataPacket::nextItem()
+int EventMetadataPacket::count() const
 {
-    if (m_currentIndex < (int) m_events.size())
-        return m_events[m_currentIndex++];
+    return m_events.size();
+}
 
-    return nullptr;
+const IEventMetadata* EventMetadataPacket::at(int index) const
+{
+    if (index < 0 || index >= m_events.size())
+        return nullptr;
+
+    return m_events[index];
 }
 
 void EventMetadataPacket::setTimestampUs(int64_t timestampUs)
@@ -48,7 +53,7 @@ void EventMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void EventMetadataPacket::addItem(IEvent* event)
+void EventMetadataPacket::addItem(IEventMetadata* event)
 {
     m_events.push_back(event);
 }
@@ -56,7 +61,6 @@ void EventMetadataPacket::addItem(IEvent* event)
 void EventMetadataPacket::clear()
 {
     m_events.clear();
-    m_currentIndex = 0;
 }
 
 } // namespace analytics

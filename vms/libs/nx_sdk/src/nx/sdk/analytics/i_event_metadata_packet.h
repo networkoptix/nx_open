@@ -1,7 +1,7 @@
 #pragma once
 
-#include "i_event.h"
-#include "i_iterable_metadata_packet.h"
+#include "i_event_metadata.h"
+#include "i_metadata_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -14,14 +14,12 @@ static const nxpl::NX_GUID IID_EventMetadataPacket =
 /**
  * Metadata packet containing information about some event which occurred on the scene.
  */
-class IEventMetadataPacket: public IIterableMetadataPacket
+class IEventMetadataPacket: public IMetadataPacket
 {
 public:
-    /**
-     * Should not modify the object, and should behave like a constant iterator.
-     * @return Next item in the list, or null if no more.
-     */
-    virtual IEvent* nextItem() override = 0;
+    virtual int count() const override = 0;
+
+    virtual const IEventMetadata* at(int index) const override = 0;
 };
 
 } // namespace analytics

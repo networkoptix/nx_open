@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "i_data_packet.h"
+#include "i_metadata.h"
 
 namespace nx {
 namespace sdk {
@@ -25,6 +26,12 @@ public:
      * @return Validity duration of the metadata in the packet, or 0 if irrelevant.
      */
     virtual int64_t durationUs() const = 0;
+
+    /* @return number of elements in the packet */
+    virtual int count() const = 0;
+
+    /* @return element in the position defined by the index */
+    virtual const IMetadata* at(int index) const = 0;
 };
 
 } // namespace analytics
