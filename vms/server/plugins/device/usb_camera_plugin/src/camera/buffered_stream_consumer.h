@@ -166,7 +166,7 @@ protected:
         }
         else
         {
-            m_wait.wait( 
+            m_wait.wait(
                 lock,
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }

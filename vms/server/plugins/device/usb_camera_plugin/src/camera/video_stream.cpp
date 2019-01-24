@@ -365,8 +365,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
         m_inputFormat->videoCodecId(),
-        AVMEDIA_TYPE_VIDEO,
-        m_packetCount);
+        AVMEDIA_TYPE_VIDEO);
 
     int result;
     if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
