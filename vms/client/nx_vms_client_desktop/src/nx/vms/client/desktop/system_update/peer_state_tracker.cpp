@@ -376,16 +376,10 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     if (!server)
         return;
 
+    server->disconnect(this);
     auto item = findItemById(server->getId());
     if (!item)
         return;
-
-    disconnect(server.data(), &QnResource::statusChanged,
-        this, &PeerStateTracker::atResourceChanged);
-    disconnect(server.data(), &QnMediaServerResource::versionChanged,
-        this, &PeerStateTracker::atResourceChanged);
-    disconnect(server.data(), &QnResource::flagsChanged,
-        this, &PeerStateTracker::atResourceChanged);
 
     // We should emit this event before m_items size is changed
     emit itemRemoved(item);
