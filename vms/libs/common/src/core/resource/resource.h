@@ -211,7 +211,7 @@ protected:
      * Update url value without mutex locking.
      * @return if value was actually changed.
      */
-    bool setUrlInternal(const QString& value);
+    bool setUrlUnsafe(const QString& value);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */

@@ -53,7 +53,7 @@ void QnNetworkResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (!setUrlInternal(url))
+        if (!setUrlUnsafe(url))
             return;
 
         m_cachedHostAddress.reset();

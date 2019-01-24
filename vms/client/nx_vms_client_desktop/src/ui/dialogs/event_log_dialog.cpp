@@ -35,7 +35,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/resource_selection_dialog.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <ui/models/event_log_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
@@ -590,7 +590,12 @@ void QnEventLogDialog::setDateRange(qint64 startTimeMs, qint64 endTimeMs)
     ui->dateRangeWidget->setRange(startTimeMs, endTimeMs);
 }
 
-void QnEventLogDialog::setCameraList(const QSet<QnUuid>& ids)
+QnUuidSet QnEventLogDialog::getCameraList() const
+{
+    return m_filterCameraList;
+}
+
+void QnEventLogDialog::setCameraList(const QnUuidSet& ids)
 {
     if (ids == m_filterCameraList)
         return;
@@ -694,11 +699,11 @@ void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 
 void QnEventLogDialog::at_cameraButton_clicked()
 {
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this);
-    dialog.setSelectedResources(m_filterCameraList);
-
-    if (dialog.exec() == QDialog::Accepted)
-        setCameraList(dialog.selectedResources());
+    auto cameraIds = getCameraList();
+    auto dialogAccepted = CameraSelectionDialog::selectCameras
+        <CameraSelectionDialog::DummyPolicy>(cameraIds, this);
+    if (dialogAccepted)
+        setCameraList(cameraIds);
 }
 
 void QnEventLogDialog::disableUpdateData()
