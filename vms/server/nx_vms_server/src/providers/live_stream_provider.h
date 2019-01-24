@@ -66,7 +66,6 @@ public:
 
     virtual bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
-    void updateSoftwareMotionStreamNum();
 
     void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
@@ -115,9 +114,6 @@ private:
     QTime m_timeSinceLastMetaData;
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
-
-    QnMutex m_motionStreamIndexMtx;
-    CachedValue<QnVirtualCameraResource::MotionStreamIndex> m_cachedSoftMotionStreamIndex;
 
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 

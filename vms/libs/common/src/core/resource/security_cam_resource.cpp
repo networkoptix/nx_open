@@ -123,7 +123,8 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         {
             return !resourceData().value(ResourceDataKey::kNoVideoSupport, false);
         },
-        &m_mutex)
+        &m_mutex),
+    m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); }, &m_mutex)
 {
     addFlags(Qn::live_cam);
 
@@ -369,6 +370,11 @@ QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
 
 QRegion QnSecurityCamResource::getMotionMask(int channel) const {
     return getMotionRegion(channel).getMotionMask();
+}
+
+QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::motionStreamIndex() const
+{
+    return m_cachedMotionStreamIndex.get();
 }
 
 QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const
@@ -736,6 +742,27 @@ Qn::MotionType QnSecurityCamResource::calculateMotionType() const
         return getDefaultMotionType();
 
     return value;
+}
+
+QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionStreamIndex() const
+{
+    const auto forcedMotionStreamStr = getProperty(motionStreamKey()).toLower();
+    if (!forcedMotionStreamStr.isEmpty())
+    {
+        const auto forcedMotionStream = QnLexical::deserialized<Qn::StreamIndex>(
+            forcedMotionStreamStr, Qn::StreamIndex::undefined);
+        NX_ASSERT(forcedMotionStream != Qn::StreamIndex::undefined);
+        if (forcedMotionStream != Qn::StreamIndex::undefined)
+            return {forcedMotionStream, /*isForced*/ true};
+    }
+
+    if (!hasDualStreaming()
+        && getCameraCapabilities().testFlag(Qn::PrimaryStreamSoftMotionCapability))
+    {
+        return {Qn::StreamIndex::primary, /*isForced*/ false};
+    }
+
+    return {Qn::StreamIndex::secondary, /*isForced*/ false};
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value)
@@ -1324,6 +1351,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();
     m_cachedHasVideo.reset();
+    m_cachedMotionStreamIndex.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const
