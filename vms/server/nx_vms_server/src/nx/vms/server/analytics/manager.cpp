@@ -250,10 +250,6 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
 void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
 {
     connect(
-        device, &QnResource::propertyChanged,
-        this, &Manager::at_resourcePropertyChanged);
-
-    connect(
         device, &QnVirtualCameraResource::enabledAnalyticsEnginesChanged,
         this, &Manager::at_deviceEnabledAnalyticsEnginesChanged);
 
