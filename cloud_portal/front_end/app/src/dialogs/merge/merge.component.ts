@@ -101,7 +101,7 @@ export class MergeModalContent {
         }, {
             errorCodes: {
                 vmsRequestFailure: (error) => {
-                    return this.language.errorCodes[error.errorText];
+                    return this.language.errorCodes[error.errorText] || error.errorText;
                 }
             },
             successMessage: this.language.system.mergeSystemSuccess
