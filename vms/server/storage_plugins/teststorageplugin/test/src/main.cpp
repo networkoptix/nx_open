@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <plugin_api.h>
+#include <plugins/plugin_api.h>
 
 int main(int argc, const char* argv[])
 {

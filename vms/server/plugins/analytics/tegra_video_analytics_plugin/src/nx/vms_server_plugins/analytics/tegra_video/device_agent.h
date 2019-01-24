@@ -3,8 +3,9 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <string>
 
-#include <nx/sdk/analytics/common/video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics for Tegra; the lib is a stub on a PC.
 
@@ -18,7 +19,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace tegra_video {
 
-class DeviceAgent: public nx::sdk::analytics::common::VideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine);
@@ -31,14 +32,14 @@ protected:
     virtual std::string manifest() const override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;
+        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
     bool pushCompressedFrame(
-        const nx::sdk::analytics::CompressedVideoPacket* videoPacket);
+        const nx::sdk::analytics::ICompressedVideoPacket* videoPacket);
 
     bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 
@@ -65,7 +66,7 @@ private:
     int64_t usSinceEpoch() const;
 
     void setTrackerAttributeOptions(
-        const std::map<QString, std::vector<QString>>& options);
+        const std::map<std::string, std::vector<std::string>>& options);
 
 private:
     int m_counter = 0;

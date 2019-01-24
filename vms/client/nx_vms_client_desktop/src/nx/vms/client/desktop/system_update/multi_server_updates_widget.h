@@ -99,7 +99,7 @@ private:
         ready,
         /** We have issued a command to remote servers to start downloading the updates. */
         downloading,
-        /** Pushing local update package to server(s). */
+        /** Pushing local update package to the servers. */
         pushing,
         /** Some servers have downloaded update data and ready to install it. */
         readyInstall,

@@ -4,7 +4,8 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/i_device_info.h>
-#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
@@ -17,7 +18,7 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(IPlugin* plugin): nx::sdk::analytics::common::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(IPlugin* plugin): nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
@@ -30,8 +31,8 @@ Engine::~Engine()
         m_thread->join();
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* /*deviceInfo*/, Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(
+    const IDeviceInfo* /*deviceInfo*/, Error* /*outError*/)
 {
     return new DeviceAgent(this);
 }
@@ -44,8 +45,7 @@ void Engine::initCapabilities()
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
     {
-        if (!nx::sdk::analytics::common::pixelFormatFromStdString(
-            pixelFormatString, &m_pixelFormat))
+        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
         {
             NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
                 << ini().iniFile() << ": [" << pixelFormatString << "].";
@@ -105,6 +105,11 @@ std::string Engine::manifest() const
             "id": ")json" + kObjectInTheAreaEventType + R"json(",
             "name": "Object in the area",
             "flags": "stateDependent|regionDependent"
+        },
+        {
+            "id": ")json" + kSuspiciousNoiseEventType + R"json(",
+            "name": "Suspicious noise",
+            "groupId": ")json" + kSoundRelatedEventGroup + R"json("
         }
     ],
     "objectTypes": [
@@ -117,6 +122,12 @@ std::string Engine::manifest() const
             "name": "Human face"
         }
     ],
+    "groups": [
+        {
+            "id": ")json" + kSoundRelatedEventGroup + R"json(",
+            "name": "Sound related events"
+        }
+    ],
     "capabilities": ")json" + m_capabilities + R"json(",
     "objectActions": [
         {
@@ -125,20 +136,56 @@ std::string Engine::manifest() const
             "supportedObjectTypeIds": [
                 ")json" + kCarObjectType + R"json("
             ],
-            "settings": {
-                "params": [
+            "parametersModel": {
+                "type": "Settings",
+                "items": [
                     {
-                        "id": "paramA",
-                        "dataType": "Number",
-                        "name": "Param A",
-                        "description": "Number A"
+                        "type": "TextField",
+                        "name": "testTextField",
+                        "caption": "Text Field Parameter",
+                        "description": "A text field",
+                        "defaultValue": "a text"
                     },
                     {
-                        "id": "paramB",
-                        "dataType": "Enumeration",
-                        "range": "b1,b3",
-                        "name": "Param B",
-                        "description": "Enumeration B"
+                        "type": "GroupBox",
+                        "caption": "Parameter Group",
+                        "items": [
+                            {
+                                "type": "SpinBox",
+                                "caption": "SpinBox Parameter",
+                                "name": "testSpinBox",
+                                "defaultValue": 42,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "DoubleSpinBox",
+                                "caption": "DoubleSpinBox Parameter",
+                                "name": "testDoubleSpinBox",
+                                "defaultValue": 3.1415,
+                                "minValue": 0.0,
+                                "maxValue": 100.0
+                            },
+                            {
+                                "type": "ComboBox",
+                                "name": "testComboBox",
+                                "caption": "ComboBox Parameter",
+                                "defaultValue": "value2",
+                                "range": ["value1", "value2", "value3"]
+                            },
+                            {
+                                "type": "Row",
+                                "items": [
+                                    {
+                                        "type": "CheckBox",
+                                        "caption": "CheckBox Parameter",
+                                        "name": "testCheckBox",
+                                        "defaultValue": true,
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
@@ -156,7 +203,7 @@ std::string Engine::manifest() const
         "items": [
             {
                 "type": "TextField",
-                "name": "test_text_field",
+                "name": "testTextField",
                 "caption": "Device Agent Text Field",
                 "description": "A text field",
                 "defaultValue": "a text"
@@ -168,7 +215,7 @@ std::string Engine::manifest() const
                     {
                         "type": "SpinBox",
                         "caption": "Device Agent SpinBox",
-                        "name": "test_spin_box",
+                        "name": "testSpinBox",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
@@ -176,14 +223,14 @@ std::string Engine::manifest() const
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Device Agent DoubleSpinBox",
-                        "name": "test_double_spin_box",
+                        "name": "testDoubleSpinBox",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "test_combo_box",
+                        "name": "testComboBox",
                         "caption": "Device Agent ComboBox",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
@@ -194,7 +241,7 @@ std::string Engine::manifest() const
                             {
                                 "type": "CheckBox",
                                 "caption": "Device Agent CheckBox",
-                                "name": "test_check_box",
+                                "name": "testCheckBox",
                                 "defaultValue": true,
                                 "value": true
                             }
@@ -224,8 +271,8 @@ void Engine::settingsReceived()
 
 void Engine::executeAction(
     const std::string& actionId,
-    nxpl::NX_GUID objectId,
-    nxpl::NX_GUID /*deviceId*/,
+    Uuid objectId,
+    Uuid /*deviceId*/,
     int64_t /*timestampUs*/,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
@@ -234,25 +281,31 @@ void Engine::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
-        std::string valueA;
-        auto paramAIt = params.find("paramA");
-        if (paramAIt != params.cend())
-            valueA = paramAIt->second;
+        if (!params.empty())
+        {
+            *outMessageToUser = std::string("Your param values are:\n");
+            for (const auto& entry : params)
+            {
+                const auto& parameterName = entry.first;
+                const auto& parameterValue = entry.second;
 
-        std::string valueB;
-        auto paramBIt = params.find("paramB");
-        if (paramBIt != params.cend())
-            valueB = paramBIt->second;
+                *outMessageToUser += parameterName + ": [" + parameterValue + "],\n";
+            }
 
-        *outMessageToUser = std::string("Your param values are: ")
-            + "paramA: [" + valueA + "], "
-            + "paramB: [" + valueB + "]";
+            // Remove a trailing comma and a newline character.
+            *outMessageToUser = outMessageToUser->substr(0, outMessageToUser->size() - 2);
+        }
+        else
+        {
+            *outMessageToUser = "No action parameters have been provided";
+        }
 
         NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
     }
     else if (actionId == "nx.stub.addPerson")
     {
-        *outActionUrl = "http://internal.server/addPerson?objectId=" + nxpt::toStdString(objectId);
+        *outActionUrl =
+            "http://internal.server/addPerson?objectId=" + UuidHelper::toStdString(objectId);
         NX_PRINT << __func__ << "(): Returning URL: [" << *outActionUrl << "]";
     }
     else
@@ -291,21 +344,21 @@ static const std::string kPluginManifest = R"json(
                 "items": [
                     {
                         "type": "SpinBox",
-                        "name": "test_spin_box",
+                        "name": "testSpinBox",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
                     },
                     {
                         "type": "DoubleSpinBox",
-                        "name": "test_double_spin_box",
+                        "name": "testDoubleSpinBox",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "test_double_combo_box",
+                        "name": "testComboBox",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
                     },
@@ -314,7 +367,7 @@ static const std::string kPluginManifest = R"json(
                         "items": [
                             {
                                 "type": "CheckBox",
-                                "name": "test_check_box",
+                                "name": "testCheckBox",
                                 "defaultValue": true,
                                 "value": true
                             }
@@ -332,7 +385,7 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)

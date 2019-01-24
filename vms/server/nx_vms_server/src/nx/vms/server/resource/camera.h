@@ -155,6 +155,7 @@ public:
     static QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
+    int getMaxChannels() const;
 
     void inputPortListenerAttached();
     void inputPortListenerDetached();
@@ -206,6 +207,8 @@ signals:
         qint64 timestamp);
 
 protected:
+    virtual int getMaxChannelsFromDriver() const { return 1; }
+
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void initializationDone() override;
 
@@ -220,7 +223,7 @@ protected:
      * For each key optional CameraStreamCapability could be provided.
      * CameraStreamCapability could be null. That case it is auto-filled with default values.
      */
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex) = 0;
 
     /**
      * @return stream capability traits

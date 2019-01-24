@@ -18,7 +18,7 @@ QnClientStorageResource::QnClientStorageResource(QnCommonModule* commonModule)
 }
 
 QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaServerResourcePtr &parentServer, const QString &url ) {
-    NX_ASSERT(parentServer, Q_FUNC_INFO, "Server must exist here");
+    NX_ASSERT(parentServer, "Server must exist here");
 
     QnClientStorageResourcePtr storage(new QnClientStorageResource(qnClientCoreModule->commonModule()));
     storage->setTypeId(nx::vms::api::StorageData::kResourceTypeId);

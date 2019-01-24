@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <nx/vms_server_plugins/analytics/deepstream/engine.h>
 #include <nx/vms_server_plugins/analytics/deepstream/base_pipeline.h>
 #include <nx/vms_server_plugins/analytics/deepstream/default/tracking_mapper.h>
@@ -13,6 +15,7 @@ namespace deepstream {
 class DefaultPipeline: public BasePipeline
 {
     using base_type = BasePipeline;
+    
 public:
     DefaultPipeline(
         const nx::gstreamer::ElementName& pipelineName,

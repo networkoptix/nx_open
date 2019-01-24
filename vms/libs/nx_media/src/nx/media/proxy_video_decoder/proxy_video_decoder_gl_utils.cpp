@@ -132,10 +132,10 @@ void debugTextureTest()
         NX_GL(tex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
         buffer = malloc(17 + kMediaAlignment + 1920 * 1080);
-        bufferStart = nx::kit::debug::unalignedPtr(buffer);
+        bufferStart = nx::kit::utils::misalignedPtr(buffer);
 
         buffer2 = malloc(17 + kMediaAlignment + 1920 * 1080);
-        buffer2Start = nx::kit::debug::unalignedPtr(buffer2);
+        buffer2Start = nx::kit::utils::misalignedPtr(buffer2);
     }
 
     funcs->glFlush();

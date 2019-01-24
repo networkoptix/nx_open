@@ -207,9 +207,9 @@ int QnMiscManager<T>::getSystemMergeHistory(
                 handler->done(reqID, errorCode, nx::vms::api::SystemMergeHistoryRecordList());
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QByteArray /*dummy*/,
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t /*dummy*/,
             nx::vms::api::SystemMergeHistoryRecordList, decltype(queryDoneHandler)>
-        (ApiCommand::getSystemMergeHistory, QByteArray(), queryDoneHandler);
+        (ApiCommand::getSystemMergeHistory, nullptr, queryDoneHandler);
 
     return reqID;
 }

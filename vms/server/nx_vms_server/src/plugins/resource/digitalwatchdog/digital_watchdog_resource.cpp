@@ -31,11 +31,13 @@ QnDigitalWatchdogResource::QnDigitalWatchdogResource(QnMediaServerModule* server
     m_cproApiClient(std::make_unique<CproApiClient>(this))
 {
     setVendor(lit("Digital Watchdog"));
+
+    NX_VERBOSE(this, "Created: %1", getId());
 }
 
 QnDigitalWatchdogResource::~QnDigitalWatchdogResource()
 {
-
+    NX_VERBOSE(this, "Destroyed: %1", getId());
 }
 
 bool QnDigitalWatchdogResource::isCproChipset() const
@@ -92,18 +94,20 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
 {
-    bool unauth = false;
-    if (!isDualStreamingEnabled(unauth) && unauth==false)
+    if (getRole() != Role::subchannel)
     {
-        if (commonModule()->isNeedToStop())
+        bool unauth = false;
+        if (!isDualStreamingEnabled(unauth) && unauth == false)
+        {
+            if (commonModule()->isNeedToStop())
+                return CameraDiagnostics::UnknownErrorResult();
+
+            // The camera most likely is going to reset after enabling dual streaming
+            enableOnvifSecondStream();
             return CameraDiagnostics::UnknownErrorResult();
-
-        // The camera most likely is going to reset after enabling dual streaming
-        enableOnvifSecondStream();
-        return CameraDiagnostics::UnknownErrorResult();
+        }
+        disableB2FramesForActiDW();
     }
-    disableB2FramesForActiDW();
-
     const CameraDiagnostics::Result result = QnPlOnvifResource::initializeCameraDriver();
     return result;
 }
@@ -311,9 +315,11 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
 }
 
 nx::vms::server::resource::StreamCapabilityMap
-    QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+    QnDigitalWatchdogResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
 {
-    auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    NX_VERBOSE(this, "%1(%2): id %3", __func__, streamIndex, getId());
+
+    auto onvifResult = base_type::getStreamCapabilityMapFromDriver(streamIndex);
 
     if (!this->getMedia2Url().isEmpty())
     {
@@ -340,7 +346,7 @@ nx::vms::server::resource::StreamCapabilityMap
 
     const auto resourceUrl = nx::utils::Url(getUrl());
     JsonApiClient jsonClient({resourceUrl.host(), static_cast<quint16>(resourceUrl.port())}, getAuth());
-    const auto codecsFromJson = jsonClient.getSupportedVideoCodecs(streamIndex);
+    const auto codecsFromJson = jsonClient.getSupportedVideoCodecs(getChannel(), streamIndex);
     if (codecsFromJson.empty())
         return onvifResult;
 
@@ -354,11 +360,12 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
+    NX_VERBOSE(this, "%1(%2): id %3", __func__, streamIndex, getId());
     if (streamParams.codec == "H265" && m_isJsonApiSupported)
     {
         const auto resourceUrl = nx::utils::Url(getUrl());
         JsonApiClient jsonClient({resourceUrl.host(), static_cast<quint16>(resourceUrl.port())}, getAuth());
-        if (!jsonClient.sendStreamParams(streamIndex, streamParams))
+        if (!jsonClient.sendStreamParams(getChannel(), streamIndex, streamParams))
             return CameraDiagnostics::CannotConfigureMediaStreamResult("Codec");
 
         return CameraDiagnostics::NoErrorResult();

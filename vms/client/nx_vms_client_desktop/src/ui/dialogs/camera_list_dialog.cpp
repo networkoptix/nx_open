@@ -130,7 +130,7 @@ void QnCameraListDialog::updateWindowTitle() {
         if (QnVirtualCameraResourcePtr camera = index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>())
             cameras << camera;
     }
-    NX_ASSERT(cameras.size() == m_resourceSearch->rowCount(), Q_FUNC_INFO, "Make sure all found resources are cameras");
+    NX_ASSERT(cameras.size() == m_resourceSearch->rowCount(), "Make sure all found resources are cameras");
 
     const QString titleServerPart = m_model->server()
         ? QnDeviceDependentStrings::getDefaultNameFromSet(

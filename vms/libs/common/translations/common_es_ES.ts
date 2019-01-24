@@ -1524,19 +1524,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Problema con el almacenamiento</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Problema con el almacenamiento en %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Establecer a pantalla completa</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>Salir de pantalla completa</translation>
     </message>
   </context>
   <context>

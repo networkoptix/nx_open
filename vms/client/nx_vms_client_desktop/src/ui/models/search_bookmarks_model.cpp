@@ -52,7 +52,7 @@ QnBookmarkSortOrder calculateSortOrder(int modelColumn, Qt::SortOrder order)
                 case QnSearchBookmarksModel::kCamera:
                     return Qn::BookmarkCameraName;
                 default:
-                    NX_ASSERT(false, Q_FUNC_INFO, "Wrong column");
+                    NX_ASSERT(false, "Wrong column");
                     return Qn::BookmarkStartTime;
             }
         }();
@@ -381,7 +381,7 @@ int QnSearchBookmarksModel::sortFieldToColumn(Qn::BookmarkSortField field)
         case Qn::BookmarkCameraName:
             return Column::kCamera;
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Unhandled field");
+            NX_ASSERT(false, "Unhandled field");
             break;
     }
     return kInvalidSortingColumn;

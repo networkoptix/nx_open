@@ -328,7 +328,7 @@ public:
     void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
-    int getMaxChannels() const;
+    virtual int getMaxChannelsFromDriver() const override;
 
     void updateToChannel(int value);
 
@@ -385,7 +385,7 @@ protected:
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODEC c);
 
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(

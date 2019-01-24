@@ -188,7 +188,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
             // Sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order.
             auto foreignResources = foreignResourcesMap.values();
-            const QnUuid ownGuid = commonModule()->moduleGUID();
             sortForeignResources(foreignResources);
             for (const auto& res: foreignResources)
             {

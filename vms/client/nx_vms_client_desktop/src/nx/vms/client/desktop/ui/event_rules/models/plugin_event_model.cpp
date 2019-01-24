@@ -22,9 +22,11 @@ PluginEventModel::~PluginEventModel()
 
 void PluginEventModel::buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines)
 {
+    static const QString kAnyPlugin = tr("Any Plugin");
+
     beginResetModel();
 
-    auto addItem = 
+    auto addItem =
         [this](const QnUuid& id, const QString& name)
         {
             auto item = new QStandardItem(name);
@@ -34,6 +36,8 @@ void PluginEventModel::buildFromList(const nx::vms::common::AnalyticsEngineResou
         };
 
     clear();
+
+    addItem(QnUuid(), kAnyPlugin);
 
     for (const auto& engine: engines)
     {

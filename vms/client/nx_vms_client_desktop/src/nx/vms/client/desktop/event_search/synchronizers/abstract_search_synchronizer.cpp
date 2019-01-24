@@ -11,7 +11,7 @@ AbstractSearchSynchronizer::AbstractSearchSynchronizer(
     QnWorkbenchContext* context,
     QObject* parent)
     :
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(context)
 {
     NX_CRITICAL(this->context());
@@ -19,7 +19,7 @@ AbstractSearchSynchronizer::AbstractSearchSynchronizer(
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
         [this]() { emit mediaWidgetAboutToBeChanged(mediaWidget(), {}); });
 
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         [this]()
         {
             const auto widget = navigator()->currentMediaWidget();

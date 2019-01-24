@@ -140,7 +140,7 @@ void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& param
             ui->viewDownButton->setChecked(true);
             break;
         default:
-            NX_ASSERT( __LINE__, Q_FUNC_INFO, "Unsupported value");
+            NX_ASSERT(false, "Unsupported value");
     }
 
     ui->fisheyeEnabledButton->setChecked(params.enabled);

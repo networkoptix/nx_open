@@ -36,7 +36,8 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
-    void setCameraList(const QSet<QnUuid>& ids);
+    QnUuidSet getCameraList() const;
+    void setCameraList(const QnUuidSet& ids);
     void setActionType(nx::vms::api::ActionType value);
     void setEventType(nx::vms::api::EventType value);
 

@@ -35,7 +35,7 @@ public:
         bool isAdditionalSupportCheckNeeded = false);
 
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

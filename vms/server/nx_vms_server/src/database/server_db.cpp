@@ -259,7 +259,7 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
             return QnCameraBookmarkSearchFilter::kNoLimit;
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Invalid sorting column value!");
+            NX_ASSERT(false, "Invalid sorting column value!");
             return QnCameraBookmarkSearchFilter::kNoLimit;
     }
 }
@@ -1296,7 +1296,7 @@ bool QnServerDb::addBookmark(const QnCameraBookmark& bookmark)
 
 bool QnServerDb::updateBookmark(const QnCameraBookmark& bookmark)
 {
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmarks must not be stored");
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmarks must not be stored");
     if (!bookmark.isValid())
         return false;
 
@@ -1354,7 +1354,7 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit)
 
 bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUpdate)
 {
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be stored in database");
     if (!bookmark.isValid())
         return false;
 
@@ -1486,7 +1486,7 @@ void QnServerDb::updateBookmarkCount()
 
         if (!query.next())
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "Query has failed!");
+            NX_ASSERT(false, "Query has failed!");
             return;
         }
 
@@ -1586,7 +1586,7 @@ void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
 {
     {
         QnWriteLocker lock(&m_mutex);
-        NX_ASSERT(!m_updateBookmarkCount, Q_FUNC_INFO, "controller is already set");
+        NX_ASSERT(!m_updateBookmarkCount, "controller is already set");
         m_updateBookmarkCount = std::move(handler);
     }
     updateBookmarkCount();

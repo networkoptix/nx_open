@@ -3,11 +3,9 @@
 #include <iostream>
 
 #include <nx/kit/test.h>
+#include <nx/kit/debug.h>
 
 #include "disabled_ini_config_ut.h"
-
-#include <nx/kit/ini_config.h>
-#include <nx/kit/debug.h>
 
 int main(int argc, const char* const argv[])
 {

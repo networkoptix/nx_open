@@ -19,11 +19,11 @@ public:
     CommonPluginContainer();
     virtual ~CommonPluginContainer();
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
 private:
-    std::atomic<unsigned int> m_refCount;
+    mutable std::atomic<int> m_refCount;
 };
 
 #endif  //NX_COMMON_PLUGIN_CONTAINER_H

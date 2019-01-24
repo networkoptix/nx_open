@@ -20,6 +20,7 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info,
         nxcip::BaseCameraManager::fixedQualityCapability),
     m_timeProvider(timeProvider)
 {
+    m_pluginRef->addRef();
 }
 
 CameraManager::~CameraManager()
@@ -46,12 +47,12 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraManager::addRef()
+int CameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraManager::releaseRef()
+int CameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

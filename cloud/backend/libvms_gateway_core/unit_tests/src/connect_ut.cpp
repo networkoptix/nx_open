@@ -100,7 +100,7 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
 
     server.pleaseStopSync();
     QByteArray receiveBuffer(1, 0);  //< It should be >0 to differentiate EOF and zero bytes read.
-    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL), 0);
+    ASSERT_GE(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL), 0);
 }
 
 TEST_F(VmsGatewayConnectTest, IpSpecified)

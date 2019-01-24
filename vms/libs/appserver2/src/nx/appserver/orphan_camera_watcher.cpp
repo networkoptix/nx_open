@@ -90,7 +90,7 @@ void OrphanCameraWatcher::update()
     if (currentOrphanCameras.empty())
         NX_DEBUG(this, lm("No orphan cameras found."));
     else
-        NX_DEBUG(this, lm("%1 orphan camera(s) found.").args(QString::number(currentOrphanCameras.size())));
+        NX_DEBUG(this, lm("%1 orphan cameras found.").args(QString::number(currentOrphanCameras.size())));
 
     Uuids longlivedOrphanCameras;
     std::set_intersection(m_previousOrphanCameras.begin(), m_previousOrphanCameras.end(),

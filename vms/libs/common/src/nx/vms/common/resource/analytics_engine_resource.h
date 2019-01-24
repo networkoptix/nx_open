@@ -3,6 +3,7 @@
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource.h>
+#include <nx/analytics/types.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx::vms::common {
@@ -28,6 +29,9 @@ public:
     virtual void setSettingsValues(const QVariantMap& values);
 
     AnalyticsPluginResourcePtr plugin() const;
+
+    nx::analytics::EventTypeDescriptorMap analyticsEventTypeDescriptors() const;
+    nx::analytics::ObjectTypeDescriptorMap analyticsObjectTypeDescriptors() const;
 };
 
 } // namespace nx::vms::common

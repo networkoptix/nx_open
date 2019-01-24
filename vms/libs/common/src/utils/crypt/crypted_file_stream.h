@@ -18,6 +18,8 @@ namespace nx::utils {
 
 class CryptedFileStream: public QIODevice
 {
+    Q_OBJECT
+
     using Key = crypto_functions::Key;
 
 public:

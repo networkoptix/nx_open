@@ -152,7 +152,7 @@ TEST_F(LogMainTest, This)
     { \
         struct ScopeTag{}; /*< Needed for NX_SCOPE_TAG macro used in NX_OUTPUT. */ \
         NX_OUTPUT << "NX_SCOPE_TAG " << NAME << ": " \
-            << nx::kit::debug::toString(NX_SCOPE_TAG.toString()); \
+            << nx::kit::utils::toString(NX_SCOPE_TAG.toString()); \
     } \
     NX_VERBOSE(NX_SCOPE_TAG, NAME); /*< Perform the tested action. */ \
 } while (0)

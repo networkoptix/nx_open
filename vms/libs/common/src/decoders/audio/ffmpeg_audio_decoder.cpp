@@ -32,7 +32,7 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
     if (data->context)
         QnFfmpegHelper::mediaContextToAvCodecContext(m_audioDecoderCtx, data->context);
     else
-        NX_ASSERT(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
+        NX_ASSERT(false, "Audio packets without codec is deprecated!");
 
     m_initialized = avcodec_open2(m_audioDecoderCtx, codec, nullptr) >= 0;
 

@@ -2,6 +2,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <vector>
 #include <mutex>
@@ -25,8 +26,8 @@ public:
     virtual ~CameraManager() = default;
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
     virtual int getEncoderCount( int* encoderCount ) const override;
     virtual int getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr ) override;
@@ -54,7 +55,7 @@ protected:
     std::shared_ptr<Camera> m_camera;
 
     nxpt::CommonRefManager m_refManager;
-    nxpt::ScopedRef<Plugin> m_pluginRef;
+    nx::sdk::Ptr<Plugin> m_pluginRef;
     unsigned int m_capabilities;
     static int constexpr kEncoderCount = 2;
     std::unique_ptr<MediaEncoder> m_encoders[kEncoderCount];
@@ -63,4 +64,4 @@ protected:
 };
 
 } // namespace usb_cam
-} // namespace nx 
+} // namespace nx

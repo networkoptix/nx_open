@@ -559,10 +559,6 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
                 dialogAccepted = CameraSelectionDialog::selectCameras<QnExecPtzPresetPolicy>(
                     selectedCameras, this);
                 break;
-            case ActionType::showTextOverlayAction:
-                dialogAccepted = CameraSelectionDialog::selectCameras
-                    <CameraSelectionDialog::DummyPolicy>(selectedCameras, this);
-                break;
             case ActionType::playSoundAction:
             case ActionType::playSoundOnceAction:
             case ActionType::sayTextAction:
@@ -570,7 +566,9 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
                     selectedCameras, this);
                 break;
             default:
-                NX_ASSERT(false);
+                dialogAccepted = CameraSelectionDialog::selectCameras
+                    <CameraSelectionDialog::DummyPolicy>(selectedCameras, this);
+                break;
         }
 
         if (dialogAccepted)

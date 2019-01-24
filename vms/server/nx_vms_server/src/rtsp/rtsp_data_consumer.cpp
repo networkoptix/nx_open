@@ -421,7 +421,7 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::AUDIO:
         case QnAbstractMediaData::CONTAINER:
         case QnAbstractMediaData::EMPTY_DATA:
-            return m_streamDataFilter == StreamDataFilters(StreamDataFilter::mediaOnly)
+            return !m_streamDataFilter //< Send media data for empty flags
                 || m_streamDataFilter.testFlag(StreamDataFilter::media);
         case QnAbstractMediaData::META_V1:
             return m_streamDataFilter.testFlag(StreamDataFilter::motion);
@@ -805,6 +805,15 @@ void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     m_liveQuality = quality;
+}
+
+nx::vms::api::StreamDataFilters QnRtspDataConsumer::streamDataFilter() const
+{
+    using namespace nx::vms::api;
+    if (!m_streamDataFilter)
+        return nx::vms::api::StreamDataFilter::media;
+
+    return m_streamDataFilter;
 }
 
 void QnRtspDataConsumer::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)

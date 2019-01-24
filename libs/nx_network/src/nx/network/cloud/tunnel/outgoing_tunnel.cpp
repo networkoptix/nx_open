@@ -55,7 +55,7 @@ void OutgoingTunnel::stopWhileInAioThread()
 void OutgoingTunnel::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(!m_onClosedHandler, Q_FUNC_INFO, "State handler is already set");
+    NX_ASSERT(!m_onClosedHandler, "State handler is already set");
     m_onClosedHandler = std::move(handler);
 }
 
@@ -118,11 +118,7 @@ void OutgoingTunnel::establishNewConnection(
             break;
 
         default:
-            NX_ASSERT(
-                false,
-                Q_FUNC_INFO,
-                lm("Unexpected state %1")
-                    .arg(stateToString(m_state)).toStdString().c_str());
+            NX_ASSERT(false, lm("Unexpected state %1").arg(stateToString(m_state)));
             break;
     }
 }

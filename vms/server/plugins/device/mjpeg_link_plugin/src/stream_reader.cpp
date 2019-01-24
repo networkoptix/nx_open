@@ -21,6 +21,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -90,13 +91,13 @@ void* StreamReader::queryInterface(const nxpl::NX_GUID& interfaceID)
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int StreamReader::addRef()
+int StreamReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int StreamReader::releaseRef()
+int StreamReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -226,7 +227,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(m_videoPacket.get())
     {
         *lpPacket = m_videoPacket.release();
-        nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+        const nx::sdk::Ptr<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
         if (!plugin)
         {
             NX_DEBUG(this, "No plugin");

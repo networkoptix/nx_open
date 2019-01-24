@@ -18,7 +18,7 @@ namespace {
         if (offset >= 64) {
             offset = 63;
             if (overflow) {
-                NX_ASSERT(!(*overflow), Q_FUNC_INFO, "Code should be improved to support more than one overflowed events.");
+                NX_ASSERT(!(*overflow), "Code should be improved to support more than one overflowed events.");
                 *overflow = true;
             }
         }

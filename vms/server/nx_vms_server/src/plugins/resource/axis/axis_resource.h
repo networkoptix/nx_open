@@ -57,8 +57,6 @@ public:
 
     virtual int getChannel() const override;
 
-    int getChannelNumAxis() const; // depracated
-
     virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
@@ -72,6 +70,7 @@ public:
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
     int rtspPort() const;
+    virtual int getMaxChannelsFromDriver() const override;
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
@@ -83,7 +82,7 @@ public slots:
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
@@ -91,6 +90,7 @@ protected:
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
 private:
+    int getChannelNumAxis() const; // depracated
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
     static QRect gridRectToAxisRect(const QRect& gridRect);

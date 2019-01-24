@@ -350,7 +350,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     {
         QnLayoutItemData& item = items[i];
         QString path = item.resource.uniqueId;
-        NX_ASSERT(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
+        NX_ASSERT(!path.isEmpty(), "Resource path should not be empty. Exported file is not valid.");
         if (!path.endsWith(lit(".mkv")))
             path += lit(".mkv");
         item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(layoutUrl, path);

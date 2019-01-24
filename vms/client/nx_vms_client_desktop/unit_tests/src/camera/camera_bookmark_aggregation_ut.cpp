@@ -19,7 +19,7 @@ namespace
         result.cameraId =  guidFromArbitraryData(lit("testcamera"));
         result.startTimeMs = startTimeMs;
         result.durationMs = kDefaultBookmarkDuration;
-        NX_ASSERT(result.isValid(), Q_FUNC_INFO, "This function must create valid bookmarks");
+        NX_ASSERT(result.isValid(), "This function must create valid bookmarks");
 
         return result;
     }

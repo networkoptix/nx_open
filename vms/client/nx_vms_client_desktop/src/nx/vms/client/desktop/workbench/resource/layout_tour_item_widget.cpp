@@ -222,8 +222,9 @@ void LayoutTourItemWidget::initOverlay()
                 && item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
             QColor textColor = palette().color(QPalette::Dark);
             QString text = isManual
-                ? tr("Switch by %1").arg(QString::fromWCharArray(L"\x2190 \x2192")) //< Arrows.
-                : tr("Display for");
+                ? tr("Switch by", "Arrows will follow")
+                    + QString::fromWCharArray(L" \x2190 \x2192") //< Arrows.
+                : tr("Display for", "Time selector will follow");
 
             if (!isManual)
             {
@@ -232,7 +233,7 @@ void LayoutTourItemWidget::initOverlay()
                     case SelectionState::selected:
                     case SelectionState::focusedAndSelected:
                         textColor = palette().color(QPalette::Highlight);
-                        text = tr("Display selected for");
+                        text = tr("Display selected for", "Time will follow");
                         break;
                     default:
                         break;

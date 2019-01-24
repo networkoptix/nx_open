@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "core/resource/storage_resource.h"
-#include "plugins/storage/third_party/third_party_storage.h"
+#include <storage/third_party_storage.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::server { class Settings; }
