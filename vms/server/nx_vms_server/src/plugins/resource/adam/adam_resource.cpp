@@ -72,16 +72,16 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 
     m_ioManager.reset(new QnAdamModbusIOManager(this));
 
-    auto ports = m_ioManager->getInputPortList();
+    auto allPorts = m_ioManager->getInputPortList();
     auto outputs = m_ioManager->getOutputPortList();
-    ports.insert(ports.begin(), ports.begin(), ports.end());
+    allPorts.insert(allPorts.begin(), outputs.begin(), outputs.end());
 
     m_portTypes.clear();
-    for (const auto& port: ports)
+    for (const auto& port: allPorts)
         m_portTypes[port.id] = port.portType;
 
     setPortDefaultStates();
-    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
 
     setFlags(flags() | Qn::io_module);
     setProperty(ResourcePropertyKey::kIoConfigCapability, 1);
