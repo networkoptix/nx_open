@@ -41,7 +41,8 @@ void CommandLogReader::readTransactions(
 {
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
         lm("systemId %1. Reading commands from (%2) to (%3)")
-        .args(m_systemId, stateToString(*readFilter.from), stateToString(*readFilter.to)));
+        .args(m_systemId, readFilter.from ? stateToString(*readFilter.from) : "none",
+            readFilter.to ? stateToString(*readFilter.to) : "none"));
 
     ReadCommandsFilter effectiveReadFilter = readFilter;
     m_outgoingCommandFilter.updateReadFilter(&effectiveReadFilter);
