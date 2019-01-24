@@ -5,6 +5,12 @@
 #include "../command_descriptor.h"
 #include "../transaction_transport.h"
 
+static constexpr std::pair<const char*, const char*> usernameAndPassword[] = {
+    {"user1", "7ab592129c1345326c0cea345e71170a"},
+    {"user2", "3064acea7f7be21564a2a9cac41e1807"} }
+    // and so on
+;
+
 namespace nx::clusterdb::engine::transport {
 
 /** Holding in queue not more then this transaction count. */
