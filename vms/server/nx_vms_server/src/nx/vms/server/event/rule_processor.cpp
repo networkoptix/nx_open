@@ -200,7 +200,7 @@ void RuleProcessor::doExecuteAction(const vms::event::AbstractActionPtr& action,
 
 void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 {
-    if (!NX_ASSERT(action, Q_FUNC_INFO, "No action to execute"))
+    if (!NX_ASSERT(action, "No action to execute"))
         return; //< Something is wrong.
     NX_VERBOSE(this, "Executing action [%1]", action->getRuleId());
 

@@ -50,7 +50,7 @@ int QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSet
 
 void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
 {
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
     d->addCameraBookmark(bookmark, callback);
 
@@ -62,7 +62,7 @@ void QnCameraBookmarksManager::addAcknowledge(
     const QnUuid& eventRuleId,
     OperationCallbackType callback)
 {
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
     d->acknowledgeEvent(bookmark, eventRuleId, callback);
 
@@ -71,7 +71,7 @@ void QnCameraBookmarksManager::addAcknowledge(
 
 void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
 {
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
     d->updateCameraBookmark(bookmark, callback);
 

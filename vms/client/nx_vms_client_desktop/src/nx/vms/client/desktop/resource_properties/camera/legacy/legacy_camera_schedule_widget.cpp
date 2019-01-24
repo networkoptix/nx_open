@@ -683,7 +683,7 @@ qreal LegacyCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) c
 
     if (m_cameras.size() != 1)
     {
-        NX_ASSERT(false, Q_FUNC_INFO);
+        NX_ASSERT(false);
         return 0.0;
     }
 
@@ -1142,7 +1142,7 @@ void LegacyCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
     }
     else /* One camera */
     {
-        NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
+        NX_ASSERT(m_cameras.size() == 1, "Following options are valid only for singular camera");
         QnVirtualCameraResourcePtr camera = m_cameras.first();
 
         // TODO: #GDM #Common duplicate code.
@@ -1170,7 +1170,7 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
 {
     if (m_cameras.size() > 1)
     {
-        NX_ASSERT(false, Q_FUNC_INFO);
+        NX_ASSERT(false);
         return;
     }
 

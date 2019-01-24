@@ -721,7 +721,7 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
 {
     if (m_overlays[0])
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "ExportSettingsDialog::Private::createOverlays called twice");
+        NX_ASSERT(false, "ExportSettingsDialog::Private::createOverlays called twice");
         return;
     }
 

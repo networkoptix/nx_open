@@ -4122,7 +4122,7 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->mutableSettings()->obsoleteServerGuid.remove();
     serverModule()->mutableSettings()->appserverPassword.set("");
 #ifdef _DEBUG
-    NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(), Q_FUNC_INFO,
+    NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(),
         "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 

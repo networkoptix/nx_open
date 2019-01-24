@@ -267,7 +267,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         info.updateInformation = m_updateFiles.value(server->getSystemInfo());
 
         if (!info.updateInformation) {
-            NX_ASSERT(0, "No update info for server", Q_FUNC_INFO);
+            NX_ASSERT(0, "No update info for server");
             return;
         }
 

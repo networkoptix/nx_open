@@ -73,7 +73,7 @@ QnThumbnailsLoader::QnThumbnailsLoader(const QnMediaResourcePtr &resource, QnThu
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
-    NX_ASSERT(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
+    NX_ASSERT(supportedResource(resource), "Loaders must not be created for unsupported resources");
 
     if (!supportedResource(resource))
         return;

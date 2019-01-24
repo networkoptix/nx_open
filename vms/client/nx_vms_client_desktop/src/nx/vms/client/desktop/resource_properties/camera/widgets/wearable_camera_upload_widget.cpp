@@ -93,7 +93,7 @@ void WearableCameraUploadWidget::loadState(const CameraSettingsDialogState& stat
         }
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+            NX_ASSERT(false, "Should never get here");
             ui->stackedWidget->setCurrentWidget(ui->messagePage);
             ui->messageLabel->setText(QString());
             break;

@@ -21,7 +21,7 @@ void QnUpdatable::beginUpdate()
 
 void QnUpdatable::endUpdate()
 {
-    NX_ASSERT(m_updateCount > 0, Q_FUNC_INFO, "Invalid begin/end sequence");
+    NX_ASSERT(m_updateCount > 0, "Invalid begin/end sequence");
     endUpdateInternal();
     --m_updateCount;
     if (m_updateCount == 0)

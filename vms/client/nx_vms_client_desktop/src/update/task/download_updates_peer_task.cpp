@@ -125,7 +125,7 @@ void QnDownloadUpdatesPeerTask::continueDownload() {
 void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) {
-        NX_ASSERT(0, "This function must be called only from QNetworkReply", Q_FUNC_INFO);
+        NX_ASSERT(0, "This function must be called only from QNetworkReply");
         return;
     }
 
@@ -189,7 +189,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
 void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) {
-        NX_ASSERT(0, "This function must be called only from QNetworkReply", Q_FUNC_INFO);
+        NX_ASSERT(0, "This function must be called only from QNetworkReply");
         return;
     }
 
@@ -224,7 +224,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
 void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) {
-        NX_ASSERT(0, "This function must be called only from QNetworkReply", Q_FUNC_INFO);
+        NX_ASSERT(0, "This function must be called only from QNetworkReply");
         return;
     }
 

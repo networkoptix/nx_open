@@ -72,7 +72,7 @@ int ConcatenationListModel::sourceModelPosition(const QAbstractItemModel* source
         position += sourceRowCount(model);
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Source model is not in the list");
+    NX_ASSERT(false, "Source model is not in the list");
     return -1;
 }
 
@@ -103,7 +103,7 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
 
     if (row < 0 || count < 0 || row + count > rowCount())
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Rows are out of range");
+        NX_ASSERT(false, "Rows are out of range");
         return false;
     }
 

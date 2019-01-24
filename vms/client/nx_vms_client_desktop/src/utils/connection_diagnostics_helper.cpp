@@ -493,7 +493,7 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
                 "Check server Internet connection or try again later.",
                 "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName());
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+            NX_ASSERT(false, "Should never get here");
             break;
     }
     return QString();

@@ -101,14 +101,14 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
             ui->authTypeComboBox->setCurrentIndex(1);
             break;
         default:
-            NX_ASSERT(0, Q_FUNC_INFO, "Uxepected authType value in ActionParameters");
+            NX_ASSERT(0, "Uxepected authType value in ActionParameters");
             ui->authTypeComboBox->setCurrentIndex(0);
     }
 
     int requestTypeComboBoxIndex = kAutoRequestTypes.indexOf(QString::fromUtf8(params.requestType));
     if (requestTypeComboBoxIndex < 0)
     {
-        NX_ASSERT(0, Q_FUNC_INFO, "Uxepected requestType value in ActionParameters");
+        NX_ASSERT(0, "Uxepected requestType value in ActionParameters");
         requestTypeComboBoxIndex = 0;
     }
     ui->requestTypeComboBox->setCurrentIndex(requestTypeComboBoxIndex);
