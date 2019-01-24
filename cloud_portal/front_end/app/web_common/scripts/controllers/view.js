@@ -235,7 +235,7 @@
                     if (live) {
                         playingPosition = window.timeManager.nowToDisplay();
                     } else {
-                        playingPosition = Math.round(playingPosition);
+                        playingPosition = Math.round(window.timeManager.displayToServer(playingPosition));
                     }
                     
                     // Fix here!
@@ -351,6 +351,7 @@
                         } else {
                             $scope.playerAPI.pause();
                         }
+                        
                         if ($scope.positionProvider) {
                             $scope.positionProvider.playing = play;
                             
@@ -543,11 +544,13 @@
                     $scope.updateCamera(timeFromUrl);
                     
                     //When camera is changed request offset for camera
-                    $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId).then( function(serverOffset) {
-                        window.timeManager.setOffset(serverOffset);
-                        updateVideoSource(timeFromUrl);
-                        timeFromUrl = null;
-                    });
+                    $scope.camerasProvider
+                        .getServerTimeOffset($scope.activeCamera.parentId)
+                        .then(function (serverOffset) {
+                            window.timeManager.setOffset(serverOffset);
+                            updateVideoSource(timeFromUrl);
+                            timeFromUrl = null;
+                        });
                 });
                 
                 window.timeManager.init(CONFIG.webclient.useServerTime, CONFIG.webclient.useSystemTime);
