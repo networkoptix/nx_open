@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/maintenance/log/client.h>
-#include <nx/network/maintenance/log/request_path.h>
 #include <nx/network/maintenance/log/utils.h>
 #include <nx/network/maintenance/log/server.h>
-#include <nx/network/url/url_builder.h>
+#include <nx/network/maintenance/log/request_path.h>
 
 #include <nx/utils/log/logger_collection.h>
 #include <nx/utils/log/log_level.h>
@@ -33,6 +33,7 @@ public:
         delete m_httpServer;
         delete m_logServer;
     }
+
 protected:
     virtual void SetUp() override
     {
@@ -61,18 +62,15 @@ protected:
         ASSERT_TRUE(messageBody);
 
         bool parseSucceeded = false;
-        Loggers loggersReturnedByServer = QJson::deserialized<Loggers>(*messageBody, {}, &parseSucceeded);
+        Loggers loggersReturnedByServer = QJson::deserialized<Loggers>(
+            *messageBody,
+            Loggers(),
+            &parseSucceeded);
         ASSERT_TRUE(parseSucceeded);
 
         ASSERT_EQ(loggers.size(), loggersReturnedByServer.loggers.size());
         for (std::size_t i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
-        {
-            assertLoggerEquality(
-                loggers[i], 
-                loggersReturnedByServer.loggers[i],
-                /*compareId*/ true,
-                /*comparePath*/ true);
-        }
+            assertLoggerEquality(loggers[i], loggersReturnedByServer.loggers[i]);
     }
 
     void andAddloggerToAddFailed()
@@ -108,23 +106,17 @@ protected:
             *outLoggerReturnedByServer = loggerReturnedByServer;
     }
 
-    void assertLoggerEquality(const Logger& a, const Logger& b, bool compareId, bool comparePath)
+    void assertLoggerEquality(const Logger& a, const Logger& b)
     {
-        if (compareId)
-        {
-            ASSERT_EQ(a.id, b.id);
-        }
-
-        if (comparePath)
-        {
-            ASSERT_EQ(a.path, b.path);
-        }
-
+        ASSERT_EQ(a.id, b.id);
+        ASSERT_EQ(a.path, b.path);
         assertDefaultLevelEquality(a, b);
         assertFiltersEquality(a, b);
     }
 
-    void assertDefaultLevelEquality(const Logger& loggerToAdd, const Logger& loggerReturnedByServer)
+    void assertDefaultLevelEquality(
+        const Logger& loggerToAdd,
+        const Logger& loggerReturnedByServer)
     {
         // When adding a logger, empty defaultLevel is interpreted as Level::none by server.
         if (loggerReturnedByServer.defaultLevel == "none")
@@ -478,7 +470,7 @@ TEST_F(LogServer, server_rejects_logger_stream_request_with_malformed_query_stri
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
-TEST_F(LogServer, DISABLED_server_crashes_when_logger_is_removed_during_stream)
+TEST_F(LogServer, server_handles_logger_removal_while_streaming)
 {
     Level level(Level::debug);
     std::string tag("nx::network");
