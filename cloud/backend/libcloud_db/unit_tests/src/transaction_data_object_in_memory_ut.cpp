@@ -2,9 +2,6 @@
 
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/sql/detail/query_execution_thread.h>
-#include <nx/vms/api/data/user_data.h>
-
 #include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/ec2/data_conversion.h>
@@ -151,7 +148,7 @@ private:
             m_systemId,
             m_peerGuid.toSimpleString(),
             m_peerDbId.toSimpleString(),
-            0,
+            -1,
             std::numeric_limits<int64_t>::max(),
             &transactions);
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, resultCode);
