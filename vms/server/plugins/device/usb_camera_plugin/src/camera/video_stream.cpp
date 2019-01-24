@@ -487,9 +487,9 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
     // Try to find an exact match first
     for (const auto & resolution : resolutionList)
     {
-        if (resolution.width == params.resolution.width
-            && resolution.height == params.resolution.height
-            && resolution.fps == params.fps)
+        if (resolution.width == params.resolution.width &&
+            resolution.height == params.resolution.height &&
+            resolution.fps == params.fps)
         {
             return CodecParameters(
                 m_codecParams.codecId,
@@ -513,7 +513,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
                     m_codecParams.codecId,
                     resolution.fps,
                     m_codecParams.bitrate,
-                    nxcip::Resolution(resolution.width, resolution.width));
+                    nxcip::Resolution(resolution.width, resolution.height));
             }
         }
     }
@@ -529,7 +529,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
                 m_codecParams.codecId,
                 resolution.fps,
                 m_codecParams.bitrate,
-                nxcip::Resolution(resolution.width, resolution.width));
+                nxcip::Resolution(resolution.width, resolution.height));
         }
     }
 

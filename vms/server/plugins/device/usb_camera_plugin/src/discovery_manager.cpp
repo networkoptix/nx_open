@@ -23,7 +23,7 @@ static constexpr const char kNxMacAddressDelimiter[] = "-";
 
 DiscoveryManager::DiscoveryManager(
     nxpt::CommonRefManager* const refManager,
-    nxpl::TimeProvider *const timeProvider)
+    nxpl::TimeProvider* const timeProvider)
     :
     m_refManager(refManager),
     m_timeProvider(timeProvider)
