@@ -27,10 +27,10 @@ public:
      */
     virtual int64_t durationUs() const = 0;
 
-    /* @return number of elements in the packet */
+    /** @return Number of elements in the packet. */
     virtual int count() const = 0;
 
-    /* @return element in the position defined by the index */
+    /** @return Element at the zero-based index, or null if the index is invalid. */
     virtual const IMetadata* at(int index) const = 0;
 };
 
