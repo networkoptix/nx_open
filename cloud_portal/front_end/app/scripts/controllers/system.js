@@ -39,6 +39,9 @@ angular.module('cloudApp')
             }
 
             function setMergeStatus(mergeInfo) {
+                if (Object.keys(mergeInfo).length === 0) {
+                    return;
+                }
                 $scope.currentlyMerging = true;
                 $scope.isMaster = mergeInfo.role ? mergeInfo.role !== Config.systemStatuses.slave : mergeInfo.masterSystemId === $scope.system.id;
                 $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
