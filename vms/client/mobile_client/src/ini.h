@@ -20,7 +20,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, execAtGlThreadOnFrameSwapped, "Connect lambda execution to the event.");
     NX_INI_STRING("", tcpLogAddress, "Write log to specified IP:port as raw TCP stream");
     NX_INI_FLAG(1, forceSoftwareDecoderForA12XBionicChip,
-        "Due to issues with hardware decoding on iPad Pro with A12X Bionic chip we need to "
+        "Due to issues with hardware decoding on Apple devices with A12X Bionic chip we need to "
         "enable software-only decoding mode.");
 };
 
