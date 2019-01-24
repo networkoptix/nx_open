@@ -29,6 +29,7 @@ GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::Camera
     m_info(info),
     m_capabilities(0)
 {
+    m_pluginRef->addRef();
     m_capabilities
         |= nxcip::BaseCameraManager::audioCapability
         | nxcip::BaseCameraManager::shareIpCapability

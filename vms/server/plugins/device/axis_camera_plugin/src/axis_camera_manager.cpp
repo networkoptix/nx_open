@@ -26,6 +26,7 @@ AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
     m_inputPortCount( 0 ),
     m_outputPortCount( 0 )
 {
+    m_pluginRef->addRef();
     m_credentials.setUser( QString::fromUtf8(m_info.defaultLogin) );
     m_credentials.setPassword( QString::fromUtf8(m_info.defaultPassword) );
     m_encoders.resize( 2 ); //all AXIS cameras support dual streaming
