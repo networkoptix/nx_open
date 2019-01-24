@@ -10,7 +10,7 @@
 
 #include "serialization/transaction_deserializer.h"
 #include "transaction_log.h"
-#include "transaction_transport_header.h"
+#include "transport/transaction_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

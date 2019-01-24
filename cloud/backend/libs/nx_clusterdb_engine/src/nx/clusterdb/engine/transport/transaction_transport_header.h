@@ -4,7 +4,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_message.h>
 
-#include "command.h"
+#include "../command.h"
 
 namespace nx::clusterdb::engine {
 

@@ -4,8 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "compatible_ec2_protocol_version.h"
-#include "command_descriptor.h"
+#include "../../command_descriptor.h"
 
 namespace nx::clusterdb::engine::transport {
 
@@ -16,7 +15,7 @@ CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
     nx::network::aio::AbstractAioThread* aioThread,
     std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
-    const transport::ConnectionRequestAttributes& connectionRequestAttributes,
+    const ConnectionRequestAttributes& connectionRequestAttributes,
     const std::string& systemId,
     const vms::api::PeerData& localPeer,
     const network::SocketAddress& remotePeerEndpoint,

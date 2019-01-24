@@ -8,13 +8,10 @@
 #include <nx/utils/move_only_func.h>
 
 #include <nx/vms/api/data/tran_state_data.h>
-
 #include <transaction/transaction_transport_base.h>
 
-#include "abstract_transaction_transport.h"
-#include "serialization/transaction_serializer.h"
-#include "transaction_processor.h"
-#include "transaction_transport_header.h"
+#include "../abstract_transaction_transport.h"
+#include "../../compatible_ec2_protocol_version.h"
 
 namespace ec2 {
 class QnTransactionTransportBase;
@@ -39,7 +36,7 @@ public:
         const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
         std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
-        const transport::ConnectionRequestAttributes& connectionRequestAttributes,
+        const ConnectionRequestAttributes& connectionRequestAttributes,
         const std::string& systemId,
         const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,

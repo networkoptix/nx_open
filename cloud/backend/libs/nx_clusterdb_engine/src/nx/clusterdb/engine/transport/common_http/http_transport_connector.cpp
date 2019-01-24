@@ -6,8 +6,8 @@
 #include <nx/vms/api/types/connection_types.h>
 
 #include "http_transport_paths.h"
+#include "transaction_transport.h"
 #include "../generic_transport.h"
-#include "../../transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport {
 

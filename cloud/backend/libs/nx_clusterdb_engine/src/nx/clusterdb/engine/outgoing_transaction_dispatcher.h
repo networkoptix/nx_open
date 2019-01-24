@@ -7,7 +7,7 @@
 #include "outgoing_command_filter.h"
 #include "serialization/serializable_transaction.h"
 #include "serialization/transaction_serializer.h"
-#include "transaction_transport_header.h"
+#include "transport/transaction_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

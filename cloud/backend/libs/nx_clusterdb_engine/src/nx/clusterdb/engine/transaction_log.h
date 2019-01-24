@@ -22,7 +22,7 @@
 #include "serialization/transaction_serializer.h"
 #include "serialization/ubjson_serialized_transaction.h"
 #include "transaction_log_cache.h"
-#include "transaction_transport_header.h"
+#include "transport/transaction_transport_header.h"
 
 namespace nx::clusterdb::engine {
 
