@@ -92,8 +92,7 @@ void MetadataHandler::handleEventMetadataPacket(
         if (!eventMetadata)
             break;
 
-        const int64_t timestampUsec = eventMetadataPacket->timestampUs();
-        handleEventMetadata(eventMetadata, timestampUsec);
+        handleEventMetadata(eventMetadata, eventMetadataPacket->timestampUs());
     }
 }
 
