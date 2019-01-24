@@ -18,24 +18,24 @@ CREATE TABLE "vms_layout" (
 
 
 INSERT INTO vms_layout (
-    resource_ptr_id,
-    cell_aspect_ratio,
-    cell_spacing,
-    locked,
-    background_width,
-    background_image_filename,
-    background_height,
-    background_opacity
+        resource_ptr_id,
+        cell_aspect_ratio,
+        cell_spacing,
+        locked,
+        background_width,
+        background_image_filename,
+        background_height,
+        background_opacity
     )
     SELECT
-    resource_ptr_id,
-    cell_aspect_ratio,
-    cell_spacing_width,
-    locked,
-    background_width,
-    background_image_filename,
-    background_height,
-    background_opacity
+        resource_ptr_id,
+        cell_aspect_ratio,
+        cell_spacing_width,
+        locked,
+        background_width,
+        background_image_filename,
+        background_height,
+        background_opacity
     FROM vms_layout_tmp;
 
 DROP TABLE vms_layout_tmp;
