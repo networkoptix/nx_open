@@ -1,12 +1,15 @@
 // Copyright 2018-present Network Optix, Inc.
 
-#include <stdio.h>
 #if defined(_WIN32)
+    #include <stdio.h>
     #include <io.h>
     #define dup _dup
     #define dup2 _dup2
     #define fileno _fileno
 #else
+    #undef __STRICT_ANSI__ //< Enable fileno() in <stdio.h> on Cygwin/MinGW.
+    #include <stdio.h>
+    
     #include <unistd.h>
 #endif
 #include <fstream>
