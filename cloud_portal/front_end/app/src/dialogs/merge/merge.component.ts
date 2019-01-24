@@ -100,6 +100,9 @@ export class MergeModalContent {
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
             errorCodes: {
+                mergedSystemIsOffline: (error) => {
+                    return this.language.errorCodes[error.errorText] || error.errorText;
+                },
                 vmsRequestFailure: (error) => {
                     return this.language.errorCodes[error.errorText] || error.errorText;
                 }
