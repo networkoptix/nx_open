@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 MAINTAINER "Dmitry Kargin" <dkargin@networkoptix.com>
 
 # This Dockerfile was based on the knowledge from the following sources:
@@ -33,7 +33,7 @@ RUN mkdir /debs
 COPY ${mediaserver_deb} /debs/
 
 # Getting necessary packages for the server. There is some ancient tool that needs libssl1.0.0
-RUN apt update -q && apt -y -qq install net-tools libssl1.0.0 libcap2-bin libldap-2.4-2
+RUN apt update -q && apt -y -qq install libssl1.0.0
 
 # Installing the mediaserver
 RUN apt install -y -qq --no-install-recommends /debs/${mediaserver_deb}
