@@ -666,43 +666,18 @@ bool MainWindow::handleKeyPress(int key)
 
 void MainWindow::updateContentsMargins()
 {
-    if (isFullScreen())
-    {
-        /* Full screen mode. */
-        m_drawCustomFrame = false;
-        m_frameMargins = QMargins{};
-        setContentsMargins({});
-        m_viewLayout->setContentsMargins({});
-    }
-    else
-    {
-        /* Windowed or maximized without aero glass. */
-#ifdef Q_OS_LINUX
-        // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
-        if (isMaximized())
-        {
-            m_drawCustomFrame = false;
-            m_frameMargins = QMargins{};
-        }
-        else
-        {
-            m_drawCustomFrame = true;
-            m_frameMargins = QMargins(2, 2, 2, 2);
-        }
-#else
-        m_drawCustomFrame = false;
-        m_frameMargins = QMargins{};
-#endif
+    m_drawCustomFrame = false;
+    m_frameMargins = QMargins{};
 
-        setContentsMargins({});
-
-        m_viewLayout->setContentsMargins(
-            m_frameMargins.left(),
-            isTitleVisible() ? 0 : m_frameMargins.top(),
-            m_frameMargins.right(),
-            m_frameMargins.bottom()
-        );
+    if (nx::utils::AppInfo::isLinux() && !isFullScreen() && !isMaximized())
+    {
+        // In Linux window managers cannot disable titlebar leaving window border in place.
+        // Thus we have to disable decorations completely and draw our own border.
+        m_drawCustomFrame = true;
+        m_frameMargins = QMargins(2, 2, 2, 2);
     }
+
+    m_globalLayout->setContentsMargins(m_frameMargins);
 }
 
 // -------------------------------------------------------------------------- //
