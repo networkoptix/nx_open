@@ -735,7 +735,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
                     Ptz::ContinuousPanTiltCapabilities);
             });
 
-        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, editableCameras,
+        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, editableCameras,
             [](const Camera& camera)
             {
                 return camera->ptzCapabilitiesAddedByUser().testFlag(
