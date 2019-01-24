@@ -162,8 +162,14 @@ function display_complete_setup_hint {
     fi
 }
 
-# This is necessary because changed configuration options should take effect immediately.
-service $COMPANY_NAME-mediaserver stop || true
+# This is necessary because changed configuration options should take effect
+# immediately.
+
+if [ $(which systemctl) ]; then
+    systemctl stop $COMPANY_NAME-mediaserver || true
+else
+    service $COMPANY_NAME-mediaserver stop || true
+fi
 
 case "$1" in
     configure)
@@ -289,9 +295,7 @@ if [ $(which systemctl) ]; then
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-service $COMPANY_NAME-root-tool start
-if service $COMPANY_NAME-mediaserver start
-then
+if service $COMPANY_NAME-root-tool start && service $COMPANY_NAME-mediaserver start; then
     sleep 1
     echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 else
