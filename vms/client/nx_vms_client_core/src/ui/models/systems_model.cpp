@@ -94,7 +94,7 @@ QnSystemsModel::QnSystemsModel(QObject* parent):
     base_type(parent),
     d_ptr(new QnSystemsModelPrivate(this))
 {
-    NX_ASSERT(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
+    NX_ASSERT(qnSystemsFinder, "Systems finder is null!");
 
     Q_D(QnSystemsModel);
 

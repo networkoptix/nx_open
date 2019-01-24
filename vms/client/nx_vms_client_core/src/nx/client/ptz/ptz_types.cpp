@@ -19,7 +19,7 @@ QnPtzHotkey::QnPtzHotkey(const QString &id, int hotkey):
 
 bool deserialize(const QString& /*value*/, QnPtzIdByHotkeyHash* /*target*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
     return false;
 }
 

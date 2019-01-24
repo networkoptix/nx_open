@@ -1901,7 +1901,7 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
 
     if (options() & DisplayMotionSensitivity)
     {
-        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount, Q_FUNC_INFO);
+        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount);
         for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; ++i)
         {
             QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : QColor(Qt::darkRed);

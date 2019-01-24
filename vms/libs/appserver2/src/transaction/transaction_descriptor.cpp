@@ -33,7 +33,7 @@ struct InvalidGetHashHelper
     template<typename Param>
     QnUuid operator ()(const Param &)
     {
-        // NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
+        // NX_ASSERT(0, "Invalid transaction for hash!");
         return QnUuid();
     }
 };
@@ -43,7 +43,7 @@ struct InvalidTriggerNotificationHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &, const NotificationParams &)
     {
-        NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+        NX_ASSERT(0, "This is a system transaction!"); // we MUSTN'T be here
     }
 };
 

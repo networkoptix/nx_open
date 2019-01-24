@@ -10,6 +10,7 @@
 
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -323,9 +324,9 @@ TEST(stub_analytics_plugin, test)
     testExecuteActionAddToList(engine);
     testExecuteActionAddPerson(engine);
 
-    nx::sdk::DeviceInfo deviceInfo;
+    auto deviceInfo = nx::sdk::makePtr<nx::sdk::DeviceInfo>();
     error = nx::sdk::Error::noError;
-    auto baseDeviceAgent = engine->obtainDeviceAgent(&deviceInfo, &error);
+    auto baseDeviceAgent = engine->obtainDeviceAgent(deviceInfo.get(), &error);
     ASSERT_EQ(noError, (int) error);
     ASSERT_TRUE(baseDeviceAgent != nullptr);
 

@@ -113,18 +113,18 @@ IStringMap* Engine::pluginSideSettings() const
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo,
+    const IDeviceInfo* deviceInfo,
     Error* /*outError*/)
 {
     if (!isCompatible(deviceInfo))
         return nullptr;
 
     const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest
-        = fetchDeviceAgentParsedManifest(*deviceInfo);
+        = fetchDeviceAgentParsedManifest(deviceInfo);
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
         return nullptr;
 
-    return new DeviceAgent(this, *deviceInfo, deviceAgentParsedManifest);
+    return new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
 }
 
 const nx::sdk::IString* Engine::manifest(Error* outError) const
@@ -163,17 +163,17 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
 }
 
 nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManifest(
-    const DeviceInfo& deviceInfo)
+    const IDeviceInfo* deviceInfo)
 {
     using namespace nx::vms::api::analytics;
 
-    auto& data = m_cachedDeviceData[deviceInfo.sharedId];
+    auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
     if (!data.hasExpired())
         return DeviceAgentManifest{ data.supportedEventTypeIds };
 
     using namespace std::chrono;
 
-    nx::utils::Url url(deviceInfo.url);
+    nx::utils::Url url(deviceInfo->url());
     url.setPath("/cgi-bin/eventManager.cgi");
     url.setQuery("action=getExposureEvents");
 
@@ -181,15 +181,15 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
     httpClient.setResponseReadTimeout(kRequestTimeout);
     httpClient.setSendTimeout(kRequestTimeout);
     httpClient.setMessageBodyReadTimeout(kRequestTimeout);
-    httpClient.setUserName(deviceInfo.login);
-    httpClient.setUserPassword(deviceInfo.password);
+    httpClient.setUserName(deviceInfo->login());
+    httpClient.setUserPassword(deviceInfo->password());
 
     const auto result = httpClient.doGet(url);
     const auto response = httpClient.response();
 
     if (!result || !response)
     {
-        NX_WARNING(this, "No response for supported events request %1.", deviceInfo.url);
+        NX_WARNING(this, "No response for supported events request %1.", deviceInfo->url());
         data.timeout.invalidate();
         return DeviceAgentManifest{};
     }
@@ -199,13 +199,13 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
     if (!nx::network::http::StatusCode::isSuccessCode(statusCode) || !buffer)
     {
         NX_WARNING(this, "Unable to fetch supported events for device %1. HTTP status code: %2",
-            deviceInfo.url, statusCode);
+            deviceInfo->url(), statusCode);
         data.timeout.invalidate();
         return DeviceAgentManifest{};
     }
 
     NX_DEBUG(this, "Device url %1. RAW list of supported analytics events: %2",
-        deviceInfo.url, buffer);
+        deviceInfo->url(), buffer);
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
@@ -227,9 +227,9 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
     return vendor.startsWith(kVendor);
 }
 

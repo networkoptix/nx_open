@@ -72,10 +72,10 @@ IStringMap* Engine::pluginSideSettings() const
     return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
     if (isCompatible(deviceInfo))
-        return new DeviceAgent(this, *deviceInfo, m_typedManifest);
+        return new DeviceAgent(this, deviceInfo, m_typedManifest);
 
     return nullptr;
 }
@@ -106,9 +106,9 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
     return vendor.startsWith(kVcaVendor);
 }
 

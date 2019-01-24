@@ -112,7 +112,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo,
+    const IDeviceInfo* deviceInfo,
     Error* outError)
 {
     *outError = Error::noError;
@@ -120,15 +120,15 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     if (!isCompatible(deviceInfo))
         return nullptr;
 
-    auto sharedRes = sharedResources(*deviceInfo);
+    auto sharedRes = sharedResources(deviceInfo);
     auto sharedResourceGuard = nx::utils::makeScopeGuard(
         [&sharedRes, deviceInfo, this]()
         {
             if (sharedRes->deviceAgentCount == 0)
-                m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId));
+                m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId()));
         });
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(*deviceInfo);
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
         return nullptr;
 
@@ -136,7 +136,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     auto deviceAgent = new DeviceAgent(this);
-    deviceAgent->setDeviceInfo(*deviceInfo);
+    deviceAgent->setDeviceInfo(deviceInfo);
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
     deviceAgent->setEngineManifest(engineManifest());
 
@@ -166,7 +166,7 @@ void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
-    const DeviceInfo& deviceInfo)
+    const IDeviceInfo* deviceInfo)
 {
     using namespace nx::vms::server::plugins;
 
@@ -185,7 +185,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
 
     return eventTypeIdsFromParameters(
         sharedRes->sharedContext->url(),
-        cgiParameters, eventStatuses.value, deviceInfo.channel);
+        cgiParameters, eventStatuses.value, deviceInfo->channelNumber());
 }
 
 boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
@@ -301,23 +301,22 @@ void Engine::deviceAgentIsAboutToBeDestroyed(const QString& sharedId)
         m_sharedResources.remove(sharedId);
 }
 
-std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
-    const DeviceInfo& deviceInfo)
+std::shared_ptr<Engine::SharedResources> Engine::sharedResources(const IDeviceInfo* deviceInfo)
 {
-    const nx::utils::Url url(deviceInfo.url);
+    const nx::utils::Url url(deviceInfo->url());
 
     QAuthenticator auth;
-    auth.setUser(deviceInfo.login);
-    auth.setPassword(deviceInfo.password);
+    auth.setUser(deviceInfo->login());
+    auth.setPassword(deviceInfo->password());
 
     QnMutexLocker lock(&m_mutex);
-    auto sharedResourcesItr = m_sharedResources.find(deviceInfo.sharedId);
+    auto sharedResourcesItr = m_sharedResources.find(deviceInfo->sharedId());
     if (sharedResourcesItr == m_sharedResources.cend())
     {
         sharedResourcesItr = m_sharedResources.insert(
-            deviceInfo.sharedId,
+            deviceInfo->sharedId(),
             std::make_shared<SharedResources>(
-                deviceInfo.sharedId,
+                deviceInfo->sharedId(),
                 engineManifest(),
                 url,
                 auth));
@@ -336,9 +335,9 @@ Error Engine::setHandler(IEngine::IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    const QString vendor = QString(deviceInfo->vendor).toLower();
+    const QString vendor = QString(deviceInfo->vendor()).toLower();
     return vendor.startsWith(kHanwhaTechwinVendor) || vendor.startsWith(kSamsungTechwinVendor);
 }
 

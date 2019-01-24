@@ -107,11 +107,11 @@ public:
 private:
     bool checkFrame(QWidget* parent)
     {
-        NX_ASSERT(m_callback, Q_FUNC_INFO, "Callback must be set here");
+        NX_ASSERT(m_callback, "Callback must be set here");
         if (!m_callback)
             return false;
 
-        NX_ASSERT(parent && parent->layout(), Q_FUNC_INFO, "Invalid delegate frame");
+        NX_ASSERT(parent && parent->layout(), "Invalid delegate frame");
         if (!parent || !parent->layout())
             return false;
 
@@ -211,7 +211,7 @@ QString QnFailoverPriorityDialog::priorityToString(Qn::FailoverPriority priority
         case Qn::FailoverPriority::high:
             return tr("High", "Failover priority");
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+            NX_ASSERT(false, "Should never get here");
             break;
     }
     return QString();
@@ -257,6 +257,6 @@ void QnFailoverPriorityDialog::buttonBoxClicked(QDialogButtonBox::StandardButton
         if (forced.contains(camera->getId()))
             camera->setFailoverPriority(forced[camera->getId()]);
         else
-            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+            NX_ASSERT(false, "Should never get here");
     });
 }

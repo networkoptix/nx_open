@@ -42,8 +42,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_url(url),
     m_camera(camera),
     m_timeProvider(camera.lock()->timeProvider()),
-    m_packetConsumerManager(packetConsumerManager),
-    m_packetCount(std::make_shared<std::atomic_int>())
+    m_packetConsumerManager(packetConsumerManager)
 {
     if (!m_packetConsumerManager->empty() && pluggedIn())
         start();
@@ -135,16 +134,6 @@ int AudioStream::AudioStreamPrivate::initialize()
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    m_packetConsumerManager->flush();
-
-    while (*m_packetCount > 0)
-    {
-        static constexpr std::chrono::milliseconds kSleep(30);
-        std::this_thread::sleep_for(kSleep);
-    }
-
-    if (m_decoder)
-        m_decoder->flush();
     m_decoder.reset(nullptr);
 
     if (m_resampleContext)
@@ -374,8 +363,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
         m_encoder->codecId(),
-        AVMEDIA_TYPE_AUDIO,
-        m_packetCount);
+        AVMEDIA_TYPE_AUDIO);
 
     for(;;)
     {

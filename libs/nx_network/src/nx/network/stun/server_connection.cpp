@@ -73,7 +73,7 @@ void ServerConnection::setInactivityTimeout(
 void ServerConnection::setDestructHandler(std::function< void() > handler)
 {
     QnMutexLocker lk(&m_mutex);
-    NX_ASSERT(!(handler && m_destructHandler), Q_FUNC_INFO,
+    NX_ASSERT(!(handler && m_destructHandler),
         "Can not set new handler while previous is not removed");
 
     m_destructHandler = std::move(handler);

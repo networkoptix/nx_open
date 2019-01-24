@@ -986,7 +986,7 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    NX_ASSERT(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
+    NX_ASSERT(data.totalProgress < 1.01, "invalid progress");
     QnMutexLocker lock( &m_rebuildStateMtx );
     m_archiveRebuildInfo = data;
 }

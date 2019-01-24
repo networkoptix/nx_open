@@ -68,9 +68,6 @@ private:
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
         std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
         struct SwrContext * m_resampleContext = nullptr;
-
-        std::shared_ptr<std::atomic_int> m_packetCount;
-
         AdtsInjector m_adtsInjector;
 
     private:

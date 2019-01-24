@@ -72,7 +72,7 @@ IStringMap* Engine::pluginSideSettings() const
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo,
+    const IDeviceInfo* deviceInfo,
     Error* outError)
 {
     *outError = Error::noError;
@@ -80,12 +80,12 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     if (!isCompatible(deviceInfo))
         return nullptr;
 
-    EngineManifest events = fetchSupportedEvents(*deviceInfo);
+    EngineManifest events = fetchSupportedEvents(deviceInfo);
 
     if (events.eventTypes.empty())
         return nullptr;
 
-    return new DeviceAgent(this, *deviceInfo, events);
+    return new DeviceAgent(this, deviceInfo, events);
 }
 
 const IString* Engine::manifest(Error* error) const
@@ -94,12 +94,14 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_jsonManifest);
 }
 
-EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
+EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
 {
     EngineManifest result;
-    const char* const ip_port = deviceInfo.url + sizeof("http://") - 1;
-    nx::axis::CameraController axisCameraController(ip_port, deviceInfo.login,
-        deviceInfo.password);
+    const char* const ip_port = deviceInfo->url() + sizeof("http://") - 1;
+    nx::axis::CameraController axisCameraController(
+        ip_port,
+        deviceInfo->login(),
+        deviceInfo->password());
     if (!axisCameraController.readSupportedEvents())
         return result;
 
@@ -136,9 +138,9 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
     return vendor.startsWith(kAxisVendor);
 }
 

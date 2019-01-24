@@ -1,6 +1,8 @@
 #include "modbus_client.h"
 #include "modbus.h"
 
+#include <nx/utils/scope_guard.h>
+
 namespace
 {
 static const std::chrono::seconds kDefaultConnectionTimeout(4);
@@ -67,17 +69,32 @@ bool QnModbusClient::connect()
 
 ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, bool* outStatus)
 {
+    NX_VERBOSE(this, "Sending request with function code [%1]", request.functionCode);
+
+    QString errorMessage;
     ModbusResponse response;
+    const auto scopeGuard = nx::utils::makeScopeGuard(
+        [this, outStatus, &response, &errorMessage]()
+        {
+            if (!*outStatus)
+                NX_DEBUG(this, "Request error: %1", errorMessage);
+            else if (response.isException())
+                NX_DEBUG(this, "Response modbus exception: %1", response.getExceptionString());
+            else
+                NX_DEBUG(this, "Got response for function code %1", response.functionCode);
+        });
 
     if (m_endpoint.isNull())
     {
         *outStatus = false;
+        errorMessage = "Endpoint is null";
         return response;
     }
 
     if (!m_socket && !initSocket())
     {
         *outStatus = false;
+        errorMessage = "Failed to get socket: " + SystemError::getLastOSErrorText();
         return response;
     }
 
@@ -86,6 +103,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
         initSocket();
         if (!connect())
         {
+            errorMessage = "Can't connect to device: "  + SystemError::getLastOSErrorText();
             *outStatus = false;
             return response;
         }
@@ -107,6 +125,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
 
         if (bytesSent < 1)
         {
+            errorMessage = "Failed to send request:" + SystemError::getLastOSErrorText();
             initSocket();
             *outStatus = false;
             return response;
@@ -123,6 +142,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
         bytesRead = m_socket->recv(m_recvBuffer + totalBytesRead, kBufferSize - totalBytesRead);
         if (bytesRead <= 0)
         {
+            errorMessage = "Failed to receive response" + SystemError::getLastOSErrorText();
             initSocket();
             *outStatus = false;
             return response;
@@ -133,7 +153,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
         if (totalBytesRead >= bytesNeeded)
             break;
 
-        if (totalBytesRead >= ModbusMBAPHeader::size)
+        if (totalBytesRead >= static_cast<int>(ModbusMBAPHeader::size))
         {
             auto header = ModbusMBAPHeader::decode(
                 QByteArray(m_recvBuffer, ModbusMBAPHeader::size));
@@ -145,14 +165,9 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
         }
     }
 
-    if (bytesRead < 0)
-        *outStatus = false;
-
-    if (*outStatus)
-        response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesNeeded));
-    else
-        initSocket();
-
+    NX_ASSERT(bytesRead > 0);
+    NX_ASSERT(*outStatus);
+    response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesNeeded));
     return response;
 }
 

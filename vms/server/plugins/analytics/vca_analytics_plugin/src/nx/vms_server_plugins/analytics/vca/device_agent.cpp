@@ -176,16 +176,16 @@ Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(engine)
 {
     m_reconnectTimer.bindToAioThread(m_stopEventTimer.getAioThread());
 
-    m_url = deviceInfo.url;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
+    m_url = deviceInfo->url();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.eventTypes)

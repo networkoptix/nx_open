@@ -1177,9 +1177,9 @@ void QnGlobalSettings::synchronizeNow()
         adaptor->saveToResource();
 
     QnMutexLocker locker(&m_mutex);
-    //NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return;
+
     propertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
@@ -1187,7 +1187,7 @@ bool QnGlobalSettings::resynchronizeNowSync()
 {
     {
         QnMutexLocker locker(&m_mutex);
-        NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+        NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
         propertyDictionary()->markAllParamsDirty(m_admin->getId());
@@ -1201,7 +1201,7 @@ bool QnGlobalSettings::synchronizeNowSync()
         adaptor->saveToResource();
 
     QnMutexLocker locker(&m_mutex);
-    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    NX_ASSERT(m_admin, "Invalid sync state");
     if (!m_admin)
         return false;
     return propertyDictionary()->saveParams(m_admin->getId());

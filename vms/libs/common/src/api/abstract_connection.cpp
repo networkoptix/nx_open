@@ -99,7 +99,7 @@ int QnAbstractConnection::sendAsyncRequest(
     if (!m_url.isValid() || m_url.host().isEmpty())
         return -1;
 
-    NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
+    NX_ASSERT(commonModule(), "Session manager object must exist here");
     if (!commonModule())
         return -1;
 
@@ -191,7 +191,7 @@ int QnAbstractConnection::sendSyncRequest(
     const QnRequestParamList &params, QByteArray msgBody, QVariant *reply,
     std::optional<std::chrono::milliseconds> timeout)
 {
-    NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
+    NX_ASSERT(commonModule(), "Session manager object must exist here");
     if (!commonModule())
         return -1;
 

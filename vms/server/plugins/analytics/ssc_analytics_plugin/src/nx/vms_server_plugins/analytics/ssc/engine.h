@@ -37,7 +37,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
@@ -49,7 +49,7 @@ public:
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
-    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     void readAllowedPortNames();

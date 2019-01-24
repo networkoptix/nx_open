@@ -22,7 +22,7 @@ CameraFisheyeSettingsWidget::CameraFisheyeSettingsWidget(
     m_previewProvider(previewProvider),
     m_widget(new FisheyeSettingsWidget(this))
 {
-    NX_ASSERT(previewProvider, "Preview image provider must be set", Q_FUNC_INFO);
+    NX_ASSERT(previewProvider, "Preview image provider must be set");
 
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);

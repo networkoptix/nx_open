@@ -17,7 +17,7 @@ using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest)
     :
     m_engine(engine),
@@ -86,12 +86,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
             for (const auto& dahuaEvent: events)
             {
-                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channel)
+                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
                 auto event = new nx::sdk::analytics::Event();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
-                    dahuaEvent.caption, dahuaEvent.description, m_channel);
+                    dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
                 event->setTypeId(dahuaEvent.typeId.toStdString());
                 event->setCaption(dahuaEvent.caption.toStdString());
@@ -151,16 +151,16 @@ const IString* DeviceAgent::manifest(Error* error) const
     return new nx::sdk::String(m_jsonManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
-    m_url = deviceInfo.url;
-    m_model = deviceInfo.model;
-    m_firmware = deviceInfo.firmware;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
-    m_uniqueId = deviceInfo.uid;
-    m_sharedId = deviceInfo.sharedId;
-    m_channel = deviceInfo.channel;
+    m_url = deviceInfo->url();
+    m_model = deviceInfo->model();
+    m_firmware = deviceInfo->firmware();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
+    m_uniqueId = deviceInfo->id();
+    m_sharedId = deviceInfo->sharedId();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 } // namespace nx::vms_server_plugins::analytics::dahua

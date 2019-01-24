@@ -394,7 +394,7 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
 {
     setLastMediaTime(media->timestamp);
 
-    NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
+    NX_ASSERT(m_dualStreamingHelper, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
     if (metaData) {
         m_dualStreamingHelper->onMotion(metaData.get());
@@ -710,7 +710,7 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 {
     QnMutexLocker lock( &m_scheduleMutex );
     m_schedule = cameraRes->getScheduleTasks();
-    NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "DualStreaming helper must be defined!");
+    NX_ASSERT(m_dualStreamingHelper, "DualStreaming helper must be defined!");
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
@@ -737,7 +737,7 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     if (m_catalog == QnServer::HiQualityCatalog)
         return cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_HighQuality);
 
-    NX_ASSERT(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
+    NX_ASSERT(m_catalog == QnServer::LowQualityCatalog, "Only two options are allowed");
     return cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_LowQuality);
 }
 
@@ -747,7 +747,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     {
         QnMutexLocker lock(&m_queueSizeMutex);
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
-        NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
+        NX_ASSERT(netResource != 0, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
 
         auto normalStorage = m_serverModule->normalStorageManager()->getOptimalStorageRoot();

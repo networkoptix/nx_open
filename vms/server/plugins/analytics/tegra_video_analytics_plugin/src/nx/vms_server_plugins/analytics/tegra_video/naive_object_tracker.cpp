@@ -77,7 +77,7 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const TegraVideo::Rect& boundin
             continue;
 
         auto& rect = itr->second.rect;
-        auto speed = itr->second.speed;
+        //auto speed = itr->second.speed;
         double currentDistance = std::numeric_limits<double>::max();
         if (ini().postprocApplySpeedForDistanceCalculation)
         {
@@ -301,21 +301,21 @@ TegraVideo::Rect NaiveObjectTracker::correctRectangle(const TegraVideo::Rect& re
     double xCorrection = 0;
     double yCorrection = 0;
 
-    auto center = rectangleCenter(rect);
-    auto x = center.x();
-    auto y = center.y();
+    const auto center = rectangleCenter(rect);
+    const auto x = center.x();
+    //const auto y = center.y();
 
-    double xFirstZoneCorrection = (double)ini().postprocXfirstZoneCorrection / 1000;
-    double yFirstZoneCorrection = (double)ini().postprocYfirstZoneCorrection / 1000;
+    const double xFirstZoneCorrection = ini().postprocXfirstZoneCorrection / 1000.0;
+    const double yFirstZoneCorrection = ini().postprocYfirstZoneCorrection / 1000.0;
 
-    double xSecondZoneCorrection = (double)ini().postprocXsecondZoneCorrection / 1000;
-    double ySecondZoneCorrection = (double)ini().postprocYsecondZoneCorrection / 1000;
+    const double xSecondZoneCorrection = ini().postprocXsecondZoneCorrection / 1000.0;
+    const double ySecondZoneCorrection = ini().postprocYsecondZoneCorrection / 1000.0;
 
-    double xThirdZoneCorrection = (double)ini().postprocXthirdZoneCorrection / 1000;
-    double yThirdZoneCorrection = (double)ini().postprocYthirdZoneCorrection / 1000;
+    const double xThirdZoneCorrection = ini().postprocXthirdZoneCorrection / 1000.0;
+    const double yThirdZoneCorrection = ini().postprocYthirdZoneCorrection / 1000.0;
 
-    double firstZoneBound = (double)ini().postprocFirstZoneBound / 100;
-    double secondZoneBound = (double)ini().postprocSecondZoneBound / 100;
+    const double firstZoneBound = ini().postprocFirstZoneBound / 100.0;
+    const double secondZoneBound = ini().postprocSecondZoneBound / 100.0;
 
     if (x < firstZoneBound)
     {
@@ -375,9 +375,9 @@ std::string NaiveObjectTracker::randomAttributeValue(const std::string& attribut
         return std::string();
 
     const auto& options = itr->second;
-    const auto index = std::rand() % options.size();
-    NX_KIT_ASSERT(index >= 0 && index < options.size());
-    if (index < 0 && index >= options.size())
+    const int index = std::rand() % options.size();
+    NX_KIT_ASSERT(index >= 0 && index < (int) options.size());
+    if (index < 0 && index >= (int) options.size())
         return std::string();
 
     return options[index];

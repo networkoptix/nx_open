@@ -10,6 +10,7 @@
 #include <EGL/eglext.h>
 
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 
 #include "proxy_video_decoder_utils.h"
 

@@ -52,69 +52,31 @@ analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModu
     return sdkObjectFactory;
 }
 
-bool deviceInfoFromResource(
-    const QnVirtualCameraResourcePtr& device,
-    nx::sdk::DeviceInfo* outDeviceInfo)
+nx::sdk::Ptr<nx::sdk::DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device)
 {
     using namespace nx::sdk;
 
-    if (!outDeviceInfo)
-    {
-        NX_ASSERT(false, "Device info is invalid");
-        return false;
-    }
+    if (!NX_ASSERT(device, "No device has been provided"))
+        return nullptr;
 
-    if (!device)
-    {
-        NX_ASSERT(false, "Device is empty");
-        return false;
-    }
+    auto deviceInfo = nx::sdk::makePtr<nx::sdk::DeviceInfo>();
 
-    strncpy(
-        outDeviceInfo->vendor,
-        device->getVendor().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->model,
-        device->getModel().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->firmware,
-        device->getFirmware().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->uid,
-        device->getId().toByteArray().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->sharedId,
-        device->getSharedId().toStdString().c_str(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->url,
-        device->getUrl().toUtf8().data(),
-        DeviceInfo::kTextParameterMaxLength);
+    deviceInfo->setId(device->getId().toStdString());
+    deviceInfo->setName(device->getUserDefinedName().toStdString());
+    deviceInfo->setVendor(device->getVendor().toStdString());
+    deviceInfo->setModel(device->getModel().toStdString());
+    deviceInfo->setFirmware(device->getFirmware().toStdString());
+    deviceInfo->setSharedId(device->getSharedId().toStdString());
+    deviceInfo->setLogicalId(QString::number(device->logicalId()).toStdString());
+    deviceInfo->setUrl(device->getUrl().toStdString());
 
     auto auth = device->getAuth();
-    strncpy(
-        outDeviceInfo->login,
-        auth.user().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
+    deviceInfo->setLogin(auth.user().toStdString());
+    deviceInfo->setPassword(auth.password().toStdString());
 
-    strncpy(
-        outDeviceInfo->password,
-        auth.password().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
+    deviceInfo->setChannelNumber(device->getChannel());
 
-    outDeviceInfo->channel = device->getChannel();
-    outDeviceInfo->logicalId = device->logicalId();
-
-    return true;
+    return deviceInfo;
 }
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings)

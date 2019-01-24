@@ -349,9 +349,6 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (isAnalog())
         return Qn::LC_Analog;
 
-    if (QnMediaServerResource::requiresEdgeLicense(getParentResource()))
-        return Qn::LC_Edge;
-
     return Qn::LC_Professional;
 }
 

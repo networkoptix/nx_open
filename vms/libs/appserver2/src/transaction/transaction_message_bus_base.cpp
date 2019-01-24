@@ -54,7 +54,7 @@ void TransactionMessageBusBase::setHandler(ECConnectionNotificationManager* hand
 {
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(!m_thread->isRunning());
-    NX_ASSERT(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
+    NX_ASSERT(m_handler == NULL, "Previous handler must be removed at this time");
     m_handler = handler;
 }
 
@@ -64,7 +64,7 @@ void TransactionMessageBusBase::removeHandler(ECConnectionNotificationManager* h
     NX_ASSERT(!m_thread->isRunning());
     if (m_handler)
     {
-        NX_ASSERT(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
+        NX_ASSERT(m_handler == handler, "We must remove only current handler");
         if (m_handler == handler)
             m_handler = nullptr;
     }

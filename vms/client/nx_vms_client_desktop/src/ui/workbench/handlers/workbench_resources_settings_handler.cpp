@@ -137,14 +137,14 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
             return !server.dynamicCast<QnFakeMediaServerResource>();
         });
 
-    NX_ASSERT(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
+    NX_ASSERT(servers.size() == 1, "Invalid action condition");
     if(servers.isEmpty())
         return;
 
     QnMediaServerResourcePtr server = servers.first();
 
     bool hasAccess = accessController()->hasGlobalPermission(GlobalPermission::admin);
-    NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition"); /*< It must be checked on action level. */
+    NX_ASSERT(hasAccess, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;
 
@@ -188,7 +188,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
         return;
 
     bool hasAccess = accessController()->hasPermissions(user, Qn::ReadPermission);
-    NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition");
+    NX_ASSERT(hasAccess, "Invalid action condition");
     if (!hasAccess)
         return;
 

@@ -46,19 +46,19 @@ EventMetadataPacket* createCommonEventMetadataPacket(
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* plugin,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(plugin),
-    m_url(deviceInfo.url),
-    m_cameraLogicalId(deviceInfo.logicalId)
+    m_url(deviceInfo->url()),
+    m_cameraLogicalId(QString(deviceInfo->logicalId()).toInt())
 {
     nx::vms::api::analytics::DeviceAgentManifest typedDeviceAgentManifest;
     for (const auto& eventType: typedManifest.eventTypes)
         typedDeviceAgentManifest.supportedEventTypeIds.push_back(eventType.id);
     m_deviceAgentManifest = QJson::serialized(typedDeviceAgentManifest);
 
-    NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo.model;
+    NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo->model();
 }
 
 DeviceAgent::~DeviceAgent()

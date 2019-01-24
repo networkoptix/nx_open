@@ -62,8 +62,17 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     m_lastIssueTimer(),
     m_cachedAnalyticsEngines([this] { return calculateEnabledAnalyticsEngines(); }, &m_cacheMutex)
 {
-    connect(this, &QnResource::propertyChanged,
-        this, [&]{ m_cachedAnalyticsEngines.reset(); });
+    connect(
+        this,
+        &QnResource::propertyChanged,
+        this,
+        [&](auto& resource, auto& key)
+        {
+            if (key == kEnabledAnalyticsEnginesProperty)
+                m_cachedAnalyticsEngines.reset();
+
+            emit enabledAnalyticsEnginesChanged(toSharedPointer(this));
+        });
 }
 
 QString QnVirtualCameraResource::getUniqueId() const

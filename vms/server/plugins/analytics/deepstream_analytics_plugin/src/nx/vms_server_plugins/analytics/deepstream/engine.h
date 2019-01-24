@@ -36,7 +36,7 @@ public:
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     virtual void executeAction(nx::sdk::analytics::IAction*, nx::sdk::Error*) override;
 
@@ -46,7 +46,7 @@ public:
 
     nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
 
-    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;

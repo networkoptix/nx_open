@@ -576,7 +576,7 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     if (error)
     {
         auto camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
+        NX_ASSERT(camRes, "Make sure camera exists");
         const auto resourcePool = camRes->resourcePool();
         NX_ASSERT(resourcePool);
         d->lastError = ExportProcessError::unsupportedMedia;

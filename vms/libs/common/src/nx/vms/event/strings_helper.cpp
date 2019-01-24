@@ -77,7 +77,7 @@ QString StringsHelper::actionName(ActionType value) const
             break;
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
+    NX_ASSERT(false, "All enumeration values must be handled here");
     return lit("Unknown (%1)").arg(static_cast<int>(value));
 }
 
@@ -559,7 +559,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                     disabledCameras << camera;
             }
 
-            NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
+            NX_ASSERT(!disabledCameras.isEmpty(), "At least one camera should be disabled on this event");
 
             result = QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),

@@ -45,7 +45,7 @@ class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgen
 public:
     DeviceAgent(
         Engine* engine,
-        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         const EngineManifest& typedManifest);
 
     virtual ~DeviceAgent();
