@@ -45,7 +45,6 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
-    bool needConfigureProvider() const override;
 private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
@@ -111,7 +110,6 @@ private:
     QString m_streamUrl;
     QElapsedTimer m_cachedTimer;
     QnLiveStreamParams m_previousStreamParams;
-    bool m_mustNotConfigureResource = false;
 };
 
 #endif //ENABLE_ONVIF

@@ -11,8 +11,10 @@
 
 #include "test_api_requests.h"
 #include <utils/merge_systems_common.h>
+#include <core/resource_management/resource_pool.h>
 
 using MergeStatus = utils::MergeSystemsStatus::Value;
+using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
 
 namespace nx {
 namespace test {
@@ -26,12 +28,11 @@ protected:
         off
     };
 
-    using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
-
     void assertMergeRequestReturn(
         const LauncherPtr& requestTarget,
         const LauncherPtr& serverToMerge,
-        MergeStatus mergeStatus)
+        MergeStatus mergeStatus,
+        nx::vms::api::SystemMergeHistoryRecord* outMergeResult = nullptr)
     {
         QnGetNonceReply nonceReply;
         issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
@@ -55,6 +56,9 @@ protected:
         auto result = QJson::deserialized<QnJsonRestResult>(responseBody, QnJsonRestResult(), &success);
         ASSERT_TRUE(success);
         ASSERT_EQ(toString(mergeStatus), result.errorString);
+
+        if (outMergeResult)
+            *outMergeResult = result.deserialized<nx::vms::api::SystemMergeHistoryRecord>();
     }
 
     LauncherPtr givenServer()
@@ -139,6 +143,65 @@ TEST_F(MergeSystems, SafeMode_To)
         /* requestTarget */ server1,
         /* serverToMerge */ server2,
         /* expectedCode */ MergeStatus::safeMode);
+}
+
+void waitForMergeFinished(
+    const std::vector<LauncherPtr>& servers,
+    int size,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeResult)
+{
+    int success = 0;
+    do
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        success = 0;
+        for (int i = 0; i < size; ++i)
+        {
+            auto connection = servers[i]->serverModule()->ec2Connection();
+            nx::vms::api::SystemMergeHistoryRecordList mergeData;
+            connection->getMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
+
+            auto itr = std::find_if(
+                mergeData.begin(), mergeData.end(),
+                [&mergeResult](const nx::vms::api::SystemMergeHistoryRecord& record)
+                {
+                    return mergeResult == record;
+                });
+            if (itr != mergeData.end())
+                ++success;
+
+        }
+    } while (success != size);
+}
+
+TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
+{
+    std::vector<LauncherPtr> servers;
+    nx::vms::api::SystemMergeHistoryRecord mergeResult;
+    for (int i = 0; i < 3; ++i)
+    {
+        auto server = givenServer();
+        whenServerLaunched(server, SafeMode::off);
+        whenServerIsConfigured(server);
+        servers.push_back(std::move(server));
+    }
+
+    assertMergeRequestReturn(
+        /* requestTarget */ servers[0],
+        /* serverToMerge */ servers[1],
+        /* expectedCode */ MergeStatus::ok,
+        &mergeResult);
+
+    waitForMergeFinished(servers, 2, mergeResult);
+
+    assertMergeRequestReturn(
+        /* requestTarget */ servers[2],
+        /* serverToMerge */ servers[1],
+        /* expectedCode */ MergeStatus::ok,
+        &mergeResult);
+
+    waitForMergeFinished(servers, 3, mergeResult);
+
 }
 
 } // namespace test

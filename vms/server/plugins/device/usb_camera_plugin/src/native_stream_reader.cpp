@@ -14,11 +14,11 @@ NativeStreamReader::NativeStreamReader(
     const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
-    StreamReaderPrivate(
-        encoderIndex,
-        codecParams,
-        camera)
+    StreamReaderPrivate(encoderIndex, camera)
 {
+    m_camera->videoStream()->setResolution(codecParams.resolution);
+    m_camera->videoStream()->setFps(codecParams.fps);
+    m_camera->videoStream()->setBitrate(codecParams.bitrate);
 }
 
 NativeStreamReader::~NativeStreamReader()
@@ -58,19 +58,16 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void NativeStreamReader::setFps(float fps)
 {
-    StreamReaderPrivate::setFps(fps);
-    m_avConsumer->setFps(fps);
+    m_camera->videoStream()->setFps(fps);
 }
 void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    StreamReaderPrivate::setResolution(resolution);
-    m_avConsumer->setResolution(resolution);
+    m_camera->videoStream()->setResolution(resolution);
 }
 
 void NativeStreamReader::setBitrate(int bitrate)
 {
-    StreamReaderPrivate::setBitrate(bitrate);
-    m_avConsumer->setBitrate(bitrate);
+    m_camera->videoStream()->setBitrate(bitrate);
 }
 
 void NativeStreamReader::ensureConsumerAdded()

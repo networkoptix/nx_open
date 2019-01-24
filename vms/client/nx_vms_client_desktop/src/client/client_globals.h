@@ -225,6 +225,7 @@ namespace Qn
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
+        AnalyticsObjectsVisualizationModeRole,      /**< Role for analytics objects visualization mode. */
 
         ForceShowCamerasList,                       /**< Used for default password dialog. */
         ParentWidgetRole,                           /**< Used for dialog's parent widget. */

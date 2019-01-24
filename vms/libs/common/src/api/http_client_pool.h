@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -33,18 +35,23 @@ public:
         nx::network::http::StringType contentType;
         nx::network::http::StringType messageBody;
         nx::network::http::AuthType authType;
+        std::optional<std::chrono::milliseconds> timeout{std::nullopt};
     };
 
     ClientPool(QObject *parent = nullptr);
     virtual ~ClientPool();
 
-    int doGet(const nx::utils::Url& url, nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders());
+    int doGet(
+        const nx::utils::Url& url,
+        nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders(),
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     int doPost(
         const nx::utils::Url& url,
         const QByteArray& contentType,
         const QByteArray& msgBody,
-        nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders());
+        nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders(),
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     int sendRequest(const Request& request);
 

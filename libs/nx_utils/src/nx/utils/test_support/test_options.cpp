@@ -2,6 +2,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
@@ -37,17 +38,24 @@ bool TestOptions::areTimeAssertsDisabled()
     return s_disableTimeAsserts;
 }
 
-void TestOptions::setTemporaryDirectoryPath(const QString& path)
+bool TestOptions::keepTemporaryDirectory()
 {
-    QnMutexLocker lock(&s_mutex);
-    TEST_OPTIONS_SET_VALUE(s_temporaryDirectoryPath, path);
+    return s_keepTemporaryDirectory;
 }
 
-QString TestOptions::temporaryDirectoryPath()
+void TestOptions::setKeepTemporaryDirectory(bool value)
 {
-    QnMutexLocker lock(&s_mutex);
-    QDir().mkpath(s_temporaryDirectoryPath);
-    return s_temporaryDirectoryPath;
+    TEST_OPTIONS_SET_VALUE(s_keepTemporaryDirectory, value);
+}
+
+void TestOptions::setTemporaryDirectoryPath(const QString& path)
+{
+    s_temporaryDirectory.setPath(path);
+}
+
+QString TestOptions::temporaryDirectoryPath(bool canCreate)
+{
+   return s_temporaryDirectory.path(canCreate);
 }
 
 void TestOptions::setLoadMode(const QString& mode)
@@ -81,6 +89,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
     if (const auto value = arguments.get("tmp"))
         setTemporaryDirectoryPath(*value);
 
+    if (arguments.get("keep-temporary-directory"))
+        setKeepTemporaryDirectory(true);
+
     if (const auto value = arguments.get("load-mode"))
         setLoadMode(*value);
 
@@ -101,13 +112,43 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 #endif
 }
 
+TestOptions::TemporaryDirectory::TemporaryDirectory()
+{
+    const auto kModuleSubdirectory = QString("nx_unit_tests/%1").arg(random::number());
+    const auto root = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    m_path = root.absoluteFilePath(kModuleSubdirectory);
+}
+
+TestOptions::TemporaryDirectory::~TemporaryDirectory()
+{
+    if (!keepTemporaryDirectory())
+        QDir(m_path).removeRecursively();
+}
+
+QString TestOptions::TemporaryDirectory::path(bool canCreate) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (canCreate)
+    {
+        const bool created = QDir().mkpath(m_path);
+        NX_ASSERT(created, "Temporary directory cannot be created");
+    }
+    return m_path;
+}
+
+void TestOptions::TemporaryDirectory::setPath(const QString& path)
+{
+    QnMutexLocker lock(&m_mutex);
+    QDir(m_path).removeRecursively();
+    TEST_OPTIONS_SET_VALUE(m_path, path);
+}
+
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);
 std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
+std::atomic<bool> TestOptions::s_keepTemporaryDirectory(false);
 std::atomic<size_t> TestOptions::s_loadMode(1);
 
-QnMutex TestOptions::s_mutex;
-QString TestOptions::s_temporaryDirectoryPath =
-    lm("%1/nx_unit_tests/%2").args(QDir::homePath(), nx::utils::random::number());
+TestOptions::TemporaryDirectory TestOptions::s_temporaryDirectory;
 
 } // namespace utils
 } // namespace nx

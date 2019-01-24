@@ -3568,7 +3568,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray& name, MiscData& miscData)
 }
 
 ErrorCode QnDbManager::doQueryNoLock(
-    const QByteArray& /*dummy*/,
+    const std::nullptr_t& /*dummy*/,
     SystemMergeHistoryRecordList& systemMergeHistory)
 {
     QSqlQuery fetchMergeHistoryQuery(m_sdb);

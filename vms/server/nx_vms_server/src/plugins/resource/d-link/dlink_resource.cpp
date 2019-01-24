@@ -223,7 +223,7 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

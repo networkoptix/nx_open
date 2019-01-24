@@ -2527,7 +2527,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
-     * %param[opt]:enum streamSelectionMode Policy for stream selection.
+     * %param[opt]:enum streamSelectionMode Policy for stream selection. Default value is "auto".
      *     %value auto Chooses the most suitable stream automatically.
      *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
      *         primary one is not available.
@@ -2918,6 +2918,26 @@ void MediaServerProcess::initializeUpnpPortMapper()
 
 }
 
+static bool isDwBlackJackMini()
+{
+    // The only way we know to find out is to detect their web-server presence on device.
+    const QString kWebServerPath = "/usr/local/bin/main-server";
+    QFile file(kWebServerPath);
+    if (!file.open(QFile::ReadOnly))
+    {
+        NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - unable to open file").args(kWebServerPath));
+        return false;
+    }
+
+    const auto content = file.readAll();
+    NX_VERBOSE(typeid(MediaServerProcess), lm("%1 - contains:\n%2").args(kWebServerPath, content));
+    if (!content.contains("SteelBox"))
+        return false;
+
+    NX_ALWAYS(typeid(MediaServerProcess), "This server is DW BlackJack MINI");
+    return true;
+}
+
 nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
@@ -2956,6 +2976,11 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 #else
     serverFlags |= nx::vms::api::SF_Has_HDD;
 #endif
+
+    // DW requested to accept professional licenses on their BlackJack MINI, see VMS-12693.
+    // This code should be removed as soon as we accept professional licenses on all arm devices.
+    if ((serverFlags & nx::vms::api::SF_ArmServer) && !isDwBlackJackMini())
+        serverFlags |= nx::vms::api::SF_RequiresEdgeLicense;
 
     if (!(serverFlags & (nx::vms::api::SF_ArmServer | nx::vms::api::SF_Edge)))
         serverFlags |= nx::vms::api::SF_SupportsTranscoding;
@@ -3190,6 +3215,8 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
 
 void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 {
+    using namespace nx::utils::log;
+
     auto& settings = serverSettings->settings();
     auto roSettings = serverSettings->roSettings();
 
@@ -3201,62 +3228,62 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
     logSettings.loggers.front().logBaseName = "log_file";
-    nx::utils::log::setMainLogger(
-        nx::utils::log::buildLogger(
+    setMainLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath));
 
-    if (auto path = nx::utils::log::mainLogger()->filePath())
+    if (auto path = mainLogger()->filePath())
         roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
-        settings.httpLogLevel(), toString(nx::utils::log::Level::none));
+        settings.httpLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings, qApp->applicationName(), binaryPath,
-            {QnLog::HTTP_LOG_INDEX}));
+            {Filter(QnLog::HTTP_LOG_INDEX)}));
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
             {
-                QnLog::HWID_LOG,
-                nx::utils::log::Tag(typeid(nx::vms::server::LicenseWatcher))
+                Filter(QnLog::HWID_LOG),
+                Filter(Tag(typeid(nx::vms::server::LicenseWatcher)))
             }),
         /*writeLogHeader*/ false);
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
-        settings.tranLogLevel(), toString(nx::utils::log::Level::none));
+        settings.tranLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "ec2_tran";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
-            {QnLog::EC2_TRAN_LOG}));
+            {Filter(QnLog::EC2_TRAN_LOG)}));
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
-        settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
+        settings.permissionsLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "permissions";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
-            {QnLog::PERMISSIONS_LOG}));
+            {Filter(QnLog::PERMISSIONS_LOG)}));
 
     nx::utils::enableQtMessageAsserts();
 }
@@ -3267,17 +3294,18 @@ void MediaServerProcess::initializeHardwareId()
 
     auto logSettings = makeLogSettings(serverModule()->settings());
 
+    using namespace nx::utils::log;
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
-        serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
+        serverModule()->settings().systemLogLevel(), toString(Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
             {
-                QnLog::HWID_LOG,
-                nx::utils::log::Tag(toString(typeid(nx::vms::server::LicenseWatcher)))
+                Filter(QnLog::HWID_LOG),
+                Filter(Tag(typeid(nx::vms::server::LicenseWatcher)))
             }));
 
     LLUtil::initHardwareId(serverModule());

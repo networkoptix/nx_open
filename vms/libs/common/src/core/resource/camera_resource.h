@@ -40,7 +40,7 @@ public:
     static const QString kSupportedAnalyticsEventsProperty;
     static const QString kSupportedAnalyticsObjectsProperty;
 
-    struct MotionStreamIndex {Qn::StreamIndex index; bool isForced;};
+    struct MotionStreamIndex { Qn::StreamIndex index; bool isForced; };
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 

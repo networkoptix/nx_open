@@ -41,6 +41,27 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
     ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     setHelpTopic(ui->descriptionLabel, Qn::EventsActions_Generic_Help);
+
+    const QString linkText = tr("Server API");
+    const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
+    const QString documentationHint = tr("To generate Generic Event, please refer to %1.").arg(link);
+
+    ui->hintLabel->setTextFormat(Qt::RichText);
+    ui->hintLabel->setText(lit("<hr/>%1").arg(documentationHint));
+
+    connect(ui->hintLabel, &QnWordWrappedLabel::linkActivated, this,
+        [this]
+        {
+            auto server = commonModule()->currentServer();
+            if (!server)
+                return;
+
+            QUrl targetUrl = server->getApiUrl().toQUrl();
+            targetUrl.setScheme(kDocumentationScheme);
+            targetUrl.setPath(kApiDocPath);
+            targetUrl.setFragment(kApiDocFragment);
+            QDesktopServices::openUrl(targetUrl);
+        });
 }
 
 QnCustomBusinessEventWidget::~QnCustomBusinessEventWidget()

@@ -104,7 +104,9 @@ private:
         const QString& authenticationKey,
         nx::vms::api::ModuleInformationWithAddresses* moduleInformation);
 
-    bool addMergeHistoryRecord(const MergeSystemData& data);
+    bool addMergeHistoryRecord(
+        const MergeSystemData& data,
+        nx::vms::api::SystemMergeHistoryRecord* outResult);
 };
 
 } // namespace utils

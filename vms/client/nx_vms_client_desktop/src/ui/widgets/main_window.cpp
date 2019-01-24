@@ -66,6 +66,8 @@
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <ui/workbench/handlers/workbench_wearable_handler.h>
 #include <ui/workbench/handlers/startup_actions_handler.h>
+#include <nx/vms/client/desktop/analytics/analytics_menu_action_handler.h>
+#include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -108,7 +110,6 @@
 #include <utils/screen_manager.h>
 
 #include <nx/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
@@ -247,7 +248,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
-    context->instance<nx::vms::client::desktop::WorkbenchManualDeviceAdditionHandler>();
+    context->instance<WorkbenchManualDeviceAdditionHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
@@ -255,6 +256,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<workbench::LayoutToursHandler>();
     context->instance<RadassActionHandler>();
     context->instance<StartupActionsHandler>();
+    context->instance<AnalyticsMenuActionsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();

@@ -122,7 +122,7 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

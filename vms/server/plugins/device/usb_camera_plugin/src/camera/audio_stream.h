@@ -49,7 +49,6 @@ private:
         nxpl::TimeProvider * const m_timeProvider;
         std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
         mutable std::mutex m_mutex;
-        std::condition_variable m_wait;
 
         std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
         std::unique_ptr<ffmpeg::Codec> m_decoder;
@@ -76,7 +75,6 @@ private:
 
     private:
         std::string ffmpegUrlPlatformDependent() const;
-        bool waitForConsumers();
         int initialize();
         void uninitialize();
         bool ensureInitialized();
@@ -96,7 +94,6 @@ private:
 
         bool checkIoError(int ffmpegError);
         void setLastError(int ffmpegError);
-        void terminate();
         void tryToStartIfNotStarted();
         void start();
         void stop();

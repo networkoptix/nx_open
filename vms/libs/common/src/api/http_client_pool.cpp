@@ -11,6 +11,10 @@ namespace {
     {
         return nx::network::SocketAddress(url.host(), url.port(80));
     }
+    unsigned int httpTimeoutMs(std::chrono::milliseconds value)
+    {
+        return (unsigned int) value.count();
+    }
 }
 
 namespace nx {
@@ -40,12 +44,16 @@ void ClientPool::setPoolSize(int value)
     m_maxPoolSize = value;
 }
 
-int ClientPool::doGet(const nx::utils::Url& url, nx::network::http::HttpHeaders headers)
+int ClientPool::doGet(
+    const nx::utils::Url& url,
+    nx::network::http::HttpHeaders headers,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     Request request;
     request.method = Method::get;
     request.url = url;
     request.headers = headers;
+    request.timeout = timeout;
     return sendRequest(request);
 }
 
@@ -53,7 +61,8 @@ int ClientPool::doPost(
     const nx::utils::Url& url,
     const QByteArray& contentType,
     const QByteArray& msgBody,
-    nx::network::http::HttpHeaders headers)
+    nx::network::http::HttpHeaders headers,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     Request request;
     request.method = Method::post;
@@ -61,6 +70,7 @@ int ClientPool::doPost(
     request.headers = headers;
     request.contentType = contentType;
     request.messageBody = msgBody;
+    request.timeout = timeout;
     return sendRequest(request);
 }
 
@@ -108,6 +118,17 @@ int ClientPool::size() const
 
 void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient)
 {
+    if (request.timeout)
+    {
+        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(*request.timeout));
+        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(*request.timeout));
+    }
+    else
+    {
+        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(kResponseReadTimeout));
+        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(kMessageBodyReadTimeout));
+    }
+
     httpClient->setAdditionalHeaders(request.headers);
     httpClient->setAuthType(request.authType);
     if (request.method == Method::get)
@@ -202,12 +223,9 @@ AsyncHttpClientPtr ClientPool::createHttpConnection()
 
     //setting appropriate timeouts
     using namespace std::chrono;
-    result->setSendTimeoutMs(
-        duration_cast<milliseconds>(kRequestSendTimeout).count());
-    result->setResponseReadTimeoutMs(
-        duration_cast<milliseconds>(kResponseReadTimeout).count());
-    result->setMessageBodyReadTimeoutMs(
-        duration_cast<milliseconds>(kMessageBodyReadTimeout).count());
+    result->setSendTimeoutMs(httpTimeoutMs(kRequestSendTimeout));
+    result->setResponseReadTimeoutMs(httpTimeoutMs(kResponseReadTimeout));
+    result->setMessageBodyReadTimeoutMs(httpTimeoutMs(kMessageBodyReadTimeout));
 
     connect(
         result.get(), &nx::network::http::AsyncHttpClient::done,

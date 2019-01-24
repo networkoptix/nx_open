@@ -11,8 +11,7 @@
 #include "device/video/utils.h"
 #include "device/audio/utils.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace {
 
@@ -88,7 +87,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
 int DiscoveryManager::checkHostAddress(
     nxcip::CameraInfo* /*cameras*/,
     const char* /*address*/,
-    const char* /*login*/,
+    const char* /*login*/, 
     const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam
@@ -196,13 +195,12 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     return nxDevices;
 }
 
-DiscoveryManager::CameraAndDeviceDataWithNxId* 
-    DiscoveryManager::getCameraAndDeviceData(const std::string& nxId)
+DiscoveryManager::CameraAndDeviceDataWithNxId* DiscoveryManager::getCameraAndDeviceData(
+    const std::string& nxId)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(nxId);
     return it != m_cameras.end() ? &it->second : nullptr;
 }
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

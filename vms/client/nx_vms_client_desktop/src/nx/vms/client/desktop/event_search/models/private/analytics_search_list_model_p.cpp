@@ -22,6 +22,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -765,7 +766,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         {
             const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, actionDescriptor, object, engineId]()
+                [this, actionDescriptor=actionDescriptor, object, engineId=engineId]()
                 {
                     executePluginAction(engineId, actionDescriptor, object);
                 }));

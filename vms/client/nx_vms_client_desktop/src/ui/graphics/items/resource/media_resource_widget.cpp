@@ -59,6 +59,7 @@
 #include <nx/utils/collection.h>
 
 #include <nx/client/core/motion/motion_grid.h>
+#include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
 #include <nx/vms/client/desktop/utils/entropix_image_enhancer.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
@@ -129,6 +130,8 @@ using namespace ui;
 
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionGrid;
+using nx::vms::api::StreamDataFilter;
+using nx::vms::api::StreamDataFilters;
 
 namespace {
 
@@ -900,15 +903,6 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
 
-    auto analyticsButton =
-        createStatisticAwareButton(lit("media_widget_analytics"));
-    analyticsButton->setIcon(qnSkin->icon("item/analytics.png"));
-    analyticsButton->setCheckable(true);
-    analyticsButton->setToolTip(lit("Analytics"));
-    connect(analyticsButton, &QnImageButtonWidget::toggled, this,
-        &QnMediaResourceWidget::at_analyticsButton_toggled);
-    titleBar()->rightButtonsBar()->addButton(Qn::AnalyticsButton, analyticsButton);
-
     auto entropixEnhancementButton =
         createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
     entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
@@ -1564,6 +1558,22 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
                 this, &QnMediaResourceWidget::updateButtonsVisibility);
             connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
                 this, &QnMediaResourceWidget::clearEntropixEnhancedImage);
+
+            if (const auto m = context()->findInstance<AnalyticsObjectsVisualizationManager>())
+            {
+                NX_ASSERT(item() && item()->layout());
+                if (item() && item()->layout() && item()->layout()->resource())
+                {
+                    QnLayoutItemIndex index(item()->layout()->resource(), item()->uuid());
+                    if (m->mode(index) == AnalyticsObjectsVisualizationMode::always)
+                    {
+                        StreamDataFilters filter = archiveReader->streamDataFilter();
+                        filter.setFlag(StreamDataFilter::objectDetection, true);
+                        filter.setFlag(StreamDataFilter::media);
+                        archiveReader->setStreamDataFilter(filter);
+                    }
+                }
+            }
         }
 
         setChannelLayout(display->videoLayout());
@@ -2052,7 +2062,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
         if (auto reader = d->display()->archiveReader())
         {
-            using namespace nx::vms::api;
             StreamDataFilters filter = reader->streamDataFilter();
             filter.setFlag(StreamDataFilter::motion, motionSearchEnabled);
             filter.setFlag(StreamDataFilter::media);
@@ -2263,9 +2272,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             )
             result |= Qn::ZoomWindowButton;
     }
-
-    if (d->analyticsMetadataProvider)
-        result |= Qn::AnalyticsButton;
 
     if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
         result |= Qn::RecordingStatusIconButton;
@@ -2587,11 +2593,6 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
         updateTitleText();
 }
 
-void QnMediaResourceWidget::at_analyticsButton_toggled(bool checked)
-{
-    setAnalyticsEnabled(checked);
-}
-
 void QnMediaResourceWidget::at_entropixEnhancementButton_clicked()
 {
     using nx::vms::client::desktop::EntropixImageEnhancer;
@@ -2888,23 +2889,27 @@ bool QnMediaResourceWidget::isLicenseUsed() const
 
 bool QnMediaResourceWidget::isAnalyticsEnabled() const
 {
-    return d->analyticsMetadataProvider
-        && titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->isChecked();
+    if (!d->analyticsMetadataProvider)
+        return false;
+
+    if (const auto reader = display()->archiveReader())
+        return reader->streamDataFilter().testFlag(StreamDataFilter::objectDetection);
+
+    return false;
 }
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
+    if (!d->analyticsMetadataProvider)
+        return;
+
     if (auto reader = display()->archiveReader())
     {
-        using namespace nx::vms::api;
         StreamDataFilters filter = reader->streamDataFilter();
         filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
         filter.setFlag(StreamDataFilter::media);
         reader->setStreamDataFilter(filter);
     }
-
-    if (!d->analyticsMetadataProvider)
-        return;
 
     if (!analyticsEnabled)
     {
@@ -2917,8 +2922,6 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         display()->camDisplay()->setForcedVideoBufferLength(
             milliseconds(ini().analyticsVideoBufferLengthMs));
     }
-
-    titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->setChecked(analyticsEnabled);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr

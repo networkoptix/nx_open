@@ -16,7 +16,11 @@ nx_option(developerBuild
 if(developerBuild)
     set(default_cmake_build_type "Debug")
 else()
-    set(default_cmake_build_type "Release")
+    if(targetDevice MATCHES "edge1")
+        set(default_cmake_build_type "MinSizeRel")
+    else()
+        set(default_cmake_build_type "Release")
+    endif()
 endif()
 
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING

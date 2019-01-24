@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>Installazione fallita</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Impossibile annullare l'installazione</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Installazione completata</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>Impostazioni schermo...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -4593,7 +4593,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http (s): // host: porta</translation>
+      <translation>http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -5462,6 +5462,10 @@ to %1</source>
     <message>
       <source>Search</source>
       <translation>Ricerca</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -8508,6 +8512,17 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>Il periodo selezionato non può essere esportato per la videocamera corrente.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n segnalibri</numerusform>
+        <numerusform>%n segnalibri</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

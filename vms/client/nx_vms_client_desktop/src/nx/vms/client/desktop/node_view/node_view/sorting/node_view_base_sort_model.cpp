@@ -50,7 +50,7 @@ bool NodeViewBaseSortModel::nextLessThan(
 
 bool NodeViewBaseSortModel::filterAcceptsRow(
     int sourceRow,
-    const QModelIndex &sourceParent) const
+    const QModelIndex& sourceParent) const
 {
     if (d->filter.isEmpty())
         return true;
