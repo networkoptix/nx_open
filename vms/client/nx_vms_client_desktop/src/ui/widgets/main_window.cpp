@@ -817,8 +817,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
             gdi::SolidBrush brush(palette().color(QPalette::Window));
 
             RECT rect;
-            GetWindowRect(msg->hwnd, &rect);
-            OffsetRect(&rect, -rect.left, -rect.top);
+            GetClientRect(msg->hwnd, &rect);
             FillRect(context, &rect, brush);
 
             *result = TRUE;
