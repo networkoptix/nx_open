@@ -1,5 +1,7 @@
 #include "object_metadata_packet.h"
 
+#include <nx/kit/debug.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -53,8 +55,9 @@ void ObjectMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void ObjectMetadataPacket::addItem(IObjectMetadata* object)
+void ObjectMetadataPacket::addItem(const IObjectMetadata* object)
 {
+    NX_KIT_ASSERT(object);
     m_objects.push_back(object);
 }
 

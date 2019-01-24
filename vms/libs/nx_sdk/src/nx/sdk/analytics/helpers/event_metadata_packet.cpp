@@ -1,5 +1,7 @@
 #include "event_metadata_packet.h"
 
+#include <nx/kit/debug.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -53,8 +55,9 @@ void EventMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void EventMetadataPacket::addItem(IEventMetadata* event)
+void EventMetadataPacket::addItem(const IEventMetadata* event)
 {
+    NX_KIT_ASSERT(event);
     m_events.push_back(event);
 }
 

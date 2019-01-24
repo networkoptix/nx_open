@@ -21,14 +21,14 @@ public:
 
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
-    void addItem(IObjectMetadata* object);
+    void addItem(const IObjectMetadata* object);
     void clear();
 
 private:
     int64_t m_timestampUs = -1;
     int64_t m_durationUs = -1;
 
-    std::vector<IObjectMetadata*> m_objects;
+    std::vector<const IObjectMetadata*> m_objects;
 };
 
 } // namespace analytics

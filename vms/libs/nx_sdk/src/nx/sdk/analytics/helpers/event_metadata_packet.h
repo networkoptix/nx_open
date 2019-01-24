@@ -22,14 +22,14 @@ public:
 
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
-    void addItem(IEventMetadata* event);
+    void addItem(const IEventMetadata* event);
     void clear();
 
 private:
     int64_t m_timestampUs = -1;
     int64_t m_durationUs = -1;
 
-    std::vector<IEventMetadata*> m_events;
+    std::vector<const IEventMetadata*> m_events;
 };
 
 } // namespace analytics
