@@ -287,6 +287,7 @@ private:
         ASSERT_TRUE(m_dbConnectionHolder.open());
 
         // Moving local peer sequence.
+        // TODO: #ak Do it by generating commands and get rid of shiftLocalTransactionSequence method.
         commandLog()->shiftLocalTransactionSequence(m_systemId.c_str(), 100);
     }
 
