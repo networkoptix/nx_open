@@ -10,8 +10,6 @@ extern "C" {
 
 #include "ffmpeg/utils.h"
 
-#include "timestamp_config.h"
-
 namespace nx {
 namespace usb_cam {
 
@@ -172,8 +170,8 @@ bool TranscodeStreamReader::waitForTimespan(
         for (const auto & k : audioTimeStamps)
             allTimestamps.insert(k);
 
-        bool shouldSleep = allTimestamps.empty() 
-            || duration_t(*allTimestamps.rbegin() - *allTimestamps.begin()) < timespan;
+        bool shouldSleep = allTimestamps.empty()
+            || std::chrono::milliseconds(*allTimestamps.rbegin() - *allTimestamps.begin()) < timespan;
 
         if (shouldSleep)
         {
