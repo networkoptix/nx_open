@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
@@ -75,6 +76,7 @@ private:
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
     vms::api::TranState m_remotePeerTranState;
+    std::optional<vms::api::TranState> m_prevReadResult;
     bool m_haveToSendSyncDone = false;
     std::unique_ptr<CommandLogReader> m_transactionLogReader;
     CommandTransportHeader m_commonTransportHeaderOfRemoteTransaction;
@@ -103,8 +105,6 @@ private:
         vms::api::TranState readedUpTo);
 
     void enableOutputChannel();
-
-    std::string stateToString(const vms::api::TranState& tranState);
 };
 
 } // namespace nx::clusterdb::engine::transport

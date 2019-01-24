@@ -1,5 +1,7 @@
 #include "transaction_log_reader.h"
 
+#include <nx/utils/log/log.h>
+
 #include "outgoing_command_filter.h"
 #include "transaction_log.h"
 
@@ -37,6 +39,10 @@ void CommandLogReader::readTransactions(
     const ReadCommandsFilter& readFilter,
     TransactionsReadHandler completionHandler)
 {
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        lm("systemId %1. Reading commands from (%2) to (%3)")
+        .args(m_systemId, stateToString(*readFilter.from), stateToString(*readFilter.to)));
+
     ReadCommandsFilter effectiveReadFilter = readFilter;
     m_outgoingCommandFilter.updateReadFilter(&effectiveReadFilter);
 
@@ -95,6 +101,24 @@ vms::api::TranState CommandLogReader::getCurrentState() const
 std::string CommandLogReader::systemId() const
 {
     return m_systemId;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+std::string stateToString(const vms::api::TranState& tranState)
+{
+    std::string str;
+    for (auto it = tranState.values.begin(); it != tranState.values.end(); ++it)
+    {
+        if (!str.empty())
+            str += ", ";
+
+        str += it.key().id.toSimpleString().toStdString();
+        str += ": ";
+        str += std::to_string(it.value());
+    }
+
+    return str;
 }
 
 } // namespace nx::clusterdb::engine

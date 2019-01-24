@@ -47,6 +47,11 @@ public:
         quint64 newValue) = 0;
 
     // TODO: #ak Too many arguments in following method.
+    /**
+     * @param minSequence This value is non-inclusive (e.g., the sequence the peer already has).
+     * @param maxSequence This value is inclusive
+     * (e.g., max sequence known in the cluster and, thus, desirable by the peer).
+     */
     virtual nx::sql::DBResult fetchTransactionsOfAPeerQuery(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
