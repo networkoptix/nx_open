@@ -547,6 +547,7 @@ QByteArray QnStorageDb::serializeData() const
     }
 
     nx::media_db::MediaFileOperation mediaFileOp;
+    mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
 
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
@@ -566,12 +567,11 @@ QByteArray QnStorageDb::serializeData() const
 
             for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
             {
+                mediaFileOp.setStartTime(chunkIt->startTimeMs);
                 mediaFileOp.setDuration(chunkIt->durationMs);
+                mediaFileOp.setTimeZone(chunkIt->timeZone);
                 mediaFileOp.setFileSize(chunkIt->getFileSize());
                 mediaFileOp.setFileTypeIndex(chunkIt->fileIndex);
-                mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
-                mediaFileOp.setStartTime(chunkIt->startTimeMs);
-                mediaFileOp.setTimeZone(chunkIt->timeZone);
 
                 AV_WB64(&dst, mediaFileOp.part1);
                 AV_WB64(&dst, mediaFileOp.part2);
