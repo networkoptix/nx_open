@@ -12,7 +12,7 @@
 #include <nx/vms/api/types/connection_types.h>
 
 #include "request_path.h"
-#include "../p2p_websocket/websocket_transaction_transport.h"
+#include "../p2p_websocket/connection.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 

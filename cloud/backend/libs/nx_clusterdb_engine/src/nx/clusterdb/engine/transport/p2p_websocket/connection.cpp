@@ -1,4 +1,4 @@
-#include "websocket_transaction_transport.h"
+#include "connection.h"
 
 #include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>

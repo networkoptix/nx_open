@@ -1,4 +1,4 @@
-#include "http_transport_acceptor.h"
+#include "acceptor.h"
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -8,7 +8,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/api/types/connection_types.h>
 
-#include "http_transport_paths.h"
+#include "request_path.h"
 #include "../generic_transport.h"
 #include "../util.h"
 #include "../../connection_manager.h"

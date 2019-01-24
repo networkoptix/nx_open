@@ -1,12 +1,12 @@
-#include "http_transport_connector.h"
+#include "connector.h"
 
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/vms/api/types/connection_types.h>
 
-#include "http_transport_paths.h"
-#include "transaction_transport.h"
+#include "request_path.h"
+#include "connection.h"
 #include "../generic_transport.h"
 
 namespace nx::clusterdb::engine::transport {

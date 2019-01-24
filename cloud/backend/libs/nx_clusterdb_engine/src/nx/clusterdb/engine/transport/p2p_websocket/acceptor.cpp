@@ -1,4 +1,4 @@
-#include "websocket_transport_acceptor.h"
+#include "acceptor.h"
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -10,8 +10,8 @@
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/vms/api/types/connection_types.h>
 
+#include "connection.h"
 #include "request_path.h"
-#include "websocket_transaction_transport.h"
 #include "../util.h"
 #include "../../connection_manager.h"
 #include "../../compatible_ec2_protocol_version.h"

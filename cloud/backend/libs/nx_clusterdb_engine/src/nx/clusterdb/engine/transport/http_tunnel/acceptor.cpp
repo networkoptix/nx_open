@@ -1,8 +1,8 @@
-#include "http_tunnel_transport_acceptor.h"
+#include "acceptor.h"
 
 #include <nx/vms/api/types/connection_types.h>
 
-#include "http_tunnel_transport_connection.h"
+#include "command_pipeline.h"
 #include "../generic_transport.h"
 #include "../../connection_manager.h"
 

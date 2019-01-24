@@ -13,7 +13,7 @@
 #include <nx/vms/api/data/peer_data.h>
 #include <transaction/connection_guard_shared_state.h>
 
-#include "transaction_transport.h"
+#include "connection.h"
 #include "../command_transport_delegate.h"
 
 namespace nx::clusterdb::engine {

@@ -1,4 +1,4 @@
-#include "transaction_transport.h"
+#include "connection.h"
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
