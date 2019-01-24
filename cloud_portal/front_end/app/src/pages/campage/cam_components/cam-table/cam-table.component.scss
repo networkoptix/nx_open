@@ -47,13 +47,13 @@
       font-family      : $font-family-medium;
       font-weight      : 500 !important;
       font-size        : $line-height-ssm;
-      line-height      : 16px;
+      line-height      : 1rem;
       text-transform   : none;
       overflow-wrap    : break-word;
       
       &.table-title {
         font-family : $font-family-regular;
-        line-height : 24px;
+        line-height : rem(24px);
         
         .text-placeholder {
           font-size : 1.25rem;
