@@ -387,14 +387,14 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     disconnect(server.data(), &QnResource::flagsChanged,
         this, &PeerStateTracker::atResourceChanged);
 
+    // We should emit this event before m_items size is changed
+    emit itemRemoved(item);
     {
         QnMutexLocker locker(&m_dataLock);
         m_activeServers.erase(server->getId());
         m_items.removeAt(item->row);
         updateContentsIndex();
     }
-
-    emit itemRemoved(item);
 }
 
 void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
