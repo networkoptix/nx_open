@@ -164,6 +164,7 @@ function display_complete_setup_hint {
 
 # This is necessary because changed configuration options should take effect immediately.
 service $COMPANY_NAME-mediaserver stop || true
+service $COMPANY_NAME-root-tool stop || true
 
 case "$1" in
     configure)

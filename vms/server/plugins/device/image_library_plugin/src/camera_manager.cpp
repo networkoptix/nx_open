@@ -28,6 +28,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
         info.url,
         FRAME_DURATION_USEC )
 {
+    m_pluginRef->addRef();
 }
 
 CameraManager::~CameraManager()
