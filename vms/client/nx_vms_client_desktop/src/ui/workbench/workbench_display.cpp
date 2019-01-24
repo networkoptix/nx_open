@@ -706,7 +706,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const
 {
-    return m_widgetByItem.value(item);
+    return m_widgetByItem.value(item, nullptr);
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const
