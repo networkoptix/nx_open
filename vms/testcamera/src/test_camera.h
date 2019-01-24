@@ -11,6 +11,8 @@
 #include <nx/streaming/video_data_packet.h>
 
 
+class QnCommonModule;
+
 class QnTestCamera
 {
 public:
@@ -24,7 +26,11 @@ public:
 
     void setOfflineFreq(double offlineFreq);
 
-    void startStreaming(nx::network::AbstractStreamSocket* socket, bool isSecondary, int fps);
+    void startStreaming(
+        nx::network::AbstractStreamSocket* socket,
+        bool isSecondary,
+        int fps,
+        QnCommonModule* commonModule);
 
     bool isEnabled();
 private:
@@ -51,7 +57,7 @@ class QnFileCache
 public:
     static QnFileCache* instance();
 
-    QList<QnCompressedVideoDataPtr> getMediaData(const QString& fileName);
+    QList<QnCompressedVideoDataPtr> getMediaData(const QString& fileName, QnCommonModule* commonModule);
 private:
     typedef QMap<QString, QList<QnCompressedVideoDataPtr> > MediaCache;
     MediaCache m_cache;

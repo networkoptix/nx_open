@@ -173,8 +173,18 @@ void LocalConnectionFactory::registerTransactionListener(
     }
     else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
-        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kDeprecatedUrlPath));
+        // For compatibility with clients from previous versions.
+        static const QString deprecatedUrls[] = {
+            "/ec2/messageBus",
+            "/ec2/transactionBus"
+        };
+
+        for (const auto& path: deprecatedUrls)
+        {
+            httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+                "HTTP", QnTcpListener::normalizedPath(path));
+        }
+
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
             "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kWebsocketUrlPath));
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
@@ -198,6 +208,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractResourceManager::getResourceTypes
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
+
+    /**%apidoc[proprietary] GET /ec2/getSystemMergeHistory
+     * Return information about previous system merges.
+     */
+    regGet<std::nullptr_t, SystemMergeHistoryRecordList>(p, ApiCommand::getSystemMergeHistory);
 
     /**%apidoc[proprietary] POST /ec2/setResourceStatus
      * Change a resource status.

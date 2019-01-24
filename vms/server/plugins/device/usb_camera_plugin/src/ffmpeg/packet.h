@@ -31,7 +31,7 @@ public:
     void initialize();
     void unreference();
     int newPacket(int size);
-    
+
     AVCodecID codecId() const;
     AVMediaType mediaType() const;
 

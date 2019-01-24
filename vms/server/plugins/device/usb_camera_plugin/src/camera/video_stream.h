@@ -15,14 +15,14 @@
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 #include "codec_parameters.h"
+#include "fps_counter.h"
 #include "timestamp_mapper.h"
 #include "stream_consumer_manager.h"
 #include "abstract_stream_consumer.h"
 
 namespace nxpl { class TimeProvider; }
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 class Camera;
 
@@ -38,12 +38,12 @@ public:
      * Get the url used by ffmpeg to open the video stream.
      */
     std::string ffmpegUrl() const;
-    
+
     /**
      * The target frames per second the video stream was opened with.
      */
     float fps() const;
-    
+
     /**
      * The number of frames per second the video stream is actually producing, updated every
      *    second. Some cameras run at a lower fps than it actually reports.
@@ -60,16 +60,14 @@ public:
      */
     std::chrono::milliseconds actualTimePerFrame() const;
 
-    AVPixelFormat decoderPixelFormat() const;
-
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
     void removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
 
-    void updateFps();
-    void updateBitrate();
-    void updateResolution();
+    void setFps(float fps);
+    void setResolution(const nxcip::Resolution& resolution);
+    void setBitrate(int bitrate);
 
     /**
      *  Return internal io error code, set if readFrame fails with such code.
@@ -93,17 +91,13 @@ private:
     std::weak_ptr<Camera> m_camera;
     CodecParameters m_codecParams;
     nxpl::TimeProvider * const m_timeProvider;
+    FpsCounter m_fpsCounter;
 
-    CameraState m_streamState = csOff;
+    std::atomic<CameraState> m_streamState = csOff;
 
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
-    std::atomic_int m_decoderPixelFormat = -1;
     bool m_skipUntilNextKeyPacket = true;
-
-    std::atomic_int m_updatingFps = 0;
-    std::atomic_int m_actualFps = 0;
-    uint64_t m_oneSecondAgo = 0;
 
     /**
      * Some cameras crash the plugin if they are uninitialized while there are still packets and 
@@ -113,16 +107,15 @@ private:
      * assigning nullptr where possible to release decerement the count.
      */
     std::shared_ptr<std::atomic_int> m_packetCount;
-    
+
     /**
      * See m_packetCount
      */
     std::shared_ptr<std::atomic_int> m_frameCount;
 
-    TimestampMapper m_timestamps;    
+    TimestampMapper m_timestamps;
 
     mutable std::mutex m_mutex;
-    std::condition_variable m_wait;
     FrameConsumerManager m_frameConsumerManager;
     PacketConsumerManager m_packetConsumerManager;
 
@@ -133,14 +126,12 @@ private:
     int m_initCode = 0;
 
 private:
-    void updateActualFps(uint64_t now);
     /**
      * Get the url of the video stream, modified appropriately based on platform.
      */
     std::string ffmpegUrlPlatformDependent() const;
     bool waitForConsumers();
     bool noConsumers() const;
-    void terminate();
     void tryToStartIfNotStarted();
     void start();
     void stop();
@@ -155,13 +146,6 @@ private:
     std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
     int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
 
-    float findLargestFps() const;
-    nxcip::Resolution findLargestResolution() const;
-    int findLargestBitrate() const;
-    void updateFpsUnlocked();
-    void updateResolutionUnlocked();
-    void updateBitrateUnlocked();
-    void updateUnlocked();
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
     void setCameraState(CameraState cameraState);
@@ -170,5 +154,4 @@ private:
     void setLastError(int ffmpegError);
 };
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

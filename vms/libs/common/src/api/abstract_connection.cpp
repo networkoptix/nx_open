@@ -91,7 +91,8 @@ int QnAbstractConnection::sendAsyncRequest(
     QByteArray msgBody,
     const char *replyTypeName,
     QObject *target,
-    const char *slot)
+    const char *slot,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     if (!isReady())
         return -1;
@@ -136,10 +137,16 @@ int QnAbstractConnection::sendAsyncRequest(
         params,
         std::move(msgBody),
         processor,
-        "processReply");
+        "processReply",
+        Qt::AutoConnection,
+        timeout);
 }
 
-int QnAbstractConnection::sendAsyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
+int QnAbstractConnection::sendAsyncGetRequest(
+    int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params,
+    const char *replyTypeName, QObject *target, const char *slot,
+    std::optional<std::chrono::milliseconds> timeout)
+{
     return sendAsyncRequest(
         nx::network::http::Method::get,
         object,
@@ -148,22 +155,42 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, nx::network::http::Htt
         QByteArray(),
         replyTypeName,
         target,
-        slot);
+        slot,
+        timeout);
 }
 
-int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(object, nx::network::http::HttpHeaders(), params, replyTypeName, target, slot);
+int QnAbstractConnection::sendAsyncGetRequest(
+    int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target,
+    const char *slot, std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendAsyncGetRequest(
+        object, nx::network::http::HttpHeaders(), params, replyTypeName, target, slot, timeout);
 }
 
-int QnAbstractConnection::sendAsyncPostRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncRequest(nx::network::http::Method::post, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
+int QnAbstractConnection::sendAsyncPostRequest(
+    int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody,
+    const char *replyTypeName, QObject *target, const char *slot,
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendAsyncRequest(
+        nx::network::http::Method::post, object, std::move(headers), params,
+        std::move(msgBody), replyTypeName, target, slot, timeout);
 }
 
-int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncPostRequest(object, nx::network::http::HttpHeaders(), params, std::move(msgBody), replyTypeName, target, slot);
+int QnAbstractConnection::sendAsyncPostRequest(
+    int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName,
+    QObject *target, const char *slot, std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendAsyncPostRequest(
+        object, nx::network::http::HttpHeaders(), params, std::move(msgBody),
+        replyTypeName, target, slot, timeout);
 }
 
-int QnAbstractConnection::sendSyncRequest(nx::network::http::Method::ValueType method, int object, nx::network::http::HttpHeaders actualHeaders, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
+int QnAbstractConnection::sendSyncRequest(
+    nx::network::http::Method::ValueType method, int object, nx::network::http::HttpHeaders actualHeaders,
+    const QnRequestParamList &params, QByteArray msgBody, QVariant *reply,
+    std::optional<std::chrono::milliseconds> timeout)
+{
     NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!commonModule())
         return -1;
@@ -182,7 +209,8 @@ int QnAbstractConnection::sendSyncRequest(nx::network::http::Method::ValueType m
         std::move(actualHeaders),
         params,
         std::move(msgBody),
-        response);
+        response,
+        timeout);
     if (status != 0)
         return status;
 
@@ -196,20 +224,45 @@ int QnAbstractConnection::sendSyncRequest(nx::network::http::Method::ValueType m
     return processor->status();
 }
 
-int QnAbstractConnection::sendSyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply) {
-    return sendSyncRequest(nx::network::http::Method::get, object, std::move(headers), params, QByteArray(), reply);
+int QnAbstractConnection::sendSyncGetRequest(
+    int object,
+    nx::network::http::HttpHeaders headers,
+    const QnRequestParamList &params,
+    QVariant *reply,
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendSyncRequest(
+        nx::network::http::Method::get, object,
+        std::move(headers), params,
+        QByteArray(), reply, timeout);
 }
 
-int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply) {
-    return sendSyncGetRequest(object, nx::network::http::HttpHeaders(), params, reply);
+int QnAbstractConnection::sendSyncGetRequest(
+    int object, const QnRequestParamList &params, QVariant *reply,
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendSyncGetRequest(object, nx::network::http::HttpHeaders(), params, reply, timeout);
 }
 
-int QnAbstractConnection::sendSyncPostRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    return sendSyncRequest(nx::network::http::Method::post, object, std::move(headers), params, std::move(msgBody), reply);
+int QnAbstractConnection::sendSyncPostRequest(
+    int object,
+    nx::network::http::HttpHeaders headers,
+    const QnRequestParamList &params,
+    QByteArray msgBody,
+    QVariant *reply,
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendSyncRequest(
+        nx::network::http::Method::post, object, std::move(headers),
+        params, std::move(msgBody), reply, timeout);
 }
 
-int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    return sendSyncPostRequest(object, nx::network::http::HttpHeaders(), params, std::move(msgBody), reply);
+int QnAbstractConnection::sendSyncPostRequest(
+    int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply,
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    return sendSyncPostRequest(
+        object, nx::network::http::HttpHeaders(), params, std::move(msgBody), reply, timeout);
 }
 
 QnResourcePtr QnAbstractConnection::targetResource() const

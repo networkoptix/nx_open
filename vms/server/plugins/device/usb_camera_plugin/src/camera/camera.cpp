@@ -46,7 +46,7 @@ static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
 //--------------------------------------------------------------------------------------------------
 // Camera
 
-const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList = 
+const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList =
 {
     nxcip::AV_CODEC_ID_H263
     ,nxcip::AV_CODEC_ID_H264

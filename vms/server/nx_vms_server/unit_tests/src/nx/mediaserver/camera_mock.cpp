@@ -138,7 +138,7 @@ std::vector<Camera::AdvancedParametersProvider*> CameraMock::advancedParametersP
     return rawPointers;
 }
 
-StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
 {
     return m_streamCapabilityMaps.value(streamIndex);
 }

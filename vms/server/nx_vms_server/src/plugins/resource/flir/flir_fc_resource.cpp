@@ -48,7 +48,7 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
-nx::vms::server::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

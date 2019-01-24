@@ -65,7 +65,7 @@ int CameraManager::releaseRef() const
     return m_refManager.releaseRef();
 }
 
-int CameraManager::getEncoderCount( int* encoderCount ) const
+int CameraManager::getEncoderCount(int* encoderCount) const
 {
     *encoderCount = kEncoderCount;
     return nxcip::NX_NO_ERROR;
@@ -77,7 +77,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
     if (!m_camera->isInitialized() && !m_camera->initialize())
         return nxcip::NX_IO_ERROR;
-    
+
     switch (encoderIndex)
     {
         case 0:

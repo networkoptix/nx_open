@@ -152,7 +152,7 @@ nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() cons
         case V4L2_PIX_FMT_H264:
         case V4L2_PIX_FMT_H264_NO_SC:
 #ifdef V4L2_PIX_FMT_H264_MVC
-        case V4L2_PIX_FMT_H264_MVC:   
+        case V4L2_PIX_FMT_H264_MVC:
 #endif
                                       return nxcip::AV_CODEC_ID_H264;
         default:                      return nxcip::AV_CODEC_ID_NONE;

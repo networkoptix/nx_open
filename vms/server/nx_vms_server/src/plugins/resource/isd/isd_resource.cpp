@@ -78,7 +78,7 @@ QString QnPlIsdResource::getDriverName() const
     return MANUFACTURE;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

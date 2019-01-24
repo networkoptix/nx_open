@@ -104,12 +104,14 @@ QnJsonRestResult SystemMergeProcessor::merge(
         return result;
     }
 
-    if (!addMergeHistoryRecord(data))
+    nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
+    if (!addMergeHistoryRecord(data, &mergeHistoryRecord))
     {
         NX_DEBUG(this, "Failed to add merge history data");
         setMergeError(&result, MergeStatus::unknownError);
         return result;
     }
+    QJson::serialize(mergeHistoryRecord, &result.reply);
 
     NX_DEBUG(this, "Merge succeeded");
     return result;
@@ -756,7 +758,9 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
     return nx::network::http::StatusCode::ok;
 }
 
-bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
+bool SystemMergeProcessor::addMergeHistoryRecord(
+    const MergeSystemData& data,
+    nx::vms::api::SystemMergeHistoryRecord* outResult)
 {
     const auto& mergedSystemModuleInformation = data.takeRemoteSettings
         ? m_localModuleInformation
@@ -783,6 +787,7 @@ bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
             .arg(::ec2::toString(errorCode)));
         return false;
     }
+    *outResult = mergeHistoryRecord;
 
     return true;
 }

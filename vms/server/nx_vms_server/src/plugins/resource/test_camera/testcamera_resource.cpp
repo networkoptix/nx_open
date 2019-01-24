@@ -18,7 +18,7 @@ QString QnTestCameraResource::getDriverName() const
     return QLatin1String(kManufacturer);
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

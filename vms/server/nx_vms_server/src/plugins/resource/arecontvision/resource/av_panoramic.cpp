@@ -120,7 +120,7 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& id, const QStrin
     return false;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
