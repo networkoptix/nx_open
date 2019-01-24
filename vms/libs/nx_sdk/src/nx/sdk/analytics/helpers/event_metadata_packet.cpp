@@ -34,7 +34,7 @@ int64_t EventMetadataPacket::durationUs() const
 
 int EventMetadataPacket::count() const
 {
-    return m_events.size();
+    return (int) m_events.size();
 }
 
 const IEventMetadata* EventMetadataPacket::at(int index) const

@@ -34,7 +34,7 @@ int64_t ObjectMetadataPacket::durationUs() const
 
 int ObjectMetadataPacket::count() const
 {
-    return m_objects.size();
+    return (int) m_objects.size();
 }
 
 const IObjectMetadata* ObjectMetadataPacket::at(int index) const
