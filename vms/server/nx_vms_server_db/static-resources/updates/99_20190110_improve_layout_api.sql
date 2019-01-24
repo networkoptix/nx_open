@@ -3,17 +3,17 @@
 ALTER TABLE vms_layout RENAME TO vms_layout_tmp;
 
 CREATE TABLE "vms_layout" (
-    "resource_ptr_id"           INTEGER PRIMARY KEY AUTOINCREMENT,
-    "cell_aspect_ratio"         REAL NOT NULL DEFAULT -1.0,
-    "cell_spacing"              REAL NOT NULL DEFAULT -1.0,
-    "locked"                    BOOL NOT NULL DEFAULT 0,
-    "background_width"          INTEGER NOT NULL DEFAULT 1,
+    "resource_ptr_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "cell_aspect_ratio" REAL NOT NULL DEFAULT -1.0,
+    "cell_spacing" REAL NOT NULL DEFAULT -1.0,
+    "locked" BOOL NOT NULL DEFAULT 0,
+    "background_width" INTEGER NOT NULL DEFAULT 1,
     "background_image_filename" TEXT,
-    "background_height"         INTEGER NOT NULL DEFAULT 1,
-    "background_opacity"        REAL NOT NULL DEFAULT 0,
-    "logical_id"                INTEGER,
-    "fixed_width"               INTEGER,
-    "fixed_height"              INTEGER
+    "background_height" INTEGER NOT NULL DEFAULT 1,
+    "background_opacity" REAL NOT NULL DEFAULT 0,
+    "logical_id" INTEGER,
+    "fixed_width" INTEGER,
+    "fixed_height" INTEGER
 );
 
 
