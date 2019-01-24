@@ -18,12 +18,12 @@ namespace nx::clusterdb::engine { class CommandLog; }
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
-class WebsocketCommandTransport:
+class Connection:
     public AbstractConnection,
     public nx::p2p::ConnectionBase
 {
 public:
-    WebsocketCommandTransport(
+    Connection(
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* const transactionLog,
         const std::string& systemId,

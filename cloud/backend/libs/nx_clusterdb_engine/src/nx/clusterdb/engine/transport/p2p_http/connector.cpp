@@ -100,7 +100,7 @@ void Connector::handlePipelineStart(SystemError::ErrorCode resultCode)
 
     NX_DEBUG(this, "Established connection to %1", m_remoteNodeUrl);
 
-    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::Connection>(
         m_protocolVersionRange,
         m_commandLog,
         m_systemId,

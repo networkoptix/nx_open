@@ -9,7 +9,7 @@ namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 static constexpr int kMaxTransactionsPerIteration = 17;
 
-WebsocketCommandTransport::WebsocketCommandTransport(
+Connection::Connection(
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* const transactionLog,
     const std::string& systemId,
@@ -48,7 +48,7 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     //auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     //p2pTransport->setAliveTimeout(keepAliveTimeout);
 
-    connect(this, &ConnectionBase::gotMessage, this, &WebsocketCommandTransport::onGotMessage);
+    connect(this, &ConnectionBase::gotMessage, this, &Connection::onGotMessage);
     connect(this, &ConnectionBase::allDataSent,
         [this]()
         {
@@ -63,21 +63,21 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     startReading();
 }
 
-void WebsocketCommandTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+void Connection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractConnection::bindToAioThread(aioThread);
     nx::p2p::ConnectionBase::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
 }
 
-void WebsocketCommandTransport::stopWhileInAioThread()
+void Connection::stopWhileInAioThread()
 {
     AbstractConnection::stopWhileInAioThread();
     nx::p2p::ConnectionBase::stopWhileInAioThread();
     m_transactionLogReader.reset();
 }
 
-void WebsocketCommandTransport::onGotMessage(
+void Connection::onGotMessage(
     QWeakPointer<nx::p2p::ConnectionBase> /*connection*/,
     nx::p2p::MessageType messageType,
     const QByteArray& payload)
@@ -115,7 +115,7 @@ void WebsocketCommandTransport::onGotMessage(
     }
 }
 
-void WebsocketCommandTransport::reportCommandReceived(
+void Connection::reportCommandReceived(
     QByteArray commandBuffer)
 {
     CommandTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
@@ -143,7 +143,7 @@ void WebsocketCommandTransport::reportCommandReceived(
         std::move(cdbTransportHeader));
 }
 
-void WebsocketCommandTransport::readTransactions()
+void Connection::readTransactions()
 {
     NX_CRITICAL(m_remoteSubscription);
 
@@ -158,7 +158,7 @@ void WebsocketCommandTransport::readTransactions()
         [this](auto&&... args) { onTransactionsReadFromLog(std::move(args)...); });
 }
 
-void WebsocketCommandTransport::onTransactionsReadFromLog(
+void Connection::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
     vms::api::TranState readedUpTo)
@@ -188,17 +188,17 @@ void WebsocketCommandTransport::onTransactionsReadFromLog(
         m_sendHandshakeDone = true; //< All data are sent.
 }
 
-network::SocketAddress WebsocketCommandTransport::remotePeerEndpoint() const
+network::SocketAddress Connection::remotePeerEndpoint() const
 {
     return p2pTransport().getForeignAddress();
 }
 
-ConnectionClosedSubscription& WebsocketCommandTransport::connectionClosedSubscription()
+ConnectionClosedSubscription& Connection::connectionClosedSubscription()
 {
     return m_connectionClosedSubscription;
 }
 
-void WebsocketCommandTransport::setState(State state)
+void Connection::setState(State state)
 {
     if (state == State::Error)
     {
@@ -210,23 +210,23 @@ void WebsocketCommandTransport::setState(State state)
     nx::p2p::ConnectionBase::setState(state);
 }
 
-void WebsocketCommandTransport::setOnGotTransaction(CommandHandler handler)
+void Connection::setOnGotTransaction(CommandHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-std::string WebsocketCommandTransport::connectionGuid() const
+std::string Connection::connectionGuid() const
 {
     return m_connectionGuid;
 }
 
 const CommandTransportHeader&
-    WebsocketCommandTransport::commonTransportHeaderOfRemoteTransaction() const
+    Connection::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransactionHeader;
 }
 
-void WebsocketCommandTransport::sendTransaction(
+void Connection::sendTransaction(
     CommandTransportHeader /*transportHeader*/,
     const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer)
 {
@@ -239,18 +239,18 @@ void WebsocketCommandTransport::sendTransaction(
     sendMessage(nx::p2p::MessageType::pushTransactionData, serializedTransaction);
 }
 
-void WebsocketCommandTransport::start()
+void Connection::start()
 {
 }
 
-int WebsocketCommandTransport::highestProtocolVersionCompatibleWithRemotePeer() const
+int Connection::highestProtocolVersionCompatibleWithRemotePeer() const
 {
     return remotePeer().protoVersion >= m_protocolVersionRange.begin()
         ? m_protocolVersionRange.currentVersion()
         : remotePeer().protoVersion;
 }
 
-void WebsocketCommandTransport::fillAuthInfo(
+void Connection::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {

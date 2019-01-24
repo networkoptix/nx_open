@@ -143,7 +143,7 @@ nx::network::http::StatusCode::Value Acceptor::forwardMessageToConnection(
         [message = std::move(message), &messageProcessed](
             AbstractConnection* connection) mutable
         {
-            auto p2pConnection = dynamic_cast<websocket::WebsocketCommandTransport*>(connection);
+            auto p2pConnection = dynamic_cast<websocket::Connection*>(connection);
             if (!p2pConnection)
                 return;
 
@@ -211,7 +211,7 @@ bool Acceptor::registerNewConnection(
     const auto userAgent = nx::network::http::getHeaderValue(
         requestContext.request.headers, "User-Agent").toStdString();
 
-    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::Connection>(
         m_protocolVersionRange,
         m_commandLog,
         systemId,

@@ -19,10 +19,10 @@ class CommandLog;
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
-class WebSocketTransportAcceptor
+class Acceptor
 {
 public:
-    WebSocketTransportAcceptor(
+    Acceptor(
         const QnUuid& moduleGuid,
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* transactionLog,

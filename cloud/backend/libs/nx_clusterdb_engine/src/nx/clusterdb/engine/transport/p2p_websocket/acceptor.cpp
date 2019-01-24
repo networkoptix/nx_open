@@ -18,7 +18,7 @@
 
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
-WebSocketTransportAcceptor::WebSocketTransportAcceptor(
+Acceptor::Acceptor(
     const QnUuid& moduleGuid,
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* transactionLog,
@@ -37,7 +37,7 @@ WebSocketTransportAcceptor::WebSocketTransportAcceptor(
 {
 }
 
-void WebSocketTransportAcceptor::registerHandlers(
+void Acceptor::registerHandlers(
     const std::string& rootPath,
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
@@ -53,7 +53,7 @@ void WebSocketTransportAcceptor::registerHandlers(
         [this](auto&&... args) { return createConnection(std::move(args)...); });
 }
 
-void WebSocketTransportAcceptor::createConnection(
+void Acceptor::createConnection(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
@@ -115,7 +115,7 @@ void WebSocketTransportAcceptor::createConnection(
     completionHandler(std::move(result));
 }
 
-void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
+void Acceptor::addWebSocketTransactionTransport(
     std::unique_ptr<network::AbstractStreamSocket> connection,
     vms::api::PeerDataEx localPeerInfo,
     vms::api::PeerDataEx remotePeerInfo,
@@ -129,7 +129,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     p2pTransport->start();
     const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();
 
-    auto transactionTransport = std::make_unique<WebsocketCommandTransport>(
+    auto transactionTransport = std::make_unique<Connection>(
         m_protocolVersionRange,
         m_commandLog,
         systemId.c_str(),

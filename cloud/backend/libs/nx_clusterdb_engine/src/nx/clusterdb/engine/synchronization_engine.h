@@ -82,7 +82,7 @@ private:
     transport::TransportManager m_transportManager;
     Connector m_connector;
     transport::CommonHttpAcceptor m_httpTransportAcceptor;
-    transport::p2p::websocket::WebSocketTransportAcceptor m_webSocketAcceptor;
+    transport::p2p::websocket::Acceptor m_webSocketAcceptor;
     transport::p2p::http::Acceptor m_p2pHttpAcceptor;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
