@@ -82,12 +82,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
             for (const auto& hikvisionEvent: events)
             {
-                if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
+                if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channelNumber)
                     return;
 
                 auto event = new nx::sdk::analytics::Event();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
-                    .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
+                    .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channelNumber));
 
                 event->setTypeId(hikvisionEvent.typeId.toStdString());
                 event->setCaption(hikvisionEvent.caption.toStdString());
@@ -159,7 +159,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_auth.setPassword(deviceInfo->password());
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
-    m_channel = deviceInfo->channelNumber();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

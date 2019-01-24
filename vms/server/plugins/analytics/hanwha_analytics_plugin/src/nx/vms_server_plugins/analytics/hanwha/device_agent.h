@@ -65,7 +65,7 @@ private:
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;
-    int m_channel = 0;
+    int m_channelNumber = 0;
 
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;

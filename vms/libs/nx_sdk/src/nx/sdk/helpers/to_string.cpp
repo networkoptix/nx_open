@@ -52,7 +52,7 @@ std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent)
     result += innerIndent + "\"url\": " + toString(deviceInfo->url()) + ",\n";
     result += innerIndent + "\"login\": " + toString(deviceInfo->login()) + ",\n";
     result += innerIndent + "\"password\": " + toString(deviceInfo->password()) + ",\n";
-    result += innerIndent + "\"channel\": " + toString(deviceInfo->channelNumber()) + ",\n";
+    result += innerIndent + "\"channelNumber\": " + toString(deviceInfo->channelNumber()) + ",\n";
     result += innerIndent + "\"sharedId\": " + toString(deviceInfo->sharedId()) + ",\n";
     result += innerIndent + "\"logicalId\": " + toString(deviceInfo->logicalId()) + "\n";
 

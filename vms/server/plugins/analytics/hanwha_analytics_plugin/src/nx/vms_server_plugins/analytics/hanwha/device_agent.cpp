@@ -88,7 +88,7 @@ Error DeviceAgent::startFetchingMetadata(
 
             for (const auto& hanwhaEvent: events)
             {
-                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
+                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channelNumber)
                     return;
 
                 auto event = new nx::sdk::analytics::Event();
@@ -96,10 +96,10 @@ Error DeviceAgent::startFetchingMetadata(
                     << "Got event: caption ["
                     << hanwhaEvent.caption.toStdString() << "], description ["
                     << hanwhaEvent.description.toStdString() << "], "
-                    << "channel " << m_channel;
+                    << "channel " << m_channelNumber;
 
                 NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
-                    hanwhaEvent.caption, hanwhaEvent.description, m_channel));
+                    hanwhaEvent.caption, hanwhaEvent.description, m_channelNumber));
 
                 event->setTypeId(hanwhaEvent.typeId.toStdString());
                 event->setCaption(hanwhaEvent.caption.toStdString());
@@ -166,7 +166,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_auth.setPassword(deviceInfo->password());
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
-    m_channel = deviceInfo->channelNumber();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

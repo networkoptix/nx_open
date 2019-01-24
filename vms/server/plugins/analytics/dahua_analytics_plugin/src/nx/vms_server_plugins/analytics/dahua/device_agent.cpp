@@ -86,12 +86,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
             for (const auto& dahuaEvent: events)
             {
-                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channel)
+                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
                 auto event = new nx::sdk::analytics::Event();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
-                    dahuaEvent.caption, dahuaEvent.description, m_channel);
+                    dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
                 event->setTypeId(dahuaEvent.typeId.toStdString());
                 event->setCaption(dahuaEvent.caption.toStdString());
@@ -160,7 +160,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_auth.setPassword(deviceInfo->password());
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
-    m_channel = deviceInfo->channelNumber();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 } // namespace nx::vms_server_plugins::analytics::dahua
