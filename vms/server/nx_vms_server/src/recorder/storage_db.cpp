@@ -10,6 +10,20 @@
 #include <nx/utils/scope_guard.h>
 #include "utils/common/util.h"
 #include "storage_db.h"
+#include <nx/utils/elapsed_timer.h>
+
+inline void AV_WB64(char** dst, quint64 data)
+{
+    quint64* dst64 = (quint64*)(*dst);
+    *dst64 = qToLittleEndian(data);
+    *dst += 8;
+}
+
+inline void AV_WRITE_BUFFER(char** dst, const char* src, qint64 size)
+{
+    memcpy(*dst, src, size);
+    *dst += size;
+}
 
 const uint8_t kDbVersion = 1;
 
@@ -19,6 +33,8 @@ const uint8_t kDbVersion = 1;
 const int kMaxReadErrorCount = 2;
 
 namespace {
+
+const size_t kCatalogsCount = 2;
 
 const std::chrono::seconds kVacuumInterval(3600 * 24);
 
@@ -491,39 +507,44 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     return false;
 }
 
-bool QnStorageDb::vacuumInternal()
+QByteArray QnStorageDb::serializeData() const
 {
-    NX_DEBUG(this, "QnStorageDb::vacuumInternal begin");
-
     QByteArray writeBuf;
-    QBuffer writeDevice(&writeBuf);
-    writeDevice.open(QIODevice::WriteOnly);
 
-    VacuumHandler vh(m_readData);
-    nx::media_db::DbHelper tmpDbHelper(&vh);
-    tmpDbHelper.setDevice(&writeDevice);
-    tmpDbHelper.setMode(nx::media_db::Mode::Write);
+    qint64 dataSize = nx::media_db::FileHeader::kSerializedRecordSize;
+    dataSize += m_readUuidToHash.size() * nx::media_db::CameraOperation::kSerializedRecordSize;
 
-    nx::media_db::Error error = tmpDbHelper.writeFileHeader(m_dbVersion);
-    if (error == nx::media_db::Error::WriteError)
+    for (auto it = m_readUuidToHash.right.begin(); it != m_readUuidToHash.right.end(); ++it)
+        dataSize += it->second.size();
+
+    for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
-        NX_WARNING(this, lit("%1 temporary DB file write header error").arg(Q_FUNC_INFO));
-        return false;
+        for (size_t i = 0; i < kCatalogsCount; ++i)
+            dataSize += it->second[i].size() *  nx::media_db::MediaFileOperation::kSerializedRecordSize;
     }
+
+    writeBuf.resize(dataSize);
+
+    nx::media_db::FileHeader fh;
+    fh.setDbVersion(m_dbVersion);
+
+    char* dst = writeBuf.data();
+
+    AV_WB64(&dst, fh.part1);
+    AV_WB64(&dst, fh.part2);
 
     for (auto it = m_readUuidToHash.right.begin(); it != m_readUuidToHash.right.end(); ++it)
     {
         nx::media_db::CameraOperation camOp;
         camOp.setCameraId(it->first);
         camOp.setCameraUniqueId(QByteArray(it->second.toLatin1().constData(),
-                                           it->second.size()));
+            it->second.size()));
         camOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
         camOp.setCameraUniqueIdLen(it->second.size());
 
-        tmpDbHelper.writeRecord(camOp);
+        AV_WB64(&dst, camOp.part1);
+        AV_WRITE_BUFFER(&dst, camOp.cameraUniqueId.data(), it->second.size());
     }
-
-    static const size_t kCatalogsCount = 2;
 
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
@@ -542,7 +563,7 @@ bool QnStorageDb::vacuumInternal()
 
                 mediaFileOp.setCameraId(cameraIdIt->second);
                 mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
-                                       QnServer::ChunksCatalog::HiQualityCatalog);
+                    QnServer::ChunksCatalog::HiQualityCatalog);
                 mediaFileOp.setDuration(chunkIt->durationMs);
                 mediaFileOp.setFileSize(chunkIt->getFileSize());
                 mediaFileOp.setFileTypeIndex(chunkIt->fileIndex);
@@ -550,43 +571,31 @@ bool QnStorageDb::vacuumInternal()
                 mediaFileOp.setStartTime(chunkIt->startTimeMs);
                 mediaFileOp.setTimeZone(chunkIt->timeZone);
 
-                tmpDbHelper.writeRecord(mediaFileOp);
+                AV_WB64(&dst, mediaFileOp.part1);
+                AV_WB64(&dst, mediaFileOp.part2);
             }
         }
     }
+    writeBuf.truncate(dst - writeBuf.data());
+    return writeBuf;
+}
 
-    if (vh.getError() == nx::media_db::Error::WriteError)
-        return false;
+bool QnStorageDb::vacuumInternal()
+{
+    using namespace std::chrono;
 
-    tmpDbHelper.setMode(nx::media_db::Mode::Read); // flush
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
 
-    auto readDataCopy = m_readData;
-    uint8_t dbVersion = m_dbVersion;
-
-    if (!parseDbContent(writeBuf))
-        return false;
-
-    NX_ASSERT(dbVersion == m_dbVersion);
-    if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
-    {
-        NX_WARNING(this, lit("%1 DB file read header error after vacuum").arg(Q_FUNC_INFO));
-        return false;
-    }
-
-    bool isDataConsistent = checkDataConsistency(readDataCopy);
-    NX_ASSERT(isDataConsistent);
-    if (!isDataConsistent)
-    {
-        NX_WARNING(this, lit("%1 DB is not consistent after vacuum").arg(Q_FUNC_INFO));
-        return false;
-    }
-
-    NX_DEBUG(this, "QnStorageDb::vacuumInternal completed successfully");
+    NX_DEBUG(this, "QnStorageDb::vacuumInternal begin");
+    QByteArray writeBuf = serializeData();
+    NX_DEBUG(this, "QnStorageDb::vacuumInternal completed successfully. time = %1ms", timer.elapsedMs());
 
     if (!resetIoDevice())
         return false;
 
     m_dbHelper.stream().writeRawData(writeBuf.constData(), writeBuf.size());
+    NX_DEBUG(this, "QnStorageDb::vacuumInternal write to disk finished. time = %1ms", timer.elapsedMs());
     return true;
 }
 
@@ -700,13 +709,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
         if (newChunk.startTimeMs == -1)
             currentChunkSet->clear();
         else
-            for (auto it = currentChunkSet->begin(); it != currentChunkSet->end();)
-            {
-                if (it->startTimeMs == newChunk.startTimeMs)
-                    it = currentChunkSet->erase(it);
-                else
-                    ++it;
-            }
+            ;// currentChunkSet->erase(newChunk);
         break;
     }
     default:

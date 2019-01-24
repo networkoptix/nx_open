@@ -25,6 +25,8 @@ struct FileHeader
     quint64 part1;
     quint64 part2;
 
+    static const int kSerializedRecordSize = sizeof(part1) + sizeof(part2);
+
     FileHeader() : part1(0), part2(0) {}
 
     uint8_t getDbVersion() const { return part1 & 0xff;  }
@@ -50,6 +52,8 @@ struct RecordBase
 {
     quint64 part1;
 
+    static const int kSerializedRecordSize = sizeof(part1);
+
     RecordBase(quint64 i = 0) : part1(i) {}
     RecordType getRecordType() const;
     void setRecordType(RecordType recordType);
@@ -58,6 +62,8 @@ struct RecordBase
 struct MediaFileOperation : RecordBase
 {
     quint64 part2;
+
+    static const int kSerializedRecordSize = sizeof(part1) + sizeof(part2);
 
     MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part2(i2) {}
     int getCameraId() const;

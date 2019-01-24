@@ -23,7 +23,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 
-class QnStorageDb: 
+class QnStorageDb:
     public nx::media_db::DbHelperHandler,
     public nx::vms::server::ServerModuleAware
 {
@@ -92,7 +92,7 @@ private:
 
     template<typename Callback>
     void startVacuumAsync(Callback callback);
-
+    QByteArray serializeData() const;
 private:
     QnStorageResourcePtr m_storage;
     int m_storageIndex;

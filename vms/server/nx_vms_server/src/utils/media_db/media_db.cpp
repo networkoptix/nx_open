@@ -11,21 +11,6 @@ namespace media_db
 
 const size_t kMaxWriteQueueSize = 1000;
 
-template<typename StructToWrite>
-static QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
-{
-    QByteArray tmpBuffer;
-    tmpBuffer.resize(sizeof(s.part1) + sizeof(s.part2));
-
-    decltype (s.part1) *part1 = (decltype (s.part1)*) tmpBuffer.data();
-    decltype (s.part2) *part2 = (decltype (s.part2)*) (tmpBuffer.data() + sizeof(s.part1));
-    *part1 = qToLittleEndian(s.part1);
-    *part2 = qToLittleEndian(s.part2);
-
-    stream.writeRawData(tmpBuffer.data(), tmpBuffer.size());
-    return stream;
-}
-
 namespace
 {
 
@@ -60,10 +45,18 @@ public:
         }
     }
 
-    template<typename StructToWrite>
-    void operator() (const StructToWrite &s) const
+    void operator() (const MediaFileOperation &s) const
     {
-        *m_stream << s;
+        QByteArray tmpBuffer;
+        tmpBuffer.resize(sizeof(s.part1) + sizeof(s.part2));
+
+        decltype (s.part1) *part1 = (decltype (s.part1)*)tmpBuffer.data();
+        decltype (s.part2) *part2 = (decltype (s.part2)*)(tmpBuffer.data() + sizeof(s.part1));
+        *part1 = qToLittleEndian(s.part1);
+        *part2 = qToLittleEndian(s.part2);
+
+        m_stream->writeRawData(tmpBuffer.data(), tmpBuffer.size());
+
         if (m_stream->status() == QDataStream::WriteFailed)
         {
             qWarning() << "Media DB Media File operation write error: QDataStream::WriteFailed. errno: "
@@ -384,7 +377,7 @@ Error DbHelper::writeFileHeader(uint8_t dbVersion)
         return Error::WrongMode;
     FileHeader fh;
     fh.setDbVersion(dbVersion);
-    m_stream << fh;
+    m_stream << fh.part1 << fh.part2;
 
     return getError();
 }
