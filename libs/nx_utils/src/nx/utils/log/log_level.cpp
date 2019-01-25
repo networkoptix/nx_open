@@ -10,6 +10,15 @@ namespace nx {
 namespace utils {
 namespace log {
 
+namespace {
+
+QRegularExpression makeExactMatchPattern(const Tag& tag)
+{
+    return QRegularExpression("^" + tag.toString() + "$");
+}
+
+} // namespace
+
 Level levelFromString(const QString& levelString)
 {
     const auto level = levelString.toLower();
@@ -76,6 +85,9 @@ QString toString(Level level)
     return lm("unknown(%1)").arg(static_cast<int>(level));
 }
 
+//-------------------------------------------------------------------------------------------------
+// Tag
+
 Tag::Tag(const std::type_info& info):
     m_value(::toString(info))
 {
@@ -116,33 +128,27 @@ bool Tag::operator!=(const Tag& rhs) const
     return m_value != rhs.m_value;
 }
 
-Filter::Filter(const QString& source, bool regexp):
-    m_mode(regexp ? Mode::regexp : Mode::exactMatch),
-    m_value(source),
-    m_filter(regexp
-        ? QRegularExpression(source, QRegularExpression::CaseInsensitiveOption)
-        : QRegularExpression())
+//-------------------------------------------------------------------------------------------------
+// Filter
+
+Filter::Filter(const QRegularExpression& source):
+    m_filter(source)
+{
+}
+
+Filter::Filter(const QString& source):
+    Filter(QRegularExpression(source, QRegularExpression::CaseInsensitiveOption))
 {
 }
 
 Filter::Filter(const Tag& tag):
-    m_mode(Mode::exactMatch),
-    m_value(tag.toString())
-{
-}
-
-Filter::Filter(const QRegularExpression& source):
-    m_mode(Mode::regexp),
-    m_value(source.pattern()),
-    m_filter(source)
+    Filter(makeExactMatchPattern(tag))
 {
 }
 
 bool Filter::isValid() const
 {
-    return m_mode == Mode::regexp
-        ? m_filter.isValid()
-        : !m_value.isEmpty();
+    return m_filter.isValid();
 }
 
 bool Filter::accepts(const Tag& tag) const
@@ -150,10 +156,7 @@ bool Filter::accepts(const Tag& tag) const
     if (!isValid())
         return false;
 
-    // Actual tag value may contain object address, etc, so checking tag match with `startsWith`.
-    return m_mode == Mode::regexp
-        ? m_filter.match(tag.toString()).hasMatch()
-        : tag.toString().startsWith(m_value);
+    return m_filter.match(tag.toString()).hasMatch();
 }
 
 QString Filter::toString() const
@@ -163,18 +166,21 @@ QString Filter::toString() const
 
 bool Filter::operator<(const Filter& rhs) const
 {
-    return m_mode < rhs.m_mode || m_value < rhs.m_value;
+    return toString() < rhs.toString();
 }
 
 bool Filter::operator==(const Filter& rhs) const
 {
-    return m_mode == rhs.m_mode && m_value == rhs.m_value;
+    return toString() == rhs.toString();
 }
 
 bool Filter::operator!=(const Filter& rhs) const
 {
     return !(*this == rhs);
 }
+
+//-------------------------------------------------------------------------------------------------
+// LevelSettings
 
 LevelSettings::LevelSettings(Level primary, LevelFilters filters):
     primary(primary),
