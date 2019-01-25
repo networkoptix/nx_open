@@ -50,7 +50,7 @@ using nx::vms::api::ActionType;
 namespace {
 
 template<typename Policy>
-void updateEventResources(
+void updateCameraResources(
     const QnBusinessRuleViewModelPtr model,
     QWidget* parent)
 {
@@ -472,13 +472,13 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
 
     vms::api::EventType eventType = m_model->eventType();
     if (eventType == EventType::cameraMotionEvent)
-        updateEventResources<QnCameraMotionPolicy>(m_model, this);
+        updateCameraResources<QnCameraMotionPolicy>(m_model, this);
     else if (eventType == EventType::cameraInputEvent)
-        updateEventResources<QnCameraInputPolicy>(m_model, this);
+        updateCameraResources<QnCameraInputPolicy>(m_model, this);
     else if (eventType == EventType::analyticsSdkEvent)
-        updateEventResources<QnCameraAnalyticsPolicy>(m_model, this);
+        updateCameraResources<QnCameraAnalyticsPolicy>(m_model, this);
     else
-        updateEventResources<CameraSelectionDialog::DummyPolicy>(m_model, this);
+        updateCameraResources<CameraSelectionDialog::DummyPolicy>(m_model, this);
 }
 
 void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
@@ -538,41 +538,29 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     }
     else
     {
-        bool dialogAccepted = false;
-        QnUuidSet selectedCameras = m_model->actionResources();
-
         switch (m_model->actionType())
         {
             case ActionType::cameraRecordingAction:
-                dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraRecordingPolicy>(
-                    selectedCameras, this);
+                updateCameraResources<QnCameraRecordingPolicy>(m_model, this);
                 break;
             case ActionType::bookmarkAction:
-                dialogAccepted = CameraSelectionDialog::selectCameras<QnBookmarkActionPolicy>(
-                    selectedCameras, this);
+                updateCameraResources<QnBookmarkActionPolicy>(m_model, this);
                 break;
             case ActionType::cameraOutputAction:
-                dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraOutputPolicy>(
-                    selectedCameras, this);
+                updateCameraResources<QnCameraOutputPolicy>(m_model, this);
                 break;
             case ActionType::executePtzPresetAction:
-                dialogAccepted = CameraSelectionDialog::selectCameras<QnExecPtzPresetPolicy>(
-                    selectedCameras, this);
+                updateCameraResources<QnExecPtzPresetPolicy>(m_model, this);
                 break;
             case ActionType::playSoundAction:
             case ActionType::playSoundOnceAction:
             case ActionType::sayTextAction:
-                dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraAudioTransmitPolicy>(
-                    selectedCameras, this);
+                updateCameraResources<QnCameraAudioTransmitPolicy>(m_model, this);
                 break;
             default:
-                dialogAccepted = CameraSelectionDialog::selectCameras
-                    <CameraSelectionDialog::DummyPolicy>(selectedCameras, this);
+                updateCameraResources<CameraSelectionDialog::DummyPolicy>(m_model, this);
                 break;
         }
-
-        if (dialogAccepted)
-            m_model->setActionResources(selectedCameras);
     }
 }
 
