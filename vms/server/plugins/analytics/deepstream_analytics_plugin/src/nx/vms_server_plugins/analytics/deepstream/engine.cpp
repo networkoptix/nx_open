@@ -131,7 +131,7 @@ const IString* Engine::manifest(Error* error) const
     }
     else
     {
-        for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+        for (int i = 0; i < (int) m_objectClassDescritions.size(); ++i)
         {
             objectTypesManifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
             if (i < (int) m_objectClassDescritions.size() - 1)
