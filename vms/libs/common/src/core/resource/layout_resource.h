@@ -99,6 +99,7 @@ public:
     static QRect backgroundRect(const QSize& backgroundSize);
 
     /** Filename of background image on Server */
+    bool hasBackground() const;
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);
 

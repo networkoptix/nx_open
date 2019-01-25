@@ -366,6 +366,11 @@ QRect QnLayoutResource::backgroundRect(const QSize& backgroundSize)
     return QRect(-left, -top, backgroundSize.width(), backgroundSize.height());
 }
 
+bool QnLayoutResource::hasBackground() const
+{
+    return !backgroundImageFilename().isEmpty();
+}
+
 /********* Background image id property **********/
 QString QnLayoutResource::backgroundImageFilename() const
 {
