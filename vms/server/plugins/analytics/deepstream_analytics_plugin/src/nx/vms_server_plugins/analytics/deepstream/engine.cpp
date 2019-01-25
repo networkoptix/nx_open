@@ -63,7 +63,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
 
-    if (const auto timeProvider = nxpt::queryInterfacePtr<nxpl::TimeProvider>(
+    if (const auto timeProvider = queryInterfacePtr<nxpl::TimeProvider>(
         m_plugin->pluginContainer(), nxpl::IID_TimeProvider))
     {
         m_timeProvider = decltype(m_timeProvider)(

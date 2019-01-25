@@ -118,7 +118,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
 
-    auto camManager2 = nxpt::queryInterfacePtr<nxcip::BaseCameraManager2>(
+    auto camManager2 = nx::sdk::queryInterfacePtr<nxcip::BaseCameraManager2>(
         m_camManager.getRef(), nxcip::IID_BaseCameraManager2);
     if( !camManager2 )
         return;
@@ -177,7 +177,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
-            if (const auto mediaEncoder4 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
+            if (const auto mediaEncoder4 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
                 intf, nxcip::IID_CameraMediaEncoder4))
             {
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
@@ -194,7 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             intf->queryInterface(nxcip::IID_CameraMediaEncoder2)),
         refDeleter);
 
-    auto mediaEncoder3 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder3>(
+    auto mediaEncoder3 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder3>(
         intf, nxcip::IID_CameraMediaEncoder3);
 
     if (mediaEncoder3) //< One-call config.
@@ -619,7 +619,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
 
     QnAbstractMediaDataPtr mediaPacket;
 
-    if (const auto mediaDataPacket2 = nxpt::queryInterfacePtr<nxcip::MediaDataPacket2>(
+    if (const auto mediaDataPacket2 = nx::sdk::queryInterfacePtr<nxcip::MediaDataPacket2>(
         packet, nxcip::IID_MediaDataPacket2))
     {
         auto extradataSize = mediaDataPacket2->extradataSize();

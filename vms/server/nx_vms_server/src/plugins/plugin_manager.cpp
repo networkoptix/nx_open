@@ -215,7 +215,7 @@ bool PluginManager::loadNxPlugin(
     NX_WARNING(this, "Loaded Nx plugin [%1]", filename);
     m_nxPlugins.push_back(obj);
 
-    if (const auto pluginObj = nxpt::queryInterfacePtr<nxpl::Plugin>(obj, nxpl::IID_Plugin))
+    if (const auto pluginObj = queryInterfacePtr<nxpl::Plugin>(obj, nxpl::IID_Plugin))
     {
         if (isAnalyticsPlugin && pluginObj->name() != libName)
         {
@@ -228,7 +228,7 @@ bool PluginManager::loadNxPlugin(
             pluginObj->setSettings(settingsHolder.array(), settingsHolder.size());
     }
 
-    if (const auto plugin2Obj = nxpt::queryInterfacePtr<nxpl::Plugin2>(obj, nxpl::IID_Plugin2))
+    if (const auto plugin2Obj = queryInterfacePtr<nxpl::Plugin2>(obj, nxpl::IID_Plugin2))
     {
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);

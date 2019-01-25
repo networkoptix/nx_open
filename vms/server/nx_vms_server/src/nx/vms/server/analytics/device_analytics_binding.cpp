@@ -337,7 +337,7 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
         return nullptr;
     }
 
-    auto streamConsumer = nxpt::queryInterfacePtr<IConsumingDeviceAgent>(deviceAgent,
+    auto streamConsumer = queryInterfacePtr<IConsumingDeviceAgent>(deviceAgent,
         IID_ConsumingDeviceAgent);
 
     m_isStreamConsumer = streamConsumer != nullptr;
@@ -499,7 +499,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
 
         return true;
     }
-    auto consumingDeviceAgent = nxpt::queryInterfacePtr<IConsumingDeviceAgent>(m_deviceAgent,
+    auto consumingDeviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(m_deviceAgent,
         IID_ConsumingDeviceAgent);
 
     if (!NX_ASSERT(consumingDeviceAgent))

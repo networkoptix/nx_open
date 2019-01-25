@@ -178,6 +178,18 @@ static Ptr<Interface> queryInterfacePtr(RefCountablePtr refCountable)
 }
 
 /**
+ * Calls queryInterface() from old SDK and returns a smart pointer to its result, possibly null.
+ */
+template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr,
+    /*deduced*/ typename InterfaceId>
+static Ptr<Interface> queryInterfacePtr(
+    RefCountablePtr refCountable, const InterfaceId& interfaceId)
+{
+    return Ptr<Interface>(
+        static_cast<Interface*>(refCountable->queryInterface(interfaceId)));
+}
+
+/**
  * Intended for debug. Is not thread-safe.
  * @return Reference counter, or 0 if the pointer is null.
  */

@@ -55,14 +55,14 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     }
 
     bool handled = false;
-    if (const auto eventsPacket = nxpt::queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
+    if (const auto eventsPacket = queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
         IID_EventMetadataPacket))
     {
         handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = nxpt::queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
+    if (const auto objectsPacket = queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
         IID_ObjectMetadataPacket))
     {
         handleObjectMetadataPacket(objectsPacket);

@@ -26,7 +26,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
         return;
     }
 
-    const auto video = nxpt::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(
+    const auto video = nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(
         frame, nx::sdk::analytics::IID_CompressedVideoPacket);
     if (!video)
     {
