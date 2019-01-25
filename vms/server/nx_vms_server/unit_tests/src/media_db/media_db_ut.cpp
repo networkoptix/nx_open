@@ -455,7 +455,7 @@ public:
         tfop.chunksCatalog = mediaFileOp.getCatalog();
         tfop.code = (int)mediaFileOp.getRecordType();
         tfop.duration = mediaFileOp.getDuration();
-        tfop.timeZone = mediaFileOp.getTimeZone();
+        tfop.timeZone = mediaFileOp.getTimeZoneV2();
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.fileIndex = mediaFileOp.getFileTypeIndex();
         tfop.startTime = mediaFileOp.getStartTime();
@@ -615,7 +615,7 @@ TEST_F(MediaDbTest, BitsTwiddling)
         ASSERT_TRUE(mfop.getFileTypeIndex() == tfop.fileIndex);
         ASSERT_TRUE(mfop.getRecordType() == nx::media_db::RecordType(tfop.code));
         ASSERT_TRUE(mfop.getStartTime() == tfop.startTime);
-        ASSERT_TRUE(mfop.getTimeZone() == tfop.timeZone);
+        ASSERT_TRUE(mfop.getTimeZoneV2() == tfop.timeZone);
     }
 
     std::vector<TestCameraOperation> copVector;

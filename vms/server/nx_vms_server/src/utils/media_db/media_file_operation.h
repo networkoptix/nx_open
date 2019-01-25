@@ -55,10 +55,9 @@ struct MediaFileOperation: RecordBase
         part2 |= (quint64)duration & getBitMask(0x10);
     }
 
-    int getTimeZone() const
+    int getTimeZoneV1() const
     {
         bool isPositive = ((part2 >> 0x10) & 0x1) == 0;
-
         int intPart = (part2 >> 0x11) & getBitMask(0x4);
         int remainder = (part2 >> 0x15) & 0x3;
 
@@ -74,27 +73,24 @@ struct MediaFileOperation: RecordBase
             result += 45;
             break;
         }
-
         return result * (isPositive ? 1 : -1);
+    }
+
+    int getTimeZoneV2() const
+    {
+        bool isPositive = ((part2 >> 0x10) & 0x1) == 0;
+        const int intPart = (part2 >> 0x11) & getBitMask(0x6);
+        return intPart * 15 * (isPositive ? 1 : -1);
     }
 
     void setTimeZone(int timeZone)
     {
         part2 &= ~(0x7fULL << 0x10);
-
         if (timeZone < 0)
             part2 |= 0x1ULL << 0x10;
 
-        timeZone = qAbs(timeZone);
-
-        int intPart = timeZone / 60;
-        part2 |= ((quint64)intPart & getBitMask(0x4)) << 0x11;
-
-        int remainderPart = timeZone - intPart * 60;
-        if (remainderPart == 30)
-            part2 |= (0x1ULL & 0x3) << 0x15;
-        else if (remainderPart == 45)
-            part2 |= (0x2ULL & 0x3) << 0x15;
+        const int intPart = qAbs(timeZone) / 15;
+        part2 |= ((quint64)intPart & getBitMask(0x6)) << 0x11;
     }
 
     qint64 getFileSize() const

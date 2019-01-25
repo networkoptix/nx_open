@@ -25,7 +25,7 @@ inline void AV_WRITE_BUFFER(char** dst, const char* src, qint64 size)
     *dst += size;
 }
 
-const uint8_t kDbVersion = 1;
+const uint8_t kDbVersion = 2;
 
 /*    It is ok to have at most 2 read errors per storage at mediaserver start.
 *    In most cases this means that we've read all data and hit the eof.
@@ -330,7 +330,8 @@ bool QnStorageDb::createDatabase(const QString &fileName)
 
     m_dbHelper.setMode(nx::media_db::Mode::Read);
 
-    if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
+    uint8_t dbVersion;
+    if (m_dbHelper.readFileHeader(&dbVersion) != nx::media_db::Error::NoError)
     {   // either file has just been created or unrecognized format
         return startDbFile();
     }
@@ -402,8 +403,6 @@ bool QnStorageDb::startDbFile()
         NX_WARNING(this, lit("%1 write DB header failed").arg(Q_FUNC_INFO));
         return false;
     }
-    m_dbVersion = kDbVersion;
-
     return true;
 }
 
@@ -447,12 +446,17 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
     fileBuffer.open(QIODevice::ReadOnly);
     m_dbHelper.setDevice(&fileBuffer);
 
-    auto err = m_dbHelper.readFileHeader(&m_dbVersion);
+    uint8_t dbVersion;
+    auto err = m_dbHelper.readFileHeader(&dbVersion);
     if (err != nx::media_db::Error::NoError)
     {
         NX_WARNING(this, lit("%1 read DB header failed").arg(Q_FUNC_INFO));
         return false;
     }
+
+    m_getTimeZoneFunc = dbVersion == 1
+        ? &nx::media_db::MediaFileOperation::getTimeZoneV1
+        : &nx::media_db::MediaFileOperation::getTimeZoneV2;
 
     nx::media_db::Error error;
     int64_t recordCount = 0;
@@ -526,7 +530,7 @@ QByteArray QnStorageDb::serializeData() const
     writeBuf.resize(dataSize);
 
     nx::media_db::FileHeader fh;
-    fh.setDbVersion(m_dbVersion);
+    fh.setDbVersion(kDbVersion);
 
     char* dst = writeBuf.data();
 
@@ -689,7 +693,8 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     DeviceFileCatalog::Chunk newChunk(
         DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
                                  mediaFileOp.getFileTypeIndex(),
-                                 mediaFileOp.getDuration(), mediaFileOp.getTimeZone(),
+                                 mediaFileOp.getDuration(),
+                                 (mediaFileOp.*m_getTimeZoneFunc)(),
                                  (quint16)(mediaFileOp.getFileSize() >> 32),
                                  (quint32)mediaFileOp.getFileSize()));
     switch (opType)

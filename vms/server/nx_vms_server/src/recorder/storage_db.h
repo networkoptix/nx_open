@@ -103,7 +103,6 @@ private:
     nx::media_db::DbHelper m_dbHelper;
     std::unique_ptr<QIODevice> m_ioDevice;
     QString m_dbFileName;
-    uint8_t m_dbVersion;
     UuidToHash m_uuidToHash;
     UuidToHash m_readUuidToHash;
     UuidToCatalogs m_readData;
@@ -119,6 +118,8 @@ private:
     nx::utils::thread m_vacuumThread;
     std::atomic<bool> m_vacuumThreadRunning;
     mutable QnMutex m_vacuumMutex;
+
+    int (nx::media_db::MediaFileOperation::*m_getTimeZoneFunc)() const;
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;
