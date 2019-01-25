@@ -5,7 +5,7 @@
 namespace nx {
 namespace p2p {
 
-class Connection: public ConnectionBase, public QnCommonModuleAware
+class Connection: public ConnectionBase, public /*mixin*/ QnCommonModuleAware
 {
 public:
     using ValidateRemotePeerFunc =

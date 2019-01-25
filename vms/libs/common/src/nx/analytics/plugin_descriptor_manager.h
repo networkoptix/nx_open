@@ -10,7 +10,7 @@
 
 namespace nx::analytics {
 
-class PluginDescriptorManager: public QnCommonModuleAware
+class PluginDescriptorManager: public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 

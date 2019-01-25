@@ -79,7 +79,7 @@ struct ServerConnectionBase::Result<QByteArray>
  */
 class ServerConnection:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public Qn::EnableSafeDirectConnection,
     public ServerConnectionBase
 {

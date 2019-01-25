@@ -15,7 +15,7 @@ namespace nx {
 namespace vms {
 namespace utils {
 
-class SystemSettingsProcessor: public QnCommonModuleAware
+class SystemSettingsProcessor: public /*mixin*/ QnCommonModuleAware
 {
 public:
     using BeforeUpdatingSettingValueHandler = nx::utils::MoveOnlyFunc<void(

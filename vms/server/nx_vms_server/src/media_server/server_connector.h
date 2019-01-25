@@ -9,7 +9,7 @@
 
 class QnServerConnector:
     public QObject,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

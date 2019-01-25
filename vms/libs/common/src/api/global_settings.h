@@ -113,7 +113,7 @@ const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
 
 using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
-class QnGlobalSettings: public Connective<QObject>, public QnCommonModuleAware
+class QnGlobalSettings: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

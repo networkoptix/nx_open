@@ -24,7 +24,7 @@
 class QnCameraUserAttributePool:
     public QObject,
     public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

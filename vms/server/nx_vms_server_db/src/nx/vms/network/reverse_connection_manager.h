@@ -22,7 +22,7 @@ namespace network {
 
 class ReverseConnectionManager:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public AbstractServerConnector
 {
     Q_OBJECT

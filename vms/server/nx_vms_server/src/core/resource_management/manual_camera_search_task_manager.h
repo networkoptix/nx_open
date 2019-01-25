@@ -10,7 +10,7 @@
 
 #include "manual_camera_search_task.h"
 
-class QnManualSearchTaskManager: public QnCommonModuleAware, public nx::network::QnStoppableAsync
+class QnManualSearchTaskManager: public /*mixin*/ QnCommonModuleAware, public nx::network::QnStoppableAsync
 {
 public:
     using TasksFinishedCallback = nx::utils::MoveOnlyFunc<void(QnManualResourceSearchList)>;

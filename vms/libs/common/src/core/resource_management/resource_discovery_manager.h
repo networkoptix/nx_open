@@ -81,7 +81,7 @@ class QnResourceDiscoveryManager
 :
     public Connective<QnLongRunnable>,
     public QnResourceFactory,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = Connective<QnLongRunnable>;

@@ -23,7 +23,7 @@ enum class DiscoveryMode
 /**
  * Interface for resource searcher plugins.
  */
-class QnAbstractResourceSearcher: public QnResourceFactory, public QnCommonModuleAware
+class QnAbstractResourceSearcher: public QnResourceFactory, public /*mixin*/ QnCommonModuleAware
 {
 protected:
     explicit QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept;
