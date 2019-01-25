@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/url/url_parse_helper.h>            
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/http/writable_message_body.h>
 #include <nx/utils/log/logger_builder.h>
 #include <nx/utils/log/logger_collection.h>
@@ -100,7 +100,7 @@ void Server::serveDeleteLogger(
     {
         return completionHandler(http::StatusCode::badRequest);
     }
-    
+
     if (!m_loggerCollection->get(loggerId))
         return completionHandler(http::RequestResult(http::StatusCode::notFound));
 
@@ -142,12 +142,12 @@ void Server::servePostLogger(
         logger,
         m_loggerCollection->getEffectiveTags(loggerId),
         loggerId);
-    
+
     http::RequestResult result(http::StatusCode::created);
     result.dataSource = std::make_unique<http::BufferSource>(
         "application/json",
         QJson::serialized(loggerInfo));
-    
+
     completionHandler(std::move(result));
 }
 
@@ -162,7 +162,7 @@ void Server::serveGetStreamingLogger(
     auto messageBody = std::make_unique<WritableMessageBody>("text/plain");
     auto logWriter = std::make_unique<StreamingLogWriter>(messageBody.get());
     auto logWriterPtr = logWriter.get();
-    
+
     Settings logSettings;
     logSettings.loggers.push_back(loggerSettings);
 
@@ -174,16 +174,12 @@ void Server::serveGetStreamingLogger(
         std::move(logWriter));
     if (!newLogger)
         return completionHandler(http::StatusCode::internalServerError);
-    
+
     std::shared_ptr<AbstractLogger> sharedNewLogger(std::move(newLogger));
 
     int loggerId = m_loggerCollection->add(sharedNewLogger);
     if (loggerId == LoggerCollection::kInvalidId)
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
-
-    auto logger = m_loggerCollection->get(loggerId);
-    if (!logger)
-        return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
 
     messageBody->setOnBeforeDestructionHandler(
         [this, sharedNewLogger, logWriterPtr, loggerId]()
