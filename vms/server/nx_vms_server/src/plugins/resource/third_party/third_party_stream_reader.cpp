@@ -615,7 +615,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
-    nx::sdk::Ptr<nxcip::MediaDataPacket> packetAp(packet);
+    auto packetAp = nx::sdk::toPtr(packet);
 
     QnAbstractMediaDataPtr mediaPacket;
 

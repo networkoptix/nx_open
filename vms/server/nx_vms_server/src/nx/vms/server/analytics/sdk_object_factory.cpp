@@ -141,7 +141,7 @@ bool SdkObjectFactory::initPluginResources()
     std::map<QnUuid, Ptr<IPlugin>> sdkPluginsById;
     for (const auto analyticsPlugin: analyticsPlugins)
     {
-        auto analyticsPluginPtr = Ptr<IPlugin>(analyticsPlugin);
+        const auto analyticsPluginPtr = toPtr(analyticsPlugin);
 
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
@@ -293,7 +293,7 @@ bool SdkObjectFactory::initEngineResources()
             }
 
             Error error = Error::noError;
-            Ptr<IEngine> sdkEngine(sdkPlugin->createEngine(&error));
+            const auto sdkEngine = toPtr(sdkPlugin->createEngine(&error));
             if (!sdkEngine)
             {
                 NX_WARNING(this, "Unable to create a SDK engine %1 (%2)",

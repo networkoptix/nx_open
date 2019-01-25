@@ -133,6 +133,19 @@ TEST(Ptr, basic)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
+TEST(Ptr, toPtr)
+{
+    Data::s_destructorCalled = false;
+    {
+        Data* p = new Data(42);
+        const Ptr<Data> data = toPtr(p);
+        ASSERT_EQ(p, data.get());
+        ASSERT_EQ(1, data->refCount());
+        ASSERT_FALSE(Data::s_destructorCalled);
+    } //< data destroyed via ~Ptr().
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
 TEST(Ptr, assign)
 {
     Data::s_destructorCalled = false;

@@ -88,7 +88,7 @@ void MetadataHandler::handleEventMetadataPacket(
 
     for (int i = 0; i < eventMetadataPacket->count(); ++i)
     {
-        if (const auto eventMetadata = Ptr<const IEventMetadata>(eventMetadataPacket->at(i)))
+        if (const auto eventMetadata = toPtr(eventMetadataPacket->at(i)))
             handleEventMetadata(eventMetadata, eventMetadataPacket->timestampUs());
         else
             break;
@@ -101,7 +101,7 @@ void MetadataHandler::handleObjectMetadataPacket(
     nx::common::metadata::DetectionMetadataPacket data;
     for (int i = 0; i < objectMetadataPacket->count(); ++i)
     {
-        Ptr<const IObjectMetadata> item(objectMetadataPacket->at(i));
+        const auto item = toPtr(objectMetadataPacket->at(i));
         if (!item)
             break;
 

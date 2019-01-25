@@ -186,7 +186,7 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
     jsonEngine.applyValues(settingsFromProperty);
 
-    const Ptr<IStringMap> pluginSideSettings(deviceAgent->pluginSideSettings());
+    const auto pluginSideSettings = toPtr(deviceAgent->pluginSideSettings());
     if (!pluginSideSettings)
     {
         NX_DEBUG(this, "Got null device agent settings for device %1 (%2) and engine %3 (%4)",
@@ -328,7 +328,7 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
     }
 
     Error error = Error::noError;
-    Ptr<DeviceAgent> deviceAgent(sdkEngine->obtainDeviceAgent(deviceInfo.get(), &error));
+    const auto deviceAgent = toPtr(sdkEngine->obtainDeviceAgent(deviceInfo.get(), &error));
 
     if (!deviceAgent)
     {

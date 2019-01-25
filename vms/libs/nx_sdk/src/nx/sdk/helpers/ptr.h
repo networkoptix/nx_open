@@ -159,6 +159,18 @@ template<class RefCountable>
 bool operator!=(std::nullptr_t, const Ptr<RefCountable>& ptr) { return (bool) ptr; }
 
 /**
+ * Wrapper for Ptr constructor - needed to use the template argument deduction.
+ *
+ * NOTE: Will not be needed after migrating to C++17 because of the support for constructor
+ * template argument deduction.
+ */
+template<class RefCountable>
+static Ptr<RefCountable> toPtr(RefCountable* refCountable)
+{
+    return Ptr<RefCountable>(refCountable);
+}
+
+/**
  * Creates a new object via `new` (with reference count of 1) and returns a smart pointer to it.
  */
 template<class RefCountable, typename... Args>

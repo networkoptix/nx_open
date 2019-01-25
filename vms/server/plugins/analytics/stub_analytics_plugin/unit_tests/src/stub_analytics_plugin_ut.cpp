@@ -46,7 +46,8 @@ static std::string trimString(const std::string& s)
 static void testEngineManifest(IEngine* engine)
 {
     Error error = Error::noError;
-    const Ptr<const IString> manifest(engine->manifest(&error));
+
+    const auto manifest = toPtr(engine->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
@@ -67,7 +68,7 @@ static void testEngineManifest(IEngine* engine)
 static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 {
     Error error = Error::noError;
-    const Ptr<const IString> manifest(deviceAgent->manifest(&error));
+    const auto manifest = toPtr(deviceAgent->manifest(&error));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
