@@ -19,7 +19,7 @@ static const nxpl::NX_GUID IID_Action =
     {{0x92,0xF4,0x7D,0x22,0x1A,0x57,0x43,0xC6,0xB8,0x43,0xF4,0x27,0xB2,0x1B,0xD0,0x3F}};
 
 /**
- * Interface to an object supplied to IEngine::executeAction().
+ * Object supplied to IEngine::executeAction().
  */
 class IAction: public nxpl::PluginInterface
 {

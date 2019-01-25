@@ -136,7 +136,7 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto analyticsPlugins = pluginManager->findNxPlugins<IPlugin>(IID_Plugin);
+    const auto analyticsPlugins = pluginManager->findNxPlugins<IPlugin>(IID_Plugin);
 
     std::map<QnUuid, Ptr<IPlugin>> sdkPluginsById;
     for (const auto analyticsPlugin: analyticsPlugins)
