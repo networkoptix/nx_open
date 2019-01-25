@@ -28,7 +28,7 @@ struct MediaFileOperation: RecordBase
 
     void setCameraIdUnsafe(quint64 cameraId)
     {
-        NX_DEBUG_ONLY_ASSERT(getCameraId() == 0);
+        NX_ASSERT_HEAVY_CONDITION(getCameraId() == 0);
         part1 |= cameraId << 0x2;
     }
 
@@ -54,7 +54,7 @@ struct MediaFileOperation: RecordBase
 
     void setStartTimeUnsafe(quint64 startTime)
     {
-        NX_DEBUG_ONLY_ASSERT(getStartTimeV2() == 0);
+        NX_ASSERT_HEAVY_CONDITION(getStartTimeV2() == 0);
         part1 |= (startTime & getBitMask(0x2a)) << 0x12;
     }
 
@@ -74,7 +74,7 @@ struct MediaFileOperation: RecordBase
 
     void setDurationUnsafe(int duration)
     {
-        NX_DEBUG_ONLY_ASSERT(getDuration() == 0);
+        NX_ASSERT_HEAVY_CONDITION(getDuration() == 0);
         part1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3c;
         part2 |= (quint64)duration & getBitMask(0x10);
     }
@@ -115,7 +115,7 @@ struct MediaFileOperation: RecordBase
 
     void setTimeZoneUnsafe(int timeZone)
     {
-        NX_DEBUG_ONLY_ASSERT(getTimeZoneV2() == 0);
+        NX_ASSERT_HEAVY_CONDITION(getTimeZoneV2() == 0);
 
         if (timeZone < 0)
             part2 |= 0x1ULL << 0x10;
@@ -150,8 +150,8 @@ struct MediaFileOperation: RecordBase
 
     void setFileSizeUnsafe(quint64 fileSize)
     {
-        NX_DEBUG_ONLY_ASSERT(getFileSize() == 0);
-        NX_DEBUG_ONLY_ASSERT(fileSize <= kMaxFileSizeValue);
+        NX_ASSERT_HEAVY_CONDITION(getFileSize() == 0);
+        NX_ASSERT_HEAVY_CONDITION(fileSize <= kMaxFileSizeValue);
         part2 |= fileSize << 0x17;
     }
 
@@ -170,8 +170,8 @@ struct MediaFileOperation: RecordBase
 
     void setFileTypeIndexUnsafe(int fileTypeIndex)
     {
-        NX_DEBUG_ONLY_ASSERT(getFileTypeIndex() == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
-        NX_DEBUG_ONLY_ASSERT(
+        NX_ASSERT_HEAVY_CONDITION(getFileTypeIndex() == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+        NX_ASSERT_HEAVY_CONDITION(
             fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
             || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
 
@@ -192,8 +192,8 @@ struct MediaFileOperation: RecordBase
 
     void setCatalogUnsafe(quint64 catalog)
     {
-        NX_DEBUG_ONLY_ASSERT(getCatalog() == 0);
-        NX_DEBUG_ONLY_ASSERT(catalog < 2);
+        NX_ASSERT_HEAVY_CONDITION(getCatalog() == 0);
+        NX_ASSERT_HEAVY_CONDITION(catalog < 2);
         part2 |= catalog << 0x3f;
     }
 
