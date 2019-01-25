@@ -77,7 +77,7 @@ protected: // 'protected' -> enable access for ut
 
 class QnRecordingManager:
     public QThread,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

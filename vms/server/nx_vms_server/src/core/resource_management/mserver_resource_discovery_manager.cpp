@@ -89,14 +89,14 @@ void QnMServerResourceDiscoveryManager::stop()
 QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& resourceTypeId,
     const QnResourceParams& params)
 {
-    QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
-    if( res )
+    QnResourcePtr res = QnResourceDiscoveryManager::createResource(resourceTypeId, params);
+    if (res)
         return res;
 
     const QnResourceTypePtr& resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    if( !resourceType )
+    if (!resourceType)
         return res;
-    return QnResourcePtr(new DataOnlyCameraResource( resourceTypeId ));   //found resource type, but could not find factory. Disabled discovery?
+    return QnResourcePtr(new DataOnlyCameraResource(resourceTypeId));   //found resource type, but could not find factory. Disabled discovery?
 }
 
 static void printInLogNetResources(const QnResourceList& resources)
@@ -280,7 +280,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     //preserving "manuallyAdded" flag
                     const bool isDiscoveredManually = newCamRes->isManuallyAdded();
                     newNetRes->update(existCamRes);
-                    newCamRes->setManuallyAdded( isDiscoveredManually );
+                    newCamRes->setManuallyAdded(isDiscoveredManually);
                     NX_ASSERT(newNetRes->resourcePool() == nullptr);
                     newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
@@ -305,7 +305,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
-                    if( errorCode != ec2::ErrorCode::ok )
+                    if (errorCode != ec2::ErrorCode::ok)
                         NX_WARNING(this, QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)));
                     existCamRes->saveProperties();
                 }
@@ -402,7 +402,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
 
     std::vector<QnManualCameraInfo> newCameras;
     {
-        QnMutexLocker lock( &m_searchersListMutex );
+        QnMutexLocker lock(&m_searchersListMutex);
         const auto camera = resource.dynamicCast<QnSecurityCamResource>();
         if (!camera || !camera->isManuallyAdded())
             return;
@@ -474,7 +474,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (res->hasFlags(Qn::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
-        if( res->hasFlags(Qn::foreigner) )      //this camera belongs to some other mediaserver
+        if (res->hasFlags(Qn::foreigner))      //this camera belongs to some other mediaserver
         {
             continue;
         }

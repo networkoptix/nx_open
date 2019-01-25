@@ -19,7 +19,7 @@ namespace plugins {
 class HanwhaResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 
 {
 public:
@@ -54,7 +54,7 @@ private:
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
         const nx::utils::MacAddress& mac,
-        QnResourceList& result );
+        QnResourceList& result);
 
     bool isHanwhaCamera(const nx::network::upnp::DeviceInfo& devInfo) const;
 

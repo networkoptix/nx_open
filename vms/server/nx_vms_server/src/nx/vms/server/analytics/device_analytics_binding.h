@@ -27,7 +27,7 @@ namespace nx::vms::server::analytics {
 
 class DeviceAnalyticsBinding:
     public QnAbstractDataConsumer,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 
 {
     using base_type = QnAbstractDataConsumer;

@@ -96,8 +96,7 @@ const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 } // namespace <anonymous>
 
-
-class ArchiveScanPosition: public nx::vms::server::ServerModuleAware
+class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
@@ -3116,4 +3115,3 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     return result | storage->statusFlag();
 }
-

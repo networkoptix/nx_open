@@ -14,7 +14,7 @@ class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:

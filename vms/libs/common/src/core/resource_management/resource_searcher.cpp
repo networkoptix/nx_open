@@ -75,13 +75,13 @@ QnAbstractFileResourceSearcher::QnAbstractFileResourceSearcher(QnCommonModule* c
 
 QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
 {
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
     return m_pathListToCheck;
 }
 
 void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
 {
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
     m_pathListToCheck = paths;
 }
 

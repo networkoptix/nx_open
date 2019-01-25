@@ -29,7 +29,7 @@ namespace nx::vms::server::analytics {
 
 class Manager final:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -120,4 +120,3 @@ private:
 };
 
 } // namespace nx::vms::server::analytics
-

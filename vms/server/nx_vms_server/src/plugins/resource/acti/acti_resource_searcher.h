@@ -12,7 +12,7 @@
 class QnActiResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using base_type = nx::network::upnp::SearchAutoHandler;
 public:
@@ -34,7 +34,6 @@ protected:
         const nx::network::SocketAddress& deviceEndpoint,
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
-
 
 private:
     struct CacheInfo
@@ -74,7 +73,7 @@ private:
         const nx::network::upnp::DeviceInfo& devInfo,
         const nx::utils::MacAddress& mac,
         const QAuthenticator &auth,
-        QnResourceList& result );
+        QnResourceList& result);
 
     boost::optional<QnActiResource::ActiSystemInfo> getActiSystemInfo(
         const QnActiResourcePtr& actiResource);

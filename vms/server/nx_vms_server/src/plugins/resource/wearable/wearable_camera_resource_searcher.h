@@ -7,7 +7,7 @@ class QnMediaServerModule;
 
 class QnWearableCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
@@ -23,4 +23,3 @@ public:
     virtual QnResourceList findResources() override;
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction) override;
 };
-

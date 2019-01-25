@@ -38,7 +38,7 @@ protected:
         QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
-        const QHostAddress& foundHostAddress ) override;
+        const QHostAddress& foundHostAddress) override;
 
 private:
     nx::network::SocketAddress obtainFixedHostAddress(

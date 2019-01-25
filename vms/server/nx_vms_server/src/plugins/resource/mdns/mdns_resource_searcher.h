@@ -29,7 +29,7 @@ protected:
         QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
-        const QHostAddress& foundHostAddress ) = 0;
+        const QHostAddress& foundHostAddress) = 0;
 private:
     QnMediaServerModule* m_serverModule = nullptr;
 };

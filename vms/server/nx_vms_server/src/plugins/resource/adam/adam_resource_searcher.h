@@ -11,7 +11,7 @@
 
 class QnAdamResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     struct QnAdamAsciiCommand
     {

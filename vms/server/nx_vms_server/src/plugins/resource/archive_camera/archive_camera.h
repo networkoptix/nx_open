@@ -6,7 +6,7 @@
 
 class QnArchiveCamResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:

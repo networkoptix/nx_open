@@ -84,7 +84,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         &streamUrl, isCameraControlRequired, params);
-    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
     {
         #if defined(PL_ONVIF_DEBUG)
             qCritical() << "QnOnvifStreamReader::openStream: "
@@ -343,7 +343,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
     const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const
 {
-    Q_UNUSED( isPrimary );
+    Q_UNUSED(isPrimary);
 
     StreamUriResp response;
     StreamUriReq request;

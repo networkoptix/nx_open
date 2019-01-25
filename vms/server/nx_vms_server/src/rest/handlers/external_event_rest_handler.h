@@ -5,7 +5,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 class QnExternalEventRestHandler:
-    public QnJsonRestHandler, public nx::vms::server::ServerModuleAware
+    public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

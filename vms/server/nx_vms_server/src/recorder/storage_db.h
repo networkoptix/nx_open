@@ -22,10 +22,9 @@
 #include "device_file_catalog.h"
 #include <nx/vms/server/server_module_aware.h>
 
-
-class QnStorageDb: 
+class QnStorageDb:
     public nx::media_db::DbHelperHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;

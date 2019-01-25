@@ -424,7 +424,7 @@ QString defaultLocalAddress(const QHostAddress& target)
 
             QString result = socket.localAddress().toString();
 
-            NX_ASSERT(result.length() > 0 );
+            NX_ASSERT(result.length() > 0);
 
             return result;
         }
@@ -779,7 +779,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
     while (servers.empty() && !needToStop())
     {
         ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
-        if( rez == ec2::ErrorCode::ok )
+        if (rez == ec2::ErrorCode::ok)
             break;
 
         qDebug() << "findServer(): Call to getServers failed. Reason: " << ec2::toString(rez);
@@ -888,12 +888,12 @@ void MediaServerProcess::dumpSystemUsageStats()
         m_mediaServer->saveProperties();
     }
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
-        std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
-        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT) );
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
+        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 }
 
 #ifdef Q_OS_WIN
@@ -921,13 +921,13 @@ nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
 
     // ### remove
     QString host = settings->appserverHost();
-    if( QUrl( host ).scheme() == "file" )
+    if (QUrl(host).scheme() == "file")
     {
-        appServerUrl = nx::utils::Url( host ); // it is a completed URL
+        appServerUrl = nx::utils::Url(host); // it is a completed URL
     }
     else if (host.isEmpty() || host == "localhost")
     {
-        appServerUrl = nx::utils::Url::fromLocalFile(closeDirPath(serverModule()->settings().dataDir()) );
+        appServerUrl = nx::utils::Url::fromLocalFile(closeDirPath(serverModule()->settings().dataDir()));
     }
     else
     {
@@ -1028,7 +1028,7 @@ void MediaServerProcess::initResourceTypes()
 
 bool MediaServerProcess::isStopping() const
 {
-    QnMutexLocker lock( &m_stopMutex );
+    QnMutexLocker lock(&m_stopMutex);
     return m_stopping;
 }
 
@@ -1074,7 +1074,7 @@ void MediaServerProcess::stopSync()
 
     if (serviceMainInstance) {
         {
-            QnMutexLocker lock( &m_stopMutex );
+            QnMutexLocker lock(&m_stopMutex);
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
@@ -1156,7 +1156,7 @@ void MediaServerProcess::updateAddressesList()
     for (const auto& host: allLocalAddresses(addressMask))
         serverAddresses << nx::network::SocketAddress(host, port);
 
-    for (const auto& host : m_forwardedAddresses )
+    for (const auto& host : m_forwardedAddresses)
         serverAddresses << nx::network::SocketAddress(host.first, host.second);
 
     if (!m_ipDiscovery->publicIP().isNull())
@@ -4524,7 +4524,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
         appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this,
-            [this, userId]( int /*reqID*/, ec2::ErrorCode /*errorCode*/ )
+            [this, userId]( int /*reqID*/, ec2::ErrorCode /*errorCode*/)
             {
                 m_updateUserRequests.remove(userId);
             });
@@ -4660,7 +4660,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     #if defined(__linux__)
-        signal( SIGUSR1, SIGUSR1_handler );
+        signal( SIGUSR1, SIGUSR1_handler);
     #endif
 
     #if !defined(EDGE_SERVER)

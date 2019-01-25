@@ -13,7 +13,7 @@ class QnMediaServerModule;
 
 class QnTestCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
 public:

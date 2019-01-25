@@ -20,7 +20,7 @@ namespace flir {
 
 class FcResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using DeviceInfo = nx::plugins::flir::fc_private::DeviceInfo;
 

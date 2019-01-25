@@ -11,7 +11,7 @@ class QnCommonModule;
 
 class QnPlArecontResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     typedef std::array<unsigned char, 6> MacArray;
     using base_type = QnAbstractNetworkResourceSearcher;

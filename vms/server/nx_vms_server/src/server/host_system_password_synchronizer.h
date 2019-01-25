@@ -13,7 +13,7 @@
  */
 class HostSystemPasswordSynchronizer:
     public QObject,
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT

@@ -6,7 +6,7 @@
 
 class QnPlC2pCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnPlC2pCameraResourceSearcher(QnMediaServerModule* serverModule);

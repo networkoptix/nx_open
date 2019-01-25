@@ -14,7 +14,7 @@ class QnMediaServerModule;
 class QnPlISDResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 
 public:
@@ -48,7 +48,7 @@ private:
         const nx::network::upnp::DeviceInfo& devInfo,
         const nx::utils::MacAddress& mac,
         const QAuthenticator& auth,
-        QnResourceList& result );
+        QnResourceList& result);
 
     QList<QnResourcePtr> checkHostAddrInternal(
         const nx::utils::Url& url,

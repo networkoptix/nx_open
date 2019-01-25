@@ -6,7 +6,9 @@
 
 class QnAbstractResourceSearcher;
 
-class QnMediaServerResourceSearchers: public QObject, public nx::vms::server::ServerModuleAware
+class QnMediaServerResourceSearchers:
+    public QObject,
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnMediaServerResourceSearchers(QnMediaServerModule* serverModule);

@@ -90,7 +90,6 @@
 #include "server_connector.h"
 #include "resource_status_watcher.h"
 
-
 using namespace nx;
 using namespace nx::vms::server;
 
@@ -111,7 +110,7 @@ void installTranslations()
 
 class ServerDataProviderFactory:
     public QnDataProviderFactory,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ServerDataProviderFactory(QnMediaServerModule* serverModule):
@@ -247,7 +246,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     const bool isRootToolEnabled = !settings().ignoreRootTool();
     m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled, 
+        isRootToolEnabled,
         qApp->applicationFilePath());
 
     #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)

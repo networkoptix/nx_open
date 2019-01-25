@@ -10,7 +10,7 @@ class QnMediaServerModule;
 
 class QnPlDlinkResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 
 public:
