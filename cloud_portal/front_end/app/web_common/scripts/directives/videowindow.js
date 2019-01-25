@@ -76,17 +76,6 @@ import * as Hls from 'hls.js';
                         }
                         
                         function detectBestFormat() {
-                            // Set iOS
-                            if ($window.jscd.os === 'iOS') {
-                                return 'native-hls'; // jshls have problems with iOS
-                            }
-    
-                            // Set Android
-                            if ($window.jscd.os === 'Android') {
-                                return 'jshls';
-                            }
-                            
-                            // ELSE
                             // 1. Hide all informers
                             scope.videoFlags = {
                                 flashRequired: false,
@@ -139,6 +128,17 @@ import * as Hls from 'hls.js';
                                 return src.type === mimeTypes['hls'];
                             });
                             var jsHlsSupported = Hls.isSupported();
+    
+                            // Set iOS
+                            if ($window.jscd.os === 'iOS') {
+                                return 'native-hls'; // jshls have problems with iOS
+                            }
+    
+                            // Set Android
+                            if ($window.jscd.os === 'Android') {
+                                return 'jshls';
+                            }
+                            
                             
                             // No native support
                             // Presume we are on desktop:
