@@ -222,7 +222,7 @@ void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
     }
 }
 
-void Manager::at_deviceEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device)
+void Manager::at_deviceUserEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device)
 {
     auto analyticsContext = context(device);
     if (!analyticsContext)
@@ -233,7 +233,7 @@ void Manager::at_deviceEnabledAnalyticsEnginesChanged(const QnVirtualCameraResou
     }
 
     analyticsContext->setEnabledAnalyticsEngines(
-        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
+        sdk_support::toServerEngineList(device->userEnabledAnalyticsEngineResources()));
 }
 
 void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
@@ -250,12 +250,12 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
 void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
 {
     connect(
-        device, &QnVirtualCameraResource::enabledAnalyticsEnginesChanged,
-        this, &Manager::at_deviceEnabledAnalyticsEnginesChanged);
+        device, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged,
+        this, &Manager::at_deviceUserEnabledAnalyticsEnginesChanged);
 
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(
-        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
+        sdk_support::toServerEngineList(device->userEnabledAnalyticsEngineResources()));
     context->setMetadataSink(metadataSink(device));
 
     if (auto source = mediaSource(device).toStrongRef())

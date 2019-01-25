@@ -86,8 +86,8 @@ bool AnalyticsEngineResource::isEngineEnabledForDevice(
     const QnVirtualCameraResourcePtr& device) const
 {
     const auto engineId = getId();
-    const auto enabledEngines = device->enabledAnalyticsEngines();
-    if (enabledEngines.contains(engineId))
+    const auto userEnabledEngines = device->userEnabledAnalyticsEngines();
+    if (userEnabledEngines.contains(engineId))
         return true;
 
     if (!isDeviceDependent())

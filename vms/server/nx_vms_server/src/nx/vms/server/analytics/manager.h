@@ -76,7 +76,7 @@ private:
     void at_deviceRemoved(const QnVirtualCameraResourcePtr& device);
     void at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device);
 
-    void at_deviceEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device);
+    void at_deviceUserEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device);
 
     void at_deviceStatusChanged(const QnResourcePtr& deviceResource);
 

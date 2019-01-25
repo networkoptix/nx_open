@@ -361,68 +361,15 @@ public:
         addButton("Generate analytics manifests",
             [this]()
             {
-                auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
-                if (servers.empty())
-                    return;
-
-                int serverIndex = 0;
-
-                for (int i = 0; i < 5; ++i)
-                {
-                    nx::vms::api::analytics::EngineManifest manifest;
-                    for (int j = 0; j < 3; ++j)
-                    {
-                        nx::vms::api::analytics::EventType eventType;
-                        eventType.id = "";
-                        eventType.name = lm("Event %1").arg(j);
-                        manifest.eventTypes.push_back(eventType);
-                    }
-
-                    auto server = servers[serverIndex];
-                    auto manifests = server->analyticsDrivers();
-                    manifests.push_back(manifest);
-                    server->setAnalyticsDrivers(manifests);
-                    server->savePropertiesAsync();
-
-                    serverIndex = (serverIndex + 1) % servers.size();
-                }
-
-                for (auto server: servers)
-                {
-                    // TODO: #sivanov: Get rid of the term "driver".
-                    auto drivers = server->analyticsDrivers();
-
-                    // Some devices will not have an Engine.
-                    drivers.push_back(nx::vms::api::analytics::EngineManifest());
-
-                    for (auto camera: resourcePool()->getAllCameras(server, true))
-                    {
-                        const auto randomDriver = nx::utils::random::choice(drivers);
-                        QSet<QString> eventTypeIds;
-                        for (const auto& eventType: randomDriver.eventTypes)
-                            eventTypeIds.insert(eventType.id);
-
-                        camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
-
-                        camera->savePropertiesAsync();
-                    }
-                }
+                // TODO: Implement this method or get rid of it completely.
+                NX_ASSERT(false, "Method is not implemented");
             });
 
         addButton("Clear analytics manifests",
             [this]()
             {
-                for (auto camera: resourcePool()->getAllCameras({}))
-                {
-                    camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
-                    camera->savePropertiesAsync();
-                }
-
-                for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
-                {
-                    server->setAnalyticsDrivers({});
-                    server->savePropertiesAsync();
-                }
+                // TODO: Implement this method or get rid of it completely.
+                NX_ASSERT(false, "Method is not implemented");
             });
 
         for (auto [name, handler]: nx::utils::constKeyValueRange(debugActions()))

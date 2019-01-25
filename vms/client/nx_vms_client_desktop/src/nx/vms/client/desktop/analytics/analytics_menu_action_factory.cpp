@@ -29,7 +29,7 @@ bool analyticsModeCanBeChangedForWidget(QnResourceWidget* widget)
         return false;
 
     const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    return camera && !camera->enabledAnalyticsEngineResources().isEmpty();
+    return camera && !camera->userEnabledAnalyticsEngineResources().isEmpty();
 }
 
 } // namespace
