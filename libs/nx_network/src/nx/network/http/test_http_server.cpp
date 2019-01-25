@@ -15,7 +15,8 @@ TestAuthenticationManager::TestAuthenticationManager(
     nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
     :
     BaseType(authenticationDataProvider),
-    m_authenticationEnabled(false)
+    m_authenticationEnabled(false),
+    m_authenticationSucceeded(true)
 {
 }
 
@@ -31,7 +32,7 @@ void TestAuthenticationManager::authenticate(
     else
     {
         completionHandler(nx::network::http::server::AuthenticationResult(
-            true,
+            m_authenticationSucceeded,
             nx::utils::stree::ResourceContainer(),
             std::nullopt,
             nx::network::http::HttpHeaders(),
@@ -42,6 +43,11 @@ void TestAuthenticationManager::authenticate(
 void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 {
     m_authenticationEnabled = value;
+}
+
+void TestAuthenticationManager::setAuthenticationSucceeded(bool value)
+{
+    m_authenticationSucceeded = value;
 }
 
 //-------------------------------------------------------------------------------------------------
