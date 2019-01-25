@@ -102,7 +102,7 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
     deviceAgent->setSettings(settings); //< Test assigning some settings.
 }
 
-class Action: public IAction
+class Action: public nxpt::CommonRefCounter<IAction>
 {
 public:
     Action(): m_params(new StringMap()) {}
@@ -112,9 +112,6 @@ public:
         ASSERT_TRUE(false);
         return nullptr;
     }
-
-    virtual int addRef() const override { ASSERT_TRUE(false); return -1; }
-    virtual int releaseRef() const override { ASSERT_TRUE(false); return -1; }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
     virtual Uuid objectId() override { return m_objectId; }
@@ -187,45 +184,45 @@ private:
 
 static void testExecuteActionNonExisting(IEngine* engine)
 {
-    Action action;
-    action.m_actionId = "non_existing_actionId";
+    auto action = makePtr<Action>();
+    action->m_actionId = "non_existing_actionId";
 
     Error error = Error::noError;
-    engine->executeAction(&action, &error);
+    engine->executeAction(action.get(), &error);
     ASSERT_TRUE(error != Error::noError);
-    action.assertExpectedState();
+    action->assertExpectedState();
 }
 
 static void testExecuteActionAddToList(IEngine* engine)
 {
-    Action action;
-    action.m_actionId = "nx.stub.addToList";
-    action.setParams({
+    const auto action = makePtr<Action>();
+    action->m_actionId = "nx.stub.addToList";
+    action->setParams({
         {"testTextField", "Some text"},
         {"testSpinBox", "20"},
         {"testDoubleSpinBox", "13.5"},
         {"testComboBox", "value1"},
         {"testCheckBox", "false"}
     });
-    action.m_expectedNonNullMessageToUser = true;
+    action->m_expectedNonNullMessageToUser = true;
 
     Error error = Error::noError;
-    engine->executeAction(&action, &error);
+    engine->executeAction(action.get(), &error);
     ASSERT_EQ(Error::noError, error);
-    action.assertExpectedState();
+    action->assertExpectedState();
 }
 
 static void testExecuteActionAddPerson(IEngine* engine)
 {
-    Action action;
-    action.m_actionId = "nx.stub.addPerson";
-    action.m_objectId = Uuid();
-    action.m_expectedNonNullActionUrl = true;
+    const auto action = makePtr<Action>();
+    action->m_actionId = "nx.stub.addPerson";
+    action->m_objectId = Uuid();
+    action->m_expectedNonNullActionUrl = true;
 
     Error error = Error::noError;
-    engine->executeAction(&action, &error);
+    engine->executeAction(action.get(), &error);
     ASSERT_EQ(Error::noError, error);
-    action.assertExpectedState();
+    action->assertExpectedState();
 }
 
 class DeviceAgentHandler: public IDeviceAgent::IHandler
@@ -309,20 +306,18 @@ TEST(stub_analytics_plugin, test)
 
     Error error = Error::noError;
 
-    nxpl::PluginInterface* const pluginObject = createNxAnalyticsPlugin();
-    ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin2));
-    pluginObject->releaseRef();
-
-    const auto plugin = static_cast<IPlugin*>(pluginObject->queryInterface(IID_Plugin));
+    const auto pluginObject = toPtr(createNxAnalyticsPlugin());
+    ASSERT_TRUE(pluginObject);
+    ASSERT_TRUE(queryInterfacePtr<nxpl::Plugin2>(pluginObject, nxpl::IID_Plugin2));
+    const auto plugin = queryInterfacePtr<IPlugin>(pluginObject, IID_Plugin);
     ASSERT_TRUE(plugin);
 
-    nxpl::PluginInterface* const engineObject = plugin->createEngine(&error);
+    const auto engineObject = toPtr(plugin->createEngine(&error));
     ASSERT_EQ(Error::noError, error);
-
-    auto engine = static_cast<IEngine*>(engineObject->queryInterface(IID_Engine));
+    const auto engine = queryInterfacePtr<IEngine>(engineObject, IID_Engine);
     ASSERT_TRUE(engine);
 
-    ASSERT_EQ(plugin, engine->plugin());
+    ASSERT_EQ(plugin.get(), engine->plugin());
 
     ASSERT_EQ(Error::noError, engine->setHandler(engineHandler.get()));
 
@@ -331,26 +326,24 @@ TEST(stub_analytics_plugin, test)
     NX_PRINT << "Plugin name: [" << pluginName << "]";
     ASSERT_STREQ(pluginName, "stub_analytics_plugin");
 
-    testEngineManifest(engine);
-    testEngineSettings(engine);
-    testExecuteActionNonExisting(engine);
-    testExecuteActionAddToList(engine);
-    testExecuteActionAddPerson(engine);
+    testEngineManifest(engine.get());
+    testEngineSettings(engine.get());
+    testExecuteActionNonExisting(engine.get());
+    testExecuteActionAddToList(engine.get());
+    testExecuteActionAddPerson(engine.get());
 
     const auto deviceInfo = makePtr<DeviceInfo>();
-    auto baseDeviceAgent = engine->obtainDeviceAgent(deviceInfo.get(), &error);
+    const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), &error));
     ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(baseDeviceAgent);
-    ASSERT_TRUE(baseDeviceAgent->queryInterface(IID_DeviceAgent));
-    baseDeviceAgent->releaseRef();
+    ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent, IID_DeviceAgent));
 
-    auto deviceAgent = static_cast<IConsumingDeviceAgent*>(
-        baseDeviceAgent->queryInterface(IID_ConsumingDeviceAgent));
+    const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent,
+        IID_ConsumingDeviceAgent);
     ASSERT_TRUE(deviceAgent);
-    baseDeviceAgent->releaseRef();
 
-    testDeviceAgentManifest(deviceAgent);
-    testDeviceAgentSettings(deviceAgent);
+    testDeviceAgentManifest(deviceAgent.get());
+    testDeviceAgentSettings(deviceAgent.get());
 
     ASSERT_EQ(Error::noError, deviceAgent->setHandler(deviceAgentHandler.get()));
 
@@ -359,10 +352,6 @@ TEST(stub_analytics_plugin, test)
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
     ASSERT_EQ(Error::noError, deviceAgent->pushDataPacket(compressedVideoPacket.get()));
-
-    deviceAgent->releaseRef();
-    engine->releaseRef();
-    plugin->releaseRef();
 }
 
 } // namespace test
