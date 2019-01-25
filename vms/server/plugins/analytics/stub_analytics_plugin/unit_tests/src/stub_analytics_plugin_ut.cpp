@@ -6,6 +6,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
@@ -42,8 +43,6 @@ static std::string trimString(const std::string& s)
     return s.substr(start, end - start + 1);
 }
 
-static const int noError = (int) Error::noError;
-
 static void testEngineManifest(IEngine* engine)
 {
     Error error = Error::noError;
@@ -53,7 +52,7 @@ static void testEngineManifest(IEngine* engine)
     const char* manifestStr = manifest->str();
 
     ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ((int) Error::noError, (int) error);
+    ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "Engine manifest:\n" << manifestStr;
 
@@ -73,7 +72,7 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
     ASSERT_TRUE(manifestStr);
-    ASSERT_EQ(noError, (int) error);
+    ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
 
@@ -211,7 +210,7 @@ static void testExecuteActionAddToList(IEngine* engine)
 
     Error error = Error::noError;
     engine->executeAction(&action, &error);
-    ASSERT_EQ(noError, (int) error);
+    ASSERT_EQ(Error::noError, error);
     action.assertExpectedState();
 }
 
@@ -224,7 +223,7 @@ static void testExecuteActionAddPerson(IEngine* engine)
 
     Error error = Error::noError;
     engine->executeAction(&action, &error);
-    ASSERT_EQ(noError, (int) error);
+    ASSERT_EQ(Error::noError, error);
     action.assertExpectedState();
 }
 
@@ -317,14 +316,14 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(plugin);
 
     nxpl::PluginInterface* const engineObject = plugin->createEngine(&error);
-    ASSERT_EQ(noError, (int) error);
+    ASSERT_EQ(Error::noError, error);
 
     auto engine = static_cast<IEngine*>(engineObject->queryInterface(IID_Engine));
     ASSERT_TRUE(engine);
 
     ASSERT_EQ(plugin, engine->plugin());
 
-    ASSERT_EQ(noError, (int) engine->setHandler(engineHandler.get()));
+    ASSERT_EQ(Error::noError, engine->setHandler(engineHandler.get()));
 
     const std::string pluginName = engine->plugin()->name();
     ASSERT_TRUE(!pluginName.empty());
@@ -339,7 +338,7 @@ TEST(stub_analytics_plugin, test)
 
     const auto deviceInfo = makePtr<DeviceInfo>();
     auto baseDeviceAgent = engine->obtainDeviceAgent(deviceInfo.get(), &error);
-    ASSERT_EQ(noError, (int) error);
+    ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(baseDeviceAgent);
     ASSERT_TRUE(baseDeviceAgent->queryInterface(IID_DeviceAgent));
     baseDeviceAgent->releaseRef();
@@ -352,14 +351,13 @@ TEST(stub_analytics_plugin, test)
     testDeviceAgentManifest(deviceAgent);
     testDeviceAgentSettings(deviceAgent);
 
-    ASSERT_EQ(noError, (int) deviceAgent->setHandler(deviceAgentHandler.get()));
+    ASSERT_EQ(Error::noError, deviceAgent->setHandler(deviceAgentHandler.get()));
 
     const auto metadataTypes = makePtr<MetadataTypes>();
-
-    ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
+    ASSERT_EQ(Error::noError, deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
-    ASSERT_EQ(noError, (int) deviceAgent->pushDataPacket(compressedVideoPacket.get()));
+    ASSERT_EQ(Error::noError, deviceAgent->pushDataPacket(compressedVideoPacket.get()));
 
     deviceAgent->releaseRef();
     engine->releaseRef();

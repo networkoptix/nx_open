@@ -6,6 +6,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>

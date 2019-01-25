@@ -15,16 +15,5 @@ enum class Error: int
     networkError = -22,
 };
 
-inline const char* toString(Error error)
-{
-    switch (error)
-    {
-        case Error::noError: return "noError";
-        case Error::unknownError: return "unknownError";
-        case Error::networkError: return "networkError";
-        default: return "<unsupported Error>";
-    }
-}
-
 } // namespace sdk
 } // namespace nx
