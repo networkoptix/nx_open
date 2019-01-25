@@ -1,6 +1,6 @@
 #include <chrono>
 
-#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
@@ -89,22 +89,22 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
-                auto event = new nx::sdk::analytics::Event();
+                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
                     dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
-                event->setTypeId(dahuaEvent.typeId.toStdString());
-                event->setCaption(dahuaEvent.caption.toStdString());
-                event->setDescription(dahuaEvent.description.toStdString());
-                event->setIsActive(dahuaEvent.isActive);
-                event->setConfidence(1.0);
-                //event->setAuxiliaryData(dahuaEvent.fullEventName.toStdString());
+                eventMetadata->setTypeId(dahuaEvent.typeId.toStdString());
+                eventMetadata->setCaption(dahuaEvent.caption.toStdString());
+                eventMetadata->setDescription(dahuaEvent.description.toStdString());
+                eventMetadata->setIsActive(dahuaEvent.isActive);
+                eventMetadata->setConfidence(1.0);
+                //eventMetadata->setAuxiliaryData(dahuaEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUs(-1);
-                packet->addItem(event);
+                packet->addItem(eventMetadata);
             }
 
             m_handler->handleMetadata(packet);

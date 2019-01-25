@@ -16,18 +16,19 @@ public:
 
     virtual int64_t timestampUs() const override;
     virtual int64_t durationUs() const override;
-    virtual IObject* nextItem() override;
+    virtual int count() const override;
+    virtual const IObjectMetadata* at(int index) const override;
+
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
-    void addItem(IObject* object);
+    void addItem(const IObjectMetadata* object);
     void clear();
 
 private:
     int64_t m_timestampUs = -1;
     int64_t m_durationUs = -1;
 
-    std::vector<IObject*> m_objects;
-    int m_currentIndex = 0;
+    std::vector<const IObjectMetadata*> m_objects;
 };
 
 } // namespace analytics

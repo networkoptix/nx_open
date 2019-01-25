@@ -1,5 +1,7 @@
 #include "object_metadata_packet.h"
 
+#include <nx/kit/debug.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -30,12 +32,17 @@ int64_t ObjectMetadataPacket::durationUs() const
     return m_durationUs;
 }
 
-IObject* ObjectMetadataPacket::nextItem()
+int ObjectMetadataPacket::count() const
 {
-    if (m_currentIndex < (int) m_objects.size())
-        return m_objects[m_currentIndex++];
+    return m_objects.size();
+}
 
-    return nullptr;
+const IObjectMetadata* ObjectMetadataPacket::at(int index) const
+{
+    if (index < 0 || index >= m_objects.size())
+        return nullptr;
+
+    return m_objects[index];
 }
 
 void ObjectMetadataPacket::setTimestampUs(int64_t timestampUs)
@@ -48,15 +55,15 @@ void ObjectMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void ObjectMetadataPacket::addItem(IObject* object)
+void ObjectMetadataPacket::addItem(const IObjectMetadata* object)
 {
+    NX_KIT_ASSERT(object);
     m_objects.push_back(object);
 }
 
 void ObjectMetadataPacket::clear()
 {
     m_objects.clear();
-    m_currentIndex = 0;
 }
 
 } // namespace analytics
