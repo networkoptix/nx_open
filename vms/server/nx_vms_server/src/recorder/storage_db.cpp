@@ -479,6 +479,12 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
 
 bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
 {
+    using namespace std::chrono;
+
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+
+
     QnMutexLocker lk(&m_readMutex);
     auto resetModeGuard = nx::utils::makeScopeGuard(
         [this]()
@@ -511,6 +517,8 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     {
         NX_WARNING(this, lit("%1 DB remove file error").arg(Q_FUNC_INFO));
     }
+
+    NX_DEBUG(this, "total vacuum time: %1", timer.elapsed());
 
     startDbFile();
     return false;
