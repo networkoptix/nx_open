@@ -98,7 +98,7 @@ fi
 
 case "$1" in
     configure)
-        SYSTEM_NAME_DEFAULT=System_${$RANDOM}
+        SYSTEM_NAME_DEFAULT=System_$RANDOM
 
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
