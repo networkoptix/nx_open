@@ -120,6 +120,7 @@ private:
     mutable QnMutex m_vacuumMutex;
 
     int (nx::media_db::MediaFileOperation::*m_getTimeZoneFunc)() const;
+    qint64(nx::media_db::MediaFileOperation::*m_getStartTimeFunc)() const;
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

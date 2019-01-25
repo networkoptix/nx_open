@@ -458,7 +458,7 @@ public:
         tfop.timeZone = mediaFileOp.getTimeZoneV2();
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.fileIndex = mediaFileOp.getFileTypeIndex();
-        tfop.startTime = mediaFileOp.getStartTime();
+        tfop.startTime = mediaFileOp.getStartTimeV2();
 
         if (!m_tdm->seekAndSet(tfop))
             initErrorString("Media file operation not found in the test data");
@@ -614,7 +614,7 @@ TEST_F(MediaDbTest, BitsTwiddling)
         ASSERT_TRUE(mfop.getFileSize() == tfop.fileSize);
         ASSERT_TRUE(mfop.getFileTypeIndex() == tfop.fileIndex);
         ASSERT_TRUE(mfop.getRecordType() == nx::media_db::RecordType(tfop.code));
-        ASSERT_TRUE(mfop.getStartTime() == tfop.startTime);
+        ASSERT_TRUE(mfop.getStartTimeV2() == tfop.startTime);
         ASSERT_TRUE(mfop.getTimeZoneV2() == tfop.timeZone);
     }
 
@@ -673,7 +673,10 @@ TEST_F(MediaDbTest, MediaFileOP_ResetValues)
     mfop.setStartTime(std::pow(2, 42));
     quint64 newStartTime = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 42) - 1));
     mfop.setStartTime(newStartTime);
-    ASSERT_EQ(newStartTime, mfop.getStartTime());
+    ASSERT_EQ(newStartTime, mfop.getStartTimeV2());
+
+    mfop.setStartTime(-1);
+    ASSERT_EQ(-1, mfop.getStartTimeV2());
 }
 
 TEST_F(MediaDbTest, CameraOP_ResetValues)

@@ -5,6 +5,12 @@ namespace nx
 namespace media_db
 {
 
+#if defined(_DEBUG)
+#define NX_DEBUG_ONLY_ASSERT(x) NX_ASSERT(x)
+#else
+#define NX_DEBUG_ONLY_ASSERT(x)
+#endif
+
 inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
 
 enum class RecordType
@@ -31,6 +37,12 @@ struct RecordBase
     {
         part1 &= ~0x3;
         part1 |= (quint64)recordType & 0x3;
+    }
+
+    void setRecordTypeUnsafe(RecordType recordType)
+    {
+        NX_DEBUG_ONLY_ASSERT((int)getRecordType() == 0);
+        part1 |= (quint64)recordType;
     }
 
 };

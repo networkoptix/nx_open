@@ -23,21 +23,39 @@ struct MediaFileOperation: RecordBase
     void setCameraId(int cameraId)
     {
         part1 &= ~(0xffffULL << 0x2);
-        part1 |= ((quint64)cameraId & 0xffff) << 0x2;
+        setCameraIdUnsafe((quint64)cameraId & 0xffff);
     }
 
-    qint64 getStartTime() const
+    void setCameraIdUnsafe(quint64 cameraId)
+    {
+        NX_DEBUG_ONLY_ASSERT(getCameraId() == 0);
+        part1 |= cameraId << 0x2;
+    }
+
+    qint64 getStartTimeV1() const
     {   // -1 is a special value which designates that this operation
         // should be done with entire catalog instead of one chunk.
         qint64 ret = (part1 >> 0x12) & getBitMask(0x2a);
         return ret == 1 ? -1 : ret;
     }
 
+    qint64 getStartTimeV2() const
+    {   // -1 is a special value which designates that this operation
+        // should be done with entire catalog instead of one chunk.
+        qint64 ret = (part1 >> 0x12) & getBitMask(0x2a);
+        return ret == getBitMask(0x2a) ? -1 : ret;
+    }
+
     void setStartTime(qint64 startTime)
     {
-        startTime = startTime == -1 ? 1 : startTime;
         part1 &= ~(getBitMask(0x2a) << 0x12);
-        part1 |= ((quint64)startTime & getBitMask(0x2a)) << 0x12;
+        return setStartTimeUnsafe(startTime);
+    }
+
+    void setStartTimeUnsafe(quint64 startTime)
+    {
+        NX_DEBUG_ONLY_ASSERT(getStartTimeV2() == 0);
+        part1 |= (startTime & getBitMask(0x2a)) << 0x12;
     }
 
     int getDuration() const
@@ -50,8 +68,14 @@ struct MediaFileOperation: RecordBase
     void setDuration(int duration)
     {
         part1 &= ~(0xfULL << 0x3c);
-        part1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3c;
         part2 &= ~getBitMask(0x10);
+        setDurationUnsafe(duration);
+    }
+
+    void setDurationUnsafe(int duration)
+    {
+        NX_DEBUG_ONLY_ASSERT(getDuration() == 0);
+        part1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3c;
         part2 |= (quint64)duration & getBitMask(0x10);
     }
 
@@ -86,11 +110,18 @@ struct MediaFileOperation: RecordBase
     void setTimeZone(int timeZone)
     {
         part2 &= ~(0x7fULL << 0x10);
+        setTimeZoneUnsafe(timeZone);
+    }
+
+    void setTimeZoneUnsafe(int timeZone)
+    {
+        NX_DEBUG_ONLY_ASSERT(getTimeZoneV2() == 0);
+
         if (timeZone < 0)
             part2 |= 0x1ULL << 0x10;
 
-        const int intPart = qAbs(timeZone) / 15;
-        part2 |= ((quint64)intPart & getBitMask(0x6)) << 0x11;
+        const quint64 intPart = (qAbs(timeZone) / 15) & getBitMask(0x6);
+        part2 |= intPart << 0x11;
     }
 
     qint64 getFileSize() const
@@ -98,11 +129,11 @@ struct MediaFileOperation: RecordBase
         return (part2 >> 0x17) & getBitMask(0x27LL);
     }
 
+    const quint64 kFileSizeMaskLength = 0x27ULL;
+    const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
+
     void setFileSize(qint64 fileSize)
     {
-        const quint64 kFileSizeMaskLength = 0x27ULL;
-        const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
-
         part2 &= ~(getBitMask(kFileSizeMaskLength) << 0x17);
         if (fileSize > kMaxFileSizeValue)
         {
@@ -114,8 +145,14 @@ struct MediaFileOperation: RecordBase
             part2 |= (getBitMask(kFileSizeMaskLength)) << 0x17;
             return;
         }
+        setFileSizeUnsafe((quint64)fileSize & getBitMask(kFileSizeMaskLength));
+    }
 
-        part2 |= ((quint64)fileSize & getBitMask(kFileSizeMaskLength)) << 0x17;
+    void setFileSizeUnsafe(quint64 fileSize)
+    {
+        NX_DEBUG_ONLY_ASSERT(getFileSize() == 0);
+        NX_DEBUG_ONLY_ASSERT(fileSize <= kMaxFileSizeValue);
+        part2 |= fileSize << 0x17;
     }
 
     int getFileTypeIndex() const
@@ -127,13 +164,19 @@ struct MediaFileOperation: RecordBase
 
     void setFileTypeIndex(int fileTypeIndex)
     {
-        NX_ASSERT(
+        part2 &= ~(0x1ULL << 0x3e);
+        setFileTypeIndexUnsafe(fileTypeIndex);
+    }
+
+    void setFileTypeIndexUnsafe(int fileTypeIndex)
+    {
+        NX_DEBUG_ONLY_ASSERT(getFileTypeIndex() == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+        NX_DEBUG_ONLY_ASSERT(
             fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
             || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
 
-        quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
-        part2 &= ~(0x1ULL << 0x3e);
-        part2 |= ((quint64)value & 0x1) << 0x3e;
+        const quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
+        part2 |= value << 0x3e;
     }
 
     int getCatalog() const
@@ -144,7 +187,14 @@ struct MediaFileOperation: RecordBase
     void setCatalog(int catalog)
     {
         part2 &= ~(0x1ULL << 0x3f);
-        part2 |= ((quint64)catalog & 0x1) << 0x3f;
+        setCatalogUnsafe(catalog & 0x1);
+    }
+
+    void setCatalogUnsafe(quint64 catalog)
+    {
+        NX_DEBUG_ONLY_ASSERT(getCatalog() == 0);
+        NX_DEBUG_ONLY_ASSERT(catalog < 2);
+        part2 |= catalog << 0x3f;
     }
 
 };

@@ -102,6 +102,9 @@ QnStorageDb::QnStorageDb(
     m_vacuumTimePoint(std::chrono::system_clock::now()),
     m_vacuumThreadRunning(false)
 {
+    using namespace nx::media_db;
+    m_getTimeZoneFunc = &MediaFileOperation::getTimeZoneV2;
+    m_getStartTimeFunc = &MediaFileOperation::getStartTimeV2;
 }
 
 QnStorageDb::~QnStorageDb()
@@ -454,9 +457,11 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
         return false;
     }
 
+    using namespace nx::media_db;
     m_getTimeZoneFunc = dbVersion == 1
-        ? &nx::media_db::MediaFileOperation::getTimeZoneV1
-        : &nx::media_db::MediaFileOperation::getTimeZoneV2;
+        ? &MediaFileOperation::getTimeZoneV1 : &MediaFileOperation::getTimeZoneV2;
+    m_getStartTimeFunc = dbVersion == 1
+        ? &MediaFileOperation::getStartTimeV1 : &MediaFileOperation::getStartTimeV2;
 
     nx::media_db::Error error;
     int64_t recordCount = 0;
@@ -550,9 +555,6 @@ QByteArray QnStorageDb::serializeData() const
         AV_WRITE_BUFFER(&dst, camOp.cameraUniqueId.data(), it->second.size());
     }
 
-    nx::media_db::MediaFileOperation mediaFileOp;
-    mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
-
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
         const auto cameraIdIt = m_readUuidToHash.left.find(it->first);
@@ -562,20 +564,22 @@ QByteArray QnStorageDb::serializeData() const
             NX_DEBUG(this, lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first));
             continue;
         }
-        mediaFileOp.setCameraId(cameraIdIt->second);
 
         for (size_t i = 0; i < kCatalogsCount; ++i)
         {
-            mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
-                QnServer::ChunksCatalog::HiQualityCatalog);
-
             for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
             {
-                mediaFileOp.setStartTime(chunkIt->startTimeMs);
-                mediaFileOp.setDuration(chunkIt->durationMs);
-                mediaFileOp.setTimeZone(chunkIt->timeZone);
-                mediaFileOp.setFileSize(chunkIt->getFileSize());
-                mediaFileOp.setFileTypeIndex(chunkIt->fileIndex);
+                nx::media_db::MediaFileOperation mediaFileOp;
+                mediaFileOp.setRecordTypeUnsafe(nx::media_db::RecordType::FileOperationAdd);
+                mediaFileOp.setCameraIdUnsafe(cameraIdIt->second);
+                mediaFileOp.setCatalogUnsafe(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
+                    QnServer::ChunksCatalog::HiQualityCatalog);
+
+                mediaFileOp.setStartTimeUnsafe(chunkIt->startTimeMs);
+                mediaFileOp.setDurationUnsafe(chunkIt->durationMs);
+                mediaFileOp.setTimeZoneUnsafe(chunkIt->timeZone);
+                mediaFileOp.setFileSizeUnsafe(chunkIt->getFileSize());
+                mediaFileOp.setFileTypeIndexUnsafe(chunkIt->fileIndex);
 
                 AV_WB64(&dst, mediaFileOp.part1);
                 AV_WB64(&dst, mediaFileOp.part2);
@@ -691,12 +695,14 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     ChunkSet *currentChunkSet = &existCameraIt->second[catalogIndex];
 
     DeviceFileCatalog::Chunk newChunk(
-        DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
-                                 mediaFileOp.getFileTypeIndex(),
-                                 mediaFileOp.getDuration(),
-                                 (mediaFileOp.*m_getTimeZoneFunc)(),
-                                 (quint16)(mediaFileOp.getFileSize() >> 32),
-                                 (quint32)mediaFileOp.getFileSize()));
+        DeviceFileCatalog::Chunk(
+            (mediaFileOp.*m_getStartTimeFunc)(),
+            m_storageIndex,
+            mediaFileOp.getFileTypeIndex(),
+            mediaFileOp.getDuration(),
+            (mediaFileOp.*m_getTimeZoneFunc)(),
+            (quint16)(mediaFileOp.getFileSize() >> 32),
+            (quint32)mediaFileOp.getFileSize()));
     switch (opType)
     {
     case nx::media_db::RecordType::FileOperationAdd:
