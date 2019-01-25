@@ -32,6 +32,10 @@ public:
 
     nx::analytics::EventTypeDescriptorMap analyticsEventTypeDescriptors() const;
     nx::analytics::ObjectTypeDescriptorMap analyticsObjectTypeDescriptors() const;
+
+    bool isDeviceDependent() const;
+
+    bool isEngineEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;
 };
 
 } // namespace nx::vms::common

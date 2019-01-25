@@ -5,6 +5,7 @@
 #include <QtCore/QJsonDocument>
 
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
@@ -13,6 +14,7 @@
 
 #include <nx/analytics/types.h>
 #include <nx/analytics/utils.h>
+#include <nx/analytics/device_descriptor_manager.h>
 
 namespace nx::vms::common {
 
@@ -72,6 +74,29 @@ analytics::ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeD
     return analytics::fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(
         getId(),
         engineManifest.objectTypes);
+}
+
+bool AnalyticsEngineResource::isDeviceDependent() const
+{
+    const auto engineManifest = manifest();
+    return engineManifest.capabilities.testFlag(EngineManifest::Capability::deviceModelDependent);
+}
+
+bool AnalyticsEngineResource::isEngineEnabledForDevice(
+    const QnVirtualCameraResourcePtr& device) const
+{
+    const auto engineId = getId();
+    const auto enabledEngines = device->enabledAnalyticsEngines();
+    if (enabledEngines.contains(engineId))
+        return true;
+
+    if (!isDeviceDependent())
+        return false;
+
+    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
+    const auto compatibleEngines = deviceDescriptorManager.compatibleEngineIds(device);
+
+    return compatibleEngines.find(engineId) != compatibleEngines.cend();
 }
 
 } // namespace nx::vms::common
