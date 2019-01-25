@@ -546,3 +546,18 @@ void QnLayoutResource::forgetPasswordForRecordings()
             aviItem->forgetPassword();
     }
 }
+
+// The one who requests to remove this function will become a permanent maintainer of this class.
+void QnLayoutResource::dumpStructure() const
+{
+    auto items = layoutResources();
+
+    qDebug() << "Layout Url:" << getUrl() << "ID:" << getId() << "UniqueID:" << getUniqueId();
+
+    for(auto &item: items)
+    {
+        qDebug() << "  Item Resource URL:" << item->getUrl() << "ID:" << item->getId()
+            << "UniqueId:" << item->getId();
+    }
+
+}

@@ -150,6 +150,11 @@ public:
      */
     void forgetPasswordForRecordings();
 
+    /**
+     * Used to dump some layout content to qDebug().
+     */
+    void dumpStructure() const;
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
