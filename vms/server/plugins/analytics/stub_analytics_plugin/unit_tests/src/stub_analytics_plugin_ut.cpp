@@ -261,35 +261,51 @@ public:
     }
 };
 
-class CompressedVideoFrame: public nx::sdk::analytics::IDataPacket
+class CompressedVideoPacket:
+    public nxpt::CommonRefCounter<nx::sdk::analytics::ICompressedVideoPacket>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId)
+    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
     {
         if (interfaceId == nx::sdk::analytics::IID_CompressedVideoPacket)
         {
             addRef();
             return this;
         }
+        if (interfaceId == nx::sdk::analytics::IID_CompressedMediaPacket)
+        {
+            addRef();
+            return static_cast<ICompressedMediaPacket*>(this);
+        }
+        if (interfaceId == nx::sdk::analytics::IID_DataPacket)
+        {
+            addRef();
+            return static_cast<IDataPacket*>(this);
+        }
         return nullptr;
-    }
-
-    virtual int addRef() const override { return ++m_refCounter; }
-
-    virtual int releaseRef() const override
-    {
-        ASSERT_TRUE(m_refCounter > 1);
-        return --m_refCounter;
     }
 
     virtual int64_t timestampUs() const override { return /*dummy*/ 42; }
 
+    virtual const char* codec() const override { return "test_stub_codec"; }
+    virtual const char* data() const override { return m_data.data(); }
+    virtual int dataSize() const override { return (int) m_data.size(); }
+    virtual const nx::sdk::analytics::IMediaContext* context() const override { return nullptr; }
+    virtual MediaFlags flags() const override { return MediaFlags::none; }
+
+    virtual int width() const override { return 256; }
+    virtual int height() const override { return 128; }
+
 private:
-    mutable int m_refCounter = 1;
+    const std::vector<char> m_data = std::vector<char>(width() * height(), /*dummy*/ 42);
 };
 
 TEST(stub_analytics_plugin, test)
 {
+    // These handlers should be destroyed after the Plugin, Engine and DeviceAgent objects.
+    const auto engineHandler = std::make_unique<EngineHandler>();
+    const auto deviceAgentHandler = std::make_unique<DeviceAgentHandler>();
+
     nx::sdk::Error error = nx::sdk::Error::noError;
 
     nxpl::PluginInterface* const pluginObject = createNxAnalyticsPlugin();
@@ -310,8 +326,7 @@ TEST(stub_analytics_plugin, test)
 
     ASSERT_EQ(plugin, engine->plugin());
 
-    EngineHandler engineHandler;
-    ASSERT_EQ(noError, (int) engine->setHandler(&engineHandler));
+    ASSERT_EQ(noError, (int) engine->setHandler(engineHandler.get()));
 
     const std::string pluginName = engine->plugin()->name();
     ASSERT_TRUE(!pluginName.empty());
@@ -342,18 +357,15 @@ TEST(stub_analytics_plugin, test)
     testDeviceAgentManifest(deviceAgent);
     testDeviceAgentSettings(deviceAgent);
 
-    DeviceAgentHandler deviceAgentHandler;
-    ASSERT_EQ(noError, (int) deviceAgent->setHandler(&deviceAgentHandler));
+    ASSERT_EQ(noError, (int) deviceAgent->setHandler(deviceAgentHandler.get()));
 
     const nx::sdk::Ptr<nx::sdk::analytics::MetadataTypes> metadataTypes(
         new nx::sdk::analytics::MetadataTypes());
 
     ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
-    CompressedVideoFrame compressedVideoFrame;
-    ASSERT_EQ(noError, (int) deviceAgent->pushDataPacket(&compressedVideoFrame));
-
-    ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
+    const auto compressedVideoPacket = nx::sdk::makePtr<CompressedVideoPacket>();
+    ASSERT_EQ(noError, (int) deviceAgent->pushDataPacket(compressedVideoPacket.get()));
 
     deviceAgent->releaseRef();
     engine->releaseRef();
