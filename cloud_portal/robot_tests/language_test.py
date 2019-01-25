@@ -44,9 +44,12 @@ def runTest(key, langList):
             # start testing.
             map(remove, (path.join(loc, 'combined-results', file) for file in listdir(path.join(loc, 'combined-results'))
                          if file.endswith('.png') and file.find(key) > -1))
-            
+
+            # run the threading script run, then take the output file, rename
+            # it and put it in the proper language folder
             threadedTestRun(loc, key)
-            system('rebot -o output.xml -d {} -N {}_{} multi*'.format(path.join(loc, key),langList[key], key))
+            system('rebot -o output.xml -d {} -N {}_{} queuedRun.xml'.format(
+                path.join(loc, key), langList[key], key))
             '''
             system('robot -N {}_{} -v SCREENSHOTDIRECTORY:{} -v BROWSER:headlesschrome -d {} -e not-ready -V getvars.py:{} test-cases'.format(
                 langList[key], key, path.join(loc, 'combined-results'), path.join(loc, key), key))

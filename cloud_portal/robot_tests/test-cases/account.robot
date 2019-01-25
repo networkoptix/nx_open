@@ -30,7 +30,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Can access the account page from dropdown
-    [tags]    C41573
+    [tags]    C41573    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -40,18 +40,21 @@ Can access the account page from dropdown
     Verify in account page
 
 Can access the account page from direct link while logged in
+    [tags]    C41573    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/account
     Verify in account page
 
 Accessing the account page from a direct link while logged out asks for login, closing log in takes you to main page
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Location Should Be    ${url}/
 
 Accessing the account page from a direct link while logged out asks for login, on valid login takes you to account page
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -100,7 +103,7 @@ Changing last name and saving maintains that setting
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 First name is required
-    [tags]    C41573
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -111,7 +114,7 @@ First name is required
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 Last name is required
-    [tags]    C41573
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -122,7 +125,7 @@ Last name is required
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 SPACE for first name is not valid
-    [tags]    C41573
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -133,7 +136,7 @@ SPACE for first name is not valid
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 SPACE for last name is not valid
-    [tags]    C41573
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -145,7 +148,7 @@ SPACE for last name is not valid
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 Email field is un-editable
-    [tags]    C41573
+    [tags]    C41573    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In

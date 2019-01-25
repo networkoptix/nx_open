@@ -4,6 +4,7 @@ Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
+Force Tags        Threaded
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
