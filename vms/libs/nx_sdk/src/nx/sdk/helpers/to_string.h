@@ -19,9 +19,7 @@ namespace sdk {
  */
 std::string toJsonString(const IStringMap* map, int overallIndent = 0);
 
-/**
- * @return Multiline JSON string without the trailing `\n`.
- */
+/** @return Multiline JSON string without the trailing `\n`. */
 std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent = 0);
 
 } // namespace sdk

@@ -3,9 +3,13 @@
 namespace nx {
 namespace sdk {
 
-enum class Error
+/**
+ * Error codes used both by Plugin methods and Server callbacks.
+ *
+ * ATTENTION: The values match error constants in <camera/camera_plugin.h>.
+ */
+enum class Error: int
 {
-    // ATTENTION: Values match error constants in camera_plugin.h.
     noError = 0,
     unknownError = -100,
     networkError = -22,

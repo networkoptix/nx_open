@@ -38,7 +38,7 @@ public:
     virtual int dataSize() const = 0;
 
     /**
-     * @return Pointer to the codec context.
+     * @return Pointer to the codec context, or null if not available.
      */
     virtual const IMediaContext* context() const = 0;
 
