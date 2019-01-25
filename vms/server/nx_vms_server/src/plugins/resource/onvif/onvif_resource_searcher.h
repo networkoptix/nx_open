@@ -19,7 +19,7 @@ public:
 
     virtual void pleaseStop() override;
 
-    bool isProxy() const;
+    //bool isProxy() const;
 
     virtual QnResourceList findResources();
 

@@ -78,10 +78,10 @@ OnvifResourceSearcher::~OnvifResourceSearcher()
 
 }
 
-bool OnvifResourceSearcher::isProxy() const
-{
-    return false;
-}
+//bool OnvifResourceSearcher::isProxy() const
+//{
+//    return false;
+//}
 
 QString OnvifResourceSearcher::manufacture() const
 {

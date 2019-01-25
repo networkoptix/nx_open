@@ -26,15 +26,16 @@ class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 public:
     QnPlAxisResourceSearcher(QnMediaServerModule* serverModule);
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    // return the manufacture of the server
     virtual QString manufacture() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
-protected:
-    QList<QnNetworkResourcePtr> processPacket(
+private:
+    virtual QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,

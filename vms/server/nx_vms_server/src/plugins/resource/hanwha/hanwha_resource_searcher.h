@@ -30,10 +30,9 @@ public:
         const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
 
-    // return the manufacture of the server
     virtual QString manufacture() const override;
 
-    virtual QnResourceList findResources(void) override;
+    virtual QnResourceList findResources() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,

@@ -12,16 +12,14 @@ class QnArchiveCamResourceSearcher:
 public:
     QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule);
 
-    virtual void pleaseStop() override;
-
-    bool isProxy() const;
-
-    virtual QnResourceList findResources() override;
-
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
 
+    virtual void pleaseStop() override;
+
     virtual QString manufacture() const override;
+
+    virtual QnResourceList findResources() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth, bool doMultichannelCheck) override;

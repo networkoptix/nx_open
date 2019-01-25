@@ -46,7 +46,7 @@ public:
      * iteration time very much.
      *
      */
-    virtual bool isSequential() const {return false;};
+    virtual bool isSequential() const {return false;}
 
     /**
      * Searches for resources.
@@ -100,7 +100,7 @@ protected:
 
 private:
     DiscoveryMode m_discoveryMode;
-    bool m_localResources;
+    bool m_isLocal;
     std::atomic<bool> m_shouldStop;
 };
 

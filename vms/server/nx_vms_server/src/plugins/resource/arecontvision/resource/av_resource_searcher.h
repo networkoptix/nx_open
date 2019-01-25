@@ -21,15 +21,12 @@ public:
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
 
-    // returns all available devices
-    virtual QnResourceList findResources();
+    virtual QString manufacture() const override;
+
+    virtual QnResourceList findResources() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth, bool doMultichannelCheck) override;
-protected:
-    // return the manufacture of the server
-    virtual QString manufacture() const;
-
 private:
     QnNetworkResourcePtr findResourceHelper(const MacArray& mac,
         const nx::network::SocketAddress& addr);

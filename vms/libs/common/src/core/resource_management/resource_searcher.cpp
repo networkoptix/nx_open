@@ -8,7 +8,7 @@
 QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept:
     QnCommonModuleAware(commonModule),
     m_discoveryMode(DiscoveryMode::fullyEnabled),
-    m_localResources(false),
+    m_isLocal(false),
     m_shouldStop(false)
 {
 }
@@ -48,12 +48,12 @@ bool QnAbstractResourceSearcher::shouldStop() const noexcept
 
 bool QnAbstractResourceSearcher::isLocal() const noexcept
 {
-    return m_localResources;
+    return m_isLocal;
 }
 
 void QnAbstractResourceSearcher::setLocal(bool l) noexcept
 {
-    m_localResources = l;
+    m_isLocal = l;
 }
 
 bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const

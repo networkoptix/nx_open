@@ -24,14 +24,13 @@ public:
     virtual QnResourcePtr createResource(const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;
 
-    // return the manufacture of the server
+    virtual QnResourceList findResources() override;
+
     virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
-
-    virtual QnResourceList findResources() override;
 
     void registerCamera(std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         const QString& userName,
