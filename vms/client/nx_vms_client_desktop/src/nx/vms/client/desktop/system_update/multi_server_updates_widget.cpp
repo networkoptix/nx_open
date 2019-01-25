@@ -1672,7 +1672,12 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
                 break;
             case WidgetUpdateState::installing:
                 if (!targets.empty())
-                    m_serverUpdateTool->requestInstallAction(targets);
+                {
+                    m_stateTracker->setPeersInstalling(targets, true);
+                    QSet<QnUuid> servers = targets;
+                    servers.remove(m_stateTracker->getClientPeerId());
+                    m_serverUpdateTool->requestInstallAction(servers);
+                }
                 // Should not install update before mediaservers has completed its update process.
                 //if (m_clientUpdateTool->hasUpdate())
                 //    m_clientUpdateTool->installUpdate();
@@ -2054,6 +2059,12 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         debugState << QString("size(peers)=%1").arg(m_stateTracker->peersCount());
         debugState << QString("size(model)=%1").arg(m_updatesModel->rowCount());
         debugState << QString("size(sorted)=%1").arg(m_sortedModel->rowCount());
+
+        QStringList serversReport;
+        for (auto server: m_serverUpdateTool->getServersInstalling())
+            serversReport << server.toString();
+        if (!serversReport.empty())
+            debugState << QString("installing=%1").arg(serversReport.join(","));
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {

@@ -749,7 +749,7 @@ void ServerUpdateTool::requestInstallAction(
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = Clock::now();
-    m_stateTracker->setPeersInstalling(targets, true);
+    m_serversAreInstalling.clear();
 
     auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -842,7 +842,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     return;
                 tool->m_activeRequests.remove(handle);
                 if (success)
+                {
                     tool->m_updateManifest = response;
+                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.participants);
+                }
             }, thread());
         m_activeRequests.insert(handle);
     }
@@ -880,6 +883,11 @@ std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 {
     return m_stateTracker;
+}
+
+QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
+{
+    return m_serversAreInstalling;
 }
 
 ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(
@@ -985,6 +993,7 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
     }
     return "";
 }
+
 
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
