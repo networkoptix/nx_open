@@ -32,22 +32,22 @@ class LogServer:
 public:
     ~LogServer()
     {
-        delete m_httpClient;
-        delete m_httpServer;
-        delete m_logServer;
+        m_httpClient.reset(nullptr);
+        m_httpServer.reset(nullptr);
+        m_logServer.reset(nullptr);
     }
 
 protected:
     virtual void SetUp() override
     {
-        m_httpServer = new http::TestHttpServer();
+        m_httpServer = std::make_unique<http::TestHttpServer>();
         ASSERT_TRUE(m_httpServer->bindAndListen());
 
-        m_httpClient = new http::HttpClient();
+        m_httpClient = std::make_unique<http::HttpClient>();
         m_httpClient->setResponseReadTimeout(kNoTimeout);
         m_httpClient->setMessageBodyReadTimeout(kNoTimeout);
 
-        m_logServer = new Server(&m_loggerCollection);
+        m_logServer = std::make_unique<maintenance::log::Server>(loggerCollection());
 
         m_logServer->registerRequestHandlers(
             kBasePath,
@@ -74,11 +74,6 @@ protected:
         ASSERT_EQ(loggers.size(), loggersReturnedByServer.loggers.size());
         for (std::size_t i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
             assertLoggerEquality(loggers[i], loggersReturnedByServer.loggers[i]);
-    }
-
-    void andAddloggerToAddFailed()
-    {
-        ASSERT_EQ(http::StatusCode::badRequest, m_httpClient->response()->statusLine.statusCode);
     }
 
     void whenAddLoggerConfiguration(const Logger& logger)
@@ -227,6 +222,21 @@ protected:
         thenRequestSucceeded(http::StatusCode::ok);
     }
 
+    void whenServerConnectionIsClosed()
+    {
+        m_httpClient.reset(nullptr);
+    }
+
+    void thenLoggerIsRemovedByServer()
+    {
+        while (loggerCollection()->get(0))
+        {
+            static const std::chrono::milliseconds kSleep(100);
+            std::this_thread::sleep_for(kSleep);
+        }
+        ASSERT_EQ(loggerCollection()->get(0), nullptr);
+    }
+
     void thenLogsAreProduced()
     {
         std::string tagStr(kTag);
@@ -249,9 +259,9 @@ protected:
             s += m_httpClient->fetchMessageBodyBuffer();
     }
 
-    void andLoggerIsRemoved()
+    void whenLoggerIsRemoved()
     {
-        loggerCollection()->remove(0);
+        loggerCollection()->remove(0/*loggerId*/);
     }
 
     void whenAddLoggingConfigurationWithMalformedJson()
@@ -262,7 +272,7 @@ protected:
             getMalformedJson().toUtf8()));
     }
 
-    void whenRequestLogStreamWithMalformeQueryString()
+    void whenRequestLogStreamWithMalformedQueryString()
     {
         std::string malformedJson = "level=verbnx::network],level=none"; //< "verb" instead of "verbose"
         ASSERT_TRUE(m_httpClient->doGet(createRequestUrl(kStream, malformedJson)));
@@ -324,9 +334,9 @@ protected:
 
 private:
     LoggerCollection m_loggerCollection;
-    http::TestHttpServer* m_httpServer = nullptr;
-    http::HttpClient* m_httpClient = nullptr;
-    maintenance::log::Server* m_logServer = nullptr;
+    std::unique_ptr<http::TestHttpServer> m_httpServer;
+    std::unique_ptr<http::HttpClient> m_httpClient;
+    std::unique_ptr<maintenance::log::Server> m_logServer;
 
     nx::utils::Url createRequestUrl(
         const std::string& requestName,
@@ -350,7 +360,7 @@ private:
     }
     };
 
-TEST_F(LogServer, server_provides_all_logger_configurations)
+TEST_F(LogServer, provides_all_logger_configurations)
 {
     std::vector<Logger> loggersReturnedByServer;
     givenTwoLoggers(&loggersReturnedByServer);
@@ -361,7 +371,7 @@ TEST_F(LogServer, server_provides_all_logger_configurations)
     andActualConfigurationIsProvided(loggersReturnedByServer);
 }
 
-TEST_F(LogServer, server_accepts_new_logger)
+TEST_F(LogServer, accepts_new_logger)
 {
     Logger loggerToAdd = getDefaultLogger("nx::network");
     Logger loggerReturnedByServer;
@@ -377,7 +387,7 @@ TEST_F(LogServer, server_accepts_new_logger)
 
 TEST_F(
     LogServer,
-    server_accepts_loggers_with_a_duplicate_tag_and_second_logger_does_not_have_duplicate)
+    accepts_loggers_with_a_duplicate_tag_and_second_logger_does_not_have_duplicate)
 {
     std::string duplicateTag("nx::network");
     Logger loggerToAdd1 = getDefaultLogger(duplicateTag);
@@ -408,7 +418,7 @@ TEST_F(
     assertLoggerDoesNotHaveTag(loggerReturnedByServer2, duplicateTag);
 }
 
-TEST_F(LogServer, server_rejects_logger_configuration_with_duplicate_tags)
+TEST_F(LogServer, rejects_logger_configuration_with_duplicate_tags)
 {
     Logger loggerToAdd = getDefaultLogger();
     Logger duplicateLoggerToAdd = loggerToAdd;
@@ -424,12 +434,12 @@ TEST_F(LogServer, server_rejects_logger_configuration_with_duplicate_tags)
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
-TEST_F(LogServer, server_deletes_existing_logger_configuration)
+TEST_F(LogServer, deletes_existing_logger_configuration)
 {
     Logger loggerToAdd = getDefaultLogger();
     Logger loggerReturnedByServer;
 
-    whenAddLoggerConfiguration(getDefaultLogger());
+    whenAddLoggerConfiguration(loggerToAdd);
     thenRequestSucceeded(http::StatusCode::created);
 
     andNewLoggerConfigurationIsProvided(
@@ -441,7 +451,7 @@ TEST_F(LogServer, server_deletes_existing_logger_configuration)
     thenRequestSucceeded(http::StatusCode::ok);
 }
 
-TEST_F(LogServer, server_fails_to_delete_non_existing_logger_configuration)
+TEST_F(LogServer, fails_to_delete_non_existing_logger_configuration)
 {
     givenTwoLoggers();
 
@@ -449,7 +459,7 @@ TEST_F(LogServer, server_fails_to_delete_non_existing_logger_configuration)
     thenRequestFailed(http::StatusCode::notFound);
 }
 
-TEST_F(LogServer, server_streams_logs_by_adding_custom_logging_configuration)
+TEST_F(LogServer, streams_logs_by_adding_custom_logging_configuration)
 {
     whenAddLoggerStreamingConfiguration();
 
@@ -458,7 +468,7 @@ TEST_F(LogServer, server_streams_logs_by_adding_custom_logging_configuration)
     andLogStreamIsFetched();
 }
 
-TEST_F(LogServer, server_rejects_malformated_json_when_adding_logger_configuration)
+TEST_F(LogServer, srejects_malformated_json_when_adding_logger_configuration)
 {
     whenAddLoggingConfigurationWithMalformedJson();
 
@@ -467,28 +477,28 @@ TEST_F(LogServer, server_rejects_malformated_json_when_adding_logger_configurati
 
 TEST_F(LogServer, server_rejects_logger_stream_request_with_malformed_query_string)
 {
-    whenRequestLogStreamWithMalformeQueryString();
+    whenRequestLogStreamWithMalformedQueryString();
 
     thenRequestFailed(http::StatusCode::badRequest);
+}
+
+TEST_F(LogServer, connection_closure_causes_server_to_remove_logger)
+{
+    givenStreamingLogger();
+
+    whenServerConnectionIsClosed();
+
+    thenLoggerIsRemovedByServer();
 }
 
 TEST_F(LogServer, streaming_logger_removal_before_connection_closure_is_properly_handled)
 {
     givenStreamingLogger();
 
-    std::atomic_bool keepLogging = true;
-    std::thread thread([&]()
-    {
-        while (keepLogging)
-            thenLogsAreProduced();
-    });
+    whenLoggerIsRemoved();
+    whenServerConnectionIsClosed();
 
-    andLoggerIsRemoved();
-
-    // thenProcessDoesNotCrash();
-
-    keepLogging = false;
-    thread.join();
+    // thenSeverDoesNotCrash();
 }
 
 } // namespace nx::network::maintenance::log::test
