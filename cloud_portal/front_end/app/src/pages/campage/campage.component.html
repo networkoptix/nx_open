@@ -7,16 +7,10 @@
                     expandable
                     ngDefaultControl>
             </nx-search>
-            <!--<nx-camera-search-->
-                <!--name="filterModel"-->
-                <!--[(ngModel)]="filterModel"-->
-                <!--[multiselectOptions] = "multiselectOptions"-->
-                <!--ngDefaultControl>-->
-            <!--</nx-camera-search>-->
         </div>
     </div>
 
-    <div class="row pl-3 pr-3 d-flex" *ngIf="filterModel.query">
+    <div class="row pl-3 pr-3 d-flex" *ngIf="camerasTable.length">
         <div class="order-1 order-lg-0" [ngClass]="{'col-12': !toggleCamview, 'col-lg-8 col-xl-9' : toggleCamview}">
             <nx-cam-table
                     [elements]="camerasTable"
@@ -47,8 +41,9 @@
     </div>
 
     <nx-vendor-list
+            *ngIf="!camerasTable.length"
             [vendors]="vendors"
-            [cameras]="allCameras"
+            [cameras]="allCameras.length"
             [(ngModel)]="filterModel">
     </nx-vendor-list>
 

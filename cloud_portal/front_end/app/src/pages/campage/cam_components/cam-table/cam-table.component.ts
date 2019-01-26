@@ -29,13 +29,15 @@ export class CamTableComponent implements OnChanges, OnInit {
 
   private _elements: any[];
   private selectedRow;
+  private selectedHeader;
+  private sortOrderASC: boolean;
   private results;
   private cameraHeaders;
   private showParameters;
   private showHeaders;
   private paramsShown;
   private lang;
-
+  private sortables;
 
   pager: any = {};
   pagedItems: any[];
@@ -61,25 +63,92 @@ export class CamTableComponent implements OnChanges, OnInit {
               config: NxConfigService) {
 
       this.lang = this.translate.translations[this.translate.currentLang];
-
       this.CONFIG = config.getConfig();
+
+      this.sortOrderASC = true;
       this._elements = this.elements;
 
       this.paramsShown = 6;
       this.cameraHeaders = [
-          this.lang.manufacturer,
+          this.lang.vendor,
           this.lang.model,
-          this.lang.type,
-          this.lang.max_resolution,
-          this.lang.max_fps,
-          this.lang.codec,
-          this.lang.audio,
-          this.lang.ptz,
-          this.lang.fisheye,
-          this.lang.motion,
-          this.lang.io
+          this.lang.hardwareType,
+          this.lang.maxResolution,
+          this.lang.maxFps,
+          this.lang.primaryCodecamera,
+          this.lang.isAudioSupported,
+          this.lang.isPtzSupported,
+          this.lang.isFisheye,
+          this.lang.isMdSupported,
+          this.lang.isIoSupported
+      ];
+
+      this.sortables = [
+          this.lang.vendor,
+          this.lang.model,
+          this.lang.hardwareType
       ];
   }
+
+    byKey(a, b) {
+        if (+a.key < +b.key) {
+            return -1;
+        }
+        if (+a.key > +b.key) {
+            return 1;
+        }
+        return 0;
+    }
+
+    sortBy(fn) {
+        return (a, b) => {
+            // if (this.sortOrderASC) {
+                // return -(fn(a) < fn(b)) || +(fn(a) > fn(b));
+                if (fn(a) < fn(b)) {
+                    return (this.sortOrderASC) ? -1 : 1;
+                }
+                if (fn(a) > fn(b)) {
+                    return (this.sortOrderASC) ? 1 : -1;
+                }
+                return 0;
+            // }
+
+            // return +(fn(a) < fn(b)) || -(fn(a) > fn(b));
+        };
+    }
+
+    isSortable(header) {
+        return this.sortables.indexOf(header) > -1;
+    }
+
+    toggleHeaderSort(param) {
+        if (!this.isSortable(param)) {
+            return;
+        }
+
+        let filter;
+        for (const [key, value] of Object.entries(this.lang)) {
+            if (value === param) {
+                filter = key;
+                break;
+            }
+        }
+
+        this.sortOrderASC = (this.lang[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
+        this.toggleSort(filter);
+    }
+
+    toggleSort(param) {
+        const byParam = this.sortBy((elm) => {
+            return elm[param];
+        });
+        this._elements.sort(byParam);
+        this.setPage(1);
+
+        this.selectedHeader = this.cameraHeaders.find(x => {
+            return x === this.lang[param];
+        });
+    }
 
     toggleHeaderCaption(param, label1, label2) {
         const paramLookup = this.allowedParameters.find(x => x === param);
@@ -94,8 +163,9 @@ export class CamTableComponent implements OnChanges, OnInit {
     ngOnChanges(changes: SimpleChanges) {
         if (changes.elements) {
             this._elements = changes.elements.currentValue;
+            this.toggleSort('sortKey');
+
             this.results = this._elements.length;
-            this.setPage(1);
         }
 
         if (changes.activeCamera) {
@@ -104,8 +174,8 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         if (changes.allowedParameters) {
-            this.toggleHeaderCaption('isTwAudioSupported', this.lang.audio, this.lang.tw_audio);
-            this.toggleHeaderCaption('isAptzSupported', this.lang.ptz, this.lang.aptz);
+            this.toggleHeaderCaption('isTwAudioSupported', this.lang.isAudioSupported, this.lang.isTwAudioSupported);
+            this.toggleHeaderCaption('isAptzSupported', this.lang.isPtzSupported, this.lang.isAptzSupported);
 
             this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
             this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;

@@ -31,13 +31,24 @@
         <table class="table table-hover nx-table">
             <thead>
                 <tr *ngIf="results > 0">
-                    <th *ngFor="let header of showHeaders" class="align-bottom">
-                        {{header}}
+                    <th *ngFor="let header of showHeaders"
+                        class="align-bottom"
+                        [ngClass]="{'selectable' : isSortable(header)}"
+                        (click)="toggleHeaderSort(header)">
+
+                        <div class="float-left">{{header}}</div>
+                        <div class="sort-dir nav-arrow position-relative float-left ml-3"
+                             *ngIf="header == selectedHeader && isSortable(header)"
+                             [ngClass]="{'up': !sortOrderASC}">
+
+                            <span></span>
+                            <span></span>
+                        </div>
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let element of pagedItems  | keyvalue; let i = index" [ngClass]="{'selected': i == selectedRow}"
+                <tr *ngFor="let element of pagedItems | keyvalue: byKey; let i = index" [ngClass]="{'selected': i == selectedRow}"
                     (click)="setClickedRow(i, element);">
                     <td *ngFor="let p of showParameters" class="text-left">
                         <span *ngIf="isString(element.value[p]); else icon">
@@ -54,7 +65,12 @@
 
     <div class="row vertical-align ml-0">
         <nav aria-label="Cameras table navigation" class="pagination-nav pt-3 pb-3">
-            <ngb-pagination [collectionSize]="pager.totalItems" [maxSize]="3" [pageSize]="20" (pageChange)="setPage($event)"></ngb-pagination>
+            <ngb-pagination
+                    [collectionSize]="pager.totalItems"
+                    [maxSize]="3"
+                    [pageSize]="pager.pageSize"
+                    [page]="pager.currentPage"
+                    (pageChange)="setPage($event)"></ngb-pagination>
         </nav>
     </div>
 </div>

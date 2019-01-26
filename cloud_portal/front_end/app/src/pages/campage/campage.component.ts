@@ -168,7 +168,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
     constructor(private configService: NxConfigService,
                 private cameraService: CamerasService,
-                private camSearch: CampageSearchService,
+                private cameraSearchService: CampageSearchService,
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
                 private differs: KeyValueDiffers) {
@@ -272,7 +272,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
                camerasWithAliases.push(camera);
            }
 
-           const vm = camera.vendor + camera.model;
+           const vm = camera.vendor.replace(/\s/g, '') + camera.model;
            const existing = vendorModelCount[vm];
            if (existing !== undefined) {
                if (camera.count > existing.count) {
@@ -281,6 +281,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
            } else {
                vendorModelCount[vm] = camera;
            }
+
+           camera.sortKey = vm;
        });
 
        this.allCameras = Object.keys(vendorModelCount);
@@ -310,7 +312,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     const filteredCameras = [];
     values.forEach(camera => {
         const filteredCamera = Object.keys(camera)
-          .filter(key => this.allowedParameters.indexOf(key) > -1)
+          .filter(key => this.allowedParameters.indexOf(key) > -1 || key === 'sortKey')
           .reduce((obj, key) => {
             obj[key] = camera[key];
             return obj;
@@ -320,19 +322,24 @@ export class NxCampageComponent implements OnInit, DoCheck {
     return filteredCameras;
   }
 
-  searchVendor (filter) {
-      this.resetActiveCamera();
-      this.filter = filter;
+    searchVendor(filter) {
+        this.resetActiveCamera();
+        // debugger;
+        this.filter = filter;
 
-      if (this.data) {
-          this.camSearch.campageSearch(this.data, this.filter).subscribe(cameras => {
-              this.activeCamera = undefined;
-              this.cameras = cameras;
-              this.camerasSuccessFn(this.cameras);
-              this.camerasTable = this.preFilterCameraTable(cameras);
-          });
-      }
-  }
+        if (this.data) {
+            this.cameraSearchService
+                .campageSearch(this.data, this.filter)
+                .subscribe(cameras => {
+                    this.activeCamera = undefined;
+                    this.cameras = cameras;
+                    this.camerasSuccessFn(this.cameras);
+                    this.camerasTable = [];
+
+                    this.camerasTable = (cameras.length !== this.data.length) ? this.preFilterCameraTable(cameras) : [];
+                });
+        }
+    }
 
   setVendor(vendor) {
       this.filterModel.query = vendor;

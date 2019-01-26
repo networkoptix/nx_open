@@ -47,9 +47,12 @@
       font-family      : $font-family-medium;
       font-weight      : 500 !important;
       font-size        : $line-height-ssm;
-      line-height      : 1rem;
       text-transform   : none;
       overflow-wrap    : break-word;
+      
+      &.selectable {
+        cursor : pointer;
+      }
       
       &.table-title {
         font-family : $font-family-regular;
@@ -58,6 +61,18 @@
         .text-placeholder {
           font-size : 1.25rem;
           color     : $light16;
+        }
+      }
+      
+      .sort-dir {
+        &:after {
+          content: ' ';
+        }
+        
+        &.asc {
+          &:after {
+            content : '+';
+          }
         }
       }
     }
