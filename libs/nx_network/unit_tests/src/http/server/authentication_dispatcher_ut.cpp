@@ -41,15 +41,12 @@ protected:
         // Skipping kTestPaths[2]: "/test/unregisteredput"
         for (std::size_t i = 0; i < kTestPaths.size() - 1; ++i)
         {
-            // true forces TestAuthenticationManager to provide a dummy success response,
-            // false forces it to actually authenticate, which fails because request header
-            // is missing header::Authorization::NAME attribute
             bool authenticationResult = std::string(kTestPaths[i]) == "/test/delete"
                 ? false
                 : true;
 
             auto authenticationManager = std::make_unique<TestAuthenticationManager>(nullptr);
-            authenticationManager->setAuthenticationEnabled(false); // force dummy authentication
+            authenticationManager->setAuthenticationEnabled(false); //< Force dummy authentication
             authenticationManager->setAuthenticationSucceeded(authenticationResult);
 
             std::regex regex(kTestPaths[i]);
@@ -64,17 +61,17 @@ protected:
     {
         messageDispatcher->registerRequestProcessorFunc(
             http::Method::get,
-            kTestPaths[0], // "/test/get"
+            kTestPaths[0], //< "/test/get"
             [this](auto&&... args) { serveTestGet(std::move(args)...); });
 
         messageDispatcher->registerRequestProcessorFunc(
             http::Method::delete_,
-            kTestPaths[1], // "/test/delete"
+            kTestPaths[1], //< "/test/delete"
             [this](auto&&... args) { serveTestDelete(std::move(args)...); });
 
         messageDispatcher->registerRequestProcessorFunc(
             http::Method::put,
-            kTestPaths[2], // "/test/unregistered"
+            kTestPaths[2], //< "/test/unregistered"
             [this](auto&&... args) { serveTestUnregisteredPut(std::move(args)...); });
     }
 
