@@ -560,8 +560,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))
 //-------------------------------------------------------------------------------------------------
 
 KeepAliveOptions::KeepAliveOptions(
-    std::chrono::seconds inactivityPeriodBeforeFirstProbe,
-    std::chrono::seconds probeSendPeriod,
+    std::chrono::milliseconds inactivityPeriodBeforeFirstProbe,
+    std::chrono::milliseconds probeSendPeriod,
     size_t probeCount)
     :
     inactivityPeriodBeforeFirstProbe(inactivityPeriodBeforeFirstProbe),
@@ -582,16 +582,18 @@ bool KeepAliveOptions::operator!=(const KeepAliveOptions& rhs) const
     return !(*this == rhs);
 }
 
-std::chrono::seconds KeepAliveOptions::maxDelay() const
+std::chrono::milliseconds KeepAliveOptions::maxDelay() const
 {
     return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
 }
 
 QString KeepAliveOptions::toString() const
 {
+    using namespace std::chrono;
+
     // TODO: Use JSON serrialization instead?
-    return lm("{ %1, %2, %3 }").arg(inactivityPeriodBeforeFirstProbe.count())
-        .arg(probeSendPeriod.count()).arg(probeCount);
+    return lm("{ %1, %2, %3 }").arg(duration_cast<seconds>(inactivityPeriodBeforeFirstProbe).count())
+        .arg(duration_cast<seconds>(probeSendPeriod).count()).arg(probeCount);
 }
 
 void KeepAliveOptions::resetUnsupportedFieldsToSystemDefault()
