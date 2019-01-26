@@ -5,12 +5,12 @@
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/stun_types.h>
+#include <nx/network/test_support/stun_async_client_acceptance_tests.h>
+#include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
 
-#include "stun_async_client_acceptance_tests.h"
 #include "stun_over_http_server_fixture.h"
-#include "stun_simple_server.h"
 
 namespace nx {
 namespace network {
@@ -71,7 +71,8 @@ protected:
     {
         nx::utils::promise<SystemError::ErrorCode> done;
         m_client.connect(
-            network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
+            network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
+                .setEndpoint(m_stunServer.address()),
             [&done](SystemError::ErrorCode sysErrorCode)
             {
                 done.set_value(sysErrorCode);

@@ -1,12 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
 #include <nx/network/socket_factory.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -31,23 +33,57 @@ public:
     virtual std::size_t connectionCount() const = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class BasicStunAsyncClientAcceptanceTest:
     public ::testing::Test
 {
 public:
-    ~BasicStunAsyncClientAcceptanceTest();
+    ~BasicStunAsyncClientAcceptanceTest()
+    {
+        if (m_streamSocketFactoryBak)
+            SocketFactory::setCreateStreamSocketFunc(std::move(*m_streamSocketFactoryBak));
+    }
 
 protected:
-    void setSingleShotUnconnectableSocketFactory();
+    void setSingleShotUnconnectableSocketFactory()
+    {
+        m_streamSocketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
+            [this](auto&&... args) {
+                return createUnconnectableStreamSocket(std::forward<decltype(args)>(args)...); });
+    }
 
 private:
-    boost::optional<network::SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
+    class UnconnectableStreamSocket:
+        public nx::network::TCPSocket
+    {
+    public:
+        virtual void connectAsync(
+            const SocketAddress& /*addr*/,
+            nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        {
+            post([handler = std::move(handler)]() { handler(SystemError::connectionRefused); });
+        }
+    };
+
+    std::optional<network::SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     QnMutex m_mutex;
 
     std::unique_ptr<network::AbstractStreamSocket> createUnconnectableStreamSocket(
         bool /*sslRequired*/,
-        nx::network::NatTraversalSupport /*natTraversalRequired*/);
+        nx::network::NatTraversalSupport /*natTraversalRequired*/,
+        boost::optional<int> /*ipVersion*/)
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        SocketFactory::setCreateStreamSocketFunc(std::move(*m_streamSocketFactoryBak));
+        m_streamSocketFactoryBak.reset();
+
+        return std::make_unique<UnconnectableStreamSocket>();
+    }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * @param AsyncClientTestTypes It is a struct with following nested types:
