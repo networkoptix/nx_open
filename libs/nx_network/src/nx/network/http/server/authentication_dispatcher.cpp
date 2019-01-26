@@ -15,7 +15,7 @@ void AuthenticationDispatcher::authenticate(
     const nx::network::http::Request& request,
     AuthenticationCompletionHandler completionHandler)
 {
-    AbstractAuthenticationManager * manager = nullptr;
+    AbstractAuthenticationManager* manager = nullptr;
     std::string path = request.requestLine.url.path().toStdString();
 
     {
