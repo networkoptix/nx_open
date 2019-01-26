@@ -98,9 +98,6 @@ export class LoginModalContent implements OnInit {
         const nextUrl = /\?next=(.*)/.exec(this.document.location.search.replace(/%2F/g, '/'));
         if (nextUrl && nextUrl.length > 1) {
             this.next = nextUrl[1];
-            if (!this.next.endsWith('/') && !this.next.endsWith('%2F')) {
-                this.next += '/';
-            }
         }
         this.password = '';
 

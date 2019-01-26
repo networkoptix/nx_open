@@ -320,6 +320,12 @@ window.L = {};
                                     }]
                                 }
                             })
+                            .when('/admin', {
+                                resolve: {
+                                    test: function(){
+                                        window.location = '/admin/';
+                                    }
+                                }})
                             // for history purpose
                             .when('/downloads/history', {
                                 template: '<download-history></download-history>'
@@ -331,7 +337,7 @@ window.L = {};
                                 }],
                                 resolve: {
                                     getParam: [ '$route', function($route){
-                                        return $route.current.params.param
+                                        return $route.current.params.param;
                                     }]
                                 }
                             })
