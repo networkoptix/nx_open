@@ -39,7 +39,7 @@ angular.module('cloudApp')
             }
 
             function setMergeStatus(mergeInfo) {
-                if (Object.keys(mergeInfo).length === 0) {
+                if (!mergeInfo || Object.keys(mergeInfo).length === 0) {
                     return;
                 }
                 $scope.currentlyMerging = true;
