@@ -3,7 +3,7 @@
 namespace nx::network::http::server {
 
 void AuthenticationDispatcher::add(
-    std::regex& pathPattern,
+    const std::regex& pathPattern,
     AbstractAuthenticationManager* authenticator)
 {
     QnMutexLocker lock(&m_mutex);

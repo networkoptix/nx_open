@@ -20,7 +20,7 @@ public:
      * Request::requestLine.url.path() is matched against pathPattern.
      */
     void add(
-        std::regex& pathPattern,
+        const std::regex& pathPattern,
         AbstractAuthenticationManager* authenticator);
 
     virtual void authenticate(

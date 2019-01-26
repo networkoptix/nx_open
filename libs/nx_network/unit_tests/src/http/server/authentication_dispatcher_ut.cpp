@@ -49,8 +49,7 @@ protected:
             authenticationManager->setAuthenticationEnabled(false); //< Force dummy authentication
             authenticationManager->setAuthenticationSucceeded(authenticationResult);
 
-            std::regex regex(kTestPaths[i]);
-            m_dispatcher.add(regex, authenticationManager.get());
+            m_dispatcher.add(std::regex(kTestPaths[i]), authenticationManager.get());
 
             m_authenticators.emplace(std::move(authenticationManager));
         }
