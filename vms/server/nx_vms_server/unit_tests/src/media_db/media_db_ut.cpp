@@ -47,41 +47,6 @@ private:
 
 } // namespace nx::media_db::test
 
-
-struct ErrorStream
-{
-    QnMutex mutex;
-    std::unique_ptr<std::stringstream> stream;
-
-    void reset()
-    {
-        QnMutexLocker lock(&mutex);
-        stream.reset(new std::stringstream);
-    }
-
-    ErrorStream(): stream(new std::stringstream) {}
-};
-
-template<class _Elem, class _Traits>
-using EndlType = std::basic_ostream<_Elem, _Traits>& (*)(std::basic_ostream<_Elem, _Traits>&);
-
-ErrorStream& operator<<(ErrorStream& stream, EndlType<char, std::char_traits<char>>)
-{
-    QnMutexLocker lock(&stream.mutex);
-    *(stream.stream) << std::endl;
-    return stream;
-}
-
-template<typename T>
-ErrorStream& operator<<(ErrorStream& stream, T&& t)
-{
-    QnMutexLocker lock(&stream.mutex);
-    *(stream.stream) << std::forward<T>(t);
-    return stream;
-}
-
-ErrorStream errorStream;
-
 void generateCameraUid(QByteArray *camUid, size_t n)
 {
     for (size_t i = 0; i < n; i++)
@@ -147,16 +112,6 @@ TestFileOperation generateFileOperation(int code)
         ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
         : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
 
-    errorStream
-        << "result.startTime: " << result.startTime << std::endl
-        << "result.fileSize: " << result.fileSize << std::endl
-        << "result.code: " << result.code << std::endl
-        << "result.cameraId: " << result.cameraId << std::endl
-        << "result.duration: " << result.duration << std::endl
-        << "result.timezone: " << result.timeZone << std::endl
-        << "result.catalog: " << result.chunksCatalog << std::endl
-        << "result.fileIndex: " << result.fileIndex << std::endl;
-
     return result;
 }
 
@@ -187,46 +142,6 @@ TestCameraOperation generateCameraOperation()
 }
 
 typedef boost::variant<TestFileHeader, TestFileOperation, TestCameraOperation> TestRecord;
-
-class RecordWriteVisitor : public boost::static_visitor<>
-{
-public:
-    RecordWriteVisitor(nx::media_db::DbHelper *helper) : m_helper(helper) {}
-
-    void operator() (const TestFileHeader &tfh) const
-    {
-        m_helper->writeFileHeader(tfh.dbVersion);
-    }
-
-    void operator() (const TestFileOperation &tfo) const
-    {
-        nx::media_db::MediaFileOperation fileOp;
-        fileOp.setCameraId(tfo.cameraId);
-        fileOp.setCatalog(tfo.chunksCatalog);
-        fileOp.setDuration(tfo.duration);
-        fileOp.setTimeZone(tfo.timeZone);
-        fileOp.setFileSize(tfo.fileSize);
-        fileOp.setFileTypeIndex(tfo.fileIndex);
-        fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
-        fileOp.setStartTime(tfo.startTime);
-
-        m_helper->writeRecord(fileOp);
-    }
-
-    void operator() (const TestCameraOperation &tco) const
-    {
-        nx::media_db::CameraOperation camOp;
-        camOp.setCameraId(tco.id);
-        camOp.setCameraUniqueIdLen(tco.uuidLen);
-        camOp.setRecordType(tco.code);
-        camOp.setCameraUniqueId(tco.camUniqueId);
-
-        m_helper->writeRecord(camOp);
-    }
-
-private:
-    nx::media_db::DbHelper *m_helper;
-};
 
 struct TestData
 {
@@ -332,7 +247,6 @@ public:
     boost::optional<TestChunk> generateAddOperation()
     {
         Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
-        errorStream << "catalog: " << catalog->cameraUniqueId.constData() << std::endl;
         TestFileOperation fileOp = generateFileOperation(0);
 
         if (chunkExists(fileOp.startTime))
@@ -349,7 +263,6 @@ public:
         ret.chunk = chunk;
 
         m_unremovedChunks.push_back((TestChunk*) &(*m_chunks.insert(ret).first));
-        //qDebug() << "put in unremoved" << ((TestChunk*) &(*m_chunks.end()));
 
         return ret;
     }
@@ -364,7 +277,6 @@ public:
         chunk->isDeleted = true;
         m_unremovedChunks.erase(m_unremovedChunks.cbegin() + indexToRemove);
 
-        //qDebug() << "returning unremoved" << chunk;
         return chunk;
     }
 
@@ -423,27 +335,10 @@ private:
     }
 };
 
-std::string dbErrorToString(nx::media_db::Error error)
-{
-    switch (error)
-    {
-        case nx::media_db::Error::NoError: return "No Error";
-        case nx::media_db::Error::ReadError: return "Read Error";
-        case nx::media_db::Error::WriteError: return "Write Error";
-        case nx::media_db::Error::ParseError: return "Parse Error";
-        case nx::media_db::Error::Eof: return "EOF";
-        case nx::media_db::Error::WrongMode: return "Wrong DB Mode";
-    }
-    return "Unknown error";
-}
-
-class TestDbHelperHandler : public nx::media_db::DbHelperHandler, boost::static_visitor<>
+class TestDbHelperHandler: boost::static_visitor<>
 {
 public:
-    TestDbHelperHandler(nx::media_db::Error *error, TestDataManager *tdm)
-        : m_error(error),
-          m_tdm(tdm)
-    {}
+    TestDbHelperHandler(TestDataManager *tdm): m_tdm(tdm) {}
 
     void operator()(const nx::media_db::CameraOperation &cameraOp)
     {
@@ -453,8 +348,7 @@ public:
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
 
-        if (!m_tdm->seekAndSet(top))
-            initErrorString("Camera operation not found in the test data");
+        ASSERT_TRUE(m_tdm->seekAndSet(top));
     }
 
     void operator()(const nx::media_db::MediaFileOperation &mediaFileOp)
@@ -469,39 +363,10 @@ public:
         tfop.fileIndex = mediaFileOp.getFileTypeIndex();
         tfop.startTime = mediaFileOp.getStartTimeV2();
 
-        if (!m_tdm->seekAndSet(tfop))
-            initErrorString("Media file operation not found in the test data");
-    }
-
-    void handleRecordWrite(nx::media_db::Error error) override
-    {
-        *m_error = error;
-        if (error != nx::media_db::Error::NoError &&
-            error != nx::media_db::Error::Eof)
-        {
-            initErrorString(dbErrorToString(error));
-        }
-    }
-
-    const std::string* const getErrorString() const
-    {
-        return m_errorString.get();
-    }
-
-    void resetErrorString()
-    {
-        m_errorString.reset();
+        ASSERT_TRUE(m_tdm->seekAndSet(tfop));
     }
 
 private:
-    void initErrorString(const std::string& errorString)
-    {
-        if (!m_errorString)
-            m_errorString = std::unique_ptr<std::string>(new std::string(errorString));
-    }
-
-private:
-    nx::media_db::Error *m_error;
     TestDataManager *m_tdm;
     std::unique_ptr<std::string> m_errorString;
 };
@@ -540,53 +405,15 @@ public:
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
 };
 
-TEST_F(MediaDbTest, SimpleFileWriteTest)
+TEST(MediaFileOperations, BitsTwiddling)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
-
-    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.tst");
-    QFile file(fileName);
-    file.open(QIODevice::ReadWrite);
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-
-    quint64 tmp;
-    const size_t kMaxWrites = 10 * 1000 * 1000l;
-
-    for (size_t i = 0; i < kMaxWrites; ++i)
-    {
-        tmp = i;
-        stream << tmp;
-        ASSERT_NE(stream.status(), QDataStream::WriteFailed)
-            << "Stream status: "
-            << stream.status();
-    }
-
-    stream.resetStatus();
-    file.close();
-    file.open(QIODevice::ReadWrite);
-    stream.setDevice(&file);
-
-    for (size_t i = 0; i < kMaxWrites; ++i)
-    {
-        stream >> tmp;
-        ASSERT_EQ(tmp, i);
-        ASSERT_EQ(stream.status(), QDataStream::Ok)
-            << "Stream status: "
-            << stream.status();
-    }
-}
-
-TEST_F(MediaDbTest, BitsTwiddling)
-{
-    const size_t kTestBufSize = 10000;
+    const size_t iterations = 10000;
     std::vector<TestFileHeader> fhVector;
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
         fhVector.push_back(generateFileHeader());
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
     {
         nx::media_db::FileHeader fh;
         fh.setDbVersion(fhVector[i].dbVersion);
@@ -595,10 +422,10 @@ TEST_F(MediaDbTest, BitsTwiddling)
 
     std::vector<TestFileOperation> fopVector;
 
-    for (size_t i = 0; i < kTestBufSize;  ++i)
+    for (size_t i = 0; i < iterations;  ++i)
         fopVector.push_back(generateFileOperation(i % 2));
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
     {
         nx::media_db::MediaFileOperation mfop;
         const TestFileOperation &tfop = fopVector[i];
@@ -624,10 +451,10 @@ TEST_F(MediaDbTest, BitsTwiddling)
 
     std::vector<TestCameraOperation> copVector;
 
-    for (size_t i = 0; i < kTestBufSize;  ++i)
+    for (size_t i = 0; i < iterations;  ++i)
         copVector.push_back(generateCameraOperation());
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
     {
         nx::media_db::CameraOperation cop;
         const TestCameraOperation &tcop = copVector[i];
@@ -644,7 +471,7 @@ TEST_F(MediaDbTest, BitsTwiddling)
     }
 }
 
-TEST_F(MediaDbTest, MediaFileOP_ResetValues)
+TEST(MediaFileOperations, MediaFileOP_ResetValues)
 {
     nx::media_db::MediaFileOperation mfop;
     mfop.setCameraId(65535);
@@ -683,7 +510,7 @@ TEST_F(MediaDbTest, MediaFileOP_ResetValues)
     ASSERT_EQ(-1, mfop.getStartTimeV2());
 }
 
-TEST_F(MediaDbTest, CameraOP_ResetValues)
+TEST(MediaFileOperations, CameraOP_ResetValues)
 {
     nx::media_db::CameraOperation cop;
     cop.setCameraId(std::pow(2, 16));
