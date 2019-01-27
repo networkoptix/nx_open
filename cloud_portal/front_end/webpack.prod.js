@@ -12,12 +12,18 @@ module.exports = merge(common, {
         new CleanWebpackPlugin([ 'dist' ]),
         new UglifyJSPlugin({}),
         new webpack.HashedModuleIdsPlugin(),
-
+    
         new CopyWebpackPlugin([
-                {
-                    from: '../app/scripts/commonPasswordsList.json',
-                    to  : 'scripts/commonPasswordsList.json'
-                }
+            {
+                from: '../app/scripts/commonPasswordsList.json',
+                to: 'scripts/commonPasswordsList.json'
+            },
+            {
+                // Copy en_US lang file to have correct values
+                // before Boris update translations
+                from: '../app/language_i18n.json',
+                to: '../../translations/en_US/language_i18n.json'
+            }
         ])
     ],
     output: {
