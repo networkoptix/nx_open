@@ -130,7 +130,7 @@ struct MediaFileOperation: RecordBase
     }
 
     const quint64 kFileSizeMaskLength = 0x27ULL;
-    const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
+    const qint64 kMaxFileSizeValue = (qint64) getBitMask(kFileSizeMaskLength);
 
     void setFileSize(qint64 fileSize)
     {
@@ -148,7 +148,7 @@ struct MediaFileOperation: RecordBase
         setFileSizeUnsafe((quint64)fileSize & getBitMask(kFileSizeMaskLength));
     }
 
-    void setFileSizeUnsafe(quint64 fileSize)
+    void setFileSizeUnsafe(qint64 fileSize)
     {
         NX_ASSERT_HEAVY_CONDITION(getFileSize() == 0);
         NX_ASSERT_HEAVY_CONDITION(fileSize <= kMaxFileSizeValue);

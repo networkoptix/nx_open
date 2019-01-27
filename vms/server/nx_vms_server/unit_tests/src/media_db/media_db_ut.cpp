@@ -35,6 +35,19 @@
 
 #include "../media_server_module_fixture.h"
 
+
+namespace nx::media_db::test {
+
+class MediaDbWriteRead: public ::testing::Test
+{
+protected:
+private:
+    MediaDbReader m_reader;
+};
+
+} // namespace nx::media_db::test
+
+
 struct ErrorStream
 {
     QnMutex mutex;
@@ -266,6 +279,10 @@ struct TestDataManager
             it->visited = true;
             return true;
         }
+        else
+        {
+            qDebug() << "record not found";
+        }
         return false;
     }
 
@@ -331,24 +348,23 @@ public:
         ret.isVisited = false;
         ret.chunk = chunk;
 
-        m_chunks.insert(ret);
+        m_unremovedChunks.push_back((TestChunk*) &(*m_chunks.insert(ret).first));
+        //qDebug() << "put in unremoved" << ((TestChunk*) &(*m_chunks.end()));
 
         return ret;
     }
 
     TestChunk* generateRemoveOperation()
     {
-        std::vector<TestChunk *> unremovedChunks;
-        for (auto& chunk: m_chunks)
-        {
-            if (chunk.isDeleted == false)
-                unremovedChunks.push_back((TestChunk*)&chunk);
-        }
-        if (unremovedChunks.empty())
+        if (m_unremovedChunks.empty())
             return nullptr;
 
-        TestChunk *chunk = unremovedChunks[nx::utils::random::number((size_t)0, unremovedChunks.size() - 1)];
+        auto indexToRemove = nx::utils::random::number((size_t)0, m_unremovedChunks.size() - 1);
+        TestChunk* chunk = m_unremovedChunks[indexToRemove];
         chunk->isDeleted = true;
+        m_unremovedChunks.erase(m_unremovedChunks.cbegin() + indexToRemove);
+
+        //qDebug() << "returning unremoved" << chunk;
         return chunk;
     }
 
@@ -393,6 +409,7 @@ public:
 private:
     TestChunkCont m_chunks;
     CatalogCont m_catalogs;
+    std::vector<TestChunk*> m_unremovedChunks;
 
     bool chunkExists(qint64 startTime) const
     {
@@ -420,7 +437,7 @@ std::string dbErrorToString(nx::media_db::Error error)
     return "Unknown error";
 }
 
-class TestDbHelperHandler : public nx::media_db::DbHelperHandler
+class TestDbHelperHandler : public nx::media_db::DbHelperHandler, boost::static_visitor<>
 {
 public:
     TestDbHelperHandler(nx::media_db::Error *error, TestDataManager *tdm)
@@ -428,12 +445,8 @@ public:
           m_tdm(tdm)
     {}
 
-    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
-                        nx::media_db::Error error) override
+    void operator()(const nx::media_db::CameraOperation &cameraOp)
     {
-        if ((*m_error = error) == nx::media_db::Error::ReadError)
-            return;
-
         TestCameraOperation top;
         top.camUniqueId = cameraOp.getCameraUniqueId();
         top.code = cameraOp.getRecordType();
@@ -444,12 +457,8 @@ public:
             initErrorString("Camera operation not found in the test data");
     }
 
-    void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
-                           nx::media_db::Error error) override
+    void operator()(const nx::media_db::MediaFileOperation &mediaFileOp)
     {
-        if ((*m_error = error) == nx::media_db::Error::ReadError)
-            return;
-
         TestFileOperation tfop;
         tfop.cameraId = mediaFileOp.getCameraId();
         tfop.chunksCatalog = mediaFileOp.getCatalog();
@@ -462,11 +471,6 @@ public:
 
         if (!m_tdm->seekAndSet(tfop))
             initErrorString("Media file operation not found in the test data");
-    }
-
-    void handleError(nx::media_db::Error error) override
-    {
-        *m_error = error;
     }
 
     void handleRecordWrite(nx::media_db::Error error) override
@@ -736,15 +740,19 @@ TEST_F(MediaDbTest, ReadWrite_Simple)
     ASSERT_TRUE(error == nx::media_db::Error::NoError);
 
     while (error == nx::media_db::Error::NoError)
-        dbHelper.readRecord();
+    {
+        const auto dbRecord = dbHelper.readRecord(&error);
+        boost::apply_visitor(testHandler, dbRecord);
+    }
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
     dbFile.close();
+    ASSERT_TRUE(QFile::remove(fileName));
 
-    size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
-                                       [](const TestData &td) { return td.visited; });
-    ASSERT_TRUE(readRecords == tdm.dataVector.size());
+    ASSERT_TRUE(
+        std::all_of(
+            tdm.dataVector.cbegin(),
+            tdm.dataVector.cend(),
+            [](const TestData &td) { return td.visited; }));
 }
 
 TEST_F(MediaDbTest, DbFileTruncate)
@@ -785,7 +793,7 @@ TEST_F(MediaDbTest, DbFileTruncate)
                                      << fileName.toLatin1().constData()
                                      << " remove failed";
         // truncating randomly last record
-        content.truncate((int)content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 1));
+        content.truncate((int)content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 2));
 
         initDbFile(&dbFile, fileName);
         dbFile.write(content);
@@ -801,19 +809,25 @@ TEST_F(MediaDbTest, DbFileTruncate)
         ASSERT_TRUE(error == nx::media_db::Error::NoError) << (int)error;
 
         while (error == nx::media_db::Error::NoError)
-            dbHelper.readRecord();
+        {
+            const auto dbRecord = dbHelper.readRecord(&error);
+            if (error == nx::media_db::Error::Eof)
+                qDebug() << "EOF";
+            else if (error == nx::media_db::Error::ReadError)
+                qDebug() << "Read error";
 
-        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-        testHandler.resetErrorString();
+            if (error == nx::media_db::Error::NoError || error == nx::media_db::Error::Eof)
+                boost::apply_visitor(testHandler, dbRecord);
+        }
 
         dbFile.close();
-        ASSERT_TRUE(error == nx::media_db::Error::ReadError) << (int)error;
-        ASSERT_TRUE(QFile::remove(fileName));
+        //ASSERT_TRUE(error == nx::media_db::Error::ReadError) << (int)error << truncateCount;
+        //ASSERT_TRUE(QFile::remove(fileName));
 
         size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                            [](const TestData &td) { return td.visited; });
         // we've read all except the very last record
-        ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords;
+        ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords << truncateCount;
     }
 }
 
@@ -837,7 +851,7 @@ TEST_F(MediaDbTest, ReadWrite_MT)
     dbHelper.setDevice(&dbFile);
     dbHelper.setMode(nx::media_db::Mode::Write);
 
-    //write header explicitely
+    // write header explicitly
     boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
 
     std::vector<nx::utils::thread> threads;
@@ -872,7 +886,10 @@ TEST_F(MediaDbTest, ReadWrite_MT)
     ASSERT_TRUE(error == nx::media_db::Error::NoError);
 
     while (error == nx::media_db::Error::NoError)
-        dbHelper.readRecord();
+    {
+        const auto dbRecord = dbHelper.readRecord(&error);
+        boost::apply_visitor(testHandler, dbRecord);
+    }
 
     ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
     testHandler.resetErrorString();
@@ -921,11 +938,9 @@ TEST_F(MediaDbTest, ReadWrite_MT)
     while (error == nx::media_db::Error::NoError)
     {
         ++readCount;
-        dbHelper.readRecord();
+        const auto dbRecord = dbHelper.readRecord(&error);
+        boost::apply_visitor(testHandler, dbRecord);
     }
-
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
 
     readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                 [](const TestData &td) { return td.visited; });
@@ -957,71 +972,131 @@ TEST_F(MediaDbTest, StorageDB)
     std::vector<nx::utils::thread> threads;
     TestChunkManager tcm(128);
 
-    auto writerFunc = [&mutex, &sdb, &tcm]
+    //auto writerFunc = [&mutex, &sdb, &tcm]
+    //{
+    //    for (int i = 0; i < 6000000; ++i)
+    //    {
+    //        int diceRoll = nx::utils::random::number(0, 10);
+    //        errorStream << "dice rolled: " << diceRoll << std::endl;
+    //        switch (diceRoll)
+    //        {
+    //            //case 0:
+    //            //{
+    //            //    std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
+    //            //    QnMutexLocker lk(&mutex);
+    //            //    p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
+    //            //    sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
+    //            //    break;
+    //            //}
+    //            //case 1:
+    //            case 0:
+    //            case 1:
+    //            case 2:
+    //            {
+    //                TestChunkManager::TestChunk *chunk;
+    //                QnMutexLocker lk(&mutex);
+    //                chunk = tcm.generateRemoveOperation();
+    //                if (chunk)
+    //                {
+    //                    sdb.deleteRecords(
+    //                        chunk->catalog->cameraUniqueId,
+    //                        chunk->catalog->quality, chunk->chunk.startTimeMs);
+    //                }
+    //                break;
+    //            }
+    //            default:
+    //            {
+    //                boost::optional<TestChunkManager::TestChunk> chunk;
+    //                QnMutexLocker lk(&mutex);
+    //                chunk = tcm.generateAddOperation();
+    //                if (!(bool)chunk)
+    //                    break;
+    //                sdb.addRecord(
+    //                    chunk->catalog->cameraUniqueId,
+    //                    chunk->catalog->quality, chunk->chunk);
+    //                break;
+    //            }
+    //        }
+
+    //        if (i % 10000 == 0)
+    //            qDebug() << "Added" << i << "records";
+    //    }
+    //};
+
+    for (int i = 0; i < 6000; ++i)
     {
-        for (int i = 0; i < 100; ++i)
+        //int diceRoll = nx::utils::random::number(0, 10);
+        //errorStream << "dice rolled: " << diceRoll << std::endl;
+        switch (i % 10)
         {
-            int diceRoll = nx::utils::random::number(0, 10);
-            errorStream << "dice rolled: " << diceRoll << std::endl;
-            switch (diceRoll)
+            //case 0:
+            //{
+            //    std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
+            //    QnMutexLocker lk(&mutex);
+            //    p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
+            //    sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
+            //    break;
+            //}
+            //case 1:
+        case 0:
+        case 1:
+        case 2:
+        {
+            TestChunkManager::TestChunk *chunk;
+            chunk = tcm.generateRemoveOperation();
+            if (chunk)
             {
-            case 0:
-            {
-                std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
-                QnMutexLocker lk(&mutex);
-                p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
-                sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
-                break;
-            }
-            case 1:
-            case 2:
-            {
-                TestChunkManager::TestChunk *chunk;
-                QnMutexLocker lk(&mutex);
-                chunk = tcm.generateRemoveOperation();
-                if (chunk)
-                {
-                    sdb.deleteRecords(
-                        chunk->catalog->cameraUniqueId,
-                        chunk->catalog->quality, chunk->chunk.startTimeMs);
-                }
-                break;
-            }
-            default:
-            {
-                boost::optional<TestChunkManager::TestChunk> chunk;
-                QnMutexLocker lk(&mutex);
-                chunk = tcm.generateAddOperation();
-                if (!(bool)chunk)
-                    break;
-                sdb.addRecord(
+                sdb.deleteRecords(
                     chunk->catalog->cameraUniqueId,
-                    chunk->catalog->quality, chunk->chunk);
-                break;
+                    chunk->catalog->quality, chunk->chunk.startTimeMs);
             }
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(7));
+            break;
         }
-    };
+        default:
+        {
+            boost::optional<TestChunkManager::TestChunk> chunk;
+            chunk = tcm.generateAddOperation();
+            if (!(bool)chunk)
+                break;
+            sdb.addRecord(
+                chunk->catalog->cameraUniqueId,
+                chunk->catalog->quality, chunk->chunk);
+            break;
+        }
+        }
+
+        if (i % 10000 == 0)
+            qDebug() << "Added" << i << "records";
+    }
+
+    using namespace std::chrono;
 
     QVector<DeviceFileCatalogPtr> dbChunkCatalogs;
     auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        for (size_t i = 0; i < 10; ++i)
+        //std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        for (size_t i = 0; i < 1; ++i)
         {
+            const auto start = system_clock::now();
             sdb.loadFullFileCatalog();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            const auto end = system_clock::now();
+            qDebug() << "VACUUM FINISHED" << duration_cast<milliseconds>(end - start).count() << "ms";
+            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };
 
-    for (size_t i = 0; i < 3; ++i)
-        threads.push_back(nx::utils::thread(writerFunc));
+    //for (size_t i = 0; i < 3; ++i)
+    //    threads.push_back(nx::utils::thread(writerFunc));
 
-    threads.push_back(nx::utils::thread(readerFunc));
+    ////threads.push_back(nx::utils::thread(readerFunc));
 
-    for (auto &t : threads)
-        t.join();
+    //for (auto &t : threads)
+    //    t.join();
+
+    qDebug() << "WRITERS FINISHED";
+
+    nx::utils::thread(readerFunc).join();
+    return;
 
     dbChunkCatalogs = sdb.loadFullFileCatalog();
 

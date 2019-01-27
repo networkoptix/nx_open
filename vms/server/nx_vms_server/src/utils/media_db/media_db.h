@@ -1,7 +1,7 @@
 #ifndef __MEDIA_DB_H__
 #define __MEDIA_DB_H__
 
-#include <deque>
+#include <queue>
 #include <cmath>
 
 #include <boost/variant.hpp>
@@ -35,13 +35,7 @@ struct FileHeader
     void setDbVersion(uint8_t dbVersion) { part1 |= (dbVersion & 0xff); }
 };
 
-enum class Mode
-{
-    Read,
-    Write
-};
-
-struct CameraOperation : RecordBase
+struct CameraOperation: RecordBase
 {
     QByteArray cameraUniqueId;
 
@@ -60,151 +54,40 @@ struct CameraOperation : RecordBase
     void setCameraUniqueId(const QByteArray &uniqueId);
 };
 
-typedef boost::variant<MediaFileOperation, CameraOperation> WriteRecordType;
+typedef boost::variant<boost::blank, MediaFileOperation, CameraOperation> DBRecord;
 
-enum class Error
-{
-    NoError,
-    ReadError,
-    WriteError,
-    ParseError,
-    Eof,
-    WrongMode
-};
-
-class DbHelperHandler
+class MediaDbReader
 {
 public:
-    virtual ~DbHelperHandler() {}
+    MediaDbReader(QIODevice* ioDevice);
 
-    virtual void handleCameraOp(const CameraOperation &cameraOp, Error error) = 0;
-    virtual void handleMediaFileOp(const MediaFileOperation &mediaFileOp, Error error) = 0;
-    virtual void handleError(Error error) = 0;
-
-    virtual void handleRecordWrite(Error error) = 0;
-};
-
-class FaultTolerantDataStream
-{
-public:
-    FaultTolerantDataStream(QIODevice* device):
-        m_stream(device)
-    {}
-
-    template<typename T>
-    FaultTolerantDataStream& operator<<(T t)
-    {
-        if (m_stream.device())
-            m_stream << t;
-        else
-            NX_WARNING(this, "[media db] attempt to use null file stream");
-
-        return *this;
-    }
-
-    template<typename T>
-    FaultTolerantDataStream& operator>>(T& t)
-    {
-        if (m_stream.device())
-            m_stream >> t;
-        else
-            NX_WARNING(this, "[media db] attempt to use null file stream");
-
-        return *this;
-    }
-
-    void setDevice(QIODevice* device)
-    {
-        m_stream.setDevice(device);
-    }
-
-    QDataStream::Status status() const
-    {
-        return m_stream.status();
-    }
-
-    int writeRawData(const char* s, int len)
-    {
-        if (m_stream.device())
-            return m_stream.writeRawData(s, len);
-
-        NX_WARNING(this, "[media db] attempt to use null file stream");
-        return -1;
-    }
-
-    void setByteOrder(QDataStream::ByteOrder order)
-    {
-        m_stream.setByteOrder(order);
-    }
-
-    void resetStatus()
-    {
-        m_stream.resetStatus();
-    }
-
-    bool atEnd() const
-    {
-        if (!m_stream.device())
-            NX_WARNING(this, "[media db] attempt to use null file stream");
-
-        return m_stream.atEnd();
-    }
-
-    int readRawData(char* s, int len)
-    {
-        if (m_stream.device())
-            return m_stream.readRawData(s, len);
-
-        NX_WARNING(this, "[media db] attempt to use null file stream");
-        return -1;
-    }
-
-    QDataStream& stream() { return m_stream; }
+    bool readFileHeader(uint8_t *dbVersion);
+    DBRecord readRecord();
 
 private:
     QDataStream m_stream;
 };
 
-class DbHelper : public QnLongRunnable
+using DBRecordQueue = std::queue<DBRecord>;
+
+class MediaDbWriter: public QnLongRunnable
 {
-    typedef std::deque<WriteRecordType> WriteQueue;
 public:
-    DbHelper(DbHelperHandler *const handler);
-    ~DbHelper();
+    MediaDbWriter();
+    ~MediaDbWriter();
+    void setDevice(QIODevice* ioDevice);
+    void writeRecord(const DBRecord &record);
 
-    DbHelper& operator = (DbHelper&& other) = default;
-
-    Error readFileHeader(uint8_t *dbVersion);
-    Error writeFileHeader(uint8_t dbVersion);
-
-    Error readRecord();
-    void writeRecord(const WriteRecordType &record);
-    void stopWriter();
-    void reset();
-
-    void setMode(Mode mode);
-    Mode getMode() const;
-
-    QIODevice *getDevice() const;
-    void setDevice(QIODevice *device);
-    QDataStream& stream() { return m_stream.stream(); }
-
-public:
-    virtual void run() override;
+    static bool writeFileHeader(QIODevice* ioDevice, uint8_t dbVersion);
 
 private:
-    Error getError() const;
-
-private:
-    QIODevice *m_device;
-    DbHelperHandler *m_handler;
-    WriteQueue m_writeQueue;
-    FaultTolerantDataStream m_stream;
-
+    QDataStream m_stream;
     mutable QnMutex m_mutex;
-    QnWaitCondition m_cond;
-    QnWaitCondition m_writerDoneCond;
-    Mode m_mode;
+    QnWaitCondition m_waitCondition;
+    DBRecordQueue m_queue;
+
+    virtual void run() override;
+    virtual void pleaseStop() override;
 };
 
 } // namespace media_db
