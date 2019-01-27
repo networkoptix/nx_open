@@ -604,8 +604,8 @@ QByteArray QnStorageDb::serializeData() const
 {
     QByteArray writeBuf;
 
-    qint64 dataSize = nx::media_db::FileHeader::kSerializedRecordSize;
-    dataSize += m_readUuidToHash.size() * nx::media_db::CameraOperation::kSerializedRecordSize;
+    qint64 dataSize =
+        m_readUuidToHash.size() * nx::media_db::CameraOperation::kSerializedRecordSize;
 
     for (auto it = m_readUuidToHash.right.begin(); it != m_readUuidToHash.right.end(); ++it)
         dataSize += it->second.size();
@@ -617,14 +617,7 @@ QByteArray QnStorageDb::serializeData() const
     }
 
     writeBuf.resize(dataSize);
-
-    nx::media_db::FileHeader fh;
-    fh.setDbVersion(kDbVersion);
-
     char* dst = writeBuf.data();
-
-    AV_WB64(&dst, fh.part1);
-    AV_WB64(&dst, fh.part2);
 
     for (auto it = m_readUuidToHash.right.begin(); it != m_readUuidToHash.right.end(); ++it)
     {
