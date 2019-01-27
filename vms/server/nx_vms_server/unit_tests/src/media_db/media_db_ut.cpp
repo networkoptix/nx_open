@@ -568,6 +568,8 @@ protected:
             m_dbRecords.push(camOp);
             m_writer.writeRecord(camOp);
         }
+
+        m_writer.stop();
     }
 
     void thenAllShouldBeRetrievedCorrectly()
