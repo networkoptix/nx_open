@@ -258,6 +258,11 @@ namespace nx
             doModbusRequestAsync(std::move(message));
         }
 
+        QString QnModbusAsyncClient::idForToStringFromPtr() const
+        {
+            return m_endpoint.toString();
+        }
+
         void QnModbusAsyncClient::addHeader(ModbusMessage* message)
         {
             ModbusMBAPHeader header;
