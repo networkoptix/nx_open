@@ -1,11 +1,14 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <optional>
 
 #include <gtest/gtest.h>
 
 #include <nx/network/socket_factory.h>
+#include <nx/network/stream_proxy.h>
+#include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/system_socket.h>
@@ -85,6 +88,29 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+class DroppingStream:
+    public nx::utils::bstream::AbstractOutputConverter
+{
+public:
+    DroppingStream(std::atomic<bool>* dropDataFlag):
+        m_dropServerData(dropDataFlag)
+    {
+    }
+
+    virtual int write(const void* data, size_t count) override
+    {
+        if (!*m_dropServerData)
+            return m_outputStream->write(data, count);
+
+        return count;
+    }
+
+private:
+    std::atomic<bool>* m_dropServerData = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * @param AsyncClientTestTypes It is a struct with following nested types:
  * - ClientType Type that inherits nx::network::stun::AbstractAsyncClient.
@@ -105,6 +131,25 @@ public:
     ~StunAsyncClientAcceptanceTest()
     {
         m_client->pleaseStopSync();
+    }
+
+    void enableProxy()
+    {
+        m_proxy = std::make_unique<StreamProxy>();
+
+        m_proxy->setDownStreamConverterFactory(
+            [this]() { return std::make_unique<DroppingStream>(&m_dropServerData); });
+
+        auto tcpServerSocket = std::make_unique<TCPServerSocket>(AF_INET);
+        ASSERT_TRUE(tcpServerSocket->setNonBlockingMode(true));
+        ASSERT_TRUE(tcpServerSocket->bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(tcpServerSocket->listen());
+        m_proxyAddress = tcpServerSocket->getLocalAddress();
+
+        m_proxy->startProxy(
+            std::make_unique<StreamServerSocketToAcceptorWrapper>(
+                std::move(tcpServerSocket)),
+            SocketAddress());
     }
 
 protected:
@@ -143,7 +188,7 @@ protected:
 
         whenRestartServer();
 
-        thenClientReportsConnectionClosure();
+        thenClientReportedConnectionClosure();
         thenClientReconnects();
         // NOTE: Client reconnect does not mean server has initialized connection already.
         thenServerHasAtLeastOneConnection();
@@ -229,7 +274,7 @@ protected:
     void whenConnectToServer()
     {
         m_client->connect(
-            m_serverUrl,
+            serverUrl(),
             [this](SystemError::ErrorCode systemErrorCode)
             {
                 m_connectResults.push(systemErrorCode);
@@ -254,6 +299,13 @@ protected:
     void whenConnectToNewServer()
     {
         whenConnectToServer();
+    }
+
+    void whenSilentlyDropAllConnectionsToServer()
+    {
+        ASSERT_TRUE(m_proxy);
+
+        m_dropServerData = true;
     }
 
     void thenClientConnected()
@@ -316,9 +368,15 @@ protected:
         m_indicationsReceived.pop();
     }
 
-    void thenClientReportsConnectionClosure()
+    void thenClientReportedConnectionClosure()
     {
         m_connectionClosedEventsReceived.pop();
+    }
+
+    void thenClientReportedConnectionClosureWithResult(
+        SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, m_connectionClosedEventsReceived.pop());
     }
 
     void thenClientDoesNotReportConnectionClosure()
@@ -334,7 +392,7 @@ protected:
 
     typename AsyncClientTestTypes::ClientType& client()
     {
-        return m_client;
+        return *m_client;
     }
 
 private:
@@ -367,6 +425,9 @@ private:
     RequestResult m_prevRequestResult;
     const int m_testMethodNumber = stun::MethodType::userMethod + 1;
     int m_indictionMethodToSubscribeTo = stun::MethodType::userMethod + 1;
+    std::unique_ptr<StreamProxy> m_proxy;
+    std::optional<SocketAddress> m_proxyAddress;
+    std::atomic<bool> m_dropServerData{false};
 
     virtual void SetUp() override
     {
@@ -392,6 +453,10 @@ private:
 
         ASSERT_TRUE(m_server->bind(m_serverEndpoint));
         m_serverEndpoint = nx::network::url::getEndpoint(m_server->url());
+
+        if (m_proxy)
+            m_proxy->setProxyDestination(m_serverEndpoint);
+
         m_serverUrl = m_server->url();
         ASSERT_TRUE(m_server->listen());
     }
@@ -406,11 +471,19 @@ private:
             this));
 
         m_client->connect(
-            m_serverUrl,
+            serverUrl(),
             [this](SystemError::ErrorCode systemErrorCode)
             {
                 m_connectResults.push(systemErrorCode);
             });
+    }
+
+    nx::utils::Url serverUrl() const
+    {
+        auto url = m_serverUrl;
+        if (m_proxyAddress)
+            url = url::Builder(url).setEndpoint(*m_proxyAddress);
+        return url;
     }
 
     void sendResponse(
@@ -579,7 +652,7 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, connection_closure_is_reported)
     this->givenConnectedClient();
 
     this->whenStopServer();
-    this->thenClientReportsConnectionClosure();
+    this->thenClientReportedConnectionClosure();
 }
 
 TYPED_TEST_P(
@@ -600,7 +673,7 @@ TYPED_TEST_P(
 {
     this->givenReconnectedClient();
     this->whenStopServer();
-    this->thenClientReportsConnectionClosure();
+    this->thenClientReportedConnectionClosure();
 }
 
 TYPED_TEST_P(

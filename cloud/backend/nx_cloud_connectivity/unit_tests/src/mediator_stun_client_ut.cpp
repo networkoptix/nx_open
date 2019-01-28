@@ -38,6 +38,27 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 
 //-------------------------------------------------------------------------------------------------
 
-// TODO: #ak Add keep-alive related tests.
+class MediatorStunClientKeepAlive:
+    public StunAsyncClientAcceptanceTest<MediatorStunClientTestTypes>
+{
+public:
+    MediatorStunClientKeepAlive()
+    {
+        enableProxy();
+
+        nx::network::KeepAliveOptions keepAliveOptions;
+        keepAliveOptions.inactivityPeriodBeforeFirstProbe = std::chrono::milliseconds(10);
+        keepAliveOptions.probeSendPeriod = std::chrono::milliseconds(10);
+        keepAliveOptions.probeCount = 3;
+        client().setKeepAliveOptions(keepAliveOptions);
+    }
+};
+
+TEST_F(MediatorStunClientKeepAlive, connection_is_closed_after_keep_alive_failure)
+{
+    givenConnectedClient();
+    whenSilentlyDropAllConnectionsToServer();
+    thenClientReportedConnectionClosureWithResult(SystemError::connectionReset);
+}
 
 } // namespace nx::hpm::api::test
