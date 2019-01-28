@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/aio/repetitive_timer.h>
+#include <nx/network/aio/timer.h>
 
 #include "socket_common.h"
 
@@ -55,7 +55,7 @@ protected:
 
 private:
     const KeepAliveOptions m_keepAliveOptions;
-    aio::RepetitiveTimer m_timer;
+    aio::Timer m_timer;
     nx::utils::MoveOnlyFunc<void()> m_onTestFailure;
     int m_probeNumber = 0;
 

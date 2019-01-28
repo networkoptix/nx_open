@@ -49,8 +49,8 @@ class AbstractAlivenessTester:
 public:
     AbstractAlivenessTester()
     {
-        m_keepAliveOptions.inactivityPeriodBeforeFirstProbe = std::chrono::seconds(1);
-        m_keepAliveOptions.probeSendPeriod = std::chrono::seconds(1);
+        m_keepAliveOptions.inactivityPeriodBeforeFirstProbe = std::chrono::milliseconds(1);
+        m_keepAliveOptions.probeSendPeriod = std::chrono::milliseconds(1);
         m_keepAliveOptions.probeCount = 3;
     }
 
@@ -71,6 +71,12 @@ protected:
         m_serverIsAlive = false;
     }
 
+    void givenWorkingAlivenessTester()
+    {
+        whenStartAlivenessTester();
+        thenProbeIsSended();
+    }
+
     void whenStartAlivenessTester()
     {
         m_alivenessTester = std::make_unique<AlivenessTester>(
@@ -82,13 +88,19 @@ protected:
 
     void whenWaitForMultipleSuccessfulProbes()
     {
-        for (int i = 0; i < 7; ++i)
+        for (int i = 0; i < m_keepAliveOptions.probeCount * 3; ++i)
             m_probesSent.pop();
     }
 
     void whenStopServer()
     {
         m_serverIsAlive = false;
+    }
+
+    void whenRestartAlivenessTester()
+    {
+        m_alivenessTester->cancelSync();
+        m_alivenessTester->start([this]() { m_failures.push(0); });
     }
 
     void thenProbeIsSended()
@@ -99,6 +111,12 @@ protected:
     void thenFailureIsReported()
     {
         m_failures.pop();
+    }
+
+    void thenAlivenessTesterWorks()
+    {
+        whenStopServer();
+        thenFailureIsReported();
     }
 
 private:
@@ -137,8 +155,22 @@ TEST_F(AbstractAlivenessTester, test_failure_is_not_reported_while_alive)
 
 //TEST_F(AbstractAlivenessTester, confirming_aliveness_prevents_unneeded_probes)
 
-//TEST_F(AbstractAlivenessTester, can_be_restarted)
+TEST_F(AbstractAlivenessTester, can_be_restarted)
+{
+    givenWorkingAlivenessTester();
+    whenRestartAlivenessTester();
+    thenAlivenessTesterWorks();
+}
 
-//TEST_F(AbstractAlivenessTester, can_be_reused_after_aliveness_failure)
+TEST_F(AbstractAlivenessTester, can_be_reused_after_aliveness_failure)
+{
+    givenMalfunctioningServer();
+    whenStartAlivenessTester();
+    thenFailureIsReported();
+
+    givenAliveServer();
+    whenStartAlivenessTester();
+    thenProbeIsSended();
+}
 
 } // namespace nx::network::test
