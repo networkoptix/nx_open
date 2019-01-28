@@ -14,9 +14,9 @@
 #include <nx/vms/client/desktop/common/widgets/dialog_title_bar_widget.h>
 #include <nx/vms/client/desktop/common/widgets/emulated_non_client_area.h>
 #include <nx/vms/client/desktop/platforms/windows/system_non_client_area_remover_win.h>
-#endif // defined(Q_OS_WIN)
 
 using namespace nx::vms::client::desktop;
+#endif // defined(Q_OS_WIN)
 
 QnDialog::QnDialog(QWidget* parent, Qt::WindowFlags flags):
     base_type(parent, flags),
