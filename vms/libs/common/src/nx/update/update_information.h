@@ -188,7 +188,8 @@ struct UpdateContents
      * Maps system information to a set of packages. We use this cache to find and check
      * if a specific OS variant is supported.
      */
-    PackageCache packageCache;
+    PackageCache serverPackageCache;
+    PackageCache clientPackageCache;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;
