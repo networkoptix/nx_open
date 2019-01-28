@@ -232,7 +232,7 @@ private:
 SystemNonClientAreaRemover::SystemNonClientAreaRemover():
     d(new Private())
 {
-    NX_CRITICAL(qApp, "WindowTitleCustomizer requires QCoreApplication instance to exist");
+    NX_CRITICAL(qApp, "SystemNonClientAreaRemover requires QCoreApplication instance to exist");
     qApp->installNativeEventFilter(d.get());
 }
 
