@@ -304,7 +304,8 @@ bool QnStorageDb::createDatabase(const QString &fileName)
     if (!resetIoDevice())
         return false;
 
-    ByteStreamReader reader(m_ioDevice->read(nx::media_db::FileHeader::kSerializedRecordSize));
+    const QByteArray data = m_ioDevice->read(nx::media_db::FileHeader::kSerializedRecordSize);
+    ByteStreamReader reader(data);
     nx::media_db::FileHeader fileHeader;
 
     if (!fileHeader.deserialize(&reader) || fileHeader.getDbVersion() != nx::media_db::kDbVersion)
