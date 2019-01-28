@@ -166,7 +166,7 @@ struct MediaFileOperation: RecordBase
 
     quint64 getHashInCatalog() const
     {
-        return (getStartTime() << 24) + getDuration();
+        return getStartTime();
     }
 
     MediaFileOperation& operator=(const MediaFileOperation& right)

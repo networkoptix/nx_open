@@ -165,6 +165,17 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
     return true;
 }
 
+bool DbReader::parse(const QByteArray& fileContent, Data* parsedData)
+{
+    if (!deserialize(fileContent, parsedData))
+        return false;
+
+    for (auto& catalog : parsedData->removeRecords)
+        std::sort(catalog.second.begin(), catalog.second.end());
+
+    return true;
+}
+
 MediaDbWriter::MediaDbWriter()
 {
     m_stream.setByteOrder(QDataStream::LittleEndian);

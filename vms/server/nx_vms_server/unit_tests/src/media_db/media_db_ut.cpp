@@ -35,6 +35,7 @@
 #include <media_server/media_server_module.h>
 
 #include "../media_server_module_fixture.h"
+#include <nx/utils/std/thread.h>
 
 namespace nx::media_db::test {
 void generateCameraUid(QByteArray *camUid, size_t n)
@@ -775,6 +776,139 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     }
 }
 
+TEST_F(MediaDbTest, StorageDB)
+{
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    const QString workDirPath = *workDirResource.getDirName();
+
+    bool result;
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
+    storage->setUrl(workDirPath);
+    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
+    ASSERT_TRUE(result);
+
+    QnStorageDb sdb(&serverModule(), storage, 1);
+    result = sdb.open(workDirPath + lit("/test.nxdb"));
+    ASSERT_TRUE(result);
+
+    sdb.loadFullFileCatalog();
+
+    QnMutex mutex;
+    std::vector<nx::utils::thread> threads;
+    TestChunkManager tcm(128);
+
+    auto writerFunc = [&mutex, &sdb, &tcm]
+    {
+        for (int i = 0; i < 100; ++i)
+        {
+            int diceRoll = nx::utils::random::number(0, 10);
+            switch (diceRoll)
+            {
+            case 0:
+            {
+                std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
+                QnMutexLocker lk(&mutex);
+                p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
+                sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
+                break;
+            }
+            case 1:
+            case 2:
+            {
+                TestChunkManager::TestChunk *chunk;
+                QnMutexLocker lk(&mutex);
+                chunk = tcm.generateRemoveOperation();
+                if (chunk)
+                {
+                    sdb.deleteRecords(
+                        chunk->catalog->cameraUniqueId,
+                        chunk->catalog->quality, chunk->chunk.startTimeMs);
+                }
+                break;
+            }
+            default:
+            {
+                boost::optional<TestChunkManager::TestChunk> chunk;
+                QnMutexLocker lk(&mutex);
+                chunk = tcm.generateAddOperation();
+                if (!(bool)chunk)
+                    break;
+                sdb.addRecord(
+                    chunk->catalog->cameraUniqueId,
+                    chunk->catalog->quality, chunk->chunk);
+                break;
+            }
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(7));
+        }
+    };
+
+    QVector<DeviceFileCatalogPtr> dbChunkCatalogs;
+    auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        for (size_t i = 0; i < 10; ++i)
+        {
+            sdb.loadFullFileCatalog();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    };
+
+    for (size_t i = 0; i < 3; ++i)
+        threads.push_back(nx::utils::thread(writerFunc));
+
+    threads.push_back(nx::utils::thread(readerFunc));
+
+    for (auto &t : threads)
+        t.join();
+
+    dbChunkCatalogs = sdb.loadFullFileCatalog();
+
+    for (auto catalogIt = dbChunkCatalogs.cbegin();
+         catalogIt != dbChunkCatalogs.cend();
+         ++catalogIt)
+    {
+        for (auto chunkIt = (*catalogIt)->getChunksUnsafe().cbegin();
+             chunkIt != (*catalogIt)->getChunksUnsafe().cend();
+             ++chunkIt)
+        {
+            TestChunkManager::TestChunkCont::iterator tcmIt =
+                std::find_if(tcm.get().begin(), tcm.get().end(),
+                    [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
+                    {
+                        return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId()
+                            && tc.catalog->quality == (*catalogIt)->getCatalog()
+                            && !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
+                    });
+            bool tcmChunkFound = tcmIt != tcm.get().end();
+            ASSERT_TRUE(tcmChunkFound);
+            if (tcmChunkFound)
+                ((TestChunkManager::TestChunk&)(*tcmIt)).isVisited = true;
+        }
+    }
+
+    bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(),
+                                   [](const TestChunkManager::TestChunk &tc)
+                                   {
+                                       return !tc.isDeleted && !tc.isVisited;
+                                   });
+    if (!allVisited)
+    {
+//        std::cout << errorStream.stream->str() << std::endl;
+//        errorStream.reset();
+        size_t notVisited = std::count_if(
+                tcm.get().cbegin(),
+                tcm.get().cend(),
+                [](const TestChunkManager::TestChunk &tc)
+                { return !tc.isDeleted && !tc.isVisited; });
+        qWarning() << lit("Not visited count: %1").arg(notVisited);
+    }
+
+    ASSERT_EQ(allVisited, true);
+}
+
 } // namespace nx::media_db::test
 
 
@@ -896,197 +1030,5 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 //    QFile::remove(fileName);
 //}
 //
-//TEST_F(MediaDbTest, StorageDB)
-//{
-//    nx::ut::utils::WorkDirResource workDirResource;
-//    ASSERT_TRUE((bool)workDirResource.getDirName());
-//
-//    const QString workDirPath = *workDirResource.getDirName();
-//
-//    bool result;
-//    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
-//    storage->setUrl(workDirPath);
-//    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
-//    ASSERT_TRUE(result);
-//
-//    QnStorageDb sdb(&serverModule(), storage, 1);
-//    result = sdb.open(workDirPath + lit("/test.nxdb"));
-//    ASSERT_TRUE(result);
-//
-//    sdb.loadFullFileCatalog();
-//
-//    QnMutex mutex;
-//    std::vector<nx::utils::thread> threads;
-//    TestChunkManager tcm(128);
-//
-//    //auto writerFunc = [&mutex, &sdb, &tcm]
-//    //{
-//    //    for (int i = 0; i < 6000000; ++i)
-//    //    {
-//    //        int diceRoll = nx::utils::random::number(0, 10);
-//    //        errorStream << "dice rolled: " << diceRoll << std::endl;
-//    //        switch (diceRoll)
-//    //        {
-//    //            //case 0:
-//    //            //{
-//    //            //    std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
-//    //            //    QnMutexLocker lk(&mutex);
-//    //            //    p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
-//    //            //    sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
-//    //            //    break;
-//    //            //}
-//    //            //case 1:
-//    //            case 0:
-//    //            case 1:
-//    //            case 2:
-//    //            {
-//    //                TestChunkManager::TestChunk *chunk;
-//    //                QnMutexLocker lk(&mutex);
-//    //                chunk = tcm.generateRemoveOperation();
-//    //                if (chunk)
-//    //                {
-//    //                    sdb.deleteRecords(
-//    //                        chunk->catalog->cameraUniqueId,
-//    //                        chunk->catalog->quality, chunk->chunk.startTimeMs);
-//    //                }
-//    //                break;
-//    //            }
-//    //            default:
-//    //            {
-//    //                boost::optional<TestChunkManager::TestChunk> chunk;
-//    //                QnMutexLocker lk(&mutex);
-//    //                chunk = tcm.generateAddOperation();
-//    //                if (!(bool)chunk)
-//    //                    break;
-//    //                sdb.addRecord(
-//    //                    chunk->catalog->cameraUniqueId,
-//    //                    chunk->catalog->quality, chunk->chunk);
-//    //                break;
-//    //            }
-//    //        }
-//
-//    //        if (i % 10000 == 0)
-//    //            qDebug() << "Added" << i << "records";
-//    //    }
-//    //};
-//
-//    for (int i = 0; i < 6000; ++i)
-//    {
-//        //int diceRoll = nx::utils::random::number(0, 10);
-//        //errorStream << "dice rolled: " << diceRoll << std::endl;
-//        switch (i % 10)
-//        {
-//            //case 0:
-//            //{
-//            //    std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
-//            //    QnMutexLocker lk(&mutex);
-//            //    p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
-//            //    sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
-//            //    break;
-//            //}
-//            //case 1:
-//        case 0:
-//        case 1:
-//        case 2:
-//        {
-//            TestChunkManager::TestChunk *chunk;
-//            chunk = tcm.generateRemoveOperation();
-//            if (chunk)
-//            {
-//                sdb.deleteRecords(
-//                    chunk->catalog->cameraUniqueId,
-//                    chunk->catalog->quality, chunk->chunk.startTimeMs);
-//            }
-//            break;
-//        }
-//        default:
-//        {
-//            boost::optional<TestChunkManager::TestChunk> chunk;
-//            chunk = tcm.generateAddOperation();
-//            if (!(bool)chunk)
-//                break;
-//            sdb.addRecord(
-//                chunk->catalog->cameraUniqueId,
-//                chunk->catalog->quality, chunk->chunk);
-//            break;
-//        }
-//        }
-//
-//        if (i % 10000 == 0)
-//            qDebug() << "Added" << i << "records";
-//    }
-//
-//    using namespace std::chrono;
-//
-//    QVector<DeviceFileCatalogPtr> dbChunkCatalogs;
-//    auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
-//    {
-//        //std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//        for (size_t i = 0; i < 1; ++i)
-//        {
-//            const auto start = system_clock::now();
-//            sdb.loadFullFileCatalog();
-//            const auto end = system_clock::now();
-//            qDebug() << "VACUUM FINISHED" << duration_cast<milliseconds>(end - start).count() << "ms";
-//            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//        }
-//    };
-//
-//    //for (size_t i = 0; i < 3; ++i)
-//    //    threads.push_back(nx::utils::thread(writerFunc));
-//
-//    ////threads.push_back(nx::utils::thread(readerFunc));
-//
-//    //for (auto &t : threads)
-//    //    t.join();
-//
-//    qDebug() << "WRITERS FINISHED";
-//
-//    nx::utils::thread(readerFunc).join();
-//    return;
-//
-//    dbChunkCatalogs = sdb.loadFullFileCatalog();
-//
-//    for (auto catalogIt = dbChunkCatalogs.cbegin();
-//         catalogIt != dbChunkCatalogs.cend();
-//         ++catalogIt)
-//    {
-//        for (auto chunkIt = (*catalogIt)->getChunksUnsafe().cbegin();
-//             chunkIt != (*catalogIt)->getChunksUnsafe().cend();
-//             ++chunkIt)
-//        {
-//            TestChunkManager::TestChunkCont::iterator tcmIt =
-//                std::find_if(tcm.get().begin(), tcm.get().end(),
-//                    [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
-//                    {
-//                        return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId()
-//                            && tc.catalog->quality == (*catalogIt)->getCatalog()
-//                            && !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
-//                    });
-//            bool tcmChunkFound = tcmIt != tcm.get().end();
-//            ASSERT_TRUE(tcmChunkFound);
-//            if (tcmChunkFound)
-//                ((TestChunkManager::TestChunk&)(*tcmIt)).isVisited = true;
-//        }
-//    }
-//
-//    bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(),
-//                                   [](const TestChunkManager::TestChunk &tc)
-//                                   {
-//                                       return !tc.isDeleted && !tc.isVisited;
-//                                   });
-//    if (!allVisited)
-//    {
-////        std::cout << errorStream.stream->str() << std::endl;
-////        errorStream.reset();
-//        size_t notVisited = std::count_if(
-//                tcm.get().cbegin(),
-//                tcm.get().cend(),
-//                [](const TestChunkManager::TestChunk &tc)
-//                { return !tc.isDeleted && !tc.isVisited; });
-//        qWarning() << lit("Not visited count: %1").arg(notVisited);
-//    }
-//
-//    ASSERT_EQ(allVisited, true);
-//}
+
 

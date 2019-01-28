@@ -105,16 +105,7 @@ public:
         std::unordered_map<int, std::vector<quint64>> removeRecords;
     };
 
-    static bool parse(const QByteArray& fileContent, Data* parsedData)
-    {
-        if (!deserialize(fileContent, parsedData))
-            return false;
-
-        for (auto& catalog : parsedData->removeRecords)
-            std::sort(catalog.second.begin(), catalog.second.end());
-
-        return true;
-    }
+    static bool parse(const QByteArray& fileContent, Data* parsedData);
 
 private:
     static bool deserialize(const QByteArray& buffer, Data* parsedData);
