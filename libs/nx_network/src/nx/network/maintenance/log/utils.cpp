@@ -53,9 +53,8 @@ std::set<nx::utils::log::Filter> toFilters(const std::vector<Filter>& filters)
     std::set<nx::utils::log::Filter> logFilters;
     for (const auto& filter: filters)
     {
-        // TODO: #Nate make sure you want regexp here.
         for (const auto& tag: filter.tags)
-            logFilters.emplace(QString::fromStdString(tag), /*regexp*/ true); 
+            logFilters.emplace(QString::fromStdString(tag));
     }
 
     return logFilters;
@@ -77,8 +76,7 @@ LevelFilters toLevelFilters(const std::vector<Filter>& filters)
     {
         for (const auto& tag: filter.tags)
         {
-            // TODO: #Nate make sure you want regexp here.
-            nx::utils::log::Filter logFilter(QString::fromStdString(tag), /*regexp*/ true);
+            nx::utils::log::Filter logFilter(QString::fromStdString(tag));
             levelFilters.emplace(logFilter, levelFromString(filter.level.c_str()));
         }
     }
