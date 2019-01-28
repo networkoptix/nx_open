@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/time.h>
 
 #include "pollset_factory.h"
 
@@ -20,13 +21,12 @@ AioTaskQueue::AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSetToUse):
         pollSet = std::move(pollSetToUse);
     else
         pollSet = PollSetFactory::instance()->create();
-
-    m_monotonicClock.restart();
 }
 
 qint64 AioTaskQueue::getSystemTimerVal() const
 {
-    return m_monotonicClock.elapsed();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        nx::utils::monotonicTime().time_since_epoch()).count();
 }
 
 void AioTaskQueue::addTask(SocketAddRemoveTask task)
