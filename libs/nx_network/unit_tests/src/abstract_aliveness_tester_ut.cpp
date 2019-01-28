@@ -34,7 +34,6 @@ public:
 
     virtual void cancelProbe() override
     {
-        // TODO
     }
 
 private:
