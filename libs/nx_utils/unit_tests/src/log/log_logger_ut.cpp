@@ -60,8 +60,7 @@ TEST(LogLogger, Levels)
 }
 
 static Tag makeTag(const char* tag) { return Tag(QString::fromUtf8(tag)); }
-static Filter makeFilter(const char* filter) { return Filter(QString::fromUtf8(filter),
-    /*regexp*/ false); }
+static Filter makeFilter(const char* filter) { return Filter(QString::fromUtf8(filter)); }
 
 TEST(LogLogger, Filters)
 {
