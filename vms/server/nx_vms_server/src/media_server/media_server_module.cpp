@@ -84,6 +84,7 @@
 #include <recorder/schedule_sync.h>
 #include "media_server_process.h"
 #include <camera/camera_error_processor.h>
+#include <nx/vms/server/server_update_manager.h>
 #include "media_server_resource_searchers.h"
 #include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
@@ -487,7 +488,7 @@ void QnMediaServerModule::registerResourceDataProviders()
     m_resourceDataProviderFactory->registerResourceType<nx::vms::server::resource::Camera>();
 }
 
-nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
+nx::vms::server::ServerUpdateManager* QnMediaServerModule::updateManager() const
 {
     return m_updateManager;
 }

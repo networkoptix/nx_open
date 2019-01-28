@@ -45,8 +45,6 @@ public:
     QString brand() const;
     QString customization() const;
 
-    nx::utils::SoftwareVersion engineVersion() const;
-    void setEngineVersion(const nx::utils::SoftwareVersion& version);
 
     void setModuleShortId(const QnUuid& id, int number);
     int moduleShortId(const QnUuid& id) const;
@@ -60,7 +58,6 @@ private:
     const nx::vms::api::PeerType m_localPeerType;
     const QString m_brand;
     const QString m_customization;
-    nx::utils::SoftwareVersion m_engineVersion;
 };
 
 #define qnStaticCommon (QnStaticCommonModule::instance())

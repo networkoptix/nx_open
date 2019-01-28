@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abstract_peer_manager.h"
+#include <nx/network/aio/timer.h>
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -42,10 +43,13 @@ public:
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
+    virtual void stop() override;
 
 private:
     class Private;
     const QScopedPointer<Private> d;
+    bool m_stopped = false;
+    network::aio::Timer m_aioTimer;
 };
 
 class InternetOnlyPeerManagerFactory: public AbstractPeerManagerFactory

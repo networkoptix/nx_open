@@ -201,7 +201,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
 
     if (!m_target.denyClientUpdates && !m_clientRequiresInstaller)
     {
-        bool updateClient = isUpdateNeeded(qnStaticCommon->engineVersion(), m_target.version);
+        bool updateClient = isUpdateNeeded(commonModule()->engineVersion(), m_target.version);
 
         if (updateClient && !m_clientUpdateFile)
         {
@@ -340,9 +340,9 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     }
 
     QString currentRelease = customizationInfo.current_release;
-    if (nx::utils::SoftwareVersion(currentRelease) < qnStaticCommon->engineVersion())
+    if (nx::utils::SoftwareVersion(currentRelease) < commonModule()->engineVersion())
     {
-        currentRelease = qnStaticCommon->engineVersion().toString(
+        currentRelease = commonModule()->engineVersion().toString(
             nx::utils::SoftwareVersion::MinorFormat);
     }
 

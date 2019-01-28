@@ -112,10 +112,8 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
     const UpdateInformationRequestData& request) const
 {
     nx::update::InformationError error;
-    auto information = nx::update::updateInformation(
-        m_settings->checkForUpdateUrl(),
-        publicationKey,
-        &error);
+    auto information = nx::update::updateInformation(m_settings->checkForUpdateUrl(),
+        m_engineVersion, publicationKey, &error);
 
     if (error == nx::update::InformationError::noError)
     {
@@ -185,8 +183,12 @@ static int getUpdateInformationFromGlobalSettings(
     return nx::network::http::StatusCode::ok;
 }
 
-QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(const nx::vms::server::Settings* settings):
-    m_settings(settings)
+QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(
+    const nx::vms::server::Settings* settings,
+    const nx::vms::api::SoftwareVersion& engineVersion)
+    :
+    m_settings(settings),
+    m_engineVersion(engineVersion)
 {
 }
 

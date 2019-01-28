@@ -3,6 +3,7 @@
 #include <nx/vms/applauncher/api/applauncher_api.h>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace applauncher {
 namespace api {
@@ -13,6 +14,7 @@ namespace api {
 */
 ResultType::Value isVersionInstalled(
     nx::utils::SoftwareVersion version,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     bool* const installed);
 
 //!Retrieves a list of the installed versions
@@ -23,9 +25,10 @@ ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versio
 */
 ResultType::Value restartClient(
     nx::utils::SoftwareVersion version = {},
+    const nx::vms::api::SoftwareVersion& engineVersion = {},
     const QString& auth = {});
 
-bool checkOnline(bool runWhenOffline = true);
+bool checkOnline(const nx::vms::api::SoftwareVersion& engineVersion, bool runWhenOffline = true);
 
 //!Installs client update from a zip file
 /*!

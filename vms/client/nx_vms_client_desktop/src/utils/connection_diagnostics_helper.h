@@ -7,6 +7,8 @@
 
 #include <nx/utils/software_version.h>
 
+namespace nx::vms::ap { struct SoftwareVersion; }
+
 class QnConnectionDiagnosticsHelper: public QObject
 {
     Q_OBJECT
@@ -26,18 +28,22 @@ public:
     static Qn::ConnectionResult validateConnection(
         const QnConnectionInfo &connectionInfo,
         ec2::ErrorCode errorCode,
-        QWidget* parentWidget);
+        QWidget* parentWidget,
+        const nx::vms::api::SoftwareVersion& engineVersion);
 
     // TODO: #GDM think about refactoring
     /** Another check of connection, used from 'Test connection' dialog. */
     static TestConnectionResult validateConnectionTest(
         const QnConnectionInfo &connectionInfo,
-        ec2::ErrorCode errorCode);
+        ec2::ErrorCode errorCode,
+        const nx::vms::api::SoftwareVersion& engineVersion);
 
     static void failedRestartClientMessage(QWidget* parent);
 
 private:
-    static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
+    static bool getInstalledVersions(
+        const nx::vms::api::SoftwareVersion& engineVersion,
+        QList<nx::utils::SoftwareVersion>* versions);
     static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);
 
     static QString getDiffVersionsText();
@@ -50,18 +56,21 @@ private:
 
     static QString getDiffVersionFullExtras(
         const QnConnectionInfo& serverInfo,
-        const QString& extraText);
+        const QString& extraText,
+        const nx::vms::api::SoftwareVersion& engineVersion);
 
     static void showValidateConnectionErrorMessage(
         QWidget* parentWidget,
         Qn::ConnectionResult result,
-        const QnConnectionInfo& connectionInfo);
+        const QnConnectionInfo& connectionInfo,
+        const nx::vms::api::SoftwareVersion& engineVersion);
 
     static QString ldapServerTimeoutMessage();
 
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,
-        QWidget* parentWidget);
+        QWidget* parentWidget,
+        const nx::vms::api::SoftwareVersion& engineVersion);
 
     // TODO: #GDM move all duplicating strings here
     enum class ErrorStrings
@@ -73,5 +82,6 @@ private:
 
     static QString getErrorString(ErrorStrings id);
     static QString getErrorDescription(
-        Qn::ConnectionResult result, const QnConnectionInfo& connectionInfo);
+        Qn::ConnectionResult result, const QnConnectionInfo& connectionInfo,
+        const nx::vms::api::SoftwareVersion& engineVersion);
 };

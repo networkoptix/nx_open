@@ -139,6 +139,7 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
+#include <rest/handlers/finish_update_rest_handler.h>
 #include <rest/handlers/update_status_rest_handler.h>
 #include <rest/handlers/install_update_rest_handler.h>
 #include <rest/handlers/cancel_update_rest_handler.h>
@@ -1072,20 +1073,23 @@ void MediaServerProcess::stopSync()
 
     const int kStopTimeoutMs = 100 * 1000;
 
-    if (serviceMainInstance) {
-        {
-            QnMutexLocker lock(&m_stopMutex);
-            m_stopping = true;
-        }
-        serviceMainInstance->pleaseStop();
-        serviceMainInstance->quit();
-        if (!serviceMainInstance->wait(kStopTimeoutMs))
-        {
-            serviceMainInstance->terminate();
-            serviceMainInstance->wait();
-        }
-        serviceMainInstance = 0;
+    {
+        QnMutexLocker lock( &m_stopMutex );
+        if (m_stopping)
+            return;
+
+        m_stopping = true;
     }
+
+    pleaseStop();
+    quit();
+
+    if (!wait(kStopTimeoutMs))
+    {
+        terminate();
+        wait();
+    }
+
     qApp->quit();
 }
 
@@ -2031,20 +2035,6 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler(serverModule()));
 
-    /**%apidoc[proprietary] POST /api/installUpdate
-     * Updates server by the package contained in POST body
-     * %return:object JSON object with an error code and error string.
-     *     %param:string error Error code, "0" means no error.
-     *     %param:string errorString Error token, or an empty string on success.
-     *         %value "UP_TO_DATE" The provided version is already installed.
-     *         %value "INVALID_FILE" The provided file cannot be opened as a ZIP archive.
-     *         %value "INCOMPATIBLE_SYSTEM" The update file is targeted for another system.
-     *         %value "EXTRACTION_ERROR" Some extraction problems were found (e.g. not enough
-     *             space).
-     *         %value "INSTALLATION_ERROR" The server could not execute installation script.
-     */
-    reg("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
-
     /**%apidoc POST /api/restart
      * Restarts the server.
      * %permissions Owner.
@@ -2492,10 +2482,13 @@ void MediaServerProcess::registerRestHandlers(
      * %return The amount of free space available for update files in bytes for each online server
      *     in the system, in the specified format.
      */
-    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
+    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
+        commonModule()->engineVersion()));
     reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
+    reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
-    reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
+    reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule(),
+        [this]() { m_installUpdateRequestReceived = true; }));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/cameraThumbnail
@@ -3437,7 +3430,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 
         // used for statistics reported
         server->setSystemInfo(QnAppInfo::currentSystemInformation());
-        server->setVersion(qnStaticCommon->engineVersion());
+        server->setVersion(commonModule()->engineVersion());
 
         SettingsHelper settingsHelper(this->serverModule());
         QByteArray settingsAuthKey = settingsHelper.getAuthKey();
@@ -3481,7 +3474,7 @@ bool MediaServerProcess::setUpMediaServerResource(
         moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
 
     nx::vms::api::ModuleInformation selfInformation = commonModule()->moduleInformation();
-    selfInformation.version = qnStaticCommon->engineVersion();
+    selfInformation.version = commonModule()->engineVersion();
     selfInformation.sslAllowed = serverModule->settings().allowSslConnections();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
@@ -3927,7 +3920,7 @@ void MediaServerProcess::setUpDataFromSettings()
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
         qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
-        qnStaticCommon->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
+        commonModule()->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
     if (!m_cmdLineArguments.allowedDiscoveryPeers.isEmpty())

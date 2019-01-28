@@ -21,11 +21,13 @@ using Dialog = CompatibilityVersionInstallationDialog;
 
 CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     const QnConnectionInfo& connectionInfo,
-    QWidget* parent)
+    QWidget* parent,
+    const nx::vms::api::SoftwareVersion& engineVersion)
     :
     base_type(parent),
     m_ui(new Ui::QnCompatibilityVersionInstallationDialog),
-    m_versionToInstall(connectionInfo.version)
+    m_versionToInstall(connectionInfo.version),
+    m_engineVersion(engineVersion)
 {
     m_ui->setupUi(this);
     m_ui->autoRestart->setChecked(m_autoInstall);
@@ -170,7 +172,8 @@ int CompatibilityVersionInstallationDialog::installUpdate()
         });
     QString build = QString::number(m_versionToInstall.build());
     // Callback will be called on this thread.
-    auto future = nx::update::checkSpecificChangeset(updateUrl, build, callback);
+    auto future = nx::update::checkSpecificChangeset(
+        updateUrl, m_engineVersion, build, callback);
 
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);

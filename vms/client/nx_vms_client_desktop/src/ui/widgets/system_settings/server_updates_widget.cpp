@@ -268,7 +268,7 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             setMode(Mode::SpecificBuild);
-            const auto version = qnStaticCommon->engineVersion();
+            const auto version = commonModule()->engineVersion();
             m_targetVersion = nx::utils::SoftwareVersion(
                 version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_targetChangeset = dialog.changeset();
@@ -640,7 +640,7 @@ bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& vers
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline())
+    if (!checkOnline(commonModule()->engineVersion()))
         return false;
 
     const auto result = applauncher::api::restartClient(version);
@@ -864,7 +864,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
         {
             case QnUpdateResult::Successful:
             {
-                const bool clientUpdated = (result.targetVersion != qnStaticCommon->engineVersion());
+                const bool clientUpdated = (result.targetVersion != commonModule()->engineVersion());
                 if (clientUpdated)
                 {
                     if (result.clientInstallerRequired)

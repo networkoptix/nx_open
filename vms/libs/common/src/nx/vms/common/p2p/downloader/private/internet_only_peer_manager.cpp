@@ -92,6 +92,11 @@ rest::Handle InternetOnlyPeerManager::downloadChunk(
     return -1;
 }
 
+void InternetOnlyPeerManager::stop()
+{
+    m_aioTimer.post([this]() { m_stopped = true; });
+}
+
 rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& /*fileName*/,
@@ -104,6 +109,7 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
         return -1;
 
     auto httpClient = std::make_shared<nx::network::http::AsyncClient>();
+    httpClient->bindToAioThread(m_aioTimer.getAioThread());
     httpClient->setResponseReadTimeout(kDownloadRequestTimeout);
     httpClient->setSendTimeout(kDownloadRequestTimeout);
     httpClient->setMessageBodyReadTimeout(kDownloadRequestTimeout);
@@ -122,8 +128,11 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     ++d->nextRequestId;
 
     httpClient->doGet(url,
-        [this, callback, requestId, thread = thread()]()
+        nx::utils::guarded(this, [this, callback, requestId, httpClient, thread = thread()]()
         {
+            if (m_stopped)
+                return;
+
             executeInThread(thread, nx::utils::guarded(this,
                 [this, callback, requestId]()
                 {
@@ -142,7 +151,7 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
 
                     callback(success, requestId, result);
                 }));
-        });
+        }));
 
     return requestId;
 }
