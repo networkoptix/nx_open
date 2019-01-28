@@ -67,12 +67,8 @@ private:
     std::unique_ptr<QIODevice> m_ioDevice;
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
-    UuidToHash m_readUuidToHash;
-    UuidToCatalogs m_readData;
     std::chrono::system_clock::time_point m_vacuumTimePoint;
     bool m_vacuumInProgress = false;
-    int (nx::media_db::MediaFileOperation::*m_getTimeZoneFunc)() const;
-    qint64(nx::media_db::MediaFileOperation::*m_getStartTimeFunc)() const;
     nx::media_db::DBRecordQueue m_dbRecordQueue;
     nx::network::aio::Timer m_timer;
 
@@ -84,15 +80,24 @@ private:
     bool resetIoDevice();
     // returns cameraId (hash for cameraUniqueId)
     int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
-    QVector<DeviceFileCatalogPtr> buildReadResult() const;
-    bool checkDataConsistency(const UuidToCatalogs &readDataCopy) const;
     bool startDbFile();
     int getOrGenerateCameraIdHash(const QString &cameraUniqueId);
-    bool writeVacuumedData();
+    bool writeVacuumedData(
+        std::unique_ptr<nx::media_db::DbReader::Data> readData,
+        QVector<DeviceFileCatalogPtr> *outCatalog);
+    void processDbContent(
+        nx::media_db::DbReader::Data& parsedData,
+        QVector<DeviceFileCatalogPtr> *deviceFileCatalog,
+        ByteStreamWriter& writer);
+    void putRecordsToCatalog(
+        QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
+        int cameraId,
+        int catalogIndex,
+        std::deque <DeviceFileCatalog::Chunk> chunks,
+        const UuidToHash& uuidToHash);
+    DeviceFileCatalog::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
     bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
-    bool parseDb(QByteArray* fileContent);
     QByteArray dbFileContent();
-    QByteArray serializeData() const;
     void startVacuum(
         VacuumCompletionHandler completionHandler,
         QVector<DeviceFileCatalogPtr> *data = nullptr);

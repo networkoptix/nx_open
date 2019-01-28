@@ -13,41 +13,26 @@ class RecordVisitor : public boost::static_visitor<>
 public:
     RecordVisitor(QDataStream* stream): m_stream(stream) {}
 
-    void operator() (const CameraOperation &camOp) const
+    void operator() (const CameraOperation& cameraOperation) const
     {
-        *m_stream << camOp.part1;
+        ByteStreamWriter writer(cameraOperation.serializedRecordSize());
+        cameraOperation.serialize(writer);
+
+        m_stream->writeRawData(writer.data(), writer.data().size());
         if (m_stream->status() == QDataStream::WriteFailed)
         {
             qWarning()
-                << "Media DB Camera operation write error: QDataStream::WriteFailed. errno:"
-                << strerror(errno);
-            return;
-        }
-        int bytesToWrite = camOp.getCameraUniqueIdLen();
-        int bytesWritten = m_stream->writeRawData(camOp.cameraUniqueId.data(),
-                                                  bytesToWrite);
-        if (bytesToWrite != bytesWritten)
-        {
-            qWarning()
                 << "Media DB Camera operation write error: QDataStream::WriteRawData wrong bytes written count. errno: "
-                << strerror(errno)
-                << ". Bytes to write = " << bytesToWrite
-                << "; Bytes written = " << bytesWritten;
+                << strerror(errno);
         }
     }
 
-    void operator() (const MediaFileOperation &s) const
+    void operator() (const MediaFileOperation& mediaFileOperation) const
     {
-        QByteArray tmpBuffer;
-        tmpBuffer.resize(sizeof(s.part1) + sizeof(s.part2));
+        ByteStreamWriter writer(MediaFileOperation::kSerializedRecordSize);
+        mediaFileOperation.serialize(writer);
 
-        decltype (s.part1) *part1 = (decltype (s.part1)*)tmpBuffer.data();
-        decltype (s.part2) *part2 = (decltype (s.part2)*)(tmpBuffer.data() + sizeof(s.part1));
-        *part1 = qToLittleEndian(s.part1);
-        *part2 = qToLittleEndian(s.part2);
-
-        m_stream->writeRawData(tmpBuffer.data(), tmpBuffer.size());
-
+        m_stream->writeRawData(writer.data(), writer.data().size());
         if (m_stream->status() == QDataStream::WriteFailed)
         {
             qWarning()
@@ -116,58 +101,67 @@ void CameraOperation::setCameraUniqueId(const QByteArray &uniqueId)
     cameraUniqueId = uniqueId;
 }
 
-MediaDbReader::MediaDbReader(QIODevice* ioDevice)
+bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
 {
-    m_stream.setDevice(ioDevice);
-    m_stream.setByteOrder(QDataStream::LittleEndian);
-}
+    ByteStreamReader reader(buffer);
 
-bool MediaDbReader::readFileHeader(uint8_t *dbVersion)
-{
-    FileHeader fh;
-    m_stream >> fh.part1 >> fh.part2;
-    if (dbVersion)
-        *dbVersion = fh.getDbVersion();
+    if (!parsedData->header.deserialize(&reader) || parsedData->header.getDbVersion() != kDbVersion)
+        return false;
 
-    return !streamFailed(m_stream);
-}
-
-DBRecord MediaDbReader::readRecord()
-{
-    RecordBase rb;
-    m_stream >> rb.part1;
-
-    if (streamFailed(m_stream) || m_stream.atEnd())
-        return DBRecord();
-
-    switch (rb.getRecordType())
+    while (reader.hasBuffer(sizeof(quint64)))
     {
-        case RecordType::FileOperationAdd:
-        case RecordType::FileOperationDelete:
+        RecordBase rb(reader.readUint64());
+        const auto recordType = rb.getRecordType();
+        switch (recordType)
         {
-            quint64 part2;
-            m_stream >> part2;
-            if (streamFailed(m_stream))
-                return DBRecord();
+            case RecordType::FileOperationDelete:
+            {
+                if (!reader.hasBuffer(sizeof(quint64)))
+                    return true;
 
-            return MediaFileOperation(rb.part1, part2);
-        }
-        case RecordType::CameraOperationAdd:
-        {
-            CameraOperation cameraOp(rb.part1);
-            int bytesToRead = cameraOp.getCameraUniqueIdLen();
-            cameraOp.cameraUniqueId.resize(bytesToRead);
-            int bytesRead = m_stream.readRawData(cameraOp.cameraUniqueId.data(), bytesToRead);
-            if (bytesRead != bytesToRead)
-                return DBRecord();
+                const auto operation = MediaFileOperation(rb.part1, reader.readUint64());
+                int index = operation.getCameraId() * 2 + operation.getCatalog();
+                auto& container = parsedData->removeRecords[index];
+                container.emplace_back(operation.getHashInCatalog());
+                break;
+            }
+            case RecordType::FileOperationAdd:
+            {
+                if (!reader.hasBuffer(sizeof(quint64)))
+                    return true;
 
-            return cameraOp;
+                const auto operation = MediaFileOperation(rb.part1, reader.readUint64());
+                int index = operation.getCameraId() * 2 + operation.getCatalog();
+                auto& container = parsedData->addRecords[index];
+                if (container.empty() && parsedData->cameras.size() > 0)
+                {
+                    // Minor optimization. Try to forecast record count to reduce reallocate amount.
+                    container.reserve(
+                        buffer.size()
+                        / MediaFileOperation::kSerializedRecordSize
+                        / parsedData->cameras.size());
+                }
+                container.emplace_back(operation);
+                break;
+            }
+            case RecordType::CameraOperationAdd:
+            {
+                CameraOperation camera(rb.part1);
+                const int bytesToRead = camera.getCameraUniqueIdLen();
+                camera.cameraUniqueId.resize(bytesToRead);
+                int bytesRead = reader.readRawData(camera.cameraUniqueId.data(), bytesToRead);
+                if (bytesRead != bytesToRead)
+                    return true;
+
+                parsedData->cameras.emplace_back(camera);
+            }
+            default:
+                NX_ASSERT(false, "Shold never be here");
+                return true;
         }
-        default:
-            break;
     }
 
-    return DBRecord();
+    return true;
 }
 
 MediaDbWriter::MediaDbWriter()

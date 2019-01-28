@@ -22,6 +22,8 @@ namespace nx
 namespace media_db
 {
 
+constexpr uint8_t kDbVersion = 1;
+
 struct FileHeader
 {
     quint64 part1;
@@ -33,15 +35,32 @@ struct FileHeader
 
     uint8_t getDbVersion() const { return part1 & 0xff;  }
     void setDbVersion(uint8_t dbVersion) { part1 |= (dbVersion & 0xff); }
+
+    void serialize(ByteStreamWriter& writer) const
+    {
+        writer.writeUint64(part1);
+        writer.writeUint64(part2);
+    }
+
+    bool deserialize(ByteStreamReader* reader)
+    {
+        if (!reader->hasBuffer(kSerializedRecordSize))
+            return false;
+
+        part1 = reader->readUint64();
+        part2 = reader->readUint64();
+
+        return true;
+    }
 };
 
-struct CameraOperation: RecordBase
+struct CameraOperation : RecordBase
 {
     QByteArray cameraUniqueId;
 
     CameraOperation(quint64 i1 = 0, const QByteArray &ar = QByteArray())
         : RecordBase(i1),
-          cameraUniqueId(ar)
+        cameraUniqueId(ar)
     {}
 
     int getCameraUniqueIdLen() const;
@@ -52,6 +71,17 @@ struct CameraOperation: RecordBase
 
     QByteArray getCameraUniqueId() const;
     void setCameraUniqueId(const QByteArray &uniqueId);
+
+    int serializedRecordSize() const
+    {
+        return cameraUniqueId.size() + kSerializedRecordSize;
+    }
+
+    void serialize(ByteStreamWriter& writer) const
+    {
+        writer.writeUint64(part1);
+        writer.writeRawData(cameraUniqueId.data(), cameraUniqueId.size());
+    }
 };
 
 inline bool operator==(const CameraOperation& c1, const CameraOperation& c2)
@@ -61,16 +91,33 @@ inline bool operator==(const CameraOperation& c1, const CameraOperation& c2)
 
 typedef boost::variant<boost::blank, MediaFileOperation, CameraOperation> DBRecord;
 
-class MediaDbReader
+class DbReader
 {
 public:
-    MediaDbReader(QIODevice* ioDevice);
+    struct Data
+    {
+        FileHeader header;
+        std::vector<CameraOperation> cameras;
 
-    bool readFileHeader(uint8_t *dbVersion);
-    DBRecord readRecord();
+        // key: cameraId*2 + catalog
+        std::unordered_map<int, std::vector<MediaFileOperation>> addRecords;
+        // value: MediaFileOperation::hashInCatalog()
+        std::unordered_map<int, std::vector<quint64>> removeRecords;
+    };
+
+    static bool parse(const QByteArray& fileContent, Data* parsedData)
+    {
+        if (!deserialize(fileContent, parsedData))
+            return false;
+
+        for (auto& catalog : parsedData->removeRecords)
+            std::sort(catalog.second.begin(), catalog.second.end());
+
+        return true;
+    }
 
 private:
-    QDataStream m_stream;
+    static bool deserialize(const QByteArray& buffer, Data* parsedData);
 };
 
 using DBRecordQueue = std::queue<DBRecord>;

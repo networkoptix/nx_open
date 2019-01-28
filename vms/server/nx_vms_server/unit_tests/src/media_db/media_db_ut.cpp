@@ -376,10 +376,10 @@ public:
         tfop.chunksCatalog = mediaFileOp.getCatalog();
         tfop.code = (int)mediaFileOp.getRecordType();
         tfop.duration = mediaFileOp.getDuration();
-        tfop.timeZone = mediaFileOp.getTimeZoneV2();
+        tfop.timeZone = mediaFileOp.getTimeZone();
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.fileIndex = mediaFileOp.getFileTypeIndex();
-        tfop.startTime = mediaFileOp.getStartTimeV2();
+        tfop.startTime = mediaFileOp.getStartTime();
 
         ASSERT_TRUE(m_tdm->seekAndSet(tfop));
     }
@@ -463,8 +463,8 @@ TEST(MediaFileOperations, BitsTwiddling)
         ASSERT_TRUE(mfop.getFileSize() == tfop.fileSize);
         ASSERT_TRUE(mfop.getFileTypeIndex() == tfop.fileIndex);
         ASSERT_TRUE(mfop.getRecordType() == nx::media_db::RecordType(tfop.code));
-        ASSERT_TRUE(mfop.getStartTimeV2() == tfop.startTime);
-        ASSERT_TRUE(mfop.getTimeZoneV2() == tfop.timeZone);
+        ASSERT_TRUE(mfop.getStartTime() == tfop.startTime);
+        ASSERT_TRUE(mfop.getTimeZone() == tfop.timeZone);
     }
 
     std::vector<TestCameraOperation> copVector;
@@ -522,10 +522,10 @@ TEST(MediaFileOperations, MediaFileOP_ResetValues)
     mfop.setStartTime(std::pow(2, 42));
     quint64 newStartTime = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 42) - 1));
     mfop.setStartTime(newStartTime);
-    ASSERT_EQ(newStartTime, mfop.getStartTimeV2());
+    ASSERT_EQ(newStartTime, mfop.getStartTime());
 
     mfop.setStartTime(-1);
-    ASSERT_EQ(-1, mfop.getStartTimeV2());
+    ASSERT_EQ(-1, mfop.getStartTime());
 }
 
 TEST(MediaFileOperations, CameraOP_ResetValues)
@@ -626,6 +626,14 @@ protected:
         }
     }
 
+    void whenLastRecordIsCorrupted()
+    {
+    }
+
+    void thenAllButLastRecordShouldBeRetrievedCorrectly()
+    {
+    }
+
 private:
     ut::utils::WorkDirResource m_workDirResource;
     QString m_fileName;
@@ -639,12 +647,52 @@ private:
         m_ioDevice.reset(new QFile(m_fileName));
         ASSERT_TRUE(m_ioDevice->open(QIODevice::ReadWrite));
     }
+
+    void checkCorrectness(size_t recordCount)
+    {
+        reopenFile();
+        MediaDbReader reader(m_ioDevice.get());
+
+        uint8_t dbVersion;
+        ASSERT_TRUE(reader.readFileHeader(&dbVersion));
+        ASSERT_EQ(1, dbVersion);
+
+        DBRecordQueue records;
+        while (true)
+        {
+            const auto record = reader.readRecord();
+            if (record.which() == 0)
+                break;
+
+            records.push(record);
+        }
+
+        ASSERT_EQ(m_dbRecords.size(), records.size());
+        EqVisitor eqVisitor;
+
+        for (size_t i = 0; i < m_dbRecords.size(); ++i)
+        {
+            const auto savedRecord = m_dbRecords.front();
+            m_dbRecords.pop();
+            const auto readRecord = records.front();
+            records.pop();
+
+            boost::apply_visitor(eqVisitor, savedRecord, readRecord);
+        }
+    }
 };
 
 TEST_F(MediaDbWriteRead, correctness)
 {
     whenSomeRecordsAreWrittenToTheDb();
     thenAllShouldBeRetrievedCorrectly();
+}
+
+TEST_F(MediaDbWriteRead, corruptedFile)
+{
+    whenSomeRecordsAreWrittenToTheDb();
+    whenLastRecordIsCorrupted();
+    thenAllButLastRecordShouldBeRetrievedCorrectly();
 }
 
 } // namespace nx::media_db::test
