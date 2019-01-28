@@ -39,7 +39,7 @@ int EventMetadataPacket::count() const
 
 const IEventMetadata* EventMetadataPacket::at(int index) const
 {
-    if (index < 0 || index >= m_events.size())
+    if (index < 0 || index >= (int) m_events.size())
         return nullptr;
 
     return m_events[index];

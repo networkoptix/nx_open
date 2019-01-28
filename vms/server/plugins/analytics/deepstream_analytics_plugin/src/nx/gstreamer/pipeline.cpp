@@ -19,7 +19,7 @@ Pipeline::Pipeline(Pipeline&& other):
 {
 }
 
-void Pipeline::setBusCallback(BusCallback busCallback)
+void Pipeline::setBusCallback(BusCallback /*busCallback*/)
 {
     // Do nothing.
 }

@@ -39,7 +39,7 @@ int ObjectMetadataPacket::count() const
 
 const IObjectMetadata* ObjectMetadataPacket::at(int index) const
 {
-    if (index < 0 || index >= m_objects.size())
+    if (index < 0 || index >= (int) m_objects.size())
         return nullptr;
 
     return m_objects[index];
