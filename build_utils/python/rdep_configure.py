@@ -8,10 +8,10 @@ import rdep_config
 
 OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cygwin")
 REPOSITORY_PATH = os.path.join(os.getenv("environment"), "packages")
-SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
+SYNC_URL = "rsync://mono.enk.me/buildenv/rdep/packages"
 if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
-PUSH_URL = "rsync@enk.me:buildenv/rdep/packages"
+PUSH_URL = "rsync@mono.enk.me:buildenv/rdep/packages"
 
 def print_no_rsync():
     print >> sys.stderr, "Cannot find rsync executable. Please install it or specify in .rderc."
