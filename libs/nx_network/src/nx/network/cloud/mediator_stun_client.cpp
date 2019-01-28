@@ -90,7 +90,7 @@ void MediatorStunClient::setKeepAliveOptions(
     m_keepAliveOptions = std::move(options);
 
     if (m_connected)
-        startKeepAliveProbing();
+        dispatch([this]() { startKeepAliveProbing(); });
 }
 
 void MediatorStunClient::stopWhileInAioThread()
@@ -165,6 +165,7 @@ void MediatorStunClient::startKeepAliveProbing()
     m_alivenessTester = std::make_unique<nx::network::stun::ServerAlivenessTester>(
         *m_keepAliveOptions,
         &delegate());
+    m_alivenessTester->bindToAioThread(getAioThread());
     m_alivenessTester->start([this]() { handleAlivenessTestFailure(); });
 }
 
