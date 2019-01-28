@@ -193,7 +193,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
         if (updateServer && !m_updateFiles.value(server->getSystemInfo()))
         {
             NX_VERBOSE(this, lit("Update: No update file for server [%1 : %2]")
-                   .arg(server->getName()).arg(server->getApiUrl().toString()));
+                   .arg(server->getName()).arg(server->getApiUrl().toDisplayString()));
             return QnCheckForUpdateResult::ServerUpdateImpossible;
         }
         needUpdate |= updateServer;

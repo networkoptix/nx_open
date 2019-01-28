@@ -4,7 +4,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 class QnUpdateStatusRestHandler:
-    public QnFusionRestHandler, public nx::vms::server::ServerModuleAware
+    public QnFusionRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnUpdateStatusRestHandler(QnMediaServerModule* serverModule);

@@ -92,7 +92,7 @@ namespace ec2
     * It requires because of peer can catch mutex, but camera already exists on the other peer,
     * so that peer should tell about it camera in a response message
     */
-    class QnMutexUserDataHandler: public QnCommonModuleAware
+    class QnMutexUserDataHandler: public /*mixin*/ QnCommonModuleAware
     {
     public:
         QnMutexUserDataHandler(QnCommonModule* commonModule):

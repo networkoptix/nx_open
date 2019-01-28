@@ -28,7 +28,7 @@ public:
     AVFrame * frame();
     int64_t pts() const;
     int64_t packetPts() const;
-    
+
     // Video
     AVPixelFormat pixelFormat() const;
 

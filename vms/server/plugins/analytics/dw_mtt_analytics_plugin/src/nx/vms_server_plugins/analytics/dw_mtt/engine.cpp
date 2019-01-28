@@ -6,9 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "device_agent.h"
 #include "log.h"
@@ -37,7 +35,7 @@ QString normalize(const QString& name)
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     static const char* const kResourceName=":/dw_mtt/manifest.json";
     static const char* const kFileName = "plugins/dw_mtt/manifest.json";
@@ -73,42 +71,30 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(
+    const IDeviceInfo* deviceInfo, Error* outError)
 {
     *outError = Error::noError;
-    auto vendor = normalize(QString(deviceInfo->vendor));
-    auto model = normalize(QString(deviceInfo->model));
-
-    if (!vendor.startsWith(kDwMttVendor))
-    {
-        NX_PRINT << "Unsupported camera vendor: " << nx::kit::debug::toString(deviceInfo->vendor);
+    if (!isCompatible(deviceInfo))
         return nullptr;
-    }
 
-    if (!m_typedManifest.supportsModel(model))
-    {
-        NX_PRINT << "Unsupported camera model: " << nx::kit::debug::toString(deviceInfo->model);
-        return nullptr;
-    }
-
-    return new DeviceAgent(this, *deviceInfo, m_typedManifest);
+    return new DeviceAgent(this, deviceInfo, m_typedManifest);
 }
 
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
 const EventType* Engine::eventTypeById(const QString& id) const noexcept
@@ -121,15 +107,35 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
     return (it != m_typedManifest.eventTypes.cend()) ? &(*it) : nullptr;
 }
 
-void Engine::executeAction(
-    nx::sdk::analytics::Action* action, nx::sdk::Error* outError)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
+}
+
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
+{
+    const auto vendor = normalize(QString(deviceInfo->vendor()));
+    const auto model = normalize(QString(deviceInfo->model()));
+
+    if (!vendor.startsWith(kDwMttVendor))
+    {
+        NX_PRINT << "Unsupported camera vendor: "
+            << nx::kit::utils::toString(deviceInfo->vendor());
+        return false;
+    }
+
+    if (!m_typedManifest.supportsModel(model))
+    {
+        NX_PRINT << "Unsupported camera model: " << nx::kit::utils::toString(deviceInfo->model());
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace dw_mtt
@@ -154,13 +160,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::dw_mtt::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

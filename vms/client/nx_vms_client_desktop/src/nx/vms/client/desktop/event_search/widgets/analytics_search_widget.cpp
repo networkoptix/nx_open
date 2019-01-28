@@ -8,13 +8,15 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
+#include <nx/analytics/object_type_descriptor_manager.h>
 #include <ui/style/skin.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -62,12 +64,12 @@ private:
     bool m_areaSelectionEnabled = false;
 
     using ObjectTypeDescriptors = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
-    struct PluginInfo
+    struct EngineInfo
     {
         QString name;
         ObjectTypeDescriptors objectTypes;
 
-        bool operator<(const PluginInfo& other) const
+        bool operator<(const EngineInfo& other) const
         {
             QCollator collator;
             collator.setNumericMode(true);
@@ -127,8 +129,8 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
 
 bool AnalyticsSearchWidget::calculateAllowance() const
 {
-    return !commonModule()->analyticsDescriptorListManager()
-        ->allDescriptorsInTheSystem<nx::vms::api::analytics::ObjectTypeDescriptor>().empty();
+    const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
+    return !manager.descriptors().empty();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -237,57 +239,72 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    const auto descriptorListManager = q->commonModule()->analyticsDescriptorListManager();
-    const auto allObjectTypes = descriptorListManager
-        ->allDescriptorsInTheSystem<nx::vms::api::analytics::ObjectTypeDescriptor>();
-
-    const auto allAnalyticsPlugins = descriptorListManager
-        ->allDescriptorsInTheSystem<nx::vms::api::analytics::PluginDescriptor>();
-
-    QHash<QString, PluginInfo> pluginsById;
-    for (const auto& [pluginId, descriptor]: allAnalyticsPlugins)
-        pluginsById[pluginId].name = descriptor.name;
-
-    for (const auto& entry: allObjectTypes)
-    {
-        for (const auto& path: entry.second.paths)
-            pluginsById[path.pluginId].objectTypes.insert(entry);
-    }
-
-    QVector<PluginInfo> plugins;
-    for (const auto& pluginInfo: pluginsById)
-    {
-        if (!pluginInfo.objectTypes.empty())
-            plugins.push_back(pluginInfo);
-    }
-
-    std::sort(plugins.begin(), plugins.end());
-    const bool severalPlugins = plugins.size() > 1;
-
-    QMenu* currentMenu = m_objectTypeMenu;
+    nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(q->commonModule());
+    nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
+    const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
+    const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
 
-    for (const auto& plugin: plugins)
+    QSet<QnUuid> enabledEngines;
+    const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
+    for (const auto& camera: cameras)
+        enabledEngines += camera->enabledAnalyticsEngines();
+
+    if (!objectTypeDescriptors.empty())
     {
-        if (severalPlugins)
+        QHash<QnUuid, EngineInfo> engineById;
+        for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
-            const auto pluginName = plugin.name.isEmpty()
-                ? QString("<%1>").arg(tr("unnamed analytics plugin"))
-                : plugin.name;
-
-            currentMenu = m_objectTypeMenu->addMenu(pluginName);
-
-            currentMenu->setWindowFlags(
-                currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+            if (enabledEngines.contains(engineId))
+                engineById[engineId].name = engineDescriptor.name;
         }
 
-        for (const auto entry: plugin.objectTypes)
+        for (const auto&[eventTypeId, objectTypeDescriptor]: objectTypeDescriptors)
         {
-            const auto& descriptor = entry.second;
-            addMenuAction(currentMenu, descriptor.item.name, descriptor.getId());
+            for (const auto& scope: objectTypeDescriptor.scopes)
+            {
+                if (enabledEngines.contains(scope.engineId))
+                {
+                    engineById[scope.engineId].objectTypes
+                        .emplace(eventTypeId, objectTypeDescriptor);
+                }
+            }
+        }
 
-            if (!currentSelectionStillAvailable && currentSelection == descriptor.getId())
-                currentSelectionStillAvailable = true;
+        QList<EngineInfo> engines;
+        for (const auto& engineInfo: engineById)
+            engines.push_back(engineInfo);
+
+        std::sort(engines.begin(), engines.end());
+        const bool multipleEnginesArePresent = engines.size() > 1;
+
+        QMenu* currentMenu = m_objectTypeMenu;
+        for (const auto& engine: engines)
+        {
+            if (multipleEnginesArePresent)
+            {
+                currentMenu->setWindowFlags(
+                    currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+                const auto engineName = engine.name.isEmpty()
+                    ? QString("<%1>").arg(tr("unnamed analytics engine"))
+                    : engine.name;
+
+                currentMenu = m_objectTypeMenu->addMenu(engineName);
+            }
+
+            for (const auto& [eventTypeId, objectTypeDescriptor]: engine.objectTypes)
+            {
+                addMenuAction(currentMenu,
+                    objectTypeDescriptor.name,
+                    objectTypeDescriptor.id);
+
+                if (!currentSelectionStillAvailable
+                    && currentSelection == objectTypeDescriptor.getId())
+                {
+                    currentSelectionStillAvailable = true;
+                }
+            }
         }
     }
 

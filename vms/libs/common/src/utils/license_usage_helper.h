@@ -28,7 +28,7 @@ enum class QnLicenseUsageStatus
     used
 };
 
-class QnLicenseUsageWatcher: public Connective<QObject>, public QnCommonModuleAware
+class QnLicenseUsageWatcher: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -41,7 +41,7 @@ signals:
 
 typedef std::array<int, Qn::LC_Count> licensesArray;
 
-class QnLicenseUsageHelper: public Connective<QObject>, public QnCommonModuleAware
+class QnLicenseUsageHelper: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

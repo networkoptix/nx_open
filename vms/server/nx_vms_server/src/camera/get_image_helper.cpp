@@ -33,7 +33,7 @@ static Qn::StreamIndex oppositeStreamIndex(Qn::StreamIndex streamIndex)
         case Qn::StreamIndex::secondary: return Qn::StreamIndex::primary;
         case Qn::StreamIndex::undefined: break;
     }
-    NX_ASSERT(false, "Unsupported StreamIndex %1", (int) streamIndex);
+    NX_ASSERT(false, lm("Unsupported StreamIndex %1").args(streamIndex));
     return Qn::StreamIndex::undefined; //< Fallback for the failed assertion.
 }
 

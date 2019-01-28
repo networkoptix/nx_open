@@ -6,23 +6,17 @@ namespace ffmpeg {
 
 Packet::Packet(
     AVCodecID codecId,
-    AVMediaType mediaType,
-    const std::shared_ptr<std::atomic_int>& packetCount)
+    AVMediaType mediaType)
     :
     m_codecId(codecId),
     m_mediaType(mediaType),
-    m_packetCount(packetCount),
     m_packet(av_packet_alloc())
 {
-    if (m_packetCount)
-        ++(*m_packetCount);
     initialize();
 }
 
 Packet::~Packet()
 {
-    if (m_packetCount)
-        --(*m_packetCount);
     av_packet_free(&m_packet);
 }
 

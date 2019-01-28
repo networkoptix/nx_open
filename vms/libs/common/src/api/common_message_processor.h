@@ -16,7 +16,7 @@
 
 class QnResourceFactory;
 
-class QnCommonMessageProcessor: public Connective<QObject>, public QnCommonModuleAware
+class QnCommonMessageProcessor: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

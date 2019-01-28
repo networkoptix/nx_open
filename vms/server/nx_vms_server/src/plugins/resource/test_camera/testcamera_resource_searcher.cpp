@@ -38,7 +38,8 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         clearSocketList();
         for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
         {
-            DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(), iface.address);
+            DiscoveryInfo info(
+                nx::network::SocketFactory::createDatagramSocket().release(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
                 m_sockList << info;
             else
@@ -109,8 +110,8 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
                 resource->setMAC(nx::utils::MacAddress(mac));
                 resource->setUrl(
-                    QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':') +
-                    QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );
+                    QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':')
+                    + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );
                 resources.insert(mac, resource);
             }
         }
@@ -124,7 +125,8 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     return rez;
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnTestCameraResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -159,7 +161,7 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils
     const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
-        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+        return QList<QnResourcePtr>(); //< searching if only host is present, not specific protocol
 
     return QList<QnResourcePtr>();
 }

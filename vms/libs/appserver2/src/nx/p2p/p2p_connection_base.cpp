@@ -23,9 +23,8 @@ namespace p2p {
 
 SendCounters ConnectionBase::m_sendCounters = {};
 
-const QString ConnectionBase::kDeprecatedUrlPath(lit("/ec2/messageBus"));
-const QString ConnectionBase::kWebsocketUrlPath(lit("/ec2/transactionBus"));
-const QString ConnectionBase::kHttpUrlPath(lit("/ec2/httpTransactionBus"));
+const QString ConnectionBase::kWebsocketUrlPath(lit("/ec2/transactionBus/websocket"));
+const QString ConnectionBase::kHttpUrlPath(lit("/ec2/transactionBus/http"));
 
 
 #if defined(CHECK_SEQUENCE)
@@ -224,7 +223,7 @@ void ConnectionBase::onHttpClientDone()
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
         if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
         {
-            cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
+            cancelConnecting(State::Error, lm("Not a successful HTTP status code %1").arg(statusCode));
             return;
         }
 

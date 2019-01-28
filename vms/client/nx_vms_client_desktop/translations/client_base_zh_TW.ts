@@ -79,10 +79,6 @@ to view more bookmarks</source>
       <translation>安裝失敗</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>無法取消安裝</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>安裝完成</translation>
     </message>
@@ -870,7 +866,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>某些攝影機需要設置密碼</translation>
+      <translation>部分攝影機需要輸入密碼以進行設定</translation>
     </message>
     <message>
       <source>Export Video...</source>
@@ -886,15 +882,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation>變更背景格長寬比...</translation>
+      <translation>影像顯示長寬比例...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation>背景格間距...</translation>
+      <translation>影像排列間距</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
       <translation>螢幕設定</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -1004,15 +1004,15 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>選擇的設置需要轉碼. 這會增加CPU使用率且可能需要很長時間.</translation>
+      <translation>目前的所選擇的匯出設置需要重新編碼。CPU使用率會暫時提高且需要較長時間來完成。</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>建議不要使用AVI格式匯出帶有音軌的非連續錄影.</translation>
+      <translation>AVI格式不建議使用於匯出帶有音軌的非連續錄影.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>我們建議將本攝影機以 &quot;多影像匯出&quot; 以避免被縮小.</translation>
+      <translation>建議使用 &quot;多影像匯出&quot;來匯出此攝影機影像，以保留原始影像品質。</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
@@ -1020,11 +1020,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>匯出 .EXE 檔可能會有要在 Windows 上播放必須小於 4GB 的限制. 但可以在 %1 客戶端播放.</translation>
+      <translation>在 Windows 平台上有單一 EXE 檔案需小於 4GB 的限制，若大於 4GB 將無法直接雙擊開啟，但您仍可透過%1 客戶端播放</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>本地檔案、伺服器監視器套件和網頁頁面將不會被匯出.</translation>
+      <translation>本地檔案、伺服器健康狀態和網頁頁面將不會被匯出.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
@@ -1035,7 +1035,7 @@ to view more bookmarks</source>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>影音交錯</translation>
+      <translation>音訊影片交錯</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1170,7 +1170,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>檔案 &quot;%1&quot; 正被使用中. 請嘗試另一個名稱.</translation>
+      <translation>此檔案名稱 &quot;%1&quot; 為作業系統保留檔名，請嘗試其他名稱.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
@@ -1445,11 +1445,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>使用 OpenGL 繪圖有助於避免產生 100% CPU 負載的問題。</translation>
+      <translation>使用 OpenGL 繪圖可有效避免 CPU 100% 滿載的現象。</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>調整到最小值不影響即時預覽。緩衝區越大會使迴放更平順, 但會延遲即時播放; 緩衝區越小可以減少延遲，但可能會導致播放停頓。</translation>
+      <translation>調整緩衝長度並不會影響即時預覽。較大的緩衝長度可以讓影像播放的比較流暢，但是會有些許的影像延遲; 較小的緩衝長度，影像延遲會比較小，但是影像可能會比較不流暢或者斷斷續續。</translation>
     </message>
   </context>
   <context>
@@ -1464,11 +1464,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation>如果儲存空間已滿, 則可以刪除存檔</translation>
+      <translation>如果儲存空間不足, 會優先讓新錄影檔案寫入，而舊有錄影檔案可能會被刪除.</translation>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation>最小和最大的設定值決定了此攝影機的錄影檔被保存的時間</translation>
+      <translation>最小錄影天數和最大錄影天數的設定值會決定此攝影機的錄影檔案被保存的時間</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
@@ -2370,7 +2370,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>此ID已被以下 %n 支攝影機使用: %1</numerusform>
+        <numerusform>此ID已被以下 %n 攝影機使用: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -2379,7 +2379,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>請分配自訂編號給攝影機，以便快速識別和連結</translation>
+      <translation>使用者可指派邏輯ID(自訂編號) 給攝影機以便快速識別和存取</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
@@ -2668,7 +2668,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation>首先選擇一種錄影排程, 將排程套用於欲錄影的星期和時間區段。(0 表示為12:00am 到 1:00am, 23 表示為 11:00pm 12:00am.)</translation>
+      <translation>首先選擇一種錄影排程, 將排程套用於欲錄影的星期和時間區段。(0 表示為12:00am 到 1:00am, 23 表示為 11:00pm 到 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -5401,6 +5401,10 @@ to %1</source>
       <source>Search</source>
       <translation>搜尋</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -6324,15 +6328,15 @@ to %1</source>
     </message>
     <message>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>錄影到停用的儲存將置將停止. 但其中的錄影資料仍會被循環錄影刪除.</translation>
+      <translation>錄影檔案無法儲存於已停用的儲存裝置上，且磁碟上過舊的錄影檔案仍然會在整體磁碟空間不足時被刪除。</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation>在 USB 儲存設備上啟用錄影</translation>
+      <translation>將 USB 外接儲存裝置作為錄影使用。</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation>當資料遺失、損壞或更新硬體時，重新索引可以協助歸檔或備份</translation>
+      <translation>當錄影遺失、檔案損壞或更新硬體時，重建索引可以協助伺服器重新整理錄影檔案或備份錄影的檔案列表。</translation>
     </message>
   </context>
   <context>
@@ -6595,7 +6599,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation>已刪除錄影完整性問題</translation>
+      <translation>檢測到錄影檔案完整性問題</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -7234,7 +7238,7 @@ to %1</source>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>其它使用者正在將影像上載到此攝影機.</translation>
+      <translation>其它使用者正在將影像上傳到此攝影機.</translation>
     </message>
   </context>
   <context>
@@ -7778,7 +7782,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>伺服器儲存空間不足</translation>
     </message>
   </context>
   <context>
@@ -8397,6 +8401,16 @@ to %1</source>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>所選的此攝影機時間段無法匯出.</translation>
     </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>書籤 %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
@@ -8864,11 +8878,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>警告！此版本僅用於測試！</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>請升級到下一版補丁或正式版。</translation>
     </message>
   </context>
   <context>

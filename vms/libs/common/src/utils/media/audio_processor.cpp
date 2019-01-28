@@ -61,9 +61,8 @@ QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFor
         else if (format.sampleSize() == 32)
             down_mix_to_stereo<qint32>((qint32*)(audio.data()), format.channelCount(), audio.size());
         else
-        {
-            NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
-        }
+            NX_ASSERT(false, "invalid sample size");
+
         audio.resize(audio.size() / format.channelCount() * 2);
         format.setChannelCount(2);
     }

@@ -93,7 +93,9 @@ NodePtr createServerNode(
 
     const auto camerasCount = std::accumulate(children.cbegin(), children.cend(), 0,
         [](int count, const NodePtr& node)
-        { return count + (node->childrenCount() ? node->childrenCount() : 1); });
+        {
+            return count + (node->childrenCount() > 0 ? node->childrenCount() : 1);
+        });
 
     const auto extraText = lit("%1 - %2").arg(extraInfoText,
         CameraSelectionDialog::tr("%n cameras", nullptr, camerasCount)).trimmed();

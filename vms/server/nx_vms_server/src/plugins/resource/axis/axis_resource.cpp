@@ -1453,10 +1453,10 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() const
 
 int QnPlAxisResource::getChannel() const
 {
-    auto channel = base_type::getChannel();
+    const auto channel = base_type::getChannel();
     if (channel > 0)
         return channel;
-    auto axisChannel = getChannelNumAxis();
+    const auto axisChannel = getChannelNumAxis();
     if (axisChannel)
         return axisChannel - 1;
     return 0;
@@ -1825,9 +1825,9 @@ QString QnPlAxisResource::resolutionToString(const QSize& resolution)
     return lm("%1x%2").args(resolution.width(), resolution.height());
 }
 
-int QnPlAxisResource::getMaxChannelsPhysical() const
+int QnPlAxisResource::getMaxChannelsFromDriver() const
 {
-    QString val = getProperty(QLatin1String("channelsAmount"));
+    QString val = getProperty("channelsAmount");
     if (!val.isEmpty())
         return val.toUInt();
     return 1;

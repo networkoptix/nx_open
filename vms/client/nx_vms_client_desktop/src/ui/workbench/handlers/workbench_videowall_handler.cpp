@@ -1693,7 +1693,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
             break;
     }
 
-    NX_ASSERT(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
+    NX_ASSERT(valid, "Data should correspond to action profile.");
     if (!valid)
         return;
 

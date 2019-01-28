@@ -96,8 +96,7 @@ const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 } // namespace <anonymous>
 
-
-class ArchiveScanPosition: public nx::vms::server::ServerModuleAware
+class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
@@ -986,7 +985,7 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    NX_ASSERT(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
+    NX_ASSERT(data.totalProgress < 1.01, "invalid progress");
     QnMutexLocker lock( &m_rebuildStateMtx );
     m_archiveRebuildInfo = data;
 }
@@ -2202,7 +2201,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         qint64 oldToDelete = toDelete;
         toDelete = targetFreeSpace - freeSpace;
         if (oldToDelete == toDelete && deletedChunk.startTimeMs != -1)
-        {	// Non-empty chunk's been found and delete attempt's been made.
+        {    // Non-empty chunk's been found and delete attempt's been made.
             // But ToDelete is still the same. This might mean that storage went offline.
             // Let's check it.
             if (storage->getStatus() == Qn::ResourceStatus::Offline)
@@ -3116,4 +3115,3 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     return result | storage->statusFlag();
 }
-

@@ -11,7 +11,7 @@
 
 class QnAdamResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     struct QnAdamAsciiCommand
     {
@@ -27,20 +27,20 @@ public:
     QnAdamResourceSearcher(QnMediaServerModule* serverModule);
     ~QnAdamResourceSearcher();
 
-    virtual QString manufacture() const override;
-
-    virtual QList<QnResourcePtr> checkHostAddr(
-        const nx::utils::Url& url,
-        const QAuthenticator& auth,
-        bool doMultichannelCheck);
-
-    virtual QnResourceList findResources() override;
-
     virtual QnResourcePtr createResource(
         const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;
 
-    virtual bool isSequential() const override { return true; };
+    virtual bool isSequential() const override { return true; }
+
+    virtual QString manufacture() const override;
+
+    virtual QnResourceList findResources() override;
+
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const nx::utils::Url& url,
+        const QAuthenticator& auth,
+        bool doMultichannelCheck) override;
 
 private:
     QString generatePhysicalId(const QString& url) const;

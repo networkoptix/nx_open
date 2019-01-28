@@ -34,7 +34,7 @@ void QnRestartPeerTask::doStart()
     {
         const auto server = resourcePool()->getIncompatibleServerById(id, true);
         if (!server)
-            NX_ASSERT(0, "Non-server resource in server task.", Q_FUNC_INFO);
+            NX_ASSERT(0, "Non-server resource in server task.");
 
         m_restartingServers.append(server);
     }

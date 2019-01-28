@@ -513,7 +513,12 @@ void QnAuditLogDialog::at_updateDetailModel()
         m_detailModel->setData(data);
         m_detailModel->calcColorInterleaving();
         if (m_sessionModel->rowCount() != 0)
-            labelText = tr("Details for %1 session(s) of %2").arg(checkedRows.size()).arg(m_sessionModel->rowCount());
+        {
+            labelText = tr("Details for %n sessions of %1",
+                "Total number will be substituted as %1",
+                checkedRows.size())
+                .arg(m_sessionModel->rowCount());
+        }
     }
     else
     {
@@ -521,7 +526,12 @@ void QnAuditLogDialog::at_updateDetailModel()
         auto data = filterChildDataByCameras(checkedRows);
         m_detailModel->setData(data);
         if (m_camerasModel->rowCount() != 0)
-            labelText = tr("Details for %1 camera(s) of %2").arg(checkedRows.size()).arg(m_camerasModel->rowCount());
+        {
+            labelText = tr("Details for %n cameras of %1",
+                "Total number will be substituted as %1",
+                checkedRows.size())
+                .arg(m_camerasModel->rowCount());
+        }
     }
 
     m_detailsLabel->setText(labelText);

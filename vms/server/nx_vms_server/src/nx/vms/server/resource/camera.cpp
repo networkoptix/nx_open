@@ -304,8 +304,8 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
          A = higher ratio / current ratio
          B = current ratio / lower ratio
 
-        We consider that one resolution is similar to another if their aspect ratios differs
-        no more then (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
+        We consider that one resolution is similar to another if their aspect ratios differ
+        no more than (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
         the table above.
     */
     static const float kEpsilon = 0.10f;
@@ -353,7 +353,7 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
     if (result == EMPTY_RESOLUTION_PAIR)
     {
-        // Try to get resolution ignoring aspect ratio
+        // Try to get resolution ignoring the aspect ratio.
         result = getNearestResolution(
             idealResolution,
             0.0f,
@@ -652,7 +652,7 @@ int Camera::getMaxChannels() const
         ResourceDataKey::kShouldAppearAsSingleChannel);
     if (shouldAppearAsSingleChannel)
         return 1;
-    return getMaxChannelsPhysical();
+    return getMaxChannelsFromDriver();
 }
 void Camera::inputPortListenerAttached()
 {

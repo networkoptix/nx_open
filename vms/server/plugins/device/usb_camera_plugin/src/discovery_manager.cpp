@@ -11,8 +11,7 @@
 #include "device/video/utils.h"
 #include "device/audio/utils.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace {
 
@@ -24,7 +23,7 @@ static constexpr const char kNxMacAddressDelimiter[] = "-";
 
 DiscoveryManager::DiscoveryManager(
     nxpt::CommonRefManager* const refManager,
-    nxpl::TimeProvider *const timeProvider)
+    nxpl::TimeProvider* const timeProvider)
     :
     m_refManager(refManager),
     m_timeProvider(timeProvider)
@@ -50,12 +49,12 @@ void* DiscoveryManager::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
-unsigned int DiscoveryManager::addRef()
+int DiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int DiscoveryManager::releaseRef()
+int DiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -114,7 +113,7 @@ int DiscoveryManager::fromUpnpData(
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)
 {
-    CameraAndDeviceDataWithNxId * cameraData = getCameraAndDeviceData(info.uid);
+    CameraAndDeviceDataWithNxId* cameraData = getCameraAndDeviceData(info.uid);
 
     if (!cameraData)
         return nullptr;
@@ -196,13 +195,12 @@ std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasI
     return nxDevices;
 }
 
-DiscoveryManager::CameraAndDeviceDataWithNxId* 
-DiscoveryManager::getCameraAndDeviceData(const std::string& nxId)
+DiscoveryManager::CameraAndDeviceDataWithNxId* DiscoveryManager::getCameraAndDeviceData(
+    const std::string& nxId)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(nxId);
     return it != m_cameras.end() ? &it->second : nullptr;
 }
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx::usb_cam

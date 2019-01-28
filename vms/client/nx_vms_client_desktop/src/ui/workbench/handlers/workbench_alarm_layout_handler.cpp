@@ -242,7 +242,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const
 }
 
 void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item ) {
-    NX_ASSERT(layout && item, Q_FUNC_INFO, "Objects must exist here");
+    NX_ASSERT(layout && item, "Objects must exist here");
     if (!item)
         return;
 
@@ -277,7 +277,7 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
     auto clientInstanceManager = qnClientInstanceManager;
-    NX_ASSERT(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
+    NX_ASSERT(clientInstanceManager, "Instance Manager must exist here");
     if (!clientInstanceManager)
         return true;
 

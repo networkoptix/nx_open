@@ -7,9 +7,9 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 
-class QnCameraHistoryRestHandler: 
+class QnCameraHistoryRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnCameraHistoryRestHandler(QnMediaServerModule * serverModule);

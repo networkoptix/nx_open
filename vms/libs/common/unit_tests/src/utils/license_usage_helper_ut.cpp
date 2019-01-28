@@ -28,13 +28,9 @@ protected:
     {
         m_module.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
         initializeContext(m_module.data());
+
         m_server = addServer();
-        m_server->setStatus(Qn::Online);
-
-        m_armServer = addServer();
-        m_armServer->setStatus(Qn::Online);
-        m_armServer->setServerFlags(m_armServer->getServerFlags() | nx::vms::api::SF_ArmServer);
-
+        m_armServer = addServer(nx::vms::api::SF_ArmServer);
 
         m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
         m_helper.reset(new QnCamLicenseUsageHelper(commonModule()));
@@ -73,6 +69,13 @@ protected:
             result << camera;
         }
         return result;
+    }
+
+    QnVirtualCameraResourcePtr addDefaultRecordingCamera()
+    {
+        // Camera stub should not replace license type.
+        const auto kDefaultLicenseType = Qn::LC_Count;
+        return addRecordingCamera(kDefaultLicenseType, /* licenseRequired */ false);
     }
 
     void setArmMode(bool isArm = true)
@@ -680,19 +683,19 @@ TEST_F(QnLicenseUsageHelperTest, licenseTypeChanged)
 
 TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
 {
-    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 
     addLicense(Qn::LC_Professional);
     ASSERT_TRUE(m_helper->canEnableRecording(camera));
 
     camera->setParentId(m_armServer->getId());
-    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
 }
 
 TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
 {
-    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 
     addLicense(Qn::LC_Edge);

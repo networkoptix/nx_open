@@ -513,12 +513,12 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 {
                     if (missing)
                     {
-                        packageErrors << tr("Missing update package for client and %n server(s)",
+                        packageErrors << tr("Missing update package for the client and %n servers",
                             "", missing);
                     }
                     else
                     {
-                        packageErrors << tr("Missing update package for client");
+                        packageErrors << tr("Missing update package for the client");
                     }
                 }
                 else if (missing)
@@ -1850,6 +1850,8 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     bool showButton = m_updateSourceMode != UpdateSourceType::file &&
         (m_widgetState == WidgetUpdateState::ready || m_widgetState != WidgetUpdateState::initial);
+    if (hasLatestVersion)
+        showButton = false;
     ui->manualDownloadButton->setVisible(showButton);
 
     syncVersionReport(m_updateReport);
@@ -1947,9 +1949,12 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
     }
 
-    ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
-        !storageSettingsVisible || !m_showStorageSettings);
+    // Making this button invisible for now, until a proper mediaserver selection is impelemented.
+    //ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
+    //ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
+    //    !storageSettingsVisible || !m_showStorageSettings);
+    ui->advancedUpdateSettings->setVisible(false);
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, true);
 
     ui->cancelUpdateButton->setVisible(m_widgetState == WidgetUpdateState::readyInstall);
 

@@ -47,7 +47,8 @@ public:
     virtual IPlugin* plugin() const = 0;
 
     /**
-     * Called before other methods. Server provides the set of settings stored in its database for
+     * Called before other methods. Server provides the set of settings stored in its database,
+     * combined with the values received from the plugin via pluginSideSettings() (if any), for
      * this Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null. Valid only during
@@ -80,6 +81,12 @@ public:
     virtual const IString* manifest(Error* outError) const = 0;
 
     /**
+     * @return True if the Engine is able to create DeviceAgents for the provided device, false
+     *     otherwise.
+     */
+    virtual bool isCompatible(const IDeviceInfo* deviceInfo) const = 0;
+
+    /**
      * Creates, or returns an already existing, a DeviceAgent instance intended to work with the
      * given device.
      *
@@ -88,7 +95,7 @@ public:
      * @return Pointer to an object that implements DeviceAgent interface, or null in case of
      *     failure.
      */
-    virtual IDeviceAgent* obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* outError) = 0;
+    virtual IDeviceAgent* obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* outError) = 0;
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.
@@ -98,7 +105,7 @@ public:
      *     should not be used after returning from this function.
      * @param outError Status of the operation; is set to noError before this call.
      */
-    virtual void executeAction(Action* action, Error* outError) = 0;
+    virtual void executeAction(IAction* action, Error* outError) = 0;
 
     /**
      * @param handler Generic Engine-related events (errors, warning, info messages)

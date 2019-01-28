@@ -21,7 +21,7 @@ QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePt
     QnAbstractCameraDataLoader(resource, dataType, parent),
     m_aviResource(resource)
 {
-    NX_ASSERT(m_aviResource, Q_FUNC_INFO, "Resource must exist");
+    NX_ASSERT(m_aviResource, "Resource must exist");
 
     /* Preload recording data. */
     if (dataType != Qn::RecordingContent)

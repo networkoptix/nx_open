@@ -234,7 +234,7 @@ void OnvifResourceInformationFetcher::findResources(
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
         soapWrapper.fetchLoginPassword(serverModule()->commonModule(), info.manufacturer, info.name);
 
-    if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
+    if (!existResource && discoveryMode == DiscoveryMode::partiallyEnabled)
         return; //ignoring unknown cameras
 
     if (m_shouldStop)
@@ -465,7 +465,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource(serverModule));
 
-    resource->setVendor( manufacture );
+    resource->setVendor(manufacture);
 
     return resource;
 }

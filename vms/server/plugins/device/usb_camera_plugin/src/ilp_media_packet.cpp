@@ -65,12 +65,12 @@ void* ILPMediaPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int ILPMediaPacket::addRef()
+int ILPMediaPacket::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int ILPMediaPacket::releaseRef()
+int ILPMediaPacket::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

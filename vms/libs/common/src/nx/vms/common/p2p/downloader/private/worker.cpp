@@ -19,11 +19,9 @@ using nx::vms::common::p2p::downloader::Worker;
 
 constexpr int kDefaultPeersPerOperation = 5;
 constexpr int kSubsequentChunksToDownload = 5;
-constexpr int kStartDelayMs = milliseconds(seconds(1)).count();
 constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
 constexpr int kMaxAutoRank = 5;
-constexpr int kMinAutoRank = 0;
-constexpr int kDefaultRank = 0;
+constexpr int kMinAutoRank = -1;
 static const int kMaxSimultaneousDownloads = 5;
 
 QString statusString(bool success)
@@ -62,7 +60,7 @@ QList<QnUuid> takeClosestPeerIds(QList<QnUuid>& peerIds, int count, const QnUuid
         return result;
     }
 
-    const int currentIndex = std::distance(
+    const auto currentIndex = (int) std::distance(
         peerIds.begin(), std::lower_bound(peerIds.begin(), peerIds.end(), referenceId));
 
     int index = (currentIndex - (count + 1) / 2 + size) % size;
@@ -107,8 +105,7 @@ namespace downloader {
 Worker::Worker(
     const QString& fileName,
     Storage* storage,
-    AbstractPeerManager* peerManager,
-    QObject* parent)
+    AbstractPeerManager* peerManager)
     :
     m_storage(storage),
     m_peerManager(peerManager),
@@ -362,6 +359,8 @@ void Worker::requestFileInformationInternal()
     const auto peers = selectPeersForOperation();
     if (peers.isEmpty())
     {
+        revivePeersWithMinimalRank();
+
         if (m_state == State::requestingAvailableChunks
             && !selectPeersForInternetDownload().isEmpty())
         {
@@ -542,6 +541,7 @@ void Worker::requestChecksums()
     const auto peers = selectPeersForOperation();
     if (peers.isEmpty())
     {
+        revivePeersWithMinimalRank();
         setShouldWait(true);
         return;
     }
@@ -605,8 +605,6 @@ void Worker::handleChecksumsReply(
         success = false;
         return;
     }
-
-    auto& peerInfo = m_peerInfoById[requestContext.peerId];
 
     if (!success || checksums.isEmpty() || checksums.size() != m_availableChunks.size())
     {
@@ -676,6 +674,7 @@ void Worker::downloadNextChunk()
     if (peers.isEmpty())
     {
         NX_VERBOSE(m_logTag, lm("No peers are selected for download. Waiting."));
+        revivePeersWithMinimalRank();
         return setShouldWait(true);
     }
 
@@ -923,7 +922,11 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     if (peers.size() <= count)
     {
-        result = peers;
+        for (const auto& peer: peers)
+        {
+            if (m_peerInfoById[peer].rank > kMinAutoRank)
+                result.append(peer);
+        }
         return result;
     }
 
@@ -937,9 +940,19 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     constexpr int kBigDistance = 4;
 
-    for (const auto& peerId: peers)
+    for (auto it = peers.begin(); it != peers.end(); /* no increment */)
     {
+        const QnUuid& peerId = *it;
+
         const int rank = m_peerInfoById.value(peerId).rank;
+        if (rank <= kMinAutoRank)
+        {
+            it = peers.erase(it);
+            continue;
+        }
+
+        ++it;
+
         const int distance = m_peerManager->distanceTo(peerId);
 
         const int score = std::max(0, kBigDistance - distance) * 2 + rank;
@@ -1016,6 +1029,15 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
         result += takeRandomPeers(peers, 1);
 
     return result;
+}
+
+void Worker::revivePeersWithMinimalRank()
+{
+    for (auto& peerInfo: m_peerInfoById)
+    {
+        if (peerInfo.rank <= kMinAutoRank)
+            ++peerInfo.rank;
+    }
 }
 
 int Worker::selectNextChunk() const

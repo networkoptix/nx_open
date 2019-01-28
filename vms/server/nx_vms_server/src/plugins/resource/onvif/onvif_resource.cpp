@@ -582,14 +582,14 @@ void QnPlOnvifResource::checkIfOnlineAsync(std::function<void(bool)> completionH
     // Trying to get HardwareId.
     auto asyncWrapper = std::make_shared<GSoapDeviceGetNetworkIntfAsyncWrapper>(
         std::move(soapWrapper),
-        &DeviceSoapWrapper::getNetworkInterfaces );
+        &DeviceSoapWrapper::getNetworkInterfaces);
 
     const nx::utils::MacAddress resourceMAC = getMAC();
     auto onvifCallCompletionFunc =
-        [asyncWrapper, deviceUrl, resourceMAC, completionHandler]( int soapResultCode )
+        [asyncWrapper, deviceUrl, resourceMAC, completionHandler](int soapResultCode)
         {
             if (soapResultCode != SOAP_OK)
-                return completionHandler( false );
+                return completionHandler(false);
 
             completionHandler(
                 resourceMAC.toString() == QnPlOnvifResource::fetchMacAddress(
@@ -4044,7 +4044,7 @@ bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInf
     return true;
 }
 
-int QnPlOnvifResource::getMaxChannels() const
+int QnPlOnvifResource::getMaxChannelsFromDriver() const
 {
     return m_maxChannels;
 }
@@ -4205,7 +4205,7 @@ void QnPlOnvifResource::afterConfigureStream(Qn::ConnectionRole /*role*/)
         m_streamConfCond.wait(&m_streamConfMutex);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole role)
+CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole /*role*/)
 {
     return CameraDiagnostics::NoErrorResult();
 }

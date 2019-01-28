@@ -322,7 +322,7 @@ QString QnIOPortsViewModel::portTypeToString(Qn::IOPortType portType)
             return tr("Output", "IO Port Type");
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+    NX_ASSERT(false, "Should never get here");
     return tr("Invalid", "IO Port Type");
 }
 
@@ -337,7 +337,7 @@ QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state)
             return tr("Grounded circuit", "IO Port State");
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+    NX_ASSERT(false, "Should never get here");
     return tr("Invalid state", "IO Port State");
 }
 

@@ -6,7 +6,7 @@
 
 class QnInstallUpdateRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnInstallUpdateRestHandler(QnMediaServerModule* serverModule,

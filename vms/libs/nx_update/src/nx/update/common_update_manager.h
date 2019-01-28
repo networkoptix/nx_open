@@ -17,7 +17,7 @@ namespace update { struct Package; }
 
 class CommonUpdateInstaller;
 
-class CommonUpdateManager: public QObject, public QnCommonModuleAware
+class CommonUpdateManager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

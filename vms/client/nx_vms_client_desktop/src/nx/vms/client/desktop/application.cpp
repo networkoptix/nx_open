@@ -76,6 +76,8 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
+#include <ui/workaround/combobox_wheel_filter.h>
+
 #include <nx_speech_synthesizer/text_to_wav.h>
 #include <nx/utils/file_system.h>
 
@@ -167,6 +169,12 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
+
+    // Hovered QComboBox changes its value when user scrolls a mouse wheel, even if the ComboBox
+    // is not focused. It leads to weird and undesirable UI behaviour in some parts of the client.
+    // We use a global Event Filter to prevent QComboBox instances from receiving Wheel events.
+    ComboboxWheelFilter wheelFilter;
+    qApp->installEventFilter(&wheelFilter);
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchAccessController> accessController(
@@ -282,7 +290,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 int runApplication(int argc, char** argv)
 {
 	nx::kit::OutputRedirector::ensureOutputRedirection();
-	
+
 #ifdef Q_WS_X11
     XInitThreads();
 #endif

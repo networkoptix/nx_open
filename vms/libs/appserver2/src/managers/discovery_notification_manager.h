@@ -9,7 +9,7 @@ namespace ec2 {
 
 class QnDiscoveryNotificationManager:
     public AbstractDiscoveryNotificationManager,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
 public:
     QnDiscoveryNotificationManager(QnCommonModule* commonModule);

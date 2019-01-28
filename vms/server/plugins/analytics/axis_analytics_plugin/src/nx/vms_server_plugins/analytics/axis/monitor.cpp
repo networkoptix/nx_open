@@ -3,9 +3,8 @@
 #include <chrono>
 #include <algorithm>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
@@ -23,23 +22,23 @@ static const std::string kRuleNamePrefix("NX_RULE_");
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
-nx::sdk::analytics::common::Event* createCommonEvent(
+nx::sdk::analytics::EventMetadata* createCommonEvent(
     const EventType& eventType, bool active)
 {
-    auto commonEvent = new nx::sdk::analytics::common::Event();
-    commonEvent->setTypeId(eventType.id.toStdString());
-    commonEvent->setDescription(eventType.name.toStdString());
-    commonEvent->setIsActive(active);
-    commonEvent->setConfidence(1.0);
-    commonEvent->setAuxiliaryData(eventType.topic.toStdString());
-    return commonEvent;
+    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    eventMetadata->setTypeId(eventType.id.toStdString());
+    eventMetadata->setDescription(eventType.name.toStdString());
+    eventMetadata->setIsActive(active);
+    eventMetadata->setConfidence(1.0);
+    eventMetadata->setAuxiliaryData(eventType.topic.toStdString());
+    return eventMetadata;
 }
 
-nx::sdk::analytics::common::EventMetadataPacket* createCommonEventsMetadataPacket(
+nx::sdk::analytics::EventMetadataPacket* createCommonEventsMetadataPacket(
     const EventType& event, bool active)
 {
     using namespace std::chrono;
-    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+    auto packet = new nx::sdk::analytics::EventMetadataPacket();
     auto commonEvent = createCommonEvent(event, active);
     packet->addItem(commonEvent);
     packet->setTimestampUs(
@@ -176,7 +175,7 @@ void Monitor::addRules(
                 actionId);
             const int ruleId = cameraController.addActiveRule(rule);
             if (actionId)
-                NX_PRINT << "Rule addition succeeded, ruleId = " << actionId;
+                NX_PRINT << "Rule addition succeeded, ruleId = " << ruleId;
             else
                 NX_PRINT << "Rule addition failed";
         }

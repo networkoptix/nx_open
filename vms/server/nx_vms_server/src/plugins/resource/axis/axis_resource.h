@@ -70,7 +70,7 @@ public:
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
     int rtspPort() const;
-    virtual int getMaxChannelsPhysical() const override;
+    virtual int getMaxChannelsFromDriver() const override;
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );

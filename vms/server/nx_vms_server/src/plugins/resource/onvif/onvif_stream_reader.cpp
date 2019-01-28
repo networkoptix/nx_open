@@ -84,7 +84,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         &streamUrl, isCameraControlRequired, params);
-    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
     {
         #if defined(PL_ONVIF_DEBUG)
             qCritical() << "QnOnvifStreamReader::openStream: "
@@ -343,7 +343,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
     const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const
 {
-    Q_UNUSED( isPrimary );
+    Q_UNUSED(isPrimary);
 
     StreamUriResp response;
     StreamUriReq request;
@@ -445,6 +445,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         // Usually getMaxOnvifRequestTries returns 1, but for some OnvifResource descendants it's
         // larger. In case of failure request are repeated.
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+        constexpr std::chrono::milliseconds kTryIntervalMs(300);
 
         // Some DW cameras need two same sendVideoEncoder requests with 1 second interval.
         // Both responses are Ok, but only the second request really succeeds.
@@ -458,13 +459,13 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
             result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
             if (repeatIntervalForSendVideoEncoderMs)
             {
-                msleep(repeatIntervalForSendVideoEncoderMs);
+                std::this_thread::sleep_for(std::chrono::milliseconds(repeatIntervalForSendVideoEncoderMs));
                 result = m_onvifRes->sendVideoEncoderToCameraEx(
                     *currentVEConfig, streamIndex, params);
             }
 
             if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-                msleep(300);
+                std::this_thread::sleep_for(kTryIntervalMs);
         }
 
         return result;
@@ -749,7 +750,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                     "current vSourceID=" << profile->VideoSourceConfiguration->token.data()
                     << "requested vSourceID=" << info.videoSourceToken;
             #endif
-            if (m_onvifRes->getMaxChannelsPhysical() > 1)
+            if (m_onvifRes->getMaxChannels() > 1)
             {
                     return CameraDiagnostics::RequestFailedResult(
                         QLatin1String("addVideoSourceConfiguration"), soapWrapper.getLastErrorDescription());

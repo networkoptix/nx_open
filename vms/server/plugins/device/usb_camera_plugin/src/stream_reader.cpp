@@ -58,12 +58,12 @@ void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int StreamReader::addRef()
+int StreamReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int StreamReader::releaseRef()
+int StreamReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -98,13 +98,11 @@ void StreamReader::setBitrate(int bitrate)
 
 StreamReaderPrivate::StreamReaderPrivate(
     int encoderIndex,
-    const CodecParameters &codecParams,
     const std::shared_ptr<Camera>& camera)
     :
     m_encoderIndex(encoderIndex),
-    m_codecParams(codecParams),
     m_camera(camera),
-    m_avConsumer(new BufferedPacketConsumer(m_camera->videoStream(), m_codecParams))
+    m_avConsumer(new BufferedPacketConsumer)
 {
 }
 
@@ -120,21 +118,6 @@ void StreamReaderPrivate::interrupt()
     m_avConsumer->flush();
 
     m_interrupted = true;
-}
-
-void StreamReaderPrivate::setFps(float fps)
-{
-    m_codecParams.fps = fps;
-}
-
-void StreamReaderPrivate::setResolution(const nxcip::Resolution& resolution)
-{
-    m_codecParams.resolution = resolution;
-}
-
-void StreamReaderPrivate::setBitrate(int bitrate)
-{
-    m_codecParams.bitrate = bitrate;
 }
 
 void StreamReaderPrivate::ensureConsumerAdded()
@@ -176,6 +159,35 @@ void StreamReaderPrivate::removeConsumer()
 {
     removeVideoConsumer();
     removeAudioConsumer();
+}
+
+bool StreamReaderPrivate::interrupted()
+{
+    if (m_interrupted)
+    {
+        m_interrupted = false;
+        return true;
+    }
+    return false;
+}
+
+int StreamReaderPrivate::handleNxError()
+{
+    removeConsumer();
+
+    if (interrupted())
+        return nxcip::NX_INTERRUPTED;
+
+
+    if (m_camera->ioError())
+        return nxcip::NX_IO_ERROR;
+
+    return nxcip::NX_OTHER_ERROR;
+}
+
+bool StreamReaderPrivate::shouldStopWaitingForData() const
+{
+    return m_interrupted || m_camera->ioError();
 }
 
 } // namespace usb_cam

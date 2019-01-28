@@ -49,7 +49,7 @@ using StreamCapabilityMaps = QMap<Qn::StreamIndex, StreamCapabilityMap>;
 
 class Camera:
     public QnVirtualCameraResource,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     using base_type = QnVirtualCameraResource;
@@ -156,7 +156,6 @@ public:
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
     int getMaxChannels() const;
-    virtual int getMaxChannelsPhysical() const { return 1; }
 
     void inputPortListenerAttached();
     void inputPortListenerDetached();
@@ -191,7 +190,6 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
 
-
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -208,6 +206,8 @@ signals:
         qint64 timestamp);
 
 protected:
+    virtual int getMaxChannelsFromDriver() const { return 1; }
+
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void initializationDone() override;
 

@@ -52,7 +52,7 @@ public:
     virtual PixelFormat pixelFormat() const = 0;
 
     /**
-     * @param plane Number of the plane, in range 0..planesCount().
+     * @param plane Number of the plane, in range 0..planeCount().
      * @return Number of bytes in each pixel line of the plane, or 0 if the data is not accessible.
      */
     virtual int lineSize(int plane) const = 0;

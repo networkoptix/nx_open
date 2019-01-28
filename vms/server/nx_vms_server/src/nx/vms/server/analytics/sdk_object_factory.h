@@ -7,7 +7,6 @@
 #include <nx/vms/api/data/analytics_data.h>
 
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/vms/server/sdk_support/loggers.h>
 
 namespace nx::sdk::analytics { class IPlugin; }
@@ -16,7 +15,7 @@ namespace nx::vms::server::analytics {
 
 class SdkObjectFactory:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

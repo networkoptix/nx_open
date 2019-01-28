@@ -14,7 +14,7 @@
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
-#include <plugins/resource/hanwha/hanwha_chunk_reader.h>
+#include <plugins/resource/hanwha/hanwha_chunk_loader.h>
 #include <plugins/resource/hanwha/hanwha_information.h>
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>

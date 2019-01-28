@@ -13,7 +13,7 @@ namespace {
 const std::chrono::seconds kCproApiCacheTimeout(5);
 
 const char* kJsonApiRequestDataTemplate =
-    "{\"jsonData\": { \"data\" : %1, \"file\" : \"param\", \"password\": \"%2\", \"username\": \"%3\"}}";
+    R"json({"jsonData":{"data":%1,"file":"param","password":"%2","username":"%3"}})json";
 
 QSize jsonApiResolutionToQSize(QString resolution)
 {
@@ -183,11 +183,14 @@ JsonApiClient::JsonApiClient(nx::network::SocketAddress address, QAuthenticator 
 }
 
 nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoCodecs(
-    Qn::StreamIndex streamIndex)
+    int channelNumber, Qn::StreamIndex streamIndex)
 {
     NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
-    const QJsonObject params =  getParams(QString("All.VideoInput._1.")
-        + (streamIndex == Qn::StreamIndex::primary ? "_1" : "_2"));
+
+    ++channelNumber; //< Camera API channel numbers start with 1.
+    const QJsonObject params = getParams(QString("All.VideoInput._%1._%2")
+        .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2));
+
     if (params.isEmpty())
         return {};
 
@@ -208,12 +211,14 @@ nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoC
     return result;
 }
 
-bool JsonApiClient::sendStreamParams(Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams)
+bool JsonApiClient::sendStreamParams(
+    int channelNumber, Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams)
 {
     NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
 
-    QString paramBasename =  QString("All.VideoInput._1.")
-        + (streamIndex == Qn::StreamIndex::primary ? "_1." : "_2.");
+    ++channelNumber; //< Camera API channel numbers start with 1.
+    QString paramBasename =  QString("All.VideoInput._%1._%2.")
+        .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2);
 
     const QString codec = streamParams.codec.toLower();
     const auto response = setParams({
@@ -275,11 +280,22 @@ std::optional<QJsonObject> JsonApiClient::doRequest(const nx::utils::Url& url, Q
     NX_VERBOSE(this, "Sending request [%1] with data [%2]", url, data);
 
     nx::network::http::HttpClient client;
-    if (!client.doPost(url, "application/json", std::move(data))
-        || !nx::network::http::StatusCode::isSuccessCode(client.response()->statusLine.statusCode))
+    if (!client.doPost(url, "application/json", std::move(data)))
     {
-        NX_DEBUG(this, "Error with request [%1]: errno: [%2], HTTP code: [%3]",
-            url, SystemError::getLastOSErrorText(), client.response()->statusLine.statusCode);
+        NX_DEBUG(this, "Error posting request [%1]: errno: [%2]",
+            url, SystemError::getLastOSErrorText());
+        return {};
+    }
+
+    const auto httpResponse = client.response();
+    NX_ASSERT(httpResponse);
+    if (!httpResponse)
+        return {};
+
+    if (!nx::network::http::StatusCode::isSuccessCode(httpResponse->statusLine.statusCode))
+    {
+        NX_DEBUG(this, "Error with request [%1]: HTTP code: [%2]",
+            url, httpResponse->statusLine.statusCode);
         return {};
     }
 

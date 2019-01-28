@@ -91,7 +91,6 @@
 #include "server_connector.h"
 #include "resource_status_watcher.h"
 
-
 using namespace nx;
 using namespace nx::vms::server;
 
@@ -112,7 +111,7 @@ void installTranslations()
 
 class ServerDataProviderFactory:
     public QnDataProviderFactory,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ServerDataProviderFactory(QnMediaServerModule* serverModule):
@@ -144,7 +143,7 @@ public:
 QnMediaServerModule::QnMediaServerModule(
     const nx::vms::server::CmdLineArguments* arguments,
     std::unique_ptr<MSSettings> serverSettings,
-    QObject* parent)
+    QObject* /*parent*/)
 {
     std::unique_ptr<CmdLineArguments> defaultArguments;
     if (!arguments)

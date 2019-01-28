@@ -12,12 +12,21 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
-
 OnvifResourceSearcher::OnvifResourceSearcher(QnMediaServerModule* serverModule)
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     ::OnvifResourceSearcher(serverModule)
 {
+}
+
+bool OnvifResourceSearcher::isSequential() const
+{
+    return true;
+}
+
+QnResourceList OnvifResourceSearcher::findResources()
+{
+    return QnResourceList();
 }
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
@@ -32,20 +41,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
     return ::OnvifResourceSearcher::checkHostAddr(urlCopy, auth, doMultichannelCheck);
 }
 
-QnResourceList OnvifResourceSearcher::findResources()
-{
-    return QnResourceList();
-}
-
-bool OnvifResourceSearcher::isSequential() const
-{
-    return true;
-}
-
 } // namespace flir
 } // namespace plugins
 } // namespace nx
 
-
 #endif // defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
-

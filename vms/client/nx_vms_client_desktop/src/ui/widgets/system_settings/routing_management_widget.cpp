@@ -223,7 +223,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
     ui->addressesView->header()->setSectionsMovable(false);
 
-    ui->addressesView->setIgnoreDefaultSpace(true);
+    ui->addressesView->setDefaultSpacePressIgnored(true);
     connect(ui->addressesView, &TreeView::spacePressed, this,
         [this](const QModelIndex& index)
         {

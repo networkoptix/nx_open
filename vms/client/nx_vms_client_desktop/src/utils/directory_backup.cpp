@@ -38,7 +38,7 @@ bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory,
                 return true;
 
             default:
-                NX_ASSERT(false, Q_FUNC_INFO, "All cases must be handled.");
+                NX_ASSERT(false, "All cases must be handled.");
                 break;
         }
         return false;

@@ -9,10 +9,12 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/sdk_support/pointers.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/uuid.h>
 
 #include <plugins/settings.h>
 #include <plugins/plugin_tools.h>
@@ -23,6 +25,11 @@ QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
+}
+
+QStringList QnExecuteAnalyticsActionRestHandler::cameraIdUrlParams() const
+{
+    return {"deviceId"};
 }
 
 int QnExecuteAnalyticsActionRestHandler::executePost(
@@ -43,8 +50,8 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     }
 
     QString missedField;
-    if (actionData.pluginId.isEmpty())
-        missedField = "pluginId";
+    if (actionData.engineId.isNull())
+        missedField = "engineId";
     else if (actionData.actionId.isEmpty())
         missedField = "actionId";
     else if (actionData.objectId.isNull())
@@ -57,32 +64,32 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    for (auto& engineResource: resourcePool()->getResources<resource::AnalyticsEngineResource>())
-    {
-         if (engineResource->plugin()->manifest().id == actionData.pluginId)
-        {
-            AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(
-                &actionResult, engineResource->sdkEngine().get(), actionData);
+    const auto engineResource =
+        resourcePool()->getResourceById<resource::AnalyticsEngineResource>(actionData.engineId);
 
-            if (!errorMessage.isEmpty())
-            {
-                result.setError(QnJsonRestResult::CantProcessRequest,
-                    lit("Plugin failed to execute action: %1").arg(errorMessage));
-            }
-            result.setReply(actionResult);
-            return nx::network::http::StatusCode::ok;
-        }
+    if (!engineResource)
+    {
+        NX_WARNING(this, "Engine with id %1 not found", actionData.engineId);
+        result.setError(QnJsonRestResult::InvalidParameter, "Engine not found");
+        return nx::network::http::StatusCode::ok;
     }
 
-    result.setError(QnJsonRestResult::CantProcessRequest,
-        lit("Plugin with pluginId \"%1\" not found").arg(actionData.pluginId));
+    AnalyticsActionResult actionResult;
+    QString errorMessage = executeAction(
+        &actionResult, engineResource->sdkEngine().get(), actionData);
+
+    if (!errorMessage.isEmpty())
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest,
+            lit("Plugin failed to execute action: %1").arg(errorMessage));
+    }
+    result.setReply(actionResult);
     return nx::network::http::StatusCode::ok;
 }
 
 namespace {
 
-class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::Action>
+class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::IAction>
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
@@ -90,7 +97,7 @@ public:
         if (interfaceId == nx::sdk::analytics::IID_Action)
         {
             addRef();
-            return static_cast<nx::sdk::analytics::Action*>(this);
+            return static_cast<nx::sdk::analytics::IAction*>(this);
         }
         if (interfaceId == nxpl::IID_PluginInterface)
         {
@@ -101,29 +108,26 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_params(
-            nx::vms::server::sdk_support::toIStringMap(actionData.params)),
+        m_params(nx::vms::server::sdk_support::toIStringMap(actionData.params)),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
-        m_objectId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
-        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
+        m_objectId = nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.objectId);
+        m_deviceId = nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.deviceId);
         m_timestampUs = actionData.timestampUs;
     }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
 
-    virtual nxpl::NX_GUID objectId() override { return m_objectId; }
+    virtual nx::sdk::Uuid objectId() override { return m_objectId; }
 
-    virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
+    virtual nx::sdk::Uuid deviceId() override { return m_deviceId; }
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
     virtual const nx::sdk::IStringMap* params() override { return m_params.get(); }
-
-    virtual int paramCount() override { return m_params->count(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -133,11 +137,11 @@ public:
 
 private:
     std::string m_actionId;
-    nxpl::NX_GUID m_objectId;
-    nxpl::NX_GUID m_deviceId;
+    nx::sdk::Uuid m_objectId;
+    nx::sdk::Uuid m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::vms::server::sdk_support::UniquePtr<nx::sdk::IStringMap> m_params;
+    const nx::sdk::Ptr<nx::sdk::IStringMap> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };
@@ -152,7 +156,6 @@ QString errorMessage(nx::sdk::Error error)
         case nx::sdk::Error::noError: return QString();
         case nx::sdk::Error::unknownError: return "error";
         case nx::sdk::Error::networkError: return "network error";
-        case nx::sdk::Error::typeIsNotSupported: return "type is not supported";
         default: return "unrecognized error";
     }
 }
@@ -172,8 +175,8 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     nx::sdk::Error error = nx::sdk::Error::noError;
     engine->executeAction(&action, &error);
 
-    // By this time, engine either already called Action::handleResult(), or is not going to do it.
-
+    // By this time, the Engine either already called Action::handleResult(), or is not going to
+    // do it.
     return errorMessage(error);
 }
 

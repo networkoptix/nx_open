@@ -78,10 +78,10 @@ OnvifResourceSearcher::~OnvifResourceSearcher()
 
 }
 
-bool OnvifResourceSearcher::isProxy() const
-{
-    return false;
-}
+//bool OnvifResourceSearcher::isProxy() const
+//{
+//    return false;
+//}
 
 QString OnvifResourceSearcher::manufacture() const
 {
@@ -278,9 +278,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
         QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);
-        resource->setVendor( manufacturer );
+        resource->setVendor(manufacturer);
         if (!modelName.isEmpty())
-            resource->setName( modelName );
+            resource->setName(modelName);
         //QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (!rt.isNull() && rt != resource->getTypeId())
         {
@@ -315,7 +315,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
                     QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
                     res->setGroupId(resource->getPhysicalId());
                     res->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
-                    res->setVendor( manufacturer );
+                    res->setVendor(manufacturer);
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource);
                     res->updateToChannel(i);
@@ -344,7 +344,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     if (shouldStop())
          return QnResourceList();
 
-    m_wsddSearcher->findResources( result, discoveryMode() );
+    m_wsddSearcher->findResources(result, discoveryMode());
 
     return result;
 }
@@ -373,8 +373,8 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
         serverModule(),
         resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
-        : resourceType->getName() ); // use name instead of manufacture to instantiate child onvif resource
-    if (!result )
+        : resourceType->getName()); // use name instead of manufacture to instantiate child onvif resource
+    if (!result)
         return result; // not found
 
     result->setTypeId(resourceTypeId);

@@ -54,7 +54,7 @@ public:
     virtual std::chrono::microseconds currentTimeUs() const;
 
 protected:
-    Engine* m_engine;
+    Engine* m_engine = nullptr;
     nx::gstreamer::MetadataCallback m_metadataCallback;
     std::queue<nx::sdk::analytics::IDataPacket*> m_packetQueue;
     LoopPtr m_mainLoop;

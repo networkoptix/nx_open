@@ -134,12 +134,14 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
                 return;
 
             executeInThread(thread, nx::utils::guarded(this,
-                [this, callback, requestId, httpClient]()
+                [this, callback, requestId]()
                 {
-                    {
-                        NX_MUTEX_LOCKER lock(&d->mutex);
-                        d->requestClients.remove(requestId);
-                    }
+                    NX_MUTEX_LOCKER lock(&d->mutex);
+                    const auto httpClient = d->requestClients.take(requestId);
+                    lock.unlock();
+
+                    if (!httpClient)
+                        return;
 
                     const bool success = httpClient->hasRequestSucceeded();
 

@@ -37,7 +37,7 @@ namespace vms::server {
  */
 class Authenticator:
     public QObject,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

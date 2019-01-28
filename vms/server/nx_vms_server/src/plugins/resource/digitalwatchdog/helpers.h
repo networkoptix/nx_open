@@ -33,7 +33,7 @@ private:
 };
 
 
-/** Some cameras does not support Cpro API and Onvif2, so that class is used in such cases to
+/** Some cameras does not support Cpro API and Onvif::Media2, so that class is used in such cases to
  * configure H265 codec.
  */
 class JsonApiClient
@@ -41,8 +41,10 @@ class JsonApiClient
 public:
     JsonApiClient(nx::network::SocketAddress address, QAuthenticator auth);
 
-    nx::vms::server::resource::StreamCapabilityMap getSupportedVideoCodecs(Qn::StreamIndex streamIndex);
-    bool sendStreamParams(Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams);
+    nx::vms::server::resource::StreamCapabilityMap getSupportedVideoCodecs(
+        int channelNumber, Qn::StreamIndex streamIndex);
+    bool sendStreamParams(
+        int channelNumber, Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams);
 
 private:
     QJsonObject getParams(QString paramName);

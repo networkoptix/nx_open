@@ -68,7 +68,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
 
-    int channels = m_axisRes->getMaxChannelsPhysical();
+    int channels = m_axisRes->getMaxChannels();
 
     QByteArray profileNumber("S");
     QByteArray profileName;

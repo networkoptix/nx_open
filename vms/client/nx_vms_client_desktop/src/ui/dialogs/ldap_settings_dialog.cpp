@@ -24,9 +24,6 @@
 using namespace nx;
 
 namespace {
-    // TODO: #GDM move timeout constant to more common module
-    const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
-
     /** Special value, used when the user has pressed "Test" button. */
     const int kTestPrepareHandle = 0;
 
@@ -113,7 +110,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     q->ui->testStackWidget->setCurrentWidget(q->ui->testProgressPage);
     q->ui->testStackWidget->show();
 
-    timeoutTimer->setInterval(testLdapTimeoutMSec / q->ui->testProgressBar->maximum());
+    timeoutTimer->setInterval(settings.searchTimeoutS * 1000 / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
     testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
@@ -160,6 +157,7 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     result.adminPassword = q->ui->passwordLineEdit->text().trimmed();
     result.searchBase = q->ui->searchBaseLineEdit->text().trimmed();
     result.searchFilter = q->ui->searchFilterLineEdit->text().trimmed();
+    result.searchTimeoutS = q->ui->searchTimeoutSSpinBox->value();
     return result;
 }
 
@@ -179,6 +177,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
     q->ui->searchBaseLineEdit->setText(settings.searchBase.trimmed());
     q->ui->searchFilterLineEdit->setText(settings.searchFilter.trimmed());
+    q->ui->searchTimeoutSSpinBox->setValue(settings.searchTimeoutS);
     q->ui->testStackWidget->setCurrentWidget(q->ui->testResultPage);
     q->ui->testResultLabel->setText(QString());
     q->ui->testStackWidget->hide();

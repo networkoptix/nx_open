@@ -29,7 +29,7 @@ struct ModuleEndpoint: api::ModuleInformation
  * - Tries to maintain connection to each module and access up-to-date module information.
  * - Notifies about availability or module information changes.
  */
-class Manager: public QObject, public QnCommonModuleAware
+class Manager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;

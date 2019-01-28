@@ -6,7 +6,7 @@
 #include <common/common_module_aware.h>
 
 /** Utility class that deletes desktop cameras after some time of inactivity. */
-class QnDesktopCameraDeleter: public QObject, public QnCommonModuleAware
+class QnDesktopCameraDeleter: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

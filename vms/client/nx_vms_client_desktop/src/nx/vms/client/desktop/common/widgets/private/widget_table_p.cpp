@@ -149,7 +149,7 @@ void WidgetTable::Private::setRootIndex(const QModelIndex& rootIndex, bool force
     QModelIndex newRootIndex(rootIndex);
     if (newRootIndex.isValid() && newRootIndex.model() != m_model)
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "rootIndex should not be from another model");
+        NX_ASSERT(false, "rootIndex should not be from another model");
         newRootIndex = QModelIndex();
     }
 

@@ -38,7 +38,7 @@ class QnCommonMessageProcessor;
  *  All methods that require camera history to operate are non-reliable.
  *
  */
-class QnCameraHistoryPool: public QObject, public QnCommonModuleAware
+class QnCameraHistoryPool: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 
