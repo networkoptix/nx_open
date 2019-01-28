@@ -191,8 +191,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor"));
-
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
         m_compressResponseMsgBody = true;
@@ -204,7 +202,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         incomingTransactionsRequestsParserWeak(incomingTransactionsRequestsParser );
 
     // This filter receives single HTTP message.
-    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( 
+    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc(
         [this, incomingTransactionsRequestsParserWeak]() {
             if (auto incomingTransactionsRequestsParserStrong = incomingTransactionsRequestsParserWeak.lock())
                 processChunkExtensions(incomingTransactionsRequestsParserStrong->currentMessage().headers());
@@ -392,7 +390,7 @@ void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
         const uint32_t dataSize = htonl(data.size());
         QByteArray dataWithSize;
         dataWithSize.resize(sizeof(dataSize) + data.size());
-        // TODO #ak too many memcopy here. Should use stream base64 encoder to write directly 
+        // TODO #ak too many memcopy here. Should use stream base64 encoder to write directly
         // to the output buffer.
         memcpy(dataWithSize.data(), &dataSize, sizeof(dataSize));
         memcpy(

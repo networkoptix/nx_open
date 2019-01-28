@@ -84,6 +84,7 @@ void CommandLogCache::restoreTransaction(
         m_timestampCalculator.init(timestamp);
     }
 
+    NX_ASSERT(m_tranIdToContext.empty());
     m_rawData = m_committedData;
 }
 
