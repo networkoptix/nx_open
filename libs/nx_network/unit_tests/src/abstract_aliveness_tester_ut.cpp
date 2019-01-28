@@ -5,6 +5,7 @@
 
 #include <nx/network/abstract_aliveness_tester.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/time.h>
 
 namespace nx::network::test {
 
@@ -47,7 +48,8 @@ class AbstractAlivenessTester:
     public ::testing::Test
 {
 public:
-    AbstractAlivenessTester()
+    AbstractAlivenessTester():
+        m_timeShift(nx::utils::test::ClockType::steady)
     {
         m_keepAliveOptions.inactivityPeriodBeforeFirstProbe = std::chrono::milliseconds(1);
         m_keepAliveOptions.probeSendPeriod = std::chrono::milliseconds(1);
@@ -119,12 +121,33 @@ protected:
         thenFailureIsReported();
     }
 
+    void assertProbeIsNotSentIn(std::chrono::milliseconds period)
+    {
+        ASSERT_FALSE(m_probesSent.pop(period));
+    }
+
+    KeepAliveOptions& keepAliveOptions()
+    {
+        return m_keepAliveOptions;
+    }
+
+    AlivenessTester& alivenessTester()
+    {
+        return *m_alivenessTester;
+    }
+
+    void shiftTime(std::chrono::milliseconds timeShift)
+    {
+        m_timeShift.applyRelativeShift(timeShift);
+    }
+
 private:
     KeepAliveOptions m_keepAliveOptions;
     std::atomic<bool> m_serverIsAlive{false};
     std::unique_ptr<AlivenessTester> m_alivenessTester;
     nx::utils::SyncQueue<int> m_failures;
     nx::utils::SyncQueue<int> m_probesSent;
+    nx::utils::test::ScopedTimeShift m_timeShift;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -153,7 +176,21 @@ TEST_F(AbstractAlivenessTester, test_failure_is_not_reported_while_alive)
     thenFailureIsReported();
 }
 
-//TEST_F(AbstractAlivenessTester, confirming_aliveness_prevents_unneeded_probes)
+TEST_F(AbstractAlivenessTester, confirming_aliveness_prevents_unneeded_probes)
+{
+    keepAliveOptions().inactivityPeriodBeforeFirstProbe = std::chrono::hours(24);
+
+    whenStartAlivenessTester();
+
+    alivenessTester().executeInAioThreadSync(
+        [this]()
+        {
+            shiftTime(keepAliveOptions().inactivityPeriodBeforeFirstProbe * 2);
+            alivenessTester().confirmAliveness();
+        });
+
+    assertProbeIsNotSentIn(std::chrono::milliseconds(10));
+}
 
 TEST_F(AbstractAlivenessTester, can_be_restarted)
 {
