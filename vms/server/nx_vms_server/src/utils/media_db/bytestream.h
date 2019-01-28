@@ -4,6 +4,7 @@ class ByteStreamReader
 {
 public:
     ByteStreamReader(const QByteArray& data):
+        m_data(data),
         src(data.data()),
         end(data.data() + data.size())
     {
@@ -32,6 +33,7 @@ public:
     }
 
 private:
+    const QByteArray m_data;
     const char* src;
     const char* end;
 };
