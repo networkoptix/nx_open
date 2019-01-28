@@ -34,12 +34,18 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
+    /**
+     * NOTE: "Upstream" is the stream from the source to the target.
+     */
     template<typename T>
     void setUpStreamConverterFactory(T func)
     {
         m_upStreamConverterFactory = std::move(func);
     }
 
+    /**
+     * NOTE: "Downstream" is the stream from the target to the source.
+     */
     template<typename T>
     void setDownStreamConverterFactory(T func)
     {
@@ -204,7 +210,7 @@ private:
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_upStreamConverter;
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_downStreamConverter;
     std::unique_ptr<nx::utils::bstream::OutputConverterToInputAdapter>
-        m_downStreamConverterAdapter;
+        m_upStreamConverterAdapter;
 
     bool tuneDestinationConnectionAttributes();
 

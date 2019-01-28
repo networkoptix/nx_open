@@ -6,7 +6,7 @@ namespace nx::network::test {
 
 SquidProxyEmulator::SquidProxyEmulator()
 {
-    setDownStreamConverterFactory(
+    setUpStreamConverterFactory(
         []() { return std::make_unique<nx::utils::bstream::StringReplacer>(
             "Connection: Upgrade\r\n", ""); });
 }
