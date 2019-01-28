@@ -47,8 +47,10 @@ Check Special Hint
     [arguments]    ${type}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
+    Set Suite Variable    ${dropdown type}    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
+    Run Keyword If    "${LANGUAGE}"=="nl_NL"    Set Suite Variable    ${dropdown type}    ${SHARE MODAL}//nx-permissions-select//li//span[text()="${type}"]
+    Wait Until Element Is Visible    ${dropdown type}
+    Click Link    ${dropdown type}/..
     ${type}    Convert To Uppercase    ${type}
     Run Keyword If    "${type}"=="${ADMIN TEXT}"          Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMINISTRATOR}
     ...    ELSE IF    "${type}"=="${ADV VIEWER TEXT}"     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADVANCED VIEWER}

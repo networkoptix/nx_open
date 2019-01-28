@@ -180,7 +180,7 @@ should open Privacy Policy in a new page
     Click Link    ${PRIVACY POLICY LINK}
     Sleep    2    #This is specifically for Firefox
     ${windows}    Get Window Handles
-    Select Window    @{windows}[2]
+    Select Window    @{windows}[1]
     Location Should Be    ${PRIVACY POLICY URL}
 
 should suggest user to log out, if he was logged in and goes to registration link
