@@ -4,7 +4,7 @@
     },
     "demo": {
         "options": {
-            "host": "enk.me",
+            "host": "mono.enk.me",
             "username": "ebalashov",
             "password": "e8Lp9jTsbgjk"
         },
@@ -18,7 +18,7 @@
     },
     "demo_fast": {
         "options": {
-            "host": "enk.me",
+            "host": "mono.enk.me",
             "username": "ebalashov",
             "password": "e8Lp9jTsbgjk"
         },
