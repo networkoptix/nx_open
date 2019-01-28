@@ -501,7 +501,8 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::missingPackageError:
             {
                 QStringList packageErrors;
-                auto missing = contents.missingUpdate.size();
+                auto missing = contents.missingUpdate.size()
+                    + contents.unsuportedSystemsReport.size();
                 if (contents.missingClientPackage)
                 {
                     if (missing)
