@@ -60,6 +60,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, exclusiveMotionSelection, "Whether selecting a motion search region on a camera clears motion selection on other cameras on the layout.");
     NX_INI_FLAG(0, allowDeleteLocalFiles, "Allow delete local files from the context menu.");
     NX_INI_FLAG(1, startPlaybackOnTileNavigation, "Start playback if timeline navigation occured after Right Panel tile click or double click.");
+    NX_INI_FLAG(0, overrideDialogFramesWIN, "Replace system dialog frames with application defined ones (Windows-only).");
 };
 
 inline Ini& ini()

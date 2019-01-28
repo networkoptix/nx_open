@@ -9,12 +9,28 @@
 #include <ui/style/helper.h>
 #include <ui/workaround/cancel_drag.h>
 
+#if defined(Q_OS_WIN)
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/common/widgets/dialog_title_bar_widget.h>
+#include <nx/vms/client/desktop/common/widgets/emulated_non_client_area.h>
+#include <nx/vms/client/desktop/platforms/windows/system_non_client_area_remover_win.h>
+#endif // defined(Q_OS_WIN)
+
+using namespace nx::vms::client::desktop;
+
 QnDialog::QnDialog(QWidget* parent, Qt::WindowFlags flags):
     base_type(parent, flags),
     m_resizeToContentsMode(0),
     m_safeMinimumSize(style::Metrics::kMinimumDialogSize)
 {
     cancelDrag(this);
+#if defined(Q_OS_WIN)
+    if (ini().overrideDialogFramesWIN)
+    {
+        EmulatedNonClientArea::create(this, new DialogTitleBarWidget());
+        SystemNonClientAreaRemover::instance().apply(this);
+    }
+#endif // defined(Q_OS_WIN)
 }
 
 QnDialog::~QnDialog()
