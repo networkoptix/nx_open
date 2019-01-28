@@ -22,7 +22,7 @@ void AuthenticationDispatcher::authenticate(
         QnMutexLocker lock(&m_mutex);
         for (const auto& element : m_authenticatorsByRegex)
         {
-            if (std::regex_search(path, element.first))
+            if (std::regex_match(path, element.first))
             {
                 manager = element.second;
                 break;

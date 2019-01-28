@@ -36,25 +36,6 @@ protected:
         initializeAndRegisterAuthenticators();
     }
 
-    void initializeAndRegisterAuthenticators()
-    {
-        // Skipping kTestPaths[2]: "/test/unregisteredput"
-        for (std::size_t i = 0; i < kTestPaths.size() - 1; ++i)
-        {
-            bool authenticationResult = std::string(kTestPaths[i]) == "/test/delete"
-                ? false
-                : true;
-
-            auto authenticationManager = std::make_unique<TestAuthenticationManager>(nullptr);
-            authenticationManager->setAuthenticationEnabled(false); //< Force dummy authentication
-            authenticationManager->setAuthenticationSucceeded(authenticationResult);
-
-            m_dispatcher.add(std::regex(kTestPaths[i]), authenticationManager.get());
-
-            m_authenticators.emplace(std::move(authenticationManager));
-        }
-    }
-
     void registerRequestHandlers(
         http::server::rest::MessageDispatcher* messageDispatcher)
     {
@@ -145,6 +126,28 @@ protected:
         // "/test/unregisteredput"
         ASSERT_TRUE(m_httpClient.doPut(createUrl(kTestPaths[2]), "/application/json", {}));
     }
+
+private:
+        void initializeAndRegisterAuthenticators()
+        {
+            // Skipping kTestPaths[2]: "/test/unregisteredput"
+            for (std::size_t i = 0; i < kTestPaths.size() - 1; ++i)
+            {
+                bool authenticationResult = std::string(kTestPaths[i]) == "/test/delete"
+                    ? false
+                    : true;
+
+                auto authenticationManager = std::make_unique<TestAuthenticationManager>(nullptr);
+
+                // Force dummy authentication
+                authenticationManager->setAuthenticationEnabled(false);
+                authenticationManager->setAuthenticationSucceeded(authenticationResult);
+
+                m_dispatcher.add(std::regex(kTestPaths[i]), authenticationManager.get());
+
+                m_authenticators.emplace(std::move(authenticationManager));
+            }
+        }
 
 protected:
     std::set<std::unique_ptr<TestAuthenticationManager>> m_authenticators;
