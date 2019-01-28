@@ -1,6 +1,6 @@
 #include "engine.h"
 
-#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>

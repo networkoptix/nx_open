@@ -72,7 +72,7 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
-    ASSERT_TRUE(manifestStr);
+    ASSERT_TRUE(manifestStr != nullptr);
     ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;

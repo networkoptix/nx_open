@@ -241,6 +241,7 @@ std::string VideoFrameProcessingDeviceAgent::getParamValue(const char* paramName
 
 void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
 {
+    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
     NX_KIT_ASSERT(engine,
         "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
         + nx::kit::utils::toString(this)
