@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <sstream>
+#include <boost/variant/multivisitors.hpp>
 
 #include <QtCore>
 #include <QtSql>
@@ -543,6 +544,26 @@ TEST(MediaFileOperations, CameraOP_ResetValues)
 
 namespace nx::media_db::test {
 
+struct EqVisitor : public boost::static_visitor<>
+{
+    template<typename T, typename U>
+    void operator()(const T& t, const U& u)
+    {
+        ASSERT_TRUE(false);
+    }
+
+    void operator()(const boost::blank&, const boost::blank&)
+    {
+        ASSERT_TRUE(false);
+    }
+
+    template<typename T>
+    void operator()(const T& op1, const T& op2)
+    {
+        ASSERT_EQ(op1, op2);
+    }
+};
+
 class MediaDbWriteRead: public ::testing::Test
 {
 protected:
@@ -581,10 +602,6 @@ protected:
         ASSERT_TRUE(reader.readFileHeader(&dbVersion));
         ASSERT_EQ(1, dbVersion);
 
-        struct EqVisitor: public boost::static_visitor<>
-        {
-        };
-
         DBRecordQueue records;
         while (true)
         {
@@ -595,7 +612,18 @@ protected:
             records.push(record);
         }
 
-        //ASSERT_EQ(m_dbRecords, records);
+        ASSERT_EQ(m_dbRecords.size(), records.size());
+        EqVisitor eqVisitor;
+
+        for (size_t i = 0; i < m_dbRecords.size(); ++i)
+        {
+            const auto savedRecord = m_dbRecords.front();
+            m_dbRecords.pop();
+            const auto readRecord = records.front();
+            records.pop();
+
+            boost::apply_visitor(eqVisitor, savedRecord, readRecord);
+        }
     }
 
 private:

@@ -199,5 +199,10 @@ struct MediaFileOperation: RecordBase
 
 };
 
+inline bool operator==(const MediaFileOperation& f1, const MediaFileOperation& f2)
+{
+    return f1.part1 == f2.part1 && f1.part2 == f2.part2;
+}
+
 } // namespace media_db
 } // namespace nx

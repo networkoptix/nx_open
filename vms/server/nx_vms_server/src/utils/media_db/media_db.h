@@ -54,6 +54,11 @@ struct CameraOperation: RecordBase
     void setCameraUniqueId(const QByteArray &uniqueId);
 };
 
+inline bool operator==(const CameraOperation& c1, const CameraOperation& c2)
+{
+    return c1.part1 == c2.part1 && c1.cameraUniqueId == c2.cameraUniqueId;
+}
+
 typedef boost::variant<boost::blank, MediaFileOperation, CameraOperation> DBRecord;
 
 class MediaDbReader
