@@ -37,7 +37,24 @@ bool NodeViewInvalidDeviceFilterModel::filterAcceptsRow(
         const auto sourceIndex = sourceModel()->index(
             sourceRow, ResourceNodeViewColumn::resourceNameColumn, sourceParent);
 
-        if (!isValidNode(sourceIndex))
+        auto hasOnlyInvalidChildren =
+            [](const QModelIndex& index)
+            {
+                if (index.model()->rowCount(index) == 0)
+                    return false;
+
+                QModelIndexList childIndexes;
+                for (int r = 0; r < index.model()->rowCount(index); ++r)
+                {
+                    childIndexes.append(index.model()->index(
+                        r, ResourceNodeViewColumn::resourceNameColumn, index));
+                }
+
+                return std::all_of(childIndexes.cbegin(), childIndexes.cend(),
+                    [](const QModelIndex& childIndex) { return !isValidNode(childIndex); });
+            };
+
+        if (!isValidNode(sourceIndex) || hasOnlyInvalidChildren(sourceIndex))
             return false;
     }
     return base_type::filterAcceptsRow(sourceRow, sourceParent);
