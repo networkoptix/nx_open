@@ -73,9 +73,20 @@ private:
 class NX_UTILS_API Filter
 {
 public:
-    explicit Filter(const QString& source, bool regexp = true);
-    explicit Filter(const Tag& tag);
+    /**
+     * Create filter using the provided regular expression.
+     */
     explicit Filter(const QRegularExpression& source);
+
+    /**
+     * Create filter using the provided string as a regular expression pattern.
+     */
+    explicit Filter(const QString& source);
+
+    /**
+     * Create filter using the provided tag. It will match this tag only.
+     */
+    explicit Filter(const Tag& tag);
 
     bool isValid() const;
     bool accepts(const Tag& tag) const;
@@ -84,16 +95,11 @@ public:
     bool operator<(const Filter& rhs) const;
     bool operator==(const Filter& rhs) const;
     bool operator!=(const Filter& rhs) const;
+
 private:
-    enum class Mode
-    {
-        exactMatch,
-        regexp
-    };
-    Mode m_mode;
-    QString m_value;
     QRegularExpression m_filter;
 };
+
 using LevelFilters = std::map<Filter, Level>;
 
 struct NX_UTILS_API LevelSettings

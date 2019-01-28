@@ -14,9 +14,12 @@ std::unique_ptr<AbstractLogger> LoggerBuilder::buildLogger(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath,
-    std::set<Filter> filters,
+    const std::set<Filter>& filters,
     std::unique_ptr<AbstractWriter> writer)
 {
+    NX_ASSERT(!writer || settings.loggers.size() == 1,
+        "Method semantics allows writer setup for the single logger only.");
+
     std::vector<std::unique_ptr<AbstractLogger>> loggers;
     for (const auto& loggerSettings: settings.loggers)
     {
