@@ -470,10 +470,10 @@ bool QnStorageDb::writeVacuumedData(
 
     NX_DEBUG(this, "QnStorageDb::writeVacuumedData() begin");
 
-    int expectedBufferSize = parsedData->header.kSerializedRecordSize;
-    for (const auto& cameraData : parsedData->cameras)
+    int expectedBufferSize = 0;
+    for (const auto& cameraData: parsedData->cameras)
         expectedBufferSize += cameraData.serializedRecordSize();
-    for (const auto& catalog : parsedData->addRecords)
+    for (const auto& catalog: parsedData->addRecords)
     {
         expectedBufferSize +=
             (int) catalog.second.size() * nx::media_db::MediaFileOperation::kSerializedRecordSize;
