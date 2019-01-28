@@ -12,6 +12,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -482,7 +483,7 @@ private:
     {
         auto url = m_serverUrl;
         if (m_proxyAddress)
-            url = url::Builder(url).setEndpoint(*m_proxyAddress);
+            url = network::url::Builder(url).setEndpoint(*m_proxyAddress);
         return url;
     }
 

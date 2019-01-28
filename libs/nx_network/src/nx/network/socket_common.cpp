@@ -562,7 +562,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))
 KeepAliveOptions::KeepAliveOptions(
     std::chrono::milliseconds inactivityPeriodBeforeFirstProbe,
     std::chrono::milliseconds probeSendPeriod,
-    size_t probeCount)
+    int probeCount)
     :
     inactivityPeriodBeforeFirstProbe(inactivityPeriodBeforeFirstProbe),
     probeSendPeriod(probeSendPeriod),
@@ -621,7 +621,7 @@ std::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& stri
         std::chrono::seconds((size_t)split[0].trimmed().toUInt());
     options.probeSendPeriod =
         std::chrono::seconds((size_t)split[1].trimmed().toUInt());
-    options.probeCount = (size_t)split[2].trimmed().toUInt();
+    options.probeCount = split[2].trimmed().toInt();
     return options;
 }
 

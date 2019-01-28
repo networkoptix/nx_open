@@ -223,12 +223,12 @@ struct NX_NETWORK_API KeepAliveOptions
      * The number of unacknowledged probes to send before considering the connection dead and
      * notifying the application layer.
      */
-    size_t probeCount;
+    int probeCount = 0;
 
     KeepAliveOptions(
         std::chrono::milliseconds inactivityPeriodBeforeFirstProbe = std::chrono::milliseconds::zero(),
         std::chrono::milliseconds probeSendPeriod = std::chrono::milliseconds::zero(),
-        size_t probeCount = 0);
+        int probeCount = 0);
 
     bool operator==(const KeepAliveOptions& rhs) const;
     bool operator!=(const KeepAliveOptions& rhs) const;
