@@ -128,17 +128,6 @@ import * as Hls from 'hls.js';
                                 return src.type === mimeTypes['hls'];
                             });
                             var jsHlsSupported = Hls.isSupported();
-    
-                            // Set iOS
-                            if ($window.jscd.os === 'iOS') {
-                                return 'native-hls'; // jshls have problems with iOS
-                            }
-    
-                            // Set Android
-                            if ($window.jscd.os === 'Android') {
-                                return 'jshls';
-                            }
-                            
                             
                             // No native support
                             // Presume we are on desktop:
@@ -176,18 +165,24 @@ import * as Hls from 'hls.js';
                                 case 'Opera':
                                 case 'Webkit':
                                 default:
-                                    if (jsHlsSupported && weHaveHls) {
-                                        return 'jshls';// We are hoping that we have some good browser
+                                    if (weHaveHls) {
+                                        if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
+                                            return 'native-hls';
+                                        }
+                                        if (jsHlsSupported) {
+                                            return 'jshls';// We are hoping that we have some good browser
+                                        }
+                                        if ($window.jscd.flashVersion) { // We have flash - try to play using flash
+                                            return 'flashls';
+                                        }
+                                        if ($window.jscd.os === 'Linux') {
+                                            scope.videoFlags.ubuntuNX = true;
+                                            return false;
+                                        }
                                     }
-                                    if ($window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
-                                        return 'flashls';
-                                    }
+                                    
                                     if (weHaveWebm && canPlayNatively('webm')) {
                                         return 'webm';
-                                    }
-                                    if (weHaveHls && $window.jscd.os === 'Linux') {
-                                        scope.videoFlags.ubuntuNX = true;
-                                        return false;
                                     }
                             }
                             
