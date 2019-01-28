@@ -230,6 +230,9 @@ void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()
     }
 
     layout::forgetPassword(layout);
+
+    // Clear "modified" flag from layout.
+    snapshotManager()->store(layout);
 }
 
 void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)

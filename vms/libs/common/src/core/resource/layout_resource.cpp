@@ -543,12 +543,24 @@ void QnLayoutResource::forgetPasswordForRecordings()
 {
     NX_ASSERT(isFile());
 
-    auto items = layoutResources();
+    const auto items = getItems();
+    const auto pool = resourcePool();
 
-    for(auto &item: items)
+    for (const auto& item : items)
     {
-        if (auto aviItem = item.objectCast<QnAviResource>())
-            aviItem->forgetPassword();
+        if (item.uuid.isNull()) // Check purpose unknown; copied from layoutResources().
+            continue;
+
+        if (auto resource = pool->getResourceByDescriptor(item.resource))
+        {
+            // Remove password from protected video streams.
+            if (auto aviItem = resource.objectCast<QnAviResource>())
+                aviItem->forgetPassword();
+
+            // Remove freshly added cameras from the layout.
+            if (auto cameraItem = resource.objectCast<QnVirtualCameraResource>())
+                removeItem(item);
+        }
     }
 }
 
