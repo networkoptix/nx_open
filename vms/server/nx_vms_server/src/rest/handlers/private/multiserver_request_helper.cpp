@@ -1,5 +1,7 @@
 #include "multiserver_request_helper.h"
 
+#include <network/universal_tcp_listener.h>
+
 namespace detail {
 
 void checkUpdateStatusRemotely(
@@ -70,6 +72,28 @@ QSet<QnMediaServerResourcePtr> allServers(QnCommonModule* commonModule)
     }
 
     return servers;
+}
+
+bool verifyPasswordOrSetError(
+    const QnRestConnectionProcessor* owner,
+    const QString& currentPassword,
+    QnJsonRestResult* result)
+{
+    if (currentPassword.isEmpty())
+    {
+        result->setError(QnJsonRestResult::CantProcessRequest, "currentPassword is required");
+        return false;
+    }
+
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+    const auto authResult = authenticator->verifyPassword(
+        owner->getForeignAddress().address, owner->accessRights(), currentPassword);
+
+    if (authResult == Qn::Auth_OK)
+        return true;
+
+    result->setError(QnJsonRestResult::CantProcessRequest, Qn::toErrorMessage(authResult));
+    return false;
 }
 
 } // namespace detail

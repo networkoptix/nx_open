@@ -82,4 +82,9 @@ void checkUpdateStatusRemotely(
     QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
+bool verifyPasswordOrSetError(
+    const QnRestConnectionProcessor* owner,
+    const QString& currentPassword,
+    QnJsonRestResult* result);
+
 } // namespace detail
