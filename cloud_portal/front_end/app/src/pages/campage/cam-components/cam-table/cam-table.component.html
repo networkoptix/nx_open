@@ -32,17 +32,19 @@
             <thead>
                 <tr *ngIf="results > 0">
                     <th *ngFor="let header of showHeaders"
-                        class="align-bottom"
+                        class="align-bottom position-relative"
                         [ngClass]="{'selectable' : isSortable(header)}"
                         (click)="toggleHeaderSort(header)">
 
-                        <div class="float-left">{{header}}</div>
-                        <div class="sort-dir nav-arrow position-relative float-left ml-3"
-                             *ngIf="header == selectedHeader && isSortable(header)"
-                             [ngClass]="{'up': !sortOrderASC}">
+                        <div class="d-flex">
+                            <div class="float-left">{{header}}</div>
+                            <div class="sort-dir nav-arrow position-relative float-left"
+                                 *ngIf="header == selectedHeader && isSortable(header)"
+                                 [ngClass]="{'up': !sortOrderASC}">
 
-                            <span></span>
-                            <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
                         </div>
                     </th>
                 </tr>

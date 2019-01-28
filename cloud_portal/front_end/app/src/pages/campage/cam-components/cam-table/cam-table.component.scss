@@ -65,6 +65,8 @@
       }
       
       .sort-dir {
+        right : auto;
+        
         &:after {
           content: ' ';
         }

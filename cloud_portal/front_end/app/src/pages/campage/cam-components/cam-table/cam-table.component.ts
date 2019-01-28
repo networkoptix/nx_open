@@ -86,7 +86,8 @@ export class CamTableComponent implements OnChanges, OnInit {
       this.sortables = [
           this.lang.vendor,
           this.lang.model,
-          this.lang.hardwareType
+          this.lang.hardwareType,
+          this.lang.maxResolution
       ];
   }
 
@@ -102,18 +103,29 @@ export class CamTableComponent implements OnChanges, OnInit {
 
     sortBy(fn) {
         return (a, b) => {
-            // if (this.sortOrderASC) {
-                // return -(fn(a) < fn(b)) || +(fn(a) > fn(b));
-                if (fn(a) < fn(b)) {
-                    return (this.sortOrderASC) ? -1 : 1;
-                }
-                if (fn(a) > fn(b)) {
-                    return (this.sortOrderASC) ? 1 : -1;
-                }
-                return 0;
-            // }
+            if (fn(a) < fn(b)) {
+                return (this.sortOrderASC) ? -1 : 1;
+            }
+            if (fn(a) > fn(b)) {
+                return (this.sortOrderASC) ? 1 : -1;
+            }
+            return 0;
+        };
+    }
 
-            // return +(fn(a) < fn(b)) || -(fn(a) > fn(b));
+    sortByResolution(fn) {
+        return (a, b) => {
+            const x = fn(a).map(Number);
+            const y = fn(b).map(Number);
+
+            if (x[0] < y[0] || x[1] < y[1]) {
+                return (this.sortOrderASC) ? -1 : 1;
+            }
+            if (x[0] > y[0] || x[1] > y[1]) {
+                return (this.sortOrderASC) ? 1 : -1;
+            }
+            return 0;
+
         };
     }
 
@@ -139,9 +151,17 @@ export class CamTableComponent implements OnChanges, OnInit {
     }
 
     toggleSort(param) {
-        const byParam = this.sortBy((elm) => {
-            return elm[param];
-        });
+        let byParam;
+
+        if (param === 'maxResolution') {
+            byParam = this.sortByResolution((elm) => {
+                return elm[param].split('x');
+            });
+        } else {
+            byParam = this.sortBy((elm) => {
+                return elm[param];
+            });
+        }
         this._elements.sort(byParam);
         this.setPage(1);
 
