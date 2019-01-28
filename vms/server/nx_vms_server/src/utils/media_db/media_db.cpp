@@ -154,6 +154,7 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
                     return true;
 
                 parsedData->cameras.emplace_back(camera);
+                break;
             }
             default:
                 NX_ASSERT(false, "Shold never be here");
