@@ -468,14 +468,14 @@ TEST_F(LogServer, streams_logs_by_adding_custom_logging_configuration)
     andLogStreamIsFetched();
 }
 
-TEST_F(LogServer, srejects_malformated_json_when_adding_logger_configuration)
+TEST_F(LogServer, rejects_malformed_json_when_adding_logger_configuration)
 {
     whenAddLoggingConfigurationWithMalformedJson();
 
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
-TEST_F(LogServer, server_rejects_logger_stream_request_with_malformed_query_string)
+TEST_F(LogServer, rejects_logger_stream_request_with_malformed_query_string)
 {
     whenRequestLogStreamWithMalformedQueryString();
 
