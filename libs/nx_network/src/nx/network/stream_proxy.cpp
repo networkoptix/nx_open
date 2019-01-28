@@ -261,17 +261,17 @@ void StreamProxyChannel::setUpStreamConverter(
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter)
 {
     m_upStreamConverter = std::move(converter);
-    m_converter.setOutputConverter(m_upStreamConverter.get());
+    m_upStreamConverterAdapter =
+        std::make_unique<nx::utils::bstream::OutputConverterToInputAdapter>(
+            m_upStreamConverter.get());
+    m_converter.setInputConverter(m_upStreamConverterAdapter.get());
 }
 
 void StreamProxyChannel::setDownStreamConverter(
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> converter)
 {
     m_downStreamConverter = std::move(converter);
-    m_downStreamConverterAdapter =
-        std::make_unique<nx::utils::bstream::OutputConverterToInputAdapter>(
-            m_downStreamConverter.get());
-    m_converter.setInputConverter(m_downStreamConverterAdapter.get());
+    m_converter.setOutputConverter(m_downStreamConverter.get());
 }
 
 void StreamProxyChannel::start(ProxyCompletionHandler completionHandler)
