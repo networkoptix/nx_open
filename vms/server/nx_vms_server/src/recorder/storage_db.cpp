@@ -525,7 +525,9 @@ void QnStorageDb::putRecordsToCatalog(
         (QnServer::ChunksCatalog) catalogIndex,
         QnServer::StoragePool::None));
     std::sort(chunks.begin(), chunks.end());
+
     newFileCatalog->assignChunksUnsafe(chunks.begin(), chunks.end());
+    deviceFileCatalog->push_back(newFileCatalog);
 }
 
 DeviceFileCatalog::Chunk QnStorageDb::toChunk(
@@ -552,8 +554,6 @@ void QnStorageDb::processDbContent(
         uuidToHash.insert(UuidToHash::value_type(
             cameraData.getCameraUniqueId(), cameraData.getCameraId()));
     }
-
-    parsedData.header.serialize(writer);
 
     for (const auto& camera : parsedData.cameras)
         camera.serialize(writer);

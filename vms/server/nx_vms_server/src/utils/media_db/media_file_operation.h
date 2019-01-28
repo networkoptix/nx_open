@@ -62,6 +62,11 @@ struct MediaFileOperation: RecordBase
         part2 |= (quint64)duration & getBitMask(0x10);
     }
 
+    bool isClearWholeCatalogOperation() const
+    {
+        return getStartTime() == -1;
+    }
+
     int getTimeZone() const
     {
         bool isPositive = ((part2 >> 0x10) & 0x1) == 0;

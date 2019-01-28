@@ -121,8 +121,17 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
 
                 const auto operation = MediaFileOperation(rb.part1, reader.readUint64());
                 int index = operation.getCameraId() * 2 + operation.getCatalog();
-                auto& container = parsedData->removeRecords[index];
-                container.emplace_back(operation.getHashInCatalog());
+
+                if (operation.isClearWholeCatalogOperation())
+                {
+                    parsedData->removeRecords[index].clear();
+                    parsedData->addRecords[index].clear();
+                }
+                else
+                {
+                    auto& container = parsedData->removeRecords[index];
+                    container.emplace_back(operation.getHashInCatalog());
+                }
                 break;
             }
             case RecordType::FileOperationAdd:
