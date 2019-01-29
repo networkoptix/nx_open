@@ -50,6 +50,7 @@ struct Http
     std::vector<network::SocketAddress> addrToListenList;
     std::optional<network::KeepAliveOptions> keepAliveOptions;
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    std::string maintenanceHtdigestPath;
 };
 
 struct Https
@@ -137,6 +138,7 @@ private:
     void loadConnectionParameters();
     void loadTrafficRelay();
     void loadListeningPeer();
+    void loadHttp();
     void loadHttps();
 };
 
