@@ -68,7 +68,6 @@ QnStorageDb::QnStorageDb(
     m_vacuumInterval(vacuumInterval)
 {
     using namespace nx::media_db;
-    std::cout << "VACUUM INTERVAL:" << vacuumInterval.count() << std::endl;
     m_timer.start(
         m_vacuumInterval,
         [this]() { startVacuum([this](bool success) { onVacuumFinished(success); }); });
