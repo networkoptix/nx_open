@@ -40,19 +40,20 @@ bool NodeViewInvalidDeviceFilterModel::filterAcceptsRow(
         auto hasOnlyInvalidChildren =
             [](const QModelIndex& index)
             {
-                if (index.model()->rowCount(index) == 0)
+                auto model = index.model();
+
+                if (model->rowCount(index) == 0)
                     return false;
 
-                QModelIndexList childIndexes;
-                for (int r = 0; r < index.model()->rowCount(index); ++r)
+                for (int row = 0; row < model->rowCount(index); ++row)
                 {
-                    childIndexes.append(index.model()->index(
-                        r, ResourceNodeViewColumn::resourceNameColumn, index));
+                    auto childIndex =
+                        model->index(row, ResourceNodeViewColumn::resourceNameColumn, index);
+                    if (isValidNode(childIndex))
+                        return false;
                 }
-
-                return std::all_of(childIndexes.cbegin(), childIndexes.cend(),
-                    [](const QModelIndex& childIndex) { return !isValidNode(childIndex); });
-            };
+                return true;
+        };
 
         if (!isValidNode(sourceIndex) || hasOnlyInvalidChildren(sourceIndex))
             return false;
