@@ -6,10 +6,24 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
 
-
-QnStorageDbPool::QnStorageDbPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
+    start();
+}
+
+QnStorageDbPool::~QnStorageDbPool()
+{
+    stop();
+}
+
+void QnStorageDbPool::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    {
+        QnMutexLocker lock(&m_sdbMutex);
+        m_tasksWaitCondition.wakeOne();
+    }
 }
 
 QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
@@ -21,9 +35,9 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
     {
         if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile))
         {
-            NX_LOG(lit("%1 Storage %2 is not writable. Can't create storage DB file.")
+            NX_WARNING(this, lit("%1 Storage %2 is not writable. Can't create storage DB file.")
                     .arg(Q_FUNC_INFO)
-                    .arg(storage->getUrl()), cl_logWARNING);
+                    .arg(storage->getUrl()));
             return sdb;
         }
         QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
@@ -32,14 +46,14 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             closeDirPath(dbPath) +
             QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
-        sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+        sdb = QnStorageDbPtr(new QnStorageDb(serverModule(), storage, getStorageIndex(storage)));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }
         else {
-            NX_LOG(lit("%1 Storage DB file %2 open failed.")
+            NX_WARNING(this, lit("%1 Storage DB file %2 open failed.")
                     .arg(Q_FUNC_INFO)
-                    .arg(fileName), cl_logWARNING);
+                    .arg(fileName));
             return QnStorageDbPtr();
         }
     }
@@ -57,7 +71,8 @@ int QnStorageDbPool::getStorageIndex(const QnStorageResourcePtr& storage)
     {
         return *m_storageIndexes.value(path).begin();
     }
-    else {
+    else
+    {
         int index = -1;
         for (const QSet<int>& indexes: m_storageIndexes.values())
         {
@@ -76,12 +91,28 @@ void QnStorageDbPool::removeSDB(const QnStorageResourcePtr &storage)
     m_chunksDB.remove(storage->getUrl());
 }
 
-void QnStorageDbPool::flush()
+void QnStorageDbPool::run()
 {
-    QnMutexLocker lock( &m_sdbMutex );
-    for(const QnStorageDbPtr& sdb: m_chunksDB.values())
+    QnMutexLocker lock(&m_tasksMutex);
+    while (!m_needStop)
     {
-        if (sdb)
-            sdb->flushRecords();
+        while (!needToStop() && m_tasksQueue.empty())
+            m_tasksWaitCondition.wait(&m_tasksMutex);
+
+        if (m_needStop)
+            return;
+
+        const auto vacuumTask = std::move(m_tasksQueue.front());
+        m_tasksQueue.pop();
+        lock.unlock();
+        vacuumTask();
+        lock.relock();
     }
+}
+
+void QnStorageDbPool::addVacuumTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
+{
+    QnMutexLocker lock(&m_tasksMutex);
+    m_tasksQueue.push(std::move(vacuumTask));
+    m_tasksWaitCondition.wakeOne();
 }

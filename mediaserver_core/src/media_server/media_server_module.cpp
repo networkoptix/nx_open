@@ -126,7 +126,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
-    store(new QnStorageDbPool(commonModule()));
+    m_storageDbPool = store(new QnStorageDbPool(this));
 
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
@@ -259,6 +259,11 @@ nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersW
 nx::mediaserver::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
 {
     return m_licenseWatcher;
+}
+
+QnStorageDbPool* QnMediaServerModule::storageDbPool() const
+{
+    return m_storageDbPool;
 }
 
 PluginManager* QnMediaServerModule::pluginManager() const
