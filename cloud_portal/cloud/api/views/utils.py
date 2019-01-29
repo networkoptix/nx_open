@@ -17,6 +17,16 @@ from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProd
 logger = logging.getLogger(__name__)
 
 
+def get_sorting_supported_devices():
+    return DataStructure.objects.get(name="%SORT_SUPPORTED_DEVICES%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_suported_resolutions():
+    return DataStructure.objects.get(name="%SUPPORTED_RESOLUTIONS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
 def get_public_downloads_status():
     return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
         find_actual_value(product=get_cloud_portal_product())
@@ -230,6 +240,8 @@ def get_settings(request):
     settings_object = {
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
         'publicDownloads': get_public_downloads_status(),
-        'publicReleases': get_public_release_history_status()
+        'publicReleases': get_public_release_history_status(),
+        'sortSupportedDevices': get_sorting_supported_devices(),
+        'supportedResolutions': get_suported_resolutions()
     }
     return Response(settings_object)

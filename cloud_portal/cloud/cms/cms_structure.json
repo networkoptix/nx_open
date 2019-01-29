@@ -467,7 +467,7 @@
           },
           {
             "label": "Supported Resolutions",
-            "name": "%SUPPORTED_RESOLUTION%",
+            "name": "%SUPPORTED_RESOLUTIONS%",
             "description": "Supported resolutions.",
             "advanced": true,
             "type": "select",
