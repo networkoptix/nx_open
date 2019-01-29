@@ -14,7 +14,6 @@ using namespace nx::cloud::relay;
 
 namespace detail {
 
-// TODO: #ak Replace this class with something more general.
 class ServerSideReverseStreamSocket:
     public StreamSocketDelegate
 {
