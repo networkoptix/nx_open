@@ -457,11 +457,8 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     if (m_contentBase.isEmpty())
         m_contentBase = m_url.toString(); // TODO remove url params?
 
-    if( result )
-    {
-        NX_DEBUG(this, lit("Sucessfully opened RTSP stream %1")
-                .arg(m_url.toString(QUrl::RemovePassword)));
-    }
+    if (result)
+        NX_DEBUG(this, "Sucessfully opened RTSP stream %1", m_url.toString(QUrl::RemovePassword));
 
     return result;
 }
