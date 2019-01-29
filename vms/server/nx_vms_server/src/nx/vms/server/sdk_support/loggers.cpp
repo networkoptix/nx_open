@@ -7,7 +7,7 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/placeholder_binder.h>
-#include <nx/sdk/common/to_string.h>
+#include <nx/sdk/helpers/to_string.h>
 
 namespace nx::vms::server::sdk_support {
 

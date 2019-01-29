@@ -395,10 +395,14 @@ int QnMediaServerConnection::sendAsyncGetRequestLogged(
     const QnRequestParamList& params,
     const char* replyTypeName,
     QObject* target,
-    const char* slot)
+    const char* slot,
+    std::optional<std::chrono::milliseconds> timeout)
 {
-    int handle = sendAsyncGetRequest(object, params, replyTypeName, target, slot);
-    trace(handle, object);
+    int handle = sendAsyncGetRequest(object, params, replyTypeName, target, slot, timeout);
+
+    trace(handle, object, lm("GET %1 with timeout %2").args(
+        replyTypeName, timeout ? *timeout : std::chrono::milliseconds{0}));
+
     return handle;
 }
 
@@ -409,12 +413,15 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
     const QByteArray& data,
     const char* replyTypeName,
     QObject* target,
-    const char* slot)
+    const char* slot,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     int handle = sendAsyncPostRequest(
-        object, std::move(headers), params, data, replyTypeName, target, slot);
+        object, std::move(headers), params, data, replyTypeName, target, slot, timeout);
 
-    trace(handle, object);
+    trace(handle, object, lm("POST %1 with timeout %2").args(
+        replyTypeName, timeout ? *timeout : std::chrono::milliseconds{0}));
+
     return handle;
 }
 
@@ -466,7 +473,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(
 int QnMediaServerConnection::getParamsAsync(
     const QnNetworkResourcePtr& camera, const QStringList& keys, QObject* target, const char* slot)
 {
-    NX_ASSERT(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+    NX_ASSERT(!keys.isEmpty(), "parameter names should be provided");
 
     QnRequestParamList params;
     params << QnRequestParam("cameraId", camera->getId());
@@ -481,7 +488,7 @@ int QnMediaServerConnection::setParamsAsync(
     const QnNetworkResourcePtr& camera, const QnCameraAdvancedParamValueList& values,
     QObject* target, const char* slot)
 {
-    NX_ASSERT(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+    NX_ASSERT(!values.isEmpty(), "parameter names should be provided");
 
     QnRequestParamList params;
     params << QnRequestParam("cameraId", camera->getId());
@@ -1123,9 +1130,10 @@ int QnMediaServerConnection::testLdapSettingsAsync(
 {
     nx::network::http::HttpHeaders headers;
     headers.emplace(nx::network::http::header::kContentType, "application/json");
+    std::chrono::seconds timeout(settings.searchTimeoutS);
     return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
         QnRequestParamList(), QJson::serialized(settings),
-        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
+        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

@@ -1,6 +1,7 @@
 #include "device_agent_handler.h"
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 
 #include <nx/vms/event/events/plugin_event.h>
@@ -9,7 +10,7 @@
 
 #include <nx/vms/server/event/event_connector.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 
 #include <utils/common/synctime.h>
 
@@ -30,16 +31,11 @@ DeviceAgentHandler::DeviceAgentHandler(
         Qt::QueuedConnection);
 
     m_metadataHandler.setResource(m_device);
-    m_metadataHandler.setPluginId(m_engineResource->plugin()->manifest().id);
+    m_metadataHandler.setEngineId(m_engineResource->getId());
 
-    const auto descriptorListManager = serverModule
-        ->commonModule()
-        ->analyticsDescriptorListManager();
-
-    auto eventDescriptors = descriptorListManager
-        ->deviceDescriptors<nx::vms::api::analytics::EventTypeDescriptor>(m_device);
-
-    m_metadataHandler.setEventTypeDescriptors(eventDescriptors);
+    nx::analytics::EventTypeDescriptorManager descriptorManager(serverModule->commonModule());
+    m_metadataHandler.setEventTypeDescriptors(
+        descriptorManager.supportedEventTypeDescriptors(m_device));
 }
 
 void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket)
@@ -52,11 +48,11 @@ void DeviceAgentHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent
     nx::vms::event::PluginEventPtr pluginEvent(
         new nx::vms::event::PluginEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
-            m_engineResource->getId(),
+            m_engineResource,
             sdkPluginEvent->caption(),
             sdkPluginEvent->description(),
             nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),
-            {m_device->getId().toString()}));
+            m_device));
 
     emit pluginEventTriggered(pluginEvent);
 }

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
-#include <nx/utils/elapsed_timer.h>
 
 #include "metadata_monitor.h"
 #include "common.h"

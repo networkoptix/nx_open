@@ -1,7 +1,6 @@
 #pragma once
 
 #include "abstract_stream_consumer.h"
-#include "abstract_video_consumer.h"
 
 #include <condition_variable>
 #include <mutex>
@@ -10,8 +9,7 @@
 #include <vector>
 #include <map>
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 //-------------------------------------------------------------------------------------------------
 // TimeStampedBuffer
@@ -117,7 +115,7 @@ public:
             return false;
         return true;// < Timespan condition was satisfied
     }
-    
+
     std::chrono::milliseconds timespan() const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -167,7 +165,7 @@ protected:
         }
         else
         {
-            m_wait.wait( 
+            m_wait.wait(
                 lock,
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }
@@ -190,18 +188,12 @@ protected:
 //-------------------------------------------------------------------------------------------------
 // BufferedPacketConsumer
 
-class BufferedPacketConsumer:
-    public AbstractVideoConsumer,
-    public AbstractPacketConsumer
+class BufferedPacketConsumer: public AbstractPacketConsumer
 {
 public:
-    BufferedPacketConsumer(
-        const std::weak_ptr<VideoStream>& streamReader,
-        const CodecParameters& params);
-
     void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
     void flush();
-    
+
     std::shared_ptr<ffmpeg::Packet> popOldest(
         const std::chrono::milliseconds& timeout = std::chrono::milliseconds(0));
 
@@ -222,20 +214,15 @@ public:
 
 private:
     TimeStampedBuffer<std::shared_ptr<ffmpeg::Packet>> m_buffer;
-    std::atomic_bool m_dropUntilNextVideoKeyPacket = false;
+    std::atomic_bool m_dropUntilNextVideoKeyPacket = true;
 };
 
 //-------------------------------------------------------------------------------------------------
 // BufferedVideoFrameConsumer
 
-class BufferedVideoFrameConsumer:
-    public AbstractVideoConsumer,
-    public AbstractFrameConsumer
+class BufferedVideoFrameConsumer: public AbstractFrameConsumer
 {
 public:
-    BufferedVideoFrameConsumer(
-        const std::weak_ptr<VideoStream>& streamReader,
-        const CodecParameters& params);
 
     virtual void flush() override;
     virtual void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame) override;
@@ -257,5 +244,4 @@ private:
     TimeStampedBuffer<std::shared_ptr<ffmpeg::Frame>> m_buffer;
 };
 
-} //namespace usb_cam
-} //namespace nx
+} // namespace nx::usb_cam

@@ -376,19 +376,24 @@ void QnLicenseManagerWidget::updateLicenses()
 
                 if (helper->isValid(lt))
                 {
-                    messages << tr("%1 are currently in use", "", used)
+                    messages << tr("%1 are currently in use",
+                        "Text like '6 Profesional Licenses' will be substituted",
+                        used)
                         .arg(QnLicense::displayText(lt, used));
                 }
                 else
                 {
                     const int required = helper->requiredLicenses(lt);
-                    messages << setWarningStyleHtml(tr("At least %1 are required", "", required)
+                    messages << setWarningStyleHtml(
+                        tr("At least %1 are required",
+                            "Text like '6 Profesional Licenses' will be substituted",
+                            required)
                         .arg(QnLicense::displayText(lt, required)));
                 }
             }
         }
 
-        ui->infoLabel->setText(messages.join(lit("<br/>")));
+        ui->infoLabel->setText(messages.join("<br/>"));
     }
 
     updateButtons();
@@ -666,7 +671,7 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 
     static const auto kWarningText = tr("Every license can be deactivated only a few times.");
     const auto warningColor = nx::vms::client::desktop::ColorTheme::instance()->color("red_l2").name();
-    const auto warningText = tr("<font color = \"%1\">%2</font>")
+    const auto warningText = QString("<font color = \"%1\">%2</font>")
         .arg(warningColor, kWarningText);
     extras.push_back(warningText);
 

@@ -7,10 +7,10 @@
 #define NX_PRINT_PREFIX "[hanwha::DeviceAgent] "
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log.h>
 
 #include "common.h"
@@ -50,13 +50,13 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
     return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->eventTypeIds()->count() == 0)
     {
@@ -67,59 +67,59 @@ nx::sdk::Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadat
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
+Error DeviceAgent::startFetchingMetadata(
+    const IMetadataTypes* /*metadataTypes*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
         {
             using namespace std::chrono;
-            auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+            auto eventMetadataPacket = new EventMetadataPacket();
 
             for (const auto& hanwhaEvent: events)
             {
-                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
+                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channelNumber)
                     return;
 
-                auto event = new nx::sdk::analytics::common::Event();
+                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
                 NX_PRINT
                     << "Got event: caption ["
                     << hanwhaEvent.caption.toStdString() << "], description ["
                     << hanwhaEvent.description.toStdString() << "], "
-                    << "channel " << m_channel;
+                    << "channel " << m_channelNumber;
 
                 NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
-                    hanwhaEvent.caption, hanwhaEvent.description, m_channel));
+                    hanwhaEvent.caption, hanwhaEvent.description, m_channelNumber));
 
-                event->setTypeId(hanwhaEvent.typeId.toStdString());
-                event->setCaption(hanwhaEvent.caption.toStdString());
-                event->setDescription(hanwhaEvent.caption.toStdString());
-                event->setIsActive(hanwhaEvent.isActive);
-                event->setConfidence(1.0);
-                event->setAuxiliaryData(hanwhaEvent.fullEventName.toStdString());
+                eventMetadata->setTypeId(hanwhaEvent.typeId.toStdString());
+                eventMetadata->setCaption(hanwhaEvent.caption.toStdString());
+                eventMetadata->setDescription(hanwhaEvent.caption.toStdString());
+                eventMetadata->setIsActive(hanwhaEvent.isActive);
+                eventMetadata->setConfidence(1.0);
+                eventMetadata->setAuxiliaryData(hanwhaEvent.fullEventName.toStdString());
 
-                packet->setTimestampUs(
+                eventMetadataPacket->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
-                packet->setDurationUs(-1);
-                packet->addItem(event);
+                eventMetadataPacket->setDurationUs(-1);
+                eventMetadataPacket->addItem(eventMetadata);
             }
 
             NX_ASSERT(m_handler, "Handler should exist");
             if (m_handler)
-                m_handler->handleMetadata(packet);
+                m_handler->handleMetadata(eventMetadataPacket);
 
-            packet->releaseRef();
+            eventMetadataPacket->releaseRef();
         };
 
     NX_ASSERT(m_engine);
@@ -154,19 +154,19 @@ const IString* DeviceAgent::manifest(Error* error) const
     }
 
     *error = Error::noError;
-    return new nx::sdk::common::String(m_deviceAgentManifest);
+    return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
-    m_url = deviceInfo.url;
-    m_model = deviceInfo.model;
-    m_firmware = deviceInfo.firmware;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
-    m_uniqueId = deviceInfo.uid;
-    m_sharedId = deviceInfo.sharedId;
-    m_channel = deviceInfo.channel;
+    m_url = deviceInfo->url();
+    m_model = deviceInfo->model();
+    m_firmware = deviceInfo->firmware();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
+    m_uniqueId = deviceInfo->id();
+    m_sharedId = deviceInfo->sharedId();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

@@ -366,6 +366,11 @@ QRect QnLayoutResource::backgroundRect(const QSize& backgroundSize)
     return QRect(-left, -top, backgroundSize.width(), backgroundSize.height());
 }
 
+bool QnLayoutResource::hasBackground() const
+{
+    return !backgroundImageFilename().isEmpty();
+}
+
 /********* Background image id property **********/
 QString QnLayoutResource::backgroundImageFilename() const
 {
@@ -545,4 +550,19 @@ void QnLayoutResource::forgetPasswordForRecordings()
         if (auto aviItem = item.objectCast<QnAviResource>())
             aviItem->forgetPassword();
     }
+}
+
+// The one who requests to remove this function will become a permanent maintainer of this class.
+void QnLayoutResource::dumpStructure() const
+{
+    auto items = layoutResources();
+
+    qDebug() << "Layout Url:" << getUrl() << "ID:" << getId() << "UniqueID:" << getUniqueId();
+
+    for(auto &item: items)
+    {
+        qDebug() << "  Item Resource URL:" << item->getUrl() << "ID:" << item->getId()
+            << "UniqueId:" << item->getId();
+    }
+
 }

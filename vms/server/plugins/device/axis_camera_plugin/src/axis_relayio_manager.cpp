@@ -85,12 +85,12 @@ void* AxisRelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int AxisRelayIOManager::addRef()
+int AxisRelayIOManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int AxisRelayIOManager::releaseRef()
+int AxisRelayIOManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

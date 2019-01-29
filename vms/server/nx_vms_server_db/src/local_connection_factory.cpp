@@ -209,6 +209,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
+    /**%apidoc[proprietary] GET /ec2/getSystemMergeHistory
+     * Return information about previous system merges.
+     */
+    regGet<std::nullptr_t, SystemMergeHistoryRecordList>(p, ApiCommand::getSystemMergeHistory);
+
     /**%apidoc[proprietary] POST /ec2/setResourceStatus
      * Change a resource status.
      * <p>
@@ -1417,7 +1422,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
-     * %param cellSpacing Cell spacing between layout items as percent of an item's size
+     * %param cellSpacing Cell spacing between layout items as a share of an item's size
      *     (floating-point, 0..1).
      * %param items List of the layout items.
      *     %param items[].id Item unique id. Can be omitted when creating a new object.
@@ -1497,7 +1502,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
-     * %param cellSpacing Cell spacing between layout items as percent of an item's size
+     * %param cellSpacing Cell spacing between layout items as a share of an item's size
      *     (floating-point, 0..1).
      * %param items List of the layout items.
      *     %param items[].id Item unique id. Can be omitted when creating a new object.

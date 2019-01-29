@@ -83,6 +83,8 @@ private:
     int m_offset = -1;
 
     QnClientVideoCamera* m_currentCamera = nullptr;
+
+    bool m_isExportToExe = false;
 };
 
 } // namespace nx::vms::client::desktop

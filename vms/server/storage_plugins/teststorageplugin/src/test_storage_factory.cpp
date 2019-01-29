@@ -26,12 +26,12 @@ std::string getAppDir()
 
 #if defined (_WIN32)
 
-	TCHAR tBuf[512];
+    TCHAR tBuf[512];
     int bytes = GetModuleFileName(NULL, tBuf, 512);
     if (bytes == 0)
         return result;
     char separator = '\\';
-	WideCharToMultiByte(CP_UTF8, 0, tBuf, 512, buf, 512, 0, 0);
+    WideCharToMultiByte(CP_UTF8, 0, tBuf, 512, buf, 512, 0, 0);
 
 #elif defined (__linux__)
 
@@ -124,9 +124,9 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
 
     /* parse config json */
     utils::VfsPair vfsPair;
-    if (!utils::buildVfsFromJson(configContent.c_str(), 
-                                 parsedUrl.path().empty() ? "/" : parsedUrl.path().c_str(), 
-                                 &vfsPair))
+    if (!utils::buildVfsFromJson(configContent.c_str(),
+        parsedUrl.path().empty() ? "/" : parsedUrl.path().c_str(),
+        &vfsPair))
     {
         if (vfsPair.root)
             FsStubNode_remove(vfsPair.root);
@@ -144,7 +144,7 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
 }
 
 nx_spl::Storage* TestStorageFactory::createStorageImpl(
-    const utils::VfsPair& vfsPair, 
+    const utils::VfsPair& vfsPair,
     const utils::Url& url)
 {
     return new TestStorage(vfsPair, url.scheme() + "://" + url.host(),
@@ -198,12 +198,12 @@ void* TestStorageFactory::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int TestStorageFactory::addRef()
+int TestStorageFactory::addRef() const
 {
     return pAddRef();
 }
 
-unsigned int TestStorageFactory::releaseRef()
+int TestStorageFactory::releaseRef() const
 {
     return pReleaseRef();
 }

@@ -6,18 +6,13 @@
 #include <nx/kit/test.h>
 #include <nx/kit/debug.h>
 
-using namespace nx::kit;
-
 #undef NX_DEBUG_INI
 #define NX_DEBUG_INI ini.
 
-TEST(debug, unalignedPtr)
-{
-    char data[1024];
-    uint8_t* ptr = debug::unalignedPtr(&data);
-    intptr_t ptrInt = (intptr_t) ptr;
-    ASSERT_TRUE(ptrInt % 32 != 0);
-}
+namespace nx {
+namespace kit {
+namespace debug {
+namespace test {
 
 TEST(debug, enabledOutput)
 {
@@ -55,13 +50,13 @@ TEST(debug, overrideStreamStatic)
 {
     std::ostringstream stringStream;
 
-    std::ostream* const oldStream = debug::stream();
-    debug::stream() = &stringStream;
+    std::ostream* const oldStream = stream();
+    stream() = &stringStream;
 
     NX_PRINT << "TEST";
 
-    debug::stream() = oldStream;
-    ASSERT_EQ("[" + debug::fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
+    stream() = oldStream;
+    ASSERT_EQ("[" + fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
 }
 
 TEST(debug, overrideStreamPreproc)
@@ -78,9 +73,9 @@ TEST(debug, overrideStreamPreproc)
 
     // Restore default stream.
     #undef NX_DEBUG_STREAM
-    #define NX_DEBUG_STREAM *nx::kit::debug::stream()
+    #define NX_DEBUG_STREAM *stream()
 
-    ASSERT_EQ("[" + debug::fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
+    ASSERT_EQ("[" + fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
 }
 
 TEST(debug, assertSuccess)
@@ -102,7 +97,7 @@ TEST(debug, assertFailureInRelease)
     NX_KIT_ASSERT(condition);
 }
 
-TEST(debug, show)
+TEST(debug, printValue)
 {
     const char charValue = 'z';
     NX_PRINT_VALUE(charValue);
@@ -188,62 +183,21 @@ TEST(debug, disabledTime)
     NX_TIME_END(testTag);
 }
 
-TEST(debug, toString_string)
-{
-    ASSERT_STREQ("\"abc\"", nx::kit::debug::toString(std::string("abc")));
-}
-
-TEST(debug, toString_ptr)
-{
-    ASSERT_STREQ("null", nx::kit::debug::toString((const void*) nullptr));
-}
-
-TEST(debug, toString_bool)
-{
-    ASSERT_STREQ("true", nx::kit::debug::toString(true));
-    ASSERT_STREQ("false", nx::kit::debug::toString(false));
-}
-
-TEST(debug, toString_number)
-{
-    ASSERT_STREQ("42", nx::kit::debug::toString(42));
-    ASSERT_STREQ("3.14", nx::kit::debug::toString(3.14));
-}
-
-TEST(debug, toString_char)
-{
-    ASSERT_STREQ("'C'", nx::kit::debug::toString('C'));
-    ASSERT_STREQ(R"('\'')", nx::kit::debug::toString('\''));
-    ASSERT_STREQ(R"('\xFF')", nx::kit::debug::toString('\xFF'));
-}
-
-TEST(debug, toString_char_ptr)
-{
-    ASSERT_STREQ("\"str\"", nx::kit::debug::toString("str"));
-    ASSERT_STREQ("\"str\\\"with_quote\"", nx::kit::debug::toString("str\"with_quote"));
-    ASSERT_STREQ(R"("str\\with_backslash")", nx::kit::debug::toString("str\\with_backslash"));
-    ASSERT_STREQ(R"("str\twith_tab")", nx::kit::debug::toString("str\twith_tab"));
-    ASSERT_STREQ(R"("str\nwith_newline")", nx::kit::debug::toString("str\nwith_newline"));
-    ASSERT_STREQ(R"("str\x7Fwith_127")", nx::kit::debug::toString("str\x7Fwith_127"));
-    ASSERT_STREQ(R"("str\x1Fwith_31")", nx::kit::debug::toString("str\x1Fwith_31"));
-    ASSERT_STREQ(R"("str\xFFwith_255")", nx::kit::debug::toString("str\xFFwith_255"));
-}
-
 /**
- * Call debug::pathSeparator(), converting its argument to use platform-dependent
+ * Call pathSeparator(), converting its argument to use platform-dependent
  * slashes, and its result to use forward slashes.
  * @param file Path with either back or forward slashes.
  */
-static std::string relativeSrcFilename(const std::string& file)
+static std::string relativeSrcFilenameTest(const std::string& file)
 {
-    ASSERT_TRUE(debug::pathSeparator() != '\0');
+    ASSERT_TRUE(pathSeparator() != '\0');
 
     std::string platformDependentFile = file;
     std::replace(platformDependentFile.begin(), platformDependentFile.end(),
-        '/', debug::pathSeparator());
+        '/', pathSeparator());
 
     const char* const filePtr = platformDependentFile.c_str();
-    const char* r = debug::relativeSrcFilename(filePtr);
+    const char* r = relativeSrcFilename(filePtr);
 
     // Test that the returned pointer points inside the string supplied to the function.
     bool pointsInside = false;
@@ -258,8 +212,7 @@ static std::string relativeSrcFilename(const std::string& file)
     ASSERT_TRUE(pointsInside);
 
     std::string result = r;
-    std::replace(result.begin(), result.end(),
-        debug::pathSeparator(), '/');
+    std::replace(result.begin(), result.end(), pathSeparator(), '/');
     return result;
 }
 
@@ -272,12 +225,12 @@ static bool stringEndsWithSuffix(const std::string& str, const std::string& suff
 
 static std::string thisFileFolder()
 {
-    ASSERT_TRUE(debug::pathSeparator() != '\0');
+    ASSERT_TRUE(pathSeparator() != '\0');
     const char* const file = __FILE__;
-    const char* const separator2 = strrchr(file, debug::pathSeparator());
+    const char* const separator2 = strrchr(file, pathSeparator());
     ASSERT_TRUE(separator2 != nullptr);
     const char* afterSeparator1 = separator2;
-    while (afterSeparator1 > file && *(afterSeparator1 - 1) != debug::pathSeparator())
+    while (afterSeparator1 > file && *(afterSeparator1 - 1) != pathSeparator())
         --afterSeparator1;
     // afterSeparator1 points after the previous separator or at the beginning of file.
     return std::string(afterSeparator1, separator2 - afterSeparator1);
@@ -295,22 +248,27 @@ static std::string thisFileExt()
 TEST(debug, relativeSrcFilename)
 {
     static const std::string kIrrelevantPath = "irrelevant/path/and/file.cpp";
-    ASSERT_EQ(kIrrelevantPath, relativeSrcFilename(kIrrelevantPath));
+    ASSERT_EQ(kIrrelevantPath, relativeSrcFilenameTest(kIrrelevantPath));
 
     static const std::string kAnyEnding = "nx/any/ending/file.cpp";
-    ASSERT_EQ(kAnyEnding, relativeSrcFilename("/any/starting/src/" + kAnyEnding));
+    ASSERT_EQ(kAnyEnding, relativeSrcFilenameTest("/any/starting/src/" + kAnyEnding));
 
     // debug.cpp: <commonPrefix>src/nx/kit/debug.cpp
     // __FILE__:  <commonPrefix>unit_tests/src/debug_ut.cpp
     //            <commonPrefix>toBeOmitted/dir/file.cpp
 
     std::string thisFile = __FILE__;
-    std::replace(thisFile.begin(), thisFile.end(), debug::pathSeparator(), '/');
+    std::replace(thisFile.begin(), thisFile.end(), pathSeparator(), '/');
 
     static const std::string suffix =
-        thisFileFolder() + "/" + debug::fileBaseNameWithoutExt(__FILE__) + "." + thisFileExt();
+        thisFileFolder() + "/" + fileBaseNameWithoutExt(__FILE__) + "." + thisFileExt();
     ASSERT_TRUE(stringEndsWithSuffix(thisFile, suffix));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());
-    ASSERT_EQ("dir/file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
+    ASSERT_EQ("dir/file.cpp", relativeSrcFilenameTest(commonPrefix + "dir/file.cpp"));
 }
+
+} // namespace test
+} // namespace debug
+} // namespace kit
+} // namespace nx

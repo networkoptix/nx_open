@@ -2,9 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 using namespace nx::sdk::analytics;
 
@@ -35,12 +33,8 @@ void* Yuv420UncompressedVideoFrame::queryInterface(const nxpl::NX_GUID& interfac
 
 bool Yuv420UncompressedVideoFrame::validatePlane(int plane) const
 {
-    if (plane >= planeCount())
-    {
-        NX_ASSERT(false, lm("Requested plane %1 of %2").args(plane, planeCount()));
-        return false;
-    }
-    return true;
+    return NX_ASSERT(plane >= 0 && plane < planeCount(),
+        lm("Requested plane %1 of %2").args(plane, planeCount()));
 }
 
 int Yuv420UncompressedVideoFrame::dataSize(int plane) const
@@ -80,6 +74,4 @@ int Yuv420UncompressedVideoFrame::lineSize(int plane) const
     return m_frame->linesize[plane];
 }
 
-} // namespace analytics
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

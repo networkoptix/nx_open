@@ -17,7 +17,7 @@ QByteArray Qn::roleName(int role)
         case IpAddressRole:
             return "ipAddress";
         default:
-            NX_ASSERT(0, "Unsupported role", Q_FUNC_INFO);
+            NX_ASSERT(0, "Unsupported role");
     }
     return QByteArray();
 }

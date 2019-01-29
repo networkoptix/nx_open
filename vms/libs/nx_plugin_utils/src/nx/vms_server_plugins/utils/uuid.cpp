@@ -6,33 +6,31 @@
     #include <arpa/inet.h>
 #endif
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/log/assert.h>
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 namespace nx {
 namespace vms_server_plugins {
 namespace utils {
 
-QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
+QnUuid fromSdkUuidToQnUuid(const nx::sdk::Uuid& guid)
 {
     return QnUuid(QUuid(
-        ntohl(*((unsigned int*) guid.bytes)),
-        ntohs(*((unsigned short*) (guid.bytes + 4))),
-        ntohs(*((unsigned short*) (guid.bytes + 6))),
-        guid.bytes[8],
-        guid.bytes[9],
-        guid.bytes[10],
-        guid.bytes[11],
-        guid.bytes[12],
-        guid.bytes[13],
-        guid.bytes[14],
-        guid.bytes[15]));
+        ntohl(*((unsigned int*) &guid[0])),
+        ntohs(*((unsigned short*) (&guid[4]))),
+        ntohs(*((unsigned short*) (&guid[6]))),
+        guid[8],
+        guid[9],
+        guid[10],
+        guid[11],
+        guid[12],
+        guid[13],
+        guid[14],
+        guid[15]));
 }
 
-nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
+nx::sdk::Uuid fromQnUuidToSdkUuid(const QnUuid& uuid)
 {
-    return nxpt::NxGuidHelper::fromRawData(uuid.toRfc4122());
+    return nx::sdk::UuidHelper::fromRawData(uuid.toRfc4122().data());
 }
 
 } // namespace utils

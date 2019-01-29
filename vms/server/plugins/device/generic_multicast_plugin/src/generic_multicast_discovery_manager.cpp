@@ -13,7 +13,7 @@ namespace {
 
 static const char* VENDOR_NAME = "GENERIC_MULTICAST";
 
-} // namespace 
+} // namespace
 
 
 GenericMulticastDiscoveryManager::GenericMulticastDiscoveryManager()
@@ -38,12 +38,12 @@ void* GenericMulticastDiscoveryManager::queryInterface(const nxpl::NX_GUID& inte
     return nullptr;
 }
 
-unsigned int GenericMulticastDiscoveryManager::addRef()
+int GenericMulticastDiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastDiscoveryManager::releaseRef()
+int GenericMulticastDiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

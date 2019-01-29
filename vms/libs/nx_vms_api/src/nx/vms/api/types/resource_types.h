@@ -97,6 +97,7 @@ enum ServerFlag
     SF_SupportsTranscoding = 0x200,
     SF_HasLiteClient = 0x400,
     SF_P2pSyncDone = 0x1000000, //< For UT purpose only
+    SF_RequiresEdgeLicense = 0x2000000, //< Remove when we are sure EDGE only licenses are gone.
 };
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
@@ -118,7 +119,6 @@ enum class IoModuleVisualStyle
 
 enum class StreamDataFilter
 {
-    mediaOnly = 0, //< Send audio/video but not other metadata.
     media = 1 << 0, //< Send media data.
     motion = 1 << 1, //< Send motion data.
     objectDetection = 1 << 2, //< Send analytics events.

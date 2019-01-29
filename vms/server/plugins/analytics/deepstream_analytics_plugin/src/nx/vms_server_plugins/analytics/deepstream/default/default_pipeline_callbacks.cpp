@@ -17,8 +17,9 @@ extern "C" {
 #define NX_PRINT_PREFIX "deepstream::defaultCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx{
@@ -27,7 +28,7 @@ namespace analytics {
 namespace deepstream {
 
 GstPadProbeReturn waitForSecondaryGieDoneBufProbe(
-    GstPad* pad,
+    GstPad* /*pad*/,
     GstPadProbeInfo* info,
     gpointer userData)
 {
@@ -50,7 +51,7 @@ GstPadProbeReturn waitForSecondaryGieDoneBufProbe(
         auto pipeline = (DefaultPipeline*) userData;
         while (pipeline->state() == GST_STATE_PLAYING
             && GST_OBJECT_REFCOUNT_VALUE(GST_BUFFER(info->data)) > 1
-            /*&& !pipeline->isStopping() /*TODO: #dmishin 'flush' condition */)
+            /* && !pipeline->isStopping() */ /*< TODO: #dmishin flush condition */)
         {
             #if 0
             NX_OUTPUT
@@ -92,7 +93,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
     if (!bboxes)
         return true;
 
-    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
     packet->setTimestampUs(GST_BUFFER_PTS(buffer));
     packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
 
@@ -107,7 +108,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
     if (frameHeight <= 0)
         frameHeight = ini().defaultFrameHeight;
 
-    for (auto i = 0; i < bboxes->num_rects; ++i)
+    for (int i = 0; i < (int) bboxes->num_rects; ++i)
     {
         const auto& roiMeta = bboxes->roi_meta[i];
         std::string displayText;
@@ -119,8 +120,8 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::common::Object();
-        nx::sdk::analytics::IObject::Rect rectangle;
+        auto detectedObject = new nx::sdk::analytics::ObjectMetadata();
+        nx::sdk::analytics::IObjectMetadata::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
@@ -134,25 +135,24 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        nxpl::NX_GUID guid;
-        std::deque<nx::sdk::analytics::common::Attribute> attributes;
+        std::deque<nx::sdk::analytics::Attribute> attributes;
 
         attributes = trackingMapper->attributes(roiMeta);
-        guid = trackingMapper->getMapping(roiMeta.tracking_id);
-        if (isNull(guid))
+        nx::sdk::Uuid uuid = trackingMapper->getMapping(roiMeta.tracking_id);
+        if (uuid.isNull())
         {
-            guid = makeGuid();
-            trackingMapper->addMapping(roiMeta.tracking_id, guid);
+            uuid = nx::sdk::UuidHelper::randomUuid();
+            trackingMapper->addMapping(roiMeta.tracking_id, uuid);
         }
 
-        detectedObject->setId(guid);
+        detectedObject->setId(uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
 
         const auto& objectClassDescriptions = pipeline->objectClassDescriptions();
         const auto objectClassId = roiMeta.class_id;
 
-        if (objectClassId < objectClassDescriptions.size())
+        if (objectClassId < (int) objectClassDescriptions.size())
         {
             detectedObject->setTypeId(objectClassDescriptions[objectClassId].typeId);
             attributes.emplace_front(
@@ -170,11 +170,11 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
             attributes.emplace_front(
                 nx::sdk::IAttribute::Type::string,
                 "GUID",
-                nxpt::toStdString(guid));
+                nx::sdk::UuidHelper::toStdString(uuid));
         }
 
         detectedObject->setAttributes(
-            std::vector<nx::sdk::analytics::common::Attribute>(
+            std::vector<nx::sdk::analytics::Attribute>(
                 attributes.begin(),
                 attributes.end()));
 

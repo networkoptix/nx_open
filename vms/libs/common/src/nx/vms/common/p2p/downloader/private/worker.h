@@ -52,9 +52,8 @@ public:
     Worker(
         const QString& fileName,
         Storage* storage,
-        AbstractPeerManager* peerManager,
-        QObject* parent = nullptr);
-    virtual ~Worker();
+        AbstractPeerManager* peerManager);
+    virtual ~Worker() override;
 
     State state() const;
 
@@ -117,6 +116,7 @@ protected:
     QList<QnUuid> peersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
         int count = -1, QList<QnUuid> peers = QList<QnUuid>()) const;
+    void revivePeersWithMinimalRank();
     int selectNextChunk() const;
 
     bool isInternetAvailable(const QList<QnUuid>& peers = QList<QnUuid>()) const;

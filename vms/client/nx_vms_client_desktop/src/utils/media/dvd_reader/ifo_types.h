@@ -3,8 +3,8 @@
 #define IFO_TYPES_H_INCLUDED
 
 /*
- * Copyright (C) 2000, 2001 Bj�rn Englund <d4bjorn@dtek.chalmers.se>,
- *                          H�kan Hjort <d95hjort@dtek.chalmers.se>
+ * Copyright (C) 2000, 2001 Bjarn Englund <d4bjorn@dtek.chalmers.se>,
+ *                          Hakan Hjort <d95hjort@dtek.chalmers.se>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

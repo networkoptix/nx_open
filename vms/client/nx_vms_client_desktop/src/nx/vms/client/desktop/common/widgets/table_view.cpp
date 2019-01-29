@@ -4,6 +4,7 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QScrollBar>
+#include <QKeyEvent>
 
 #include <ui/style/helper.h>
 
@@ -156,6 +157,16 @@ void TableView::setModel(QAbstractItemModel* newModel)
     handleModelReset();
 }
 
+bool TableView::isDefaultSpacePressIgnored() const
+{
+    return m_isDefauldSpacePressIgnored;
+}
+
+void TableView::setDefaultSpacePressIgnored(bool isIgnored)
+{
+    m_isDefauldSpacePressIgnored = isIgnored;
+}
+
 void TableView::setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate)
 {
     const auto it = m_delegates.find(column);
@@ -179,6 +190,33 @@ void TableView::openEditorsForColumn(int column, int firstRow, int lastRow)
 
     for (int row = firstRow; row <= lastRow; ++row)
         openPersistentEditor(currentModel->index(row, column));
+}
+
+void TableView::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Space)
+    {
+        if (state() != EditingState)
+        {
+            event->ignore();
+            if (currentIndex().isValid())
+            {
+                emit spacePressed(currentIndex());
+                if (isDefaultSpacePressIgnored())
+                    return;
+            }
+        }
+    }
+
+    base_type::keyPressEvent(event);
+}
+
+QItemSelectionModel::SelectionFlags TableView::selectionCommand(
+    const QModelIndex& index, const QEvent* event /*= nullptr*/) const
+{
+    const auto result = base_type::selectionCommand(index, event);
+    emit selectionChanging(result, index, event);
+    return result;
 }
 
 } // namespace nx::vms::client::desktop

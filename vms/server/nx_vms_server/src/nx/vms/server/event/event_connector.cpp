@@ -547,7 +547,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
             vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
                 resource->toSharedPointer(),
-                params.getAnalyticsPluginId(),
+                params.getAnalyticsEngineId(),
                 params.getAnalyticsEventTypeId(),
                 eventState,
                 params.caption,

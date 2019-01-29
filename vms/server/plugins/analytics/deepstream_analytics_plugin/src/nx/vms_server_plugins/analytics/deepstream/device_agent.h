@@ -32,7 +32,8 @@ public:
 
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
-    virtual nx::sdk::Error setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
+    virtual nx::sdk::Error setHandler(
+        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;

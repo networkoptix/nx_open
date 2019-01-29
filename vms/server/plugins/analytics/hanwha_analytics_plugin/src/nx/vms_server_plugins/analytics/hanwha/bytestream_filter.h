@@ -2,10 +2,8 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <plugins/plugin_api.h>
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
-#include "metadata_monitor.h"
 #include "common.h"
 
 namespace nx {

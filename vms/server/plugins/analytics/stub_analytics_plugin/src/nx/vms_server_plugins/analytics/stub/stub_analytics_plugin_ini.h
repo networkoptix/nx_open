@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/kit/ini_config.h>
-#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -12,7 +12,7 @@ struct Ini: public nx::kit::IniConfig
 {
     const std::string needUncompressedVideoFramesDescription =
         "Respective capability in the manifest: one of "
-            + nx::sdk::analytics::common::allPixelFormatsToStdString(", ") + ".\n"
+            + nx::sdk::analytics::allPixelFormatsToStdString(", ") + ".\n"
         "Empty means no such capability.";
 
     Ini(): IniConfig("stub_analytics_plugin.ini") { reload(); }

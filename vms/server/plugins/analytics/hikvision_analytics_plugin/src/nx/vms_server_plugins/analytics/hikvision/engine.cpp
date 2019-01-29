@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 #include "device_agent.h"
 #include "common.h"
@@ -17,7 +17,7 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -40,7 +40,7 @@ bool Engine::DeviceData::hasExpired() const
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QFile file(":/hikvision/manifest.json");
     if (file.open(QFile::ReadOnly))
@@ -77,28 +77,26 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo,
+IDeviceAgent* Engine::obtainDeviceAgent(
+    const IDeviceInfo* deviceInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(deviceInfo->vendor).toLower();
-
-    if (!vendor.startsWith(kHikvisionTechwinVendor))
+    if (!isCompatible(deviceInfo))
         return nullptr;
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(*deviceInfo);
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
         return nullptr;
 
@@ -106,17 +104,17 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     auto deviceAgent = new DeviceAgent(this);
-    deviceAgent->setDeviceInfo(*deviceInfo);
+    deviceAgent->setDeviceInfo(deviceInfo);
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
     deviceAgent->setEngineManifest(engineManifest());
 
     return deviceAgent;
 }
 
-const nx::sdk::IString* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -144,23 +142,23 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
-    const DeviceInfo& deviceInfo)
+    const IDeviceInfo* deviceInfo)
 {
-    auto& data = m_cachedDeviceData[deviceInfo.sharedId];
+    auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
     if (!data.hasExpired())
         return data.supportedEventTypeIds;
 
     using namespace std::chrono;
 
-    nx::utils::Url url(deviceInfo.url);
+    nx::utils::Url url(deviceInfo->url());
     url.setPath("/ISAPI/Event/triggersCap");
 
     nx::network::http::HttpClient httpClient;
     httpClient.setResponseReadTimeout(kRequestTimeout);
     httpClient.setSendTimeout(kRequestTimeout);
     httpClient.setMessageBodyReadTimeout(kRequestTimeout);
-    httpClient.setUserName(deviceInfo.login);
-    httpClient.setUserPassword(deviceInfo.password);
+    httpClient.setUserName(deviceInfo->login());
+    httpClient.setUserPassword(deviceInfo->password());
 
     const auto result = httpClient.doGet(url);
     const auto response = httpClient.response();
@@ -169,7 +167,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     {
         NX_WARNING(
             this,
-            lm("No response for supported events request %1.").args(deviceInfo.url));
+            lm("No response for supported events request %1.").args(deviceInfo->url()));
         data.timeout.invalidate();
         return boost::optional<QList<QString>>();
     }
@@ -181,13 +179,13 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
         NX_WARNING(
             this,
             lm("Unable to fetch supported events for device %1. HTTP status code: %2")
-                .args(deviceInfo.url, statusCode));
+                .args(deviceInfo->url(), statusCode));
         data.timeout.invalidate();
         return boost::optional<QList<QString>>();
     }
 
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
-        arg(deviceInfo.url).arg(buffer));
+        args(deviceInfo->url(), buffer));
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
@@ -199,14 +197,20 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
+}
+
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
+{
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
+    return vendor.startsWith(kHikvisionTechwinVendor);
 }
 
 } // namespace hikvision
@@ -231,13 +235,13 @@ extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::hikvision::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

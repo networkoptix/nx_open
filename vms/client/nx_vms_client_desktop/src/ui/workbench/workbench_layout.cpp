@@ -49,10 +49,6 @@ void pointize(const QRect& region, PointContainer* points)
     }
 }
 
-// TODO: these tags are better to be bound to QnWorkbenchLayout.
-static const nx::utils::log::Tag kItemMapTag(lit("__itemMap"));
-static const nx::utils::log::Tag kFreeSlotTag(lit("__freeSlot"));
-
 } // namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr& resource, QObject* parent):
@@ -278,7 +274,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
         if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
         {
             m_itemMap.fill(item->geometry(), item);
-            NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
+            NX_VERBOSE(this, lm("Add item to cell %1").arg(item->geometry()));
         }
     }
     m_rectSet.insert(item->geometry());
@@ -308,7 +304,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
         if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
         {
             m_itemMap.clear(item->geometry());
-            NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
+            NX_VERBOSE(this, lm("Item removed from cell %1").arg(item->geometry()));
         }
     }
 
@@ -428,7 +424,7 @@ bool QnWorkbenchLayout::moveItem(QnWorkbenchItem* item, const QRect& geometry)
     {
         m_itemMap.clear(item->geometry());
         m_itemMap.fill(geometry, item);
-        NX_DEBUG(kItemMapTag, lm("Item moved from cell %1 to cell %2")
+        NX_VERBOSE(this, lm("Item moved from cell %1 to cell %2")
             .arg(item->geometry())
             .arg(geometry));
     }
@@ -543,7 +539,7 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem*>& items,
         if (item->isPinned())
         {
             m_itemMap.clear(item->geometry());
-            NX_DEBUG(kItemMapTag, lm("Batch move items: clear cell %1").arg(item->geometry()));
+            NX_VERBOSE(this, lm("Batch move items: clear cell %1").arg(item->geometry()));
         }
     }
 
@@ -553,7 +549,7 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem*>& items,
         if (item->isPinned())
         {
             m_itemMap.fill(geometries[i], item);
-            NX_DEBUG(kItemMapTag, lm("Batch move items: put on cell %1").arg(geometries[i]));
+            NX_VERBOSE(this, lm("Batch move items: put on cell %1").arg(geometries[i]));
         }
         moveItemInternal(item, geometries[i]);
     }
@@ -574,7 +570,7 @@ bool QnWorkbenchLayout::pinItem(QnWorkbenchItem* item, const QRect& geometry)
         return false;
 
     m_itemMap.fill(geometry, item);
-    NX_DEBUG(kItemMapTag, lm("Pin item to cell %1").arg(geometry));
+    NX_VERBOSE(this, lm("Pin item to cell %1").arg(geometry));
     moveItemInternal(item, geometry);
     item->setFlagInternal(Qn::Pinned, true);
     return true;
@@ -589,7 +585,7 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem* item)
         return true;
 
     m_itemMap.clear(item->geometry());
-    NX_DEBUG(kItemMapTag, lm("Unpin item from cell %1").arg(item->geometry()));
+    NX_VERBOSE(this, lm("Unpin item from cell %1").arg(item->geometry()));
     item->setFlagInternal(Qn::Pinned, false);
     return true;
 }
@@ -676,7 +672,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
         return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
     }
 
-    NX_DEBUG(kFreeSlotTag, lm("Seek for closestFreeSlot to %1 of size %2").args(gridPos, size));
+    NX_VERBOSE(this, lm("Seek for closestFreeSlot to %1 of size %2").args(gridPos, size));
 
     /* Grid cell where starting search position lies. */
     QPoint gridCell = (gridPos - Geometry::toPoint(QSizeF(size)) / 2.0).toPoint();
@@ -707,10 +703,10 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
         if (walker.hasNext())
         {
             QPoint delta = walker.next();
-            NX_DEBUG(kFreeSlotTag, lm("delta %1").args(delta));
+            NX_VERBOSE(this, lm("delta %1").args(delta));
 
             qreal distance = metric->calculate(gridCell + delta);
-            NX_DEBUG(kFreeSlotTag, lm("distance %1").args(distance));
+            NX_VERBOSE(this, lm("distance %1").args(distance));
 
             if (distance > bestDistance || qFuzzyEquals(distance, bestDistance))
                 continue;
@@ -720,24 +716,24 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
 
             if (m_itemMap.isOccupied(QRect(gridCell + delta, size)))
             {
-                NX_DEBUG(kFreeSlotTag, lm("delta %1 is occupied, skip").args(delta));
+                NX_VERBOSE(this, lm("delta %1 is occupied, skip").args(delta));
                 continue;
             }
 
             checkedEdges = 0;
             bestDistance = distance;
             bestDelta = delta;
-            NX_DEBUG(kFreeSlotTag, lm("Remember delta %1 as best (distance %2)")
+            NX_VERBOSE(this, lm("Remember delta %1 as best (distance %2)")
                 .arg(delta)
                 .arg(distance));
         }
         else
         {
-            NX_DEBUG(kFreeSlotTag, lm("Walker has finished the %1").arg(processingEdge));
+            NX_VERBOSE(this, lm("Walker has finished the %1").arg(processingEdge));
             checkedEdges |= processingEdge;
             if (checkedEdges == allEdges && bestDistance < std::numeric_limits<qreal>::max())
             {
-                NX_DEBUG(kFreeSlotTag, lm("Best position found: %1 (delta %2, distance %3)")
+                NX_VERBOSE(this, lm("Best position found: %1 (delta %2, distance %3)")
                     .arg(QRect(gridCell + bestDelta, size))
                     .arg(bestDelta)
                     .arg(bestDistance));
@@ -763,7 +759,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
                 if ((checkedEdges & v.first) == v.first)
                     continue;
 
-                NX_DEBUG(kFreeSlotTag, lm("Checking edge %1: distance %2")
+                NX_VERBOSE(this, lm("Checking edge %1: distance %2")
                     .arg(v.first)
                     .arg(metric->calculate(gridCell + v.second)));
                 edgesToCheck.push_back(v);
@@ -785,7 +781,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
             });
 
             const Qt::Edge bestEdge = bestEdgeIter->first;
-            NX_DEBUG(kFreeSlotTag, lm("Expanding the best border %1").arg(bestEdge));
+            NX_VERBOSE(this, lm("Expanding the best border %1").arg(bestEdge));
             walker.expand(bestEdge);
             processingEdge = bestEdge;
         }

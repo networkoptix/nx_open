@@ -29,14 +29,14 @@ int64_t fileSize(const std::string& fileName)
 
 int64_t fileSize(const std::string& fileName)
 {
-	TCHAR buf[2048];
-	MultiByteToWideChar(CP_UTF8, 0, fileName.c_str(), fileName.size(), buf, 2048);
+    TCHAR buf[2048];
+    MultiByteToWideChar(CP_UTF8, 0, fileName.c_str(), fileName.size(), buf, 2048);
 
-	HANDLE hFile = CreateFile(buf, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (!hFile)
-		return 0;
+    HANDLE hFile = CreateFile(buf, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (!hFile)
+        return 0;
 
-	LARGE_INTEGER result;
+    LARGE_INTEGER result;
     if (!GetFileSizeEx(hFile, &result))
     {
         CloseHandle(hFile);

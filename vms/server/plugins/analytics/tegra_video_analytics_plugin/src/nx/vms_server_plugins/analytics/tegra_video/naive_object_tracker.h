@@ -1,13 +1,14 @@
 #pragma once
 
+#include <string>
+
 #include <QtGui/QVector2D>
 
+#include <boost/optional.hpp>
+
 #include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
-#include <boost/uuid/uuid.hpp>
 
-#include <nx/utils/uuid.h>
-
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -23,21 +24,21 @@ public:
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs);
 
-    void setObjectTypeId(const QString& objectTypeId);
+    void setObjectTypeId(const std::string& objectTypeId);
 
     void setAttributeOptions(
-        const QString& attributeName,
-        const std::vector<QString>& attributeValues);
+        const std::string& attributeName,
+        const std::vector<std::string>& attributeValues);
 
 private:
     struct CachedObject
     {
-        QnUuid id;
+        nx::sdk::Uuid id;
         TegraVideo::Rect rect;
         int lifetime = 1;
         QVector2D speed; //< relative units per frame
         bool found = false;
-        std::map<QString, QString> attributes;
+        std::map<std::string, std::string> attributes;
     };
 
 private:
@@ -46,14 +47,14 @@ private:
 
     void unmarkFoundObjectsInCache();
 
-    void addObjectToCache(const QnUuid& id, const TegraVideo::Rect& boundingBox);
+    void addObjectToCache(const nx::sdk::Uuid& id, const TegraVideo::Rect& boundingBox);
 
-    void updateObjectInCache(const QnUuid& id, const TegraVideo::Rect& boundingBox);
+    void updateObjectInCache(const nx::sdk::Uuid& id, const TegraVideo::Rect& boundingBox);
 
     void removeExpiredObjectsFromCache();
 
     void addNonExpiredObjectsFromCache(
-        nx::sdk::analytics::common::ObjectMetadataPacket* outPacket);
+        nx::sdk::analytics::ObjectMetadataPacket* outPacket);
 
     TegraVideo::Rect applySpeedToRectangle(
         const TegraVideo::Rect& rectangle,
@@ -73,7 +74,7 @@ private:
 
     void assignRandomAttributes(CachedObject* outCachedObject);
 
-    QString randomAttributeValue(const QString& attributeName) const;
+    std::string randomAttributeValue(const std::string& attributeName) const;
 
     bool isRectangleInNoCorrectionZone(const TegraVideo::Rect& rect) const;
 
@@ -81,13 +82,12 @@ private:
     static bool isTooSmall(const TegraVideo::Rect& rectangle);
     static float bottomRightX(const TegraVideo::Rect& rectangle);
     static float bottomRightY(const TegraVideo::Rect& rectangle);
-    static nx::sdk::analytics::IObject::Rect toSdkRect(const TegraVideo::Rect& rectangle);
-    static nxpl::NX_GUID toSdkGuid(const QnUuid& id);
+    static nx::sdk::analytics::IObjectMetadata::Rect toSdkRect(const TegraVideo::Rect& rectangle);
 
 private:
-    std::map<QnUuid, CachedObject> m_cachedObjects;
-    QString m_objectTypeId;
-    std::map<QString, std::vector<QString>> m_attributeOptions;
+    std::map<nx::sdk::Uuid, CachedObject> m_cachedObjects;
+    std::string m_objectTypeId;
+    std::map<std::string, std::vector<std::string>> m_attributeOptions;
 };
 
 } // namespace tegra_video

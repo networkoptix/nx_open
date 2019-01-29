@@ -24,8 +24,8 @@ CameraThumbnailProvider::CameraThumbnailProvider(
     m_request(request),
     m_status(Qn::ThumbnailStatus::Invalid)
 {
-    NX_ASSERT(request.camera, Q_FUNC_INFO, "Camera must exist here");
-    NX_ASSERT(commonModule()->currentServer(), Q_FUNC_INFO, "We must be connected here");
+    NX_ASSERT(request.camera, "Camera must exist here");
+    NX_ASSERT(commonModule()->currentServer(), "We must be connected here");
 
     if (!request.camera || !request.camera->hasVideo(nullptr))
     {

@@ -14,7 +14,7 @@ namespace api {
 struct NX_VMS_API SystemMergeHistoryRecord: Data
 {
     /** Milliseconds since epoch. */
-    qint64 timestamp;
+    qint64 timestamp = 0;
 
     QByteArray mergedSystemLocalId;
     QByteArray mergedSystemCloudId;

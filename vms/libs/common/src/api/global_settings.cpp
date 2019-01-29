@@ -256,6 +256,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
         ldapSearchFilter,
         QString(),
         this);
+    m_ldapSearchTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        ldapSearchTimeoutS, ldapSearchTimeoutSDefault, this);
+
 
     AdaptorList result;
     result
@@ -263,8 +266,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
         << m_ldapAdminDnAdaptor
         << m_ldapAdminPasswordAdaptor
         << m_ldapSearchBaseAdaptor
-        << m_ldapSearchFilterAdaptor;
-
+        << m_ldapSearchFilterAdaptor
+        << m_ldapSearchTimeoutSAdaptor;
     for (auto adaptor: result)
     {
         connect(
@@ -1109,6 +1112,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     result.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_ldapAdminPasswordAdaptor->value());
     result.searchBase = m_ldapSearchBaseAdaptor->value();
     result.searchFilter = m_ldapSearchFilterAdaptor->value();
+    result.searchTimeoutS = m_ldapSearchTimeoutSAdaptor->value();
     return result;
 }
 
@@ -1122,6 +1126,7 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings& settings)
         : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
+    m_ldapSearchTimeoutSAdaptor->setValue(settings.searchTimeoutS);
 }
 
 QnEmailSettings QnGlobalSettings::emailSettings() const
@@ -1172,9 +1177,9 @@ void QnGlobalSettings::synchronizeNow()
         adaptor->saveToResource();
 
     QnMutexLocker locker(&m_mutex);
-    //NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return;
+
     propertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
@@ -1182,7 +1187,7 @@ bool QnGlobalSettings::resynchronizeNowSync()
 {
     {
         QnMutexLocker locker(&m_mutex);
-        NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+        NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
         propertyDictionary()->markAllParamsDirty(m_admin->getId());
@@ -1196,7 +1201,7 @@ bool QnGlobalSettings::synchronizeNowSync()
         adaptor->saveToResource();
 
     QnMutexLocker locker(&m_mutex);
-    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    NX_ASSERT(m_admin, "Invalid sync state");
     if (!m_admin)
         return false;
     return propertyDictionary()->saveParams(m_admin->getId());

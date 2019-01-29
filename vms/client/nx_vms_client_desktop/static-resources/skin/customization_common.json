@@ -992,6 +992,23 @@
                 "windowText": "dark3"
             }
         }
+    },
+
+    "nx::vms::client::desktop::EmulatedNonClientArea": {
+        "palette": {
+            "default": {
+                "window": "dark14"
+            }
+        }
+    },
+
+    "nx::vms::client::desktop::DialogTitleBarWidget": {
+        "palette": {
+            "default": {
+                "window": "dark12",
+                "text": "light4"
+            }
+        }
     }
 }
 

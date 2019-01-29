@@ -37,7 +37,7 @@ VisualizerData generateEmptyData(qint64 elapsedMs)
         idx = maxIdx - idx;
 
     const bool isValidIndex = idx >= 0 && idx < result.size();
-    NX_ASSERT(isValidIndex, Q_FUNC_INFO, "Invalid timeStep value");
+    NX_ASSERT(isValidIndex, "Invalid timeStep value");
     if (isValidIndex)
         result[idx] = 0.2;
     return result;

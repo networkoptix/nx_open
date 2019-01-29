@@ -630,7 +630,7 @@ QString ClientUpdateTool::applauncherErrorToString(int value)
         case Result::alreadyInstalled:
             return tr("This update is already installed.");
         case Result::otherError:
-            return tr("Internal applauncher error.");
+            return tr("Internal error.");
         case Result::versionNotInstalled:
             return tr("This version is not installed.");
         case Result::invalidVersionFormat:

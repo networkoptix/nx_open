@@ -124,8 +124,6 @@ public:
     DiscoveryManager();
     virtual ~DiscoveryManager();
 
-    // nxcip::PluginInterface
-
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
     // nxcip::CameraDiscoveryManager

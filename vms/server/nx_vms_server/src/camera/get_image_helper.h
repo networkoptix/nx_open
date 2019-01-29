@@ -37,9 +37,9 @@ public:
     QByteArray encodeImage(
         const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const;
 
-private:
     Qn::StreamIndex determineStreamIndex(const nx::api::CameraImageRequest& request) const;
 
+private:
     CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,
         Qn::StreamIndex streamIndex,

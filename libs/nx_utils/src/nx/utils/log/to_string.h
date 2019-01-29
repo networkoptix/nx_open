@@ -125,8 +125,7 @@ QString toString(const boost::optional<T>& value)
 {
     if (value)
         return toString(value.get());
-    else
-        return QLatin1String("none");
+    return "none";
 }
 
 template<typename T>
@@ -134,28 +133,31 @@ QString toString(const std::optional<T>& value)
 {
     if (value)
         return toString(*value);
-    else
-        return QLatin1String("none");
+    return "none";
 }
 
 template<typename First, typename Second>
 QString toString(
     const std::pair<First, Second>& pair,
-    const QString& prefix = QString::fromLatin1("( "),
-    const QString& suffix = QString::fromLatin1(" )"),
-    const QString& delimiter = QString::fromLatin1(": "))
+    const QString& prefix = "( ",
+    const QString& suffix = " )",
+    const QString& delimiter = ": ")
 {
-    return QString::fromLatin1("%1%2%3%4%5").arg(prefix)
-        .arg(toString(pair.first)).arg(delimiter)
-        .arg(toString(pair.second)).arg(suffix);
+    // QString::operator+= works much faster than template subsitution.
+    QString result = prefix;
+    result += toString(pair.first);
+    result += delimiter;
+    result += toString(pair.second);
+    result += suffix;
+    return result;
 }
 
 template<typename Container>
 QString containerString(const Container& container,
-    const QString& delimiter = QString::fromLatin1(", "),
-    const QString& prefix = QString::fromLatin1("{ "),
-    const QString& suffix = QString::fromLatin1(" }"),
-    const QString& empty = QString::fromLatin1("none"))
+    const QString& delimiter = ", ",
+    const QString& prefix = "{ ",
+    const QString& suffix = " }",
+    const QString& empty = "none")
 {
     if (container.begin() == container.end())
         return empty;
@@ -164,5 +166,9 @@ QString containerString(const Container& container,
     for (const auto& item : container)
         strings << toString(item);
 
-    return QString::fromLatin1("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
+    // QString::operator+= works much faster than template subsitution.
+    QString result = prefix;
+    result += strings.join(delimiter);
+    result += suffix;
+    return result;
 }

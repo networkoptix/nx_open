@@ -688,7 +688,7 @@ Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
         suggested.name = lit("%1 (%2)").arg(baseName.name).arg(i);
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Failed to generate suggested filename");
+    NX_ASSERT(false, "Failed to generate suggested filename");
     return baseName;
 }
 

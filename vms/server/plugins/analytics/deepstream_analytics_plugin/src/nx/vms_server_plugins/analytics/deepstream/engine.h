@@ -10,7 +10,7 @@
 #include <plugins/plugin_container_api.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/sdk/analytics/common/plugin.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -22,10 +22,10 @@ namespace deepstream {
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::common::Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -36,15 +36,17 @@ public:
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
-    virtual void executeAction(nx::sdk::analytics::Action*, nx::sdk::Error*) override;
+    virtual void executeAction(nx::sdk::analytics::IAction*, nx::sdk::Error*) override;
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
     std::chrono::microseconds currentTimeUs() const;
 
     nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
+
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;
@@ -54,12 +56,14 @@ private:
     std::string buildManifestObectTypeString(const ObjectClassDescription& description) const;
 
 private:
-    nx::sdk::analytics::common::Plugin* const m_plugin;
+    nx::sdk::analytics::Plugin* const m_plugin;
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
     std::unique_ptr<
         nxpl::TimeProvider,
         std::function<void(nxpl::TimeProvider*)>> m_timeProvider;
+
+    nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;
 };
 
 } // namespace deepstream

@@ -75,10 +75,10 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
-    return base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    return base_type::getStreamCapabilityMapFromDriver(streamIndex);
 }
 
 CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
@@ -135,14 +135,6 @@ CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
     setOnvifRequestsSendTimeout(kSoapSendTimeout);
 
     return CameraDiagnostics::InitializationInProgress();
-}
-
-QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 }
 
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const

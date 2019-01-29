@@ -28,7 +28,7 @@ static const nxpl::NX_GUID IID_DeviceAgent =
 class IEngine; //< Forward declaration for the parent object.
 
 /**
- * Interface used to control the process of fetching metadata from the resource.
+ * Used to control the process of fetching metadata from the resource.
  *
  * All methods are guaranteed to be called without overlappings, even if from different threads,
  * thus, no synchronization is required for the implementation.
@@ -48,7 +48,8 @@ public:
     virtual IEngine* engine() const = 0;
 
     /**
-     * Called before other methods. Server provides the set of settings stored in its database for
+     * Called before other methods. Server provides the set of settings stored in its database,
+     * combined with the values received from the plugin via pluginSideSettings() (if any), for
      * the combination of a device instance and an Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null. Valid only during
@@ -85,7 +86,7 @@ public:
 
     /**
      * Sets a list of metadata types that are needed by the Server. Empty list means that the
-     * Server doesn't need any metadata from this DeviceAgent.
+     * Server does not need any metadata from this DeviceAgent.
      * @param neededMetadataTypes Lists of type ids of events and objects.
      */
     virtual Error setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;

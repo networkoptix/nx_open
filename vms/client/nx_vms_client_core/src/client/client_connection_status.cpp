@@ -94,7 +94,7 @@ void QnClientConnectionStatus::warn(const QString &message) const
     NX_WARNING(this, message);
     TRACE(message);
 #ifdef STRICT_STATE_CONTROL
-    NX_ASSERT(false, Q_FUNC_INFO, message.toUtf8());
+    NX_ASSERT(false, message.toUtf8());
 #endif
 }
 

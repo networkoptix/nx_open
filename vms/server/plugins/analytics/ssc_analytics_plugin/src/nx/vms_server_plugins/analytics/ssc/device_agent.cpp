@@ -4,14 +4,12 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
-
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include "log.h"
 
@@ -22,20 +20,23 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace ssc {
 
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
+
 namespace {
 
-nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket(
+EventMetadataPacket* createCommonEventMetadataPacket(
     const EventType& eventType, int logicalId)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
-    auto event = new nx::sdk::analytics::common::Event();
-    event->setTypeId(eventType.id.toStdString());
-    event->setDescription(eventType.name.toStdString());
-    event->setAuxiliaryData(std::to_string(logicalId));
+    auto packet = new EventMetadataPacket();
+    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    eventMetadata->setTypeId(eventType.id.toStdString());
+    eventMetadata->setDescription(eventType.name.toStdString());
+    eventMetadata->setAuxiliaryData(std::to_string(logicalId));
 
-    packet->addItem(event);
+    packet->addItem(eventMetadata);
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUs(-1);
@@ -45,19 +46,19 @@ nx::sdk::analytics::common::EventMetadataPacket* createCommonEventMetadataPacket
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* plugin,
-    const nx::sdk::DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(plugin),
-    m_url(deviceInfo.url),
-    m_cameraLogicalId(deviceInfo.logicalId)
+    m_url(deviceInfo->url()),
+    m_cameraLogicalId(QString(deviceInfo->logicalId()).toInt())
 {
     nx::vms::api::analytics::DeviceAgentManifest typedDeviceAgentManifest;
     for (const auto& eventType: typedManifest.eventTypes)
         typedDeviceAgentManifest.supportedEventTypeIds.push_back(eventType.id);
     m_deviceAgentManifest = QJson::serialized(typedDeviceAgentManifest);
 
-    NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo.model;
+    NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo->model();
 }
 
 DeviceAgent::~DeviceAgent()
@@ -68,7 +69,7 @@ DeviceAgent::~DeviceAgent()
 
 void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
+    if (interfaceId == IID_DeviceAgent)
     {
         addRef();
         return static_cast<DeviceAgent*>(this);
@@ -90,49 +91,48 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
+Error DeviceAgent::startFetchingMetadata(
+    const IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::stopFetchingMetadata()
+Error DeviceAgent::stopFetchingMetadata()
 {
     m_engine->unregisterCamera(m_cameraLogicalId);
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
+const IString* DeviceAgent::manifest(Error* error) const
 {
-    *error = nx::sdk::Error::noError;
-    return new nx::sdk::common::String(m_deviceAgentManifest);
+    *error = Error::noError;
+    return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
-    return sdk::Error::noError;
+    return Error::noError;
 }
 
-sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->eventTypeIds()->count() == 0)
     {
         stopFetchingMetadata();
-        return sdk::Error::noError;
+        return Error::noError;
     }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

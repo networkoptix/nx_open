@@ -38,8 +38,8 @@ public:
     virtual ~StreamReader() = default;
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
     virtual int getNextData(nxcip::MediaDataPacket** lpPacket) override;
     virtual void interrupt() override;
@@ -58,7 +58,6 @@ class StreamReaderPrivate
 public:
     StreamReaderPrivate(
         int encoderIndex,
-        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~StreamReaderPrivate();
@@ -66,19 +65,18 @@ public:
     virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
     virtual void interrupt();
 
-    virtual void setFps(float fps);
-    virtual void setResolution(const nxcip::Resolution& resolution);
-    virtual void setBitrate(int bitrate);
+    virtual void setFps(float fps) = 0;
+    virtual void setResolution(const nxcip::Resolution& resolution) = 0;
+    virtual void setBitrate(int bitrate) = 0;
 
     virtual void ensureConsumerAdded();
 
 protected:
     static constexpr int kMsecInSec = 1000;
     static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(150);
-    static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(10000);
+    static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(2000000);
 
     int m_encoderIndex;
-    CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
     std::shared_ptr<BufferedPacketConsumer> m_avConsumer;
 

@@ -301,14 +301,10 @@ void OnvifResourceInformationFetcher::findResources(
     else
         return;
 
-    QnResourceData resourceData = res->commonModule()->dataPool()->data(res->getVendor(), res->getModel());
-    auto shouldAppearAsSingleChannel =
-        resourceData.value<bool>(ResourceDataKey::kShouldAppearAsSingleChannel);
-
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
 
     // checking for multichannel encoders
-    if(onvifRes && onvifRes->getMaxChannels() > 1 && !shouldAppearAsSingleChannel)
+    if(onvifRes && onvifRes->getMaxChannels() > 1)
     {
         QString groupName;
         QString groupId;

@@ -8,10 +8,10 @@
 #include <QtCore/QMutex>
 #include <QtSerialPort/QSerialPort>
 
-#include <nx/sdk/analytics/common/plugin.h>
+#include <plugins/plugin_tools.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
-#include <plugins/plugin_tools.h>
 
 #include "common.h"
 
@@ -26,9 +26,9 @@ class DeviceAgent;
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::common::Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::common::Plugin* plugin() const override { return m_plugin; }
+    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -37,7 +37,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
@@ -45,9 +45,11 @@ public:
     void unregisterCamera(int cameraLogicalId);
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/) override;
+        nx::sdk::analytics::IAction* /*action*/, sdk::Error* /*outError*/) override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
+
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     void readAllowedPortNames();
@@ -57,7 +59,7 @@ private:
     void onDataReceived(int index);
 
 private:
-    nx::sdk::analytics::common::Plugin* const m_plugin;
+    nx::sdk::analytics::Plugin* const m_plugin;
 
     QByteArray m_manifest;
     EngineManifest m_typedManifest;

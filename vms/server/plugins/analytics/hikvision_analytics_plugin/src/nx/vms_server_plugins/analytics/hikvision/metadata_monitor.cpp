@@ -241,8 +241,6 @@ void HikvisionMetadataMonitor::reopenLprConnection()
 
 bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent)
 {
-    using namespace nx::vms::api::analytics;
-
     std::vector<HikvisionEvent> result;
     if (!hikvisionEvent.typeId.isEmpty())
         result.push_back(hikvisionEvent);
@@ -259,8 +257,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
         };
 
     auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(hikvisionEvent.typeId);
-    using namespace nx::sdk::analytics;
-    if (eventTypeDescriptor.flags.testFlag(EventTypeFlag::stateDependent))
+    if (eventTypeDescriptor.flags.testFlag(vms::api::analytics::EventTypeFlag::stateDependent))
     {
         const QString key = getEventKey(hikvisionEvent);
         if (hikvisionEvent.isActive)

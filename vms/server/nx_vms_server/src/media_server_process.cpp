@@ -92,9 +92,7 @@
 
 #include <camera_vendors.h>
 
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
-#include <core/resource/avi/avi_resource.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -1461,6 +1459,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /ec2/forcePrimaryTimeServer
      * Set primary time server. Requires a JSON object with optional "id" field in the message
      * body. If "id" field is missing, the primary time server is turned off.
+     * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("ec2/forcePrimaryTimeServer",
@@ -1774,6 +1773,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
+     * %permissions Owner.
      * Return audit log information in the requested format.
      * %param:string from Start time of a time interval (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
@@ -1808,7 +1808,7 @@ void MediaServerProcess::registerRestHandlers(
      * Change password for already existing user on a camera.
      * This method is allowed for cameras with 'SetUserPasswordCapability' capability only.
      * Otherwise it returns an error in the JSON result.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
      * %param:string user User name.
@@ -2047,7 +2047,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/restart
      * Restarts the server.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
@@ -2100,7 +2100,7 @@ void MediaServerProcess::registerRestHandlers(
      * in "flags" field). <p> Parameters should be passed as a JSON array of objects in POST
      * message body with content type "application/json". Example of such object can be seen in
      * the result of GET /api/iflist function. </p>
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string name Interface name.
      * %param:string ipAddr IP address with dot-separated decimal components.
      * %param:string netMask Network mask with dot-separated decimal components.
@@ -2124,7 +2124,7 @@ void MediaServerProcess::registerRestHandlers(
      * Set current time on the server machine. Can be called only if server flags include
      * "SF_timeCtrl" (server flags can be obtained via /ec2/getMediaServersEx in "flags"
      * field).
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string timezone Time zone identifier, can be obtained via /api/getTimeZones.
      * %param:string datetime System date and time (as a string containing time in milliseconds
      *     since epoch, or a local time formatted like
@@ -2148,7 +2148,7 @@ void MediaServerProcess::registerRestHandlers(
      * </code>
      * </pre>
      * </p>
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string timeZoneId Time zone identifier, can be obtained via /api/getTimeZones.
      * %param:string dateTime Date and time (as string containing time in milliseconds since
      *     epoch, or a local time formatted like
@@ -2165,7 +2165,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/configure
      * Configure various server parameters.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string systemName System display name. It affects all servers in the system.
      * %param[opt]:integer port Server API port. It affects the current server only.
      * %param[opt]:string password Set new admin password.
@@ -2180,7 +2180,7 @@ void MediaServerProcess::registerRestHandlers(
      * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
      * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
      * be called either via GET or POST method. POST data should be a json object.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param[opt]:string password Set new admin password after detach.
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
@@ -2189,7 +2189,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/detachFromSystem
      * Detaches the Server from the System and resets its state to the initial one.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
      */
@@ -2199,7 +2199,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc[proprietary] POST /api/restoreState
      * Restore initial server state, i.e. <b>delete server's database</b>.
      * <br/>Server will restart after executing this command.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string currentPassword Current admin password
      * %return:object JSON object with error message and error code (0 means OK).
      */
@@ -2209,7 +2209,7 @@ void MediaServerProcess::registerRestHandlers(
      * Configure server system name and password. This function can be called for server with
      * default system name. Otherwise function returns error. This method requires owner
      * permissions.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string password New password for admin user
      * %param:string systemName New system name
      * %return:object JSON object with error message and error code (0 means OK).
@@ -2220,7 +2220,7 @@ void MediaServerProcess::registerRestHandlers(
      * Configure server system name and attach it to cloud. This function can be called for server
      * with default system name. Otherwise function returns error. This method requires owner
      * permissions.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %param:string systemName New system name
      * %param:string cloudAuthKey could authentication key
      * %param:string cloudSystemID could system id
@@ -2308,14 +2308,14 @@ void MediaServerProcess::registerRestHandlers(
      * Execute any script from subfolder "scripts" of media server. Script name provides directly
      * in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
      * a script as an parameters.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/execute", new QnExecScript(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc[proprietary] GET /api/scriptList
      * Return list of scripts to execute.
-     * %permissions Administrator.
+     * %permissions Owner.
      * %return:object JSON object with string list.
      */
     reg("api/scriptList", new QnScriptListRestHandler(serverModule()->settings().dataDir()), kAdmin);
@@ -2529,7 +2529,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
-     * %param[opt]:enum streamSelectionMode Policy for stream selection.
+     * %param[opt]:enum streamSelectionMode Policy for stream selection. Default value is "auto".
      *     %value auto Chooses the most suitable stream automatically.
      *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
      *         primary one is not available.
@@ -2599,14 +2599,14 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
-     * %param pluginId Id of an analytics plugin which offers the action.
-     * %param actionId Id of an action to execute.
-     * %param objectId Id of a metadata object to which the action is applied.
-     * %param cameraId Id of a camera from which the action was triggered.
+     * %param engineId Id of an Analytics Engine which offers the Action.
+     * %param actionId Id of an Action to execute.
+     * %param objectId Id of an Analytics Object to which the Action is applied.
+     * %param deviceId Id of a Device from which the Action was triggered.
      * %param timestampUs Timestamp (microseconds) of the video frame from which the action was
      *     triggered.
-     * %param params JSON object with key-value pairs containing values for the action params
-     *     described in the plugin manifest.
+     * %param params JSON object with key-value pairs containing values for the Action params
+     *     described in the Engine manifest.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
@@ -3192,6 +3192,8 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
 
 void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 {
+    using namespace nx::utils::log;
+
     auto& settings = serverSettings->settings();
     auto roSettings = serverSettings->roSettings();
 
@@ -3203,62 +3205,62 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
     logSettings.loggers.front().logBaseName = "log_file";
-    nx::utils::log::setMainLogger(
-        nx::utils::log::buildLogger(
+    setMainLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath));
 
-    if (auto path = nx::utils::log::mainLogger()->filePath())
+    if (auto path = mainLogger()->filePath())
         roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
-        settings.httpLogLevel(), toString(nx::utils::log::Level::none));
+        settings.httpLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings, qApp->applicationName(), binaryPath,
-            {QnLog::HTTP_LOG_INDEX}));
+            {Filter(QnLog::HTTP_LOG_INDEX)}));
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
             {
-                QnLog::HWID_LOG,
-                nx::utils::log::Tag(typeid(nx::vms::server::LicenseWatcher))
+                Filter(QnLog::HWID_LOG),
+                Filter(Tag(typeid(nx::vms::server::LicenseWatcher)))
             }),
         /*writeLogHeader*/ false);
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
-        settings.tranLogLevel(), toString(nx::utils::log::Level::none));
+        settings.tranLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "ec2_tran";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
-            {QnLog::EC2_TRAN_LOG}));
+            {Filter(QnLog::EC2_TRAN_LOG)}));
 
     logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
-        settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
+        settings.permissionsLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "permissions";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
-            {QnLog::PERMISSIONS_LOG}));
+            {Filter(QnLog::PERMISSIONS_LOG)}));
 
     nx::utils::enableQtMessageAsserts();
 }
@@ -3269,17 +3271,18 @@ void MediaServerProcess::initializeHardwareId()
 
     auto logSettings = makeLogSettings(serverModule()->settings());
 
+    using namespace nx::utils::log;
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
-        serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
+        serverModule()->settings().systemLogLevel(), toString(Level::info));
     logSettings.loggers.front().logBaseName = "hw_log";
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
+    addLogger(
+        buildLogger(
             logSettings,
             qApp->applicationName(),
             binaryPath,
             {
-                QnLog::HWID_LOG,
-                nx::utils::log::Tag(toString(typeid(nx::vms::server::LicenseWatcher)))
+                Filter(QnLog::HWID_LOG),
+                Filter(Tag(typeid(nx::vms::server::LicenseWatcher)))
             }));
 
     LLUtil::initHardwareId(serverModule());
@@ -4094,7 +4097,7 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->mutableSettings()->obsoleteServerGuid.remove();
     serverModule()->mutableSettings()->appserverPassword.set("");
 #ifdef _DEBUG
-    NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(), Q_FUNC_INFO,
+    NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(),
         "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 

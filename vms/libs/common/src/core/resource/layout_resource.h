@@ -99,6 +99,7 @@ public:
     static QRect backgroundRect(const QSize& backgroundSize);
 
     /** Filename of background image on Server */
+    bool hasBackground() const;
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);
 
@@ -149,6 +150,11 @@ public:
      * Layout password is kept because it in data roles that are inaccessible here
      */
     void forgetPasswordForRecordings();
+
+    /**
+     * Used to dump some layout content to qDebug().
+     */
+    void dumpStructure() const;
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

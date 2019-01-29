@@ -23,9 +23,6 @@ namespace {
 
 static const int kSavedStatesLimit = 20;
 
-// TODO: This tag is better to be bound to QnWorkbenchStateManager.
-static const nx::utils::log::Tag kWorkbenchStateTag(lit("__workbenchState"));
-
 } // namespace
 
 QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/) :
@@ -79,12 +76,12 @@ void QnWorkbenchStateManager::saveState()
         NX_ASSERT(false, "Invalid connections state");
         return;
     }
-    NX_DEBUG(kWorkbenchStateTag, "Saving workbench state...");
-    NX_DEBUG(kWorkbenchStateTag, lm("System ID: %1").arg(localSystemId));
-    NX_DEBUG(kWorkbenchStateTag, lm("User ID: %1").arg(userId));
+    NX_VERBOSE(this, "Saving workbench state...");
+    NX_VERBOSE(this, lm("System ID: %1").arg(localSystemId));
+    NX_VERBOSE(this, lm("User ID: %1").arg(userId));
 
     const auto state = this->state();
-    NX_DEBUG(kWorkbenchStateTag, lm("Full state:\n%1").arg(QJson::serialized(state)));
+    NX_VERBOSE(this, lm("Full state:\n%1").arg(QJson::serialized(state)));
 
     auto states = qnSettings->workbenchStates();
     states.erase(std::remove_if(states.begin(), states.end(),
@@ -111,14 +108,14 @@ void QnWorkbenchStateManager::restoreState()
     const auto localSystemId = helpers::currentSystemLocalId(commonModule());
     const auto userId = user->getId();
 
-    NX_DEBUG(kWorkbenchStateTag, "Loading workbench state...");
-    NX_DEBUG(kWorkbenchStateTag, lm("System ID: %1").arg(localSystemId));
-    NX_DEBUG(kWorkbenchStateTag, lm("User ID: %1").arg(userId));
+    NX_VERBOSE(this, "Loading workbench state...");
+    NX_VERBOSE(this, lm("System ID: %1").arg(localSystemId));
+    NX_VERBOSE(this, lm("User ID: %1").arg(userId));
 
     auto states = qnSettings->workbenchStates();
     if (!states.empty())
     {
-        NX_DEBUG(kWorkbenchStateTag, lm("Last saved state:\n%1")
+        NX_VERBOSE(this, lm("Last saved state:\n%1")
             .arg(QJson::serialized(states.first())));
     }
 
@@ -130,7 +127,7 @@ void QnWorkbenchStateManager::restoreState()
 
     if (iter != states.cend())
     {
-        NX_DEBUG(kWorkbenchStateTag, lm("Found saved state:\n%1")
+        NX_VERBOSE(this, lm("Found saved state:\n%1")
             .arg(QJson::serialized(*iter)));
         workbench()->update(*iter);
         for (const auto& d : m_delegates)
@@ -138,7 +135,7 @@ void QnWorkbenchStateManager::restoreState()
     }
     else
     {
-        NX_DEBUG(kWorkbenchStateTag, "State was not found");
+        NX_VERBOSE(this, "State was not found");
     }
 }
 

@@ -160,7 +160,7 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(const QString& text, const QFont& 
     if (d->pixmapByKey.insert(key, result = new QnTextPixmap(r), cost))
         return *result;
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Too huge text pixmap");
+    NX_ASSERT(false, "Too huge text pixmap");
     return kEmptyTextPixmap;
 }
 

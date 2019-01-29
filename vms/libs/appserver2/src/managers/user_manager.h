@@ -92,7 +92,7 @@ int QnUserManager<QueryProcessorType>::save(
     const QString& newPassword,
     impl::SimpleHandlerPtr handler)
 {
-    NX_ASSERT(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
+    NX_ASSERT(!user.id.isNull(), "User id must be set before saving");
 
     const int reqID = generateRequestID();
     callSaveUserAsync(m_queryProcessor, m_userAccessData, handler, reqID, user, newPassword);

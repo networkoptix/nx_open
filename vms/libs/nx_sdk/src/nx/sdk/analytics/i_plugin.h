@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include <plugins/plugin_api.h>
 #include <nx/sdk/error.h>
 #include <nx/sdk/i_string.h>
@@ -20,20 +18,19 @@ static const nxpl::NX_GUID IID_Plugin =
     {{0x6d,0x73,0x71,0x36,0x17,0xad,0x43,0xf9,0x9f,0x80,0x7d,0x56,0x91,0x36,0x82,0x94}};
 
 /**
- * Main interface for an analytics::IPlugin instance. The only instance is created by a Mediaserver
- * in its start via calls to IPlugin* createNxAnalyticsPlugin() which should be exported as extern
- * "C" by the plugin library, and is destroyed (via releaseRef()) on Mediaserver shutdown.
+ * Main interface for an Analytics Plugin instance. The only instance is created by a Server
+ * on its start via calls to IPlugin* createNxAnalyticsPlugin() which should be exported as extern
+ * "C" by the plugin library, and is destroyed (via releaseRef()) on the Server shutdown.
  */
 class IPlugin: public nxpl::Plugin2
 {
 public:
-
     /**
      * Provides plugin manifest in JSON format.
      * @param outError Status of the operation; is set to noError before this call.
      * @return JSON string in UTF-8.
      */
-    virtual const IString* manifest(nx::sdk::Error* outError) const = 0;
+    virtual const IString* manifest(Error* outError) const = 0;
 
     /**
      * Creates a new instance of Analytics Engine.

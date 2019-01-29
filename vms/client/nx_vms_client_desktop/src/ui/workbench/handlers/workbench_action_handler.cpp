@@ -669,16 +669,18 @@ void ActionHandler::showMultipleCamerasErrorMessage(
     const QnVirtualCameraResourceList& camerasWithError,
     const QString& explanation)
 {
-    static const auto kMessageTemplate = tr("Failed to change password on %1 of %2 cameras");
     static const auto kSimpleOptions = QnResourceListView::Options(
         QnResourceListView::HideStatusOption
         | QnResourceListView::ServerAsHealthMonitorOption
         | QnResourceListView::SortAsInTreeOption);
 
+    const QString message = tr("Failed to change password on %n cameras of %1",
+        "Total number of cameras will be substituted as %1",
+        camerasWithError.size()).arg(totalCameras);
+
     QnSessionAwareMessageBox messageBox(mainWindowWidget());
     messageBox.setIcon(QnMessageBoxIcon::Critical);
-    messageBox.setText(kMessageTemplate.arg(
-        QString::number(camerasWithError.size()), QString::number(totalCameras)));
+    messageBox.setText(message);
     if (!explanation.isEmpty())
         messageBox.setInformativeText(explanation);
     messageBox.addCustomWidget(
@@ -810,7 +812,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
     const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = (layout->getItems().isEmpty() || !layout->hasCellAspectRatio())
-        && layout->backgroundSize().isEmpty(); // TODO: implement layout->hasBackground().
+        && !layout->hasBackground();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
@@ -2164,7 +2166,7 @@ void ActionHandler::at_renameAction_triggered()
     }
     else
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, "Invalid resource type to rename");
     }
 }
 

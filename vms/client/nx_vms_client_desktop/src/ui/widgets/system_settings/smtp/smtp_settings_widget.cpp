@@ -46,9 +46,9 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     ui->stackedWidget->addWidget(m_advancedSettingsWidget);
     ui->stackedWidget->addWidget(m_testSettingsWidget);
 
-    NX_ASSERT(ui->stackedWidget->indexOf(m_simpleSettingsWidget)   == SimplePage,  Q_FUNC_INFO, "Index check");
-    NX_ASSERT(ui->stackedWidget->indexOf(m_advancedSettingsWidget) == AdvancedPage,Q_FUNC_INFO, "Index check");
-    NX_ASSERT(ui->stackedWidget->indexOf(m_testSettingsWidget)     == TestingPage, Q_FUNC_INFO, "Index check");
+    NX_ASSERT(ui->stackedWidget->indexOf(m_simpleSettingsWidget) == SimplePage);
+    NX_ASSERT(ui->stackedWidget->indexOf(m_advancedSettingsWidget) == AdvancedPage);
+    NX_ASSERT(ui->stackedWidget->indexOf(m_testSettingsWidget) == TestingPage);
 
     auto checkedChanged = [this]{
         if (!m_updating)
