@@ -775,9 +775,12 @@ QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionS
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value)
 {
-    NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    (*userAttributesLock)->motionType = value;
+    {
+        NX_ASSERT(!getId().isNull());
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+        (*userAttributesLock)->motionType = value;
+    }
+    m_motionType.reset();
 }
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
