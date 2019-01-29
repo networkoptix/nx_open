@@ -117,7 +117,7 @@ protected:
     QList<QnUuid> selectPeersForOperation(
         int count = -1,
         QList<QnUuid> peers = QList<QnUuid>(),
-        bool skipPeersWithMinumalRank = true) const;
+        bool skipPeersWithMinimalRank = true) const;
     void revivePeersWithMinimalRank();
     int selectNextChunk() const;
 

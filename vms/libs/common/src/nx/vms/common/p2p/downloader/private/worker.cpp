@@ -950,7 +950,7 @@ QList<QnUuid> Worker::peersWithInternetConnection() const
 }
 
 QList<QnUuid> Worker::selectPeersForOperation(
-    int count, QList<QnUuid> peers, bool skipPeersWithMinumalRank) const
+    int count, QList<QnUuid> peers, bool skipPeersWithMinimalRank) const
 {
     QList<QnUuid> result;
 
@@ -969,7 +969,7 @@ QList<QnUuid> Worker::selectPeersForOperation(
 
     if (peers.size() <= count)
     {
-        if (skipPeersWithMinumalRank)
+        if (skipPeersWithMinimalRank)
         {
             for (const auto& peer: peers)
             {
@@ -999,7 +999,7 @@ QList<QnUuid> Worker::selectPeersForOperation(
         const QnUuid& peerId = *it;
 
         const int rank = m_peerInfoById.value(peerId).rank;
-        if (skipPeersWithMinumalRank && rank <= kMinAutoRank)
+        if (skipPeersWithMinimalRank && rank <= kMinAutoRank)
         {
             it = peers.erase(it);
             continue;
