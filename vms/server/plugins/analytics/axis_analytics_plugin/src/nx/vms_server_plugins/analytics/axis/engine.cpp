@@ -1,11 +1,8 @@
 #include "engine.h"
 
-#include <array>
-#include <fstream>
 #include <string>
 
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 
@@ -18,6 +15,7 @@
 #include "device_agent.h"
 
 namespace nx::vms_server_plugins::analytics::axis {
+
 namespace {
 
 const QString kAxisVendor("axis");

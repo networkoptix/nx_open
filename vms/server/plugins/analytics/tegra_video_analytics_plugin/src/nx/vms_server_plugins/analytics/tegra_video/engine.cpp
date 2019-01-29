@@ -3,7 +3,6 @@
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
-#include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 
 #include "tegra_video_analytics_plugin_ini.h"
