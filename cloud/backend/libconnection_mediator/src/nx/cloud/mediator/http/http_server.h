@@ -7,6 +7,8 @@
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+#include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
+#include <nx/network/http/server/authentication_dispatcher.h>
 #include <nx/network/maintenance/server.h>
 
 #include "../discovery/discovery_http_server.h"
@@ -42,8 +44,23 @@ public:
     void registerStatisticsApiHandlers(const stats::Provider&);
 
 private:
+    /** Provides htdigest authentication for the maintenance server */
+    struct MaintenanceHtdigestAuthenticator
+    {
+        nx::network::http::server::HtdigestAuthenticationProvider provider;
+        nx::network::http::server::BaseAuthenticationManager manager;
+
+        MaintenanceHtdigestAuthenticator(const std::string& maintenanceHtdigestPath):
+            provider(maintenanceHtdigestPath),
+            manager(&provider)
+        {
+        }
+    };
+
     const conf::Settings& m_settings;
+    MaintenanceHtdigestAuthenticator m_htdigestAuthenticator;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;

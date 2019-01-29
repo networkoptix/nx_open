@@ -24,7 +24,8 @@ Server::Server(
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
-    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher),
+    m_htdigestAuthenticator(settings.http().maintenanceHtdigestPath),
+    m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
     m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
@@ -141,6 +142,10 @@ bool Server::launchHttpServerIfNeeded(
     m_maintenanceServer.registerRequestHandlers(
         api::kMediatorApiPrefix,
         &m_httpMessageDispatcher);
+
+    m_authenticationDispatcher.add(
+        std::regex(m_maintenanceServer.maintenancePath() + ".*"),
+        &m_htdigestAuthenticator.manager);
 
     return true;
 }
