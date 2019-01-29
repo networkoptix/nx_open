@@ -57,11 +57,6 @@ const State& CameraSettingsDialogStore::state() const
     return d->state;
 }
 
-void CameraSettingsDialogStore::applyChanges()
-{
-    d->executeAction([](State state) { return Reducer::applyChanges(std::move(state)); });
-}
-
 void CameraSettingsDialogStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
