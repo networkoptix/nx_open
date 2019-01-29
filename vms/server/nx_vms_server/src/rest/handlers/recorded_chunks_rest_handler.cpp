@@ -17,6 +17,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_manager.h>
 
 QnRecordedChunksRestHandler::QnRecordedChunksRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -44,6 +45,8 @@ int QnRecordedChunksRestHandler::executeGet(
         errStr += "Parameter 'detail' must be provided.\n";
     if (request.format == Qn::UnsupportedFormat)
         errStr += "Parameter 'format' must be provided.\n";
+    if (!owner->commonModule()->resourceAccessManager()->hasGlobalPermission(owner->accessRights(), GlobalPermission::viewArchive))
+        errStr += "Can't process rest request because user has not enough access rights\n";
 
     auto errLog =
         [&](const QString& errText)
@@ -53,6 +56,7 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("</root>\n");
             return nx::network::http::StatusCode::unprocessableEntity;
         };
+
 
     if (!errStr.isEmpty())
         return errLog(errStr);
