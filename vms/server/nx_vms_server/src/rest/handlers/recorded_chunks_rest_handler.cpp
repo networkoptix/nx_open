@@ -45,8 +45,11 @@ int QnRecordedChunksRestHandler::executeGet(
         errStr += "Parameter 'detail' must be provided.\n";
     if (request.format == Qn::UnsupportedFormat)
         errStr += "Parameter 'format' must be provided.\n";
-    if (!owner->commonModule()->resourceAccessManager()->hasGlobalPermission(owner->accessRights(), GlobalPermission::viewArchive))
+    if (!owner->commonModule()->resourceAccessManager()->hasGlobalPermission(
+        owner->accessRights(), GlobalPermission::viewArchive))
+    {
         errStr += "Can't process rest request because user has not enough access rights\n";
+    }
 
     auto errLog =
         [&](const QString& errText)
@@ -56,7 +59,6 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("</root>\n");
             return nx::network::http::StatusCode::unprocessableEntity;
         };
-
 
     if (!errStr.isEmpty())
         return errLog(errStr);
