@@ -130,7 +130,8 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
                 else
                 {
                     auto& container = parsedData->removeRecords[index];
-                    container.emplace_back(operation.getHashInCatalog());
+                    container.emplace_back(DbReader::RemoveData{
+                        operation.getHashInCatalog(), parsedData->addRecords[index].size()});
                 }
                 break;
             }

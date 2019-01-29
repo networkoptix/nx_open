@@ -567,12 +567,16 @@ void QnStorageDb::processDbContent(
 
         auto& remoteCatalog = parsedData.removeRecords[index];
         auto& catalog = itr->second;
-        for (const auto& mediaData : catalog)
+        for (size_t index = 0; index < catalog.size(); ++index)
         {
-            if (std::binary_search(
-                    remoteCatalog.begin(),
-                    remoteCatalog.end(),
-                    mediaData.getHashInCatalog()))
+            const auto& mediaData = catalog[index];
+            const auto hash = mediaData.getHashInCatalog();
+            auto itr =
+            std::upper_bound(
+                remoteCatalog.begin(), remoteCatalog.end(),
+                nx::media_db::DbReader::RemoveData { hash, index });
+
+            if (itr != remoteCatalog.end() && itr->hash == hash)
             {
                 continue; //< Value removed
             }

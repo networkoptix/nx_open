@@ -94,15 +94,31 @@ typedef boost::variant<boost::blank, MediaFileOperation, CameraOperation> DBReco
 class DbReader
 {
 public:
+    struct RemoveData
+    {
+        quint64 hash = 0; //< MediaFileOperation::hashInCatalog(). Just timestamp.
+        size_t removeToNumber = 0; //< Remove records till number.
+
+        bool operator<(const RemoveData& right) const
+        {
+            if (hash != right.hash)
+                return hash < right.hash;
+            return removeToNumber < right.removeToNumber;
+        }
+
+        bool operator==(const RemoveData& right) const
+        {
+            return hash == right.hash && removeToNumber == right.removeToNumber;
+        }
+    };
+
     struct Data
     {
         FileHeader header;
         std::vector<CameraOperation> cameras;
 
-        // key: cameraId*2 + catalog
-        std::unordered_map<int, std::vector<MediaFileOperation>> addRecords;
-        // value: MediaFileOperation::hashInCatalog()
-        std::unordered_map<int, std::vector<quint64>> removeRecords;
+        std::unordered_map<int, std::vector<MediaFileOperation>> addRecords; //< key: cameraId*2 + catalog
+        std::unordered_map<int, std::vector<RemoveData>> removeRecords;
     };
 
     static bool parse(const QByteArray& fileContent, Data* parsedData);

@@ -422,7 +422,25 @@ public:
         platformAbstraction = std::make_unique<QnPlatformAbstraction>();
     }
 
+    virtual void SetUp() override
+    {
+        MediaServerModuleFixture::SetUp();
+
+        workDirResource = std::make_unique<nx::ut::utils::WorkDirResource>();
+        ASSERT_TRUE((bool)workDirResource->getDirName());
+
+        const QString workDirPath = *workDirResource->getDirName();
+
+        storage.reset(new QnFileStorageResource(&serverModule()));
+        storage->setUrl(workDirPath);
+        auto result = storage->initOrUpdate() == Qn::StorageInit_Ok;
+        ASSERT_TRUE(result);
+    }
+
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+
+    std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
+    QnFileStorageResourcePtr storage;
 };
 
 TEST(MediaFileOperations, BitsTwiddling)
@@ -573,7 +591,8 @@ protected:
             if (recordType == RecordType::FileOperationAdd)
                 m_dbData.addRecords[index].push_back(fileOp);
             else
-                m_dbData.removeRecords[index].push_back(fileOp.getHashInCatalog());
+                 m_dbData.removeRecords[index].push_back(DbReader::RemoveData
+                   {fileOp.getHashInCatalog(), m_dbData.addRecords[index].size()});
 
             m_writer.writeRecord(fileOp);
 
@@ -672,10 +691,7 @@ TEST_F(MediaDbWriteRead, correctness)
 
 TEST_F(MediaDbTest, Migration_from_sqlite)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
-
-    const QString workDirPath = *workDirResource.getDirName();
+    const QString workDirPath = *workDirResource->getDirName();
     QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
@@ -735,10 +751,6 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     }
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
-    storage->setUrl(workDirPath);
-    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
-    ASSERT_TRUE(result);
 
     auto connectionName = sqlDb->connectionName();
     sqlDb->close();
@@ -778,19 +790,8 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
 TEST_F(MediaDbTest, StorageDB)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
-
-    const QString workDirPath = *workDirResource.getDirName();
-
-    bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
-    storage->setUrl(workDirPath);
-    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
-    ASSERT_TRUE(result);
-
     QnStorageDb sdb(&serverModule(), storage, 1);
-    result = sdb.open(workDirPath + lit("/test.nxdb"));
+    auto result = sdb.open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
     sdb.loadFullFileCatalog();
@@ -907,6 +908,46 @@ TEST_F(MediaDbTest, StorageDB)
     }
 
     ASSERT_EQ(allVisited, true);
+}
+
+TEST_F(MediaDbTest, RepaceRecord)
+{
+    using namespace nx::media_db;
+
+    QnStorageDb sdb(&serverModule(), storage, 1);
+    auto result = sdb.open(*workDirResource->getDirName() + lit("/test.nxdb"));
+    ASSERT_TRUE(result);
+
+    sdb.loadFullFileCatalog();
+
+    const QString id1("1");
+    const QString id2("2");
+    const QString id3("3");
+
+    DeviceFileCatalog::Chunk chunk;
+    chunk.startTimeMs = 10;
+    chunk.durationMs = 5;
+    chunk.fileIndex = DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+
+    sdb.addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb.deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb.deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb.addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+
+    sdb.addRecord(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb.deleteRecords(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+
+    sdb.addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb.deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb.addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb.deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+
+    auto dbChunkCatalogs = sdb.loadFullFileCatalog();
+
+    ASSERT_EQ(3, dbChunkCatalogs.size());
+    ASSERT_EQ(1, dbChunkCatalogs[0]->size());
+    ASSERT_EQ(0, dbChunkCatalogs[1]->size());
+    ASSERT_EQ(0, dbChunkCatalogs[2]->size());
 }
 
 } // namespace nx::media_db::test
