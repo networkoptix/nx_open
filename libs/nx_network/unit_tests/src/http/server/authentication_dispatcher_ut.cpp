@@ -122,7 +122,7 @@ private:
         m_dispatcher.authenticate(
             *serverConnection,
             httpRequest,
-            [this, authenticator](AuthenticationResult result)
+            [this, authenticator](AuthenticationResult /*result*/)
             {
                 ASSERT_TRUE(authenticator->authenticateCalled());
             });
@@ -139,7 +139,7 @@ private:
         m_dispatcher.authenticate(
             *serverConnection,
             httpRequest,
-            [this, authenticator](AuthenticationResult result)
+            [this, authenticator](AuthenticationResult /*result*/)
             {
                 ASSERT_FALSE(authenticator->authenticateCalled());
             });
