@@ -137,7 +137,9 @@
     "cantOpenClient": "ไม่พบแอ็พพลิเคชัน %VMS_NAME% <a href=\"/download\">Download</a>",
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
     "thisSystem": "ระบบ",
-    "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10"
+    "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "ดี",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "ลบ",
     "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
-    "successMerge": "ระบบ {{systemName}} ถูกผสานกับ {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
   },
   "account": {

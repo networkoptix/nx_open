@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム",
-    "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません"
+    "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "良い",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "削除",
     "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "successMerge": "システム {{systemName}} が {{systemName}} と統合されました",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
   },
   "account": {

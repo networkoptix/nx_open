@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbinding met {{systemName}} verloren",
     "thisSystem": "het systeem",
-    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund"
+    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "goed",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "successMerge": "Systeem {{systemName}} is samengevoegd met {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
   },
   "account": {
