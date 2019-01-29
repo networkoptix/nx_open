@@ -12,9 +12,18 @@ void Server::registerRequestHandlers(
     const std::string& basePath,
     http::server::rest::MessageDispatcher* messageDispatcher)
 {
+    m_maintenancePath = url::joinPath(basePath, kMaintenance);
+
     messageDispatcher->registerRequestProcessor<GetMallocInfo>(
-        url::joinPath(basePath, kMaintenance, kMallocInfo).c_str(),
+        url::joinPath(m_maintenancePath, kMallocInfo).c_str(),
         http::Method::get);
+
+    m_logServer.registerRequestHandlers(url::joinPath(m_maintenancePath, kLog), messageDispatcher);
+}
+
+std::string Server::maintenancePath() const
+{
+    return m_maintenancePath;
 }
 
 } // namespace nx::network::maintenance
