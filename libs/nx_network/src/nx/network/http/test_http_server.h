@@ -32,11 +32,9 @@ public:
         nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
     void setAuthenticationEnabled(bool value);
-    void setAuthenticationSucceeded(bool value);
 
 private:
     bool m_authenticationEnabled;
-    bool m_authenticationSucceeded;
 };
 
 //-------------------------------------------------------------------------------------------------

@@ -19,6 +19,36 @@ static const std::vector<const char *> kTestPaths =
     "/test/unregisteredput"
 };
 
+class TestAuthenticator: public AbstractAuthenticationManager
+{
+public:
+    TestAuthenticator():
+        m_authenticationManager(std::make_unique<TestAuthenticationManager>(nullptr))
+    {
+        m_authenticationManager->setAuthenticationEnabled(false);
+    }
+
+    virtual ~TestAuthenticator() override = default;
+
+    void authenticate(
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
+        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override
+    {
+        m_authenticateCalled = true;
+        m_authenticationManager->authenticate(connection, request, std::move(completionHandler));
+    }
+
+    bool authenticateCalled() const
+    {
+        return m_authenticateCalled;
+    }
+
+private:
+    bool m_authenticateCalled = false;
+    std::unique_ptr<TestAuthenticationManager> m_authenticationManager;
+};
+
 } // namespace
 
 class AuthenticationDispatcher:
@@ -59,12 +89,16 @@ protected:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler)
     {
+        std::string requestPath = requestContext.request.requestLine.url.path().toStdString();
+
         m_dispatcher.authenticate(
             *requestContext.connection,
             requestContext.request,
-            [&](server::AuthenticationResult result)
+            [this, requestPath](server::AuthenticationResult result)
             {
-                ASSERT_TRUE(result.isSucceeded);
+                TestAuthenticator* authenticator = m_authenticators[requestPath].get();
+                ASSERT_TRUE(authenticator);
+                ASSERT_TRUE(authenticator->authenticateCalled());
             });
 
         completionHandler(http::StatusCode::ok);
@@ -74,14 +108,18 @@ protected:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler)
     {
+        std::string requestPath = requestContext.request.requestLine.url.path().toStdString();
+
         // "DELETE" method has authentication set to always fail,
         // so we expect this path authentication to fail.
         m_dispatcher.authenticate(
             *requestContext.connection,
             requestContext.request,
-            [&](server::AuthenticationResult result)
+            [this, requestPath](server::AuthenticationResult result)
             {
-                ASSERT_FALSE(result.isSucceeded);
+                TestAuthenticator* authenticator = m_authenticators[requestPath].get();
+                ASSERT_TRUE(authenticator);
+                ASSERT_TRUE(authenticator->authenticateCalled());
             });
 
         completionHandler(http::StatusCode::ok);
@@ -91,14 +129,18 @@ protected:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler)
     {
+        std::string requestPath = requestContext.request.requestLine.url.path().toStdString();
+
         // Unregistered "PUT" method does not have an authenticator,
         // so we expect the authentication dispatcher to authenticate by default.
         m_dispatcher.authenticate(
             *requestContext.connection,
             requestContext.request,
-            [&](server::AuthenticationResult result)
+            [this, requestPath](server::AuthenticationResult result)
             {
-                ASSERT_TRUE(result.isSucceeded);
+                TestAuthenticator* authenticator = m_authenticators[requestPath].get();
+                ASSERT_TRUE(authenticator);
+                ASSERT_FALSE(authenticator->authenticateCalled());
             });
 
         completionHandler(http::StatusCode::ok);
@@ -130,29 +172,22 @@ protected:
 private:
         void initializeAndRegisterAuthenticators()
         {
-            // Skipping kTestPaths[2]: "/test/unregisteredput"
-            for (std::size_t i = 0; i < kTestPaths.size() - 1; ++i)
+            for (const auto& testPath : kTestPaths)
             {
-                bool authenticationResult = std::string(kTestPaths[i]) == "/test/delete"
-                    ? false
-                    : true;
+                auto authenticator = std::make_unique<TestAuthenticator>();
 
-                auto authenticationManager = std::make_unique<TestAuthenticationManager>(nullptr);
+                // Skipping kTestPaths[2]: "/test/unregisteredput"
+                if (std::string(testPath) != kTestPaths[2])
+                    m_dispatcher.add(std::regex(testPath), authenticator.get());
 
-                // Force dummy authentication
-                authenticationManager->setAuthenticationEnabled(false);
-                authenticationManager->setAuthenticationSucceeded(authenticationResult);
-
-                m_dispatcher.add(std::regex(kTestPaths[i]), authenticationManager.get());
-
-                m_authenticators.emplace(std::move(authenticationManager));
+                m_authenticators.emplace(testPath, std::move(authenticator));
             }
         }
 
 protected:
-    std::set<std::unique_ptr<TestAuthenticationManager>> m_authenticators;
-
     server::AuthenticationDispatcher m_dispatcher;
+    std::map<std::string, std::unique_ptr<TestAuthenticator>> m_authenticators;
+
     http::TestHttpServer m_httpServer;
     http::HttpClient m_httpClient;
 };
