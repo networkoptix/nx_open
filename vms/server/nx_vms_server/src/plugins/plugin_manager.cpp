@@ -10,8 +10,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <camera/camera_plugin.h>
-#include <plugins/plugin_tools.h>
+#include <plugins/plugin_api.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/native_sdk/common_plugin_container.h>
 
