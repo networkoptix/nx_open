@@ -37,30 +37,30 @@ static int parseChar(const char **source, char c)
 
 static int createStringCopy(const char *source, int sourceLen, char **target)
 {
-	int i, j;
-	int escapedSourceLen;
+    int i, j;
+    int escapedSourceLen;
 
     if (sourceLen == -1)
         sourceLen = strlen(source);
 
-	escapedSourceLen = sourceLen;
-	for (i = 0; i < sourceLen; ++i)
-	{
-		if (source[i] == '\\' && i != sourceLen - 1 && source[i + 1] == '\\')
-			escapedSourceLen--;
-	}
+    escapedSourceLen = sourceLen;
+    for (i = 0; i < sourceLen; ++i)
+    {
+        if (source[i] == '\\' && i != sourceLen - 1 && source[i + 1] == '\\')
+            escapedSourceLen--;
+    }
 
     *target = (char*)malloc(escapedSourceLen + 1);
 
     if (!*target)
         return -1;
 
-	for (i = 0, j = 0; i < sourceLen; ++i, ++j)
-	{
-		if (source[i] == '\\' && i != sourceLen - 1 && source[i + 1] == '\\')
-			++i;
-		(*target)[j] = source[i];
-	}
+    for (i = 0, j = 0; i < sourceLen; ++i, ++j)
+    {
+        if (source[i] == '\\' && i != sourceLen - 1 && source[i + 1] == '\\')
+            ++i;
+        (*target)[j] = source[i];
+    }
 
     (*target)[escapedSourceLen] = '\0';
 

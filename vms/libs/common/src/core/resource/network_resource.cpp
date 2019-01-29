@@ -21,19 +21,22 @@
 
 namespace {
 
-static const QString kMediaPortParamName = lit("mediaPort");
+static const QString kMediaPortParamName = "mediaPort";
+
+QString calculateHostAddress(const QString& url)
+{
+    if (url.indexOf(QLatin1String("://")) == -1)
+        return url;
+    return QUrl(url).host();
+}
 
 } // namespace
 
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_authenticated(true),
-    m_networkStatus(0),
-    m_networkTimeout(1000 * 10),
     m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
-    m_probablyNeedToUpdateStatus(false)
+    m_cachedHostAddress([this] {return calculateHostAddress(getUrl()); }, &m_mutex )
 {
-    // TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
     addFlags(Qn::network);
 }
 
@@ -46,18 +49,26 @@ QString QnNetworkResource::getUniqueId() const
     return getPhysicalId();
 }
 
-QString QnNetworkResource::getHostAddress() const
+void QnNetworkResource::setUrl(const QString& url)
 {
-    //QnMutexLocker mutex( &m_mutex );
-    //return m_hostAddr;
-    QString url = getUrl();
-    if (url.indexOf(QLatin1String("://")) == -1)
-        return url;
-    else
-        return QUrl(url).host();
+    {
+        QnMutexLocker mutexLocker(&m_mutex);
+        if (!setUrlUnsafe(url))
+            return;
+
+        m_cachedHostAddress.reset();
+    }
+
+    emit urlChanged(toSharedPointer(this));
 }
 
-void QnNetworkResource::setHostAddress(const QString &ip)
+QString QnNetworkResource::getHostAddress() const
+{
+    // Secured by the same mutex as ::setUrl(), so thread-safe.
+    return m_cachedHostAddress.get();
+}
+
+void QnNetworkResource::setHostAddress(const QString& ip)
 {
     //QnMutexLocker mutex( &m_mutex );
     //m_hostAddr = ip;
@@ -115,7 +126,7 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
         ResourcePropertyKey::kCredentials,
@@ -242,12 +253,12 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
 
 void QnNetworkResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
+    m_cachedHostAddress.reset();
     base_type::updateInternal(other, notifiers);
-    QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
-    if (other_casted)
+    if (const auto otherNetwork = other.dynamicCast<QnNetworkResource>())
     {
-        m_macAddress = other_casted->m_macAddress;
-        m_lastDiscoveredTime = other_casted->m_lastDiscoveredTime;
+        m_macAddress = otherNetwork->m_macAddress;
+        m_lastDiscoveredTime = otherNetwork->m_lastDiscoveredTime;
     }
 }
 

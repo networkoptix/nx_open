@@ -17,74 +17,53 @@
 
 namespace {
 
-QString extractHost(const QString& url)
+enum Priority { kDns, kLocalIpV4, kRemoteIp, kLocalIpV6, kLocalHost, kCloud };
+
+Priority hostPriority(const nx::network::HostAddress& host)
 {
-    /* Don't go through QHostAddress/QUrl constructors as it is SLOW.
-    * Speed is important for event log. */
-    int startPos = url.indexOf(lit("://"));
-    startPos = startPos == -1 ? 0 : startPos + 3;
+    if (host.isLocalHost())
+        return kLocalHost;
 
-    static const std::array<QChar, 4> kStopChars = { L':', L'/', L'?', L'#' };
-    int endPos = -1;
-    for (const auto& stopChar: kStopChars)
-    {
-        endPos = url.indexOf(stopChar, startPos);
-        if (endPos != -1)
-            break;
-    }
+    if (host.isLocalNetwork())
+        return host.ipV4() ? kLocalIpV4 : kLocalIpV6;
 
-    endPos = endPos == -1 ? url.size() : endPos;
+    if (host.ipV4() || (bool) host.ipV6().first)
+        return kRemoteIp;
 
-    return url.mid(startPos, endPos - startPos);
-}
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
+        return kCloud;
 
-bool hostIsValid(const nx::network::SocketAddress& address)
-{
-    QString host = address.address.toString();
-
-    /* Check local host. */
-    if (host == lit("localhost") || host == lit("127.0.0.1"))
-        return false;
-
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
-        return false;
-
-    return true;
+    return kDns;
 };
 
 nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
 {
-    /* We should not display localhost or cloud addresses to user. */
     NX_ASSERT(server);
     if (!server)
         return QString();
 
+    // We should not display localhost or cloud addresses to the user.
     auto primaryUrl = server->getPrimaryAddress();
-    if (hostIsValid(primaryUrl))
+    if (hostPriority(primaryUrl.address) < kLocalHost)
         return primaryUrl;
 
     auto allAddresses = server->getAllAvailableAddresses();
-    for (auto address : allAddresses)
-    {
-        if (hostIsValid(address))
-            return address;
-    }
+    if (allAddresses.empty())
+        return primaryUrl;
 
-    return primaryUrl;
+    return *std::min_element(allAddresses.cbegin(), allAddresses.cend(),
+        [](const auto& l, const auto& r)
+        {
+            return hostPriority(l.address) < hostPriority(r.address);
+        });
 }
 
-const QString kFormatTemplate = lit("%1 (%2)");
+const QString kFormatTemplate = "%1 (%2)";
 
-};
+} // namespace
 
-QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource)
-:
-    m_resource(resource),
-    m_detailLevel(Qn::RI_Invalid),
-    m_name(),
-    m_host(),
-    m_port(0),
-    m_extraInfo()
+QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource):
+    m_resource(resource)
 {
 }
 
@@ -155,11 +134,11 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
         m_name = m_resource->getName();
         if (m_resource->hasFlags(Qn::live_cam)) /* Quick check */
         {
-            if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>())
+            if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
                 m_name = camera->getUserDefinedName();
         }
 
-        if (QnStorageResourcePtr storage = m_resource.dynamicCast<QnStorageResource>())
+        if (const auto storage = m_resource.dynamicCast<QnStorageResource>())
             m_name = storage->getUrl();
     }
 
@@ -176,7 +155,8 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
         }
         else if (flags.testFlag(Qn::network))
         {
-            m_host = extractHost(m_resource->getUrl());
+            if (const auto networkResource = m_resource.dynamicCast<QnNetworkResource>())
+                m_host = networkResource->getHostAddress();
         }
     }
 
@@ -185,9 +165,9 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
 
     if (flags.testFlag(Qn::user))
     {
-        if (const QnUserResourcePtr& user = m_resource.dynamicCast<QnUserResource>())
+        if (const auto user = m_resource.dynamicCast<QnUserResource>())
         {
-            if (auto common = user->commonModule())
+            if (const auto common = user->commonModule())
                 m_extraInfo = common->userRolesManager()->userRoleName(user);
         }
     }

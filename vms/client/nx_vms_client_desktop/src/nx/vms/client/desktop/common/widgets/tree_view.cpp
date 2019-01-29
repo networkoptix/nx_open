@@ -13,9 +13,6 @@ namespace nx::vms::client::desktop {
 TreeView::TreeView(QWidget* parent): base_type(parent)
 {
     setDragDropOverwriteMode(true);
-
-    verticalScrollBar()->installEventFilter(this);
-    handleVerticalScrollbarVisibilityChanged();
 }
 
 void TreeView::scrollContentsBy(int dx, int dy)
@@ -49,40 +46,13 @@ void TreeView::keyPressEvent(QKeyEvent* event)
             if (currentIndex().isValid())
             {
                 emit spacePressed(currentIndex());
-                if (m_ignoreDefaultSpace)
+                if (m_isDefauldSpacePressIgnored)
                     return;
             }
         }
     }
 
     base_type::keyPressEvent(event);
-}
-
-bool TreeView::eventFilter(QObject* object, QEvent* event)
-{
-    if ((event->type() == QEvent::Show || event->type() == QEvent::Hide)
-        && object == verticalScrollBar())
-    {
-        handleVerticalScrollbarVisibilityChanged();
-    }
-
-    return base_type::eventFilter(object, event);
-}
-
-void TreeView::handleVerticalScrollbarVisibilityChanged()
-{
-    const auto scrollBar = verticalScrollBar();
-    const bool visible = scrollBar && scrollBar->isVisible();
-    if (visible == m_verticalScrollBarVisible)
-        return;
-
-    m_verticalScrollBarVisible = visible;
-    emit verticalScrollbarVisibilityChanged();
-}
-
-bool TreeView::verticalScrollBarIsVisible() const
-{
-    return m_verticalScrollBarVisible;
 }
 
 void TreeView::dragMoveEvent(QDragMoveEvent* event)
@@ -155,14 +125,14 @@ QSize TreeView::viewportSizeHint() const
     return base_type::viewportSizeHint() + QSize(horizontalOffset(), verticalOffset());
 }
 
-bool TreeView::ignoreDefaultSpace() const
+bool TreeView::isDefaultSpacePressIgnored() const
 {
-    return m_ignoreDefaultSpace;
+    return m_isDefauldSpacePressIgnored;
 }
 
-void TreeView::setIgnoreDefaultSpace(bool value)
+void TreeView::setDefaultSpacePressIgnored(bool isIgnored)
 {
-    m_ignoreDefaultSpace = value;
+    m_isDefauldSpacePressIgnored = isIgnored;
 }
 
 bool TreeView::dropOnBranchesAllowed() const

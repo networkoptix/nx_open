@@ -432,11 +432,7 @@ void ExportSettingsDialog::initSettingsWidgets()
 
 void ExportSettingsDialog::updateTabWidgetSize()
 {
-    // Stupid QTabWidget sizeHint workarounds.
-    auto size = ui->tabWidget->minimumSizeHint();
-    if (ui->tabWidget->tabBar()->isHidden())
-        size.setHeight(size.height() - ui->tabWidget->tabBar()->sizeHint().height());
-    ui->tabWidget->setFixedSize(size);
+    ui->tabWidget->setFixedSize(ui->tabWidget->minimumSizeHint());
 }
 
 void ExportSettingsDialog::updateMode()
@@ -692,7 +688,7 @@ Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
         suggested.name = lit("%1 (%2)").arg(baseName.name).arg(i);
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Failed to generate suggested filename");
+    NX_ASSERT(false, "Failed to generate suggested filename");
     return baseName;
 }
 

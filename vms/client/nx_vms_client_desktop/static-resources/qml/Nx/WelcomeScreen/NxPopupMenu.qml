@@ -9,16 +9,15 @@ Menu
     topPadding: 2
     bottomPadding: 2
 
+    implicitWidth: contentItem.childrenRect.width + leftPadding + rightPadding
+
     background: Rectangle
     {
         radius: 2
         color: ColorTheme.midlight
     }
 
-    Binding
+    contentItem: Column
     {
-        target: contentItem
-        property: "implicitWidth"
-        value: contentItem.contentItem.childrenRect.width
     }
 }

@@ -14,11 +14,11 @@ NativeStreamReader::NativeStreamReader(
     const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
-    StreamReaderPrivate(
-        encoderIndex,
-        codecParams,
-        camera)
+    StreamReaderPrivate(encoderIndex, camera)
 {
+    m_camera->videoStream()->setResolution(codecParams.resolution);
+    m_camera->videoStream()->setFps(codecParams.fps);
+    m_camera->videoStream()->setBitrate(codecParams.bitrate);
 }
 
 NativeStreamReader::~NativeStreamReader()
@@ -37,19 +37,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     auto packet = nextPacket();
 
     if (!packet)
-    {
-        removeConsumer();
-        if (m_interrupted)
-        {
-            m_interrupted = false;
-            return nxcip::NX_INTERRUPTED;
-        }
-
-        if (m_camera->ioError())
-            return nxcip::NX_IO_ERROR;
-
-        return nxcip::NX_OTHER_ERROR;
-    }
+        return handleNxError();
 
     *lpPacket = toNxPacket(packet.get()).release();
 
@@ -58,19 +46,16 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void NativeStreamReader::setFps(float fps)
 {
-    StreamReaderPrivate::setFps(fps);
-    m_avConsumer->setFps(fps);
+    m_camera->videoStream()->setFps(fps);
 }
 void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    StreamReaderPrivate::setResolution(resolution);
-    m_avConsumer->setResolution(resolution);
+    m_camera->videoStream()->setResolution(resolution);
 }
 
 void NativeStreamReader::setBitrate(int bitrate)
 {
-    StreamReaderPrivate::setBitrate(bitrate);
-    m_avConsumer->setBitrate(bitrate);
+    m_camera->videoStream()->setBitrate(bitrate);
 }
 
 void NativeStreamReader::ensureConsumerAdded()
@@ -87,21 +72,15 @@ void NativeStreamReader::ensureConsumerAdded()
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    while (m_camera->audioEnabled())
-    {
-        // the time span keeps audio and video timestamps monotonic
-        if (m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
-            break;
-        else if (m_interrupted || m_camera->ioError())
-                return nullptr;
-    }
+    if (m_camera->audioEnabled() && !m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
+        return nullptr;
 
     for (;;)
     {
         auto popped = m_avConsumer->popOldest(kWaitTimeout);
         if (!popped)
         {
-            if (m_interrupted || m_camera->ioError())
+            if (shouldStopWaitingForData())
                 return nullptr;
             continue;
         }

@@ -22,7 +22,7 @@
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 
 #include <utils/email/email.h>
 
@@ -239,11 +239,9 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
-    const auto descriptors = descriptorListManager
-        ->deviceDescriptors<nx::vms::api::analytics::EventTypeDescriptor>(camera);
-
-    return !descriptors.empty();
+    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(camera->commonModule());
+    const auto deviceDescriptor = deviceDescriptorManager.descriptor(camera->getId());
+    return deviceDescriptor && !deviceDescriptor->compatibleEngineIds.empty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
@@ -502,14 +500,14 @@ bool hasAccessToSource(const nx::vms::event::EventParameters& params,
     if (nx::vms::event::isSourceCameraRequired(eventType))
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
+        NX_ASSERT(camera, "Event has occurred without its camera");
         return camera && hasViewPermission;
     }
 
     if (nx::vms::event::isSourceServerRequired(eventType))
     {
         const auto server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
+        NX_ASSERT(server, "Event has occurred without its server");
         /* Only admins should see notifications with servers. */
         return server && hasViewPermission;
     }

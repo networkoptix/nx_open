@@ -60,7 +60,7 @@ void QnUploadUpdatesPeerTask::doStart()
 
     m_pendingUploads = m_peersBySystemInformation.uniqueKeys();
 
-    NX_DEBUG(this, lit("Update: Have to upload %1 file(s).").arg(m_pendingUploads.size()));
+    NX_DEBUG(this, lit("Update: Have to upload %1 files.").arg(m_pendingUploads.size()));
 
     uploadNextUpdate();
 }

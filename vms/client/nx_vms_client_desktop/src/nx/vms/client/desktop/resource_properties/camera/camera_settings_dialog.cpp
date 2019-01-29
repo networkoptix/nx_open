@@ -16,6 +16,7 @@
 #include <utils/common/html.h>
 #include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
+#include <utils/xml/camera_advanced_param_reader.h>
 #include <client_core/client_core_module.h>
 
 #include "camera_settings_tab.h"
@@ -191,7 +192,7 @@ struct CameraSettingsDialog::Private: public QObject
             }
 
             default:
-                NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
+                NX_ASSERT(false, "Unsupported action request");
         }
     }
 

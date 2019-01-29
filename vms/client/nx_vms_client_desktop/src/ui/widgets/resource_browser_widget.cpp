@@ -1,4 +1,4 @@
-﻿#include "resource_browser_widget.h"
+#include "resource_browser_widget.h"
 #include "ui_resource_browser_widget.h"
 
 #include <QtCore/QItemSelectionModel>
@@ -156,8 +156,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     QWidget(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::ResourceBrowserWidget()),
-    m_ignoreFilterChanges(false),
-    m_filterTimerId(0),
     m_tooltipWidget(nullptr),
     m_hoverProcessor(nullptr),
     m_thumbnailManager(new CameraThumbnailManager())
@@ -168,15 +166,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
-
-    ui->typeComboBox->addItem(tr("Any Type"), 0);
-    ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
-    ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
-    ui->typeComboBox->addItem(QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
-        tr("Live Devices"),
-        tr("Live Cameras")
-    ), static_cast<int>(Qn::live));
 
     // To keep aspect ratio specify only maximum height for server request
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
@@ -219,28 +208,13 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     initInstantSearch();
 
-    ui->searchTreeWidget->setCheckboxesVisible(false);
-
-    /* This is needed so that control's context menu is not embedded into the scene. */
-    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
     m_renameActions.insert(action::RenameResourceAction, new QAction(this));
     m_renameActions.insert(action::RenameVideowallEntityAction, new QAction(this));
     m_renameActions.insert(action::RenameLayoutTourAction, new QAction(this));
 
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
-    setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
-
-    m_connections << connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
-        this, [this]() { updateFilter(false); });
-    m_connections << connect(ui->filterLineEdit, &SearchLineEdit::textChanged,
-        this, [this]() { updateFilter(false); });
-    m_connections << connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
-        this, [this]() { updateFilter(true); });
 
     m_connections << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
-        this, &QnResourceBrowserWidget::handleItemActivated);
-    m_connections << connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
 
     m_connections << connect(ui->tabWidget, &QTabWidget::currentChanged,
@@ -250,7 +224,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
-    ui->searchTreeWidget->setWorkbench(workbench());
 
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
     ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
@@ -280,12 +253,19 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
                 setTooltipResource(QnResourcePtr());
         });
 
-    installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
-        ui->searchTreeWidget->treeView()->verticalScrollBar() }, { QEvent::Show, QEvent::Hide },
+    installEventHandler({ui->scrollArea->verticalScrollBar()}, {QEvent::Show, QEvent::Hide},
         this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
+    m_connections << connect(this, &QnResourceBrowserWidget::scrollBarVisibleChanged, this,
+        [this]()
+        {
+            auto margins = ui->scrollAreaWidgetContents->contentsMargins();
+            margins.setRight(isScrollBarVisible() ?
+                style()->pixelMetric(QStyle::PM_ScrollBarExtent) : 0);
+            ui->scrollAreaWidgetContents->setContentsMargins(margins);
+        });
+
     /* Run handlers. */
-    updateFilter();
     updateIcons();
 
     at_workbench_currentLayoutChanged();
@@ -298,13 +278,10 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget()
     at_workbench_currentLayoutAboutToBeChanged();
 
     setTooltipResource(QnResourcePtr());
-    ui->searchTreeWidget->setWorkbench(nullptr);
     ui->resourceTreeWidget->setWorkbench(nullptr);
 
     /* This class is one of the most significant reasons of crashes on exit. Workarounding it.. */
     m_connections = {};
-
-    ui->typeComboBox->setEnabled(false); // #3797
 }
 
 using IndexCallback = std::function<void (const QModelIndex& index, bool hasChildren)>;
@@ -800,27 +777,6 @@ QString QnResourceBrowserWidget::getFilterName(ResourceTreeNodeType allowedNodeT
     return QString();
 }
 
-QComboBox* QnResourceBrowserWidget::typeComboBox() const
-{
-    return ui->typeComboBox;
-}
-
-QnResourceBrowserWidget::Tab QnResourceBrowserWidget::currentTab() const
-{
-    return static_cast<Tab>(ui->tabWidget->currentIndex());
-}
-
-void QnResourceBrowserWidget::setCurrentTab(Tab tab)
-{
-    if (tab < 0 || tab >= TabCount)
-    {
-        NX_ASSERT(false, lm("Invalid resource tree widget tab '%1'.").arg((int)tab));
-        return;
-    }
-
-    ui->tabWidget->setCurrentIndex(tab);
-}
-
 bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout* layout) const
 {
     // Search results must not be displayed over layout tours, preview layouts and videowalls.
@@ -861,15 +817,6 @@ QnResourceSearchSynchronizer* QnResourceBrowserWidget::layoutSynchronizer(QnWork
     return result;
 }
 
-void QnResourceBrowserWidget::killSearchTimer()
-{
-    if (m_filterTimerId == 0)
-        return;
-
-    killTimer(m_filterTimerId);
-    m_filterTimerId = 0;
-}
-
 void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSelection)
 {
     if (!context() || !context()->menu())
@@ -887,17 +834,8 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
         ? action::Parameters{Qn::NodeTypeRole, NodeType::root}
         : currentParameters(action::TreeScope)));
 
-    if (currentTreeWidget() == ui->searchTreeWidget)
-    {
-        /* Disable rename action for search view. */
-        for (action::IDType key : m_renameActions.keys())
-            manager->redirectAction(menu.data(), key, nullptr);
-    }
-    else
-    {
-        for (action::IDType key : m_renameActions.keys())
-            manager->redirectAction(menu.data(), key, m_renameActions[key]);
-    }
+    for (action::IDType key : m_renameActions.keys())
+        manager->redirectAction(menu.data(), key, m_renameActions[key]);
 
     if (menu->isEmpty())
         return;
@@ -912,14 +850,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
 
 QnResourceTreeWidget* QnResourceBrowserWidget::currentTreeWidget() const
 {
-    if (ui->tabWidget->currentIndex() == ResourcesTab)
-    {
-        return ui->resourceTreeWidget;
-    }
-    else
-    {
-        return ui->searchTreeWidget;
-    }
+    return ui->resourceTreeWidget;
 }
 
 QItemSelectionModel* QnResourceBrowserWidget::currentSelectionModel() const
@@ -1128,7 +1059,7 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
 
 bool QnResourceBrowserWidget::isScrollBarVisible() const
 {
-    return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
+    return ui->scrollArea->verticalScrollBar()->isVisible();
 }
 
 action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScope scope) const
@@ -1214,52 +1145,6 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     return result;
 }
 
-void QnResourceBrowserWidget::updateFilter(bool force)
-{
-    QString filter = ui->filterLineEdit->text();
-
-    /* Don't allow empty filters. */
-    if (!filter.isEmpty() && filter.trimmed().isEmpty())
-    {
-        ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
-        return;
-    }
-
-    killSearchTimer();
-
-    if (!workbench())
-        return;
-
-    if (m_ignoreFilterChanges)
-        return;
-
-    if (!force)
-    {
-        //        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
-
-        int pos = 0;
-        /* Estimate size of the each term in filter expression. */
-        while (pos < filter.size())
-        {
-            int size = 0;
-            for (; pos < filter.size(); pos++)
-            {
-                if (filter[pos] == QLatin1Char('+') || filter[pos] == QLatin1Char('\\'))
-                    break;
-
-                if (!filter[pos].isSpace())
-                    size++;
-            }
-            pos++;
-            if (size > 0 && size < 3)
-                return; /* Filter too short, ignore. */
-        }
-    }
-
-    m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
-}
-
-
 void QnResourceBrowserWidget::hideToolTip()
 {
     if (!m_tooltipWidget)
@@ -1303,7 +1188,6 @@ void QnResourceBrowserWidget::updateIcons()
         opts |= QnResourceItemDelegate::ProblemIcons;
 
     ui->resourceTreeWidget->itemDelegate()->setOptions(opts);
-    ui->searchTreeWidget->itemDelegate()->setOptions(opts);
 }
 
 void QnResourceBrowserWidget::updateToolTipPosition()
@@ -1321,7 +1205,7 @@ void QnResourceBrowserWidget::updateToolTipPosition()
 void QnResourceBrowserWidget::contextMenuEvent(QContextMenuEvent* event)
 {
     QWidget* child = childAt(event->pos());
-    while (child && child != ui->resourceTreeWidget && child != ui->searchTreeWidget)
+    while (child && child != ui->resourceTreeWidget)
         child = child->parentWidget();
 
     /**
@@ -1351,9 +1235,6 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent* event)
     event->accept();
     if (event->key() == Qt::Key_Menu)
     {
-        if (ui->filterLineEdit->hasFocus())
-            return;
-
         QPoint pos = currentTreeWidget()->selectionPos();
         if (pos.isNull())
             return;
@@ -1367,38 +1248,6 @@ void QnResourceBrowserWidget::keyReleaseEvent(QKeyEvent* event)
     event->accept();
 }
 
-void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
-{
-    QWidget::timerEvent(event);
-
-    if (event->timerId() == m_filterTimerId)
-    {
-        killTimer(m_filterTimerId);
-        m_filterTimerId = 0;
-
-        if (workbench())
-        {
-            const auto layout = workbench()->currentLayout();
-            const auto model = layoutModel(layout, true);
-            model->setQuery(query());
-        }
-    }
-}
-
-void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
-{
-    /* Underly alternative background for when search tab is selected: */
-    if (ui->tabWidget->currentIndex() == SearchTab)
-    {
-        QPainter painter(this);
-        QRect rectToFill(rect());
-        // rectToFill.setBottom(ui->horizontalLine->mapTo(this, QPoint(0, 0)).y()); //TODO #vkutin this line might be needed later. Remove it if not.
-        painter.fillRect(rectToFill, palette().alternateBase());
-    }
-
-    QWidget::paintEvent(event);
-}
-
 void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 {
     auto layout = workbench()->currentLayout();
@@ -1406,10 +1255,6 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->disableUpdates();
-
-    ui->searchTreeWidget->setModel(nullptr);
-    setQuery({});
-    killSearchTimer();
 }
 
 void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
@@ -1420,9 +1265,6 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
         synchronizer->enableUpdates();
 
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
-
-    if (auto model = layoutModel(layout, false))
-        setQuery(model->query());
 
     /* Bold state has changed. */
     currentTreeWidget()->update();
@@ -1453,28 +1295,6 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem* item)
 
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
 {
-    if (index == SearchTab)
-    {
-        const auto layout = workbench()->currentLayout();
-        NX_ASSERT(layout);
-        if (!layout || !layout->resource())
-            return;
-
-        layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
-        auto model = layoutModel(layout, true);
-
-        ui->searchTreeWidget->setModel(model);
-        ui->searchTreeWidget->expandAll();
-
-        /* View re-creates selection model for each model that is supplied to it,
-         * so we have to re-connect each time the model changes. */
-        connect(ui->searchTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &QnResourceBrowserWidget::selectionChanged, Qt::UniqueConnection);
-
-        ui->filterLineEdit->setFocus();
-    }
-
-    emit currentTabChanged();
     emit scrollBarVisibleChanged();
 }
 
@@ -1536,30 +1356,8 @@ void QnResourceBrowserWidget::setTooltipResource(const QnResourcePtr& resource)
     m_tooltipWidget->setThumbnailVisible(!camera.isNull());
 }
 
-QnResourceSearchQuery QnResourceBrowserWidget::query() const
-{
-    const auto filter = ui->filterLineEdit->text();
-    const auto flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(
-        ui->typeComboBox->currentIndex()).toInt());
-    return QnResourceSearchQuery(filter, flags);
-}
-
-void QnResourceBrowserWidget::setQuery(const QnResourceSearchQuery& query)
-{
-    QScopedValueRollback<bool> guard(m_ignoreFilterChanges, true);
-
-    ui->filterLineEdit->lineEdit()->setText(query.text);
-
-    int typeIndex = ui->typeComboBox->findData((int)query.flags);
-    NX_ASSERT(typeIndex >= 0);
-    ui->typeComboBox->setCurrentIndex(typeIndex);
-}
-
 void QnResourceBrowserWidget::selectNodeByUuid(const QnUuid& id)
 {
-    if (currentTab() != ResourcesTab)
-        return;
-
     NX_ASSERT(!id.isNull());
     if (id.isNull())
         return;
@@ -1578,9 +1376,6 @@ void QnResourceBrowserWidget::selectNodeByUuid(const QnUuid& id)
 
 void QnResourceBrowserWidget::selectResource(const QnResourcePtr& resource)
 {
-    if (currentTab() != ResourcesTab)
-        return;
-
     NX_ASSERT(resource);
     if (!resource)
         return;

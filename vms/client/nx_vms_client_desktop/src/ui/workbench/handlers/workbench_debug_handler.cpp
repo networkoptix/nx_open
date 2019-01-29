@@ -505,33 +505,6 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
             &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
     #endif
-
-    auto supressLog =
-        [](const nx::utils::log::Tag& tag)
-        {
-            nx::utils::log::addLogger(
-                std::make_unique<nx::utils::log::Logger>(
-                    std::set<nx::utils::log::Tag>{tag},
-                    nx::utils::log::Level::none,
-                    std::make_unique<nx::utils::log::StdOut>()));
-        };
-
-    auto consoleLog =
-        [](const nx::utils::log::Tag& tag)
-        {
-            nx::utils::log::addLogger(
-                std::make_unique<nx::utils::log::Logger>(
-                    std::set<nx::utils::log::Tag>{tag},
-                    nx::utils::log::Level::verbose,
-                    std::make_unique<nx::utils::log::StdOut>()));
-        };
-
-    // TODO: Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
-    supressLog(nx::utils::log::Tag(QStringLiteral("__freeSlot")));
-    supressLog(nx::utils::log::Tag(QStringLiteral("__workbenchState")));
-    supressLog(nx::utils::log::Tag(QStringLiteral("__itemMap")));
-    supressLog(QnLog::PERMISSIONS_LOG);
-    //consoleLog("nx::vms::client::desktop::RadassController::Private");
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

@@ -5,9 +5,11 @@
 #include "../redux/camera_settings_dialog_store.h"
 
 #include <ui/common/read_only.h>
+
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
-#include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,6 +29,9 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->wearableArchiveLengthWidget->setStore(store);
     ui->wearableMotionWidget->setStore(store);
     ui->wearableUploadWidget->setStore(store);
+
+    ui->editStreamsPanel->hide();
+    ui->overEditStreamsLine->hide();
 
     ui->licensePanel->init(licenseUsageTextProvider, store);
 
@@ -52,6 +57,9 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
 
     connect(ui->editCredentialsButton, &QPushButton::clicked, this,
         [this, store = QPointer<CameraSettingsDialogStore>(store)]() { editCredentials(store); });
+
+    connect(ui->editStreamsButton, &QPushButton::clicked, this,
+        [this, store = QPointer<CameraSettingsDialogStore>(store)]() { editCameraStreams(store); });
 }
 
 CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
@@ -88,6 +96,9 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     ui->enableAudioCheckBox->setVisible(hasAudioSettings);
     ui->audioGroupBox->setVisible(hasAudioSettings);
 
+    ui->editStreamsPanel->setVisible(state.singleCameraProperties.editableStreamUrls);
+    ui->overEditStreamsLine->setVisible(state.singleCameraProperties.editableStreamUrls);
+
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);
 
@@ -109,6 +120,22 @@ void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* 
 
     if (dialog->exec() == QDialog::Accepted)
         store->setCredentials(dialog->login(), dialog->password());
+}
+
+void CameraSettingsGeneralTabWidget::editCameraStreams(CameraSettingsDialogStore* store)
+{
+    if (!store)
+        return;
+
+    QScopedPointer<CameraStreamsDialog> dialog(new CameraStreamsDialog(this));
+    dialog->setStreams({store->state().singleCameraSettings.primaryStream(),
+        store->state().singleCameraSettings.secondaryStream()});
+
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        const auto streams = dialog->streams();
+        store->setStreamUrls(streams.primaryStreamUrl, streams.secondaryStreamUrl);
+    }
 }
 
 } // namespace nx::vms::client::desktop

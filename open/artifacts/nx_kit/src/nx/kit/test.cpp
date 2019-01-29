@@ -21,6 +21,8 @@ namespace nx {
 namespace kit {
 namespace test {
 
+bool verbose = true;
+
 namespace detail {
 
 struct TestFailure: std::exception
@@ -161,8 +163,11 @@ int regTest(const Test& test)
 {
     allTests().push_back(test);
 
-    std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
-        << test.testCase << "." << test.testName << std::endl;
+    if (verbose)
+    {
+        std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
+            << test.testCase << "." << test.testName << std::endl;
+    }
 
     return 0; //< Return value is not used.
 }
@@ -214,7 +219,8 @@ static std::string randAsString()
         auto seed = (unsigned int) std::chrono::steady_clock::now().time_since_epoch().count();
         srand(seed);
         randomized = true;
-        printNote("Randomized with seed %u", seed);
+        if (verbose)
+            printNote("Randomized with seed %u", seed);
     }
 
     std::ostringstream s;
@@ -275,7 +281,7 @@ static void processArgs(int argc, const char* const argv[])
         return; //< Do nothing if no args were specified.
 
     const std::vector<std::string> args{argv, argv + argc};
-    const auto arg = [&args](int i) { return (args.size() <= i) ? "" : args[i]; };
+    const auto arg = [&args](int i) { return ((int) args.size() <= i) ? "" : args[i]; };
 
     if (args.size() == 2 && (arg(1) == "-h" || arg(1) == "--help"))
     {
@@ -313,10 +319,30 @@ const char* tempDir()
     {
         test->tempDir = baseTempDir() + test->testCase + "." + test->testName + kPathSeparator;
         createDir(test->tempDir);
-        printNote("Created temp dir: [%s]", test->tempDir.c_str());
+
+        if (verbose)
+            printNote("Created temp dir: [%s]", test->tempDir.c_str());
     }
 
     return test->tempDir.c_str();
+}
+
+const char* staticTempDir()
+{
+    Test* const test = currentTest();
+    if (test)
+        fatalError("tempDir() called inside a TEST() body.");
+
+    static std::string staticTempDir;
+    if (!staticTempDir.empty())
+        return staticTempDir.c_str();
+    staticTempDir = baseTempDir() + "static" + kPathSeparator;
+    createDir(staticTempDir);
+
+    if (verbose)
+        printNote("Created temp dir for static tests: [%s]", staticTempDir.c_str());
+
+    return staticTempDir.c_str();
 }
 
 static bool runTest(Test& test, int testNumber)
@@ -365,7 +391,7 @@ int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
         << "Running " << allTests().size() << " test(s) from " << fullSuiteName << std::endl;
 
     std::vector<int> failedTests;
-    for (int i = 1; i <= allTests().size(); ++i)
+    for (int i = 1; i <= (int) allTests().size(); ++i)
     {
         if (!runTest(allTests()[i - 1], i))
             failedTests.push_back(i);
@@ -403,7 +429,8 @@ void createFile(const char* filename, const char* content)
     if (!(s << content))
         fatalError("Unable to write to temp file: [%s]", filename);
 
-    printNote("Created temp file: [%s]", filename);
+    if (verbose)
+        printNote("Created temp file: [%s]", filename);
 }
 
 } // namespace test

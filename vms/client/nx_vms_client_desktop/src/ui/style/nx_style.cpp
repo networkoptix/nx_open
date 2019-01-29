@@ -1133,20 +1133,21 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterPenRollback penRollback(painter);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
+            const auto adjustedRect = QRectF(rect).adjusted(0.0, 0.5, 0.0, -0.5);
             if (shape == TabShape::Default)
             {
                 painter->fillRect(rect, option->palette.color(QPalette::Mid));
 
                 painter->setPen(option->palette.color(QPalette::Window));
-                painter->drawLine(rect.topLeft(), rect.topRight());
+                painter->drawLine(adjustedRect.topLeft(), adjustedRect.topRight());
 
                 painter->setPen(option->palette.color(QPalette::Base));
-                painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+                painter->drawLine(adjustedRect.bottomLeft(), adjustedRect.bottomRight());
             }
             else
             {
                 painter->setPen(option->palette.color(QPalette::Mid));
-                painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+                painter->drawLine(adjustedRect.bottomLeft(), adjustedRect.bottomRight());
             }
 #if 0
             /*
@@ -2288,7 +2289,7 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->checked && menuItem->checkType != QStyleOptionMenuItem::NotCheckable)
                 {
-                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
+                    NX_ASSERT(!asDropdown, "Not supported");
                     drawMenuCheckMark(
                             painter,
                             QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), 16, menuItem->rect.height()),

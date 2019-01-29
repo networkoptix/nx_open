@@ -13,7 +13,7 @@ QnDiscoveryNotificationManager::QnDiscoveryNotificationManager(QnCommonModule* c
 void QnDiscoveryNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::DiscoverPeerData>& transaction, NotificationSource /*source*/)
 {
-    NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
+    NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function");
 
     // TODO: maybe it's better to move it out and use signal?..
     if (const auto manager = commonModule()->moduleDiscoveryManager())
@@ -27,7 +27,7 @@ void QnDiscoveryNotificationManager::triggerNotification(
 {
     NX_ASSERT(transaction.command == ApiCommand::addDiscoveryInformation ||
         transaction.command == ApiCommand::removeDiscoveryInformation,
-        Q_FUNC_INFO, "Invalid command for this function");
+        "Invalid command for this function");
 
     triggerNotification(transaction.params, transaction.command == ApiCommand::addDiscoveryInformation);
 }

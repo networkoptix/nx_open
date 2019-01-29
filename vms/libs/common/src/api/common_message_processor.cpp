@@ -649,6 +649,8 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             cameraUserAttributesPool(),
             userAttributes->cameraId);
+        if ((*userAttributesLock)->licenseUsed && !attrs.scheduleEnabled)
+            NX_INFO(this, "Recording was turned off for camera %1", attrs.cameraId);
         (*userAttributesLock)->assign(*userAttributes, &modifiedFields);
     }
     const QnResourcePtr& res = resourcePool()->getResourceById(userAttributes->cameraId);
@@ -1061,13 +1063,12 @@ void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::Not
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
 
-    NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
+    NX_ASSERT(qnCamera, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
     {
         qnCamera->setCommonModule(commonModule());
         ec2::fromApiToResource(camera, qnCamera);
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
-            Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");
 
         updateResource(qnCamera, source);
@@ -1089,7 +1090,7 @@ void QnCommonMessageProcessor::updateResource(
         StorageData::kResourceTypeId, QnResourceParams(storage.id, storage.url, QString()))
             .dynamicCast<QnStorageResource>();
     qnStorage->setCommonModule(commonModule());
-    NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
+    NX_ASSERT(qnStorage, "Invalid resource type pool state");
     if (qnStorage)
     {
         ec2::fromApiToResource(storage, qnStorage);

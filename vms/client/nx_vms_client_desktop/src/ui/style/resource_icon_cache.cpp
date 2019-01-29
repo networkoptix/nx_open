@@ -152,6 +152,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));
     m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.png"));
     m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.png"));
+
+    m_cache.insert(Client, loadIcon("tree/client.svg"));
 }
 
 QnResourceIconCache::~QnResourceIconCache()
@@ -192,7 +194,7 @@ QIcon QnResourceIconCache::icon(Key key)
         const auto status = key & StatusMask;
         if (status != QnResourceIconCache::Online)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+            NX_ASSERT(false, "All icons should be pre-generated.");
         }
 
         result = m_cache.value(base);

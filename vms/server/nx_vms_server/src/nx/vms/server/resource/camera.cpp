@@ -16,6 +16,7 @@
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <plugins/utils/multisensor_data_provider.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -274,15 +275,15 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
     return result;
 }
 
-QSize Camera::getNearestResolution(
+/*static*/ QSize Camera::getNearestResolution(
     const QSize& resolution,
-    float aspectRatio,
+    float desiredAspectRatio,
     double maxResolutionArea,
     const QList<QSize>& resolutionList,
-    double* coeff)
+    double* outCoefficient)
 {
-    if (coeff)
-        *coeff = INT_MAX;
+    if (outCoefficient)
+        *outCoefficient = INT_MAX;
 
     double requestSquare = resolution.width() * resolution.height();
     if (requestSquare < kMaxEps || requestSquare > maxResolutionArea)
@@ -291,20 +292,31 @@ QSize Camera::getNearestResolution(
     int bestIndex = -1;
     double bestMatchCoeff =
         (maxResolutionArea > kMaxEps) ? (maxResolutionArea / requestSquare) : INT_MAX;
+    /*
+        Typical aspect ratios:
+         w   h   ratio   A     B
+        21 / 9 = 2.(3)        1.31
+        16 / 9 = 1.(7)  1.31  1.14
+        14 / 9 = 1.(5)  1.14  1.67
+        12 / 9 = 1.(3)  1.67  1.33
+         9 / 9 = 1.(0)  1.33
+        ------
+         A = higher ratio / current ratio
+         B = current ratio / lower ratio
 
+        We consider that one resolution is similar to another if their aspect ratios differ
+        no more than (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
+        the table above.
+    */
+    static const float kEpsilon = 0.10f;
     for (int i = 0; i < resolutionList.size(); ++i)
     {
-        QSize tmp;
 
-        tmp.setWidth(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].width() + 1), 8));
-        tmp.setHeight(qPower2Floor(static_cast<unsigned int>(resolutionList[i].height() - 1), 8));
-        const float ar1 = getResolutionAspectRatio(tmp);
+        const double nextAspectRatio = getResolutionAspectRatio(resolutionList[i]);
+        const bool currentRatioFitsDesirable = nextAspectRatio * (1 - kEpsilon) < desiredAspectRatio
+            && desiredAspectRatio < nextAspectRatio * (1 + kEpsilon);
 
-        tmp.setWidth(qPower2Floor(static_cast<unsigned int>(resolutionList[i].width() - 1), 8));
-        tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
-        const float ar2 = getResolutionAspectRatio(tmp);
-
-        if (aspectRatio != 0 && !qBetween(qMin(ar1,ar2), aspectRatio, qMax(ar1,ar2)))
+        if (desiredAspectRatio != 0 && !currentRatioFitsDesirable)
             continue;
 
         const double square = resolutionList[i].width() * resolutionList[i].height();
@@ -316,17 +328,17 @@ QSize Camera::getNearestResolution(
         {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
-            if (coeff)
-                *coeff = bestMatchCoeff;
+            if (outCoefficient)
+                *outCoefficient = bestMatchCoeff;
         }
     }
 
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
-QSize Camera::closestResolution(
+/*static*/ QSize Camera::closestResolution(
     const QSize& idealResolution,
-    float aspectRatio,
+    float desiredAspectRatio,
     const QSize& maxResolution,
     const QList<QSize>& resolutionList,
     double* outCoefficient)
@@ -334,22 +346,40 @@ QSize Camera::closestResolution(
     const auto maxResolutionArea = double(maxResolution.width()) * double(maxResolution.height());
     QSize result = getNearestResolution(
         idealResolution,
-        aspectRatio,
+        desiredAspectRatio,
         maxResolutionArea,
         resolutionList,
         outCoefficient);
 
     if (result == EMPTY_RESOLUTION_PAIR)
     {
+        // Try to get resolution ignoring the aspect ratio.
         result = getNearestResolution(
             idealResolution,
-            0.0,
+            0.0f,
             maxResolutionArea,
             resolutionList,
-            outCoefficient); //< Try to get resolution ignoring aspect ration
+            outCoefficient);
     }
 
     return result;
+}
+
+/*static*/ QSize Camera::closestSecondaryResolution(
+    float desiredAspectRatio,
+    const QList<QSize>& resolutionList)
+{
+    QSize selectedResolution = Camera::closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION, desiredAspectRatio,
+        SECONDARY_STREAM_MAX_RESOLUTION, resolutionList);
+
+    if (selectedResolution == EMPTY_RESOLUTION_PAIR)
+    {
+        selectedResolution = Camera::closestResolution(
+            SECONDARY_STREAM_DEFAULT_RESOLUTION, desiredAspectRatio,
+            UNLIMITED_RESOLUTION, resolutionList);
+    }
+    return selectedResolution;
 }
 
 CameraDiagnostics::Result Camera::initInternal()
@@ -494,7 +524,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
             dst = src;
     };
 
-    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    StreamCapabilityMap result = getStreamCapabilityMapFromDriver(streamIndex);
     for (auto itr = result.begin(); itr != result.end();)
     {
         if (kSupportedCodecs.count(itr.key().codec))
@@ -577,7 +607,18 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
         case Qn::CR_Default:
         case Qn::CR_LiveVideo:
         {
-            QnAbstractStreamDataProvider* result = camera->createLiveDataProvider();
+            QnAbstractStreamDataProvider* result = nullptr;
+
+            #if defined(ENABLE_ONVIF)
+                auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
+                    ResourceDataKey::kShouldAppearAsSingleChannel);
+
+                result = shouldAppearAsSingleChannel
+                    ? new nx::plugins::utils::MultisensorDataProvider(camera)
+                    : camera->createLiveDataProvider();
+            #else
+                result = camera->createLiveDataProvider();
+            #endif
             if (result)
                 result->setRole(role);
             return result;
@@ -605,6 +646,14 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
     return nullptr;
 }
 
+int Camera::getMaxChannels() const
+{
+    bool shouldAppearAsSingleChannel = resourceData().value<bool>(
+        ResourceDataKey::kShouldAppearAsSingleChannel);
+    if (shouldAppearAsSingleChannel)
+        return 1;
+    return getMaxChannelsFromDriver();
+}
 void Camera::inputPortListenerAttached()
 {
     QnMutexLocker lk(&m_initMutex);

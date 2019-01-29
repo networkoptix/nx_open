@@ -2,15 +2,15 @@
 
 #include <stdint.h>
 
-struct AVFormatContext;
-struct AVIOContext;
 struct AVStream;
+struct AVIOContext;
+struct AVFormatContext;
 
 namespace nx {
 namespace usb_cam {
 
-namespace ffmpeg { class Packet; }
 namespace ffmpeg { class Codec; }
+namespace ffmpeg { class Packet; }
 
 class AdtsInjector
 {

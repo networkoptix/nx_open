@@ -1,13 +1,15 @@
 #include "system_hosts_model.h"
 
 #include <utils/math/math.h>
-#include <utils/common/util.h>
 #include <utils/common/connective.h>
 #include <finders/systems_finder.h>
+#include <network/system_description.h>
+
+#include <client_core/client_core_settings.h>
+#include <network/system_helpers.h>
+
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/algorithm/index_of.h>
-#include <network/system_description.h>
-#include <client_core/client_core_settings.h>
 
 namespace {
 using UrlsList = QList<nx::utils::Url>;
@@ -17,7 +19,7 @@ bool isSamePort(int first, int second)
     static const auto isDefaultPort =
         [](int port)
         {
-            return ((port == kDefaultConnectionPort) || (port == 0) || (port == -1));
+            return ((port == helpers::kDefaultConnectionPort) || (port == 0) || (port == -1));
         };
 
     return ((first == second) || (isDefaultPort(first) == isDefaultPort(second)));
@@ -156,7 +158,7 @@ QVariant QnSystemHostsModel::HostsModel::data(const QModelIndex& index, int role
     switch (role)
     {
         case Qt::DisplayRole:
-            return (data.second.port() != kDefaultConnectionPort
+            return (data.second.port() != helpers::kDefaultConnectionPort
                 ? lit("%1:%2").arg(data.second.host(), QString::number(data.second.port()))
                 : data.second.host());
         case UrlRole:

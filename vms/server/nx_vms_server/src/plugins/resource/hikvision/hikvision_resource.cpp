@@ -57,13 +57,13 @@ QString HikvisionResource::defaultCodec() const
     return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
 }
 
-nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
     const auto capabilities = channelCapabilities(toRole(streamIndex));
     if (!capabilities)
-        return base_type::getStreamCapabilityMapFromDrives(streamIndex);
+        return base_type::getStreamCapabilityMapFromDriver(streamIndex);
 
     nx::vms::server::resource::StreamCapabilityMap result;
     for (const auto& codec: capabilities->codecs)
@@ -173,7 +173,7 @@ void HikvisionResource::setResolutionList(
         ? secondaryVideoCapabilities() : primaryVideoCapabilities();
     capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
         channelCapabilities.resolutions));
-    capabilities.encoding = UnderstandableVideoCodec::H264;
+    capabilities.encoding = SupportedVideoEncoding::H264;
     if (role == Qn::CR_SecondaryLiveVideo)
         setSecondaryVideoCapabilities(capabilities);
     else
@@ -299,10 +299,9 @@ bool HikvisionResource::findDefaultPtzProfileToken()
     {
         if (!profile || !profile->PTZConfiguration)
             continue;
-        QString ptzConfiguration = QString::fromStdString(profile->PTZConfiguration->token);
-        if (ptzConfiguration == getPtzConfigurationToken())
+        if (profile->PTZConfiguration->token == ptzConfigurationToken())
         {
-            setPtzProfileToken(QString::fromStdString(profile->token));
+            setPtzProfileToken(profile->token);
             return true;
         }
     }

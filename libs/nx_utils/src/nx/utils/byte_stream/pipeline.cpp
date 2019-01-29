@@ -9,11 +9,6 @@ namespace bstream {
 //-------------------------------------------------------------------------------------------------
 // AbstractOutputConverter
 
-AbstractOutputConverter::AbstractOutputConverter():
-    m_outputStream(nullptr)
-{
-}
-
 void AbstractOutputConverter::setOutput(AbstractOutput* outputStream)
 {
     m_outputStream = outputStream;
@@ -22,13 +17,107 @@ void AbstractOutputConverter::setOutput(AbstractOutput* outputStream)
 //-------------------------------------------------------------------------------------------------
 // AbstractTwoWayConverter
 
-AbstractInputConverter::AbstractInputConverter()
-{
-}
-
 void AbstractInputConverter::setInput(AbstractInput* inputStream)
 {
     m_inputStream = inputStream;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+int CompositeConverter::write(const void* data, size_t size)
+{
+    return m_outputConverter
+        ? m_outputConverter->write(data, size)
+        : m_outputStream->write(data, size);
+}
+
+int CompositeConverter::read(void* data, size_t size)
+{
+    return m_inputConverter
+        ? m_inputConverter->read(data, size)
+        : m_inputStream->read(data, size);
+}
+
+void CompositeConverter::setOutput(AbstractOutput* output)
+{
+    base_type::setOutput(output);
+
+    if (m_outputConverter)
+        m_outputConverter->setOutput(output);
+}
+
+void CompositeConverter::setInput(AbstractInput* input)
+{
+    base_type::setInput(input);
+
+    if (m_inputConverter)
+        m_inputConverter->setInput(input);
+}
+
+bool CompositeConverter::eof() const
+{
+    return false;
+}
+
+bool CompositeConverter::failed() const
+{
+    return false;
+}
+
+void CompositeConverter::setInputConverter(AbstractInputConverter* inputConverter)
+{
+    m_inputConverter = inputConverter;
+    m_inputConverter->setInput(m_inputStream);
+}
+
+void CompositeConverter::setOutputConverter(AbstractOutputConverter* outputConverter)
+{
+    m_outputConverter = outputConverter;
+    m_outputConverter->setOutput(m_outputStream);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+OutputConverterToInputAdapter::OutputConverterToInputAdapter(
+    AbstractOutputConverter* converter)
+    :
+    m_converter(converter)
+{
+    m_converter->setOutput(this);
+}
+
+int OutputConverterToInputAdapter::read(void* data, size_t count)
+{
+    if (!m_convertedData.empty())
+        return readCachedData(data, count);
+
+    auto result = m_inputStream->read(data, count);
+    if (result <= 0)
+        return result;
+
+    result = m_converter->write(data, result);
+    if (result <= 0)
+        return result;
+
+    if (m_convertedData.empty())
+        return StreamIoError::wouldBlock;
+
+    return readCachedData(data, count);
+}
+
+int OutputConverterToInputAdapter::write(const void* data, size_t size)
+{
+    m_convertedData.append(static_cast<const char*>(data), size);
+    return size;
+}
+
+int OutputConverterToInputAdapter::readCachedData(void* data, size_t count)
+{
+    const auto bytesToCopy = std::min(count, m_convertedData.size());
+    memcpy(data, m_convertedData.data(), bytesToCopy);
+    m_convertedData.erase(0, bytesToCopy);
+
+    return bytesToCopy;
 }
 
 //-------------------------------------------------------------------------------------------------

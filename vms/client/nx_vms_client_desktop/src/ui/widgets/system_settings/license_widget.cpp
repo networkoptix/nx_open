@@ -232,12 +232,13 @@ void QnLicenseWidget::changeEvent(QEvent *event)
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                     tr("Open License File"),
-                                                     QString(),
-                                                     tr("All files") + lit(" (*.*)"),
-                                                     0,
-                                                     QnCustomFileDialog::fileDialogOptions());
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open License File"),
+        QString(),
+        QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter),
+        nullptr,
+        QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())
         return;
 

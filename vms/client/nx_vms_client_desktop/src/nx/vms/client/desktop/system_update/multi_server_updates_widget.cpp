@@ -65,6 +65,7 @@ const int kTooLateDayOfWeek = Qt::Thursday;
 const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 const int kVersionLabelFontSizePixels = 24;
 const int kVersionLabelFontWeight = QFont::DemiBold;
+const auto kExpectedInstallPeriodSec = 4.0;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;
@@ -82,11 +83,6 @@ const quint32 kProcessTerminateTimeoutMs = 15000;
 
 /* N-dash 5 times: */
 const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
-
-QString versionText(const nx::utils::SoftwareVersion& version)
-{
-    return version.isNull() ? kNoVersionNumberText : version.toString();
-}
 
 // Adds resource list to message box
 void injectResourceList(QnSessionAwareMessageBox& messageBox, const QnResourceList& resources)
@@ -157,7 +153,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     setHelpTopic(this, Qn::Administration_Update_Help);
 
     m_sortedModel.reset(new SortedPeerUpdatesModel(this));
-    m_sortedModel->setShowClients(m_showDebugData);
     m_sortedModel->setSourceModel(m_updatesModel.get());
     ui->tableView->setModel(m_sortedModel.get());
     m_statusItemDelegate.reset(new ServerStatusItemDelegate(ui->tableView));
@@ -240,6 +235,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
+    ui->releaseDescriptionLabel->setOpenExternalLinks(true);
+
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
         this, &MultiServerUpdatesWidget::checkForInternetUpdates);
 
@@ -251,7 +248,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 m_stateTracker->setResourceFeed(resourcePool());
         });
 
-    setWarningStyle(ui->errorLabel);
     setWarningStyle(ui->longUpdateWarning);
 
     ui->infoStackedWidget->setCurrentWidget(ui->errorPage);
@@ -447,16 +443,20 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     // every combination of update source and nx::update::InformationError values.
     if (contents.alreadyInstalled && source != SourceType::internet)
     {
+        report.versionMode = VersionReport::VersionMode::build;
+        report.statusHighlight = VersionReport::HighlightMode::regular;
         report.statusMessages << tr("You have already installed this version.");
     }
     else if (contents.error == Error::noError)
     {
+        report.version = contents.info.version;
         return report;
     }
     else if (!validUpdate)
     {
-        report.versionError = true;
-        report.statusError = true;
+        report.versionHighlight = VersionReport::HighlightMode::red;
+        report.statusHighlight = VersionReport::HighlightMode::red;
+
         switch(contents.error)
         {
             case Error::noError:
@@ -465,12 +465,16 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::networkError:
                 // Unable to check update from the internet.
                 report.statusMessages << tr("Unable to check updates on the internet");
-                report.versionError = false;
+                report.versionMode = VersionReport::VersionMode::empty;
+                report.versionHighlight = VersionReport::HighlightMode::regular;
                 break;
             case Error::httpError:
                 NX_ASSERT(source == SourceType::internet || source == SourceType::internetSpecific);
                 if (source == SourceType::internetSpecific)
+                {
+                    report.versionMode = VersionReport::VersionMode::build;
                     report.statusMessages << tr("Build not found");
+                }
                 else
                     report.statusMessages << tr("Unable to check updates on the internet");
                 break;
@@ -497,30 +501,35 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::missingPackageError:
             {
                 QStringList packageErrors;
+                auto missing = contents.missingUpdate.size();
                 if (contents.missingClientPackage)
-                    packageErrors << tr("Missing update package for client");
-                if (!contents.missingUpdate.empty())
-                    packageErrors << tr("Missing update package for some servers");
-                if (packageErrors.empty() && !contents.unsuportedSystemsReport.empty())
                 {
-                    if (contents.unsuportedSystemsReport.size() > 1)
+                    if (missing)
                     {
-                        packageErrors << tr("Detected unsupported OS for some servers");
+                        packageErrors << tr("Missing update package for the client and %n servers",
+                            "", missing);
                     }
                     else
                     {
-                        auto id = contents.unsuportedSystemsReport.firstKey();
-                        auto serverInfo = QnResourceDisplayInfo(m_stateTracker->getServer(id));
-                        QString serverName = serverInfo.toString(Qn::RI_WithUrl);
-                        packageErrors << tr("Detected unsupported OS for the server %1").arg(serverName);
+                        packageErrors << tr("Missing update package for the client");
                     }
                 }
+                else if (missing)
+                {
+                    packageErrors << tr("Missing update package for some servers");
+                }
 
+                report.versionHighlight = VersionReport::HighlightMode::bright;
                 report.statusMessages << packageErrors;
                 break;
             }
         }
     }
+
+    if (report.versionMode == VersionReport::VersionMode::empty)
+        report.version = kNoVersionNumberText;
+    else
+        report.version = contents.info.version;
 
     if (!contents.cloudIsCompatible)
     {
@@ -621,6 +630,7 @@ void MultiServerUpdatesWidget::clearUpdateInfo()
 {
     NX_INFO(this) << "clearUpdateInfo()";
     m_targetVersion = nx::utils::SoftwareVersion();
+    m_updateReport = {};
     m_updateInfo = nx::update::UpdateContents();
     m_updatesModel->setUpdateTarget(nx::utils::SoftwareVersion());
     m_stateTracker->clearVerificationErrors();
@@ -632,7 +642,7 @@ void MultiServerUpdatesWidget::pickLocalFile()
 {
     auto options = QnCustomFileDialog::fileDialogOptions();
     QString caption = tr("Select Update File...");
-    QString filter = tr("Update Files") + " (*.zip)";
+    QString filter = QnCustomFileDialog::createFilter(tr("Update Files"), "zip");
     QString fileName = QFileDialog::getOpenFileName(this, caption, QString(), filter, 0, options);
 
     if (fileName.isEmpty())
@@ -831,7 +841,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_peersIssued;
         m_serverUpdateTool->requestStopAction();
         m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::initial, {});
+        setTargetState(WidgetUpdateState::ready, {});
     }
     else if (m_widgetState == WidgetUpdateState::installing)
     {
@@ -848,7 +858,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_stateTracker->getServersInState(StatusCode::readyToInstall);
         m_serverUpdateTool->requestStopAction();
         m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::initial, {});
+        setTargetState(WidgetUpdateState::ready, {});
     }
     else if (m_widgetState == WidgetUpdateState::pushing)
     {
@@ -859,12 +869,11 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     else
     {
         NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState) << ": not implemented";
+        clearUpdateInfo();
+        setUpdateSourceMode(UpdateSourceType::internet);
+        checkForInternetUpdates();
         return false;
     }
-
-    clearUpdateInfo();
-    setUpdateSourceMode(UpdateSourceType::internet);
-    checkForInternetUpdates();
 
     if (m_updateRemoteStateChanged)
         loadDataToUi();
@@ -971,20 +980,25 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         // the moment right before we pressed 'Install'.
         auto serversAreInstalling = m_stateTracker->getPeersInstalling();
         auto serversHaveInstalled = m_stateTracker->getPeersCompleteInstall();
+
         result.installingServers = !m_peersActive.empty();
 
         int total = m_peersIssued.size();
 
-        result.current += serversHaveInstalled.size()*100;
+        auto installDuration = std::chrono::duration_cast<std::chrono::seconds>(
+            m_serverUpdateTool->getInstallDuration());
+        double phase = (double)installDuration.count() / kExpectedInstallPeriodSec;
+        int fakeProgress = 85 * (1.0 - qPow(0.2, phase));
+        result.current += qMax(serversHaveInstalled.size()*100, fakeProgress*serversAreInstalling.size());
         result.max += 100*total;
 
         if (m_clientUpdateTool->hasUpdate())
         {
             bool complete = m_clientUpdateTool->getState() == ClientUpdateTool::State::complete;
             if (complete)
-                result.current += 100;
+                result.current += 10;
             result.installingClient = !complete;
-            result.max += 100;
+            result.max += 10;
         }
     }
 
@@ -1071,6 +1085,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         {
             NX_INFO(NX_SCOPE_TAG, "taking update info from mediaserver");
             m_updateInfo = updateInfo;
+            m_updateReport = calculateUpdateVersionReport(m_updateInfo);
             m_haveValidUpdate = true;
         }
 
@@ -1474,7 +1489,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
                     messageBox->setIcon(QnMessageBoxIcon::Critical);
                     messageBox->setText(tr("Failed to install client package"));
                     messageBox->addButton(tr("OK"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+                    messageBox->setInformativeText(m_clientUpdateTool->getErrorText());
                     messageBox->exec();
+                    setTargetState(WidgetUpdateState::ready);
                 }
                 else
                 {
@@ -1682,6 +1699,30 @@ void MultiServerUpdatesWidget::closePanelNotifications()
     m_rightPanelDownloadProgress = QnUuid();
 }
 
+void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
+{
+    auto setHighlightMode = [](QLabel* label, VersionReport::HighlightMode mode)
+        {
+            if (mode == VersionReport::HighlightMode::bright)
+            {
+                QFont versionLabelFont;
+                versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
+                versionLabelFont.setWeight(kVersionLabelFontWeight);
+                label->setFont(versionLabelFont);
+                label->setProperty(style::Properties::kDontPolishFontProperty, true);
+            }
+            else if (mode == VersionReport::HighlightMode::red)
+                setWarningStyle(label);
+            else
+                resetStyle(label);
+        };
+    ui->errorLabel->setText(report.statusMessages.join("<br>"));
+    ui->targetVersionLabel->setText(report.version);
+
+    setHighlightMode(ui->targetVersionLabel, report.versionHighlight);
+    setHighlightMode(ui->errorLabel, report.statusHighlight);
+}
+
 void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 {
     bool isChecking = m_updateCheck.valid() || m_serverUpdateCheck.valid() || m_widgetState == WidgetUpdateState::initial;
@@ -1761,9 +1802,9 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
             ui->releaseDescriptionLabel->setVisible(!m_updateInfo.info.description.isEmpty());
         }
-        else if (m_updateReport.statusError)
+
+        if (!m_haveValidUpdate)
         {
-            ui->errorLabel->setText(m_updateReport.statusMessages.join("<br>"));
             ui->infoStackedWidget->setCurrentWidget(ui->errorPage);
             ui->downloadButton->setVisible(false);
             ui->releaseDescriptionLabel->setText("");
@@ -1799,9 +1840,11 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     bool showButton = m_updateSourceMode != UpdateSourceType::file &&
         (m_widgetState == WidgetUpdateState::ready || m_widgetState != WidgetUpdateState::initial);
+    if (hasLatestVersion)
+        showButton = false;
     ui->manualDownloadButton->setVisible(showButton);
-    auto version = versionText(m_updateInfo.getVersion());
-    ui->targetVersionLabel->setText(version);
+
+    syncVersionReport(m_updateReport);
     m_updateLocalStateChanged = false;
 }
 
@@ -1896,9 +1939,12 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
     }
 
-    ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
-        !storageSettingsVisible || !m_showStorageSettings);
+    // Making this button invisible for now, until a proper mediaserver selection is impelemented.
+    //ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
+    //ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
+    //    !storageSettingsVisible || !m_showStorageSettings);
+    ui->advancedUpdateSettings->setVisible(false);
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, true);
 
     ui->cancelUpdateButton->setVisible(m_widgetState == WidgetUpdateState::readyInstall);
 
@@ -1995,6 +2041,10 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
 
+        debugState << QString("size(peers)=%1").arg(m_stateTracker->peersCount());
+        debugState << QString("size(model)=%1").arg(m_updatesModel->rowCount());
+        debugState << QString("size(sorted)=%1").arg(m_sortedModel->rowCount());
+
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {
             QString internalError = nx::update::toString(m_updateInfo.error);
@@ -2074,15 +2124,23 @@ void MultiServerUpdatesWidget::autoCheckForUpdates()
 
 void MultiServerUpdatesWidget::syncStatusVisibility()
 {
-    bool hideInfo = m_widgetState == WidgetUpdateState::initial
-        || m_widgetState == WidgetUpdateState::ready;
-    if (m_stateTracker->hasVerificationErrors())
-        hideInfo = false;
-    if (m_updateInfo.alreadyInstalled)
-        hideInfo = true;
+    using StatusMode = ServerStatusItemDelegate::StatusMode;
+    StatusMode statusMode = StatusMode::remoteStatus;
 
-    m_statusItemDelegate->setStatusVisible(!hideInfo);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, hideInfo);
+    if (m_widgetState == WidgetUpdateState::initial
+        || m_widgetState == WidgetUpdateState::ready)
+    {
+        statusMode = StatusMode::hidden;
+    }
+
+    if (m_stateTracker->hasVerificationErrors())
+        statusMode = StatusMode::reportErrors;
+    if (m_updateInfo.alreadyInstalled)
+        statusMode = StatusMode::hidden;
+
+    m_statusItemDelegate->setStatusMode(statusMode);
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn,
+        statusMode == StatusMode::hidden);
 }
 
 void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& /*unused*/)
@@ -2166,7 +2224,7 @@ QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
     switch (mode)
     {
         case nx::update::UpdateSourceType::internet:
-            return tr("Available Update");
+            return tr("Latest Available Update");
         case nx::update::UpdateSourceType::internetSpecific:
             return tr("Specific Build");
         case nx::update::UpdateSourceType::file:

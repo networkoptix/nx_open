@@ -409,7 +409,8 @@ void ActionHandler::addToLayout(
     if (!layout)
         return;
 
-    if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeSingleItem))
+    {
         while (!layout->getItems().isEmpty())
             layout->removeItem(*(layout->getItems().begin()));
     }
@@ -668,16 +669,18 @@ void ActionHandler::showMultipleCamerasErrorMessage(
     const QnVirtualCameraResourceList& camerasWithError,
     const QString& explanation)
 {
-    static const auto kMessageTemplate = tr("Failed to change password on %1 of %2 cameras");
     static const auto kSimpleOptions = QnResourceListView::Options(
         QnResourceListView::HideStatusOption
         | QnResourceListView::ServerAsHealthMonitorOption
         | QnResourceListView::SortAsInTreeOption);
 
+    const QString message = tr("Failed to change password on %n cameras of %1",
+        "Total number of cameras will be substituted as %1",
+        camerasWithError.size()).arg(totalCameras);
+
     QnSessionAwareMessageBox messageBox(mainWindowWidget());
     messageBox.setIcon(QnMessageBoxIcon::Critical);
-    messageBox.setText(kMessageTemplate.arg(
-        QString::number(camerasWithError.size()), QString::number(totalCameras)));
+    messageBox.setText(message);
     if (!explanation.isEmpty())
         messageBox.setInformativeText(explanation);
     messageBox.addCustomWidget(
@@ -808,7 +811,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     const int maxItems = qnRuntime->maxSceneItems();
 
-    bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
+    bool adjustAspectRatio = (layout->getItems().isEmpty() || !layout->hasCellAspectRatio())
+        && !layout->hasBackground();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
@@ -1275,18 +1279,25 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_openFileAction_triggered() {
-    QStringList filters;
-    filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
-    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("All files (*.*)");
+void ActionHandler::at_openFileAction_triggered()
+{
+    static const QStringList kProprietaryFormats{"nov"};
+    static const QStringList kVideoFormats = QnCustomFileDialog::kVideoFilter.second;
+    static const QStringList kPicturesFormats = QnCustomFileDialog::kPicturesFilter.second;
+    static const QStringList kAllSupportedFormats = kProprietaryFormats
+        + kVideoFormats
+        + kPicturesFormats;
 
     QStringList files = QFileDialog::getOpenFileNames(mainWindowWidget(),
         tr("Open File"),
         QString(),
-        filters.join(lit(";;")),
-        0,
+        QnCustomFileDialog::createFilter({
+            {tr("All Supported"), kAllSupportedFormats},
+            QnCustomFileDialog::kVideoFilter,
+            QnCustomFileDialog::kPicturesFilter,
+            QnCustomFileDialog::kAllFilesFilter
+            }),
+        nullptr,
         QnCustomFileDialog::fileDialogOptions());
 
     if (!files.isEmpty())
@@ -2155,7 +2166,7 @@ void ActionHandler::at_renameAction_triggered()
     }
     else
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, "Invalid resource type to rename");
     }
 }
 

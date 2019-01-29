@@ -24,7 +24,9 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     const QString objectTypeId(params.value("objectTypeId"));
     if (objectTypeId.isNull())
     {
-        result.setError(QnRestResult::InvalidParameter, "Parameter objectTypeId is missing or invalid");
+        result.setError(
+            QnRestResult::InvalidParameter,
+            "Parameter objectTypeId is missing or invalid");
         return nx::network::http::StatusCode::unprocessableEntity;
     }
 
@@ -33,7 +35,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     const auto& manifests = owner->commonModule()->currentServer()->analyticsDrivers();
     for (const auto& manifest: manifests)
     {
-        AvailableAnalyticsActionsOfPlugin actionsOfEngine;
+        AvailableAnalyticsActionsOfEngine actionsOfEngine;
 
         // TODO: #dmishin: Assign the proper engineId.
         //actionsOfEngine.pluginId = manifest.pluginId;

@@ -151,7 +151,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
         createTreeWidget(settings[Qn::WorkbenchPane::Tree]); //< Tree panel.
         createTitleWidget(settings[Qn::WorkbenchPane::Title]); //< Title bar.
         createLayoutPanelWidget(settings[Qn::WorkbenchPane::SpecialLayout]); //< Special layout
-        if (!qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
+        if (!qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
             createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]); //< Notifications
     }
 
@@ -651,7 +651,7 @@ void WorkbenchUi::tick(int deltaMSecs)
 
 void WorkbenchUi::at_freespaceAction_triggered()
 {
-    NX_ASSERT(!qnRuntime->isAcsMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
+    NX_ASSERT(!qnRuntime->isAcsMode(), "This function must not be called in ActiveX mode.");
     if (qnRuntime->isAcsMode())
         return;
 
@@ -785,7 +785,7 @@ void WorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
 
 void WorkbenchUi::ensureAnimationAllowed(bool &animate)
 {
-    if (animate && (qnSettings->lightMode() & Qn::LightModeNoAnimation))
+    if (animate && qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation))
         animate = false;
 }
 

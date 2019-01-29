@@ -12,6 +12,11 @@ bool CameraImageRequest::isSpecialTimeValue(qint64 value)
     return value < 0 || value == DATETIME_NOW;
 }
 
+QString toString(CameraImageRequest::StreamSelectionMode value)
+{
+    return QnLexical::serialized(value);
+}
+
 } // namespace api
 } // namespace nx
 
@@ -34,4 +39,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::ImageRequest, ThumbnailFormat
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::ImageRequest, AspectRatio,
     (nx::api::ImageRequest::AspectRatio::auto_, "auto")
     (nx::api::ImageRequest::AspectRatio::source, "source")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::CameraImageRequest, StreamSelectionMode,
+    (nx::api::CameraImageRequest::StreamSelectionMode::auto_, "auto")
+    (nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary, "forcedPrimary")
+    (nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary, "forcedSecondary")
+    (nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics, "sameAsAnalytics")
+    (nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion, "sameAsMotion")
 )

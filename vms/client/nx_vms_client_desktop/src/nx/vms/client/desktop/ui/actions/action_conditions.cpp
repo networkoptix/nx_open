@@ -8,6 +8,9 @@
 
 #include <network/router.h>
 
+#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -29,8 +32,6 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
 #include <camera/resource_display.h>
-
-#include <client/client_settings.h>
 
 #include <network/cloud_url_validator.h>
 
@@ -65,7 +66,6 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
-
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -305,6 +305,17 @@ bool canExportBookmarkInternal(const QnCameraBookmark& bookmark, QnWorkbenchCont
     return canExportPeriods(resources, period, context, /*ignoreLoadedChunks*/ true);
 }
 
+bool resourceHasVideo(const QnResourcePtr& resource)
+{
+    if (!resource->hasFlags(Qn::video))
+        return false;
+
+    if (const auto mediaResource = resource.dynamicCast<QnMediaResource>())
+        return mediaResource->hasVideo();
+
+    return false;
+}
+
 } // namespace
 
 Condition::Condition()
@@ -470,15 +481,6 @@ SmartSearchCondition::SmartSearchCondition():
 
 ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
 {
-    auto pureIoModule = [](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::io_module))
-                return false; //quick check
-
-            QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-            return mediaResource && !mediaResource->hasVideo(0);
-        };
-
     for (auto widget: widgets)
     {
         if (!widget)
@@ -490,7 +492,7 @@ ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets
         if (widget->isZoomWindow())
             continue;
 
-        if (pureIoModule(widget->resource()))
+        if (!resourceHasVideo(widget->resource()))
             continue;
 
         if (m_hasRequiredGridDisplayValue)
@@ -813,17 +815,21 @@ ActionVisibility AdjustVideoCondition::check(const QnResourceWidgetList& widgets
     if (widgets.size() != 1)
         return InvisibleAction;
 
-    auto widget = widgets[0];
-    if ((widget->resource()->flags() & (Qn::server | Qn::videowall | Qn::layout))
-        || (widget->resource()->flags().testFlag(Qn::web_page)))
+    const auto widget = widgets[0];
+    const auto resource = widget ? widget->resource() : QnResourcePtr();
+    NX_ASSERT(widget && resource);
+
+    if ((resource->flags() & (Qn::server | Qn::videowall | Qn::layout))
+        || (resource->hasFlags(Qn::web_page)))
+    {
+        return InvisibleAction;
+    }
+
+    const QString url = resource->getUrl().toLower();
+    if (resource->hasFlags(Qn::still_image) && !url.endsWith(".jpg") && !url.endsWith(".jpeg"))
         return InvisibleAction;
 
-    QString url = widget->resource()->getUrl().toLower();
-    if ((widget->resource()->flags() & Qn::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
-        return InvisibleAction;
-
-    QnMediaResourcePtr mediaResource = widget->resource().dynamicCast<QnMediaResource>();
-    if (mediaResource && !mediaResource->hasVideo(0))
+    if (!resourceHasVideo(resource))
         return InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
@@ -1508,7 +1514,7 @@ LightModeCondition::LightModeCondition(Qn::LightModeFlags flags):
 
 ActionVisibility LightModeCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
 {
-    if (qnSettings->lightMode() & m_lightModeFlags)
+    if (qnRuntime->lightMode() & m_lightModeFlags)
         return InvisibleAction;
     return EnabledAction;
 }
@@ -1741,6 +1747,15 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode)
         [flags](const QnResourcePtr& resource)
         {
             return resource->hasFlags(flags);
+        }, matchMode);
+}
+
+ConditionWrapper hasVideo(MatchMode matchMode, bool value)
+{
+    return new ResourceCondition(
+        [value](const QnResourcePtr& resource)
+        {
+            return resourceHasVideo(resource) == value;
         }, matchMode);
 }
 

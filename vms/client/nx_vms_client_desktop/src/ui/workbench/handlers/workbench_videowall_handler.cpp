@@ -40,7 +40,7 @@
 #include <core/resource/videowall_matrix.h>
 #include <core/resource/videowall_matrix_index.h>
 
-#include <core/ptz/item_dewarping_params.h>
+#include <nx/vms/api/data/dewarping_data.h>
 #include <core/ptz/media_dewarping_params.h>
 
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
@@ -932,13 +932,13 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
                 }
                 case Qn::ItemImageEnhancementRole:
                 {
-                    ImageCorrectionParams data = QJson::deserialized<ImageCorrectionParams>(value);
+                    auto data = QJson::deserialized<nx::vms::api::ImageCorrectionData>(value);
                     item->setData(role, data);
                     break;
                 }
                 case Qn::ItemImageDewarpingRole:
                 {
-                    QnItemDewarpingParams data = QJson::deserialized<QnItemDewarpingParams>(value);
+                    auto data = QJson::deserialized<nx::vms::api::DewarpingData>(value);
                     item->setData(role, data);
                     break;
                 }
@@ -1693,7 +1693,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
             break;
     }
 
-    NX_ASSERT(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
+    NX_ASSERT(valid, "Data should correspond to action profile.");
     if (!valid)
         return;
 
@@ -2723,11 +2723,11 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
             break;
 
         case Qn::ItemImageEnhancementRole:
-            QJson::serialize(data.value<ImageCorrectionParams>(), &json);
+            QJson::serialize(data.value<nx::vms::api::ImageCorrectionData>(), &json);
             break;
 
         case Qn::ItemImageDewarpingRole:
-            QJson::serialize(data.value<QnItemDewarpingParams>(), &json);
+            QJson::serialize(data.value<nx::vms::api::DewarpingData>(), &json);
             cached = true;
             break;
 

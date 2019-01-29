@@ -2,6 +2,8 @@
 
 #include <core/resource/layout_resource.h>
 
+#include <nx/utils/math/fuzzy.h>
+
 QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot()
     :
     cellAspectRatio(-1.0),

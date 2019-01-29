@@ -7,11 +7,6 @@
 #  include <netinet/tcp.h>
 #endif
 
-#include <mutex>
-#include <set>
-
-#include <boost/optional.hpp>
-
 #include <udt/udt.h>
 
 #include <nx/network/aio/aio_service.h>
@@ -568,7 +563,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     nx::utils::ScopeGuard<std::function<void()>> socketModeGuard;
 
-    boost::optional<bool> newRecvMode;
+    std::optional<bool> newRecvMode;
     if (!checkIfRecvModeSwitchIsRequired(flags, &newRecvMode))
         return -1;
 
@@ -771,9 +766,9 @@ bool UdtStreamSocket::connectToIp(
 
 bool UdtStreamSocket::checkIfRecvModeSwitchIsRequired(
     int flags,
-    boost::optional<bool>* requiredRecvMode)
+    std::optional<bool>* requiredRecvMode)
 {
-    *requiredRecvMode = boost::none;
+    *requiredRecvMode = std::nullopt;
 
     if ((flags & (MSG_DONTWAIT | MSG_WAITALL)) == 0)
         return true;

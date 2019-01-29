@@ -121,7 +121,7 @@ void SystemManager::authenticateByName(
     const nx::network::http::StringType& username,
     const std::function<bool(const nx::Buffer&)>& validateHa1Func,
     nx::utils::stree::ResourceContainer* const authProperties,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
     auto scopedGuard = nx::utils::makeScopeGuard(
@@ -168,7 +168,7 @@ void SystemManager::authenticateByName(
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
     data::SystemRegistrationData registrationData,
-    std::function<void(api::ResultCode, data::SystemData)> completionHandler)
+    std::function<void(api::Result, data::SystemData)> completionHandler)
 {
     QString accountEmail;
     if (!authzInfo.get(nx::cloud::db::attr::authAccountEmail, &accountEmail))
@@ -222,7 +222,7 @@ void SystemManager::bindSystemToAccount(
 void SystemManager::unbindSystem(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemId systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string>(
@@ -240,7 +240,7 @@ void SystemManager::unbindSystem(
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     data::DataFilter filter,
-    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
+    std::function<void(api::Result, api::SystemDataExList)> completionHandler)
 {
     // Always providing only activated systems.
     filter.addFilterValue(
@@ -304,7 +304,7 @@ void SystemManager::getSystems(
 void SystemManager::shareSystem(
     const AuthorizationInfo& authzInfo,
     data::SystemSharing sharing,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     using namespace std::placeholders;
 
@@ -354,7 +354,7 @@ void SystemManager::shareSystem(
 void SystemManager::getCloudUsersOfSystem(
     const AuthorizationInfo& authzInfo,
     const data::DataFilter& filter,
-    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
+    std::function<void(api::Result, api::SystemSharingExList)> completionHandler)
 {
     api::SystemSharingExList resultData;
 
@@ -433,7 +433,7 @@ void SystemManager::getCloudUsersOfSystem(
 void SystemManager::getAccessRoleList(
     const AuthorizationInfo& authzInfo,
     data::SystemId systemId,
-    std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
+    std::function<void(api::Result, api::SystemAccessRoleList)> completionHandler)
 {
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
@@ -464,7 +464,7 @@ constexpr const std::size_t kMaxOpaqueDataSize = 1024;
 void SystemManager::updateSystem(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemAttributesUpdate data,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     NX_VERBOSE(this, lm("Updating system %1 attributes").arg(data.systemId));
 
@@ -503,7 +503,7 @@ void SystemManager::updateSystem(
 void SystemManager::recordUserSessionStart(
     const AuthorizationInfo& authzInfo,
     data::UserSessionDescriptor userSessionDescriptor,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     NX_ASSERT(userSessionDescriptor.systemId || userSessionDescriptor.accountEmail);
     if (!(userSessionDescriptor.systemId || userSessionDescriptor.accountEmail))
@@ -813,7 +813,7 @@ void SystemManager::systemAdded(
     nx::sql::DBResult dbResult,
     data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
     InsertNewSystemToDbResult resultData,
-    std::function<void(api::ResultCode, data::SystemData)> completionHandler)
+    std::function<void(api::Result, data::SystemData)> completionHandler)
 {
     if (dbResult == nx::sql::DBResult::ok)
     {
@@ -874,7 +874,7 @@ void SystemManager::systemDeleted(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::sql::DBResult dbResult,
     data::SystemId systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     if (dbResult == nx::sql::DBResult::ok)
     {
@@ -1558,7 +1558,7 @@ void SystemManager::systemNameUpdated(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::sql::DBResult dbResult,
     data::SystemAttributesUpdate data,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     if (dbResult == nx::sql::DBResult::ok)
     {

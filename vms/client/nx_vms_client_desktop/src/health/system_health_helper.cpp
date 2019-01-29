@@ -43,7 +43,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         default:
             break;
     }
-    NX_ASSERT(false, Q_FUNC_INFO, "Requesting name for non-visual action");
+    NX_ASSERT(false, "Requesting name for non-visual action");
     return QString();
 }
 

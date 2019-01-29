@@ -7,7 +7,7 @@
 #include <common/common_globals.h>
 #include <common/static_common_module.h>
 
-#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -267,7 +267,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         info.updateInformation = m_updateFiles.value(server->getSystemInfo());
 
         if (!info.updateInformation) {
-            NX_ASSERT(0, "No update info for server", Q_FUNC_INFO);
+            NX_ASSERT(0, "No update info for server");
             return;
         }
 
@@ -354,7 +354,7 @@ void QnUpdateProcess::installClientUpdate()
     /* Check if we skip this step. */
     if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
-        || qnSettings->isClientUpdateDisabled()
+        || !qnRuntime->isClientUpdateAllowed()
         || m_clientUpdateFile->version == qnStaticCommon->engineVersion())
     {
             NX_DEBUG(this, lit("Update: Client update skipped."));

@@ -19,6 +19,7 @@
 #include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include "nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.h"
 #include <nx/vms/event/action_parameters.h>
@@ -104,8 +105,11 @@ void OpenLayoutActionWidget::displayWarning(UserWarning warning)
     {
         case UserWarning::LocalResource:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForUsers->setText(tr("Local layouts can only be shown to their owners. "));
+            ui->warningForUsers->setText(tr("Local layouts can only be shown to their owners."));
             break;
+        case UserWarning::EmptyRoles:
+            setWarningStyle(ui->warningForUsers);
+            ui->warningForUsers->setText(tr("None of selected user roles contain users. Action will not work."));
         case UserWarning::NoWarning:
             break;
     }
@@ -117,8 +121,9 @@ void OpenLayoutActionWidget::checkWarnings()
 {
     QString warnings;
 
+    bool rolesSelected;
     QnResourcePtr layout = getSelectedLayout();
-    QnUserResourceList users = getSelectedUsers();
+    QnUserResourceList users = getSelectedUsers(rolesSelected);
 
     bool foundUserWarning = false;
     bool foundLayoutWarning = false;
@@ -142,13 +147,22 @@ void OpenLayoutActionWidget::checkWarnings()
         }
     }
 
-    if (othersLocal)
-        displayWarning(UserWarning::LocalResource);
-
     if (noAccess > 0)
     {
         displayWarning(noAccess == users.size() ? LayoutWarning::NobodyHasAccess : LayoutWarning::MissingAccess);
         foundLayoutWarning = true;
+    }
+
+    if (rolesSelected && !users.size())
+    {
+        displayWarning(UserWarning::EmptyRoles);
+        foundUserWarning = true;
+    }
+
+    if (othersLocal)
+    {
+        displayWarning(UserWarning::LocalResource);
+        foundUserWarning = true;
     }
 
     if (!foundUserWarning)
@@ -162,7 +176,7 @@ QnLayoutResourcePtr OpenLayoutActionWidget::getSelectedLayout()
     return m_selectedLayout;
 }
 
-QnUserResourceList OpenLayoutActionWidget::getSelectedUsers()
+QnUserResourceList OpenLayoutActionWidget::getSelectedUsers(bool& rolesSelected)
 {
     QnUserResourceList users;
     if (model())
@@ -170,6 +184,10 @@ QnUserResourceList OpenLayoutActionWidget::getSelectedUsers()
         const auto params = model()->actionParams();
         QList<QnUuid> roles;
         userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
+        rolesSelected = roles.size();
+        for (const auto& roleId: roles)
+            for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
+                users.append(subject.user()); //< TODO: skip duplicates?
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }
     return users;
@@ -234,7 +252,8 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     const bool singlePick = true;
     LayoutSelectionDialog dialog(singlePick, this);
 
-    const auto& users = getSelectedUsers();
+    bool rolesSelected; //< #TODO: check specification for the case when selection includes roles
+    const auto& users = getSelectedUsers(rolesSelected);
 
     LayoutSelectionDialog::LocalLayoutSelection selectionMode =
         LayoutSelectionDialog::ModeFull;

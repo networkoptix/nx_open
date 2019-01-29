@@ -413,18 +413,20 @@ HRESULT enumerateDevices(REFGUID category, IEnumMoniker ** ppEnum)
 
 HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** outMoniker)
 {
-    IEnumMoniker * pEnum;
+    IEnumMoniker* pEnum = NULL;
     HRESULT result = enumerateDevices(category, &pEnum);
     if (FAILED(result))
         return result;
 
     CComBSTR devicePathBstr(devicePath.c_str());
 
-    IMoniker *pMoniker = NULL;
+    IMoniker* pMoniker = NULL;
     while (S_OK == (result = pEnum->Next(1, &pMoniker, NULL)))
     {
         VARIANT var;
-        getDeviceProperty(pMoniker, L"DevicePath", &var);
+        result = getDeviceProperty(pMoniker, L"DevicePath", &var);
+        if (FAILED(result))
+            return result;
 
         // don't release the moniker in this case, it's the one we are looking for
         if (wcscmp(var.bstrVal, devicePathBstr) == 0)
@@ -496,7 +498,7 @@ HRESULT getResolutionList(IMoniker *pMoniker,
             {
                 if (viHeader->AvgTimePerFrame)
                 {
-                    float fps = 10000000 / viHeader->AvgTimePerFrame;
+                    float fps = static_cast<float>(10000000 / viHeader->AvgTimePerFrame);
                     resolutionList.push_back(
                         ResolutionData(bmiHeader->biWidth, bmiHeader->biHeight, fps));
                 }

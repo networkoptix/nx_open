@@ -54,31 +54,31 @@ void AdtsInjector::uninitialize()
     if (m_formatContext)
         av_write_trailer(m_formatContext);
 
-    uninitializeIoContext();
-
-    if(m_outputStream)
-        avcodec_free_context(&m_outputStream->codec);
+    if (m_outputStream)
+        avcodec_close(m_outputStream->codec);
     m_outputStream = nullptr;
 
     if (m_formatContext)
         avformat_free_context(m_formatContext);
     m_formatContext = nullptr;
 
+    uninitializeIoContext();
+
     m_currentPacket = nullptr;
 }
 
-int AdtsInjector::inject(ffmpeg::Packet * packet)
+int AdtsInjector::inject(ffmpeg::Packet * aacPacket)
 {
-    if(packet->size() > m_ioBufferSize)
+    if (aacPacket->size() > m_ioBufferSize)
     {
-        int result = reinitializeIoContext(packet->size());
+        int result = reinitializeIoContext(aacPacket->size());
         if (result < 0)
             return result;
     }
 
-    m_currentPacket = packet;
+    m_currentPacket = aacPacket;
 
-    int result = av_write_frame(m_formatContext, packet->packet());
+    int result = av_write_frame(m_formatContext, aacPacket->packet());
 
     m_currentPacket = nullptr;
 
@@ -108,7 +108,7 @@ int AdtsInjector::initializeIoContext(int bufferSize)
 
 void AdtsInjector::uninitializeIoContext()
 {
-    if(m_ioBuffer)
+    if (m_ioBuffer)
         av_free(m_ioBuffer);
     m_ioBuffer = nullptr;
 
@@ -118,7 +118,7 @@ void AdtsInjector::uninitializeIoContext()
         av_free(m_ioContext);
     m_ioContext = nullptr;
 
-    if(m_formatContext)
+    if (m_formatContext)
         m_formatContext->pb = nullptr;
 }
 
@@ -126,7 +126,7 @@ int AdtsInjector::reinitializeIoContext(int bufferSize)
 {
     uninitializeIoContext();
     int result = initializeIoContext(bufferSize);
-    if(result < 0)
+    if (result < 0)
         return result;
 
     m_formatContext->pb = m_ioContext;

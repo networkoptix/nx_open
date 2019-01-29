@@ -27,7 +27,7 @@ QnActiStreamReader::~QnActiStreamReader()
 
 int QnActiStreamReader::getActiChannelNum() const
 {
-    return m_role == Qn::CR_LiveVideo ? 1 : 2;
+    return getRole() == Qn::CR_LiveVideo ? 1 : 2;
 }
 
 int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
@@ -85,8 +85,8 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     const int kStreamingMethodRtpMulticast = 4;
     const int kStreamingMethodRtpUdpMulticast = 5;
 
-    m_multiCodec.setRole(m_role);
-    params.fps = m_actiRes->roundFps(params.fps, m_role);
+    m_multiCodec.setRole(getRole());
+    params.fps = m_actiRes->roundFps(params.fps, getRole());
     int ch = getActiChannelNum();
 
     QString resolutionStr = QnActiResource::formatResolutionStr(params.resolution);
@@ -150,7 +150,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
         .arg(getRole()));
 
     m_multiCodec.setRequest(streamUrl);
-	m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
+    m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
     m_multiCodec.setRtpTransport(desiredTransport);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     return result;

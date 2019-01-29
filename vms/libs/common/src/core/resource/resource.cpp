@@ -84,9 +84,14 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
+void QnResource::setForceUseLocalProperties(bool value)
+{
+    m_forceUseLocalProperties = value;
+}
+
 bool QnResource::useLocalProperties() const
 {
-    return m_id.isNull();
+    return m_forceUseLocalProperties || m_id.isNull();
 }
 
 void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
@@ -352,14 +357,14 @@ QString QnResource::getUrl() const
     return m_url;
 }
 
-void QnResource::setUrl(const QString &url)
+void QnResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (m_url == url)
+        if (!setUrlUnsafe(url))
             return;
-        m_url = url;
     }
+
     emit urlChanged(toSharedPointer(this));
 }
 
@@ -426,6 +431,14 @@ bool QnResource::hasProperty(const QString &key) const
     if (!commonModule())
         return false;
 
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (useLocalProperties()
+            && m_locallySavedProperties.find(key) != m_locallySavedProperties.end())
+        {
+            return true;
+        }
+    }
     return commonModule()->propertyDictionary()->hasProperty(getId(), key);
 }
 
@@ -464,7 +477,7 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceTypeId)
 {
     // TODO: #GDM think about code duplication
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is required.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), "Invalid input, reading from local data is required.");
 
     NX_ASSERT(commonModule);
     QString value = commonModule
@@ -525,6 +538,15 @@ void QnResource::emitPropertyChanged(const QString& key)
 
     NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
+}
+
+bool QnResource::setUrlUnsafe(const QString& value)
+{
+    if (m_url == value)
+        return false;
+
+    m_url = value;
+    return true;
 }
 
 nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
@@ -722,7 +744,7 @@ bool QnResource::isInitializationInProgress() const
 
 void QnResource::setUniqId(const QString& /*value*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

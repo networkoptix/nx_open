@@ -91,7 +91,7 @@ private:
     QString m_lastSearchPassword;
 
     QScopedPointer<FoundDevicesModel> m_model;
-    bool m_addressEditing;
+    bool m_addressEditing = false;
 
     nx::vms::common::Credentials m_knownAddressCredentials;
     nx::vms::common::Credentials m_subnetScanCredentials;

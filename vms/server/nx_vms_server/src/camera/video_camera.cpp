@@ -500,7 +500,7 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(Qn::StreamIndex streamIndex)
         case Qn::StreamIndex::primary: return m_primaryGopKeeper;
         case Qn::StreamIndex::secondary: return m_secondaryGopKeeper;
     }
-    NX_ASSERT(false, "Unsupported StreamIndex %1", (int) streamIndex);
+    NX_ASSERT(false, lm("Unsupported StreamIndex %1").arg((int) streamIndex));
     return nullptr; //< Fallback for the failed assertion.
 }
 

@@ -49,7 +49,6 @@ private:
         nxpl::TimeProvider * const m_timeProvider;
         std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
         mutable std::mutex m_mutex;
-        std::condition_variable m_wait;
 
         std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
         std::unique_ptr<ffmpeg::Codec> m_decoder;
@@ -69,14 +68,10 @@ private:
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
         std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
         struct SwrContext * m_resampleContext = nullptr;
-
-        std::shared_ptr<std::atomic_int> m_packetCount;
-
         AdtsInjector m_adtsInjector;
 
     private:
         std::string ffmpegUrlPlatformDependent() const;
-        bool waitForConsumers();
         int initialize();
         void uninitialize();
         bool ensureInitialized();
@@ -96,7 +91,6 @@ private:
 
         bool checkIoError(int ffmpegError);
         void setLastError(int ffmpegError);
-        void terminate();
         void tryToStartIfNotStarted();
         void start();
         void stop();

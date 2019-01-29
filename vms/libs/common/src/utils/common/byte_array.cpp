@@ -111,7 +111,7 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
 
 void QnByteArray::uncheckedWrite( const char *data, unsigned int size )
 {
-    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!");
     memcpy(m_data + m_size, data, size);  //1s
     m_size += size;
 }

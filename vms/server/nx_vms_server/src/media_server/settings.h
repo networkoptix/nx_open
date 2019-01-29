@@ -31,7 +31,6 @@ public:
 
     void syncRoSettings() const;
     void close();
-    void setServerModule(QnMediaServerModule* serverModule);
 
     nx::analytics::storage::Settings analyticEventsStorage() const;
 
@@ -39,6 +38,7 @@ public:
 
     static QString defaultConfigFileName;
     static QString defaultConfigFileNameRunTime;
+
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );
     void initializeROSettings();

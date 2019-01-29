@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogStateReducer
+class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateReducer
 {
 public:
     using State = CameraSettingsDialogState;
@@ -75,6 +75,7 @@ public:
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(
         State state, const std::optional<QString>& login, const std::optional<QString>& password);
+    static State setStreamUrls(State state, const QString& primary, const QString& secondary);
 };
 
 } // namespace nx::vms::client::desktop

@@ -13,18 +13,15 @@ namespace nx::streaming::rtp {
 
 enum class TimePolicy
 {
-    bindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
-    forceCameraTime, //< Use camera NPT time only.
+    bindCameraTimeToLocalTime, //< Use camera time, bound to the server time.
+    forceCameraTime, //< Use camera time only.
+    useCameraTimeIfCorrect, //< Use camera time if it's close to the server time.
 };
 
 struct TimeOffset
 {
-    std::chrono::microseconds get() { return std::chrono::microseconds(*m_timeOffset); }
-    void reset(std::chrono::microseconds value) { m_timeOffset = value.count(); }
-    bool hasValue() { return m_timeOffset.has_value(); }
-
-private:
-    std::optional<std::atomic<int64_t>> m_timeOffset;
+    std::atomic<bool> initialized{false};
+    std::atomic<std::chrono::microseconds> value{std::chrono::microseconds(0)};
 };
 
 using TimeOffsetPtr = std::shared_ptr<TimeOffset>;
@@ -32,10 +29,18 @@ using TimeOffsetPtr = std::shared_ptr<TimeOffset>;
 class CameraTimeHelper
 {
 public:
-    using CurrentTimeGetter = std::function<std::chrono::microseconds()>;
-    CameraTimeHelper(
-        const std::string& resourceId,
-        const TimeOffsetPtr& offset);
+    enum class EventType
+    {
+        BadCameraTime,
+        CameraTimeBackToNormal,
+        StreamDesync,
+        ResyncToLocalTime,
+    };
+
+    using EventCallback = std::function<void(EventType event)>;
+
+public:
+    CameraTimeHelper(const std::string& resourceId, const TimeOffsetPtr& offset);
 
     std::chrono::microseconds getTime(
         std::chrono::microseconds currentTime,
@@ -43,10 +48,11 @@ public:
         const RtcpSenderReport& senderReport,
         const std::optional<std::chrono::microseconds>& onvifTime,
         int rtpFrequency,
-        bool isPrimaryStream);
+        bool isPrimaryStream,
+        const EventCallback& callback = [](EventType /*event*/){});
 
     void setResyncThreshold(std::chrono::milliseconds value) { m_resyncThreshold = value; }
-    void setTimePolicy(TimePolicy policy) { m_timePolicy = policy; }
+    void setTimePolicy(TimePolicy policy);
 
 private:
     struct RptTimeLinearizer
@@ -63,15 +69,17 @@ private:
         const RtcpSenderReport& senderReport,
         const std::optional<std::chrono::microseconds>& onvifTime,
         int frequency);
+
 private:
     TimeOffsetPtr m_primaryOffset;
-    CurrentTimeGetter m_timeGetter;
     TimeOffset m_localOffset; //< used in case when no rtcp reports
-    std::chrono::milliseconds m_resyncThreshold {1000};
-    std::chrono::milliseconds m_streamsSyncThreshold {5000};
+    std::chrono::milliseconds m_resyncThreshold{1000};
+    std::chrono::milliseconds m_streamsSyncThreshold{5000};
+    std::chrono::milliseconds m_forceCameraTimeThreshold{10000};
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
     std::string m_resourceId;
     RptTimeLinearizer m_linearizer;
+    bool m_badCameraTimeState = false;
 };
 
 } // namespace nx::streaming::rtp

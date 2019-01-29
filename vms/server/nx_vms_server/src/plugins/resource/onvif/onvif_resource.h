@@ -20,6 +20,8 @@
 #include <QElapsedTimer>
 #include <QtCore/QTimeZone>
 
+#include <nx/kit/ini_config.h>
+
 #include <nx/vms/server/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
@@ -48,7 +50,6 @@ typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
-typedef onvifXsd__VideoSourceConfiguration VideoSource;
 
 //first = width, second = height
 
@@ -88,6 +89,21 @@ struct QnOnvifServiceUrls
     //QString eventsServiceUrl;
 
     QString getUrl(OnvifWebService onvifWebService) const;
+};
+
+struct OnvifIniConfig: public nx::kit::IniConfig
+{
+    OnvifIniConfig(): IniConfig("server_onvif.ini") {}
+
+    NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
+        "Used in ONVIF event notification subscription.\n"
+        "Value 0 (false) may be used for debugging port forwarded devices.");
+
+    static OnvifIniConfig& instance()
+    {
+        static OnvifIniConfig ini;
+        return ini;
+    }
 };
 
 class QnPlOnvifResource:
@@ -143,21 +159,21 @@ public:
     public:
         VideoEncoderCapabilities() = default;
 
-        VideoEncoderCapabilities(const QString& videoEncoderToken,
+        VideoEncoderCapabilities(std::string videoEncoderToken,
             const onvifXsd__VideoEncoderConfigurationOptions& options,
             QnBounds frameRateBounds = QnBounds());
 
-        VideoEncoderCapabilities(const QString& videoEncoderToken,
+        VideoEncoderCapabilities(std::string videoEncoderToken,
             const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
             QnBounds frameRateBounds = QnBounds());
 
         static std::vector<QnPlOnvifResource::VideoEncoderCapabilities> createVideoEncoderCapabilitiesList(
-            const QString& videoEncoderToken,
+            const std::string& videoEncoderToken,
             const onvifXsd__VideoEncoderConfigurationOptions& options,
             QnBounds frameRateBounds);
 
-        QString videoEncoderToken;
-        UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
+        std::string videoEncoderToken;
+        SupportedVideoEncoding encoding = SupportedVideoEncoding::NONE;
 
         // Profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
         // or by Media2 (from onvifXsd__VideoEncodingProfiles).
@@ -229,10 +245,6 @@ public:
     //bool isSoapAuthorized() const;
     const QSize getVideoSourceSize() const;
 
-    const QString getAudioEncoderId() const;
-    const QString getVideoSourceId() const;
-    const QString getAudioSourceId() const;
-
     void updateOnvifUrls(const QnPlOnvifResourcePtr& other);
 
     QString getMediaUrl() const;
@@ -247,20 +259,35 @@ public:
     QString getDeviceIOUrl() const;
     void setDeviceIOUrl(const QString& src);
 
-    QString getVideoSourceToken() const;
-    void setVideoSourceToken(const QString &src);
+    QString getDeviceOnvifUrl() const;
+    void setDeviceOnvifUrl(const QString& src);
 
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
 
-    QString getPtzConfigurationToken() const;
-    void setPtzConfigurationToken(const QString &src);
+    std::string videoSourceConfigurationToken() const;
+    void setVideoSourceConfigurationToken(std::string token);
 
-    QString getPtzProfileToken() const;
-    void setPtzProfileToken(const QString& src);
+    std::string videoSourceToken() const;
+    void setVideoSourceToken(std::string token);
 
-    QString getDeviceOnvifUrl() const;
-    void setDeviceOnvifUrl(const QString& src);
+    std::string audioSourceConfigurationToken() const;
+    void setAudioSourceConfigurationToken(std::string token);
+
+    std::string audioSourceToken() const;
+    void setAudioSourceToken(std::string token);
+
+    std::string audioEncoderConfigurationToken() const;
+    void setAudioEncoderConfigurationToken(std::string token);
+
+    std::string audioOutputConfigurationToken() const;
+    void setAudioOutputConfigurationToken(std::string value);
+
+    std::string ptzConfigurationToken() const;
+    void setPtzConfigurationToken(std::string token);
+
+    std::string ptzProfileToken() const;
+    void setPtzProfileToken(std::string token);
 
     AUDIO_CODEC getAudioCodec() const;
 
@@ -301,7 +328,7 @@ public:
     void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
-    int getMaxChannels() const;
+    virtual int getMaxChannelsFromDriver() const override;
 
     void updateToChannel(int value);
 
@@ -331,9 +358,6 @@ public:
 
     double getClosestAvailableFps(double desiredFps);
 
-    QSize findSecondaryResolution(
-        const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
-
     static bool isCameraForcedToOnvif(
         QnResourceDataPool* dataPool,
         const QString& manufacturer, const QString& model);
@@ -341,7 +365,7 @@ public:
     VideoEncoderCapabilities primaryVideoCapabilities() const;
     VideoEncoderCapabilities secondaryVideoCapabilities() const;
 
-    void updateVideoEncoder(
+    void updateVideoEncoder1(
         onvifXsd__VideoEncoderConfiguration& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
@@ -351,7 +375,6 @@ public:
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
 
-    QString audioOutputConfigurationToken() const;
     SoapTimeouts onvifTimeouts() const;
 
 signals:
@@ -362,15 +385,18 @@ protected:
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODEC c);
 
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         DeviceSoapWrapper& deviceSoapWrapper,
         _onvifDevice__GetCapabilitiesResponse* outCapabilitiesResponse);
-    virtual CameraDiagnostics::Result initializeMedia(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializePtz(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializeIo(const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeMedia(
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializePtz(
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeIo(
+        const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
     virtual CameraDiagnostics::Result initializeAdvancedParameters(
         const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities);
 
@@ -428,38 +454,35 @@ private:
     QnIOPortDataList generateOutputPorts() const;
 
     CameraDiagnostics::Result ReadVideoEncoderOptionsForToken(
-        const std::string& token, QList<VideoEncoderCapabilities>* dstOptionsList, const QnBounds& frameRateBounds);
+        std::string token, QList<VideoEncoderCapabilities>* dstOptionsList,
+        const QnBounds& frameRateBounds);
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions();
-    //CameraDiagnostics::Result fetchAndSetVideoEncoderOptionsNew();
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming();
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
 
     void setAudioEncoderOptions(const AudioOptions& options);
-    void setVideoSourceOptions(const VideoSrcOptions& options);
 
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     void checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration);
 
-    void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
-    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source);
+    void updateVideoSource(onvifXsd__VideoSourceConfiguration* source, const QRect& maxRect) const;
+    CameraDiagnostics::Result sendVideoSourceToCamera(onvifXsd__VideoSourceConfiguration* source);
 
-    QRect getVideoSourceMaxSize(const QString& configToken);
+    QRect getVideoSourceMaxSize(std::string token);
 
     CameraDiagnostics::Result updateVideoEncoderUsage(QList<VideoEncoderCapabilities>& optionsList);
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
-    void setAudioOutputConfigurationToken(const QString& value);
-
     std::set<QString> notificationTopicsForMonitoring() const;
     std::set<QString> allowedInputSourceNames() const;
 
-    //* fill m_primaryStreamCapabilitiesList and m_secondaryStreamCapabilitiesList
+    /** fill m_primaryStreamCapabilitiesList and m_secondaryStreamCapabilitiesList */
     void fillStreamCapabilityLists(const QList<VideoEncoderCapabilities>& capabilitiesList);
 
     VideoEncoderCapabilities findVideoEncoderCapabilities(
-        UnderstandableVideoCodec encoding, Qn::StreamIndex streamIndex);
+        SupportedVideoEncoding encoding, Qn::StreamIndex streamIndex);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
@@ -559,17 +582,19 @@ private:
     AUDIO_CODEC m_audioCodec;
     int m_audioBitrate;
     int m_audioSamplerate;
-    //QRect m_physicalWindowSize;
     QSize m_videoSourceSize;
-    QString m_audioEncoderId;
-    QString m_videoSourceId;
-    QString m_audioSourceId;
-    QString m_videoSourceToken;
+
+    std::string m_videoSourceConfigurationToken;
+    std::string m_videoSourceToken;
+    std::string m_audioSourceConfigurationToken;
+    std::string m_audioSourceToken;
+    std::string m_audioEncoderConfigurationToken;
+    std::string m_audioOutputConfigurationToken;
+    std::string m_ptzConfigurationToken;
+    std::string m_ptzProfileToken;
 
     QString m_imagingUrl;
     QString m_ptzUrl;
-    QString m_ptzProfileToken;
-    QString m_ptzConfigurationToken;
     mutable int m_timeDrift;
     mutable QElapsedTimer m_timeDriftTimer;
     mutable QTimeZone m_cameraTimeZone;
@@ -595,7 +620,6 @@ private:
     QString m_onvifNotificationSubscriptionReference;
 
     QElapsedTimer m_pullMessagesResponseElapsedTimer;
-    qint64 m_previousPullMessagesResponseTimeMs;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;
@@ -630,7 +654,6 @@ private:
         const QString& outputID,
         bool active,
         unsigned int autoResetTimeoutMS );
-    CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
     QnAbstractPtzController* createSpecialPtzController() const;
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
@@ -690,14 +713,12 @@ private:
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
-public:
     mutable QnOnvifServiceUrls m_serviceUrls;
 
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
-    QString m_audioOutputConfigurationToken;
 };
 
 #endif //ENABLE_ONVIF

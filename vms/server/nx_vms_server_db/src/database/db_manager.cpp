@@ -823,12 +823,12 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             const auto iter = std::find_if(users.cbegin(), users.cend(),
                 [this](const UserData& user) { return user.id == m_adminUserID; });
 
-            NX_ASSERT(iter != users.cend(), Q_FUNC_INFO, "Admin must exist");
+            NX_ASSERT(iter != users.cend(), "Admin must exist");
             if (iter == users.cend())
                 return false;
 
             userResource = fromApiToResource(*iter, commonModule());
-            NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
+            NX_ASSERT(userResource->isOwner(), "Admin must be admin as it is found by name");
         }
 
         QString defaultAdminPassword = commonModule()->defaultAdminPassword();
@@ -1984,9 +1984,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20181211_add_default_plugin_event_rules.sql")))
     {
-        updateDefaultRules(
-            vms::event::Rule::getPluginEventUpdateRules()) && resyncIfNeeded(ResyncRules);
+        return updateDefaultRules(vms::event::Rule::getPluginEventUpdateRules())
+            && resyncIfNeeded(ResyncRules);
     }
+
+    if (updateName.endsWith("/99_20190110_improve_layout_api.sql"))
+        return resyncIfNeeded(ResyncLayouts);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
@@ -3229,7 +3232,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<UserData>&
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<UserRoleData>& tran)
 {
-    NX_ASSERT(tran.command == ApiCommand::saveUserRole, Q_FUNC_INFO, "Unsupported transaction");
+    NX_ASSERT(tran.command == ApiCommand::saveUserRole, "Unsupported transaction");
     if (tran.command != ApiCommand::saveUserRole)
         return ec2::ErrorCode::serverError;
     return insertOrReplaceUserRole(tran.params);
@@ -3237,7 +3240,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<UserRoleDa
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<AccessRightsData>& tran)
 {
-    NX_ASSERT(tran.command == ApiCommand::setAccessRights, Q_FUNC_INFO, "Unsupported transaction");
+    NX_ASSERT(tran.command == ApiCommand::setAccessRights, "Unsupported transaction");
     if (tran.command != ApiCommand::setAccessRights)
         return ec2::ErrorCode::serverError;
 
@@ -3282,7 +3285,7 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_AnalyticsEngine;
     else
     {
-        NX_ASSERT(false, "Unknown object type", Q_FUNC_INFO);
+        NX_ASSERT(false, "Unknown object type");
         return ApiObject_NotDefined;
     }
 }
@@ -3336,7 +3339,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
             query.bindValue(":objType", (int)ApiObject_Layout);
             break;
         default:
-            //NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
+            //NX_ASSERT(0, "Not implemented!");
             return result;
     }
     query.bindValue(":guid", parentObject.id.toRfc4122());
@@ -3368,7 +3371,7 @@ ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
         query.prepare("SELECT guid from vms_businessrule");
         break;
     default:
-        NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
+        NX_ASSERT(0, "Not implemented!");
         return result;
     }
     if (!query.exec()) {
@@ -3505,7 +3508,7 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
         break;
     default:
         qWarning() << "Remove operation is not implemented for object type" << apiObject.type;
-        NX_ASSERT(0, "Remove operation is not implemented for command", Q_FUNC_INFO);
+        NX_ASSERT(0, "Remove operation is not implemented for command");
         return ErrorCode::unsupported;
     }
 
@@ -3531,7 +3534,7 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ResourceTypeDataL
     QXmlInputSource xmlSrc( &xmlData );
     if(!reader.parse( &xmlSrc )) {
         qWarning() << "Can't parse XML file " << fileName << "with additional resource types. Check XML file syntax.";
-        NX_ASSERT(0, Q_FUNC_INFO, "Can't parse XML file");
+        NX_ASSERT(0, "Can't parse XML file");
     }
 }
 
@@ -3565,7 +3568,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray& name, MiscData& miscData)
 }
 
 ErrorCode QnDbManager::doQueryNoLock(
-    const QByteArray& /*dummy*/,
+    const std::nullptr_t& /*dummy*/,
     SystemMergeHistoryRecordList& systemMergeHistory)
 {
     QSqlQuery fetchMergeHistoryQuery(m_sdb);
@@ -4801,7 +4804,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseDat
     else if (tran.command == ApiCommand::removeLicense)
         return removeLicense(tran.params);
     else {
-        NX_ASSERT(1, Q_FUNC_INFO, "Unexpected command!");
+        NX_ASSERT(1, "Unexpected command!");
         return ErrorCode::notImplemented;
     }
 }

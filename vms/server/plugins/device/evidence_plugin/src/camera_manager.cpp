@@ -80,6 +80,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_forceSecondaryStream( true ),
     m_rtspPort( 554 )
 {
+    m_pluginRef->addRef();
     m_credentials.setUser( QString::fromUtf8(m_info.defaultLogin) );
     m_credentials.setPassword( QString::fromUtf8(m_info.defaultPassword) );
     m_encoders.resize( 2 ); //TODO all cameras support dual streaming???
@@ -118,12 +119,12 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraManager::addRef()
+int CameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraManager::releaseRef()
+int CameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

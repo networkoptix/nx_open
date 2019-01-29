@@ -246,8 +246,11 @@ void GenericTransport::processHandshakeCommand(
 
     m_haveToSendSyncDone = true;
 
-    // Starting transactions delivery.
+    // TODO: #ak If m_remotePeerTranState contains everything that m_tranStateToSynchronizeTo does,
+    // then not reading log and starting sending commands.
 
+    // TODO: #ak It is possible that m_remotePeerTranState contains sequences higher than
+    // m_tranStateToSynchronizeTo.
     ReadCommandsFilter filter;
     filter.from = m_remotePeerTranState;
     filter.to = m_tranStateToSynchronizeTo;
@@ -255,7 +258,7 @@ void GenericTransport::processHandshakeCommand(
 
     m_transactionLogReader->readTransactions(
         filter,
-        [this](auto... args) { onTransactionsReadFromLog(std::move(args)...); });
+        [this](auto&&... args) { onTransactionsReadFromLog(std::move(args)...); });
 }
 
 void GenericTransport::onTransactionsReadFromLog(
@@ -295,20 +298,25 @@ void GenericTransport::onTransactionsReadFromLog(
             std::move(tranData.serializer));
     }
 
+    // TODO: #ak If m_remotePeerTranState contained unknown peers, than they are now
+    // missing in readedUpTo.
+    // So, here we need to unite sets m_remotePeerTranState and readedUpTo.
     m_remotePeerTranState = readedUpTo;
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Synchronize to %1, already synchronized to %2")
-        .args(stateToString(m_tranStateToSynchronizeTo), stateToString(m_remotePeerTranState)));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        lm("systemId %1. Synchronize to (%2), already synchronized to (%3)")
+        .args(m_systemId, stateToString(m_tranStateToSynchronizeTo),
+            stateToString(m_remotePeerTranState)));
 
+    // TODO: #ak Instead of m_tranStateToSynchronizeTo > m_remotePeerTranState we should check
+    // if m_tranStateToSynchronizeTo contains something that is missing in m_remotePeerTranState.
     if (resultCode == ResultCode::partialContent
         || m_tranStateToSynchronizeTo > m_remotePeerTranState)
     {
-        if (resultCode != ResultCode::partialContent)
-        {
-            // TODO: Printing remote and local states.
-        }
+        NX_ASSERT(!m_prevReadResult || (*m_prevReadResult < readedUpTo));
+        m_prevReadResult = readedUpTo;
 
-        //< Local state could be updated while we were synchronizing remote peer
+        // Local state could have been updated while we were synchronizing remote peer
         // Continuing reading transactions.
         m_transactionLogReader->readTransactions(
             ReadCommandsFilter{
@@ -316,7 +324,7 @@ void GenericTransport::onTransactionsReadFromLog(
                 m_tranStateToSynchronizeTo,
                 kMaxTransactionsPerIteration,
                 {}},
-            [this](auto... args) { onTransactionsReadFromLog(std::move(args)...); });
+            [this](auto&&... args) { onTransactionsReadFromLog(std::move(args)...); });
         return;
     }
 
@@ -348,22 +356,6 @@ void GenericTransport::enableOutputChannel()
             std::move(transportHeader),
             makeSerializer<command::TranSyncDone>(std::move(tranSyncDone)));
     }
-}
-
-std::string GenericTransport::stateToString(const vms::api::TranState& tranState)
-{
-    std::string str;
-    for (auto it = tranState.values.begin(); it != tranState.values.end(); ++it)
-    {
-        if (!str.empty())
-            str += ", ";
-
-        str += it.key().id.toSimpleString().toStdString();
-        str += ": ";
-        str += std::to_string(it.value());
-    }
-
-    return str;
 }
 
 } // namespace nx::clusterdb::engine::transport

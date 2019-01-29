@@ -83,7 +83,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
-            treeView->setIgnoreDefaultSpace(true);
+            treeView->setDefaultSpacePressIgnored(true);
         };
 
     setupTreeView(ui->rolesTreeView);

@@ -41,7 +41,12 @@ void Frame::unreference()
     av_frame_unref(m_frame);
 }
 
-AVFrame * Frame::frame() const
+const AVFrame * Frame::frame() const
+{
+    return m_frame;
+}
+
+AVFrame * Frame::frame()
 {
     return m_frame;
 }

@@ -11,7 +11,7 @@ namespace nx::cloud::db::api {
 nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode);
 ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statusCode);
 
-nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCode);
+nx::network::http::FusionRequestResult apiResultToFusionRequestResult(Result result);
 ResultCode fusionRequestResultToResultCode(nx::network::http::FusionRequestResult result);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)

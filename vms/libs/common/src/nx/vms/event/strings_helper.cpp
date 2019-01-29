@@ -27,33 +27,7 @@
 
 #include <nx/utils/log/assert.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
-
-namespace {
-
-static nx::vms::api::analytics::EventType analyticsEventType(
-    const QnVirtualCameraResourcePtr& camera,
-    const QString& pluginId,
-    const QString& eventTypeId)
-{
-    NX_ASSERT(camera);
-    if (!camera)
-        return {};
-
-    if (pluginId.isNull())
-        return {};
-
-    const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
-    auto descriptor = descriptorListManager
-        ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(eventTypeId);
-
-    if (!descriptor)
-        return {};
-
-    return descriptor->item;
-}
-
-} // namespace
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx {
 namespace vms {
@@ -103,7 +77,7 @@ QString StringsHelper::actionName(ActionType value) const
             break;
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
+    NX_ASSERT(false, "All enumeration values must be handled here");
     return lit("Unknown (%1)").arg(static_cast<int>(value));
 }
 
@@ -483,6 +457,14 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 result = tr("RTP packet loss detected.");
             break;
         }
+        case EventReason::networkBadCameraTime:
+        {
+            return tr("Failed to force using camera time, it lags too much, system time will be used");
+        }
+        case EventReason::networkCameraTimeBackToNormal:
+        {
+            return tr("Camera time is back to normal");
+        }
         case EventReason::networkNoResponseFromDevice:
         {
             return tr("Device does not respond to network requests.");
@@ -577,7 +559,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                     disabledCameras << camera;
             }
 
-            NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
+            NX_ASSERT(!disabledCameras.isEmpty(), "At least one camera should be disabled on this event");
 
             result = QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
@@ -730,8 +712,8 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
-    const QString pluginId = params.getAnalyticsPluginId();
-    NX_ASSERT(!pluginId.isEmpty());
+    const QnUuid engineId = params.getAnalyticsEngineId();
+    NX_ASSERT(!engineId.isNull());
 
     const QString eventTypeId = params.getAnalyticsEventTypeId();
     NX_ASSERT(!eventTypeId.isEmpty());
@@ -739,12 +721,9 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventType = analyticsEventType(camera, pluginId, eventTypeId);
-    const auto text = eventType.name;
-
-    return !text.isEmpty()
-        ? text
-        : tr("Analytics Event");
+    nx::analytics::EventTypeDescriptorManager descriptorManager(camera->commonModule());
+    const auto eventTypeDescriptor = descriptorManager.descriptor(eventTypeId);
+    return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }
 
 QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const

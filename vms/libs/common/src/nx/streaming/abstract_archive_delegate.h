@@ -112,7 +112,7 @@ public:
     virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters /*filter*/) { }
     virtual nx::vms::api::StreamDataFilters streamDataFilter() const
     {
-        return nx::vms::api::StreamDataFilter::mediaOnly;
+        return nx::vms::api::StreamDataFilter::media;
     }
 
     virtual void setMotionRegion(const QnMotionRegion& /*region*/) {}

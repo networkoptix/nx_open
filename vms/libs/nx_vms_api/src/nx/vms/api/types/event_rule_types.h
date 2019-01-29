@@ -27,6 +27,8 @@ enum class EventReason
     networkConnectionClosed = 2,
     networkRtpPacketLoss = 3,
     networkNoResponseFromDevice = 19,
+    networkBadCameraTime = 20,
+    networkCameraTimeBackToNormal = 21,
 
     // Server Failure event
     serverTerminated = 4,
@@ -191,14 +193,14 @@ enum ActionType
     executePtzPresetAction = 12,
 
     /**
-     * Show text overlay over the given camera(s).
+     * Show text overlay over the given cameras.
      * actionParams:
      * - text (string, required) - Text that will be displayed.
      */
     showTextOverlayAction = 13,
 
     /**
-     * Put the given camera(s) to the Alarm Layout.
+     * Put the given cameras to the Alarm Layout.
      * actionParams:
      * - users - List of users which will receive this alarm notification.
      */

@@ -14,7 +14,7 @@
 #include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
 #include <nx/vms/server/fs/partitions/read_partitions_linux.h>
 #include <nx/network/nettools.h>
-#include <media_server/media_server_module.h>
+#include <nx/vms/server/root_fs.h>
 
 namespace
 {
@@ -46,12 +46,12 @@ QString Nx1::getSerial()
     return readFile("/tmp/serial");
 }
 
-bool Nx1::isBootedFromSD(QnMediaServerModule* serverModule)
+bool Nx1::isBootedFromSD(nx::vms::server::RootFileSystem* footFs)
 {
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     namespace fs = nx::vms::server::fs;
 
-    fs::PartitionsInformationProvider partitionsInfoProvider(serverModule);
+    fs::PartitionsInformationProvider partitionsInfoProvider(footFs);
     std::list<fs::PartitionInfo> partitionInfoList;
 
     if (fs::readPartitionsInformation(&partitionsInfoProvider, &partitionInfoList)

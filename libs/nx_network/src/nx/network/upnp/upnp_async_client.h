@@ -106,9 +106,11 @@ public:
         std::function< void(MappingList) > callback);
 
 private:
-    // TODO: replace with single httpClient when pipeline is supported
     QnMutex m_mutex;
-    std::set< nx::network::http::AsyncHttpClientPtr > m_httpClients;
+    bool m_isTerminating = false;
+
+    // TODO: replace with single httpClient when pipeline is supported
+    std::set<nx::network::http::AsyncHttpClientPtr> m_httpClients;
 };
 
 } // namespace nx

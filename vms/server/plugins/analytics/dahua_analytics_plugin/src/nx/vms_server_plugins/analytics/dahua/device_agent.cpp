@@ -1,12 +1,11 @@
 #include <chrono>
 
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "common.h"
 #include "device_agent.h"
@@ -18,7 +17,7 @@ using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest)
     :
     m_engine(engine),
@@ -50,24 +49,23 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* /*settings*/)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // This plugin doesn't use DeviceAgent setting, it just ignores them.
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
-    return nx::sdk::Error::noError;
+    return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
     {
@@ -78,36 +76,35 @@ nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     return startFetchingMetadata(metadataTypes);
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const EventList& events)
         {
             using namespace std::chrono;
-            auto packet = new nx::sdk::analytics::common::EventMetadataPacket();
+            auto packet = new EventMetadataPacket();
 
             for (const auto& dahuaEvent: events)
             {
-                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channel)
+                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
-                auto event = new nx::sdk::analytics::common::Event();
+                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
-                    dahuaEvent.caption, dahuaEvent.description, m_channel);
+                    dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
-                event->setTypeId(dahuaEvent.typeId.toStdString());
-                event->setCaption(dahuaEvent.caption.toStdString());
-                event->setDescription(dahuaEvent.description.toStdString());
-                event->setIsActive(dahuaEvent.isActive);
-                event->setConfidence(1.0);
-                //event->setAuxiliaryData(dahuaEvent.fullEventName.toStdString());
+                eventMetadata->setTypeId(dahuaEvent.typeId.toStdString());
+                eventMetadata->setCaption(dahuaEvent.caption.toStdString());
+                eventMetadata->setDescription(dahuaEvent.description.toStdString());
+                eventMetadata->setIsActive(dahuaEvent.isActive);
+                eventMetadata->setConfidence(1.0);
+                //eventMetadata->setAuxiliaryData(dahuaEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUs(-1);
-                packet->addItem(event);
+                packet->addItem(eventMetadata);
             }
 
             m_handler->handleMetadata(packet);
@@ -151,19 +148,19 @@ const IString* DeviceAgent::manifest(Error* error) const
     }
 
     *error = Error::noError;
-    return new nx::sdk::common::String(m_jsonManifest);
+    return new nx::sdk::String(m_jsonManifest);
 }
 
-void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)
+void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
-    m_url = deviceInfo.url;
-    m_model = deviceInfo.model;
-    m_firmware = deviceInfo.firmware;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
-    m_uniqueId = deviceInfo.uid;
-    m_sharedId = deviceInfo.sharedId;
-    m_channel = deviceInfo.channel;
+    m_url = deviceInfo->url();
+    m_model = deviceInfo->model();
+    m_firmware = deviceInfo->firmware();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
+    m_uniqueId = deviceInfo->id();
+    m_sharedId = deviceInfo->sharedId();
+    m_channelNumber = deviceInfo->channelNumber();
 }
 
 } // namespace nx::vms_server_plugins::analytics::dahua

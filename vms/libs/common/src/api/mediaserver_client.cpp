@@ -387,9 +387,14 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
         result);
 }
 
-nx::network::http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
+SystemError::ErrorCode MediaServerClient::prevRequestSysErrorCode() const
 {
-    return m_prevResponseHttpStatusCode;
+    return m_prevRequestSysErrorCode;
+}
+
+nx::network::http::StatusLine MediaServerClient::lastResponseHttpStatusLine() const
+{
+    return m_prevResponseHttpStatusLine;
 }
 
 void MediaServerClient::stopWhileInAioThread()

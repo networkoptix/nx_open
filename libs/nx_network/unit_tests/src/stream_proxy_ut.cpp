@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/connection_server/simple_message_server.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/stream_proxy.h>
@@ -44,22 +45,33 @@ class StreamProxyPool:
     public ::testing::Test
 {
 public:
+    StreamProxyPool():
+        m_clientMessage("chisti-chisti"),
+        m_serverMessage("raz-raz-raz")
+    {
+    }
+
     ~StreamProxyPool()
     {
-        if (m_httpClient)
-            m_httpClient->pleaseStopSync();
+        if (m_clientSocket)
+            m_clientSocket->pleaseStopSync();
     }
 
 protected:
+    std::string m_clientMessage;
+    std::string m_serverMessage;
+    network::StreamProxyPool m_proxy;
+
     void givenListeningPingPongServer()
     {
         DestinationContext destinationContext;
-        destinationContext.server = std::make_unique<http::TestHttpServer>();
-        destinationContext.server->registerStaticProcessor(
-            kTestHandlerPath,
-            lm("%1").arg(m_destinationServers.size()).toUtf8(),
-            "text/plain");
-        ASSERT_TRUE(destinationContext.server->bindAndListen());
+        destinationContext.server = std::make_unique<server::SimpleMessageServer>(
+            /*sslRequired*/ false,
+            nx::network::NatTraversalSupport::disabled);
+        destinationContext.server->setRequest(m_clientMessage.c_str());
+        destinationContext.server->setResponse(m_serverMessage.c_str());
+        ASSERT_TRUE(destinationContext.server->bind(SocketAddress::anyPrivateAddressV4));
+        ASSERT_TRUE(destinationContext.server->listen());
         m_destinationServers.push_back(std::move(destinationContext));
 
         auto proxyServer = std::make_unique<network::TCPServerSocket>(AF_INET);
@@ -70,7 +82,7 @@ protected:
 
         m_destinationServers.back().proxyId = m_proxy.addProxy(
             std::make_unique<StreamServerSocketToAcceptorWrapper>(std::move(proxyServer)),
-            m_destinationServers.back().server->serverAddress());
+            m_destinationServers.back().server->address());
     }
 
     void givenWorkingProxy()
@@ -88,13 +100,25 @@ protected:
     void whenSendPingViaProxy()
     {
         m_expectedDestinationIndex = 0;
-        auto url = url::Builder().setScheme(http::kUrlSchemeName)
-            .setEndpoint(m_destinationServers[m_expectedDestinationIndex].proxyEndpoint)
-            .setPath(kTestHandlerPath);
 
-        m_httpClient = std::make_unique<http::AsyncClient>();
-        m_httpClient->setResponseReadTimeout(kNoTimeout);
-        m_httpClient->doGet(url, std::bind(&StreamProxyPool::saveRequestResult, this));
+        m_clientSocket = std::make_unique<TCPSocket>(AF_INET);
+        if (!m_clientSocket->connect(
+                m_destinationServers[m_expectedDestinationIndex].proxyEndpoint,
+                kNoTimeout))
+        {
+            saveRequestResult(SystemError::getLastOSErrorCode(), (std::size_t)-1);
+            return;
+        }
+        ASSERT_EQ(
+            m_clientMessage.size(),
+            m_clientSocket->send(m_clientMessage.data(), m_clientMessage.size()));
+
+        ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
+        m_readBuffer.clear();
+        m_readBuffer.reserve(4*1024);
+        m_clientSocket->readSomeAsync(
+            &m_readBuffer,
+            [this](auto&&... args) { saveRequestResult(std::move(args)...); });
     }
 
     void whenReassignToAnotherServer()
@@ -104,7 +128,7 @@ protected:
 
         m_proxy.setProxyDestination(
             m_destinationServers[0].proxyId,
-            m_destinationServers[1].server->serverAddress());
+            m_destinationServers[1].server->address());
     }
 
     void whenStopProxy()
@@ -122,11 +146,7 @@ protected:
         m_prevResponse = m_requestResults.pop();
 
         ASSERT_EQ(SystemError::noError, m_prevResponse->osResultCode);
-        ASSERT_NE(nullptr, m_prevResponse->response);
-        ASSERT_EQ(http::StatusCode::ok, m_prevResponse->response->statusLine.statusCode);
-        ASSERT_EQ(
-            lm("%1").arg(m_expectedDestinationIndex).toUtf8(),
-            m_prevResponse->response->messageBody);
+        ASSERT_EQ(m_serverMessage, m_prevResponse->response);
     }
 
     void thenTrafficProxiedToAnotherServer()
@@ -150,7 +170,10 @@ protected:
     {
         m_prevResponse = m_requestResults.pop();
 
-        ASSERT_EQ(nullptr, m_prevResponse->response);
+        // Connection can be closed gracefully without transferring any data. This is a failure too.
+        ASSERT_TRUE(
+            m_prevResponse->osResultCode != SystemError::noError ||
+            m_prevResponse->response.empty());
     }
 
     void andEndpointIsNotAvailable()
@@ -167,40 +190,34 @@ protected:
 private:
     struct DestinationContext
     {
-        std::unique_ptr<http::TestHttpServer> server;
+        std::unique_ptr<server::SimpleMessageServer> server;
         SocketAddress proxyEndpoint;
         int proxyId = -1;
     };
 
     struct RequestResult
     {
-        std::unique_ptr<http::Response> response;
         SystemError::ErrorCode osResultCode = SystemError::noError;
+        std::string response;
     };
 
-    network::StreamProxyPool m_proxy;
     std::vector<DestinationContext> m_destinationServers;
-    std::unique_ptr<http::AsyncClient> m_httpClient;
+    std::unique_ptr<TCPSocket> m_clientSocket;
     nx::utils::SyncQueue<RequestResult> m_requestResults;
     std::optional<RequestResult> m_prevResponse;
     int m_expectedDestinationIndex = -1;
     nx::utils::SyncQueue<int> m_acceptRequestQueue;
+    nx::Buffer m_readBuffer;
 
-    void saveRequestResult()
+    void saveRequestResult(
+        SystemError::ErrorCode systemErrorCode,
+        std::size_t bytesRead)
     {
-        RequestResult requestResult;
-        if (m_httpClient->response())
-        {
-            requestResult.response =
-                std::make_unique<http::Response>(*m_httpClient->response());
-            requestResult.response->messageBody =
-                m_httpClient->fetchMessageBodyBuffer();
-        }
-        requestResult.osResultCode = m_httpClient->lastSysErrorCode();
-
-        m_httpClient.reset();
-
-        m_requestResults.push(std::move(requestResult));
+        m_requestResults.push({
+            systemErrorCode,
+            systemErrorCode == SystemError::noError
+                ? std::string(m_readBuffer.constData(), bytesRead)
+                : std::string()});
     }
 };
 
@@ -239,6 +256,69 @@ TEST_F(StreamProxyPool, accept_is_retried_after_failure)
 {
     givenProxyWithBrokenAcceptor();
     assertAcceptIsRetriedAfterFailure();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class CustomFuncOutputConverter:
+    public nx::utils::bstream::AbstractOutputConverter
+{
+public:
+    CustomFuncOutputConverter(
+        std::function<void(void* /*data*/, std::size_t /*count*/)> func)
+        :
+        m_func(std::move(func))
+    {
+    }
+
+    virtual int write(const void* data, size_t count) override
+    {
+        std::string convertedData(static_cast<const char*>(data), count);
+        m_func(convertedData.data(), convertedData.size());
+        return m_outputStream->write(convertedData.data(), convertedData.size());
+    }
+
+private:
+    std::function<void(void* /*data*/, std::size_t /*count*/)> m_func;
+};
+
+static void convert(void* data, std::size_t count)
+{
+    char* charData = static_cast<char*>(data);
+    for (std::size_t i = 0; i < count; ++i)
+        charData[i] ^= 'z';
+}
+
+class StreamProxyPoolWithConverter:
+    public StreamProxyPool
+{
+    using base_type = StreamProxyPool;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_proxy.setDownStreamConverterFactory(
+            [this]() { return std::make_unique<CustomFuncOutputConverter>(&convert); });
+        m_proxy.setUpStreamConverterFactory(
+            [this]() { return std::make_unique<CustomFuncOutputConverter>(&convert); });
+
+        givenListeningPingPongServer();
+
+        convert(m_clientMessage.data(), m_clientMessage.size());
+        convert(m_serverMessage.data(), m_serverMessage.size());
+    }
+};
+
+TEST_F(StreamProxyPoolWithConverter, converts_stream)
+{
+    // If outgoing stream would have not been converted, server would not respond.
+    // If incoming stream would have not been converted,
+    // server response would have not been equal to m_serverMessage.
+
+    whenSendPingViaProxy();
+    thenPongIsReceived();
 }
 
 } // namespace nx::network::test

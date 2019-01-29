@@ -103,68 +103,73 @@ void AudioDevice::initDeviceInternal()
 #endif
 }
 
-AudioDevice::AudioDevice(QObject *parent)
-    : m_device(0), m_context(0), m_volume(1.0)
+AudioDevice::AudioDevice(QObject* parent):
+    QObject(parent)
 {
-    Q_UNUSED(parent)
-#ifdef OPENAL_STATIC
-    alc_init();
-    qDebug("OpenAL init");
-#endif
+    #ifdef OPENAL_STATIC
+        alc_init();
+        NX_DEBUG(this, "OpenAL init");
+    #endif
 
-    m_device = alcOpenDevice(NULL);
+    m_device = alcOpenDevice(nullptr);
     initDeviceInternal();
 
     if (!m_device)
     {
-        qWarning("OpenAL: unable to open Device");
+        NX_ERROR(this, "Unable to open device");
+        return;
     }
-    else
+
+    m_context = alcCreateContext(m_device, nullptr);
+    if (!m_context)
     {
-        m_context = alcCreateContext(m_device, NULL);
-        if (!m_context)
-        {
-            qWarning("OpenAL: unable to create Context");
-        }
-        else
-        {
-            alcMakeContextCurrent(m_context);
-            alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-
-            fixVolumeLevel();
-
-            NX_INFO(this, "OpenAL info: ");
-            NX_INFO(this, lm("Version: %1").arg(versionString()));
-            NX_INFO(this, lm("Company: %1").arg(company()));
-            NX_INFO(this, lm("Device type: %1").arg(static_cast<const char *>(alGetString(AL_RENDERER))));
-            NX_INFO(this, lm("OpenAL extensions: %1").arg(static_cast<const char *>(alGetString(AL_EXTENSIONS))));
-        }
+        NX_ERROR(this, "Unable to create context");
+        return;
     }
+
+    alcMakeContextCurrent(m_context);
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+
+    fixVolumeLevel();
+
+    const QByteArray renderer = static_cast<const char*>(alGetString(AL_RENDERER));
+    const QByteArray extensions = static_cast<const char*>(alGetString(AL_EXTENSIONS));
+
+    NX_INFO(this, "Version: %1", versionString());
+    NX_INFO(this, "Company: %1", company());
+    NX_INFO(this, "Device type: %1", renderer);
+    NX_DEBUG(this, "Extensions: %1", extensions);
 }
 
 AudioDevice::~AudioDevice()
 {
-    if (m_device) {
+    if (m_device)
+    {
         // Disable context
-        if (m_context) {
-            alcMakeContextCurrent(NULL);
+        if (m_context)
+        {
+            alcMakeContextCurrent(nullptr);
             // Release context(s)
             alcDestroyContext(m_context);
-            m_context = NULL;
+            m_context = nullptr;
         }
 
         // Close device
         alcCloseDevice(m_device);
-        m_device = NULL;
+        m_device = nullptr;
     }
 
-#ifdef OPENAL_STATIC
-    alc_deinit();
-    qDebug("OpenAL deinit");
-#endif
+    #ifdef OPENAL_STATIC
+        alc_deinit();
+        NX_DEBUG(this, "OpenAL deinit");
+    #endif
 }
 
-QString AudioDevice::versionString() const {
+QString AudioDevice::versionString() const
+{
+    if (!m_device)
+        return QString();
+
     int majorVersion = 0;
     int minorVersion = 0;
     alcGetIntegerv(m_device, ALC_MAJOR_VERSION, 1, &majorVersion);
@@ -173,7 +178,8 @@ QString AudioDevice::versionString() const {
     return QString::number(majorVersion) + QLatin1String(".") + QString::number(minorVersion);
 }
 
-QString AudioDevice::company() const {
+QString AudioDevice::company()
+{
     return QLatin1String(static_cast<const char *>(alGetString(AL_VENDOR)));
 }
 
@@ -182,24 +188,24 @@ float AudioDevice::volume() const
     return qBound(0.0f, m_volume, 1.0f);
 }
 
-void AudioDevice::setVolume(float volume)
+void AudioDevice::setVolume(float value)
 {
-    volume = qBound(0.0f, volume, 1.0f);
-    if (m_volume == volume)
+    value = qBound(0.0f, value, 1.0f);
+    if (m_volume == value)
         return;
 
-    if (volume == 0.0f)
+    if (value == 0.0f)
     {
-        if (m_volume < volume)
+        if (m_volume < value)
             return;
 
-        volume = -m_volume;
+        value = -m_volume;
     }
 
-    m_volume = volume;
+    m_volume = value;
 
-    volume = qBound(0.0f, volume, 1.0f);
-    emit volumeChanged(volume);
+    value = qBound(0.0f, value, 1.0f);
+    emit volumeChanged(value);
 }
 
 bool AudioDevice::isMute() const
@@ -212,10 +218,10 @@ void AudioDevice::setMute(bool mute)
     setVolume(!mute ? (m_volume < 0.0f ? -m_volume : m_volume) : 0.0f);
 }
 
-Sound *AudioDevice::createSound(const QnAudioFormat &format)
+Sound* AudioDevice::createSound(const QnAudioFormat& format) const
 {
     if (!m_device || !m_context)
-        return 0;
+        return nullptr;
 
     QScopedPointer<Sound> sound(new Sound(m_device, format));
     if (sound->isValid())
@@ -224,7 +230,7 @@ Sound *AudioDevice::createSound(const QnAudioFormat &format)
         return sound.take();
     }
 
-    return 0;
+    return nullptr;
 }
 
 } // namespace audio

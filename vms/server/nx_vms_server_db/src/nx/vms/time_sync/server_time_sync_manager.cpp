@@ -125,14 +125,16 @@ QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
     return settings->primaryTimeServer();
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
+std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(
+    const QnRoute& route,
+    bool sslRequired)
 {
     const auto maxRtt =
         commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
     if (m_serverConnector)
-        return m_serverConnector->connectTo(route, maxRtt);
-    return base_type::connectToRemoteHost(route);
+        return m_serverConnector->connectTo(route, sslRequired, maxRtt);
+    return base_type::connectToRemoteHost(route, sslRequired);
 }
 
 bool ServerTimeSyncManager::loadTimeFromInternet()

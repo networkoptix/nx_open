@@ -19,7 +19,7 @@ namespace detail {
 
 namespace {
 
-static const GUID kCaptureGuid = 
+static const GUID kCaptureGuid =
 {
     0x65e8773d, // Data1
     0x8f56, // Data2

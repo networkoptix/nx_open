@@ -1,10 +1,11 @@
 #include "mediaserver_launcher.h"
 
+#include <api/global_settings.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
 #include <test_support/utils.h>
-#include <api/global_settings.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace {
 
@@ -20,13 +21,16 @@ MediaServerLauncher::MediaServerLauncher(
     m_serverEndpoint(nx::network::HostAddress::localhost, port),
     m_firstStartup(true)
 {
+    m_serverGuid = QnUuid::createUuid();
+    fillDefaultSettings();
+
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
         addSetting("noResourceDiscovery", "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting("noMonitorStatistics", "1");
 
-    m_serverGuid = QnUuid::createUuid();
-    fillDefaultSettings();
+    if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
+        addSetting(QnServer::kNoInitStoragesOnStartup, "1");
 }
 
 void MediaServerLauncher::fillDefaultSettings()
@@ -68,6 +72,16 @@ QnMediaServerModule* MediaServerLauncher::serverModule() const
 nx::vms::server::Authenticator* MediaServerLauncher::authenticator() const
 {
     return m_mediaServerProcess->authenticator();
+}
+
+void MediaServerLauncher::connectTo(MediaServerLauncher* target, bool isSecure)
+{
+    const auto peerId = target->commonModule()->moduleGUID();
+    const auto url = nx::utils::url::parseUrlFields(
+        target->endpoint().toString(), nx::network::http::urlSheme(isSecure));
+
+    serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
+        peerId, nx::vms::api::PeerType::server, url);
 }
 
 void MediaServerLauncher::addSetting(const std::string& name, const QVariant& value)

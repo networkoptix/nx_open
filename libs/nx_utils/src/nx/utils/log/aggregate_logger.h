@@ -18,7 +18,7 @@ public:
     AggregateLogger(std::vector<std::unique_ptr<AbstractLogger>> loggers);
     AggregateLogger(AggregateLogger&&) = delete;
 
-    virtual std::set<Tag> tags() const override;
+    virtual std::set<Filter> filters() const override;
 
     virtual void log(Level level, const Tag& tag, const QString& message) override;
 

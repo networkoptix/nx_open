@@ -14,17 +14,16 @@
 
 #include <nx/vms/client/desktop/common/data/rotation.h>
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
-#include <nx/vms/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
+#include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
+#include <nx/vms/client/desktop/resource_properties/camera/data/schedule_cell_params.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
 
-#include "../utils/analytics_engine_info.h"
-
 namespace nx::vms::client::desktop {
 
-struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
+struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 {
     template<class T>
     struct UserEditable
@@ -127,9 +126,8 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
         QString ipAddress;
         QString webPage;
         QString settingsUrlPath;
-        std::optional<QString> primaryStream;
-        std::optional<QString> secondaryStream;
         bool hasVideo = true;
+        bool editableStreamUrls = false;
 
         int maxFpsWithoutMotion = 0;
 
@@ -146,6 +144,9 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
         UserEditable<QList<QnMotionRegion>> motionRegionList;
 
         UserEditable<QnMediaDewarpingParams> fisheyeDewarping;
+
+        UserEditable<QString> primaryStream;
+        UserEditable<QString> secondaryStream;
 
         UserEditable<int> logicalId;
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.

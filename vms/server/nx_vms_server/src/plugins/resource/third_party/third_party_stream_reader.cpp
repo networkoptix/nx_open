@@ -1,4 +1,3 @@
-
 #include "third_party_stream_reader.h"
 
 #ifdef ENABLE_THIRD_PARTY
@@ -8,6 +7,7 @@
 
 #include <QtCore/QTextStream>
 
+#include <plugins/plugin_tools.h>
 #include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/utils/app_info.h>
@@ -35,7 +35,8 @@ namespace
     {
         AVCodecID codecId = packet->compressionType;
 
-        NX_ASSERT( codecId == AV_CODEC_ID_H264, "IFrame detection", "only AV_CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == AV_CODEC_ID_H264,
+            "IFrame detection: only AV_CODEC_ID_H264 is supported" );
 
         if( !packet || codecId != AV_CODEC_ID_H264 )
             return false;
@@ -122,7 +123,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    auto camManager2 = nxpt::queryInterfacePtr<nxcip::BaseCameraManager2>(
+        m_camManager.getRef(), nxcip::IID_BaseCameraManager2);
     if( !camManager2 )
         return;
 
@@ -180,11 +182,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
-            nxpt::ScopedRef<nxcip::CameraMediaEncoder4> mediaEncoder4(
-                (nxcip::CameraMediaEncoder4*)intf->queryInterface(nxcip::IID_CameraMediaEncoder4),
-                false);
-            if (mediaEncoder4.get())
+            if (const auto mediaEncoder4 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
+                intf, nxcip::IID_CameraMediaEncoder4))
+            {
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
+            }
         }
     }
 
@@ -192,13 +194,15 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     m_camManager.setCredentials( auth.user(), auth.password() );
 
     m_mediaEncoder2.reset();
-    m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
+    m_mediaEncoder2.reset(
+        static_cast<nxcip::CameraMediaEncoder2*>(
+            intf->queryInterface(nxcip::IID_CameraMediaEncoder2)),
+        refDeleter);
 
-    nxpt::ScopedRef<nxcip::CameraMediaEncoder3> mediaEncoder3(
-        (nxcip::CameraMediaEncoder3*)intf->queryInterface( nxcip::IID_CameraMediaEncoder3 ),
-        false );
+    auto mediaEncoder3 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder3>(
+        intf, nxcip::IID_CameraMediaEncoder3);
 
-    if (mediaEncoder3.get()) // one-call config
+    if (mediaEncoder3) //< One-call config.
     {
         if( isCameraControlRequired )
         {
@@ -423,26 +427,6 @@ void ThirdPartyStreamReader::afterRun()
     closeStream();
 }
 
-Qn::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
-{
-    const Qn::ConnectionRole softMotionRole = CLServerPushStreamReader::roleForMotionEstimation();
-    if( softMotionRole != Qn::CR_LiveVideo)  //primary stream
-        return softMotionRole;
-
-    //checking stream resolution
-    auto forcedMotionDetection = m_thirdPartyRes->getProperty(QnMediaResource::motionStreamKey());
-    auto forcedPrimaryStreamMotionDetection =
-        forcedMotionDetection == QnMediaResource::primaryStreamValue();
-
-    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION
-        && !forcedPrimaryStreamMotionDetection)
-    {
-        return Qn::CR_SecondaryLiveVideo;
-    }
-
-    return softMotionRole;
-}
-
 void ThirdPartyStreamReader::onStreamResolutionChanged( int /*channelNumber*/, const QSize& picSize )
 {
     m_videoResolution = picSize;
@@ -636,19 +620,16 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
-    nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
+    nx::sdk::Ptr<nxcip::MediaDataPacket> packetAp(packet);
 
     QnAbstractMediaDataPtr mediaPacket;
 
-    nxcip::MediaDataPacket2* mediaDataPacket2 = static_cast<nxcip::MediaDataPacket2*>(
-        packet->queryInterface(nxcip::IID_MediaDataPacket2));
-
-    if (mediaDataPacket2)
+    if (const auto mediaDataPacket2 = nxpt::queryInterfacePtr<nxcip::MediaDataPacket2>(
+        packet, nxcip::IID_MediaDataPacket2))
     {
         auto extradataSize = mediaDataPacket2->extradataSize();
         outExtras->extradataBlob.resize(extradataSize);
         memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(), mediaDataPacket2->extradataSize());
-        mediaDataPacket2->releaseRef();
     }
     else if (packet->codecType() == nxcip::AV_CODEC_ID_AAC)
     {
@@ -662,7 +643,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
         case nxcip::dptVideo:
         {
             QnThirdPartyCompressedVideoData* videoPacket = nullptr;
-            nxcip::VideoDataPacket* srcVideoPacket = static_cast<nxcip::VideoDataPacket*>(packet->queryInterface(nxcip::IID_VideoDataPacket));
+            auto srcVideoPacket = static_cast<nxcip::VideoDataPacket*>(
+                packet->queryInterface(nxcip::IID_VideoDataPacket));
 
             if (srcVideoPacket)
             {
@@ -670,7 +652,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
                     return QnAbstractMediaDataPtr();  //looks like bug in plugin implementation
 
                 videoPacket = new QnThirdPartyCompressedVideoData( srcVideoPacket );
-                packetAp.release();
+                packetAp.releasePtr();
 
                 // leave PTS unchanged
                 //videoPacket->pts = packet->timestamp();
@@ -704,14 +686,15 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
                 srcVideoPacket->releaseRef();
             }
             else
-                videoPacket = new QnThirdPartyCompressedVideoData( packetAp.release() );
+                videoPacket = new QnThirdPartyCompressedVideoData(packetAp.releasePtr());
 
             mediaPacket = QnAbstractMediaDataPtr(videoPacket);
             break;
         }
 
         case nxcip::dptAudio:
-            mediaPacket = QnAbstractMediaDataPtr( new QnThirdPartyCompressedAudioData( packetAp.release() ) );
+            mediaPacket = QnAbstractMediaDataPtr(
+                new QnThirdPartyCompressedAudioData(packetAp.releasePtr()));
             break;
 
         case nxcip::dptEmpty:

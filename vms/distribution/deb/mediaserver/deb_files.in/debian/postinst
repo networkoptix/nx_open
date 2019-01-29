@@ -12,27 +12,15 @@ UPGRADING=${2:+yes}
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
-EC_DIR="/opt/$COMPANY_NAME/entcontroller"
 
 ETC_DIR="$BASE_DIR/etc"
-EC_CONFIG_FILE="$EC_DIR/etc/entcontroller.conf"
-CONFIG_FILE="$ETC_DIR/mediaserver.conf"
-RUNTIME_CONFIG_FILE="$ETC_DIR/running_time.conf"
-
-OLD_DB_PATH="$EC_DIR/var/db/ecs.db"
-DB_PATH="$BASE_DIR/var/ecs.sqlite"
-
 BIN_DIR="$BASE_DIR/bin"
 
+CONFIG_FILE="$ETC_DIR/mediaserver.conf"
+RUNTIME_CONFIG_FILE="$ETC_DIR/running_time.conf"
+DB_PATH="$BASE_DIR/var/ecs.sqlite"
+
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
-EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
-
-DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
-CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
-
-# This is necessary because changed configuration options should take effect
-# immediately.
-service $COMPANY_NAME-mediaserver stop || true
 
 # Default MS parameters
 PORT_DEFAULT="7001"
@@ -53,75 +41,6 @@ function is_local_addr {
     [[ "$addr" =~ ^127.[0-9]+.[0-9]+.[0-9]+$ ]] && return 0
 
     ip -4 -o addr | awk '{gsub("/", " "); print $4;}' | grep "^$addr$" > /dev/null 2>&1
-}
-
-function to_int {
-    local -i num="10#${1}"
-    echo "${num}"
-}
-
-function port_is_ok {
-    local port="$1"
-    local -i port_num=$(to_int "${port}" 2>/dev/null)
-
-    if (( $port_num < 1 || $port_num > 65535 )) ; then
-        return 1
-    fi
-
-    return 0
-}
-
-function create_dir {
-    local dir="$1";
-
-    mkdir -p "$dir"
-}
-
-function ask_for_value {
-    local varname="$1"
-    local default="$2"
-    local full_name="$COMPANY_NAME-mediaserver/$varname"
-    local error_message="${full_name}_invalid"
-
-    # Support unattened install
-    db_get $full_name
-    if [ "$RET" = "" ]; then
-        [ -n "$default" ] && db_set $full_name $default
-    fi
-
-    db_input high $full_name || true
-    db_go
-
-    while :
-    do
-        db_get $full_name
-        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true
-        [ $STATUS -eq 0 ] && break # validation passes
-        [ $STATUS -ne 1 ] && break # no validation function or invalid
-
-        db_input high $error_message
-        db_go
-
-        { db_input high $full_name; STATUS=$?; } || true
-        [ $STATUS -eq 30 ] && break
-        db_go
-    done
-
-    RESULT="$RET"
-    db_unregister $full_name
-    echo $RESULT
-}
-
-function validate_appserverPassword {
-    [ -n "$1" ]
-}
-
-function validate_port {
-    port_is_ok $1
-}
-
-function validate_storage {
-  [[ "$1" == /* ]]
 }
 
 function find_free_port {
@@ -166,11 +85,20 @@ function display_complete_setup_hint {
     fi
 }
 
+# This is necessary because changed configuration options should take effect
+# immediately.
+
+if [ $(which systemctl) ]; then
+    systemctl stop $COMPANY_NAME-mediaserver || true
+    systemctl stop $COMPANY_NAME-root-tool || true
+else
+    service $COMPANY_NAME-mediaserver stop || true
+    service $COMPANY_NAME-root-tool stop || true
+fi
+
 case "$1" in
     configure)
-        ECS_GUID="$($EC_CFG_HELPER ecsGuid)"
-        SYSTEM_NAME_SUFFIX=$(echo $ECS_GUID | sed 's/{*\([^{-]\+\)-.*/\1/')
-        SYSTEM_NAME_DEFAULT=System_${SYSTEM_NAME_SUFFIX:-$RANDOM}
+        SYSTEM_NAME_DEFAULT=System_$RANDOM
 
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
@@ -188,12 +116,11 @@ case "$1" in
         if [ -z "$UPGRADING" ]
         then
             PORT="$($CFG_HELPER port)"
-            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
             [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
-            #PORT=$(ask_for_value port "$PORT")
             $CFG_HELPER port "$PORT"
 
-            if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
+            if [ ! -f $DB_PATH ]
+            then
                 APPSERVER_PASSWORD="admin"
                 $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
                 $CFG_HELPER lowPriorityPassword 1
@@ -203,50 +130,22 @@ case "$1" in
             [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
             $CFG_HELPER rtspTransport "$TRANSPORT"
 
-            SYSTEM_NAME="$($CFG_HELPER systemName)"
-            [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-            SYSTEM_NAME=
-            $CFG_HELPER systemName "$SYSTEM_NAME"
+            $CFG_HELPER systemName ""
 
             CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
-            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
-            #CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
 
             STATISTICS_REPORT_ALLOWED="$($CFG_HELPER statisticsReportAllowed)"
             [ -z "$STATISTICS_REPORT_ALLOWED" ] && STATISTICS_REPORT_ALLOWED=$STATISTICS_REPORT_ALLOWED_DEFAULT
-            #STATISTICS_REPORT_ALLOWED=$(ask_for_value statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED")
             $CFG_HELPER statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED"
         else
             PORT="$($CFG_HELPER port)"
-            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
             [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
             $CFG_HELPER port "$PORT"
 
             SYSTEM_NAME="$($CFG_HELPER systemName)"
             [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
-        fi
-
-        EC_GUID="$($EC_CFG_HELPER ecsGuid)"
-        [ -n "$EC_GUID" ] && $CFG_HELPER ecsGuid "$EC_GUID"
-
-
-        if [ -d $EC_DIR/var/hostedfiles -a ! -d $BASE_DIR/var/vms_storedfiles ]; then
-            [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
-            mv $EC_DIR/var/hostedfiles $BASE_DIR/var/vms_storedfiles
-        fi
-
-        if [ '@arch@' != 'arm' ]; then "$CERTGEN" -i; fi
-
-        if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
-            [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
-            cp "$OLD_DB_PATH" "$DB_PATH"
-        fi
-
-        if [ '@arch@' != 'arm' ]
-        then
-            [ -n "$UPGRADING" ] && $DBSYNC
         fi
 
         useradd --system "$SYSTEM_USER" || true
@@ -274,23 +173,23 @@ case "$1" in
   ;;
 esac
 
-# Dirty huck to prevent apport to catch our crash dumps
+# Dirty hack to prevent apport from catching our crash dumps.
 echo manual > /etc/init/apport.override
 systemctl disable apport >/dev/null 2>&1 || true
 service apport stop >/dev/null 2>&1 || true
 
 if [ $(which systemctl) ]; then
-    # Systemd has a recursion problem with forwarding init.d script
-    rm /etc/init.d/$COMPANY_NAME-mediaserver
-    rm /etc/init.d/$COMPANY_NAME-root-tool
+    # Systemd has a recursion problem with forwarding init.d script.
+    # The script in init.d is for Ubuntu < 16.04 (with Upstart initialization system).
+    [ -f "/etc/init.d/$COMPANY_NAME-mediaserver" ] && rm "/etc/init.d/$COMPANY_NAME-mediaserver"
+    [ -f "/etc/init.d/$COMPANY_NAME-root-tool" ] && rm "/etc/init.d/$COMPANY_NAME-root-tool"
 
-    # Systemd requires explicit enable for service to start it on boot
+    # Systemd requires explicit enabling of the service to start it on boot.
     systemctl enable $COMPANY_NAME-root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-service $COMPANY_NAME-root-tool start;
-if service $COMPANY_NAME-mediaserver start; then
+if service $COMPANY_NAME-root-tool start && service $COMPANY_NAME-mediaserver start; then
     sleep 1
     echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 else

@@ -5,7 +5,11 @@
     <name>AnalyticsSettings</name>
     <message>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -63,10 +67,6 @@
 <context>
     <name>SystemTile</name>
     <message>
-        <source>SAFE MODE</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>INCOMPATIBLE</source>
         <translation></translation>
     </message>
@@ -76,6 +76,10 @@
     </message>
     <message>
         <source>UNREACHABLE</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>SAFE MODE</source>
         <translation></translation>
     </message>
     <message>
@@ -90,7 +94,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>You have no access to %1. Some features could be unavailable.</source>
+        <source>Connect to Another Server...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Connect to Server...</source>
         <translation></translation>
     </message>
     <message>
@@ -98,11 +106,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Connect to Another Server...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connect to Server...</source>
+        <source>You have no access to %1. Some features could be unavailable.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
     </message>
 </context>

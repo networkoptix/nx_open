@@ -78,14 +78,6 @@ struct NX_VMS_API PeerData: PersistentIdData
 
 using PeerSet = QSet<QnUuid>;
 
-enum class P2pTransportMode
-{
-    automatic,
-    websocket,
-    http
-};
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(P2pTransportMode)
-
 struct PeerDataEx: public PeerData
 {
     QnUuid systemId;
@@ -93,7 +85,6 @@ struct PeerDataEx: public PeerData
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = 0;
-    P2pTransportMode transport = P2pTransportMode::automatic;
     QnUuid connectionGuid;
 
     void assign(const PeerData& data) { PeerData::operator=(data); }
@@ -106,7 +97,6 @@ struct PeerDataEx: public PeerData
     (identityTime) \
     (aliveUpdateIntervalMs) \
     (protoVersion) \
-    (transport) \
     (connectionGuid)
 
 } // namespace api

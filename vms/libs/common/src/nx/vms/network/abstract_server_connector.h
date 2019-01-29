@@ -17,7 +17,9 @@ public:
      * Open connection to the media server defined by QnUuid.
      */
     virtual std::unique_ptr<nx::network::AbstractStreamSocket> connectTo(
-        const QnRoute& route, std::chrono::milliseconds timeout) = 0;
+        const QnRoute& route,
+        bool sslRequired,
+        std::chrono::milliseconds timeout) = 0;
 };
 
 } // namespace network

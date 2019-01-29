@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -201,6 +202,9 @@ void DeviceAdditionDialog::initializeControls()
     ui->tabWidget->setCurrentIndex(0);
     handleTabClicked(ui->tabWidget->currentIndex());
     setupSearchResultsPlaceholder();
+
+    setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+    setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -209,14 +213,24 @@ void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& val
         return;
 
     QScopedValueRollback<bool> rollback(m_addressEditing, true);
-    ui->endAddressEdit->setText(fixedAddress(ui->startAddressEdit).toString());
+
+    const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
+
+    ui->endAddressEdit->setText(
+        QHostAddress(startAddress - startAddress % 256 + endAddress % 256).toString());
 }
 
 void DeviceAdditionDialog::handleStartAddressEditingFinished()
 {
     const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
-    if (startAddress % 256 == 0)
-        ui->endAddressEdit->setText(QHostAddress(startAddress + 255).toString());
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
+
+    if (startAddress % 256 > endAddress % 256)
+    {
+        ui->endAddressEdit->setText(
+            QHostAddress(startAddress - startAddress % 256 + 255).toString());
+    }
 }
 
 void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value)
@@ -226,16 +240,11 @@ void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value
 
     QScopedValueRollback<bool> rollback(m_addressEditing, true);
 
-    const auto startAddress = fixedAddress(ui->startAddressEdit);
-    const auto endAddress = fixedAddress(ui->endAddressEdit);
+    const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
+    const auto endAddress = fixedAddress(ui->endAddressEdit).toIPv4Address();
 
-    const quint32 startSubnet = startAddress.toIPv4Address() >> 8;
-    const quint32 endSubnet = endAddress.toIPv4Address() >> 8;
-    if (startSubnet != endSubnet)
-    {
-        const QHostAddress fixed(startAddress.toIPv4Address() + ((endSubnet - startSubnet) << 8));
-        ui->startAddressEdit->setText(fixed.toString());
-    }
+    ui->startAddressEdit->setText(
+        QHostAddress(endAddress - endAddress % 256 + startAddress % 256).toString());
 }
 
 void DeviceAdditionDialog::handleTabClicked(int index)
@@ -266,7 +275,7 @@ void DeviceAdditionDialog::handleTabClicked(int index)
     else
     {
         ui->addressEdit->setValidator(
-            defaultNonEmptyValidator(tr("Address field can't be empty")));
+            defaultNonEmptyValidator(tr("Address field cannot be empty")));
         ui->addressEdit->setFocus();
         resetPageSize(ui->subnetScanPage);
         setHeightFromLayout(ui->knownAddressPage);
@@ -510,6 +519,9 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         m_model->setData(stateIndex, FoundDevicesModel::addingInProgressState,
             FoundDevicesModel::presentedStateRole);
 
+        m_model->setData(stateIndex.siblingAtColumn(FoundDevicesModel::checkboxColumn),
+            Qt::Unchecked, Qt::CheckStateRole);
+
         devices.append(device);
     }
 
@@ -687,14 +699,18 @@ void DeviceAdditionDialog::updateAddDevicesPanel()
             tr("%n devices are being added. You can close this dialog or start a new search",
                 nullptr, addingDevicesCount));
     }
-    else if (newDevicesCount != 0
-        && (newDevicesCheckedCount == 0 || newDevicesCount == newDevicesCheckedCount))
+    else if (newDevicesCount != 0)
     {
-        showAddDevicesButton(tr("Add all Devices"));
-    }
-    else if (newDevicesCount != 0 && newDevicesCheckedCount != 0)
-    {
-        showAddDevicesButton(tr("Add %n Devices", nullptr, newDevicesCheckedCount));
+        if (newDevicesCheckedCount == devicesCount
+            || (newDevicesCheckedCount == 0 && newDevicesCount == devicesCount))
+        {
+            showAddDevicesButton(tr("Add all Devices"));
+        }
+        else
+        {
+            showAddDevicesButton(tr("Add %n Devices", nullptr,
+                newDevicesCheckedCount != 0 ? newDevicesCheckedCount : newDevicesCount));
+        }
     }
 }
 

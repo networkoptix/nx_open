@@ -4,6 +4,10 @@
  * Various tools for plugins. Header-only.
  */
 
+// TODO: Remove this file when Storage and Camera SDKs are merged into Analytics SDK.
+
+#include <nx/sdk/helpers/ptr.h>
+
 #if defined(_WIN32)
     #include <Windows.h>
     #undef min
@@ -20,101 +24,7 @@
 
 #include "plugin_api.h"
 
-// TODO: #mshevchenko: Split into GUID tools (e.g. nx::sdk::common::Guid) and ref-counting class
-// (e.g. nx::sdk::common::Object), merging nx/vms/server/sdk_support/utils.h with the latter.
 namespace nxpt {
-
-/**
- * Automatic scoped pointer class which uses PluginInterface reference counting interface
- * (PluginInterface::addRef() and PluginInterface::releaseRef()) instead of new/delete.
- * Increments object's reference counter (PluginInterface::addRef()) at construction, decrements at
- * destruction (PluginInterface::releaseRef()).
- *
- * NOTE: The class is reentrant, but not thread-safe.
- *
- * @param T Must inherit PluginInterface.
- */
-template<class T>
-class ScopedRef
-{
-public:
-    /** Intended to be applied to queryInterface(). */
-    explicit ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
-
-    /** Calls ptr->addRef() if ptr is not null and increaseRef is true. */
-    explicit ScopedRef(T* ptr = nullptr, bool increaseRef = true):
-        m_ptr(ptr)
-    {
-        // TODO: #dmishin get rid of this const mess when releaseRef becomes const
-        if (m_ptr && increaseRef)
-            const_cast<std::remove_const_t<T>*>(m_ptr)->addRef();
-    }
-
-    ScopedRef(ScopedRef<T>&& right)
-    {
-        m_ptr = right.release();
-    }
-
-    ScopedRef<T>& operator=(ScopedRef<T>&& right)
-    {
-        m_ptr = right.release();
-        return *this;
-    }
-
-    ScopedRef(const ScopedRef<T>&) = delete;
-
-    ScopedRef<T>& operator=(const ScopedRef<T>&) = delete;
-
-    ~ScopedRef() { reset(); }
-
-    operator bool() const { return m_ptr != nullptr; }
-
-    /** @return Protected pointer, without releasing it. */
-    T* get() { return m_ptr; }
-
-    /** @return Protected pointer, without releasing it. */
-    const T* get() const { return m_ptr; }
-
-    T* operator->() { return m_ptr; }
-    const T* operator->() const { return m_ptr; }
-
-    /** Releases protected pointer without calling nxpl::PluginInterface::releaseRef(). */
-    T* release()
-    {
-        T* ptrBak = m_ptr;
-        m_ptr = 0;
-        return ptrBak;
-    }
-
-    /**
-     * Calls nxpl::PluginInterface::releaseRef() on protected pointer (if any) and takes the new
-     * pointer ptr (calling nxpl::PluginInterface::addRef()).
-     */
-    void reset(T* ptr = nullptr)
-    {
-        if (m_ptr)
-        {
-            // TODO: #dmishin get rid of this const mess when releaseRef becomes const
-            const_cast<std::remove_const_t<T>*>(m_ptr)->releaseRef();
-            m_ptr = nullptr;
-        }
-
-        take(ptr);
-    }
-
-private:
-    T* m_ptr;
-
-    void take(T* ptr)
-    {
-        m_ptr = ptr;
-        if(m_ptr)
-        {
-            // TODO: #dmishin get rid of this const mess when releaseRef becomes const
-            const_cast<std::remove_const_t<T>*>(m_ptr)->addRef();
-        }
-    }
-};
 
 namespace atomic {
 
@@ -182,7 +92,7 @@ public:
     }
 
     /** Implementaion of nxpl::PluginInterface::addRef(). */
-    unsigned int addRef()
+    int addRef() const
     {
         return m_refCountingDelegate
             ? m_refCountingDelegate->addRef()
@@ -193,18 +103,18 @@ public:
      * Implementaion of nxpl::PluginInterface::releaseRef(). Deletes the monitored object if the
      * reference counter drops to zero.
      */
-    unsigned int releaseRef()
+    int releaseRef() const
     {
         if (m_refCountingDelegate)
             return m_refCountingDelegate->releaseRef();
 
-        unsigned int newRefCounter = atomic::dec(&m_refCount);
+        const int newRefCounter = atomic::dec(&m_refCount);
         if (newRefCounter == 0)
             delete m_objToWatch;
         return newRefCounter;
     }
 
-    unsigned int refCount() const
+    int refCount() const
     {
         if (m_refCountingDelegate)
             return m_refCountingDelegate->refCount();
@@ -212,7 +122,7 @@ public:
     }
 
 private:
-    atomic::AtomicLong m_refCount;
+    mutable atomic::AtomicLong m_refCount;
     nxpl::PluginInterface* m_objToWatch;
     CommonRefManager* m_refCountingDelegate;
 };
@@ -227,10 +137,10 @@ public:
     CommonRefCounter& operator=(CommonRefCounter&&) = delete;
     virtual ~CommonRefCounter() = default;
 
-    virtual unsigned int addRef() override { return m_refManager.addRef(); }
-    virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
+    virtual int addRef() const override { return m_refManager.addRef(); }
+    virtual int releaseRef() const override { return m_refManager.releaseRef(); }
 
-    unsigned int refCount() const { return m_refManager.refCount(); }
+    int refCount() const { return m_refManager.refCount(); }
 
 protected:
     CommonRefManager m_refManager;
@@ -240,16 +150,31 @@ protected:
 };
 
 /**
- * Intended for debug.
- * @return Reference counter, or 0 if object is null.
+ * Intended for debug. Is not thread-safe.
+ * @return Reference counter, or 0 if the pointer is null.
  */
-template<typename Interface>
-unsigned int refCount(Interface* object)
+template<typename RefCountableInterface>
+int refCount(const nxpl::PluginInterface* object)
 {
-    if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
+    if (object == nullptr)
+        return 0;
+
+    if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<RefCountableInterface>*>(object))
         return commonRefCounter->refCount();
 
-    return 0;
+    (void) object->addRef();
+    return object->releaseRef();
+}
+
+/**
+ * Calls queryInterface() and returns a smart pointer to its result, possibly null.
+ */
+template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
+static nx::sdk::Ptr<Interface> queryInterfacePtr(
+    RefCountablePtr refCountable, const nxpl::NX_GUID& interfaceId)
+{
+    return nx::sdk::Ptr<Interface>(
+        static_cast<Interface*>(refCountable->queryInterface(interfaceId)));
 }
 
 enum NxGuidFormatOption

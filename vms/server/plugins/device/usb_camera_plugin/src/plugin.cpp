@@ -72,12 +72,12 @@ void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int Plugin::addRef()
+int Plugin::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int Plugin::releaseRef()
+int Plugin::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

@@ -78,7 +78,7 @@ private:
         void (ManagerType::*managerFunc)(
             const AuthorizationInfo& authzInfo,
             InputData inputData,
-            std::function<void(api::ResultCode, OutputData...)> completionHandler),
+            std::function<void(api::Result, OutputData...)> completionHandler),
         ManagerType* manager,
         EntityType entityType,
         DataActionType dataActionType);
@@ -89,7 +89,7 @@ private:
         const char* handlerPath,
         void (ManagerType::*managerFunc)(
             const AuthorizationInfo& authzInfo,
-            std::function<void(api::ResultCode, OutputData...)> completionHandler),
+            std::function<void(api::Result, OutputData...)> completionHandler),
         ManagerType* manager,
         EntityType entityType,
         DataActionType dataActionType);
@@ -99,7 +99,7 @@ private:
      * void(const AuthorizationInfo& authzInfo,
      *     const std::vector<nx::network::http::StringType>& restPathParams,
      *     InputData inputData,
-     *     std::function<void(api::ResultCode)> completionHandler);
+     *     std::function<void(api::Result)> completionHandler);
      */
     template<typename InputData, typename HandlerType>
     void registerWriteOnlyRestHandler(

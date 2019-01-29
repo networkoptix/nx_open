@@ -12,7 +12,6 @@
 #include <media_server/media_server_module.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/common/util.h> /* For DEFAULT_APPSERVER_HOST. */
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/event/events/server_conflict_event.h>
 #include <nx/network/nettools.h>
@@ -22,7 +21,7 @@ using nx::network::UDPSocket;
 
 static quint16 DISCOVERY_PORT = 54013;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
-static QString groupAddress(QLatin1String("224.0.1.243"));
+static const QString kGroupAddress("224.0.1.243");
 static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
@@ -31,7 +30,7 @@ QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
     if (serverModule->settings().appserverHost.present())
         host = serverModule->settings().appserverHost();
     else
-        host = DEFAULT_APPSERVER_HOST;
+        host = nx::network::HostAddress::localhost.toString();
     QByteArray result = host.toUtf8();
     if (nx::vms::server::Utils::isLocalAppServer(result))
     {
@@ -206,7 +205,7 @@ void QnMServerResourceSearcher::updateSocketList()
     m_receiveSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, DISCOVERY_PORT));
 
     for (int i = 0; i < m_localAddressList.size(); ++i)
-        m_receiveSocket->joinGroup(groupAddress, m_localAddressList[i]);
+        m_receiveSocket->joinGroup(kGroupAddress, m_localAddressList[i]);
 
     m_socketLifeTime.restart();
 }
@@ -217,7 +216,7 @@ void QnMServerResourceSearcher::deleteSocketList()
     {
         delete m_socketList[i];
         if (m_receiveSocket)
-            m_receiveSocket->leaveGroup(groupAddress, m_localAddressList[i]);
+            m_receiveSocket->leaveGroup(kGroupAddress, m_localAddressList[i]);
     }
     m_socketList.clear();
     m_localAddressList.clear();
@@ -236,7 +235,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
 
         // send request for next read
         QByteArray datagram = DiscoveryPacket::getRequest(serverModule());
-        sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
+        sock->sendTo(datagram.data(), datagram.size(), kGroupAddress, DISCOVERY_PORT);
     }
 
     for (int i = 0; i < 600 && !m_needStop; ++i)

@@ -444,7 +444,7 @@ void QnUserSettingsDialog::forcedUpdate()
 
 QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
 {
-    NX_ASSERT(m_user, Q_FUNC_INFO, "User must exist here");
+    NX_ASSERT(m_user, "User must exist here");
 
     if (m_model->mode() != QnUserSettingsModel::OwnProfile && m_model->mode() != QnUserSettingsModel::OtherSettings)
         return QDialogButtonBox::Cancel;

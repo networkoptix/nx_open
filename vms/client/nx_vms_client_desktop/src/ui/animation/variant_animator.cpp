@@ -2,7 +2,7 @@
 #include <cassert>
 #include <limits>
 
-#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <utils/common/warnings.h>
 #include <utils/math/linear_combination.h>
@@ -200,8 +200,10 @@ qreal VariantAnimator::easingCurveValue(qreal progress) const {
     return (m_easingCurve.valueForProgress(progress) - correctionValue) / (1.0 - correctionValue);
 }
 
-void VariantAnimator::updateCurrentTime(int currentTime) {
-    if (qnSettings->lightMode() & Qn::LightModeNoAnimation) {
+void VariantAnimator::updateCurrentTime(int currentTime)
+{
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation))
+    {
         updateCurrentValue(internalTargetValue());
         stop();
         return;

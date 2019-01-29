@@ -97,10 +97,12 @@ public:
         const QnUuid& engineId, const QVariantMap& values);
     void resetDeviceAgentSettingsValues(
         const QnUuid& engineId, const QVariantMap& values);
+    Q_INVOKABLE bool recordingEnabled() const;
 
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
     void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);
+    void setStreamUrls(const QString& primary, const QString& secondary);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

@@ -3,14 +3,13 @@
 #include <QtGui/QKeyEvent>
 
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 
 namespace nx::vms::client::desktop {
 
 SimpleSelectionTableView::SimpleSelectionTableView(QWidget* parent):
     base_type(parent)
 {
-    connect(this, &SimpleSelectionTableView::clicked,
-        this, &SimpleSelectionTableView::handleClicked);
 }
 
 SimpleSelectionTableView::~SimpleSelectionTableView()
@@ -32,6 +31,16 @@ void SimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHead
         setHorizontalHeader(m_checkableHeader);
         setupHeader();
     }
+
+    const auto isCheckable =
+        [column](const QModelIndex& index) -> bool
+        {
+            auto flags = index.siblingAtColumn(column).flags();
+            return flags.testFlag(Qt::ItemIsUserCheckable)
+                && flags.testFlag(Qt::ItemIsEnabled);
+        };
+
+    item_view_utils::setupDefaultAutoToggle(this, m_checkboxColumn, isCheckable);
 }
 
 int SimpleSelectionTableView::getCheckedCount() const
@@ -110,19 +119,7 @@ void SimpleSelectionTableView::handleHeaderCheckedStateChanged(Qt::CheckState st
     }
 }
 
-void SimpleSelectionTableView::keyPressEvent(QKeyEvent* event)
-{
-    if (event->key() == Qt::Key_Space)
-    {
-        handleSpacePressed();
-        event->accept();
-        return;
-    }
-
-    base_type::keyPressEvent(event);
-}
-
-void SimpleSelectionTableView::setModel(QAbstractItemModel *newModel)
+void SimpleSelectionTableView::setModel(QAbstractItemModel* newModel)
 {
     const auto currentModel = model();
     if (currentModel == newModel)
@@ -134,71 +131,6 @@ void SimpleSelectionTableView::setModel(QAbstractItemModel *newModel)
     base_type::setModel(newModel);
 
     setupHeader();
-}
-
-void SimpleSelectionTableView::handleClicked(const QModelIndex& index)
-{
-    const auto currentModel = model();
-    if (!currentModel || !index.isValid())
-        return;
-
-    if (index == getCheckboxIndex(index))
-        return; //< Click will be handled by base class implementation.
-
-    if (!getCheckboxIndex(index).flags().testFlag(Qt::ItemIsUserCheckable))
-        return;
-
-    const auto newCheckState = isChecked(index) ? Qt::Unchecked : Qt::Checked;
-    currentModel->setData(getCheckboxIndex(index), newCheckState, Qt::CheckStateRole);
-}
-
-void SimpleSelectionTableView::handleSpacePressed()
-{
-    const auto currentModel = model();
-    if (!currentModel)
-        return;
-
-    const auto indexes = selectedIndexes();
-    if (indexes.empty())
-        return;
-
-    QSet<QModelIndex> applicableCheckboxIndexes;
-    for (const auto& index: indexes)
-    {
-        auto checkboxIndex = getCheckboxIndex(index);
-        if (checkboxIndex.flags().testFlag(Qt::ItemIsEnabled)
-            && checkboxIndex.flags().testFlag(Qt::ItemIsUserCheckable))
-        {
-            applicableCheckboxIndexes.insert(checkboxIndex);
-        }
-    }
-
-    const bool anyUnchecked = std::any_of(applicableCheckboxIndexes.begin(),
-        applicableCheckboxIndexes.end(),
-        [this](const QModelIndex& index) { return !isChecked(index); });
-    const auto newState = anyUnchecked ? Qt::Checked : Qt::Unchecked;
-
-    for (const auto index: applicableCheckboxIndexes)
-        currentModel->setData(getCheckboxIndex(index), newState, Qt::CheckStateRole);
-}
-
-QModelIndex SimpleSelectionTableView::getCheckboxIndex(const QModelIndex& index) const
-{
-    const auto currentModel = model();
-    return currentModel && index.isValid()
-        ? currentModel->index(index.row(), m_checkboxColumn)
-        : QModelIndex();
-}
-
-bool SimpleSelectionTableView::isChecked(const QModelIndex& index) const
-{
-    const auto currentModel = model();
-    if (!currentModel)
-        return false;
-
-    const auto state = currentModel->data(getCheckboxIndex(index), Qt::CheckStateRole).toInt();
-
-    return state != Qt::Unchecked;
 }
 
 } // namespace nx::vms::client::desktop

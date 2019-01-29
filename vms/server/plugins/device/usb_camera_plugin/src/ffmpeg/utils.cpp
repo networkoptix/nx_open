@@ -225,7 +225,7 @@ uint64_t suggestChannelLayout(const AVCodec *codec)
 
 AVSampleFormat suggestSampleFormat(const AVCodec * codec)
 {
-    static const std::vector<AVSampleFormat> priorityList = 
+    static const std::vector<AVSampleFormat> kPriorityList = 
     {
         AV_SAMPLE_FMT_S32,
         AV_SAMPLE_FMT_S16,
@@ -237,12 +237,12 @@ AVSampleFormat suggestSampleFormat(const AVCodec * codec)
         AV_SAMPLE_FMT_U8P
     };
 
-    for(const auto & sampleFormat : priorityList)
+    for (const auto & sampleFormat : kPriorityList)
     {
         const AVSampleFormat * format = codec->sample_fmts;
-        for(; format && *format != AV_SAMPLE_FMT_NONE; ++format)
+        for (; format && *format != AV_SAMPLE_FMT_NONE; ++format)
         {
-            if(*format == sampleFormat)
+            if (*format == sampleFormat)
                 return *format;
         }
     }

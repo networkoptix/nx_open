@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <mutex>
-#include "plugins/storage/third_party/third_party_storage.h"
+#include "storage/third_party_storage.h"
 #include "impl/ftplib.h"
 
 /*! \mainpage
@@ -49,11 +49,11 @@
     You should have NX Mediaserver installed. Put built plugin library in mediaserver/bin/plugins (linux) or mediaserver/plugins (windows) folder and restart mediaserver.
     Connect to the server with client. In external storage selection dialog you should be able to see new storage type (FTP).
     Enter valid ftp url and credentials and press Ok. For example,
-	\code
-	Url:		ftp://10.2.3.87/path/to/storage
-	Login:		user1
-	Password:	12345678
-	\endcode
+    \code
+    Url:        ftp://10.2.3.87/path/to/storage
+    Login:        user1
+    Password:    12345678
+    \endcode
 */
 
 namespace nx_spl
@@ -137,8 +137,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
 
     private:
         // synchronize localfile with remote one
@@ -184,8 +184,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
 
     private:
         // In response to MLSD request list of structured file dsecription lines is returned.
@@ -272,8 +272,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
 
     private:
         // destroy only via releaseRef()
@@ -310,8 +310,8 @@ namespace nx_spl
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual int addRef() const override;
+        virtual int releaseRef() const override;
     }; // class FtpStorageFactory
 } // namespace Qn
 

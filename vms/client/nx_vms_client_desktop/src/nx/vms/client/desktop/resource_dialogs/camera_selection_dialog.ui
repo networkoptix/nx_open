@@ -6,23 +6,86 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
-    <height>449</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>960</width>
+    <height>16777215</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>Select Devices…</string>
+   <string>Select Cameras</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="nx::vms::client::desktop::FilteredResourceSelectionWidget" name="filteredResourceSelectionWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>0</number>
      </property>
-    </widget>
+     <item>
+      <widget class="nx::vms::client::desktop::FilteredResourceSelectionWidget" name="filteredResourceSelectionWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="verticalLine">
+       <property name="minimumSize">
+        <size>
+         <width>1</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QnResourceDetailsWidget" name="detailsWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>192</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>192</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -65,6 +128,12 @@
    <class>nx::vms::client::desktop::FilteredResourceSelectionWidget</class>
    <extends>QScrollArea</extends>
    <header>nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnResourceDetailsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/resource_details_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

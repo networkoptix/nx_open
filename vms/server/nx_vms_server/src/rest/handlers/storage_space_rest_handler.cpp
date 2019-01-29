@@ -163,7 +163,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
         data.storageType = QnLexical::serialized(partition.type);
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(commonModule, data.url, false));
+            commonModule->storagePluginFactory()->createStorage(commonModule, data.url, false));
 
         if (storage)
         {

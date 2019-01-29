@@ -163,11 +163,12 @@
     </message>
     <message>
         <source>Too many attempts. Try again in a minute.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 is temporary unavailable. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation></translation>
     </message>
 </context>
 <context>

@@ -6,7 +6,7 @@
 #include "hanwha_stream_reader.h"
 #include "hanwha_resource.h"
 #include "hanwha_shared_resource_context.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/server/resource/camera.h>
 
@@ -25,7 +25,8 @@ static const std::chrono::seconds kEdgeStartTimeCorrection(1);
 
 using namespace std::chrono;
 
-HanwhaArchiveDelegate::HanwhaArchiveDelegate(const HanwhaResourcePtr& hanwhaRes)
+HanwhaArchiveDelegate::HanwhaArchiveDelegate(const HanwhaResourcePtr& hanwhaRes):
+    m_resourceContext(hanwhaRes->sharedContext())
 {
     m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
@@ -65,13 +66,13 @@ void HanwhaArchiveDelegate::close()
 qint64 HanwhaArchiveDelegate::startTime() const
 {
     if (m_playbackMode == PlaybackMode::Edge)
-        return m_startTimeUsec;
+        return m_startTimeUsec + timeShiftUsec();
 
     // TODO: This copy-paste should probably be moved into helper function, but it is not easy
     // because with current interface we need to get both channel number and shared context.
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
-        if (resource->getStatus() >= Qn::Online)
+        if (resource->getStatus() >= Qn::Online || resource->isNvr())
         {
             if (const auto context = resource->sharedContext())
                 return context->timelineStartUs(resource->getChannel());
@@ -84,11 +85,11 @@ qint64 HanwhaArchiveDelegate::startTime() const
 qint64 HanwhaArchiveDelegate::endTime() const
 {
     if (m_playbackMode == PlaybackMode::Edge)
-        return m_endTimeUsec;
+        return m_endTimeUsec + timeShiftUsec();
 
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
-        if (resource->getStatus() >= Qn::Online)
+        if (resource->getStatus() >= Qn::Online || resource->isNvr())
         {
             if (const auto context = resource->sharedContext())
                 return context->timelineEndUs(resource->getChannel());
@@ -150,6 +151,7 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
             NX_VERBOSE(this, lm("Send empty packet for camera %1").arg(resource->getUrl()));
     }
 
+    result->timestamp += timeShiftUsec();
     return result;
 }
 
@@ -157,6 +159,11 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 {
     auto& rtspClient = m_streamReader->rtspClient();
     return rtspClient.getScale() >= 0;
+}
+
+qint64 HanwhaArchiveDelegate::timeShiftUsec() const
+{
+    return std::chrono::microseconds(m_resourceContext->timeShift()).count();
 }
 
 qint64 HanwhaArchiveDelegate::currentPositionUsec() const
@@ -177,6 +184,9 @@ void HanwhaArchiveDelegate::updateCurrentPositionUsec(
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
+    if (timeUsec != AV_NOPTS_VALUE)
+        timeUsec -= timeShiftUsec();
+
     nx::utils::makeScopeGuard(
         [this, timeUsec]()
         {
@@ -253,11 +263,15 @@ void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, q
     if (m_playbackMode == PlaybackMode::Edge)
         startTimeUsec -= duration_cast<microseconds>(kEdgeStartTimeCorrection).count();
 
-    if (m_streamReader)
-        m_streamReader->setPlaybackRange(startTimeUsec, endTimeUsec);
+    m_startTimeUsec = (startTimeUsec != AV_NOPTS_VALUE)
+        ? startTimeUsec - timeShiftUsec() : AV_NOPTS_VALUE;
 
-    m_startTimeUsec = startTimeUsec;
-    m_endTimeUsec = endTimeUsec;
+    m_endTimeUsec = (endTimeUsec != AV_NOPTS_VALUE)
+        ? endTimeUsec - timeShiftUsec() : AV_NOPTS_VALUE;
+
+    if (m_streamReader)
+        m_streamReader->setPlaybackRange(m_startTimeUsec, m_endTimeUsec);
+
     seek(startTimeUsec, true /*findIFrame*/);
 }
 

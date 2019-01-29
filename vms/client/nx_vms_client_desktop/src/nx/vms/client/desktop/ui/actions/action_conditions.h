@@ -603,6 +603,9 @@ ConditionWrapper isSafeMode();
 /** Allowed only for resource parameters with corresponding flags. */
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
+/** Target resources have the video stream. */
+ConditionWrapper hasVideo(MatchMode matchMode, bool value = true);
+
 ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types);
 inline ConditionWrapper treeNodeType(ResourceTreeNodeType type)
 {

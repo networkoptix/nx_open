@@ -35,6 +35,9 @@ class ConnectionBase:
     Q_OBJECT
 public:
 
+    const static QString kWebsocketUrlPath;
+    const static QString kHttpUrlPath;
+
     enum class State
     {
         NotDefined,
@@ -102,6 +105,9 @@ public:
     void addAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);
     void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
 
+    const IP2PTransport& p2pTransport() const { return *m_p2pTransport; }
+    IP2PTransport& p2pTransport() { return *m_p2pTransport; }
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -110,7 +116,6 @@ signals:
 protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
-    const P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
   private:
     void cancelConnecting(State state, const QString& reason);
 
@@ -164,6 +169,7 @@ private:
     nx::network::http::HttpHeaders m_additionalRequestHeaders;
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
+    QByteArray m_connectionGuid;
 };
 
 QString toString(ConnectionBase::State value);

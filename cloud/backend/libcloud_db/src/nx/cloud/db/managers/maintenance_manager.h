@@ -32,7 +32,7 @@ public:
     void getVmsConnections(
         const AuthorizationInfo& authzInfo,
         std::function<void(
-            api::ResultCode,
+            api::Result,
             api::VmsConnectionDataList)> completionHandler);
     /**
      * @return vms transaction log in the same format as \a /ec2/getTransactionLog request.
@@ -41,12 +41,12 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
         std::function<void(
-            api::ResultCode,
+            api::Result,
             ::ec2::ApiTransactionDataList)> completionHandler);
 
     void getStatistics(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, data::Statistics)> completionHandler);
+        std::function<void(api::Result, data::Statistics)> completionHandler);
 
 private:
     const QnUuid m_moduleGuid;
@@ -62,7 +62,7 @@ private:
         std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
         vms::api::TranState readedUpTo,
         std::function<void(
-            api::ResultCode,
+            api::Result,
             ::ec2::ApiTransactionDataList)> completionHandler);
 };
 

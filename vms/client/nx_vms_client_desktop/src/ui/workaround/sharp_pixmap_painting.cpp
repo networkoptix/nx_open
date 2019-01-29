@@ -62,7 +62,7 @@ void paintPixmapSharp(
     const QRectF& rect,
     const QRect& sourceRect)
 {
-    NX_ASSERT(painter, Q_FUNC_INFO, "Painter must exist here");
+    NX_ASSERT(painter, "Painter must exist here");
     if (!painter || pixmap.isNull())
         return;
 

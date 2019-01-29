@@ -165,6 +165,7 @@ public:
 
     virtual bool saveProperties();
     virtual int savePropertiesAsync();
+    void setForceUseLocalProperties(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
@@ -205,6 +206,12 @@ protected:
     virtual void initializationDone();
 
     virtual void emitPropertyChanged(const QString& key);
+
+    /**
+     * Update url value without mutex locking.
+     * @return if value was actually changed.
+     */
+    bool setUrlUnsafe(const QString& value);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -289,6 +296,7 @@ private:
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     std::atomic<bool> m_initInProgress{false};
     QnCommonModule* m_commonModule;
+    bool m_forceUseLocalProperties = false;
 };
 
 template<class Resource>

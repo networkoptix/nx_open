@@ -29,7 +29,7 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
     // Do nothing.
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me

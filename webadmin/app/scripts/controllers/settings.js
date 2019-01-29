@@ -340,8 +340,8 @@ angular.module('webadminApp')
                     //1. Check password
                     //return mediaserver.checkCurrentPassword(oldPassword).then(function(){
                             return mediaserver.disconnectFromSystem(oldPassword).then(function(data){
-                                if(data.error!=='0') {
-                                    dialogs.alert( L.settings.disconnectedFromSystemError + ': ' + data.errorString);
+                                if(data.data.error!=='0') {
+                                    dialogs.alert( L.settings.disconnectedFromSystemError + ': ' + data.data.errorString);
                                 }else {
                                     return dialogs.alert(L.settings.disconnectedFromSystemSuccess).finally(function () {
                                         window.location.reload();
@@ -361,8 +361,8 @@ angular.module('webadminApp')
             function doDisconnect(oldPassword, localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(oldPassword, localLogin, localPassword).then(function(data){
-                    if(data.error!=='0') {
-                        dialogs.alert( L.settings.disconnectedFromCloudError + ': ' + data.errorString);
+                    if(data.data.error!=='0') {
+                        dialogs.alert( L.settings.disconnectedFromCloudError + ': ' + data.data.errorString);
                     }else {
                         dialogs.alert(L.settings.disconnectedFromCloudSuccess.replace("{{CLOUD_NAME}}",
                             Config.cloud.productName)).finally(function () {

@@ -6,7 +6,7 @@ class TranslatableProject():
     sources = "src"
     groups = []
 
-    def __init__(self, name, path=None, groups=[]):
+    def __init__(self, name, path, groups=[]):
         self.name = name
         self.path = path if path else name
         self.groups = groups
@@ -37,20 +37,38 @@ class ProjectGroups:
 
 
 TRANSLATABLE_PROJECTS = [
-    TranslatableProject("common", groups=[ProjectGroups.MOBILE]),
-    TranslatableProject("traytool", groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_base", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]),
+        "common",
+        "vms/libs/common",
+        groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
     TranslatableProject(
-        "client_ui", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]).ui(),
+        "traytool",
+        "vms/traytool",
+        groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_core", "vms/client/nx_vms_client_core", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
+        "client_base",
+        "vms/client/nx_vms_client_desktop",
+        groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_qml", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]).qml(),
+        "client_ui",
+        "vms/client/nx_vms_client_desktop",
+        groups=[ProjectGroups.VMS]).ui(),
     TranslatableProject(
-        "mobile_client_base", "vms/client/mobile_client", groups=[ProjectGroups.MOBILE]),
+        "client_core",
+        "vms/client/nx_vms_client_core",
+        groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
     TranslatableProject(
-        "mobile_client_qml", "vms/client/mobile_client", groups=[ProjectGroups.MOBILE]).qml()
+        "client_qml",
+        "vms/client/nx_vms_client_desktop",
+        groups=[ProjectGroups.VMS]).qml(),
+    TranslatableProject(
+        "mobile_client_base",
+        "vms/client/mobile_client",
+        groups=[ProjectGroups.MOBILE]),
+    TranslatableProject(
+        "mobile_client_qml",
+        "vms/client/mobile_client",
+        groups=[ProjectGroups.MOBILE]).qml()
 ]
 
 

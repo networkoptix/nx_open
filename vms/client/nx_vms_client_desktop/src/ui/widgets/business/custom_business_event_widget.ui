@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>478</width>
-    <height>153</height>
+    <height>131</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,9 +67,18 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QnWordWrappedLabel" name="hintLabel" native="true"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::LabelWithHint</class>
    <extends>QLabel</extends>

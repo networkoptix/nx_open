@@ -20,7 +20,7 @@ QnReconnectInfoDialog::QnReconnectInfoDialog(QWidget *parent, Qt::WindowFlags wi
 {
     ui->setupUi(this);
 
-    if (!qnRuntime->isDesktopMode())
+    if (qnRuntime->isVideoWallMode())
         ui->buttonBox->setVisible(false);
 }
 
@@ -44,11 +44,4 @@ void QnReconnectInfoDialog::setCurrentServer(const QnMediaServerResourcePtr& ser
     ui->iconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));
 
     emit currentServerChanged(server);
-}
-
-void QnReconnectInfoDialog::reject()
-{
-    if (!qnRuntime->isDesktopMode())
-        return;
-    base_type::reject();
 }

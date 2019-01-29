@@ -27,6 +27,7 @@ struct QnStartupParameters
     nx::utils::Url parseAuthenticationString() const;
 
     bool isDevMode() const;
+    bool isVideoWallMode() const;
 
     int screen = kInvalidScreen;
     const static QString kScreenKey;
@@ -50,7 +51,7 @@ struct QnStartupParameters
 
     /**
      * Special mode for ACS and similar scenarios: client does not have any UI elements, opens
-     * fixed camera(s) and limits timeline by 5-min window.
+     * fixed cameras and limits timeline by 5-min window.
      */
     bool acsMode = false;
 

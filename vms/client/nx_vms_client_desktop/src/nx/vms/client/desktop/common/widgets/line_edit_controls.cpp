@@ -76,7 +76,7 @@ struct LineEditControls::Private
                 if (control->isHidden() && !policy.retainSizeWhenHidden())
                     return QSize();
 
-                NX_ASSERT(!policy.hasHeightForWidth(), Q_FUNC_INFO,
+                NX_ASSERT(!policy.hasHeightForWidth(),
                     "Controls embedded to line edit should not have height-for-width.");
 
                 bool sizeHintCached = false;

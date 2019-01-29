@@ -61,9 +61,8 @@ MultipleServerSocket::~MultipleServerSocket()
             }                                           \
                                                         \
             NX_ASSERT(firstValue == *value,             \
-                Q_FUNC_INFO, QString("%1 != %2")        \
-                    .arg(firstValue).arg(*value)        \
-                    .toStdString().c_str());            \
+                QString("%1 != %2")                     \
+                    .arg(firstValue).arg(*value));      \
         }                                               \
                                                         \
         return true;                                    \

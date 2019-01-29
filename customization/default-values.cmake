@@ -23,15 +23,8 @@ set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
-set(prodUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
+set(updateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
-set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
-
-if(beta)
-    set(updateFeedUrl ${testUpdateFeedUrl})
-else()
-    set(updateFeedUrl ${prodUpdateFeedUrl})
-endif()
 
 set(mac_certificate_file_password "qweasd123")
 
@@ -63,6 +56,8 @@ set(translations
     hu_HU
     nl_NL
     pl_PL
+    pt_BR
+    pt_PT
     uk_UA
     vi_VN
     th_TH

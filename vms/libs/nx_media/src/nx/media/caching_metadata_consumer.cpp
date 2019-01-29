@@ -54,12 +54,12 @@ public:
 
         QList<QnAbstractCompressedMetadataPtr> result;
 
-        auto it = std::lower_bound(
+        auto it = std::upper_bound(
             m_metadataByTimestamp.keyBegin(),
             m_metadataByTimestamp.keyEnd(),
             startTimestamp).base();
 
-        if (it.key() > startTimestamp && it != m_metadataByTimestamp.begin())
+        if (it != m_metadataByTimestamp.begin())
         {
             --it;
             if ((*it)->duration() > 0 && it.key() + (*it)->duration() < startTimestamp)

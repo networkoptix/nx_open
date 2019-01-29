@@ -97,7 +97,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::DriverIdRole).value<QString>(),
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
         ui->sdkEventTypeComboBox->currentData(
             AnalyticsSdkEventModel::EventTypeIdRole).value<QString>()));
 }
@@ -113,18 +113,18 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
-    QString pluginId = model()->eventParams().getAnalyticsPluginId();
+    QnUuid engineId = model()->eventParams().getAnalyticsEngineId();
     QString eventTypeId = model()->eventParams().getAnalyticsEventTypeId();
 
-    if (pluginId.isNull() || eventTypeId.isNull())
+    if (engineId.isNull() || eventTypeId.isNull())
     {
-        pluginId = ui->sdkEventTypeComboBox->itemData(0,
-            AnalyticsSdkEventModel::DriverIdRole).value<QString>();
+        engineId = ui->sdkEventTypeComboBox->itemData(0,
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
 
         eventTypeId = ui->sdkEventTypeComboBox->itemData(0,
             AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();
 
-        model()->setEventParams(createEventParameters(pluginId, eventTypeId));
+        model()->setEventParams(createEventParameters(engineId, eventTypeId));
     }
 
     auto analyticsModel = ui->sdkEventTypeComboBox->model();
@@ -141,14 +141,14 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(
-    const QString& pluginId,
+    const QnUuid& engineId,
     const QString& analyticsEventTypeId)
 {
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
     eventParams.setAnalyticsEventTypeId(analyticsEventTypeId);
-    eventParams.setAnalyticsPluginId(pluginId);
+    eventParams.setAnalyticsEngineId(engineId);
 
     return eventParams;
 }

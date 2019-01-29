@@ -383,9 +383,9 @@ private:
                         m_aioTimer.start(
                             std::chrono::milliseconds(100),
                             [sharedContext, this]
-                        {
-                            sharedContext->checkForPairFunc();
-                        });
+                            {
+                                sharedContext->checkForPairFunc();
+                            });
                         return;
                     }
                 }

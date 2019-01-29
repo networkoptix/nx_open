@@ -307,7 +307,7 @@ public:
                 return processMultiUpdateAsync<nx::vms::api::IdDataList, nx::vms::api::IdData>(
                     tran, handler, ApiCommand::removeResource);
             default:
-                NX_ASSERT(false, "Not implemented", Q_FUNC_INFO);
+                NX_ASSERT(false, "Not implemented");
         }
     }
 
@@ -450,7 +450,7 @@ public:
                     handler,
                     ApiCommand::removeResourceParam);
             default:
-                NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
+                NX_ASSERT(0, "Not implemented!");
         }
     }
 
@@ -496,7 +496,10 @@ private:
         QnTransaction<QueryDataType>& tran,
         PostProcessList* const postProcessList)
     {
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
+        const auto descriptor = getTransactionDescriptorByTransaction(tran);
+        if (!descriptor)
+            return ErrorCode::forbidden;
+        if (!descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
             return ErrorCode::forbidden;
 
         postProcessList->push_back(std::bind(
@@ -776,7 +779,10 @@ public:
 
         detail::PersistentStorage persistentDb(m_db.db());
         auto amendedTran = amendTranIfNeeded(tran);
-        amendedTran.transactionType = getTransactionDescriptorByTransaction(amendedTran)
+        const auto descriptor = getTransactionDescriptorByTransaction(amendedTran);
+        if (!descriptor)
+            return ErrorCode::forbidden;
+        amendedTran.transactionType = descriptor
             ->getTransactionTypeFunc(
                 m_db.db()->commonModule(),
                 amendedTran.params,

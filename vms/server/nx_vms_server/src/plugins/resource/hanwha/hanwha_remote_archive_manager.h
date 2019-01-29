@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -21,6 +21,8 @@ public:
         nx::core::resource::OverlappedRemoteChunks* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
+
+    virtual nx::core::resource::ImportOrder overlappedIdImportOrder() const override;
 
     virtual bool fetchArchiveEntry(
         const QString& entryId,

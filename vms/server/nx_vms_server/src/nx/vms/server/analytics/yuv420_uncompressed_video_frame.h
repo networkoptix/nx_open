@@ -4,9 +4,7 @@
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 class Yuv420UncompressedVideoFrame:
     public nxpt::CommonRefCounter<nx::sdk::analytics::IUncompressedVideoFrame>
@@ -36,6 +34,4 @@ private:
     CLConstVideoDecoderOutputPtr m_frame;
 };
 
-} // namespace nx
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

@@ -15,9 +15,10 @@ extern "C" {
 
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr/openalpr_pipeline.h>
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr_common.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx {
@@ -48,7 +49,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (bboxes->gie_type != 3)
         return true;
 
-    auto packet = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
     packet->setTimestampUs(GST_BUFFER_PTS(buffer));
     packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
 
@@ -63,7 +64,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (frameHeight <= 0)
         frameHeight = ini().defaultFrameHeight;
 
-    for (auto i = 0; i < bboxes->num_rects; ++i)
+    for (int i = 0; i < (int) bboxes->num_rects; ++i)
     {
         const auto& roiMeta = bboxes->roi_meta[i];
         std::string displayText;
@@ -75,8 +76,8 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::common::Object();
-        nx::sdk::analytics::IObject::Rect rectangle;
+        auto detectedObject = new nx::sdk::analytics::ObjectMetadata();
+        nx::sdk::analytics::IObjectMetadata::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
@@ -90,14 +91,12 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        nxpl::NX_GUID guid;
-        std::deque<nx::sdk::analytics::common::Attribute> attributes;
+        std::deque<nx::sdk::analytics::Attribute> attributes;
 
-        auto info = licensePlateTracker->licensePlateInfo(displayText);
-        guid = info.guid;
+        const auto& info = licensePlateTracker->licensePlateInfo(displayText);
 
         auto encodedAttributes = split(displayText, '%');
-        for (auto i = 0; i < encodedAttributes.size(); ++i)
+        for (int i = 0; i < (int) encodedAttributes.size(); ++i)
         {
             switch (i)
             {
@@ -134,7 +133,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             }
         }
 
-        detectedObject->setId(guid);
+        detectedObject->setId(info.uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
         detectedObject->setTypeId(kLicensePlateGuid);
@@ -144,11 +143,11 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             attributes.emplace_front(
                 nx::sdk::IAttribute::Type::string,
                 "GUID",
-                nxpt::toStdString(guid));
+                nx::sdk::UuidHelper::toStdString(info.uuid));
         }
 
         detectedObject->setAttributes(
-            std::vector<nx::sdk::analytics::common::Attribute>(
+            std::vector<nx::sdk::analytics::Attribute>(
                 attributes.begin(),
                 attributes.end()));
 
@@ -159,7 +158,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     return true;
 }
 
-GstPadProbeReturn processOpenAlprResult(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
+GstPadProbeReturn processOpenAlprResult(GstPad* /*pad*/, GstPadProbeInfo* info, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling OpenALPR process result probe";
     auto* buffer = (GstBuffer*) info->data;
@@ -168,7 +167,7 @@ GstPadProbeReturn processOpenAlprResult(GstPad* pad, GstPadProbeInfo* info, gpoi
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn dropOpenAlprFrames(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
+GstPadProbeReturn dropOpenAlprFrames(GstPad* /*pad*/, GstPadProbeInfo* info, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling OpenALPR drop frames probe";
     auto pipeline = (deepstream::OpenAlprPipeline*) userData;

@@ -37,6 +37,7 @@ public:
     static const int kDefaultSecondStreamFpsHigh;
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
+    struct MotionStreamIndex { Qn::StreamIndex index; bool isForced; };
 public:
     QnSecurityCamResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnSecurityCamResource();
@@ -69,6 +70,9 @@ public:
     void setMotionRegion(const QnMotionRegion& mask, int channel);
 
     QRegion getMotionMask(int channel) const;
+
+    /** Returns which stream should be used for motion detection and is it forced. */
+    MotionStreamIndex motionStreamIndex() const;
 
     ////!Get camera settings, which are generally modified by user
     ///*!
@@ -351,6 +355,7 @@ public:
     QnResourceData resourceData() const;
 
     virtual void setCommonModule(QnCommonModule* commonModule) override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -392,11 +397,14 @@ protected:
 
     virtual void initializationDone() override;
 
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-
     virtual void setMotionMaskPhysical(int /*channel*/) {}
 
     virtual Qn::LicenseType calculateLicenseType() const;
+
+private:
+    Qn::MotionTypes calculateSupportedMotionType() const;
+    Qn::MotionType calculateMotionType() const;
+    MotionStreamIndex calculateMotionStreamIndex() const;
 
 private:
     int m_recActionCnt;
@@ -414,11 +422,10 @@ private:
     CachedValue<Qn::MotionType> m_motionType;
     CachedValue<bool> m_cachedIsIOModule;
     CachedValue<bool> m_cachedCanConfigureRemoteRecording;
-    Qn::MotionTypes calculateSupportedMotionType() const;
-    Qn::MotionType calculateMotionType() const;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;
+    CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
 private slots:
     void resetCachedValues();

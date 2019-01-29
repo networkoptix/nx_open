@@ -155,7 +155,7 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     // If not all cameras are opened, show proper message after double click delay.
     if (openResources.size() != resourceList.size())
     {
-        const auto message = tr("Double click to add camera(s) to current layout "
+        const auto message = tr("Double click to add cameras to the current layout "
             "or ctrl+click to open in a new tab.", "", resourceList.size());
 
         showMessageDelayed(message, doubleClickInterval());
@@ -192,6 +192,9 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         navigationTime = microseconds(DATETIME_NOW);
     }
 
+    const auto playbackStarter = scopedPlaybackStarter(navigationTime != microseconds(DATETIME_NOW)
+        && ini().startPlaybackOnTileNavigation);
+
     // Perform navigation.
     menu()->triggerIfPossible(JumpToTimeAction,
         Parameters().withArgument(Qn::TimestampRole, navigationTime));
@@ -216,6 +219,9 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
     }
 
     hideMessages();
+
+    const auto playbackStarter = scopedPlaybackStarter(!inNewTab
+        && ini().startPlaybackOnTileNavigation);
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
     menu()->trigger(action, parameters);
@@ -344,6 +350,22 @@ void TileInteractionHandler::hideMessages()
         box->hideAnimated();
 
     m_pendingMessages.clear();
+}
+
+utils::Guard TileInteractionHandler::scopedPlaybackStarter(bool baseCondition)
+{
+    if (!baseCondition)
+        return {};
+
+    return utils::Guard(
+        [this, oldPosition = navigator()->positionUsec()]()
+        {
+            if (oldPosition == navigator()->positionUsec())
+                return;
+
+            navigator()->setSpeed(1.0);
+            navigator()->setPlaying(true);
+        });
 }
 
 } // namespace nx::vms::client::desktop

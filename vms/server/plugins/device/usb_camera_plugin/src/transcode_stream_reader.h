@@ -91,10 +91,10 @@ private:
         {
             return !operator==(rhs);
         }
-            
     };
 
 private:
+    CodecParameters m_codecParams;
     std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
 
     int m_initCode = 0;
@@ -115,14 +115,14 @@ private:
 private:
     bool shouldDrop(const ffmpeg::Frame * frame);
     void transcode(const std::shared_ptr<ffmpeg::Frame>& frame);
-    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
+    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame);
     int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
 
     bool waitForTimespan(
         const std::chrono::milliseconds& timespan,
         const std::chrono::milliseconds& timeout);
 
-    std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
+    std::shared_ptr<ffmpeg::Packet> nextPacket();
 
     bool ensureEncoderInitialized();
     void ensureConsumerAdded() override;

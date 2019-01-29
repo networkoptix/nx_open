@@ -18,6 +18,7 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 
+class QnStoragePluginFactory;
 class QSettings;
 class QnSessionManager;
 class QnRouter;
@@ -39,7 +40,6 @@ class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
-namespace nx { namespace analytics { class DescriptorListManager;  }}
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
@@ -87,6 +87,12 @@ public:
     using QnInstanceStorage::store;
 
     void bindModuleInformation(const QnMediaServerResourcePtr &server);
+
+    QnStoragePluginFactory* storagePluginFactory() const
+    {
+        return m_storagePluginFactory;
+    }
+
 
     QnSessionManager* sessionManager() const
     {
@@ -281,7 +287,6 @@ public:
 
     QnResourceDataPool* dataPool() const;
 
-    nx::analytics::DescriptorListManager* analyticsDescriptorListManager() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -323,6 +328,7 @@ private:
     bool m_lowPriorityAdminPassword = false;
     QDateTime m_startupTime;
 
+    QnStoragePluginFactory* m_storagePluginFactory = nullptr;
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
@@ -343,7 +349,6 @@ private:
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
     QnResourceDataPool* m_dataPool = nullptr;
-    nx::analytics::DescriptorListManager* m_analyticsDescriptorListManager = nullptr;
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;

@@ -368,6 +368,14 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 camera->setIoPortDescriptions(ioPortDataList, /*needMerge*/ false);
         }
 
+        if (state.singleCameraProperties.editableStreamUrls)
+        {
+            camera->updateSourceUrl(state.singleCameraSettings.primaryStream(),
+                Qn::CR_LiveVideo, /*save*/ false);
+            camera->updateSourceUrl(state.singleCameraSettings.secondaryStream(),
+                Qn::CR_SecondaryLiveVideo, /*save*/ false);
+        }
+
         camera->setEnabledAnalyticsEngines(state.analytics.enabledEngines());
     }
 

@@ -1,10 +1,9 @@
 #pragma once
 
 #include <map>
+#include <optional>
 
 #include <QtCore/QString>
-
-#include <nx/utils/std/optional.h>
 
 namespace nx::vms::server::sdk_support {
 

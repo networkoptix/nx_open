@@ -454,6 +454,11 @@ void CameraSettingsDialogStore::resetDeviceAgentSettingsValues(
         });
 }
 
+bool CameraSettingsDialogStore::recordingEnabled() const
+{
+    return d->state.recording.enabled();
+}
+
 void CameraSettingsDialogStore::setWearableMotionDetectionEnabled(bool value)
 {
     d->executeAction(
@@ -477,6 +482,12 @@ void CameraSettingsDialogStore::setCredentials(
 
     d->executeAction(
         [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
+}
+
+void CameraSettingsDialogStore::setStreamUrls(const QString& primary, const QString& secondary)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setStreamUrls(std::move(state), primary, secondary); });
 }
 
 } // namespace nx::vms::client::desktop

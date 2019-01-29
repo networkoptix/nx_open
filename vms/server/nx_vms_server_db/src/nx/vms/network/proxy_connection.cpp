@@ -118,10 +118,10 @@ bool ProxyConnectionProcessor::doProxyData(
 	nx::network::AbstractStreamSocket* dstSocket,
 	char* buffer,
 	int bufferSize,
-	bool* outSomeBytesRead)
+    qint64* outBytesRead)
 {
-	if (outSomeBytesRead)
-		*outSomeBytesRead = false;
+	if (outBytesRead)
+		*outBytesRead = 0;
 	int readed;
 	if( !readSocketNonBlock(&readed, srcSocket, buffer, bufferSize) )
 		return true;
@@ -133,8 +133,8 @@ bool ProxyConnectionProcessor::doProxyData(
 		return false;
 	}
 
-	if (outSomeBytesRead)
-		*outSomeBytesRead = true;
+	if (outBytesRead)
+		*outBytesRead = readed;
 
 	for( ;; )
 	{
@@ -189,8 +189,10 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 			return QString();
 		}
 
+        const bool useSsl = url.scheme() == nx::network::http::kSecureUrlSchemeName
+            || url.scheme() == nx::network::rtsp::kSecureUrlSchemeName;
         d->dstSocket =
-			nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"));
+			nx::network::SocketFactory::createStreamSocket(useSsl);
 		d->dstSocket->setRecvTimeout(d->connectTimeout.count());
 		d->dstSocket->setSendTimeout(d->connectTimeout.count());
 		if (!d->dstSocket->connect(
@@ -393,6 +395,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     else
         dstRoute.id = commonModule()->moduleGUID();
 
+    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
+        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
+
 	if (dstRoute.id == commonModule()->moduleGUID())
 	{
 		if (!cameraGuid.isNull())
@@ -404,8 +409,8 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		else if (isStandardProxyNeeded(commonModule(), d->request))
 		{
 			nx::utils::Url url = d->request.requestLine.url;
-			int defaultPort = getDefaultPortByProtocol(url.scheme());
-			dstRoute.addr = nx::network::SocketAddress(url.host(), url.port(defaultPort));
+			int defaultPort = getDefaultPortByProtocol(dstUrl.scheme());
+			dstRoute.addr = nx::network::SocketAddress(dstUrl.host(), dstUrl.port(defaultPort));
 		}
 		else
 		{
@@ -433,9 +438,6 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		if (!replaceAuthHeader())
 			return false;
 	}
-
-    if (!dstRoute.id.isNull()) //< Means dstUrl targets another server in the system.
-        fixServerUrlSchemeSecurity(&dstUrl, commonModule()->globalSettings());
 
 	if (!dstRoute.addr.isNull())
 	{
@@ -479,9 +481,12 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         // Destination host may be empty in case of reverse connection.
         auto hostIter = d->request.headers.find("Host");
         if (hostIter != d->request.headers.end())
+        {
+            int defaultPort = getDefaultPortByProtocol(dstUrl.scheme());
             hostIter->second = nx::network::SocketAddress(
                 dstUrl.host(),
-                dstUrl.port(nx::network::http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+                dstUrl.port(defaultPort)).toString().toLatin1();
+        }
     }
 
 	//NOTE next hop should accept Authorization header already present
@@ -578,8 +583,8 @@ void ProxyConnectionProcessor::doRawProxy()
 		if (m_needStop || timeSinseLastIo >= kIoTimeout)
 			return;
 
-		bool someBytesRead1 = false;
-		bool someBytesRead2 = false;
+		qint64 someBytesRead1 = 0;
+		qint64 someBytesRead2 = 0;
 		if (!doProxyData(d->socket.get(), d->dstSocket.get(), buffer.data(), buffer.size(), &someBytesRead1))
 			return;
 
@@ -596,6 +601,15 @@ void ProxyConnectionProcessor::doProxyRequest()
 	Q_D(ProxyConnectionProcessor);
 
 	parseRequest();
+
+    qint64 moreContentToReceive = 0;
+    auto contentLength = nx::network::http::getHeaderValue(d->request.headers, "Content-Length").toLongLong();
+    if (contentLength > 0 )
+    {
+        qint64 receivedContentLength = d->clientRequest.size() - d->clientRequest.indexOf("\r\n\r\n") - 4;
+        moreContentToReceive = contentLength - receivedContentLength;
+    }
+
 	QString path = d->request.requestLine.url.path();
 	// Parse next request and change dst if required.
 	nx::utils::Url dstUrl;
@@ -613,6 +627,7 @@ void ProxyConnectionProcessor::doProxyRequest()
 			NX_VERBOSE(this, lm("Failed to connect to destination %1 during \"smart\" proxying")
 				.args(dstUrl));
 			d->socket->close();
+            m_needStop = true;
 			return; // invalid dst address
 		}
 	}
@@ -624,6 +639,21 @@ void ProxyConnectionProcessor::doProxyRequest()
 		m_needStop = true;
 	}
 	d->clientRequest.clear();
+
+    while (!m_needStop && moreContentToReceive > 0)
+    {
+        qint64 bytesRead = 0;
+        nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
+        if (doProxyData(d->socket.get(), d->dstSocket.get(), buffer.data(), buffer.size(), &bytesRead))
+        {
+            moreContentToReceive -= bytesRead;
+        }
+        else
+        {
+            m_needStop = true;
+        }
+    }
+
 }
 
 void ProxyConnectionProcessor::doSmartProxy()
@@ -656,17 +686,16 @@ void ProxyConnectionProcessor::doSmartProxy()
 			someBytesRead1 = true;
 
 			d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-			const auto messageSize = isFullMessage(d->clientRequest);
-			if (messageSize < 0)
-				return;
+            if (d->clientRequest.size() > QnTCPConnectionProcessor::kMaxRequestSize)
+                break;
+            if (d->clientRequest.contains("\r\n\r\n"))
+                doProxyRequest();
 
-			if (messageSize > 0)
-				doProxyRequest();
-			if (m_needStop)
+            if (m_needStop)
 				break;
 		}
 
-		bool someBytesRead2 = false;
+		qint64 someBytesRead2 = 0;
 		if (!doProxyData(d->dstSocket.get(), d->socket.get(), buffer.data(), kReadBufferSize, &someBytesRead2))
 			return;
 

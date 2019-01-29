@@ -68,8 +68,11 @@ private:
     boost::optional<utils::Url> m_url;
     utils::ObjectDestructionFlag m_destructionFlag;
     nx::Buffer m_connectionGuid;
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
 
     void startReading();
+    void reportStartResult();
+
     virtual void stopWhileInAioThread() override;
 };
 

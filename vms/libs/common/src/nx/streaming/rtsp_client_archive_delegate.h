@@ -141,7 +141,7 @@ private:
     QElapsedTimer m_reopenTimer;
     QElapsedTimer m_sessionTimeout;
     std::chrono::milliseconds m_maxSessionDurationMs;
-    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly};
+    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::media};
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

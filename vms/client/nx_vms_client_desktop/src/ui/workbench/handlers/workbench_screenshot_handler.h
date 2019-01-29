@@ -7,15 +7,15 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <core/ptz/item_dewarping_params.h>
-#include <core/ptz/media_dewarping_params.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <transcoding/timestamp_params.h>
 
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
-#include <utils/color_space/image_correction.h>
+
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
+
 #include <utils/common/connective.h>
 #include <utils/common/aspect_ratio.h>
 
@@ -33,8 +33,8 @@ struct QnScreenshotParameters
     qint64 displayTimeMsec = 0;
     QString filename;
     QnTimeStampParams timestampParams;
-    QnItemDewarpingParams itemDewarpingParams;
-    ImageCorrectionParams imageCorrectionParams;
+    nx::vms::api::ImageCorrectionData imageCorrectionParams;
+    nx::vms::api::DewarpingData itemDewarpingParams;
     QRectF zoomRect;
     QnAspectRatio customAspectRatio;
     qreal rotationAngle = 0;

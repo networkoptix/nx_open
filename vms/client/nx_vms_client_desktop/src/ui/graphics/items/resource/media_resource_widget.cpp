@@ -129,6 +129,8 @@ using namespace ui;
 
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionGrid;
+using nx::vms::api::StreamDataFilter;
+using nx::vms::api::StreamDataFilters;
 
 namespace {
 
@@ -239,10 +241,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(base_type::resource(), &QnResource::propertyChanged, this,
         &QnMediaResourceWidget::at_resource_propertyChanged);
+
     connect(base_type::resource(), &QnResource::mediaDewarpingParamsChanged, this,
-        &QnMediaResourceWidget::handleDewarpingParamsChanged);
+        &QnMediaResourceWidget::updateDewarpingParams);
+
     connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
         &QnMediaResourceWidget::handleDewarpingParamsChanged);
+
     connect(this, &QnResourceWidget::zoomTargetWidgetChanged, this,
         &QnMediaResourceWidget::updateDisplay);
 
@@ -896,15 +901,6 @@ void QnMediaResourceWidget::createButtons()
             });
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
-
-    auto analyticsButton =
-        createStatisticAwareButton(lit("media_widget_analytics"));
-    analyticsButton->setIcon(qnSkin->icon("item/analytics.png"));
-    analyticsButton->setCheckable(true);
-    analyticsButton->setToolTip(lit("Analytics"));
-    connect(analyticsButton, &QnImageButtonWidget::toggled, this,
-        &QnMediaResourceWidget::at_analyticsButton_toggled);
-    titleBar()->rightButtonsBar()->addButton(Qn::AnalyticsButton, analyticsButton);
 
     auto entropixEnhancementButton =
         createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
@@ -1617,12 +1613,13 @@ void QnMediaResourceWidget::updateRendererEnabled()
         m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
 
-ImageCorrectionParams QnMediaResourceWidget::imageEnhancement() const
+nx::vms::api::ImageCorrectionData QnMediaResourceWidget::imageEnhancement() const
 {
     return item()->imageEnhancement();
 }
 
-void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &imageEnhancement)
+void QnMediaResourceWidget::setImageEnhancement(
+    const nx::vms::api::ImageCorrectionData& imageEnhancement)
 {
     titleBar()->rightButtonsBar()->button(Qn::EnhancementButton)->setChecked(imageEnhancement.enabled);
     item()->setImageEnhancement(imageEnhancement);
@@ -1904,7 +1901,7 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
 
     if (options() & DisplayMotionSensitivity)
     {
-        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount, Q_FUNC_INFO);
+        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount);
         for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; ++i)
         {
             QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : QColor(Qt::darkRed);
@@ -1944,8 +1941,11 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
 {
     if (m_dewarpingParams == params)
         return;
+
     m_dewarpingParams = params;
     handleDewarpingParamsChanged();
+
+    emit dewarpingParamsChanged();
 }
 
 // -------------------------------------------------------------------------- //
@@ -2045,7 +2045,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
         if (auto reader = d->display()->archiveReader())
         {
-            using namespace nx::vms::api;
             StreamDataFilters filter = reader->streamDataFilter();
             filter.setFlag(StreamDataFilter::motion, motionSearchEnabled);
             filter.setFlag(StreamDataFilter::media);
@@ -2246,7 +2245,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->hasVideo && d->isIoModule)
         result |= Qn::IoModuleButton;
 
-    if (d->hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
+    if (d->hasVideo && !qnRuntime->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
         if (item()
             && item()->layout()
@@ -2256,9 +2255,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             )
             result |= Qn::ZoomWindowButton;
     }
-
-    if (d->analyticsMetadataProvider)
-        result |= Qn::AnalyticsButton;
 
     if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
         result |= Qn::RecordingStatusIconButton;
@@ -2513,7 +2509,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
 {
-    QnItemDewarpingParams params = item()->dewarpingParams();
+    auto params = item()->dewarpingParams();
     params.enabled = checked;
     item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
 
@@ -2535,7 +2531,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
 
 void QnMediaResourceWidget::at_imageEnhancementButton_toggled(bool checked)
 {
-    ImageCorrectionParams params = item()->imageEnhancement();
+    auto params = item()->imageEnhancement();
     if (params.enabled == checked)
         return;
 
@@ -2580,11 +2576,6 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
         updateTitleText();
 }
 
-void QnMediaResourceWidget::at_analyticsButton_toggled(bool checked)
-{
-    setAnalyticsEnabled(checked);
-}
-
 void QnMediaResourceWidget::at_entropixEnhancementButton_clicked()
 {
     using nx::vms::client::desktop::EntropixImageEnhancer;
@@ -2608,16 +2599,12 @@ void QnMediaResourceWidget::at_entropixImageLoaded(const QImage& image)
 
 void QnMediaResourceWidget::updateDewarpingParams()
 {
-    if (m_dewarpingParams == d->mediaResource->getDewarpingParams())
-        return;
-
-    m_dewarpingParams = d->mediaResource->getDewarpingParams();
-    emit dewarpingParamsChanged();
+    setDewarpingParams(d->mediaResource->getDewarpingParams());
 }
 
 void QnMediaResourceWidget::updateFisheye()
 {
-    QnItemDewarpingParams itemParams = item()->dewarpingParams();
+    auto itemParams = item()->dewarpingParams();
 
     // Zoom windows have no own "dewarping" button, so counting it always pressed.
     bool enabled = isZoomWindow() || itemParams.enabled;
@@ -2883,25 +2870,36 @@ bool QnMediaResourceWidget::isLicenseUsed() const
     return d->licenseStatus() == QnLicenseUsageStatus::used;
 }
 
-bool QnMediaResourceWidget::isAnalyticsEnabled() const
+bool QnMediaResourceWidget::isAnalyticsSupported() const
 {
     return d->analyticsMetadataProvider
-        && titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->isChecked();
+        && display()
+        && display()->archiveReader();
+}
+
+bool QnMediaResourceWidget::isAnalyticsEnabled() const
+{
+    if (!isAnalyticsSupported())
+        return false;
+
+    if (const auto reader = display()->archiveReader())
+        return reader->streamDataFilter().testFlag(StreamDataFilter::objectDetection);
+
+    return false;
 }
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
+    if (!isAnalyticsSupported())
+        return;
+
     if (auto reader = display()->archiveReader())
     {
-        using namespace nx::vms::api;
         StreamDataFilters filter = reader->streamDataFilter();
         filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
         filter.setFlag(StreamDataFilter::media);
         reader->setStreamDataFilter(filter);
     }
-
-    if (!d->analyticsMetadataProvider)
-        return;
 
     if (!analyticsEnabled)
     {
@@ -2914,8 +2912,6 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         display()->camDisplay()->setForcedVideoBufferLength(
             milliseconds(ini().analyticsVideoBufferLengthMs));
     }
-
-    titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->setChecked(analyticsEnabled);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr

@@ -157,7 +157,7 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
     module = newModule;
     if (module && !module->isIOModule())
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Must be I/O module!");
+        NX_ASSERT(false, "Must be I/O module!");
         module.clear();
     }
 

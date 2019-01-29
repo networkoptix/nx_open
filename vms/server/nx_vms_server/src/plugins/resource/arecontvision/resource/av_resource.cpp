@@ -159,7 +159,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
     return nx::vms::server::resource::StreamCapabilityMap();
@@ -541,7 +541,7 @@ bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
+    NX_ASSERT(false, "QnPlAreconVisionResource is abstract.");
     return 0;
 }
 

@@ -47,7 +47,6 @@ private:
     QString rtpTransport() const;
     QnRtspClient& rtspClient();
 
-    QString toHanwhaPlaybackTime(int64_t timestamp) const;
     QnAbstractMediaDataPtr createEmptyPacket();
     QString forcedUrl(Qn::ConnectionRole role) const;
 private:

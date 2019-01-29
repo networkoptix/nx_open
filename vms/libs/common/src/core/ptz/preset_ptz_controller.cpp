@@ -10,7 +10,7 @@ using namespace nx::core;
 
 bool deserialize(const QString& /*value*/, QnPtzPresetRecordHash* /*target*/)
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
     return false;
 }
 
@@ -105,7 +105,7 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
         QnMutexLocker locker(&m_mutex);
         if ((status = doPresetsAction(updatePresetActionFunc, preset)))
         {
-            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot update preset since corresponding resource does not exist.");
+            NX_ASSERT(m_camera, "Cannot update preset since corresponding resource does not exist.");
             m_camera->savePropertiesAsync();
         }
     }
@@ -131,7 +131,7 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
         QnMutexLocker locker(&m_mutex);
         if ((status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString()))))
         {
-            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot remove preset since correspondent resource does not exist.");
+            NX_ASSERT(m_camera, "Cannot remove preset since correspondent resource does not exist.");
             m_camera->savePropertiesAsync();
         }
     }

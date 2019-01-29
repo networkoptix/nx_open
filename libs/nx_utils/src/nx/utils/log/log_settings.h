@@ -50,7 +50,7 @@ public:
      *
      * Generally, "level=none" means "ignore everything else".
      */
-    void parse(const QString& str);
+    bool parse(const QString& str);
     void updateDirectoryIfEmpty(const QString& dataDirectory);
 
     bool operator==(const LoggerSettings& right) const;

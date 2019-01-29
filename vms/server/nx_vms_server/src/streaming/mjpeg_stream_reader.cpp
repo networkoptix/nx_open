@@ -170,11 +170,11 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool /*isCameraC
             m_camera->getAuth()));
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
 
-	QUrl requestedUrl;
-	requestedUrl.setHost(m_camera->getHostAddress());
-	requestedUrl.setPort(m_camera->httpPort());
-	requestedUrl.setScheme(QLatin1String("http"));
-	requestedUrl.setPath(m_request);
+    QUrl requestedUrl;
+    requestedUrl.setHost(m_camera->getHostAddress());
+    requestedUrl.setPort(m_camera->httpPort());
+    requestedUrl.setScheme(QLatin1String("http"));
+    requestedUrl.setPath(m_request);
 
     m_camera->updateSourceUrl(requestedUrl.toString(), getRole());
 

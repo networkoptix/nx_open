@@ -15,11 +15,11 @@ class NX_UTILS_API Logger:
 public:
     /** Initializes log with minimal level and writers, no writers means std out and err. */
     Logger(
-        const std::set<Tag>& tags,
+        std::set<Filter> filters,
         Level defaultLevel = Level::none,
         std::unique_ptr<AbstractWriter> writer = nullptr);
 
-    virtual std::set<Tag> tags() const override;
+    virtual std::set<Filter> filters() const override;
 
     /** Writes message to every writer if it is to be logged. */
     virtual void log(Level level, const Tag& tag, const QString& message) override;
@@ -57,7 +57,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    std::set<Tag> m_tags;
+    std::set<Filter> m_filters;
     Level m_defaultLevel = Level::none;
     OnLevelChanged m_onLevelChanged;
     LoggerSettings m_settings;

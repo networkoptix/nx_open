@@ -53,12 +53,12 @@ void* CommonPluginContainer::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int CommonPluginContainer::addRef()
+int CommonPluginContainer::addRef() const
 {
     return ++m_refCount;
 }
 
-unsigned int CommonPluginContainer::releaseRef()
+int CommonPluginContainer::releaseRef() const
 {
     return --m_refCount;
 }

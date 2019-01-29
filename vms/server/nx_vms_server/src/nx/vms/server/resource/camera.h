@@ -109,7 +109,7 @@ public:
      */
     static QSize getNearestResolution(
         const QSize& resolution,
-        float aspectRatio,
+        float desiredAspectRatio,
         double maxResolutionArea,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
@@ -121,10 +121,14 @@ public:
      */
     static QSize closestResolution(
         const QSize& idealResolution,
-        float aspectRatio,
+        float desiredAspectRatio,
         const QSize& maxResolution,
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
+
+    static QSize closestSecondaryResolution(
+        float desiredAspectRatio,
+        const QList<QSize>& resolutionList);
 
     class AdvancedParametersProvider
     {
@@ -151,6 +155,7 @@ public:
     static QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
+    int getMaxChannels() const;
 
     void inputPortListenerAttached();
     void inputPortListenerDetached();
@@ -177,6 +182,14 @@ public:
         int limit,
         Qt::SortOrder sortOrder);
 
+    enum class Role
+    {
+        regular,
+        subchannel
+    };
+    void setRole(Role role) { m_role = role; }
+    Role getRole() const { return m_role; }
+
 
 signals:
     /** Emit on camera or IO module input change. */
@@ -194,6 +207,8 @@ signals:
         qint64 timestamp);
 
 protected:
+    virtual int getMaxChannelsFromDriver() const { return 1; }
+
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void initializationDone() override;
 
@@ -208,7 +223,7 @@ protected:
      * For each key optional CameraStreamCapability could be provided.
      * CameraStreamCapability could be null. That case it is auto-filled with default values.
      */
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex) = 0;
 
     /**
      * @return stream capability traits
@@ -247,6 +262,7 @@ private:
     bool m_inputPortListeningInProgress = false;
     QnMutex m_ioPortStatesMutex;
     std::map<QString, QnIOStateData> m_ioPortStatesCache;
+    Role m_role = Role::regular;
 };
 
 } // namespace resource

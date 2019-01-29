@@ -24,6 +24,7 @@ static const QString kWidthParam = "width";
 static const QString kImageFormatParam = "imageFormat";
 static const QString kRoundMethodParam = "method";
 static const QString kAspectRatioParam = "aspectRatio";
+static const QString kStreamSelectionModeParam = "streamSelectionMode";
 
 static const QString kLatestTimeValue = "latest";
 
@@ -67,6 +68,9 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
         params.value(kRoundMethodParam), /*defaultValue*/ request.roundMethod);
     request.aspectRatio = QnLexical::deserialized<nx::api::ImageRequest::AspectRatio>(
         params.value(kAspectRatioParam), /*defaultValue*/ request.aspectRatio);
+    request.streamSelectionMode =
+        QnLexical::deserialized<nx::api::CameraImageRequest::StreamSelectionMode>(
+            params.value(kStreamSelectionModeParam), /*defaultValue*/ request.streamSelectionMode);
 }
 
 QnRequestParamList QnThumbnailRequestData::toParams() const
@@ -87,6 +91,7 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     result.insert(kImageFormatParam, QnLexical::serialized(request.imageFormat));
     result.insert(kRoundMethodParam, QnLexical::serialized(request.roundMethod));
     result.insert(kAspectRatioParam, QnLexical::serialized(request.aspectRatio));
+    result.insert(kStreamSelectionModeParam, QnLexical::serialized(request.streamSelectionMode));
     return result;
 }
 

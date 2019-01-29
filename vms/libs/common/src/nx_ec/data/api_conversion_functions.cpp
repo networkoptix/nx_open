@@ -173,9 +173,8 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
     if (dstId == uidToId)
         return;
 
-    QString message = lit("Malformed camera id: id = %1; uniqueId = %2; uniqueIdToId = %3")
-        .arg(dstId.toString()).arg(dstUid).arg(uidToId.toString());
-    NX_ASSERT(false, "fromApiToResource()", message);
+    NX_ASSERT(false, lit("Malformed camera id: id = %1; uniqueId = %2; uniqueIdToId = %3")
+        .arg(dstId.toString()).arg(dstUid).arg(uidToId.toString()));
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, CameraData& dst)
@@ -392,8 +391,8 @@ void fromApiToResource(const LayoutItemData& src, QnLayoutItemData& dst)
     dst.resource.uniqueId = src.resourcePath;
     dst.zoomRect = QRectF(QPointF(src.zoomLeft, src.zoomTop), QPointF(src.zoomRight, src.zoomBottom));
     dst.zoomTargetUuid = src.zoomTargetId;
-    dst.contrastParams = ImageCorrectionParams::deserialize(src.contrastParams);
-    dst.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(src.dewarpingParams);
+    dst.contrastParams = src.contrastParams;
+    dst.dewarpingParams = src.dewarpingParams;
     dst.displayInfo = src.displayInfo;
 }
 
@@ -413,8 +412,8 @@ void fromResourceToApi(const QnLayoutItemData& src, LayoutItemData& dst)
     dst.zoomRight = src.zoomRect.bottomRight().x();
     dst.zoomBottom = src.zoomRect.bottomRight().y();
     dst.zoomTargetId = src.zoomTargetUuid;
-    dst.contrastParams = src.contrastParams.serialize();
-    dst.dewarpingParams = QJson::serialized(src.dewarpingParams);
+    dst.contrastParams = src.contrastParams;
+    dst.dewarpingParams = src.dewarpingParams;
     dst.displayInfo = src.displayInfo;
 }
 
@@ -423,7 +422,7 @@ void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setCellAspectRatio(src.cellAspectRatio);
-    dst->setCellSpacing(src.horizontalSpacing);
+    dst->setCellSpacing(src.cellSpacing);
     dst->setLocked(src.locked);
     dst->setLogicalId(src.logicalId);
     dst->setFixedSize({src.fixedWidth, src.fixedHeight});
@@ -446,8 +445,7 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.cellAspectRatio = src->cellAspectRatio();
-    dst.horizontalSpacing = src->cellSpacing();
-    dst.verticalSpacing = src->cellSpacing(); // TODO: #ynikitenkov Remove vertical spacing?
+    dst.cellSpacing = src->cellSpacing();
     dst.locked = src->locked();
     dst.logicalId = src->logicalId();
 
@@ -769,7 +767,7 @@ QnUserResourcePtr fromApiToResource(const UserData& src, QnCommonModule* commonM
 
 void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
 {
-    NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), Q_FUNC_INFO, "Unexpected user type");
+    NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), "Unexpected user type");
 
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 

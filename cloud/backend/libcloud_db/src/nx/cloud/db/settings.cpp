@@ -135,6 +135,12 @@ const QLatin1String kLoginLockoutLockPeriod("loginLockout/lockPeriod");
 constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod =
     nx::network::server::UserLockerSettings().lockPeriod;
 
+//-------------------------------------------------------------------------------------------------
+// HostLockout
+
+constexpr char kHostLockoutEnabled[] = "hostLockout/enabled";
+constexpr bool kDefaultHostLockoutEnabled = true;
+
 } // namespace
 
 namespace nx::cloud::db {
@@ -246,11 +252,6 @@ const Auth& Settings::auth() const
     return m_auth;
 }
 
-std::optional<network::server::UserLockerSettings> Settings::loginLockout() const
-{
-    return m_loginLockout;
-}
-
 const Notification& Settings::notification() const
 {
     return m_notification;
@@ -296,9 +297,9 @@ const VmsGateway& Settings::vmsGateway() const
     return m_vmsGateway;
 }
 
-const LoginEnumerationProtectionSettings& Settings::loginEnumerationProtectionSettings() const
+const Security& Settings::security() const
 {
-    return m_loginEnumerationProtectionSettings;
+    return m_security;
 }
 
 void Settings::setDbConnectionOptions(
@@ -381,7 +382,7 @@ void Settings::loadSettings()
 
     loadAuth();
 
-    loadLoginLockout();
+    loadSecurity();
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -447,6 +448,12 @@ void Settings::loadAuth()
         kMaxSystemsToUpdateAtATime, kDefaultMaxSystemsToUpdateAtATime).toInt();
 }
 
+void Settings::loadSecurity()
+{
+    loadLoginLockout();
+    loadHostLockout();
+}
+
 void Settings::loadLoginLockout()
 {
     const auto loginLockoutEnabled = settings().value(
@@ -456,19 +463,32 @@ void Settings::loadLoginLockout()
     if (!loginLockoutEnabled)
         return;
 
-    m_loginLockout.emplace(network::server::UserLockerSettings());
+    m_security.loginLockout.emplace(network::server::UserLockerSettings());
 
-    m_loginLockout->checkPeriod = nx::utils::parseTimerDuration(
+    m_security.loginLockout->checkPeriod = nx::utils::parseTimerDuration(
         settings().value(kLoginLockoutCheckPeriod).toString(),
         kDefaultLoginLockoutCheckPeriod);
 
-    m_loginLockout->authFailureCount = settings().value(
+    m_security.loginLockout->authFailureCount = settings().value(
         kLoginLockoutAuthFailureCount,
         kDefaultLoginLockoutAuthFailureCount).toInt();
 
-    m_loginLockout->lockPeriod = nx::utils::parseTimerDuration(
+    m_security.loginLockout->lockPeriod = nx::utils::parseTimerDuration(
         settings().value(kLoginLockoutLockPeriod).toString(),
         kDefaultLoginLockoutLockPeriod);
+}
+
+void Settings::loadHostLockout()
+{
+    const auto hostLockoutEnabled = settings().value(
+        kHostLockoutEnabled,
+        kDefaultHostLockoutEnabled ? "true" : "false").toString() == "true";
+
+    if (!hostLockoutEnabled)
+        return;
+
+    m_security.loginEnumerationProtectionSettings.emplace(
+        LoginEnumerationProtectionSettings());
 }
 
 } // namespace conf

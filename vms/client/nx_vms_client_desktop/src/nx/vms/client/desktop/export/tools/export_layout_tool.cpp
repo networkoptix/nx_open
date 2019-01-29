@@ -15,28 +15,27 @@
 #include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_display_info.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/layout_reader.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/api/data/layout_data.h>
-#include <nx_ec/data/api_conversion_functions.h>
-
-#include <core/storage/file_storage/layout_storage_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/core/watermark/watermark.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+
+#include <nx_ec/data/api_conversion_functions.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -92,6 +91,28 @@ struct ExportLayoutTool::Private
         emit q->statusChanged(status);
     }
 
+    // Replace Cameras with AviResources for saving local layouts.
+    void refreshLocalLayoutInTree() const
+    {
+        const auto dummyLayout = layout::layoutFromFile(settings.fileName.completeFileName());
+
+        if (dummyLayout)
+        {
+            // Check if there were any cameras on old layout.
+            const auto resources = settings.layout->layoutResources();
+            if (resources.end() == std::find_if(resources.begin(), resources.end(),
+                    [](QnResourcePtr resource) { return resource.dynamicCast<QnVirtualCameraResource>(); }))
+            {
+                return; // No cameras - no need to refresh.
+            }
+
+            settings.layout->setItems(QnLayoutItemDataMap());
+            settings.layout->setItems(dummyLayout->getItems());
+            // Set password again to make sure that new AviResources do get it.
+            settings.layout->usePasswordForRecordings(layout::password(settings.layout));
+        }
+    }
+
     void finishExport()
     {
         switch (status)
@@ -117,7 +138,11 @@ struct ExportLayoutTool::Private
             const auto targetFilename = settings.fileName.completeFileName();
             if (actualFilename != targetFilename)
                 storage->renameFile(storage->getUrl(), targetFilename);
+
+            if (settings.mode == ExportLayoutSettings::Mode::LocalSave)
+                refreshLocalLayoutInTree();
         }
+
         emit q->finished();
     }
 };
@@ -138,13 +163,17 @@ ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* paren
     base_type(parent),
     d(new Private(this, settings))
 {
+    // Make m_layout a deep exact copy of original layout.
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(d->settings.layout->getId()); //before update() uuid's must be the same
     m_layout->update(d->settings.layout);
 
-    // If exporting layout, create new guid. If layout just renamed, keep guid
+    // If exporting layout, create new guid. If layout just renamed or saved, keep guid.
     if (d->settings.mode != ExportLayoutSettings::Mode::LocalSave)
         m_layout->setId(QnUuid::createUuid());
+
+    m_isExportToExe = nx::utils::AppInfo::isWindows()
+        && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
 }
 
 ExportLayoutTool::~ExportLayoutTool()
@@ -153,14 +182,11 @@ ExportLayoutTool::~ExportLayoutTool()
 
 bool ExportLayoutTool::prepareStorage()
 {
-    const auto isExeFile = nx::utils::AppInfo::isWindows()
-        && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
-
     // Save to tmp file, then rename.
     d->actualFilename += lit(".tmp");
 
 #ifdef Q_OS_WIN
-    if (isExeFile)
+    if (m_isExportToExe)
     {
         // TODO: #GDM handle other errors
         if (QnNovLauncher::createLaunchingFile(d->actualFilename) != QnNovLauncher::ErrorCode::Ok)
@@ -197,12 +223,14 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
+        // We only export video files or cameras; no still images, web pages etc.
         const bool skip = !mediaResource || resource->hasFlags(Qn::still_image);
 
         if (skip)
             continue;
 
         const auto uniqueId = resource->getUniqueId();
+        // Only export every resource once, even if it placed on layout several times.
         if (!uniqIdList.contains(uniqueId))
         {
             d->resources << mediaResource;
@@ -211,7 +239,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
 
         QnLayoutItemData localItem = item;
         localItem.resource.id = resource->getId();
-        localItem.resource.uniqueId = uniqueId;
+        localItem.resource.uniqueId = uniqueId; // Ensure uniqueId is set.
         items.insert(localItem.uuid, localItem);
 
         ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
@@ -461,33 +489,6 @@ bool ExportLayoutTool::exportNextCamera()
 void ExportLayoutTool::finishExport(bool success)
 {
     d->finishExport();
-
-    // TODO: #GDM This is more correct "Save as" handling, but it does not work yet.
-    /*
-    else if (m_mode == Qn::LayoutLocalSaveAs)
-    {
-        QString oldUrl = m_layout->getUrl();
-        QString newUrl = d->storage->getUrl();
-
-        for (const QnLayoutItemData &item : m_layout->getItems())
-        {
-            QnAviResourcePtr aviRes = resourcePool()->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
-            if (aviRes)
-            {
-                aviRes->setUniqueId(QnLayoutFileStorageResource::itemUniqueId(newUrl,
-                    item.resource.uniqueId));
-            }
-        }
-        m_layout->setUrl(newUrl);
-        m_layout->setName(QFileInfo(newUrl).fileName());
-
-        QnLayoutFileStorageResourcePtr novStorage = d->storage.dynamicCast<QnLayoutFileStorageResource>();
-        if (novStorage)
-            novStorage->switchToFile(oldUrl, newUrl, false);
-        snapshotManager()->store(m_layout);
-    }
-    */
-
 }
 
 bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
@@ -576,7 +577,7 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     if (error)
     {
         auto camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
+        NX_ASSERT(camRes, "Make sure camera exists");
         const auto resourcePool = camRes->resourcePool();
         NX_ASSERT(resourcePool);
         d->lastError = ExportProcessError::unsupportedMedia;

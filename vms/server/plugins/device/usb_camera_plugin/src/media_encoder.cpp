@@ -56,12 +56,12 @@ void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
-unsigned int MediaEncoder::addRef() 
+int MediaEncoder::addRef() const
 {
-    return m_refManager.addRef(); 
+    return m_refManager.addRef();
 }
 
-unsigned int MediaEncoder::releaseRef()
+int MediaEncoder::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -77,9 +77,9 @@ int MediaEncoder::getMaxBitrate(int* maxBitrate) const
     if(!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    int bitrate = 
+    int bitrate =
         device::video::getMaxBitrate(m_camera->ffmpegUrl(), m_camera->compressionTypeDescriptor());
-        
+
     *maxBitrate = bitrate / kBytesInOneKilobyte;
 
     return nxcip::NX_NO_ERROR;
@@ -168,8 +168,8 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 #ifdef _WIN32
     audioFormat->byteOrder = nxcip::AudioFormat::boLittleEndian;
 #else
-    audioFormat->byteOrder = __BYTE_ORDER == BIG_ENDIAN 
-        ? nxcip::AudioFormat::boBigEndian 
+    audioFormat->byteOrder = __BYTE_ORDER == BIG_ENDIAN
+        ? nxcip::AudioFormat::boBigEndian
         : nxcip::AudioFormat::boLittleEndian;
 #endif
     audioFormat->channels = context->channels;

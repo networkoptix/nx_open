@@ -8,9 +8,12 @@
 
 namespace nx::network::maintenance::log {
 
+// TODO: #Nate add documentation please. What's that? Third way to setup the same logs?
 struct Filter
 {
     std::string level;
+
+    // TODO: #Nate Actually regexps can be written here. Suggesting to rename to 'filters'.
     std::vector<std::string> tags;
 };
 
@@ -25,9 +28,10 @@ struct Logger
     int id = -1;
     std::string path;
     std::vector<Filter> filters;
+    std::string defaultLevel;
 };
 
-#define Logger_Fields (id)(path)(filters)
+#define Logger_Fields (id)(path)(filters)(defaultLevel)
 
 QN_FUSION_DECLARE_FUNCTIONS(Logger, (json), NX_NETWORK_API)
 

@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: When Storage and Camera SDKs are merged into Analytics SDK, rename this file and keep
+// only Setting, Plugin and Plugin2 (renamed as `deprecated`) to be used when loading old plugins.
+
 //!VMS dynamic plugin API (c++)
 /*!
     - inspired by COM
@@ -25,7 +28,8 @@ namespace nxpl
     };
 
     // {E03B8532-9531-41d6-982A-CA7BF0269780}
-    static const NX_GUID IID_PluginInterface = { { 0xe0, 0x3b, 0x85, 0x32, 0x95, 0x31, 0x41, 0xd6, 0x98, 0x2a, 0xca, 0x7b, 0xf0, 0x26, 0x97, 0x80 } };
+    static const nxpl::NX_GUID IID_PluginInterface =
+        {{0xe0,0x3b,0x85,0x32,0x95,0x31,0x41,0xd6,0x98,0x2a,0xca,0x7b,0xf0,0x26,0x97,0x80}};
 
     //!Base class for every interface, provided by plugin
     /*!
@@ -52,14 +56,14 @@ namespace nxpl
             \return new reference count
             \note \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef
         */
-        virtual unsigned int addRef() = 0;
+        virtual int addRef() const = 0;
         //!Decrement reference counter
         /*!
             When zero, object MUST be removed
             \return new reference count
             \note \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef
         */
-        virtual unsigned int releaseRef() = 0;
+        virtual int releaseRef() const = 0;
     };
 
     struct Setting
@@ -76,21 +80,19 @@ namespace nxpl
         Setting(const char* name, const char* value): name(name), value(value) {}
     };
 
-    static const NX_GUID IID_Plugin = //< {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
+    static const nxpl::NX_GUID IID_Plugin =
         {{0xe5,0x3c,0xf9,0x3d,0x61,0xd3,0x42,0x61,0x9d,0x25,0x9b,0x7b,0x3f,0x3a,0x81,0x2b}};
 
     /**
      * Optional interface with general plugin features (name, settings). Server tries to cast
      * the initial pointer received from createNXPluginInstance() to this type right after the
      * plugin is loaded.
-    */
+     */
     class Plugin: public nxpl::PluginInterface
     {
     public:
         /** Prototype of a plugin entry point function. */
         typedef PluginInterface* (*EntryPoint)();
-
-        virtual ~Plugin() {}
 
         /** Name of the plugin, used for information purpose only. */
         virtual const char* name() const = 0;
@@ -104,7 +106,7 @@ namespace nxpl
         virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
     };
 
-    static const NX_GUID IID_Plugin2 = //< {100AFC3E-CA63-47FB-9D5D-0440FC59F866}
+    static const nxpl::NX_GUID IID_Plugin2 =
         {{0x10,0x0a,0xfc,0x3e,0xca,0x63,0x47,0xfb,0x9d,0x5d,0x4,0x40,0xfc,0x59,0xf8,0x66}};
 
     class Plugin2: public Plugin

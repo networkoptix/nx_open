@@ -1,10 +1,13 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <chrono>
 
 #include "time_synchronization_widget_state.h"
 
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
 
 class TimeSynchronizationWidgetStore: public QObject
 {
@@ -17,8 +20,9 @@ public:
     struct TimeOffsetInfo
     {
         QnUuid serverId;
-        qint64 osTimeOffset = 0;
-        qint64 vmsTimeOffset = 0;
+        milliseconds osTimeOffset = 0ms;
+        milliseconds vmsTimeOffset = 0ms;
+        milliseconds timeZoneOffset = 0ms;
     };
     using TimeOffsetInfoList = QList<TimeOffsetInfo>;
 
@@ -35,6 +39,7 @@ public:
     void addServer(const State::ServerInfo& serverInfo);
     void removeServer(const QnUuid& id);
     void setServerOnline(const QnUuid &id, bool isOnline);
+    void setServerHasInternet(const QnUuid &id, bool hasInternet);
 
     void applyChanges();
     void setReadOnly(bool value);

@@ -955,7 +955,7 @@ T parseMessageBody(
          default:
              if (success)
                  *success = false;
-             NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+             NX_ASSERT(0, "Unsupported data format");
              break;
      }
     return T();
@@ -977,7 +977,7 @@ T parseMessageBody(
         default:
             if (success)
                 *success = false;
-            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+            NX_ASSERT(0, "Unsupported data format");
             break;
     }
     return T();

@@ -23,6 +23,10 @@ namespace p2p {
 
 SendCounters ConnectionBase::m_sendCounters = {};
 
+const QString ConnectionBase::kWebsocketUrlPath(lit("/ec2/transactionBus/websocket"));
+const QString ConnectionBase::kHttpUrlPath(lit("/ec2/transactionBus/http"));
+
+
 #if defined(CHECK_SEQUENCE)
     const int kMessageOffset = 8;
 #else
@@ -212,19 +216,20 @@ void ConnectionBase::onHttpClientDone()
         }
         return;
     }
-    else if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
-    {
-        cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
-        return;
-    }
 
     const auto& headers = m_httpClient->response()->headers;
     if (m_connectionLockGuard && headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
     {
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
+        if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
+        {
+            cancelConnecting(State::Error, lm("Not a successful HTTP status code %1").arg(statusCode));
+            return;
+        }
+
         if (m_connectionLockGuard->tryAcquireConnecting())
             m_httpClient->doGet(
-                m_remotePeerUrl,
+                m_httpClient->url(),
                 std::bind(&ConnectionBase::onHttpClientDone, this));
         else
             cancelConnecting(State::Error, lm("tryAcquireConnecting failed"));
@@ -269,22 +274,12 @@ void ConnectionBase::onHttpClientDone()
     using namespace nx::network;
     using namespace nx::vms::api;
 
-    bool useWebsocketMode = m_remotePeer.transport != P2pTransportMode::http;
-    if (useWebsocketMode)
+    auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
+    auto useWebsocketMode = error == websocket::Error::noError;
+    if (!useWebsocketMode)
     {
-        auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
-        if (error != websocket::Error::noError)
-        {
-            NX_WARNING(this,
-                lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
-            if (m_remotePeer.transport == P2pTransportMode::websocket)
-            {
-                setState(State::Error);
-                m_httpClient.reset();
-                return;
-            }
-            useWebsocketMode = false;
-        }
+        NX_WARNING(this,
+            lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
     }
 
     //saving credentials we used to authorize request
@@ -307,9 +302,15 @@ void ConnectionBase::onHttpClientDone()
     }
     else
     {
+        auto url = m_httpClient->url();
+        auto urlPath = url.path().replace(kWebsocketUrlPath, kHttpUrlPath);
+        url.setPath(urlPath);
+
         m_p2pTransport.reset(new P2PHttpClientTransport(
             std::move(m_httpClient),
-            remotePeer.connectionGuid.toByteArray()));
+            m_connectionGuid,
+            network::websocket::FrameType::binary,
+            url));
     }
 
     m_p2pTransport->start();
@@ -321,7 +322,8 @@ void ConnectionBase::startConnection()
 {
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
-    headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray());
+    m_connectionGuid = QnUuid::createUuid().toByteArray();
+    headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_httpClient->addRequestHeaders(headers);
 
     auto requestUrl = m_remotePeerUrl;

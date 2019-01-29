@@ -85,8 +85,11 @@ namespace detail {
 
 void TransactionExecutor::stop()
 {
-    pleaseStop();
-    m_waitCondition.wakeOne();
+    {
+        QnMutexLocker lock(&m_mutex);
+        pleaseStop();
+        m_waitCondition.wakeOne();
+    }
     QnLongRunnable::stop();
 }
 

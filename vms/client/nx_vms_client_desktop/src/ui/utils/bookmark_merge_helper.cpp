@@ -212,7 +212,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
             {
                 for (const auto& bookmarkItem: d->bookmarksForItem(item))
                 {
-                    NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO,
+                    NX_ASSERT(bookmarkItem->bookmark,
                         "Zero level item should contain real bookmarks");
                     if (bookmarkItem->bookmark)
                         result.append(bookmarkItem->bookmark.get());
@@ -233,7 +233,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
             BookmarkItemList bookmarkItems = d->bookmarksForItem(item);
             for (const BookmarkItemPtr& bookmarkItem : bookmarkItems)
             {
-                NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO, "Zero level item should contain real bookmarks");
+                NX_ASSERT(bookmarkItem->bookmark, "Zero level item should contain real bookmarks");
                 if (bookmarkItem->bookmark)
                     result.append(bookmarkItem->bookmark.get());
             }
@@ -250,7 +250,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
             auto item = level.items[nearestItemIndex];
             for (const auto& bookmarkItem: d->bookmarksForItem(item))
             {
-                NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO,
+                NX_ASSERT(bookmarkItem->bookmark,
                     "Zero level item should contain real bookmarks");
                 if (bookmarkItem->bookmark)
                     result.append(bookmarkItem->bookmark.get());
@@ -368,7 +368,7 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
             auto parentIt = std::lower_bound(currentLevel.items.begin(), currentLevel.items.end(), parent, &bookmarkItemLess);
             if (parentIt == zeroLevel.items.end() || (*parentIt)->bookmark.get().guid != bookmark.guid)
             {
-                NX_ASSERT(false, Q_FUNC_INFO, "Bookmark item parent is not found in a higher level.");
+                NX_ASSERT(false, "Bookmark item parent is not found in a higher level.");
                 return;
             }
             currentLevel.items.erase(parentIt);
@@ -380,7 +380,7 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
                 const auto children = d->childrenForItem(parent, level);
                 if (children.isEmpty())
                 {
-                    NX_ASSERT(false, Q_FUNC_INFO, "Bookmark children list should not be empty at the moment.");
+                    NX_ASSERT(false, "Bookmark children list should not be empty at the moment.");
                     return;
                 }
                 parent->startTimeMs = children.first()->startTimeMs;
@@ -417,11 +417,11 @@ void QnBookmarkMergeHelperPrivate::clear()
 
 void QnBookmarkMergeHelperPrivate::mergeBookmarkItems(int detailLevel)
 {
-    NX_ASSERT(detailLevel > 0, Q_FUNC_INFO, "Zero level should not be merged");
+    NX_ASSERT(detailLevel > 0, "Zero level should not be merged");
     if (detailLevel <= 0)
         return;
 
-    NX_ASSERT(detailLevel < detailLevels.size(), Q_FUNC_INFO, "Invalid detail level");
+    NX_ASSERT(detailLevel < detailLevels.size(), "Invalid detail level");
     if (detailLevel >= detailLevels.size())
         return;
 
@@ -478,7 +478,7 @@ void QnBookmarkMergeHelperPrivate::adjustItemBoundsAfterRemoval(BookmarkItemPtr 
     const DetailLevel &currentLevel = detailLevels[level];
     auto itemIt = std::find(currentLevel.items.begin(), currentLevel.items.end(), item);
 
-    NX_ASSERT(itemIt != currentLevel.items.end(), Q_FUNC_INFO, "Item should be present in the specified detail level.");
+    NX_ASSERT(itemIt != currentLevel.items.end(), "Item should be present in the specified detail level.");
     if (itemIt == currentLevel.items.end())
         return;
 
@@ -486,7 +486,7 @@ void QnBookmarkMergeHelperPrivate::adjustItemBoundsAfterRemoval(BookmarkItemPtr 
 
     auto it = std::lower_bound(zeroLevel.items.begin(), zeroLevel.items.end(), removedItem, &bookmarkItemLess);
 
-    NX_ASSERT(it != zeroLevel.items.end(), Q_FUNC_INFO, "Attempt to adjust an empty cluster");
+    NX_ASSERT(it != zeroLevel.items.end(), "Attempt to adjust an empty cluster");
     if (it == zeroLevel.items.end())
         return;
 

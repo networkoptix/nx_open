@@ -52,7 +52,7 @@ public:
     /** Returns password */
     virtual QString password() override;
 
-    virtual void setUrl(const QString& value) override;
+    virtual void setUrl(const QString& value) override; // URL for Layout File is always plain file path!
 
     virtual QIODevice* open(const QString& url, QIODevice::OpenMode openMode) override;
 

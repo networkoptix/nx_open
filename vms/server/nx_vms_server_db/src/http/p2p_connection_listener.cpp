@@ -46,7 +46,7 @@ ConnectionProcessor::~ConnectionProcessor()
     stop();
 }
 
-vms::api::PeerDataEx ConnectionProcessor::localPeer() const
+vms::api::PeerDataEx ConnectionProcessor::localPeer(const vms::api::PeerDataEx& remotePeer) const
 {
     vms::api::PeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
@@ -59,6 +59,7 @@ vms::api::PeerDataEx ConnectionProcessor::localPeer() const
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
     localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    localPeer.connectionGuid = remotePeer.connectionGuid;
     return localPeer;
 }
 
@@ -319,23 +320,21 @@ void ConnectionProcessor::run()
     if (!tryAcquireConnected(sameDirectionConnectionLockGuard, remotePeer))
         return;
 
-    bool useWebSocket = false;
-    if (remotePeer.transport != P2pTransportMode::http)
+    bool useWebSocket = !d->request.requestLine.url.path().contains(ConnectionBase::kHttpUrlPath);
+    if (useWebSocket)
     {
         auto error = websocket::validateRequest(d->request, &d->response);
-        if (error != websocket::Error::noError && remotePeer.transport == P2pTransportMode::websocket)
+        if (error != websocket::Error::noError)
         {
             auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
-            sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
-            NX_ERROR(this, errorMessage);
-            return;
+            NX_WARNING(this, errorMessage);
+            useWebSocket = false;
         }
-        useWebSocket = (error == websocket::Error::noError);
     }
 
-    serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
+    serializePeerData(d->response, localPeer(remotePeer), remotePeer.dataFormat);
     sendResponse(
-        useWebSocket ? http::StatusCode::switchingProtocols : http::StatusCode::ok,
+        useWebSocket ? http::StatusCode::switchingProtocols : http::StatusCode::badRequest,
         nx::network::http::StringType());
 
     std::function<void()> onConnectionClosedCallback;

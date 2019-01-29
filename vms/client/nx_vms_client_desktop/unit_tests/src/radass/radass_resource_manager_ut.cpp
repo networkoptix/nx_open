@@ -50,7 +50,7 @@ class RadassResourceManagerTest:
 {
 public:
     RadassResourceManagerTest():
-        TestWithTemporaryDirectory("nx_vms_client_desktop_ut")
+        TestWithTemporaryDirectory("nx_vms_client_desktop/radass_resource_manager")
     {}
 
 protected:

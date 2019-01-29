@@ -41,12 +41,12 @@ void* GenericMulticastMediaEncoder::queryInterface(const nxpl::NX_GUID& interfac
     return nullptr;
 }
 
-unsigned int GenericMulticastMediaEncoder::addRef()
+int GenericMulticastMediaEncoder::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastMediaEncoder::releaseRef()
+int GenericMulticastMediaEncoder::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

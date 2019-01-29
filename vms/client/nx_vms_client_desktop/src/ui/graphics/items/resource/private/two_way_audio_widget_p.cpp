@@ -160,7 +160,7 @@ namespace
             idx = maxIdx - idx;
 
         bool isValidIndex = idx >= 0 && idx < result.size();
-        NX_ASSERT(isValidIndex, Q_FUNC_INFO, "Invalid timeStep value");
+        NX_ASSERT(isValidIndex, "Invalid timeStep value");
         if (isValidIndex)
             result[idx] = 0.2;
         return result;
@@ -201,7 +201,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(
     hint->setFont(f);
     hint->setOpacity(kHidden);
 
-    button->setIcon(qnSkin->icon("item/mic.png"));
+    button->setIcon(qnSkin->icon("soft_triggers/user_selectable/mic.png"));
     button->setCheckable(false);
 
     connect(button, &QnImageButtonWidget::pressed,  this, &QnTwoWayAudioWidgetPrivate::startStreaming);
@@ -243,7 +243,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(
             break;
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Invalid case");
+            NX_ASSERT(false, "Invalid case");
             return;
         }
 
@@ -361,7 +361,7 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!m_started)
         return;
 
-    NX_ASSERT(m_state == Pressed || m_state == Error, Q_FUNC_INFO, "Invalid state");
+    NX_ASSERT(m_state == Pressed || m_state == Error, "Invalid state");
     if (m_state != Error)
         setState(Released);
 

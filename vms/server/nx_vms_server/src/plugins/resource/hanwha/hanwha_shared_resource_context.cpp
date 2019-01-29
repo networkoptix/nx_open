@@ -1,14 +1,14 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include "hanwha_common.h"
 
-#include <media_server/media_server_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/abstract_remote_archive_manager.h>
-#include <nx/utils/log/log.h>
+#include <core/resource_management/resource_pool.h>
+#include <media_server/media_server_module.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace vms::server {
@@ -111,34 +111,22 @@ nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
     return &m_requestLock;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const HanwhaInformation& info)
+void HanwhaSharedResourceContext::startServices()
 {
+    const auto information = this->information();
+    if (!information)
+        return;
+
     {
         QnMutexLocker lock(&m_servicesMutex);
-        if (m_timeSynchronizer)
-            return; //< All members are already initialized.
-
-        m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
-
-        if (hasVideoArchive)
-        {
+        if (!m_chunkLoader)
             m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this, m_chunkLoaderSettings);
-            m_timeSynchronizer->setTimeSynchronizationEnabled(false);
-            m_timeSynchronizer->setTimeZoneShiftHandler(
-                [this](std::chrono::seconds timeZoneShift)
-                {
-                    m_chunkLoader->setTimeZoneShift(timeZoneShift);
-                    m_timeZoneShift = timeZoneShift;
-                });
-        }
     }
 
-    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
-        .arg(info.deviceType == HanwhaDeviceType::nvr));
+    NX_VERBOSE(this, "Starting services (is NVR: %1)...",
+        information->deviceType == HanwhaDeviceType::nvr);
 
-    m_timeSynchronizer->start(this);
-    if (hasVideoArchive)
-        m_chunkLoader->start(info);
+    m_chunkLoader->start(information.value);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
@@ -388,11 +376,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
     return {CameraDiagnostics::NoErrorResult(), std::move(videoProfiles)};
 }
 
-std::chrono::seconds HanwhaSharedResourceContext::timeZoneShift() const
-{
-    return m_timeZoneShift;
-}
-
 boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
 {
     QnMutexLocker lock(&m_servicesMutex);
@@ -402,9 +385,16 @@ boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
     return m_chunkLoader->overlappedId();
 }
 
-void HanwhaSharedResourceContext::setDateTime(const QDateTime& dateTime)
+std::chrono::milliseconds HanwhaSharedResourceContext::timeShift() const
 {
-    m_timeSynchronizer->setDateTime(dateTime);
+    QnMutexLocker lock(&m_servicesMutex);
+    return m_chunkLoader ? m_chunkLoader->timeShift() : std::chrono::milliseconds::zero();
+}
+
+void HanwhaSharedResourceContext::setTimeShift(std::chrono::milliseconds value)
+{
+    QnMutexLocker lock(&m_servicesMutex);
+    m_chunkLoader->setTimeShift(value);
 }
 
 void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings)

@@ -142,7 +142,7 @@ bool QnLocalSettingsDialog::isRestartRequired() const
 void QnLocalSettingsDialog::addRestartLabel()
 {
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(ui->buttonBox->layout());
-    NX_ASSERT(layout, Q_FUNC_INFO, "Layout must already exist here.");
+    NX_ASSERT(layout, "Layout must already exist here.");
     if (!layout)
         return;
 

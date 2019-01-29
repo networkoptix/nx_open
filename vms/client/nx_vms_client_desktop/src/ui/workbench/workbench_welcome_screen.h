@@ -66,6 +66,8 @@ public: // Properties
 
     QString message() const;
 
+    void activateView() const;
+
 public:
     void setupFactorySystem(const QString& serverUrl);
 

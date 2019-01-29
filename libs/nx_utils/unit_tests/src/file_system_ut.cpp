@@ -24,7 +24,7 @@ protected:
         QDir rootDir(tempDir.absoluteFilePath(kTestDirectoryName));
 
         rootDir.removeRecursively();
-        ASSERT_TRUE(QDir().mkdir(rootDir.absolutePath()));
+        ASSERT_TRUE(QDir().mkpath(rootDir.absolutePath()));
 
         ASSERT_TRUE(rootDir.mkdir(kSourceDirectoryName));
         sourceDir = rootDir.absoluteFilePath(kSourceDirectoryName);
@@ -34,7 +34,8 @@ protected:
 
     virtual void TearDown() override
     {
-        QDir rootDir(QDir::temp().absoluteFilePath(kTestDirectoryName));
+        QDir tempDir(nx::utils::TestOptions::temporaryDirectoryPath());
+        QDir rootDir(tempDir.absoluteFilePath(kTestDirectoryName));
         ASSERT_TRUE(rootDir.removeRecursively());
     }
 
