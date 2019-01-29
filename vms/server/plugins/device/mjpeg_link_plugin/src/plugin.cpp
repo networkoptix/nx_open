@@ -98,8 +98,8 @@ void HttpLinkPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*
 
 void HttpLinkPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider = static_cast<nxpl::TimeProvider *>(
-            pluginContainer->queryInterface(nxpl::IID_TimeProvider));
+    m_timeProvider = static_cast<nxpl::TimeProvider*>(
+        pluginContainer->queryInterface(nxpl::IID_TimeProvider));
 }
 
 nxpt::CommonRefManager* HttpLinkPlugin::refManager()

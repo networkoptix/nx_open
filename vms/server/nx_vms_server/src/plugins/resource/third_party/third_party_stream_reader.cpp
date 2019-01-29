@@ -7,6 +7,7 @@
 
 #include <QtCore/QTextStream>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <plugins/plugin_tools.h>
 #include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
@@ -17,7 +18,6 @@
 #include <streaming/mjpeg_stream_reader.h>
 #include <network/multicodec_rtp_reader.h>
 
-#include <utils/common/app_info.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/frame_type_extractor.h>
 
@@ -29,42 +29,37 @@
 #include <core/resource/param.h>
 #include <decoders/audio/aac.h>
 
-namespace
+namespace {
+
+bool isIFrame(const QnAbstractMediaDataPtr& packet)
 {
-    bool isIFrame( QnAbstractMediaDataPtr packet )
-    {
-        AVCodecID codecId = packet->compressionType;
+    AVCodecID codecId = packet->compressionType;
 
-        NX_ASSERT( codecId == AV_CODEC_ID_H264,
-            "IFrame detection: only AV_CODEC_ID_H264 is supported" );
+    NX_ASSERT(codecId == AV_CODEC_ID_H264,
+        "IFrame detection: only AV_CODEC_ID_H264 is supported");
 
-        if( !packet || codecId != AV_CODEC_ID_H264 )
-            return false;
-
-        const void * data = packet->data();
-        const quint8 * udata = static_cast<const quint8 *>(data);
-
-        FrameTypeExtractor frameTypeEx(codecId);
-        auto type = frameTypeEx.getFrameType( udata, packet->dataSize() );
-
-        switch(type)
-        {
-            case FrameTypeExtractor::I_Frame:
-                return true;
-
-            default:
-                break;
-        }
-
+    if (!packet || codecId != AV_CODEC_ID_H264)
         return false;
+
+    FrameTypeExtractor frameTypeEx(codecId);
+    switch(frameTypeEx.getFrameType((const quint8*) packet->data(), (int) packet->dataSize()))
+    {
+        case FrameTypeExtractor::I_Frame:
+            return true;
+        default:
+            break;
     }
 
-    void refDeleter(nxpl::PluginInterface * ptr)
-    {
-        if( ptr )
-            ptr->releaseRef();
-    }
+    return false;
 }
+
+void refDeleter(nxpl::PluginInterface* ptr)
+{
+    if (ptr)
+        ptr->releaseRef();
+}
+
+} // namespace
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
@@ -123,7 +118,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
 
-    auto camManager2 = nxpt::queryInterfacePtr<nxcip::BaseCameraManager2>(
+    auto camManager2 = nx::sdk::queryInterfacePtr<nxcip::BaseCameraManager2>(
         m_camManager.getRef(), nxcip::IID_BaseCameraManager2);
     if( !camManager2 )
         return;
@@ -182,7 +177,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
-            if (const auto mediaEncoder4 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
+            if (const auto mediaEncoder4 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
                 intf, nxcip::IID_CameraMediaEncoder4))
             {
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
@@ -199,7 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             intf->queryInterface(nxcip::IID_CameraMediaEncoder2)),
         refDeleter);
 
-    auto mediaEncoder3 = nxpt::queryInterfacePtr<nxcip::CameraMediaEncoder3>(
+    auto mediaEncoder3 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder3>(
         intf, nxcip::IID_CameraMediaEncoder3);
 
     if (mediaEncoder3) //< One-call config.
@@ -620,16 +615,17 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
-    nx::sdk::Ptr<nxcip::MediaDataPacket> packetAp(packet);
+    auto packetAp = nx::sdk::toPtr(packet);
 
     QnAbstractMediaDataPtr mediaPacket;
 
-    if (const auto mediaDataPacket2 = nxpt::queryInterfacePtr<nxcip::MediaDataPacket2>(
+    if (const auto mediaDataPacket2 = nx::sdk::queryInterfacePtr<nxcip::MediaDataPacket2>(
         packet, nxcip::IID_MediaDataPacket2))
     {
         auto extradataSize = mediaDataPacket2->extradataSize();
         outExtras->extradataBlob.resize(extradataSize);
-        memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(), mediaDataPacket2->extradataSize());
+        memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(),
+            mediaDataPacket2->extradataSize());
     }
     else if (packet->codecType() == nxcip::AV_CODEC_ID_AAC)
     {
@@ -670,10 +666,13 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
 
                         if( motionPicture.pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                         {
-                            NX_ASSERT( motionPicture.width() == Qn::kMotionGridHeight && motionPicture.height() == Qn::kMotionGridWidth );
-                            NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
+                            NX_ASSERT(motionPicture.width() == Qn::kMotionGridHeight);
+                            NX_ASSERT(motionPicture.height() == Qn::kMotionGridWidth);
+                            NX_ASSERT(
+                                motionPicture.xStride(0) * CHAR_BIT == motionPicture.width());
 
-                            motion->assign( motionPicture.data(), srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                            motion->assign(motionPicture.data(), srcVideoPacket->timestamp(),
+                                DEFAULT_MOTION_DURATION);
                         }
 
                         motion->timestamp = srcVideoPacket->timestamp();

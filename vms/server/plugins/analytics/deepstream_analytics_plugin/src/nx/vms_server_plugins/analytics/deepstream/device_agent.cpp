@@ -100,10 +100,7 @@ Error DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
-    Ptr<ICompressedVideoPacket> compressedVideo(
-        dataPacket->queryInterface(IID_CompressedVideoPacket));
-
-    if (!compressedVideo)
+    if (!queryInterfacePtr<ICompressedVideoPacket>(dataPacket, IID_CompressedVideoPacket))
         return Error::noError;
 
     NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();

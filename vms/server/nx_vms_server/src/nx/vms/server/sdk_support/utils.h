@@ -54,7 +54,7 @@ std::optional<ManifestType> manifest(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const nx::sdk::Ptr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    const auto manifestStr = nx::sdk::toPtr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](

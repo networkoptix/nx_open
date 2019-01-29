@@ -1,8 +1,5 @@
 #include <nx/kit/test.h>
 
-#include <map>
-#include <string>
-
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
@@ -126,8 +123,8 @@ TEST(Ptr, basic)
 {
     Data::s_destructorCalled = false;
     {
-        const auto data = makePtr<Data>(113);
-        ASSERT_EQ(data->number(), 113);
+        const Ptr<Data> data = makePtr<Data>(42);
+        ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
         ASSERT_TRUE(static_cast<bool>(data)); //< operator bool()
         ASSERT_TRUE(data.get() != nullptr); //< get()
@@ -136,17 +133,30 @@ TEST(Ptr, basic)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
+TEST(Ptr, toPtr)
+{
+    Data::s_destructorCalled = false;
+    {
+        Data* p = new Data(42);
+        const Ptr<Data> data = toPtr(p);
+        ASSERT_EQ(p, data.get());
+        ASSERT_EQ(1, data->refCount());
+        ASSERT_FALSE(Data::s_destructorCalled);
+    } //< data destroyed via ~Ptr().
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
 TEST(Ptr, assign)
 {
     Data::s_destructorCalled = false;
     {
-        auto oldData = makePtr<Data>(113);
-        ASSERT_EQ(oldData->number(), 113);
+        auto oldData = makePtr<Data>(42);
+        ASSERT_EQ(oldData->number(), 42);
 
         ASSERT_EQ(1, oldData->refCount());
         ASSERT_FALSE(Data::s_destructorCalled);
         {
-            Ptr<Data> newData; //< Should be of exactly the same Ptr template instance.
+            Ptr<Data> newData; //< Should be of exactly the same Ptr template instance as oldData.
             ASSERT_EQ(nullptr, newData.get());
 
             newData = oldData; //< operator=(const)
@@ -179,8 +189,8 @@ TEST(Ptr, dynamicCast)
     Data::s_destructorCalled = false;
     Base::s_destructorCalled = false;
     {
-        const auto data = makePtr<Data>(113);
-        ASSERT_EQ(data->number(), 113);
+        const auto data = makePtr<Data>(42);
+        ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
 
         const auto base = makePtr<Base>();
