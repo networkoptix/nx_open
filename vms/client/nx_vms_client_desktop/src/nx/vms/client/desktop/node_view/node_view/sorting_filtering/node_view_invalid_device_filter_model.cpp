@@ -15,24 +15,24 @@ NodeViewInvalidDeviceFilterModel::~NodeViewInvalidDeviceFilterModel()
 {
 }
 
-void NodeViewInvalidDeviceFilterModel::setShowInvalidDevices(bool show)
+void NodeViewInvalidDeviceFilterModel::setShowInvalidDevices(bool showInvalidDevices)
 {
-    if (m_isShowInvalidDevices == show)
+    if (m_showInvalidDevices == showInvalidDevices)
         return;
-    m_isShowInvalidDevices = show;
+    m_showInvalidDevices = showInvalidDevices;
     invalidateFilter();
 }
 
-bool NodeViewInvalidDeviceFilterModel::isShowInvalidDevices() const
+bool NodeViewInvalidDeviceFilterModel::getShowInvalidDevices() const
 {
-    return m_isShowInvalidDevices;
+    return m_showInvalidDevices;
 }
 
 bool NodeViewInvalidDeviceFilterModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    if (!isShowInvalidDevices())
+    if (!getShowInvalidDevices())
     {
         const auto sourceIndex = sourceModel()->index(
             sourceRow, ResourceNodeViewColumn::resourceNameColumn, sourceParent);

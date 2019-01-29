@@ -15,8 +15,8 @@ public:
     virtual ~NodeViewInvalidDeviceFilterModel() override;
 
 public:
-    void setShowInvalidDevices(bool show);
-    bool isShowInvalidDevices() const;
+    void setShowInvalidDevices(bool showInvalidDevices);
+    bool getShowInvalidDevices() const;
 
 protected:
     virtual bool filterAcceptsRow(
@@ -24,7 +24,7 @@ protected:
         const QModelIndex& sourceParent) const override;
 
 private:
-    bool m_isShowInvalidDevices = false;
+    bool m_showInvalidDevices = false;
 };
 
 } // namespace node_view
