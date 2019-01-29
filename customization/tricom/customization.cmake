@@ -50,8 +50,6 @@ set(ios.group_identifier "group.com.tricom.MvssMobile")
 set(ios.sign.identity "iPhone Distribution: Tricom Research Incorporated (H469MR7KD6)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Tricom Research Incorporated (H469MR7KD6)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Tricom Research Incorporated (H469MR7KD6)")
 set(mac.bundle.identifier "com.tricom.Mvss")
 set(mac.protocol_handler_bundle.identifier "com.tricom.protocol_handler")
 

@@ -40,8 +40,6 @@ set(ios.group_identifier "group.com.ust.VmsViewer")
 set(ios.sign.identity "iPhone Distribution: Ubiquity Smart Technology Inc. (A535Q7K2TN)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.vmsdtv")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 
