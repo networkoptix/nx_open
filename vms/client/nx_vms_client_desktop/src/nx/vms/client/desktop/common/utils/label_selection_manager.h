@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
+class QCoreApplication;
+
 namespace nx::vms::client::desktop {
 
 /**
