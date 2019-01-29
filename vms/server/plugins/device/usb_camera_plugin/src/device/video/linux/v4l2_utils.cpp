@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 #include "device/video/rpi/rpi_utils.h"
 #include "udev_utils.h"
@@ -207,7 +208,7 @@ std::vector<DeviceData> getDeviceList()
             nameIndex = ++it->second;
 
         std::string uniqueId;
-        if(rpi::isRpi() && rpi::isMmalCamera(name))
+        if(nx::utils::AppInfo::isRaspberryPi() && rpi::isMmalCamera(name))
             uniqueId = rpi::getMmalUniqueId();
         else
             uniqueId = getDeviceUniqueId(devicePath);
