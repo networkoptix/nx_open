@@ -9,6 +9,7 @@
 #include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "stun_over_http_server_fixture.h"
 
@@ -47,24 +48,42 @@ protected:
 
     void givenScheduledStunRequest()
     {
-        using namespace std::placeholders;
-
         m_client.sendRequest(
             prepareRequest(),
-            std::bind(&AsyncClientWithHttpTunneling::onResponseReceived, this, _1, _2));
+            [this](auto&&... args)
+            {
+                onResponseReceived(std::forward<decltype(args)>(args)...);
+            });
+    }
+
+    void givenHttpServerThatAlwaysResponds(http::StatusCode::Value statusCode)
+    {
+        m_httpServer = std::make_unique<http::TestHttpServer>();
+        ASSERT_TRUE(m_httpServer->bindAndListen());
+        m_httpServer->registerRequestProcessorFunc(
+            http::kAnyPath,
+            [statusCode](
+                nx::network::http::RequestContext /*requestContext*/,
+                nx::network::http::RequestProcessedHandler completionHandler)
+            {
+                completionHandler(statusCode);
+            });
     }
 
     void whenConnectToStunOverHttpServer()
     {
-        nx::utils::promise<SystemError::ErrorCode> connected;
+        whenConnectToHttpServer();
+        thenConnectSucceeded();
+    }
 
+    void whenConnectToHttpServer()
+    {
         m_client.connect(
-            tunnelUrl(),
-            [&connected](SystemError::ErrorCode sysErrorCode)
+            httpUrl(),
+            [this](SystemError::ErrorCode sysErrorCode)
             {
-                connected.set_value(sysErrorCode);
+                m_connectResults.push(sysErrorCode);
             });
-        ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
 
     void whenConnectToRegularStunServer()
@@ -78,6 +97,16 @@ protected:
                 done.set_value(sysErrorCode);
             });
         ASSERT_EQ(SystemError::noError, done.get_future().get());
+    }
+
+    void thenConnectSucceeded()
+    {
+        ASSERT_EQ(SystemError::noError, m_connectResults.pop());
+    }
+
+    void thenConnectFailed()
+    {
+        ASSERT_NE(SystemError::noError, m_connectResults.pop());
     }
 
     void thenHttpTunnelIsOpened()
@@ -103,6 +132,19 @@ private:
     stun::AsyncClientWithHttpTunneling m_client;
     nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_responses;
     nx::network::stun::SocketServer m_stunServer;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResults;
+    std::unique_ptr<http::TestHttpServer> m_httpServer;
+
+    nx::utils::Url httpUrl() const
+    {
+        if (m_httpServer)
+        {
+            return url::Builder().setScheme(http::kUrlSchemeName)
+                .setEndpoint(m_httpServer->serverAddress());
+        }
+
+        return tunnelUrl();
+    }
 
     void onResponseReceived(
         SystemError::ErrorCode sysErrorCode,
@@ -129,6 +171,13 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 {
     whenConnectToRegularStunServer();
     thenConnectionIsEstablished();
+}
+
+TEST_F(AsyncClientWithHttpTunneling, http_ok_response_to_upgrade_results_connect_error)
+{
+    givenHttpServerThatAlwaysResponds(http::StatusCode::ok);
+    whenConnectToHttpServer();
+    thenConnectFailed();
 }
 
 //-------------------------------------------------------------------------------------------------
