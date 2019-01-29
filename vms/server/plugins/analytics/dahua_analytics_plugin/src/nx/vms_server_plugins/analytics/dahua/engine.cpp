@@ -1,14 +1,8 @@
 #include "engine.h"
 
-#include "device_agent.h"
-#include "common.h"
-#include "string_helper.h"
-#include "parser.h"
-
 #include <chrono>
 
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
@@ -17,6 +11,10 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/string.h>
+
+#include "device_agent.h"
+#include "common.h"
+#include "parser.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 

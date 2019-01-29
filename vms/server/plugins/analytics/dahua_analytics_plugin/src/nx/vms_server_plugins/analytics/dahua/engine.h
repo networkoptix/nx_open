@@ -1,18 +1,17 @@
 #pragma once
 
-#include "common.h"
-#include "metadata_monitor.h"
-
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QUrl>
-#include <QtNetwork/QAuthenticator>
 
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_api.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
+
+#include "common.h"
+#include "metadata_monitor.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
