@@ -134,7 +134,6 @@ int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
     vms::api::DetailedLicenseData reply;
-
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
     {
         result.setError(QnJsonRestResult::InvalidParameter,
@@ -186,9 +185,16 @@ int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     QnLicenseList licenses;
     licenses << license;
     auto licenseManager = connect->getLicenseManager(owner->accessRights());
+
     const ec2::ErrorCode errorCode = licenseManager->addLicensesSync(licenses);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if( errorCode != ec2::ErrorCode::ok)
+    if (errorCode == ec2::ErrorCode::forbidden)
+    {
+        result.setError(QnJsonRestResult::Forbidden,
+            QString("Can't activate license because user has not enough access rights."));
+        return nx::network::http::StatusCode::ok;
+    }
+
+    if (errorCode != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
             QString("Internal server error: %1").arg(ec2::toString(errorCode)));
