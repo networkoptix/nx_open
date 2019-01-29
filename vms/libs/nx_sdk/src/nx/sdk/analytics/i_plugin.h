@@ -18,8 +18,8 @@ static const nxpl::NX_GUID IID_Plugin =
     {{0x6d,0x73,0x71,0x36,0x17,0xad,0x43,0xf9,0x9f,0x80,0x7d,0x56,0x91,0x36,0x82,0x94}};
 
 /**
- * Main interface for an Analytics Plugin instance. The only instance is created by a Server
- * on its start via calls to IPlugin* createNxAnalyticsPlugin() which should be exported as extern
+ * The main interface for an Analytics Plugin instance. The only instance is created by a Server
+ * on its start via calls to IPlugin* createNxPlugin() which should be exported as extern
  * "C" by the plugin library, and is destroyed (via releaseRef()) on the Server shutdown.
  */
 class IPlugin: public nxpl::Plugin2

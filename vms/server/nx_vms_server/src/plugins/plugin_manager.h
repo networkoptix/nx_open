@@ -10,10 +10,10 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 #include <plugins/settings.h>
-#include <nx/sdk/analytics/i_engine.h>
 
 /**
  * Loads custom application plugins and provides plugin management methods. Plugins are looked for
@@ -27,43 +27,25 @@ class PluginManager: public QObject
     Q_OBJECT
 
 public:
-    PluginManager(QObject* parent = nullptr, nxpl::PluginInterface* pluginContainer = nullptr);
+    PluginManager(QObject* parent);
 
     virtual ~PluginManager();
 
-    /** Searches for plugins of type T among loaded plugins. */
-    template<class T>
-    QList<T*> findPlugins() const
-    {
-        QnMutexLocker lock(&m_mutex);
-
-        QList<T*> foundPlugins;
-        for (QSharedPointer<QPluginLoader> plugin: m_qtPlugins)
-        {
-            T* foundPlugin = qobject_cast<T*>(plugin->instance());
-            if (foundPlugin)
-                foundPlugins.push_back(foundPlugin);
-        }
-
-        return foundPlugins;
-    }
-
     /**
-     * Searches for plugins of type T, derived from nxpl::PluginInterface among loaded plugins.
+     * Searches for plugins that implement the specified interface derived from
+     * nxpl::PluginInterface among loaded plugins.
      *
      * Increments (implicitly using queryInterface()) reference counter for the returned pointers.
      */
-    template<class T>
-    QList<T*> findNxPlugins(const nxpl::NX_GUID& guid) const
+    template<class Interface>
+    QList<Interface*> findNxPlugins(const nxpl::NX_GUID& guid) const
     {
-        QList<T*> foundPlugins;
-        for (nxpl::PluginInterface* plugin: m_nxPlugins)
+        QList<Interface*> foundPlugins;
+        for (const auto& plugin: m_nxPlugins)
         {
-            void* ptr = plugin->queryInterface(guid);
-            if (ptr)
-                foundPlugins.push_back(static_cast<T*>(ptr));
+            if (const auto ptr = plugin->queryInterface(guid))
+                foundPlugins.push_back(static_cast<Interface*>(ptr));
         }
-
         return foundPlugins;
     }
 
@@ -94,8 +76,8 @@ private:
         const QString& libName);
 
 private:
-    nxpl::PluginInterface* const m_pluginContainer;
+    const nx::sdk::Ptr<nxpl::PluginInterface> m_pluginContainer;
     QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
-    QList<nxpl::PluginInterface*> m_nxPlugins;
+    std::vector<nx::sdk::Ptr<nxpl::PluginInterface>> m_nxPlugins;
     mutable QnMutex m_mutex;
 };

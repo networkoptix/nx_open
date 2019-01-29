@@ -4,6 +4,8 @@
 #include <atomic>
 #include <memory>
 #include <condition_variable>
+#include <vector>
+#include <string>
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>

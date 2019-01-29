@@ -19,7 +19,7 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
-extern "C" nxpl::PluginInterface* createNxAnalyticsPlugin();
+extern "C" nxpl::PluginInterface* createNxPlugin();
 
 namespace nx {
 namespace vms_server_plugins {
@@ -82,14 +82,14 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
     ASSERT_EQ('}', trimmedDeviceAgentManifest.back());
 }
 
-static void testEngineSettings(IEngine* plugin)
+static void testEngineSettings(IEngine* engine)
 {
     const auto settings = new StringMap();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    plugin->setSettings(nullptr); //< Test assigning empty settings.
-    plugin->setSettings(settings); //< Test assigning some settings.
+    engine->setSettings(nullptr); //< Test assigning empty settings.
+    engine->setSettings(settings); //< Test assigning some settings.
 }
 
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
@@ -306,16 +306,17 @@ TEST(stub_analytics_plugin, test)
 
     Error error = Error::noError;
 
-    const auto pluginObject = toPtr(createNxAnalyticsPlugin());
+    const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
+    ASSERT_TRUE(queryInterfacePtr<nxpl::PluginInterface>(pluginObject, nxpl::IID_PluginInterface));
     ASSERT_TRUE(queryInterfacePtr<nxpl::Plugin2>(pluginObject, nxpl::IID_Plugin2));
-    const auto plugin = queryInterfacePtr<IPlugin>(pluginObject, IID_Plugin);
+    const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject, IID_Plugin);
     ASSERT_TRUE(plugin);
 
-    const auto engineObject = toPtr(plugin->createEngine(&error));
+    const auto engine = toPtr(plugin->createEngine(&error));
     ASSERT_EQ(Error::noError, error);
-    const auto engine = queryInterfacePtr<IEngine>(engineObject, IID_Engine);
     ASSERT_TRUE(engine);
+    ASSERT_TRUE(queryInterfacePtr<IEngine>(engine, IID_Engine));
 
     ASSERT_EQ(plugin.get(), engine->plugin());
 

@@ -247,7 +247,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     const bool isRootToolEnabled = !settings().ignoreRootTool();
     m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled, 
+        isRootToolEnabled,
         qApp->applicationFilePath());
 
     #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
@@ -266,7 +266,7 @@ QnMediaServerModule::QnMediaServerModule(
         nullptr,
         this));
 
-    m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
+    m_pluginManager = store(new PluginManager(this));
     m_pluginManager->loadPlugins(roSettings());
 
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));

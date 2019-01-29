@@ -323,6 +323,7 @@ void Engine::executeAction(
 namespace {
 
 static const std::string kLibName = "stub_analytics_plugin";
+
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.stub",
@@ -383,7 +384,7 @@ static const std::string kPluginManifest = R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nxpl::PluginInterface* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,
