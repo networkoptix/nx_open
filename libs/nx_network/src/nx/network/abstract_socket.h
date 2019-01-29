@@ -29,6 +29,9 @@ static constexpr std::chrono::milliseconds kDefaultConnectTimeout =
 static constexpr std::chrono::milliseconds kNoTimeout =
     std::chrono::milliseconds::zero();
 
+/**
+ * Using IANA assigned numbers for protocol when possible.
+ */
 namespace Protocol {
 
 static constexpr int tcp = 6;
