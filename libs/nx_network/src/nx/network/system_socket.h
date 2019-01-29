@@ -192,6 +192,7 @@ public:
     TCPSocket(TCPSocket&&) = delete;
     TCPSocket& operator=(TCPSocket&&) = delete;
 
+    virtual bool getProtocol(int* protocol) const override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -232,6 +233,8 @@ public:
      */
     static int accept(int sockDesc);
 
+    virtual bool getProtocol(int* protocol) const override;
+
     virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
@@ -267,6 +270,8 @@ public:
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
     UDPSocket& operator=(UDPSocket&&) = delete;
+
+    virtual bool getProtocol(int* protocol) const override;
 
     virtual SocketAddress getForeignAddress() const override;
 

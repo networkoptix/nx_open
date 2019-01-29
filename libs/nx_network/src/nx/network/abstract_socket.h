@@ -29,6 +29,18 @@ static constexpr std::chrono::milliseconds kDefaultConnectTimeout =
 static constexpr std::chrono::milliseconds kNoTimeout =
     std::chrono::milliseconds::zero();
 
+namespace Protocol {
+
+static constexpr int tcp = 6;
+static constexpr int udp = 17;
+static constexpr int udt = 143;
+/**
+ * Custom protocol numbers should start with incrementing this number.
+ */
+static constexpr int unassigned = 144;
+
+} // namespace ProtocolType
+
 /**
  * Base interface for sockets. Provides methods to set different socket configuration parameters.
  * Removing socket:
@@ -169,6 +181,14 @@ public:
      * Set IPV6_V6ONLY socket option. Default value is false on EVERY platform.
      */
     virtual bool setIpv6Only(bool val) = 0;
+
+    /**
+     * @param protocol One of values from Protocol namespace.
+     * Note that additional protocol support can be added.
+     * @return false if protocol is not defined yet.
+     * An impementation is allowed to choose actual protocol after socket creation.
+     */
+    virtual bool getProtocol(int* protocol) const = 0;
 
     /**
      * @return System specific socket handle.
@@ -390,7 +410,6 @@ class NX_NETWORK_API AbstractStreamSocket:
     public AbstractCommunicatingSocket
 {
 public:
-
     virtual ~AbstractStreamSocket() override;
 
     /**
@@ -427,7 +446,7 @@ public:
     /**
      * Set keep alive options.
      * @return false on error.
-     * NOTE: due to some OS limitations some values might not be actually set eg
+     * NOTE: due to some OS limitations some values might not be actually set.
      *   linux: full support
      *   windows: only timeSec and intervalSec support
      *   macosx: only timeSec support

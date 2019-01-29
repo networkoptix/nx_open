@@ -83,6 +83,8 @@ public:
         std::shared_ptr<int> usageCounter);
     virtual ~OutgoingConnection() override;
 
+    virtual bool getProtocol(int* protocol) const override;
+
 private:
     std::unique_ptr<AbstractStreamSocket> m_delegate;
     std::shared_ptr<int> m_usageCounter;
