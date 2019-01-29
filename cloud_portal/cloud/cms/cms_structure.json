@@ -376,15 +376,6 @@
         "translatable": false,
         "values": [
           {
-            "label": "Sort supported devices by popularity",
-            "name": "%SORT_SUPPORTED_DEVICES%",
-            "value": "true",
-            "description": "Sets supported devices (camera page) sorting order by popularity",
-            "advanced": true,
-            "optional": true,
-            "type": "check_box"
-          },
-          {
             "label": "Public Downloads",
             "name": "%PUBLIC_DOWNLOADS%",
             "value": "true",
@@ -421,8 +412,25 @@
             }
           }
         ]
+      },
+      {
+        "name": "Camera page",
+        "is_global": false,
+        "description": "Settings for camera page",
+        "hidden": true,
+        "translatable": false,
+        "values": [
+          {
+            "label": "Sort supported devices by popularity",
+            "name": "%SORT_SUPPORTED_DEVICES%",
+            "value": "true",
+            "description": "Sets supported devices (camera page) sorting order by popularity",
+            "advanced": true,
+            "optional": true,
+            "type": "check_box"
+          }
+        ]
       }
-    ]
   },
   {
     "type": "integration",
