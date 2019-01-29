@@ -6,6 +6,7 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 
 namespace test {
 
@@ -250,6 +251,9 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
 
         if (vmsTransactionLog == cloudTransactionLog)
             break;
+
+        NX_VERBOSE(this, "VMS transaction log: %1", QJson::serialized(vmsTransactionLog));
+        NX_VERBOSE(this, "Cloud transaction log: %1", QJson::serialized(cloudTransactionLog));
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
