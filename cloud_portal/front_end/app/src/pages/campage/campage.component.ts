@@ -1,8 +1,9 @@
 import { Component, OnInit, DoCheck, KeyValueDiffers, ViewEncapsulation } from '@angular/core';
-import { CamerasService } from '../../services/cameras.service';
-import { CampageSearchService } from './campage-search.service';
-import { NxModalMessageComponent } from '../../dialogs/message/message.component';
-import { NxConfigService } from '../../services/nx-config';
+import { CamerasService }                                                 from '../../services/cameras.service';
+import { CampageSearchService }                                           from './campage-search.service';
+import { NxModalMessageComponent }                                        from '../../dialogs/message/message.component';
+import { NxConfigService }                                                from '../../services/nx-config';
+import { TranslateService }                                               from '@ngx-translate/core';
 
 @Component({
   selector: 'campage',
@@ -13,6 +14,7 @@ import { NxConfigService } from '../../services/nx-config';
 
 // TODO: what is company used for? Its never assigned.
 export class NxCampageComponent implements OnInit, DoCheck {
+    lang: any;
     config: any;
     data: any;
     company: any;
@@ -39,6 +41,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     toggleCamview: boolean;
 
   private setupDefaults() {
+      this.lang = this.translate.translations[this.translate.currentLang];
       this.config = this.configService.getConfig();
       this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported', 'isPtzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 
@@ -61,11 +64,11 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
       // format to fit the multiselect component
       this.hardwareTypes = [
-          {id: 'Camera', label: 'Camera'},
-          {id: 'Multi-Sensor Camera', label: 'Multi-Sensor Camera'},
-          {id: 'Encoder', label: 'Encoder'},
-          {id: 'DVR', label: 'DVR'},
-          {id: 'Other', label: 'Other'}
+          {id: 'Camera', label: this.lang.camera},
+          {id: 'Multi-Sensor Camera', label: this.lang.multi_sensor_camera},
+          {id: 'Encoder', label: this.lang.encoder},
+          {id: 'DVR', label: this.lang.dvr},
+          {id: 'Other', label: this.lang.other}
       ];
 
       this.resolutions = [
@@ -103,47 +106,47 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.filterModel.tags = [
           {
               id  : 'isAudioSupported',
-              label: 'Audio',
+              label: this.lang.isAudioSupported,
               value: false
           },
           {
               id  : 'isTwAudioSupported',
-              label: '2-Way Audio',
+              label: this.lang.isTwAudioSupported,
               value: false
           },
           {
               id: 'isPtzSupported',
-              label: 'PTZ',
+              label: this.lang.isPtzSupported,
               value: false
           },
           {
               id  : 'isAptzSupported',
-              label: 'Advanced PTZ',
+              label: this.lang.isAptzSupported,
               value: false
           },
           {
               id  : 'isFisheye',
-              label: 'Fisheye',
+              label: this.lang.isFisheye,
               value: false
           },
           {
               id  : 'isMdSupported',
-              label: 'Motion',
+              label: this.lang.isMdSupported,
               value: false
           },
           {
               id  : 'isIoSupported',
-              label: 'I/O',
+              label: this.lang.isIoSupported,
               value: false
           },
           {
               id  : 'isH265',
-              label: 'H.265',
+              label: this.lang.isH265,
               value: false
           },
           {
               id  : 'isMultiSensor',
-              label: 'Multi Sensor',
+              label: this.lang.isMultiSensor,
               value: false
           }
       ];
@@ -167,6 +170,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
     constructor(private configService: NxConfigService,
+                private translate: TranslateService,
                 private cameraService: CamerasService,
                 private cameraSearchService: CampageSearchService,
                 // TODO: Use dialog service when it is not being downgraded
