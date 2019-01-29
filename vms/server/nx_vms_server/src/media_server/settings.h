@@ -9,6 +9,7 @@
 #include <nx/vms/server/settings.h>
 
 class QnMediaServerModule;
+    static const QString VACUUM_INTERVAL("vacuumIntervalSec");
 
 /**
  * QSettings instance is initialized in \a initializeROSettingsFromConfFile or

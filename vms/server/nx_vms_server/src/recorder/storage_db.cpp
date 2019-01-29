@@ -20,7 +20,6 @@ namespace {
 const size_t kCatalogsCount = 2;
 const size_t kMaxWriteQueueSize = 5000;
 
-const std::chrono::seconds kVacuumInterval(3600 * 24);
 
 inline void AV_WB64(char** dst, quint64 data)
 {
@@ -56,26 +55,29 @@ auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
 
 QnStorageDb::QnStorageDb(
     QnMediaServerModule* serverModule,
-    const QnStorageResourcePtr& s, int storageIndex)
+    const QnStorageResourcePtr& s,
+    int storageIndex,
+    std::chrono::seconds vacuumInterval)
     :
     nx::vms::server::ServerModuleAware(serverModule),
     m_storage(s),
     m_storageIndex(storageIndex),
     m_dbWriter(new nx::media_db::MediaDbWriter),
     m_ioDevice(nullptr),
-    m_vacuumTimePoint(std::chrono::system_clock::now()),
-    m_vacuumInProgress(false)
+    m_vacuumInProgress(false),
+    m_vacuumInterval(vacuumInterval)
 {
     using namespace nx::media_db;
+    std::cout << "VACUUM INTERVAL:" << vacuumInterval.count() << std::endl;
     m_timer.start(
-        kVacuumInterval,
+        m_vacuumInterval,
         [this]() { startVacuum([this](bool success) { onVacuumFinished(success); }); });
 }
 
 void QnStorageDb::onVacuumFinished(bool success)
 {
     m_timer.start(
-        kVacuumInterval,
+        m_vacuumInterval,
         [this]() { startVacuum([this](bool success) { onVacuumFinished(success); }); });
 }
 
