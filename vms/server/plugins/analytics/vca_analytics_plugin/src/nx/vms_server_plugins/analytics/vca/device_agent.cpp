@@ -534,7 +534,7 @@ const IString* DeviceAgent::manifest(Error* /*error*/) const
     return new nx::sdk::String();
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

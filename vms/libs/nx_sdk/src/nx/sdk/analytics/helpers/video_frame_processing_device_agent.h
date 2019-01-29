@@ -24,10 +24,10 @@ namespace analytics {
  * back constructed metadata packets. Hides many technical details of Analytics SDK, but may
  * limit DeviceAgent capabilities - use only when suitable.
  *
- * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
- * add the following to the derived class cpp:
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the prefix defined by this class, add the
+ * following to the derived class .cpp:
  * <pre><code>
- *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */

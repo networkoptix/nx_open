@@ -174,6 +174,7 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 
 void Engine::assertPluginCasted(void* plugin) const
 {
+    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
     NX_KIT_ASSERT(plugin,
         "nx::sdk::analytics::Engine " + nx::kit::utils::toString(this)
         + " has m_plugin of incorrect runtime type " + typeid(*m_plugin).name());

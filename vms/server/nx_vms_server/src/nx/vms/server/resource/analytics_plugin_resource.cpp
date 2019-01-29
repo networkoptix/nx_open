@@ -34,8 +34,7 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 {
 }
 
-void AnalyticsPluginResource::setSdkPlugin(
-    nx::sdk::Ptr<nx::sdk::analytics::IPlugin> plugin)
+void AnalyticsPluginResource::setSdkPlugin(nx::sdk::Ptr<nx::sdk::analytics::IPlugin> plugin)
 {
     m_sdkPlugin = std::move(plugin);
 }

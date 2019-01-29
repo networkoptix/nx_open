@@ -1,6 +1,6 @@
-# Create analytics_sdk folder at build phase.
-# Build analytics_sdk zip, then build included sample(s) via included build_sample.sh/.bat at
-# build phase.
+# Collect file lists to be included into the SDK at the generation phase via "configuring"
+# (substituting file list variables into) a dedicated cmake script. Register a build-phase command
+# that will zip the SDK directory and test that the SDK samples can be built via build scripts.
 
 include(find_doxygen)
 
@@ -38,10 +38,11 @@ file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
 set(copied_sample_ut_origin ${copied_sample_dir}/unit_tests/src)
 file(GLOB_RECURSE copied_sample_ut_files ${copied_sample_ut_origin}/*)
 
-set(create_sdk_script ${CMAKE_CURRENT_BINARY_DIR}/create_sdk.cmake)
+set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 
 # Substitute variable values into the cmake script which will be called at the build phase.
-nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/create_sdk.cmake.in ${create_sdk_script} @ONLY)
+nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/copy_sdk_files.cmake.in
+    ${copy_sdk_files_script} @ONLY)
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(sample_build_script "./build_sample.sh")
@@ -65,30 +66,39 @@ else()
     set(cross_compiling_options "")
 endif()
 
+# Command to be executed at the build phase.
 add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir} #< Delete old sdk directory (if any).
-    COMMAND ${CMAKE_COMMAND} -P ${create_sdk_script} #< Create and populate sdk directory.
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir} #< Delete old sdk dir (if any).
+    COMMAND ${CMAKE_COMMAND} -P ${copy_sdk_files_script} #< Create and populate sdk dir.
+
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples${sample_tests_message} - see ${sample_build_log}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script} ${sample_tests_trigger}
-        ${cross_compiling_options}
+    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
+        ${sample_build_script} ${sample_tests_trigger} ${cross_compiling_options}
         >${sample_build_log} 2>&1
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir}-build #< Delete sdk build dir.
+
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Running Doxygen - see ${doxygen_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${doxygen_executable} >${doxygen_log} 2>&1
+
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Zipping SDK - see ${zip_log}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} #< Needed for zipping.
     COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip ${sdk_name} >${zip_log}
+
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir} #< Delete sdk dir.
+
     DEPENDS
-        ${create_sdk_script}
+        ${copy_sdk_files_script}
         ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name}/${sample_build_script}
         ${copied_static_files}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_files}
         ${copied_nx_sdk_old_header_files}
         ${copied_sample_files}
+        ${copied_sample_ut_files}
 )
 
 add_custom_target(nx_analytics_sdk ALL DEPENDS ${zip_file})

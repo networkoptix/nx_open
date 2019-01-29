@@ -105,7 +105,7 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
         return Error::unknownError;
     }
 
-    if (const auto compressedFrame = nxpt::queryInterfacePtr<ICompressedVideoPacket>(
+    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(
         dataPacket, IID_CompressedVideoPacket))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
@@ -114,7 +114,7 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
             return Error::unknownError;
         }
     }
-    else if (const auto uncompressedFrame = nxpt::queryInterfacePtr<IUncompressedVideoFrame>(
+    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(
         dataPacket, IID_UncompressedVideoFrame))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
@@ -241,6 +241,7 @@ std::string VideoFrameProcessingDeviceAgent::getParamValue(const char* paramName
 
 void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
 {
+    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
     NX_KIT_ASSERT(engine,
         "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
         + nx::kit::utils::toString(this)
