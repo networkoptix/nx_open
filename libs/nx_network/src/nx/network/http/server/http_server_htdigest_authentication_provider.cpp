@@ -2,7 +2,7 @@
 
 namespace nx::network::http::server {
 
-HtDigestAuthenticationProvider::HtDigestAuthenticationProvider(const std::string& filePath)
+HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(const std::string& filePath)
 {
     std::ifstream file(filePath);
     if (file.is_open())
@@ -12,12 +12,12 @@ HtDigestAuthenticationProvider::HtDigestAuthenticationProvider(const std::string
     }
 }
 
-HtDigestAuthenticationProvider::HtDigestAuthenticationProvider(std::istream& input)
+HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(std::istream& input)
 {
     load(input);
 }
 
-void HtDigestAuthenticationProvider::getPasswordByUserName(
+void HtdigestAuthenticationProvider::getPasswordByUserName(
     const nx::String& userName,
     LookupResultHandler completionHandler)
 {
@@ -36,7 +36,7 @@ void HtDigestAuthenticationProvider::getPasswordByUserName(
     completionHandler(std::move(result));
 }
 
-void HtDigestAuthenticationProvider::load(std::istream& input)
+void HtdigestAuthenticationProvider::load(std::istream& input)
 {
     std::string line;
     while (std::getline(input, line))

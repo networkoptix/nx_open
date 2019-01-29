@@ -10,11 +10,11 @@ namespace nx::network::http::server {
  * Provides htdigest authentication by loading htdigest user/password combinations from a file or
  * input stream.
  */
-class NX_NETWORK_API HtDigestAuthenticationProvider: public AbstractAuthenticationDataProvider
+class NX_NETWORK_API HtdigestAuthenticationProvider: public AbstractAuthenticationDataProvider
 {
 public:
-    HtDigestAuthenticationProvider(const std::string& filePath);
-    HtDigestAuthenticationProvider(std::istream& input);
+    HtdigestAuthenticationProvider(const std::string& filePath);
+    HtdigestAuthenticationProvider(std::istream& input);
 
     virtual void getPasswordByUserName(
         const nx::String& userName,

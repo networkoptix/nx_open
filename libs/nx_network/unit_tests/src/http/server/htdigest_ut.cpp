@@ -22,7 +22,7 @@ static const std::pair<const char*, const char*> kUnknownUserAndPassword("unknow
 
 } // namespace
 
-class HtDigestAuthenticationProvider:
+class HtdigestAuthenticationProvider:
     public ::testing::Test
 {
 protected:
@@ -62,13 +62,13 @@ protected:
     void whenCreateAuthenticationProviderWithValidInputStream()
     {
         std::stringstream input = getValidInputStream();
-        m_authenticationProvider = std::make_unique<server::HtDigestAuthenticationProvider>(input);
+        m_authenticationProvider = std::make_unique<server::HtdigestAuthenticationProvider>(input);
     }
 
     void whenCreateAuthenticationProviderWithMalformedInputStream()
     {
         std::stringstream input = getMalformedInputStream();
-        m_authenticationProvider = std::make_unique<server::HtDigestAuthenticationProvider>(input);
+        m_authenticationProvider = std::make_unique<server::HtdigestAuthenticationProvider>(input);
     }
 
     void thenPasswordLookupSucceeds(const std::pair<const char*, const char*>& userAndPassword)
@@ -115,24 +115,24 @@ protected:
     }
 
 protected:
-    std::unique_ptr <server::HtDigestAuthenticationProvider> m_authenticationProvider;
+    std::unique_ptr <server::HtdigestAuthenticationProvider> m_authenticationProvider;
 };
 
-TEST_F(HtDigestAuthenticationProvider, provides_passwords_for_all_known_users)
+TEST_F(HtdigestAuthenticationProvider, provides_passwords_for_all_known_users)
 {
     whenCreateAuthenticationProviderWithValidInputStream();
 
     thenAllPasswordLookupsSucceed();
 }
 
-TEST_F(HtDigestAuthenticationProvider, rejects_password_lookup_for_unknown_user)
+TEST_F(HtdigestAuthenticationProvider, rejects_password_lookup_for_unknown_user)
 {
     whenCreateAuthenticationProviderWithValidInputStream();
 
     thenPasswordLookupFailsForUnknownUser();
 }
 
-TEST_F(HtDigestAuthenticationProvider,
+TEST_F(HtdigestAuthenticationProvider,
     provides_password_for_valid_user_after_loading_malformed_input_stream)
 {
     whenCreateAuthenticationProviderWithMalformedInputStream();
@@ -140,7 +140,7 @@ TEST_F(HtDigestAuthenticationProvider,
     thenValidPasswordLookupsSucceed();
 }
 
-TEST_F(HtDigestAuthenticationProvider, rejects_malformed_input)
+TEST_F(HtdigestAuthenticationProvider, rejects_malformed_input)
 {
     whenCreateAuthenticationProviderWithMalformedInputStream();
 
