@@ -55,7 +55,7 @@ public:
     virtual bool hasAccessToTheUrl(const QString& url) const override;
 
     void setServerDirectConnection(const QnUuid& id, const rest::QnConnectionPtr& connection);
-    void stop();
+    void cancel();
 
 protected:
     virtual QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;

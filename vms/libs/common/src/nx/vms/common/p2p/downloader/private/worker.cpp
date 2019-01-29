@@ -162,7 +162,7 @@ void Worker::pleaseStopUnsafe()
 {
     m_needStop = true;
     cancelRequests();
-    m_peerManager->stop();
+    m_peerManager->cancel();
     m_waitCondition.wakeOne();
 }
 

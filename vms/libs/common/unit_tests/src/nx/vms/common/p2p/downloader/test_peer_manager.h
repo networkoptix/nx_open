@@ -127,7 +127,7 @@ public:
 
     virtual void pleaseStop() override;
     virtual void run() override;
-    virtual void stop() override {}
+    virtual void cancel() override {}
 
     void setDelayBeforeRequest(qint64 delay);
     void setValidateShouldFail();
@@ -224,7 +224,7 @@ public:
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }
-    virtual void stop() override {}
+    virtual void cancel() override {}
 
 private:
     TestPeerManager* m_peerManager;

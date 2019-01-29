@@ -92,9 +92,9 @@ rest::Handle InternetOnlyPeerManager::downloadChunk(
     return -1;
 }
 
-void InternetOnlyPeerManager::stop()
+void InternetOnlyPeerManager::cancel()
 {
-    m_aioTimer.post([this]() { m_stopped = true; });
+    m_aioTimer.post([this]() { m_cancelled = true; });
 }
 
 rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
@@ -130,7 +130,7 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     httpClient->doGet(url,
         nx::utils::guarded(this, [this, callback, requestId, httpClient, thread = thread()]()
         {
-            if (m_stopped)
+            if (m_cancelled)
                 return;
 
             executeInThread(thread, nx::utils::guarded(this,

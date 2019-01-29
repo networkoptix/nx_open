@@ -43,12 +43,12 @@ public:
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
-    virtual void stop() override;
+    virtual void cancel() override;
 
 private:
     class Private;
     const QScopedPointer<Private> d;
-    bool m_stopped = false;
+    bool m_cancelled = false;
     network::aio::Timer m_aioTimer;
 };
 

@@ -365,10 +365,10 @@ void ResourcePoolPeerManager::cancelRequest(const QnUuid& /*peerId*/, rest::Hand
         cancelFunction();
 }
 
-void ResourcePoolPeerManager::stop()
+void ResourcePoolPeerManager::cancel()
 {
     if (d->internetPeerManger)
-        d->internetPeerManger->stop();
+        d->internetPeerManger->cancel();
 }
 
 QnMediaServerResourcePtr ResourcePoolPeerManager::getServer(const QnUuid& peerId) const
