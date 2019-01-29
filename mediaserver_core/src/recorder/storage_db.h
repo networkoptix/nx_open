@@ -38,7 +38,8 @@ public:
     QnStorageDb(
         QnMediaServerModule* serverModule,
         const QnStorageResourcePtr& storage,
-        int storageIndex);
+        int storageIndex,
+        std::chrono::seconds vacuumInterval = kVacuumInterval);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
@@ -60,6 +61,7 @@ public:
 
 private:
     using VacuumCompletionHandler = nx::utils::MoveOnlyFunc<void(bool)>;
+    static constexpr std::chrono::seconds kVacuumInterval{3600 * 24};
 
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
@@ -67,10 +69,10 @@ private:
     std::unique_ptr<QIODevice> m_ioDevice;
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
-    std::chrono::system_clock::time_point m_vacuumTimePoint;
     bool m_vacuumInProgress = false;
     nx::media_db::DBRecordQueue m_dbRecordQueue;
     nx::network::aio::Timer m_timer;
+    std::chrono::seconds m_vacuumInterval;
 
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();

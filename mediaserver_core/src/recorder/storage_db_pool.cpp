@@ -5,6 +5,8 @@
 #include <common/common_module.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
+#include <media_server/media_server_module.h>
+#include <media_server/settings.h>
 
 QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
@@ -46,7 +48,13 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             closeDirPath(dbPath) +
             QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
-        sdb = QnStorageDbPtr(new QnStorageDb(serverModule(), storage, getStorageIndex(storage)));
+        sdb = QnStorageDbPtr(
+            new QnStorageDb(
+                serverModule(),
+                storage,
+                getStorageIndex(storage),
+                std::chrono::seconds(
+                    serverModule()->roSettings()->value(nx_ms_conf::VACUUM_INTERVAL).toInt())));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }
