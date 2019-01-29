@@ -82,6 +82,7 @@ MessageBus::MessageBus(
             {
                 m_timer = new QTimer(this);
                 connect(m_timer, &QTimer::timeout, this, [this]() { doPeriodicTasks(); });
+                connect(this, &MessageBus::removeConnectionAsync, this, &MessageBus::removeConnection, Qt::QueuedConnection);
             }
             m_timer->start(500);
         });
@@ -102,9 +103,9 @@ void MessageBus::dropConnections()
 void MessageBus::dropConnectionsThreadUnsafe()
 {
     for (const auto& connection: m_connections)
-        connection->setState(Connection::State::Error);
+        removeConnectionAsync(connection);
     for (const auto& connection: m_outgoingConnections)
-        connection->setState(Connection::State::Error);
+        removeConnectionAsync(connection);
     m_remoteUrls.clear();
     if (m_peers)
     {
@@ -210,7 +211,7 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     m_lastConnectionState.remove(id);
     auto itr = m_connections.find(id);
     if (itr != m_connections.end() && itr.value()->direction() == Connection::Direction::outgoing)
-        itr.value()->setState(Connection::State::Error);
+        removeConnectionAsync(itr.value());
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -434,6 +435,46 @@ void MessageBus::startReading(P2pConnectionPtr connection)
     connection->startReading();
 }
 
+void MessageBus::removeConnection(QWeakPointer<ConnectionBase> weakRef)
+{
+    QnMutexLocker lock(&m_mutex);
+    removeConnectionUnsafe(weakRef);
+}
+
+void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
+{
+    P2pConnectionPtr connection = weakRef.toStrongRef();
+    if (!connection)
+        return;
+
+    const auto& remoteId = connection->remotePeer().id;
+    NX_DEBUG(
+        this,
+        lit("Peer %1 has closed connection to %2")
+        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+        .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)));
+
+    if (auto callback = context(connection)->onConnectionClosedCallback)
+        callback();
+    auto outgoingConnection = m_outgoingConnections.value(remoteId);
+    if (outgoingConnection == connection)
+    {
+        m_outgoingConnections.remove(remoteId);
+    }
+    else
+    {
+        auto connectedConnection = m_connections.value(remoteId);
+        if (connectedConnection == connection)
+        {
+            m_peers->removePeer(connection->remotePeer());
+            m_connections.remove(remoteId);
+        }
+    }
+    emitPeerFoundLostSignals();
+    if (connection->state() == Connection::State::Unauthorized)
+        emit remotePeerUnauthorized(connection->remotePeer().id);
+}
+
 void MessageBus::at_stateChanged(
     QWeakPointer<ConnectionBase> weakRef,
     Connection::State /*state*/)
@@ -465,31 +506,7 @@ void MessageBus::at_stateChanged(
         case Connection::State::Unauthorized:
         case Connection::State::Error:
         {
-            NX_DEBUG(
-                this,
-                lit("Peer %1 has closed connection to %2")
-                .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-                .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)));
-
-            if (auto callback = context(connection)->onConnectionClosedCallback)
-                callback();
-            auto outgoingConnection = m_outgoingConnections.value(remoteId);
-            if (outgoingConnection == connection)
-            {
-                m_outgoingConnections.remove(remoteId);
-            }
-            else
-            {
-                auto connectedConnection = m_connections.value(remoteId);
-                if (connectedConnection == connection)
-                {
-                    m_peers->removePeer(connection->remotePeer());
-                    m_connections.remove(remoteId);
-                }
-            }
-            emitPeerFoundLostSignals();
-            if (connection->state() == Connection::State::Unauthorized)
-                emit remotePeerUnauthorized(connection->remotePeer().id);
+            removeConnectionUnsafe(weakRef);
             break;
         }
         default:
@@ -609,7 +626,7 @@ void MessageBus::at_gotMessage(
         break;
     }
     if (!result)
-        connection->setState(Connection::State::Error);
+        removeConnectionAsync(connection);
 }
 
 bool MessageBus::handlePushImpersistentBroadcastTransaction(

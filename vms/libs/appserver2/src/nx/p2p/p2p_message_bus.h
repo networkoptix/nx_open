@@ -413,6 +413,11 @@ private slots:
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);
     void at_allDataSent(QWeakPointer<ConnectionBase> connection);
     void cleanupRuntimeInfo(const vms::api::PersistentIdData& peer);
+    void removeConnection(QWeakPointer<ConnectionBase> weakRef);
+signals:
+    void removeConnectionAsync(QWeakPointer<ConnectionBase> weakRef);
+private:
+    void removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef);
 public:
     bool needStartConnection(
         const vms::api::PersistentIdData& peer,

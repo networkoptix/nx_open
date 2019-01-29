@@ -501,7 +501,7 @@ void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connectio
         if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
             connection->remotePeer(), &tran.params))
         {
-            connection->setState(Connection::State::Error);
+            removeConnectionAsync(connection);
             return;
         }
         sendTransactionImpl(connection, tran, TransportHeader());
@@ -688,7 +688,7 @@ bool ServerMessageBus::selectAndSendTransactions(
                 SendTransactionToTransportFastFuction(),
                 this, _1, _2, connection)))
         {
-            connection->setState(Connection::State::Error);
+            removeConnectionAsync(connection);
         }
     }
     return true;
@@ -743,7 +743,7 @@ void ServerMessageBus::gotTransaction(
         sendTransaction(tran, transportHeader);
         break;
     default:
-        connection->setState(Connection::State::Error);
+        removeConnectionAsync(connection);
         resotreAfterDbError();
         break;
     }
@@ -804,7 +804,7 @@ void ServerMessageBus::gotTransaction(
                 .arg(ApiCommand::toString(tran.command))
                 .arg(ec2::toString(errorCode)));
             dbTran.reset(); //< rollback db data
-            connection->setState(Connection::State::Error);
+            removeConnectionAsync(connection);
             resotreAfterDbError();
             return;
         }
