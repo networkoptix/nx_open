@@ -544,7 +544,7 @@
             "description": "Supported hardware types.",
             "advanced": true,
             "type": "select",
-            "value": "",
+            "value": "[{\"id\":\"Camera\", \"label\":\"camera\"},{\"id\":\"Multi-Sensor Camera\", \"label\":\"multi_sensor_camera\"},{\"id\":\"Encoder\", \"label\":\"encoder\"},{\"id\":\"DVR\", \"label\":\"dvr\"},{\"id\":\"Other\", \"label\":\"other\"}]",
             "meta": {
               "multi": true,
               "options": [

@@ -95,6 +95,7 @@ window.L = {};
                     appState.publicReleases = response.publicReleases;
                     appState.sortSupportedDevices = response.sortSupportedDevices;
                     appState.supportedResolutions = response.supportedResolutions;
+                    appState.supportedHardwareTypes = response.supportedHardwareTypes;
                     
                     angular.extend(CONFIG, appState);
                 });

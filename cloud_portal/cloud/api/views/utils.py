@@ -248,6 +248,6 @@ def get_settings(request):
         'publicReleases': get_public_release_history_status(),
         'sortSupportedDevices': get_sorting_supported_devices(),
         'supportedResolutions': get_suported_resolutions(),
-        'supportedhardwareTypes': get_suported_hardware_types()
+        'supportedHardwareTypes': get_suported_hardware_types()
     }
     return Response(settings_object)

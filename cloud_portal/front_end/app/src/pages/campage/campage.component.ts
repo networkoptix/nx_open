@@ -166,13 +166,10 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterTypes() {
-        this.hardwareTypes = [
-            { id: 'Camera', label: this.lang.camera },
-            { id: 'Multi-Sensor Camera', label: this.lang.multi_sensor_camera },
-            { id: 'Encoder', label: this.lang.encoder },
-            { id: 'DVR', label: this.lang.dvr },
-            { id: 'Other', label: this.lang.other }
-        ];
+        this.hardwareTypes = JSON.parse(this.config.supportedHardwareTypes.replace(/[]/g, '').split(','));
+        this.hardwareTypes.forEach(type => {
+            type.label = this.lang[type.label];
+        });
 
         this.filterModel.multiselects = [
             {
