@@ -144,7 +144,7 @@ bool Server::launchHttpServerIfNeeded(
         &m_httpMessageDispatcher);
 
     m_authenticationDispatcher.add(
-        std::regex(m_maintenanceServer.maintenancePath() + ".*"),
+        std::regex(m_maintenanceServer.maintenancePath() + "/.*"),
         &m_htdigestAuthenticator.manager);
 
     return true;
