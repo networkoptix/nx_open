@@ -79,7 +79,8 @@ private:
         QVector<DeviceFileCatalogPtr>& result);
     bool resetIoDevice();
     // returns cameraId (hash for cameraUniqueId)
-    int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
+    boost::optional<nx::media_db::CameraOperation> createCameraOperation(
+        const QString& cameraUniqueId);
     bool startDbFile();
     int getOrGenerateCameraIdHash(const QString &cameraUniqueId);
     bool writeVacuumedData(
