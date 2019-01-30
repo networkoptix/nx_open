@@ -143,6 +143,7 @@ public:
 
 private:
     void assertEngineCasted(void* engine) const;
+    void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
 
 private:
     mutable std::mutex m_mutex;

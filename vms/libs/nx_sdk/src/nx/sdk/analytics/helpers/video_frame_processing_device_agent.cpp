@@ -7,9 +7,12 @@
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/helpers/plugin_event.h>
 #include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_object_metadata_packet.h>
+#include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
@@ -88,87 +91,107 @@ Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handle
 
 Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
+    const auto logError =
+        [this, func = __func__](Error error, const std::string& message = "")
+        {
+            if (!message.empty() || error != Error::noError || (NX_DEBUG_ENABLE_OUTPUT))
+            {
+                NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
+                    << error << (message.empty() ? "" : ": ") << message;
+            }
+            return error;
+        };
+
     NX_OUTPUT << __func__ << "() BEGIN";
 
     if (!dataPacket)
-    {
-        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: dataPacket is null; "
-            << "discarding the packet.";
-        return Error::unknownError;
-    }
+        return logError(Error::unknownError, "dataPacket is null; discarding it.");
 
     if (dataPacket->timestampUs() < 0)
     {
-        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: "
-            << "dataPacket has invalid timestamp " << dataPacket->timestampUs()
-            << "; discarding the packet.";
-        return Error::unknownError;
+        return logError(Error::unknownError, "dataPacket has invalid timestamp "
+            + nx::kit::utils::toString(dataPacket->timestampUs()) + "; discarding the packet.");
     }
 
-    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(
-        dataPacket, IID_CompressedVideoPacket))
+    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket,
+        IID_CompressedVideoPacket))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
-        {
-            NX_OUTPUT << __func__ << "() END -> unknownError: pushCompressedVideoFrame() failed.";
-            return Error::unknownError;
-        }
+            return logError(Error::unknownError, "pushCompressedVideoFrame() failed.");
     }
-    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(
-        dataPacket, IID_UncompressedVideoFrame))
+    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket,
+        IID_UncompressedVideoFrame))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
-        {
-            NX_PRINT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed.";
-            return Error::unknownError;
-        }
+            return logError(Error::unknownError, "pushUncompressedVideoFrame() failed.");
     }
     else
     {
-        NX_OUTPUT << __func__ << "() END -> noError: Unsupported frame supplied; ignored.";
-        return Error::noError;
-    }
-
-    std::vector<IMetadataPacket*> metadataPackets;
-    if (!pullMetadataPackets(&metadataPackets))
-    {
-        NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed.";
-        return Error::unknownError;
-    }
-
-    if (!metadataPackets.empty())
-    {
-        NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
-            << " metadata packet(s).";
+        return logError(Error::noError, "Server ERROR: Unsupported frame supplied; ignored.");
     }
 
     if (!m_handler)
+        return logError(Error::unknownError, "Server ERROR: setMetadataHandler() was not called.");
+
+    std::vector<IMetadataPacket*> metadataPackets;
+    if (!pullMetadataPackets(&metadataPackets))
+        return logError(Error::unknownError, "pullMetadataPackets() failed.");
+
+    processMetadataPackets(metadataPackets);
+
+    return logError(Error::noError);
+}
+
+void VideoFrameProcessingDeviceAgent::processMetadataPackets(
+    const std::vector<IMetadataPacket*>& metadataPackets)
+{
+    if (!metadataPackets.empty())
     {
-        NX_PRINT << __func__ << "() END -> unknownError: setMetadataHandler() was not called.";
-        return Error::unknownError;
+        NX_OUTPUT << __func__ << "(): Producing " << metadataPackets.size()
+            << " metadata packet(s).";
     }
 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto& metadataPacket: metadataPackets)
+        for (int i = 0; i < (int) metadataPackets.size(); ++i)
         {
+            const auto metadataPacket = toPtr(metadataPackets.at(i));
             if (metadataPacket)
             {
+                std::string packetName;
+                if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
+                    IID_ObjectMetadataPacket))
+                {
+                    packetName = "Object";
+                }
+                else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
+                    IID_EventMetadataPacket))
+                {
+                    packetName = "Event";
+                }
+                else
+                {
+                    NX_OUTPUT << __func__ << "(): WARNING: Metadata packet #" << i
+                        << " has unknown type.";
+                    packetName = "Unknown";
+                }
+                packetName += " metadata packet #" + nx::kit::utils::toString(i);
+
+                NX_OUTPUT << __func__ << "(): " << packetName << " contains "
+                    << metadataPacket->count() << " item(s).";
                 NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
                 if (metadataPacket->timestampUs() == 0)
-                    NX_OUTPUT << __func__ << "(): WARNING: Metadata packet has timestamp 0.";
-                m_handler->handleMetadata(metadataPacket);
-                metadataPacket->releaseRef();
+                    NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+
+                m_handler->handleMetadata(metadataPacket.get());
             }
             else
             {
-                NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet found; discarded.";
+                NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet #" << i
+                    << " found; discarded.";
             }
         }
     }
-
-    NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
 }
 
 const IString* VideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
