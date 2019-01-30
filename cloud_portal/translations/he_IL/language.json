@@ -138,8 +138,8 @@
     "lostConnection": "החיבור ל- {{systemName}} אבד",
     "thisSystem": "המערכת",
     "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "שרתים כפולים נמצאו באחת המערכות.<br>הסר שרתים ישנים מכל מערכת שאתה מנסה למזג ונסה שוב.",
+    "mergedSystemIsOffline": "אחת המערכות הממוזגות אינה מקוונת. ודא שהן מקוונות ונסה שוב."
   },
   "passwordRequirements": {
     "good": "טוב",
@@ -185,7 +185,7 @@
     "confirmUnshareAction": "מחיקה",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
-    "successMerge": "System merge completed",
+    "successMerge": "מיזוג המערכת הושלם",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
   },
   "account": {

@@ -138,8 +138,8 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Servidores duplicados foram encontrados em um dos sistemas.<br> Remova servidores antigos de cada sistema que você está tentando mesclar e tente novamente.",
+    "mergedSystemIsOffline": "Um dos sistemas que estão sendo mesclados está offline. Verifique se estão online e tente novamente."
   },
   "passwordRequirements": {
     "good": "bom",
@@ -185,7 +185,7 @@
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "successMerge": "System merge completed",
+    "successMerge": "Mesclagem de sistema concluída",
     "permissionsRemoved": "As permissões foram removidas de {{email}}"
   },
   "account": {
