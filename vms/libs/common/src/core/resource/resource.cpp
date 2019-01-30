@@ -536,7 +536,8 @@ void QnResource::emitPropertyChanged(const QString& key)
     if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
-    NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
+    NX_VERBOSE(this, "Changed property '%1' = '%2'", key,
+        key == ResourcePropertyKey::kCredentials ? "***" : getProperty(key));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
