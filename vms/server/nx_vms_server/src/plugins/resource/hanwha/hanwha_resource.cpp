@@ -1464,6 +1464,7 @@ CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
         const auto id = physicalIdForChannel(groupId, ptzTargetChannel);
         NX_DEBUG(this, "Set PTZ target id: %1", id);
         setProperty(ResourcePropertyKey::kPtzTargetId, id);
+        m_ptzCapabilities[core::ptz::Type::operational] &= Ptz::ViewportPtzCapability;
     }
     else
     {
