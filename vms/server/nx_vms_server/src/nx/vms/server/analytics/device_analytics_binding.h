@@ -88,8 +88,7 @@ private:
 
     std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
 
-    // TODO: #dmishin: Rename to m_deviceAgent.
-    nx::sdk::Ptr<DeviceAgent> m_sdkDeviceAgent;
+    nx::sdk::Ptr<DeviceAgent> m_deviceAgent;
 
     QnAbstractDataReceptorPtr m_metadataSink;
 

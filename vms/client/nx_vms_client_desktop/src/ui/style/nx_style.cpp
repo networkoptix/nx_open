@@ -55,6 +55,7 @@
 #include <nx/vms/client/desktop/common/utils/object_companion.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/common/utils/popup_shadow.h>
+#include <nx/vms/client/desktop/common/utils/label_selection_manager.h>
 #include <nx/vms/client/desktop/common/widgets/detail/base_input_field.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/scroll_bar_proxy.h>
@@ -575,6 +576,8 @@ namespace
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
+    LabelSelectionManager::init(qApp);
+
     // TODO: Think through how to make it better
     /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates.
      * Menu popups do not cause deactivation but steal focus so we should handle that too. */

@@ -63,7 +63,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
 
-    if (const auto timeProvider = nxpt::queryInterfacePtr<nxpl::TimeProvider>(
+    if (const auto timeProvider = queryInterfacePtr<nxpl::TimeProvider>(
         m_plugin->pluginContainer(), nxpl::IID_TimeProvider))
     {
         m_timeProvider = decltype(m_timeProvider)(
@@ -131,7 +131,7 @@ const IString* Engine::manifest(Error* error) const
     }
     else
     {
-        for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+        for (int i = 0; i < (int) m_objectClassDescritions.size(); ++i)
         {
             objectTypesManifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
             if (i < (int) m_objectClassDescritions.size() - 1)

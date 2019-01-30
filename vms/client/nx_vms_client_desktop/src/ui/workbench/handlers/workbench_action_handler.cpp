@@ -812,7 +812,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
     const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = (layout->getItems().isEmpty() || !layout->hasCellAspectRatio())
-        && layout->backgroundSize().isEmpty(); // TODO: implement layout->hasBackground().
+        && !layout->hasBackground();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())

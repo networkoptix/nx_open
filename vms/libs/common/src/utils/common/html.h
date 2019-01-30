@@ -35,9 +35,26 @@ QString htmlFormattedParagraph(const QString &text
 
 QString htmlParagraph(const QString& source);
 
+/**
+ * Create html link with text, equal to url.
+ */
+QString makeHref(const QUrl& url);
+
+/**
+ * Create html link with text, equal to url.
+ */
+QString makeHref(const nx::utils::Url&);
+
+/**
+ * Create html link with text, equal to url.
+ */
+QString makeHref(const QString& link);
+
 QString makeHref(const QString& text, const QUrl& url);
-QString makeHref(const QString& text, const nx::utils::Url &url);
+QString makeHref(const QString& text, const nx::utils::Url& url);
 QString makeHref(const QString& text, const QString& link);
+
+QString makeMailHref(const QString& text);
 QString makeMailHref(const QString& text, const QString& mail);
 QString makeMailHref(const QString& text, const QUrl& mail);
 

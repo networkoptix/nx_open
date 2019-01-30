@@ -366,6 +366,11 @@ QRect QnLayoutResource::backgroundRect(const QSize& backgroundSize)
     return QRect(-left, -top, backgroundSize.width(), backgroundSize.height());
 }
 
+bool QnLayoutResource::hasBackground() const
+{
+    return !backgroundImageFilename().isEmpty();
+}
+
 /********* Background image id property **********/
 QString QnLayoutResource::backgroundImageFilename() const
 {
@@ -538,11 +543,38 @@ void QnLayoutResource::forgetPasswordForRecordings()
 {
     NX_ASSERT(isFile());
 
+    const auto items = getItems();
+    const auto pool = resourcePool();
+
+    for (const auto& item : items)
+    {
+        if (item.uuid.isNull()) // Check purpose unknown; copied from layoutResources().
+            continue;
+
+        if (auto resource = pool->getResourceByDescriptor(item.resource))
+        {
+            // Remove password from protected video streams.
+            if (auto aviItem = resource.objectCast<QnAviResource>())
+                aviItem->forgetPassword();
+
+            // Remove freshly added cameras from the layout.
+            if (auto cameraItem = resource.objectCast<QnVirtualCameraResource>())
+                removeItem(item);
+        }
+    }
+}
+
+// The one who requests to remove this function will become a permanent maintainer of this class.
+void QnLayoutResource::dumpStructure() const
+{
     auto items = layoutResources();
+
+    qDebug() << "Layout Url:" << getUrl() << "ID:" << getId() << "UniqueID:" << getUniqueId();
 
     for(auto &item: items)
     {
-        if (auto aviItem = item.objectCast<QnAviResource>())
-            aviItem->forgetPassword();
+        qDebug() << "  Item Resource URL:" << item->getUrl() << "ID:" << item->getId()
+            << "UniqueId:" << item->getId();
     }
+
 }

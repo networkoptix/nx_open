@@ -746,11 +746,22 @@ QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionS
     const auto forcedMotionStreamStr = getProperty(motionStreamKey()).toLower();
     if (!forcedMotionStreamStr.isEmpty())
     {
-        const auto forcedMotionStream = QnLexical::deserialized<Qn::StreamIndex>(
-            forcedMotionStreamStr, Qn::StreamIndex::undefined);
-        NX_ASSERT(forcedMotionStream != Qn::StreamIndex::undefined);
-        if (forcedMotionStream != Qn::StreamIndex::undefined)
-            return {forcedMotionStream, /*isForced*/ true};
+        const auto forcedMotionStream = QnLexical::deserialized<nx::vms::api::MotionStreamType>(
+            forcedMotionStreamStr, nx::vms::api::MotionStreamType::automatic);
+
+        switch (forcedMotionStream)
+        {
+            case nx::vms::api::MotionStreamType::primary:
+                return {Qn::StreamIndex::primary, /*isForced*/ true};
+            case nx::vms::api::MotionStreamType::secondary:
+                return {Qn::StreamIndex::secondary, /*isForced*/ true};
+            case nx::vms::api::MotionStreamType::edge:
+                NX_ASSERT(false, "This value was not handled and is used only in isRemoteArchiveMotionDetectionEnabled()");
+                break;
+            default:
+                NX_ASSERT(false, "Automatic stream type should not be forced");
+                break;
+        }
     }
 
     if (!hasDualStreaming()
@@ -764,9 +775,12 @@ QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionS
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value)
 {
-    NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    (*userAttributesLock)->motionType = value;
+    {
+        NX_ASSERT(!getId().isNull());
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+        (*userAttributesLock)->motionType = value;
+    }
+    m_motionType.reset();
 }
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const

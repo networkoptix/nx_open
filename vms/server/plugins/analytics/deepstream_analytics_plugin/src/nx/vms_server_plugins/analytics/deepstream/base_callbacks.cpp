@@ -19,14 +19,14 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    const nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket());
+    const auto frame = nx::sdk::toPtr(pipeline->nextDataPacket());
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
         return;
     }
 
-    const auto video = nxpt::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(
+    const auto video = nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(
         frame, nx::sdk::analytics::IID_CompressedVideoPacket);
     if (!video)
     {

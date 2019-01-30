@@ -248,9 +248,11 @@ void setWearableMotionEnabled(bool value, const Cameras& cameras)
             continue;
 
         NX_ASSERT(camera->getDefaultMotionType() == Qn::MotionType::MT_SoftwareGrid);
-        camera->setMotionType(value
+        const auto actualMotionType = value
             ? Qn::MotionType::MT_SoftwareGrid
-            : Qn::MotionType::MT_NoMotion);
+            : Qn::MotionType::MT_NoMotion;
+        camera->setMotionType(actualMotionType);
+        NX_ASSERT(camera->getMotionType() == actualMotionType);
     }
 }
 
@@ -349,7 +351,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         camera->setDewarpingParams(state.singleCameraSettings.fisheyeDewarping());
         camera->setLogicalId(state.singleCameraSettings.logicalId());
 
-        if (state.devicesDescription.hasMotion == State::CombinedValue::All)
+        if (state.devicesDescription.hasMotion == CombinedValue::All)
         {
             camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
                 ? camera->getDefaultMotionType()
@@ -358,7 +360,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             camera->setMotionRegionList(state.singleCameraSettings.motionRegionList());
         }
 
-        if (camera->isIOModule() && state.devicesDescription.isIoModule == State::CombinedValue::All)
+        if (camera->isIOModule() && state.devicesDescription.isIoModule == CombinedValue::All)
         {
             camera->setProperty(ResourcePropertyKey::kIoOverlayStyle, QnLexical::serialized(
                 state.singleIoModuleSettings.visualStyle()));
@@ -379,7 +381,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         camera->setEnabledAnalyticsEngines(state.analytics.enabledEngines());
     }
 
-    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    if (state.devicesDescription.isWearable == CombinedValue::All)
     {
         if (state.wearableMotion.enabled.hasValue())
         {
@@ -391,7 +393,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     }
 
     if ((state.credentials.login.hasValue() || state.credentials.password.hasValue())
-        && state.devicesDescription.isWearable == State::CombinedValue::None)
+        && state.devicesDescription.isWearable == CombinedValue::None)
     {
         setCredentials(state.credentials, cameras);
     }
@@ -430,7 +432,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             setUseBitratePerGOP(state.expert.useBitratePerGOP(), cameras);
         }
 
-        if (state.devicesDescription.isArecontCamera == State::CombinedValue::None
+        if (state.devicesDescription.isArecontCamera == CombinedValue::None
             && state.expert.cameraControlDisabled.hasValue())
         {
             setCameraControlDisabled(state.expert.cameraControlDisabled(), cameras);
@@ -443,7 +445,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.expert.secondaryRecordingDisabled.hasValue())
         setSecondaryRecordingDisabled(state.expert.secondaryRecordingDisabled(), cameras);
 
-    if (state.devicesDescription.supportsMotionStreamOverride == State::CombinedValue::All
+    if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
         && state.expert.motionStreamType.hasValue())
     {
         setMotionStreamType(state.expert.motionStreamType(), cameras);

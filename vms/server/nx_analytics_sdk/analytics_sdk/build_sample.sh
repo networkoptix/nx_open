@@ -18,21 +18,23 @@ else
     NO_TESTS=0
 fi
 
-case "$(uname -s)" in #< Check OS.
+# Use Ninja for Linux and Cygwin, if it is available on PATH.
+if which ninja >/dev/null
+then
+    GEN_OPTIONS=( -GNinja ) #< Generate for Ninja and gcc. Use all available CPU cores.
+else
+    GEN_OPTIONS=() #< Generate for GNU make and gcc. ATTENTION: Uses 1 CPU core only.
+fi
+
+case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
     CYGWIN*|MINGW*)
-        if [[ $(which cmake) == /usr/bin/* ]]
+        if [[ $(which cmake) == /usr/bin/* ]] # Cygwin's cmake is on PATH.
         then
-            echo "WARNING: In Cygwin/MinGW, gcc instead of MSVC may work, but is not supported."
-            echo ""
-            GEN_OPTIONS=() #< Generate for GNU make and gcc.
-        else
-            # Using Windows native cmake.
-            GEN_OPTIONS=( -Ax64 -Tv140,host=x64 )
-            SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows cmake requires Windows path.
+            echo "WARNING: In Cygwin/MinGW, gcc instead of MSVC may work, but is not supported.\n"
+        else # Assuming Windows-native cmake is on PATH.
+            GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
+            SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows-native cmake requires Windows path.
         fi
-        ;;
-    *) # Assuming Linux.
-        GEN_OPTIONS=() #< Generate for GNU make and gcc.
         ;;
 esac
 

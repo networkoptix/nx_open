@@ -53,8 +53,6 @@ set(ios.sign.identity "iPhone Distribution: Samsung Opto-Electronics America, In
 set(ios.old_app_appstore_id "")
 
 set(mac.sign.identity "Developer ID Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.bundle.identifier "com.hanwhasecurity.wisenetwave2")
 set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler")
 

@@ -48,7 +48,7 @@ private:
 
     int64_t usSinceEpoch() const;
 
-    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) const;
+    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* frame) const;
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);

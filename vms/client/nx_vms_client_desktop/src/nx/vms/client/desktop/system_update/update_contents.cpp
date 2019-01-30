@@ -248,9 +248,13 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         info.modification = package.variant;
         info.platform = package.platform;
 
-        if (!contents.packageCache.count(info))
-            contents.packageCache.emplace(info, QList<nx::update::Package>());
-        auto& record = contents.packageCache[info];
+        auto& cache = (package.component == "client")
+            ? contents.clientPackageCache
+            : contents.serverPackageCache;
+
+        if (!cache.count(info))
+            cache.emplace(info, QList<nx::update::Package>());
+        auto& record = cache[info];
         record.append(package);
     }
 
@@ -266,8 +270,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
         auto serverInfo = server->getSystemInfo();
 
-        auto it = contents.packageCache.find(serverInfo);
-        if (it == contents.packageCache.end())
+        auto it = contents.serverPackageCache.find(serverInfo);
+        if (it == contents.serverPackageCache.end())
         {
             NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") server"

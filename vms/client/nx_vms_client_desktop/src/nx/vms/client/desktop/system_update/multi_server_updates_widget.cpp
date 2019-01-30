@@ -508,7 +508,8 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::missingPackageError:
             {
                 QStringList packageErrors;
-                auto missing = contents.missingUpdate.size();
+                auto missing = contents.missingUpdate.size()
+                    + contents.unsuportedSystemsReport.size();
                 if (contents.missingClientPackage)
                 {
                     if (missing)
@@ -1747,8 +1748,8 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         hasLatestVersion = true;
     else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
         hasLatestVersion = true;
-    if (m_updateInfo.isValid() && m_updateInfo.sourceType != UpdateSourceType::internet)
-        hasLatestVersion = false;
+    //if (m_updateInfo.isValid() && m_updateInfo.sourceType != UpdateSourceType::internet)
+    //    hasLatestVersion = false;
 
     if (m_updateInfo.error != nx::update::InformationError::noNewVersion
         && m_updateInfo.error != nx::update::InformationError::noError)
@@ -1767,6 +1768,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     ui->manualDownloadButton->setVisible(!isChecking);
     ui->updateStackedWidget->setVisible(!isChecking);
     ui->selectUpdateTypeButton->setEnabled(!isChecking);
+    ui->errorLabel->setVisible(true);
 
     if (isChecking)
     {
@@ -1785,6 +1787,11 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         if (hasLatestVersion)
         {
             ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
+            if (m_updateInfo.sourceType == UpdateSourceType::internet)
+                ui->latestVersionBannerLabel->setText(tr("The latest version is already installed"));
+            else
+                ui->latestVersionBannerLabel->setText(tr("This version is already installed"));
+            ui->errorLabel->setVisible(false);
             ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
             ui->downloadButton->setVisible(false);
             ui->releaseDescriptionLabel->setText("");
