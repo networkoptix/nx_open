@@ -63,7 +63,7 @@ private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_terminated{false};
+    bool m_terminated = false;
 
     std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;
