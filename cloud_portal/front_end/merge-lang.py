@@ -1,4 +1,5 @@
 import json
+from shutil import copyfile
 
 
 def sortdict(dct):
@@ -25,3 +26,6 @@ static_file = json.load(open('app/language_i18n_static.json', 'r'))
 
 with open("./app/language_i18n.json", "wb") as outfile:
     json.dump(merge_two_json(base_file, static_file), outfile)
+
+# update EN lang so we can test on cloud-dev before Boris updates translations
+copyfile('./app/language_i18n.json', '../translations/en_US/language_i18n.json')
