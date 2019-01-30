@@ -102,10 +102,10 @@ void MessageBus::dropConnections()
 
 void MessageBus::dropConnectionsThreadUnsafe()
 {
-    for (const auto& connection: m_connections)
-        removeConnectionAsync(connection);
-    for (const auto& connection: m_outgoingConnections)
-        removeConnectionAsync(connection);
+    while (!m_connections.empty())
+        removeConnectionUnsafe(m_connections.first());
+    while(!m_outgoingConnections.empty())
+        removeConnectionUnsafe(m_outgoingConnections.first());
     m_remoteUrls.clear();
     if (m_peers)
     {
@@ -211,7 +211,7 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     m_lastConnectionState.remove(id);
     auto itr = m_connections.find(id);
     if (itr != m_connections.end() && itr.value()->direction() == Connection::Direction::outgoing)
-        removeConnectionAsync(itr.value());
+        removeConnectionUnsafe(itr.value());
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -483,6 +483,8 @@ void MessageBus::at_stateChanged(
     if (!connection)
         return;
 
+    NX_VERBOSE(this, "Connection [%1] state changed to [%2]", connection->remotePeer().id, connection->state());
+
     QnMutexLocker lock(&m_mutex);
 
     const auto& remoteId = connection->remotePeer().id;
@@ -626,7 +628,7 @@ void MessageBus::at_gotMessage(
         break;
     }
     if (!result)
-        removeConnectionAsync(connection);
+        emit removeConnectionAsync(connection);
 }
 
 bool MessageBus::handlePushImpersistentBroadcastTransaction(
