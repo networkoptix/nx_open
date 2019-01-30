@@ -91,7 +91,7 @@ should show system name in header with no dropdown if user has only one system
     Remove User Permissions    ${EMAIL NOPERM}
 
 should show the system page instead of all systems when user only has one
-    [tags]    C41878    Threaded
+    [tags]    C41878
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
