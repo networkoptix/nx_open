@@ -1457,18 +1457,13 @@ CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
     if (ptzTargetChannel == -1 || ptzTargetChannel == getChannel())
         return CameraDiagnostics::NoErrorResult();
 
+    const auto groupId = getGroupId();
     const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
-    const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
-    if (isCalibrated)
+    if (!groupId.isEmpty() && calibratedChannels && calibratedChannels->count(getChannel()))
     {
-        const auto id = physicalIdForChannel(getGroupId(), ptzTargetChannel);
+        const auto id = physicalIdForChannel(groupId, ptzTargetChannel);
         NX_DEBUG(this, "Set PTZ target id: %1", id);
         setProperty(ResourcePropertyKey::kPtzTargetId, id);
-
-        // TODO: Remove this workaround when client fixes a bug:
-        //     Absolute move and viewport is not accessible if continious move is not supportd.
-        //
-        // m_ptzCapabilities[core::ptz::Type::operational] |= Ptz::ContinuousPanTiltCapabilities;
     }
     else
     {
@@ -3090,6 +3085,7 @@ boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterI
 
 void HanwhaResource::updateToChannel(int value)
 {
+    NX_VERBOSE(this, "Update to channel %1", value);
     QUrl url(getUrl());
     QUrlQuery query(url.query());
     query.removeQueryItem("channel");
