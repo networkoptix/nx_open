@@ -18,7 +18,7 @@ public:
 
     /**
      * Get the path that this server registered its request handlers under.
-     * NOTE: not available until after regiesterRequestHandlers is called.
+     * NOTE: not available until after registerRequestHandlers is called.
      *
      * @return a string containing {basePath}/maintenance
      */
