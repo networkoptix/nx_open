@@ -20,7 +20,7 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
 
 }
 
-void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
+bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 {
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
@@ -34,14 +34,14 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     if (!pool)
     {
         NX_DEBUG(this, "setResourceFeed() got nullptr resource pool");
-        return;
+        return false;
     }
 
     auto systemId = helpers::currentSystemLocalId(commonModule());
     if (systemId.isNull())
     {
         NX_DEBUG(this, "setResourceFeed() got null system id");
-        return;
+        return false;
     }
 
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
@@ -55,6 +55,7 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
         this, &PeerStateTracker::atResourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
         this, &PeerStateTracker::atResourceRemoved);
+    return true;
 }
 
 UpdateItemPtr PeerStateTracker::findItemById(QnUuid id) const

@@ -244,8 +244,13 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         [this]()
         {
             NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
-            if (m_stateTracker)
-                m_stateTracker->setResourceFeed(resourcePool());
+
+            if (m_stateTracker && !m_stateTracker->setResourceFeed(resourcePool()))
+            {
+                // We will be here when we disconnect from the server.
+                // So we can clear our state as well.
+                clearUpdateInfo();
+            }
         });
 
     setWarningStyle(ui->longUpdateWarning);
@@ -2097,9 +2102,6 @@ void MultiServerUpdatesWidget::discardChanges()
         if (dialog.clickedButton() == cancelUpdateButton)
             atCancelCurrentAction();
     }
-
-    clearUpdateInfo();
-    setTargetState(WidgetUpdateState::initial, {});
 }
 
 bool MultiServerUpdatesWidget::hasChanges() const
