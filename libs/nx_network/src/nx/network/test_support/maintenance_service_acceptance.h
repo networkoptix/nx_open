@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <gtest/gtest.h>
 
 #include "functional_tests/mediator_functional_test.h"
@@ -148,11 +147,11 @@ TYPED_TEST_P(MaintenanceServiceAcceptance, log_server_is_not_available_with_inva
     this->thenRequestFailed(nx::network::http::StatusCode::unauthorized);
 }
 
-REGISTER_TYPED_TEST_CASE_P(MaintenanceServiceAcceptance,
+REGISTER_TYPED_TEST_CASE_P(
+    MaintenanceServiceAcceptance,
     malloc_info_is_available_with_valid_credentials,
     log_server_is_available_with_valid_credentials,
     malloc_info_is_not_available_with_invalid_credentials,
     log_server_is_not_available_with_invalid_credentials);
-
 
 } // namespace nx::network::test
