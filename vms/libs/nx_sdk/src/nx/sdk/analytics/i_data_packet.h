@@ -2,25 +2,20 @@
 
 #include <cstdint>
 
-#include <plugins/plugin_api.h>
+#include <nx/sdk/interface.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
 /**
- * Each class that implements IDataPacket interface should properly handle this GUID in its
- * queryInterface() method.
- */
-static const nxpl::NX_GUID IID_DataPacket =
-    {{0x13,0x85,0x3c,0xd6,0x13,0x7e,0x4d,0x8b,0x9b,0x8e,0x63,0xf1,0x5f,0x93,0x2a,0xc1}};
-
-/**
  * Base class for classes that represent the packet of data (e.g. audio, video, metadata).
  */
-class IDataPacket: public nxpl::PluginInterface
+class IDataPacket: public Interface<IDataPacket>
 {
 public:
+    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IDataPacket"); }
+
     /**
      * @return Timestamp of the media data in microseconds since epoch, or 0 if not relevant.
      */

@@ -2,18 +2,17 @@
 
 #include <vector>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
+
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class ObjectMetadataPacket: public nxpt::CommonRefCounter<IObjectMetadataPacket>
+class ObjectMetadataPacket: public RefCountable<IObjectMetadataPacket>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
     virtual int64_t timestampUs() const override;
     virtual int64_t durationUs() const override;
     virtual int count() const override;

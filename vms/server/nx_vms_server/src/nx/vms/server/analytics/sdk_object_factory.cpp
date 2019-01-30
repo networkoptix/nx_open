@@ -136,16 +136,14 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    const auto analyticsPlugins = pluginManager->findNxPlugins<IPlugin>(IID_Plugin);
+    const auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::IPlugin>();
 
-    std::map<QnUuid, Ptr<IPlugin>> sdkPluginsById;
-    for (const auto analyticsPlugin: analyticsPlugins)
+    std::map<QnUuid, Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
+    for (const auto& analyticsPlugin: analyticsPlugins)
     {
-        const auto analyticsPluginPtr = toPtr(analyticsPlugin);
-
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
-            makeLogger(analyticsPlugin));
+            makeLogger(analyticsPlugin.get()));
 
         if (!pluginManifest)
         {
@@ -155,7 +153,7 @@ bool SdkObjectFactory::initPluginResources()
         }
 
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
-        sdkPluginsById.emplace(id, analyticsPluginPtr);
+        sdkPluginsById.emplace(id, analyticsPlugin);
 
         NX_DEBUG(this, "Creating an analytics plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
@@ -358,7 +356,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
 }
 
 std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
-    const IPlugin* plugin) const
+    const nx::sdk::analytics::IPlugin* plugin) const
 {
     return std::make_unique<sdk_support::StartupPluginManifestLogger>(
         nx::utils::log::Tag(typeid(this)),

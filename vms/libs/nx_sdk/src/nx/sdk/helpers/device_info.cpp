@@ -3,17 +3,6 @@
 namespace nx {
 namespace sdk {
 
-void* DeviceInfo::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceInfo)
-        return this;
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-        return static_cast<nxpl::PluginInterface*>(this);
-
-    return nullptr;
-}
-
 const char* DeviceInfo::id() const
 {
     return m_id.c_str();

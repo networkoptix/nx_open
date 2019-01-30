@@ -1,7 +1,6 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
-
+#include <nx/sdk/interface.h>
 #include <nx/sdk/error.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_string.h>
@@ -18,13 +17,6 @@ static const int NX_NO_ERROR = 0;
 static const int NX_UNKNOWN_PARAMETER = -41;
 static const int NX_MORE_DATA = -23;
 
-/**
- * Each class that implements DeviceAgent interface should properly handle this GUID in
- * its queryInterface method.
- */
-static const nxpl::NX_GUID IID_DeviceAgent =
-    {{0x48,0x5a,0x23,0x51,0x55,0x73,0x4f,0xb5,0xa9,0x11,0xe4,0xfb,0x22,0x87,0x79,0x24}};
-
 class IEngine; //< Forward declaration for the parent object.
 
 /**
@@ -33,9 +25,11 @@ class IEngine; //< Forward declaration for the parent object.
  * All methods are guaranteed to be called without overlappings, even if from different threads,
  * thus, no synchronization is required for the implementation.
  */
-class IDeviceAgent: public nxpl::PluginInterface
+class IDeviceAgent: public Interface<IDeviceAgent>
 {
 public:
+    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IDeviceAgent"); }
+
     class IHandler
     {
     public:

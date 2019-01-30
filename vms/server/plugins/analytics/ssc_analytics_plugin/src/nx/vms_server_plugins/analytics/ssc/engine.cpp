@@ -272,21 +272,6 @@ void Engine::configureSerialPort(QSerialPort* port, const QString& name, int ind
     NX_PRINT << "Serial port " << name.toStdString() << " configuration finished";
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
@@ -416,7 +401,7 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

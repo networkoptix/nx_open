@@ -13,17 +13,6 @@ String::String(const char* s)
     setString(s);
 }
 
-void* String::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == nxpl::IID_PluginInterface)
-        return this;
-
-    if (interfaceId == IID_String)
-        return this;
-
-    return nullptr;
-}
-
 const char* String::str() const
 {
     return m_string.c_str();

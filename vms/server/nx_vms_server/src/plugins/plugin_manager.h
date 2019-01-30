@@ -12,7 +12,7 @@
 
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/plugin_api.h>
-#include <plugins/plugin_container_api.h>
+#include <nx/vms/server/plugins/utility_provider.h>
 #include <plugins/settings.h>
 
 /**
@@ -31,20 +31,42 @@ public:
 
     virtual ~PluginManager();
 
+    // TODO: Remove when Storage and Camera SDKs migrate into the new SDK.
     /**
      * Searches for plugins that implement the specified interface derived from
-     * nxpl::PluginInterface among loaded plugins.
+     * nxpl::PluginInterface (old SDK) among loaded plugins.
      *
      * Increments (implicitly using queryInterface()) reference counter for the returned pointers.
      */
     template<class Interface>
-    QList<Interface*> findNxPlugins(const nxpl::NX_GUID& guid) const
+    QList<Interface*> findNxPlugins(const nxpl::NX_GUID& oldSdkInterfaceId) const
     {
         QList<Interface*> foundPlugins;
         for (const auto& plugin: m_nxPlugins)
         {
-            if (const auto ptr = plugin->queryInterface(guid))
+            // It is safe to treat new SDK plugins as if they were old SDK plugins for the purpose
+            // of calling queryInterface().
+            auto oldSdkPlugin = reinterpret_cast<nxpl::PluginInterface*>(plugin.get());
+            if (const auto ptr = oldSdkPlugin->queryInterface(oldSdkInterfaceId))
                 foundPlugins.push_back(static_cast<Interface*>(ptr));
+        }
+        return foundPlugins;
+    }
+
+    /**
+     * Searches for plugins that implement the specified interface derived from IRefCountable,
+     * among loaded plugins.
+     *
+     * Increments (implicitly using queryInterface()) reference counter for the returned pointers.
+     */
+    template<class Interface>
+    QList<nx::sdk::Ptr<Interface>> findNxPlugins() const
+    {
+        QList<nx::sdk::Ptr<Interface>> foundPlugins;
+        for (const auto& plugin: m_nxPlugins)
+        {
+            if (const auto ptr = nx::sdk::queryInterfacePtr<Interface>(plugin))
+                foundPlugins.push_back(ptr);
         }
         return foundPlugins;
     }
@@ -69,15 +91,18 @@ private:
         const nx::plugins::SettingsHolder& settingsHolder,
         const QString& dirToSearchIn);
 
-    /** Loads nxpl::PluginInterface-based plugin. */
     bool loadNxPlugin(
         const nx::plugins::SettingsHolder& settingsHolder,
         const QString& filename,
         const QString& libName);
 
 private:
-    const nx::sdk::Ptr<nxpl::PluginInterface> m_pluginContainer;
+    const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
     QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
-    std::vector<nx::sdk::Ptr<nxpl::PluginInterface>> m_nxPlugins;
+
+    // For compatibility with the old-SDK-based plugins, we store pointers to the base interface
+    // rather than nx::sdk::IPlugin.
+    std::vector<nx::sdk::Ptr<nx::sdk::IRefCountable>> m_nxPlugins;
+
     mutable QnMutex m_mutex;
 };

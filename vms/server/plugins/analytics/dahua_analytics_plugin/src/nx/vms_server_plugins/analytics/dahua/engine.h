@@ -4,8 +4,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-#include <plugins/plugin_tools.h>
-#include <plugins/plugin_api.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
@@ -15,14 +14,12 @@
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
-class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
+class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
 
     virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 

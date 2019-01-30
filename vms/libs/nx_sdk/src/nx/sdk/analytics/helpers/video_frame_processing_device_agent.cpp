@@ -60,28 +60,6 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 
-void* VideoFrameProcessingDeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<IDeviceAgent*>(this);
-    }
-
-    if (interfaceId == IID_ConsumingDeviceAgent)
-    {
-        addRef();
-        return static_cast<IConsumingDeviceAgent*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -113,14 +91,12 @@ Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
             + nx::kit::utils::toString(dataPacket->timestampUs()) + "; discarding the packet.");
     }
 
-    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket,
-        IID_CompressedVideoPacket))
+    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
             return logError(Error::unknownError, "pushCompressedVideoFrame() failed.");
     }
-    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket,
-        IID_UncompressedVideoFrame))
+    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
             return logError(Error::unknownError, "pushUncompressedVideoFrame() failed.");
@@ -159,13 +135,11 @@ void VideoFrameProcessingDeviceAgent::processMetadataPackets(
             if (metadataPacket)
             {
                 std::string packetName;
-                if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
-                    IID_ObjectMetadataPacket))
+                if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
                 {
                     packetName = "Object";
                 }
-                else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
-                    IID_EventMetadataPacket))
+                else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
                 {
                     packetName = "Event";
                 }

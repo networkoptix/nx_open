@@ -6,31 +6,6 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::sdk::analytics;
 
-void* Yuv420UncompressedVideoFrame::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_UncompressedVideoFrame)
-    {
-        addRef();
-        return static_cast<IUncompressedVideoFrame*>(this);
-    }
-    if (interfaceId == IID_UncompressedMediaFrame)
-    {
-        addRef();
-        return static_cast<IUncompressedMediaFrame*>(this);
-    }
-    if (interfaceId == IID_DataPacket)
-    {
-        addRef();
-        return static_cast<IDataPacket*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 bool Yuv420UncompressedVideoFrame::validatePlane(int plane) const
 {
     return NX_ASSERT(plane >= 0 && plane < planeCount(),

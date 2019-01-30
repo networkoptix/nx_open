@@ -16,7 +16,8 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(IPlugin* plugin): nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
+    nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
 }
 
@@ -74,7 +75,7 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

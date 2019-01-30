@@ -3,7 +3,6 @@
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
@@ -26,8 +25,8 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
         return;
     }
 
-    const auto video = nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(
-        frame, nx::sdk::analytics::IID_CompressedVideoPacket);
+    const auto video =
+        nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(frame);
     if (!video)
     {
         NX_OUTPUT << __func__ << " Can not convert data packet to 'ICompressedVideoPacket'";

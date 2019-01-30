@@ -4,8 +4,8 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/test.h>
 
-#include <plugins/plugin_api.h>
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/interface.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
@@ -19,7 +19,7 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
-extern "C" nxpl::PluginInterface* createNxPlugin();
+extern "C" nx::sdk::IPlugin* createNxPlugin();
 
 namespace nx {
 namespace vms_server_plugins {
@@ -102,16 +102,10 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
     deviceAgent->setSettings(settings); //< Test assigning some settings.
 }
 
-class Action: public nxpt::CommonRefCounter<IAction>
+class Action: public RefCountable<IAction>
 {
 public:
     Action(): m_params(new StringMap()) {}
-
-    virtual void* queryInterface(const nxpl::NX_GUID& /*interfaceId*/) override
-    {
-        ASSERT_TRUE(false);
-        return nullptr;
-    }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
     virtual Uuid objectId() override { return m_objectId; }
@@ -260,29 +254,9 @@ public:
     }
 };
 
-class CompressedVideoPacket: public nxpt::CommonRefCounter<ICompressedVideoPacket>
+class CompressedVideoPacket: public RefCountable<ICompressedVideoPacket>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
-    {
-        if (interfaceId == IID_CompressedVideoPacket)
-        {
-            addRef();
-            return this;
-        }
-        if (interfaceId == IID_CompressedMediaPacket)
-        {
-            addRef();
-            return static_cast<ICompressedMediaPacket*>(this);
-        }
-        if (interfaceId == IID_DataPacket)
-        {
-            addRef();
-            return static_cast<IDataPacket*>(this);
-        }
-        return nullptr;
-    }
-
     virtual int64_t timestampUs() const override { return /*dummy*/ 42; }
 
     virtual const char* codec() const override { return "test_stub_codec"; }
@@ -308,15 +282,15 @@ TEST(stub_analytics_plugin, test)
 
     const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
-    ASSERT_TRUE(queryInterfacePtr<nxpl::PluginInterface>(pluginObject, nxpl::IID_PluginInterface));
-    ASSERT_TRUE(queryInterfacePtr<nxpl::Plugin2>(pluginObject, nxpl::IID_Plugin2));
-    const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject, IID_Plugin);
+    ASSERT_TRUE(queryInterfacePtr<IRefCountable>(pluginObject));
+    ASSERT_TRUE(queryInterfacePtr<nx::sdk::IPlugin>(pluginObject));
+    const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject);
     ASSERT_TRUE(plugin);
 
     const auto engine = toPtr(plugin->createEngine(&error));
     ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(engine);
-    ASSERT_TRUE(queryInterfacePtr<IEngine>(engine, IID_Engine));
+    ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
 
     ASSERT_EQ(plugin.get(), engine->plugin());
 
@@ -337,10 +311,8 @@ TEST(stub_analytics_plugin, test)
     const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), &error));
     ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(baseDeviceAgent);
-    ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent, IID_DeviceAgent));
-
-    const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent,
-        IID_ConsumingDeviceAgent);
+    ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent));
+    const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
     ASSERT_TRUE(deviceAgent);
 
     testDeviceAgentManifest(deviceAgent.get());

@@ -2,20 +2,19 @@
 
 #include <map>
 
+#include <nx/sdk/helpers/ref_countable.h>
+
 #include <nx/sdk/i_string_map.h>
-#include <plugins/plugin_tools.h>
 
 namespace nx {
 namespace sdk {
 
 // TODO: Do something with O(N^2) complexity of lookup by index.
-class StringMap: public nxpt::CommonRefCounter<IStringMap>
+class StringMap: public RefCountable<IStringMap>
 {
     using Map = std::map<std::string, std::string>;
 
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
     void addItem(const std::string& key, const std::string& value);
 
     void clear();

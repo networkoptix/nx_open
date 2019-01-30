@@ -1,21 +1,18 @@
 #pragma once
 
+#include <nx/sdk/interface.h>
+
 #include <nx/sdk/analytics/i_uncompressed_media_frame.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-/**
- * Each class that implements IUncompressedVideoFrame interface should properly handle this GUID in
- * its queryInterface().
- */
-static const nxpl::NX_GUID IID_UncompressedVideoFrame =
-    {{0x46,0xb3,0x52,0x7f,0x17,0xf1,0x4e,0x29,0x98,0x6f,0xfa,0x1a,0xcc,0x87,0xac,0x0d}};
-
-class IUncompressedVideoFrame: public IUncompressedMediaFrame
+class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncompressedMediaFrame>
 {
 public:
+    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IUncompressedVideoFrame"); }
+
     enum class PixelFormat
     {
         yuv420,

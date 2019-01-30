@@ -1,21 +1,19 @@
 #pragma once
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 
 namespace nx::vms::server::analytics {
 
 class Yuv420UncompressedVideoFrame:
-    public nxpt::CommonRefCounter<nx::sdk::analytics::IUncompressedVideoFrame>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IUncompressedVideoFrame>
 {
 public:
     Yuv420UncompressedVideoFrame(CLConstVideoDecoderOutputPtr uncompressedFrame):
         m_frame(std::move(uncompressedFrame))
     {
     }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual int64_t timestampUs() const override { return m_frame->pkt_dts; }
     virtual int width() const override { return m_frame->width; }
