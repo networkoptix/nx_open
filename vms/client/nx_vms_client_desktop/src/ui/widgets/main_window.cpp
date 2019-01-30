@@ -290,6 +290,11 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         });
 
     /* Set up actions. Only these actions will be available through hotkeys. */
+    addAction(action(action::NotificationsTabAction));
+    addAction(action(action::MotionTabAction));
+    addAction(action(action::BookmarksTabAction));
+    addAction(action(action::EventsTabAction));
+    addAction(action(action::ObjectsTabAction));
     addAction(action(action::NextLayoutAction));
     addAction(action(action::PreviousLayoutAction));
     addAction(action(action::SaveCurrentLayoutAction));
