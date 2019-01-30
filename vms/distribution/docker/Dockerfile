@@ -35,4 +35,4 @@ RUN mkdir /debs
 COPY "${mediaserver_deb}" /debs/
 
 # Installing the mediaserver
-RUN apt-get update -qq && apt install -y -qq --no-install-recommends /debs/${mediaserver_deb}
+RUN apt-get update -qq && apt install -y -qq --no-install-recommends "/debs/${mediaserver_deb}"
