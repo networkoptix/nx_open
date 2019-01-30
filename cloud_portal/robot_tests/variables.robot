@@ -201,10 +201,10 @@ ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-s
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 
 #Downloads
-${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
-${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOADS HEADER}                   //h1["Downloads"]
+${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - Client only"]/../..
+${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - Client only"]/../..
+${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - Client only"]/../..
 ${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]
 ${PLAY STORE DOWNLOAD BUTTON}         //a[@class="mobile-link Android"]
 
@@ -213,9 +213,9 @@ ${UBUNTU TAB}                         //a[@id="Linux"]
 ${MAC OS TAB}                         //a[@id="MacOS"]
 
 #History
-${RELEASES TAB}                       //span[@class='tab-heading' and text()='${RELEASES TEXT}']/..
-${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
-${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
+${RELEASES TAB}                       //span[@class='tab-heading' and text()='Releases']/..
+${PATCHES TAB}                        //span[@class='tab-heading' and text()='Patches']/..
+${BETAS TAB}                          //span[@class='tab-heading' and text()='Betas']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
 #Known Limitations

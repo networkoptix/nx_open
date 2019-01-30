@@ -62,7 +62,7 @@
     "RESET PASSWORD EMAIL SUBJECT": "Відновити пароль",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Вам відкритий доступ до системи {{message.system_name}}",
     "DISCONNECT FORM HEADER TEXT": "Відключити систему від %PRODUCT_NAME%?",
-    "FIRST NAME IS REQUIRED TEXT": "Поле Ім'я обов'язково до заповнення",
+    "FIRST NAME IS REQUIRED TEXT": "Поле Ім'я обов'язкове до заповнення",
     "LAST NAME IS REQUIRED TEXT": "Поле Прізвище обов'язкове до заповнення",
     "EMAIL IS REQUIRED TEXT": "Електронна пошта обов'язкова",
     "EMAIL ALREADY REGISTERED TEXT": "Ця електронна адреса вже зареєстрована в %PRODUCT_NAME%",
