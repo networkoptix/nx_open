@@ -760,7 +760,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         {
             const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, actionDescriptor=actionDescriptor, object, engineId=engineId]()
+                [this, actionDescriptor = actionDescriptor, object, engineId = engineId]()
                 {
                     executePluginAction(engineId, actionDescriptor, object);
                 }));
