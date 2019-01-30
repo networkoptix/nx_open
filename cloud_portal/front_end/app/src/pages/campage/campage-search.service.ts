@@ -53,7 +53,7 @@ export class CampageSearchService {
                 return false;
             }
 
-            if (resolution.value !== '0' && camera.resolutionArea <= resolution.value * 0.9) {
+            if (resolution && resolution.value !== '0' && camera.resolutionArea <= resolution.value * 0.9) {
                 return false;
             }
 

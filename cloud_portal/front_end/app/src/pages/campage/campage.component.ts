@@ -41,9 +41,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     toggleCamview: boolean;
 
   private setupDefaults() {
-      this.lang = this.translate.translations[this.translate.currentLang];
-      this.config = this.configService.getConfig();
-      this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported', 'isPtzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
+      this.allowedParameters = ['count', 'vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported', 'isPtzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 
       this.data = undefined;
       this.company = undefined;
@@ -62,32 +60,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.showAll = false;
       this.toggleCamview = false;
 
-      // format to fit the multiselect component
-      this.hardwareTypes = [
-          {id: 'Camera', label: this.lang.camera},
-          {id: 'Multi-Sensor Camera', label: this.lang.multi_sensor_camera},
-          {id: 'Encoder', label: this.lang.encoder},
-          {id: 'DVR', label: this.lang.dvr},
-          {id: 'Other', label: this.lang.other}
-      ];
-
-      this.resolutions = [
-            {value: '0', name: 'All'},
-            {value: '84480', name: '1CIF'},
-            {value: '168960', name: '2CIF'},
-            {value: '337920', name: 'D1'},
-            {value: '307200', name: 'VGA'},
-            {value: '786432', name: 'SVGA'},
-            {value: '921600', name: '720p'},
-            {value: '1310720', name: '1mp'},
-            {value: '2073600', name: '1080p'},
-            {value: '1920000', name: '2mp'},
-            {value: '3145728', name: '3mp'},
-            {value: '4915200', name: '5mp'},
-            {value: '8000000', name: '8mp'},
-            {value: '10039296', name: '10mp'},
-            {value: '15824256', name: '16mp'}
-        ];
       this.filter = {};
       this.emptyFilter = {
             query: '',
@@ -103,70 +75,10 @@ export class NxCampageComponent implements OnInit, DoCheck {
         };
       this.filterModel = this.emptyFilter;
 
-      this.filterModel.tags = [
-          {
-              id  : 'isAudioSupported',
-              label: this.lang.isAudioSupported,
-              value: false
-          },
-          {
-              id  : 'isTwAudioSupported',
-              label: this.lang.isTwAudioSupported,
-              value: false
-          },
-          {
-              id: 'isPtzSupported',
-              label: this.lang.isPtzSupported,
-              value: false
-          },
-          {
-              id  : 'isAptzSupported',
-              label: this.lang.isAptzSupported,
-              value: false
-          },
-          {
-              id  : 'isFisheye',
-              label: this.lang.isFisheye,
-              value: false
-          },
-          {
-              id  : 'isMdSupported',
-              label: this.lang.isMdSupported,
-              value: false
-          },
-          {
-              id  : 'isIoSupported',
-              label: this.lang.isIoSupported,
-              value: false
-          },
-          {
-              id  : 'isH265',
-              label: this.lang.isH265,
-              value: false
-          },
-          {
-              id  : 'isMultiSensor',
-              label: this.lang.isMultiSensor,
-              value: false
-          }
-      ];
-      this.filterModel.selects = [
-          {
-              id      : 'resolution',
-              label   : 'Minimum Resolution',
-              items   : this.resolutions,
-              selected: this.resolutions[0]
-          }
-      ];
-      this.filterModel.multiselects = [
-          {
-              id      : 'hardwareTypes',
-              label   : 'Types',
-              items   : this.hardwareTypes,
-              selected: []
-          }
-          // vendors will be added later
-      ];
+      this.resolutions = [];
+      this.hardwareTypes = [];
+      this.filterModel.tags = [];
+      this.filterModel.multiselects = [];
   }
 
     constructor(private configService: NxConfigService,
@@ -190,6 +102,89 @@ export class NxCampageComponent implements OnInit, DoCheck {
         this.activate();
     }
 
+    addFilterResolutions() {
+        this.resolutions = JSON.parse(this.config.supportedResolutions.replace(/[]/g, '').split(','));
+
+        this.filterModel.selects = [
+            {
+                id      : 'resolution',
+                label   : 'Minimum Resolution',
+                items   : this.resolutions,
+                selected: this.resolutions[0]
+            }
+        ];
+    }
+
+    addFilterTags() {
+        this.filterModel.tags = [
+            {
+                id   : 'isAudioSupported',
+                label: this.lang.isAudioSupported,
+                value: false
+            },
+            {
+                id   : 'isTwAudioSupported',
+                label: this.lang.isTwAudioSupported,
+                value: false
+            },
+            {
+                id   : 'isPtzSupported',
+                label: this.lang.isPtzSupported,
+                value: false
+            },
+            {
+                id   : 'isAptzSupported',
+                label: this.lang.isAptzSupported,
+                value: false
+            },
+            {
+                id   : 'isFisheye',
+                label: this.lang.isFisheye,
+                value: false
+            },
+            {
+                id   : 'isMdSupported',
+                label: this.lang.isMdSupported,
+                value: false
+            },
+            {
+                id   : 'isIoSupported',
+                label: this.lang.isIoSupported,
+                value: false
+            },
+            {
+                id   : 'isH265',
+                label: this.lang.isH265,
+                value: false
+            },
+            {
+                id   : 'isMultiSensor',
+                label: this.lang.isMultiSensor,
+                value: false
+            }
+        ];
+    }
+
+    addFilterTypes() {
+        this.hardwareTypes = [
+            { id: 'Camera', label: this.lang.camera },
+            { id: 'Multi-Sensor Camera', label: this.lang.multi_sensor_camera },
+            { id: 'Encoder', label: this.lang.encoder },
+            { id: 'DVR', label: this.lang.dvr },
+            { id: 'Other', label: this.lang.other }
+        ];
+
+        this.filterModel.multiselects = [
+            {
+                id      : 'hardwareTypes',
+                label   : 'Types',
+                items   : this.hardwareTypes,
+                selected: []
+            }
+            // vendors will be added later
+        ];
+    }
+
     toggleAllowedParameters(param, label1, label2) {
         const paramLookup = this.filterModel.tags.find(x => x.id === param);
         const paramLabel = this.allowedParameters.findIndex(x => x === label1 || x === label2);
@@ -203,9 +198,13 @@ export class NxCampageComponent implements OnInit, DoCheck {
     ngDoCheck() {
         const filterChanges = this.differ.diff(this.filterModel);
         let vendorChanges;
+        let hardwareChanges;
+        let resolutionChanges;
 
         if (this.filterModel.multiselects.find(x => x.id === 'vendors') !== undefined) {
-            vendorChanges = this.vendorDiffer.diff(this.filterModel.multiselects.find(x => x.id === 'vendors').selected);
+            vendorChanges = this.vendorDiffer.diff(this.filterModel.multiselects.find(x => {
+                return x.id === 'vendors';
+            }).selected);
         }
 
         const tagChanges = this.tagDiffer.diff(this.filterModel.tags.map(tag => tag.value));
@@ -217,8 +216,17 @@ export class NxCampageComponent implements OnInit, DoCheck {
             this.allowedParameters = [...this.allowedParameters];
         }
 
-        const resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => x.id === 'resolution').selected);
-        const hardwareChanges = this.hardwareDiffer.diff(this.filterModel.multiselects.find(x => x.id === 'hardwareTypes').selected);
+        if (this.filterModel.multiselects.find(x => x.id === 'resolution') !== undefined) {
+            resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => {
+                return x.id === 'resolution';
+            }).selected);
+        }
+
+        if (this.filterModel.multiselects.find(x => x.id === 'hardwareTypes') !== undefined) {
+            hardwareChanges = this.hardwareDiffer.diff(this.filterModel.multiselects.find(x => {
+                return x.id === 'hardwareTypes';
+            }).selected);
+        }
 
         if (filterChanges || tagChanges || resolutionChanges || vendorChanges || hardwareChanges) {
             this.searchVendor(this.filterModel);
@@ -230,8 +238,17 @@ export class NxCampageComponent implements OnInit, DoCheck {
         this.cameraService
             .getAllCameras(this.company)
             .subscribe(data => {
+                // LANG and CONFIG are not available till now
+                this.lang = this.translate.translations[this.translate.currentLang];
+                this.config = this.configService.getConfig();
+
                 this.data = data;
                 this.camerasSuccessFn(this.data);
+
+                // add hardware types and tags
+                this.addFilterTags();
+                this.addFilterTypes();
+                this.addFilterResolutions();
 
                 // reformat vendors to fit the multiselect component
                 this.filterModel

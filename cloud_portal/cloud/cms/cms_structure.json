@@ -471,54 +471,102 @@
             "description": "Supported resolutions.",
             "advanced": true,
             "type": "select",
-            "value": "[\"0\": \"All\"]",
+            "value": "[{ \"value\":\"0\", \"name\":\"All\" }, { \"value\":\"84480\", \"name\":\"1CIF\" }, { \"value\":\"168960\", \"name\":\"2CIF\" }, { \"value\":\"337920\", \"name\":\"D1\" }, { \"value\":\"307200\", \"name\":\"VGA\" }, { \"value\":\"786432\", \"name\":\"SVGA\" }, { \"value\":\"921600\", \"name\":\"720p\" }, { \"value\":\"1310720\", \"name\":\"1mp\" }, { \"value\":\"2073600\", \"name\":\"1080p\" }, { \"value\":\"1920000\", \"name\":\"2mp\" }, { \"value\":\"3145728\", \"name\":\"3mp\" }, { \"value\":\"4915200\", \"name\":\"5mp\" }, { \"value\":\"8000000\", \"name\":\"8mp\" }, { \"value\":\"10039296\", \"name\":\"10mp\" }, { \"value\":\"15824256\", \"name\":\"16mp\" }]",
             "meta": {
               "multi": true,
               "options": [
                 {
-                  "0": "All"
+                  "value": "0",
+                  "name": "All"
                 },
                 {
-                  "84480": "1CIF"
+                  "value": "84480",
+                  "name": "1CIF"
                 },
                 {
-                  "168960": "2CIF"
+                  "value": "168960",
+                  "name": "2CIF"
                 },
                 {
-                  "337920": "D1"
+                  "value": "337920",
+                  "name": "D1"
                 },
                 {
-                  "307200": "VGA"
+                  "value": "307200",
+                  "name": "VGA"
                 },
                 {
-                  "786432": "SVGA"
+                  "value": "786432",
+                  "name": "SVGA"
                 },
                 {
-                  "921600": "720p"
+                  "value": "921600",
+                  "name": "720p"
                 },
                 {
-                  "1310720": "1mp"
+                  "value": "1310720",
+                  "name": "1mp"
                 },
                 {
-                  "2073600": "1080p"
+                  "value": "2073600",
+                  "name": "1080p"
                 },
                 {
-                  "1920000": "2mp"
+                  "value": "1920000",
+                  "name": "2mp"
                 },
                 {
-                  "3145728": "3mp"
+                  "value": "3145728",
+                  "name": "3mp"
                 },
                 {
-                  "4915200": "5mp"
+                  "value": "4915200",
+                  "name": "5mp"
                 },
                 {
-                  "8000000": "8mp"
+                  "value": "8000000",
+                  "name": "8mp"
                 },
                 {
-                  "10039296": "10mp"
+                  "value": "10039296",
+                  "name": "10mp"
                 },
                 {
-                  "15824256": "16mp"
+                  "value": "15824256",
+                  "name": "16mp"
+                }
+              ]
+            }
+          },
+          {
+            "label": "Supported hardware types",
+            "name": "%SUPPORTED_HARDWARE_TYPES%",
+            "description": "Supported hardware types.",
+            "advanced": true,
+            "type": "select",
+            "value": "",
+            "meta": {
+              "multi": true,
+              "options": [
+                {
+                  "id": "Camera",
+                  "label": "camera"
+                },
+                {
+                  "id": "Multi-Sensor Camera",
+                  "label": "multi_sensor_camera"
+                },
+                {
+                  "id": "Encoder",
+                  "label": "encoder"
+                },
+                {
+                  "id": "DVR",
+                  "label": "dvr"
+                },
+                {
+                  "id": "Other",
+                  "label": "other"
                 }
               ]
             }

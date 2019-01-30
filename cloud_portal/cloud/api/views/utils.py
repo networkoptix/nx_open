@@ -17,6 +17,11 @@ from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProd
 logger = logging.getLogger(__name__)
 
 
+def get_suported_hardware_types():
+    return DataStructure.objects.get(name="%SUPPORTED_HARDWARE_TYPES%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
 def get_sorting_supported_devices():
     return DataStructure.objects.get(name="%SORT_SUPPORTED_DEVICES%").\
         find_actual_value(product=get_cloud_portal_product())
@@ -242,6 +247,7 @@ def get_settings(request):
         'publicDownloads': get_public_downloads_status(),
         'publicReleases': get_public_release_history_status(),
         'sortSupportedDevices': get_sorting_supported_devices(),
-        'supportedResolutions': get_suported_resolutions()
+        'supportedResolutions': get_suported_resolutions(),
+        'supportedhardwareTypes': get_suported_hardware_types()
     }
     return Response(settings_object)

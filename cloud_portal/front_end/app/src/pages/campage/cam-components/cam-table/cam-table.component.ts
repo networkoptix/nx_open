@@ -77,7 +77,7 @@ export class CamTableComponent implements OnChanges, OnInit {
           this.lang.maxFps,
           this.lang.primaryCodecamera,
           this.lang.isAudioSupported,
-          this.lang.isPtzSupported,
+          this.lang.isPtzSupportedShort,
           this.lang.isFisheye,
           this.lang.isMdSupported,
           this.lang.isIoSupported
@@ -180,10 +180,23 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
     }
 
+    filterAllowedParams() {
+        // filter 'service' params
+        const serviceParams = ['count'];
+        this.allowedParameters.forEach((item, index) => {
+            if (serviceParams.indexOf(item) > -1) {
+                this.allowedParameters.splice(index, 1);
+            }
+        });
+    }
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes.elements) {
+            // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
+            const sortBy = (this.CONFIG.sortSupportedDevices) ? 'count' : 'sortKey';
+            this.sortOrderASC = !this.CONFIG.sortSupportedDevices;
             this._elements = changes.elements.currentValue;
-            this.toggleSort('sortKey');
+            this.toggleSort(sortBy);
 
             this.results = this._elements.length;
         }
@@ -194,6 +207,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         if (changes.allowedParameters) {
+            this.filterAllowedParams();
             this.toggleHeaderCaption('isTwAudioSupported', this.lang.isAudioSupported, this.lang.isTwAudioSupported);
             this.toggleHeaderCaption('isAptzSupported', this.lang.isPtzSupported, this.lang.isAptzSupported);
 

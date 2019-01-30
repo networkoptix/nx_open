@@ -93,6 +93,9 @@ window.L = {};
                     appState.trafficRelayHost = response.trafficRelayHost;
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
+                    appState.sortSupportedDevices = response.sortSupportedDevices;
+                    appState.supportedResolutions = response.supportedResolutions;
+                    
                     angular.extend(CONFIG, appState);
                 });
 
