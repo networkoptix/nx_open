@@ -1,6 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include <string>
+#include <unordered_set>
 #include <boost/scope_exit.hpp>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
@@ -120,19 +121,41 @@ QnStorageDb::~QnStorageDb()
     m_timer.cancelSync();
 }
 
-int QnStorageDb::fillCameraOp(
-    nx::media_db::CameraOperation &cameraOp,
-    const QString &cameraUniqueId)
+boost::optional<nx::media_db::CameraOperation> QnStorageDb::createCameraOperation(
+    const QString& cameraUniqueId)
 {
-    int cameraId = qHash(cameraUniqueId);
+    std::unordered_set<int> usedIds;
+    for (const auto uuidCamIdPair: m_uuidToHash.right)
+        usedIds.insert(uuidCamIdPair.first);
 
-    cameraOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
-    cameraOp.setCameraId(cameraId);
-    cameraOp.setCameraUniqueIdLen(cameraUniqueId.size());
-    cameraOp.setCameraUniqueId(
-        QByteArray(cameraUniqueId.toLatin1().constData(), cameraUniqueId.size()));
+    nx::media_db::CameraOperation cameraOperation;
+    int cameraId = -1;
+    for (int i = 0; i <= std::numeric_limits<uint16_t>::max(); ++i)
+    {
+        if (usedIds.find(i) == usedIds.cend())
+        {
+            cameraId = i;
+            break;
+        }
+    }
 
-    return cameraId;
+    const QString warningMessage =
+        lm("Failed to find an unused camera ID index for a unique id %1").args(cameraUniqueId);
+    NX_ASSERT(cameraId != -1, warningMessage);
+    if (!cameraId != -1)
+    {
+        NX_WARNING(this, warningMessage);
+        return boost::none;
+    }
+
+    m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
+
+    cameraOperation.setCameraId(cameraId);
+    cameraOperation.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+    cameraOperation.setCameraUniqueIdLen(cameraUniqueId.size());
+    cameraOperation.setCameraUniqueId(cameraUniqueId.toUtf8());
+
+    return cameraOperation;
 }
 
 int QnStorageDb::getOrGenerateCameraIdHash(const QString &cameraUniqueId)
@@ -145,35 +168,12 @@ int QnStorageDb::getOrGenerateCameraIdHash(const QString &cameraUniqueId)
         return cameraId;
     }
 
-    nx::media_db::CameraOperation cameraOp;
-    cameraId = fillCameraOp(cameraOp, cameraUniqueId);
-    auto existHashIdIt = m_uuidToHash.right.find(cameraId);
+    const auto cameraOperation = createCameraOperation(cameraUniqueId);
+    if (!cameraOperation)
+        return -1;
 
-    const int kMaxTries = 20;
-    int triesSoFar = 0;
-    while (existHashIdIt != m_uuidToHash.right.end())
-    {
-        if (triesSoFar == kMaxTries)
-        {
-            NX_WARNING(
-                this,
-                lm("[media_db] Unable to generate unique hash for camera id %1")
-                .arg(cameraUniqueId));
-            return -1;
-        }
-        cameraId = nx::utils::random::number<uint16_t>();
-        existHashIdIt = m_uuidToHash.right.find(cameraId);
-        triesSoFar++;
-    }
-
-    NX_ASSERT(existHashIdIt == m_uuidToHash.right.end());
-    if (existHashIdIt != m_uuidToHash.right.end())
-        NX_WARNING(this, lit("%1 Bad camera hash").arg(Q_FUNC_INFO));
-
-    m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
-    cameraOp.setCameraId(cameraId);
-    m_dbWriter->writeRecord(cameraOp);
-    return cameraId;
+    writeOrCache(*cameraOperation);
+    return cameraOperation->getCameraId();
 }
 
 bool QnStorageDb::deleteRecords(
@@ -556,34 +556,34 @@ void QnStorageDb::processDbContent(
     UuidToHash uuidToHash;
     for (const auto& cameraData : parsedData.cameras)
     {
+        int index = cameraData.getCameraId() * 2;
+        if (parsedData.addRecords[index].empty() && parsedData.addRecords[index + 1].empty())
+            continue;
+
         uuidToHash.insert(UuidToHash::value_type(
             cameraData.getCameraUniqueId(), cameraData.getCameraId()));
+        cameraData.serialize(writer);
     }
 
-    for (const auto& camera : parsedData.cameras)
-        camera.serialize(writer);
-
+    m_uuidToHash = uuidToHash;
     for (auto itr = parsedData.addRecords.begin(); itr != parsedData.addRecords.end(); ++itr)
     {
         int index = itr->first;
+        auto& catalog = itr->second;
 
         std::deque <DeviceFileCatalog::Chunk> chunks;
-
-        auto& remoteCatalog = parsedData.removeRecords[index];
-        auto& catalog = itr->second;
-        for (size_t index = 0; index < catalog.size(); ++index)
+        auto& removeCatalog = parsedData.removeRecords[index];
+        for (size_t i = 0; i < catalog.size(); ++i)
         {
-            const auto& mediaData = catalog[index];
+            const auto& mediaData = catalog[i];
             const auto hash = mediaData.getHashInCatalog();
-            auto itr =
-            std::upper_bound(
-                remoteCatalog.begin(), remoteCatalog.end(),
-                nx::media_db::DbReader::RemoveData { hash, index });
+            auto removeItr = std::upper_bound(
+                removeCatalog.begin(),
+                removeCatalog.end(),
+                nx::media_db::DbReader::RemoveData { hash, i });
 
-            if (itr != remoteCatalog.end() && itr->hash == hash)
-            {
+            if (removeItr != removeCatalog.end() && removeItr->hash == hash)
                 continue; //< Value removed
-            }
 
             mediaData.serialize(writer);
             if (deviceFileCatalog)
