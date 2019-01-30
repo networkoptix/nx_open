@@ -507,7 +507,7 @@ const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::enabledAnalyticsEngineResources() const
 {
     auto enabledEngines = enabledAnalyticsEngines();
-    return resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
+    return commonModule()->resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
 }
 
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
