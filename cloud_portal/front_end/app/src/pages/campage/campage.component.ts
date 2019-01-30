@@ -78,6 +78,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.resolutions = [];
       this.hardwareTypes = [];
       this.filterModel.tags = [];
+      this.filterModel.selects = [];
       this.filterModel.multiselects = [];
   }
 
