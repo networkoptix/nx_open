@@ -800,11 +800,12 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
         // an artificial delta is added to make the client area differ from the screen dimensions.
         case WM_NCCALCSIZE:
         {
-            if (!isFullScreen())
+            if (!isFullScreen() || isMinimized())
                 return false;
 
             auto rect = LPRECT(msg->lParam);
             ++rect->right;
+
             *result = WVR_REDRAW;
             return true;
         }
@@ -824,11 +825,21 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
             return true;
         }
 
+        // Block default activation processing in fullscreen.
+        case WM_NCACTIVATE:
+        {
+            if (!isFullScreen())
+                return false;
+
+            *result = TRUE;
+            return true;
+        }
+
         // Filling non-client area in fullscreen with the background color also improves visual
         // behavior.
         case WM_NCPAINT:
         {
-            if (!isFullScreen())
+            if (!isFullScreen() && !isMinimized())
                 return false;
 
             gdi::WindowDC context(msg->hwnd);
