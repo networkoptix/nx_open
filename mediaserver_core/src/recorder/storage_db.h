@@ -91,7 +91,8 @@ private:
     void processDbContent(
         nx::media_db::DbReader::Data& parsedData,
         QVector<DeviceFileCatalogPtr> *deviceFileCatalog,
-        ByteStreamWriter& writer);
+        ByteStreamWriter& writer,
+        UuidToHash* outUuidToHash);
     void putRecordsToCatalog(
         QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
         int cameraId,
