@@ -142,7 +142,7 @@ boost::optional<nx::media_db::CameraOperation> QnStorageDb::createCameraOperatio
     const QString warningMessage =
         lm("Failed to find an unused camera ID index for a unique id %1").args(cameraUniqueId);
     NX_ASSERT(cameraId != -1, warningMessage);
-    if (!cameraId != -1)
+    if (cameraId == -1)
     {
         NX_WARNING(this, warningMessage);
         return boost::none;
@@ -482,7 +482,8 @@ bool QnStorageDb::writeVacuumedData(
     }
 
     ByteStreamWriter writer(expectedBufferSize);
-    processDbContent(*(parsedData.get()), outCatalog, writer);
+    UuidToHash updatedUuidToHash;
+    processDbContent(*(parsedData.get()), outCatalog, writer, &updatedUuidToHash);
     writer.flush();
 
     NX_DEBUG(
@@ -504,6 +505,8 @@ bool QnStorageDb::writeVacuumedData(
     NX_DEBUG(
         this,
         "QnStorageDb::writeVacuumedData write to disk finished. time = %1 ms", timer.elapsedMs());
+
+    m_uuidToHash = updatedUuidToHash;
     return true;
 }
 
@@ -548,7 +551,8 @@ DeviceFileCatalog::Chunk QnStorageDb::toChunk(
 void QnStorageDb::processDbContent(
     nx::media_db::DbReader::Data& parsedData,
     QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
-    ByteStreamWriter& writer)
+    ByteStreamWriter& writer,
+    UuidToHash* outUuidToHash)
 {
     UuidToHash uuidToHash;
     for (const auto& cameraData : parsedData.cameras)
@@ -562,7 +566,7 @@ void QnStorageDb::processDbContent(
         cameraData.serialize(writer);
     }
 
-    m_uuidToHash = uuidToHash;
+    *outUuidToHash = uuidToHash;
     for (auto itr = parsedData.addRecords.begin(); itr != parsedData.addRecords.end(); ++itr)
     {
         int index = itr->first;
