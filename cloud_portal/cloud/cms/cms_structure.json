@@ -572,6 +572,67 @@
             }
           }
         ]
+      },
+      {
+        "name": "Footer Menu",
+        "is_global": false,
+        "description": "Footer Menu",
+        "hidden": true,
+        "translatable": true,
+        "values": [
+          {
+            "label": "Footer Items",
+            "name": "%FOOTER_ITEMS%",
+            "value": [
+              {
+                "name": "About <span class=\"product-name\">%PRODUCT_NAME%</span>",
+                "url": "/content/about",
+                "newWindow": false,
+                "enabled": true
+              },
+              {
+                "name": "Download %VMS_NAME%",
+                "url": "/download",
+                "newWindow": false,
+                "enabled": true
+              },
+              {
+                "name": "Integrations",
+                "url": "/integrations",
+                "newWindow": false,
+                "enabled": true
+              },
+              {
+                "name": "Support",
+                "url": "%SUPPORT_LINK%",
+                "newWindow": true,
+                "enabled": true
+              },
+              {
+                "name": "Terms",
+                "url": "/content/eula",
+                "newWindow": false,
+                "enabled": true
+              },
+              {
+                "name": "Privacy",
+                "url": "%PRIVACY_LINK%",
+                "newWindow": false,
+                "enabled": true
+              },
+              {
+                "name": "Supported Devices",
+                "url": "/campage",
+                "newWindow": false,
+                "enabled": true
+              }
+            ],
+            "description": "Defines the elements in the menu",
+            "advanced": true,
+            "optional": false,
+            "type": "array"
+          }
+        ]
       }
     ]
   },

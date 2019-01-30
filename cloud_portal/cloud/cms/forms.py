@@ -90,7 +90,9 @@ class CustomContextForm(forms.Form):
 
             disabled = data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced'))
 
-            if data_structure.type == DataStructure.DATA_TYPES.long_text:
+            if data_structure.type in [DataStructure.DATA_TYPES.long_text,
+                                       DataStructure.DATA_TYPES.object,
+                                       DataStructure.DATA_TYPES.array]:
                 widget_type = forms.Textarea(attrs={'placeholder': data_structure.default})
 
             if data_structure.type == DataStructure.DATA_TYPES.html:
@@ -153,6 +155,9 @@ class CustomContextForm(forms.Form):
             validator = RegexValidator('')
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
                 validator = RegexValidator(data_structure.meta_settings['regex'])
+
+            if data_structure.type in [DataStructure.DATA_TYPES.object, DataStructure.DATA_TYPES.array]:
+                record_value = yaml.safe_load(record_value)
 
             self.fields[data_structure.name] = forms.CharField(required=False,
                                                                label=ds_label,

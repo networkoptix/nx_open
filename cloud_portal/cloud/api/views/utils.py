@@ -32,6 +32,11 @@ def get_suported_resolutions():
         find_actual_value(product=get_cloud_portal_product())
 
 
+def get_footer_items():
+    return DataStructure.objects.get(name="%FOOTER_ITEMS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
 def get_public_downloads_status():
     return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
         find_actual_value(product=get_cloud_portal_product())
@@ -243,6 +248,7 @@ def downloads(request):
 @handle_exceptions
 def get_settings(request):
     settings_object = {
+        'footerItems': get_footer_items(),
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
         'publicDownloads': get_public_downloads_status(),
         'publicReleases': get_public_release_history_status(),
