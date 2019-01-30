@@ -459,24 +459,17 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
         auto cameras = q->cameras();
         MetadataReceiverList newMetadataReceivers;
 
-        const auto isOnline =
-            [](const QnVirtualCameraResourcePtr& camera)
-            {
-                const auto status = camera->getStatus();
-                return status == Qn::Online || status == Qn::Recording;
-            };
-
         // Preserve existing receivers that are still relevant.
         for (auto& receiver: m_metadataReceivers)
         {
-            if (cameras.remove(receiver->camera()) && isOnline(receiver->camera()))
+            if (cameras.remove(receiver->camera()) && receiver->camera()->isOnline())
                 newMetadataReceivers.emplace_back(receiver.release());
         }
 
         // Create new receivers if needed.
         for (const auto& camera: cameras)
         {
-            if (isOnline(camera))
+            if (camera->isOnline())
             {
                 newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
 

@@ -297,11 +297,7 @@ void QnTwoWayAudioWidgetPrivate::updateCamera(const QnVirtualCameraResourcePtr& 
 
 bool QnTwoWayAudioWidgetPrivate::isAllowed() const
 {
-    if (!m_camera)
-        return false;
-
-    bool allowedStatus = (m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording);
-    if (!allowedStatus)
+    if (!m_camera || !m_camera->isOnline())
         return false;
 
     /* Check if we are require licenses for two-way audio. */

@@ -653,7 +653,7 @@ bool QnResource::init()
         changed = m_initialized;
         if (m_initialized)
             initializationDone();
-        else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
+        else if (isOnline())
             setStatus(Qn::Offline);
     }
 

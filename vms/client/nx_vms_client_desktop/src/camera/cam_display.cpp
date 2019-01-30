@@ -2070,7 +2070,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->toResource()->getStatus() == Qn::Online || m_resource->toResource()->getStatus() == Qn::Recording;
+    return m_resource->toResource()->isOnline();
 }
 
 QnAspectRatio QnCamDisplay::overridenAspectRatio() const
