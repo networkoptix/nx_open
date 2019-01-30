@@ -85,7 +85,7 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 {
     const bool singleCamera = state.isSingleCamera();
     const bool singleNonWearableCamera = singleCamera
-        && state.devicesDescription.isWearable == CameraSettingsDialogState::CombinedValue::None;
+        && state.devicesDescription.isWearable == CombinedValue::None;
 
     ui->nameLabel->setVisible(singleCamera);
 

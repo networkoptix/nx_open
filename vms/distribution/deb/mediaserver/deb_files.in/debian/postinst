@@ -85,6 +85,14 @@ function display_complete_setup_hint {
     fi
 }
 
+if [ $(which systemctl) ]
+then
+    # Systemd has a recursion problem with forwarding init.d script.
+    # The script in init.d is for Ubuntu < 16.04 (with Upstart initialization system).
+    [ -f "/etc/init.d/$COMPANY_NAME-mediaserver" ] && rm "/etc/init.d/$COMPANY_NAME-mediaserver"
+    [ -f "/etc/init.d/$COMPANY_NAME-root-tool" ] && rm "/etc/init.d/$COMPANY_NAME-root-tool"
+fi
+
 # This is necessary because changed configuration options should take effect
 # immediately.
 
@@ -179,11 +187,6 @@ systemctl disable apport >/dev/null 2>&1 || true
 service apport stop >/dev/null 2>&1 || true
 
 if [ $(which systemctl) ]; then
-    # Systemd has a recursion problem with forwarding init.d script.
-    # The script in init.d is for Ubuntu < 16.04 (with Upstart initialization system).
-    [ -f "/etc/init.d/$COMPANY_NAME-mediaserver" ] && rm "/etc/init.d/$COMPANY_NAME-mediaserver"
-    [ -f "/etc/init.d/$COMPANY_NAME-root-tool" ] && rm "/etc/init.d/$COMPANY_NAME-root-tool"
-
     # Systemd requires explicit enabling of the service to start it on boot.
     systemctl enable $COMPANY_NAME-root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?

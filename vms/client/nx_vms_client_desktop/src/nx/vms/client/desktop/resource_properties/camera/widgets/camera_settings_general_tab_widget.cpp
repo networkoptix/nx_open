@@ -69,8 +69,6 @@ CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
 
 void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& state)
 {
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
-
     const bool allWearableCameras = state.devicesDescription.isWearable == CombinedValue::All;
     ui->wearableArchiveLengthWidget->setVisible(allWearableCameras);
     ui->wearableMotionWidget->setVisible(allWearableCameras);
@@ -98,6 +96,18 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
 
     ui->editStreamsPanel->setVisible(state.singleCameraProperties.editableStreamUrls);
     ui->overEditStreamsLine->setVisible(state.singleCameraProperties.editableStreamUrls);
+
+    ui->alertBar->setText(
+        [&state]
+        {
+            if (!state.generalTabAlert)
+                return QString();
+
+            NX_ASSERT(*state.generalTabAlert ==
+                CameraSettingsDialogState::GeneralTabAlert::wearableMotionDetection);
+
+            return tr("Motion will be detected only for video, uploaded after function is enabled.");
+        }());
 
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);

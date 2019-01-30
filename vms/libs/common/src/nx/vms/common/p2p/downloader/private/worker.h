@@ -115,7 +115,9 @@ protected:
 
     QList<QnUuid> peersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
-        int count = -1, QList<QnUuid> peers = QList<QnUuid>()) const;
+        int count = -1,
+        QList<QnUuid> peers = QList<QnUuid>(),
+        bool skipPeersWithMinimalRank = true) const;
     void revivePeersWithMinimalRank();
     int selectNextChunk() const;
 

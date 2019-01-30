@@ -702,7 +702,7 @@ void Worker::downloadNextChunk()
         }
     }
 
-    peers = selectPeersForOperation(1, peers);
+    peers = selectPeersForOperation(1, peers, !m_usingInternet);
     if (peers.isEmpty())
     {
         NX_VERBOSE(m_logTag, "downloadNextChunk(): No peers are selected for download. Waiting.");
@@ -949,7 +949,8 @@ QList<QnUuid> Worker::peersWithInternetConnection() const
     return result;
 }
 
-QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) const
+QList<QnUuid> Worker::selectPeersForOperation(
+    int count, QList<QnUuid> peers, bool skipPeersWithMinimalRank) const
 {
     QList<QnUuid> result;
 
@@ -968,10 +969,17 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     if (peers.size() <= count)
     {
-        for (const auto& peer: peers)
+        if (skipPeersWithMinimalRank)
         {
-            if (m_peerInfoById[peer].rank > kMinAutoRank)
-                result.append(peer);
+            for (const auto& peer: peers)
+            {
+                if (m_peerInfoById[peer].rank > kMinAutoRank)
+                    result.append(peer);
+            }
+        }
+        else
+        {
+            result = peers;
         }
         return result;
     }
@@ -991,7 +999,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
         const QnUuid& peerId = *it;
 
         const int rank = m_peerInfoById.value(peerId).rank;
-        if (rank <= kMinAutoRank)
+        if (skipPeersWithMinimalRank && rank <= kMinAutoRank)
         {
             it = peers.erase(it);
             continue;
