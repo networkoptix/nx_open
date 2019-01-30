@@ -10,7 +10,7 @@ class QnCommonModule;
 
 class QnModuleInformationRestHandler:
     public QnJsonRestHandler,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT

@@ -371,7 +371,9 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto status = silent
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindowWidget());
+        : QnConnectionDiagnosticsHelper::validateConnection(
+            connectionInfo, errorCode, mainWindowWidget(),
+            commonModule()->engineVersion());
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
     NX_DEBUG(this, lm("handleConnectReply: connection status %1").arg(status));
 
@@ -1033,7 +1035,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
     // TODO: Should enter 'updating' mode
 
     auto status =  QnConnectionDiagnosticsHelper::validateConnection(
-        connectionInfo, errorCode, mainWindowWidget());
+        connectionInfo, errorCode, mainWindowWidget(), commonModule()->engineVersion());
 
     switch (status)
     {
@@ -1042,7 +1044,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
         // This code is also returned if we are downloading compatibility version
         case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
-            if (!applauncher::api::checkOnline(false))
+            if (!applauncher::api::checkOnline(commonModule()->engineVersion(), false))
                 break;
             // Fall through
         case Qn::SuccessConnectionResult:

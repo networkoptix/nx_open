@@ -458,7 +458,8 @@ int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
 {
     if (isForcedBufferingEnabled())
     {
-        constexpr int kMillisecondsPerFrame = 10; //< Should be enough for every camera so far.
+        // TODO Add warning when buffer size not enought to fill required duration.
+        constexpr int kMillisecondsPerFrame = 2; //< Should be enough for every camera so far.
         return (int) forcedVideoBufferLength().count() / kMillisecondsPerFrame;
     }
 

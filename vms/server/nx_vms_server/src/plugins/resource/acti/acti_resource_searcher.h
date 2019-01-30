@@ -12,29 +12,32 @@
 class QnActiResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using base_type = nx::network::upnp::SearchAutoHandler;
 public:
     QnActiResourceSearcher(QnMediaServerModule* serverModule);
-    virtual ~QnActiResourceSearcher();
+    virtual ~QnActiResourceSearcher() override;
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params);
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QString manufacture() const;
+    virtual QString manufacture() const override;
 
     virtual QnResourceList findResources() override;
-    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
     static const QString kSystemInfoProductionIdParamName;
+
     virtual bool isEnabled() const override;
-protected:
+
     virtual bool processPacket(
         const QHostAddress& discoveryAddr,
         const nx::network::SocketAddress& deviceEndpoint,
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
-
 
 private:
     struct CacheInfo
@@ -74,7 +77,7 @@ private:
         const nx::network::upnp::DeviceInfo& devInfo,
         const nx::utils::MacAddress& mac,
         const QAuthenticator &auth,
-        QnResourceList& result );
+        QnResourceList& result);
 
     boost::optional<QnActiResource::ActiSystemInfo> getActiSystemInfo(
         const QnActiResourcePtr& actiResource);

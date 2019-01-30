@@ -5,7 +5,7 @@
 
 class QnCancelUpdateRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnCancelUpdateRestHandler(QnMediaServerModule* serverModule);

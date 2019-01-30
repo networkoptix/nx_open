@@ -108,7 +108,7 @@ private:
 
     TimestampMapper m_timestamps;
 
-    uint64_t m_lastVideoPts = 0;
+    int64_t m_lastVideoPts = 0;
     uint64_t m_lastTimestamp = 0;
     uint64_t m_timePerFrame = 0;
 

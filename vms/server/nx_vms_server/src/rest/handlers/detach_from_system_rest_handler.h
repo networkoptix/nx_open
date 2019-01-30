@@ -12,7 +12,7 @@ namespace ec2 {
 
 class QnDetachFromSystemRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

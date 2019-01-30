@@ -124,7 +124,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
 
 }
 
-QnResourceList QnPlISDResourceSearcher::findResources(void)
+QnResourceList QnPlISDResourceSearcher::findResources()
 {
 
     QnResourceList upnpResults;

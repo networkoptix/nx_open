@@ -11,7 +11,7 @@
 
 namespace nx::analytics {
 
-class EventTypeDescriptorManager: public QnCommonModuleAware
+class EventTypeDescriptorManager: public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 

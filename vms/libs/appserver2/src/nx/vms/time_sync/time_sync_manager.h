@@ -54,7 +54,7 @@ namespace nx {
 namespace vms {
 namespace time_sync {
 
-class TimeSyncManager: public AbstractTimeSyncManager, public QnCommonModuleAware
+class TimeSyncManager: public AbstractTimeSyncManager, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

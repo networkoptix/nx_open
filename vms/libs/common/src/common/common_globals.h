@@ -480,6 +480,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
+    QString toErrorMessage(AuthResult value);
 
     using FailoverPriority = nx::vms::api::FailoverPriority;
 

@@ -59,7 +59,7 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
-class QnStorageManager: public QObject, public nx::vms::server::ServerModuleAware
+class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;

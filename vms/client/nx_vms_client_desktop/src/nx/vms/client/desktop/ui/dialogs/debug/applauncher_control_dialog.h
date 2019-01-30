@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ui/dialogs/common/dialog.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace Ui {
 class ApplauncherControlDialog;
@@ -13,10 +14,13 @@ class QnApplauncherControlDialog: public QnDialog
 {
     using base_type = QnDialog;
 public:
-    QnApplauncherControlDialog(QWidget* parent = nullptr);
+    QnApplauncherControlDialog(
+        QWidget* parent = nullptr,
+        const api::SoftwareVersion& engineVersion = api::SoftwareVersion());
 
 private:
     QScopedPointer<Ui::ApplauncherControlDialog> ui;
+    const api::SoftwareVersion m_engineVersion;
 };
 
 } // namespace ui

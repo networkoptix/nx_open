@@ -18,7 +18,7 @@ class MediaServerLauncher: public QObject
     Q_OBJECT
 public:
 
-    enum class DisabledFeature
+    enum DisabledFeature
     {
         none                = 0,
         noResourceDiscovery = 1 << 0,
@@ -28,6 +28,7 @@ public:
         all = count - 1
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
+
 
     MediaServerLauncher(
         const QString& tmpDir = QString(),
@@ -43,6 +44,7 @@ public:
     void connectTo(MediaServerLauncher* target, bool isSecure = true);
 
     void addSetting(const std::string& name, const QVariant& value);
+    void addCmdOption(const std::string& option);
 
     /**
      * Run media server at the current thread
@@ -71,6 +73,7 @@ public:
      */
     nx::utils::Url apiUrl() const;
     QString dataDir() const;
+    MediaServerProcess* mediaServerProcess() const { return m_mediaServerProcess.get(); }
 
 signals:
     void started();
@@ -86,5 +89,6 @@ private:
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
     bool m_firstStartup;
     std::map<std::string, QString> m_settings;
+    std::vector<std::string> m_cmdOptions;
     QnUuid m_serverGuid;
 };

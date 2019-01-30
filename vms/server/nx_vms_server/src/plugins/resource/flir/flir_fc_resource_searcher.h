@@ -20,7 +20,7 @@ namespace flir {
 
 class FcResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using DeviceInfo = nx::plugins::flir::fc_private::DeviceInfo;
 
@@ -34,18 +34,19 @@ public:
     FcResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~FcResourceSearcher() override;
 
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId,
+        const QnResourceParams &params) override;
+
+    virtual bool isSequential() const override;
+    virtual QString manufacture() const override;
+
+    virtual QnResourceList findResources() override;
+
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
-
-    virtual QnResourceList findResources() override;
-
-    virtual bool isSequential() const override;
-    virtual QString manufacture() const override;
-    virtual QnResourcePtr createResource(
-        const QnUuid &resourceTypeId,
-        const QnResourceParams &params) override;
 
 private:
     QnResourcePtr makeResource(

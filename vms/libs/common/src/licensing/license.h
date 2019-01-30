@@ -152,7 +152,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
-class QnLicensePool: public QObject, public QnCommonModuleAware
+class QnLicensePool: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

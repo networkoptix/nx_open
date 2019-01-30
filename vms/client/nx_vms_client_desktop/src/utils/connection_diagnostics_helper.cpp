@@ -27,6 +27,7 @@
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/api/data/software_version.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -65,7 +66,8 @@ QnConnectionDiagnosticsHelper::QnConnectionDiagnosticsHelper(QObject* parent):
 
 QString QnConnectionDiagnosticsHelper::getErrorDescription(
     Qn::ConnectionResult result,
-    const QnConnectionInfo& connectionInfo)
+    const QnConnectionInfo& connectionInfo,
+    const nx::vms::api::SoftwareVersion& engineVersion)
 {
     static const QString kRowMarker = lit(" - ");
     QString versionDetails;
@@ -76,7 +78,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
         };
 
 
-    addRow(tr("Client version: %1.").arg(qnStaticCommon->engineVersion().toString()));
+    addRow(tr("Client version: %1.").arg(engineVersion.toString()));
 
     if (qnRuntime->isDevMode())
     {
@@ -141,14 +143,15 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     const QnConnectionInfo& connectionInfo,
     ec2::ErrorCode errorCode,
-    QWidget* parentWidget)
+    QWidget* parentWidget,
+    const nx::vms::api::SoftwareVersion& engineVersion)
 {
     const auto result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
     if (result == Qn::SuccessConnectionResult)
     {
         // Forcing compatibility mode for debug purposes.
         if (ini().forceCompatibilityMode)
-            return handleCompatibilityMode(connectionInfo, parentWidget);
+            return handleCompatibilityMode(connectionInfo, parentWidget, engineVersion);
 
         return result;
     }
@@ -156,11 +159,11 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     if (result == Qn::IncompatibleProtocolConnectionResult
         || result == Qn::IncompatibleCloudHostConnectionResult)
     {
-        return handleCompatibilityMode(connectionInfo, parentWidget);
+        return handleCompatibilityMode(connectionInfo, parentWidget, engineVersion);
     }
 
     showValidateConnectionErrorMessage(parentWidget,
-        result, connectionInfo);
+        result, connectionInfo, engineVersion);
     return result;
 }
 
@@ -172,7 +175,8 @@ QString QnConnectionDiagnosticsHelper::ldapServerTimeoutMessage()
 void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
     QWidget* parentWidget,
     Qn::ConnectionResult result,
-    const QnConnectionInfo& connectionInfo)
+    const QnConnectionInfo& connectionInfo,
+    const nx::vms::api::SoftwareVersion& engineVersion)
 {
     const QString serverVersion = connectionInfo.version.toString();
 
@@ -229,14 +233,14 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::IncompatibleVersionConnectionResult:
             QnMessageBox::critical(parentWidget,
                 getDiffVersionsText(),
-                getDiffVersionsExtra(qnStaticCommon->engineVersion().toString(), serverVersion) + L'\n'
+                getDiffVersionsExtra(engineVersion.toString(), serverVersion) + L'\n'
                     + tr("Compatibility mode for versions lower than %1 is not supported.")
                         .arg(QnConnectionValidator::minSupportedVersion().toString()));
             break;
         case Qn::IncompatibleProtocolConnectionResult:
             QnMessageBox::warning(parentWidget,
                 QString(),
-                getDiffVersionsFullText(qnStaticCommon->engineVersion().toString(), serverVersion)
+                getDiffVersionsFullText(engineVersion.toString(), serverVersion)
                     + L'\n' + tr("Restart %1 in compatibility mode "
                         "will be required.").arg(QnClientAppInfo::applicationDisplayName()));
             break;
@@ -255,7 +259,8 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
 QnConnectionDiagnosticsHelper::TestConnectionResult
 QnConnectionDiagnosticsHelper::validateConnectionTest(
     const QnConnectionInfo& connectionInfo,
-    ec2::ErrorCode errorCode)
+    ec2::ErrorCode errorCode,
+    const nx::vms::api::SoftwareVersion& engineVersion)
 {
     using namespace Qn;
     TestConnectionResult result;
@@ -265,17 +270,18 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
     result.result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
     result.helpTopicId = helpTopic(result.result);
 
-    result.details = getErrorDescription(result.result, connectionInfo);
+    result.details = getErrorDescription(result.result, connectionInfo, engineVersion);
     return result;
 }
 
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
+    const nx::vms::api::SoftwareVersion& engineVersion,
     QList<nx::utils::SoftwareVersion>* versions)
 {
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline())
+    if (!checkOnline(engineVersion))
         return false;
 
     const auto result = applauncher::api::getInstalledVersions(versions);
@@ -306,9 +312,10 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidg
 
 QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     const QnConnectionInfo& serverInfo,
-    const QString& extraText)
+    const QString& extraText,
+    const nx::vms::api::SoftwareVersion& engineVersion)
 {
-    const QString clientVersion = qnStaticCommon->engineVersion().toString();
+    const QString clientVersion = engineVersion.toString();
     const QString serverVersion = serverInfo.version.toString();
 
     QString devModeText;
@@ -347,12 +354,13 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionsFullText(
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     const QnConnectionInfo &connectionInfo,
-    QWidget* parentWidget)
+    QWidget* parentWidget,
+    const nx::vms::api::SoftwareVersion& engineVersion)
 {
     using namespace Qn;
     using Dialog = CompatibilityVersionInstallationDialog;
     QList<nx::utils::SoftwareVersion> versions;
-    if (!getInstalledVersions(&versions))
+    if (!getInstalledVersions(engineVersion, &versions))
         return handleApplauncherError(parentWidget);
 
     QList<QString> versionStrings;
@@ -371,7 +379,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         {
             auto extras = getDiffVersionFullExtras(connectionInfo,
                 tr("You have to download another version of %1 to "
-                    "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
+                    "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()),
+                engineVersion);
 
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Download Client version %1?").arg(versionString), extras,
@@ -382,7 +391,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             if (dialog.exec() == QDialogButtonBox::Cancel)
                 return Qn::IncompatibleVersionConnectionResult;
 
-            QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
+            QScopedPointer<Dialog> installationDialog(new Dialog(
+                connectionInfo, parentWidget, engineVersion));
 
             //starting installation
             installationDialog->exec();
@@ -406,7 +416,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         //version is installed, trying to run
         const auto extras = getDiffVersionFullExtras(connectionInfo,
             tr("You have to restart %1 in compatibility"
-                " mode to connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
+                " mode to connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()),
+            engineVersion);
 
         if (!shouldAutoRestart)
         {
@@ -427,7 +438,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
             connectionInfo.version);
 
-        switch (applauncher::api::restartClient(connectionInfo.version, authString))
+        switch (applauncher::api::restartClient(connectionInfo.version, engineVersion, authString))
         {
             case applauncher::api::ResultType::ok:
                 return Qn::IncompatibleProtocolConnectionResult;
@@ -453,7 +464,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                     return Qn::IncompatibleVersionConnectionResult;
 
                 //starting installation
-                QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
+                QScopedPointer<Dialog> installationDialog(
+                    new Dialog(connectionInfo, parentWidget, engineVersion));
                 installationDialog->exec();
                 auto result = installationDialog->installationResult();
                 if (result == Dialog::InstallResult::complete)

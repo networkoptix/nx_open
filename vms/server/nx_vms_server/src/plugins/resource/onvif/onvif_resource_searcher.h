@@ -11,7 +11,7 @@ namespace nx::vms::server { class Settings; }
 
 class OnvifResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     OnvifResourceSearcher(QnMediaServerModule* serverModule);
@@ -19,7 +19,7 @@ public:
 
     virtual void pleaseStop() override;
 
-    bool isProxy() const;
+    //bool isProxy() const;
 
     virtual QnResourceList findResources();
 

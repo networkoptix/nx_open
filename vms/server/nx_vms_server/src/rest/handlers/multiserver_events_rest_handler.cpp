@@ -22,7 +22,7 @@ using namespace nx;
 //-------------------------------------------------------------------------------------------------
 // QnMultiserverEventsRestHandler::Private
 
-class QnMultiserverEventsRestHandler::Private: public nx::vms::server::ServerModuleAware
+class QnMultiserverEventsRestHandler::Private: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using MultiData = std::vector<vms::event::ActionDataList>;
 

@@ -32,7 +32,7 @@ class StreamingChunkTranscoder:
     public QObject,
     public nx::utils::TimerEventHandler,
     public Qn::EnableSafeDirectConnection,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

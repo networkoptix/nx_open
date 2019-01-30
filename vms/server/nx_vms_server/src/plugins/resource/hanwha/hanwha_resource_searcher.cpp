@@ -137,7 +137,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     return result;
 }
 
-QnResourceList HanwhaResourceSearcher::findResources(void)
+QnResourceList HanwhaResourceSearcher::findResources()
 {
     QnResourceList upnpResults;
 

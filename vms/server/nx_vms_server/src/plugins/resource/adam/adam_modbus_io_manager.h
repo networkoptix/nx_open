@@ -65,6 +65,8 @@ public:
 
     virtual void terminate() override;
 
+    QString idForToStringFromPtr() const;
+
 private:
     bool initializeIO();
 

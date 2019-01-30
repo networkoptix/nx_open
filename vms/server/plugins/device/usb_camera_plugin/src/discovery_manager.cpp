@@ -2,7 +2,6 @@
 
 #include <QCryptographicHash>
 
-#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
 #include "plugin.h"

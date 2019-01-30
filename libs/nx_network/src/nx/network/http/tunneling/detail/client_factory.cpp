@@ -79,7 +79,7 @@ void ClientFactory::registerClientType(
         ++m_prevUsedTypeId,
         ClientTypeContext{ std::move(factoryFunction) });
 
-    // Using same weight for each tunnel since m_tunnelTypeSelector selects 
+    // Using same weight for each tunnel since m_tunnelTypeSelector selects
     // first-added item from items on the same depth.
     NX_CRITICAL(m_tunnelTypeSelector.add(m_prevUsedTypeId, kEveryTunnelTypeWeight));
 }
