@@ -80,6 +80,9 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
+    const QSet<QnUuid> enabledAnalyticsEngines() const;
+    const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
+
     const nx::vms::common::AnalyticsEngineResourceList userEnabledAnalyticsEngineResources() const;
     QSet<QnUuid> userEnabledAnalyticsEngines() const;
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);

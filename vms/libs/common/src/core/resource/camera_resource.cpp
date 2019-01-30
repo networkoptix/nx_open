@@ -498,6 +498,31 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
     return QnAdvancedStreamParams();
 }
 
+const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
+{
+    auto enabledEngines = userEnabledAnalyticsEngines();
+    const auto engineResources = commonModule()
+        ->resourcePool()
+        ->getResources<nx::vms::common::AnalyticsEngineResource>();
+
+    const auto sharedThis = toSharedPointer(this);
+    for (const auto& engineResource: engineResources)
+    {
+        if (engineResource->isEngineEnabledForDevice(sharedThis))
+            enabledEngines.insert(engineResource->getId());
+    }
+
+    return enabledEngines;
+}
+
+const nx::vms::common::AnalyticsEngineResourceList
+    QnVirtualCameraResource::enabledAnalyticsEngineResources() const
+{
+    const auto enabledEngines = enabledAnalyticsEngines();
+    return resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
+        enabledEngines);
+}
+
 const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::userEnabledAnalyticsEngineResources() const
 {

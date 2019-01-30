@@ -615,7 +615,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             nullptr,
             false);
 
-        state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
+        state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
     }
 
     state.recording.enabled = {};

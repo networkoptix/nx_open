@@ -252,7 +252,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         QSet<QnUuid> enabledEngines;
         const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
         for (const auto& camera: cameras)
-            enabledEngines += camera->userEnabledAnalyticsEngines();
+            enabledEngines += camera->enabledAnalyticsEngines();
 
         if (!eventTypeDescriptors.empty())
         {
