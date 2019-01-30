@@ -53,7 +53,8 @@ export class NxLayoutRightComponent implements OnInit {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        const toggle: SimpleChange = changes.toggle;
-        this._toggle = toggle.currentValue;
+        if (changes.toggle) {
+            this._toggle = changes.toggle.currentValue;
+        }
     }
 }

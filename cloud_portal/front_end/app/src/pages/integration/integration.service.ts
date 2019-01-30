@@ -23,7 +23,6 @@ export class IntegrationService implements OnDestroy {
 
     constructor(private api: NxCloudApiService,
                 private config: NxConfigService) {
-
         this.getIntegrations().subscribe(result => {
             this.plugins = result.data;
             this.formatPlugins();

@@ -98,7 +98,7 @@ def get_integration(request, product_id=None):
 
 
 @api_view(("GET", ))
-@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny, ))
 def get_integrations(request):
     integrations = Product.objects.filter(product_type__type=INTEGRATION,
                                           customizations__name__in=[settings.CUSTOMIZATION])

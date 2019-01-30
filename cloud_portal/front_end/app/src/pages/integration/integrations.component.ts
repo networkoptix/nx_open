@@ -1,13 +1,13 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { IntegrationService }                          from './integration.service';
+import { Component, OnInit }  from '@angular/core';
+import { IntegrationService } from './integration.service';
 
 @Component({
     selector   : 'integrations-component',
     templateUrl: 'integrations.component.html',
-    styleUrls  : [ 'integrations.component.scss' ]
+    styleUrls  : ['integrations.component.scss']
 })
 
-export class NxIntegrationsComponent implements OnInit, OnChanges {
+export class NxIntegrationsComponent implements OnInit {
 
     private allElements: any;
     private elements: any;
@@ -34,15 +34,15 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
         this.integrations
             .pluginsSubject
             .subscribe((result: any) => {
-                if (result.length) {
-                    this.allElements = result;
-                    // array deep copy for filtering
-                    this.elements = this.allElements.map(obj => ({ ...obj }));
-                }
-            },
-            error => {
-                console.error('Error -> ', error);
-            });
+                        if (result.length) {
+                            this.allElements = result;
+                            // array deep copy for filtering
+                            this.elements = this.allElements.map(obj => ({ ...obj }));
+                        }
+                    },
+                    error => {
+                        console.error('Error -> ', error);
+                    });
     }
 
     markMatch(item, text) {
@@ -54,7 +54,7 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
         this.elements = this.allElements.map(obj => ({ ...obj }));
         this.elements = this.elements.filter(item => {
             if (item.name.indexOf(text) > -1 ||
-                item.description.indexOf(text) > -1) {
+                    item.description.indexOf(text) > -1) {
 
                 this.markMatch(item, text);
                 return item;
@@ -64,14 +64,14 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
 
     setFilter(value, target) {
         let showAll = true;
-        this.selectors[ target ] = value; // model is not updated yet
+        this.selectors[target] = value; // model is not updated yet
 
         if (this.search === '') {
             this.elements = this.allElements.map(obj => ({ ...obj }));
         }
 
         this.elements = this.elements.filter(item => {
-            if (this.selectors[ item.type ]) {
+            if (this.selectors[item.type]) {
                 showAll = false;
                 return item;
             }
@@ -82,10 +82,5 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
             this.elements = this.allElements.map(obj => ({ ...obj }));
         }
     }
-
-    ngOnChanges(change: SimpleChanges) {
-
-    }
-
 }
 

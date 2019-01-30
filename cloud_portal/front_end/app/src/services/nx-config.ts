@@ -38,7 +38,7 @@ export class NxConfigService {
 
             links: {
                 admin: {
-                    product: '/admin/cms/product/'
+                    product: '/admin/cms/product/%ID%/pages/'
                 }
             },
 
