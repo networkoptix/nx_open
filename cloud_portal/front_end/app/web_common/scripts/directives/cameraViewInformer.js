@@ -2,19 +2,20 @@
     
     'use strict';
     
-    function CameraViewInformer(configService) {
-    
-        const CONFIG = configService.config;
+    function CameraViewInformer(nxConfigService, languageService) {
+        
+        const CONFIG = nxConfigService.getConfig();
+        const LANG = languageService.lang;
         
         function updateTpl(scope) {
             //offline and unauthorized are special cases. All others can be set without editing
             if (scope.alertType === 'status') {
-                scope.placeholderTitle = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
+                scope.placeholderTitle = LANG.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
                 scope.message = '';
                 scope.iconClass = (scope.flags.status === 'Offline') ? 'camera-view-offline' : 'camera-view-unauthorized';
             } else {
                 scope.iconClass = 'camera-view-error';
-                scope.placeholderTitle = L.common.cameraStates.error;
+                scope.placeholderTitle = LANG.common.cameraStates.error;
                 scope.message = scope.flags.errorDescription;
             }
         }
@@ -72,7 +73,7 @@
         };
     }
     
-    CameraViewInformer.$inject = ['configService'];
+    CameraViewInformer.$inject = ['nxConfigService', 'languageService'];
     
     angular
         .module('nxCommon')

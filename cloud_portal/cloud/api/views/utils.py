@@ -2,18 +2,49 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import caches
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
+from api.helpers.exceptions import handle_exceptions, require_params,\
     APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
-import datetime, logging
+import datetime
 import json
+import logging
 import re
 import requests
 from cloud import settings
 from django.shortcuts import redirect
 
-from cms.models import Customization, UserGroupsToCustomizationPermissions
+from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProductPermissions
 
 logger = logging.getLogger(__name__)
+
+
+def get_suported_hardware_types():
+    return DataStructure.objects.get(name="%SUPPORTED_HARDWARE_TYPES%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_sorting_supported_devices():
+    return DataStructure.objects.get(name="%SORT_SUPPORTED_DEVICES%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_suported_resolutions():
+    return DataStructure.objects.get(name="%SUPPORTED_RESOLUTIONS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_footer_items():
+    return DataStructure.objects.get(name="%FOOTER_ITEMS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_public_downloads_status():
+    return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_public_release_history_status():
+    return DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
+        find_actual_value(product=get_cloud_portal_product())
 
 
 @api_view(['GET', 'POST'])
@@ -29,16 +60,16 @@ def visited_key(request):
         key = 'visited_key_' + request.query_params['key']
         value = global_cache.get(key, False)
 
-        logger.debug('check visited: {0}: {1}'.format(key,value))
+        logger.debug('check visited: {0}: {1}'.format(key, value))
 
-    elif request.method == 'POST':
+    else:
         # Save cache value here
         require_params(request, ('key',))
         key = 'visited_key_' + request.data['key']
         value = datetime.datetime.now().strftime('%c')
         global_cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
 
-        logger.debug('visited: {0}: {1}'.format(key,value))
+        logger.debug('visited: {0}: {1}'.format(key, value))
 
     return Response({'visited': value})
 
@@ -79,13 +110,12 @@ def language(request):
 @handle_exceptions
 def downloads_history(request):
     # TODO: later we can check specific permissions
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-    can_view_releases = UserGroupsToCustomizationPermissions.check_permission(request.user, customization.name,
-                                                                              'api.can_view_release')
-    if not customization.public_release_history and not can_view_releases:
+    can_view_releases = UserGroupsToProductPermissions.\
+        check_customization_permission(request.user, settings.CUSTOMIZATION, 'api.can_view_release')
+    if not get_public_release_history_status() and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
-    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization.name)
+    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
     downloads_json = requests.get(downloads_url)
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()
@@ -99,14 +129,15 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release') \
-            and not Customization.objects.get(name=customization).public_release_history:
+    if not get_public_release_history_status() and not UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, customization, 'api.can_view_release'):
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
         raise APINotFoundException("Invalid build number", ErrorCodes.bad_request)
 
-    downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
+    downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).\
+        replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
 
     if downloads_json.status_code != 200:
@@ -115,7 +146,9 @@ def download_build(request, build):
     downloads_json = downloads_json.json()
 
     if 'releaseNotes' not in downloads_json:
-        raise APINotFoundException("No downloads.json for this build", ErrorCodes.not_found, error_data=request.query_params)
+        raise APINotFoundException("No downloads.json for this build",
+                                   ErrorCodes.not_found,
+                                   error_data=request.query_params)
 
     updates_json = requests.get(settings.UPDATE_JSON)
     updates_json.raise_for_status()
@@ -138,8 +171,7 @@ def download_build(request, build):
 def downloads(request):
     global_cache = caches['global']
     customization = settings.CUSTOMIZATION
-    customization_model = Customization.objects.get(name=settings.CUSTOMIZATION)
-    if not customization_model.public_downloads and not request.user.is_authenticated:
+    if not get_public_downloads_status() and not request.user.is_authenticated:
         raise APIForbiddenException("Not authorized", ErrorCodes.not_authorized)
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
@@ -198,6 +230,16 @@ def downloads(request):
         global_cache.set(cache_key, json.dumps(downloads_json))
     else:
         downloads_json = json.loads(downloads_json)
+
+    # Remove platforms that are not marked as available.
+    available_platforms = DataStructure.objects.get(name='%AVAILABLE_DOWNLOADS_PLATFORM%').\
+        find_actual_value(get_cloud_portal_product())
+    platforms = []
+    for platform in downloads_json['platforms']:
+        if platform['name'] in available_platforms:
+            platforms.append(platform)
+
+    downloads_json['platforms'] = platforms
     return Response(downloads_json)
 
 
@@ -205,11 +247,13 @@ def downloads(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def get_settings(request):
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-
     settings_object = {
-        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST,
-        'publicDownloads':customization.public_downloads,
-        'publicReleases':customization.public_release_history
+        'footerItems': get_footer_items(),
+        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads': get_public_downloads_status(),
+        'publicReleases': get_public_release_history_status(),
+        'sortSupportedDevices': get_sorting_supported_devices(),
+        'supportedResolutions': get_suported_resolutions(),
+        'supportedHardwareTypes': get_suported_hardware_types()
     }
     return Response(settings_object)

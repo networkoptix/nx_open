@@ -9,16 +9,14 @@
     <base href="/">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://cameras.networkoptix.com/api/v1/cacameras/">
 
     <link rel="icon" href="static/images/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
-    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
-    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
-    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/fonts.css"/>
 
     <% for (key in htmlWebpackPlugin.files.css) { %>
     <link rel="stylesheet" href="/static<%= htmlWebpackPlugin.files.css[key] %>" />
@@ -35,6 +33,7 @@
     Please, turn on JavaScript in your browser
 </noscript>
 
+<nx-ribbon></nx-ribbon>
 <nx-header ng-cloak></nx-header>
 
 <nx-app>

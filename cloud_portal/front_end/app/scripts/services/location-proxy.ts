@@ -6,9 +6,11 @@
         .module('cloudApp.services')
         .service('locationProxyService', LocationProxyService);
 
-    LocationProxyService.$inject = [ '$location', '$rootScope', '$route', 'configService' ];
+    LocationProxyService.$inject = [ '$location', '$rootScope', '$route', 'nxConfigService' ];
 
-    function LocationProxyService($location, $rootScope, $route, configService) {
+    function LocationProxyService($location, $rootScope, $route, nxConfigService) {
+
+        const CONFIG = nxConfigService.getConfig();
 
         // Support changing location without reloading controller
         const original = $location.path;
@@ -29,10 +31,10 @@
                 });
             }
             if ($location.search().debug) {
-                configService.allowDebugMode = $location.search().debug;
+                CONFIG.allowDebugMode = $location.search().debug;
             }
             if ($location.search().beta) {
-                configService.allowBetaMode = $location.search().beta;
+                CONFIG.allowBetaMode = $location.search().beta;
             }
             return original.apply($location, [ path ]);
         };

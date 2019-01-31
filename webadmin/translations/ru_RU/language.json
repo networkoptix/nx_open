@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Неверный логин или пароль",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Слишком много попыток. Повторите позже."
     },
     "navigaion": {
         "cannotGetUser": "Ошибка сервера: не удаётся получить данные текущего пользователя"

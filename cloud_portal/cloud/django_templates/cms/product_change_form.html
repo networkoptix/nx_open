@@ -1,0 +1,39 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+{% load cms_filters %}
+{% block content %}
+    <div class="module custom-block">
+        <div style="margin-bottom: 20px;">
+        {% if current_versions %}
+            <h2>Current Version for customization</h2>
+            <div class="table-responsive">
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <td><strong>Customization</strong></td>
+                            <td><strong>Version</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for customization_version in current_versions %}
+                        <tr>
+                            <td> {{ customization_version.customization }} </td>
+                            {% if customization_version.version %}
+                            <td> {{ customization_version.version.id }} </td>
+                            {% else %}
+                            <td> {{ customization_version.id }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif current_versions %}
+            <h2>Current Version</h2>
+            <div>{{ current_versions.0.id }}</div>
+        {% endif %}
+        </div>
+        <h2>Product Information</h2>
+    </div>
+    {{ block.super }}
+{% endblock %}

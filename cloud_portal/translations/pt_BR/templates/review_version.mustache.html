@@ -1,0 +1,10 @@
+<h1>Existe uma nova revisão para {{ message.product }}</h1>
+<p>Clique no link para revisar o rascunho {{ message.id }} para {{ message.product }}</p>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/version/{{ message.id }}/">Versão de Revisão</a>
+<h4>Nesta página pode</h4>
+<ul>
+	<li>Crie uma pré-visualização para ver as alterações mais recentes.</li>
+	<li>Publique esta versão que atualizará todo o conteúdo.</li>
+	<li>Edite os contextos clicando no botão de edição de registo. <br>
+		Para ver essas alterações, precisará de criar uma nova versão</li>
+</ul>

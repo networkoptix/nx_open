@@ -26,12 +26,13 @@ Restart
 
 *** Test Cases ***
 can be opened in anonymous state
+    [Tags]        Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
 can be closed by clicking on the X
-    [tags]    C24212
+    [tags]    C24212    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
@@ -39,30 +40,34 @@ can be closed by clicking on the X
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
-    [tags]    C24212    C24213
+    [tags]    C24212    C24213    Threaded
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
     Validate Log Out
 
 redirects to systems after log In
+    [Tags]    Threaded
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Location Should Be    ${url}/systems
 
 after log In, display user's email and menu in top right corner
+    [Tags]    Threaded
     Set Window Size    1920    1080
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}/span[text()="${email}"]
 
 allows log in with existing email in uppercase
+    [Tags]    Threaded
     ${email uppercase}    Convert To Uppercase    ${email}
     Log In    ${email uppercase}    ${password}
     Validate Log In
 
 allows log in with 'Remember Me checkmark' switched off
+    [Tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
@@ -72,6 +77,7 @@ allows log in with 'Remember Me checkmark' switched off
     Validate Log In
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form
+    [Tags]    Threaded
     Log In    ${email}    'aderhgadehf'
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
@@ -79,7 +85,7 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
-    [tags]    C41872
+    [tags]    C41872    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -92,7 +98,7 @@ passes email from email input to Restore password page, even without clicking 'L
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 shows non-activated user message when not activated at login; Resend activation button sends email
-    [tags]    email    C41865
+    [tags]    email    C41865    Threaded
     Go To    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
     Register    'mark'    'hamill'    ${random email}    ${password}
@@ -106,6 +112,7 @@ shows non-activated user message when not activated at login; Resend activation 
     Validate Log In
 
 displays password masked
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${PASSWORD INPUT}
@@ -113,6 +120,7 @@ displays password masked
     Should Be Equal    '${input type}'    'password'
 
 requires log In, if the user has just logged out and pressed back button in browser
+    [tags]    Threaded
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
@@ -120,6 +128,7 @@ requires log In, if the user has just logged out and pressed back button in brow
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
 handles more than 255 symbols email and password
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
@@ -129,6 +138,7 @@ handles more than 255 symbols email and password
     Textfield Should Contain    ${PASSWORD INPUT}    ${255CHARS}
 
 logout refreshes page
+    [tags]    Threaded
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
@@ -136,6 +146,7 @@ logout refreshes page
 
 # We don't actually allow copy of the password field at log in.
 allows copy-paste in input fields
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -147,6 +158,7 @@ allows copy-paste in input fields
     Textfield Should Contain    ${EMAIL INPUT}    Copy Paste Test
 
 should respond to Esc key and close dialog
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${PASSWORD INPUT}
@@ -155,6 +167,7 @@ should respond to Esc key and close dialog
     Element Should Not Be Visible    ${LOG IN MODAL}
 
 should respond to Enter key and log in
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
@@ -165,6 +178,7 @@ should respond to Enter key and log in
     Validate Log In
 
 should respond to Tab key
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -173,6 +187,7 @@ should respond to Tab key
     Element Should Be Focused    ${PASSWORD INPUT}
 
 should respond to Space key and toggle checkbox
+    [tags]    Threaded
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX VISIBLE}
@@ -208,3 +223,57 @@ handles two tabs, updates second tab state if logout is done on first
     Location Should Be    ${url}/systems
     Reload Page
     Wait Until Element Is Visible    ${LOG IN MODAL}
+
+Log in more than 10 times
+    [tags]    C42075    Threaded
+    Go To    ${url}/register
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${email}    ${BASE PASSWORD}
+    Activate    ${email}
+    Wait Until Element Is Visible    ${LOG IN NAV BAR}
+    Click Link    ${LOG IN NAV BAR}
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
+    Input Text    ${EMAIL INPUT}    ${email}
+    :FOR  ${x}  IN RANGE  10
+    \  Input Text    ${PASSWORD INPUT}    incorrect
+    \  Wait Until Element Is Visible    ${LOG IN BUTTON}
+    \  Click Button    ${LOG IN BUTTON}
+    \  Sleep    1
+    Wait Until Element Is Visible    ${TOO MANY ATTEMPTS MESSAGE}
+    Sleep    65
+    Input Text    ${PASSWORD INPUT}    ${BASE PASSWORD}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
+    Validate Log In
+
+User is logged out of browser after a password change in another browser
+    [tags]    C41837
+    Log In    ${email}    ${password}
+    Validate Log In
+    Open Browser and go to URL    ${url}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Switch Browser    1
+    Go To    ${url}/account/password
+    Sleep    1
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${password}
+    Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Switch Browser    2
+    #wait for server to disconnect user
+    sleep    30
+    Wait Until Element Is Visible    ${LOG IN MODAL}
+    Click Element    ${LOG IN CLOSE BUTTON}
+    Validate Log Out
+
+    Log In    ${email}    ${ALT PASSWORD}
+    Validate Log In
+    Go To    ${url}/account/password
+    Sleep    1
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${ALT PASSWORD}
+    Input Text    ${NEW PASSWORD INPUT}    ${password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}

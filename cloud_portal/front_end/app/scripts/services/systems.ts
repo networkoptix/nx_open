@@ -8,12 +8,12 @@ import * as angular from 'angular';
     angular
         .module('cloudApp')
         .service('systemsProvider', [ 'cloudApi', '$interval', '$q', '$poll',
-            'configService', 'languageService', 'account',
+            'nxConfigService', 'languageService', 'account',
 
             function (cloudApi, $interval, $q, $poll,
-                      configService, languageService, account) {
+                      nxConfigService, languageService, account) {
 
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 this.pollingSystemsUpdate = undefined;
 
                 this.systems = [];

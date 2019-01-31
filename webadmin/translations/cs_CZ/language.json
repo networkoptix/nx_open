@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "vytvořit účet",
         "errorNoHDD": "Toto zařízení je určeno pro práci s nainstalovanou jednotkou pevného disku.<br>Vypněte prosím zařízení a nainstalujte jednotku pevného disku.",
-        "errorNoNetwork": "Toto zařízení vyžaduje připojení k síti. <br>Prosím připojte zařízení k místní síti nebo Internetu"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
@@ -61,12 +61,12 @@
         "backupNewCamerasByDefault": "Zálohování nové kamery ve výchozím nastavení",
         "backupQualities": "Kvalita zálohování",
         "cameraSettingsOptimization": "Povolit optimalizaci nastavení zařízení",
-        "clientStatisticsSettingsUrl": "Relativní URL statistika klienta",
+        "clientStatisticsSettingsUrl": "Relativní url statistika klienta",
         "cloudAccountName": "Účet vlastníka Cloudu",
         "cloudConnectRelayingEnabled": "Povolit přenos pro cloudové připojení",
         "cloudConnectUdpHolePunchingEnabled": "Povolit UDP děrování pro připojení cloudu",
         "cloudHost": "Cloud host",
-        "cloudSystemID": "ID cloudového systému",
+        "cloudSystemID": "Id cloudového systému",
         "disabledVendors": "Prodejci byli zakázáni",
         "ec2AliveUpdateIntervalSec": "Interval aktualizace systému (v sekundách)",
         "ec2ConnectionKeepAliveTimeoutSec": "Časový limit pro obnovení spojení (sekundy)",
@@ -86,7 +86,7 @@
         "maxRecordQueueSizeBytes": "Maximální velikost fronty záznamů (bajty)",
         "maxRecordQueueSizeElements": "Maximální velikost fronty záznamů (elementy)",
         "maxRemoteArchiveSynchronizationThreads": "Maximální počet synchronizačních procesů vzdálené archivace",
-        "maxRtspConnectDurationSeconds": "Maximální doba RTSP připojení",
+        "maxRtspConnectDurationSeconds": "Maximální doba Rtsp připojení",
         "maxSceneItems": "Maximální počet elementů scény (0 znamená výchozí)",
         "proxyConnectTimeoutSec": "Časový limit proxy připojení (sekundy)",
         "rtpTimeoutMs": "Časový limit rtp (milisekundy)",
@@ -102,7 +102,7 @@
         "statisticsReportLastNumber": "Statistický report - poslední číslo",
         "statisticsReportLastTime": "Statistický report - minule",
         "statisticsReportLastVersion": "Statistický report - poslední verze",
-        "statisticsReportServerApi": "API statistického serveru",
+        "statisticsReportServerApi": "Api statistického serveru",
         "statisticsReportTimeCycle": "Interval statistického reportu",
         "statisticsReportUpdateDelay": "Statistický report - zpoždění aktualizace",
         "synchronizeTimeWithInternet": "Synchronizovat čas s Internetem",

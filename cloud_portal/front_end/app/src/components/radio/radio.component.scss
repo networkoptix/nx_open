@@ -17,6 +17,10 @@ nx-radio {
             }
         }
     }
+    
+    & + label {
+        cursor : pointer;
+    }
 
     .nx-radio {
         display : flex;
@@ -26,7 +30,6 @@ nx-radio {
         input[type="radio"] {
             position : absolute;
             opacity  : 0;
-            cursor   : pointer;
         }
 
         input:hover ~ .check {
@@ -38,6 +41,26 @@ nx-radio {
         input:active ~ .check {
             svg path.circle {
                 fill : $dark9 !important;
+            }
+        }
+
+        input:hover ~ .check {
+            svg path.circle {
+                fill : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg path.circle {
+                fill : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
             }
         }
     }

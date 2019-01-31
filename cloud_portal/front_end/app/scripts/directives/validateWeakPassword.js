@@ -6,9 +6,12 @@
         .module('cloudApp')
         .directive('validateWeakPassword', ValidateWeakPassword);
 
-    ValidateWeakPassword.$inject = [ 'configService' ];
+    ValidateWeakPassword.$inject = [ 'nxConfigService' ];
 
-    function ValidateWeakPassword(configService) {
+    function ValidateWeakPassword(nxConfigService) {
+
+        var CONFIG = nxConfigService.getConfig();
+
         function checkComplexity(value) {
             var classes = [
                 '[0-9]+',
@@ -38,7 +41,7 @@
                         return;
                     }
 
-                    return checkComplexity(modelValue) >= configService.config.passwordRequirements.minClassesCount;
+                    return checkComplexity(modelValue) >= CONFIG.passwordRequirements.minClassesCount;
                 };
 
 

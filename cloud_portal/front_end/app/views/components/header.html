@@ -16,7 +16,7 @@
                     </a>
                 </div>
 
-                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
+                <ul ng-if="activeSystem && !active.integrations" class="nav navbar-nav auth-visible d-none d-sm-flex">
                     <li ng-class="{ 'active' :active.view }">
                         <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">View</a>
                     </li>

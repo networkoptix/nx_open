@@ -8,7 +8,8 @@
                 Ce périphérique sert à travailler avec le disque dur installé.<br> S.V.P éteindre l’appareil et installer un disque dur.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Cet appareil a besoin de connexion réseau pour fonctionner.<br> S.V.P connecter au réseau local ou Internet
+                Cet appareil a besoin de connexion réseau pour fonctionner.<br>
+                S. V. P connecter au réseau local ou Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Ce périphérique à une configuration réseau incorrect.<br> S.V.P connecter au réseau ou définir une adresse IP correcte.

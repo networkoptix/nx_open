@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "utwórz konto",
         "errorNoHDD": "To urządzenie jest przeznaczone do działania z zainstalowanym dyskiem twardym. <br> Proszę wyłączyć urządzenie i zainstalować dysk twardy.",
-        "errorNoNetwork": "To urządzenie wymaga połączenia sieciowego. <br> Podłącz je do sieci lokalnej lub do Internetu"
+        "errorNoNetwork": "To urządzenie wymaga połączenia sieciowego.<br>Podłącz je do sieci lokalnej lub do Internetu"
     },
     "passwordRequirements": {
         "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",

@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "it_IT",
   "language_name": "Italiano",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -10,7 +10,7 @@
     "loginButton": "Accesso",
     "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
     "logoutAuthorisedContinueButton": "Continua",
-    "logoutAuthorisedLogoutButton": "Scollegati"
+    "logoutAuthorisedLogoutButton": "Disconnetti"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -137,13 +137,21 @@
     "cantOpenClient": "%VMS_NAME% applicazione non rilevata. <a href=\"/download\">Scarica</a>",
     "lostConnection": "Connessione a {{systemName}} persa",
     "thisSystem": "il sistema",
-    "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate"
+    "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "buono",
+    "fair": "giusta",
+    "minLength": "troppo corto",
     "minLengthMessage": "La password deve contenere almeno 8 caratteri",
+    "required": "errato",
     "requiredMessage": "Usa solo lettere latine, numeri e simboli della tastiera, evita spazi iniziali e finali",
+    "weak": "debole",
     "weakMessage": "Utilizzare numeri, lettere maiuscole e minuscole e caratteri speciali per rendere più sicura la password",
     "strongMessage": "Password sicura!",
+    "common": "troppo comune",
     "commonMessage": "Questa password è nelle migliori e più popolari password utilizzate nel mondo",
     "missingMessage": "È richiesta la password"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Elimina",
     "successDisconnected": "Il sistema è stato scollegato correttamente da %PRODUCT_NAME%",
     "successDeleted": "Il sistema {{systemName}} è stato eliminato correttamente dal suo account",
-    "successMerge": "Il sistema {{systemName}} è stato unito a {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Le autorizzazioni sono state rimosse da {{email}}"
   },
   "account": {

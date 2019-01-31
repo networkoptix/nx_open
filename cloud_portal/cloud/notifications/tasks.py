@@ -9,7 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 
 from api.models import Account
-from notifications import api
+from notifications import notifications_api
 from util.helpers import get_language_for_email
 
 import traceback
@@ -33,7 +33,7 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
                 customization,
                 queue,
                 attempt,
-                traceback.format_exc())
+                traceback.format_exc().replace("Traceback", ""))
 
     if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
@@ -41,7 +41,15 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
         logger.error(error_formatted)
 
 
+def send_email_log(_task):
+    def wrapper(*args, **kwargs):
+        logger.info("Start {} was run with args {}, kwargs: {}".format(_task.__name__, args, kwargs))
+        return _task(*args, **kwargs)
+    return wrapper
+
+
 @shared_task
+@send_email_log
 def send_email(user_email, type, message, customization, queue="", attempt=1):
     lang = get_language_for_email(user_email, customization)
     try:
@@ -84,7 +92,7 @@ def send_to_all_users(notification_id, message, customizations, force=False):
 
     for user in users:
         message['userFullName'] = user.get_full_name()
-        api.send(user.email, 'cloud_notification', message, user.customization)
+        notifications_api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
 

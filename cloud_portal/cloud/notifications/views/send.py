@@ -9,14 +9,15 @@ from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
+from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes
 from api.models import Account
-from cms.models import Customization, UserGroupsToCustomizationPermissions
-from notifications import api
+from cms.models import Customization, UserGroupsToProductPermissions, get_cloud_portal_product
+from notifications import notifications_api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
 
 import re
+
 
 # Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
@@ -24,13 +25,14 @@ def html_to_text(html):
     tags = re.compile(r'<[\w\=\'\"\:\;\_\-\,\!\/\ ]+>')
     return tags.sub('', new_line.sub('\n', html))
 
+
 def add_brs(html):
     br = re.compile(r'\n')
     return br.sub('<br>', html)
 
 
 def format_message(notification):
-    message = {}
+    message = dict()
     message['subject'] = notification.subject
     message['html_body'] = add_brs(notification.body)
     message['text_body'] = html_to_text(notification.body)
@@ -52,6 +54,51 @@ def update_or_create_notification(data, customizations=[]):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def send_event(request):
+    try:
+        validation_error = False
+        error_data = {}
+
+        if 'type' not in request.data or not request.data['type']:
+            validation_error = True
+            error_data['type'] = ['This field is required.']
+
+        if 'type' in request.data and request.data['type'] != 'ipvd_feedback' and 'productId' not in request.data:
+            validation_error = True
+            error_data['productId'] = ['This field is required.']
+
+        if 'message' not in request.data:
+            validation_error = True
+            error_data['message'] = ['This field is required.']
+
+        if validation_error:
+            raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
+                                      error_data=error_data)
+
+        product_id = ''
+        if request.data['type'] != 'ipvd_feedback':
+            product = Product.objects.filter(id=request.data['productId'])
+            if product.exists():
+                request.data['product'] = product.first().name
+                product_id = product.first().id
+        else:
+            request.data['product'] = request.data['productId']
+
+        user = request.user
+        request.data['sender_email'] = user.email
+        request.data['sender_name'] = user.get_full_name()
+
+        notifications_api.notify(request.data['type'], product_id, request.data)
+
+    except ValidationError as error:
+        error_data = error.detail if hasattr(error, 'detail') else None
+        raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error_data)
+    return api_success()
+
+
+@api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def send_notification(request):
@@ -62,7 +109,7 @@ def send_notification(request):
         external_id = None
         if 'id' in request.data:  # external service generated an id for this message to track it
             external_id = request.data['id']
-            msg = api.find_message(external_id)
+            msg = notifications_api.find_message(external_id)
             if msg:
                 # there is already a message with this id - do not send the message, respond with status
                 serializer = models.MessageStatusSerializer(msg, many=False)
@@ -93,7 +140,7 @@ def send_notification(request):
             if user_account.exists():
                 request.data['message']['userFullName'] = user_account[0].get_full_name()
 
-        api.send(request.data['user_email'],
+        notifications_api.send(request.data['user_email'],
                  request.data['type'],
                  request.data['message'],
                  request.data['customization'],
@@ -117,8 +164,9 @@ def cloud_notification_action(request):
         customizations = request.data.getlist('customizations')
 
     for customization in customizations:
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization,
-                                                                     'send_cloud_notification'):
+        if not UserGroupsToProductPermissions.check_customization_permission(request.user,
+                                                                             customization,
+                                                                             'send_cloud_notification'):
             raise PermissionDenied
 
     notification_id = str(update_or_create_notification(request.data, customizations))
@@ -130,7 +178,7 @@ def cloud_notification_action(request):
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['userFullName'] = request.user.get_full_name()
 
-        api.send(request.user.email, 'cloud_notification', message, request.user.customization)
+        notifications_api.send(request.user.email, 'cloud_notification', message, request.user.customization)
         messages.success(request._request, "Preview has been sent")
 
     elif can_send and 'Send' in request.data and notification_id:
@@ -161,5 +209,5 @@ def test(request):
     from .. import tasks
     from random import seed, randint
     seed()
-    tasks.test_task.delay(randint(1,100),randint(1,5))
+    tasks.test_task.delay(randint(1, 100), randint(1, 5))
     return Response('ok')

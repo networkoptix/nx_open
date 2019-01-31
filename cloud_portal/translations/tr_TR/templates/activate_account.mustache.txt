@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+Merhaba, {{message.userFullName}},
 
   Lütfen e-posta adresinizi onaylamak ve hesabı etkinleştirmek için aşağıdaki bağlantıyı açın.
 

@@ -1,0 +1,20 @@
+{
+  "activate_account": {
+    "emailSubject": "Activar a sua conta"
+  },
+  "restore_password": {
+    "emailSubject": "Reset da sua senha"
+  },
+  "system_invite": {
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} convida você para %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Sistema de vídeo {{message.system_name}} foi partilhado consigo{{/message.sharer_name}}"
+  },
+  "system_shared": {
+    "emailSubject": "O sistema de vídeo {{message.system_name}} foi partilhado consigo"
+  },
+  "review_version": {
+    "emailSubject": "A versão {{message.id}} está pronta para ser revisada"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
+  }
+}

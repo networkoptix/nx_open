@@ -8,7 +8,9 @@
     "KNOWN LIMITATIONS URL"    :    "/content/faq",
     "TERMS URL"                :    "/content/eula",
     "COPYRIGHT URL"            :    "https://www.networkoptix.com/",
-    "COPYRIGHT TEXT"           :    "© 2018 Network Optix",
+    "COPYRIGHT TEXT"           :    "© 2019 Network Optix",
     "THEME COLOR"              :    "#2FA2DB",
-    "THEME COLOR RGB"          :    "rgba(47, 162, 219, 1)"
+    "THEME COLOR RGB"          :    "rgba(47, 162, 219, 1)",
+    "ITUNES STORE LINK"        :    "https://itunes.apple.com/eg/app/hd-witness/id1050899754",
+    "PLAY STORE LINK"          :    "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness"
 }
