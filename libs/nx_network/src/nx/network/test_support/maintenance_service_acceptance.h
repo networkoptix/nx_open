@@ -1,7 +1,5 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>
@@ -41,6 +39,7 @@ static const std::pair<const char*, const char*> kInvalidUserAndPassword("unknow
  * </code>
  *
  * NOTE: SomeParentClass must:
+ *    - inherit from testing::Test (from google test)
  *    - implement `void addArg(const char *)` method
  *    - implement `QString testDataDir() const` method
  *    - implement `bool startAndWaitUntilStarted()` method
@@ -48,8 +47,7 @@ static const std::pair<const char*, const char*> kInvalidUserAndPassword("unknow
  */
 template<typename MaintenanceTypeSet>
 class MaintenanceServiceAcceptance:
-    public MaintenanceTypeSet::BaseType,
-    public testing::Test
+    public MaintenanceTypeSet::BaseType
 {
 protected:
     virtual void SetUp() override

@@ -1,10 +1,13 @@
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include "basic_component_test.h"
 
 namespace nx::cloud::relay::test {
 
-class MaintenanceServiceBaseTypeImpl
+class MaintenanceServiceBaseTypeImpl:
+    public testing::Test
 {
 public:
     MaintenanceServiceBaseTypeImpl();
