@@ -76,7 +76,7 @@ import * as Hls from 'hls.js';
                         }
                         
                         function detectBestFormat() {
-                            //1. Hide all informers
+                            // 1. Hide all informers
                             scope.videoFlags = {
                                 flashRequired: false,
                                 flashOrWebmRequired: false,
@@ -94,11 +94,10 @@ import * as Hls from 'hls.js';
                                 return scope.activeFormat;
                             }
                             
-                            //This function gets available sources for camera and chooses the best player for this browser
+                            // This function gets available sources for camera and chooses the best player for this browser
+                            // return 'rtsp'; // To debug some format - force it to work
                             
-                            //return 'rtsp'; // To debug some format - force it to work
-                            
-                            //We have options:
+                            // We have options:
                             // webm - for good desktop browsers
                             // webm-codec - for IE. Detectf
                             // native-hls - for mobile browsers
@@ -130,27 +129,8 @@ import * as Hls from 'hls.js';
                             });
                             var jsHlsSupported = Hls.isSupported();
                             
-                            // Should Catch MS edge, Safari, Mobile Devices
-                            // if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
-    
-                            // Should catch Mobile Devices
-                            if ($window.jscd.mobile) {
-                                return 'native-hls';
-                            }
-                            
-                            // Hardcode native support
-                            if ($window.jscd.os === 'Android') {
-                                if (weHaveWebm) {
-                                    return 'webm';
-                                    // TODO: Try removing this line.
-                                } else {
-                                    scope.videoFlags.noArmSupport = true;
-                                    return false;
-                                }
-                            }
-                            
                             // No native support
-                            //Presume we are on desktop:
+                            // Presume we are on desktop:
                             switch ($window.jscd.browser) {
                                 case 'Microsoft Internet Explorer':
                                     // Check version here
@@ -185,18 +165,24 @@ import * as Hls from 'hls.js';
                                 case 'Opera':
                                 case 'Webkit':
                                 default:
-                                    if (jsHlsSupported && weHaveHls) {
-                                        return 'jshls';// We are hoping that we have some good browser
+                                    if (weHaveHls) {
+                                        if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
+                                            return 'native-hls';
+                                        }
+                                        if (jsHlsSupported) {
+                                            return 'jshls';// We are hoping that we have some good browser
+                                        }
+                                        if ($window.jscd.flashVersion) { // We have flash - try to play using flash
+                                            return 'flashls';
+                                        }
+                                        if ($window.jscd.os === 'Linux') {
+                                            scope.videoFlags.ubuntuNX = true;
+                                            return false;
+                                        }
                                     }
-                                    if ($window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
-                                        return 'flashls';
-                                    }
+                                    
                                     if (weHaveWebm && canPlayNatively('webm')) {
                                         return 'webm';
-                                    }
-                                    if (weHaveHls && $window.jscd.os === 'Linux') {
-                                        scope.videoFlags.ubuntuNX = true;
-                                        return false;
                                     }
                             }
                             
@@ -229,7 +215,7 @@ import * as Hls from 'hls.js';
                             scope.jsHls = false;
                         }
                         
-                        //For the native player. Handles webm's long loading times
+                        // For the native player. Handles webm's long loading times
                         function loadingTimeout() {
                             scope.videoFlags.errorLoading = true;
                             scope.loading = false;
@@ -287,7 +273,7 @@ import * as Hls from 'hls.js';
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 
-                                scope.vgApi.addEventListener('loadeddata', function () {
+                                scope.vgApi.addEventListener('canplaythrough', function () {
                                     scope.loading = false;  // Video is ready - disable loading
                                     scope.playerHandler();
                                 });
@@ -328,10 +314,14 @@ import * as Hls from 'hls.js';
                                             });
                                         });
                                         
-                                        scope.vgApi.addEventListener('loadeddata', function (event) {
-                                            scope.loading = false; // Video is playing - disable loading
+                                        scope.vgApi.addEventListener('canplaythrough', function (event) {
+                                            $timeout(() => scope.loading = false ); // Video is playing - disable loading
                                             scope.playerHandler();
                                             cancelTimeoutNativeLoad();
+                                        });
+                                        
+                                        scope.vgApi.addEventListener('waiting', function (event) {
+                                            $timeout(() => scope.loading = true );
                                         });
                                         
                                         scope.vgApi.addEventListener('ended', function (event) {

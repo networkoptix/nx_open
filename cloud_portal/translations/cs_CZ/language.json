@@ -137,7 +137,9 @@
     "cantOpenClient": "Aplikace %VMS_NAME% není nalezena. <a href=\"/download\">Stáhnout</a>",
     "lostConnection": "Připojení k {{systemName}} se ztratilo",
     "thisSystem": "systém",
-    "oldSafariNotSupported": "Verze Safari starší než 10 není podporována"
+    "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "dobré",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "Smazat",
     "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
   },
   "account": {

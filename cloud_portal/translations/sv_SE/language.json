@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% programmet hittades inte. <a href=\"/download\">Ladda ner</a>",
     "lostConnection": "Anslutning till {{systemName}} förlorad",
     "thisSystem": "systemet",
-    "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte"
+    "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "good",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "Radera",
     "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
-    "successMerge": "System {{systemName}} har slagits samman med {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Rättigheterna togs bort från {{email}}"
   },
   "account": {

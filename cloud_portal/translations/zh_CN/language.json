@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% 应用程序未检测到。<a href=\"/download\"> 下载</a>",
     "lostConnection": "连接到 {{systemName}} 失去了",
     "thisSystem": "系统",
-    "oldSafariNotSupported": "不支持10岁以上的Safari版本"
+    "oldSafariNotSupported": "不支持10岁以上的Safari版本",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "良好",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "删除",
     "successDisconnected": "系统成功地断开 %PRODUCT_NAME%",
     "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
-    "successMerge": "系统 {{systemName}} 已与 {{systemName}} 合并",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "权限从 {{email}} 被刪除"
   },
   "account": {

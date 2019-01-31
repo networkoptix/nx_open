@@ -30,7 +30,7 @@
                        required name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Поле Ім'я обов'язково до заповнення</span>
+                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Поле Ім'я обов'язкове до заповнення</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
@@ -60,7 +60,7 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-md-4">
-                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Електронна адреса є обов'язковою</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Електронна пошта обов'язкова</span></div>
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Будь ласка, введіть дійсну електронну скриню</span></div>
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">Ця електронна адреса вже зареєстрована в %PRODUCT_NAME%</span></div>
             </div>

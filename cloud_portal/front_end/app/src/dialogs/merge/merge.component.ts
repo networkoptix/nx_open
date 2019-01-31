@@ -102,9 +102,16 @@ export class MergeModalContent {
                 masterSystemId = this.targetSystem.id;
                 slaveSystemId = this.system.id;
             }
-            // return this.cloudApi.systems(); //In for testing purposes with merging things
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
+            errorCodes: {
+                mergedSystemIsOffline: (error) => {
+                    return this.language.errorCodes[error.errorText] || error.errorText;
+                },
+                vmsRequestFailure: (error) => {
+                    return this.language.errorCodes[error.errorText] || error.errorText;
+                }
+            },
             successMessage: this.language.system.mergeSystemSuccess
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();

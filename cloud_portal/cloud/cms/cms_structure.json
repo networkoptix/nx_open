@@ -126,6 +126,12 @@
             "description": "The name of the company itself"
           },
           {
+            "label": "Copyright Year",
+            "name": "%COPYRIGHT_YEAR%",
+            "value": "2019",
+            "description": "Copyright information"
+          },
+          {
             "label": "Client Protocol",
             "name": "%CLIENT_PROTOCOL%",
             "old_name": "{{CLIENT_PROTOCOL}}",
@@ -293,6 +299,30 @@
             "value": "",
             "description": "Content for support page",
             "type": "html"
+          }
+        ]
+      },
+      {
+        "name": "ARM support policy page",
+        "file_path": "static/lang_{{language}}/views/static/arm.html",
+        "url": "/content/arm",
+        "translatable": true,
+        "values":[
+          {
+            "label": "Arm Support Page Policy Title",
+            "name": "%TITLE%",
+            "value": "ARM Support Policy",
+            "description": "Title for the ARM support policy page",
+            "type": "text",
+            "advanced": true
+          },
+          {
+            "label": "ARM Support Policy Page Content",
+            "name": "%CONTENT%",
+            "value": "",
+            "description": "Content for ARM support policy page",
+            "type": "html",
+            "advanced": true
           }
         ]
       },

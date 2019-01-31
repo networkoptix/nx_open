@@ -123,6 +123,7 @@ password with space in the middle is valid
     Reset user password to base    ${email}    ${space password}
 
 more than 255 symbols can be entered in new password field and then are cut to 255
+    [Tags]    Threaded
     Log In To Change Password Page
     Input Text    ${CURRENT PASSWORD INPUT}    ${300CHARS}
     Input Text    ${NEW PASSWORD INPUT}    ${300CHARS}
