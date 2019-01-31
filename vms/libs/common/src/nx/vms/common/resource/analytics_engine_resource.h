@@ -35,7 +35,7 @@ public:
 
     bool isDeviceDependent() const;
 
-    bool isEngineEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;
+    bool isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;
 };
 
 } // namespace nx::vms::common

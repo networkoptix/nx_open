@@ -82,7 +82,7 @@ bool AnalyticsEngineResource::isDeviceDependent() const
     return engineManifest.capabilities.testFlag(EngineManifest::Capability::deviceModelDependent);
 }
 
-bool AnalyticsEngineResource::isEngineEnabledForDevice(
+bool AnalyticsEngineResource::isEnabledForDevice(
     const QnVirtualCameraResourcePtr& device) const
 {
     const auto engineId = getId();
