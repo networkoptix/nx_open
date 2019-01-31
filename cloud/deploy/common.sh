@@ -59,8 +59,6 @@ function pack()
 
 function pushns()
 {
-    docker login -u registry -p 225653 la.hdw.mx:5000
-
     echo "Pushing $MODULE:$VERSION to the private registry"
     docker tag $MODULE:$VERSION la.hdw.mx:5000/$MODULE:$VERSION
     docker push la.hdw.mx:5000/$MODULE:$VERSION
