@@ -468,108 +468,94 @@
           {
             "label": "Supported Resolutions",
             "name": "%SUPPORTED_RESOLUTIONS%",
-            "description": "Supported resolutions.",
-            "advanced": true,
-            "type": "select",
-            "value": "[{ \"value\":\"0\", \"name\":\"All\" }, { \"value\":\"84480\", \"name\":\"1CIF\" }, { \"value\":\"168960\", \"name\":\"2CIF\" }, { \"value\":\"337920\", \"name\":\"D1\" }, { \"value\":\"307200\", \"name\":\"VGA\" }, { \"value\":\"786432\", \"name\":\"SVGA\" }, { \"value\":\"921600\", \"name\":\"720p\" }, { \"value\":\"1310720\", \"name\":\"1mp\" }, { \"value\":\"2073600\", \"name\":\"1080p\" }, { \"value\":\"1920000\", \"name\":\"2mp\" }, { \"value\":\"3145728\", \"name\":\"3mp\" }, { \"value\":\"4915200\", \"name\":\"5mp\" }, { \"value\":\"8000000\", \"name\":\"8mp\" }, { \"value\":\"10039296\", \"name\":\"10mp\" }, { \"value\":\"15824256\", \"name\":\"16mp\" }]",
-            "meta": {
-              "multi": true,
-              "options": [
-                {
-                  "value": "0",
-                  "name": "All"
-                },
-                {
-                  "value": "84480",
-                  "name": "1CIF"
-                },
-                {
-                  "value": "168960",
-                  "name": "2CIF"
-                },
-                {
-                  "value": "337920",
-                  "name": "D1"
-                },
-                {
-                  "value": "307200",
-                  "name": "VGA"
-                },
-                {
-                  "value": "786432",
-                  "name": "SVGA"
-                },
-                {
-                  "value": "921600",
-                  "name": "720p"
-                },
-                {
-                  "value": "1310720",
-                  "name": "1mp"
-                },
-                {
-                  "value": "2073600",
-                  "name": "1080p"
-                },
-                {
-                  "value": "1920000",
-                  "name": "2mp"
-                },
-                {
-                  "value": "3145728",
-                  "name": "3mp"
-                },
-                {
-                  "value": "4915200",
-                  "name": "5mp"
-                },
-                {
-                  "value": "8000000",
-                  "name": "8mp"
-                },
-                {
-                  "value": "10039296",
-                  "name": "10mp"
-                },
-                {
-                  "value": "15824256",
-                  "name": "16mp"
-                }
-              ]
-            }
+            "value": [
+              {
+                "value": "0",
+                "name": "All"
+              },
+              {
+                "value": "84480",
+                "name": "1CIF"
+              },
+              {
+                "value": "168960",
+                "name": "2CIF"
+              },
+              {
+                "value": "337920",
+                "name": "D1"
+              },
+              {
+                "value": "307200",
+                "name": "VGA"
+              },
+              {
+                "value": "786432",
+                "name": "SVGA"
+              },
+              {
+                "value": "921600",
+                "name": "720p"
+              },
+              {
+                "value": "1310720",
+                "name": "1mp"
+              },
+              {
+                "value": "2073600",
+                "name": "1080p"
+              },
+              {
+                "value": "1920000",
+                "name": "2mp"
+              },
+              {
+                "value": "3145728",
+                "name": "3mp"
+              },
+              {
+                "value": "4915200",
+                "name": "5mp"
+              },
+              {
+                "value": "8000000",
+                "name": "8mp"
+              },
+              {
+                "value": "10039296",
+                "name": "10mp"
+              },
+              {
+                "value": "15824256",
+                "name": "16mp"
+              }
+            ]
           },
           {
             "label": "Supported hardware types",
             "name": "%SUPPORTED_HARDWARE_TYPES%",
-            "description": "Supported hardware types.",
-            "advanced": true,
-            "type": "select",
-            "value": "[{\"id\":\"Camera\", \"label\":\"camera\"},{\"id\":\"Multi-Sensor Camera\", \"label\":\"multi_sensor_camera\"},{\"id\":\"Encoder\", \"label\":\"encoder\"},{\"id\":\"DVR\", \"label\":\"dvr\"},{\"id\":\"Other\", \"label\":\"other\"}]",
-            "meta": {
-              "multi": true,
-              "options": [
-                {
-                  "id": "Camera",
-                  "label": "camera"
-                },
-                {
-                  "id": "Multi-Sensor Camera",
-                  "label": "multi_sensor_camera"
-                },
-                {
-                  "id": "Encoder",
-                  "label": "encoder"
-                },
-                {
-                  "id": "DVR",
-                  "label": "dvr"
-                },
-                {
-                  "id": "Other",
-                  "label": "other"
-                }
-              ]
-            }
+            "value": [
+              {
+                "id": "Camera",
+                "label": "camera"
+              },
+              {
+                "id": "Multi-Sensor Camera",
+                "label": "multi_sensor_camera"
+              },
+              {
+                "id": "Encoder",
+                "label": "encoder"
+              },
+              {
+                "id": "DVR",
+                "label": "dvr"
+              },
+              {
+                "id": "Other",
+                "label": "other"
+              }
+            ]
           }
         ]
       },
