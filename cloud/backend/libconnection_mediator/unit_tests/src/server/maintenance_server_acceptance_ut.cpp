@@ -1,7 +1,7 @@
 
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 #include <nx/network/test_support/maintenance_service_acceptance.h>
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
-#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 namespace nx::hpm::test {
 
