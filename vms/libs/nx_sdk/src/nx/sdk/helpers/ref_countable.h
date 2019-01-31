@@ -2,7 +2,6 @@
 
 #include <atomic>
 
-#include <nx/sdk/uuid.h> //< For deprecated interface id support.
 #include <nx/sdk/interface.h>
 
 namespace nx {
