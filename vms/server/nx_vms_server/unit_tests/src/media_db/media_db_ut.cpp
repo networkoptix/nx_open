@@ -908,6 +908,11 @@ TEST_F(MediaDbTest, StorageDB)
     ASSERT_EQ(allVisited, true);
 }
 
+TEST_F(MediaDbTest, startWithNonEmptyDb_merge)
+{
+    // #TODO: #akulikov implement
+}
+
 TEST_F(MediaDbTest, RepaceRecord)
 {
     using namespace nx::media_db;

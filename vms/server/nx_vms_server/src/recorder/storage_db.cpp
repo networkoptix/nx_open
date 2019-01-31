@@ -431,7 +431,6 @@ void QnStorageDb::mergeUuidToHashes()
         {
             if (existingUuidToHashIt->second != dbUuidToHashPair.second)
             {
-                qDebug() << "REPLACED FROM DB";
                 m_uuidToHash.left.erase(existingUuidToHashIt);
                 m_uuidToHash.insert(UuidToHash::value_type(
                     dbUuidToHashPair.first, dbUuidToHashPair.second));
@@ -439,7 +438,6 @@ void QnStorageDb::mergeUuidToHashes()
         }
         else
         {
-            qDebug() << "INSERTED FROM DB";
             m_uuidToHash.insert(UuidToHash::value_type(
                 dbUuidToHashPair.first, dbUuidToHashPair.second));
         }
