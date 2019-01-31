@@ -358,7 +358,7 @@ public:
     };
     Option<std::chrono::seconds> vacuumIntervalSec{this, "vacuumIntervalSec",
         kDefaultVacuumIntervalSecacuumIntervalSec,
-        "Interval between storage media db vacuum routine is performed",
+        "Interval between storage media db vacuum routines.",
         [](const std::chrono::seconds& value)
         {
             if (value.count() == 0)
