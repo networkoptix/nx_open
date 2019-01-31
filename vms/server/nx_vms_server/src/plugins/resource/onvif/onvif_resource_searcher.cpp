@@ -78,10 +78,42 @@ OnvifResourceSearcher::~OnvifResourceSearcher()
 
 }
 
-//bool OnvifResourceSearcher::isProxy() const
-//{
-//    return false;
-//}
+QnResourcePtr OnvifResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& params)
+{
+    QnResourcePtr result;
+
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    if (resourceType.isNull())
+    {
+        NX_DEBUG(this, "createResource: no resource type for ID = %1", resourceTypeId);
+        return result;
+    }
+
+    //if (resourceType->getManufacture() != manufacture())
+    /*
+    if (!resourceType->getAllManufacturesIncludeAncessor().contains(manufacture()))
+    {
+        qDebug() << "createResource: manufacture " << resourceType->getManufacture()
+                 << " != " << manufacture();
+        return result;
+    }
+    */
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+        serverModule(),
+        resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
+        ? params.vendor
+        : resourceType->getName()); // use name instead of manufacture to instantiate child onvif resource
+    if (!result)
+        return result; // not found
+
+    result->setTypeId(resourceTypeId);
+
+    NX_DEBUG(this, "createResource: create ONVIF camera resource. TypeID: %1.", resourceTypeId);
+
+    result->setCommonModule(serverModule()->commonModule());
+    return result;
+}
 
 QString OnvifResourceSearcher::manufacture() const
 {
@@ -147,12 +179,13 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
     return kDefaultOnvifPort;
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const nx::utils::Url& _url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
+    const nx::utils::Url& _url, const QAuthenticator& auth, bool isSearchAction)
 {
     nx::utils::Url url(_url);
 
     if( !url.scheme().isEmpty() && isSearchAction)
-        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+        return QList<QnResourcePtr>(); //< searching if only host is present, not specific protocol
 
     if (url.port() == -1)
         url.setPort(autoDetectDevicePort(url));
@@ -160,7 +193,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const nx::utils::Url& 
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
+    const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if (shouldStop())
         return QList<QnResourcePtr>();
@@ -168,20 +202,22 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
     QString urlStr = url.toString();
 
     QList<QnResourcePtr> resList;
-    QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
+    QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QString("ONVIF"));
     if (!typePtr)
         return resList;
 
     const int onvifPort = url.port(nx::network::http::DEFAULT_HTTP_PORT);
-    QString onvifUrl(QLatin1String("onvif/device_service"));
+    QString onvifUrl("onvif/device_service");
 
     QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
     QnPlOnvifResourcePtr rpResource = serverModule()->resourcePool()
         ->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
 
-    QnPlOnvifResourcePtr resource = createResource(rpResource ? rpResource->getTypeId() : typePtr->getId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
+    QnPlOnvifResourcePtr resource = createResource(
+        rpResource ? rpResource->getTypeId() : typePtr->getId(),
+        QnResourceParams()).dynamicCast<QnPlOnvifResource>();
     resource->setDefaultAuth(auth);
-    QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
+    QString deviceUrl = QString("http://%1:%2/%3").arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
@@ -193,7 +229,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
             auth);
     }
 
-    // optimization. do not pull resource every time if resource already in pool
+    // Optimization: do not pull resource every time if resource already in pool.
     if (rpResource)
     {
         int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
@@ -204,20 +240,21 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
                 return resList; // no answer from camera
         }
         else if (rpResource->getStatus() == Qn::Offline)
-            return resList; // do not add 1..N channels if resource is offline
+            return resList; // Do not add 1..N channels if resource is offline.
 
         resource->setPhysicalId(rpResource->getPhysicalId());
         resource->update(rpResource);
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = commonModule()->dataPool()
+        auto resData = commonModule()->resourceDataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
         if (rpResource->getMaxChannels() > 1)
         {
             resource->setGroupId(rpResource->getPhysicalId());
-            resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+            resource->setDefaultGroupName(resource->getModel() + QString(" ")
+                + resource->getHostAddress());
         }
 
         resList << resource;
@@ -250,7 +287,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         if (resource->getMAC().isNull() && resData.value<bool>(lit("isMacAddressMandatory"), true))
             return resList;
 
-        auto dataPool = commonModule()->dataPool();
+        auto dataPool = commonModule()->resourceDataPool();
         const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(
             dataPool, manufacturer, modelName);
         if (!forceOnvif)
@@ -261,8 +298,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
             if (OnvifResourceInformationFetcher::ignoreCamera(dataPool, manufacturer, modelName))
                 return resList;
 
-            if (OnvifResourceInformationFetcher::isModelSupported(manufacturer, modelName)) {
-                qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << modelName;
+            if (OnvifResourceInformationFetcher::isModelSupported(manufacturer, modelName))
+            {
+                qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera "
+                    << modelName;
                 return resList;
             }
             int modelNamePos = modelName.indexOf(QLatin1String(" "));
@@ -284,7 +323,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         //QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (!rt.isNull() && rt != resource->getTypeId())
         {
-            QnPlOnvifResourcePtr updatedResource = createResource(rt, QnResourceParams()).dynamicCast<QnPlOnvifResource>();
+            QnPlOnvifResourcePtr updatedResource =
+                createResource(rt, QnResourceParams()).dynamicCast<QnPlOnvifResource>();
             updatedResource->update(resource);
             updatedResource->setTypeId(rt);
             updatedResource->setPhysicalId(resource->getPhysicalId());
@@ -307,14 +347,18 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
                 if (resource->getMaxChannels() > 1)
                 {
                     resource->setGroupId(resource->getPhysicalId());
-                    resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+                    resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ")
+                        + resource->getHostAddress());
                 }
 
                 for (int i = 1; i < resource->getMaxChannels(); ++i)
                 {
-                    QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
+                    QnPlOnvifResourcePtr res =
+                        createResource(resource->getTypeId(), QnResourceParams())
+                        .dynamicCast<QnPlOnvifResource>();
                     res->setGroupId(resource->getPhysicalId());
-                    res->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+                    res->setDefaultGroupName(resource->getModel() + QLatin1String(" ")
+                        + resource->getHostAddress());
                     res->setVendor(manufacturer);
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource);
@@ -336,55 +380,10 @@ void OnvifResourceSearcher::pleaseStop()
 
 QnResourceList OnvifResourceSearcher::findResources()
 {
-
     QnResourceList result;
-
-    //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
-    //mdnsSearcher.findResources(result, specialResourceCreator);
-    if (shouldStop())
-         return QnResourceList();
-
-    m_wsddSearcher->findResources(result, discoveryMode());
-
+    if (!shouldStop())
+        m_wsddSearcher->findResources(result, discoveryMode());
     return result;
-}
-
-QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
-{
-    QnResourcePtr result;
-
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    if (resourceType.isNull())
-    {
-        NX_DEBUG(this, lit("createResource: no resource type for ID = %1").arg(resourceTypeId.toString()));
-        return result;
-    }
-
-    //if (resourceType->getManufacture() != manufacture())
-    /*
-    if (!resourceType->getAllManufacturesIncludeAncessor().contains(manufacture()))
-    {
-        qDebug() << "createResource: manufacture " << resourceType->getManufacture()
-                 << " != " << manufacture();
-        return result;
-    }
-    */
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
-        serverModule(),
-        resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
-        ? params.vendor
-        : resourceType->getName()); // use name instead of manufacture to instantiate child onvif resource
-    if (!result)
-        return result; // not found
-
-    result->setTypeId(resourceTypeId);
-
-    NX_DEBUG(this, lit("createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()));
-
-    //result->deserialize(parameters);
-    result->setCommonModule(serverModule()->commonModule());
-    return result;
-
 }
 
 #endif //ENABLE_ONVIF

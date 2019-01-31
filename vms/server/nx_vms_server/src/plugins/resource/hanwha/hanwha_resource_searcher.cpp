@@ -382,7 +382,7 @@ void HanwhaResourceSearcher::createResource(
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = commonModule()->dataPool()
+    QnResourceData resourceData = commonModule()->resourceDataPool()
         ->data(devInfo.manufacturer, devInfo.modelName);
 
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))

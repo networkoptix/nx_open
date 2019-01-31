@@ -4204,7 +4204,7 @@ void MediaServerProcess::loadResourceParamsData()
             const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
             if (internetVersion > dataVersion)
             {
-                if (serverModule()->commonModule()->dataPool()->validateData(internetValue))
+                if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
                 {
                     param.value = internetValue;
                     source = url;

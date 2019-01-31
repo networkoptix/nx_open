@@ -94,7 +94,6 @@ void LegacyAdvancedSettingsWidget::updateFromResource()
         : tr("This camera has no advanced settings"));
 }
 
-
 bool LegacyAdvancedSettingsWidget::hasManualPage() const
 {
     if (!m_camera)
@@ -112,7 +111,7 @@ bool LegacyAdvancedSettingsWidget::hasWebPage() const
 {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return false;
-    QnResourceData resourceData = m_camera->commonModule()->dataPool()->data(m_camera);
+    QnResourceData resourceData = m_camera->commonModule()->resourceDataPool()->data(m_camera);
     return resourceData.value<bool>(lit("showUrl"), false);
 }
 
@@ -130,7 +129,6 @@ void LegacyAdvancedSettingsWidget::updatePage()
         ui->tabWidget->addTab(ui->noSettingsPage, tr("No settings"));
 }
 
-
 void LegacyAdvancedSettingsWidget::reloadData()
 {
     updatePage();
@@ -141,7 +139,7 @@ void LegacyAdvancedSettingsWidget::reloadData()
         if (!m_camera)
             return;
 
-        QnResourceData resourceData = m_camera->commonModule()->dataPool()->data(m_camera);
+        QnResourceData resourceData = m_camera->commonModule()->resourceDataPool()->data(m_camera);
         auto urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
         while (urlPath.startsWith(lit("/")))
             urlPath = urlPath.mid(1); //< VMS Gateway does not like several slashes at the beginning.

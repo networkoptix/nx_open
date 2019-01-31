@@ -18,7 +18,9 @@ namespace aio {
 AIOThread::AIOThread(std::unique_ptr<AbstractPollSet> pollSet):
     m_taskQueue(std::make_unique<detail::AioTaskQueue>(std::move(pollSet)))
 {
-    setObjectName(QString::fromLatin1("AIOThread"));
+    static int threadNumber = 0;
+    setObjectName(QString("AIOThread %1")
+        .arg(threadNumber++, /*fieldWidth*/ 2, /*base*/ 10 , /*fill*/ QLatin1Char('0')));
 }
 
 AIOThread::~AIOThread()

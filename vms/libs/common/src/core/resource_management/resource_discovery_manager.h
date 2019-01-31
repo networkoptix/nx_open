@@ -25,17 +25,7 @@
 #include <common/common_module_aware.h>
 #include "resource_searcher.h"
 
-#   define NetResString(res) \
-        QString::fromLatin1("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4") \
-            .arg(res->getUrl()) \
-            .arg(res->getHostAddress()) \
-            .arg(res->getMAC().toString()) \
-            .arg(res->getUniqueId())
-# define FL1(x) QString::fromLatin1(x)
-
-
 class QnAbstractResourceSearcher;
-class QnAbstractDTSSearcher;
 
 struct QnManualCameraInfo
 {
@@ -93,7 +83,6 @@ public:
         PeriodicSearch
     };
 
-
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
     QnResourceDiscoveryManager(QObject* parent);
@@ -102,7 +91,6 @@ public:
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
-    void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
     QnAbstractResourceSearcher* searcherByManufacture(const QString& manufacture) const;
 
@@ -113,7 +101,7 @@ public:
 
     void setReady(bool ready);
 
-    /** Returns number of cameras that were sucessfully added. */
+    /** Returns number of cameras that were successfully added. */
     QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
     bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
     QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera) const;
@@ -137,7 +125,6 @@ public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
 protected:
-    unsigned int m_runNumber;
     virtual void run() override;
     QnManualCameraInfo manualCameraInfoUnsafe(const QnSecurityCamResourcePtr& camera) const;
 
@@ -189,8 +176,6 @@ protected:
 
     QList<QHostAddress> m_allLocalAddresses;
 
-    QVector<QnAbstractDTSSearcher*> m_dstList;
-
     QScopedPointer<QTimer> m_timer;
     State m_state;
     QSet<QString> m_recentlyDeleted;
@@ -203,5 +188,6 @@ protected:
     int m_discoveryUpdateIdx;
 
 protected:
+    unsigned int m_runNumber;
     int m_serverOfflineTimeout;
 };

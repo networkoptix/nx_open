@@ -70,7 +70,7 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
 {
     base_type::setCommonModule(commonModule);
-    connect(commonModule->dataPool(), &QnResourceDataPool::changed, this,
+    connect(commonModule->resourceDataPool(), &QnResourceDataPool::changed, this,
         &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
 }
 
@@ -1529,5 +1529,5 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 
 QnResourceData QnSecurityCamResource::resourceData() const
 {
-    return commonModule()->dataPool()->data(toSharedPointer(this));
+    return commonModule()->resourceDataPool()->data(toSharedPointer(this));
 }

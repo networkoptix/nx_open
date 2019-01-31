@@ -292,7 +292,7 @@ void QnResource::setTypeByName(const QString& resTypeName)
 Qn::ResourceStatus QnResource::getStatus() const
 {
     return commonModule()
-        ? commonModule()->statusDictionary()->value(getId())
+        ? commonModule()->resourceStatusDictionary()->value(getId())
         : Qn::NotDefined;
 }
 
@@ -308,14 +308,14 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     QnUuid id = getId();
-    Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
+    Qn::ResourceStatus oldStatus = commonModule()->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
 
     NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
         oldStatus, newStatus, reason, getName(), getUrl());
 
-    commonModule()->statusDictionary()->setValue(id, newStatus);
+    commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
@@ -439,7 +439,7 @@ bool QnResource::hasProperty(const QString &key) const
             return true;
         }
     }
-    return commonModule()->propertyDictionary()->hasProperty(getId(), key);
+    return commonModule()->resourcePropertyDictionary()->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key) const
@@ -455,7 +455,7 @@ QString QnResource::getProperty(const QString &key) const
         }
         else if (auto module = commonModule())
         {
-            value = module->propertyDictionary()->value(m_id, key);
+            value = module->resourcePropertyDictionary()->value(m_id, key);
         }
     }
 
@@ -481,7 +481,7 @@ QString QnResource::getResourceProperty(
 
     NX_ASSERT(commonModule);
     QString value = commonModule
-        ? commonModule->propertyDictionary()->value(resourceId, key)
+        ? commonModule->resourcePropertyDictionary()->value(resourceId, key)
         : QString();
 
     if (value.isNull())
@@ -509,7 +509,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
             // Will apply to global dictionary when id is known.
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary()->saveProperties(...) does not make any sense
+            //calling resourcePropertyDictionary()->saveProperties(...) does not make any sense
             return false;
         }
     }
@@ -517,7 +517,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     NX_ASSERT(!getId().isNull());
     NX_ASSERT(commonModule());
 
-    bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
+    bool isModified = commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
         getId(), key, value, markDirty, replaceIfExists);
 
     if (isModified)
@@ -561,7 +561,7 @@ nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
     }
 
     if (const auto module = commonModule())
-        return module->propertyDictionary()->allProperties(getId());
+        return module->resourcePropertyDictionary()->allProperties(getId());
 
     return {};
 }
@@ -571,7 +571,7 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
     nx::vms::api::ResourceParamDataList result;
     nx::vms::api::ResourceParamDataList runtimeProperties;
     if (const auto module = commonModule())
-        runtimeProperties = module->propertyDictionary()->allProperties(getId());
+        runtimeProperties = module->resourcePropertyDictionary()->allProperties(getId());
 
     ParamTypeMap defaultProperties;
 
@@ -595,7 +595,7 @@ bool QnResource::saveProperties()
 {
     NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
-        return module->propertyDictionary()->saveParams(getId());
+        return module->resourcePropertyDictionary()->saveParams(getId());
     return false;
 }
 
@@ -603,7 +603,7 @@ int QnResource::savePropertiesAsync()
 {
     NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
-        return module->propertyDictionary()->saveParamsAsync(getId());
+        return module->resourcePropertyDictionary()->saveParamsAsync(getId());
     return false;
 }
 

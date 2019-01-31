@@ -12,7 +12,7 @@
 
 class QnAdamModbusIOManager:
     public QObject,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public QnAbstractIOManager
 {
     struct PortStateChangeInfo
@@ -32,7 +32,7 @@ class QnAdamModbusIOManager:
         int lifetimeCounter;
     };
 
-public: 
+public:
 
     // Resource is not owned by IO manager. Maybe weak pointer would be better.
     explicit QnAdamModbusIOManager(QnResource* ptr);
@@ -56,7 +56,7 @@ public:
     virtual nx_io_managment::IOPortState getPortDefaultState(const QString& portId) const override;
 
     virtual void setPortDefaultState(
-        const QString& portId, 
+        const QString& portId,
         nx_io_managment::IOPortState state) override;
 
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) override;
