@@ -8,6 +8,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
+
 #include "ffmpeg/utils.h"
 
 namespace nx {
@@ -18,20 +21,14 @@ TranscodeStreamReader::TranscodeStreamReader(
     const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
-    StreamReaderPrivate(
-        encoderIndex,
-        camera),
-    m_codecParams(codecParams),
-    m_videoFrameConsumer(new BufferedVideoFrameConsumer)
+    StreamReaderPrivate(encoderIndex, camera),
+    m_codecParams(codecParams)
 {
     calculateTimePerFrame();
 }
 
 TranscodeStreamReader::~TranscodeStreamReader()
 {
-    m_videoFrameConsumer->interrupt();
-    // Avoid virtual removeVideoConsumer()
-    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
     uninitialize();
 }
 
@@ -52,13 +49,6 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     *lpPacket = toNxPacket(packet.get()).release();
 
     return nxcip::NX_NO_ERROR;
-}
-
-void TranscodeStreamReader::interrupt()
-{
-    StreamReaderPrivate::interrupt();
-    m_videoFrameConsumer->interrupt();
-    m_videoFrameConsumer->flush();
 }
 
 void TranscodeStreamReader::setFps(float fps)
@@ -90,7 +80,7 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     }
 }
 
-bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
+bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame* frame)
 {
     if (!frame)
         return true;
@@ -100,27 +90,19 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
     if(m_codecParams.fps >= m_camera->videoStream()->fps())
         return false;
 
-    // The Mmal decoder can reorder frames, causing time stamps to be out of order. 
-    // The h263 encoder throws an error if the inputFrame it encodes is equal to or earlier in time 
-    // than the previous inputFrame, so drop it to avoid this error.
-    if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() <= m_lastVideoPts)
-        return true;
-
-    uint64_t now = m_camera->millisSinceEpoch();
-
-    // If the time stamp of this inputFrame minus the amount of time per video inputFrame is lower
-    // than the timestamp of the last transcoded inputFrame, we should drop.
-    bool drop = now - m_timePerFrame < m_lastTimestamp;
-
+    bool drop = int64_t(frame->timestamp()) - m_lastTimestamp < m_timePerFrame;
     if (!drop)
-        m_lastTimestamp = now;
+        m_lastTimestamp = frame->timestamp();
 
     return drop;
 }
 
-std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(const ffmpeg::Frame * frame)
+std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
+    const ffmpeg::Packet* sourcePacket)
 {
-    m_lastVideoPts = frame->pts();
+    auto frame = decode(sourcePacket);
+    if (shouldDrop(frame.get()))
+        return nullptr;
 
     int result = scale(frame->frame());
     if (result < 0)
@@ -150,87 +132,28 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * o
     return result;
 }
 
-bool TranscodeStreamReader::waitForTimespan(
-    const std::chrono::milliseconds& timespan,
-    const std::chrono::milliseconds& timeout)
-{
-    uint64_t waitStart = m_camera->millisSinceEpoch();
-    for (;;)
-    {
-        if (m_interrupted)
-            return false;
-
-        std::set<uint64_t> allTimestamps;
-
-        auto videoTimeStamps = m_videoFrameConsumer->timestamps();
-        for (const auto & k : videoTimeStamps)
-            allTimestamps.insert(k);
-
-        auto audioTimeStamps = m_avConsumer->timestamps();
-        for (const auto & k : audioTimeStamps)
-            allTimestamps.insert(k);
-
-        bool shouldSleep = allTimestamps.empty()
-            || std::chrono::milliseconds(*allTimestamps.rbegin() - *allTimestamps.begin()) < timespan;
-
-        if (shouldSleep)
-        {
-            static constexpr std::chrono::milliseconds kSleep(1);
-            std::this_thread::sleep_for(kSleep);
-            if (m_camera->millisSinceEpoch() - waitStart >= timeout.count())
-                return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-}
-
 std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket()
 {
-    // Audio disabled
-    while (!m_camera->audioEnabled())
-    {
-        auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeout);
-        if (shouldStopWaitingForData())
-            return nullptr;
-        if (!shouldDrop(videoFrame.get()))
-            return transcodeVideo(videoFrame.get());
-    }
-
-    // Audio enabled
-    if (!waitForTimespan(kStreamDelay, kWaitTimeout))
-        return nullptr;
-
     for (;;)
     {
-        static constexpr std::chrono::milliseconds kTimeout(1);
-
-        {
-            // videoFrame needs to be released after this scope to prevent deadlock
-            auto videoFrame = m_videoFrameConsumer->popOldest(kTimeout);
-            if (shouldStopWaitingForData())
-                return nullptr;
-            if (!shouldDrop(videoFrame.get()))
-            {
-                if (auto videoPacket = transcodeVideo(videoFrame.get()))
-                    m_avConsumer->givePacket(videoPacket);
-            }
-        }
-
-        auto peeked = m_avConsumer->peekOldest(kTimeout);
-        if (!peeked)
-            continue;
-
-        auto popped =  m_avConsumer->popOldest(kTimeout);
+        auto popped =  m_avConsumer->pop();
         if (!popped)
         {
             if (shouldStopWaitingForData())
                 return nullptr;
+            continue;
         }
-
-        return popped;
+        if (popped->mediaType() == AVMEDIA_TYPE_VIDEO)
+        {
+            if (!m_decoder)
+                initializeDecoder();
+            if (auto videoPacket = transcodeVideo(popped.get()))
+                return videoPacket;
+        }
+        else
+        {
+            return popped;
+        }
     }
     return nullptr;
 }
@@ -247,19 +170,12 @@ bool TranscodeStreamReader::ensureEncoderInitialized()
     return !m_encoderNeedsReinitialization;
 }
 
-void TranscodeStreamReader::ensureConsumerAdded()
-{
-    StreamReaderPrivate::ensureConsumerAdded();
-    if (!m_videoConsumerAdded)
-    {
-        m_camera->videoStream()->addFrameConsumer(m_videoFrameConsumer);
-        m_videoConsumerAdded = true;
-    }
-}
-
 void TranscodeStreamReader::uninitialize()
 {
     uninitializeScaleContext();
+    if (m_decoder)
+        m_decoder->flush();
+    m_decoder.reset(nullptr);
     m_encoder.reset(nullptr);
     m_encoderNeedsReinitialization = true;
 }
@@ -329,7 +245,6 @@ int TranscodeStreamReader::initializeScaledFrame(const PictureParameters & pictu
         return result;
 
     m_scaledFrame = std::move(scaledFrame);
-    
     return 0;
 }
 
@@ -388,8 +303,8 @@ int TranscodeStreamReader::reinitializeScaleContext(
     return m_initCode;
 }
 
-TranscodeStreamReader::ScaleParameters
-TranscodeStreamReader::getNewestScaleParameters(const AVFrame * inputFrame) const
+TranscodeStreamReader::ScaleParameters TranscodeStreamReader::getNewestScaleParameters(
+    const AVFrame * inputFrame) const
 {
     PictureParameters input(inputFrame);
     PictureParameters output(
@@ -434,10 +349,57 @@ void TranscodeStreamReader::calculateTimePerFrame()
     m_timePerFrame = 1.0 / m_codecParams.fps * kMsecInSec;
 }
 
-void TranscodeStreamReader::removeVideoConsumer()
+int TranscodeStreamReader::initializeDecoder()
 {
-    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
-    m_videoConsumerAdded = false;
+    auto decoder = std::make_unique<ffmpeg::Codec>();
+
+    int status;
+    AVCodecParameters* codecPar = m_camera->videoStream()->getCodecParameters();
+    if (!codecPar)
+        return AVERROR_DECODER_NOT_FOUND; //< Using as stream not found.
+    if (nx::utils::AppInfo::isRaspberryPi() && codecPar->codec_id == AV_CODEC_ID_H264)
+        status = decoder->initializeDecoder("h264_mmal");
+    else
+        status = decoder->initializeDecoder(codecPar);
+
+    if (status < 0)
+        return status;
+
+    status = decoder->open();
+    if (status < 0)
+        return status;
+
+    m_decoder = std::move(decoder);
+    return 0;
+}
+
+std::shared_ptr<ffmpeg::Frame> TranscodeStreamReader::decode(const ffmpeg::Packet * packet)
+{
+    if (!m_decoder)
+        return nullptr;
+
+    m_decoderTimestamps.addTimestamp(packet->pts(), packet->timestamp());
+    int status = m_decoder->sendPacket(packet->packet());
+
+    auto frame = std::make_shared<ffmpeg::Frame>();
+    if (status == 0 || status == AVERROR(EAGAIN))
+        status = m_decoder->receiveFrame(frame->frame());
+
+    if (status < 0)
+        return nullptr;
+
+    if (frame->pts() == AV_NOPTS_VALUE)
+        frame->frame()->pts = frame->packetPts();
+
+    auto nxTimestamp = m_decoderTimestamps.takeNxTimestamp(frame->packetPts());
+    if (!nxTimestamp.has_value())
+    {
+        NX_DEBUG(this, "Unknown pts %1", frame->packetPts());
+        nxTimestamp.emplace(m_camera->millisSinceEpoch());
+    }
+
+    frame->setTimestamp(nxTimestamp.value());
+    return frame;
 }
 
 } // namespace usb_cam

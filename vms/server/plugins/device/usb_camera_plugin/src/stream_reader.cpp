@@ -109,7 +109,7 @@ StreamReaderPrivate::StreamReaderPrivate(
 StreamReaderPrivate::~StreamReaderPrivate()
 {
     m_avConsumer->interrupt();
-    removeAudioConsumer();
+    removeConsumer();
 }
 
 void StreamReaderPrivate::interrupt()
@@ -126,6 +126,12 @@ void StreamReaderPrivate::ensureConsumerAdded()
     {
         m_camera->audioStream()->addPacketConsumer(m_avConsumer);
         m_audioConsumerAdded = true;
+    }
+
+    if (!m_videoConsumerAdded)
+    {
+        m_camera->videoStream()->addPacketConsumer(m_avConsumer);
+        m_videoConsumerAdded = true;
     }
 }
 
@@ -149,16 +155,13 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
     return nxPacket;
 }
 
-void StreamReaderPrivate::removeAudioConsumer()
+void StreamReaderPrivate::removeConsumer()
 {
     m_camera->audioStream()->removePacketConsumer(m_avConsumer);
     m_audioConsumerAdded = false;
-}
 
-void StreamReaderPrivate::removeConsumer()
-{
-    removeVideoConsumer();
-    removeAudioConsumer();
+    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
+    m_videoConsumerAdded = false;
 }
 
 bool StreamReaderPrivate::interrupted()

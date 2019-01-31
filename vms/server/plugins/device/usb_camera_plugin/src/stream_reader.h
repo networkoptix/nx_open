@@ -88,8 +88,6 @@ protected:
 
 protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
-    void removeAudioConsumer();
-    virtual void removeVideoConsumer() = 0;
     void removeConsumer();
     bool interrupted();
     int handleNxError();

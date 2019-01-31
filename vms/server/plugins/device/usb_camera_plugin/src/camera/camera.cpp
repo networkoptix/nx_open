@@ -41,7 +41,7 @@ static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
     return nullptr;
 }
 
-} // namespace 
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
 // Camera
@@ -223,7 +223,7 @@ CodecParameters Camera::getDefaultVideoParameters()
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const device::video::ResolutionData& a, const device::video::ResolutionData& b)
         {
-            return a.width * a.height < b.width * b.height;
+            return a.width * a.height < b.width * b.height && a.fps < b.fps;
         });
 
     if (it != resolutionList.end())
