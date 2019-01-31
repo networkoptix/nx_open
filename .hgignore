@@ -21,7 +21,6 @@ CMakeLists.txt.user
 # Project-specific items.
 subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
-subinclude:nx_cloud_deploy/.hgignore
 subinclude:webadmin/.hgignore
 
 # Build folders in the repository root.
