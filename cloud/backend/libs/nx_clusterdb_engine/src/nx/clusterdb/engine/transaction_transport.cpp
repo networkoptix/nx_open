@@ -61,6 +61,8 @@ CommonHttpConnection::CommonHttpConnection(
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
+    m_baseTransactionTransport->setReceivedTransactionsQueueControlEnabled(false);
+
     bindToAioThread(m_baseTransactionTransport->getAioThread());
     m_baseTransactionTransport->setState(
         ::ec2::QnTransactionTransportBase::ReadyForStreaming);
