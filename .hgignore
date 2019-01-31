@@ -22,6 +22,7 @@ CMakeLists.txt.user
 subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
 subinclude:nx_cloud_deploy/.hgignore
+subinclude:webadmin/.hgignore
 
 # Build folders in the repository root.
 re:^build/
