@@ -86,7 +86,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
 int DiscoveryManager::checkHostAddress(
     nxcip::CameraInfo* /*cameras*/,
     const char* /*address*/,
-    const char* /*login*/, 
+    const char* /*login*/,
     const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam

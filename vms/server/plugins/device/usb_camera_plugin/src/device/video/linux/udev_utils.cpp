@@ -43,7 +43,7 @@ struct UdevEnumerate
 
     UdevEnumerate(struct udev * udev):
         udevEnumerate(udev_enumerate_new(udev))
-    {   
+    {
     }
 
     ~UdevEnumerate()
@@ -65,7 +65,7 @@ struct UdevEnumerate
     struct udev_list_entry * getListEntry()
     {
         return udev_enumerate_get_list_entry(udevEnumerate);
-    }        
+    }
 
     const char * getListEntryName(struct udev_list_entry * udev_list_entry)
     {

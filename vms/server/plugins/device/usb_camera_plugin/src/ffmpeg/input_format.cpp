@@ -19,7 +19,7 @@ static std::chrono::milliseconds now()
 
 InputFormat::InputFormat():
     Options()
-{    
+{
 }
 
 InputFormat::~InputFormat()
@@ -29,7 +29,7 @@ InputFormat::~InputFormat()
 
 int InputFormat::initialize(const char * deviceType)
 {
-    m_inputFormat = av_find_input_format(deviceType); 
+    m_inputFormat = av_find_input_format(deviceType);
     if (!m_inputFormat)
     {
         // There is no error code for format not found

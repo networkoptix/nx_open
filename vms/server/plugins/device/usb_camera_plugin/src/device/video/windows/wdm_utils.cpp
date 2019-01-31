@@ -90,7 +90,7 @@ std::wstring getDevicePath(
     // SetupDiGetDeviceInterfaceDetail requires space equal to bufferSize returned from
     // the first call for DevicePath + size of the struct + size of an extra TCHAR
     DWORD detailDataSize =
-        (bufferSize * sizeof(WCHAR)) + sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA) + sizeof(TCHAR);    
+        (bufferSize * sizeof(WCHAR)) + sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA) + sizeof(TCHAR);
 
     // Needs to be dynamically allocaed to give enough space to DevicePath member variable.
     PSP_DEVICE_INTERFACE_DETAIL_DATA detailData =
@@ -125,13 +125,13 @@ static bool findDevice(
     SP_DEVICE_INTERFACE_DATA interfaceData = {0};
     interfaceData.cbSize = sizeof(interfaceData);
 
-    for (int deviceIndex = 0; 
+    for (int deviceIndex = 0;
         SetupDiEnumDeviceInfo(deviceInfoSet, deviceIndex, outTargetDevice);
         ++deviceIndex)
     {
-        for(int interfaceIndex = 0;
+        for (int interfaceIndex = 0;
             SetupDiEnumDeviceInterfaces(
-                deviceInfoSet, 
+                deviceInfoSet,
                 outTargetDevice,
                 classGuid,
                 interfaceIndex,
@@ -142,7 +142,7 @@ static bool findDevice(
                 deviceInfoSet,
                 *outTargetDevice,
                 interfaceData);
-            
+
             size_t size = std::min(currentDevicePath.size(), devicePath.size());
             if (_wcsnicmp(currentDevicePath.c_str(), devicePath.c_str(), size) == 0)
                 return true;
@@ -193,9 +193,9 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
     // Call it once to get required buffer size...
     if (!SetupDiGetDeviceRegistryProperty(
         deviceInfoSet,
-        &targetUsbDevice, 
+        &targetUsbDevice,
         SPDRP_LOCATION_INFORMATION,
-        NULL, 
+        NULL,
         NULL,
         0,
         &bufferSize))
@@ -229,7 +229,7 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
 
     size_t start = registryProperty.find(kPortPrefix);
     size_t end = registryProperty.find(L".");
-   
+
     if(start == std::wstring::npos || end == std::wstring::npos || end < start)
         return -1;
 
@@ -239,7 +239,7 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
 
     // Dropping "Port_#" and ".Hub_#0001"
     std::wstring portIndex = registryProperty.substr(start, end - start);
-    
+
     return std::stol(portIndex);
 }
 
@@ -287,7 +287,7 @@ static std::string getUsbSerialNumber(HANDLE usbHubHandle, ULONG portIndex)
     ULONG bytesReturned = 0;
     if(!DeviceIoControl(
         usbHubHandle,
-        IOCTL_USB_GET_NODE_CONNECTION_INFORMATION, 
+        IOCTL_USB_GET_NODE_CONNECTION_INFORMATION,
         &connectionInfo,
         size,
         &connectionInfo,
@@ -371,8 +371,8 @@ std::string getDeviceUniqueId(const std::string& devicePath)
         GENERIC_WRITE,
         FILE_SHARE_WRITE,
         NULL,
-        OPEN_EXISTING, 
-        0, 
+        OPEN_EXISTING,
+        0,
         NULL);
     if (usbHubHandle == INVALID_HANDLE_VALUE)
         return std::string();

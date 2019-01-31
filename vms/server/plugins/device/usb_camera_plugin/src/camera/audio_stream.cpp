@@ -107,7 +107,7 @@ std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 int AudioStream::AudioStreamPrivate::initialize()
 {
     m_initCode = initializeInputFormat();
-    if (m_initCode < 0) 
+    if (m_initCode < 0)
         return m_initCode;
 
     m_initCode = initializeDecoder();
@@ -285,15 +285,15 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fram
 
 int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
-    for(;;)
+    for (;;)
     {
         ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
 
-        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see 
+        // AVFMT_FLAG_NONBLOCK is set if running on Windows. see
         int result;
         if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
         {
-            static constexpr std::chrono::milliseconds kTimeout = 
+            static constexpr std::chrono::milliseconds kTimeout =
                 std::chrono::milliseconds(1000);
             result = m_inputFormat->readFrameNonBlock(packet.packet(), kTimeout);
             if (result < AVERROR(EAGAIN)) //< Treaat a timeout as an error.
@@ -345,7 +345,7 @@ int AudioStream::AudioStreamPrivate::resample(
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
 {
-    return m_resampleContext 
+    return m_resampleContext
         ? std::chrono::milliseconds(swr_get_delay(m_resampleContext, kMsecInSec))
         : std::chrono::milliseconds(0);
 }
@@ -365,7 +365,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
         m_encoder->codecId(),
         AVMEDIA_TYPE_AUDIO);
 
-    for(;;)
+    for (;;)
     {
         // need to drain the the resampler periodically to avoid increasing audio delay
         if(m_resampleContext && resampleDelay() > timePerVideoFrame())
@@ -491,7 +491,7 @@ void AudioStream::AudioStreamPrivate::run()
 AudioStream::AudioStream(
     const std::string& url,
     const std::weak_ptr<Camera>& camera,
-    bool enabled) 
+    bool enabled)
     :
     m_url(url),
     m_camera(camera),

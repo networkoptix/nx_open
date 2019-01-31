@@ -15,7 +15,7 @@ namespace detail {
 
 namespace {
 
-static const std::vector<std::string> kMotherBoardAudioList = 
+static const std::vector<std::string> kMotherBoardAudioList =
 {
     "HDA Intel PCH"
     // AMD? built in audio card goes here
@@ -34,7 +34,7 @@ struct DeviceDescriptor
     // The unique name of the interface used to open the device for capture.
     std::string path;
 
-    // The name of the sound card, used to match a camera to its microphone and to 
+    // The name of the sound card, used to match a camera to its microphone and to
     //    determine if it should be ignored or deprioritized.
     std::string name;
 
@@ -44,12 +44,12 @@ struct DeviceDescriptor
     // Can be Input, Output or both. Used to find input only devices.
     IOType ioType;
 
-    // Set to true if path contains the word "default", but not "sysdefault". 
-    // Presumeably this is the systems default audio device, though ALSA has no explicit 
+    // Set to true if path contains the word "default", but not "sysdefault".
+    // Presumeably this is the systems default audio device, though ALSA has no explicit
     // interface to get it.
     bool isDefault;
 
-    // Set to true if the path contains "sysdefault", marking this device descriptor as the 
+    // Set to true if the path contains "sysdefault", marking this device descriptor as the
     // default audio interface for this particular device.
     bool sysDefault;
 
@@ -62,7 +62,7 @@ struct DeviceDescriptor
 
     bool operator==(const DeviceDescriptor& rhs) const
     {
-        return 
+        return
             path == rhs.path
             && name == rhs.name
             && cardIndex == rhs.cardIndex
@@ -72,9 +72,9 @@ struct DeviceDescriptor
     bool isCameraAudioInput(const nxcip::CameraInfo& info) const
     {
         std::string modelName(info.modelName);
-        return 
+        return
             (modelName.find(name) != std::string::npos
-            || name.find(modelName) != std::string::npos) 
+            || name.find(modelName) != std::string::npos)
             && isInput();
     }
 
@@ -117,8 +117,8 @@ static std::vector<DeviceDescriptor> getDevices()
 
             if (char * ioHint = snd_device_name_get_hint(*hint, "IOID"))
             {
-                device.ioType = strcmp(ioHint, "Input") == 0 
-                    ? DeviceDescriptor::iotInput 
+                device.ioType = strcmp(ioHint, "Input") == 0
+                    ? DeviceDescriptor::iotInput
                     : DeviceDescriptor::iotOutput;
                 free(ioHint);
             }
@@ -130,7 +130,7 @@ static std::vector<DeviceDescriptor> getDevices()
             if ((device.isDefault || device.sysDefault))
             {
                 bool isMotherBoardAudio = false;
-                for(const auto & motherBoardAudio : kMotherBoardAudioList)
+                for (const auto & motherBoardAudio : kMotherBoardAudioList)
                     isMotherBoardAudio = device.name.find(motherBoardAudio) != std::string::npos;
 
                 auto it = std::find(motherBoardDevices.begin(), motherBoardDevices.end(), device);
@@ -153,7 +153,7 @@ static std::vector<DeviceDescriptor> getDevices()
     // We want built in mother board audio devices at the back of the list because they are
     // registered even with nothing plugged into them. Audio capture devices that are actually
     // present should get priority.
-    for(const auto motherBoardDevice : motherBoardDevices)
+    for (const auto motherBoardDevice : motherBoardDevices)
         devices.push_back(motherBoardDevice);
 
     return devices;

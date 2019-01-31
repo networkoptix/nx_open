@@ -46,7 +46,7 @@ int Codec::receivePacket(AVPacket * outPacket) const
 {
     return avcodec_receive_packet(m_codecContext, outPacket);
 }
-    
+
 int Codec::receiveFrame(AVFrame * outFrame) const
 {
     return avcodec_receive_frame(m_codecContext, outFrame);
@@ -72,7 +72,7 @@ int Codec::initializeEncoder(const char * codecName)
     m_codec = avcodec_find_encoder_by_name(codecName);
     if (!m_codec)
         return AVERROR_ENCODER_NOT_FOUND;
-        
+
     m_codecContext = avcodec_alloc_context3(m_codec);
     if (!m_codecContext)
         return AVERROR(ENOMEM);
@@ -99,11 +99,11 @@ int Codec::initializeDecoder(const AVCodecParameters * codecParameters)
     int result = initializeDecoder(codecParameters->codec_id);
     if (result < 0)
         return result;
-    
+
     result = avcodec_parameters_to_context(m_codecContext, codecParameters);
     if (result < 0)
         avcodec_free_context(&m_codecContext);
-    
+
     return result;
 }
 

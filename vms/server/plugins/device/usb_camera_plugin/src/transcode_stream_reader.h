@@ -137,7 +137,7 @@ private:
     /**
      * Scale @param frame, modifying the preallocated @param outFrame whose size and format are
      * expected to have already been set.
-     * 
+     *
      * @param[in] frame - the input frame
      * @return Ffmpeg error code, 0 on success negative value on failure
      */

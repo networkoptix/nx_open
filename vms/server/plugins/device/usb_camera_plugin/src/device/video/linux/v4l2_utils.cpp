@@ -26,7 +26,7 @@ NX_DEBUG(nx::utils::log::Tag(std::string("nx::usb_cam::v4l2_utils::")+__FUNCTION
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace video {    
+namespace video {
 namespace detail {
 
 namespace {
@@ -68,7 +68,7 @@ std::string getDeviceName(int fileDescriptor)
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
-    
+
     //force a null terminator on the end of the string with c_str()
     return std::string(
         deviceCapability.card,
@@ -271,7 +271,7 @@ std::vector<ResolutionData> getResolutionList(
         return {};
     }
 
-    auto descriptor = 
+    auto descriptor =
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
 
     std::vector<ResolutionData> resolutionList;

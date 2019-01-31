@@ -29,5 +29,5 @@ private:
         const std::vector<device::video::ResolutionData>& resolutionList) const;
 };
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx
+} // namespace usb_cam

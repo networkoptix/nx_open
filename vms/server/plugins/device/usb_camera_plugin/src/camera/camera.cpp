@@ -203,11 +203,11 @@ std::string Camera::toString() const
     static const std::string suffix = " }";
 
     return
-        prefix 
-        + "name: " + m_cameraInfo.modelName 
-        + ", uid: " + m_cameraInfo.uid 
+        prefix
+        + "name: " + m_cameraInfo.modelName
+        + ", uid: " + m_cameraInfo.uid
         + ", video:" + ffmpegUrl()
-        + ", audio: " + m_cameraInfo.auxiliaryData 
+        + ", audio: " + m_cameraInfo.auxiliaryData
         + suffix;
 }
 
@@ -228,7 +228,7 @@ CodecParameters Camera::getDefaultVideoParameters()
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = 
+        int maxBitrate =
             device::video::getMaxBitrate(ffmpegUrl().c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,
