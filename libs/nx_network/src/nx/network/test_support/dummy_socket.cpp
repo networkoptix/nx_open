@@ -111,6 +111,11 @@ bool DummySocket::setIpv6Only(bool /*val*/)
     return false;
 }
 
+bool DummySocket::getProtocol(int* /*protocol*/) const
+{
+    return false;
+}
+
 AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
 {
     return m_basicPollable.pollable().handle();

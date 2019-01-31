@@ -41,7 +41,7 @@ class QnFfmpegVideoTranscoder;
 class QnStreamRecorder:
     public QnAbstractDataConsumer,
     public QnResourceConsumer,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

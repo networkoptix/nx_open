@@ -5,7 +5,7 @@
 
 struct QnChunksRequestData;
 
-class QnChunksRequestHelper: public nx::vms::server::ServerModuleAware
+class QnChunksRequestHelper: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnChunksRequestHelper(QnMediaServerModule* serverModule);
@@ -15,4 +15,3 @@ public:
 private:
     QnTimePeriodList loadAnalyticsTimePeriods(const QnChunksRequestData& request) const;
 };
-

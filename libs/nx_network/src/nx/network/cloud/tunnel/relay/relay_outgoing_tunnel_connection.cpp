@@ -4,6 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "api/relay_api_client_factory.h"
+#include "../../protocol_type.h"
 
 namespace nx {
 namespace network {
@@ -211,6 +212,12 @@ OutgoingConnection::OutgoingConnection(
 OutgoingConnection::~OutgoingConnection()
 {
     --(*m_usageCounter);
+}
+
+bool OutgoingConnection::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::relay;
+    return true;
 }
 
 } // namespace relay

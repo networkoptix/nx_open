@@ -68,7 +68,7 @@ private:
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
-class OnvifResourceInformationFetcher: public nx::vms::server::ServerModuleAware
+class OnvifResourceInformationFetcher: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
@@ -87,7 +87,6 @@ public:
         const QString& manufacturer, const QString& name);
     static bool isModelSupported(const QString& manufacturer, const QString& modelNamee);
 private:
-
 
     bool findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender, const QString& manufacturer, QnResourceList& result) const;
 

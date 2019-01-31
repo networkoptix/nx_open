@@ -18,7 +18,7 @@ class DeviceAnalyticsBinding;
 
 class DeviceAnalyticsContext:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public AbstractVideoDataReceptor
 {
     using base_type = nx::vms::server::ServerModuleAware;

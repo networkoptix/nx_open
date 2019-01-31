@@ -21,7 +21,8 @@ QnFlirResourceSearcher::~QnFlirResourceSearcher()
 {
 }
 
-QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnFlirResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -47,7 +48,8 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 
 }
 
-QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(
+    const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
@@ -97,7 +99,8 @@ quint16 QnFlirResourceSearcher::getVendorIdFromDevice(SimpleEIPClient& eipClient
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occurred when retrieving vendor."
+            << data.generalStatus << data.additionalStatus;
         return 0;
     }
 
@@ -116,7 +119,8 @@ QString QnFlirResourceSearcher::getMACAdressFromDevice(SimpleEIPClient& eipClien
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving vendor."
+            << data.generalStatus << data.additionalStatus;
         return QString();
     }
 
@@ -135,7 +139,8 @@ QString QnFlirResourceSearcher::getModelFromDevice(SimpleEIPClient& eipClient) c
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured when retrieving model." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving model."
+            << data.generalStatus << data.additionalStatus;
         return QString();
     }
 
@@ -163,7 +168,8 @@ QString QnFlirResourceSearcher::getFirmwareFromDevice(SimpleEIPClient &eipClient
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured while retrieving firmware." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured while retrieving firmware."
+            << data.generalStatus << data.additionalStatus;
         return QString();
     }
 
@@ -186,8 +192,8 @@ QList<QnNetworkResourcePtr> QnFlirResourceSearcher::processPacket(
     return localRes;
 }
 
-
-void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result)
+void QnFlirResourceSearcher::createResource(
+    const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result)
 {
     QnFlirEIPResourcePtr resource(new QnFlirEIPResource(m_serverModule));
 

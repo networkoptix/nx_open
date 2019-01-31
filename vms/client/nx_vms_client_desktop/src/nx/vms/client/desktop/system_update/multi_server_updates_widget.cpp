@@ -401,7 +401,10 @@ void MultiServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QSet<QnUuid> targets = m_stateTracker->getAllPeers();
-            auto url = generateUpdatePackageUrl(m_updateInfo, targets, resourcePool()).toString();
+            auto url = generateUpdatePackageUrl(
+                commonModule()->engineVersion(),
+                m_updateInfo, targets,
+                resourcePool()).toString();
 
             QDesktopServices::openUrl(url);
         });
@@ -410,7 +413,11 @@ void MultiServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QSet<QnUuid> targets = m_stateTracker->getAllPeers();
-            auto url = generateUpdatePackageUrl(m_updateInfo, targets, resourcePool()).toString();
+            auto url = generateUpdatePackageUrl(
+                commonModule()->engineVersion(),
+                m_updateInfo,
+                targets,
+                resourcePool()).toString();
             qApp->clipboard()->setText(url);
 
             ui->linkCopiedWidget->show();
@@ -672,13 +679,16 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     m_updateLocalStateChanged = true;
 
     clearUpdateInfo();
-    nx::utils::SoftwareVersion version = qnStaticCommon->engineVersion();
+    nx::utils::SoftwareVersion version = commonModule()->engineVersion();
     auto buildNumber = dialog.buildNumber();
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
     QString updateUrl = qnSettings->updateFeedUrl();
-    m_updateCheck = nx::update::checkSpecificChangeset(updateUrl, dialog.changeset());
+    m_updateCheck = nx::update::checkSpecificChangeset(
+        updateUrl,
+        commonModule()->engineVersion(),
+        dialog.changeset());
     loadDataToUi();
 }
 
@@ -697,7 +707,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
+        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
         // Maybe we should call loadDataToUi instead.
         syncUpdateCheckToUi();
     }
@@ -1020,7 +1030,7 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
+        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
     }
 
     if (!m_serverUpdateCheck.valid())
@@ -1668,7 +1678,12 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
                 break;
             case WidgetUpdateState::installing:
                 if (!targets.empty())
-                    m_serverUpdateTool->requestInstallAction(targets);
+                {
+                    m_stateTracker->setPeersInstalling(targets, true);
+                    QSet<QnUuid> servers = targets;
+                    servers.remove(m_stateTracker->getClientPeerId());
+                    m_serverUpdateTool->requestInstallAction(servers);
+                }
                 // Should not install update before mediaservers has completed its update process.
                 //if (m_clientUpdateTool->hasUpdate())
                 //    m_clientUpdateTool->installUpdate();
@@ -2056,6 +2071,12 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         debugState << QString("size(peers)=%1").arg(m_stateTracker->peersCount());
         debugState << QString("size(model)=%1").arg(m_updatesModel->rowCount());
         debugState << QString("size(sorted)=%1").arg(m_sortedModel->rowCount());
+
+        QStringList serversReport;
+        for (auto server: m_serverUpdateTool->getServersInstalling())
+            serversReport << server.toString();
+        if (!serversReport.empty())
+            debugState << QString("installing=%1").arg(serversReport.join(","));
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {

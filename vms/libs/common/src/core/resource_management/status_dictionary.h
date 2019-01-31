@@ -5,7 +5,7 @@
 #include <common/common_globals.h>
 #include <common/common_module_aware.h>
 
-class QnResourceStatusDictionary: public QObject, public QnCommonModuleAware
+class QnResourceStatusDictionary: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

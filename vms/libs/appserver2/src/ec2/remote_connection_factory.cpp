@@ -362,7 +362,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
     QnConnectionInfo* const connectionInfo,
     nx::network::http::Response* response)
 {
-    connectionInfo->version = qnStaticCommon->engineVersion();
+    connectionInfo->version = commonModule()->engineVersion();
     connectionInfo->brand = qnStaticCommon->brand();
     connectionInfo->customization = qnStaticCommon->customization();
     connectionInfo->systemName = commonModule()->globalSettings()->systemName();

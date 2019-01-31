@@ -1163,7 +1163,7 @@ protected:
 /*!
     \note All methods are asynchronous if other not specified
 */
-class AbstractECConnectionFactory: public QObject, public QnCommonModuleAware
+class AbstractECConnectionFactory: public QObject, public /*mixin*/ QnCommonModuleAware
 {
 Q_OBJECT
 

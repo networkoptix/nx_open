@@ -17,7 +17,7 @@
  */
 class QnNetworkProxyFactory:
     public QNetworkProxyFactory,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
 public:
     QnNetworkProxyFactory(QnCommonModule* commonModule);

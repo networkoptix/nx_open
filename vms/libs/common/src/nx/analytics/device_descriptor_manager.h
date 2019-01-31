@@ -10,7 +10,7 @@
 
 namespace nx::analytics {
 
-class DeviceDescriptorManager: public QnCommonModuleAware
+class DeviceDescriptorManager: public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 

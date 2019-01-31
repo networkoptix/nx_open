@@ -5,15 +5,15 @@
 
 class QnRebuildArchiveRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
     QnRebuildArchiveRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
-        const QString &path, 
-        const QnRequestParams &params, 
-        QnJsonRestResult &result, 
+        const QString &path,
+        const QnRequestParams &params,
+        QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
 };

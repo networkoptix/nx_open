@@ -28,6 +28,12 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
         emit itemRemoved(*it);
+    if (m_clientItem)
+    {
+        emit itemRemoved(m_clientItem);
+        m_clientItem.reset();
+    }
+
     m_items.clear();
     m_activeServers.clear();
 

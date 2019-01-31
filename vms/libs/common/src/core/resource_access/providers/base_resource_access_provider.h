@@ -10,7 +10,7 @@
  */
 class QnBaseResourceAccessProvider:
     public QnAbstractResourceAccessProvider,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnAbstractResourceAccessProvider;
 

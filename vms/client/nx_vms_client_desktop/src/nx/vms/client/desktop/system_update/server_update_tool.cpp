@@ -669,9 +669,11 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::findPackage(
+        commonModule()->moduleGUID(),
+        commonModule()->engineVersion(),
         systemInfo,
         m_updateManifest,
-        true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
+        /*isClient=*/true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
     // TODO: Should move this to Widget somehow.
     verifyUpdateManifest(contents, {});
     return contents;
@@ -747,7 +749,7 @@ void ServerUpdateTool::requestInstallAction(
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = Clock::now();
-    m_stateTracker->setPeersInstalling(targets, true);
+    m_serversAreInstalling.clear();
 
     auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
@@ -759,7 +761,7 @@ void ServerUpdateTool::requestInstallAction(
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        if (auto handle = connection->updateActionInstall(callback, thread()))
+        if (auto handle = connection->updateActionInstall(targets, callback, thread()))
             m_requestingInstall.insert(handle);
     }
 }
@@ -840,7 +842,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     return;
                 tool->m_activeRequests.remove(handle);
                 if (success)
+                {
                     tool->m_updateManifest = response;
+                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.participants);
+                }
             }, thread());
         m_activeRequests.insert(handle);
     }
@@ -878,6 +883,11 @@ std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 {
     return m_stateTracker;
+}
+
+QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
+{
+    return m_serversAreInstalling;
 }
 
 ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(
@@ -984,6 +994,7 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
     return "";
 }
 
+
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
     return getServerUrl(commonModule(), "/ec2/updateStatus");
@@ -999,9 +1010,11 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
     return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
 }
 
-nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+nx::utils::SoftwareVersion getCurrentVersion(
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    QnResourcePool* resourcePool)
 {
-    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+    nx::utils::SoftwareVersion minimalVersion = engineVersion;
     const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
     {
@@ -1011,7 +1024,11 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     return minimalVersion;
 }
 
-QUrl generateUpdatePackageUrl(const nx::update::UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
+QUrl generateUpdatePackageUrl(
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::update::UpdateContents& contents,
+    const QSet<QnUuid>& targets,
+    QnResourcePool* resourcePool)
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
     auto changeset = contents.info.version;
@@ -1027,7 +1044,7 @@ QUrl generateUpdatePackageUrl(const nx::update::UpdateContents& contents, const 
     if (targetVersion.isNull())
     {
         query.addQueryItem("version", "latest");
-        query.addQueryItem("current", getCurrentVersion(resourcePool).toString());
+        query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());
     }
     else
     {

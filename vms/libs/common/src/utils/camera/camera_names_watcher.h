@@ -8,7 +8,7 @@
 
 namespace utils {
 
-class QnCameraNamesWatcher: public QObject, public QnCommonModuleAware
+class QnCameraNamesWatcher: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

@@ -163,6 +163,12 @@ bool MultipleServerSocket::setIpv6Only(bool /*val*/)
     return false;
 }
 
+bool MultipleServerSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::unassigned;
+    return false;
+}
+
 AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 {
     NX_ASSERT(false);

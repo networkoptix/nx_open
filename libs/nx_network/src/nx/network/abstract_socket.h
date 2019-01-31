@@ -13,8 +13,7 @@
 #include "buffer.h"
 #include "socket_common.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class Pollable;
 
@@ -22,13 +21,28 @@ namespace aio { class AbstractAioThread; }
 
 namespace deprecated {
 
-constexpr static const std::chrono::milliseconds kDefaultConnectTimeout =
+static constexpr std::chrono::milliseconds kDefaultConnectTimeout =
     std::chrono::milliseconds(3000);
 
 } // namespace deprecated
 
-constexpr static const std::chrono::milliseconds kNoTimeout =
+static constexpr std::chrono::milliseconds kNoTimeout =
     std::chrono::milliseconds::zero();
+
+/**
+ * Using IANA assigned numbers for protocol when possible.
+ */
+namespace Protocol {
+
+static constexpr int tcp = 6;
+static constexpr int udp = 17;
+static constexpr int udt = 143;
+/**
+ * Custom protocol numbers should start with incrementing this number.
+ */
+static constexpr int unassigned = 144;
+
+} // namespace ProtocolType
 
 /**
  * Base interface for sockets. Provides methods to set different socket configuration parameters.
@@ -52,9 +66,9 @@ public:
      * But we don't want to include windows headers here.
      * Equivalence of these typedefs is checked via static_assert in system_socket.cpp.
      */
-    typedef std::uintptr_t SOCKET_HANDLE;
+    using SOCKET_HANDLE = std::uintptr_t;
 #else
-    typedef int SOCKET_HANDLE;
+    using SOCKET_HANDLE = int;
 #endif
 
     /**
@@ -172,8 +186,16 @@ public:
     virtual bool setIpv6Only(bool val) = 0;
 
     /**
-     * Returns system-specific socket handle.
-     * TODO: #ak remove this method after complete move to the new socket.
+     * @param protocol One of values from Protocol namespace.
+     * Note that additional protocol support can be added.
+     * @return false if protocol is not defined yet.
+     * An impementation is allowed to choose actual protocol after socket creation.
+     */
+    virtual bool getProtocol(int* protocol) const = 0;
+
+    /**
+     * @return System specific socket handle.
+     * TODO: #ak Remove this method after complete move to the new socket.
      */
     virtual SOCKET_HANDLE handle() const = 0;
 
@@ -199,8 +221,8 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) = 0;
 
     /**
-     * Returns pointer to AIOThread this socket is bound to
-     * NOTE: if socket is not bound to any thread yet, binds it automatically
+     * @return Pointer to AIO thread this socket is bound to.
+     * NOTE: If socket is not bound to any thread yet, binds it automatically.
      */
     virtual nx::network::aio::AbstractAioThread* getAioThread() const = 0;
 
@@ -222,7 +244,7 @@ using IoCompletionHandler = nx::utils::MoveOnlyFunc<
     void(SystemError::ErrorCode /*errorCode*/, std::size_t /*bytesTransferred*/)>;
 
 /**
- * Interface for writing to/reading from socket.
+ * Interface of a socket that supports receiving / sending data.
  */
 class NX_NETWORK_API AbstractCommunicatingSocket:
     public AbstractSocket
@@ -237,10 +259,12 @@ public:
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
         std::chrono::milliseconds timeout) = 0;
+
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
         std::chrono::milliseconds timeout);
+
     /**
      * Read into the given buffer up to bufferLen bytes data from this socket.
      * Call AbstractCommunicatingSocket::connect()
@@ -252,6 +276,7 @@ public:
      *   method will return -1 and set error code to SystemError::wouldBlock.
      */
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) = 0;
+
     /**
      * Write the given buffer to this socket.
      * Call AbstractCommunicatingSocket::connect() before calling AbstractCommunicatingSocket::send().
@@ -263,20 +288,21 @@ public:
      */
     virtual int send(const void* buffer, unsigned int bufferLen) = 0;
     int send(const QByteArray& data);
+
     /**
-     * Returns host address/port of remote host, socket has been connected to.
-     * Get the foreign address. Call connect() before calling recv().
-     * @return foreign address
+     * @returns Host address/port of remote host socket has been connected to.
      * NOTE: If AbstractCommunicatingSocket::connect() has not been called yet,
      *   empty address is returned.
      */
     virtual SocketAddress getForeignAddress() const = 0;
+
     /**
      * @return Text name of the remote host. By default, getForeignAddress().address.toString().
      */
     virtual QString getForeignHostName() const;
+
     /**
-     * Returns true, if connection has been established, false otherwise.
+     * @return true, if connection has been established, false otherwise.
      */
     virtual bool isConnected() const = 0;
 
@@ -299,7 +325,6 @@ public:
      *   @endcode
      *   bytesRead is undefined, if errorCode is not SystemError::noError.
      *   bytesRead is 0, if connection has been closed.
-     * @return true, if asynchronous read has been issued
      * WARNING: If dst->capacity() == 0, false is returned and no bytes read.
      * WARNING: Multiple concurrent asynchronous write operations result in undefined behavior.
      */
@@ -308,8 +333,8 @@ public:
         IoCompletionHandler handler) = 0;
 
     /**
-     * Reads at least @param minimalSize bytes from socket asynchronously.
-     * Calls @param handler when least @param minimalSize bytes are read or
+     * Reads at least minimalSize bytes from socket asynchronously.
+     * Calls handler when least @param minimalSize bytes are read or
      *   error or disconnect has happend.
      * NOTE: Works similar to POSIX MSG_WAITALL flag but async.
      */
@@ -338,6 +363,7 @@ public:
     virtual void registerTimer(
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> handler) = 0;
+
     void registerTimer(
         unsigned int timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler);
@@ -359,6 +385,7 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) final;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+
     virtual void pleaseStopSync() override;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
@@ -386,7 +413,6 @@ class NX_NETWORK_API AbstractStreamSocket:
     public AbstractCommunicatingSocket
 {
 public:
-
     virtual ~AbstractStreamSocket() override;
 
     /**
@@ -394,11 +420,13 @@ public:
      * @return false on error.
      */
     virtual bool setNoDelay(bool value) = 0;
+
     /**
      * Read TCP_NODELAY option value.
      * @return false on error.
      */
     virtual bool getNoDelay(bool* value) const = 0;
+
     /**
      * Enable collection of socket statistics.
      * @param val true - enable, false - diable.
@@ -408,6 +436,7 @@ public:
      *   on linux it is enabled by default for every socket.
      */
     virtual bool toggleStatisticsCollection(bool val) = 0;
+
     /**
      * Reads extended stream socket information.
      * NOTE: AbstractStreamSocket::toggleStatisticsCollection
@@ -416,26 +445,29 @@ public:
      *   so it is not recommended to call it too often.
      */
     virtual bool getConnectionStatistics(StreamSocketInfo* info) = 0;
+
     /**
      * Set keep alive options.
      * @return false on error.
-     * NOTE: due to some OS limitations some values might not be actually set eg
+     * NOTE: due to some OS limitations some values might not be actually set.
      *   linux: full support
      *   windows: only timeSec and intervalSec support
      *   macosx: only timeSec support
      *   other unix: only boolean enabled/disabled is supported
      */
-    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) = 0;
+    virtual bool setKeepAlive(std::optional<KeepAliveOptions> info) = 0;
+
     /**
      * Reads keep alive options.
      * @return false on error.
      * NOTE: due to some OS limitations some values might be = 0 (meaning system defaults).
      */
-    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const = 0;
+    virtual bool getKeepAlive(std::optional<KeepAliveOptions>* result) const = 0;
 
     void setBeforeDestroyCallback(nx::utils::MoveOnlyFunc<void()> callback);
+
 private:
-    nx::utils::MoveOnlyFunc<void()> m_beforeDestroyCallback = nullptr;
+    nx::utils::MoveOnlyFunc<void()> m_beforeDestroyCallback;
 };
 
 /**
@@ -469,7 +501,7 @@ class NX_NETWORK_API AbstractStreamServerSocket:
     public AbstractSocket
 {
 public:
-    static const int kDefaultBacklogSize = 128;
+    static constexpr int kDefaultBacklogSize = 128;
 
     /**
      * Start listening for incoming connections.
@@ -480,12 +512,14 @@ public:
      * NOTE: Method returns immediately.
      */
     virtual bool listen(int backlog = kDefaultBacklogSize) = 0;
+
     /**
      * Accepts new connection.
      * @return NULL in case of error (use SystemError::getLastOSErrorCode() to get error description).
      * NOTE: Uses read timeout.
      */
     virtual std::unique_ptr<AbstractStreamSocket> accept() = 0;
+
     /**
      * Starts async accept operation.
      * @param handler functor with following signature:
@@ -496,10 +530,12 @@ public:
      * newConnection is NULL, if errorCode is not SystemError::noError.
      */
     virtual void acceptAsync(AcceptCompletionHandler handler) = 0;
+
     /**
      * Cancel active AbstractStreamServerSocket::acceptAsync.
      */
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) final;
+
     /**
      * Cancel active AbstractStreamServerSocket::acceptAsync waiting for completion.
      * NOTE: If called within socket's aio thread, then does not block.
@@ -523,9 +559,9 @@ class NX_NETWORK_API AbstractDatagramSocket:
     public AbstractCommunicatingSocket
 {
 public:
-    static const int UDP_HEADER_SIZE = 8;
-    static const int MAX_IP_HEADER_SIZE = 60;
-    static const int MAX_DATAGRAM_SIZE = 64*1024 - 1 - UDP_HEADER_SIZE - MAX_IP_HEADER_SIZE;
+    static constexpr int UDP_HEADER_SIZE = 8;
+    static constexpr int MAX_IP_HEADER_SIZE = 60;
+    static constexpr int MAX_DATAGRAM_SIZE = 64*1024 - 1 - UDP_HEADER_SIZE - MAX_IP_HEADER_SIZE;
 
     /**
      * Set destination address for use by AbstractCommunicatingSocket::send() method.
@@ -534,8 +570,10 @@ public:
      *   and AbstractCommunicatingSocket::connect() does.
      */
     virtual bool setDestAddr(const SocketAddress& foreignEndpoint) = 0;
+
     // TODO: #ak Drop following overload.
     bool setDestAddr(const QString& foreignAddress, unsigned short foreignPort);
+
     /**
      * Send the given buffer as a datagram to the specified address/port.
      * @param buffer buffer to be written
@@ -551,6 +589,7 @@ public:
         unsigned int bufferLen,
         const QString& foreignAddress,
         unsigned short foreignPort);
+
     /**
      * Send the given buffer as a datagram to the specified address/port.
      * Same as previous method.
@@ -559,9 +598,11 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const SocketAddress& foreignAddress) = 0;
+
     bool sendTo(
         const nx::Buffer& buf,
         const SocketAddress& foreignAddress);
+
     /**
      * @param completionHandler (errorCode, resolved target address, bytesSent).
      */
@@ -569,6 +610,7 @@ public:
         const nx::Buffer& buf,
         const SocketAddress& targetAddress,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+
     /**
      * Read up to bufferLen bytes data from this socket.
      *   The given buffer is where the data will be placed.
@@ -581,6 +623,7 @@ public:
         void* buffer,
         unsigned int bufferLen,
         SocketAddress* const sourceAddress) = 0;
+
     /**
      * @param buf Data appended here.
      * @param handler(errorCode, sourceAddress, bytesRead).
@@ -588,11 +631,13 @@ public:
     virtual void recvFromAsync(
         nx::Buffer* const buf,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+
     /**
      * @return Address of previous datagram read with
      * AbstractCommunicatingSocket::recv or AbstractDatagramSocket::recvFrom.
      */
     virtual SocketAddress lastDatagramSourceAddress() const = 0;
+
     /**
      * Checks, whether data is available for reading in non-blocking mode.
      * Does not block for timeout, returns immediately.
@@ -600,6 +645,7 @@ public:
      *   which is heavy, use MSG_DONTWAIT instead.
      */
     virtual bool hasData() const = 0;
+
     /**
      * Set the multicast send interface.
      * @param multicastIF multicast interface for sending packets.
@@ -610,16 +656,15 @@ public:
      * Join the specified multicast group.
      * @param multicastGroup multicast group address to join.
      */
-    virtual bool joinGroup(const QString &multicastGroup) = 0;
-    virtual bool joinGroup(const QString &multicastGroup, const QString& multicastIF) = 0;
+    virtual bool joinGroup(const QString& multicastGroup) = 0;
+    virtual bool joinGroup(const QString& multicastGroup, const QString& multicastIF) = 0;
 
     /**
      * Leave the specified multicast group.
      * @param multicastGroup multicast group address to leave.
      */
-    virtual bool leaveGroup(const QString &multicastGroup) = 0;
-    virtual bool leaveGroup(const QString &multicastGroup, const QString& multicastIF) = 0;
+    virtual bool leaveGroup(const QString& multicastGroup) = 0;
+    virtual bool leaveGroup(const QString& multicastGroup, const QString& multicastIF) = 0;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

@@ -3,8 +3,7 @@
 #include "rpi_utils.h"
 
 #include <stdio.h>
-
-#include <nx/utils/app_info.h>
+#include <cstring>
 
 namespace nx {
 namespace usb_cam {
@@ -140,11 +139,6 @@ bool isMmalCamera(const std::string& deviceName)
     return deviceName.find("mmal") != std::string::npos;
 }
 
-bool isRpi()
-{
-    return nx::utils::AppInfo::isRaspberryPi();
-}
-    
 } // namespace rpi
 } // namespace video
 } // namespace device

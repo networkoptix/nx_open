@@ -282,7 +282,7 @@ void QnConnectToCurrentSystemTool::updateServer()
             emit progressChanged(updateProgress * kUpdateProgress / 100);
         });
 
-    auto targetVersion = qnStaticCommon->engineVersion();
+    auto targetVersion = commonModule()->engineVersion();
     if (const auto ecServer = commonModule()->currentServer())
         targetVersion = ecServer->getVersion();
 

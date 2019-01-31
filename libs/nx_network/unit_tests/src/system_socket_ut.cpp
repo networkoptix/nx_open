@@ -118,16 +118,16 @@ TEST_F(TcpSocket, KeepAliveOptions )
     ASSERT_TRUE( static_cast< bool >( result ) );
 
     #if defined( Q_OS_LINUX )
-        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
-        EXPECT_EQ( result->probeSendPeriod.count(), 1 );
+        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe, seconds(5) );
+        EXPECT_EQ( result->probeSendPeriod, seconds(1) );
         EXPECT_EQ( result->probeCount, 3U );
     #elif defined( Q_OS_WIN )
-        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
-        EXPECT_EQ( result->probeSendPeriod.count(), 1 );
+        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe, seconds(5) );
+        EXPECT_EQ( result->probeSendPeriod, seconds(1) );
         EXPECT_EQ( result->probeCount, 10U ); // means default
     #elif defined( Q_OS_MACX )
-        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
-        EXPECT_EQ( result->probeSendPeriod.count(), 0 ); // means default
+        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe, seconds(5) );
+        EXPECT_EQ( result->probeSendPeriod, seconds::zero() ); // means default
         EXPECT_EQ( result->probeCount, 0U ); // means default
     #endif
 

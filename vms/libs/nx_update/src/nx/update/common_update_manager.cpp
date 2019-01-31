@@ -8,6 +8,7 @@
 #include <api/runtime_info_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/update/common_update_installer.h>
+#include <utils/common/synctime.h>
 
 namespace nx {
 
@@ -130,6 +131,11 @@ void CommonUpdateManager::cancel()
     startUpdate("{}");
 }
 
+void CommonUpdateManager::finish()
+{
+    startUpdate("{}");
+}
+
 void CommonUpdateManager::onGlobalUpdateSettingChanged()
 {
     start();
@@ -138,7 +144,7 @@ void CommonUpdateManager::onGlobalUpdateSettingChanged()
 void CommonUpdateManager::startUpdate(const QByteArray& content)
 {
     commonModule()->globalSettings()->setUpdateInformation(content);
-    commonModule()->globalSettings()->synchronizeNow();
+    commonModule()->globalSettings()->synchronizeNowSync();
 }
 
 bool CommonUpdateManager::canDownloadFile(
@@ -253,6 +259,8 @@ update::FindPackageResult CommonUpdateManager::findPackage(
     QString* outMessage) const
 {
     return update::findPackage(
+        commonModule()->moduleGUID(),
+        commonModule()->engineVersion(),
         QnAppInfo::currentSystemInformation(),
         globalSettings()->updateInformation(),
         runtimeInfoManager()->localInfo().data.peer.isClient(),
@@ -262,7 +270,81 @@ update::FindPackageResult CommonUpdateManager::findPackage(
         outMessage);
 }
 
-bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outPackage,
+bool CommonUpdateManager::deserializedUpdateInformation(update::Information* outUpdateInformation,
+    const QString& caller) const
+{
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+        outUpdateInformation, nullptr);
+
+    if (deserializeResult != nx::update::FindPackageResult::ok)
+    {
+        NX_DEBUG(this, lm("%1: Failed to deserialize").args(caller));
+        return false;
+    }
+
+    return true;
+}
+
+bool CommonUpdateManager::participants(QList<QnUuid>* outParticipants) const
+{
+    nx::update::Information updateInformation;
+    if (!deserializedUpdateInformation(&updateInformation, "participants"))
+        return false;
+
+    *outParticipants = updateInformation.participants;
+    return true;
+}
+
+vms::api::SoftwareVersion CommonUpdateManager::targetVersion() const
+{
+    nx::update::Information updateInformation;
+    if (!deserializedUpdateInformation(&updateInformation, "targetVersion"))
+        return vms::api::SoftwareVersion();
+
+    return vms::api::SoftwareVersion(updateInformation.version);
+}
+
+bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
+{
+    nx::update::Information updateInformation;
+    if (!deserializedUpdateInformation(&updateInformation, "setParticipants"))
+        return false;
+
+    updateInformation.participants = participants;
+    setUpdateInformation(updateInformation);
+
+    return true;
+}
+
+void CommonUpdateManager::setUpdateInformation(const update::Information& updateInformation)
+{
+    QByteArray serializedUpdateInformation;
+
+    QJson::serialize(updateInformation, &serializedUpdateInformation);
+    globalSettings()->setUpdateInformation(serializedUpdateInformation);
+    globalSettings()->synchronizeNowSync();
+}
+
+bool CommonUpdateManager::updateLastInstallationRequestTime()
+{
+    nx::update::Information updateInformation;
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+        &updateInformation, nullptr);
+
+    if (deserializeResult != nx::update::FindPackageResult::ok)
+    {
+        NX_DEBUG(this, "updateLastInstallationRequestTime: Failed to deserialize");
+        return false;
+    }
+
+    updateInformation.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
+    setUpdateInformation(updateInformation);
+
+    return true;
+}
+
+bool CommonUpdateManager::statusAppropriateForDownload(
+    nx::update::Package* outPackage,
     update::Status* outStatus)
 {
     QString message;
@@ -286,6 +368,12 @@ bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outP
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
                 update::Status::Code::latestUpdateInstalled,
+                message);
+            return false;
+        case update::FindPackageResult::notParticipant:
+            *outStatus = update::Status(
+            commonModule()->moduleGUID(),
+                update::Status::Code::idle,
                 message);
             return false;
     }

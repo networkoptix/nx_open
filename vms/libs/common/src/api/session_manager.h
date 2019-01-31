@@ -43,7 +43,7 @@ Q_DECLARE_METATYPE(AsyncRequestInfo);
 // TODO: #Elric separate into two objects, one object per thread.
 class QnSessionManager:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
