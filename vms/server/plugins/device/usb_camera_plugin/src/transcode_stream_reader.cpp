@@ -134,15 +134,12 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * o
 
 std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket()
 {
-    for (;;)
+    while (!shouldStop())
     {
         auto popped =  m_avConsumer->pop();
         if (!popped)
-        {
-            if (shouldStopWaitingForData())
-                return nullptr;
             continue;
-        }
+
         if (popped->mediaType() == AVMEDIA_TYPE_VIDEO)
         {
             if (!m_decoder)

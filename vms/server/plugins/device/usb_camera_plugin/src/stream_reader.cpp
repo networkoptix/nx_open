@@ -188,7 +188,7 @@ int StreamReaderPrivate::handleNxError()
     return nxcip::NX_OTHER_ERROR;
 }
 
-bool StreamReaderPrivate::shouldStopWaitingForData() const
+bool StreamReaderPrivate::shouldStop() const
 {
     return m_interrupted || m_camera->ioError();
 }

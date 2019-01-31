@@ -60,17 +60,15 @@ void NativeStreamReader::setBitrate(int bitrate)
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    for (;;)
+    while (!shouldStop())
     {
         auto popped = m_avConsumer->pop();
         if (!popped)
-        {
-            if (shouldStopWaitingForData())
-                return nullptr;
             continue;
-        }
+
         return popped;
     }
+    return nullptr;
 }
 
 } // namespace usb_cam

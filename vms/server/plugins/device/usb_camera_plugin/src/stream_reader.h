@@ -91,7 +91,7 @@ protected:
     void removeConsumer();
     bool interrupted();
     int handleNxError();
-    bool shouldStopWaitingForData() const;
+    bool shouldStop() const;
 };
 
 } // namespace usb_cam
