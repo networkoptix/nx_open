@@ -116,8 +116,8 @@ void GenericTransport::sendTransaction(
                 return;
             }
 
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing send transaction %1 to %2")
-                .args(transactionSerializer->header().command,
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing sending command %1 to %2")
+                .args(engine::toString(transactionSerializer->header()),
                     m_commonTransportHeaderOfRemoteTransaction));
 
             //cannot send transaction right now: updating local transaction sequence
