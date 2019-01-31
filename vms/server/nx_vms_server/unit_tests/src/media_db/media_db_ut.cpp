@@ -790,7 +790,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
 TEST_F(MediaDbTest, StorageDB)
 {
-    QnStorageDb sdb(&serverModule(), storage, 1);
+    QnStorageDb sdb(&serverModule(), storage, 1, std::chrono::seconds(600));
     auto result = sdb.open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
@@ -897,8 +897,6 @@ TEST_F(MediaDbTest, StorageDB)
                                    });
     if (!allVisited)
     {
-//        std::cout << errorStream.stream->str() << std::endl;
-//        errorStream.reset();
         size_t notVisited = std::count_if(
                 tcm.get().cbegin(),
                 tcm.get().cend(),
@@ -914,7 +912,7 @@ TEST_F(MediaDbTest, RepaceRecord)
 {
     using namespace nx::media_db;
 
-    QnStorageDb sdb(&serverModule(), storage, 1);
+    QnStorageDb sdb(&serverModule(), storage, 1, std::chrono::seconds(600));
     auto result = sdb.open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 

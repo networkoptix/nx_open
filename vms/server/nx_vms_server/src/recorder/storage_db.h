@@ -38,7 +38,7 @@ public:
         QnMediaServerModule* serverModule,
         const QnStorageResourcePtr& storage,
         int storageIndex,
-        std::chrono::seconds vacuumInterval = kVacuumInterval);
+        std::chrono::seconds vacuumInterval);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
