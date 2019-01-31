@@ -15,6 +15,7 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QStackedLayout>
 
+#include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <nx/vms/discovery/manager.h>
@@ -419,10 +420,22 @@ void MainWindow::updateWidgetsVisibility()
 {
     m_titleBar->setTabBarStuffVisible(!m_welcomeScreenVisible);
 
-    if (m_welcomeScreen && m_welcomeScreenVisible)
-        m_viewLayout->setCurrentWidget(m_welcomeScreen);
+    const auto switchWidgetsCallback =
+        [this]()
+        {
+            const auto currentWidget = m_welcomeScreen && m_welcomeScreenVisible
+                ? static_cast<QWidget*>(m_welcomeScreen)
+                : static_cast<QWidget*>(m_view.data());
+
+            m_viewLayout->setCurrentWidget(currentWidget);
+        };
+
+    // For some reason mouse events don't go to the QGraphicsView if we change visibility
+    // under some circumstances in MacOs. This ugly workaround fixes it.
+    if (nx::utils::AppInfo::isMacOsX())
+        executeLater(switchWidgetsCallback, this);
     else
-        m_viewLayout->setCurrentWidget(m_view.data());
+        switchWidgetsCallback();
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen).
     m_titleBar->setVisible(isTitleVisible());
