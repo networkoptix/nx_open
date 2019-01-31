@@ -50,7 +50,7 @@ QnStaticCommonModule::QnStaticCommonModule(
             });
 
     store(new QnLongRunableCleanup());
-    store(new nx::utils::TimerManager());
+    store(new nx::utils::TimerManager("QnStaticCommonModule::StandaloneTimerManager"));
 
     instance<QnSyncTime>();
     instance<nx::network::http::ClientPool>();

@@ -75,7 +75,8 @@ public:
     QnStorageManager(
         QnMediaServerModule* serverModule,
         nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
-        QnServer::StoragePool kind);
+        QnServer::StoragePool kind,
+        const char* threadName = nullptr);
     virtual ~QnStorageManager();
     void removeStorage(const QnStorageResourcePtr &storage);
     bool hasStorageUnsafe(const QnStorageResourcePtr &storage) const;
