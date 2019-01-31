@@ -157,9 +157,9 @@ QString makeHref(const nx::utils::Url& url)
     return makeHref(url.toString());
 }
 
-QString makeHref(const QString& link)
+QString makeHref(const QString& url)
 {
-    return makeHref(link, link);
+    return makeHref(url, url);
 }
 
 QString makeHref(const QString& text, const QUrl& url)

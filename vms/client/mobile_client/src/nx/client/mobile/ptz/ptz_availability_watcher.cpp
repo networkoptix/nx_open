@@ -79,9 +79,7 @@ void PtzAvailabilityWatcher::updateAvailability()
     if (!user || !globalPermissionsManager()->hasGlobalPermission(user, GlobalPermission::userInput))
         return;
 
-    const auto cameraStatus = m_camera->getStatus();
-    const bool correctStatus = cameraStatus == Qn::Online || cameraStatus == Qn::Recording;
-    if (!correctStatus)
+    if (!m_camera->isOnline())
         return;
 
     if (!qnClientCoreModule->ptzControllerPool()->controller(m_camera))

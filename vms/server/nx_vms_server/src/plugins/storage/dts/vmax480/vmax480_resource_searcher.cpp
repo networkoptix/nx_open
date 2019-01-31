@@ -80,7 +80,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryA
         bool needHttpData = true;
 
         QnPlVmax480ResourcePtr existsRes = resourcePool()->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
-        if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording))
+        if (existsRes && existsRes->isOnline())
         {
             resource->setName(existsRes->getName());
             int existHttpPort = QUrlQuery(QUrl(existsRes->getUrl()).query()).queryItemValue(lit("http_port")).toInt();
@@ -303,7 +303,8 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils:
             if (existsRes)
                 break;
         }
-        if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording)) {
+        if (existsRes && existsRes->isOnline())
+        {
             channels = extractChannelCount(existsRes->getModel().toUtf8()); // avoid real requests
             QUrl url(existsRes->getUrl());
             apiPort = url.port(VMAX_API_PORT);

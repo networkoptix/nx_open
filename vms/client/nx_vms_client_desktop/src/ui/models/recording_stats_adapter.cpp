@@ -21,8 +21,7 @@ bool isOwnCamera(const QnSecurityCamResourcePtr& resource, const QnMediaServerRe
 // Only active cameras are included in forecast.
 bool isActive(const QnSecurityCamResourcePtr& resource, const QnCamRecordingStatsData& stats)
 {
-    return resource && resource->isLicenseUsed()
-        && (resource->getStatus() == Qn::Online || resource->getStatus() == Qn::Recording)
+    return resource && resource->isLicenseUsed() && resource->isOnline()
         && stats.archiveDurationSecs > 0 && stats.recordedBytes > 0;
 }
 } // namespace

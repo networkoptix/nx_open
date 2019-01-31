@@ -43,15 +43,26 @@ QString makeHref(const QUrl& url);
 /**
  * Create html link with text, equal to url.
  */
-QString makeHref(const nx::utils::Url&);
+QString makeHref(const nx::utils::Url& url);
 
 /**
  * Create html link with text, equal to url.
  */
-QString makeHref(const QString& link);
+QString makeHref(const QString& url);
 
+/**
+ * Create html link with the given text and url.
+ */
 QString makeHref(const QString& text, const QUrl& url);
+
+/**
+ * Create html link with the given text and url.
+ */
 QString makeHref(const QString& text, const nx::utils::Url& url);
+
+/**
+ * Create html link with the given text and url.
+ */
 QString makeHref(const QString& text, const QString& link);
 
 QString makeMailHref(const QString& text);

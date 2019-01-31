@@ -3,19 +3,20 @@
 #include <algorithm>
 #include <chrono>
 
+// TODO: #vkutin Figure out what widgets are doing inside an item model...
 #include <QtCore/QJsonObject>
-
 #include <QtGui/QPalette>
-
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickItem>
-
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QScrollArea>
 
 #include <analytics/common/object_detection_metadata.h>
 #include <api/server_rest_connection.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -33,8 +34,10 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/analytics/descriptor_manager.h>
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
@@ -42,12 +45,6 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
-
-#include <common/common_module.h>
-#include <nx/analytics/descriptor_manager.h>
-#include <client_core/client_core_module.h>
-#include <QGroupBox>
-#include <QScrollArea>
 
 namespace nx::vms::client::desktop {
 
@@ -197,6 +194,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(previewParams(object).timestamp);
+
+        case Qn::PreviewStreamSelectionRole:
+            return QVariant::fromValue(
+                nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics);
 
         case Qn::DurationRole:
             return QVariant::fromValue(objectDuration(object));
@@ -458,24 +459,17 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
         auto cameras = q->cameras();
         MetadataReceiverList newMetadataReceivers;
 
-        const auto isOnline =
-            [](const QnVirtualCameraResourcePtr& camera)
-            {
-                const auto status = camera->getStatus();
-                return status == Qn::Online || status == Qn::Recording;
-            };
-
         // Preserve existing receivers that are still relevant.
         for (auto& receiver: m_metadataReceivers)
         {
-            if (cameras.remove(receiver->camera()) && isOnline(receiver->camera()))
+            if (cameras.remove(receiver->camera()) && receiver->camera()->isOnline())
                 newMetadataReceivers.emplace_back(receiver.release());
         }
 
         // Create new receivers if needed.
         for (const auto& camera: cameras)
         {
-            if (isOnline(camera))
+            if (camera->isOnline())
             {
                 newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
 
@@ -766,7 +760,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         {
             const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, actionDescriptor=actionDescriptor, object, engineId=engineId]()
+                [this, actionDescriptor = actionDescriptor, object, engineId = engineId]()
                 {
                     executePluginAction(engineId, actionDescriptor, object);
                 }));

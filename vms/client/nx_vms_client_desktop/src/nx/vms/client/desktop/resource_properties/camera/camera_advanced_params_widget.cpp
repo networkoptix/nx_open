@@ -378,7 +378,7 @@ bool CameraAdvancedParamsWidget::isCameraAvailable() const {
         return false;
 
     // TODO: #GDM check special capability flag
-    return m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording;
+    return m_camera->isOnline();
 }
 
 QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() const

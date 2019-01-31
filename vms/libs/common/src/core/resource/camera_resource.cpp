@@ -506,6 +506,9 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::enabledAnalyticsEngineResources() const
 {
+    if (!resourcePool())
+        return {};
+
     auto enabledEngines = enabledAnalyticsEngines();
     return resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
 }

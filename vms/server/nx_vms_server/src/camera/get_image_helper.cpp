@@ -258,9 +258,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
     if (!isArchiveVideoPacket)
     {
-        if (resource->getStatus() == Qn::Online
-            || resource->getStatus() == Qn::Recording
-            || request.usecSinceEpoch != DATETIME_NOW)
+        if (resource->isOnline() || request.usecSinceEpoch != DATETIME_NOW)
         {
             gotFrame = decoder.decode(video, &outFrame);
             if (!gotFrame)

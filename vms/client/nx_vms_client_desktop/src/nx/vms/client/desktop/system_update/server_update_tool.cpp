@@ -1032,7 +1032,12 @@ QUrl generateUpdatePackageUrl(
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
     auto changeset = contents.info.version;
-    nx::utils::SoftwareVersion targetVersion = useLatest ? nx::utils::SoftwareVersion() : contents.getVersion();
+    nx::utils::SoftwareVersion targetVersion = useLatest
+        ? nx::utils::SoftwareVersion()
+        : contents.getVersion();
+    bool noFullVersion = false;
+    // Checking if version has only build number.
+    contents.info.version.toInt(&noFullVersion);
 
     QUrlQuery query;
 
@@ -1043,10 +1048,11 @@ QUrl generateUpdatePackageUrl(
     }
     else
     {
-        QString key = QString::number(targetVersion.build());
+        QString key = noFullVersion ? changeset : QString::number(targetVersion.build());
         QString password = passwordForBuild(key);
-        qDebug() << "Generated password" << password << "for key" << key;
-        query.addQueryItem("version", targetVersion.toString());
+        // Changeset will contain either full version like "4.0.0.28340",
+        // or only build number like "28340".
+        query.addQueryItem("version", changeset);
         query.addQueryItem("password", password);
     }
 
