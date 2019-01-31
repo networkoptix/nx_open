@@ -47,7 +47,8 @@ void HtdigestAuthenticationProvider::getPasswordByUserName(
 void HtdigestAuthenticationProvider::load(std::istream& input)
 {
     std::string line;
-    for (int lineNumber = 1; std::getline(input, line); ++lineNumber)
+    int lineNumber = 1;
+    for (; std::getline(input, line); ++lineNumber)
     {
         // Each line is expected to be of the form:
         // someuser:realm:c30b86d219198b1ada5b63fbfa0818e3
@@ -77,6 +78,9 @@ void HtdigestAuthenticationProvider::load(std::istream& input)
             m_credentials.emplace(userName.c_str(), digest.c_str());
         }
     }
+
+    if (lineNumber == 1)
+        NX_WARNING(this, lm("Empty htdigest file provided, authentication will fail"));
 }
 
 } // namespace nx::network::http::server
