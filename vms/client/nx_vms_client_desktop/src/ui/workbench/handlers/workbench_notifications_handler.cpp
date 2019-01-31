@@ -277,7 +277,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
             /* In unit tests there can be users when we are disconnected. */
             QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
             if (guiApp)
-                NX_ASSERT(false, Q_FUNC_INFO, "No events should be displayed if we are disconnected");
+                NX_ASSERT(false, "No events should be displayed if we are disconnected");
         }
     }
     else

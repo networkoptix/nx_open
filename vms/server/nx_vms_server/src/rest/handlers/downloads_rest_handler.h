@@ -7,7 +7,7 @@ namespace nx::vms::common::p2p::downloader { class Downloader; }
 
 class QnDownloadsRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnDownloadsRestHandler(QnMediaServerModule* serverModule);

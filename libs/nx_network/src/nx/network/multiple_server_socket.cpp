@@ -61,9 +61,8 @@ MultipleServerSocket::~MultipleServerSocket()
             }                                           \
                                                         \
             NX_ASSERT(firstValue == *value,             \
-                Q_FUNC_INFO, QString("%1 != %2")        \
-                    .arg(firstValue).arg(*value)        \
-                    .toStdString().c_str());            \
+                QString("%1 != %2")                     \
+                    .arg(firstValue).arg(*value));      \
         }                                               \
                                                         \
         return true;                                    \
@@ -161,6 +160,12 @@ bool MultipleServerSocket::setIpv6Only(bool /*val*/)
 {
     NX_ASSERT(false);
     SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
+bool MultipleServerSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::unassigned;
     return false;
 }
 

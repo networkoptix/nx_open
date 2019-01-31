@@ -25,7 +25,6 @@ struct QStringHasher
         return qHash(s);
     }
 };
-
 class QnStorageDb: public nx::vms::server::ServerModuleAware
 {
 public:

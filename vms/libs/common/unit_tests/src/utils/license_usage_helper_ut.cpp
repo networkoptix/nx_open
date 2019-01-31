@@ -30,8 +30,7 @@ protected:
         initializeContext(m_module.data());
 
         m_server = addServer();
-        m_armServer = addServer(nx::vms::api::SF_ArmServer | nx::vms::api::SF_RequiresEdgeLicense);
-        m_bjMiniServer = addServer(nx::vms::api::SF_ArmServer);
+        m_armServer = addServer(nx::vms::api::SF_ArmServer);
 
         m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
         m_helper.reset(new QnCamLicenseUsageHelper(commonModule()));
@@ -103,7 +102,6 @@ protected:
     QSharedPointer<QnCommonModule> m_module;
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_armServer;
-    QnMediaServerResourcePtr m_bjMiniServer;
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
     QScopedPointer<QnCamLicenseUsageHelper> m_helper;
     QScopedPointer<QLicenseStubValidator> m_validator;
@@ -692,34 +690,10 @@ TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
     ASSERT_TRUE(m_helper->canEnableRecording(camera));
 
     camera->setParentId(m_armServer->getId());
-    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
 }
 
 TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
-{
-    auto camera = addDefaultRecordingCamera();
-    ASSERT_FALSE(m_helper->canEnableRecording(camera));
-
-    addLicense(Qn::LC_Edge);
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-
-    camera->setParentId(m_armServer->getId());
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-}
-
-TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToBjMiniServer)
-{
-    auto camera = addDefaultRecordingCamera();
-    ASSERT_FALSE(m_helper->canEnableRecording(camera));
-
-    addLicense(Qn::LC_Professional);
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-
-    camera->setParentId(m_bjMiniServer->getId());
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-}
-
-TEST_F(QnLicenseUsageHelperTest, moveArmCameraToBjMiniServer)
 {
     auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));

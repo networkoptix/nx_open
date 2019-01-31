@@ -651,7 +651,7 @@ void WorkbenchUi::tick(int deltaMSecs)
 
 void WorkbenchUi::at_freespaceAction_triggered()
 {
-    NX_ASSERT(!qnRuntime->isAcsMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
+    NX_ASSERT(!qnRuntime->isAcsMode(), "This function must not be called in ActiveX mode.");
     if (qnRuntime->isAcsMode())
         return;
 

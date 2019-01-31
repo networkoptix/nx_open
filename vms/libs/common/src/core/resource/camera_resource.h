@@ -40,7 +40,6 @@ public:
     static const QString kSupportedAnalyticsEventsProperty;
     static const QString kSupportedAnalyticsObjectsProperty;
 
-    struct MotionStreamIndex { Qn::StreamIndex index; bool isForced; };
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
@@ -65,9 +64,6 @@ public:
     CameraMediaStreamInfo streamInfo(Qn::StreamIndex index = Qn::StreamIndex::primary) const;
 
     virtual QnAspectRatio aspectRatio() const;
-
-    /** Returns which stream should be used for motion detection and is it forced. */
-    MotionStreamIndex motionStreamIndex() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
     // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
@@ -117,6 +113,7 @@ public:
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
+    void enabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void emitPropertyChanged(const QString& key) override;

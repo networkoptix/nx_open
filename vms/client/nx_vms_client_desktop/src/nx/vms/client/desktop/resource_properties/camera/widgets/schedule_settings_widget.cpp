@@ -214,8 +214,6 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
-
     const bool hasDualRecordingOption = state.hasMotion()
         && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
 
@@ -298,7 +296,6 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
 QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState& state)
 {
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
     const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
     const bool devicesHaveDualStreaming =
         state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;

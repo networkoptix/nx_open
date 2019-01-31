@@ -214,7 +214,6 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->groupBoxArchive->setEnabled(state.supportsVideoStreamControl());
     ui->groupBoxRTP->setEnabled(state.supportsVideoStreamControl());
 
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
     const bool hasDualStreaming =
         state.devicesDescription.hasDualStreamingCapability != CombinedValue::None;
 

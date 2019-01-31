@@ -1,8 +1,5 @@
 #include "utils.h"
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
-
 #include <core/resource/camera_resource.h>
 
 #include <media_server/media_server_module.h>
@@ -10,8 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 
-#include <plugins/plugins_ini.h>
-
+#include <nx/sdk/i_plugin_event.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
@@ -20,6 +16,8 @@
 #include <nx/fusion/model_functions.h>
 
 namespace nx::vms::server::sdk_support {
+
+using namespace nx::sdk;
 
 namespace {
 
@@ -52,69 +50,31 @@ analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModu
     return sdkObjectFactory;
 }
 
-bool deviceInfoFromResource(
-    const QnVirtualCameraResourcePtr& device,
-    nx::sdk::DeviceInfo* outDeviceInfo)
+Ptr<DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device)
 {
     using namespace nx::sdk;
 
-    if (!outDeviceInfo)
-    {
-        NX_ASSERT(false, "Device info is invalid");
-        return false;
-    }
+    if (!NX_ASSERT(device, "No device has been provided"))
+        return nullptr;
 
-    if (!device)
-    {
-        NX_ASSERT(false, "Device is empty");
-        return false;
-    }
+    auto deviceInfo = makePtr<DeviceInfo>();
 
-    strncpy(
-        outDeviceInfo->vendor,
-        device->getVendor().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->model,
-        device->getModel().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->firmware,
-        device->getFirmware().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->uid,
-        device->getId().toByteArray().data(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->sharedId,
-        device->getSharedId().toStdString().c_str(),
-        DeviceInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outDeviceInfo->url,
-        device->getUrl().toUtf8().data(),
-        DeviceInfo::kTextParameterMaxLength);
+    deviceInfo->setId(device->getId().toStdString());
+    deviceInfo->setName(device->getUserDefinedName().toStdString());
+    deviceInfo->setVendor(device->getVendor().toStdString());
+    deviceInfo->setModel(device->getModel().toStdString());
+    deviceInfo->setFirmware(device->getFirmware().toStdString());
+    deviceInfo->setSharedId(device->getSharedId().toStdString());
+    deviceInfo->setLogicalId(QString::number(device->logicalId()).toStdString());
+    deviceInfo->setUrl(device->getUrl().toStdString());
 
     auto auth = device->getAuth();
-    strncpy(
-        outDeviceInfo->login,
-        auth.user().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
+    deviceInfo->setLogin(auth.user().toStdString());
+    deviceInfo->setPassword(auth.password().toStdString());
 
-    strncpy(
-        outDeviceInfo->password,
-        auth.password().toUtf8().data(),
-        DeviceInfo::kStringParameterMaxLength);
+    deviceInfo->setChannelNumber(device->getChannel());
 
-    outDeviceInfo->channel = device->getChannel();
-    outDeviceInfo->logicalId = device->logicalId();
-
-    return true;
+    return deviceInfo;
 }
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings)
@@ -126,25 +86,25 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
     return std::make_unique<nx::plugins::SettingsHolder>(settingsMap);
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map)
+Ptr<IStringMap> toIStringMap(const QVariantMap& map)
 {
-    auto stringMap = new nx::sdk::StringMap();
+    const auto stringMap = makePtr<StringMap>();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
         stringMap->addItem(it.key().toStdString(), it.value().toString().toStdString());
 
-    return nx::sdk::Ptr<nx::sdk::IStringMap>(stringMap);
+    return stringMap;
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map)
+Ptr<IStringMap> toIStringMap(const QMap<QString, QString>& map)
 {
-    auto stringMap = new nx::sdk::StringMap();
+    const auto stringMap = makePtr<StringMap>();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
         stringMap->addItem(it.key().toStdString(), it.value().toStdString());
 
-    return nx::sdk::Ptr<nx::sdk::IStringMap>(stringMap);
+    return stringMap;
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
+Ptr<IStringMap> toIStringMap(const QString& mapJson)
 {
     bool isValid = false;
     const auto deserialized = QJson::deserialized<std::vector<StringMapItem>>(
@@ -153,7 +113,7 @@ nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
     if (!isValid)
         return nullptr;
 
-    auto stringMap = new nx::sdk::StringMap();
+    const auto stringMap = makePtr<StringMap>();
     for (const auto& setting: deserialized)
     {
         if (stringMap->value(setting.name.c_str()) != nullptr) //< Duplicate key.
@@ -161,10 +121,10 @@ nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson)
         stringMap->addItem(setting.name, setting.value);
     }
 
-    return nx::sdk::Ptr<nx::sdk::IStringMap>(stringMap);
+    return stringMap;
 }
 
-QVariantMap fromIStringMap(const nx::sdk::IStringMap* map)
+QVariantMap fromIStringMap(const IStringMap* map)
 {
     QVariantMap variantMap;
     if (!map)
@@ -201,7 +161,8 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
             }
 
             // Delete the pixel format which has been tested.
-            auto it = std::find(pixelFormats.begin(), pixelFormats.end(), correspondingPixelFormat);
+            auto it = std::find(pixelFormats.begin(), pixelFormats.end(),
+                correspondingPixelFormat);
             NX_ASSERT(it != pixelFormats.end());
             pixelFormats.erase(it);
         };
@@ -243,7 +204,7 @@ resource::AnalyticsEngineResourceList toServerEngineList(
     return result;
 }
 
-nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level)
+nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
 {
     using namespace nx::sdk;
     using namespace nx::vms::api;

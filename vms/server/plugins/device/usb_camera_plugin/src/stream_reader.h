@@ -73,8 +73,8 @@ public:
 
 protected:
     static constexpr int kMsecInSec = 1000;
-    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(100);
-    static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(3000);
+    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(150);
+    static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(2000000);
 
     int m_encoderIndex;
     std::shared_ptr<Camera> m_camera;
@@ -91,6 +91,9 @@ protected:
     void removeAudioConsumer();
     virtual void removeVideoConsumer() = 0;
     void removeConsumer();
+    bool interrupted();
+    int handleNxError();
+    bool shouldStopWaitingForData() const;
 };
 
 } // namespace usb_cam

@@ -342,19 +342,12 @@ void AsyncClientWithHttpTunneling::onOpenHttpTunnelCompletion(
         });
 
     auto httpTunnelingClient = std::exchange(m_httpTunnelingClient, nullptr);
-    if (tunnelResult.sysError != SystemError::noError)
+    if (tunnelResult.resultCode != nx::network::http::tunneling::ResultCode::ok)
     {
-        NX_DEBUG(this, lm("HTTP tunnel to %1 failed with error %2")
-            .args(m_url, SystemError::toString(tunnelResult.sysError)));
-        resultCode = tunnelResult.sysError;
-        return;
-    }
-
-    if (!network::http::StatusCode::isSuccessCode(tunnelResult.httpStatus))
-    {
-        NX_DEBUG(this, lm("Connection to %1 failed with HTTP status %2")
-            .args(m_url, http::StatusCode::toString(tunnelResult.httpStatus)));
-        resultCode = SystemError::connectionRefused;
+        NX_DEBUG(this, lm("HTTP tunnel to %1 failed. %2").args(m_url, tunnelResult));
+        resultCode = tunnelResult.sysError != SystemError::noError
+            ? tunnelResult.sysError
+            : SystemError::connectionRefused;
         return;
     }
 

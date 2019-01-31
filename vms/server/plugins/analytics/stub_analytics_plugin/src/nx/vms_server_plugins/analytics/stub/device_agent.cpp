@@ -6,9 +6,9 @@
 #include <cmath>
 
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 
@@ -42,8 +42,9 @@ DeviceAgent::~DeviceAgent()
 /**
  * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
  * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
- * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
- * which are treated as white-list filters for the respective set.
+ * manifest. Also this manifest should declare supportedEventTypeIds and supportedObjectTypeIds
+ * lists which are treated as white-list filters for the respective set (absent lists are treated
+ * as empty lists, thus, disabling all types from the Engine).
  */
 std::string DeviceAgent::manifest() const
 {
@@ -263,22 +264,22 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
         m_counter = 0;
     }
 
-    auto event = new nx::sdk::analytics::Event();
-    event->setCaption("Line crossing (caption)");
-    event->setDescription("Line crossing (description)");
-    event->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    event->setIsActive(m_counter == 1);
-    event->setTypeId(m_eventTypeId);
+    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    eventMetadata->setCaption("Line crossing (caption)");
+    eventMetadata->setDescription("Line crossing (description)");
+    eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
+    eventMetadata->setIsActive(m_counter == 1);
+    eventMetadata->setTypeId(m_eventTypeId);
 
-    auto eventPacket = new EventMetadataPacket();
-    eventPacket->setTimestampUs(usSinceEpoch());
-    eventPacket->setDurationUs(0);
-    eventPacket->addItem(event);
+    auto eventMetadataPacket = new EventMetadataPacket();
+    eventMetadataPacket->setTimestampUs(usSinceEpoch());
+    eventMetadataPacket->setDurationUs(0);
+    eventMetadataPacket->addItem(eventMetadata);
 
     NX_OUTPUT << "Firing event: "
         << "type: " << m_eventTypeId << ", isActive: " << ((m_counter == 1) ? "true" : "false");
 
-    return eventPacket;
+    return eventMetadataPacket;
 }
 
 IMetadataPacket* DeviceAgent::cookSomeObjects()
@@ -289,10 +290,10 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
 
-    auto object = new Object();
+    auto objectMetadata = new ObjectMetadata();
 
-    object->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    object->setTypeId(kCarObjectType);
+    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
+    objectMetadata->setTypeId(kCarObjectType);
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -306,8 +307,8 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
         m_currentObjectIndex = sequentialNumber;
     }
 
-    object->setId(m_objectId);
-    object->setBoundingBox(IObject::Rect((float) dt, (float) dt, 0.25F, 0.25F));
+    objectMetadata->setId(m_objectId);
+    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     if (dt < 0.5)
     {
@@ -318,7 +319,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
         m_previewAttributesGenerated = true;
 
         // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        object->setAttributes({
+        objectMetadata->setAttributes({
             {IAttribute::Type::number, "nx.sys.preview.timestampUs",
                 std::to_string(m_lastVideoFrameTimestampUsec)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
@@ -328,12 +329,12 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
         });
     }
 
-    auto objectPacket = new ObjectMetadataPacket();
+    auto objectMetadataPacket = new ObjectMetadataPacket();
 
-    objectPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
-    objectPacket->setDurationUs(0);
-    objectPacket->addItem(object);
-    return objectPacket;
+    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
+    objectMetadataPacket->setDurationUs(0);
+    objectMetadataPacket->addItem(objectMetadata);
+    return objectMetadataPacket;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const

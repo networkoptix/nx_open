@@ -33,7 +33,7 @@ int StringMap::count() const
 
 const char* StringMap::key(int i) const
 {
-    if (i < 0 || i >= m_map.size())
+    if (i < 0 || i >= (int) m_map.size())
         return nullptr;
 
     auto position = m_map.cbegin();
@@ -43,7 +43,7 @@ const char* StringMap::key(int i) const
 
 const char* StringMap::value(int i) const
 {
-    if (i < 0 || i >= m_map.size())
+    if (i < 0 || i >= (int) m_map.size())
         return nullptr;
 
     auto position = m_map.cbegin();

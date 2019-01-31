@@ -147,6 +147,21 @@ QString htmlParagraph(const QString& source)
     return lit("<p>") + source + lit("</p>");
 }
 
+QString makeHref(const QUrl& url)
+{
+    return makeHref(url.toString());
+}
+
+QString makeHref(const nx::utils::Url& url)
+{
+    return makeHref(url.toString());
+}
+
+QString makeHref(const QString& link)
+{
+    return makeHref(link, link);
+}
+
 QString makeHref(const QString& text, const QUrl& url)
 {
     return makeHref(text, url.toString());
@@ -160,6 +175,11 @@ QString makeHref(const QString& text, const nx::utils::Url& url)
 QString makeHref(const QString& text, const QString& link)
 {
     return lit("<a href=\"%2\">%1</a>").arg(text, link);
+}
+
+QString makeMailHref(const QString& text)
+{
+    return makeMailHref(text, text);
 }
 
 QString makeMailHref(const QString& text, const QString& mail)

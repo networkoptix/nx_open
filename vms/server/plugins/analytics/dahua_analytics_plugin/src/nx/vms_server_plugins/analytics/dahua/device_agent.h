@@ -22,7 +22,7 @@ class DeviceAgent:
 {
 public:
     DeviceAgent(Engine* engine,
-        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest);
 
     virtual ~DeviceAgent();
@@ -44,7 +44,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
-    void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
+    void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
@@ -65,7 +65,7 @@ private:
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;
-    int m_channel = 0;
+    int m_channelNumber = 0;
 
     std::unique_ptr<MetadataMonitor> m_monitor;
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;

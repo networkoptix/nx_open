@@ -10,7 +10,7 @@
     <height>415</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,0,1,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -278,6 +278,9 @@
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -322,6 +325,11 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::AlertBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

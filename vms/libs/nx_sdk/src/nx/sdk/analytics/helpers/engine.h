@@ -18,10 +18,10 @@ namespace analytics {
  * Base class for a typical implementation of an Analytics Engine. Hides many technical details of
  * the Analytics Plugin SDK, but may limit plugin capabilities - use only when suitable.
  *
- * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
- * add the following to the derived class cpp:
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the prefix defined by this class, add the
+ * following to the derived class .cpp:
  * <pre><code>
- *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */
@@ -93,12 +93,12 @@ protected:
     template<typename DerivedPlugin>
     DerivedPlugin* pluginCasted()
     {
-        const auto plugin= dynamic_cast<DerivedPlugin*>(m_plugin);
-        assetPluginCasted(plugin);
+        const auto plugin = dynamic_cast<DerivedPlugin*>(m_plugin);
+        assertPluginCasted(plugin);
         return plugin;
     }
 
-    IEngine::IHandler* handler() { return m_handler; }
+    IEngine::IHandler* handler() const { return m_handler; }
 
 public:
     virtual ~Engine() override;
@@ -116,7 +116,7 @@ public:
 
     virtual void executeAction(IAction* action, Error* outError) override;
     virtual nx::sdk::Error setHandler(IEngine::IHandler* handler) override;
-    virtual bool isCompatible(const nx::sdk::DeviceInfo* deviceInfo) const override;
+    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
 private:
     void assertPluginCasted(void* plugin) const;

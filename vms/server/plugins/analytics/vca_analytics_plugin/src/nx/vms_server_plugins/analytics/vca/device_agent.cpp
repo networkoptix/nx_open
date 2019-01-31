@@ -10,7 +10,7 @@
 #include <nx/fusion/serialization/json.h>
 
 #include <nx/sdk/helpers/string.h>
-#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
@@ -43,15 +43,15 @@ struct EventMessage
     std::map<QByteArray, QByteArray> parameters;
 };
 
-Event* createCommonEvent(const EventType& eventType, bool active)
+EventMetadata* createCommonEvent(const EventType& eventType, bool active)
 {
-    auto commonEvent = new Event();
-    commonEvent->setTypeId(eventType.id.toStdString());
-    commonEvent->setDescription(eventType.name.toStdString());
-    commonEvent->setIsActive(active);
-    commonEvent->setConfidence(1.0);
-    commonEvent->setAuxiliaryData(eventType.internalName.toStdString());
-    return commonEvent;
+    auto eventMetadata = new EventMetadata();
+    eventMetadata->setTypeId(eventType.id.toStdString());
+    eventMetadata->setDescription(eventType.name.toStdString());
+    eventMetadata->setIsActive(active);
+    eventMetadata->setConfidence(1.0);
+    eventMetadata->setAuxiliaryData(eventType.internalName.toStdString());
+    return eventMetadata;
 }
 
 EventMetadataPacket* createCommonEventMetadataPacket(
@@ -176,16 +176,16 @@ Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(engine)
 {
     m_reconnectTimer.bindToAioThread(m_stopEventTimer.getAioThread());
 
-    m_url = deviceInfo.url;
-    m_auth.setUser(deviceInfo.login);
-    m_auth.setPassword(deviceInfo.password);
+    m_url = deviceInfo->url();
+    m_auth.setUser(deviceInfo->login());
+    m_auth.setPassword(deviceInfo->password());
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.eventTypes)
@@ -534,7 +534,7 @@ const IString* DeviceAgent::manifest(Error* /*error*/) const
     return new nx::sdk::String();
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

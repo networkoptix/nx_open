@@ -24,8 +24,8 @@ namespace
         , const ValueType &value
         , const QnStatisticsStoragePtr &storage)
     {
-        NX_ASSERT(!name.isEmpty(), Q_FUNC_INFO, "Name could not be empty!");
-        NX_ASSERT(storage, Q_FUNC_INFO, "Storage has not set!");
+        NX_ASSERT(!name.isEmpty(), "Name could not be empty!");
+        NX_ASSERT(storage, "Storage has not set!");
 
         if (!storage || name.isEmpty())
             return;
@@ -48,7 +48,7 @@ namespace
 
     QnStringsSet getLastFilters(const QnStatisticsStoragePtr &storage)
     {
-        NX_ASSERT(storage, Q_FUNC_INFO, "Storage has not set!");
+        NX_ASSERT(storage, "Storage has not set!");
 
         if (!storage)
             return QnStringsSet();
@@ -60,7 +60,7 @@ namespace
 
     qint64 getLastSentTime(const QnStatisticsStoragePtr &storage)
     {
-        NX_ASSERT(storage, Q_FUNC_INFO, "Storage has not set!");
+        NX_ASSERT(storage, "Storage has not set!");
 
         enum { kMinLastTimeMs = 0 };
         if (!storage)
@@ -322,7 +322,7 @@ void QnStatisticsManager::sendStatistics()
 
 void QnStatisticsManager::saveCurrentStatistics()
 {
-    NX_ASSERT(!m_clientId.isNull(), Q_FUNC_INFO
+    NX_ASSERT(!m_clientId.isNull()
         , "Can't save client statistics without client identifier!");
 
     if (m_clientId.isNull())

@@ -22,7 +22,7 @@ namespace detail { class QnDbManager; }
 
 class AbstractTransactionMessageBus:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public EnableMultiThreadDirectConnection<AbstractTransactionMessageBus>
 {
     Q_OBJECT;

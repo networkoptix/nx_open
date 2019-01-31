@@ -216,6 +216,12 @@ public:
 
     TimePoint::duration getInstallDuration() const;
 
+    /**
+     * Get a set of servers participating in the installation process.
+     * This data is extracted from /ec2/updateInformation
+     */
+    QSet<QnUuid> getServersInstalling() const;
+
 signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
@@ -303,6 +309,12 @@ private:
     QList<nx::update::Package> m_manualPackages;
     /** Direct connection to the mediaserver. */
     rest::QnConnectionPtr m_serverConnection;
+
+    /**
+     * A set of servers that were participating in update.
+     * This information is extracted from ec2/updateInformation request.
+     */
+    QSet<QnUuid> m_serversAreInstalling;
 };
 
 /**
@@ -311,6 +323,7 @@ private:
  * to a single zip archive.
  */
 QUrl generateUpdatePackageUrl(
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const nx::update::UpdateContents& contents,
     const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 

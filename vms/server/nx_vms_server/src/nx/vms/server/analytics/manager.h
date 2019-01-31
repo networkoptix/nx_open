@@ -29,7 +29,7 @@ namespace nx::vms::server::analytics {
 
 class Manager final:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -75,9 +75,8 @@ private:
     void at_deviceAdded(const QnVirtualCameraResourcePtr& device);
     void at_deviceRemoved(const QnVirtualCameraResourcePtr& device);
     void at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device);
-    void at_devicePropertyChanged(
-        const QnVirtualCameraResourcePtr& device,
-        const QString& propertyName);
+
+    void at_deviceEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device);
 
     void at_deviceStatusChanged(const QnResourcePtr& deviceResource);
 
@@ -121,4 +120,3 @@ private:
 };
 
 } // namespace nx::vms::server::analytics
-

@@ -812,7 +812,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
     const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = (layout->getItems().isEmpty() || !layout->hasCellAspectRatio())
-        && layout->backgroundSize().isEmpty(); // TODO: implement layout->hasBackground().
+        && !layout->hasBackground();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
@@ -2166,7 +2166,7 @@ void ActionHandler::at_renameAction_triggered()
     }
     else
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, "Invalid resource type to rename");
     }
 }
 
@@ -2559,12 +2559,12 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
 void ActionHandler::at_queueAppRestartAction_triggered()
 {
 
-    auto tryToRestartClient = []
+    auto tryToRestartClient = [this]
         {
             using namespace applauncher::api;
 
             /* Try to run applauncher if it is not running. */
-            if (!checkOnline())
+            if (!checkOnline(commonModule()->engineVersion()))
                 return false;
 
             const auto result = restartClient();

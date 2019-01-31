@@ -7,10 +7,11 @@
 
 struct QnIOPortData
 {
-    QnIOPortData(): portType(Qn::PT_Disabled), iDefaultState(Qn::IO_OpenCircuit), oDefaultState(Qn::IO_OpenCircuit), autoResetTimeoutMs(0) {}
+    QnIOPortData();
 
-    QString getName() const                    { return portType == Qn::PT_Output ? outputName : inputName; }
-    Qn::IODefaultState getDefaultState() const { return portType == Qn::PT_Output ? oDefaultState : iDefaultState; }
+    QString toString() const;
+    QString getName() const;
+    Qn::IODefaultState getDefaultState() const;
 
     QString id;
     Qn::IOPortType portType;
@@ -21,6 +22,7 @@ struct QnIOPortData
     Qn::IODefaultState oDefaultState;
     int autoResetTimeoutMs; // for output only. Keep output state on during timeout if non zero
 };
+
 typedef std::vector<QnIOPortData> QnIOPortDataList;
 #define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(iDefaultState)(oDefaultState)(autoResetTimeoutMs)
 

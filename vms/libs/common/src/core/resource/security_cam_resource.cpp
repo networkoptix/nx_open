@@ -70,7 +70,7 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
 {
     base_type::setCommonModule(commonModule);
-    connect(commonModule->dataPool(), &QnResourceDataPool::changed, this,
+    connect(commonModule->resourceDataPool(), &QnResourceDataPool::changed, this,
         &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
 }
 
@@ -123,7 +123,8 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         {
             return !resourceData().value(ResourceDataKey::kNoVideoSupport, false);
         },
-        &m_mutex)
+        &m_mutex),
+    m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); }, &m_mutex)
 {
     addFlags(Qn::live_cam);
 
@@ -348,9 +349,6 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (isAnalog())
         return Qn::LC_Analog;
 
-    if (QnMediaServerResource::requiresEdgeLicense(getParentResource()))
-        return Qn::LC_Edge;
-
     return Qn::LC_Professional;
 }
 
@@ -369,6 +367,11 @@ QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
 
 QRegion QnSecurityCamResource::getMotionMask(int channel) const {
     return getMotionRegion(channel).getMotionMask();
+}
+
+QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::motionStreamIndex() const
+{
+    return m_cachedMotionStreamIndex.get();
 }
 
 QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const
@@ -738,11 +741,46 @@ Qn::MotionType QnSecurityCamResource::calculateMotionType() const
     return value;
 }
 
+QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionStreamIndex() const
+{
+    const auto forcedMotionStreamStr = getProperty(motionStreamKey()).toLower();
+    if (!forcedMotionStreamStr.isEmpty())
+    {
+        const auto forcedMotionStream = QnLexical::deserialized<nx::vms::api::MotionStreamType>(
+            forcedMotionStreamStr, nx::vms::api::MotionStreamType::automatic);
+
+        switch (forcedMotionStream)
+        {
+            case nx::vms::api::MotionStreamType::primary:
+                return {Qn::StreamIndex::primary, /*isForced*/ true};
+            case nx::vms::api::MotionStreamType::secondary:
+                return {Qn::StreamIndex::secondary, /*isForced*/ true};
+            case nx::vms::api::MotionStreamType::edge:
+                NX_ASSERT(false, "This value was not handled and is used only in isRemoteArchiveMotionDetectionEnabled()");
+                break;
+            default:
+                NX_ASSERT(false, "Automatic stream type should not be forced");
+                break;
+        }
+    }
+
+    if (!hasDualStreaming()
+        && getCameraCapabilities().testFlag(Qn::PrimaryStreamSoftMotionCapability))
+    {
+        return {Qn::StreamIndex::primary, /*isForced*/ false};
+    }
+
+    return {Qn::StreamIndex::secondary, /*isForced*/ false};
+}
+
 void QnSecurityCamResource::setMotionType(Qn::MotionType value)
 {
-    NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    (*userAttributesLock)->motionType = value;
+    {
+        NX_ASSERT(!getId().isNull());
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+        (*userAttributesLock)->motionType = value;
+    }
+    m_motionType.reset();
 }
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
@@ -1324,6 +1362,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();
     m_cachedHasVideo.reset();
+    m_cachedMotionStreamIndex.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const
@@ -1490,5 +1529,5 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 
 QnResourceData QnSecurityCamResource::resourceData() const
 {
-    return commonModule()->dataPool()->data(toSharedPointer(this));
+    return commonModule()->resourceDataPool()->data(toSharedPointer(this));
 }

@@ -130,7 +130,7 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
             &status);
 
         if (!status)
-            qDebug() << "Failed to set port state" << outputId << "tries left:" << triesLeft;
+            NX_DEBUG(this, "Failed to set port [%1] state, tries left: [%2]", outputId, triesLeft);
     }
 
     if (!status && m_networkIssueCallback)
@@ -198,6 +198,11 @@ void QnAdamModbusIOManager::terminate()
 {
     stopIOMonitoring();
     m_client.pleaseStopSync();
+}
+
+QString QnAdamModbusIOManager::idForToStringFromPtr() const
+{
+    return m_resource->getId().toString();
 }
 
 quint32 QnAdamModbusIOManager::getPortCoil(const QString& ioPortId, bool& success) const
@@ -292,9 +297,7 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx::modbus::Modbu
 
     if (response.isException())
     {
-        qDebug()
-            << lit("QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1")
-            .arg(m_client.getLastErrorString());
+        NX_DEBUG(this, "Modbus exception has occured %1", m_client.getLastErrorString());
         return;
     }
 
@@ -410,7 +413,7 @@ bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitInde
 
     int byteIndex = bitIndex / kBitsInByte;
 
-    Q_ASSERT(byteIndex < bytes.size());
+    NX_ASSERT(byteIndex < bytes.size());
 
     auto byte = bytes[byteIndex];
 
@@ -454,10 +457,7 @@ void QnAdamModbusIOManager::handleMonitoringError()
 {
     auto error = m_client.getLastErrorString();
 
-    qDebug() << "Error occured << " << error;
-
-    NX_VERBOSE(this, error);
-
+    NX_DEBUG(this, "%1() error: %2", __func__, error);
     if (++m_networkFaultsCounter >= kMaxNetworkFaultsNumber)
     {
         m_networkFaultsCounter = 0;

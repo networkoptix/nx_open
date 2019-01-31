@@ -4,7 +4,6 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/helpers/ptr.h>
 
 namespace nx {
 namespace sdk {
@@ -53,23 +52,6 @@ private:
     int m_number = 42;
 };
 bool Data::s_destructorCalled = false;
-
-template<typename ExpectedRefCountable, typename ActualRefCountable>
-void assertEq(
-    const Ptr<ExpectedRefCountable>& expected,
-    const Ptr<ActualRefCountable>& actual,
-    int expectedRefCount)
-{
-    ASSERT_EQ(expected.get(), actual.get());
-    ASSERT_TRUE(expected == actual); //< operator==()
-    ASSERT_FALSE(expected != actual); //< operator==()
-
-    // This is the only correct way to access the ref counter of an arbitrary interface.
-    const int increasedRefCount = actual->addRef();
-    const int actualRefCount = actual->releaseRef();
-    ASSERT_EQ(increasedRefCount, actualRefCount + 1); //< Just in case.
-    ASSERT_EQ(expectedRefCount, actualRefCount);
-}
 
 } // namespace
 

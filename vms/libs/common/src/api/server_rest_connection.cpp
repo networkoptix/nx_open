@@ -812,7 +812,7 @@ Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& c
         internalCallback, targetThread);
 }
 
-Handle ServerConnection::updateActionInstall(
+Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
     std::function<void (Handle, bool)>&& callback,
     QThread* targetThread)
 {
@@ -823,8 +823,15 @@ Handle ServerConnection::updateActionInstall(
                 callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    QString peerList;
+    for (const auto& peer: participants)
+    {
+        if (!peerList.isEmpty())
+            peerList += ",";
+        peerList += peer.toString();
+    }
     return executePost<EmptyResponseType>(lit("/api/installUpdate"),
-        QnRequestParamList(),
+        QnRequestParamList{{ lit("peers"), peerList }},
         contentType, QByteArray(), internalCallback, targetThread);
 }
 
@@ -955,7 +962,7 @@ T parseMessageBody(
          default:
              if (success)
                  *success = false;
-             NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+             NX_ASSERT(0, "Unsupported data format");
              break;
      }
     return T();
@@ -977,7 +984,7 @@ T parseMessageBody(
         default:
             if (success)
                 *success = false;
-            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+            NX_ASSERT(0, "Unsupported data format");
             break;
     }
     return T();

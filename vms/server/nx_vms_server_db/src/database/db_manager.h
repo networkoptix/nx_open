@@ -92,7 +92,7 @@ namespace detail
     :
         public QObject,
         public QnDbHelper,
-        public QnCommonModuleAware
+        public /*mixin*/ QnCommonModuleAware
     {
         Q_OBJECT
 
@@ -111,7 +111,7 @@ namespace detail
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
+            NX_ASSERT(!tran.persistentInfo.isNull(), "You must register transaction command in persistent command list!");
             if (!tran.isLocal()) {
                 QnTransactionLog::ContainsReason isContains = m_tranLog->contains(tran);
                 if (isContains == QnTransactionLog::Reason_Timestamp)
@@ -144,7 +144,7 @@ namespace detail
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
+            NX_ASSERT(!tran.persistentInfo.isNull(), "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
             if (result == ErrorCode::ok) {
@@ -415,7 +415,7 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ResetEventRulesData>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This transaction can't be executed directly!");
+            NX_ASSERT(false, "This transaction can't be executed directly!");
             return ErrorCode::notImplemented;
         }
 
@@ -459,135 +459,135 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::IdDataList>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::MediaServerUserAttributesDataList>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::CameraDataList>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::StorageDataList>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ResourceParamDataList>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ResourceParamWithRefDataList>& /*tran*/)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::EmailSettingsData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::FullInfoData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::EventActionData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::VideowallControlMessageData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UpdateUploadData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DiscoveredServerData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DiscoveredServerDataList>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::DiscoverPeerData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::SystemIdData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LockData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::RuntimeData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::PeerAliveData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UpdateInstallData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::SyncRequestData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::TranStateResponse>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
@@ -597,26 +597,26 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::UpdateSequenceData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::TranSyncDoneData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::DiscoveryDataList>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ReverseConnectionData>&)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
+            NX_ASSERT(false, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 

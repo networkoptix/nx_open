@@ -123,7 +123,7 @@ protected:
     void thenTunnelIsNotEstablished()
     {
         m_prevClientTunnelResult = m_clientTunnels.pop();
-        
+
         ASSERT_NE(SystemError::noError, m_prevClientTunnelResult.sysError);
         ASSERT_EQ(nullptr, m_prevClientTunnelResult.connection);
     }
@@ -165,7 +165,7 @@ private:
 
         if (tunnelMethodMask & TunnelMethod::getPost)
             m_localFactory.registerClientType<detail::GetPostTunnelClient>();
-        
+
         if (tunnelMethodMask & TunnelMethod::connectionUpgrade)
             m_localFactory.registerClientType<detail::ConnectionUpgradeTunnelClient>();
 
@@ -243,7 +243,7 @@ TEST_P(HttpTunneling, timeout_supported)
     givenSilentTunnellingServer();
 
     whenRequestTunnel();
-    
+
     thenTunnelIsNotEstablished();
     andResultCodeIs(SystemError::timedOut);
 }

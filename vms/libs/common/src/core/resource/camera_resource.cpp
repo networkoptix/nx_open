@@ -62,8 +62,17 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     m_lastIssueTimer(),
     m_cachedAnalyticsEngines([this] { return calculateEnabledAnalyticsEngines(); }, &m_cacheMutex)
 {
-    connect(this, &QnResource::propertyChanged,
-        this, [&]{ m_cachedAnalyticsEngines.reset(); });
+    connect(
+        this,
+        &QnResource::propertyChanged,
+        this,
+        [&](auto& resource, auto& key)
+        {
+            if (key == kEnabledAnalyticsEnginesProperty)
+                m_cachedAnalyticsEngines.reset();
+
+            emit enabledAnalyticsEnginesChanged(toSharedPointer(this));
+        });
 }
 
 QString QnVirtualCameraResource::getUniqueId() const
@@ -248,23 +257,6 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
         static_cast<int>(size.height() * sensorSize.height()));
 
     return QnAspectRatio(realSensorSize);
-}
-
-QnVirtualCameraResource::MotionStreamIndex QnVirtualCameraResource::motionStreamIndex() const
-{
-    const auto forcedMotionStreamStr = getProperty(QnMediaResource::motionStreamKey()).toLower();
-    if (forcedMotionStreamStr.isEmpty())
-    {
-        if (!hasDualStreaming() && (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
-            return {Qn::StreamIndex::primary, /*isForced*/ false};
-
-        return {Qn::StreamIndex::secondary, /*isForced*/ false};
-    }
-
-    const auto forcedMotionStream =
-        QnLexical::deserialized<Qn::StreamIndex>(forcedMotionStreamStr, Qn::StreamIndex::undefined);
-    NX_ASSERT(forcedMotionStream != Qn::StreamIndex::undefined);
-    return {forcedMotionStream, /*isForced*/ true};
 }
 
 static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
@@ -515,7 +507,7 @@ const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::enabledAnalyticsEngineResources() const
 {
     auto enabledEngines = enabledAnalyticsEngines();
-    return resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
+    return commonModule()->resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
 }
 
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const

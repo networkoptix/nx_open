@@ -1039,6 +1039,12 @@ TCPSocket::~TCPSocket()
 {
 }
 
+bool TCPSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::tcp;
+    return true;
+}
+
 bool TCPSocket::reopen()
 {
     close();
@@ -1466,6 +1472,12 @@ void TCPServerSocket::cancelIoInAioThread()
     return d->asyncServerSocketHelper.cancelIOSync();
 }
 
+bool TCPServerSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::tcp;
+    return true;
+}
+
 bool TCPServerSocket::listen(int queueLen)
 {
     return ::listen(handle(), queueLen) == 0;
@@ -1571,6 +1583,12 @@ UDPSocket::UDPSocket(int ipVersion):
 
 UDPSocket::~UDPSocket()
 {
+}
+
+bool UDPSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::udp;
+    return true;
 }
 
 SocketAddress UDPSocket::getForeignAddress() const

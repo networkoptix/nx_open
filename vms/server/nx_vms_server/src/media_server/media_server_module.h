@@ -74,9 +74,8 @@ namespace nx::vms::server {
 
 namespace nx::vms::server::resource { class SharedContextPool; }
 namespace nx::vms::server::camera { class ErrorProcessor; }
-namespace nx { class CommonUpdateManager; }
 
-class QnMediaServerModule : public QObject, public QnInstanceStorage
+class QnMediaServerModule : public QObject, public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT;
 
@@ -86,7 +85,6 @@ public:
         std::unique_ptr<MSSettings> serverSettings = nullptr,
         QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
-
 
     void stop();
     using QnInstanceStorage::instance;
@@ -118,7 +116,7 @@ public:
     nx::vms::server::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::CommonUpdateManager* updateManager() const;
+    nx::vms::server::ServerUpdateManager* updateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
@@ -191,7 +189,7 @@ private:
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
-    nx::CommonUpdateManager* m_updateManager = nullptr;
+    nx::vms::server::ServerUpdateManager* m_updateManager = nullptr;
     QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;

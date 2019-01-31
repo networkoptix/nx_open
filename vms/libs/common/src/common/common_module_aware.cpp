@@ -20,7 +20,7 @@ void QnCommonModuleAware::init(QObject* parent)
         if (moduleAware != nullptr)
         {
             m_commonModule = moduleAware->commonModule();
-            NX_ASSERT(m_commonModule, Q_FUNC_INFO, "Invalid context");
+            NX_ASSERT(m_commonModule, "Invalid context");
             break;
         }
 
@@ -116,7 +116,7 @@ QnCameraHistoryPool* QnCommonModuleAware::cameraHistoryPool() const
 QnResourcePropertyDictionary* QnCommonModuleAware::propertyDictionary() const
 {
     NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->propertyDictionary() : nullptr;
+    return m_commonModule ? m_commonModule->resourcePropertyDictionary() : nullptr;
 }
 
 QnCameraUserAttributePool* QnCommonModuleAware::cameraUserAttributesPool() const
@@ -134,7 +134,7 @@ QnMediaServerUserAttributesPool* QnCommonModuleAware::mediaServerUserAttributesP
 QnResourceStatusDictionary* QnCommonModuleAware::statusDictionary() const
 {
     NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->statusDictionary() : nullptr;
+    return m_commonModule ? m_commonModule->resourceStatusDictionary() : nullptr;
 }
 
 QnGlobalSettings* QnCommonModuleAware::globalSettings() const
@@ -170,5 +170,5 @@ nx::network::http::ClientPool* QnCommonModuleAware::httpClientPool() const
 QnResourceDataPool* QnCommonModuleAware::dataPool() const
 {
     NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->dataPool() : nullptr;
+    return m_commonModule ? m_commonModule->resourceDataPool() : nullptr;
 }

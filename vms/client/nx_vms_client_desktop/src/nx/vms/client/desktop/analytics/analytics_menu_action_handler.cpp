@@ -57,9 +57,6 @@ AnalyticsMenuActionsHandler::AnalyticsMenuActionsHandler(QObject* parent):
     connect(action(ui::action::AnalyticsObjectsVisualizationModeAction), &QAction::triggered, this,
         &AnalyticsMenuActionsHandler::handleAnalyticsObjectsModeActionAction);
 
-    connect(d->manager, &AnalyticsObjectsVisualizationManager::modeChanged, this,
-        &AnalyticsMenuActionsHandler::handleItemModeChanged);
-
     // We must load settings as early as possible to handle auto-run showreels and layouts.
     connect(globalSettings(), &QnGlobalSettings::localSystemIdChangedDirect, this,
         &AnalyticsMenuActionsHandler::handleLocalSystemIdChanged);
@@ -85,22 +82,6 @@ void AnalyticsMenuActionsHandler::handleAnalyticsObjectsModeActionAction()
 
     if (!globalSettings()->localSystemId().isNull())
         d->manager->saveData(globalSettings()->localSystemId(), resourcePool());
-}
-
-void AnalyticsMenuActionsHandler::handleItemModeChanged(const QnLayoutItemIndex& item,
-    AnalyticsObjectsVisualizationMode mode)
-{
-    NX_ASSERT(item.layout());
-    if (!item.layout())
-        return;
-
-    // Ignore items that do not belong to the current layout.
-    if (item.layout() != workbench()->currentLayout()->resource())
-        return;
-
-    auto widget = display()->widget(item.uuid());
-    if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
-        mediaWidget->setAnalyticsEnabled(mode == AnalyticsObjectsVisualizationMode::always);
 }
 
 void AnalyticsMenuActionsHandler::handleLocalSystemIdChanged()

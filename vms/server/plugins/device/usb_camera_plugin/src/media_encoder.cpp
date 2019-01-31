@@ -1,6 +1,5 @@
 #include "media_encoder.h"
 
-#include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>

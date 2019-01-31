@@ -36,7 +36,6 @@ public:
 
     //!Implementation of QnResourceFactory::createResource
     virtual QnResourcePtr createResource( const QnUuid &resourceTypeId, const QnResourceParams &params ) override;
-    // return the manufacture of the server
     virtual QString manufacture() const override;
     //!Implementation of QnAbstractNetworkResourceSearcher::checkHostAddr
     virtual QList<QnResourcePtr> checkHostAddr(
@@ -48,12 +47,6 @@ public:
     static ThirdPartyResourceSearcher* instance();
 
 protected:
-    //!Implementation of QnMdnsResourceSearcher::processPacket
-    virtual QList<QnNetworkResourcePtr> processPacket(
-        QnResourceList& /*result*/,
-        const QByteArray& responseData,
-        const QHostAddress& discoveryAddress,
-        const QHostAddress& foundHostAddress ) override;
     //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
@@ -65,8 +58,14 @@ protected:
     virtual QnResourceList findResources() override;
 
 private:
-    std::list<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
+    //!Implementation of QnMdnsResourceSearcher::processPacket
+    virtual QList<QnNetworkResourcePtr> processPacket(
+        QnResourceList& /*result*/,
+        const QByteArray& responseData,
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress) override;
 
+private:
     //!Searchers resources using custom search method
     QnResourceList doCustomSearch();
     QnResourceList createResListFromCameraInfoList(
@@ -77,6 +76,7 @@ private:
         const nxcip::CameraInfo2& cameraInfo );
 private:
     QnMediaServerModule* m_serverModule = nullptr;
+    std::list<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
 };
 
 #endif // ENABLE_THIRD_PARTY

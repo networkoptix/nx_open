@@ -9,7 +9,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 
@@ -77,7 +77,7 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const TegraVideo::Rect& boundin
             continue;
 
         auto& rect = itr->second.rect;
-        auto speed = itr->second.speed;
+        //auto speed = itr->second.speed;
         double currentDistance = std::numeric_limits<double>::max();
         if (ini().postprocApplySpeedForDistanceCalculation)
         {
@@ -180,7 +180,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
 {
     for (auto& item: m_cachedObjects)
     {
-        auto object = new nx::sdk::analytics::Object();
+        auto objectMetadata = new nx::sdk::analytics::ObjectMetadata();
         auto& cached = item.second;
 
         bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles
@@ -203,10 +203,10 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
                 << bottomRightY(cached.rect) << ")";
         }
 
-        object->setBoundingBox(toSdkRect(cached.rect));
-        object->setId(cached.id);
-        object->setConfidence(1);
-        object->setTypeId(m_objectTypeId);
+        objectMetadata->setBoundingBox(toSdkRect(cached.rect));
+        objectMetadata->setId(cached.id);
+        objectMetadata->setConfidence(1);
+        objectMetadata->setTypeId(m_objectTypeId);
 
         std::vector<nx::sdk::analytics::Attribute> attributes;
         for (const auto& entry: cached.attributes)
@@ -222,8 +222,8 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
             attributes.push_back(attribute);
         }
 
-        object->setAttributes(attributes);
-        outPacket->addItem(object);
+        objectMetadata->setAttributes(attributes);
+        outPacket->addItem(objectMetadata);
     }
 }
 
@@ -301,21 +301,21 @@ TegraVideo::Rect NaiveObjectTracker::correctRectangle(const TegraVideo::Rect& re
     double xCorrection = 0;
     double yCorrection = 0;
 
-    auto center = rectangleCenter(rect);
-    auto x = center.x();
-    auto y = center.y();
+    const auto center = rectangleCenter(rect);
+    const auto x = center.x();
+    //const auto y = center.y();
 
-    double xFirstZoneCorrection = (double)ini().postprocXfirstZoneCorrection / 1000;
-    double yFirstZoneCorrection = (double)ini().postprocYfirstZoneCorrection / 1000;
+    const double xFirstZoneCorrection = ini().postprocXfirstZoneCorrection / 1000.0;
+    const double yFirstZoneCorrection = ini().postprocYfirstZoneCorrection / 1000.0;
 
-    double xSecondZoneCorrection = (double)ini().postprocXsecondZoneCorrection / 1000;
-    double ySecondZoneCorrection = (double)ini().postprocYsecondZoneCorrection / 1000;
+    const double xSecondZoneCorrection = ini().postprocXsecondZoneCorrection / 1000.0;
+    const double ySecondZoneCorrection = ini().postprocYsecondZoneCorrection / 1000.0;
 
-    double xThirdZoneCorrection = (double)ini().postprocXthirdZoneCorrection / 1000;
-    double yThirdZoneCorrection = (double)ini().postprocYthirdZoneCorrection / 1000;
+    const double xThirdZoneCorrection = ini().postprocXthirdZoneCorrection / 1000.0;
+    const double yThirdZoneCorrection = ini().postprocYthirdZoneCorrection / 1000.0;
 
-    double firstZoneBound = (double)ini().postprocFirstZoneBound / 100;
-    double secondZoneBound = (double)ini().postprocSecondZoneBound / 100;
+    const double firstZoneBound = ini().postprocFirstZoneBound / 100.0;
+    const double secondZoneBound = ini().postprocSecondZoneBound / 100.0;
 
     if (x < firstZoneBound)
     {
@@ -375,9 +375,9 @@ std::string NaiveObjectTracker::randomAttributeValue(const std::string& attribut
         return std::string();
 
     const auto& options = itr->second;
-    const auto index = std::rand() % options.size();
-    NX_KIT_ASSERT(index >= 0 && index < options.size());
-    if (index < 0 && index >= options.size())
+    const int index = std::rand() % options.size();
+    NX_KIT_ASSERT(index >= 0 && index < (int) options.size());
+    if (index < 0 && index >= (int) options.size())
         return std::string();
 
     return options[index];
@@ -428,9 +428,14 @@ float NaiveObjectTracker::bottomRightY(const TegraVideo::Rect& rectangle)
     return rectangle.y + rectangle.h;
 }
 
-nx::sdk::analytics::IObject::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
+nx::sdk::analytics::IObjectMetadata::Rect NaiveObjectTracker::toSdkRect(
+    const TegraVideo::Rect& rectangle)
 {
-    return nx::sdk::analytics::IObject::Rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
+    return nx::sdk::analytics::IObjectMetadata::Rect(
+        rectangle.x,
+        rectangle.y,
+        rectangle.w,
+        rectangle.h);
 }
 
 } // namespace tegra_video

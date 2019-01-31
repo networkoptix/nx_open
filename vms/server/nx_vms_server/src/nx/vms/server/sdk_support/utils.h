@@ -25,6 +25,8 @@
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/helpers/device_info.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <plugins/settings.h>
 
 class QnMediaServerModule;
@@ -52,7 +54,7 @@ std::optional<ManifestType> manifest(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const nx::sdk::Ptr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    const auto manifestStr = nx::sdk::toPtr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](
@@ -113,9 +115,7 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule);
 
-bool deviceInfoFromResource(
-    const QnVirtualCameraResourcePtr& device,
-    nx::sdk::DeviceInfo* outDeviceInfo);
+nx::sdk::Ptr<nx::sdk::DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device);
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
 

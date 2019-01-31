@@ -1132,10 +1132,7 @@ void initialize(Manager* manager, Action* root)
     factory(AnalyticsObjectsVisualizationModeAction)
         .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Objects Frames and Info..."))
-        .childFactory(new AnalyticsMenuActionFactory(manager))
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::All)
-            && condition::hasVideo(MatchMode::All)
-            && !condition::isLayoutTourReviewMode());
+        .childFactory(new AnalyticsMenuActionFactory(manager));
 
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)
@@ -1730,7 +1727,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleMuteAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("M"))
+        .shortcut(lit("U"))
         .text(ContextMenu::tr("Toggle Mute"))
         .checkable()
         .condition(new TimelineVisibleCondition());

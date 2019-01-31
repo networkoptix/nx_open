@@ -39,7 +39,7 @@ static const QByteArray defaultConfiguration = /*suppress newline*/1 + R"json(
 )json";
 
 // The following constants are from "SSC System Specification" (page 5).
-static const unsigned int kCommandLength = 4;
+static const int kCommandLength = 4;
 static const char kSTX = 0x02; //< start byte
 static const char kETX = 0x03; //< stop byte
 static const char kMinDigitCode = 0x30;
@@ -70,7 +70,7 @@ int extractLogicalId(const QByteArray& data)
 /** Check if data begins with a correct command. */
 bool isCorrectCommand(const QByteArray& data)
 {
-    NX_ASSERT(data.size() >= kCommandLength);
+    NX_ASSERT((int) data.size() >= kCommandLength);
     const bool commandEnvelopeIsCorrect = (data[0] == kSTX && data[3] == kETX);
 
     const char b1 = data[1];
@@ -363,11 +363,11 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const DeviceInfo* deviceInfo, Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))
-        return new DeviceAgent(this, *deviceInfo, m_typedManifest);
+        return new DeviceAgent(this, deviceInfo, m_typedManifest);
     else
         return nullptr;
 }
@@ -388,9 +388,11 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    return deviceInfo->logicalId != 0;
+    bool success = false;
+    int logicalId = QString(deviceInfo->logicalId()).toInt(&success);
+    return success && logicalId != 0;
 }
 
 } // namespace ssc

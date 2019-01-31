@@ -1,8 +1,8 @@
 #include "common_globals.h"
 
-#include <nx/fusion/model_functions.h>
-
 #include <core/ptz/ptz_constants.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzObjectType)
@@ -115,6 +115,26 @@ namespace Qn {
 QString toString(AuthResult value)
 {
     return QnLexical::serialized(value);
+}
+
+QString toErrorMessage(AuthResult value)
+{
+    switch (value)
+    {
+        case Auth_PasswordExpired:
+            return "The password is expired. Please, contact your system administrator.";
+        case Auth_LDAPConnectError:
+            return "The LDAP server is not accessible. Please, try again later.";
+        case Auth_CloudConnectError:
+            return nx::network::AppInfo::cloudName()
+                + " is not accessible yet. Please, try again later.";
+        case Auth_DisabledUser:
+            return "The user is disabled. Please, contact your system administrator.";
+        case Auth_LockedOut:
+            return "User is locked out due to several failed attempts. Please, try again later.";
+        default:
+            return "Wrong username or password.";
+    }
 }
 
 QString toString(MediaStreamEvent value)

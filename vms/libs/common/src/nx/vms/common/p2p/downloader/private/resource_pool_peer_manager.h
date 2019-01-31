@@ -12,7 +12,7 @@ namespace nx::vms::common::p2p::downloader {
 
 class InternetOnlyPeerManager;
 
-class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModuleAware
+class ResourcePoolPeerManager: public AbstractPeerManager, public /*mixin*/ QnCommonModuleAware
 {
 public:
     ResourcePoolPeerManager(
@@ -55,6 +55,7 @@ public:
     virtual bool hasAccessToTheUrl(const QString& url) const override;
 
     void setServerDirectConnection(const QnUuid& id, const rest::QnConnectionPtr& connection);
+    void cancel();
 
 protected:
     virtual QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
@@ -67,7 +68,7 @@ private:
 
 class ResourcePoolPeerManagerFactory:
     public AbstractPeerManagerFactory,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);

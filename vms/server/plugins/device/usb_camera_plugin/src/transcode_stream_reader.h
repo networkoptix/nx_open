@@ -108,21 +108,21 @@ private:
 
     TimestampMapper m_timestamps;
 
-    uint64_t m_lastVideoPts = 0;
+    int64_t m_lastVideoPts = 0;
     uint64_t m_lastTimestamp = 0;
     uint64_t m_timePerFrame = 0;
 
 private:
     bool shouldDrop(const ffmpeg::Frame * frame);
     void transcode(const std::shared_ptr<ffmpeg::Frame>& frame);
-    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
+    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame);
     int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
 
     bool waitForTimespan(
         const std::chrono::milliseconds& timespan,
         const std::chrono::milliseconds& timeout);
 
-    std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
+    std::shared_ptr<ffmpeg::Packet> nextPacket();
 
     bool ensureEncoderInitialized();
     void ensureConsumerAdded() override;

@@ -57,7 +57,7 @@ public:
     QSqlQuery query(const QString& s)
     {
         QSqlQuery q(m_db);
-        NX_ASSERT(q.prepare(s), q.lastError().text(), s);
+        NX_ASSERT(q.prepare(s), lm("%1: %2").args(s, q.lastError().text()));
         return q;
     }
 

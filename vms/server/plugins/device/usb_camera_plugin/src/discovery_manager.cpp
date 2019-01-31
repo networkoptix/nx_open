@@ -2,7 +2,6 @@
 
 #include <QCryptographicHash>
 
-#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
 #include "plugin.h"
@@ -23,7 +22,7 @@ static constexpr const char kNxMacAddressDelimiter[] = "-";
 
 DiscoveryManager::DiscoveryManager(
     nxpt::CommonRefManager* const refManager,
-    nxpl::TimeProvider *const timeProvider)
+    nxpl::TimeProvider* const timeProvider)
     :
     m_refManager(refManager),
     m_timeProvider(timeProvider)

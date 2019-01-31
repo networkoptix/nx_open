@@ -307,7 +307,7 @@ public:
                 return processMultiUpdateAsync<nx::vms::api::IdDataList, nx::vms::api::IdData>(
                     tran, handler, ApiCommand::removeResource);
             default:
-                NX_ASSERT(false, "Not implemented", Q_FUNC_INFO);
+                NX_ASSERT(false, "Not implemented");
         }
     }
 
@@ -450,7 +450,7 @@ public:
                     handler,
                     ApiCommand::removeResourceParam);
             default:
-                NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
+                NX_ASSERT(0, "Not implemented!");
         }
     }
 

@@ -14,10 +14,10 @@ if not REPOSITORY_PATH:
     REPOSITORY_PATH = os.getenv("environment")
     if REPOSITORY_PATH:
         REPOSITORY_PATH = os.path.join(REPOSITORY_PATH, "packages")
-SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
+SYNC_URL = "rsync://mono.enk.me/buildenv/rdep/packages"
 if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
-PUSH_URL = "rsync@enk.me:buildenv/rdep/packages"
+PUSH_URL = "rsync@mono.enk.me:buildenv/rdep/packages"
 
 def configure(print_summary = False):
     if not os.path.isdir(REPOSITORY_PATH):

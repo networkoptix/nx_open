@@ -118,7 +118,6 @@ struct CameraSettingsDialog::Private: public QObject
 
         deviceAgentSettingsAdaptor->applySettings();
 
-        store->applyChanges();
         const auto& state = store->state();
 
         const auto apply =
@@ -127,6 +126,7 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
+                store->loadCameras(cameras);
             };
 
         const auto backout =
@@ -192,7 +192,7 @@ struct CameraSettingsDialog::Private: public QObject
             }
 
             default:
-                NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
+                NX_ASSERT(false, "Unsupported action request");
         }
     }
 
@@ -493,8 +493,6 @@ void CameraSettingsDialog::updateState()
 
     // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
     // Legacy code has more complicated conditions.
-
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
 
     setPageVisible(int(CameraSettingsTab::motion),
         state.isSingleCamera()

@@ -292,7 +292,7 @@ void QnResource::setTypeByName(const QString& resTypeName)
 Qn::ResourceStatus QnResource::getStatus() const
 {
     return commonModule()
-        ? commonModule()->statusDictionary()->value(getId())
+        ? commonModule()->resourceStatusDictionary()->value(getId())
         : Qn::NotDefined;
 }
 
@@ -308,14 +308,14 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     QnUuid id = getId();
-    Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
+    Qn::ResourceStatus oldStatus = commonModule()->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
 
     NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
         oldStatus, newStatus, reason, getName(), getUrl());
 
-    commonModule()->statusDictionary()->setValue(id, newStatus);
+    commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
@@ -361,7 +361,7 @@ void QnResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (!setUrlInternal(url))
+        if (!setUrlUnsafe(url))
             return;
     }
 
@@ -439,7 +439,7 @@ bool QnResource::hasProperty(const QString &key) const
             return true;
         }
     }
-    return commonModule()->propertyDictionary()->hasProperty(getId(), key);
+    return commonModule()->resourcePropertyDictionary()->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key) const
@@ -455,7 +455,7 @@ QString QnResource::getProperty(const QString &key) const
         }
         else if (auto module = commonModule())
         {
-            value = module->propertyDictionary()->value(m_id, key);
+            value = module->resourcePropertyDictionary()->value(m_id, key);
         }
     }
 
@@ -477,11 +477,11 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceTypeId)
 {
     // TODO: #GDM think about code duplication
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is required.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), "Invalid input, reading from local data is required.");
 
     NX_ASSERT(commonModule);
     QString value = commonModule
-        ? commonModule->propertyDictionary()->value(resourceId, key)
+        ? commonModule->resourcePropertyDictionary()->value(resourceId, key)
         : QString();
 
     if (value.isNull())
@@ -509,7 +509,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
             // Will apply to global dictionary when id is known.
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary()->saveProperties(...) does not make any sense
+            //calling resourcePropertyDictionary()->saveProperties(...) does not make any sense
             return false;
         }
     }
@@ -517,7 +517,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     NX_ASSERT(!getId().isNull());
     NX_ASSERT(commonModule());
 
-    bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
+    bool isModified = commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
         getId(), key, value, markDirty, replaceIfExists);
 
     if (isModified)
@@ -531,16 +531,24 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
     return setProperty(key, value.toString(), options);
 }
 
+QString hidePasswordIfCredentialsPropety(const QString& key, const QString& value)
+{
+    if (key == ResourcePropertyKey::kCredentials || key == ResourcePropertyKey::kDefaultCredentials)
+        return value.left(value.indexOf(':')) + ":******";
+    return value;
+}
+
 void QnResource::emitPropertyChanged(const QString& key)
 {
     if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
-    NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
+    NX_VERBOSE(this, "Changed property '%1' = '%2'", key,
+        hidePasswordIfCredentialsPropety(key, getProperty(key)));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-bool QnResource::setUrlInternal(const QString& value)
+bool QnResource::setUrlUnsafe(const QString& value)
 {
     if (m_url == value)
         return false;
@@ -560,7 +568,7 @@ nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
     }
 
     if (const auto module = commonModule())
-        return module->propertyDictionary()->allProperties(getId());
+        return module->resourcePropertyDictionary()->allProperties(getId());
 
     return {};
 }
@@ -570,7 +578,7 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
     nx::vms::api::ResourceParamDataList result;
     nx::vms::api::ResourceParamDataList runtimeProperties;
     if (const auto module = commonModule())
-        runtimeProperties = module->propertyDictionary()->allProperties(getId());
+        runtimeProperties = module->resourcePropertyDictionary()->allProperties(getId());
 
     ParamTypeMap defaultProperties;
 
@@ -594,7 +602,7 @@ bool QnResource::saveProperties()
 {
     NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
-        return module->propertyDictionary()->saveParams(getId());
+        return module->resourcePropertyDictionary()->saveParams(getId());
     return false;
 }
 
@@ -602,7 +610,7 @@ int QnResource::savePropertiesAsync()
 {
     NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
-        return module->propertyDictionary()->saveParamsAsync(getId());
+        return module->resourcePropertyDictionary()->saveParamsAsync(getId());
     return false;
 }
 
@@ -744,7 +752,7 @@ bool QnResource::isInitializationInProgress() const
 
 void QnResource::setUniqId(const QString& /*value*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

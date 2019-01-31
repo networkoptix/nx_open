@@ -88,7 +88,7 @@ IStringMap* Engine::pluginSideSettings() const
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo,
+    const IDeviceInfo* deviceInfo,
     Error* outError)
 {
     *outError = Error::noError;
@@ -96,7 +96,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     if (!isCompatible(deviceInfo))
         return nullptr;
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(*deviceInfo);
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
         return nullptr;
 
@@ -104,7 +104,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     auto deviceAgent = new DeviceAgent(this);
-    deviceAgent->setDeviceInfo(*deviceInfo);
+    deviceAgent->setDeviceInfo(deviceInfo);
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
     deviceAgent->setEngineManifest(engineManifest());
 
@@ -142,23 +142,23 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
-    const DeviceInfo& deviceInfo)
+    const IDeviceInfo* deviceInfo)
 {
-    auto& data = m_cachedDeviceData[deviceInfo.sharedId];
+    auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
     if (!data.hasExpired())
         return data.supportedEventTypeIds;
 
     using namespace std::chrono;
 
-    nx::utils::Url url(deviceInfo.url);
+    nx::utils::Url url(deviceInfo->url());
     url.setPath("/ISAPI/Event/triggersCap");
 
     nx::network::http::HttpClient httpClient;
     httpClient.setResponseReadTimeout(kRequestTimeout);
     httpClient.setSendTimeout(kRequestTimeout);
     httpClient.setMessageBodyReadTimeout(kRequestTimeout);
-    httpClient.setUserName(deviceInfo.login);
-    httpClient.setUserPassword(deviceInfo.password);
+    httpClient.setUserName(deviceInfo->login());
+    httpClient.setUserPassword(deviceInfo->password());
 
     const auto result = httpClient.doGet(url);
     const auto response = httpClient.response();
@@ -167,7 +167,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     {
         NX_WARNING(
             this,
-            lm("No response for supported events request %1.").args(deviceInfo.url));
+            lm("No response for supported events request %1.").args(deviceInfo->url()));
         data.timeout.invalidate();
         return boost::optional<QList<QString>>();
     }
@@ -179,13 +179,13 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
         NX_WARNING(
             this,
             lm("Unable to fetch supported events for device %1. HTTP status code: %2")
-                .args(deviceInfo.url, statusCode));
+                .args(deviceInfo->url(), statusCode));
         data.timeout.invalidate();
         return boost::optional<QList<QString>>();
     }
 
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
-        arg(deviceInfo.url).arg(buffer));
+        args(deviceInfo->url(), buffer));
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
@@ -207,9 +207,9 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* deviceInfo) const
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
     return vendor.startsWith(kHikvisionTechwinVendor);
 }
 

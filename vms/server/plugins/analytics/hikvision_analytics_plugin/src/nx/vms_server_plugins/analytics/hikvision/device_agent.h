@@ -42,7 +42,7 @@ public:
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
+    void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
@@ -66,7 +66,7 @@ private:
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;
-    int m_channel = 0;
+    int m_channelNumber = 0;
 
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;

@@ -6,7 +6,7 @@
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/helpers/object.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
@@ -70,7 +70,7 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() -> noError";
     return Error::noError;
@@ -194,20 +194,20 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
 {
     // Create metadata Objects directly from the rects; create no events.
 
-    auto objectPacket = new ObjectMetadataPacket();
-    objectPacket->setTimestampUs(ptsUs);
-    objectPacket->setDurationUs(1000000LL * 10);
+    auto objectMetadataPacket = new ObjectMetadataPacket();
+    objectMetadataPacket->setTimestampUs(ptsUs);
+    objectMetadataPacket->setDurationUs(1000000LL * 10);
 
     for (const auto& rect: rects)
     {
-        auto object = new Object();
-        object->setId(UuidHelper::randomUuid());
-        object->setTypeId(m_objectTypeId);
+        auto objectMetadata = new ObjectMetadata();
+        objectMetadata->setId(UuidHelper::randomUuid());
+        objectMetadata->setTypeId(m_objectTypeId);
+        objectMetadata->setBoundingBox(IObjectMetadata::Rect(rect.x, rect.y, rect.w, rect.h));
 
-        object->setBoundingBox(IObject::Rect(rect.x, rect.y, rect.w, rect.h));
-        objectPacket->addItem(object);
+        objectMetadataPacket->addItem(objectMetadata);
     }
-    metadataPackets->push_back(objectPacket);
+    metadataPackets->push_back(objectMetadataPacket);
 
     NX_OUTPUT << __func__ << "(): Created objects packet with " << rects.size() << " rects";
     return true;

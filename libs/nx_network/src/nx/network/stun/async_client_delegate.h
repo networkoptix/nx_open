@@ -20,10 +20,10 @@ public:
         ConnectHandler handler) override;
 
     virtual bool setIndicationHandler(
-        int method, IndicationHandler handler, void* client) override;
+        int method, IndicationHandler handler, void* client = nullptr) override;
 
     virtual void addOnReconnectedHandler(
-        ReconnectHandler handler, void* client) override;
+        ReconnectHandler handler, void* client = nullptr) override;
 
     virtual void setOnConnectionClosedHandler(
         OnConnectionClosedHandler onConnectionClosedHandler) override;

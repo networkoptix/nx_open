@@ -1,6 +1,6 @@
 #include "engine.h"
 
-#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
@@ -22,7 +22,7 @@ Engine::Engine(IPlugin* plugin): nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENA
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* /*deviceInfo*/, Error* /*outError*/)
+    const IDeviceInfo* /*deviceInfo*/, Error* /*outError*/)
 {
     return new DeviceAgent(this);
 }

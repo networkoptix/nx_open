@@ -65,8 +65,6 @@ set(ios.group_identifier "group.com.vista.qulu")
 set(ios.old_app_appstore_id "id888320566")
 
 set(mac.sign.identity "Developer ID Application: Norbain SD LTD (N3KX2CKR5P)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Norbain SD LTD (N3KX2CKR5P)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Norbain SD LTD (N3KX2CKR5P)")
 set(mac.bundle.identifier "com.vista.qulu2")
 set(mac.protocol_handler_bundle.identifier "com.vista.protocol_handler")
 

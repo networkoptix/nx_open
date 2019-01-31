@@ -17,7 +17,7 @@ namespace nx::vms::server::resource {
 
 class AnalyticsEngineResource:
     public nx::vms::common::AnalyticsEngineResource,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

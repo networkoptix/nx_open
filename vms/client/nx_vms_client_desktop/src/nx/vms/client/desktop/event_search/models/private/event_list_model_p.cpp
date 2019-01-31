@@ -58,7 +58,7 @@ bool EventListModel::Private::removeEvent(const QnUuid& id)
 void EventListModel::Private::removeEvents(int first, int count)
 {
     NX_ASSERT(first >= 0 && count >= 0 && first + count <= m_events.size(),
-        Q_FUNC_INFO, "Rows are out of range");
+        "Rows are out of range");
 
     if (count == 0)
         return;
@@ -98,7 +98,7 @@ const EventListModel::EventData& EventListModel::Private::getEvent(int index) co
 {
     if (index < 0 || index >= m_events.count())
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Index is out of range");
+        NX_ASSERT(false, "Index is out of range");
         static EventData dummy;
         return dummy;
     }

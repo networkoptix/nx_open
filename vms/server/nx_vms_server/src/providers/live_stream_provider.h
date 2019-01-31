@@ -27,7 +27,7 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
 class QnLiveStreamProvider:
     public QnAbstractMediaStreamDataProvider,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     class MetadataDataReceptor;
@@ -66,7 +66,6 @@ public:
 
     virtual bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
-    void updateSoftwareMotionStreamNum();
 
     void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
@@ -115,9 +114,6 @@ private:
     QTime m_timeSinceLastMetaData;
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
-
-    QnMutex m_motionStreamIndexMtx;
-    CachedValue<QnVirtualCameraResource::MotionStreamIndex> m_cachedSoftMotionStreamIndex;
 
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 

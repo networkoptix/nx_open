@@ -13,7 +13,7 @@ namespace nx::vms::common::p2p::downloader {
 
 class AbstractPeerManagerFactory;
 
-class Downloader: public QObject, public QnCommonModuleAware
+class Downloader: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

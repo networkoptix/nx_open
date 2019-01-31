@@ -4,6 +4,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ptr.h>
 
 namespace nxcip_qt
 {
@@ -43,7 +44,7 @@ namespace nxcip_qt
 
         const QByteArray& localInterfaceIPAddrUtf8 = localInterfaceIPAddr.toUtf8();
 
-        auto discoveryManager2 = nxpt::queryInterfacePtr<nxcip::CameraDiscoveryManager2>(
+        auto discoveryManager2 = nx::sdk::queryInterfacePtr<nxcip::CameraDiscoveryManager2>(
             m_intf, nxcip::IID_CameraDiscoveryManager2);
         int result = 0;
         if (discoveryManager2.get())
@@ -75,7 +76,7 @@ namespace nxcip_qt
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 
-        auto discoveryManager2 = nxpt::queryInterfacePtr<nxcip::CameraDiscoveryManager2>(
+        auto discoveryManager2 = nx::sdk::queryInterfacePtr<nxcip::CameraDiscoveryManager2>(
             m_intf, nxcip::IID_CameraDiscoveryManager2);
 
         int result = 0;

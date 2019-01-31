@@ -25,7 +25,7 @@ void QnUuidPool::markAsUsed(const QnUuid &id) {
     offset_type i = offset(id);
     if (m_usageData.size() < i)
         m_usageData.resize(i, false);
-    NX_ASSERT(m_usageData[i] == false, Q_FUNC_INFO, "Uuids must not be used twice");
+    NX_ASSERT(m_usageData[i] == false, "Uuids must not be used twice");
     m_usageData[i] = true;
 }
 
@@ -34,7 +34,7 @@ void QnUuidPool::markAsFree(const QnUuid &id) {
         return;
 
     offset_type i = offset(id);
-    NX_ASSERT(m_usageData.size() >= i && m_usageData[i] == true, Q_FUNC_INFO, "Uuids must not be freed twice");
+    NX_ASSERT(m_usageData.size() >= i && m_usageData[i] == true, "Uuids must not be freed twice");
     if (m_usageData.size() < i)
         return;
     m_usageData[i] = false;
@@ -48,7 +48,7 @@ QnUuid QnUuidPool::getFreeId() const {
 
     offset_type i = std::distance(m_usageData.cbegin(), iter);
     QnUuid result(QnUuid::createUuidFromPool(m_baseid, i));
-    NX_ASSERT(belongsToPool(result), Q_FUNC_INFO, "Make sure returned id is valid");
+    NX_ASSERT(belongsToPool(result), "Make sure returned id is valid");
 
     return result;
 }

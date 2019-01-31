@@ -162,7 +162,7 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
 {
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
-    auto resData = m_resource->commonModule()->dataPool()->data(
+    auto resData = m_resource->commonModule()->resourceDataPool()->data(
         secRes->getVendor(),
         secRes->getModel());
 

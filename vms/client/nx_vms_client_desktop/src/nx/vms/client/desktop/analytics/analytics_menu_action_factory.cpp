@@ -3,16 +3,36 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QActionGroup>
 
+#include <core/resource/camera_resource.h>
+
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
 
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+bool analyticsModeCanBeChangedForWidget(QnResourceWidget* widget)
+{
+    const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+    if (!mediaWidget)
+        return false;
+
+    if (!mediaWidget->isAnalyticsSupported())
+        return false;
+
+    const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    return camera && !camera->enabledAnalyticsEngineResources().isEmpty();
+}
+
+} // namespace
 
 AnalyticsMenuActionFactory::AnalyticsMenuActionFactory(QObject* parent):
     base_type(parent)
@@ -24,11 +44,17 @@ QList<QAction*> AnalyticsMenuActionFactory::newActions(const ui::action::Paramet
 {
     const auto manager = context()->findInstance<AnalyticsObjectsVisualizationManager>();
     NX_ASSERT(manager);
+    if (!manager)
+        return {};
 
-    auto items = parameters.layoutItems();
-    NX_ASSERT(!items.empty());
-
-    if (!manager || items.empty())
+    QnLayoutItemIndexList items;
+    auto widgets = parameters.widgets();
+    for (const auto widget: widgets)
+    {
+        if (analyticsModeCanBeChangedForWidget(widget))
+            items.push_back(ui::action::ParameterTypes::layoutItem(widget));
+    }
+    if (items.empty())
         return {};
 
     const auto currentMode = manager->mode(items);

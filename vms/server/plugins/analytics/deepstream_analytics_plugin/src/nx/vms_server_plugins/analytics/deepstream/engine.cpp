@@ -63,7 +63,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
 
-    if (const auto timeProvider = nxpt::queryInterfacePtr<nxpl::TimeProvider>(
+    if (const auto timeProvider = queryInterfacePtr<nxpl::TimeProvider>(
         m_plugin->pluginContainer(), nxpl::IID_TimeProvider))
     {
         m_timeProvider = decltype(m_timeProvider)(
@@ -131,7 +131,7 @@ const IString* Engine::manifest(Error* error) const
     }
     else
     {
-        for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+        for (int i = 0; i < (int) m_objectClassDescritions.size(); ++i)
         {
             objectTypesManifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
             if (i < (int) m_objectClassDescritions.size() - 1)
@@ -159,21 +159,21 @@ const IString* Engine::manifest(Error* error) const
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+    const IDeviceInfo* deviceInfo, Error* outError)
 {
     NX_OUTPUT
         << __func__
         << " Obtaining DeviceAgent for the device "
-        << deviceInfo->vendor << ", "
-        << deviceInfo->model << ", "
-        << deviceInfo->uid;
+        << deviceInfo->vendor() << ", "
+        << deviceInfo->model() << ", "
+        << deviceInfo->id();
 
     *outError = Error::noError;
 
     // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
     // It's not a production-ready solution, but is OK for demos.
     if (!m_deviceAgent)
-        m_deviceAgent = new DeviceAgent(this, std::string(deviceInfo->uid));
+        m_deviceAgent = new DeviceAgent(this, deviceInfo->id());
 
     m_deviceAgent->addRef();
     return m_deviceAgent;
@@ -289,7 +289,7 @@ Error Engine::setHandler(IHandler* /*handler*/)
     return Error::noError;
 }
 
-bool Engine::isCompatible(const DeviceInfo* /*deviceInfo*/) const
+bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 {
     return true;
 }

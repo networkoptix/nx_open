@@ -24,6 +24,9 @@ set(common_depends
     "libfontconfig1"
     "libgl1-mesa-glx"
     "cifs-utils"
+    "net-tools"
+    "libcap2-bin"
+    "libldap-2.4-2"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 set(arch.depends ", syslinux")

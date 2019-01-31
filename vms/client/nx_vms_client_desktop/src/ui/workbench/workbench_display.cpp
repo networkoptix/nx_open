@@ -706,7 +706,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const
 {
-    return m_widgetByItem.value(item);
+    return m_widgetByItem.value(item, nullptr);
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const
@@ -2435,8 +2435,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     else
     {
         NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
-            || actionType == vms::api::ActionType::playSoundAction,
-            Q_FUNC_INFO, "Invalid action type");
+            || actionType == vms::api::ActionType::playSoundAction);
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);

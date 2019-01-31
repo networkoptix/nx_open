@@ -69,9 +69,9 @@ QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
         return QList<QnResourcePtr>();
 }
 
-QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager )
+QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager)
 :
-    m_discoveryManager( discoveryManager )
+    m_discoveryManager(discoveryManager)
 {
 }
 
@@ -104,29 +104,22 @@ void QnResourceDiscoveryManager::setReady(bool ready)
     m_ready = ready;
 }
 
-void QnResourceDiscoveryManager::start( Priority priority )
+void QnResourceDiscoveryManager::start(Priority priority)
 {
     updateSearchersUsage();
-    QnLongRunnable::start( priority );
-    //moveToThread( this );
+    QnLongRunnable::start(priority);
+    //moveToThread(this);
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
-    QnMutexLocker lock( &m_searchersListMutex );
+    QnMutexLocker lock(&m_searchersListMutex);
     m_searchersList.push_back(serv);
 }
 
-void QnResourceDiscoveryManager::addDTSServer(QnAbstractDTSSearcher* serv)
-{
-    QnMutexLocker lock( &m_searchersListMutex );
-    m_dstList.push_back(serv);
-}
-
-
 void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
-    QnMutexLocker lock( &m_searchersListMutex );
+    QnMutexLocker lock(&m_searchersListMutex);
     m_resourceProcessor = processor;
 }
 
@@ -169,7 +162,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     {
         ResourceSearcherList searchersList;
         {
-            QnMutexLocker lock( &m_searchersListMutex );
+            QnMutexLocker lock(&m_searchersListMutex);
             searchersList = m_searchersList;
         }
 
@@ -207,17 +200,17 @@ void QnResourceDiscoveryManager::run()
     initSystemThreadId();
     m_runNumber = 0;
     // #dkargin: I really want to move m_timer inside QnResourceDiscoveryManagerTimeoutDelegate.
-    m_timer.reset( new QTimer() );
-    m_timer->setSingleShot( true );
+    m_timer.reset(new QTimer());
+    m_timer->setSingleShot(true);
 
     m_state = InitialSearch;
 
-    QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
+    QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate(this);
 
     connect(m_timer, &QTimer::timeout,
         &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onTimeout);
 
-    m_timer->start( 0 );    //immediate execution
+    m_timer->start(0);    //immediate execution
 
     exec();
 
@@ -259,7 +252,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
             break;
 
         case PeriodicSearch:
-            if( !m_ready )
+            if (!m_ready)
                 break;
 
             updateLocalNetworkInterfaces();
@@ -280,7 +273,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
 void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList& resources)
 {
-    QnMutexLocker lock( &m_resListMutex );
+    QnMutexLocker lock(&m_resListMutex);
     m_lastDiscoveredResources[m_discoveryUpdateIdx] = resources;
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
@@ -288,7 +281,7 @@ void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList
 
 QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
 {
-    QnMutexLocker lock( &m_resListMutex );
+    QnMutexLocker lock(&m_resListMutex);
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     QMap<QString, QnResourcePtr> result;
     for (int i = 0; i < sz; ++i)
@@ -361,7 +354,6 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
     if (localInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
         return false; //< Current server hasn't storages.
-
 
     if (camera->hasFlags(Qn::desktop_camera))
         return true;

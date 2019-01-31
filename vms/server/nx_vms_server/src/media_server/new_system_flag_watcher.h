@@ -10,7 +10,7 @@
  * This flag must be cleaned on server start if there are enabled local administrators except admin/admin
  * or system is linked to cloud
  */
-class QnNewSystemServerFlagWatcher: public QObject, public QnCommonModuleAware
+class QnNewSystemServerFlagWatcher: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

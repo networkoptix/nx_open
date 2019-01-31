@@ -37,7 +37,7 @@ public:
 
     MetadataHandler(QnMediaServerModule* serverModule);
 
-    void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadata);
+    void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket);
 
     void setResource(QnVirtualCameraResourcePtr resource);
     void setEngineId(QnUuid pluginId);
@@ -58,14 +58,14 @@ private:
     std::optional<nx::vms::api::analytics::EventTypeDescriptor> eventTypeDescriptor(
         const QString& eventTypeId) const;
 
-    void handleEventsPacket(
-        nx::sdk::Ptr<nx::sdk::analytics::IEventMetadataPacket> packet);
+    void handleEventMetadataPacket(
+        const nx::sdk::Ptr<nx::sdk::analytics::IEventMetadataPacket>& eventMetadataPacket);
 
-    void handleObjectsPacket(
-        nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket> packet);
+    void handleObjectMetadataPacket(
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>& objectMetadataPacket);
 
-    void handleMetadataEvent(
-        nx::sdk::Ptr<nx::sdk::analytics::IEvent> eventData,
+    void handleEventMetadata(
+        const nx::sdk::Ptr<const nx::sdk::analytics::IEventMetadata>& eventMetadata,
         qint64 timestampUsec);
 
 private:

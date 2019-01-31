@@ -78,7 +78,10 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
         {
             atCheckerUpdateAvailable(contents);
         });
-    m_updateInfo = nx::update::checkLatestUpdate(updateUrl, std::move(callback));
+    m_updateInfo = nx::update::checkLatestUpdate(
+        updateUrl,
+        commonModule()->engineVersion(),
+        std::move(callback));
 }
 
 void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
@@ -103,7 +106,7 @@ void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& co
         return;
 
     // Current version is greater or equal to latest.
-    if (qnStaticCommon->engineVersion() >= targetVersion)
+    if (commonModule()->engineVersion() >= targetVersion)
         return;
 
     // User is not interested in this update.
@@ -156,7 +159,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
 {
     m_notifiedVersion = targetVersion;
 
-    const auto current = qnStaticCommon->engineVersion();
+    const auto current = commonModule()->engineVersion();
     const bool majorVersionChange = ((targetVersion.major() > current.major())
         || (targetVersion.minor() > current.minor()));
 

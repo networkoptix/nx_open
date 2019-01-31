@@ -82,7 +82,7 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(
     setString(IOModule, true, ioModuleString.isEmpty() ? "<invalid>" : ioModuleString);
     setString(IOModule, false, ioModuleString.isEmpty() ? "<invalid>" : ioModuleString);
 
-    NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
+    NX_ASSERT(isValid(), "Invalid string set");
 }
 
 QnCameraDeviceStringSet::QnCameraDeviceStringSet(
@@ -100,13 +100,13 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(
     setString(IOModule, false, ioModuleSigularString);
     setString(IOModule, true, ioModulePluralString);
 
-    NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
+    NX_ASSERT(isValid(), "Invalid string set");
 }
 
 QString QnCameraDeviceStringSet::getString(QnCameraDeviceType deviceType, bool plural) const
 {
-    NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
-    NX_ASSERT(deviceType < QnCameraDeviceType::Count, Q_FUNC_INFO, "Check if device type is valid");
+    NX_ASSERT(isValid(), "Invalid string set");
+    NX_ASSERT(deviceType < QnCameraDeviceType::Count, "Check if device type is valid");
 
     if (deviceType >= QnCameraDeviceType::Count)
         deviceType = QnCameraDeviceType::Mixed;
@@ -157,7 +157,7 @@ QString QnDeviceDependentStrings::getNumericName(
         case Mixed:
             return QnResourceNameStrings::numericDevices(count, capitalize);
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All fixed device types should be handled");
+            NX_ASSERT(false, "All fixed device types should be handled");
             return QnResourceNameStrings::numericDevices(count, capitalize);
     }
 }

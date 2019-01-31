@@ -15,7 +15,7 @@ class QnCommonModule;
 
 class QnStorageDbPool:
     public QnLongRunnable,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

@@ -7,6 +7,7 @@
 #include <ui/dialogs/common/dialog.h>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 
 class QnMediaServerUpdateTool;
 struct QnConnectionInfo;
@@ -27,7 +28,8 @@ class CompatibilityVersionInstallationDialog:
 
 public:
     CompatibilityVersionInstallationDialog(
-        const QnConnectionInfo& connectionInfo, QWidget* parent = nullptr);
+        const QnConnectionInfo& connectionInfo, QWidget* parent,
+        const nx::vms::api::SoftwareVersion& engineVersion);
     virtual ~CompatibilityVersionInstallationDialog();
 
     // Mirroring some states from ClientUpdateTool.
@@ -63,4 +65,5 @@ protected:
 
     InstallResult m_installationResult = InstallResult::initial;
     bool m_autoInstall = true;
+    const nx::vms::api::SoftwareVersion m_engineVersion;
 };

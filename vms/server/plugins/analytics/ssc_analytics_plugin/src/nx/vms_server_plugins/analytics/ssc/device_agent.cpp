@@ -8,7 +8,7 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/sdk/analytics/helpers/event.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include "log.h"
@@ -31,12 +31,12 @@ EventMetadataPacket* createCommonEventMetadataPacket(
     using namespace std::chrono;
 
     auto packet = new EventMetadataPacket();
-    auto event = new nx::sdk::analytics::Event();
-    event->setTypeId(eventType.id.toStdString());
-    event->setDescription(eventType.name.toStdString());
-    event->setAuxiliaryData(std::to_string(logicalId));
+    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    eventMetadata->setTypeId(eventType.id.toStdString());
+    eventMetadata->setDescription(eventType.name.toStdString());
+    eventMetadata->setAuxiliaryData(std::to_string(logicalId));
 
-    packet->addItem(event);
+    packet->addItem(eventMetadata);
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUs(-1);
@@ -46,19 +46,19 @@ EventMetadataPacket* createCommonEventMetadataPacket(
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* plugin,
-    const DeviceInfo& deviceInfo,
+    const IDeviceInfo* deviceInfo,
     const EngineManifest& typedManifest)
     :
     m_engine(plugin),
-    m_url(deviceInfo.url),
-    m_cameraLogicalId(deviceInfo.logicalId)
+    m_url(deviceInfo->url()),
+    m_cameraLogicalId(QString(deviceInfo->logicalId()).toInt())
 {
     nx::vms::api::analytics::DeviceAgentManifest typedDeviceAgentManifest;
     for (const auto& eventType: typedManifest.eventTypes)
         typedDeviceAgentManifest.supportedEventTypeIds.push_back(eventType.id);
     m_deviceAgentManifest = QJson::serialized(typedDeviceAgentManifest);
 
-    NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo.model;
+    NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo->model();
 }
 
 DeviceAgent::~DeviceAgent()

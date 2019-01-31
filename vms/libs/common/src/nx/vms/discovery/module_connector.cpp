@@ -404,6 +404,13 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         if (m_forbiddenEndpoints.count(endpoint))
             continue;
 
+        // TODO: Remove as soon as IPv6 is finally supported.
+        if (endpoint.address.isPureIpV6())
+        {
+            NX_VERBOSE(this, "Enpoint %1 is omited, IPv6 is not fully supported yet", endpoint);
+            continue;
+        }
+
         ++endpointsInProgress;
         NX_ASSERT(!endpoint.toString().isEmpty());
         connectToEndpoint(endpoint, endpointsGroup);

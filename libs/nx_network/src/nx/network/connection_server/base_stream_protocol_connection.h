@@ -441,7 +441,7 @@ template<
         Message,
         Parser,
         Serializer>;
-    
+
     using base_type = BaseStreamProtocolConnection<
         self_type,
         Message,
@@ -449,7 +449,7 @@ template<
         Serializer>;
 
 public:
-    using OnConnectionClosedHandler = 
+    using OnConnectionClosedHandler =
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode /*closeReason*/)>;
 
     StreamProtocolConnection(

@@ -112,6 +112,10 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/app_info.h>
 
+#ifdef Q_OS_WIN
+#include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
+#endif
+
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
 
@@ -644,20 +648,18 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Left:
         case Qt::Key_Up:
         case Qt::Key_PageUp:
-        {
             menu()->trigger(action::PreviousLayoutAction);
             break;
-        }
+
         case Qt::Key_Enter:
         case Qt::Key_Return:
         case Qt::Key_Space:
         case Qt::Key_Right:
         case Qt::Key_Down:
         case Qt::Key_PageDown:
-        {
             menu()->trigger(action::NextLayoutAction);
             break;
-        }
+
         default:
             // Stop layout tour if it is running.
             menu()->trigger(action::ToggleLayoutTourModeAction);
@@ -668,52 +670,18 @@ bool MainWindow::handleKeyPress(int key)
 
 void MainWindow::updateContentsMargins()
 {
-    if (isFullScreen())
+    m_drawCustomFrame = false;
+    m_frameMargins = QMargins{};
+
+    if (nx::utils::AppInfo::isLinux() && !isFullScreen() && !isMaximized())
     {
-        /* Full screen mode. */
-        m_drawCustomFrame = false;
-        m_frameMargins = QMargins(0, 0, 0, 0);
-
-        /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
-         * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
-#ifdef Q_OS_WIN
-        // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
-        setContentsMargins(1, 0, 0, 0); //FIXME
-#else
-        setContentsMargins(0, 0, 0, 0);
-#endif
-
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+        // In Linux window managers cannot disable titlebar leaving window border in place.
+        // Thus we have to disable decorations completely and draw our own border.
+        m_drawCustomFrame = true;
+        m_frameMargins = QMargins(2, 2, 2, 2);
     }
-    else
-    {
-        /* Windowed or maximized without aero glass. */
-#ifdef Q_OS_LINUX
-        // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
-        if (isMaximized())
-        {
-            m_drawCustomFrame = false;
-            m_frameMargins = QMargins(0, 0, 0, 0);
-        }
-        else
-        {
-            m_drawCustomFrame = true;
-            m_frameMargins = QMargins(2, 2, 2, 2);
-        }
-#else
-        m_drawCustomFrame = false;
-        m_frameMargins = QMargins(0, 0, 0, 0);
-#endif
 
-        setContentsMargins(0, 0, 0, 0);
-
-        m_viewLayout->setContentsMargins(
-            m_frameMargins.left(),
-            isTitleVisible() ? 0 : m_frameMargins.top(),
-            m_frameMargins.right(),
-            m_frameMargins.bottom()
-        );
-    }
+    m_globalLayout->setContentsMargins(m_frameMargins);
 }
 
 // -------------------------------------------------------------------------- //
@@ -819,5 +787,85 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
     else
         handleOpenFile(fileEvent->file());
 }
+
+#ifdef Q_OS_WIN
+
+bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    const auto msg = static_cast<MSG*>(message);
+    switch (msg->message)
+    {
+        // Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to
+        // turn desktop composition off and enter fullscreen mode. To avoid this behavior,
+        // an artificial delta is added to make the client area differ from the screen dimensions.
+        case WM_NCCALCSIZE:
+        {
+            if (!isFullScreen() || isMinimized())
+                return false;
+
+            auto rect = LPRECT(msg->lParam);
+            ++rect->right;
+
+            *result = WVR_REDRAW;
+            return true;
+        }
+
+        // Paint background to avoid white window background flashing when switched from the scene
+        // to the welcome screen and back.
+        case WM_ERASEBKGND:
+        {
+            const auto context = HDC(msg->wParam);
+            gdi::SolidBrush brush(palette().color(QPalette::Window));
+
+            RECT rect;
+            GetClientRect(msg->hwnd, &rect);
+            FillRect(context, &rect, brush);
+
+            *result = TRUE;
+            return true;
+        }
+
+        // Block default activation processing in fullscreen.
+        case WM_NCACTIVATE:
+        {
+            if (!isFullScreen())
+                return false;
+
+            *result = TRUE;
+            return true;
+        }
+
+        // Filling non-client area in fullscreen with the background color also improves visual
+        // behavior.
+        case WM_NCPAINT:
+        {
+            if (!isFullScreen() && !isMinimized())
+                return false;
+
+            gdi::WindowDC context(msg->hwnd);
+            gdi::SolidBrush brush(palette().color(QPalette::Window));
+
+            RECT rect;
+            GetWindowRect(msg->hwnd, &rect);
+
+            if (GetObjectType(HGDIOBJ(msg->wParam)) == OBJ_REGION)
+            {
+                OffsetRgn(HRGN(msg->wParam), -rect.left, -rect.top);
+                SelectClipRgn(context, HRGN(msg->wParam));
+            }
+
+            OffsetRect(&rect, -rect.left, -rect.top);
+            FillRect(context, &rect, brush);
+
+            *result = 0;
+            return true;
+        }
+
+        default:
+            return false;
+    }
+}
+
+#endif // Q_OS_WIN
 
 } // namespace nx::vms::client::desktop

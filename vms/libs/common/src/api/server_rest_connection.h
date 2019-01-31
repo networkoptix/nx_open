@@ -79,8 +79,8 @@ struct ServerConnectionBase::Result<QByteArray>
  */
 class ServerConnection:
     public QObject,
-    public QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ QnCommonModuleAware,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public ServerConnectionBase
 {
     Q_OBJECT
@@ -417,7 +417,7 @@ public:
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
-    Handle updateActionInstall(
+    Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 

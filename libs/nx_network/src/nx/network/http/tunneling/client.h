@@ -12,9 +12,6 @@
 
 namespace nx::network::http::tunneling {
 
-using OpenTunnelResult = detail::OpenTunnelResult;
-using OpenTunnelCompletionHandler = detail::OpenTunnelCompletionHandler;
-
 /**
  * Establishes connection to nx::network::http::tunneling::Server listening same request path.
  * For description of tunneling methods supported see nx::network::http::tunneling::Server.

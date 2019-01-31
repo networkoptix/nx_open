@@ -53,7 +53,7 @@ void QnNetworkResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (!setUrlInternal(url))
+        if (!setUrlUnsafe(url))
             return;
 
         m_cachedHostAddress.reset();
@@ -126,7 +126,7 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
         ResourcePropertyKey::kCredentials,
