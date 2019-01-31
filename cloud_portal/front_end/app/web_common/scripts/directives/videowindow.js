@@ -273,7 +273,7 @@ import * as Hls from 'hls.js';
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 
-                                scope.vgApi.addEventListener('canplaythrough', function () {
+                                scope.vgApi.addEventListener('loadeddata', function () {
                                     scope.loading = false;  // Video is ready - disable loading
                                     scope.playerHandler();
                                 });
@@ -314,7 +314,7 @@ import * as Hls from 'hls.js';
                                             });
                                         });
                                         
-                                        scope.vgApi.addEventListener('canplaythrough', function (event) {
+                                        scope.vgApi.addEventListener('loadeddata', function (event) {
                                             $timeout(() => scope.loading = false ); // Video is playing - disable loading
                                             scope.playerHandler();
                                             cancelTimeoutNativeLoad();
