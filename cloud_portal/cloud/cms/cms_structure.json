@@ -498,6 +498,10 @@
           {
             "label": "Supported Resolutions",
             "name": "%SUPPORTED_RESOLUTIONS%",
+            "description": "Defines supported resolutions",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
             "value": [
               {
                 "value": "0",
@@ -564,6 +568,10 @@
           {
             "label": "Supported hardware types",
             "name": "%SUPPORTED_HARDWARE_TYPES%",
+            "description": "Defines supported hardware types",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
             "value": [
               {
                 "id": "Camera",
