@@ -531,13 +531,20 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
     return setProperty(key, value.toString(), options);
 }
 
+QString hidePasswordIfCredentialsPropety(const QString& key, const QString& value)
+{
+    if (key == ResourcePropertyKey::kCredentials || key == ResourcePropertyKey::kDefaultCredentials)
+        return value.left(value.indexOf(':')) + ":******";
+    return value;
+}
+
 void QnResource::emitPropertyChanged(const QString& key)
 {
     if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
     NX_VERBOSE(this, "Changed property '%1' = '%2'", key,
-        key == ResourcePropertyKey::kCredentials ? "***" : getProperty(key));
+        hidePasswordIfCredentialsPropety(key, getProperty(key)));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
