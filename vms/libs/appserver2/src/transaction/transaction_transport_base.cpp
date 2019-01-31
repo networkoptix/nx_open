@@ -1218,9 +1218,6 @@ void QnTransactionTransportBase::onDataSent(
     }
     NX_ASSERT(bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size());
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lm("Send of %1 bytes to %2 has completed")
-        .args(m_dataToSend.front().encodedSourceData.size(), m_remotePeer.id.toString()));
-
     m_dataToSend.pop_front();
     if (m_dataToSend.empty())
         return;
