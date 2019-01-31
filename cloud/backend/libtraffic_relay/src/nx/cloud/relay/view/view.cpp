@@ -124,7 +124,7 @@ void View::registerAuthenticators()
         NX_INFO(
             this,
             lm("htdigest authentication for traffic relay maintenance server enabled. File path: %1")
-            .arg(m_settings.http().maintenanceHtdigestPath));
+               .arg(m_settings.http().maintenanceHtdigestPath));
 
         m_authenticationDispatcher.add(
             std::regex(m_maintenanceServer.maintenancePath() + "/.*"),
