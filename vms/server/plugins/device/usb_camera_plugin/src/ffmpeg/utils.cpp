@@ -22,7 +22,7 @@ static int greatestCommonDenominator(int n1, int n2)
     return gcd;
 }
 
-} // namespace
+} // namespace 
 
 std::string errorToString(int errorCode)
 {
@@ -39,17 +39,17 @@ std::string codecIdToName(AVCodecID codecId)
 AVCodecID codecNameToId(const char * codecName)
 {
     AVCodec* codec = avcodec_find_decoder_by_name(codecName);
-    if(codec)
+    if (codec)
         return codec->id;
     codec = avcodec_find_encoder_by_name(codecName);
-    if(codec)
+    if (codec)
         return codec->id;
     return AV_CODEC_ID_NONE;
 }
 
 AVPixelFormat suggestPixelFormat(const AVCodec* codec)
 {
-    if(codec)
+    if (codec)
         return codec->pix_fmts ? codec->pix_fmts[0] : AV_PIX_FMT_NONE;
     return AV_PIX_FMT_NONE;
 }
@@ -214,7 +214,7 @@ uint64_t suggestChannelLayout(const AVCodec *codec)
     for (const uint64_t *channel = codec->channel_layouts; *channel; ++channel)
     {
         int nbChannels = av_get_channel_layout_nb_channels(*channel);
-        if (nbChannels > bestNbChannels)
+        if (nbChannels > bestNbChannels) 
         {
             bestLayout = *channel;
             bestNbChannels = nbChannels;
@@ -225,7 +225,7 @@ uint64_t suggestChannelLayout(const AVCodec *codec)
 
 AVSampleFormat suggestSampleFormat(const AVCodec * codec)
 {
-    static const std::vector<AVSampleFormat> priorityList =
+    static const std::vector<AVSampleFormat> priorityList = 
     {
         AV_SAMPLE_FMT_S32,
         AV_SAMPLE_FMT_S16,
@@ -242,7 +242,7 @@ AVSampleFormat suggestSampleFormat(const AVCodec * codec)
         const AVSampleFormat * format = codec->sample_fmts;
         for (; format && *format != AV_SAMPLE_FMT_NONE; ++format)
         {
-            if(*format == sampleFormat)
+            if (*format == sampleFormat)
                 return *format;
         }
     }
@@ -280,10 +280,10 @@ AVRational toFraction(float number, int precision)
         numerator /= gcd;
         denominator /= gcd;
     }while (gcd != 1);
-
+    
     if (wholeNumber > 0)
         numerator = denominator * wholeNumber + numerator;
-
+    
     return {numerator, denominator};
 }
 

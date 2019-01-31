@@ -32,7 +32,7 @@ static const std::wstring kUsbHubClassGuid(L"f18a0e88-c30c-11d0-8815-00a0c906bed
 
 std::wstring toWString(const std::string& str)
 {
-    if(str.empty())
+    if (str.empty())
         return std::wstring();
 
     std::size_t size = std::mbstowcs(NULL, str.c_str(), 0) + 1; //< + 1 for NULL terminator.
@@ -44,7 +44,7 @@ std::wstring toWString(const std::string& str)
 
 std::string toString(const std::wstring& wideStr)
 {
-    if(wideStr.empty())
+    if (wideStr.empty())
         return std::string();
 
     std::size_t size = std::wcstombs(NULL, wideStr.c_str(), 0) + 1; //< + 1 for NULL terminator.
@@ -230,7 +230,7 @@ static LONG getUsbPortIndex(HDEVINFO deviceInfoSet, SP_DEVINFO_DATA& targetUsbDe
     size_t start = registryProperty.find(kPortPrefix);
     size_t end = registryProperty.find(L".");
 
-    if(start == std::wstring::npos || end == std::wstring::npos || end < start)
+    if (start == std::wstring::npos || end == std::wstring::npos || end < start)
         return -1;
 
     start += kPortPrefix.size(); //< Advance past "Port_#".
@@ -285,7 +285,7 @@ static std::string getUsbSerialNumber(HANDLE usbHubHandle, ULONG portIndex)
     connectionInfo.ConnectionIndex = portIndex;
 
     ULONG bytesReturned = 0;
-    if(!DeviceIoControl(
+    if (!DeviceIoControl(
         usbHubHandle,
         IOCTL_USB_GET_NODE_CONNECTION_INFORMATION,
         &connectionInfo,

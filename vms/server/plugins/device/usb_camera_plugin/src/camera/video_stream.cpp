@@ -32,7 +32,7 @@ static const char * ffmpegDeviceTypePlatformDependent()
 #ifdef _WIN32
 static bool isKeyFrame(const ffmpeg::Packet * packet)
 {
-    if(!packet)
+    if (!packet)
         return false;
 
     const quint8 * udata = static_cast<const quint8 *>(packet->data());
@@ -188,7 +188,7 @@ bool VideoStream::ensureInitialized()
     {
         m_initCode = initialize();
         checkIoError(m_initCode);
-        if(m_initCode < 0)
+        if (m_initCode < 0)
         {
             setLastError(m_initCode);
             if (m_ioError)
@@ -274,7 +274,9 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     context->flags |= AVFMT_FLAG_NOBUFFER; //< Could be helpful for Linux too.
 
     if (m_codecParams.fps > 0)
+    {
         inputFormat->setFps(m_codecParams.fps);
+    }
 
     if (m_codecParams.resolution.width * m_codecParams.resolution.height > 0)
     {
@@ -286,7 +288,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
-        if(auto cam = m_camera.lock())
+        if (auto cam = m_camera.lock())
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::video::setBitrate(

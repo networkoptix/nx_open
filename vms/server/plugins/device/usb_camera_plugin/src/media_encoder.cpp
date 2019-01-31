@@ -73,7 +73,7 @@ int MediaEncoder::getMediaUrl(char* urlBuf) const
 
 int MediaEncoder::getMaxBitrate(int* maxBitrate) const
 {
-    if(!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
 
     int bitrate =

@@ -48,7 +48,7 @@ struct UdevEnumerate
 
     ~UdevEnumerate()
     {
-        if(udevEnumerate)
+        if (udevEnumerate)
             udev_enumerate_unref(udevEnumerate);
     }
 

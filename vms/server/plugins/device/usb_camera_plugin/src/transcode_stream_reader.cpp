@@ -87,7 +87,7 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame* frame)
 
     // If this stream's requested framerate is equal to the cameras' requested framerate,
     // never drop.
-    if(m_codecParams.fps >= m_camera->videoStream()->fps())
+    if (m_codecParams.fps >= m_camera->videoStream()->fps())
         return false;
 
     bool drop = int64_t(frame->timestamp()) - m_lastTimestamp < m_timePerFrame;
@@ -283,7 +283,7 @@ int TranscodeStreamReader::initializeScaleContext(const ScaleParameters & scaleP
 
 void TranscodeStreamReader::uninitializeScaleContext()
 {
-    if(m_scaleContext)
+    if (m_scaleContext)
         sws_freeContext(m_scaleContext);
     m_scaleContext = nullptr;
     m_scaledFrame.reset(nullptr);
@@ -331,7 +331,7 @@ int TranscodeStreamReader::scale(const AVFrame * inputFrame)
         m_scaledFrame->frame()->data,
         m_scaledFrame->frame()->linesize);
 
-    if(result < 0)
+    if (result < 0)
         return result;
 
     m_scaledFrame->frame()->pts = inputFrame->pts;

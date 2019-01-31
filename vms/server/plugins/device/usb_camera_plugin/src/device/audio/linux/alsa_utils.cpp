@@ -134,11 +134,11 @@ static std::vector<DeviceDescriptor> getDevices()
                     isMotherBoardAudio = device.name.find(motherBoardAudio) != std::string::npos;
 
                 auto it = std::find(motherBoardDevices.begin(), motherBoardDevices.end(), device);
-                if(isMotherBoardAudio && it == motherBoardDevices.end())
+                if (isMotherBoardAudio && it == motherBoardDevices.end())
                 {
                     motherBoardDevices.push_back(device);
                 }
-                else if(std::find(devices.begin(), devices.end(), device) == devices.end())
+                else if (std::find(devices.begin(), devices.end(), device) == devices.end())
                 {
                     devices.push_back(device);
                 }
