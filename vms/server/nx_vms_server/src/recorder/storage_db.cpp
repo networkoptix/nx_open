@@ -544,7 +544,6 @@ bool QnStorageDb::writeVacuumedData(
     }
 
     ByteStreamWriter writer(expectedBufferSize);
-    m_dbUuidToHash.clear();
     processDbContent(*(parsedData.get()), outCatalog, writer);
     writer.flush();
 
@@ -613,6 +612,7 @@ void QnStorageDb::processDbContent(
     QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
     ByteStreamWriter& writer)
 {
+    m_dbUuidToHash.clear();
     for (const auto& cameraData : parsedData.cameras)
     {
         int index = cameraData.getCameraId() * 2;
