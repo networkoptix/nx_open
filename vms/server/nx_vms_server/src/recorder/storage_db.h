@@ -60,7 +60,6 @@ public:
 
 private:
     using VacuumCompletionHandler = nx::utils::MoveOnlyFunc<void(bool)>;
-    static constexpr std::chrono::seconds kVacuumInterval{3600 * 24};
 
     QnStorageResourcePtr m_storage;
     int m_storageIndex;

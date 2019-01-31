@@ -53,8 +53,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
                 serverModule(),
                 storage,
                 getStorageIndex(storage),
-                std::chrono::seconds(
-                    serverModule()->roSettings()->value(nx_ms_conf::VACUUM_INTERVAL).toInt())));
+                serverModule()->settings()->vacuumIntervalSec()));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }
