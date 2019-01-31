@@ -54,12 +54,12 @@ class MaintenanceServiceAcceptance:
 protected:
     virtual void SetUp() override
     {
-        std::string htdigestPath = testDataDir().toStdString() + "/htdigest.txt";
+        std::string htdigestPath = this->testDataDir().toStdString() + "/htdigest.txt";
         ASSERT_TRUE(writeCredentials(htdigestPath));
 
-        addArg((std::string("--http/maintenanceHtdigestPath=") + htdigestPath).c_str());
+        this->addArg((std::string("--http/maintenanceHtdigestPath=") + htdigestPath).c_str());
 
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        ASSERT_TRUE(this->startAndWaitUntilStarted());
 
         m_httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
         m_httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
@@ -110,7 +110,7 @@ protected:
 
     nx::utils::Url requestUrl(const std::string& requestPath)
     {
-        return nx::network::url::Builder().setEndpoint(httpEndpoint())
+        return nx::network::url::Builder().setEndpoint(this->httpEndpoint())
             .setScheme(nx::network::http::kUrlSchemeName)
             .setPath(MaintenanceTypeSet::apiPrefix).
             appendPath(nx::network::maintenance::kMaintenance).appendPath(requestPath);
