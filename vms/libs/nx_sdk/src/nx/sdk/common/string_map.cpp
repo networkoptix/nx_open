@@ -1,0 +1,71 @@
+#include "string_map.h"
+
+#include <iterator>
+
+#include <plugins/plugin_tools.h>
+#include <nx/kit/debug.h>
+
+namespace nx {
+namespace sdk {
+namespace common {
+
+void* StringMap::queryInterface(const nxpl::NX_GUID& interfaceId)
+{
+    if (interfaceId == interfaceId)
+        return this;
+
+    return nullptr;
+}
+
+void StringMap::addItem(const std::string& key, const std::string& value)
+{
+    NX_KIT_ASSERT(!key.empty());
+    m_map[key] = value;
+}
+
+void StringMap::clear()
+{
+    m_map.clear();
+}
+
+int StringMap::count() const
+{
+    return (int) m_map.size();
+}
+
+const char* StringMap::key(int i) const
+{
+    if (i < 0 || i >= m_map.size())
+        return nullptr;
+
+    auto position = m_map.cbegin();
+    std::advance(position, i);
+    return position->first.c_str();
+}
+
+const char* StringMap::value(int i) const
+{
+    if (i < 0 || i >= m_map.size())
+        return nullptr;
+
+    auto position = m_map.cbegin();
+    std::advance(position, i);
+    return position->second.c_str();
+}
+
+const char* StringMap::value(const char* key) const
+{
+    if (key == nullptr)
+        return nullptr;
+
+    Map::const_iterator it = m_map.find(key);
+    if (it == m_map.cend())
+        return nullptr;
+
+    return it->second.c_str();
+}
+
+} // namespace common
+} // namespace sdk
+} // namespace nx
+

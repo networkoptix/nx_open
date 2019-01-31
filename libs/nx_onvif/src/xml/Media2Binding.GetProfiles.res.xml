@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
+    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
+    xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+    xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:saml1="urn:oasis:names:tc:SAML:1.0:assertion"
+    xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+    xmlns:wsc="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
+    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+    xmlns:onvifPacs="http://www.onvif.org/ver10/pacs"
+    xmlns:xmime="http://tempuri.org/xmime.xsd"
+    xmlns:xop="http://www.w3.org/2004/08/xop/include"
+    xmlns:onvifXsd="http://www.onvif.org/ver10/schema"
+    xmlns:oasisWsrf="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:oasisWsnT1="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:oasisWsrfR2="http://docs.oasis-open.org/wsrf/r-2"
+    xmlns:onvifAccessControl="http://www.onvif.org/ver10/accesscontrol/wsdl"
+    xmlns:onvifAccessRules="http://www.onvif.org/ver10/accessrules/wsdl"
+    xmlns:onvifActionEngine="http://www.onvif.org/ver10/actionengine/wsdl"
+    xmlns:onvifAdvancedSecurity-assb="http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding"
+    xmlns:onvifAdvancedSecurity-db="http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding"
+    xmlns:onvifAdvancedSecurity-kb="http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding"
+    xmlns:onvifAdvancedSecurity-tsb="http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding"
+    xmlns:onvifAdvancedSecurity="http://www.onvif.org/ver10/advancedsecurity/wsdl"
+    xmlns:onvifAnalytics-aeb="http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
+    xmlns:onvifAnalytics-reb="http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
+    xmlns:onvifAnalytics="http://www.onvif.org/ver20/analytics/wsdl"
+    xmlns:onvifAnalyticsDevice="http://www.onvif.org/ver10/analyticsdevice/wsdl"
+    xmlns:onvifCredential="http://www.onvif.org/ver10/credential/wsdl"
+    xmlns:onvifDevice="http://www.onvif.org/ver10/device/wsdl"
+    xmlns:onvifDeviceIO="http://www.onvif.org/ver10/deviceIO/wsdl"
+    xmlns:onvifDisplay="http://www.onvif.org/ver10/display/wsdl"
+    xmlns:onvifDoorControl="http://www.onvif.org/ver10/doorcontrol/wsdl"
+    xmlns:onvifEvents-cpb="http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
+    xmlns:onvifEvents-eb="http://www.onvif.org/ver10/events/wsdl/EventBinding"
+    xmlns:onvifEvents-ncb="http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
+    xmlns:onvifEvents-npb="http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding"
+    xmlns:onvifEvents-ppb="http://www.onvif.org/ver10/events/wsdl/PullPointBinding"
+    xmlns:onvifEvents="http://www.onvif.org/ver10/events/wsdl"
+    xmlns:onvifEvents-pps="http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
+    xmlns:onvifEvents-psmb="http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
+    xmlns:oasisWsnB2="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:onvifEvents-smb="http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
+    xmlns:onvifImg="http://www.onvif.org/ver20/imaging/wsdl"
+    xmlns:onvifMedia="http://www.onvif.org/ver10/media/wsdl"
+    xmlns:onvifMedia2="http://www.onvif.org/ver20/media/wsdl"
+    xmlns:onvifNetwork-dlb="http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
+    xmlns:onvifNetwork-rdb="http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
+    xmlns:onvifNetwork="http://www.onvif.org/ver10/network/wsdl"
+    xmlns:onvifProvisioning="http://www.onvif.org/ver10/provisioning/wsdl"
+    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl"
+    xmlns:onvifReceiver="http://www.onvif.org/ver10/receiver/wsdl"
+    xmlns:onvifRecording="http://www.onvif.org/ver10/recording/wsdl"
+    xmlns:onvifReplay="http://www.onvif.org/ver10/replay/wsdl"
+    xmlns:onvifScedule="http://www.onvif.org/ver10/schedule/wsdl"
+    xmlns:onvifSearch="http://www.onvif.org/ver10/search/wsdl"
+    xmlns:onvifThermal="http://www.onvif.org/ver10/thermal/wsdl">
+ <!-- struct SOAP_ENV__Header *soap::header -->
+ <SOAP-ENV:Header>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <!-- __onvifMedia2__GetProfiles(..., _onvifMedia2__GetProfilesResponse &onvifMedia2__GetProfilesResponse) -->
+  <onvifMedia2:GetProfilesResponse>
+   <!-- std::vector<onvifMedia2__MediaProfile *> Profiles -->
+   <!-- a repetition of 0 or more of the following -->
+   <onvifMedia2:Profiles token="" fixed="false">
+    <!-- std::string Name -->
+    <onvifMedia2:Name></onvifMedia2:Name>
+    <!-- onvifMedia2__ConfigurationSet *Configurations -->
+    <onvifMedia2:Configurations>
+     <!-- onvifXsd__VideoSourceConfiguration *VideoSource -->
+     <onvifMedia2:VideoSource ViewMode="" token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::string SourceToken -->
+      <onvifXsd:SourceToken></onvifXsd:SourceToken>
+      <!-- onvifXsd__IntRectangle *Bounds -->
+      <onvifXsd:Bounds x="0" y="0" width="0" height="0">
+      </onvifXsd:Bounds>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+      <!-- onvifXsd__VideoSourceConfigurationExtension *Extension -->
+      <onvifXsd:Extension>
+       <!-- onvifXsd__Rotate *Rotate -->
+       <onvifXsd:Rotate>
+        <!-- onvifXsd__RotateMode Mode -->
+        <onvifXsd:Mode>OFF</onvifXsd:Mode>
+       </onvifXsd:Rotate>
+       <!-- onvifXsd__VideoSourceConfigurationExtension2 *Extension -->
+       <onvifXsd:Extension>
+       </onvifXsd:Extension>
+      </onvifXsd:Extension>
+     </onvifMedia2:VideoSource>
+     <!-- onvifXsd__AudioSourceConfiguration *AudioSource -->
+     <onvifMedia2:AudioSource token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::string SourceToken -->
+      <onvifXsd:SourceToken></onvifXsd:SourceToken>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+     </onvifMedia2:AudioSource>
+     <!-- onvifXsd__VideoEncoder2Configuration *VideoEncoder -->
+     <onvifMedia2:VideoEncoder GovLength="0" Profile="" token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::string Encoding -->
+      <onvifXsd:Encoding></onvifXsd:Encoding>
+      <!-- onvifXsd__VideoResolution2 *Resolution -->
+      <onvifXsd:Resolution>
+       <!-- int Width -->
+       <onvifXsd:Width>0</onvifXsd:Width>
+       <!-- int Height -->
+       <onvifXsd:Height>0</onvifXsd:Height>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:Resolution>
+      <!-- onvifXsd__VideoRateControl2 *RateControl -->
+      <onvifXsd:RateControl ConstantBitRate="false">
+       <!-- float FrameRateLimit -->
+       <onvifXsd:FrameRateLimit>0.0</onvifXsd:FrameRateLimit>
+       <!-- int BitrateLimit -->
+       <onvifXsd:BitrateLimit>0</onvifXsd:BitrateLimit>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:RateControl>
+      <!-- onvifXsd__MulticastConfiguration *Multicast -->
+      <onvifXsd:Multicast>
+       <!-- onvifXsd__IPAddress *Address -->
+       <onvifXsd:Address>
+        <!-- onvifXsd__IPType Type -->
+        <onvifXsd:Type>IPv4</onvifXsd:Type>
+       </onvifXsd:Address>
+       <!-- int Port -->
+       <onvifXsd:Port>0</onvifXsd:Port>
+       <!-- int TTL -->
+       <onvifXsd:TTL>0</onvifXsd:TTL>
+       <!-- bool AutoStart -->
+       <onvifXsd:AutoStart>false</onvifXsd:AutoStart>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:Multicast>
+      <!-- float Quality -->
+      <onvifXsd:Quality>0.0</onvifXsd:Quality>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+     </onvifMedia2:VideoEncoder>
+     <!-- onvifXsd__AudioEncoder2Configuration *AudioEncoder -->
+     <onvifMedia2:AudioEncoder token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::string Encoding -->
+      <onvifXsd:Encoding></onvifXsd:Encoding>
+      <!-- onvifXsd__MulticastConfiguration *Multicast -->
+      <onvifXsd:Multicast>
+       <!-- onvifXsd__IPAddress *Address -->
+       <onvifXsd:Address>
+        <!-- onvifXsd__IPType Type -->
+        <onvifXsd:Type>IPv4</onvifXsd:Type>
+       </onvifXsd:Address>
+       <!-- int Port -->
+       <onvifXsd:Port>0</onvifXsd:Port>
+       <!-- int TTL -->
+       <onvifXsd:TTL>0</onvifXsd:TTL>
+       <!-- bool AutoStart -->
+       <onvifXsd:AutoStart>false</onvifXsd:AutoStart>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:Multicast>
+      <!-- int Bitrate -->
+      <onvifXsd:Bitrate>0</onvifXsd:Bitrate>
+      <!-- int SampleRate -->
+      <onvifXsd:SampleRate>0</onvifXsd:SampleRate>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+     </onvifMedia2:AudioEncoder>
+     <!-- onvifXsd__VideoAnalyticsConfiguration *Analytics -->
+     <onvifMedia2:Analytics token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- onvifXsd__AnalyticsEngineConfiguration *AnalyticsEngineConfiguration -->
+      <onvifXsd:AnalyticsEngineConfiguration>
+       <!-- std::vector<onvifXsd__Config *> AnalyticsModule -->
+       <!-- a repetition of 0 or more of the following -->
+       <onvifXsd:AnalyticsModule Name="" Type="xsd:string">
+        <!-- onvifXsd__ItemList *Parameters -->
+        <onvifXsd:Parameters>
+        </onvifXsd:Parameters>
+       </onvifXsd:AnalyticsModule>
+       <!-- onvifXsd__AnalyticsEngineConfigurationExtension *Extension -->
+       <onvifXsd:Extension>
+       </onvifXsd:Extension>
+      </onvifXsd:AnalyticsEngineConfiguration>
+      <!-- onvifXsd__RuleEngineConfiguration *RuleEngineConfiguration -->
+      <onvifXsd:RuleEngineConfiguration>
+       <!-- std::vector<onvifXsd__Config *> Rule -->
+       <!-- a repetition of 0 or more of the following -->
+       <onvifXsd:Rule Name="" Type="xsd:string">
+        <!-- onvifXsd__ItemList *Parameters -->
+        <onvifXsd:Parameters>
+        </onvifXsd:Parameters>
+       </onvifXsd:Rule>
+       <!-- onvifXsd__RuleEngineConfigurationExtension *Extension -->
+       <onvifXsd:Extension>
+       </onvifXsd:Extension>
+      </onvifXsd:RuleEngineConfiguration>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+     </onvifMedia2:Analytics>
+     <!-- onvifXsd__PTZConfiguration *PTZ -->
+     <onvifMedia2:PTZ MoveRamp="0" PresetRamp="0" PresetTourRamp="0" token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::string NodeToken -->
+      <onvifXsd:NodeToken></onvifXsd:NodeToken>
+      <!-- std::string *DefaultAbsolutePantTiltPositionSpace -->
+      <onvifXsd:DefaultAbsolutePantTiltPositionSpace>http://www.example.com/schema/anyURI</onvifXsd:DefaultAbsolutePantTiltPositionSpace>
+      <!-- std::string *DefaultAbsoluteZoomPositionSpace -->
+      <onvifXsd:DefaultAbsoluteZoomPositionSpace>http://www.example.com/schema/anyURI</onvifXsd:DefaultAbsoluteZoomPositionSpace>
+      <!-- std::string *DefaultRelativePanTiltTranslationSpace -->
+      <onvifXsd:DefaultRelativePanTiltTranslationSpace>http://www.example.com/schema/anyURI</onvifXsd:DefaultRelativePanTiltTranslationSpace>
+      <!-- std::string *DefaultRelativeZoomTranslationSpace -->
+      <onvifXsd:DefaultRelativeZoomTranslationSpace>http://www.example.com/schema/anyURI</onvifXsd:DefaultRelativeZoomTranslationSpace>
+      <!-- std::string *DefaultContinuousPanTiltVelocitySpace -->
+      <onvifXsd:DefaultContinuousPanTiltVelocitySpace>http://www.example.com/schema/anyURI</onvifXsd:DefaultContinuousPanTiltVelocitySpace>
+      <!-- std::string *DefaultContinuousZoomVelocitySpace -->
+      <onvifXsd:DefaultContinuousZoomVelocitySpace>http://www.example.com/schema/anyURI</onvifXsd:DefaultContinuousZoomVelocitySpace>
+      <!-- onvifXsd__PTZSpeed *DefaultPTZSpeed -->
+      <onvifXsd:DefaultPTZSpeed>
+       <!-- onvifXsd__Vector2D *PanTilt -->
+       <onvifXsd:PanTilt x="0.0" y="0.0" space="http://www.example.com/schema/anyURI">
+       </onvifXsd:PanTilt>
+       <!-- onvifXsd__Vector1D *Zoom -->
+       <onvifXsd:Zoom x="0.0" space="http://www.example.com/schema/anyURI">
+       </onvifXsd:Zoom>
+      </onvifXsd:DefaultPTZSpeed>
+      <!-- LONG64 *DefaultPTZTimeout -->
+      <onvifXsd:DefaultPTZTimeout>PT0S</onvifXsd:DefaultPTZTimeout>
+      <!-- onvifXsd__PanTiltLimits *PanTiltLimits -->
+      <onvifXsd:PanTiltLimits>
+       <!-- onvifXsd__Space2DDescription *Range -->
+       <onvifXsd:Range>
+        <!-- std::string URI -->
+        <onvifXsd:URI>http://www.example.com/schema/anyURI</onvifXsd:URI>
+        <!-- onvifXsd__FloatRange *XRange -->
+        <onvifXsd:XRange>
+         <!-- float Min -->
+         <onvifXsd:Min>0.0</onvifXsd:Min>
+         <!-- float Max -->
+         <onvifXsd:Max>0.0</onvifXsd:Max>
+        </onvifXsd:XRange>
+        <!-- onvifXsd__FloatRange *YRange -->
+        <onvifXsd:YRange>
+         <!-- float Min -->
+         <onvifXsd:Min>0.0</onvifXsd:Min>
+         <!-- float Max -->
+         <onvifXsd:Max>0.0</onvifXsd:Max>
+        </onvifXsd:YRange>
+       </onvifXsd:Range>
+      </onvifXsd:PanTiltLimits>
+      <!-- onvifXsd__ZoomLimits *ZoomLimits -->
+      <onvifXsd:ZoomLimits>
+       <!-- onvifXsd__Space1DDescription *Range -->
+       <onvifXsd:Range>
+        <!-- std::string URI -->
+        <onvifXsd:URI>http://www.example.com/schema/anyURI</onvifXsd:URI>
+        <!-- onvifXsd__FloatRange *XRange -->
+        <onvifXsd:XRange>
+         <!-- float Min -->
+         <onvifXsd:Min>0.0</onvifXsd:Min>
+         <!-- float Max -->
+         <onvifXsd:Max>0.0</onvifXsd:Max>
+        </onvifXsd:XRange>
+       </onvifXsd:Range>
+      </onvifXsd:ZoomLimits>
+      <!-- onvifXsd__PTZConfigurationExtension *Extension -->
+      <onvifXsd:Extension>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+       <!-- onvifXsd__PTControlDirection *PTControlDirection -->
+       <onvifXsd:PTControlDirection>
+       </onvifXsd:PTControlDirection>
+       <!-- onvifXsd__PTZConfigurationExtension2 *Extension -->
+       <onvifXsd:Extension>
+       </onvifXsd:Extension>
+      </onvifXsd:Extension>
+     </onvifMedia2:PTZ>
+     <!-- onvifXsd__MetadataConfiguration *Metadata -->
+     <onvifMedia2:Metadata CompressionType="" GeoLocation="false" token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- onvifXsd__PTZFilter *PTZStatus -->
+      <onvifXsd:PTZStatus>
+       <!-- bool Status -->
+       <onvifXsd:Status>false</onvifXsd:Status>
+       <!-- bool Position -->
+       <onvifXsd:Position>false</onvifXsd:Position>
+      </onvifXsd:PTZStatus>
+      <!-- onvifXsd__EventSubscription *Events -->
+      <onvifXsd:Events>
+       <!-- oasisWsnB2__FilterType *Filter -->
+       <onvifXsd:Filter>
+       </onvifXsd:Filter>
+       <!-- _onvifXsd__EventSubscription_SubscriptionPolicy *SubscriptionPolicy -->
+       <onvifXsd:SubscriptionPolicy>
+       </onvifXsd:SubscriptionPolicy>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:Events>
+      <!-- bool *Analytics -->
+      <onvifXsd:Analytics>false</onvifXsd:Analytics>
+      <!-- onvifXsd__MulticastConfiguration *Multicast -->
+      <onvifXsd:Multicast>
+       <!-- onvifXsd__IPAddress *Address -->
+       <onvifXsd:Address>
+        <!-- onvifXsd__IPType Type -->
+        <onvifXsd:Type>IPv4</onvifXsd:Type>
+       </onvifXsd:Address>
+       <!-- int Port -->
+       <onvifXsd:Port>0</onvifXsd:Port>
+       <!-- int TTL -->
+       <onvifXsd:TTL>0</onvifXsd:TTL>
+       <!-- bool AutoStart -->
+       <onvifXsd:AutoStart>false</onvifXsd:AutoStart>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:Multicast>
+      <!-- LONG64 SessionTimeout -->
+      <onvifXsd:SessionTimeout>PT0S</onvifXsd:SessionTimeout>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+      <!-- onvifXsd__AnalyticsEngineConfiguration *AnalyticsEngineConfiguration -->
+      <onvifXsd:AnalyticsEngineConfiguration>
+       <!-- std::vector<onvifXsd__Config *> AnalyticsModule -->
+       <!-- a repetition of 0 or more of the following -->
+       <onvifXsd:AnalyticsModule Name="" Type="xsd:string">
+        <!-- onvifXsd__ItemList *Parameters -->
+        <onvifXsd:Parameters>
+        </onvifXsd:Parameters>
+       </onvifXsd:AnalyticsModule>
+       <!-- onvifXsd__AnalyticsEngineConfigurationExtension *Extension -->
+       <onvifXsd:Extension>
+       </onvifXsd:Extension>
+      </onvifXsd:AnalyticsEngineConfiguration>
+      <!-- onvifXsd__MetadataConfigurationExtension *Extension -->
+      <onvifXsd:Extension>
+       <!-- std::vector<struct soap_dom_element> __any -->
+       <!-- a repetition of 0 or more of the following -->
+
+      </onvifXsd:Extension>
+     </onvifMedia2:Metadata>
+     <!-- onvifXsd__AudioOutputConfiguration *AudioOutput -->
+     <onvifMedia2:AudioOutput token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::string OutputToken -->
+      <onvifXsd:OutputToken></onvifXsd:OutputToken>
+      <!-- std::string *SendPrimacy -->
+      <onvifXsd:SendPrimacy>http://www.example.com/schema/anyURI</onvifXsd:SendPrimacy>
+      <!-- int OutputLevel -->
+      <onvifXsd:OutputLevel>0</onvifXsd:OutputLevel>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+     </onvifMedia2:AudioOutput>
+     <!-- onvifXsd__AudioDecoderConfiguration *AudioDecoder -->
+     <onvifMedia2:AudioDecoder token="">
+      <!-- std::string Name -->
+      <onvifXsd:Name></onvifXsd:Name>
+      <!-- int UseCount -->
+      <onvifXsd:UseCount>0</onvifXsd:UseCount>
+      <!-- std::vector<struct soap_dom_element> __any -->
+      <!-- a repetition of 0 or more of the following -->
+
+     </onvifMedia2:AudioDecoder>
+     <!-- std::vector<struct soap_dom_element> __any -->
+     <!-- a repetition of 0 or more of the following -->
+
+    </onvifMedia2:Configurations>
+   </onvifMedia2:Profiles>
+  </onvifMedia2:GetProfilesResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

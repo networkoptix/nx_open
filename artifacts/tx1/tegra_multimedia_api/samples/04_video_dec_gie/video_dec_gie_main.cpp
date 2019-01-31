@@ -718,7 +718,7 @@ gieThread(void *arg)
 
             void *cuda_buf = ctx->gie_ctx->getBuffer(0);
 
-            // TODO: #mshevchenko: Here they convert RGB to float directly to NN buffer in VRAM.
+            // NOTE: Here RGB is converted to float directly to the NN buffer in VRAM.
 
             // map eglimage into GPU address
             mapEGLImage2Float2(
@@ -890,7 +890,7 @@ conv0_captureDqbufThreadCallback(struct v4l2_buffer *v4l2_buf,
     // copy this for using at out of the callback.
     memcpy(&gie_buffer.v4l2_buf, v4l2_buf, sizeof(v4l2_buffer));
 
-    // TODO: #mshevchenko: Here they got decoded frame: NvBuffer* buffer.
+    // NOTE: Here we get the decoded frame: NvBuffer* buffer.
 
     gie_buffer.buffer = buffer;
     gie_buffer.shared_buffer = shared_buffer;

@@ -30,7 +30,6 @@ set(android.keypass "S6rtgPMk")
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{E10C4B91-CC3A-442F-A017-266BB23A44E4}")
 set(customization.clientUpgradeCode "{6E9B3B5B-0AC9-4718-A1B1-EA59F706A72F}")
-set(customization.serverUpgradeCode "{B85E5E85-963A-477A-9D04-F122576E2364}")
 
 set(customization.clientBundleUpgradeCode "{4A83450D-1F57-4314-9638-6C66AB1C8E06}")
 set(customization.serverBundleUpgradeCode "{76AEB816-5F97-4C06-96E4-2D5603F29111}")
@@ -43,7 +42,6 @@ set(ios.group_identifier "group.com.rassecurity.probox")
 set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")
 set(ios.old_app_appstore_id "")
 
-set(mac.skip.sign "false")
 set(mac.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: RAS Bvba (CJ7G58V6NE)")
@@ -54,7 +52,3 @@ set(mac.protocol_handler_bundle.identifier "com.probox.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0027")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

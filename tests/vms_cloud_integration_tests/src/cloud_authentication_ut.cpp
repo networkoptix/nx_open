@@ -18,7 +18,7 @@
 #include "mediaserver_cloud_integration_test_setup.h"
 #include <test_support/mediaserver_launcher.h>
 
-using namespace nx::cdb;
+using namespace nx::cloud::db;
 
 class CloudAuthentication:
     public MediaServerCloudIntegrationTest
@@ -45,11 +45,11 @@ protected:
 
     void givenTemporaryCloudCredentials()
     {
-        nx::cdb::api::TemporaryCredentialsParams temporaryCredentialsParams;
+        nx::cloud::db::api::TemporaryCredentialsParams temporaryCredentialsParams;
         temporaryCredentialsParams.type = "long";
-        nx::cdb::api::TemporaryCredentials temporaryCredentials;
+        nx::cloud::db::api::TemporaryCredentials temporaryCredentials;
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             cdb()->createTemporaryCredentials(
                 accountEmail(), accountPassword(),
                 temporaryCredentialsParams, &temporaryCredentials));
@@ -67,7 +67,6 @@ protected:
         ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), nx::network::kNoTimeout));
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
         auto httpMsgPipeline = std::make_unique<nx::network::http::deprecated::AsyncMessagePipeline>(
-            nullptr,
             std::move(tcpSocket));
         httpMsgPipeline->startReadingConnection();
 
@@ -122,7 +121,7 @@ private:
 
     void getCloudNonce(api::NonceData* nonceData)
     {
-        typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+        typedef void(nx::cloud::db::api::AuthProvider::*GetCdbNonceType)
             (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
 
         auto cdbConnection =

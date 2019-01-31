@@ -247,7 +247,7 @@ angular.module('nxCommon')
                     function playerErrorHandler(error) {
                         scope.loading = false; // Some error happended - stop loading
                         resetPlayer();
-        
+                        
                         scope
                             .playerHandler(error)
                             .then(function (showError) {
@@ -255,7 +255,8 @@ angular.module('nxCommon')
                 
                                 // Trying to get error description requesting media stream url as ajax request
                                 if (scope.videoFlags.errorLoading) {
-                                    $http.get(error.url)
+                                    $http
+                                        .get(error.url)
                                         .then(function (response) {
                                             scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
                                         }, function (failResponse) {
@@ -263,9 +264,12 @@ angular.module('nxCommon')
                                             console.error('failResponse', failResponse);
                                         });
                                 }
+                            }, function (error) {
+                                scope.videoFlags.errorLoading = error;
                             });
                     }
-
+    
+    
                     function initNativePlayer(nativeFormat) {
 
                         scope.native = true;
@@ -325,8 +329,8 @@ angular.module('nxCommon')
                                                 target.error.url = target.currentSrc;
                                             }
         
-                                            // sometimes Error is thrown with currentSrc as baseURI (Firefox)
-                                            if (target.error.url === e.target.baseURI) {
+                                            // sometimes Error is thrown with currentSrc as host URL (Firefox)
+                                            if (target.error.url === window.location.origin + window.location.pathname) {
                                                 return;
                                             }
         
@@ -399,7 +403,7 @@ angular.module('nxCommon')
                     element.bind('contextmenu', function () {
                         return !!scope.debugMode;
                     }); // Kill context menu
-
+                    
                     function initNewPlayer() {
                         if (makingPlayer) {
                             return;

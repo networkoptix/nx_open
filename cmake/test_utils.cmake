@@ -9,7 +9,14 @@ function(nx_add_test target)
         AFFECTED_VARIABLES_RESULT affected_variables)
     nx_expose_variables_to_parent_scope(affected_variables)
 
-    nx_add_target(${target} EXECUTABLE ${ARGN})
+    nx_add_target(${target}
+        EXECUTABLE
+        NO_RC_FILE
+        NO_MOC
+        PRIVATE_LIBS
+            GTest
+            GMock
+        ${ARGN})
 
     add_test(NAME ${target} COMMAND ${target})
 

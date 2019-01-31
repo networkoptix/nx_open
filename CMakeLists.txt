@@ -58,7 +58,7 @@ endif()
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 18.1)
+set(mobileClientVersion 18.5)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -73,10 +73,7 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
+nx_option(codeSigning "Enable code signing" OFF)
 
 include(target_detection)
 include(utils)
@@ -157,26 +154,22 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia)
+        Multimedia
+        Qml
+)
 
 if(withDesktopClient OR withMobileClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Qml
-            Quick)
+    find_package(Qt5 COMPONENTS Quick)
 endif()
 
 if(withDesktopClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Widgets
-    )
+    find_package(Qt5 COMPONENTS Widgets)
 endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/client/nx_client_desktop/static-resources/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/mobile_client/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
@@ -194,63 +187,18 @@ list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
 add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
-    add_subdirectory(common_libs)
-    add_subdirectory(vms_libs)
-    add_subdirectory(common)
-    add_subdirectory(appserver2)
-    add_subdirectory(nx_cloud)
-endif()
-
-if(withMediaServer OR withClouds)
-    add_subdirectory(mediaserver_db)
-endif()
-
-if(withMediaServer)
-    add_subdirectory(mediaserver_core)
-    add_subdirectory(mediaserver)
-    add_subdirectory(plugins)
-    add_subdirectory(storage_plugins)
-    add_subdirectory(nx_system_commands)
-
-    if(withDistributions)
-        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
-        add_subdirectory(nx_metadata_sdk)
-    endif()
-
-    if(withMediaDbUtil)
-        add_subdirectory(media_db_util)
-    endif()
-
-    if(withRootTool)
-        add_subdirectory(root_tool)
-    endif()
+    add_subdirectory(libs)
+    add_subdirectory(cloud)
 endif()
 
 #add_subdirectory(_axis_controller)
 #add_subdirectory(_dw_vca_controller)
 #add_subdirectory(_dw_mtt_controller)
 
-if(withTestCamera)
-    add_subdirectory(testcamera)
-endif()
-
-if(withTrayTool)
-    add_subdirectory(traytool)
-endif()
-
-add_subdirectory(client)
-
-if(withNxTool)
-    add_subdirectory(nxtool)
-endif()
+add_subdirectory(vms)
 
 if(withTests)
-    add_subdirectory(unit_tests)
     add_subdirectory(tests)
-endif()
-
-if(withDistributions)
-    add_subdirectory(distribution)
 endif()
 
 include(fix_qt_vars)
@@ -268,9 +216,11 @@ if(withClouds)
         add_subdirectory(cloud_portal)
         add_custom_target(cloud-frontend DEPENDS cloud_portal)
         add_dependencies(cloud cloud-frontend)
-
-        add_subdirectory(nx_cloud_deploy)
     endif()
+endif()
+
+if(withDocumentation)
+    add_subdirectory(doc)
 endif()
 
 nx_save_known_files()

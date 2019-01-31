@@ -37,20 +37,20 @@ class ProjectGroups:
 
 
 TRANSLATABLE_PROJECTS = [
-    TranslatableProject("common", groups=[ProjectGroups.MOBILE]),
-    TranslatableProject("traytool", groups=[ProjectGroups.VMS]),
+    TranslatableProject("vms/libs/common", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
+    TranslatableProject("vms/traytool", groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_base", "client/nx_client_desktop", groups=[ProjectGroups.VMS]),
+        "client_base", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_ui", "client/nx_client_desktop", groups=[ProjectGroups.VMS]).ui(),
+        "client_ui", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]).ui(),
     TranslatableProject(
-        "client_core", "client/nx_client_core", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
+        "client_core", "vms/client/nx_vms_client_core", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
     TranslatableProject(
-        "client_qml", "client/nx_client_desktop", groups=[ProjectGroups.VMS]).qml(),
+        "client_qml", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]).qml(),
     TranslatableProject(
-        "mobile_client_base", "client/mobile_client", groups=[ProjectGroups.MOBILE]),
+        "mobile_client_base", "vms/client/mobile_client", groups=[ProjectGroups.MOBILE]),
     TranslatableProject(
-        "mobile_client_qml", "client/mobile_client", groups=[ProjectGroups.MOBILE]).qml()
+        "mobile_client_qml", "vms/client/mobile_client", groups=[ProjectGroups.MOBILE]).qml()
 ]
 
 

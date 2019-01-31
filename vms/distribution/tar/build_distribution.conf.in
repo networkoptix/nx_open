@@ -1,0 +1,27 @@
+# This file is filtered by cmake; intended to be sourced into build_distribution.sh.
+
+CUSTOMIZATION="@deb.customization.company.name@"
+PRODUCT_NAME="@product.name.short@"
+VERSION="@releaseVersion@.@buildNumber@"
+MAJOR_VERSION="@PROJECT_VERSION_MAJOR@"
+MINOR_VERSION="@PROJECT_VERSION_MINOR@"
+BUILD_VERSION="@PROJECT_VERSION_PATCH@"
+DISTRIBUTION_TAR_GZ="@server_distribution_name@.tar.gz"
+UPDATE_ZIP="@server_update_distribution_name@.zip"
+DISTRIBUTION_ZIP="@server_distribution_name@.zip"
+CURRENT_BUILD_DIR="@CMAKE_CURRENT_BINARY_DIR@"
+BUILD_DIR="@CMAKE_BINARY_DIR@" #< Top-level build dir, containing "bin", "lib", etc.
+LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
+DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@"
+QT_DIR="@QT_DIR@"
+BOX="@box@"
+VOX_SOURCE_DIR="@ClientVoxSourceDir@"
+PLATFORM_PACKAGES_DIR="@PACKAGES_DIR@/@rdep_target@"
+SYSROOT_DIR="@sysroot_directory@"
+SOURCE_DIR="@CMAKE_SOURCE_DIR@"
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
+ENABLE_HANWHA="@enable_hanwha@"
+SERVER_PLUGINS=(@server_plugins_list@)
+SERVER_PLUGINS_OPTIONAL=(@server_plugins_optional_list@)

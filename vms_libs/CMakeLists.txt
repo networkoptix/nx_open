@@ -1,3 +1,0 @@
-add_subdirectory(nx_vms_api)
-add_subdirectory(nx_vms_applauncher_api)
-add_subdirectory(nx_vms_utils)

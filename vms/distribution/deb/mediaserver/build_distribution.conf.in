@@ -1,0 +1,33 @@
+# This file is filtered by cmake; intended to be sourced into build_distribution.sh.
+
+CUSTOMIZATION="@deb.customization.company.name@"
+RELEASE_VERSION="@releaseVersion@"
+
+CURRENT_BUILD_DIR="@CMAKE_CURRENT_BINARY_DIR@"
+BUILD_DIR="@CMAKE_BINARY_DIR@"
+BUILD_CONFIG="@CMAKE_BUILD_TYPE@" #< Debug or Release.
+LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
+DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@" #< If empty, CURRENT_BUILD_DIR will be used.
+QT_DIR="@QT_DIR@"
+SYSROOT_DIR="@sysroot_directory@"
+SOURCE_DIR="@CMAKE_SOURCE_DIR@"
+PLATFORM_PACKAGES_DIR="@PACKAGES_DIR@/@rdep_target@"
+SCRIPTS_DIR="@CMAKE_CURRENT_SOURCE_DIR@/../scripts"
+
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
+ARCH="@arch@"
+CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
+ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
+BOX="@box@"
+
+DISTRIBUTION_NAME="@server_distribution_name@"
+UPDATE_ZIP="@server_update_distribution_name@.zip"
+ARCHITECTURE="@os.arch@"
+
+ENABLE_HANWHA="@enable_hanwha@"
+ENABLE_ROOT_TOOL="@withRootTool@"
+
+SERVER_PLUGINS=(@server_plugins_list@)
+SERVER_PLUGINS_OPTIONAL=(@server_plugins_optional_list@)

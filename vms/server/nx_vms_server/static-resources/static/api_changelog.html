@@ -1,0 +1,323 @@
+<div class="api_changelog" >
+
+<!--
+Uncomment the following line to enable live-reload during editing this document.
+<meta http-equiv="refresh" content="1" >
+-->
+
+<!--
+Style conventions in this document:
+- This file will be embedded into a framing HTML to be shown to the user.
+- Preserve it both a valid XML and an HTML renderable in a browser.
+- Use only ASCII chars, Unix newlines, 4 spaces for indentation, lines up to 99 chars long.
+
+Use the following tags for markup, among others:
+
+<hr/><h2>Section header. Use only h2, h3, etc. - h1 is reserved for the embedding page.</h2>
+<p>
+Paragraph describing a particular API change.
+<pre>
+    One or more lines of code, indented as needed. Rendered in monospace.
+</pre>
+<em>Comment or note. Rendered in italics and gray.</em>
+<strong>Most significant part of the text. Rendered in bold.</strong>
+<i>Removed or deprecated stuff. Rendered in red, non-italics.</i>
+<b>Newly introduced stuff. Rendered in blue, non-bold.</b>
+</p>
+-->
+<style type="text/css" scoped="scoped">
+    code { color: inherit; }
+    em { color: gray; font-family: inherit; }
+    i { color: red; /* non-italics */ font-style: inherit; font-family: inherit; }
+    b { color: blue; /* non-bold */ font-weight: inherit; font-family: inherit; }
+</style>
+<!--============================================================================================-->
+<p>
+Here the <strong>changes</strong> of Rest <strong>API</strong> from VMS version to version are
+documented, which can potentially <strong>break compatibility</strong>. In particular, methods and
+params can be <strong>renamed</strong>, though often <strong>deprecated names</strong> are
+supported for a while, when noted below.
+</p>
+<!--============================================================================================-->
+<hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
+<!--............................................................................................-->
+<h3>Breaking compatibility</h3>
+<p>
+In case of <strong><code>InvalidParameter</code></strong> or
+<strong><code>MissingParameter</code></strong> error, the return status code has been changed from
+<strong><code><i>200 OK</i></code></strong> to
+<strong><code><b>422 Unprocessable Entity</b></code></strong>; in the case of timeout, the return
+status code has been changed from <strong><code><i>200 OK</i></code></strong> to
+<strong><code><b>408 Request Timeout</b></code></strong> in methods:
+<pre>
+    /api/getCameraParam
+    /api/setCameraParam
+</pre>
+</p>
+<p>
+Output parameter value list can contain not only parameters specified by the user,
+but also additional parameter values affected by the set operation in the method:
+<pre>
+    /api/setCameraParam
+</pre>
+</p>
+
+<p>
+Params <strong><code>scheduleTask.<i>beforeThreshold</i></code></strong> and <strong><code>
+scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the new
+<strong><code><b>recordBeforeMotionSec</b></code></strong> and
+<strong><code><b>recordAfterMotionSec</b></code></strong> params in methods:
+<pre>
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+    /ec2/getCameraUserAttributesList
+    /ec2/getCamerasEx
+</pre>
+</p>
+
+<p>
+Added optional param <strong><code><b>currentPassword</b></code></strong>, which is required if new
+<strong><code>password</code></strong> is provided in methods:
+<pre>
+    /api/configure
+    /api/detachFromCloud
+</pre>
+</p>
+
+<p>
+Added required param <strong><code><b>currentPassword</b></code></strong> in method
+<strong><code>/api/restoreState</code></strong>.
+</p>
+
+<p>
+Expanded <strong><code><b>dewarpingParams</b></code></strong> and <strong><code><b>contrastParams
+</b></code></strong> fields in the layout items description in methods:
+<pre>
+    /ec2/getLayouts
+    /ec2/saveLayout
+    /ec2/saveLayouts
+</pre>
+</p>
+
+<p>
+Parameters <strong><code>layout.<i>horizontalSpacing</i></code></strong> and <strong><code>
+layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
+<strong><code><b>cellSpacing</b></code></strong> parameter in methods:
+<pre>
+    /ec2/getLayouts
+    /ec2/saveLayout
+    /ec2/saveLayouts
+</pre>
+</p>
+
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
+<strong><b>POST</b></strong> in method <strong><code>/api/setCameraParam</code></strong>
+(deprecated method support expires after 4.0).
+<br/>
+<em>NOTE: In API documentation, this method was previously incorrectly stated as POST, but now
+this statement becomes true.</em>
+</p>
+<p>
+Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
+<strong><b>POST</b></strong> in method <strong><code>/api/restart</code></strong>
+(deprecated method support expires after 4.0).
+</p>
+
+<!--............................................................................................-->
+<h3>Retaining compatibility</h3>
+<p>
+Removed param <strong><code>scheduleTask.<i>recordAudio</i></code></strong>
+(was not used) in methods:
+<pre>
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+    /ec2/getCameraUserAttributesList
+    /ec2/getCamerasEx
+</pre>
+</p>
+<!--<p>
+<em>[proprietary]</em> Made <strong><i>GET</i></strong> deprecated in favor of
+<strong><b>POST</b></strong> in method <strong><code>/api/activateLicense</code></strong>
+(deprecated method support expires after 4.0).
+</p>-->
+<!--============================================================================================-->
+<hr/><h2>VMS <b>3.2</b> relative to <i>3.1</i></h2>
+<!--............................................................................................-->
+<h3>Breaking compatibility</h3>
+<p>
+Deleted deprecated method <strong><code><i>/api/image</i></code></strong>.
+</p>
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+Made <strong><i>GET</i></strong> deprecated in favor of <strong><b>POST</b></strong> in method
+<strong><code>/api/detachFromCloud</code></strong> (deprecated method support expires after 3.2).
+</p>
+<p>
+Renamed certain param values in method <strong><code>/ec2/cameraThumbnail</code></strong>
+(deprecated values support expires after 3.2):
+<pre>
+    Param <strong><code>imageFormat</code></strong> values:
+        <i>jpeg</i> -> <b>jpg</b>
+        <i>tiff</i> -> <b>tif</b>
+
+    Param <strong><code>roundMethod</code></strong> values:
+        <i>exact</i> -> <b>precise</b>
+</pre>
+</p>
+<!--............................................................................................-->
+<h3>Errata fixed in the API documentation (not changing API behavior)</h3>
+<p>
+Fixed param and value names in method <strong><code>/ec2/cameraThumbnail</code></strong>:
+<pre>
+    Param <strong><code>imageFormat</code></strong> values:
+        <i>PngFormat</i> -> <b>png</b>
+        <i>JpgFormat</i> -> <b>jpg</b>
+        <i>TiffFormat</i> -> <b>tif</b>
+        <i>RawFormat</i> -> <b>raw</b>
+
+    Param <strong><code><i>method</i> -> <b>roundMethod</b></code></strong> values:
+        <i>KeyFrameBeforeMethod</i> -> <b>before</b>
+        <i>PreciseMethod</i> -> <b>precise</b>
+        <i>KeyFrameAfterMethod</i> -> <b>after</b>
+</pre>
+</p>
+<p>
+Fixed method URL prefix:
+<strong><code><i>/api</i>/execAction -> <b>/ec2</b>/execAction</code></strong>.
+</p>
+<!--============================================================================================-->
+<hr/><h2>VMS <b>3.1</b> relative to <i>3.0</i></h2>
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
+<strong><code>/api/mergeSystems</code></strong>
+(deprecated method support expires after 3.2). Check changed params in the API documentation.
+</p>
+<!--============================================================================================-->
+<hr/><h2>VMS <b>3.0</b> relative to <i>2.6</i></h2>
+<!--............................................................................................-->
+<h3>Breaking compatibility</h3>
+<p>
+Renamed methods:
+<pre>
+    /ec2/getServerUserAttributes -> /ec2/get<b>Media</b>ServerUserAttributes<b>List</b>
+    /ec2/saveServerUserAttributes -> /ec2/save<b>Media</b>ServerUserAttributes
+    /ec2/saveServerUserAttributesList -> /ec2/save<b>Media</b>ServerUserAttributesList
+    /ec2/getCameraUserAttributes -> /ec2/getCameraUserAttributes<b>List</b>
+    /api/<i>business</i>Events -> /api/<b>get</b>Events
+    /ec2/get<i>Business</i>Rules -> /ec2/get<b>Event</b>Rules
+<!-- Proprietary methods commented out:
+    <em>[proprietary]</em> /ec2/getClientInfo<i>s</i> -> /ec2/getClientInfo<b>List</b>
+    <em>[proprietary]</em> /ec2/save<i>Business</i>Rule -> /ec2/save<b>Event</b>Rule
+    <em>[proprietary]</em> /ec2/remove<i>Business</i>Rule -> /ec2/remove<b>Event</b>Rule
+    <em>[proprietary]</em> /ec2/reset<i>Business</i>Rules -> /ec2/reset<b>Event</b>Rules
+    <em>[proprietary]</em> /ec2/broadcast<i>Business</i>Action -> /ec2/broadcastAction
+    <em>[proprietary]</em> /ec2/exec<i>Business</i>Action -> /ec2/execAction
+--></pre>
+</p>
+<p>
+Changed <strong>reply</strong> format <strong><i>XML</i> -> <b>JSON</b></strong> in methods:
+<pre>
+    /api/manualCamera/search
+    /api/manualCamera/status
+    /api/manualCamera/stop
+    /api/statistics
+    /api/storageSpace
+    /api/storageStatus
+</pre>
+</p>
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+Replaced method <strong><code><i>/api/image</i> -> <b>/ec2/cameraThumbnail</b></code></strong>
+(deprecated method support expires after 3.1). The new method can get thumbnails from cameras
+located on other servers (the old one can not).
+</p>
+<p>
+Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /ec2/getCamerasEx
+    /ec2/getCameraUserAttributesList
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+</pre>
+</p>
+<p>
+Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /ec2/getMediaServerUserAttributesList
+    /ec2/saveMediaServerUserAttributesList
+    /ec2/saveMediaServerUserAttributes
+</pre>
+</p>
+<p>
+Renamed param <strong><code>ph<i>i</i>sicalMemory -> ph<b>y</b>sicalMemory</code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /ec2/saveClientInfo
+    /ec2/getClientInfoList
+</pre>
+</p>
+<p>
+Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId</code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+    /ec2/getCameraUserAttributesList
+    /ec2/getCamerasEx
+</pre>
+</p>
+<p>
+Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /api/doCameraDiagnosticsStep
+    /api/setCameraParam
+    /api/getCameraParam
+</pre>
+</p>
+<p>
+Renamed param <strong><code><i>resource</i>Id -> <b>camera</b>Id</code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /api/ptz
+</pre>
+</p>
+<p>
+Renamed and merged together params
+<strong><code><i>mac</i> + <i>physicalId</i> -> <b>cameraId</b></code></strong>
+in method <strong><code>/ec2/bookmarks</code></strong>
+(deprecated names support expires after 3.2).
+<p/>
+<p>
+Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
+(deprecated name support expires after 3.2) in methods:
+<pre>
+    /api/image
+    /api/getEvents
+    /ec2/recordedTimePeriods
+</pre>
+</p>
+<p>
+Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
+<strong><code>/api/manualCamera/add</code></strong>
+(deprecated method support expires after 3.2). Check changed params in the API documentation.
+</p>
+<p>
+Renamed param
+<strong><code><i>timeSinseEpochMs</i> -> <b>timeSinceEpochMs</b></code></strong>
+in method <strong><code>/ec2/getTimeOfServers</code></strong>.
+</p>
+Remove global setting <strong><code><i>synchronizeTimeWithInternet</i></code></strong>
+It implicitly turned on if settings 'primaryTimeServer' is not defined and 'timeSynchronizationEnabled' is true.
+</p>
+
+</div>

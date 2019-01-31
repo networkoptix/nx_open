@@ -18,15 +18,15 @@ function(nx_target_enable_werror target werror_condition)
     endif()
 
     if(${werror_condition})
-        target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
+        target_compile_options(${target} PRIVATE -Werror)
     endif()
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND)
+    set(options NO_MOC NO_RC_FILE WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND)
     set(oneValueArgs LIBRARY_TYPE RC_FILE)
     set(multiValueArgs
-        ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        ADDITIONAL_SOURCES ADDITIONAL_RESOURCES ADDITIONAL_MOCABLES
         SOURCE_EXCLUSIONS
         OTHER_SOURCES
         PUBLIC_LIBS PRIVATE_LIBS
@@ -109,18 +109,20 @@ function(nx_add_target name type)
     if("${type}" STREQUAL "EXECUTABLE")
         set(rc_file)
         if(WINDOWS)
-            if(NX_RC_FILE)
-                set(rc_source_file "${NX_RC_FILE}")
-                set(rc_filename "${NX_RC_FILE}")
-                get_filename_component(rc_filename ${rc_source_file} NAME)
-                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
-            else()
-                set(rc_source_file "${CMAKE_SOURCE_DIR}/cmake/project.rc")
-                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
+            if(NOT NX_NO_RC_FILE)
+                if(NX_RC_FILE)
+                    set(rc_source_file "${NX_RC_FILE}")
+                    set(rc_filename "${NX_RC_FILE}")
+                    get_filename_component(rc_filename ${rc_source_file} NAME)
+                    set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
+                else()
+                    set(rc_source_file "${CMAKE_SOURCE_DIR}/cmake/project.rc")
+                    set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
+                endif()
+                configure_file(
+                    "${rc_source_file}"
+                    "${rc_file}")
             endif()
-            configure_file(
-                "${rc_source_file}"
-                "${rc_file}")
         endif()
 
         add_executable(${name} ${sources} "${rc_file}")
@@ -159,12 +161,12 @@ function(nx_add_target name type)
     endif()
 
     if(NOT NX_NO_MOC)
-        nx_add_qt_mocables(${name} ${hpp_files}
+        nx_add_qt_mocables(${name} ${hpp_files} ${NX_ADDITIONAL_MOCABLES}
             INCLUDE_DIRS
                 ${CMAKE_CURRENT_SOURCE_DIR}/src
                 # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
                 # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
-                ${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src
+                ${CMAKE_SOURCE_DIR}/libs/nx_fusion/src
         )
     endif()
 

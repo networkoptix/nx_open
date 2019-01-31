@@ -72,6 +72,10 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'advanced.html',
             controller: 'AdvancedCtrl'
         })
+        .when('/metrics', {
+            templateUrl: Config.viewsDir + 'metrics.html',
+            controller: 'MetricsCtrl'
+        })
         .when('/debug', {
             templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'

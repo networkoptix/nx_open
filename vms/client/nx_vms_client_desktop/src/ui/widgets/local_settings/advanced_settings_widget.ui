@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdvancedSettingsWidget</class>
+ <widget class="QWidget" name="AdvancedSettingsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>443</width>
+    <height>371</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QCheckBox" name="downmixAudioCheckBox">
+     <property name="text">
+      <string>Downmix Audio from 5.1 to 2.1</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="disableBlurCheckbox">
+     <property name="toolTip">
+      <string>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</string>
+     </property>
+     <property name="text">
+      <string>Disable blur</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="doubleBufferCheckbox">
+       <property name="text">
+        <string>Double Buffering</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="nx::vms::client::desktop::HintButton" name="doubleBufferCheckboxHint" native="true">
+       <property name="hint" stdset="0">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="maximumLiveBufferLengthLabelLayout" stretch="0,1,0">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="maximumLiveBufferLengthLabel">
+       <property name="text">
+        <string>Maximum Live Buffer Length</string>
+       </property>
+       <property name="buddy">
+        <cstring>maximumLiveBufferLengthSlider</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="nx::vms::client::desktop::HintButton" name="maximumLiveBufferLengthLabelHint" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="hint" stdset="0">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QSpinBox" name="maximumLiveBufferLengthSpinBox">
+       <property name="suffix">
+        <string notr="true">&lt; ms&gt;</string>
+       </property>
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="value">
+        <number>200</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="maximumLiveBufferLengthSlider">
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>200</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="browseLogsButton">
+       <property name="text">
+        <string>Browse Logs</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clearCacheButton">
+       <property name="text">
+        <string>Clear Local Cache</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetAllWarningsButton">
+       <property name="text">
+        <string>Reset All Warnings</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>browseLogsButton</tabstop>
+  <tabstop>clearCacheButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -36,16 +36,16 @@ customizableProjects = [
     CustomizableProject("client-dmg"),
     CustomizableProject(
         "client",
-        ["client/nx_client_desktop/src", "client/nx_client_desktop/static-resources/src"],
-        ["client/nx_client_desktop/static-resources/skin"],
-        ["nx_client_desktop/resources/skin"],
+        ["vms/client/nx_vms_client_desktop/src", "vms/client/nx_vms_client_desktop/static-resources/src"],
+        ["vms/client/nx_vms_client_desktop/static-resources/skin"],
+        ["vms/client/nx_vms_client_desktop/resources/skin"],
         "skin"
         ),
     CustomizableProject(
         "mobile_client",
-        ["client/mobile_client/src", "client/mobile_client/static-resources/qml"],
-        ["client/mobile_client/static-resources/images"],
-        ["mobile_client/resources/images"],
+        ["vms/client/mobile_client/src", "vms/client/mobile_client/static-resources/qml"],
+        ["vms/client/mobile_client/static-resources/images"],
+        ["vms/client/mobile_client/resources/images"],
         "images"
         )
 ]

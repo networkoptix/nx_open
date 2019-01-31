@@ -35,7 +35,6 @@ set(android.keypass "S6rtgPMk")
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{9FC2D14A-A8AA-42E9-A134-F1A3694FAF42}")
 set(customization.clientUpgradeCode "{1CD8F2DD-60B9-4E3E-BDC1-B698C507F1D7}")
-set(customization.serverUpgradeCode "{7A6B77AA-E139-4F23-B8FD-2379E9A69E87}")
 
 set(customization.clientBundleUpgradeCode "{3C05AA84-9E80-418D-9558-0BA6729AB6EA}")
 set(customization.serverBundleUpgradeCode "{110DF587-DBCE-4CEF-ABBF-2C502A4A3723}")
@@ -53,7 +52,6 @@ set(ios.group_identifier "group.com.hanwhasecurity.wisenetwave")
 set(ios.sign.identity "iPhone Distribution: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(ios.old_app_appstore_id "")
 
-set(mac.skip.sign "false")
 set(mac.sign.identity "Developer ID Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
@@ -64,7 +62,3 @@ set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler"
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0028")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

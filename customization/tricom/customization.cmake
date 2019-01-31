@@ -36,7 +36,6 @@ set(android.keypass "tricom")
 
 set(customization.upgradeCode "{f942a106-912d-4917-b5ff-78b0aaab37ee}")
 set(customization.clientUpgradeCode "{c4fb92b6-c621-4fed-9142-1500e31f71ed}")
-set(customization.serverUpgradeCode "{bc3591ce-f999-4c31-95c8-36d41a21286f}")
 set(customization.clientBundleUpgradeCode "{dde84a45-76fa-4cfa-8997-ed4765a8e7b4}")
 set(customization.serverBundleUpgradeCode "{85bb4604-128d-45fa-a7f3-5b64f7633055}")
 set(customization.fullBundleUpgradeCode "{3f3ce050-de10-4a42-a071-9c1e278596ee}")
@@ -60,7 +59,3 @@ set(mac.protocol_handler_bundle.identifier "com.tricom.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0022")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

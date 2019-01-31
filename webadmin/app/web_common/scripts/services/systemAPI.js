@@ -231,6 +231,10 @@ angular.module('nxCommon')
         ServerConnection.prototype.getServerTimes = function(){
             return this._get('/ec2/getTimeOfServers');
         };
+        
+        ServerConnection.prototype.getSystemTime = function(){
+            return this._get('/api/synchronizedTime');
+        };
         /* End of Server settings */
 
         /* Working with users*/
@@ -294,9 +298,18 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.getMediaServersAndCameras = function(){
             return this._get('/api/aggregator?exec_cmd=ec2%2FgetMediaServersEx&exec_cmd=ec2%2FgetCamerasEx');
-        }
+        };
         ServerConnection.prototype.getResourceTypes = function(){
             return this._get('/ec2/getResourceTypes');
+        };
+
+        ServerConnection.prototype.getServerMetrics = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/api/metrics');
+        };
+        ServerConnection.prototype.getServerStatistics = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/api/statistics');
         };
         /* End of Cameras and Servers */
 
@@ -312,7 +325,7 @@ angular.module('nxCommon')
             if(height){
                 data.height = height;
             }
-            return this._setGetParams('/ec2/cameraThumbnail', data, this.systemId && this.authGet());
+            return this._setGetParams('/ec2/cameraThumbnail?ignoreExternalArchive', data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};

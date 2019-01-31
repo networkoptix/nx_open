@@ -45,6 +45,7 @@ require('./controllers/dialogs/cloudDialog.js');
 require('./controllers/dialogs/setup.js');
 
 require('./controllers/advanced.js');
+require('./controllers/metrics.js');
 require('./controllers/apitool.js');
 require('./controllers/client.js');
 require('./controllers/debug.js');

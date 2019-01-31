@@ -44,7 +44,6 @@ set(update.generator.url "http://manual-updates.vista-cctv.com/upcombiner/upcomb
 
 set(customization.upgradeCode "{b96e7ebf-bd31-49fd-95b3-f1b9fe2a957e}")
 set(customization.clientUpgradeCode "{a41c6f94-b9f7-4a68-85b9-a6ee43b7a530}")
-set(customization.serverUpgradeCode "{16393a07-3da3-4e8d-b755-fe1d29dcf973}")
 
 set(customization.clientBundleUpgradeCode "{6d44e2f9-55a2-46f1-942c-97b7daf19a93}")
 set(customization.serverBundleUpgradeCode "{f4f70e01-4e4e-4d2c-a9cd-25b3654343d6}")
@@ -75,11 +74,6 @@ set(mac.protocol_handler_bundle.identifier "com.vista.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0018")
-
-# Installer Customizations
-#set(sign.password "0987654321nb")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(translations

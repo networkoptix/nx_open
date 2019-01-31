@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/connection.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/connection.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/url/url_builder.h>
@@ -14,7 +14,7 @@
 #include <api/app_server_connection.h>
 #include <media_server/settings.h>
 
-using nx::cdb::api::ResultCode;
+using nx::cloud::db::api::ResultCode;
 using nx::vms::api::UserData;
 using nx::vms::api::UserDataList;
 
@@ -95,7 +95,7 @@ nx::network::SocketAddress MediaServerCloudIntegrationTest::mediaServerEndpoint(
     return m_mediaServerLauncher.endpoint();
 }
 
-nx::cdb::CdbLauncher* MediaServerCloudIntegrationTest::cdb()
+nx::cloud::db::CdbLauncher* MediaServerCloudIntegrationTest::cdb()
 {
     return &m_cdb;
 }
@@ -170,7 +170,7 @@ void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
 {
     const auto newPassword = nx::utils::generateRandomName(7).toStdString();
 
-    nx::cdb::api::AccountUpdateData update;
+    nx::cloud::db::api::AccountUpdateData update;
     update.passwordHa1 = nx::network::http::calcHa1(
         m_ownerAccount.email.c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
@@ -197,7 +197,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
         m_ownerAccount,
         m_cloudSystem,
         newAccount.email,
-        nx::cdb::api::SystemAccessRole::viewer);
+        nx::cloud::db::api::SystemAccessRole::viewer);
 
     auto mediaServerClient = prepareMediaServerClient();
 
@@ -220,7 +220,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
 UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
 {
     const auto userEmail =
-        nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
+        nx::cloud::db::test::BusinessDataGenerator::generateRandomEmailAddress();
     UserData userData;
     userData.id = guidFromArbitraryData(userEmail);
     userData.typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
@@ -242,7 +242,7 @@ UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
 
 void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::string& email)
 {
-    using namespace nx::cdb::api;
+    using namespace nx::cloud::db::api;
 
     for (;;)
     {

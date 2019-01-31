@@ -6,6 +6,7 @@
 
 #include <QLibrary>
 #include <QDebug>
+#include <dlfcn.h>
 
 #if defined(HAVE_LIBSECRET)
 const SecretSchema* qtkeychainSchema(void) {
@@ -305,7 +306,7 @@ bool LibSecretKeyring::deletePassword(const QString &key, const QString &service
 }
 
 LibSecretKeyring::LibSecretKeyring()
-    : QLibrary("secret-1")
+    : QLibrary("secret-1", 0)
 {
 #ifdef HAVE_LIBSECRET
     if (load()) {
@@ -325,6 +326,11 @@ LibSecretKeyring::LibSecretKeyring()
                 (secret_password_free_t)resolve("secret_password_free");
         secret_error_get_quark_fn =
                 (secret_error_get_quark_t)resolve("secret_error_get_quark");
+    }
+    else
+    {
+        auto error = errorString();
+        qWarning() << "LibSecretKeyring::LibSecretKeyring() failed to load LibSecret library: " << error;
     }
 #endif
 }

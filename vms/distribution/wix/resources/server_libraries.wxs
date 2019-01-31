@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <?include BuildVars.wxi ?>
+        <ComponentGroup Id="server_misc_libraries"
+                Source="$(var.SourceDir)"
+                Directory="InstallDirRoot">
+            <Component><File Name="sigar.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_qt_libraries"
+                Source="$(var.QtDir)"
+                Directory="InstallDirRoot">
+            <Component><File Name="Qt5WebSockets.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_qt_sqldrivers"
+                Source="$(var.QtPluginsDir)\sqldrivers"
+                Directory="sqldrivers">
+            <Component><File Name="qsqlite.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_plugins"
+                Source="$(var.PluginsDir)"
+                Directory="plugins">
+            <Component><File Name="generic_rtsp_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="mjpeg_link_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="usb_camera_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="generic_multicast_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="dw_mtt_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="hikvision_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="axis_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="vca_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="dahua_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <?if $(var.enable_hanwha) = "true"?>
+                <Component><File Name="hanwha_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <?endif?>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_plugins_optional"
+                Source="$(var.plugins_optional_dir)"
+                Directory="plugins_optional">
+            <Component><File Name="stub_analytics_plugin.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

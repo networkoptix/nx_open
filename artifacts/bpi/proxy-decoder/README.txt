@@ -5,7 +5,7 @@ mobile_client
     libnx_bpi_videonode_plugin.so # Gl Shader for native bpi YUV format.
     libnx_media.so
         libproxydecoder.so # Plugin into nx_media which supports bpi hw video engine.
-            lib<ffmpeg-new>*.so # With vdpau support.       
+            lib<ffmpeg-new>*.so # With vdpau support.
             libvdpau.so # Default Bananian vdpau with dynamically-linked backends.
                 libvdpau_sunxi.so # vdpau backend for bpi.
                     libcedrus.so # Kernel driver for bpi hw video engine.
@@ -31,7 +31,7 @@ mkdir -p ~/develop && mount -o nolock <ubuntu-ip>:/<ubuntu-path-to-develop> ~/de
 killall lightdm
 cd /opt/networkoptix/lite_client
 # Use latest ffmpeg with vdpau support:
-export LD_LIBRARY_PATH=lib:/opt/ffmpeg/lib 
+export LD_LIBRARY_PATH=lib:/opt/ffmpeg/lib
 bin/mobile_client
 
 ---------------------------------------------------------------------------------------------------
@@ -53,5 +53,5 @@ make -C mobile_client/arm-bpi -f Makefile.debug -j12
 sudo cp -r build_environment/target-bpi/bin/debug/mobile_client /bpi/opt/networkoptix/lite_client/bin/
 
 # Rebuild and install nx_media:
-make -C common_libs/nx_media/arm-bpi -f Makefile.debug -j12
+make -C vms/libs/nx_media/arm-bpi -f Makefile.debug -j12
 sudo cp -r build_environment/target-bpi/lib/debug/libnx_media* /bpi/opt/networkoptix/lite_client/lib/
