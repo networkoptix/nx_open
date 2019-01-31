@@ -48,6 +48,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include <helpers/system_helpers.h>
 
@@ -73,6 +74,9 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
     m_view->rootContext()->setContextProperty(lit("context"), this);
     m_view->setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
     m_view->setResizeMode(QQuickView::SizeRootObjectToView);
+
+    connect(m_view, &QQuickWindow::colorChanged,
+        this, &QnWorkbenchWelcomeScreen::backgroundColorChanged);
 
     if (m_view->status() == QQuickView::Error)
     {
@@ -191,6 +195,19 @@ void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
     qnStartupTileManager->skipTileAction(); //< available only on first show
 
     action(action::EscapeHotkeyAction)->setEnabled(true);
+}
+
+void QnWorkbenchWelcomeScreen::changeEvent(QEvent* event)
+{
+    if (event->type() == QEvent::PaletteChange)
+        m_view->setColor(palette().color(QPalette::Window));
+
+    base_type::changeEvent(event);
+}
+
+QColor QnWorkbenchWelcomeScreen::backgroundColor() const
+{
+    return m_view->color();
 }
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
@@ -416,7 +433,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 }
 
 void QnWorkbenchWelcomeScreen::connectToCloudSystem(
-    const QString& systemId, 
+    const QString& systemId,
     const QString& serverUrl)
 {
     if (!isLoggedInToCloud())

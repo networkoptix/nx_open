@@ -10,7 +10,7 @@ Rectangle
 {
     id: control;
 
-    color: ColorTheme.window;
+    color: context.backgroundColor;
 
     readonly property bool active: Window.visibility !== Window.Hidden
 
