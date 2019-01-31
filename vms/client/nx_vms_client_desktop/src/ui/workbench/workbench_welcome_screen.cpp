@@ -48,7 +48,6 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include <helpers/system_helpers.h>
 
