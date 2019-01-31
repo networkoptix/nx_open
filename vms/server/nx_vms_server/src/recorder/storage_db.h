@@ -67,8 +67,9 @@ private:
     std::unique_ptr<QIODevice> m_ioDevice;
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
+    UuidToHash m_dbUuidToHash;
     bool m_vacuumInProgress = false;
-    nx::media_db::DBRecordQueue m_dbRecordQueue;
+    std::list<nx::media_db::DBRecord> m_cachedDbRecords;
     nx::network::aio::Timer m_timer;
     std::chrono::seconds m_vacuumInterval;
 
@@ -89,14 +90,12 @@ private:
     void processDbContent(
         nx::media_db::DbReader::Data& parsedData,
         QVector<DeviceFileCatalogPtr> *deviceFileCatalog,
-        ByteStreamWriter& writer,
-        UuidToHash* outUuidToHash);
+        ByteStreamWriter& writer);
     void putRecordsToCatalog(
         QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
         int cameraId,
         int catalogIndex,
-        std::deque <DeviceFileCatalog::Chunk> chunks,
-        const UuidToHash& uuidToHash);
+        std::deque <DeviceFileCatalog::Chunk> chunks);
     DeviceFileCatalog::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
     bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
     QByteArray dbFileContent();
@@ -105,6 +104,7 @@ private:
         QVector<DeviceFileCatalogPtr> *data = nullptr);
     void writeOrCache(const nx::media_db::DBRecord& dbRecord);
     void onVacuumFinished(bool success);
+    void mergeUuidToHashes();
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

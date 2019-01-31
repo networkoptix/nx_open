@@ -798,11 +798,11 @@ TEST_F(MediaDbTest, StorageDB)
 
     QnMutex mutex;
     std::vector<nx::utils::thread> threads;
-    TestChunkManager tcm(128);
+    TestChunkManager tcm(100);
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < 300; ++i)
         {
             int diceRoll = nx::utils::random::number(0, 10);
             switch (diceRoll)
@@ -849,7 +849,7 @@ TEST_F(MediaDbTest, StorageDB)
     QVector<DeviceFileCatalogPtr> dbChunkCatalogs;
     auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         for (size_t i = 0; i < 10; ++i)
         {
             sdb.loadFullFileCatalog();
