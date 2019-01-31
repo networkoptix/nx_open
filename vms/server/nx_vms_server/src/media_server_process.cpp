@@ -3497,6 +3497,7 @@ void MediaServerProcess::stopObjects()
         };
 
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
+    m_universalTcpListener->stop();
     serverModule()->stop();
 
     m_generalTaskTimer.reset();
@@ -3537,17 +3538,11 @@ void MediaServerProcess::stopObjects()
     m_ipDiscovery.reset(); // stop it before IO deinitialized
     m_multicastHttp.reset();
 
-    if (m_universalTcpListener)
-        m_universalTcpListener->pleaseStop();
-
     if (const auto manager = commonModule()->moduleDiscoveryManager())
         manager->stop();
 
     if (m_universalTcpListener)
-    {
-        m_universalTcpListener->stop();
         m_universalTcpListener.reset();
-    }
 
     serverModule()->resourceCommandProcessor()->stop();
     if (m_initStoragesAsyncPromise)
