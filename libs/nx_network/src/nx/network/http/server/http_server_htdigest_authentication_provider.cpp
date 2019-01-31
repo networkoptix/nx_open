@@ -1,5 +1,7 @@
 #include "http_server_htdigest_authentication_provider.h"
 
+#include <nx/utils/system_error.h>
+
 namespace nx::network::http::server {
 
 HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(const std::string& filePath)
@@ -10,11 +12,12 @@ HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(const std::string
     std::ifstream file(filePath);
     if (!file.is_open())
     {
-        NX_ERROR(this, lm("Failed to open htdigest file: %1").arg(filePath));
+        NX_ERROR(this, lm("Failed to open htdigest file: %1. Reason: %2. Authentication will fail.")
+            .arg(filePath).arg(SystemError::getLastOSErrorText()));
         return;
     }
 
-    NX_INFO(this, lm("Opening htdigest file to load credentials: %1").arg(filePath));
+    NX_INFO(this, lm("Loading htdigest credentials from file: %1").arg(filePath));
 
     load(file);
     file.close();
@@ -80,7 +83,7 @@ void HtdigestAuthenticationProvider::load(std::istream& input)
     }
 
     if (lineNumber == 1)
-        NX_WARNING(this, lm("Empty htdigest file provided, authentication will fail"));
+        NX_WARNING(this, lm("Empty htdigest file provided, authentication will fail."));
 }
 
 } // namespace nx::network::http::server
