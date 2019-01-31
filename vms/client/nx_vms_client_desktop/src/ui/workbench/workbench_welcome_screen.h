@@ -30,8 +30,6 @@ class QnWorkbenchWelcomeScreen: public Connective<QWidget>, public QnWorkbenchCo
 
     Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor NOTIFY backgroundColorChanged)
-
 public:
     QnWorkbenchWelcomeScreen(QWidget* parent = nullptr);
 
@@ -67,8 +65,6 @@ public: // Properties
     void setMessage(const QString& message);
 
     QString message() const;
-
-    QColor backgroundColor() const;
 
     void activateView() const;
 
@@ -128,8 +124,6 @@ signals:
     void globalPreloaderVisibleChanged();
 
     void messageChanged();
-
-    void backgroundColorChanged();
 
     void openTile(const QString& systemId);
 

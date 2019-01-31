@@ -74,9 +74,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
     m_view->setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
     m_view->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    connect(m_view, &QQuickWindow::colorChanged,
-        this, &QnWorkbenchWelcomeScreen::backgroundColorChanged);
-
     if (m_view->status() == QQuickView::Error)
     {
         for (const auto& error: m_view->errors())
@@ -202,11 +199,6 @@ void QnWorkbenchWelcomeScreen::changeEvent(QEvent* event)
         m_view->setColor(palette().color(QPalette::Window));
 
     base_type::changeEvent(event);
-}
-
-QColor QnWorkbenchWelcomeScreen::backgroundColor() const
-{
-    return m_view->color();
 }
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
