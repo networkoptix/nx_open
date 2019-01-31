@@ -100,10 +100,6 @@ void GenericTransport::sendTransaction(
     CommandTransportHeader transportHeader,
     const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer)
 {
-    transportHeader.vmsTransportHeader.fillSequence(
-        m_localPeer.id,
-        m_localPeer.instanceId);
-
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
