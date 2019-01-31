@@ -60,10 +60,12 @@ View::View(
     m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
     m_authenticationManager(m_authRestrictionList),
     m_multiAddressHttpServer(
-        &m_authenticationManager,
-        &m_httpMessageDispatcher)
+        &m_authenticationDispatcher,
+        &m_httpMessageDispatcher),
+    m_maintenanceAuthenticator(m_settings.http().maintenanceHtdigestPath)
 {
     registerApiHandlers();
+    registerAuthenticators();
     initializeProxy();
     loadSslCertificate();
     startAcceptor();
@@ -113,6 +115,15 @@ std::vector<network::SocketAddress> View::httpsEndpoints() const
 const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
 {
     return m_multiAddressHttpServer;
+}
+
+void View::registerAuthenticators()
+{
+    m_authenticationDispatcher.add(
+        std::regex(m_maintenanceServer.maintenancePath() + "/.*"),
+        &m_maintenanceAuthenticator.manager);
+
+    m_authenticationDispatcher.add(std::regex(".*"), &m_authenticationManager);
 }
 
 void View::registerApiHandlers()
