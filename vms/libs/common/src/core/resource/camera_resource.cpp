@@ -24,6 +24,8 @@
 #include <utils/math/math.h>
 #include <nx/utils/log/log_main.h>
 
+#include <nx/analytics/device_descriptor_manager.h>
+
 namespace {
 
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
@@ -505,11 +507,18 @@ const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
         ->resourcePool()
         ->getResources<nx::vms::common::AnalyticsEngineResource>();
 
-    const auto sharedThis = toSharedPointer(this);
+    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
+    const auto compatibleEngines =
+        deviceDescriptorManager.compatibleEngineIds(toSharedPointer(this));
+
     for (const auto& engineResource: engineResources)
     {
-        if (engineResource->isEngineEnabledForDevice(sharedThis))
-            enabledEngines.insert(engineResource->getId());
+        if (!engineResource->isDeviceDependent())
+            continue;
+
+        const auto engineId = engineResource->getId();
+        if (compatibleEngines.find(engineResource->getId()) != compatibleEngines.cend())
+            enabledEngines.insert(engineId);
     }
 
     return enabledEngines;
