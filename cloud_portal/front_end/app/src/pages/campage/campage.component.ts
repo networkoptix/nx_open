@@ -104,7 +104,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterResolutions() {
-        this.resolutions = JSON.parse(this.config.supportedResolutions.replace(/[]/g, '').split(','));
+        this.resolutions = JSON.parse(this.config.supportedResolutions.replace(/u/g, '').replace(/'/g, '"'));
 
         this.filterModel.selects = [
             {
@@ -167,7 +167,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterTypes() {
-        this.hardwareTypes = JSON.parse(this.config.supportedHardwareTypes.replace(/[]/g, '').split(','));
+        this.hardwareTypes = JSON.parse(this.config.supportedHardwareTypes.replace(/u'/g, '"').replace(/'/g, '"'));
         this.hardwareTypes.forEach(type => {
             type.label = this.lang[type.label];
         });

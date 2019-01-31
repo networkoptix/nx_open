@@ -77,7 +77,7 @@ export class CamTableComponent implements OnChanges, OnInit {
           this.lang.maxFps,
           this.lang.primaryCodecamera,
           this.lang.isAudioSupported,
-          this.lang.isPtzSupportedShort,
+          this.lang.isAptzSupportedShort,
           this.lang.isFisheye,
           this.lang.isMdSupported,
           this.lang.isIoSupported
@@ -209,7 +209,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         if (changes.allowedParameters) {
             this.filterAllowedParams();
             this.toggleHeaderCaption('isTwAudioSupported', this.lang.isAudioSupported, this.lang.isTwAudioSupported);
-            this.toggleHeaderCaption('isAptzSupported', this.lang.isPtzSupported, this.lang.isAptzSupported);
+            this.toggleHeaderCaption('isAptzSupported', this.lang.isPtzSupported, this.lang.isAptzSupportedShort);
 
             this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
             this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
