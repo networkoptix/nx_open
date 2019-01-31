@@ -4,12 +4,20 @@ namespace nx::network::http::server {
 
 HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(const std::string& filePath)
 {
+    if (filePath.empty())
+        return;
+
     std::ifstream file(filePath);
-    if (file.is_open())
+    if (!file.is_open())
     {
-        load(file);
-        file.close();
+        NX_ERROR(this, lm("Failed to open htdigest file: %1").arg(filePath));
+        return;
     }
+
+    NX_INFO(this, lm("Opening htdigest file to load credentials: %1").arg(filePath));
+
+    load(file);
+    file.close();
 }
 
 HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(std::istream& input)
@@ -39,7 +47,7 @@ void HtdigestAuthenticationProvider::getPasswordByUserName(
 void HtdigestAuthenticationProvider::load(std::istream& input)
 {
     std::string line;
-    while (std::getline(input, line))
+    for (int lineNumber = 1; std::getline(input, line); ++lineNumber)
     {
         // Each line is expected to be of the form:
         // someuser:realm:c30b86d219198b1ada5b63fbfa0818e3
@@ -48,13 +56,19 @@ void HtdigestAuthenticationProvider::load(std::istream& input)
 
         std::size_t colon = line.find(':');
         if (colon == std::string::npos)
+        {
+            NX_ERROR(this, lm("Malformed line: missing ':' on line: %1").arg(lineNumber));
             continue;
+        }
 
         std::string userName = line.substr(0, colon);
 
         colon = line.find(':', colon + 1);
         if (colon == std::string::npos || colon >= line.size() - 1)
+        {
+            NX_ERROR(this, lm("Malformed line: missing second ':' on line: %1").arg(lineNumber));
             continue;
+        }
 
         std::string digest = line.substr(colon + 1);
 
