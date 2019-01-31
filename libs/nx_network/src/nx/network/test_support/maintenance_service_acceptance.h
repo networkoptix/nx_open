@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "functional_tests/mediator_functional_test.h"
-
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>
@@ -23,17 +21,43 @@ static const std::pair<const char*, const char*> kInvalidUserAndPassword("unknow
 
 } // namespace
 
+/**
+ * GTest template for maintenance server authentication tests.
+ *
+ * In unit_test.cpp file, put the following:
+ *
+ * <code>
+ * struct MaintenanceTypeSetImplementation
+ * {
+ *     static const char* apiPrefix;
+ *     using BaseType = SomeParentClass;
+ * };
+ *
+ * using namespace nx::network::test;
+ * INSTANTIATE_TYPED_TEST_CASE_P(
+ *    SomeTestPrefix,                    //< Can be anything
+ *    MaintenanceServiceAcceptance,      //< Do not change
+ *    MaintenanceTypeSetImplementation); //< Must match the struct name above
+ * </code>
+ *
+ * NOTE: SomeParentClass must:
+ *    - implement `void addArg(const char *)` method
+ *    - implement `QString testDataDir() const` method
+ *    - implement `bool startAndWaitUntilStarted()` method
+ *    - implement `nx::network::SocketAddress httpEndpoint() const` method
+ */
 template<typename MaintenanceTypeSet>
 class MaintenanceServiceAcceptance:
-    public MaintenanceTypeSet::BaseType
+    public MaintenanceTypeSet::BaseType,
+    public testing::Test
 {
 protected:
     virtual void SetUp() override
     {
-        QString htdigestPath = testDataDir() + "/htdigest.txt";
+        std::string htdigestPath = testDataDir().toStdString() + "/htdigest.txt";
         ASSERT_TRUE(writeCredentials(htdigestPath));
 
-        addArg(lm("--http/maintenanceHtdigestPath=%1").arg(htdigestPath).toUtf8().constData());
+        addArg((std::string("--http/maintenanceHtdigestPath=") + htdigestPath).c_str());
 
         ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -99,9 +123,9 @@ protected:
             nx::network::http::Ha1AuthToken(userAndPassword.second)));
     }
 
-    bool writeCredentials(const QString& filePath)
+    bool writeCredentials(const std::string& filePath)
     {
-        std::ofstream output(filePath.toStdString(), std::ofstream::out);
+        std::ofstream output(filePath, std::ofstream::out);
         if (!output.is_open())
             return false;
 
