@@ -1,6 +1,6 @@
 import json
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from cloud import settings
 from api.helpers.exceptions import api_success, handle_exceptions
