@@ -472,7 +472,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.wearableMotion = {};
     state.devicesCount = cameras.size();
     state.audioEnabled = {};
-    state.generalTabAlert.reset();
     state.recordingHint = {};
     state.recordingAlert = {};
     state.motionAlert = {};
@@ -1381,15 +1380,7 @@ State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State 
     if (state.devicesDescription.isWearable != CombinedValue::All)
         return state;
 
-    state.wearableMotion.enabled.resetUser();
-
-    // Display warning only if MD was disabled and it is enabled now.
-    const bool shouldDisplayWarning = value && !state.wearableMotion.enabled.get();
     state.wearableMotion.enabled.setUser(value);
-    if (shouldDisplayWarning)
-        state.generalTabAlert = State::GeneralTabAlert::wearableMotionDetection;
-    else
-        state.generalTabAlert.reset();
     state.hasChanges = true;
     return state;
 }
