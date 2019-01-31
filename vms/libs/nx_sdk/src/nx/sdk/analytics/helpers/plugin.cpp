@@ -34,6 +34,7 @@ const char* Plugin::name() const
 
 void Plugin::setUtilityProvider(IUtilityProvider* utilityProvider)
 {
+    utilityProvider->addRef();
     m_utilityProvider.reset(utilityProvider);
 }
 
