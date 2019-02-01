@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <test_support/utils.h>
 #include <transaction/message_bus_adapter.h>
+#include <nx/p2p/p2p_message_bus.h>
 
 namespace {
 
@@ -132,6 +133,20 @@ void MediaServerLauncher::run()
     m_mediaServerProcess->run();
 }
 
+void MediaServerLauncher::setLowDelayIntervals()
+{
+    const auto connection = serverModule()->ec2Connection();
+    auto bus = connection->messageBus()->dynamicCast<nx::p2p::MessageBus*>();
+    if (bus)
+    {
+        auto intervals = bus->delayIntervals();
+        intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
+        intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+        intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
+        bus->setDelayIntervals(intervals);
+    }
+}
+
 bool MediaServerLauncher::start()
 {
     prepareToStart();
@@ -160,6 +175,7 @@ bool MediaServerLauncher::start()
     if (result != std::future_status::ready)
         return false;
 
+    setLowDelayIntervals();
     while (m_mediaServerProcess->getTcpPort() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 

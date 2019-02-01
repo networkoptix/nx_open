@@ -78,6 +78,7 @@ public:
 signals:
     void started();
 private:
+    void setLowDelayIntervals();
     void prepareToStart();
     void fillDefaultSettings();
 
