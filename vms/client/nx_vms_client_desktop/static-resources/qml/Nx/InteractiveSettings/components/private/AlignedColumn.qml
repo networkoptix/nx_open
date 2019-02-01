@@ -6,7 +6,9 @@ Column
 
     spacing: 8
 
-    onChildrenChanged:
+    onChildrenChanged: alignCaptions()
+
+    function alignCaptions()
     {
         var maxWidth = 0
 
@@ -14,7 +16,10 @@ Column
         {
             var item = children[i]
             if (item.hasOwnProperty("implicitCaptionWidth"))
+            {
+                item.implicitCaptionWidthChanged.connect(alignCaptions)
                 maxWidth = Math.max(maxWidth, item.implicitCaptionWidth)
+            }
         }
 
         maxWidth = Math.min(maxWidth, maxCaptionWidth)
