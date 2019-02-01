@@ -14,8 +14,10 @@ namespace {
 static const std::pair<const char*, const char*> kValidUserAndPassword(
     "valid_user",
     "7ab592129c1345326c0cea345e71170a");
-
 static const std::pair<const char*, const char*> kInvalidUserAndPassword("unknown_user", "");
+
+static constexpr char kMaintenanceHtdigestPathArg[] = "--http/maintenanceHtdigestPath=";
+static constexpr char kHtdigestFile[] = "/htdigest.txt";
 
 } // namespace
 
@@ -158,10 +160,10 @@ private:
     virtual void loadHtdigestFile() override
     {
         // Give a file path and write credentials.
-        std::string htdigestPath = this->testDataDir().toStdString() + "/htdigest.txt";
+        std::string htdigestPath = this->testDataDir().toStdString() + kHtdigestFile;
         ASSERT_TRUE(this->writeCredentials(htdigestPath));
 
-        this->addArg((std::string("--http/maintenanceHtdigestPath=") + htdigestPath).c_str());
+        this->addArg((std::string(kMaintenanceHtdigestPathArg) + htdigestPath).c_str());
     }
 
     bool writeCredentials(const std::string& filePath) const
@@ -279,8 +281,8 @@ private:
     virtual void loadHtdigestFile() override
     {
         // Give a file path but do not write any credentials.
-        std::string htdigestPath = this->testDataDir().toStdString() + "/htdigest.txt";
-        this->addArg((std::string("--http/maintenanceHtdigestPath=") + htdigestPath).c_str());
+        std::string htdigestPath = this->testDataDir().toStdString() + kHtdigestFile;
+        this->addArg((std::string(kMaintenanceHtdigestPathArg) + htdigestPath).c_str());
     }
 };
 
