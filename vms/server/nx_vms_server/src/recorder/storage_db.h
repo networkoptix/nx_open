@@ -72,6 +72,7 @@ private:
     std::list<nx::media_db::DBRecord> m_cachedDbRecords;
     nx::network::aio::Timer m_timer;
     std::chrono::seconds m_vacuumInterval;
+    bool m_firstVacuum = true;
 
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();

@@ -676,7 +676,7 @@ private:
     //}
 };
 
-TEST_F(MediaDbWriteRead, correctness)
+TEST_F(MediaDbWriteRead, WrittenReadConsistency)
 {
     whenSomeRecordsAreWrittenToTheDb();
     thenAllShouldBeRetrievedCorrectly();

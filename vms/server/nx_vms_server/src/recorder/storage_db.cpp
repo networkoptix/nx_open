@@ -616,13 +616,19 @@ void QnStorageDb::processDbContent(
     for (const auto& cameraData : parsedData.cameras)
     {
         int index = cameraData.getCameraId() * 2;
-        //if (parsedData.addRecords[index].empty() && parsedData.addRecords[index + 1].empty())
-        //    continue;
+        if (m_firstVacuum
+            && parsedData.addRecords[index].empty()
+            && parsedData.addRecords[index + 1].empty())
+        {
+            continue;
+        }
 
         m_dbUuidToHash.insert(UuidToHash::value_type(
             cameraData.getCameraUniqueId(), cameraData.getCameraId()));
         cameraData.serialize(writer);
     }
+
+    m_firstVacuum = false;
 
     for (auto itr = parsedData.addRecords.begin(); itr != parsedData.addRecords.end(); ++itr)
     {
