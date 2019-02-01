@@ -24,7 +24,6 @@ Server::Server(
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
-    m_htdigestAuthenticator(settings.http().maintenanceHtdigestPath),
     m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
     m_holePunchingProcessor(holePunchingProcessor)
 {
@@ -150,9 +149,11 @@ bool Server::launchHttpServerIfNeeded(
             lm("htdigest authentication for connection mediator maintenance server enabled. File path: %1")
                 .arg(m_settings.http().maintenanceHtdigestPath));
 
+        m_maintenanceAuthenticator.initialize(m_settings.http().maintenanceHtdigestPath);
+
         m_authenticationDispatcher.add(
             std::regex(m_maintenanceServer.maintenancePath() + "/.*"),
-            &m_htdigestAuthenticator.manager);
+            m_maintenanceAuthenticator.manager.get());
     }
 
     return true;
