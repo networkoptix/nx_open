@@ -568,7 +568,8 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         return;
 
     // We poll all our tools for new information. Then we update UI if there are any changes
-    if (m_updateCheck.valid() && m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+    if (m_updateCheck.valid()
+        && m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
     {
         auto checkResponse = m_updateCheck.get();
         NX_VERBOSE(this) << "atUpdateCurrentState got update info:"

@@ -143,6 +143,7 @@ private:
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
 
 private:
     QQuickView* m_view = nullptr;
