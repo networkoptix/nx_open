@@ -34,7 +34,7 @@ class AbstractCloudUserInfoPool;
 class CdbNonceFetcher:
     public auth::AbstractNonceProvider,
     public QObject,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
 public:
     /**

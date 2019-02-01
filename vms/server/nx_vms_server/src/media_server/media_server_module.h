@@ -75,7 +75,7 @@ namespace nx::vms::server {
 namespace nx::vms::server::resource { class SharedContextPool; }
 namespace nx::vms::server::camera { class ErrorProcessor; }
 
-class QnMediaServerModule : public QObject, public QnInstanceStorage
+class QnMediaServerModule : public QObject, public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT;
 
@@ -85,7 +85,6 @@ public:
         std::unique_ptr<MSSettings> serverSettings = nullptr,
         QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
-
 
     void stop();
     using QnInstanceStorage::instance;

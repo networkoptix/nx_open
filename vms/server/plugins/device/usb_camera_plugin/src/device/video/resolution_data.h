@@ -12,7 +12,7 @@ struct ResolutionData
     // Resolution
     int width;
     int height;
-    
+
     // Maximum frames per second
     float fps;
 

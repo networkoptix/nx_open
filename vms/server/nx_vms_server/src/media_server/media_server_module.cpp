@@ -185,7 +185,8 @@ QnMediaServerModule::QnMediaServerModule(
     {
         soapServer = store(new QnSoapServer());
         soapServer->bind();
-        soapServer->start();     //starting soap server to accept event notifications from onvif cameras
+        // Starting soap server to accept event notifications from onvif cameras
+        soapServer->start();
     }
 #endif //ENABLE_ONVIF
 
@@ -235,14 +236,17 @@ QnMediaServerModule::QnMediaServerModule(
         new QnStorageManager(
             this,
             m_analyticsEventsStorage.get(),
-            QnServer::StoragePool::Normal
+            QnServer::StoragePool::Normal,
+            "normalStorageManager"
         ));
 
    m_context->backupStorageManager.reset(
         new QnStorageManager(
             this,
             nullptr,
-            QnServer::StoragePool::Backup
+            QnServer::StoragePool::Backup,
+            "backupStorageManager"
+
         ));
 
     const bool isRootToolEnabled = !settings().ignoreRootTool();
@@ -510,7 +514,7 @@ QnResourcePool* QnMediaServerModule::resourcePool() const
 
 QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
 {
-    return commonModule()->propertyDictionary();
+    return commonModule()->resourcePropertyDictionary();
 }
 
 QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const

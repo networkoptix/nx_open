@@ -228,6 +228,12 @@ void CommonHttpConnection::forwardTransactionToProcessor(
 {
     NX_CRITICAL(isInSelfAioThread());
 
+    // NOTE: Transport sequence MUST be valid for compatibility with VMS <= 3.2.
+    // Although, it is not used by this implementation.
+    if (m_prevReceivedTransportSequence)
+        NX_ASSERT(transportHeader.sequence > *m_prevReceivedTransportSequence);
+    m_prevReceivedTransportSequence = transportHeader.sequence;
+
     if (!m_gotTransactionEventHandler)
         return;
 

@@ -88,7 +88,7 @@ int Codec::initializeDecoder(AVCodecID codecId)
         return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
-    if(!m_codecContext)
+    if (!m_codecContext)
         return AVERROR(ENOMEM);
 
     return 0;
@@ -111,11 +111,11 @@ int Codec::initializeDecoder(const char * codecName)
 {
     close();
     m_codec = avcodec_find_decoder_by_name(codecName);
-    if(!m_codec)
+    if (!m_codec)
         return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
-    if(!m_codecContext)
+    if (!m_codecContext)
         return AVERROR(ENOMEM);
 
     return 0;
@@ -195,7 +195,7 @@ void Codec::flush()
     if (!avcodec_is_open(m_codecContext))
         return;
 
-    if(av_codec_is_decoder(m_codec))
+    if (av_codec_is_decoder(m_codec))
     {
         Frame frame;
         int returnCode = sendPacket(nullptr);

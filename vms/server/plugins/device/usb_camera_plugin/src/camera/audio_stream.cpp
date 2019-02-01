@@ -152,11 +152,11 @@ void AudioStream::AudioStreamPrivate::uninitialize()
 
 bool AudioStream::AudioStreamPrivate::ensureInitialized()
 {
-    if(!m_initialized)
+    if (!m_initialized)
     {
         m_initCode = initialize();
         checkIoError(m_initCode);
-        if(m_initCode < 0)
+        if (m_initCode < 0)
         {
             setLastError(m_initCode);
             if (m_ioError)
@@ -285,7 +285,7 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Fram
 
 int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
-    for(;;)
+    for (;;)
     {
         ffmpeg::Packet packet(m_inputFormat->audioCodecId(), AVMEDIA_TYPE_AUDIO);
 
@@ -323,10 +323,10 @@ int AudioStream::AudioStreamPrivate::resample(
     const ffmpeg::Frame * frame,
     ffmpeg::Frame * outFrame)
 {
-    if(!m_resampleContext)
+    if (!m_resampleContext)
     {
         m_initCode = initalizeResampleContext(frame);
-        if(m_initCode < 0)
+        if (m_initCode < 0)
         {
             m_terminated = true;
             setLastError(m_initCode);
@@ -334,7 +334,7 @@ int AudioStream::AudioStreamPrivate::resample(
         }
     }
 
-    if(!m_resampleContext)
+    if (!m_resampleContext)
         return m_initCode;
 
     return swr_convert_frame(
@@ -365,10 +365,10 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
         m_encoder->codecId(),
         AVMEDIA_TYPE_AUDIO);
 
-    for(;;)
+    for (;;)
     {
         // need to drain the the resampler periodically to avoid increasing audio delay
-        if(m_resampleContext && resampleDelay() > timePerVideoFrame())
+        if (m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
             *outFfmpegError = resample(nullptr, m_resampledFrame.get());
             if (*outFfmpegError < 0)
@@ -381,7 +381,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
                 return nullptr;
 
             *outFfmpegError = resample(m_decodedFrame.get(), m_resampledFrame.get());
-            if(*outFfmpegError < 0)
+            if (*outFfmpegError < 0)
                 return nullptr;
         }
 
@@ -425,7 +425,7 @@ uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
 {
-    if(auto cam = m_camera.lock())
+    if (auto cam = m_camera.lock())
         return cam->videoStream()->actualTimePerFrame();
     return std::chrono::milliseconds(0); //< Should never happen
 }
@@ -504,7 +504,7 @@ void AudioStream::setEnabled(bool enabled)
 {
     if (enabled)
     {
-        if(!m_streamReader)
+        if (!m_streamReader)
         {
             m_streamReader = std::make_unique<AudioStreamPrivate>(
                 m_url,

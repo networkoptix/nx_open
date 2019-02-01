@@ -32,7 +32,7 @@ static const char * ffmpegDeviceTypePlatformDependent()
 #ifdef _WIN32
 static bool isKeyFrame(const ffmpeg::Packet * packet)
 {
-    if(!packet)
+    if (!packet)
         return false;
 
     const quint8 * udata = static_cast<const quint8 *>(packet->data());
@@ -51,9 +51,7 @@ VideoStream::VideoStream(
     :
     m_camera(camera),
     m_codecParams(codecParams),
-    m_timeProvider(camera.lock()->timeProvider()),
-    m_packetCount(std::make_shared<std::atomic_int>(0)),
-    m_frameCount(std::make_shared<std::atomic_int>(0))
+    m_timeProvider(camera.lock()->timeProvider())
 {
 }
 
@@ -102,28 +100,12 @@ void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
     std::lock_guard<std::mutex> lock(m_threadStartMutex);
     m_packetConsumerManager.removeConsumer(consumer);
 
-    if (m_packetConsumerManager.empty() && m_frameConsumerManager.empty())
+    if (m_packetConsumerManager.empty())
         stop();
-}
-
-void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
-{
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    m_frameConsumerManager.addConsumer(consumer);
-    tryToStartIfNotStarted();
-}
-
-void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
-{
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    m_frameConsumerManager.removeConsumer(consumer);
 
     // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
-    if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
+    if (nx::utils::AppInfo::isRaspberryPi())
         setCameraState(csModified);
-
-    if (m_packetConsumerManager.empty() && m_frameConsumerManager.empty())
-        stop();
 }
 
 bool VideoStream::ioError() const
@@ -184,12 +166,8 @@ void VideoStream::run()
         if (!packet)
             continue;
 
-        auto frame = maybeDecode(packet.get());
-
         m_fpsCounter.update(std::chrono::milliseconds(m_timeProvider->millisSinceEpoch()));
         m_packetConsumerManager.givePacket(packet);
-        if (frame)
-            m_frameConsumerManager.giveFrame(frame);
     }
     uninitialize();
 }
@@ -210,7 +188,7 @@ bool VideoStream::ensureInitialized()
     {
         m_initCode = initialize();
         checkIoError(m_initCode);
-        if(m_initCode < 0)
+        if (m_initCode < 0)
         {
             setLastError(m_initCode);
             if (m_ioError)
@@ -229,45 +207,31 @@ int VideoStream::initialize()
     if (result < 0)
         return result;
 
-    result = initializeDecoder();
-    if (result < 0)
-        return result;
-
     setCameraState(csInitialized);
-
     return 0;
 }
 
 void VideoStream::uninitialize()
 {
-    // Flushing to reduce m_packetCount and m_frameCount before sleepy loop below.
+    // Some cameras segfault if they are unintialized while there are still packets, so need flush
     m_packetConsumerManager.flush();
-    m_frameConsumerManager.flush();
-
-    // Make sure not to keep m_mutex locked while sleeping here.
-
-    // Some cameras segfault if they are unintialized while there are still packets and / or frames
-    // allocated. They own the memory being referred to by the packet, so the packets / frames
-    // need to be deallocated first. Beware, any strong references to the packets should be
-    // released ASAP to avoid endless spinning here.
-    while (*m_packetCount > 0 || *m_frameCount > 0)
-    {
-        static constexpr std::chrono::milliseconds kSleep(30);
-        std::this_thread::sleep_for(kSleep);
-    }
-
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-
-        // flush the decoder to avoid memory ownership problems described above.
-        if (m_decoder)
-            m_decoder->flush();
-
-        m_decoder.reset(nullptr);
         m_inputFormat.reset(nullptr);
 
         setCameraState(csOff);
     }
+}
+
+AVCodecParameters* VideoStream::getCodecParameters()
+{
+    if (!m_inputFormat)
+        return nullptr;
+    AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
+    if (!stream)
+        return nullptr;
+
+    return stream->codecpar;
 }
 
 int VideoStream::initializeInputFormat()
@@ -310,7 +274,9 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     context->flags |= AVFMT_FLAG_NOBUFFER; //< Could be helpful for Linux too.
 
     if (m_codecParams.fps > 0)
+    {
         inputFormat->setFps(m_codecParams.fps);
+    }
 
     if (m_codecParams.resolution.width * m_codecParams.resolution.height > 0)
     {
@@ -322,7 +288,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
-        if(auto cam = m_camera.lock())
+        if (auto cam = m_camera.lock())
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::video::setBitrate(
@@ -331,34 +297,6 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
                 cam->compressionTypeDescriptor());
         }
     }
-}
-
-int VideoStream::initializeDecoder()
-{
-    auto decoder = std::make_unique<ffmpeg::Codec>();
-
-    int result;
-    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecId == AV_CODEC_ID_H264)
-    {
-        result = decoder->initializeDecoder("h264_mmal");
-    }
-    else
-    {
-        AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
-        result = stream
-            ? decoder->initializeDecoder(stream->codecpar)
-            : AVERROR_DECODER_NOT_FOUND; //< Using as stream not found.
-    }
-    if (result < 0)
-        return result;
-
-    result = decoder->open();
-    if (result < 0)
-        return result;
-
-    m_skipUntilNextKeyPacket = true;
-    m_decoder = std::move(decoder);
-    return 0;
 }
 
 std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
@@ -400,45 +338,6 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
     packet->setTimestamp(m_timeProvider->millisSinceEpoch());
 
     return packet;
-}
-
-std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * packet)
-{
-    if (m_frameConsumerManager.empty())
-        return nullptr;
-
-    if (m_skipUntilNextKeyPacket)
-    {
-        if (!packet->keyPacket())
-            return nullptr;
-        m_skipUntilNextKeyPacket = false;
-    }
-
-    auto frame = std::make_shared<ffmpeg::Frame>(m_frameCount);
-    int result = decode(packet, frame.get());
-    if (result < 0)
-        return nullptr;
-
-    if (frame->pts() == AV_NOPTS_VALUE)
-        frame->frame()->pts = frame->packetPts();
-
-    m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
-
-    auto nxTimestamp = m_timestamps.takeNxTimestamp(frame->packetPts());
-    if (!nxTimestamp.has_value())
-        nxTimestamp.emplace(m_timeProvider->millisSinceEpoch());
-
-    frame->setTimestamp(nxTimestamp.value());
-
-    return frame;
-}
-
-int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
-{
-    int result = m_decoder->sendPacket(packet->packet());
-    if(result == 0 || result == AVERROR(EAGAIN))
-        return m_decoder->receiveFrame(frame->frame());
-    return result;
 }
 
 void VideoStream::setFps(float fps)

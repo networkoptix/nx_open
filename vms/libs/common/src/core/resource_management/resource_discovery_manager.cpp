@@ -117,12 +117,6 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
     m_searchersList.push_back(serv);
 }
 
-void QnResourceDiscoveryManager::addDTSServer(QnAbstractDTSSearcher* serv)
-{
-    QnMutexLocker lock(&m_searchersListMutex);
-    m_dstList.push_back(serv);
-}
-
 void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
     QnMutexLocker lock(&m_searchersListMutex);

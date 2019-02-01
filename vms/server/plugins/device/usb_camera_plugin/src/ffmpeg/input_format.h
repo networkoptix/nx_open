@@ -31,7 +31,7 @@ public:
     int readFrame(AVPacket * packet);
 
     /**
-     * If formatContext()->flags was set with AVFMT_FLAG_NONBLOCK, then this function can be called to 
+     * If formatContext()->flags was set with AVFMT_FLAG_NONBLOCK, then this function can be called to
      * loop repeatedly for /a timeout milliseconds, with a 1 millisecond sleep between each attempt.
      * The default value is 0. if left at 0, then the function returns immediately.
      *
@@ -39,7 +39,7 @@ public:
      * @param timeout - the timeout specifying when to return in the event of repeated failure.
      */
     int readFrameNonBlock(
-        AVPacket * packet, 
+        AVPacket * packet,
         const std::chrono::milliseconds& timeout = std::chrono::milliseconds(0));
 
     AVCodecID videoCodecId() const;

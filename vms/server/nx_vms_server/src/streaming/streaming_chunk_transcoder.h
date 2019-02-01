@@ -31,7 +31,7 @@ class QnVideoCameraPool;
 class StreamingChunkTranscoder:
     public QObject,
     public nx::utils::TimerEventHandler,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT

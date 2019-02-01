@@ -205,7 +205,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     m_moduleInformation.realm = nx::network::AppInfo::realm();
 
-    m_dataPool = instance<QnResourceDataPool>();
+    m_resourceDataPool = instance<QnResourceDataPool>();
     m_engineVersion = nx::vms::api::SoftwareVersion(QnAppInfo::engineVersion());
 }
 
@@ -552,7 +552,7 @@ CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
     return m_cameraDriverRestrictionList;
 }
 
-QnResourceDataPool* QnCommonModule::dataPool() const
+QnResourceDataPool* QnCommonModule::resourceDataPool() const
 {
-    return m_dataPool;
+    return m_resourceDataPool;
 }

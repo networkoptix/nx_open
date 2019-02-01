@@ -72,7 +72,8 @@ private:
 private:
     QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
-    QSet<QnLongRunnable *> m_created, m_running;
+    QSet<QnLongRunnable*> m_created;
+    QSet<QnLongRunnable*> m_running;
 };
 
 //-------------------------------------------------------------------------------------------------
