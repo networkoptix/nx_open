@@ -578,6 +578,9 @@ protected:
         m_writer.setDevice(m_ioDevice.get());
         ASSERT_TRUE(media_db::MediaDbWriter::writeFileHeader(m_ioDevice.get(), 1));
         m_writer.start();
+
+        while (m_writer.systemThreadId() == 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
     void whenSomeRecordsAreWrittenToTheDb()
@@ -610,7 +613,8 @@ protected:
         reopenFile();
 
         DbReader::Data readData;
-        ASSERT_TRUE(DbReader::parse(m_ioDevice->readAll(), &readData));
+        const auto rawData = m_ioDevice->readAll();
+        ASSERT_TRUE(DbReader::parse(rawData, &readData));
         ASSERT_EQ(1, readData.header.getDbVersion());
         ASSERT_EQ(m_dbData.addRecords, readData.addRecords);
         ASSERT_EQ(m_dbData.cameras, readData.cameras);
@@ -930,6 +934,7 @@ TEST_F(MediaDbTest, ReplaceRecord)
     chunk.startTimeMs = 10;
     chunk.durationMs = 5;
     chunk.fileIndex = DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+    chunk.storageIndex = serverModule().storageDbPool()->getStorageIndex(storage);
 
     sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
     sdb->deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
@@ -946,10 +951,8 @@ TEST_F(MediaDbTest, ReplaceRecord)
 
     auto dbChunkCatalogs = sdb->loadFullFileCatalog();
 
-    ASSERT_EQ(3, dbChunkCatalogs.size());
+    ASSERT_EQ(1, dbChunkCatalogs.size());
     ASSERT_EQ(1, dbChunkCatalogs[0]->size());
-    ASSERT_EQ(0, dbChunkCatalogs[1]->size());
-    ASSERT_EQ(0, dbChunkCatalogs[2]->size());
 }
 
 } // namespace nx::media_db::test

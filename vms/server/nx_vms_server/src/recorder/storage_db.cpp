@@ -60,7 +60,6 @@ QnStorageDb::QnStorageDb(
     m_storage(s),
     m_storageIndex(storageIndex),
     m_dbWriter(new nx::media_db::MediaDbWriter),
-    m_ioDevice(nullptr),
     m_vacuumInterval(vacuumInterval)
 {
     using namespace nx::media_db;

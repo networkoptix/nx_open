@@ -63,8 +63,8 @@ private:
 
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
-    std::unique_ptr<nx::media_db::MediaDbWriter> m_dbWriter;
     std::unique_ptr<QIODevice> m_ioDevice;
+    std::unique_ptr<nx::media_db::MediaDbWriter> m_dbWriter;
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
     std::chrono::seconds m_vacuumInterval;
