@@ -47,15 +47,14 @@ private:
     /** Provides htdigest authentication for maintenance server*/
     struct MaintenanceAuthenticator
     {
-        std::unique_ptr<nx::network::http::server::HtdigestAuthenticationProvider> provider;
-        std::unique_ptr<nx::network::http::server::BaseAuthenticationManager> manager;
+        nx::network::http::server::HtdigestAuthenticationProvider provider;
+        nx::network::http::server::BaseAuthenticationManager manager;
 
-        void initialize(const std::string& filePath)
+        MaintenanceAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
+            manager(&provider)
         {
-            provider = std::make_unique<nx::network::http::server::HtdigestAuthenticationProvider>(
-                filePath);
-            manager = std::make_unique<nx::network::http::server::BaseAuthenticationManager>(
-                provider.get());
+
         }
     };
 
@@ -66,7 +65,7 @@ private:
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
-    MaintenanceAuthenticator m_maintenanceAuthenticator;
+    std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
     network::maintenance::Server m_maintenanceServer;
 
     void loadSslCertificate();
