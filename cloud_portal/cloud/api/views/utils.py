@@ -27,8 +27,8 @@ def get_settings_from_cache():
     settings_cache_name = "{}_settings".format(product.customizations.first().name)
     settings_object = cache.get(settings_cache_name, None)
 
-    if not settings_object or 'version_id' not in settings_object\
-            or settings_object['version_id'] != product.version_id():
+    if not settings_object or "version_id" not in settings_object\
+            or settings_object["version_id"] != product.version_id():
         settings_object = {
             'footerItems': get_settings_from_db(product, "%FOOTER_ITEMS%"),
             'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
@@ -108,7 +108,8 @@ def downloads_history(request):
     # TODO: later we can check specific permissions
     can_view_releases = UserGroupsToProductPermissions.\
         check_customization_permission(request.user, settings.CUSTOMIZATION, 'api.can_view_release')
-    if not get_settings_from_db(get_cloud_portal_product(), "%PUBLIC_RELEASE_HISTORY%") and not can_view_releases:
+    public_release_history = get_settings_from_cache()['publicReleases']
+    if not public_release_history and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
@@ -125,10 +126,10 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not get_settings_from_db(get_cloud_portal_product(), "%PUBLIC_RELEASE_HISTORY%") and \
-            not UserGroupsToProductPermissions.check_customization_permission(request.user,
-                                                                              customization,
-                                                                              'api.can_view_release'):
+    public_release_history = get_settings_from_cache()['publicReleases']
+    can_view_releases = UserGroupsToProductPermissions.\
+        check_customization_permission(request.user, customization, 'api.can_view_release')
+    if not public_release_history and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
@@ -169,8 +170,8 @@ def download_build(request, build):
 def downloads(request):
     global_cache = caches['global']
     customization = settings.CUSTOMIZATION
-    if not get_settings_from_db(get_cloud_portal_product(), "%PUBLIC_DOWNLOADS%") and \
-            not request.user.is_authenticated:
+    public_downloads = get_settings_from_cache()['publicDownloads']
+    if not public_downloads and not request.user.is_authenticated:
         raise APIForbiddenException("Not authorized", ErrorCodes.not_authorized)
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
