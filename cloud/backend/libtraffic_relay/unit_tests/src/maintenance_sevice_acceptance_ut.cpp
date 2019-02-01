@@ -3,6 +3,7 @@
 #include <nx/network/test_support/maintenance_service_acceptance.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 
+
 namespace nx::cloud::relay::test {
 
 MaintenanceServiceBaseTypeImpl::MaintenanceServiceBaseTypeImpl():
@@ -42,20 +43,30 @@ std::vector<const char *> MaintenanceServiceBaseTypeImpl::argsAsConstCharPtr()
 
 //-------------------------------------------------------------------------------------------------
 
-struct TrafficeRelayMaintenanceTypeSet
+struct MaintenanceTypeSetImpl
 {
     static const char* apiPrefix;
     using BaseType = MaintenanceServiceBaseTypeImpl;
 };
 
-const char* TrafficeRelayMaintenanceTypeSet::apiPrefix = nx::cloud::relay::api::kApiPrefix;
+const char* MaintenanceTypeSetImpl::apiPrefix = nx::cloud::relay::api::kApiPrefix;
 
 using namespace nx::network::test;
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    TrafficeRelayMaintenance,
-    MaintenanceServiceAcceptance,
-    TrafficeRelayMaintenanceTypeSet);
+    TrafficeRelay,
+    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
+    MaintenanceTypeSetImpl);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    TrafficeRelay,
+    MaintenanceServiceAcceptanceWithNoHtdigestFile,
+    MaintenanceTypeSetImpl);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    TrafficeRelay,
+    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
+    MaintenanceTypeSetImpl);
 
 } // namespace nx::cloud::relay::test
 
