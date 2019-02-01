@@ -26,7 +26,7 @@ public:
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     int getStorageIndex(const QnStorageResourcePtr& storage);
     void removeSDB(const QnStorageResourcePtr &storage);
-    void addVacuumTask(nx::utils::MoveOnlyFunc<void()> vacuumTask);
+    void addTask(nx::utils::MoveOnlyFunc<void()> vacuumTask);
 
 private:
     mutable QnMutex m_sdbMutex;

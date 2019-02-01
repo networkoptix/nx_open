@@ -10,13 +10,13 @@
 
 #include <QElapsedTimer>
 
-#include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 
 #include "utils/media_db/media_db.h"
 
 #include "device_file_catalog.h"
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/utils/timer_manager.h>
 
 struct QStringHasher
 {
@@ -43,18 +43,18 @@ public:
 
     bool open(const QString& fileName);
 
-    bool deleteRecords(
+    void deleteRecords(
         const QString& cameraUniqueId,
         QnServer::ChunksCatalog catalog,
         qint64 startTimeMs = -1);
 
-    bool addRecord(const QString& cameraUniqueId,
+    void addRecord(const QString& cameraUniqueId,
                    QnServer::ChunksCatalog catalog,
                    const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    bool replaceChunks(const QString& cameraUniqueId,
+    void replaceChunks(const QString& cameraUniqueId,
                        QnServer::ChunksCatalog catalog,
                        const std::deque<DeviceFileCatalog::Chunk>& chunks);
 
@@ -67,12 +67,8 @@ private:
     std::unique_ptr<QIODevice> m_ioDevice;
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
-    UuidToHash m_dbUuidToHash;
-    bool m_vacuumInProgress = false;
-    std::list<nx::media_db::DBRecord> m_cachedDbRecords;
-    nx::network::aio::Timer m_timer;
     std::chrono::seconds m_vacuumInterval;
-    bool m_firstVacuum = true;
+    nx::utils::StandaloneTimerManager m_vacuumTimer;
 
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
@@ -96,16 +92,15 @@ private:
         QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
         int cameraId,
         int catalogIndex,
-        std::deque <DeviceFileCatalog::Chunk> chunks);
+        std::deque <DeviceFileCatalog::Chunk> chunks,
+        const UuidToHash& uuidToHash);
     DeviceFileCatalog::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
     bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
     QByteArray dbFileContent();
     void startVacuum(
         VacuumCompletionHandler completionHandler,
         QVector<DeviceFileCatalogPtr> *data = nullptr);
-    void writeOrCache(const nx::media_db::DBRecord& dbRecord);
     void onVacuumFinished(bool success);
-    void mergeUuidToHashes();
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

@@ -695,15 +695,13 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
-    auto sqlDb = std::unique_ptr<QSqlDatabase>(
-            new QSqlDatabase(
-                QSqlDatabase::addDatabase(
-                    lit("QSQLITE"),
-                    QString("QnStorageManager_%1").arg(fileName))));
+    auto sqlDb = QSqlDatabase::addDatabase(
+        lit("QSQLITE"),
+        QString("QnStorageManager_%1").arg(fileName));
 
-    sqlDb->setDatabaseName(fileName);
-    ASSERT_TRUE(sqlDb->open());
-    ASSERT_TRUE(nx::sql::SqlQueryExecutionHelper::execSQLFile(lit(":/01_create_storage_db.sql"), *sqlDb));
+    sqlDb.setDatabaseName(fileName);
+    ASSERT_TRUE(sqlDb.open());
+    ASSERT_TRUE(nx::sql::SqlQueryExecutionHelper::execSQLFile(lit(":/01_create_storage_db.sql"), sqlDb));
 
     const size_t kMaxCatalogs = 4;
     const size_t kMaxChunks = 50;
@@ -734,7 +732,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     {
         for (size_t j = 0; j < k23MaxChunks; ++j)
         {
-            QSqlQuery query(*sqlDb);
+            QSqlQuery query(sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
             DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunksUnsafe().at(j);
 
@@ -752,9 +750,9 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
     bool result;
 
-    auto connectionName = sqlDb->connectionName();
-    sqlDb->close();
-    sqlDb.reset();
+    auto connectionName = sqlDb.connectionName();
+    sqlDb.close();
+    sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
 
     auto sdb = serverModule().storageDbPool()->getSDB(storage);

@@ -8,6 +8,8 @@
 #include <media_server/media_server_module.h>
 #include <media_server/settings.h>
 
+const size_t kMaxTasksQueueSize = 5000;
+
 QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
@@ -117,9 +119,15 @@ void QnStorageDbPool::run()
     }
 }
 
-void QnStorageDbPool::addVacuumTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
+void QnStorageDbPool::addTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
 {
     QnMutexLocker lock(&m_tasksMutex);
+    if (m_tasksQueue.size() > kMaxTasksQueueSize)
+    {
+        NX_WARNING(this, "Tasks queue overflow. Dropping a task");
+        return;
+    }
+
     m_tasksQueue.push(std::move(vacuumTask));
     m_tasksWaitCondition.wakeOne();
 }
