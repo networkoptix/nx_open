@@ -475,7 +475,6 @@ import * as Hls from 'hls.js';
                         }
                         
                         function srcChanged() {
-                            debugger;
                             scope.loading = true; // source changed - start loading
                             scope.videoFlags.errorLoading = false;
                             
