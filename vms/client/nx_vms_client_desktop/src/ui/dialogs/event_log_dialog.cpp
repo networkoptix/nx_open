@@ -258,7 +258,6 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 
     for (const auto& [eventTypeId, eventTypeDescriptor]: allEventTypes)
     {
-
         if (eventTypeDescriptor.isHidden())
             continue;
 

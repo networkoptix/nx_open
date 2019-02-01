@@ -79,11 +79,10 @@ analytics::ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeD
 bool AnalyticsEngineResource::isDeviceDependent() const
 {
     const auto engineManifest = manifest();
-    return engineManifest.capabilities.testFlag(EngineManifest::Capability::deviceModelDependent);
+    return engineManifest.capabilities.testFlag(EngineManifest::Capability::deviceDependent);
 }
 
-bool AnalyticsEngineResource::isEnabledForDevice(
-    const QnVirtualCameraResourcePtr& device) const
+bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const
 {
     const auto engineId = getId();
     const auto userEnabledEngines = device->userEnabledAnalyticsEngines();
