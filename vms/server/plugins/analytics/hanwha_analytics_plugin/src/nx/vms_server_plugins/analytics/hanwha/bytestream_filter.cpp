@@ -1,10 +1,9 @@
 #include "bytestream_filter.h"
 
-#include <iostream>
+#include <nx/utils/log/log.h>
 
 #include "common.h"
 #include "string_helper.h"
-#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -32,7 +31,7 @@ BytestreamFilter::BytestreamFilter(
 
 bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
-    NX_ASSERT(m_handler, lit("No handler is set."));
+    NX_ASSERT(m_handler, "No handler is set.");
     if (!m_handler)
         return false;
 

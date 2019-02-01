@@ -18,7 +18,7 @@ public:
 
     virtual ~AbstractLogger() = default;
 
-    virtual std::set<Tag> tags() const = 0;
+    virtual std::set<Filter> filters() const = 0;
 
     /** Writes message to every writer if it is to be logged. */
     virtual void log(Level level, const Tag& tag, const QString& message) = 0;
@@ -33,7 +33,7 @@ public:
     virtual Level defaultLevel() const = 0;
     virtual void setDefaultLevel(Level level) = 0;
 
-    /** Custom levels for messages which tag starting with one of the filters. */
+    /** Custom levels for messages which tag matches one of the filters. */
     virtual LevelFilters levelFilters() const = 0;
     virtual void setLevelFilters(LevelFilters filters) = 0;
 

@@ -66,8 +66,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_speed(1.0),
     m_prevSpeed(1.0),
     m_pausedStart(false),
-    m_streamDataFilter(StreamDataFilter::mediaOnly),
-    m_prevStreamDataFilter(StreamDataFilter::mediaOnly),
+    m_streamDataFilter(StreamDataFilter::media),
+    m_prevStreamDataFilter(StreamDataFilter::media),
     m_outOfPlaybackMask(false),
     m_latPacketTime(DATETIME_NOW),
     m_stopCond(false)

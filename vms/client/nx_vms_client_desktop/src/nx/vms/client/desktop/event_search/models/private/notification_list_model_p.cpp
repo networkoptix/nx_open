@@ -127,7 +127,7 @@ NotificationListModel::Private::~Private()
 NotificationListModel::Private::ExtraData NotificationListModel::Private::extraData(
     const EventData& event)
 {
-    NX_ASSERT(event.extraData.canConvert<ExtraData>(), Q_FUNC_INFO);
+    NX_ASSERT(event.extraData.canConvert<ExtraData>());
     return event.extraData.value<ExtraData>();
 }
 
@@ -370,7 +370,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 {
     if (action->actionType() != vms::api::ActionType::showPopupAction)
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Invalid action type");
+        NX_ASSERT(false, "Invalid action type");
         return;
     }
 

@@ -46,13 +46,13 @@ void* MotionDataPicture::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int MotionDataPicture::addRef()
+int MotionDataPicture::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int MotionDataPicture::releaseRef()
+int MotionDataPicture::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

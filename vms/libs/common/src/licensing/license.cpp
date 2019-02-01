@@ -257,7 +257,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
         case Qn::LC_Start:
             return tr("Start Licenses");
         case Qn::LC_Free:
-            return tr("Free license");
+            return tr("Free Licenses");
         case Qn::LC_Bridge:
             return tr("Bridge Licenses");
         case Qn::LC_Invalid:
@@ -290,7 +290,7 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count)
         case Qn::LC_Start:
             return tr("%n Start Licenses", "", count);
         case Qn::LC_Free:
-            return tr("%n Free license", "", count);
+            return tr("%n Free Licenses", "", count);
         case Qn::LC_Bridge:
             return tr("%n Bridge Licenses", "", count);
         case Qn::LC_Invalid:
@@ -305,29 +305,41 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count, int total
     switch (licenseType)
     {
         case Qn::LC_Trial:
-            return tr("%n/%1 Time Licenses", "", count).arg(total);
+            return tr("%n/%1 Time Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Analog:
-            return tr("%n/%1 Analog Licenses", "", count).arg(total);
+            return tr("%n/%1 Analog Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Professional:
-            return tr("%n/%1 Professional Licenses", "", count).arg(total);
+            return tr("%n/%1 Professional Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Edge:
-            return tr("%n/%1 Edge Licenses", "", count).arg(total);
+            return tr("%n/%1 Edge Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_VMAX:
-            return tr("%n/%1 Vmax Licenses", "", count).arg(total);
+            return tr("%n/%1 Vmax Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_AnalogEncoder:
-            return tr("%n/%1 Analog Encoder Licenses", "", count).arg(total);
+            return tr("%n/%1 Analog Encoder Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_VideoWall:
-            return tr("%n/%1 Video Wall Licenses", "", count).arg(total);
+            return tr("%n/%1 Video Wall Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_IO:
-            return tr("%n/%1 I/O Module Licenses", "", count).arg(total);
+            return tr("%n/%1 I/O Module Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Start:
-            return tr("%n/%1 Start Licenses", "", count).arg(total);
+            return tr("%n/%1 Start Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Free:
-            return tr("%n/%1 Free license", "", count).arg(total);
+            return tr("%n/%1 Free Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Bridge:
-            return tr("%n/%1 Bridge Licenses", "", count).arg(total);
+            return tr("%n/%1 Bridge Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Invalid:
-            return tr("%n/%1 Invalid Licenses", "", count).arg(total);
+            return tr("%n/%1 Invalid Licenses",
+                "%n will be replaced by the total count", count).arg(total);
         default:
             return QString();
     }

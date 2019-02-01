@@ -681,7 +681,8 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
 
     if (stateString) {
         qint64 time = estimatedTimeSecs(tourModel.tour);
-        *stateString = tr("Tour Time: %1.").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
+        *stateString = tr("Tour Time: %1.").arg(
+            (time < 60) ? tr("less than a minute") : tr("about %n minutes", "", time / 60));
     }
     return ValidTour;
 }

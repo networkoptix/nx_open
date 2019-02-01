@@ -1,9 +1,7 @@
-#include <iostream>
-#include <nx/utils/log/log_main.h>
+#include "bytestream_filter.h"
 
 #include "common.h"
 #include "parser.h"
-#include "bytestream_filter.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 

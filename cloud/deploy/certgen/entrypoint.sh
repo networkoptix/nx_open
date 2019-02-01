@@ -32,6 +32,6 @@ do
     DOMAINS="$DOMAINS -d *.$domain"
 done
 
-certbot certonly -n --dns-route53 --agree-tos --email certgen@enk.me --server https://acme-v02.api.letsencrypt.org/directory $DOMAINS
+certbot certonly -n --dns-route53 --agree-tos --email devops@networkoptix.com --server https://acme-v02.api.letsencrypt.org/directory $DOMAINS
 
 cat /etc/letsencrypt/live/$MAIN/fullchain.pem /etc/letsencrypt/live/$MAIN/privkey.pem > /ssl/cert.pem

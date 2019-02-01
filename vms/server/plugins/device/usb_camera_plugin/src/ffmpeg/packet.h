@@ -16,8 +16,7 @@ class Packet
 public:
     Packet(
         AVCodecID codecId,
-        AVMediaType mediaType,
-        const std::shared_ptr<std::atomic_int>& packetCount = nullptr);
+        AVMediaType mediaType);
     ~Packet();
 
     int size() const;
@@ -31,7 +30,7 @@ public:
     void initialize();
     void unreference();
     int newPacket(int size);
-    
+
     AVCodecID codecId() const;
     AVMediaType mediaType() const;
 
@@ -43,7 +42,6 @@ public:
 private:
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
     AVMediaType m_mediaType = AVMEDIA_TYPE_UNKNOWN;
-    std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timestamp = 0;
     AVPacket* m_packet = nullptr;
 };

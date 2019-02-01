@@ -192,7 +192,7 @@ struct CameraSettingsDialog::Private: public QObject
             }
 
             default:
-                NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
+                NX_ASSERT(false, "Unsupported action request");
         }
     }
 

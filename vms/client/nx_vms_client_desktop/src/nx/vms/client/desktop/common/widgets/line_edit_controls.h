@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop {
 // A class that allows adding custom widgets to QLineEdit to the right of its text.
 // Replaces QLineEdit built-in actions system which has very low flexibility and usability.
 //
-// Custom widgets are added by addControl(s) and aligned from left to right.
+// Custom widgets are added by `addControls` and aligned from left to right.
 // Line edit's layout direction is honored, in case of RTL direction widgets are aligned from
 // right to left and the entire block is sticked to the left side of line edit.
 //

@@ -284,9 +284,9 @@ ErrorCode QnTransactionLog::saveToDB(
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("add transaction to log: %1 hash=%2"),
         tran.toString(), hash.toString());
 
-    NX_ASSERT(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    NX_ASSERT(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    NX_ASSERT(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
+    NX_ASSERT(!tran.peerID.isNull(), "Transaction ID MUST be filled!");
+    NX_ASSERT(!tran.persistentInfo.dbID.isNull(), "Transaction ID MUST be filled!");
+    NX_ASSERT(tran.persistentInfo.sequence, "Transaction sequence MUST be filled!");
     if (tran.peerID == m_dbManager->commonModule()->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->getID())
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 

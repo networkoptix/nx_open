@@ -30,7 +30,7 @@ public:
         }
     };
 
-    using LoggersByTag = std::map<Tag, Context>;
+    using LoggersByFilter = std::map<Filter, Context>;
 
 public:
     LoggerCollection();
@@ -43,12 +43,12 @@ public:
     void setMainLogger(std::unique_ptr<AbstractLogger> logger);
 
     /**
-     * Add a logger to the collection. 
+     * Add a logger to the collection.
      * If this logger has a tag that is already associated with another logger, the existing
      * logger/tag association is not overwritten and the new logger will not be associated with
      * the tag. To get the tags associated with a given logger, see getEffectiveTags().
      *
-     * @return The logger id if added successfully (at least one tag was not already taken), 
+     * @return The logger id if added successfully (at least one tag was not already taken),
      * -1 otherwise.
      */
     int add(std::shared_ptr<AbstractLogger> logger);
@@ -58,20 +58,20 @@ public:
     std::shared_ptr<AbstractLogger> get(int loggerId) const;
 
     /**
-     * Get all the tags associated with the given logger id.
-     * If multiple loggers are added with the same tag, only the first logger added is associated 
-     * with that tag.
+     * Get all the filters associated with the given logger id.
+     * If multiple loggers are added with the same filter, only the first logger added is
+     * associated with that filter.
      */
-    std::set<Tag> getEffectiveTags(int loggerId) const;
+    std::set<Filter> getEffectiveFilters(int loggerId) const;
 
     /**
      * Get all the loggers in this collection.
-     * If a logger has multiple tags associated with it, the data structure will contain the same 
+     * If a logger has multiple tags associated with it, the data structure will contain the same
      * logger multiple times. there are as many loggers as there are tags associated with it.
      */
-    LoggersByTag allLoggers() const;
+    LoggersByFilter allLoggers() const;
 
-    void remove(const std::set<Tag>& filters);
+    void remove(const std::set<Filter>& filters);
 
     void remove(int loggerId);
 
@@ -85,7 +85,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     std::shared_ptr<AbstractLogger> m_mainLogger;
-    std::map<Tag, Context> m_loggersByTags;
+    LoggersByFilter m_loggersByFilter;
     std::atomic<Level> m_maxLevel{Level::none};
     int m_loggerId = 0;
 };

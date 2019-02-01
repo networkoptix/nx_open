@@ -20,9 +20,9 @@ TranscodeStreamReader::TranscodeStreamReader(
     :
     StreamReaderPrivate(
         encoderIndex,
-        codecParams,
         camera),
-    m_videoFrameConsumer(new BufferedVideoFrameConsumer(m_camera->videoStream(), m_codecParams))
+    m_codecParams(codecParams),
+    m_videoFrameConsumer(new BufferedVideoFrameConsumer)
 {
     calculateTimePerFrame();
 }
@@ -32,7 +32,6 @@ TranscodeStreamReader::~TranscodeStreamReader()
     m_videoFrameConsumer->interrupt();
     // Avoid virtual removeVideoConsumer()
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
-    
     uninitialize();
 }
 
@@ -66,8 +65,7 @@ void TranscodeStreamReader::setFps(float fps)
 {
     if (m_codecParams.fps != fps)
     {
-        StreamReaderPrivate::setFps(fps);
-        m_videoFrameConsumer->setFps(fps);
+        m_codecParams.fps = fps;
         calculateTimePerFrame();
         m_encoderNeedsReinitialization = true;
     }
@@ -75,11 +73,10 @@ void TranscodeStreamReader::setFps(float fps)
 
 void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    if (m_codecParams.resolution.width != resolution.width 
-        || m_codecParams.resolution.height != resolution.height)
+    if (m_codecParams.resolution.width != resolution.width ||
+        m_codecParams.resolution.height != resolution.height)
     {
-        StreamReaderPrivate::setResolution(resolution);
-        m_videoFrameConsumer->setResolution(resolution);
+        m_codecParams.resolution = resolution;
         m_encoderNeedsReinitialization = true;
     }
 }
@@ -88,8 +85,7 @@ void TranscodeStreamReader::setBitrate(int bitrate)
 {
     if (m_codecParams.bitrate != bitrate)
     {
-        StreamReaderPrivate::setBitrate(bitrate);
-        m_videoFrameConsumer->setBitrate(bitrate);
+        m_codecParams.bitrate = bitrate;
         m_encoderNeedsReinitialization = true;
     }
 }
@@ -130,7 +126,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(const ffmp
     if (result < 0)
         return nullptr;
 
-    auto packet = std::make_shared<ffmpeg::Packet>(m_encoder->codecId(), AVMEDIA_TYPE_VIDEO);    
+    auto packet = std::make_shared<ffmpeg::Packet>(m_encoder->codecId(), AVMEDIA_TYPE_VIDEO);
 
     result = encode(m_scaledFrame.get(), packet.get());
     if (result < 0)
@@ -174,7 +170,7 @@ bool TranscodeStreamReader::waitForTimespan(
         for (const auto & k : audioTimeStamps)
             allTimestamps.insert(k);
 
-        bool shouldSleep = allTimestamps.empty() 
+        bool shouldSleep = allTimestamps.empty()
             || std::chrono::milliseconds(*allTimestamps.rbegin() - *allTimestamps.begin()) < timespan;
 
         if (shouldSleep)

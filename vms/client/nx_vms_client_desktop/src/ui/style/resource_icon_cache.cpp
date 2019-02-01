@@ -194,7 +194,7 @@ QIcon QnResourceIconCache::icon(Key key)
         const auto status = key & StatusMask;
         if (status != QnResourceIconCache::Online)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+            NX_ASSERT(false, "All icons should be pre-generated.");
         }
 
         result = m_cache.value(base);

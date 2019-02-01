@@ -126,10 +126,10 @@ public:
 
 AsyncClient::~AsyncClient()
 {
-    m_isTerminating = true;
     std::set<nx::network::http::AsyncHttpClientPtr> httpClients;
     {
         QnMutexLocker lk(&m_mutex);
+        m_isTerminating = true;
         std::swap(httpClients, m_httpClients);
     }
 
@@ -206,6 +206,7 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
         callback(Message());
     };
 
+    QnMutexLocker lk(&m_mutex);
     if (m_isTerminating)
         return;
 
@@ -215,7 +216,6 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
     QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         httpClient.get(), std::move(complete), Qt::DirectConnection);
 
-    QnMutexLocker lk(&m_mutex);
     m_httpClients.insert(httpClient);
     httpClient->doPost(url, "text/xml", request.toUtf8());
 }

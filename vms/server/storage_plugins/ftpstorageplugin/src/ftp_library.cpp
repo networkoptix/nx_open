@@ -630,12 +630,12 @@ void* FtpFileInfoIterator::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int FtpFileInfoIterator::addRef()
+int FtpFileInfoIterator::addRef() const
 {
     return p_addRef();
 }
 
-unsigned int FtpFileInfoIterator::releaseRef()
+int FtpFileInfoIterator::releaseRef() const
 {
     return p_releaseRef();
 }
@@ -961,12 +961,12 @@ void* FtpStorage::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int FtpStorage::addRef()
+int FtpStorage::addRef() const
 {
     return p_addRef();
 }
 
-unsigned int FtpStorage::releaseRef()
+int FtpStorage::releaseRef() const
 {
     return p_releaseRef();
 }
@@ -997,12 +997,12 @@ void* FtpStorageFactory::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int FtpStorageFactory::addRef()
+int FtpStorageFactory::addRef() const
 {
     return p_addRef();
 }
 
-unsigned int FtpStorageFactory::releaseRef()
+int FtpStorageFactory::releaseRef() const
 {
     return p_releaseRef();
 }
@@ -1322,12 +1322,12 @@ void* FtpIODevice::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int FtpIODevice::addRef()
+int FtpIODevice::addRef() const
 {
     return p_addRef();
 }
 
-unsigned int FtpIODevice::releaseRef()
+int FtpIODevice::releaseRef() const
 {
     return p_releaseRef();
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <third_party_storage.h>
+#include <storage/third_party_storage.h>
 #include <common.h>
 #include <detail/fs_stub.h>
 
@@ -13,12 +13,12 @@ enum class FileCategory
     infoTxt
 };
 
-class TestIODevice :
+class NX_TEST_STORAGE_PLUGIN_API TestIODevice :
     public nx_spl::IODevice,
     public PluginRefCounter<TestIODevice>
 {
 public:
-    TestIODevice(const std::string& name, FileCategory category, 
+    TestIODevice(const std::string& name, FileCategory category,
                  int mode, int64_t size = 0, FILE* f = nullptr);
     ~TestIODevice();
 public:
@@ -39,15 +39,15 @@ public:
     virtual uint32_t STORAGE_METHOD_CALL size(int* ecode) const override;
 
     virtual int STORAGE_METHOD_CALL seek(
-        uint64_t    pos, 
+        uint64_t    pos,
         int*        ecode
     ) override;
 
 public: // plugin interface implementation
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
 private:
     virtual uint32_t readImpl(void* dst, uint32_t size, int* ecode) const;

@@ -6,7 +6,8 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <nx/sdk/analytics/common/engine.h>
+#include <nx/sdk/uuid.h>
+#include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
@@ -14,7 +15,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
-class Engine: public nx::sdk::analytics::common::Engine
+class Engine: public nx::sdk::analytics::Engine
 {
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
@@ -23,7 +24,7 @@ public:
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
@@ -36,8 +37,8 @@ protected:
 
     virtual void executeAction(
         const std::string& actionId,
-        nxpl::NX_GUID objectId,
-        nxpl::NX_GUID deviceId,
+        nx::sdk::Uuid objectId,
+        nx::sdk::Uuid deviceId,
         int64_t timestampUs,
         const std::map<std::string, std::string>& params,
         std::string* outActionUrl,

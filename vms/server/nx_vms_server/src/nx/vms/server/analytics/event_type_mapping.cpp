@@ -12,7 +12,7 @@ static const std::initializer_list<
     boost::bimap<nx::vms::api::EventType, QString>::value_type> list = {
     {
         nx::vms::api::EventType::cameraInputEvent,
-        "nx.hanwha.cameraInput"
+        "nx.hanwha.AlarmInput"
     }
 };
 

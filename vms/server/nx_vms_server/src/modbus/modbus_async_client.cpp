@@ -130,6 +130,7 @@ namespace nx
 
         void QnModbusAsyncClient::onMessage(ModbusMessage message)
         {
+            NX_VERBOSE(this, "Received modbus message with function code [%1]", message.functionCode);
             emit done(message);
         }
 
@@ -147,6 +148,7 @@ namespace nx
             post(
                 [this, message = std::move(message)]()
             {
+                NX_VERBOSE(this, "Sending request with function code [%1]", message.functionCode);
                 m_pendingMessage = std::move(message);
                 m_hasPendingMessage = true;
 
@@ -162,6 +164,7 @@ namespace nx
             {
                 QnMutexLocker lock(&m_mutex);
                 m_lastErrorString = errorStr + lm(" Error code: %1").arg(errorCode);
+                NX_DEBUG(this, "Error: %1", m_lastErrorString);
             }
 
             emit error();

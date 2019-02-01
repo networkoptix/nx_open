@@ -70,7 +70,7 @@ bool QnDesktopCameraResource::isReadyToDetach() const
 }
 
 nx::vms::server::resource::StreamCapabilityMap
-    QnDesktopCameraResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex)
+    QnDesktopCameraResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex)
 {
     return nx::vms::server::resource::StreamCapabilityMap(); //< Not used.
 }

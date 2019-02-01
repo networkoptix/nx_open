@@ -21,8 +21,6 @@ public:
     StreamReader(CameraManager * cameraManager, int encoderNumber);
     virtual ~StreamReader();
 
-    // nxcip::PluginInterface
-
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
     // nxcip::StreamReader

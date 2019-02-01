@@ -455,7 +455,9 @@ void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
 
 void BaseRemoteArchiveSynchronizationTask::onEndOfRecording()
 {
-    NX_DEBUG(this, lit("Stopping recording from recorder. Got out of bounds packet."));
+    NX_DEBUG(this, "Stopping recording on out of bounds packet, imported %1 / %2",
+        m_importedDuration, m_totalDuration);
+
     if (m_archiveReader)
         m_archiveReader->pleaseStop();
 

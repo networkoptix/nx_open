@@ -115,14 +115,17 @@ private:
                 continue;
 
             const int total = helper.totalLicenses(type);
-            QString message = CameraSettingsLicenseWatcher::tr("%1 are used", "", used).arg(
-                QnLicense::displayText(type, used, total));
+            QString message = CameraSettingsLicenseWatcher::tr(
+                    "%1 are used",
+                    "Text like '5/10 Professional Licenses' will be substituted",
+                    used)
+                .arg(QnLicense::displayText(type, used, total));
 
             const int required = helper.requiredLicenses(type);
             if (required > 0)
             {
                 limitExceeded = true;
-                message += setWarningStyleHtml(lit(" (%1)").arg(
+                message += setWarningStyleHtml(QString(" (%1)").arg(
                     CameraSettingsLicenseWatcher::tr("%n more required", "", required)));
             }
 

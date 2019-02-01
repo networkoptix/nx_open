@@ -17,7 +17,9 @@ namespace {
     static const unsigned int kSendTimeoutMs = 1000;
 }
 
-QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileName)
+QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(
+    const QString& fileName,
+    QnCommonModule* commonModule)
 {
     QMutexLocker lock(&m_mutex);
     QList<QnCompressedVideoDataPtr> rez;
@@ -27,6 +29,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileNam
         return *itr;
 
     QnAviResourcePtr file(new QnAviResource(fileName));
+    file->setCommonModule(commonModule);
     QnAviArchiveDelegate aviDelegate;
     if (!aviDelegate.open(file, nullptr))
     {
@@ -203,7 +206,9 @@ bool QnTestCamera::doStreamingFile(
     return true;
 }
 
-void QnTestCamera::startStreaming(nx::network::AbstractStreamSocket* socket, bool isSecondary, int fps)
+void QnTestCamera::startStreaming(
+    nx::network::AbstractStreamSocket* socket, bool isSecondary, int fps,
+    QnCommonModule* commonModule)
 {
     int fileIndex = 0;
     QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;
@@ -218,7 +223,7 @@ void QnTestCamera::startStreaming(nx::network::AbstractStreamSocket* socket, boo
     {
         QString fileName = fileList[fileIndex];
 
-        QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName);
+        QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName, commonModule);
         if (data.isEmpty())
         {
             qWarning() << "File" << fileName << "not found. Stop streaming for camera" << getMac();

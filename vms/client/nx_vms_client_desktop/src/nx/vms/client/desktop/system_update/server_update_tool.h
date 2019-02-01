@@ -139,7 +139,7 @@ public:
         UpdateContents& contents,
         const std::set<nx::utils::SoftwareVersion>& clientVersions) const;
 
-    // Start uploading local update packages to the server(s).
+    // Start uploading local update packages to the servers.
     bool startUpload(const UpdateContents& contents);
     void startUpload(
         const QnMediaServerResourcePtr& server,

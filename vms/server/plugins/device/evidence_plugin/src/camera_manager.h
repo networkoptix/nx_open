@@ -1,10 +1,4 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef AXIS_CAMERA_MANAGER_H
-#define AXIS_CAMERA_MANAGER_H
+#pragma once
 
 #include <functional>
 #include <map>
@@ -18,9 +12,9 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include "ptz_manager.h"
-
 
 class CameraPlugin;
 class MediaEncoder;
@@ -45,9 +39,9 @@ public:
     //!Implementaion of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementaion of nxpl::PluginInterface::addRef
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementaion of nxpl::PluginInterface::releaseRef
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
     virtual int getEncoderCount( int* encoderCount ) const override;
@@ -147,10 +141,10 @@ private:
 
     nxpt::CommonRefManager m_refManager;
     /*!
-        Holding reference to \a CameraPlugin, but not \a CameraDiscoveryManager, 
+        Holding reference to \a CameraPlugin, but not \a CameraDiscoveryManager,
         since \a CameraDiscoveryManager instance is not required for \a CameraManager object
     */
-    nxpt::ScopedRef<CameraPlugin> m_pluginRef;
+    nx::sdk::Ptr<CameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
@@ -182,5 +176,3 @@ private:
     template<class ParamAssignFunc>
         int readCameraParam( ParamAssignFunc func ) const;
 };
-
-#endif  //AXIS_CAMERA_MANAGER_H

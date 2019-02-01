@@ -11,17 +11,17 @@ AggregateLogger::AggregateLogger(
 {
 }
 
-std::set<Tag> AggregateLogger::tags() const
+std::set<Filter> AggregateLogger::filters() const
 {
-    std::set<Tag> tags;
+    std::set<Filter> filters;
 
     for (auto& logger: m_loggers)
     {
-        auto loggerTags = logger->tags();
-        tags.insert(loggerTags.begin(), loggerTags.end());
+        auto loggerFilters = logger->filters();
+        filters.insert(loggerFilters.begin(), loggerFilters.end());
     }
 
-    return tags;
+    return filters;
 }
 
 void AggregateLogger::log(Level level, const Tag& tag, const QString& message)

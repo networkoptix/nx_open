@@ -420,6 +420,11 @@ protected:
         assertCbErrorCode(SystemError::timedOut, [](){});
     }
 
+    void thenTransferFinishedSuccessfully()
+    {
+        readyFuture.wait();
+    }
+
     void whenServerStartsAnsweringPings()
     {
         serverReadCb = [this](SystemError::ErrorCode, size_t) {};
@@ -620,7 +625,7 @@ TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
 
     whenReadWriteScheduled();
 
-    readyFuture.wait();
+    thenTransferFinishedSuccessfully();
 }
 
 TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)

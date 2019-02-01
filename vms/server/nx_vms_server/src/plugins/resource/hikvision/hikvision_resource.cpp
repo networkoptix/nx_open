@@ -57,13 +57,13 @@ QString HikvisionResource::defaultCodec() const
     return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
 }
 
-nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
     const auto capabilities = channelCapabilities(toRole(streamIndex));
     if (!capabilities)
-        return base_type::getStreamCapabilityMapFromDrives(streamIndex);
+        return base_type::getStreamCapabilityMapFromDriver(streamIndex);
 
     nx::vms::server::resource::StreamCapabilityMap result;
     for (const auto& codec: capabilities->codecs)

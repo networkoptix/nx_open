@@ -9,6 +9,7 @@ namespace websocket {
 static const auto kAliveTimeout = std::chrono::seconds(100);
 static const auto kDefaultPingTimeoutMultiplier = 0.5;
 static const auto kBufferSize = 4096;
+static const auto kMaxIncomingMessageQueueSize = 1000;
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
@@ -96,14 +97,23 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
     m_readBuffer.resize(0);
     m_readBuffer.reserve(kBufferSize);
 
-    if (m_incomingMessageQueue.size() != 0 && m_userReadContext)
+    if (m_incomingMessageQueue.size() != 0)
     {
-        const auto incomingMessage = m_incomingMessageQueue.popFront();
-        *(m_userReadContext->bufferPtr) = incomingMessage;
-        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-        callOnReadhandler(SystemError::noError, incomingMessage.size());
-        if (watcher.objectDestroyed())
-            return;
+        if (m_userReadContext)
+        {
+            const auto incomingMessage = m_incomingMessageQueue.popFront();
+            *(m_userReadContext->bufferPtr) = incomingMessage;
+            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            callOnReadhandler(SystemError::noError, incomingMessage.size());
+            if (watcher.objectDestroyed())
+                return;
+        }
+        else if (m_incomingMessageQueue.size() > kMaxIncomingMessageQueueSize)
+        {
+            NX_DEBUG(
+                this,
+                lm("Incoming message queue breached %1 messages treshold").args(kMaxIncomingMessageQueueSize));
+        }
     }
 
     m_socket->readSomeAsync(
@@ -169,7 +179,6 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
             {
                 const auto incomingMessage = m_incomingMessageQueue.popFront();
                 *buffer = incomingMessage;
-                utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
                 handler(SystemError::noError, incomingMessage.size());
                 return;
             }

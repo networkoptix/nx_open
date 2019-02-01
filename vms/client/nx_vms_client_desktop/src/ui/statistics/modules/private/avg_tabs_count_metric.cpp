@@ -10,7 +10,7 @@ AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
     , m_workbench(workbench)
     , m_tabsCountDurations()
 {
-    NX_ASSERT(m_workbench, Q_FUNC_INFO, "Workbench is null");
+    NX_ASSERT(m_workbench, "Workbench is null");
     if (!m_workbench)
         return;
 

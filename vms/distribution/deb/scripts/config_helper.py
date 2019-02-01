@@ -1,41 +1,54 @@
 #!/usr/bin/env python
 
-import sys
-from ConfigParser import ConfigParser, NoSectionError, NoOptionError
+from __future__ import print_function
+import argparse
 
-if len(sys.argv) < 2 or len(sys.argv) > 4:
-    print "Usage: config_helper <file> | config_helper <file> name value"
-    sys.exit(1)
+try:
+    # For Python 2.
+    import ConfigParser as configparser
+except:
+    # For Python 3.
+    import configparser
 
-config_file = sys.argv[1]
-cfgparser = ConfigParser()
-cfgparser.optionxform = str
+parser = argparse.ArgumentParser()
+parser.add_argument("config_file", help="Configuration file name")
+parser.add_argument("key", default=None, nargs="?", help="A key to read, write or delete")
+parser.add_argument("value", default=None, nargs="?",
+    help="When specified, this value will be assigned to the specified key")
+parser.add_argument("--delete", "-d", action="store_true", help="Delete the specified key")
 
-cfgparser.read(config_file)
-if len(sys.argv) == 2:
-    try:
-        for name, value in cfgparser.items('General'):
-            print "%s='%s'" % (name, value)
-    except NoSectionError:
-        pass
-elif len(sys.argv) == 3:
-    try:
-        print cfgparser.get('General', sys.argv[2])
-    except NoSectionError:
-        pass
-    except NoOptionError:
-        pass
-else:
-    if not cfgparser.has_section('General'):
-        cfgparser.add_section('General')
+args = parser.parse_args()
 
-    if sys.argv[2] == '-d':
-        name = sys.argv[3]
-        if cfgparser.has_option('General', name):
-            cfgparser.remove_option('General', name)
+config = configparser.ConfigParser()
+config.optionxform = str
+config.read(args.config_file)
+
+has_changes = False
+
+if args.key:
+    if args.delete:
+        if config.has_section("General") and config.has_option("General", args.key):
+            config.remove_option("General", args.key)
+            has_changes = True
+    elif args.value:
+        if not config.has_section("General"):
+            config.add_section("General")
+        config.set("General", args.key, args.value)
+        has_changes = True
     else:
-        name, value = sys.argv[2:4]
-        cfgparser.set('General', name, value)
+        try:
+            print(config.get("General", args.key))
+        except configparser.NoSectionError:
+            pass
+        except configparser.NoOptionError:
+            pass
+else:
+    try:
+        for name, value in config.items("General"):
+            print("{}='{}'".format(name, value))
+    except configparser.NoSectionError:
+        pass
 
-    with open(config_file, 'w') as f:
-        cfgparser.write(f)
+if has_changes:
+    with open(args.config_file, "w") as f:
+        config.write(f)

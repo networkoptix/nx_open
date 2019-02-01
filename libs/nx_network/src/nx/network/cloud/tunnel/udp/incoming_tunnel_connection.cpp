@@ -66,7 +66,7 @@ void IncomingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread
 
 void IncomingTunnelConnection::accept(AcceptHandler handler)
 {
-    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
+    NX_ASSERT(!m_acceptHandler, "Concurrent accept");
     m_serverSocket->post(
         [this, handler = std::move(handler)]() mutable
         {

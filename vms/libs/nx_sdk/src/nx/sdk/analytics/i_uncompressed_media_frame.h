@@ -14,7 +14,7 @@ static const nxpl::NX_GUID IID_UncompressedMediaFrame =
     {{0x13,0x85,0x3c,0xd6,0x13,0x7e,0x4d,0x8b,0x9b,0x8e,0x63,0xf1,0x5f,0x93,0x2a,0xc1}};
 
 /**
- * Interface for a decoded media frame, e.g. video or audio.
+ * Decoded media frame, e.g. video or audio.
  */
 class IUncompressedMediaFrame: public IDataPacket
 {
@@ -27,13 +27,13 @@ public:
     virtual int planeCount() const = 0;
 
     /**
-     * @param plane Number of the plane, in range 0..planesCount().
+     * @param plane Number of the plane, in range 0..planeCount().
      * @return Number of bytes accessible via data(plane), or 0 if the data is not accessible.
      */
     virtual int dataSize(int plane) const = 0;
 
     /**
-     * @param plane Number of the plane, in range 0..planesCount().
+     * @param plane Number of the plane, in range 0..planeCount().
      * @return Pointer to the byte data of the plane, or null if the data is not accessible.
      */
     virtual const char* data(int plane) const = 0;

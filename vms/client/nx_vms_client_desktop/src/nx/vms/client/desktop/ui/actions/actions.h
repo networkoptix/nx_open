@@ -592,12 +592,12 @@ enum IDType
     AnalyticsEngineSettingsAction,
 
     /**
-     * Opens event log dialog with filter for current camera(s) issues
+     * Opens event log dialog with filter for current cameras issues
      */
     CameraIssuesAction,
 
     /**
-     * Opens business rules dialog with filter for current camera(s) rules
+     * Opens business rules dialog with filter for current cameras rules
      */
     CameraBusinessRulesAction,
 
@@ -635,7 +635,7 @@ enum IDType
     ServerLogsAction,
 
     /**
-     * Opens event log dialog with filter for current server(s) issues.
+     * Opens event log dialog with filter for current servers issues.
      */
     ServerIssuesAction,
 
@@ -778,7 +778,7 @@ enum IDType
     DeleteFromDiskAction,
 
     /**
-     * Removes item(s) from layout(s).
+     * Removes items from layouts.
      */
     RemoveLayoutItemAction,
     RemoveLayoutItemFromSceneAction,
@@ -829,12 +829,12 @@ enum IDType
     AttachToVideoWallAction,
 
     /**
-     * Detaches selected layout(s) from the videowall.
+     * Detaches selected layouts from the videowall.
      */
     ClearVideoWallScreen,
 
     /**
-     * Deletes selected videowall item(s).
+     * Deletes selected videowall items.
      */
     DeleteVideoWallItemAction,
 
@@ -1166,6 +1166,11 @@ enum IDType
 
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
+
+    /**
+     * Control in which mode analytics objects must be displayed for the selected cameras.
+     */
+    AnalyticsObjectsVisualizationModeAction,
 
     ActionCount,
 

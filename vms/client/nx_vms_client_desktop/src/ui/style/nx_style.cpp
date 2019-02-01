@@ -2289,7 +2289,7 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->checked && menuItem->checkType != QStyleOptionMenuItem::NotCheckable)
                 {
-                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
+                    NX_ASSERT(!asDropdown, "Not supported");
                     drawMenuCheckMark(
                             painter,
                             QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), 16, menuItem->rect.height()),

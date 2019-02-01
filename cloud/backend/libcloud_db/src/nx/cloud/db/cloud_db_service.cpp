@@ -54,7 +54,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
             logSettings,
             QnLibCloudDbAppInfo::applicationDisplayName(),
             QString(),
-            {QnLog::EC2_TRAN_LOG}));
+            {nx::utils::log::Filter(QnLog::EC2_TRAN_LOG)}));
 
     m_settings = &settings;
 

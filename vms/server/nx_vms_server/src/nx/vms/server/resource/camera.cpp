@@ -304,8 +304,8 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
          A = higher ratio / current ratio
          B = current ratio / lower ratio
 
-        We consider that one resolution is similar to another if their aspect ratios differs
-        no more then (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
+        We consider that one resolution is similar to another if their aspect ratios differ
+        no more than (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
         the table above.
     */
     static const float kEpsilon = 0.10f;
@@ -353,7 +353,7 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
     if (result == EMPTY_RESOLUTION_PAIR)
     {
-        // Try to get resolution ignoring aspect ratio
+        // Try to get resolution ignoring the aspect ratio.
         result = getNearestResolution(
             idealResolution,
             0.0f,
@@ -524,7 +524,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
             dst = src;
     };
 
-    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    StreamCapabilityMap result = getStreamCapabilityMapFromDriver(streamIndex);
     for (auto itr = result.begin(); itr != result.end();)
     {
         if (kSupportedCodecs.count(itr.key().codec))
@@ -607,12 +607,18 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
         case Qn::CR_Default:
         case Qn::CR_LiveVideo:
         {
-            auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
-                ResourceDataKey::kShouldAppearAsSingleChannel);
+            QnAbstractStreamDataProvider* result = nullptr;
 
-            QnAbstractStreamDataProvider* result = shouldAppearAsSingleChannel
-                ? new nx::plugins::utils::MultisensorDataProvider(camera)
-                : camera->createLiveDataProvider();
+            #if defined(ENABLE_ONVIF)
+                auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
+                    ResourceDataKey::kShouldAppearAsSingleChannel);
+
+                result = shouldAppearAsSingleChannel
+                    ? new nx::plugins::utils::MultisensorDataProvider(camera)
+                    : camera->createLiveDataProvider();
+            #else
+                result = camera->createLiveDataProvider();
+            #endif
             if (result)
                 result->setRole(role);
             return result;
@@ -640,6 +646,14 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
     return nullptr;
 }
 
+int Camera::getMaxChannels() const
+{
+    bool shouldAppearAsSingleChannel = resourceData().value<bool>(
+        ResourceDataKey::kShouldAppearAsSingleChannel);
+    if (shouldAppearAsSingleChannel)
+        return 1;
+    return getMaxChannelsFromDriver();
+}
 void Camera::inputPortListenerAttached()
 {
     QnMutexLocker lk(&m_initMutex);

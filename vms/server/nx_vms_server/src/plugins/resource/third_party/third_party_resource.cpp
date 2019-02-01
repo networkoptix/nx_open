@@ -75,8 +75,11 @@ QnThirdPartyResource::QnThirdPartyResource(
 {
     setVendor( discoveryManager.getVendorName() );
 
-    if( m_camManager )
-        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
+    if (m_camManager)
+    {
+        m_cameraManager3 = static_cast<nxcip::BaseCameraManager3*>(
+            m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
+    }
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
@@ -260,7 +263,8 @@ QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
         return NULL;
     }
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     if( !camManager2 )
         return NULL;
 
@@ -289,7 +293,8 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !m_camManager )
         return QnTimePeriodList();
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     NX_ASSERT( camManager2 );
 
     QnTimePeriodList resultTimePeriods;
@@ -361,7 +366,6 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods(
         sortOrder);
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
 void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_CameraInputEventHandler, sizeof(nxcip::IID_CameraInputEventHandler) ) == 0 )
@@ -377,14 +381,12 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
-unsigned int QnThirdPartyResource::addRef()
+int QnThirdPartyResource::addRef() const
 {
     return m_refCounter.fetchAndAddOrdered(1) + 1;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
-unsigned int QnThirdPartyResource::releaseRef()
+int QnThirdPartyResource::releaseRef() const
 {
     return m_refCounter.fetchAndAddOrdered(-1) - 1;
 }
@@ -416,7 +418,7 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::Stre
     return nxcip::Resolution();
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDriver(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
@@ -479,7 +481,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             return CameraDiagnostics::UnknownErrorResult();
         m_camManager.reset( new nxcip_qt::BaseCameraManager( cameraIntf ) );
 
-        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
+        m_cameraManager3 = static_cast<nxcip::BaseCameraManager3*>(
+            m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
     }
 
     m_camManager->setCredentials( auth.user(), auth.password() );

@@ -3,8 +3,7 @@
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace {
 
@@ -14,14 +13,6 @@ static constexpr std::chrono::milliseconds kBufferMaxTimeSpan(3000);
 
 //-------------------------------------------------------------------------------------------------
 // BufferedPacketConsumer
-
-BufferedPacketConsumer::BufferedPacketConsumer(
-    const std::weak_ptr<VideoStream>& streamReader,
-    const CodecParameters& params)
-    :
-    AbstractVideoConsumer(streamReader, params)
-{
-}
 
 void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
@@ -91,14 +82,6 @@ std::vector<uint64_t> BufferedPacketConsumer::timestamps() const
 //-------------------------------------------------------------------------------------------------
 // BufferedVideoFrameConsumer
 
-BufferedVideoFrameConsumer::BufferedVideoFrameConsumer(
-    const std::weak_ptr<VideoStream>& streamReader,
-    const CodecParameters& params)
-    :
-    AbstractVideoConsumer(streamReader, params)
-{  
-}
-
 void BufferedVideoFrameConsumer::flush()
 {
     m_buffer.clear();
@@ -138,5 +121,4 @@ std::vector<uint64_t> BufferedVideoFrameConsumer::timestamps() const
     return m_buffer.timestamps();
 }
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

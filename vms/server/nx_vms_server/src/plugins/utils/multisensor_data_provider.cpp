@@ -21,10 +21,11 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(const nx::vms::server::resource::CameraPtr& res)
+MultisensorDataProvider::MultisensorDataProvider(
+    const nx::vms::server::resource::CameraPtr& resource)
     :
-    CLServerPushStreamReader(res),
-    m_cameraResource(res)
+    CLServerPushStreamReader(resource),
+    m_cameraResource(resource)
 {
 }
 
@@ -153,6 +154,7 @@ QnSecurityCamResourcePtr MultisensorDataProvider::initSubChannelResource(quint32
     for (const auto& p: m_cameraResource->getRuntimeProperties())
         resource->setProperty(p.name, p.value);
 
+    NX_VERBOSE(this, "Created subchannel resource with id [%1]", resource->getId());
     return resource;
 }
 

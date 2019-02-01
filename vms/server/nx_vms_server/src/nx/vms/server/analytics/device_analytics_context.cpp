@@ -182,13 +182,7 @@ void DeviceAnalyticsContext::putFrame(
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
     FrameConverter frameConverter(
-        [&compressedFrame]() { return compressedFrame; },
-        [&uncompressedFrame, this]()
-        {
-            if (!uncompressedFrame)
-                issueMissingUncompressedFrameWarningOnce();
-            return uncompressedFrame;
-        });
+        compressedFrame, uncompressedFrame, &m_missingUncompressedFrameWarningIssued);
 
     for (auto& entry: m_bindings)
     {
@@ -353,17 +347,6 @@ std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding
         return nullptr;
 
     return itr->second;
-}
-
-void DeviceAnalyticsContext::issueMissingUncompressedFrameWarningOnce()
-{
-    auto logLevel = nx::utils::log::Level::verbose;
-    if (!m_uncompressedFrameWarningIssued)
-    {
-        m_uncompressedFrameWarningIssued = true;
-        logLevel = nx::utils::log::Level::warning;
-    }
-    NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
 }
 
 } // namespace nx::vms::server::analytics
