@@ -123,6 +123,14 @@ public:
     //!Returns information of chunk, used by previous \a QnAbstractArchiveDelegate::seek or \a QnAbstractArchiveDelegate::getNextData call
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); }
 
+    /**
+     * Get currently used network protocol. See the predefined values in the nx::network::Protocol
+     * namespace (nx/network/abstract_socket.h).
+     * Actual for cameras only.
+     * @return 0 if connection is not opened yet, IANA protocol number otherwise.
+     */
+    virtual int protocol() const { return 0; }
+
     virtual int getSequence() const { return 0;  }
 
     virtual void setPlaybackMode(PlaybackMode /*value*/) {}
