@@ -26,9 +26,6 @@ public:
     virtual ~Private() override;
 
 private:
-    QToolButton* newActionButton(ui::action::IDType actionId, int helpTopicId);
-
-private:
     NotificationListWidget* q = nullptr;
     EventRibbon* const m_eventRibbon = nullptr;
     AbstractEventListModel* m_systemHealthModel = nullptr;

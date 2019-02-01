@@ -148,49 +148,4 @@ NotificationListWidget::Private::~Private()
 {
 }
 
-QToolButton* NotificationListWidget::Private::newActionButton(
-    ui::action::IDType actionId,
-    int helpTopicId)
-{
-    const auto paintFunction =
-        [](QPainter* painter, const QStyleOption* /*option*/, const QWidget* widget) -> bool
-        {
-            const auto button = qobject_cast<const QToolButton*>(widget);
-            if (!button)
-                return false;
-
-            auto mode = QIcon::Normal;
-            if (button->isDown())
-                mode = QnIcon::Pressed;
-            else if (button->underMouse())
-                mode = QIcon::Active;
-
-            button->icon().paint(painter, button->rect(), Qt::AlignCenter, mode);
-            return true;
-        };
-
-    auto button = new CustomPainted<QToolButton>();
-    button->setCustomPaintFunction(paintFunction);
-    button->setDefaultAction(action(actionId));
-    button->setIconSize(QnSkin::maximumSize(button->defaultAction()->icon()));
-    button->setFixedSize(button->iconSize());
-
-    if (helpTopicId != Qn::Empty_Help)
-        setHelpTopic(button, helpTopicId);
-
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        [this, button, actionId]()
-        {
-            button->setVisible(menu()->canTrigger(actionId));
-        });
-
-    button->setVisible(menu()->canTrigger(actionId));
-
-    const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"),
-        QnLexical::serialized(actionId));
-
-    context()->statisticsModule()->registerButton(statAlias, button);
-    return button;
-}
-
 } // namespace nx::vms::client::desktop
