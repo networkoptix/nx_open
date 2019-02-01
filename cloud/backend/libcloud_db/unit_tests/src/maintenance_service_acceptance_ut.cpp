@@ -29,17 +29,7 @@ using namespace nx::network::test;
 
 INSTANTIATE_TYPED_TEST_CASE_P(
     CloudDb,
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    MaintenanceTypeSetImpl);
-
-INSTANTIATE_TYPED_TEST_CASE_P(
-    CloudDb,
-    MaintenanceServiceAcceptanceWithNoHtdigestFile,
-    MaintenanceTypeSetImpl);
-
-INSTANTIATE_TYPED_TEST_CASE_P(
-    CloudDb,
-    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
+    MaintenanceServiceAcceptance,
     MaintenanceTypeSetImpl);
 
 } // namespace nx::cloud::db::test

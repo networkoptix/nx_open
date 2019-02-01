@@ -18,17 +18,7 @@ using namespace nx::network::test;
 
 INSTANTIATE_TYPED_TEST_CASE_P(
     ConnectionMediator,
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    MaintenanceTypeSetImpl);
-
-INSTANTIATE_TYPED_TEST_CASE_P(
-    ConnectionMediator,
-    MaintenanceServiceAcceptanceWithNoHtdigestFile,
-    MaintenanceTypeSetImpl);
-
-INSTANTIATE_TYPED_TEST_CASE_P(
-    ConnectionMediator,
-    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
+    MaintenanceServiceAcceptance,
     MaintenanceTypeSetImpl);
 
 } // namespace nx::hpm::test

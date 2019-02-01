@@ -38,16 +38,6 @@ static constexpr char kHtdigestFile[] = "/htdigest.txt";
  *    SomeTestPrefix,                                       //< Can be anything
  *    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile, //< Do not change
  *    MaintenanceTypeSetImpl);                              //< Must match the struct name above
-
- INSTANTIATE_TYPED_TEST_CASE_P(
- *    SomeTestPrefix,                                 //< Can be anything
- *    MaintenanceServiceAcceptanceWithNoHtdigestFile, //< Do not change
- *    MaintenanceTypeSetImpl);                        //< Must match the struct name above
-
- INSTANTIATE_TYPED_TEST_CASE_P(
- *    SomeTestPrefix,                                    //< Can be anything
- *    MaintenanceServiceAcceptanceWithEmptyHtdigestFile, //< Do not change
- *    MaintenanceTypeSetImpl);                           //< Must match the struct name above
  * </code>
  *
  * NOTE: SomeParentClass must:
@@ -58,34 +48,45 @@ static constexpr char kHtdigestFile[] = "/htdigest.txt";
  *    - implement `nx::network::SocketAddress httpEndpoint() const` method
  */
 template<typename MaintenanceTypeSet>
-class AbstractMaintenanceServiceAcceptance:
+class MaintenanceServiceAcceptance:
     public MaintenanceTypeSet::BaseType
 {
 protected:
-    virtual void loadHtdigestFile() = 0;
-
     virtual void SetUp() override
     {
-        this->loadHtdigestFile();
-
-        ASSERT_TRUE(this->startAndWaitUntilStarted());
-
         this->m_httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
         this->m_httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+    }
+
+    void givenNonEmptyHtdigestFile()
+    {
+        this->loadHtdigestFile(/*writeCredentials*/ true);
+        ASSERT_TRUE(this->startAndWaitUntilStarted());
+    }
+
+    void givenNoHtdigestFile()
+    {
+        ASSERT_TRUE(this->startAndWaitUntilStarted());
+    }
+
+    void givenEmptyHtdigestFile()
+    {
+        this->loadHtdigestFile(/*writeCredentials*/ false);
+        ASSERT_TRUE(this->startAndWaitUntilStarted());
     }
 
     void whenRequestMallocInfoWithValidCredentials()
     {
         this->setClientCredentials(kValidUserAndPassword);
-        ASSERT_TRUE(this->m_httpClient.doGet(
-            this->requestUrl(nx::network::maintenance::kMallocInfo)));
+        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(
+            nx::network::maintenance::kMallocInfo)));
     }
 
     void whenRequestLoggingConfigurationWithValidCredentials()
     {
         this->setClientCredentials(kValidUserAndPassword);
-        ASSERT_TRUE(this->m_httpClient.doGet(
-            this->requestUrl(this->loggerPath())));
+        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(
+            this->loggerPath())));
     }
 
     void whenRequestMallocInfoWithAnyCredentials()
@@ -96,6 +97,19 @@ protected:
     void whenRequestLoggingConfigurationWithAnyCredentials()
     {
         this->whenRequestLoggingConfigurationWithValidCredentials();
+    }
+
+    void whenRequestMallocInfoWithInvalidCredentials()
+    {
+        this->setClientCredentials(kInvalidUserAndPassword);
+        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(
+            nx::network::maintenance::kMallocInfo)));
+    }
+
+    void whenRequestLoggingConfigurationWithInvalidCredentials()
+    {
+        this->setClientCredentials(kInvalidUserAndPassword);
+        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(this->loggerPath())));
     }
 
     void thenRequestSucceeded(nx::network::http::StatusCode::Value statusCode)
@@ -110,6 +124,7 @@ protected:
         ASSERT_EQ(statusCode, this->m_httpClient.response()->statusLine.statusCode);
     }
 
+private:
     void setClientCredentials(const std::pair<const char*, const char*>& userAndPassword)
     {
         this->m_httpClient.setCredentials(nx::network::http::Credentials(
@@ -128,41 +143,18 @@ protected:
     {
         return nx::network::url::Builder().setEndpoint(this->httpEndpoint())
             .setScheme(nx::network::http::kUrlSchemeName)
-            .setPath(MaintenanceTypeSet::apiPrefix).
-            appendPath(nx::network::maintenance::kMaintenance).appendPath(requestPath);
+            .setPath(MaintenanceTypeSet::apiPrefix)
+            .appendPath(nx::network::maintenance::kMaintenance).appendPath(requestPath);
     }
 
-protected:
-    nx::network::http::HttpClient m_httpClient;
-};
-
-//-------------------------------------------------------------------------------------------------
-// Non empty htdigest file
-
-template<typename MaintenanceTypeSet>
-class MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile:
-    public AbstractMaintenanceServiceAcceptance<MaintenanceTypeSet>
-{
-protected:
-    void whenRequestMallocInfoWithInvalidCredentials()
-    {
-        this->setClientCredentials(kInvalidUserAndPassword);
-        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(nx::network::maintenance::kMallocInfo)));
-    }
-
-    void whenRequestLoggingConfigurationWithInvalidCredentials()
-    {
-        this->setClientCredentials(kInvalidUserAndPassword);
-        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(this->loggerPath())));
-    }
-
-private:
-    virtual void loadHtdigestFile() override
+    void loadHtdigestFile(bool writeCredentials)
     {
         // Give a file path and write credentials.
         std::string htdigestPath = this->testDataDir().toStdString() + kHtdigestFile;
-        ASSERT_TRUE(this->writeCredentials(htdigestPath));
-
+        if (writeCredentials)
+        {
+            ASSERT_TRUE(this->writeCredentials(htdigestPath));
+        }
         this->addArg((std::string(kMaintenanceHtdigestPathArg) + htdigestPath).c_str());
     }
 
@@ -178,139 +170,102 @@ private:
         output.close();
         return true;
     }
+
+private:
+    nx::network::http::HttpClient m_httpClient;
 };
 
-TYPED_TEST_CASE_P(MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile);
+TYPED_TEST_CASE_P(MaintenanceServiceAcceptance);
 
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    malloc_info_is_available_with_valid_credentials)
+    MaintenanceServiceAcceptance,
+    malloc_info_is_available_with_valid_credentials_with_non_empty_htdigest_file)
 {
-    // givenNonEmptyHtdigestFile();
+    this->givenNonEmptyHtdigestFile();
     this->whenRequestMallocInfoWithValidCredentials();
 
     this->thenRequestSucceeded(nx::network::http::StatusCode::ok);
 }
 
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    log_server_is_available_with_valid_credentials)
+    MaintenanceServiceAcceptance,
+    log_server_is_available_with_valid_credentials_with_non_empty_htdigest_file)
 {
-    // givenNonEmptyHtdigestFile();
+    this->givenNonEmptyHtdigestFile();
     this->whenRequestLoggingConfigurationWithValidCredentials();
 
     this->thenRequestSucceeded(nx::network::http::StatusCode::ok);
 }
 
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    malloc_info_is_not_available_with_invalid_credentials)
+    MaintenanceServiceAcceptance,
+    malloc_info_is_not_available_with_invalid_credentials_with_non_empty_htdigest_file)
 {
-    // givenNonEmptyHtdigestFile();
+    this->givenNonEmptyHtdigestFile();
     this->whenRequestMallocInfoWithInvalidCredentials();
 
     this->thenRequestFailed(nx::network::http::StatusCode::unauthorized);
 }
 
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    log_server_is_not_available_with_invalid_credentials)
+    MaintenanceServiceAcceptance,
+    log_server_is_not_available_with_invalid_credentials_with_non_empty_htdigest_file)
 {
-    // givenNonEmptyHtdigestFile();
+    this->givenNonEmptyHtdigestFile();
     this->whenRequestLoggingConfigurationWithInvalidCredentials();
 
     this->thenRequestFailed(nx::network::http::StatusCode::unauthorized);
 }
 
-REGISTER_TYPED_TEST_CASE_P(
-    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
-    malloc_info_is_available_with_valid_credentials,
-    log_server_is_available_with_valid_credentials,
-    malloc_info_is_not_available_with_invalid_credentials,
-    log_server_is_not_available_with_invalid_credentials);
-
-//-------------------------------------------------------------------------------------------------
-// No htdigest file
-
-template<typename MaintenanceTypeSet>
-class MaintenanceServiceAcceptanceWithNoHtdigestFile:
-    public AbstractMaintenanceServiceAcceptance<MaintenanceTypeSet>
-{
-private:
-    virtual void loadHtdigestFile() override
-    {
-        // Do not specify a file path.
-    }
-};
-
-TYPED_TEST_CASE_P(MaintenanceServiceAcceptanceWithNoHtdigestFile);
-
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithNoHtdigestFile,
-    malloc_info_is_available)
+    MaintenanceServiceAcceptance,
+    malloc_info_is_available_with_no_htdigest_file)
 {
-    // givenNoHtdigestFile();
+    this->givenNoHtdigestFile();
     this->whenRequestMallocInfoWithAnyCredentials();
 
     this->thenRequestSucceeded(nx::network::http::StatusCode::ok);
 }
 
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithNoHtdigestFile,
-    log_server_is_available)
+    MaintenanceServiceAcceptance,
+    log_server_is_available_with_no_htdigest_file)
 {
-    // givenNoHtdigestFile();
+    this->givenNoHtdigestFile();
     this->whenRequestLoggingConfigurationWithAnyCredentials();
 
     this->thenRequestSucceeded(nx::network::http::StatusCode::ok);
 }
 
-REGISTER_TYPED_TEST_CASE_P(
-    MaintenanceServiceAcceptanceWithNoHtdigestFile,
-    malloc_info_is_available,
-    log_server_is_available);
-
-//-------------------------------------------------------------------------------------------------
-// Empty htdigest file
-
-template<typename MaintenanceTypeSet>
-class MaintenanceServiceAcceptanceWithEmptyHtdigestFile:
-    public AbstractMaintenanceServiceAcceptance<MaintenanceTypeSet>
-{
-private:
-    virtual void loadHtdigestFile() override
-    {
-        // Give a file path but do not write any credentials.
-        std::string htdigestPath = this->testDataDir().toStdString() + kHtdigestFile;
-        this->addArg((std::string(kMaintenanceHtdigestPathArg) + htdigestPath).c_str());
-    }
-};
-
-TYPED_TEST_CASE_P(MaintenanceServiceAcceptanceWithEmptyHtdigestFile);
-
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
-    malloc_info_is_not_available)
+    MaintenanceServiceAcceptance,
+    malloc_info_is_not_available_with_empty_htdigest_file)
 {
-    // givenEmptyHtdigestFile();
+    this->givenEmptyHtdigestFile();
     this->whenRequestMallocInfoWithAnyCredentials();
 
     this->thenRequestFailed(nx::network::http::StatusCode::unauthorized);
 }
 
 TYPED_TEST_P(
-    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
-    log_server_is_not_available)
+    MaintenanceServiceAcceptance,
+    log_server_is_not_available_with_empty_htdigest_file)
 {
-    // givenEmptyHtdigestFile();
+    this->givenEmptyHtdigestFile();
     this->whenRequestLoggingConfigurationWithAnyCredentials();
 
     this->thenRequestFailed(nx::network::http::StatusCode::unauthorized);
 }
 
 REGISTER_TYPED_TEST_CASE_P(
-    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
-    malloc_info_is_not_available,
-    log_server_is_not_available);
+    MaintenanceServiceAcceptance,
+    malloc_info_is_available_with_valid_credentials_with_non_empty_htdigest_file,
+    log_server_is_available_with_valid_credentials_with_non_empty_htdigest_file,
+    malloc_info_is_not_available_with_invalid_credentials_with_non_empty_htdigest_file,
+    log_server_is_not_available_with_invalid_credentials_with_non_empty_htdigest_file,
+    malloc_info_is_available_with_no_htdigest_file,
+    log_server_is_available_with_no_htdigest_file,
+    malloc_info_is_not_available_with_empty_htdigest_file,
+    log_server_is_not_available_with_empty_htdigest_file);
 
 } // namespace nx::network::test
