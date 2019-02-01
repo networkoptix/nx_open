@@ -33,6 +33,7 @@
 #include <nx/update/update_check.h>
 
 using namespace nx::vms::client::desktop::ui;
+using UpdateContents = nx::update::UpdateContents;
 
 namespace {
     constexpr int kUpdatePeriodMSec = 60 * 60 * 1000; //< 1 hour.
@@ -42,33 +43,65 @@ namespace {
     constexpr int kTooLateDayOfWeek = Qt::Thursday;
 } // anonymous namespace
 
+struct QnWorkbenchUpdateWatcher::Private
+{
+    UpdateContents updateContents;
+    std::future<UpdateContents> m_updateCheck;
+};
+
 QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject* parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_timer(new QTimer(this)),
-    m_notifiedVersion()
+    m_notifiedVersion(),
+    m_private(new Private())
 {
     m_timer->setInterval(kUpdatePeriodMSec);
+
+    m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
     connect(m_timer, &QTimer::timeout, this, &QnWorkbenchUpdateWatcher::atStartCheckUpdate);
+    connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
+        [this]()
+        {
+            m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
+            syncState();
+        });
 }
 
 QnWorkbenchUpdateWatcher::~QnWorkbenchUpdateWatcher() {}
 
+void QnWorkbenchUpdateWatcher::syncState()
+{
+    if (m_userLoggedIn && m_autoChecksEnabled && !m_timer->isActive())
+    {
+        NX_VERBOSE(this, "syncState() - starting automatic checks for updates");
+        m_timer->start();
+        atStartCheckUpdate();
+    }
+
+    if ((!m_userLoggedIn || !m_autoChecksEnabled) && m_timer->isActive())
+    {
+        NX_VERBOSE(this, "syncState() - stopping automatic checks for updates");
+        m_timer->stop();
+    }
+}
+
 void QnWorkbenchUpdateWatcher::start()
 {
-    m_timer->start();
-    atStartCheckUpdate();
+    m_userLoggedIn = true;
+    syncState();
 }
 
 void QnWorkbenchUpdateWatcher::stop()
 {
-    m_timer->stop();
+    m_userLoggedIn = false;
+    syncState();
 }
 
 void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
 {
     // This signal will be removed when update check is complete.
-    if (m_updateInfo.valid())
+    if (m_private->m_updateCheck.valid())
         return;
     QString updateUrl = qnSettings->updateFeedUrl();
     NX_ASSERT(!updateUrl.isEmpty());
@@ -78,7 +111,8 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
         {
             atCheckerUpdateAvailable(contents);
         });
-    m_updateInfo = nx::update::checkLatestUpdate(
+
+    m_private->m_updateCheck = nx::update::checkLatestUpdate(
         updateUrl,
         commonModule()->engineVersion(),
         std::move(callback));
@@ -86,7 +120,11 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
 
 void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
 {
-    m_updateInfo = std::future<UpdateContents>();
+    if (!qnGlobalSettings->isUpdateNotificationsEnabled())
+        return;
+
+    m_private->m_updateCheck = std::future<UpdateContents>();
+    m_private->updateContents = contents;
 
     // 'NoNewVersion' is considered invalid as well.
     if (!contents.info.isValid())
@@ -193,4 +231,9 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
 
     if (result != QDialogButtonBox::Cancel)
         action(action::SystemUpdateAction)->trigger();
+}
+
+const UpdateContents& QnWorkbenchUpdateWatcher::getUpdateContents() const
+{
+    return m_private->updateContents;
 }

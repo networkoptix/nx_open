@@ -38,6 +38,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <update/low_free_space_warning.h>
@@ -125,6 +126,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->setupUi(this);
 
     m_showDebugData = ini().massSystemUpdateDebugInfo;
+    m_autoCheckUpdate = qnGlobalSettings->isUpdateNotificationsEnabled();
 
     m_serverUpdateTool.reset(new ServerUpdateTool(this));
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
@@ -223,10 +225,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->advancedUpdateSettings->setIcon(qnSkin->icon("text_buttons/collapse.png"));
     // This button is hidden for now. We will implement it in future.
     ui->downloadAndInstall->hide();
-    /*
-    connect(ui->autoCheckUpdates, &QCheckBox::stateChanged,
-        this, &QnAbstractPreferencesWidget::hasChangesChanged);
-        */
 
     connect(ui->releaseNotesLabel, &QLabel::linkActivated, this,
         [this]()
@@ -237,8 +235,17 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     ui->releaseDescriptionLabel->setOpenExternalLinks(true);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
-        this, &MultiServerUpdatesWidget::checkForInternetUpdates);
+    connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
+        [this]()
+        {
+            setAutoUpdateCheckMode(qnGlobalSettings->isUpdateNotificationsEnabled());
+        });
+
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,this,
+        [this]()
+        {
+            checkForInternetUpdates();
+        });
 
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
@@ -312,7 +319,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.
-    checkForInternetUpdates();
+    checkForInternetUpdates(/*initial=*/true);
 
     loadDataToUi();
 }
@@ -334,7 +341,12 @@ void MultiServerUpdatesWidget::setAutoUpdateCheckMode(bool mode)
         ui->updateCheckMode->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     }
 
-    m_autoCheckUpdate = mode;
+    if (mode != m_autoCheckUpdate)
+    {
+        m_autoCheckUpdate = mode;
+        qnGlobalSettings->setUpdateNotificationsEnabled(mode);
+        qnGlobalSettings->synchronizeNow();
+    }
 }
 
 void MultiServerUpdatesWidget::initDropdownActions()
@@ -390,7 +402,7 @@ void MultiServerUpdatesWidget::initDropdownActions()
             ui->updateCheckMode->update();
         });
 
-    setAutoUpdateCheckMode(true);
+    setAutoUpdateCheckMode(qnGlobalSettings->isUpdateNotificationsEnabled());
 }
 
 void MultiServerUpdatesWidget::initDownloadActions()
@@ -693,16 +705,36 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     loadDataToUi();
 }
 
-void MultiServerUpdatesWidget::checkForInternetUpdates()
+void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
 {
     if (m_updateSourceMode != UpdateSourceType::internet)
         return;
-    if (!isVisible())
+
+    if (!initial && !isVisible())
         return;
 
     // No need to check for updates if we are already installing something.
     if (m_widgetState != WidgetUpdateState::initial && m_widgetState != WidgetUpdateState::ready)
         return;
+
+    if (initial)
+    {
+        // QnWorkbenchUpdateWatcher checks for updates periodically. We could reuse its update
+        // info, if there is any.
+        auto watcher = context()->instance<QnWorkbenchUpdateWatcher>();
+        auto contents = watcher->getUpdateContents();
+        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        if (!contents.isEmpty()
+            && m_serverUpdateTool->verifyUpdateManifest(contents, installedVersions))
+        {
+            // Widget FSM uses future<UpdateContents> while it spins around 'initial'->'ready'.
+            // So the easiest way to advance it towards 'ready' state is by providing another
+            // future to await.
+            std::promise<nx::update::UpdateContents> promise;
+            m_updateCheck = promise.get_future();
+            promise.set_value(contents);
+        }
+    }
 
     if (!m_updateCheck.valid())
     {

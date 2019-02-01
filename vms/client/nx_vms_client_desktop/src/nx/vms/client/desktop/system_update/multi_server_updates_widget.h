@@ -121,7 +121,7 @@ private:
 
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
-    void checkForInternetUpdates();
+    void checkForInternetUpdates(bool initial = false);
 
     /**
      * Describes all possible display modes for update version.
