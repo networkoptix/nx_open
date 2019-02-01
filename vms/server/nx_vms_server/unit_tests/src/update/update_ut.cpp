@@ -36,9 +36,13 @@ protected:
 
             m_peers.back()->addCmdOption("--override-version=4.0.0.0");
             m_peers.back()->addSetting("--ignoreRootTool", "true");
-            ASSERT_TRUE(m_peers.back()->start());
-            m_peers.back()->commonModule()->globalSettings()->setLocalSystemId(systemId);
-            m_peers.back()->commonModule()->globalSettings()->synchronizeNowSync();
+            ASSERT_TRUE(m_peers.back()->startAsync());
+        }
+        for (int i = 0; i < count; ++i)
+        {
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
+            m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
+            m_peers[i]->commonModule()->globalSettings()->synchronizeNowSync();
         }
 
         connectPeers();
