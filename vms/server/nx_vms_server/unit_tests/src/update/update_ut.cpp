@@ -154,8 +154,10 @@ protected:
         for (const auto& peer: m_peers)
         {
             peer->addCmdOption("--override-version=4.0.0.1");
-            ASSERT_TRUE(peer->start());
+            ASSERT_TRUE(peer->startAsync());
         }
+        for (int i = 0; i < m_peers.size(); ++i)
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
 
         connectPeers();
     }
