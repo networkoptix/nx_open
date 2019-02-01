@@ -8,7 +8,9 @@
 #include <media_server/media_server_module.h>
 #include <media_server/settings.h>
 
-QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
+const size_t kMaxTasksQueueSize = 5000;
+
+QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule) :
     nx::mediaserver::ServerModuleAware(serverModule)
 {
     start();
@@ -30,7 +32,7 @@ void QnStorageDbPool::pleaseStop()
 
 QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
 {
-    QnMutexLocker lock( &m_sdbMutex );
+    QnMutexLocker lock(&m_sdbMutex);
 
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
@@ -38,8 +40,8 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
         if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile))
         {
             NX_WARNING(this, lit("%1 Storage %2 is not writable. Can't create storage DB file.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(storage->getUrl()));
+                .arg(Q_FUNC_INFO)
+                .arg(storage->getUrl()));
             return sdb;
         }
         QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
@@ -60,8 +62,8 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
         }
         else {
             NX_WARNING(this, lit("%1 Storage DB file %2 open failed.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(fileName));
+                .arg(Q_FUNC_INFO)
+                .arg(fileName));
             return QnStorageDbPtr();
         }
     }
@@ -70,7 +72,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
 
 int QnStorageDbPool::getStorageIndex(const QnStorageResourcePtr& storage)
 {
-    QnMutexLocker lock( &m_mutexStorageIndex );
+    QnMutexLocker lock(&m_mutexStorageIndex);
 
     const QString path = storage->getUrl();
     //QString path = toCanonicalPath(p);
@@ -82,9 +84,9 @@ int QnStorageDbPool::getStorageIndex(const QnStorageResourcePtr& storage)
     else
     {
         int index = -1;
-        for (const QSet<int>& indexes: m_storageIndexes.values())
+        for (const QSet<int>& indexes : m_storageIndexes.values())
         {
-            for (const int& value: indexes)
+            for (const int& value : indexes)
                 index = qMax(index, value);
         }
         index++;
@@ -118,9 +120,15 @@ void QnStorageDbPool::run()
     }
 }
 
-void QnStorageDbPool::addVacuumTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
+void QnStorageDbPool::addTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
 {
     QnMutexLocker lock(&m_tasksMutex);
+    if (m_tasksQueue.size() > kMaxTasksQueueSize)
+    {
+        NX_WARNING(this, "Tasks queue overflow. Dropping a task");
+        return;
+    }
+
     m_tasksQueue.push(std::move(vacuumTask));
     m_tasksWaitCondition.wakeOne();
 }

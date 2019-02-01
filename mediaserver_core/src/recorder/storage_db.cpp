@@ -18,39 +18,35 @@
 
 namespace {
 
-const size_t kCatalogsCount = 2;
-const size_t kMaxWriteQueueSize = 5000;
-
-
-inline void AV_WB64(char** dst, quint64 data)
-{
-    quint64* dst64 = (quint64*)(*dst);
-    *dst64 = qToLittleEndian(data);
-    *dst += sizeof(data);
-}
-
-inline void AV_WRITE_BUFFER(char** dst, const char* src, qint64 size)
-{
-    memcpy(*dst, src, size);
-    *dst += size;
-}
-
-template<typename F>
-auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
-{
-    NX_DEBUG(typeid(QnStorageDb), lm("%1 Starting").args(message));
-    nx::utils::ElapsedTimer timer;
-    timer.restart();
-
-    auto onExit = makeScopeGuard([&message, &timer]()
+    inline void AV_WB64(char** dst, quint64 data)
     {
-        NX_DEBUG(
-            typeid(QnStorageDb),
-            lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
-    });
+        quint64* dst64 = (quint64*)(*dst);
+        *dst64 = qToLittleEndian(data);
+        *dst += sizeof(data);
+    }
 
-    return f();
-}
+    inline void AV_WRITE_BUFFER(char** dst, const char* src, qint64 size)
+    {
+        memcpy(*dst, src, size);
+        *dst += size;
+    }
+
+    template<typename F>
+    auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
+    {
+        NX_DEBUG(typeid(QnStorageDb), lm("%1 Starting").args(message));
+        nx::utils::ElapsedTimer timer;
+        timer.restart();
+
+        auto onExit = makeScopeGuard([&message, &timer]()
+        {
+            NX_DEBUG(
+                typeid(QnStorageDb),
+                lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
+        });
+
+        return f();
+    }
 
 } // namespace <anonynous>
 
@@ -64,68 +60,53 @@ QnStorageDb::QnStorageDb(
     m_storage(s),
     m_storageIndex(storageIndex),
     m_dbWriter(new nx::media_db::MediaDbWriter),
-    m_ioDevice(nullptr),
-    m_vacuumInProgress(false),
     m_vacuumInterval(vacuumInterval)
 {
     using namespace nx::media_db;
-    m_timer.start(
-        m_vacuumInterval,
-        [this]() { startVacuum([this](bool success) { onVacuumFinished(success); }); });
+    m_vacuumTimer.addTimer(
+        [this](nx::utils::TimerId)
+    {
+        startVacuum([this](bool success) { onVacuumFinished(success); });
+    },
+        m_vacuumInterval);
 }
 
-void QnStorageDb::onVacuumFinished(bool success)
+void QnStorageDb::onVacuumFinished(bool /*success*/)
 {
-    m_timer.start(
-        m_vacuumInterval,
-        [this]() { startVacuum([this](bool success) { onVacuumFinished(success); }); });
+    m_vacuumTimer.addTimer(
+        [this](nx::utils::TimerId)
+    {
+        startVacuum([this](bool success) { onVacuumFinished(success); });
+    },
+        m_vacuumInterval);
 }
 
 void QnStorageDb::startVacuum(
     VacuumCompletionHandler completionHandler,
     QVector<DeviceFileCatalogPtr> *data)
 {
-    if (m_vacuumInProgress)
-        return;
+    serverModule()->storageDbPool()->addTask(
+        [this, completionHandler = std::move(completionHandler), data]()
+    {
+        m_dbWriter.reset(new nx::media_db::MediaDbWriter);
+        const bool vacuumResult =
+            measureTime([this, data]() { return vacuum(data); }, "Vacuum:");
 
-    m_vacuumInProgress = true;
-    m_dbWriter.reset(new nx::media_db::MediaDbWriter);
-    auto sharedHandler = std::make_shared<VacuumCompletionHandler>(std::move(completionHandler));
-
-    serverModule()->storageDbPool()->addVacuumTask(
-        [this, sharedHandler, data]()
-        {
-            const bool vacuumResult =
-                measureTime([this, data]() { return vacuum(data); }, "Vacuum:");
-
-            m_timer.post(
-                [this, sharedHandler, vacuumResult]()
-                {
-                    m_dbWriter->setDevice(m_ioDevice.get());
-                    m_dbWriter->start();
-                    while (!m_dbRecordQueue.empty())
-                    {
-                        const auto dbRecord = m_dbRecordQueue.front();
-                        m_dbRecordQueue.pop();
-                        m_dbWriter->writeRecord(dbRecord);
-                    }
-
-                    m_vacuumInProgress = false;
-                    (*sharedHandler)(vacuumResult);
-                });
-        });
+        m_dbWriter->setDevice(m_ioDevice.get());
+        m_dbWriter->start();
+        completionHandler(vacuumResult);
+    });
 }
 
 QnStorageDb::~QnStorageDb()
 {
-    m_timer.cancelSync();
 }
 
 boost::optional<nx::media_db::CameraOperation> QnStorageDb::createCameraOperation(
     const QString& cameraUniqueId)
 {
     std::unordered_set<int> usedIds;
-    for (const auto uuidCamIdPair: m_uuidToHash.right)
+    for (const auto uuidCamIdPair : m_uuidToHash.right)
         usedIds.insert(uuidCamIdPair.first);
 
     nx::media_db::CameraOperation cameraOperation;
@@ -172,114 +153,79 @@ int QnStorageDb::getOrGenerateCameraIdHash(const QString &cameraUniqueId)
     if (!cameraOperation)
         return -1;
 
-    writeOrCache(*cameraOperation);
+    m_dbWriter->writeRecord(*cameraOperation);
     return cameraOperation->getCameraId();
 }
 
-bool QnStorageDb::deleteRecords(
+void QnStorageDb::deleteRecords(
     const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog,
     qint64 startTimeMs)
 {
-    nx::utils::promise<bool> readyPromise;
-    nx::utils::future<bool> readyFuture = readyPromise.get_future();
-
-    m_timer.post(
+    serverModule()->storageDbPool()->addTask(
         [this,
-        readyPromise = std::move(readyPromise),
         cameraUniqueId,
         catalog,
         startTimeMs]() mutable
+    {
+        const int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
+        if (cameraId == -1)
         {
-            const int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
-            if (cameraId == -1)
-            {
-                NX_WARNING(
-                    this,
-                    lit("[media_db, delete] camera id hash is not generated. Unable to delete"));
-                readyPromise.set_value(false);
-                return;
-            }
+            NX_WARNING(
+                this,
+                lit("[media_db, delete] camera id hash is not generated. Unable to delete"));
+            return;
+        }
 
-            nx::media_db::MediaFileOperation mediaFileOp;
-            mediaFileOp.setCameraId(cameraId);
-            mediaFileOp.setCatalog(catalog);
-            mediaFileOp.setStartTime(startTimeMs);
-            mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
+        nx::media_db::MediaFileOperation mediaFileOp;
+        mediaFileOp.setCameraId(cameraId);
+        mediaFileOp.setCatalog(catalog);
+        mediaFileOp.setStartTime(startTimeMs);
+        mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
-            writeOrCache(mediaFileOp);
-            readyPromise.set_value(true);
-        });
-
-    return readyFuture.get();
+        m_dbWriter->writeRecord(mediaFileOp);
+    });
 }
 
-void QnStorageDb::writeOrCache(const nx::media_db::DBRecord& dbRecord)
-{
-    if (m_vacuumInProgress)
-    {
-        if (m_dbRecordQueue.size() > kMaxWriteQueueSize)
-            NX_WARNING(this, "Records queue overflown.");
-        else
-            m_dbRecordQueue.push(dbRecord);
-    }
-    else
-    {
-        m_dbWriter->writeRecord(dbRecord);
-    }
-}
-
-bool QnStorageDb::addRecord(
+void QnStorageDb::addRecord(
     const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog,
     const DeviceFileCatalog::Chunk& chunk)
 {
-    nx::utils::promise<bool> readyPromise;
-    nx::utils::future<bool> readyFuture = readyPromise.get_future();
-
-    m_timer.post(
-        [this, readyPromise = std::move(readyPromise), cameraUniqueId, catalog, chunk]() mutable
+    serverModule()->storageDbPool()->addTask(
+        [this, cameraUniqueId, catalog, chunk]() mutable
+    {
+        nx::media_db::MediaFileOperation mediaFileOp;
+        int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
+        if (cameraId == -1)
         {
-            nx::media_db::MediaFileOperation mediaFileOp;
-            int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
-            if (cameraId == -1)
-            {
-                NX_WARNING(
-                    this,
-                    lit("[media_db, add] camera id hash is not generated. Unable to add record"));
-                readyPromise.set_value(false);
-                return;
-            }
-            mediaFileOp.setCameraId(cameraId);
-            mediaFileOp.setCatalog(catalog);
-            mediaFileOp.setDuration(chunk.durationMs);
-            mediaFileOp.setFileTypeIndex(chunk.fileIndex);
-            mediaFileOp.setFileSize(chunk.getFileSize());
-            mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
-            mediaFileOp.setStartTime(chunk.startTimeMs);
-            mediaFileOp.setTimeZone(chunk.timeZone);
+            NX_WARNING(
+                this,
+                lit("[media_db, add] camera id hash is not generated. Unable to add record"));
+            return;
+        }
 
-            writeOrCache(mediaFileOp);
-            readyPromise.set_value(true);
-        });
+        mediaFileOp.setCameraId(cameraId);
+        mediaFileOp.setCatalog(catalog);
+        mediaFileOp.setDuration(chunk.durationMs);
+        mediaFileOp.setFileTypeIndex(chunk.fileIndex);
+        mediaFileOp.setFileSize(chunk.getFileSize());
+        mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
+        mediaFileOp.setStartTime(chunk.startTimeMs);
+        mediaFileOp.setTimeZone(chunk.timeZone);
 
-    return readyFuture.get();
+        m_dbWriter->writeRecord(mediaFileOp);
+    });
 }
 
-bool QnStorageDb::replaceChunks(
+void QnStorageDb::replaceChunks(
     const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog,
     const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
-    bool result = true;
-    bool delResult = deleteRecords(cameraUniqueId, catalog, -1);
-
+    deleteRecords(cameraUniqueId, catalog, -1);
     for (const auto &chunk : chunks)
-    {
-        bool addResult = addRecord(cameraUniqueId, catalog, chunk);
-        result = result && addResult;
-    }
-    return result && delResult;
+        addRecord(cameraUniqueId, catalog, chunk);
 }
 
 bool QnStorageDb::open(const QString& fileName)
@@ -327,10 +273,10 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
 }
 
 bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result,
-                            QnServer::ChunksCatalog catalog,
-                            const QString& uniqueId)
+    QnServer::ChunksCatalog catalog,
+    const QString& uniqueId)
 {
-    for(const DeviceFileCatalogPtr& c: result)
+    for (const DeviceFileCatalogPtr& c : result)
     {
         if (c->getRole() == catalog && c->cameraUniqueId() == uniqueId)
             return true;
@@ -339,8 +285,8 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result,
 }
 
 void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
-                                            QnServer::ChunksCatalog catalog,
-                                            QVector<DeviceFileCatalogPtr>& result)
+    QnServer::ChunksCatalog catalog,
+    QVector<DeviceFileCatalogPtr>& result)
 {
     QString root = closeDirPath(QFileInfo(m_dbFileName).absoluteDir().path()) + postfix;
 
@@ -350,19 +296,16 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
     else
         files = QnAbstractStorageResource::FIListFromQFIList(
             QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot,
-                                     QDir::Name));
+                QDir::Name));
 
-    for (const QnAbstractStorageResource::FileInfo& fi: files)
+    for (const QnAbstractStorageResource::FileInfo& fi : files)
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId))
         {
-            result <<
-                DeviceFileCatalogPtr(
-                    new DeviceFileCatalog(
-                        uniqueId,
-                        catalog,
-                        QnServer::StoragePool::None));
+            result << DeviceFileCatalogPtr(new DeviceFileCatalog(
+                uniqueId, catalog,
+                QnServer::StoragePool::None));
         }
     }
 }
@@ -388,35 +331,40 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
     NX_INFO(this, lit("Loading chunks from DB. storage: %1, file: %2")
-            .arg(m_storage->getUrl())
-            .arg(m_dbFileName));
+        .arg(m_storage->getUrl())
+        .arg(m_dbFileName));
 
     nx::utils::promise<void> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    startVacuum(
+    auto completionHandler =
         [readyPromise = std::move(readyPromise), this](bool success) mutable
+    {
+        if (success)
         {
-            if (success)
-            {
-                NX_INFO(
-                    this,
-                    lit("finished loading chunks from DB. storage: %1, file: %2")
-                        .arg(m_storage->getUrl())
-                        .arg(m_dbFileName));
-            }
-            else
-            {
-                NX_WARNING(
-                    this,
-                    lit("loading chunks from DB failed. storage: %1, file: %2")
-                        .arg(m_storage->getUrl())
-                        .arg(m_dbFileName));
-            }
+            NX_INFO(
+                this,
+                lit("finished loading chunks from DB. storage: %1, file: %2")
+                .arg(m_storage->getUrl())
+                .arg(m_dbFileName));
+        }
+        else
+        {
+            NX_WARNING(
+                this,
+                lit("loading chunks from DB failed. storage: %1, file: %2")
+                .arg(m_storage->getUrl())
+                .arg(m_dbFileName));
+        }
 
-            readyPromise.set_value();
-        },
-        &result);
+        readyPromise.set_value();
+    };
+
+    serverModule()->storageDbPool()->addTask(
+        [this, completionHandler = std::move(completionHandler), &result]() mutable
+    {
+        startVacuum(std::move(completionHandler), &result);
+    });
 
     readyFuture.wait();
     return result;
@@ -442,11 +390,11 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     auto fileContent = dbFileContent();
 
     if (!measureTime(
-            [this, &fileContent, &parsedData]()
-            {
-                return nx::media_db::DbReader::parse(fileContent, parsedData.get());
-            },
-            QString("Vacuum: Parse DB:")))
+        [this, &fileContent, &parsedData]()
+    {
+        return nx::media_db::DbReader::parse(fileContent, parsedData.get());
+    },
+        QString("Vacuum: Parse DB:")))
     {
         NX_WARNING(this, lm("Failed to parse DB file %1").args(m_dbFileName));
         startDbFile();
@@ -454,8 +402,8 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     }
 
     if (!measureTime(
-            [this, &parsedData, data]() { return writeVacuumedData(std::move(parsedData), data); },
-            QString("Vacuum: writeVacuumedData:")))
+        [this, &parsedData, data]() { return writeVacuumedData(std::move(parsedData), data); },
+        QString("Vacuum: writeVacuumedData:")))
     {
         NX_WARNING(this, lm("Failed to write vacuumed data. DB file %1").args(m_dbFileName));
         startDbFile();
@@ -477,17 +425,16 @@ bool QnStorageDb::writeVacuumedData(
     NX_DEBUG(this, "QnStorageDb::writeVacuumedData() begin");
 
     int expectedBufferSize = 0;
-    for (const auto& cameraData: parsedData->cameras)
+    for (const auto& cameraData : parsedData->cameras)
         expectedBufferSize += cameraData.serializedRecordSize();
-    for (const auto& catalog: parsedData->addRecords)
+    for (const auto& catalog : parsedData->addRecords)
     {
         expectedBufferSize +=
-            (int) catalog.second.size() * nx::media_db::MediaFileOperation::kSerializedRecordSize;
+            (int)catalog.second.size() * nx::media_db::MediaFileOperation::kSerializedRecordSize;
     }
 
     ByteStreamWriter writer(expectedBufferSize);
-    UuidToHash updatedUuidToHash;
-    processDbContent(*(parsedData.get()), outCatalog, writer, &updatedUuidToHash);
+    processDbContent(*(parsedData.get()), outCatalog, writer);
     writer.flush();
 
     NX_DEBUG(
@@ -510,7 +457,6 @@ bool QnStorageDb::writeVacuumedData(
         this,
         lm("QnStorageDb::writeVacuumedData write to disk finished. time = %1 ms").args(timer.elapsedMs()));
 
-    m_uuidToHash = updatedUuidToHash;
     return true;
 }
 
@@ -554,8 +500,7 @@ DeviceFileCatalog::Chunk QnStorageDb::toChunk(
 void QnStorageDb::processDbContent(
     nx::media_db::DbReader::Data& parsedData,
     QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
-    ByteStreamWriter& writer,
-    UuidToHash* outUuidToHash)
+    ByteStreamWriter& writer)
 {
     UuidToHash uuidToHash;
     for (const auto& cameraData : parsedData.cameras)
@@ -569,7 +514,7 @@ void QnStorageDb::processDbContent(
         cameraData.serialize(writer);
     }
 
-    *outUuidToHash = uuidToHash;
+    m_uuidToHash = uuidToHash;
     for (auto itr = parsedData.addRecords.begin(); itr != parsedData.addRecords.end(); ++itr)
     {
         int index = itr->first;
@@ -584,7 +529,7 @@ void QnStorageDb::processDbContent(
             auto removeItr = std::upper_bound(
                 removeCatalog.begin(),
                 removeCatalog.end(),
-                nx::media_db::DbReader::RemoveData { hash, i });
+                nx::media_db::DbReader::RemoveData{ hash, i });
 
             if (removeItr != removeCatalog.end() && removeItr->hash == hash)
                 continue; //< Value removed
@@ -593,12 +538,14 @@ void QnStorageDb::processDbContent(
             if (deviceFileCatalog)
                 chunks.push_back(toChunk(mediaData));
         }
-        if (deviceFileCatalog)
+
+        if (deviceFileCatalog && !chunks.empty())
         {
             putRecordsToCatalog(
                 deviceFileCatalog, index / 2,
                 index & 1,
-                std::move(chunks), uuidToHash);
+                std::move(chunks),
+                uuidToHash);
         }
     }
 }

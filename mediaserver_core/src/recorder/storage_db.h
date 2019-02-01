@@ -10,13 +10,13 @@
 
 #include <QElapsedTimer>
 
-#include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 
 #include "utils/media_db/media_db.h"
 
 #include "device_file_catalog.h"
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/utils/timer_manager.h>
 
 struct QStringHasher
 {
@@ -25,8 +25,7 @@ struct QStringHasher
         return qHash(s);
     }
 };
-
-class QnStorageDb: public nx::mediaserver::ServerModuleAware
+class QnStorageDb : public nx::mediaserver::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;
@@ -39,40 +38,37 @@ public:
         QnMediaServerModule* serverModule,
         const QnStorageResourcePtr& storage,
         int storageIndex,
-        std::chrono::seconds vacuumInterval = kVacuumInterval);
+        std::chrono::seconds vacuumInterval);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
 
-    bool deleteRecords(
+    void deleteRecords(
         const QString& cameraUniqueId,
         QnServer::ChunksCatalog catalog,
         qint64 startTimeMs = -1);
 
-    bool addRecord(const QString& cameraUniqueId,
-                   QnServer::ChunksCatalog catalog,
-                   const DeviceFileCatalog::Chunk& chunk);
+    void addRecord(const QString& cameraUniqueId,
+        QnServer::ChunksCatalog catalog,
+        const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    bool replaceChunks(const QString& cameraUniqueId,
-                       QnServer::ChunksCatalog catalog,
-                       const std::deque<DeviceFileCatalog::Chunk>& chunks);
+    void replaceChunks(const QString& cameraUniqueId,
+        QnServer::ChunksCatalog catalog,
+        const std::deque<DeviceFileCatalog::Chunk>& chunks);
 
 private:
     using VacuumCompletionHandler = nx::utils::MoveOnlyFunc<void(bool)>;
-    static constexpr std::chrono::seconds kVacuumInterval{3600 * 24};
 
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
-    std::unique_ptr<nx::media_db::MediaDbWriter> m_dbWriter;
     std::unique_ptr<QIODevice> m_ioDevice;
+    std::unique_ptr<nx::media_db::MediaDbWriter> m_dbWriter;
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
-    bool m_vacuumInProgress = false;
-    nx::media_db::DBRecordQueue m_dbRecordQueue;
-    nx::network::aio::Timer m_timer;
     std::chrono::seconds m_vacuumInterval;
+    nx::utils::StandaloneTimerManager m_vacuumTimer;
 
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
@@ -91,8 +87,7 @@ private:
     void processDbContent(
         nx::media_db::DbReader::Data& parsedData,
         QVector<DeviceFileCatalogPtr> *deviceFileCatalog,
-        ByteStreamWriter& writer,
-        UuidToHash* outUuidToHash);
+        ByteStreamWriter& writer);
     void putRecordsToCatalog(
         QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
         int cameraId,
@@ -105,7 +100,6 @@ private:
     void startVacuum(
         VacuumCompletionHandler completionHandler,
         QVector<DeviceFileCatalogPtr> *data = nullptr);
-    void writeOrCache(const nx::media_db::DBRecord& dbRecord);
     void onVacuumFinished(bool success);
 };
 
