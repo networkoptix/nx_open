@@ -436,7 +436,7 @@
       },
       {
         "name": "Settings",
-        "is_global": false,
+        "is_global": true,
         "description": "Settings for product",
         "hidden": true,
         "translatable": false,
@@ -481,7 +481,7 @@
       },
       {
         "name": "Camera page",
-        "is_global": false,
+        "is_global": true,
         "description": "Settings for camera page",
         "hidden": true,
         "translatable": false,
@@ -599,7 +599,7 @@
       },
       {
         "name": "Footer Menu",
-        "is_global": false,
+        "is_global": true,
         "description": "Footer Menu",
         "hidden": true,
         "translatable": true,

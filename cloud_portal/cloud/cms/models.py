@@ -58,7 +58,13 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
             'smtp_port': product.read_global_value('%SMTP_PORT%'),
             'smtp_user': product.read_global_value('%SMTP_USER%'),
             'smtp_password': product.read_global_value('%SMTP_PASSWORD%'),
-            'smtp_tls': product.read_global_value('%SMTP_TLS%')
+            'smtp_tls': product.read_global_value('%SMTP_TLS%'),
+            'footer_items': product.read_global_value("%FOOTER_ITEMS%"),
+            'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
+            'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
+            'sort_supported_devices': product.read_global_value("%SORT_SUPPORTED_DEVICES%"),
+            'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
+            'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%")
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])

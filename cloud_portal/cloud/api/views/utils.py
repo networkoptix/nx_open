@@ -12,35 +12,23 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
-from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProductPermissions
+from cms.models import DataStructure, get_cloud_portal_product,\
+    cloud_portal_customization_cache, UserGroupsToProductPermissions
 
 logger = logging.getLogger(__name__)
 
 
-def get_settings_from_db(product, data_structure_name):
-    return DataStructure.objects.get(name=data_structure_name).\
-        find_actual_value(product=product, version_id=product.version_id())
-
-
 def get_settings_from_cache():
-    product = get_cloud_portal_product()
-    settings_cache_name = "{}_settings".format(product.customizations.first().name)
-    settings_object = cache.get(settings_cache_name, None)
-
-    if not settings_object or "version_id" not in settings_object\
-            or settings_object["version_id"] != product.version_id():
-        settings_object = {
-            'footerItems': get_settings_from_db(product, "%FOOTER_ITEMS%"),
-            'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
-            'publicDownloads': get_settings_from_db(product, "%PUBLIC_DOWNLOADS%"),
-            'publicReleases': get_settings_from_db(product, "%PUBLIC_RELEASE_HISTORY%"),
-            'sortSupportedDevices': get_settings_from_db(product, "%SORT_SUPPORTED_DEVICES%"),
-            'supportedResolutions': get_settings_from_db(product, "%SUPPORTED_RESOLUTIONS%"),
-            'supportedHardwareTypes': get_settings_from_db(product, "%SUPPORTED_HARDWARE_TYPES%"),
-            'version_id': product.version_id()
-        }
-        cache.set(settings_cache_name, settings_object)
-    return settings_object
+    customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION)
+    return {
+        'footerItems': customization_cache['footer_items'],
+        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads': customization_cache['public_downloads'],
+        'publicReleases': customization_cache['public_releases'],
+        'sortSupportedDevices': customization_cache['sort_supported_devices'],
+        'supportedResolutions': customization_cache['supported_resolutions'],
+        'supportedHardwareTypes': customization_cache['supported_hardware_types']
+    }
 
 
 @api_view(['GET', 'POST'])
