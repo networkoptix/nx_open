@@ -11,7 +11,7 @@ bool mallocInfo(
     std::string* data,
     std::string* contentType)
 {
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
     char* buf = nullptr;
     std::size_t bufSize = 0;
     FILE* outputStream = open_memstream(&buf, &bufSize);

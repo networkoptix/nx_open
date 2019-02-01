@@ -36,6 +36,7 @@ Flickable
             {
                 text: index + 1
 
+                labelPadding: 0
                 leftPadding: 0
                 rightPadding: 0
                 topPadding: 0

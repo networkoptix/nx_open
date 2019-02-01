@@ -29,19 +29,14 @@ nx::utils::SoftwareVersion minSupportedVersion(nx::vms::api::PeerType localPeerT
     return nx::utils::SoftwareVersion("1.4");
 }
 
-/* For mobile clients country-local customizations must be compatible with base, e.g.
- * 'default' should connect to 'default_cn' and 'default_zh_CN'. The same applied to brands
- * comparing, e.g. 'hdwitness' is compatible with 'hdwitness_cn' on mobile clients. */
-bool compatibleCustomization(const QString& c1, const QString& c2, bool isMobile)
+bool isDefaultCustomization(const QString& customization)
 {
-    if (c1.isEmpty() || c2.isEmpty())
-        return true;
+    return customization == "default" || customization == "hdwitness";
+}
 
-    if (!isMobile)
-        return c1 == c2;
-
-    const QChar kSeparator = L'_';
-    return c1.left(c1.indexOf(kSeparator)) == c2.left(c2.indexOf(kSeparator));
+bool isMetaCustomization(const QString& customization)
+{
+    return customization == "metavms";
 }
 
 bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
@@ -110,6 +105,28 @@ bool QnConnectionValidator::isCompatibleToCurrentSystem(const nx::vms::api::Modu
         && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
+// For mobile clients country-local customizations must be compatible with base, e.g.
+// 'default' should connect to 'default_cn' and 'default_zh_CN'. The same applied to brands
+// comparing, e.g. 'hdwitness' is compatible with 'hdwitness_cn' on mobile clients.
+bool QnConnectionValidator::isCompatibleCustomization(
+    const QString& serverCustomization,
+    const QString& clientCustomization,
+    bool isMobile)
+{
+    // In developer mode customization is empty.
+    if (serverCustomization.isEmpty() || clientCustomization.isEmpty())
+        return true;
+
+    if (!isMobile)
+        return serverCustomization == clientCustomization;
+
+    if (isDefaultCustomization(clientCustomization) && isMetaCustomization(serverCustomization))
+        return true;
+
+    const QChar kSeparator = L'_';
+    return serverCustomization.left(serverCustomization.indexOf(kSeparator)) == clientCustomization.left(clientCustomization.indexOf(kSeparator));
+}
+
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QString& brand,
     const QString& customization,
@@ -119,10 +136,10 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
 {
     bool isMobile = nx::vms::api::PeerData::isMobileClient(qnStaticCommon->localPeerType());
 
-    if (!compatibleCustomization(brand, qnStaticCommon->brand(), isMobile))
+    if (!isCompatibleCustomization(brand, qnStaticCommon->brand(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    if (!compatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
+    if (!isCompatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
     if (!compatibleCloudHost(cloudHost, isMobile))

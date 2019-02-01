@@ -197,7 +197,7 @@ Item
             return
 
         d.connecting = false
-        if (error == QnCloudStatusWatcher.InvalidUser)
+        if (error == QnCloudStatusWatcher.InvalidEmail)
         {
             d.invalidUser = true
             showAccountWarning(qsTr("Account not found"))

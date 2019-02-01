@@ -17,8 +17,7 @@
     #include <libgen.h>
     #include <memory.h>
 #elif defined(__APPLE__)
-    #include <libgen.h>
-    #include <crt_externs.h>
+    #include <nx/kit/apple_utils.h>
 #endif
 
 #include "ini_config.h"
@@ -76,10 +75,7 @@ OutputRedirector::OutputRedirector()
         const std::string name = (strlen(path_s) == 0) ? "" : basename(path_s);
         free(path_s);
     #elif defined(__APPLE__)
-        // Needed because basename() changes the string.
-        char* const path_s = strdup((*_NSGetArgv())[0]);
-        const std::string name = (strlen(path_s) == 0) ? "" : basename(path_s);
-        free(path_s);
+        const auto name = processName();
     #elif defined(_WIN32)
         int argc;
         LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
