@@ -43,8 +43,8 @@ IDeviceAgent* Engine::obtainDeviceAgent(
 
 void Engine::initCapabilities()
 {
-    if (ini().deviceModelDependent)
-        m_capabilities += "|deviceModelDependent";
+    if (ini().deviceDependent)
+        m_capabilities += "|deviceDependent";
 
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
