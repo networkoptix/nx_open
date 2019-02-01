@@ -250,7 +250,7 @@ public:
     typedef std::vector<Catalog> CatalogCont;
 
 public:
-    TestChunkManager(int cameraCount)
+    TestChunkManager(int cameraCount, int storageIndex): m_storageIndex(storageIndex)
     {
         for (int i = 0; i < cameraCount; ++i)
         {
@@ -272,7 +272,7 @@ public:
         if (chunkExists(fileOp.startTime))
             return boost::none;
 
-        DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,  fileOp.fileIndex,
+        DeviceFileCatalog::Chunk chunk(fileOp.startTime, m_storageIndex,  fileOp.fileIndex,
             fileOp.duration, fileOp.timeZone, (quint16)(fileOp.fileSize >> 32),
             (quint32)(fileOp.fileSize));
 
@@ -319,7 +319,7 @@ public:
             if (chunkExists(fileOp.startTime))
                 continue;
 
-            DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1, fileOp.fileIndex,
+            DeviceFileCatalog::Chunk chunk(fileOp.startTime, m_storageIndex, fileOp.fileIndex,
                 fileOp.duration, fileOp.timeZone, (quint16)((fileOp.fileSize) >> 32),
                 (quint32)(fileOp.fileSize));
 
@@ -342,6 +342,7 @@ private:
     TestChunkCont m_chunks;
     CatalogCont m_catalogs;
     std::vector<TestChunk*> m_unremovedChunks;
+    const int m_storageIndex;
 
     bool chunkExists(qint64 startTime) const
     {
@@ -788,19 +789,19 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
 TEST_F(MediaDbTest, StorageDB)
 {
-    QnStorageDb sdb(&serverModule(), storage, 1, std::chrono::seconds(600));
-    auto result = sdb.open(*workDirResource->getDirName() + lit("/test.nxdb"));
+    auto sdb  = serverModule().storageDbPool()->getSDB(storage);
+    auto result = sdb->open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
-    sdb.loadFullFileCatalog();
+    sdb->loadFullFileCatalog();
 
     QnMutex mutex;
     std::vector<nx::utils::thread> threads;
-    TestChunkManager tcm(100);
+    TestChunkManager tcm(100, serverModule().storageDbPool()->getStorageIndex(storage));
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 300; ++i)
+        for (int i = 0; i < 500; ++i)
         {
             int diceRoll = nx::utils::random::number(0, 10);
             switch (diceRoll)
@@ -810,7 +811,7 @@ TEST_F(MediaDbTest, StorageDB)
                 std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
                 QnMutexLocker lk(&mutex);
                 p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
-                sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
+                sdb->replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
                 break;
             }
             case 1:
@@ -821,7 +822,7 @@ TEST_F(MediaDbTest, StorageDB)
                 chunk = tcm.generateRemoveOperation();
                 if (chunk)
                 {
-                    sdb.deleteRecords(
+                    sdb->deleteRecords(
                         chunk->catalog->cameraUniqueId,
                         chunk->catalog->quality, chunk->chunk.startTimeMs);
                 }
@@ -834,7 +835,7 @@ TEST_F(MediaDbTest, StorageDB)
                 chunk = tcm.generateAddOperation();
                 if (!(bool)chunk)
                     break;
-                sdb.addRecord(
+                sdb->addRecord(
                     chunk->catalog->cameraUniqueId,
                     chunk->catalog->quality, chunk->chunk);
                 break;
@@ -850,7 +851,7 @@ TEST_F(MediaDbTest, StorageDB)
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         for (size_t i = 0; i < 10; ++i)
         {
-            sdb.loadFullFileCatalog();
+            sdb->loadFullFileCatalog();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };
@@ -863,7 +864,7 @@ TEST_F(MediaDbTest, StorageDB)
     for (auto &t : threads)
         t.join();
 
-    dbChunkCatalogs = sdb.loadFullFileCatalog();
+    dbChunkCatalogs = sdb->loadFullFileCatalog();
 
     for (auto catalogIt = dbChunkCatalogs.cbegin();
          catalogIt != dbChunkCatalogs.cend();
@@ -911,15 +912,15 @@ TEST_F(MediaDbTest, startWithNonEmptyDb_merge)
     // #TODO: #akulikov implement
 }
 
-TEST_F(MediaDbTest, RepaceRecord)
+TEST_F(MediaDbTest, ReplaceRecord)
 {
     using namespace nx::media_db;
 
-    QnStorageDb sdb(&serverModule(), storage, 1, std::chrono::seconds(600));
-    auto result = sdb.open(*workDirResource->getDirName() + lit("/test.nxdb"));
+    auto sdb  = serverModule().storageDbPool()->getSDB(storage);
+    auto result = sdb->open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
-    sdb.loadFullFileCatalog();
+    sdb->loadFullFileCatalog();
 
     const QString id1("1");
     const QString id2("2");
@@ -930,20 +931,20 @@ TEST_F(MediaDbTest, RepaceRecord)
     chunk.durationMs = 5;
     chunk.fileIndex = DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
 
-    sdb.addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
-    sdb.deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
-    sdb.deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
-    sdb.addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
 
-    sdb.addRecord(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
-    sdb.deleteRecords(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->addRecord(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
 
-    sdb.addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
-    sdb.deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
-    sdb.addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
-    sdb.deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
 
-    auto dbChunkCatalogs = sdb.loadFullFileCatalog();
+    auto dbChunkCatalogs = sdb->loadFullFileCatalog();
 
     ASSERT_EQ(3, dbChunkCatalogs.size());
     ASSERT_EQ(1, dbChunkCatalogs[0]->size());
