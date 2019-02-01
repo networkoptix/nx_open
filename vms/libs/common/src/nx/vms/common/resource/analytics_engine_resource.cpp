@@ -76,6 +76,13 @@ analytics::ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeD
         engineManifest.objectTypes);
 }
 
+QList<nx::vms::api::analytics::EngineManifest::ObjectAction>
+    AnalyticsEngineResource::supportedObjectActions() const
+{
+    const auto engineManifest = manifest();
+    return engineManifest.objectActions;
+}
+
 bool AnalyticsEngineResource::isDeviceDependent() const
 {
     const auto engineManifest = manifest();

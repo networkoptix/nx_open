@@ -68,9 +68,6 @@ namespace ResourcePropertyKey
     // Contains QnCameraAdvancedParams in ubjson-serialized state.
     static const QString kCameraAdvancedParams("cameraAdvancedParams");
 
-    // TODO: Rename to supportedAnalyticsEventTypeIds.
-    static const QString kAnalyticsDriversParamName("analyticsDrivers");
-
     static const QString kFirmware("firmware");
     static const QString kDeviceType("deviceType");
     static const QString kIoConfigCapability("ioConfigCapability");
