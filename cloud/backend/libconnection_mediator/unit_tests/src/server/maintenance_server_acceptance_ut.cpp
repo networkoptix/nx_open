@@ -6,19 +6,29 @@
 
 namespace nx::hpm::test {
 
-struct MediatorMaintenanceTypeSet
+struct MaintenanceTypeSetImpl
 {
     static const char* apiPrefix;
     using BaseType = MediatorFunctionalTest;
 };
 
-const char* MediatorMaintenanceTypeSet::apiPrefix = nx::hpm::api::kMediatorApiPrefix;
+const char* MaintenanceTypeSetImpl::apiPrefix = nx::hpm::api::kMediatorApiPrefix;
 
 using namespace nx::network::test;
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    MediatorMaintenance,
-    MaintenanceServiceAcceptance,
-    MediatorMaintenanceTypeSet);
+    ConnectionMediator,
+    MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile,
+    MaintenanceTypeSetImpl);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    ConnectionMediator,
+    MaintenanceServiceAcceptanceWithNoHtdigestFile,
+    MaintenanceTypeSetImpl);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    ConnectionMediator,
+    MaintenanceServiceAcceptanceWithEmptyHtdigestFile,
+    MaintenanceTypeSetImpl);
 
 } // namespace nx::hpm::test
