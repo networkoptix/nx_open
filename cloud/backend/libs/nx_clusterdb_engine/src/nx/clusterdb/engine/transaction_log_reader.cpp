@@ -114,7 +114,8 @@ std::string stateToString(const vms::api::TranState& tranState)
         if (!str.empty())
             str += ", ";
 
-        str += it.key().id.toSimpleString().toStdString();
+        str += "{" + it.key().id.toSimpleString().toStdString() + ", " +
+            it.key().persistentId.toSimpleString().toStdString() + "}";
         str += ": ";
         str += std::to_string(it.value());
     }
