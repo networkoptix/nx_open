@@ -609,7 +609,7 @@
             "name": "%FOOTER_ITEMS%",
             "value": [
               {
-                "name": "About <span class=\"product-name\">%PRODUCT_NAME%</span>",
+                "name": "About %PRODUCT_NAME%",
                 "url": "/content/about",
                 "newWindow": false,
                 "enabled": true

@@ -21,5 +21,12 @@
 	"multi_sensor_camera": "Multi-Sensor Camera",
 	"encoder": "Encoder",
 	"dvr": "DVR",
-	"other": "Other"
+	"other": "Other",
+	"About %PRODUCT_NAME%": "About %PRODUCT_NAME%",
+	"Download %VMS_NAME%": "Download %VMS_NAME%",
+	"Integrations": "Integrations",
+	"Support": "Support",
+	"Terms": "Terms",
+	"Privacy": "Privacy",
+	"Supported Devices": "Supported Devices"
 }

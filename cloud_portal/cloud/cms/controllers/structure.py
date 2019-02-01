@@ -155,7 +155,7 @@ def update_from_object(cms_structure):
                     data_structure.optional = True
 
                 elif data_structure.type in [DataStructure.DATA_TYPES.object, DataStructure.DATA_TYPES.array]:
-                    value = json.dumps(value)
+                    value = json.dumps(value, indent=4)
 
                 data_structure.meta_settings = meta if meta else {}
                 data_structure.default = value
