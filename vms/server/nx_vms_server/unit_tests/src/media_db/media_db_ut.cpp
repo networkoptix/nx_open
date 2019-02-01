@@ -699,7 +699,9 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     const QString workDirPath = *workDirResource->getDirName();
     QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
-    //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
+    auto sdb = serverModule().storageDbPool()->getSDB(storage);
+    sdb->loadFullFileCatalog();
+
     auto sqlDb = QSqlDatabase::addDatabase(
         lit("QSQLITE"),
         QString("QnStorageManager_%1").arg(fileName));
@@ -753,16 +755,10 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         }
     }
 
-    bool result;
-
     auto connectionName = sqlDb.connectionName();
     sqlDb.close();
     sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
-
-    auto sdb = serverModule().storageDbPool()->getSDB(storage);
-    ASSERT_TRUE(result);
-    sdb->loadFullFileCatalog();
 
     for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
