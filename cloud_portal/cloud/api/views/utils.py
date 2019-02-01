@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.core.cache import caches
+from django.core.cache import cache, caches
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.helpers.exceptions import handle_exceptions, require_params,\
     APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
@@ -17,34 +17,30 @@ from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProd
 logger = logging.getLogger(__name__)
 
 
-def get_suported_hardware_types():
-    return DataStructure.objects.get(name="%SUPPORTED_HARDWARE_TYPES%").\
-        find_actual_value(product=get_cloud_portal_product())
+def get_settings_from_db(product, data_structure_name):
+    return DataStructure.objects.get(name=data_structure_name).\
+        find_actual_value(product=product, version_id=product.version_id())
 
 
-def get_sorting_supported_devices():
-    return DataStructure.objects.get(name="%SORT_SUPPORTED_DEVICES%").\
-        find_actual_value(product=get_cloud_portal_product())
+def get_settings_from_cache():
+    product = get_cloud_portal_product()
+    settings_cache_name = "{}_settings".format(product.customizations.first().name)
+    settings_object = cache.get(settings_cache_name, None)
 
-
-def get_suported_resolutions():
-    return DataStructure.objects.get(name="%SUPPORTED_RESOLUTIONS%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_footer_items():
-    return DataStructure.objects.get(name="%FOOTER_ITEMS%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_public_downloads_status():
-    return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_public_release_history_status():
-    return DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
-        find_actual_value(product=get_cloud_portal_product())
+    if not settings_object or 'version_id' not in settings_object\
+            or settings_object['version_id'] != product.version_id():
+        settings_object = {
+            'footerItems': get_settings_from_db(product, "%FOOTER_ITEMS%"),
+            'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+            'publicDownloads': get_settings_from_db(product, "%PUBLIC_DOWNLOADS%"),
+            'publicReleases': get_settings_from_db(product, "%PUBLIC_RELEASE_HISTORY%"),
+            'sortSupportedDevices': get_settings_from_db(product, "%SORT_SUPPORTED_DEVICES%"),
+            'supportedResolutions': get_settings_from_db(product, "%SUPPORTED_RESOLUTIONS%"),
+            'supportedHardwareTypes': get_settings_from_db(product, "%SUPPORTED_HARDWARE_TYPES%"),
+            'version_id': product.version_id()
+        }
+        cache.set(settings_cache_name, settings_object)
+    return settings_object
 
 
 @api_view(['GET', 'POST'])
@@ -247,13 +243,7 @@ def downloads(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def get_settings(request):
-    settings_object = {
-        'footerItems': get_footer_items(),
-        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
-        'publicDownloads': get_public_downloads_status(),
-        'publicReleases': get_public_release_history_status(),
-        'sortSupportedDevices': get_sorting_supported_devices(),
-        'supportedResolutions': get_suported_resolutions(),
-        'supportedHardwareTypes': get_suported_hardware_types()
-    }
+    settings_object = get_settings_from_cache()
+    if 'version_id' in settings_object:
+        del settings_object['version_id']
     return Response(settings_object)
