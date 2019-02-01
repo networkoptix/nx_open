@@ -188,7 +188,21 @@ add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(libs)
+
+    if(withClouds AND LINUX)
+        add_subdirectory(cloud_portal)
+    endif()
+
     add_subdirectory(cloud)
+
+    if(withClouds)
+        add_custom_target(cloud DEPENDS cloud-backend)
+
+        if(LINUX)
+            add_custom_target(cloud-frontend DEPENDS cloud_portal)
+            add_dependencies(cloud cloud-frontend)
+        endif()
+    endif()
 endif()
 
 #add_subdirectory(_axis_controller)
@@ -207,16 +221,6 @@ if(beta)
     set(beta_bool "true")
 else()
     set(beta_bool "false")
-endif()
-
-if(withClouds)
-    add_custom_target(cloud DEPENDS cloud-backend)
-
-    if(LINUX)
-        add_subdirectory(cloud_portal)
-        add_custom_target(cloud-frontend DEPENDS cloud_portal)
-        add_dependencies(cloud cloud-frontend)
-    endif()
 endif()
 
 if(withDocumentation)
