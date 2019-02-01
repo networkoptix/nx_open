@@ -22,7 +22,7 @@ HttpView::HttpView(
     m_settings(settings),
     m_controller(controller),
     m_multiAddressHttpServer(
-        &controller->securityManager().authenticator(),
+        &m_authenticationDispatcher,
         &m_httpMessageDispatcher,
         false,  //< TODO: #ak enable ssl when it works properly.
         nx::network::NatTraversalSupport::disabled)
@@ -57,6 +57,8 @@ HttpView::HttpView(
     m_maintenanceServer.registerRequestHandlers(
         kApiPrefix,
         &m_httpMessageDispatcher);
+
+    registerAuthenticators();
 }
 
 HttpView::~HttpView()
@@ -105,6 +107,27 @@ void HttpView::registerStatisticsApiHandlers(
         kStatisticsMetricsPath,
         std::bind(&statistics::Provider::statistics, statisticsProvider),
         network::http::Method::get);
+}
+
+void HttpView::registerAuthenticators()
+{
+    if (!m_settings.http().maintenanceHtdigestPath.empty())
+    {
+        NX_INFO(
+            this,
+            lm("htdigest authentication for cloud db maintenance server enabled. File path: %1")
+                .arg(m_settings.http().maintenanceHtdigestPath));
+
+        m_maintenanceAuthenticator.initialize(m_settings.http().maintenanceHtdigestPath);
+
+        m_authenticationDispatcher.add(
+            std::regex(m_maintenanceServer.maintenancePath() + "/.*"),
+            m_maintenanceAuthenticator.manager.get());
+    }
+
+    m_authenticationDispatcher.add(
+        std::regex(".*"),
+        &m_controller->securityManager().authenticator());
 }
 
 void HttpView::registerApiHandlers(

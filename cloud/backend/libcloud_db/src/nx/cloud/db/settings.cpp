@@ -110,6 +110,9 @@ const int kDefaultTcpBacklogSize = 1024;
 const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
+const QLatin1String kMaintenanceHtdigestPath("http/maintenanceHtdigestPath");
+const QLatin1String kDefaultMaintenanceHtdigestPath("");
+
 //-------------------------------------------------------------------------------------------------
 // VmsGateway
 const QLatin1String kVmsGatewayUrl("vmsGateway/url");
@@ -405,6 +408,9 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
+
+    m_http.maintenanceHtdigestPath = settings().value(
+        kMaintenanceHtdigestPath, kDefaultMaintenanceHtdigestPath).toString().toStdString();
 
     //vmsGateway
     m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();
