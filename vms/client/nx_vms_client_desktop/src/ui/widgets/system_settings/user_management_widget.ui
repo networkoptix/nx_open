@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>831</width>
     <height>400</height>
    </rect>
   </property>
@@ -48,6 +48,9 @@
        </property>
        <property name="rootIsDecorated">
         <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
@@ -162,7 +165,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="nx::vms::client::desktop::HintButton" name="ldapTooltip" native="true"/>
+      <widget class="nx::vms::client::desktop::HintButton" name="ldapTooltip"/>
      </item>
      <item>
       <widget class="QPushButton" name="ldapSettingsButton">
@@ -189,9 +192,9 @@
    <header location="global">nx/vms/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-    <class>nx::vms::client::desktop::HintButton</class>
-    <extends>QPushButton</extends>
-    <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
+   <class>nx::vms::client::desktop::HintButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
