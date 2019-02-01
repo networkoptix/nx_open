@@ -68,20 +68,22 @@ protected:
 
         ASSERT_TRUE(this->startAndWaitUntilStarted());
 
-        m_httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
-        m_httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+        this->m_httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
+        this->m_httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
     }
 
     void whenRequestMallocInfoWithValidCredentials()
     {
-        setClientCredentials(kValidUserAndPassword);
-        ASSERT_TRUE(m_httpClient.doGet(requestUrl(nx::network::maintenance::kMallocInfo)));
+        this->setClientCredentials(kValidUserAndPassword);
+        ASSERT_TRUE(this->m_httpClient.doGet(
+            this->requestUrl(nx::network::maintenance::kMallocInfo)));
     }
 
     void whenRequestLoggingConfigurationWithValidCredentials()
     {
-        setClientCredentials(kValidUserAndPassword);
-        ASSERT_TRUE(m_httpClient.doGet(requestUrl(loggerPath())));
+        this->setClientCredentials(kValidUserAndPassword);
+        ASSERT_TRUE(this->m_httpClient.doGet(
+            this->requestUrl(this->loggerPath())));
     }
 
     void whenRequestMallocInfoWithAnyCredentials()
@@ -96,19 +98,19 @@ protected:
 
     void thenRequestSucceeded(nx::network::http::StatusCode::Value statusCode)
     {
-        ASSERT_NE(nullptr, m_httpClient.response());
-        ASSERT_EQ(statusCode, m_httpClient.response()->statusLine.statusCode);
+        ASSERT_NE(nullptr, this->m_httpClient.response());
+        ASSERT_EQ(statusCode, this->m_httpClient.response()->statusLine.statusCode);
     }
 
     void thenRequestFailed(nx::network::http::StatusCode::Value statusCode)
     {
-        ASSERT_NE(nullptr, m_httpClient.response());
-        ASSERT_EQ(statusCode, m_httpClient.response()->statusLine.statusCode);
+        ASSERT_NE(nullptr, this->m_httpClient.response());
+        ASSERT_EQ(statusCode, this->m_httpClient.response()->statusLine.statusCode);
     }
 
     void setClientCredentials(const std::pair<const char*, const char*>& userAndPassword)
     {
-        m_httpClient.setCredentials(nx::network::http::Credentials(
+        this->m_httpClient.setCredentials(nx::network::http::Credentials(
             userAndPassword.first,
             nx::network::http::Ha1AuthToken(userAndPassword.second)));
     }
@@ -142,20 +144,20 @@ class MaintenanceServiceAcceptanceWithNonEmptyHtdigestFile:
 protected:
     void whenRequestMallocInfoWithInvalidCredentials()
     {
-        setClientCredentials(kInvalidUserAndPassword);
-        ASSERT_TRUE(m_httpClient.doGet(requestUrl(nx::network::maintenance::kMallocInfo)));
+        this->setClientCredentials(kInvalidUserAndPassword);
+        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(nx::network::maintenance::kMallocInfo)));
     }
 
     void whenRequestLoggingConfigurationWithInvalidCredentials()
     {
-        setClientCredentials(kInvalidUserAndPassword);
-        ASSERT_TRUE(m_httpClient.doGet(requestUrl(nx::network::maintenance::kMallocInfo)));
+        this->setClientCredentials(kInvalidUserAndPassword);
+        ASSERT_TRUE(this->m_httpClient.doGet(this->requestUrl(this->loggerPath())));
     }
 
 private:
     virtual void loadHtdigestFile() override
     {
-        // Give a file path but do not write any credentials.
+        // Give a file path and write credentials.
         std::string htdigestPath = this->testDataDir().toStdString() + "/htdigest.txt";
         ASSERT_TRUE(this->writeCredentials(htdigestPath));
 
