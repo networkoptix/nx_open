@@ -315,13 +315,19 @@ import * as Hls from 'hls.js';
                                         });
                                         
                                         scope.vgApi.addEventListener('loadeddata', function (event) {
-                                            $timeout(() => scope.loading = false ); // Video is playing - disable loading
+                                            scope.loading = false; // Video is playing - disable loading
                                             scope.playerHandler();
                                             cancelTimeoutNativeLoad();
                                         });
+    
+                                        scope.vgApi.addEventListener('playing', function (event) {
+                                            // I experienced a missing event "loadeddata" (WebM?)
+                                            // this is to continue playing -- TT
+                                            scope.loading = false;
+                                        });
                                         
                                         scope.vgApi.addEventListener('waiting', function (event) {
-                                            $timeout(() => scope.loading = true );
+                                            scope.loading = true;
                                         });
                                         
                                         scope.vgApi.addEventListener('ended', function (event) {
@@ -432,6 +438,7 @@ import * as Hls from 'hls.js';
                             if (makingPlayer) {
                                 return;
                             }
+                            
                             makingPlayer = true;
                             switch (scope.player) {
                                 case 'flashls':
@@ -468,6 +475,7 @@ import * as Hls from 'hls.js';
                         }
                         
                         function srcChanged() {
+                            debugger;
                             scope.loading = true; // source changed - start loading
                             scope.videoFlags.errorLoading = false;
                             
