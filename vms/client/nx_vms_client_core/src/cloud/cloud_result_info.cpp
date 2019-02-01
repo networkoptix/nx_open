@@ -2,11 +2,10 @@
 
 #include <nx/network/app_info.h>
 
-#include <utils/common/app_info.h>
+using ResultCode = nx::cloud::db::api::ResultCode;
 
-using namespace nx::cloud::db::api;
-
-QnCloudResultInfo::QnCloudResultInfo(ResultCode code) : m_text(toString(code))
+QnCloudResultInfo::QnCloudResultInfo(ResultCode code):
+    m_text(toString(code))
 {
 }
 
@@ -19,7 +18,8 @@ QString QnCloudResultInfo::toString(ResultCode code)
 {
     switch (code)
     {
-        /* Public result codes: */
+        //------------------------------------------------------------------------------------------
+        // Public result codes.
 
         case ResultCode::ok:
             return tr("Successful.");
@@ -48,45 +48,42 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Invalid login.");
 
         case ResultCode::serviceUnavailable:
+        case ResultCode::retryLater:
             return tr("%1 is temporary unavailable. Please try again later.",
                 "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName());
 
         case ResultCode::credentialsRemovedPermanently:
             return tr("Credentials are no longer valid.");
 
-        case ResultCode::retryLater:
-            return tr("Sorry, %1 Service could not process your request. Please try again in a few moments.",
-                "%1 is the cloud name (like Nx Cloud)")
-                .arg(nx::network::AppInfo::cloudName());
-
-        /* Internal result codes: */
+        //------------------------------------------------------------------------------------------
+        // Internal result codes.
 
         case ResultCode::partialContent:
-            return tr("Successful.");
+            return "Successful.";
 
         case ResultCode::notFound:
-            return tr("Requested object is not found.");
+            return "Requested object is not found.";
 
         case ResultCode::alreadyExists:
-            return tr("Object already exists.");
+            return "Object already exists.";
 
         case ResultCode::notImplemented:
-            return tr("Requested feature is not implemented.");
+            return "Requested feature is not implemented.";
 
         case ResultCode::unknownRealm:
-            return tr("Unknown realm.");
+            return "Unknown realm.";
 
         case ResultCode::badRequest:
-            return tr("Bad request.");
+            return "Bad request.";
 
         case ResultCode::invalidNonce:
-            return tr("Invalid nonce.");
+            return "Invalid nonce.";
 
         case ResultCode::invalidFormat:
-            return tr("Invalid data received.");
+            return "Invalid data received.";
 
         case ResultCode::unknownError:
-            return tr("Unknown error.");
+            return "Unknown error.";
 
         default:
             return QString();
