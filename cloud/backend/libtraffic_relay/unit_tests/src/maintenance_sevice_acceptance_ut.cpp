@@ -35,9 +35,8 @@ QString MaintenanceServiceBaseTypeImpl::testDataDir() const
 std::vector<const char *> MaintenanceServiceBaseTypeImpl::argsAsConstCharPtr()
 {
     std::vector<const char *> args;
-    args.reserve(m_args.size());
-    for (const auto& arg : m_args)
-        args.push_back(arg.c_str());
+    std::transform(m_args.begin(), m_args.end(),
+        std::back_inserter(args), [](const auto& str){ return str.c_str(); });
     return args;
 }
 
