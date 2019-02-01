@@ -18,10 +18,8 @@ QString QnCloudResultInfo::toString(ResultCode code)
 {
     switch (code)
     {
-        //------------------------------------------------------------------------------------------
-        // Public result codes.
-
         case ResultCode::ok:
+        case ResultCode::partialContent:
             return tr("Successful.");
 
         case ResultCode::notAuthorized:
@@ -37,6 +35,14 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Too many attempts. Try again in a minute.");
 
         case ResultCode::dbError:
+        case ResultCode::notFound:
+        case ResultCode::alreadyExists:
+        case ResultCode::notImplemented:
+        case ResultCode::unknownRealm:
+        case ResultCode::badRequest:
+        case ResultCode::invalidNonce:
+        case ResultCode::invalidFormat:
+        case ResultCode::unknownError:
             return tr("Internal %1 error. Please contact support team.",
                 "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::network::AppInfo::cloudName());
@@ -54,36 +60,6 @@ QString QnCloudResultInfo::toString(ResultCode code)
 
         case ResultCode::credentialsRemovedPermanently:
             return tr("Credentials are no longer valid.");
-
-        //------------------------------------------------------------------------------------------
-        // Internal result codes.
-
-        case ResultCode::partialContent:
-            return "Successful.";
-
-        case ResultCode::notFound:
-            return "Requested object is not found.";
-
-        case ResultCode::alreadyExists:
-            return "Object already exists.";
-
-        case ResultCode::notImplemented:
-            return "Requested feature is not implemented.";
-
-        case ResultCode::unknownRealm:
-            return "Unknown realm.";
-
-        case ResultCode::badRequest:
-            return "Bad request.";
-
-        case ResultCode::invalidNonce:
-            return "Invalid nonce.";
-
-        case ResultCode::invalidFormat:
-            return "Invalid data received.";
-
-        case ResultCode::unknownError:
-            return "Unknown error.";
 
         default:
             return QString();
