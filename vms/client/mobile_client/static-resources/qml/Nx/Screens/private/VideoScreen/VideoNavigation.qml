@@ -14,6 +14,7 @@ Item
 {
     id: videoNavigation
 
+    readonly property bool hasArchive: d.hasArchive && videoNavigation.canViewArchive
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
@@ -26,7 +27,7 @@ Item
     property alias motionFilter: cameraChunkProvider.motionFilter
     property alias changingMotionRoi: timeline.changingMotionRoi
     property bool hasCustomRoi: false;
-
+    property bool drawingRoi: false
     property string warningText
 
     signal ptzButtonClicked()
@@ -37,8 +38,9 @@ Item
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
-    onHasCustomRoiChanged: d.updateWarningText()
-    onMotionSearchModeChanged: d.updateWarningText()
+    onDrawingRoiChanged: updateWarningTextTimer.restart()
+    onHasCustomRoiChanged: updateWarningTextTimer.restart()
+    onMotionSearchModeChanged: updateWarningTextTimer.restart()
 
     Connections
     {
@@ -65,13 +67,12 @@ Item
         }
     }
 
-    QtObject
+    Object
     {
         id: d
 
         readonly property bool loadingChunks:
-            cameraChunkProvider.loading
-            || cameraChunkProvider.loadingMotion
+            cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool playbackStarted: false
         property bool controlsNeeded:
@@ -94,14 +95,26 @@ Item
             NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
         }
 
-        onLoadingChunksChanged: updateWarningText()
+        onLoadingChunksChanged: updateWarningTextTimer.restart()
+
+        Timer
+        {
+            // Updates warning message after some delay to prevent fast changes.
+            id: updateWarningTextTimer
+
+            interval: 10
+            repeat: false
+            onTriggered: d.updateWarningText()
+        }
 
         function updateWarningText()
         {
-            if (videoNavigation.loadingChunks)
+            if (loadingChunks)
                 return
 
-            if (!videoNavigation.motionSearchMode || cameraChunkProvider.hasMotionChunks())
+            var motionMode = videoNavigation.motionSearchMode
+            var hasMotionChunks = cameraChunkProvider.hasMotionChunks()
+            if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
                 videoNavigation.warningText = ""
             else if (!cameraChunkProvider.hasChunks())
                 videoNavigation.warningText = qsTr("No motion data for this camera")
@@ -114,8 +127,8 @@ Item
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
             videoScreenController
-                && videoScreenController.mediaPlayer.liveMode
-                && !playbackController.paused
+            && videoScreenController.mediaPlayer.liveMode
+            && !playbackController.paused
         property real resumePosition: -1
 
         function updateNavigatorPosition()
@@ -332,7 +345,7 @@ Item
             onPositionTapped:
             {
                 d.resumePosition = -1
-                timeline.position = position
+                timeline.timelineView.setPositionImmediately(position)
                 videoScreenController.setPosition(position, true)
             }
             onPositionChanged:
@@ -481,8 +494,11 @@ Item
                 anchors.left:  calendarButton.right
                 anchors.verticalCenter: parent.verticalCenter
                 icon.source: lp("/images/motion.svg")
+                icon.width: 24
+                icon.height: 24
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
+                visible: videoNavigation.hasArchive
             }
 
             Row

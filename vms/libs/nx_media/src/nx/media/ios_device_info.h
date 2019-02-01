@@ -20,7 +20,9 @@ struct IosDeviceInformation
     {
         iPhoneXs = 11,
         iPhone6 = 7,
+        
         iPadAir2 = 5,
+        iPadProA12XBionic = 8
     };
 
     Type type = Type::unknown;

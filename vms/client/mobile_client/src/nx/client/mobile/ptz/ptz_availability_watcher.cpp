@@ -10,6 +10,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <nx/client/core/watchers/user_watcher.h>
+#include <core/resource/client_core_camera.h>
 
 namespace {
 
@@ -51,16 +52,18 @@ void PtzAvailabilityWatcher::setResourceId(const QnUuid& uuid)
         m_camera->disconnect(this);
 
     const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    m_camera = resourcePool->getResourceById<QnVirtualCameraResource>(uuid);
+    m_camera = resourcePool->getResourceById<nx::vms::client::core::Camera>(uuid);
     if (!m_camera)
     {
         setAvailable(false);
         return;
     }
 
-    connect(m_camera, &QnVirtualCameraResource::statusChanged,
+    connect(m_camera, &nx::vms::client::core::Camera::statusChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
-    connect(m_camera, &QnVirtualCameraResource::mediaDewarpingParamsChanged,
+    connect(m_camera, &nx::vms::client::core::Camera::mediaDewarpingParamsChanged,
+        this, &PtzAvailabilityWatcher::updateAvailability);
+    connect(m_camera, &nx::vms::client::core::Camera::propertyChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
 
     updateAvailability();
@@ -94,6 +97,9 @@ void PtzAvailabilityWatcher::updateAvailability()
         return;
 
     if (m_camera->getDewarpingParams().enabled)
+        return;
+
+    if (m_camera->isPtzRedirected())
         return;
 
     nonAvailableSetter.disarm();

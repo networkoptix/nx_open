@@ -2,6 +2,8 @@ import QtQuick 2.6
 import nx.client.core 1.0
 import Nx 1.0
 
+import "private"
+
 Item
 {
     id: rootItem
@@ -29,23 +31,21 @@ Item
     property real allowedTopMargin: 0
     property real allowedBottomMargin: 0
 
-    property bool allowCompositeEvents: true
-
+    property bool interactive: true
     readonly property alias flickable: flick
     readonly property real contentScale: Geometry.scaleFactor(
         Qt.size(width, height), Qt.size(contentWidth, contentHeight))
 
-    signal pressed(int mouseX, int mouseY)
-    signal released()
-    signal positionChanged(int mouseX, int mouseY)
-    signal cancelled()
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
     signal movementEnded()
-    signal contentRectChanged()
     property bool moving: false
 
-    property var doubleTapStartCheckFuncion
+    property alias doubleTapStartCheckFuncion: controller.doubleTapStartCheckFunction
+    property alias allowCompositeEvents: controller.allowCompositeEvents
+
+    property alias pinchArea: pinchArea
+    property alias mouseArea: mouseArea
 
     function resizeContent(width, height, animate, forceSize)
     {
@@ -76,7 +76,8 @@ Item
         onMovementEnded: rootItem.movementEnded()
 
         interactive:
-            !mouseArea.doubleTapScaleMode
+            rootItem.interactive
+            && !mouseArea.doubleTapScaleMode
             && (mouseArea.doubleTapDownPos ? false : true)
             && rootItem.allowCompositeEvents
 
@@ -88,22 +89,8 @@ Item
         }
 
         /* Workaround for qt bug: top and left margins are ignored. */
-        onContentXChanged:
-        {
-            fixContentX()
-            rootItem.contentRectChanged()
-        }
-        onContentYChanged:
-        {
-            fixContentY()
-            rootItem.contentRectChanged()
-        }
-
-        onOriginXChanged: rootItem.contentRectChanged()
-        onOriginYChanged: rootItem.contentRectChanged()
-        onContentHeightChanged: rootItem.contentRectChanged()
-        onContentWidthChanged: rootItem.contentRectChanged()
-
+        onContentXChanged: fixContentX()
+        onContentYChanged: fixContentY()
         onLeftMarginChanged: fixContentX()
         onTopMarginChanged: fixContentY()
 
@@ -171,19 +158,6 @@ Item
 
             /* Cannot use returnToBounds for smooth animation due to the mentioned Flickable bug. */
             animateToSize(contentWidth, contentHeight, true)
-            /*
-            boundsAnimation.stop()
-
-            var x = contentX
-            var y = contentY
-
-            updateMargins()
-
-            contentX = x
-            contentY = y
-
-            returnToBounds()
-            */
         }
 
         function animateToSize(cw, ch, animate, forceSize)
@@ -211,11 +185,15 @@ Item
                 x = w - width + allowedRightMargin
             if (-x > allowedLeftMargin)
                 x = -allowedLeftMargin
+            if (w <= width)
+                x = 0
 
             if (-y + h < rootItem.height - allowedBottomMargin)
                 y = h - rootItem.height + allowedBottomMargin
             if (-y > allowedTopMargin)
                 y = -allowedTopMargin
+            if (h <= height)
+                y = 0
 
             if (animate)
             {
@@ -313,218 +291,33 @@ Item
         }
     }
 
+    ZoomableFlickableController
+    {
+        id: controller
+
+        enabled: !flick.dragging && rootItem.interactive
+
+        pinchArea: pinchArea
+        mouseArea: mouseArea
+        flickable: flick
+
+        onClicked: rootItem.clicked()
+        onDoubleClicked: rootItem.doubleClicked(mouseX, mouseY)
+    }
+
     PinchArea
     {
         id: pinchArea
 
         parent: flick
-
-        anchors.fill: flick
-
-        property real initialWidth
-        property real initialHeight
-        property real initialContentX
-        property real initialContentY
-
-        function startPinch()
-        {
-            boundsAnimation.stop()
-            initialWidth = flick.contentWidth
-            initialHeight = flick.contentHeight
-            initialContentX = flick.contentX
-            initialContentY = flick.contentY
-            flick.leftMargin = 0
-            flick.topMargin = 0
-            flick.contentX = initialContentX
-            flick.contentY = initialContentY
-            flick.fixMargins()
-        }
-
-        function finishPinch()
-        {
-            flick.animating = true
-            flick.fixMargins()
-            flick.animateToBounds()
-        }
-
-        function updatePinch(center, previousCenter, targetScale)
-        {
-            flick.contentX += previousCenter.x - center.x
-            flick.contentY += previousCenter.y - center.y
-
-            var cx = center.x + flick.contentX
-            var cy = center.y + flick.contentY
-
-            var w = initialWidth * targetScale
-            var h = initialHeight * targetScale
-
-            if (w > maxContentWidth)
-                targetScale = maxContentWidth / initialWidth
-
-            w = initialWidth * targetScale
-            h = initialHeight * targetScale
-
-            if (h > maxContentHeight)
-                targetScale = Math.min(targetScale, maxContentHeight / initialHeight)
-
-            if (targetScale < 0.1)
-                targetScale = 0.1
-            flick.resizeContent(initialWidth * targetScale, initialHeight * targetScale, Qt.point(cx, cy))
-        }
-
-        onPinchStarted: startPinch()
-        onPinchUpdated: updatePinch(pinch.center, pinch.previousCenter, pinch.scale)
-        onPinchFinished: finishPinch()
-
-        enabled: !flick.dragging
+        anchors.fill: parent
 
         MouseArea
         {
             id: mouseArea
 
-            property var doubleTapDownPos: undefined
-            property bool doubleTapScaleMode: false
-            property point downPos
-
-            anchors.fill: parent
-
             propagateComposedEvents: true
-
-            onDoubleTapScaleModeChanged:
-            {
-                if (doubleTapScaleMode)
-                {
-                    pinchArea.startPinch()
-                }
-                else
-                {
-                    doubleTapDownPos = undefined
-                    pinchArea.finishPinch()
-                }
-            }
-
-            onPositionChanged:
-            {
-                rootItem.positionChanged(mouse.x, mouse.y)
-
-                if (!doubleTapDownPos)
-                    return
-
-                var currentVector = Qt.vector2d(
-                    doubleTapDownPos.x - mouseX,
-                    doubleTapDownPos.y - mouseY)
-
-                if (!doubleTapScaleMode)
-                {
-                    var minDoubleTapStartLength = 15
-                    if (currentVector.length() > minDoubleTapStartLength)
-                        doubleTapScaleMode = rootItem.allowCompositeEvents
-
-                }
-
-                if (!doubleTapScaleMode)
-                    return
-
-                var sideSize = Math.min(flick.width, flick.height) / 2
-                var scaleChange = 1 + Math.abs(currentVector.y / sideSize)
-                var targetScale = currentVector.y > 0 ? 1 / scaleChange : scaleChange
-                pinchArea.updatePinch(doubleTapDownPos, doubleTapDownPos, targetScale)
-            }
-
-            onDoubleClicked:
-            {
-                delayedClickTimer.stop()
-                doubleClickFilterTimer.restart();
-
-                var mousePosition = Qt.point(mouseX, mouseY)
-                if (rootItem.doubleTapStartCheckFuncion
-                    && rootItem.doubleTapStartCheckFuncion(mousePosition))
-                {
-                    doubleTapDownPos = mousePosition
-                }
-            }
-
-            onPressed:
-            {
-                downPos = Qt.point(mouse.x, mouse.y)
-                rootItem.pressed(mouse.x, mouse.y)
-                clickFilterTimer.restart()
-            }
-
-            onCanceled:
-            {
-                delayedClickTimer.stop()
-                rootItem.cancelled()
-
-                doubleTapScaleMode = false
-                doubleTapDownPos = undefined
-            }
-
-            onReleased:
-            {
-                if (clickFilterTimer.running
-                    && !doubleClickFilterTimer.running
-                    && downPos.x == mouse.x && downPos.y == mouse.y)
-                {
-
-                    delayedClickTimer.restart()
-                }
-                else
-                {
-                    delayedClickTimer.stop()
-                }
-
-                rootItem.released()
-                doubleTapScaleMode = false
-                doubleTapDownPos = undefined
-                if (!doubleClickFilterTimer.running)
-                    return
-
-                doubleClickFilterTimer.stop()
-                rootItem.doubleClicked(mouse.x, mouse.y)
-            }
-
-            onClicked: mouse.accepted = true
-
-            Timer
-            {
-                id: delayedClickTimer
-
-                interval: 300
-                onTriggered: rootItem.clicked()
-            }
-
-            Timer
-            {
-                id: clickFilterTimer
-                interval: 400
-            }
-
-            Timer
-            {
-                id: doubleClickFilterTimer
-                interval: 300
-            }
-
-            onWheel:
-            {
-                var cx = wheel.x + flick.contentX
-                var cy = wheel.y + flick.contentY
-
-                var scale = wheel.angleDelta.y > 0 ? 1.1 : 0.9
-                var w = flick.contentWidth * scale
-                var h = flick.contentHeight * scale
-
-                if (w > maxContentWidth)
-                    scale = maxContentWidth / flick.contentWidth
-                if (h > maxContentHeight)
-                    scale = Math.max(scale, maxContentHeight / flick.contentHeight)
-
-                flick.animating = true
-                flick.fixMargins()
-                flick.resizeContent(flick.contentWidth * scale, flick.contentHeight * scale, Qt.point(cx, cy))
-                flick.animateToBounds()
-            }
+            anchors.fill: parent
         }
     }
 

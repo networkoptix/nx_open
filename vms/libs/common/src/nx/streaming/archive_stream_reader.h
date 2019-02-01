@@ -47,7 +47,10 @@ public:
     virtual void directJumpToNonKeyFrame(qint64 mksec) override;
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime) override;
-    bool jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime);
+
+    // Function jumps to the specified time or to the corrected accordingly to the playback
+    // mask position.
+    bool jumpTo(qint64 mksec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime);
 
     virtual void setSkipFramesToTime(qint64 skipTime) override;
     virtual void nextFrame() override;

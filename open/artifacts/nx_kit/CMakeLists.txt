@@ -15,7 +15,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
-add_library(nx_kit ${nxKitLibraryType}
+set (nx_kit_files
     src/nx/kit/utils.h
     src/nx/kit/utils.cpp
     src/nx/kit/debug.h
@@ -27,8 +27,20 @@ add_library(nx_kit ${nxKitLibraryType}
     src/nx/kit/test.h
     src/nx/kit/test.cpp
     src/ini_config_c.h
-    src/ini_config_c_impl.h
-)
+    src/ini_config_c_impl.h)
+
+if (APPLE)
+    set (nx_kit_files ${nx_kit_files}
+        src/nx/kit/apple_utils.h
+        src/nx/kit/apple_utils.mm)
+endif()
+
+add_library(nx_kit ${nxKitLibraryType} ${nx_kit_files})
+
+if (APPLE)
+    find_library(Foundation_LIBRARY Foundation REQIRED)
+    target_link_libraries(nx_kit ${Foundation_LIBRARY})
+endif()
 
 target_include_directories(nx_kit PUBLIC src)
 
@@ -47,6 +59,7 @@ target_compile_definitions(nx_kit
     PRIVATE NX_KIT_API=${NX_KIT_API_EXPORT_MACRO}
     INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
+
 
 set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
 if(nxKitWithTests)

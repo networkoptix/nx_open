@@ -87,6 +87,10 @@ function(setup_ios_application target)
         z
     )
 
+    if(qml_debug)
+        target_link_libraries(${target} PRIVATE Qt5PacketProtocol)
+    endif()
+
     set(plugins_import_cpp "${CMAKE_CURRENT_BINARY_DIR}/${target}_qt_plugins_import.cpp")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"

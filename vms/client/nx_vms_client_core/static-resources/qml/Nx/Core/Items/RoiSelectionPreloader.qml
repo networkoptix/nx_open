@@ -17,19 +17,21 @@ Item
     property real normalThickness: 1
 
     property bool enableAnimation: true
-    property int animationDuration: 600
+    property int animationDuration: 400
     property real expandedSize: 63
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
     property real centerCircleRadius: 2.5
+    readonly property bool expandingFinished: state == "normal"
+        || (d.circleRadius == expandedCircleRadius && state == "expanded")
 
     layer.enabled: true
 
     x: centerPoint.x - width / 2
     y: centerPoint.y - height / 2
 
-    width: d.size
-    height: width
+    width: d.size + shadow.radius * 2
+    height: width + shadow.radius * 2
     visible: opacity > 0
 
     Item
@@ -39,6 +41,11 @@ Item
         anchors.fill: parent
         visible: false
 
+        x: shadow.radius
+        y: shadow.radius
+        width: parent.width - x * 2
+        height: parent.height - y * 2
+
         Rectangle
         {
             id: leftDash
@@ -46,7 +53,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: d.thickness
             color: item.mainColor
-            width: item.dashSize - d.thickness
+            width: item.dashSize + d.thickness
             height: d.thickness
         }
 
@@ -57,7 +64,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: parent.width - width - d.thickness
             color: item.mainColor
-            width: item.dashSize - d.thickness
+            width: item.dashSize
             height: d.thickness
         }
 
@@ -69,7 +76,7 @@ Item
             y: d.thickness
             color: item.mainColor
             width: d.thickness
-            height: item.dashSize - d.thickness
+            height: item.dashSize + d.thickness
         }
 
         Rectangle
@@ -80,7 +87,7 @@ Item
             y: parent.height - height - d.thickness
             color: item.mainColor
             width: d.thickness
-            height: item.dashSize - d.thickness
+            height: item.dashSize + d.thickness
         }
 
         Circle
@@ -109,6 +116,7 @@ Item
 
         anchors.fill: visualHolder
         radius: 1
+        spread: 1
         color: item.shadowColor
         source: visualHolder
     }

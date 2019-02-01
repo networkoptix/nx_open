@@ -10,11 +10,12 @@ Item
     property point endPoint
     property bool drawing: false
 
-    property alias animationDuration: singleSelectionMarker.animationDuration
     property color roiColor
     property color shadowColor
     property int lineWidth: 1
     property bool singlePoint: true
+
+    readonly property alias expandingFinished: singleSelectionMarker.expandingFinished
 
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y
@@ -23,14 +24,18 @@ Item
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
     // Shows preloader
-    function start()
+    function start(immediate)
     {
-        d.preloader = true
+        if (immediate)
+            d.preloader = true
+        else
+            startDelayTimer.restart()
     }
 
     // Shows selection
     function show()
     {
+        startDelayTimer.stop()
         d.visible = true
         d.preloader = false
     }
@@ -38,8 +43,18 @@ Item
     // Hides whatever it shows.
     function hide()
     {
+        startDelayTimer.stop()
         d.preloader = false
         d.visible = false
+    }
+
+    Timer
+    {
+        id: startDelayTimer
+
+        interval: 200
+        repeat: false
+        onTriggered: d.preloader = true
     }
 
     RoiSelectionPreloader

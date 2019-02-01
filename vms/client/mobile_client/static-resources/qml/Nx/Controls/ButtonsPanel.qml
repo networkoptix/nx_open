@@ -4,6 +4,8 @@ ListView
 {
     id: control
 
+    readonly property bool denyFlickableVisibleAreaCorrection: true
+
     property int pressedStateFilterMs: 500
     property int emptyHeaderSize: 4
     readonly property alias scrollable: d.prefferToBeInteractive
