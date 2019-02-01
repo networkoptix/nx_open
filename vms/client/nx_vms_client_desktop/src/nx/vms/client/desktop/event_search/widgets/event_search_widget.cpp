@@ -265,6 +265,9 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
             for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
             {
+                if (eventTypeDescriptor.isHidden())
+                    continue;
+
                 for (const auto& scope: eventTypeDescriptor.scopes)
                 {
                     if (enabledEngines.contains(scope.engineId))

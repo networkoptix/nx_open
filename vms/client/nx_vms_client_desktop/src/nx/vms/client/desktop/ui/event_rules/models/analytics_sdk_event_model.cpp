@@ -85,13 +85,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                 const auto eventTypeDescriptor =
                     eventTypeDescriptorManager.descriptor(eventTypeId);
 
-                if (!eventTypeDescriptor)
-                    continue;
-
-                const bool isHidden = eventTypeDescriptor->flags.testFlag(
-                    nx::vms::api::analytics::EventTypeFlag::hidden);
-
-                if (isHidden)
+                if (!eventTypeDescriptor || eventTypeDescriptor->isHidden())
                     continue;
 
                 addItem(
