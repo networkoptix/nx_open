@@ -108,7 +108,7 @@ def downloads_history(request):
     # TODO: later we can check specific permissions
     can_view_releases = UserGroupsToProductPermissions.\
         check_customization_permission(request.user, settings.CUSTOMIZATION, 'api.can_view_release')
-    if not get_public_release_history_status() and not can_view_releases:
+    if not get_settings_from_db(get_cloud_portal_product(), "%PUBLIC_RELEASE_HISTORY%") and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
@@ -125,8 +125,10 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not get_public_release_history_status() and not UserGroupsToProductPermissions.\
-            check_customization_permission(request.user, customization, 'api.can_view_release'):
+    if not get_settings_from_db(get_cloud_portal_product(), "%PUBLIC_RELEASE_HISTORY%") and \
+            not UserGroupsToProductPermissions.check_customization_permission(request.user,
+                                                                              customization,
+                                                                              'api.can_view_release'):
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
@@ -167,7 +169,8 @@ def download_build(request, build):
 def downloads(request):
     global_cache = caches['global']
     customization = settings.CUSTOMIZATION
-    if not get_public_downloads_status() and not request.user.is_authenticated:
+    if not get_settings_from_db(get_cloud_portal_product(), "%PUBLIC_DOWNLOADS%") and \
+            not request.user.is_authenticated:
         raise APIForbiddenException("Not authorized", ErrorCodes.not_authorized)
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
