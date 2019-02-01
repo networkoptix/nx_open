@@ -41,7 +41,7 @@ static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
     return nullptr;
 }
 
-} // namespace 
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
 // Camera
@@ -78,7 +78,7 @@ bool Camera::initialize()
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
 
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
-    if(!m_compressionTypeDescriptor)
+    if (!m_compressionTypeDescriptor)
     {
         NX_DEBUG(
             this,
@@ -132,7 +132,7 @@ bool Camera::hasAudio() const
 void Camera::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
-    if(m_audioStream)
+    if (m_audioStream)
         m_audioStream->setEnabled(value);
 }
 
@@ -213,7 +213,7 @@ std::string Camera::toString() const
 
 CodecParameters Camera::getDefaultVideoParameters()
 {
-    if(!m_compressionTypeDescriptor)
+    if (!m_compressionTypeDescriptor)
         return CodecParameters();
 
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
@@ -223,7 +223,7 @@ CodecParameters Camera::getDefaultVideoParameters()
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const device::video::ResolutionData& a, const device::video::ResolutionData& b)
         {
-            return a.width * a.height < b.width * b.height;
+            return a.width * a.height < b.width * b.height && a.fps < b.fps;
         });
 
     if (it != resolutionList.end())

@@ -66,7 +66,6 @@ struct BeforeRestoreDbData
     QByteArray storageInfo;
 };
 
-
 class QnResourceDataPool;
 
 /**
@@ -74,7 +73,7 @@ class QnResourceDataPool;
  *
  * All singletons and initialization/deinitialization code goes here.
  */
-class QnCommonModule: public QObject, public QnInstanceStorage
+class QnCommonModule: public QObject, public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT
 public:
@@ -92,7 +91,6 @@ public:
     {
         return m_storagePluginFactory;
     }
-
 
     QnSessionManager* sessionManager() const
     {
@@ -139,12 +137,12 @@ public:
         return m_resourceAccessProvider;
     }
 
-    QnResourcePropertyDictionary* propertyDictionary() const
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const
     {
         return m_resourcePropertyDictionary;
     }
 
-    QnResourceStatusDictionary* statusDictionary() const
+    QnResourceStatusDictionary* resourceStatusDictionary() const
     {
         return m_resourceStatusDictionary;
     }
@@ -289,7 +287,7 @@ public:
 
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
 
-    QnResourceDataPool* dataPool() const;
+    QnResourceDataPool* resourceDataPool() const;
 
 signals:
     void readOnlyChanged(bool readOnly);
@@ -351,7 +349,7 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
-    QnResourceDataPool* m_dataPool = nullptr;
+    QnResourceDataPool* m_resourceDataPool = nullptr;
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;

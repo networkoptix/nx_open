@@ -44,7 +44,7 @@ Q_DECLARE_METATYPE(AsyncRequestInfo);
 class QnSessionManager:
     public QObject,
     public /*mixin*/ QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

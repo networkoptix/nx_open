@@ -89,9 +89,6 @@ public:
     }
 };
 
-
-
-
 /**
  * Base class for accessing resource properties.
  *
@@ -99,7 +96,7 @@ public:
  */
 class QnAbstractResourcePropertyAdaptor:
     public Connective<QObject>,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -160,7 +157,6 @@ private:
     QVariant m_value;
 };
 
-
 template<class T>
 class QnResourcePropertyAdaptor: public QnAbstractResourcePropertyAdaptor {
     typedef QnAbstractResourcePropertyAdaptor base_type;
@@ -208,7 +204,6 @@ private:
     QString m_defaultSerializedValue;
 };
 
-
 template<class T>
 class QnJsonResourcePropertyAdaptor: public QnResourcePropertyAdaptor<T> {
     typedef QnResourcePropertyAdaptor<T> base_type;
@@ -217,7 +212,6 @@ public:
         base_type(key, new QnJsonResourcePropertyHandler<T>(), defaultValue, parent)
     {}
 };
-
 
 template<class T>
 class QnLexicalResourcePropertyAdaptor: public QnResourcePropertyAdaptor<T> {

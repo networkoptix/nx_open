@@ -86,7 +86,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
 int DiscoveryManager::checkHostAddress(
     nxcip::CameraInfo* /*cameras*/,
     const char* /*address*/,
-    const char* /*login*/, 
+    const char* /*login*/,
     const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam
@@ -134,7 +134,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(device.nxId);
     NX_DEBUG(this, "addOrUpdateCamera");
-    if(it == m_cameras.end())
+    if (it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
         m_cameras.emplace(device.nxId, CameraAndDeviceDataWithNxId(device));

@@ -564,7 +564,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     if (param.name == Qn::kResourceDataParamName)
     {
         const bool loaded = param.value.isEmpty()
-            || commonModule()->dataPool()->loadData(param.value.toUtf8());
+            || commonModule()->resourceDataPool()->loadData(param.value.toUtf8());
         NX_ASSERT(loaded, "Invalid json received");
     }
 }

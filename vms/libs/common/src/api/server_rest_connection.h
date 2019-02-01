@@ -80,7 +80,7 @@ struct ServerConnectionBase::Result<QByteArray>
 class ServerConnection:
     public QObject,
     public /*mixin*/ QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public ServerConnectionBase
 {
     Q_OBJECT

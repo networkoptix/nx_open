@@ -39,17 +39,17 @@ std::string codecIdToName(AVCodecID codecId)
 AVCodecID codecNameToId(const char * codecName)
 {
     AVCodec* codec = avcodec_find_decoder_by_name(codecName);
-    if(codec)
+    if (codec)
         return codec->id;
     codec = avcodec_find_encoder_by_name(codecName);
-    if(codec)
+    if (codec)
         return codec->id;
     return AV_CODEC_ID_NONE;
 }
 
 AVPixelFormat suggestPixelFormat(const AVCodec* codec)
 {
-    if(codec)
+    if (codec)
         return codec->pix_fmts ? codec->pix_fmts[0] : AV_PIX_FMT_NONE;
     return AV_PIX_FMT_NONE;
 }
@@ -237,12 +237,12 @@ AVSampleFormat suggestSampleFormat(const AVCodec * codec)
         AV_SAMPLE_FMT_U8P
     };
 
-    for(const auto & sampleFormat : priorityList)
+    for (const auto & sampleFormat : priorityList)
     {
         const AVSampleFormat * format = codec->sample_fmts;
-        for(; format && *format != AV_SAMPLE_FMT_NONE; ++format)
+        for (; format && *format != AV_SAMPLE_FMT_NONE; ++format)
         {
-            if(*format == sampleFormat)
+            if (*format == sampleFormat)
                 return *format;
         }
     }
@@ -257,7 +257,7 @@ int suggestSampleRate(const AVCodec * codec)
         return kDefaultSampleRate;
 
     int largest = 0;
-    for(const int * sampleRate = codec->supported_samplerates; *sampleRate; ++sampleRate)
+    for (const int * sampleRate = codec->supported_samplerates; *sampleRate; ++sampleRate)
         largest = FFMAX(largest, *sampleRate);
     return largest;
 }

@@ -91,7 +91,7 @@ public:
     /**
      * Launches internal thread.
      */
-    StandaloneTimerManager();
+    StandaloneTimerManager(const char* threadName = nullptr);
     virtual ~StandaloneTimerManager();
 
     /**
@@ -189,6 +189,8 @@ class NX_UTILS_API TimerManager:
     public StandaloneTimerManager,
     public Singleton<TimerManager>
 {
+public:
+    TimerManager(const char* threadName = nullptr) : StandaloneTimerManager(threadName) {}
 };
 
 /**

@@ -57,7 +57,7 @@ DnsResolver::DnsResolver():
     m_predefinedHostResolver = predefinedHostResolver.get();
     registerResolver(std::move(predefinedHostResolver), 1);
     registerResolver(std::make_unique<SystemResolver>(), 0);
-
+    setObjectName("DnsResolver");
     start();
 }
 

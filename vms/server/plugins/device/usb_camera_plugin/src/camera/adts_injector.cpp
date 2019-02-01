@@ -36,7 +36,7 @@ int AdtsInjector::initialize(ffmpeg::Codec * codec)
     m_outputStream->id = m_formatContext->nb_streams - 1;
 
     result = avcodec_parameters_from_context(m_outputStream->codecpar, codec->codecContext());
-    if(result < 0)
+    if (result < 0)
         return result;
 
     result = initializeIoContext(kDefaultBufferSize);

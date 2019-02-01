@@ -34,8 +34,7 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_terminated(false),
     m_statisticsCollector(nullptr)
 {
-    m_dropConnectionThread =
-        nx::utils::thread(
+    m_dropConnectionThread = nx::utils::thread(
             std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
     using namespace std::placeholders;

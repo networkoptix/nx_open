@@ -104,6 +104,7 @@ public:
     void addAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);
     void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
 
+    QString idForToStringFromPtr() const;
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);

@@ -68,9 +68,9 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
 
     auto resourceId = getId();
 
-    commonModule()->propertyDictionary()->setValue(resourceId, ResourcePropertyKey::kVideoLayout,
+    commonModule()->resourcePropertyDictionary()->setValue(resourceId, ResourcePropertyKey::kVideoLayout,
         m_videoLayout->toString());
-    commonModule()->propertyDictionary()->saveParams(resourceId);
+    commonModule()->resourcePropertyDictionary()->saveParams(resourceId);
 
     return m_videoLayout;
 }

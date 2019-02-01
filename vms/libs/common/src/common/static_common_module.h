@@ -23,7 +23,7 @@ struct QnStaticCommonModulePrivate;
  */
 class QnStaticCommonModule:
     public QObject,
-    public QnInstanceStorage,
+    public /*mixin*/ QnInstanceStorage,
     public Singleton<QnStaticCommonModule>
 {
     Q_OBJECT

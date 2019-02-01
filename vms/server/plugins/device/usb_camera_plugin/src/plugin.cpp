@@ -53,17 +53,17 @@ void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if ( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
     }
-    if( memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof( nxpl::IID_Plugin) ) == 0 )
+    if ( memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof( nxpl::IID_Plugin) ) == 0 )
     {
         addRef();
         return static_cast<nxpl::Plugin*>(this);
     }
-    if( memcmp( &interfaceID, &nxpl::IID_Plugin2, sizeof( nxpl::IID_Plugin2) ) == 0 )
+    if ( memcmp( &interfaceID, &nxpl::IID_Plugin2, sizeof( nxpl::IID_Plugin2) ) == 0 )
     {
         addRef();
         return static_cast<nxpl::Plugin2*>(this);
@@ -93,8 +93,8 @@ void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 
 void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider = static_cast<nxpl::TimeProvider*>(
-        pluginContainer->queryInterface(nxpl::IID_TimeProvider));
+    m_timeProvider = static_cast<nxpl::TimeProvider *>(
+            pluginContainer->queryInterface(nxpl::IID_TimeProvider));
 }
 
 nxpt::CommonRefManager* Plugin::refManager()

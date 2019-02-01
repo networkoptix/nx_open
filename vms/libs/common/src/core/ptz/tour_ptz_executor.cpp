@@ -46,7 +46,6 @@ struct QnPtzTourData {
     int size() const { return tour.spots.size(); }
 };
 
-
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutorPrivate
 // -------------------------------------------------------------------------- //
@@ -154,7 +153,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
         baseController->setParent(q);
     }
     connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
-    QnResourceData resourceData = controller->resource()->commonModule()->dataPool()
+    QnResourceData resourceData = controller->resource()->commonModule()->resourceDataPool()
         ->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
     tourGetPosWorkaround = resourceData.value<bool>(lit("tourGetPosWorkaround"), false);
 }
@@ -357,7 +356,6 @@ void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVar
     else if(command == defaultCommand)
         processMoving(data.isValid(), data.value<nx::core::ptz::Vector>());
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutor
