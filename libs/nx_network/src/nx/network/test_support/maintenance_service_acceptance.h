@@ -42,7 +42,7 @@ static constexpr char kHtdigestFile[] = "/htdigest.txt";
  INSTANTIATE_TYPED_TEST_CASE_P(
  *    SomeTestPrefix,                                 //< Can be anything
  *    MaintenanceServiceAcceptanceWithNoHtdigestFile, //< Do not change
- *    MaintenanceTypeSetImplementation);              //< Must match the struct name above
+ *    MaintenanceTypeSetImpl);                        //< Must match the struct name above
 
  INSTANTIATE_TYPED_TEST_CASE_P(
  *    SomeTestPrefix,                                    //< Can be anything
