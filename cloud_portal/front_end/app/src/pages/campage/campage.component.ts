@@ -40,6 +40,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
     hardwareDiffer: any;
     toggleCamview: boolean;
 
+    hwtypes: any;
+
   private setupDefaults() {
       this.allowedParameters = ['count', 'vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported', 'isPtzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 
@@ -104,7 +106,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterResolutions() {
-        this.resolutions = JSON.parse(this.config.supportedResolutions.replace(/u/g, '').replace(/'/g, '"'));
+        this.resolutions = JSON.parse(this.config.supportedResolutions.replace(/u'/g, '"').replace(/'/g, '"'));
 
         this.filterModel.selects = [
             {
@@ -214,7 +216,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
             this.allowedParameters = [...this.allowedParameters];
         }
 
-        if (this.filterModel.multiselects.find(x => x.id === 'resolution') !== undefined) {
+        if (this.filterModel.selects.find(x => x.id === 'resolution') !== undefined) {
             resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => {
                 return x.id === 'resolution';
             }).selected);
@@ -224,6 +226,9 @@ export class NxCampageComponent implements OnInit, DoCheck {
             hardwareChanges = this.hardwareDiffer.diff(this.filterModel.multiselects.find(x => {
                 return x.id === 'hardwareTypes';
             }).selected);
+            this.hwtypes = this.filterModel.multiselects.find(x => {
+                return x.id === 'hardwareTypes';
+            }).selected;
         }
 
         if (filterChanges || tagChanges || resolutionChanges || vendorChanges || hardwareChanges) {

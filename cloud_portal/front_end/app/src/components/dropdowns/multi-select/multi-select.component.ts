@@ -1,7 +1,7 @@
 import {
     Component, OnInit, ViewEncapsulation,
     Input, forwardRef, OnChanges, SimpleChanges, ViewChild, ElementRef, Output, EventEmitter
-} from '@angular/core';
+}                                                  from '@angular/core';
 import { TranslateService }                        from '@ngx-translate/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -10,11 +10,11 @@ const noop = () => {
 
 /* Usage
  <nx-multi-select name="permissions"
-     canSelectAll?
-     description="Roles"
-     [items]="[{label: 'a', id: 1}, {label: 'b', id:3}]"
-     [ngModel]="[1, 3]"       <- selected items id's
-     (ngModelChanged)="onChange(result)">
+ canSelectAll?
+ description="Roles"
+ [items]="[{label: 'a', id: 1}, {label: 'b', id:3}]"
+ [ngModel]="[1, 3]"       <- selected items id's
+ (ngModelChanged)="onChange(result)">
  </nx-select>
  */
 
@@ -74,15 +74,14 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     }
 
     change(evt, item) {
-        if (!evt.target.checked) {
-            const index = this.innerValue.indexOf(item.id);
-            if (index > -1) {
-                this.innerValue.splice(index, 1);
-            }
+        const index = this.innerValue.indexOf(item.id);
+        if (index > -1) {
+            this.innerValue.splice(index, 1);
         } else {
             this.innerValue.push(item.id);
         }
 
+        item.selected = (this.innerValue.indexOf(item.id) > -1);
         this.updateModel();
 
         // break anchor nav event
