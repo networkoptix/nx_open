@@ -326,6 +326,11 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   activateCamera(elementSelected: any): void {
+      if (elementSelected === undefined) {
+          this.resetActiveCamera();
+          return;
+      }
+
       const selectedCamera = this.cameras.find((camera) => camera.sortKey === elementSelected.value.sortKey);
       if (this.activeCamera === selectedCamera) {
           return;

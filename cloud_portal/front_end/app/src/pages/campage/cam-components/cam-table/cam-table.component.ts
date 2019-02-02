@@ -235,6 +235,9 @@ export class CamTableComponent implements OnChanges, OnInit {
 
       // get current page of items
       this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
+
+      // clear selected camera
+      this.setClickedRow(-1, undefined);
   }
 
   yesNo (bVal) {
