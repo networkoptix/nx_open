@@ -40,6 +40,12 @@
         </div>
     </div>
 
+    <div class="col text-placeholder d-flex align-items-center"
+         *ngIf="!camerasTable.length && vendors && !vendors.length"
+         translate>
+        Nothing Found
+    </div>
+
     <nx-vendor-list
             *ngIf="!camerasTable.length"
             [vendors]="vendors"

@@ -1,66 +1,59 @@
 <div class="nx-table-wrapper">
-    <div class="col text-placeholder d-flex align-items-center"
-         *ngIf="results == 0; else camview"
-         translate>
-        Nothing Found
-    </div>
+    <div class="nx-table-header">
+        <div class="col-md-12 d-flex align-items-center p-0">
 
-    <ng-template #camview>
-        <div class="nx-table-header">
-            <div class="col-md-12 d-flex align-items-center p-0">
-
-                <div class="flex-grow-1">
-                    <div class="results m-0">
-                        {{results}}
-                        <span *ngIf="results != 1" translate>results</span>
-                        <span *ngIf="results == 1" translate>result</span>
-                    </div>
-                </div>
-
-                <div class="col-md-3 text-right p-0">
-                    <nx-csv-button [data]="csvCameraData"
-                                   filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
-                                   [options]="csvOptions">
-                    </nx-csv-button>
+            <div class="flex-grow-1">
+                <div class="results m-0">
+                    {{results}}
+                    <span *ngIf="results != 1" translate>results</span>
+                    <span *ngIf="results == 1" translate>result</span>
                 </div>
             </div>
+
+            <div class="col-md-3 text-right p-0">
+                <nx-csv-button [data]="csvCameraData"
+                               filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
+                               [options]="csvOptions">
+                </nx-csv-button>
+            </div>
         </div>
-    </ng-template>
+    </div>
 
     <div class="table-wrapper">
         <table class="table table-hover nx-table">
             <thead>
-                <tr *ngIf="results > 0">
-                    <th *ngFor="let header of showHeaders"
-                        class="align-bottom position-relative"
-                        [ngClass]="{'selectable' : isSortable(header)}"
-                        (click)="toggleHeaderSort(header)">
+            <tr>
+                <th *ngFor="let header of showHeaders"
+                    class="align-bottom position-relative"
+                    [ngClass]="{'selectable' : isSortable(header)}"
+                    (click)="toggleHeaderSort(header)">
 
-                        <div class="d-flex">
-                            <div class="float-left">{{header}}</div>
-                            <div class="sort-dir nav-arrow position-relative float-left"
-                                 *ngIf="header == selectedHeader && isSortable(header)"
-                                 [ngClass]="{'up': !sortOrderASC}">
+                    <div class="d-flex">
+                        <div class="float-left">{{header}}</div>
+                        <div class="sort-dir nav-arrow position-relative float-left"
+                             *ngIf="header == selectedHeader && isSortable(header)"
+                             [ngClass]="{'up': !sortOrderASC}">
 
-                                <span></span>
-                                <span></span>
-                            </div>
+                            <span></span>
+                            <span></span>
                         </div>
-                    </th>
-                </tr>
+                    </div>
+                </th>
+            </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let element of pagedItems | keyvalue: byKey; let i = index" [ngClass]="{'selected': i == selectedRow}"
-                    (click)="setClickedRow(i, element);">
-                    <td *ngFor="let p of showParameters" class="text-left">
+            <tr *ngFor="let element of pagedItems | keyvalue: byKey; let i = index"
+                [ngClass]="{'selected': i == selectedRow}"
+                (click)="setClickedRow(i, element);">
+                <td *ngFor="let p of showParameters" class="text-left">
                         <span *ngIf="isString(element.value[p]); else icon">
                             {{ element.value[p] }}
                         </span>
-                        <ng-template #icon>
-                            <nx-bool-icon [value]="element.value[p]"></nx-bool-icon>
-                        </ng-template>
-                    </td>
-                </tr>
+                    <ng-template #icon>
+                        <nx-bool-icon [value]="element.value[p]"></nx-bool-icon>
+                    </ng-template>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
