@@ -594,6 +594,52 @@
                 "label": "other"
               }
             ]
+          },
+          {
+            "label": "Search tags",
+            "name": "%SEARCH_TAGS%",
+            "description": "Defines search tags",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
+            "value": [
+              {
+                "id": "isAudioSupported",
+                "value": false
+              },
+              {
+                "id": "isTwAudioSupported",
+                "value": false
+              },
+              {
+                "id": "isPtzSupported",
+                "value": false
+              },
+              {
+                "id": "isAptzSupported",
+                "value": false
+              },
+              {
+                "id": "isFisheye",
+                "value": false
+              },
+              {
+                "id": "isMdSupported",
+                "value": false
+              },
+              {
+                "id": "isIoSupported",
+                "value": false
+              },
+              {
+                "id": "isH265",
+                "value": false
+              },
+              {
+                "id": "isMultiSensor",
+                "value": false
+              }
+            ]
           }
         ]
       },

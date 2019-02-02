@@ -97,6 +97,7 @@ window.L = {};
                     appState.supportedResolutions = response.supportedResolutions;
                     appState.supportedHardwareTypes = response.supportedHardwareTypes;
                     appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
+                    appState.searchTags = response.searchTags;
                     
                     angular.extend(CONFIG, appState);
                 });

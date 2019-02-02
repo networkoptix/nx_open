@@ -106,7 +106,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterResolutions() {
-        this.resolutions = JSON.parse(this.config.supportedResolutions.replace(/u'/g, '"').replace(/'/g, '"'));
+        this.resolutions = JSON.parse(this.config.supportedResolutions);
 
         this.filterModel.selects = [
             {
@@ -119,57 +119,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterTags() {
-        this.filterModel.tags = [
-            {
-                id   : 'isAudioSupported',
-                label: this.lang.isAudioSupported,
-                value: false
-            },
-            {
-                id   : 'isTwAudioSupported',
-                label: this.lang.isTwAudioSupported,
-                value: false
-            },
-            {
-                id   : 'isPtzSupported',
-                label: this.lang.isPtzSupported,
-                value: false
-            },
-            {
-                id   : 'isAptzSupported',
-                label: this.lang.isAptzSupported,
-                value: false
-            },
-            {
-                id   : 'isFisheye',
-                label: this.lang.isFisheye,
-                value: false
-            },
-            {
-                id   : 'isMdSupported',
-                label: this.lang.isMdSupported,
-                value: false
-            },
-            {
-                id   : 'isIoSupported',
-                label: this.lang.isIoSupported,
-                value: false
-            },
-            {
-                id   : 'isH265',
-                label: this.lang.isH265,
-                value: false
-            },
-            {
-                id   : 'isMultiSensor',
-                label: this.lang.isMultiSensor,
-                value: false
-            }
-        ];
+        this.filterModel.tags = JSON.parse(this.config.searchTags);
+        this.filterModel.tags.forEach(tag => tag.label = this.lang[tag.id]);
     }
 
     addFilterTypes() {
-        this.hardwareTypes = JSON.parse(this.config.supportedHardwareTypes.replace(/u'/g, '"').replace(/'/g, '"'));
+        this.hardwareTypes = JSON.parse(this.config.supportedHardwareTypes);
         this.hardwareTypes.forEach(type => {
             type.label = this.lang[type.label];
         });
@@ -348,7 +303,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
     searchVendor(filter) {
         this.resetActiveCamera();
-        // debugger;
         this.filter = filter;
 
         if (this.data) {

@@ -27,7 +27,8 @@ def get_settings_from_cache():
         'publicReleases': customization_cache['public_releases'],
         'sortSupportedDevices': customization_cache['sort_supported_devices'],
         'supportedResolutions': customization_cache['supported_resolutions'],
-        'supportedHardwareTypes': customization_cache['supported_hardware_types']
+        'supportedHardwareTypes': customization_cache['supported_hardware_types'],
+        'searchTags': customization_cache['search_tags']
     }
 
 
