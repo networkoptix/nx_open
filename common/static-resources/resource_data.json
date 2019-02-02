@@ -3200,6 +3200,33 @@
                     }
                 }
             }
+        },
+		{
+			"_comment1": "Mapping for firmware: IPC_HCMN2108-B0006P10D1711",
+            "keys": [
+                "UNIVIEW|IPC6322SR-X22*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-0.1666667, 1],
+                        "logical": [15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.25, 0.5, 0.75,  1],
+                        "logical": [1, 5, 9, 13, 16],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
