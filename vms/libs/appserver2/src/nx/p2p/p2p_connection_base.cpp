@@ -189,6 +189,11 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
     setState(newState);
 }
 
+QString ConnectionBase::idForToStringFromPtr() const
+{
+    return remotePeer().id.toString();
+}
+
 void ConnectionBase::onHttpClientDone()
 {
     nx::network::http::AsyncClient::State state = m_httpClient->state();
@@ -359,7 +364,7 @@ void ConnectionBase::startConnection()
 
 void ConnectionBase::startReading()
 {
-    NX_VERBOSE(this, "Connection [%1] Starting reading, state [%2]", remotePeer().id, state());
+    NX_VERBOSE(this, "Connection Starting reading, state [%1]", state());
     using namespace std::placeholders;
     m_p2pTransport->readSomeAsync(
         &m_readBuffer,
@@ -373,15 +378,15 @@ ConnectionBase::State ConnectionBase::state() const
 
 void ConnectionBase::setState(State state)
 {
-    if (state != m_state)
-    {
-        NX_CRITICAL(m_state != State::Error, "State 'Error' is final and should not be changed");
-        NX_VERBOSE(this,
-            "Connection [%1] State change: [%2] -> [%3]",
-            remotePeer().id, toString(m_state), toString(state));
-        m_state = state;
-        emit stateChanged(weakPointer(), state);
-    }
+    if (state == m_state)
+        return;
+
+    NX_ASSERT(m_state != State::Error, "State 'Error' is final and should not be changed");
+    NX_VERBOSE(this,
+        "Connection State change: [%1] -> [%2]",
+        toString(m_state), toString(state));
+    m_state = state;
+    emit stateChanged(weakPointer(), state);
 }
 
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)

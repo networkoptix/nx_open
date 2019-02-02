@@ -286,6 +286,7 @@
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
 #endif
+#include <atomic>
 
 using namespace nx::vms::server;
 
@@ -3497,6 +3498,7 @@ void MediaServerProcess::stopObjects()
         };
 
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
+    m_universalTcpListener->stop();
     serverModule()->stop();
 
     m_generalTaskTimer.reset();
@@ -3537,17 +3539,11 @@ void MediaServerProcess::stopObjects()
     m_ipDiscovery.reset(); // stop it before IO deinitialized
     m_multicastHttp.reset();
 
-    if (m_universalTcpListener)
-        m_universalTcpListener->pleaseStop();
-
     if (const auto manager = commonModule()->moduleDiscoveryManager())
         manager->stop();
 
     if (m_universalTcpListener)
-    {
-        m_universalTcpListener->stop();
         m_universalTcpListener.reset();
-    }
 
     serverModule()->resourceCommandProcessor()->stop();
     if (m_initStoragesAsyncPromise)
@@ -3718,6 +3714,12 @@ void MediaServerProcess::setUpServerRuntimeData()
 
 void MediaServerProcess::initSsl()
 {
+    static QnMutex initSslMutex;
+    static bool sslInitialized = false;
+    QnMutexLocker lock(&initSslMutex);
+    if (sslInitialized)
+        return;
+
     const auto allowedSslVersions = serverModule()->settings().allowedSslVersions();
     if (!allowedSslVersions.isEmpty())
         nx::network::ssl::Engine::setAllowedServerVersions(allowedSslVersions.toUtf8());
@@ -3730,6 +3732,8 @@ void MediaServerProcess::initSsl()
         serverModule()->settings().sslCertificatePath(),
         nx::utils::AppInfo::productName().toUtf8(), "US",
         nx::utils::AppInfo::organizationName().toUtf8());
+
+    sslInitialized = true;
 }
 
 void MediaServerProcess::doMigrationFrom_2_4()

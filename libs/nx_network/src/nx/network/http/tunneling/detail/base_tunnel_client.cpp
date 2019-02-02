@@ -58,6 +58,11 @@ void BaseTunnelClient::bindToAioThread(
         m_connection->bindToAioThread(aioThread);
 }
 
+ClientFeedbackFunction BaseTunnelClient::takeFeedbackFunction()
+{
+    return std::exchange(m_clientFeedbackFunction, nullptr);
+}
+
 void BaseTunnelClient::stopWhileInAioThread()
 {
     m_httpClient.reset();

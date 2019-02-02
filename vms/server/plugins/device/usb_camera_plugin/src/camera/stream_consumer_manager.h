@@ -5,50 +5,27 @@
 #include <mutex>
 
 #include "abstract_stream_consumer.h"
-#include "ffmpeg/frame.h"
 #include "ffmpeg/packet.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
-//-------------------------------------------------------------------------------------------------
-// AbstractStreamConsumerManager
-
-class AbstractStreamConsumerManager
+class PacketConsumerManager
 {
 public:
-    virtual ~AbstractStreamConsumerManager() = default;
+    virtual ~PacketConsumerManager() = default;
     bool empty() const;
     size_t size() const;
     /**
-     * Calls flush() on each AbstractStreamConsumer
+     * Calls flush() on each AbstractPacketConsumer
      */
     void flush();
-    virtual void addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);
-    virtual void removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);
+    void addConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
+    void removeConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
+    void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
 
 protected:
     mutable std::mutex m_mutex;
-    std::vector<std::weak_ptr<AbstractStreamConsumer>> m_consumers;
+    std::vector<std::weak_ptr<AbstractPacketConsumer>> m_consumers;
 };
 
-//-------------------------------------------------------------------------------------------------
-// FrameConsumerManager
-
-class FrameConsumerManager: public AbstractStreamConsumerManager
-{
-public:
-    void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame);
-};
-
-//--------------------------------------------------------------------------------------------------
-// PacketConsumerManager
-
-class PacketConsumerManager: public AbstractStreamConsumerManager
-{
-public:
-    void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
-};
-
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

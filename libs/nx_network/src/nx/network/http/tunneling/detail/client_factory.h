@@ -48,6 +48,8 @@ public:
             });
     }
 
+    int topTunnelTypeId() const;
+
     void clear();
 
     static ClientFactory& instance();
@@ -62,7 +64,7 @@ private:
     };
 
     std::map<int /*Tunnel type id*/, ClientTypeContext> m_clientTypes;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     int m_prevUsedTypeId = 0;
     nx::utils::algorithm::ItemSelector<int /*tunnel type id*/> m_tunnelTypeSelector;
 

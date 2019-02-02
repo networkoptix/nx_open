@@ -38,7 +38,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
             if (audioTaken[device])
                 continue;
 
-            if(device->data.name.find(camera->modelName) != std::string::npos)
+            if (device->data.name.find(camera->modelName) != std::string::npos)
             {
                 mute = false;
                 audioTaken[device] = true;

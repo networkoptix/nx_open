@@ -28,21 +28,21 @@ protected:
 
     void givenConnectedPeers(int count)
     {
-        const MediaServerLauncher::DisabledFeatures disabledFeatures(
-            MediaServerLauncher::DisabledFeature::noResourceDiscovery
-            | MediaServerLauncher::DisabledFeature::noMonitorStatistics);
 
         const QnUuid systemId = QnUuid::createUuid();
         for (int i = 0; i < count; ++i)
         {
-            m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString(), 0,
-                disabledFeatures));
+            m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString()));
 
             m_peers.back()->addCmdOption("--override-version=4.0.0.0");
             m_peers.back()->addSetting("--ignoreRootTool", "true");
-            ASSERT_TRUE(m_peers.back()->start());
-            m_peers.back()->commonModule()->globalSettings()->setLocalSystemId(systemId);
-            m_peers.back()->commonModule()->globalSettings()->synchronizeNowSync();
+            ASSERT_TRUE(m_peers.back()->startAsync());
+        }
+        for (int i = 0; i < count; ++i)
+        {
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
+            m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
+            m_peers[i]->commonModule()->globalSettings()->synchronizeNowSync();
         }
 
         connectPeers();
@@ -154,8 +154,10 @@ protected:
         for (const auto& peer: m_peers)
         {
             peer->addCmdOption("--override-version=4.0.0.1");
-            ASSERT_TRUE(peer->start());
+            ASSERT_TRUE(peer->startAsync());
         }
+        for (int i = 0; i < m_peers.size(); ++i)
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
 
         connectPeers();
     }
@@ -382,7 +384,7 @@ R"JSON({
     }
 };
 
-TEST_F(Updates, updateInformation_onePeer_correctlySet)
+TEST_F(Updates, DISABLED_updateInformation_onePeer_correctlySet)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -393,7 +395,7 @@ TEST_F(Updates, updateInformation_onePeer_correctlySet)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, installUpdate_wontWorkWithoutPeersParameter)
+TEST_F(Updates, DISABLED_installUpdate_wontWorkWithoutPeersParameter)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -406,7 +408,7 @@ TEST_F(Updates, installUpdate_wontWorkWithoutPeersParameter)
     thenInstallUpdateWithoutPeersParameterShouldFail();
 }
 
-TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
+TEST_F(Updates, DISABLED_installUpdate_willWorkOnlyWithPeersParameter)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -423,7 +425,7 @@ TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest(participants);
 }
 
-TEST_F(Updates, installUpdate_timestampCorrectlySet)
+TEST_F(Updates, DISABLED_installUpdate_timestampCorrectlySet)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -437,7 +439,7 @@ TEST_F(Updates, installUpdate_timestampCorrectlySet)
     thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime();
 }
 
-TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
+TEST_F(Updates, DISABLED_installUpdate_onlyParticipantsReceiveRequest)
 {
     givenConnectedPeers(3);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -455,7 +457,7 @@ TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
-TEST_F(Updates, installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2peers)
+TEST_F(Updates, DISABLED_installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2peers)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -472,7 +474,7 @@ TEST_F(Updates, installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({peerId(0)});
 }
 
-TEST_F(Updates, installUpdate_participantViaNewerPeerReceiveRequest)
+TEST_F(Updates, DISABLED_installUpdate_participantViaNewerPeerReceiveRequest)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -489,7 +491,7 @@ TEST_F(Updates, installUpdate_participantViaNewerPeerReceiveRequest)
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0), peerId(1) });
 }
 
-TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
+TEST_F(Updates, DISABLED_installUpdate_failIfParticipantIsOffline)
 {
     givenConnectedPeers(3);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -509,7 +511,7 @@ TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
-TEST_F(Updates, installUpdate_fail_emptyUpdateInformation)
+TEST_F(Updates, DISABLED_installUpdate_fail_emptyUpdateInformation)
 {
     givenConnectedPeers(2);
 
@@ -523,7 +525,7 @@ TEST_F(Updates, installUpdate_fail_emptyUpdateInformation)
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0) });
 }
 
-TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
+TEST_F(Updates, DISABLED_updateStatus_nonParticipantsAreNotInStatusesList)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0)});
@@ -534,7 +536,7 @@ TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList)
+TEST_F(Updates, DISABLED_updateStatus_allParticipantsAreInStatusesList)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0), peerId(1)});
@@ -546,7 +548,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonParticipant)
+TEST_F(Updates, DISABLED_updateStatus_allParticipantsAreInStatusesList_requestToNonParticipant)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
@@ -557,7 +559,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonPartic
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_nonParticipantInList_requestisLocal)
+TEST_F(Updates, DISABLED_updateStatus_nonParticipantInList_requestisLocal)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
@@ -568,7 +570,7 @@ TEST_F(Updates, updateStatus_nonParticipantInList_requestisLocal)
     thenPeersUpdateStatusShouldBe(expectedStatuses, /*isRequestLocal*/ true);
 }
 
-TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsEmpty)
+TEST_F(Updates, DISABLED_updateStatus_allParticipantsAreInStatusesList_partcipantsListIsEmpty)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
@@ -580,7 +582,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
+TEST_F(Updates, DISABLED_updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
@@ -594,7 +596,7 @@ TEST_F(Updates, updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
+TEST_F(Updates, DISABLED_updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -608,7 +610,7 @@ TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLocal)
+TEST_F(Updates, DISABLED_updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLocal)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -623,7 +625,7 @@ TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLo
     thenPeersUpdateStatusShouldBe(expectedStatuses, /*isLocal*/ true);
 }
 
-TEST_F(Updates, updateStatus_emptyUpdateInformation_allShouldBeInList)
+TEST_F(Updates, DISABLED_updateStatus_emptyUpdateInformation_allShouldBeInList)
 {
     givenConnectedPeers(2);
     QMap<QnUuid, update::Status::Code> expectedStatuses{
@@ -633,7 +635,7 @@ TEST_F(Updates, updateStatus_emptyUpdateInformation_allShouldBeInList)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, finishUpdate_success_updateInformationCleared)
+TEST_F(Updates, DISABLED_finishUpdate_success_updateInformationCleared)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -649,7 +651,7 @@ TEST_F(Updates, finishUpdate_success_updateInformationCleared)
     thenFinishUpdateShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_fail_notAllUpdated)
+TEST_F(Updates, DISABLED_finishUpdate_fail_notAllUpdated)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -667,7 +669,7 @@ TEST_F(Updates, finishUpdate_fail_notAllUpdated)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
+TEST_F(Updates, DISABLED_finishUpdate_fail_participantWithOldVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -685,7 +687,7 @@ TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, finishUpdate_success_participantWithNewVersionIsOffline)
+TEST_F(Updates, DISABLED_finishUpdate_success_participantWithNewVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -704,7 +706,7 @@ TEST_F(Updates, finishUpdate_success_participantWithNewVersionIsOffline)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
+TEST_F(Updates, DISABLED_finishUpdate_success_notAllUpdated_ignorePendingPeers)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -722,7 +724,7 @@ TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
     thenFinishUpdateWithignorePendingPeersShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
+TEST_F(Updates, DISABLED_finishUpdate_success_participantsHaveVersionNewerThanTarget)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -740,7 +742,7 @@ TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
     thenFinishUpdateWithignorePendingPeersShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
+TEST_F(Updates, DISABLED_finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");

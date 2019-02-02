@@ -21,9 +21,7 @@ public:
     virtual void setBitrate(int bitrate) override;
 
 private:
-    void ensureConsumerAdded() override;
     std::shared_ptr<ffmpeg::Packet> nextPacket();
-    virtual void removeVideoConsumer() override;
 };
 
 } // namespace usb_cam

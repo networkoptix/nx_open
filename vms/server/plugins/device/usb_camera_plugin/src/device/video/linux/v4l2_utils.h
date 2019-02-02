@@ -58,11 +58,11 @@ std::vector<ResolutionData> getResolutionList(
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
-* Set the bitrate for the device with the given path. 
+* Set the bitrate for the device with the given path.
 * On Linux, this corresponds to the devices's /dev/video* entry.
 *
 * @param[in] bitrate - the bitrate to set in bits per second.
-*/ 
+*/
 void setBitrate(
     const std::string& devicePath,
     int bitrate,
@@ -72,7 +72,7 @@ void setBitrate(
 * Get the maximum bitrate supported by the camera.
 *
 * @param[int] devicePath - the path to the device.
-*/ 
+*/
 int getMaxBitrate(
     const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& tagetCodecID);
