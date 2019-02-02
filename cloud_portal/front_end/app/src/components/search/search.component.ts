@@ -135,10 +135,8 @@ export class NxSearchComponent implements OnInit, AfterViewInit, ControlValueAcc
     }
 
     modelChanged() {
-        setTimeout(() => {
-            this.onChangeCallback(this.localFilter);
-            this.numberOfOptionsSelected();
-        });
+        this.onChangeCallback(this.localFilter);
+        this.numberOfOptionsSelected();
     }
 
 }

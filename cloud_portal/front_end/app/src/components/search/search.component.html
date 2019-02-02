@@ -24,7 +24,7 @@
                                [items]="select.items"
                                label="optionLabel"
                                [(ngModel)]="select.selected"
-                               (onSelected)="modelChanged()"
+                               (ngModelChange)="modelChanged()"
                                [selected]="select.selected ? select.selected : null">
                     </nx-select>
                 </div>
