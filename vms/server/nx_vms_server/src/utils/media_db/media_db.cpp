@@ -191,20 +191,6 @@ MediaDbWriter::MediaDbWriter()
     m_stream.setByteOrder(QDataStream::LittleEndian);
 }
 
-MediaDbWriter::~MediaDbWriter()
-{
-    stop();
-}
-
-void MediaDbWriter::pleaseStop()
-{
-    QnLongRunnable::pleaseStop();
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_waitCondition.wakeOne();
-    }
-}
-
 bool MediaDbWriter::writeFileHeader(QIODevice* ioDevice, uint8_t dbVersion)
 {
     FileHeader fh;
@@ -218,28 +204,7 @@ bool MediaDbWriter::writeFileHeader(QIODevice* ioDevice, uint8_t dbVersion)
 
 void MediaDbWriter::writeRecord(const DBRecord &record)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_queue.push(record);
-    m_waitCondition.wakeOne();
-}
-
-void MediaDbWriter::run()
-{
-    QnMutexLocker lock(&m_mutex);
-    while (!m_needStop)
-    {
-        while (m_queue.empty() && !needToStop())
-            m_waitCondition.wait(&m_mutex);
-
-        while (!m_queue.empty())
-        {
-            auto record = m_queue.front();
-            m_queue.pop();
-            lock.unlock();
-            boost::apply_visitor(RecordVisitor(&m_stream), record);
-            lock.relock();
-        }
-    }
+    boost::apply_visitor(RecordVisitor(&m_stream), record);
 }
 
 void MediaDbWriter::setDevice(QIODevice* ioDevice)

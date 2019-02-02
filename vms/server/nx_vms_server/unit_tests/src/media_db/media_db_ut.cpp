@@ -577,10 +577,6 @@ protected:
         reopenFile();
         m_writer.setDevice(m_ioDevice.get());
         ASSERT_TRUE(media_db::MediaDbWriter::writeFileHeader(m_ioDevice.get(), 1));
-        m_writer.start();
-
-        while (m_writer.systemThreadId() == 0)
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
     void whenSomeRecordsAreWrittenToTheDb()
@@ -604,8 +600,6 @@ protected:
             m_dbData.cameras.push_back(camOp);
             m_writer.writeRecord(camOp);
         }
-
-        m_writer.stop();
     }
 
     void thenAllShouldBeRetrievedCorrectly()

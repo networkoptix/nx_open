@@ -129,11 +129,10 @@ private:
 
 using DBRecordQueue = std::queue<DBRecord>;
 
-class MediaDbWriter: public QnLongRunnable
+class MediaDbWriter
 {
 public:
     MediaDbWriter();
-    ~MediaDbWriter();
     void setDevice(QIODevice* ioDevice);
     void writeRecord(const DBRecord &record);
 
@@ -141,12 +140,6 @@ public:
 
 private:
     QDataStream m_stream;
-    mutable QnMutex m_mutex;
-    QnWaitCondition m_waitCondition;
-    DBRecordQueue m_queue;
-
-    virtual void run() override;
-    virtual void pleaseStop() override;
 };
 
 } // namespace media_db

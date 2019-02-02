@@ -59,7 +59,6 @@ QnStorageDb::QnStorageDb(
     nx::vms::server::ServerModuleAware(serverModule),
     m_storage(s),
     m_storageIndex(storageIndex),
-    m_dbWriter(new nx::media_db::MediaDbWriter),
     m_vacuumInterval(vacuumInterval)
 {
     using namespace nx::media_db;
@@ -88,12 +87,11 @@ void QnStorageDb::startVacuum(
     serverModule()->storageDbPool()->addTask(
         [this, completionHandler = std::move(completionHandler), data]()
         {
-            m_dbWriter.reset(new nx::media_db::MediaDbWriter);
+            m_dbWriter.reset(new nx::media_db::MediaDbWriter());
             const bool vacuumResult =
                 measureTime([this, data]() { return vacuum(data); }, "Vacuum:");
 
             m_dbWriter->setDevice(m_ioDevice.get());
-            m_dbWriter->start();
             completionHandler(vacuumResult);
         });
 }
