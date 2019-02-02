@@ -7,10 +7,7 @@
 #include <boost/variant.hpp>
 #include <QtCore>
 
-#include "nx/utils/thread/mutex.h"
 #include <nx/utils/log/log.h>
-#include "nx/utils/thread/wait_condition.h"
-#include "nx/utils/thread/long_runnable.h"
 #include <recorder/device_file_catalog.h>
 #include "media_file_operation.h"
 
