@@ -17,7 +17,7 @@ namespace nx::network::http::tunneling {
 
 /**
  * Should be used for tunneling traffic inside an HTTP connection.
- * In general, such techniques are not compatible with some HTTP proxies and firewalls. 
+ * In general, such techniques are not compatible with some HTTP proxies and firewalls.
  * So, multiple tunneling methods are implemented:
  *
  * - GET/POST tunnel. ([Apple. Tunneling QuickTime RTSP and RTP over HTTP]).
@@ -26,9 +26,9 @@ namespace nx::network::http::tunneling {
  * After receiving GET response client uses TCP connection for some other protocol.
  *
  * - Tunneling through HTTP connection upgrade. ([rfc7230, 6.7]).
- * Client and server utilize "Connection: Upgrade" and "Upgrade: ..." 
+ * Client and server utilize "Connection: Upgrade" and "Upgrade: ..."
  * headers to switch to a different protocol.
- * This method is similar to WebSocket. 
+ * This method is similar to WebSocket.
  * Not compatible with some popular HTTP proxies (e.g., squid).
  */
 template<typename ...ApplicationData>
