@@ -2080,6 +2080,8 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         {
             titleBar()->rightButtonsBar()->setButtonsChecked(
 				Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+            titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, true);
+
             // TODO: #gdm evil hack! Won't work if SYNC is off and this item is not selected.
             action(action::JumpToLiveAction)->trigger();
         }
@@ -2860,7 +2862,7 @@ bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
 
 void QnMediaResourceWidget::setPtzMode(bool value)
 {
-    bool ptzEnabled = value && d->canControlPtz();
+    const bool ptzEnabled = value && d->canControlPtz();
     setOption(ControlPtz, ptzEnabled);
 }
 
