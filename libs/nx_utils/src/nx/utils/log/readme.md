@@ -2,7 +2,7 @@
 
 ## Writing logs
 
-TL;DR:
+Short example:
 ```
 #include <nx/utils/log/log.h>
 
@@ -13,9 +13,21 @@ NX_VERBOSE(NX_SCOPE_TAG) << "Static method is called with args" << arg1 << arg2;
 
 ### Formal syntax
 
-Log record can be added using the followind macros:
+Recommended way to add a log record is the followind macro:
 ```
-NX_<LEVEL>(<TAG>, <FORMAT>[, <MESSAGE> ... ]);
+NX_<LEVEL>(<TAG>, <FORMAT>[, <ARGS> ... ]);
+```
+Where:
+- **LEVEL** - One of log levels: ALWAYS, ERROR, WARNING, INFO, DEBUG, VERBOSE.
+- **TAG** - `nx::utils::log::Tag` object. See [Tags](#tags) for details.
+- **FORMAT** - String text message, which can contain placeholders: %1..%9.
+- **ARGS** - List of any convertible to string objects. See [To string](#tostring) for details.
+Arguments will be substituted to the format string inplace of the placeholders.
+
+### Deprecated but still supported methods
+
+Using macro:
+```
 NX_<LEVEL>(<TAG>) << <MESSAGE> [<< <MESSAGE> ... ];
 ```
 
@@ -23,8 +35,6 @@ Where:
 - **LEVEL** - One of log levels: ALWAYS, ERROR, WARNING, INFO, DEBUG, VERBOSE.
 - **TAG** - `nx::utils::log::Tag` object. See [Tags](#tags) for details.
 - **MESSAGE** - Any convertible to string object. See [To string](#tostring) for details.
-
-### Deprecated but still supported methods
 
 Standard Qt logging methods( `qDebug()`, `qWarning()`, ...) and old helper methods (`qnDebug()`,
 `qnWarning()`, ...) are highly not recommended for usage (though still supported).
@@ -83,6 +93,9 @@ If you want your class to be displayed in logs in some human-readable form, you 
 one of the following methods:
 - `QString toString() const` class method
 - `QString toString(const T&)` function, useful for library types and enumerations
+
+For the Qt classes compatibility, the following methods are also supported (though adding them to
+the code is not recommended):
 - `QDebug operator<<(QDebug)` class method
 - `QDebug operator<<(QDebug, const T&)` function, useful for library types and enumerations
 
