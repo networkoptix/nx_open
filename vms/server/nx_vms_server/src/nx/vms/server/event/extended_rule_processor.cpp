@@ -795,7 +795,7 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
     }
 
     auto aggregationInfo = aggregatedData.action->aggregationInfo();
-    aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo());
+    aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo(), /*oneRecordPerKey*/ true);
     aggregatedData.action->setAggregationInfo(aggregationInfo);
 
     return false; //< Don't write action to log so far.
