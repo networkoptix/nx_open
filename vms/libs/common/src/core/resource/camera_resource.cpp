@@ -502,12 +502,10 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 
 const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
-    const auto resPool = resourcePool();
-    if (!resPool)
-        return QSet<QnUuid>();
-
     auto enabledEngines = userEnabledAnalyticsEngines();
-    const auto engineResources = resPool->getResources<nx::vms::common::AnalyticsEngineResource>();
+    const auto engineResources = commonModule()
+        ->resourcePool()
+        ->getResources<nx::vms::common::AnalyticsEngineResource>();
 
     nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
     const auto compatibleEngines =
@@ -529,25 +527,19 @@ const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::enabledAnalyticsEngineResources() const
 {
-    const auto resPool = resourcePool();
-    if (!resPool)
-        return nx::vms::common::AnalyticsEngineResourceList();
-
     const auto enabledEngines = enabledAnalyticsEngines();
-    return resPool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
-        enabledEngines);
+    return commonModule()
+        ->resourcePool()
+        ->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledEngines);
 }
 
 const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::userEnabledAnalyticsEngineResources() const
 {
-    const auto resPool = resourcePool();
-    if (!resPool)
-        return nx::vms::common::AnalyticsEngineResourceList();
-
     auto userEnabledEngines = userEnabledAnalyticsEngines();
-    return resPool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
-        userEnabledEngines);
+    return commonModule()
+        ->resourcePool()
+        ->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(userEnabledEngines);
 }
 
 QSet<QnUuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
