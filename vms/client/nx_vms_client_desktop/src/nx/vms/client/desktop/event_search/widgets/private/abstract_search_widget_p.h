@@ -2,6 +2,7 @@
 
 #include "../abstract_search_widget.h"
 
+#include <optional>
 #include <vector>
 
 #include <QtCore/QList>
@@ -133,7 +134,7 @@ private:
 
     std::vector<DeviceDependentAction> m_deviceDependentActions;
 
-    bool m_isAllowed = true;
+    std::optional<bool> m_isAllowed; //< std::optional for lazy initialization.
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)

@@ -123,6 +123,9 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         q, &EventSearchWidget::updateAllowance);
+
+    connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
+        q, &EventSearchWidget::updateAllowance);
 }
 
 void EventSearchWidget::Private::resetType()
@@ -358,7 +361,8 @@ QString EventSearchWidget::itemCounterText(int count) const
 
 bool EventSearchWidget::calculateAllowance() const
 {
-    return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs);
+    return model()->isOnline()
+        && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs);
 }
 
 } // namespace nx::vms::client::desktop

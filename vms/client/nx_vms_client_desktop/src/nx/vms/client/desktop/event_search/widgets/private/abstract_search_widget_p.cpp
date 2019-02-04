@@ -568,19 +568,22 @@ EventRibbon* AbstractSearchWidget::Private::view() const
     return ui->ribbon;
 }
 
-
 bool AbstractSearchWidget::Private::isAllowed() const
 {
-    return m_isAllowed;
+    if (!m_isAllowed)
+        q->updateAllowance();
+
+    NX_ASSERT(m_isAllowed);
+    return *m_isAllowed;
 }
 
 void AbstractSearchWidget::Private::setAllowed(bool value)
 {
-    if (m_isAllowed == value)
+    if (m_isAllowed && *m_isAllowed == value)
         return;
 
     m_isAllowed = value;
-    emit q->allowanceChanged(m_isAllowed, {});
+    emit q->allowanceChanged(*m_isAllowed, {});
 }
 
 void AbstractSearchWidget::Private::goToLive()

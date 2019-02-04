@@ -89,6 +89,9 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setRelevantControls(Control::defaults | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
     selectCameras(AbstractSearchWidget::Cameras::layout);
+
+    connect(model(), &AbstractSearchListModel::isOnlineChanged,
+        this, &AnalyticsSearchWidget::updateAllowance);
 }
 
 AnalyticsSearchWidget::~AnalyticsSearchWidget()
@@ -129,6 +132,9 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
 
 bool AnalyticsSearchWidget::calculateAllowance() const
 {
+    if (!model()->isOnline())
+        return false;
+
     const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
     return !manager.descriptors().empty();
 }
