@@ -13,7 +13,7 @@ class BufferedPacketConsumer: public AbstractPacketConsumer
 {
 public:
     // AbstractPacketConsumer
-    virtual void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet) override;
+    virtual void pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet) override;
     virtual void flush() override;
 
 public:

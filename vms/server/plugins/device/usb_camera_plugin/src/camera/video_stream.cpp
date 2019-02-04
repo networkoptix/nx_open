@@ -167,7 +167,7 @@ void VideoStream::run()
             continue;
 
         m_fpsCounter.update(std::chrono::milliseconds(m_timeProvider->millisSinceEpoch()));
-        m_packetConsumerManager.givePacket(packet);
+        m_packetConsumerManager.pushPacket(packet);
     }
     uninitialize();
 }

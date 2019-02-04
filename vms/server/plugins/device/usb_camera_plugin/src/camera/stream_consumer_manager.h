@@ -21,7 +21,7 @@ public:
     void flush();
     void addConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-    void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
+    void pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet);
 
 protected:
     mutable std::mutex m_mutex;

@@ -13,7 +13,7 @@ static constexpr int kBufferMaxSize(1024 * 1024 * 8); // 8 MB.
 
 }
 
-void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
+void BufferedPacketConsumer::pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     if (m_bufferSizeBytes > kBufferMaxSize)
     {

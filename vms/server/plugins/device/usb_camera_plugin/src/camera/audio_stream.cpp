@@ -480,7 +480,7 @@ void AudioStream::AudioStreamPrivate::run()
         // If the encoder is AAC, some packets are buffered and copied before delivering.
         // In that case, packet is nullptr.
         if (packet)
-            m_packetConsumerManager->givePacket(packet);
+            m_packetConsumerManager->pushPacket(packet);
     }
     uninitialize();
 }
