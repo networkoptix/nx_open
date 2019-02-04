@@ -903,7 +903,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
-    // Uses the smaller MSS between the peers        
+    // Uses the smaller MSS between the peers
     if (hs->m_iMSS > m_iMSS)
         hs->m_iMSS = m_iMSS;
     else
@@ -999,6 +999,24 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     response.m_iID = m_PeerID;
     sndQueue().sendto(peer, response);
     delete[] buffer;
+}
+
+int CUDT::shutdown(int /*how*/)
+{
+    m_bBroken = true;
+
+    // signal a waiting "recv" call if there is any data available
+#ifndef _WIN32
+    pthread_mutex_lock(&m_RecvDataLock);
+    if (m_bSynRecving)
+        pthread_cond_signal(&m_RecvDataCond);
+    pthread_mutex_unlock(&m_RecvDataLock);
+#else
+    if (m_bSynRecving)
+        SetEvent(m_RecvDataCond);
+#endif
+
+    return 0;
 }
 
 void CUDT::close()
@@ -2495,8 +2513,8 @@ int CUDT::processData(CUnit* unit)
         m_iRcvLossTotal += loss;
     }
 
-    // This is not a regular fixed size packet...   
-    //an irregular sized packet usually indicates the end of a message, so send an ACK immediately   
+    // This is not a regular fixed size packet...
+    //an irregular sized packet usually indicates the end of a message, so send an ACK immediately
     if (packet.getLength() != m_iPayloadSize)
         CTimer::rdtsc(m_ullNextACKTime);
 
@@ -2572,7 +2590,7 @@ void CUDT::checkTimers(bool forceAck)
         if ((m_iEXPCount > 16) && (currtime - m_ullLastRspTime > 5000000 * m_ullCPUFrequency))
         {
             //
-            // Connection is broken. 
+            // Connection is broken.
             // UDT does not signal any information about this instead of to stop quietly.
             // Application will detect this when it calls any UDT methods next time.
             //
@@ -2759,7 +2777,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             }
             else
             {
-                // a new connection has been created, enable epoll for write 
+                // a new connection has been created, enable epoll for write
                 CUDT::s_UDTUnited->m_EPoll.update_events(m_SocketId, m_pollIds, UDT_EPOLL_OUT, true);
             }
         }

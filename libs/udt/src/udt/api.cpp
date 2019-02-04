@@ -744,6 +744,16 @@ void CUDTUnited::connect_complete(const UDTSOCKET u)
     s->m_Status = CONNECTED;
 }
 
+int CUDTUnited::shutdown(const UDTSOCKET u, int how)
+{
+    std::shared_ptr<CUDTSocket> s = locate(u);
+
+    if (nullptr == s)
+        throw CUDTException(5, 4, 0);
+
+    return s->m_pUDT->shutdown(how);
+}
+
 int CUDTUnited::close(const UDTSOCKET u)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
@@ -1160,7 +1170,7 @@ void CUDTUnited::checkBrokenSockets()
 
             // signal epoll , however user cannot perform any pending operations
             // after this wired loop, the socket for this connection is just broken.
-            // I cannot fix this problem since if I delay the deletion, the thread 
+            // I cannot fix this problem since if I delay the deletion, the thread
             // will crash !
             if (i->second->m_pUDT->shutdown())
                 m_EPoll.update_events(i->first, i->second->m_pUDT->pollIds(), UDT_EPOLL_IN | UDT_EPOLL_ERR, true);
@@ -1184,7 +1194,7 @@ void CUDTUnited::checkBrokenSockets()
     {
         if (j->second->m_pUDT->lingerExpiration() > 0)
         {
-            // asynchronous close: 
+            // asynchronous close:
             if ((nullptr == j->second->m_pUDT->sndBuffer())
                 || (0 == j->second->m_pUDT->sndBuffer()->getCurrBufSize())
                 || (j->second->m_pUDT->lingerExpiration() <= CTimer::getTime()))
@@ -1643,6 +1653,24 @@ int CUDT::connect(UDTSOCKET u, const sockaddr* name, int namelen)
     }
 }
 
+int CUDT::shutdown(UDTSOCKET u, int how)
+{
+    try
+    {
+        return s_UDTUnited->shutdown(u, how);
+    }
+    catch (CUDTException e)
+    {
+        s_UDTUnited->setError(new CUDTException(e));
+        return ERROR;
+    }
+    catch (...)
+    {
+        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        return ERROR;
+    }
+}
+
 int CUDT::close(UDTSOCKET u)
 {
     try
@@ -1779,9 +1807,9 @@ int CUDT::recv(UDTSOCKET u, char* buf, int len, int)
     }
     catch (CUDTException e)
     {
-        // This deletion is needed since library doesn't 
-        // take care of the EPOLL notification properly 
-        // And I have no way to distinguish a CRASH and 
+        // This deletion is needed since library doesn't
+        // take care of the EPOLL notification properly
+        // And I have no way to distinguish a CRASH and
         // a clean close right now. Currently only a ugly
         // hack in our code works.
         s_UDTUnited->m_EPoll.RemoveEPollEvent(u);
@@ -2179,6 +2207,11 @@ UDTSOCKET accept(UDTSOCKET u, struct sockaddr* addr, int* addrlen)
 int connect(UDTSOCKET u, const struct sockaddr* name, int namelen)
 {
     return CUDT::connect(u, name, namelen);
+}
+
+int shutdown(UDTSOCKET u, int how)
+{
+    return CUDT::shutdown(u, how);
 }
 
 int close(UDTSOCKET u)
