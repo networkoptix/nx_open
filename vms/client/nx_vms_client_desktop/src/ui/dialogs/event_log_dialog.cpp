@@ -53,6 +53,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/analytics/descriptor_manager.h>
+#include <nx/analytics/properties.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 using namespace nx;
@@ -348,7 +349,7 @@ void QnEventLogDialog::initEventsModel()
             connect(resource, &QnResource::propertyChanged, this,
                 [this](const QnResourcePtr& /*res*/, const QString& key)
                 {
-                    if (key == ResourcePropertyKey::kAnalyticsDriversParamName)
+                    if (key == nx::analytics::kEventTypeDescriptorsProperty)
                         updateAnalyticsEvents();
                 });
 
