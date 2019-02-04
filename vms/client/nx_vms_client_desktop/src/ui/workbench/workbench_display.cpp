@@ -1432,9 +1432,6 @@ QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWi
 {
     NX_ASSERT(widget);
 
-    if (widget->options().testFlag(QnResourceWidget::InvisibleWidgetOption))
-        return InvisibleLayer;
-
     if (widget == m_widgetByRole[Qn::ZoomedRole])
         return ZoomedLayer;
 

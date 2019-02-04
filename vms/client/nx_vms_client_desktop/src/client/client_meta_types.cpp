@@ -33,7 +33,6 @@
 #include <utils/ping_utility.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
-#include <nx/vms/client/desktop/layout_templates/layout_template.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/client/desktop/utils/wearable_payload.h>
@@ -145,8 +144,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<rest::QnConnectionPtr>();
 
     qRegisterMetaType<nx::vms::client::desktop::ExportMediaPersistentSettings>();
-
-    qRegisterMetaType<LayoutTemplate>();
 
     qRegisterMetaType<QnNotificationLevel::Value>();
 

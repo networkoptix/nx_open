@@ -1097,10 +1097,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
 {
     QnGlNativePainting::begin(m_renderer->glContext(), painter);
 
-    qreal opacity = effectiveOpacity();
-    if (options().testFlag(InvisibleWidgetOption))
-        opacity = 0.0;
-
+    const qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
     if (!opaque || (base_type::resource()->flags() & Qn::still_image))
@@ -1700,9 +1697,6 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect)
 {
-    if (options().testFlag(InvisibleWidgetOption))
-        return;
-
     const auto timestamp = m_renderer->lastDisplayedTimestamp(channel);
 
     if (options().testFlag(DisplayMotion))
@@ -2524,7 +2518,6 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
     bool ptzEnabled = checked && d->canControlPtz();
 
     setOption(ControlPtz, ptzEnabled);
-    setOption(DisplayCrosshair, ptzEnabled);
     if (checked)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
@@ -2638,7 +2631,6 @@ void QnMediaResourceWidget::updateFisheye()
 
     const bool showFisheyeOverlay = fisheyeEnabled && !isZoomWindow();
     setOption(ControlPtz, showFisheyeOverlay);
-    setOption(DisplayCrosshair, showFisheyeOverlay);
     setOption(DisplayDewarped, fisheyeEnabled);
 
     if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
