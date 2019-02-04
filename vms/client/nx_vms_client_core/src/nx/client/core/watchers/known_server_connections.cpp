@@ -160,7 +160,7 @@ void KnownServerConnections::Private::at_moduleFound(
     saveConnection(Connection{
         moduleData.id,
         nx::network::url::Builder()
-            .setScheme(lit("http"))
+            .setScheme(lit("https"))
             .setEndpoint(moduleData.endpoint)});
 
     qnClientCoreSettings->setKnownServerUrls(urls);

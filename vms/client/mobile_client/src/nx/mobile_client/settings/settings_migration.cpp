@@ -55,7 +55,7 @@ static void migrateFrom24To25()
         QnLoginSession session;
         session.systemName = importedSession.title;
         session.url = nx::network::url::Builder()
-            .setScheme(lit("http"))
+            .setScheme(lit("https"))
             .setHost(importedSession.host)
             .setPort(importedSession.port)
             .setUserName(importedSession.login)

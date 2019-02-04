@@ -25,7 +25,7 @@ QnLoginSession QnLoginSession::fromVariant(const QVariantMap& variant)
     session.id = QnUuid::fromStringSafe(variant[lit("sessionId")].toString());
     session.systemName = variant[lit("systemName")].toString();
     session.url = nx::network::url::Builder()
-        .setScheme(lit("http"))
+        .setScheme(lit("https"))
         .setHost(variant[lit("address")].toString())
         .setPort(variant.value(lit("port"), -1).toInt())
         .setUserName(variant[lit("user")].toString())

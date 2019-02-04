@@ -349,7 +349,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
     commonModule()->updateRunningInstanceGuid();
 
     auto connectUrl = url;
-    connectUrl.setScheme(lit("http"));
+    connectUrl.setScheme(lit("https"));
 
     auto result = new QnEc2ConnectionRequestResult(this);
     connectionHandle = qnClientCoreModule->connectionFactory()->connect(
