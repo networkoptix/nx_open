@@ -10,6 +10,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/helpers/engine_info.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
@@ -73,7 +74,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     if (!NX_ASSERT(engine, lm("Engine: %1 (%2)").args(getName(), getId())))
         return false;
 
-    NX_DEBUG(this, "Sending settings to engine %1 (%2)", getName(), getId());
+    NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
 
     nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
@@ -136,8 +137,18 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     if (!m_sdkEngine)
         return CameraDiagnostics::InternalServerErrorResult("SDK Engine object is not set");
 
+    NX_DEBUG(this, "Sending engine info to the Engine %1 (%2)", getName(), getId());
+
+    auto engineInfo = nx::sdk::makePtr<nx::sdk::analytics::EngineInfo>();
+    engineInfo->setId(getId().toStdString());
+    engineInfo->setName(getName().toStdString());
+    m_sdkEngine->setEngineInfo(engineInfo.get());
+
     m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), toSharedPointer(this));
     m_sdkEngine->setHandler(m_handler.get());
+
+    if (!sendSettingsToSdkEngine())
+        return CameraDiagnostics::InternalServerErrorResult("Unable to send settings to Engine");
 
     const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(
         m_sdkEngine,
@@ -145,9 +156,6 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
-
-    if (!sendSettingsToSdkEngine())
-        return CameraDiagnostics::InternalServerErrorResult("Unable to send settings to Engine");
 
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
