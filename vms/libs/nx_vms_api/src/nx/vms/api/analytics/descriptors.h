@@ -136,7 +136,7 @@ struct EventTypeDescriptor: BaseScopedDescriptor
 
     EventTypeFlags flags;
 
-    bool isHidden() const { return flags.testFlag(EventTypeFlag::hidden); };
+    bool isHidden() const { return flags.testFlag(EventTypeFlag::hidden); }
 };
 #define nx_vms_api_analyitcs_EventTypeDescriptor_Fields \
     nx_vms_api_analytics_BaseScopedDescriptor_Fields \
