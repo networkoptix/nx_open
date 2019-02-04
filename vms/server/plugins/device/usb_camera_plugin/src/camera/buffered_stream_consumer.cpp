@@ -35,6 +35,7 @@ void BufferedPacketConsumer::flush()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_dropUntilNextVideoKeyPacket = true;
+    m_bufferSizeBytes = 0;
     m_buffer.clear();
 }
 

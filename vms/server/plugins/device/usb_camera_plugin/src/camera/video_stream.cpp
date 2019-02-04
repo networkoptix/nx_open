@@ -400,7 +400,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
 
     // Then a match with similar aspect ratio whose resolution and fps are higher than requested
     float aspectRatio = (float) params.resolution.width / params.resolution.height;
-    for (const auto & resolution : resolutionList)
+    for (const auto& resolution: resolutionList)
     {
         if (aspectRatio == resolution.aspectRatio())
         {
@@ -418,7 +418,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
     }
 
     // Any resolution or fps higher than requested
-    for (const auto & resolution : resolutionList)
+    for (const auto& resolution: resolutionList)
     {
         bool actualResolutionGreater = resolution.width * resolution.height >=
             params.resolution.width * params.resolution.height;

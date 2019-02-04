@@ -36,14 +36,6 @@ public:
         return m_bufferSizeBytes;
     }
 
-    void clear()
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_buffer.size() > 0)
-            m_buffer.clear();
-        m_bufferSizeBytes = 0;
-    }
-
     virtual void push(const std::shared_ptr<ffmpeg::Packet>& packet)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
