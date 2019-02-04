@@ -7,8 +7,6 @@
 
 #include <nx/utils/software_version.h>
 
-namespace nx::vms::ap { struct SoftwareVersion; }
-
 class QnConnectionDiagnosticsHelper: public QObject
 {
     Q_OBJECT

@@ -5,7 +5,6 @@
 #include <client/client_runtime_settings.h>
 
 #include <utils/applauncher_utils.h>
-#include <common/common_module.h>
 
 namespace nx::vms::client::desktop {
 
@@ -16,12 +15,7 @@ static const int kCheckIntervalMs = 60 * 1000;
 
 } // namespace
 
-ApplauncherGuard::ApplauncherGuard(
-    QnCommonModule* commonModule,
-    QObject* parent)
-    :
-    base_type(parent),
-    QnCommonModuleAware(commonModule)
+ApplauncherGuard::ApplauncherGuard(QObject* parent): base_type(parent)
 {
     // Do not check right now because client is not fully initialized yet
     startTimer(kCheckIntervalMs);
@@ -37,7 +31,7 @@ void ApplauncherGuard::timerEvent(QTimerEvent* event)
         return;
     }
 
-    applauncher::api::checkOnline(commonModule()->engineVersion());
+    applauncher::api::checkOnline();
 }
 
 } // namespace nx::vms::client::desktop

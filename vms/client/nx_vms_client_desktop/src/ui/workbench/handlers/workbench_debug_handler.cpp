@@ -144,7 +144,7 @@ public:
         addButton("Applaucher control",
             [this]()
             {
-                (new QnApplauncherControlDialog(this, commonModule()->engineVersion()))->show();
+                (new QnApplauncherControlDialog(this))->show();
             });
 
         addButton("Animations control",

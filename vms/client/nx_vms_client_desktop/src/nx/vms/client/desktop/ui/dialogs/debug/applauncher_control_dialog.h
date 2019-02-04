@@ -14,13 +14,10 @@ class QnApplauncherControlDialog: public QnDialog
 {
     using base_type = QnDialog;
 public:
-    QnApplauncherControlDialog(
-        QWidget* parent = nullptr,
-        const api::SoftwareVersion& engineVersion = api::SoftwareVersion());
+    QnApplauncherControlDialog(QWidget* parent = nullptr);
 
 private:
     QScopedPointer<Ui::ApplauncherControlDialog> ui;
-    const api::SoftwareVersion m_engineVersion;
 };
 
 } // namespace ui
