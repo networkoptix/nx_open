@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
+import Nx.Dialogs 1.0 as Dialogs
 
 DialogBase
 {
@@ -29,7 +30,7 @@ DialogBase
             topPadding: dialogTitle.visible ? 0 : 16
         }
 
-        DialogButtonBox
+        Dialogs.DialogButtonBox
         {
             id: buttonBox
             visible: buttonsModel.length > 0
