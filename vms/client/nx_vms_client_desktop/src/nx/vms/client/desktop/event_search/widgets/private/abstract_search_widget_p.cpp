@@ -570,16 +570,16 @@ EventRibbon* AbstractSearchWidget::Private::view() const
 
 bool AbstractSearchWidget::Private::isAllowed() const
 {
-    if (!m_isAllowed)
+    if (!m_isAllowed.has_value())
         q->updateAllowance();
 
-    NX_ASSERT(m_isAllowed);
+    NX_ASSERT(m_isAllowed.has_value());
     return *m_isAllowed;
 }
 
 void AbstractSearchWidget::Private::setAllowed(bool value)
 {
-    if (m_isAllowed && *m_isAllowed == value)
+    if (m_isAllowed.has_value() && *m_isAllowed == value)
         return;
 
     m_isAllowed = value;
