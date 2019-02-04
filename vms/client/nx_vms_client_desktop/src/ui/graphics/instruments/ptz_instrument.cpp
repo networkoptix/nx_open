@@ -490,13 +490,21 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
             }
 
             // Switch actual sensor widget to the PTZ mode.
-            for (const auto widget: display()->widgets(ptzTarget))
+            for (const auto ptzTargetWidget: display()->widgets(ptzTarget))
 			{
-                auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+                auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(ptzTargetWidget);
                 NX_ASSERT(mediaWidget);
                 if (mediaWidget)
                     mediaWidget->setPtzMode(true);
 			}
+
+            // If current widget is zoomed, zoom target widget instead.
+            if (display()->widget(Qn::ZoomedRole) == widget)
+            {
+                const auto ptzTargetItems = workbench()->currentLayout()->items(ptzTarget);
+                if (!ptzTargetItems.empty())
+                    workbench()->setItem(Qn::ZoomedRole, *ptzTargetItems.cbegin());
+            }
         }
     }
 
