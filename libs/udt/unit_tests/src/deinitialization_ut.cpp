@@ -28,7 +28,7 @@ protected:
     {
         m_serverSocket = UDT::socket(AF_INET, SOCK_STREAM, 0);
         ASSERT_GT(m_serverSocket, 0);
-        
+
         struct sockaddr_in localAddress;
         memset(&localAddress, 0, sizeof(localAddress));
         localAddress.sin_family = AF_INET;
@@ -55,11 +55,11 @@ protected:
         int len = sizeof(acceptedAddress);
         UDT::accept(m_serverSocket, (struct sockaddr*) &acceptedAddress, &len);
     }
-    
+
     void givenConnectingClientSocket()
     {
         m_clientSocket = UDT::socket(AF_INET, SOCK_STREAM, 0);
-        
+
         bool blocking = false;
         ASSERT_EQ(0, UDT::setsockopt(m_clientSocket, 0, UDT_SNDSYN, &blocking, sizeof(blocking)));
         ASSERT_EQ(0, UDT::setsockopt(m_clientSocket, 0, UDT_RCVSYN, &blocking, sizeof(blocking)));
@@ -93,14 +93,14 @@ TEST_F(Deinitialization, does_not_crash_the_process)
 
     givenListeningServerSocket();
     startAccepting();
-    
+
     givenConnectingClientSocket();
 
     std::this_thread::sleep_for(
         std::chrono::milliseconds(rand() % 5));
 
     whenRemoveAllSockets();
-    
+
     deinitializeUdt();
 
     // thenProcessDoesNotCrash();
