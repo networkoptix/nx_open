@@ -20,14 +20,23 @@ namespace analytics {
 class PrintPrefixMaker
 {
 public:
-    std::string makePrintPrefix(const std::string& overridingPrintPrefix, const IPlugin* plugin)
+    std::string makePrintPrefix(
+        const std::string& overridingPrintPrefix,
+        const IPlugin* plugin,
+        const IEngineInfo* engineInfo = nullptr)
     {
         NX_KIT_ASSERT(plugin);
         NX_KIT_ASSERT(plugin->name());
 
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
-        return std::string("[") + plugin->name() + " Engine] ";
+
+        std::string printPrefix = std::string("[") + plugin->name() + " Engine";
+        if (engineInfo)
+            printPrefix += std::string(" ") + engineInfo->id();
+
+        printPrefix += "] ";
+        return printPrefix;
     }
 
 private:
@@ -44,7 +53,8 @@ Engine::Engine(
     const std::string& printPrefix)
     :
     logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, plugin)),
-    m_plugin(plugin)
+    m_plugin(plugin),
+    m_overridingPrintPrefix(printPrefix)
 {
     NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
@@ -77,6 +87,12 @@ void Engine::pushPluginEvent(
 Engine::~Engine()
 {
     NX_PRINT << "Destroyed " << this;
+}
+
+void Engine::setEngineInfo(const IEngineInfo* engineInfo)
+{
+    logUtils.setPrintPrefix(
+        PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
 }
 
 void Engine::setSettings(const IStringMap* settings)

@@ -9,6 +9,11 @@
 namespace nx {
 namespace sdk {
 
+void LogUtils::setPrintPrefix(std::string newPrefix)
+{
+    printPrefix = std::move(newPrefix);
+}
+
 bool LogUtils::convertAndOutputStringMap(
     std::map<std::string, std::string>* outMap,
     const IStringMap* stringMap,

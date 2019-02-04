@@ -136,6 +136,11 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_manifest);
 }
 
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+{
+    // Do nothing.
+}
+
 void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.

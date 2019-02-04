@@ -71,6 +71,11 @@ Engine::~Engine()
     NX_PRINT << " Destroyed Engine for " << m_plugin->name();
 }
 
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+{
+    // Do nothing.
+}
+
 void Engine::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
