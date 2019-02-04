@@ -358,7 +358,7 @@ void QnMediaServerModule::stop()
     resourceDiscoveryManager()->stop();
 
     m_licenseWatcher->stop();
-    m_resourceSearchers->stop();
+    m_resourceSearchers->clear();
 }
 
 void QnMediaServerModule::stopLongRunnables()

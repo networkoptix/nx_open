@@ -4406,7 +4406,7 @@ void MediaServerProcess::run()
 
     // Searchers must be initialized before the resources are loaded as resources instances
     // are created by searchers.
-    serverModule->resourceSearchers()->start();
+    serverModule->resourceSearchers()->initialize();
 
     m_audioStreamerPool = std::make_unique<QnAudioStreamerPool>(serverModule.get());
 

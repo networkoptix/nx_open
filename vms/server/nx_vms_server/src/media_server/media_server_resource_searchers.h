@@ -22,10 +22,12 @@ public:
         return result;
     }
 
-    void start();
-    void stop();
+    void initialize();
+    void clear();
+
 private:
     template <typename T> void registerSearcher(T* instance);
+
 private:
     QMap<std::type_index, QnAbstractResourceSearcher*> m_searchers;
 };

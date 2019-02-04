@@ -53,7 +53,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModu
 {
 }
 
-void QnMediaServerResourceSearchers::start()
+void QnMediaServerResourceSearchers::initialize()
 {
 
     auto commonModule = serverModule()->commonModule();
@@ -131,12 +131,13 @@ void QnMediaServerResourceSearchers::start()
 
 QnMediaServerResourceSearchers::~QnMediaServerResourceSearchers()
 {
-    stop();
+    clear();
 }
 
-void QnMediaServerResourceSearchers::stop()
+void QnMediaServerResourceSearchers::clear()
 {
     for (auto searcher: m_searchers.values())
         delete searcher;
     m_searchers.clear();
+    // What about cleaning QnResourceDiscoveryManager::m_searchersList?
 }
