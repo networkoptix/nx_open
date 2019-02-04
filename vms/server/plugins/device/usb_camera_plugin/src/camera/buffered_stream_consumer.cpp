@@ -38,4 +38,32 @@ void BufferedPacketConsumer::flush()
     m_buffer.clear();
 }
 
+void BufferedPacketConsumer::push(const std::shared_ptr<ffmpeg::Packet>& packet)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_buffer.emplace_back(packet);
+    m_bufferSizeBytes += packet->size();
+    m_wait.notify_all();
+}
+
+std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::pop()
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_wait.wait(lock, [this]() { return m_interrupted || !m_buffer.empty(); });
+    if (m_buffer.empty())
+        return nullptr;
+
+    std::shared_ptr<ffmpeg::Packet> packet = m_buffer.front();
+    m_buffer.pop_front();
+    m_bufferSizeBytes -= packet->size();
+    return packet;
+}
+
+void BufferedPacketConsumer::interrupt()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_interrupted = true;
+    m_wait.notify_all();
+}
+
 } // namespace nx::usb_cam
