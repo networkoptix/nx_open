@@ -101,7 +101,6 @@
 #include <nx/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/resource_widget_pixmap_cache.h>
-#include <nx/vms/client/desktop/layout_templates/layout_template_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
@@ -473,7 +472,6 @@ void QnClientModule::initSingletons()
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
-    commonModule->store(new LayoutTemplateManager());
     commonModule->store(new ObjectDisplaySettings());
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();

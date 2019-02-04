@@ -34,21 +34,8 @@ QString QnCloudResultInfo::toString(ResultCode code)
         case ResultCode::accountBlocked:
             return tr("Too many attempts. Try again in a minute.");
 
-        case ResultCode::dbError:
-        case ResultCode::notFound:
-        case ResultCode::alreadyExists:
-        case ResultCode::notImplemented:
-        case ResultCode::unknownRealm:
-        case ResultCode::badRequest:
-        case ResultCode::invalidNonce:
-        case ResultCode::invalidFormat:
-        case ResultCode::unknownError:
-            return tr("Internal %1 error. Please contact support team.",
-                "%1 is the cloud name (like Nx Cloud)")
-                .arg(nx::network::AppInfo::cloudName());
-
         case ResultCode::networkError:
-            return tr("Unexpected network error. Please check your Internet connection and try again.");
+            return tr("Network error. Please check your Internet connection and try again.");
 
         case ResultCode::badUsername:
             return tr("Invalid login.");
@@ -62,7 +49,9 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Credentials are no longer valid.");
 
         default:
-            return QString();
+            return tr("Internal %1 error. Please contact support team.",
+                "%1 is the cloud name (like Nx Cloud)")
+                .arg(nx::network::AppInfo::cloudName());
     }
 }
 

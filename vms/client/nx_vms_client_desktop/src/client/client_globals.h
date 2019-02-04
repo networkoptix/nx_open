@@ -118,6 +118,7 @@ namespace Qn
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
 
+        //TODO: #gdm Remove together with legacy camera settings.
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
 
         ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */

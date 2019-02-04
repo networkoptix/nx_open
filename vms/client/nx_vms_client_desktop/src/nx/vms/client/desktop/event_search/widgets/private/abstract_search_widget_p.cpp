@@ -334,7 +334,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 {
     ui->timeSelectionButton->setSelectable(false);
     ui->timeSelectionButton->setDeactivatable(true);
-    ui->timeSelectionButton->setIcon(qnSkin->icon("text_buttons/rapid_review.png"));
+    ui->timeSelectionButton->setIcon(qnSkin->icon("text_buttons/calendar.png"));
 
     auto timeMenu = q->createDropdownMenu();
     auto addMenuAction =
