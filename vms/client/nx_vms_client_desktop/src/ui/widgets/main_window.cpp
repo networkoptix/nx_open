@@ -375,7 +375,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     m_viewLayout->addWidget(m_view.data());
 
-
     // Post-initialize.
     if (nx::utils::AppInfo::isMacOsX())
         setOptions(Options());
@@ -397,8 +396,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
         Q_UNUSED(vsyncWorkaround);
     }
-    updateWidgetsVisibility();
 
+    updateWidgetsVisibility();
 }
 
 MainWindow::~MainWindow()

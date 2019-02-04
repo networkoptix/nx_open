@@ -18,7 +18,7 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    StreamFpsSharingMethod TimePeriodContent SystemComponent
+    StreamFpsSharingMethod TimePeriodContent
     ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
@@ -352,12 +352,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnalyticsContent,
 
         TimePeriodContentCount
-    };
-
-    enum SystemComponent {
-        ServerComponent,
-        ClientComponent,
-        AnyComponent
     };
 
 using StreamQuality = nx::vms::api::StreamQuality;

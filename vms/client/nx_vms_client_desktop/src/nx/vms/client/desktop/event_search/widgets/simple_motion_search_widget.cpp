@@ -47,7 +47,7 @@ public:
                     setFilterRegions({});
             });
 
-        connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
+        const auto updateResourceButton =
             [this]()
             {
                 const auto resource = this->q->navigator()->currentResource();
@@ -59,7 +59,12 @@ public:
                 setResourceName(resource.dynamicCast<QnMediaResource>()
                     ? resource->getName()
                     : tr("none"));
-            });
+            };
+
+        connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+            this, updateResourceButton);
+
+        updateResourceButton();
     }
 
     QList<QRegion> filterRegions() const

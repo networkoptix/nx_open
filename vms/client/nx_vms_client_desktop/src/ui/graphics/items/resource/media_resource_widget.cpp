@@ -121,6 +121,8 @@
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/network/cloud/protocol_type.h>
+
 using namespace std::chrono;
 
 using namespace nx;
@@ -2100,7 +2102,30 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
+	{
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
+
+        if (const auto archiveDelegate = d->display()->archiveReader()->getArchiveDelegate())
+		{
+            const auto protocol = archiveDelegate->protocol();
+            switch (protocol)
+            {
+                case nx::network::Protocol::udt:
+                    // aka UDP hole punching.
+                    hqLqString += " (N)";
+                    break;
+
+				case nx::network::cloud::Protocol::relay:
+                    // relayed connection (aka proxy).
+                    hqLqString += " (P)";
+                    break;
+
+				default:
+                    // Regular connection.
+                    break;
+            }
+		}
+	}
 
     static const int kDetailsTextPixelSize = 11;
 
