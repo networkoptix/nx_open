@@ -227,7 +227,7 @@ AVCodecParameters* VideoStream::getCodecParameters()
 {
     if (!m_inputFormat)
         return nullptr;
-    AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
+    AVStream* stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
     if (!stream)
         return nullptr;
 

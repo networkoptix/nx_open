@@ -15,7 +15,7 @@ public:
     TranscodeStreamReader(int encoderIndex, const std::shared_ptr<Camera>& camera);
     virtual ~TranscodeStreamReader();
 
-    virtual int getNextData( nxcip::MediaDataPacket** lpPacket ) override;
+    virtual int getNextData(nxcip::MediaDataPacket** lpPacket) override;
 
     virtual void setFps(float fps) override;
     virtual void setResolution(const nxcip::Resolution& resolution) override;

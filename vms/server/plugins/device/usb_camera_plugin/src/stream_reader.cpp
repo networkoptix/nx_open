@@ -94,7 +94,7 @@ StreamReaderPrivate::StreamReaderPrivate(
     :
     m_encoderIndex(encoderIndex),
     m_camera(camera),
-    m_avConsumer(new BufferedPacketConsumer)
+    m_avConsumer(new BufferedPacketConsumer(camera->toString()))
 {
 }
 

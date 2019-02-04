@@ -9,7 +9,7 @@ namespace nx::usb_cam {
 
 namespace {
 
-static constexpr int kBufferMaxSize(1024*1024*8);
+static constexpr int kBufferMaxSize(1024 * 1024 * 8); // 8 MB.
 
 }
 
@@ -17,9 +17,8 @@ void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& p
 {
     if (m_bufferSizeBytes > kBufferMaxSize)
     {
-        NX_WARNING(this, "USB camera plugin buffer overflow!");
-        m_dropUntilNextVideoKeyPacket = true;
-        return;
+        NX_WARNING(this, "USB camera %1 error: buffer overflow!", m_cameraId);
+        flush();
     }
 
     if (packet->mediaType() == AVMEDIA_TYPE_VIDEO && m_dropUntilNextVideoKeyPacket)

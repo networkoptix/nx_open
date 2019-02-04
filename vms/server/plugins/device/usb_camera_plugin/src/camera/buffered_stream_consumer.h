@@ -5,8 +5,6 @@
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
-#include <chrono>
-#include <vector>
 #include <deque>
 
 namespace nx::usb_cam {
@@ -15,10 +13,11 @@ class BufferedPacketConsumer: public AbstractPacketConsumer
 {
 public:
     // AbstractPacketConsumer
-    void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
-    void flush();
+    virtual void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet) override;
+    virtual void flush() override;
 
 public:
+    BufferedPacketConsumer(const std::string& cameraId): m_cameraId(cameraId) {}
     bool empty() const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -74,7 +73,7 @@ private:
     mutable std::mutex m_mutex;
     std::deque<std::shared_ptr<ffmpeg::Packet>> m_buffer;
     bool m_interrupted = false;
-
+    std::string m_cameraId;
 };
 
 } // namespace nx::usb_cam
