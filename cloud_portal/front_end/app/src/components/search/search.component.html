@@ -64,7 +64,7 @@
 
         <div class="col-12 dropdown p-0 mt-2" *ngIf="expandable"
              [ngClass]="{'show': showAdvancedOptions}" (nxClickElsewhere)="show = false">
-            <div class="area clearfix">
+            <div class="area clearfix d-flex">
                 <div class="float-left">
                     <a href class="btn-text" (click)="toggleOptions()">
                         <div class="nav-arrow">
@@ -74,8 +74,9 @@
                         <span translete>Advanced search</span>
                     </a>
                 </div>
-                <div *ngIf="numberFilters != 0" class="float-right">
-                    <div [ngSwitch]="numberFilters" class="float-left">
+                <div *ngIf="numberFilters != 0" class="ml-3 float-left d-flex align-items-baseline">
+                    <span>(</span>
+                    <div [ngSwitch]="numberFilters" class="">
                         <span *ngSwitchCase="1">
                         1 filter applied
                     </span>
@@ -83,13 +84,14 @@
                         {{numberFilters}} filters applied
                     </span>
                     </div>
-                    <div class="ml-2 float-left">
+                    <div class="ml-2 ">
                         <a href class="btn-text has-icon position-relative"
                            (click)="resetFilters()">
                             <span class="close"></span>
                             <span translete>Clear All</span>
                         </a>
                     </div>
+                    <span>)</span>
                 </div>
             </div>
             <hr class="mb-0 mt-2 w-100" [hidden]="!showAdvancedOptions">
