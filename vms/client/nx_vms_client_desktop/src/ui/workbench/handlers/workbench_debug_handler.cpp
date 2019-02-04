@@ -358,20 +358,6 @@ public:
                 addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"), "Engine 3", plugin2);
             });
 
-        addButton("Generate analytics manifests",
-            [this]()
-            {
-                // TODO: Implement this method or get rid of it completely.
-                NX_ASSERT(false, "Method is not implemented");
-            });
-
-        addButton("Clear analytics manifests",
-            [this]()
-            {
-                // TODO: Implement this method or get rid of it completely.
-                NX_ASSERT(false, "Method is not implemented");
-            });
-
         for (auto [name, handler]: nx::utils::constKeyValueRange(debugActions()))
             addButton(name, handler);
     }
