@@ -281,7 +281,7 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline(engineVersion))
+    if (!checkOnline())
         return false;
 
     const auto result = applauncher::api::getInstalledVersions(versions);
@@ -438,7 +438,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
             connectionInfo.version);
 
-        switch (applauncher::api::restartClient(connectionInfo.version, engineVersion, authString))
+        switch (applauncher::api::restartClient(connectionInfo.version, authString))
         {
             case applauncher::api::ResultType::ok:
                 return Qn::IncompatibleProtocolConnectionResult;

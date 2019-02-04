@@ -402,7 +402,7 @@ void QnClientModule::initSingletons()
     commonModule->store(clientSettings.release());
     commonModule->store(clientInstanceManager.release());
 
-    initRuntimeParams(commonModule, m_startupParameters);
+    initRuntimeParams(m_startupParameters);
 
     // Shortened initialization if run in self-update mode.
     if (m_startupParameters.selfUpdateMode)
@@ -484,9 +484,7 @@ void QnClientModule::initSingletons()
     registerResourceDataProviders();
 }
 
-void QnClientModule::initRuntimeParams(
-    QnCommonModule* commonModule,
-    const QnStartupParameters& startupParams)
+void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 {
     if (!m_startupParameters.engineVersion.isEmpty())
     {
@@ -494,7 +492,7 @@ void QnClientModule::initRuntimeParams(
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
-            commonModule->setEngineVersion(version);
+            m_clientCoreModule->commonModule()->setEngineVersion(version);
         }
     }
 

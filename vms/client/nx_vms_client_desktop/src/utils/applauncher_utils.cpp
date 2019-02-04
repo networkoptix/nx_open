@@ -22,13 +22,11 @@ namespace {
 
 static const int kZipInstallationTimeoutMs = 30000;
 
-ResultType::Value isVersionInstalled(
-    nx::utils::SoftwareVersion version,
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    bool* const installed)
+ResultType::Value isVersionInstalled(nx::utils::SoftwareVersion version, bool* const installed)
 {
+    NX_ASSERT(!version.isNull());
     if (version.isNull())
-        version = engineVersion;
+        return ResultType::invalidVersionFormat;
 
     IsVersionInstalledRequest request;
     request.version = version;
@@ -42,13 +40,11 @@ ResultType::Value isVersionInstalled(
     return ResultType::ok;
 }
 
-ResultType::Value restartClient(
-    nx::utils::SoftwareVersion version,
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    const QString& auth)
+ResultType::Value restartClient(nx::utils::SoftwareVersion version, const QString& auth)
 {
+    NX_ASSERT(!version.isNull());
     if (version.isNull())
-        version = nx::utils::SoftwareVersion(engineVersion);
+        return ResultType::invalidVersionFormat;
 
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
@@ -121,12 +117,12 @@ ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versio
     return response.result;
 }
 
-bool checkOnline(const nx::vms::api::SoftwareVersion& engineVersion, bool runWhenOffline)
+bool checkOnline(bool runWhenOffline)
 {
     /* Try to run applauncher if it is not running. */
     static const nx::utils::SoftwareVersion anyVersion(3, 0);
     bool notUsed = false;
-    const auto result = isVersionInstalled(anyVersion, engineVersion, &notUsed);
+    const auto result = isVersionInstalled(anyVersion, &notUsed);
 
     if (result == ResultType::ok)
         return true;

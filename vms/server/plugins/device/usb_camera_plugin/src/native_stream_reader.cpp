@@ -24,8 +24,6 @@ NativeStreamReader::NativeStreamReader(
 NativeStreamReader::~NativeStreamReader()
 {
     m_avConsumer->interrupt();
-    // Avoid virtual removeVideoConsumer()
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
 }
 
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
