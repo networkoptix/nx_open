@@ -32,7 +32,6 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     m_streamReader.reset(new StreamReader(
         &m_refManager,
         encoderIndex,
-        camera->defaultVideoParameters(),
         m_camera,
         m_isSecondaryStream));
 }

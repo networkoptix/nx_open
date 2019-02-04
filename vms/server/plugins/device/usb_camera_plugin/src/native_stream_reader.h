@@ -8,10 +8,7 @@ namespace usb_cam {
 class NativeStreamReader: public StreamReaderPrivate
 {
 public:
-    NativeStreamReader(
-        int encoderIndex,
-        const CodecParameters& codecParams,
-        const std::shared_ptr<Camera>& camera);
+    NativeStreamReader(int encoderIndex, const std::shared_ptr<Camera>& camera);
     virtual ~NativeStreamReader();
 
     virtual int getNextData(nxcip::MediaDataPacket** packet) override;

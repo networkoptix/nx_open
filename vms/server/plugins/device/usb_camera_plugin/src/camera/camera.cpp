@@ -183,14 +183,6 @@ std::string Camera::ffmpegUrl() const
     return m_discoveryManager->getFfmpegUrl(m_cameraInfo.uid);
 }
 
-std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
-{
-    std::vector<AVCodecID> ffmpegCodecList;
-    for (const auto & nxCodecID : kVideoCodecPriorityList)
-        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecId(nxCodecID));
-    return ffmpegCodecList;
-}
-
 const nxcip::CameraInfo& Camera::info() const
 {
     //return m_cameraManager->info();

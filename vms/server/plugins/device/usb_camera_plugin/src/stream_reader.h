@@ -20,8 +20,7 @@ extern "C" {
 #include "camera/codec_parameters.h"
 #include "camera/buffered_stream_consumer.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 class StreamReaderPrivate;
 
@@ -31,7 +30,6 @@ public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera,
         bool forceTranscoding);
 
@@ -72,7 +70,6 @@ public:
     virtual void ensureConsumerAdded();
 
 protected:
-    static constexpr int kMsecInSec = 1000;
     static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(150);
     static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(2000000);
 
@@ -94,5 +91,4 @@ protected:
     bool shouldStop() const;
 };
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace usb_cam::nx

@@ -9,13 +9,10 @@
 namespace nx {
 namespace usb_cam {
 
-NativeStreamReader::NativeStreamReader(
-    int encoderIndex,
-    const CodecParameters& codecParams,
-    const std::shared_ptr<Camera>& camera)
-    :
+NativeStreamReader::NativeStreamReader(int encoderIndex, const std::shared_ptr<Camera>& camera):
     StreamReaderPrivate(encoderIndex, camera)
 {
+    CodecParameters codecParams = camera->defaultVideoParameters();
     m_camera->videoStream()->setResolution(codecParams.resolution);
     m_camera->videoStream()->setFps(codecParams.fps);
     m_camera->videoStream()->setBitrate(codecParams.bitrate);

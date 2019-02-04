@@ -9,8 +9,7 @@
 #include "transcode_stream_reader.h"
 
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace  {
 
@@ -24,7 +23,6 @@ static constexpr int kUsecInMsec = 1000;
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
-    const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera,
     bool forceTranscoding)
     :
@@ -32,15 +30,9 @@ StreamReader::StreamReader(
 {
     // needs transcoding to a supported codec
     if (forceTranscoding)
-        m_streamReader.reset(new TranscodeStreamReader(
-        encoderIndex,
-        codecParams,
-        camera));
+        m_streamReader.reset(new TranscodeStreamReader(encoderIndex, camera));
     else
-        m_streamReader.reset(new NativeStreamReader(
-        encoderIndex,
-        codecParams,
-        camera));
+        m_streamReader.reset(new NativeStreamReader(encoderIndex, camera));
 }
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -193,5 +185,4 @@ bool StreamReaderPrivate::shouldStop() const
     return m_interrupted || m_camera->ioError();
 }
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace usb_cam::nx
