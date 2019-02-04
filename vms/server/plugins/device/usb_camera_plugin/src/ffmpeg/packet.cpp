@@ -4,9 +4,7 @@ namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
 
-Packet::Packet(
-    AVCodecID codecId,
-    AVMediaType mediaType)
+Packet::Packet(AVCodecID codecId, AVMediaType mediaType)
     :
     m_codecId(codecId),
     m_mediaType(mediaType),
