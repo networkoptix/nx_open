@@ -18,7 +18,9 @@ Item
 
     property bool enableAnimation: true
     property int animationDuration: 400
-    property real expandedSize: 63
+
+    property real expandedSize: 91
+    property real expandedDashSize: 24
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
     property real centerCircleRadius: 2.5
@@ -53,7 +55,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: d.thickness
             color: item.mainColor
-            width: item.dashSize + d.thickness
+            width: d.dashSize + d.thickness
             height: d.thickness
         }
 
@@ -64,7 +66,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: parent.width - width - d.thickness
             color: item.mainColor
-            width: item.dashSize
+            width: d.dashSize
             height: d.thickness
         }
 
@@ -76,7 +78,7 @@ Item
             y: d.thickness
             color: item.mainColor
             width: d.thickness
-            height: item.dashSize + d.thickness
+            height: d.dashSize + d.thickness
         }
 
         Rectangle
@@ -87,7 +89,7 @@ Item
             y: parent.height - height - d.thickness
             color: item.mainColor
             width: d.thickness
-            height: item.dashSize + d.thickness
+            height: d.dashSize + d.thickness
         }
 
         Circle
@@ -135,6 +137,7 @@ Item
                 size: item.normalSize
                 thickness: item.normalThickness
                 circleRadius: item.normalCircleRadius
+                dashSize: item.dashSize
             }
         },
         State
@@ -149,6 +152,7 @@ Item
                 size: item.normalSize
                 thickness: item.normalThickness
                 circleRadius: item.normalCircleRadius
+                dashSize: item.dashSize
             }
         },
         State
@@ -163,6 +167,7 @@ Item
                 size: item.expandedSize
                 thickness: item.expandedThickness
                 circleRadius: item.expandedCircleRadius
+                dashSize: item.expandedDashSize
             }
         }
     ]
@@ -175,6 +180,7 @@ Item
         property real size: item.normalSize
         property real thickness: item.normalThickness
         property real circleRadius: item.normalCircleRadius
+        property real dashSize: item.dashSize
 
         Behavior on circleRadius
         {
@@ -195,6 +201,15 @@ Item
         }
 
         Behavior on size
+        {
+            NumberAnimation
+            {
+                duration: d.animationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on dashSize
         {
             NumberAnimation
             {
