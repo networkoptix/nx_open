@@ -38,6 +38,9 @@ NX_UTILS_API Level maxLevel();
 /** Indicates if a message is going to be logged by any logger. */
 bool NX_UTILS_API isToBeLogged(Level level, const Tag& tag = {});
 
+/** Indicates if passwords should be shown in logs. */
+bool NX_UTILS_API showPasswords();
+
 namespace detail {
 
 class Helper

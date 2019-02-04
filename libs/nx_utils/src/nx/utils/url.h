@@ -186,8 +186,6 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
  */
 NX_UTILS_API QString hidePassword(const QString& urlStr);
 
-NX_UTILS_API bool displayPasswordInLogs();
-
 } // namespace url
 } // namespace utils
 } // namespace nx
@@ -201,7 +199,7 @@ NX_UTILS_API bool displayPasswordInLogs();
 template<>
 inline QString toString<nx::utils::Url>(const nx::utils::Url& value)
 {
-    if (nx::utils::url::displayPasswordInLogs())
+    if (nx::utils::log::showPasswords())
         return value.toString();
 
     return value.toDisplayString();

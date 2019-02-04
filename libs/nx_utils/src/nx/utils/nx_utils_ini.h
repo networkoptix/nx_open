@@ -12,10 +12,12 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         static constexpr const char* kDefaultMutexImplementation = "debug";
         static constexpr int kDefaultAssertCrash = 1;
         static constexpr int kDefaultAssertHeavyCondition = 1;
+        static constexpr int kShowPasswordsInLogs = 1;
     #else
         static constexpr const char* kDefaultMutexImplementation = "qt";
         static constexpr int kDefaultAssertCrash = 0;
         static constexpr int kDefaultAssertHeavyCondition = 0;
+        static constexpr int kShowPasswordsInLogs = 0;
     #endif
 
     NX_INI_STRING(kDefaultMutexImplementation, mutexImplementation,
@@ -27,7 +29,7 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(kDefaultAssertCrash, assertHeavyCondition,
         "Enable assertions for heavy conditions.");
 
-    NX_INI_FLAG(0, displayUrlPasswordInLogs,
+    NX_INI_FLAG(kShowPasswordsInLogs, showPasswordsInLogs,
         "Enable displaying of URL password field in the logs");
 };
 

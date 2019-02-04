@@ -531,10 +531,14 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
     return setProperty(key, value.toString(), options);
 }
 
-QString hidePasswordIfCredentialsPropety(const QString& key, const QString& value)
+static QString hidePasswordIfCredentialsPropety(const QString& key, const QString& value)
 {
+    if (nx::utils::log::showPasswords())
+        return value;
+
     if (key == ResourcePropertyKey::kCredentials || key == ResourcePropertyKey::kDefaultCredentials)
         return value.left(value.indexOf(':')) + ":******";
+
     return value;
 }
 
