@@ -476,15 +476,27 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
     if (const auto camera = widget->resource().dynamicCast<QnClientCameraResource>();
         camera->isPtzRedirected())
     {
-        // And target camera is not on the current layout already...
-        if (const auto ptzTarget = camera->ptzRedirectedTo();
-            workbench()->currentLayout()->items(ptzTarget).empty())
+        const auto ptzTarget = camera->ptzRedirectedTo();
+        if (ptzTarget)
         {
-            // Drop it as near to source camera as possible.
-            ui::action::Parameters parameters(ptzTarget);
-            parameters.setArgument(Qn::ItemPositionRole,
-                qVariantFromValue(QRectF(widget->item()->geometry()).center()));
-            menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+            // And target camera is not on the current layout already...
+            if (workbench()->currentLayout()->items(ptzTarget).empty())
+            {
+                // Drop it as near to source camera as possible.
+                ui::action::Parameters parameters(ptzTarget);
+                parameters.setArgument(Qn::ItemPositionRole,
+                    qVariantFromValue(QRectF(widget->item()->geometry()).center()));
+                menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+            }
+
+            // Switch actual sensor widget to the PTZ mode.
+            for (const auto widget: display()->widgets(ptzTarget))
+			{
+                auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+                NX_ASSERT(mediaWidget);
+                if (mediaWidget)
+                    mediaWidget->setPtzMode(true);
+			}
         }
     }
 

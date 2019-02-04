@@ -369,7 +369,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     d->analyticsController->setAnalyticsMetadataProvider(d->analyticsMetadataProvider);
 
     at_camDisplay_liveChanged();
-    at_ptzButton_toggled(false);
+    setPtzMode(false);
     at_imageEnhancementButton_toggled(item->imageEnhancement().enabled);
     updateIconButton();
 
@@ -836,7 +836,7 @@ void QnMediaResourceWidget::createButtons()
             /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
             /* internal id */ Qn::PtzButton,
             /* statistics key */ "media_widget_area_zoom",
-            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+            /* handler */ &QnMediaResourceWidget::setPtzMode);
     }
     else
     {
@@ -848,7 +848,7 @@ void QnMediaResourceWidget::createButtons()
             /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
             /* internal id */ Qn::PtzButton,
             /* statistics key */ "media_widget_ptz",
-            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+            /* handler */ &QnMediaResourceWidget::setPtzMode);
     }
 
     createActionAndButton(
@@ -2073,6 +2073,18 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         emit motionSearchModeEnabled(motionSearchEnabled);
     }
 
+    if (changedFlags.testFlag(ControlPtz))
+    {
+        const bool switchedToPtzMode = options().testFlag(ControlPtz);
+        if (switchedToPtzMode)
+        {
+            titleBar()->rightButtonsBar()->setButtonsChecked(
+				Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+            // TODO: #gdm evil hack! Won't work if SYNC is off and this item is not selected.
+            action(action::JumpToLiveAction)->trigger();
+        }
+    }
+
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -2513,18 +2525,6 @@ void QnMediaResourceWidget::at_screenshotButton_clicked()
     menu()->trigger(action::TakeScreenshotAction, this);
 }
 
-void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
-{
-    bool ptzEnabled = checked && d->canControlPtz();
-
-    setOption(ControlPtz, ptzEnabled);
-    if (checked)
-    {
-        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
-        action(action::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
-    }
-}
-
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
 {
     auto params = item()->dewarpingParams();
@@ -2659,7 +2659,7 @@ void QnMediaResourceWidget::updateFisheye()
     const bool hasPtz = titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton;
     const bool ptzEnabled = titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton;
     if (hasPtz && ptzEnabled)
-        at_ptzButton_toggled(true);
+        setPtzMode(true);
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio()
@@ -2856,6 +2856,12 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
 {
     return (titleBar()->rightButtonsBar()->checkedButtons() & Qn::MotionSearchButton) != 0;
+}
+
+void QnMediaResourceWidget::setPtzMode(bool value)
+{
+    bool ptzEnabled = value && d->canControlPtz();
+    setOption(ControlPtz, ptzEnabled);
 }
 
 QnSpeedRange QnMediaResourceWidget::speedRange() const
