@@ -22,7 +22,6 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
     m_capabilities(
             nxcip::BaseCameraManager::nativeMediaStreamCapability |
             nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-            nxcip::BaseCameraManager::fixedQualityCapability |
             nxcip::BaseCameraManager::cameraTimeCapability)
 {
     m_pluginRef->addRef();
