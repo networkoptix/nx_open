@@ -79,21 +79,18 @@ analytics::ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeD
 QList<nx::vms::api::analytics::EngineManifest::ObjectAction>
     AnalyticsEngineResource::supportedObjectActions() const
 {
-    const auto engineManifest = manifest();
-    return engineManifest.objectActions;
+    return manifest().objectActions;
 }
 
 bool AnalyticsEngineResource::isDeviceDependent() const
 {
-    const auto engineManifest = manifest();
-    return engineManifest.capabilities.testFlag(EngineManifest::Capability::deviceDependent);
+    return manifest().capabilities.testFlag(EngineManifest::Capability::deviceDependent);
 }
 
 bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const
 {
-    const auto engineId = getId();
     const auto userEnabledEngines = device->userEnabledAnalyticsEngines();
-    if (userEnabledEngines.contains(engineId))
+    if (userEnabledEngines.contains(getId()))
         return true;
 
     if (!isDeviceDependent())
@@ -102,7 +99,7 @@ bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePt
     nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
     const auto compatibleEngines = deviceDescriptorManager.compatibleEngineIds(device);
 
-    return compatibleEngines.find(engineId) != compatibleEngines.cend();
+    return compatibleEngines.find(getId()) != compatibleEngines.cend();
 }
 
 } // namespace nx::vms::common
