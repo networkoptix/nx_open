@@ -155,7 +155,6 @@ public: // internal API
     bool broken() const;
 
     CSNode* sNode() { return m_pSNode; }
-    CRNode* rNode() { return m_pRNode; }
 
     int payloadSize() const { return m_iPayloadSize; }
 
@@ -544,7 +543,6 @@ private: // for UDP multiplexer
     sockaddr* m_pPeerAddr = nullptr;    // peer address
     uint32_t m_piSelfIP[4];             // local UDP IP address
     CSNode* m_pSNode = nullptr;         // node information for UDT list used in snd queue
-    CRNode* m_pRNode = nullptr;         // node information for UDT list used in rcv queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll
