@@ -9,7 +9,6 @@
 
 #include "log.h"
 
-#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/unused.h>
 
 namespace nx::utils {
@@ -117,11 +116,6 @@ void disableQtMessageAsserts()
         qInstallMessageHandler(g_defaultQtMessageHandler);
     else
         NX_ASSERT(false, "Qt message asserts are not enabled");
-}
-
-bool isAssertHeavyConditionEnabled()
-{
-    return ini().assertHeavyCondition;
 }
 
 AssertTimer::TimeInfo::TimeInfo():
