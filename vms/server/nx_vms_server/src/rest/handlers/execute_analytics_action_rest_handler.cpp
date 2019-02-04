@@ -45,7 +45,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
     if (!success)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid Json object provided"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid JSON object provided"));
         return nx::network::http::StatusCode::ok;
     }
 
