@@ -35,7 +35,7 @@ protected:
             m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString()));
 
             m_peers.back()->addCmdOption("--override-version=4.0.0.0");
-            m_peers.back()->addSetting("--ignoreRootTool", "true");
+            m_peers.back()->addSetting("ignoreRootTool", "true");
             ASSERT_TRUE(m_peers.back()->start());
         }
         for (int i = 0; i < count; ++i)
