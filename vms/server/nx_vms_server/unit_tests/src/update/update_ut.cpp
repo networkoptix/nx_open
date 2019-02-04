@@ -36,11 +36,10 @@ protected:
 
             m_peers.back()->addCmdOption("--override-version=4.0.0.0");
             m_peers.back()->addSetting("--ignoreRootTool", "true");
-            ASSERT_TRUE(m_peers.back()->startAsync());
+            ASSERT_TRUE(m_peers.back()->start());
         }
         for (int i = 0; i < count; ++i)
         {
-            ASSERT_TRUE(m_peers[i]->waitForStarted());
             m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
             m_peers[i]->commonModule()->globalSettings()->synchronizeNowSync();
         }
@@ -669,7 +668,7 @@ TEST_F(Updates, DISABLED_finishUpdate_fail_notAllUpdated)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, DISABLED_finishUpdate_fail_participantWithOldVersionIsOffline)
+TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
