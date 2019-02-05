@@ -3,6 +3,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
+#include <nx/utils/app_info.h>
 
 #include "camera/default_audio_encoder.h"
 #include "camera_manager.h"
@@ -218,6 +219,13 @@ int MediaEncoder::getResolutionList(
         infoList[index].maxFps = kDefaultSecondaryFps;
 
         *infoListCount = index + 1;
+        if (nx::utils::AppInfo::isRaspberryPi())
+        {
+            int width = kDefaultSecondaryWidth / 2;
+            infoList[0].resolution = { width, (int)(width / aspectRatio) };
+            infoList[0].maxFps = kDefaultSecondaryFps;
+            *infoListCount = 1;
+        }
     }
 
     return nxcip::NX_NO_ERROR;
