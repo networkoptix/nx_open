@@ -242,6 +242,7 @@ class CRcvUList
 {
 public:
     CRcvUList() = default;
+    ~CRcvUList();
 
     CRcvUList(const CRcvUList&) = delete;
     CRcvUList& operator=(const CRcvUList&) = delete;

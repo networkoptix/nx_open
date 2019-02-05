@@ -573,6 +573,16 @@ int CSndQueue::sendto(const sockaddr* addr, CPacket& packet)
 //-------------------------------------------------------------------------------------------------
 // CRcvUList
 
+CRcvUList::~CRcvUList()
+{
+    for (auto node = m_nodeListHead; node != nullptr;)
+    {
+        auto nodeToDelete = node;
+        node = node->next;
+        delete nodeToDelete;
+    }
+}
+
 void CRcvUList::insert(std::shared_ptr<CUDT> u)
 {
     auto n = new CRNode();
