@@ -180,7 +180,7 @@ nx::sql::DBResult DataManager::removeFromDb(
 
 nx::sql::DBResult DataManager::incomingSave(
     nx::sql::QueryContext* queryContext,
-    const std::string& systemId,
+    const std::string& /*systemId*/,
     clusterdb::engine::Command<KeyValuePair> command)
 {
     m_keyValueDao->save(queryContext, command.params.key, command.params.value);
@@ -189,7 +189,7 @@ nx::sql::DBResult DataManager::incomingSave(
 
 nx::sql::DBResult DataManager::incomingRemove(
     nx::sql::QueryContext* queryContext,
-    const std::string& systemId,
+    const std::string& /*systemId*/,
     clusterdb::engine::Command<Key> command)
 {
     m_keyValueDao->remove(queryContext, command.params.key);

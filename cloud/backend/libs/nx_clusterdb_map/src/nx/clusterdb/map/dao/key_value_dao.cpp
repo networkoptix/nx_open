@@ -1,6 +1,6 @@
 #include "key_value_dao.h"
 
-#include <QcryptographicHash>
+#include <QCryptographicHash>
 
 #include <nx/sql/query.h>
 #include <nx/sql/query_context.h>
