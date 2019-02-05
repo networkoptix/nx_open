@@ -1,9 +1,14 @@
 version: '3'
 services:
   webapp:
-    image: dockermediaserver
+    image: mediaserver
     ports:
       - "7001:7001"
     network_mode: "host"
     volumes:
-      - /home/kyle/develop/nx_vms/cloud_portal/robot_tests/Docker/data:/dock
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./video:/dock2
+      - ./data/:/opt/networkoptix/mediaserver/var
+    tmpfs:
+      - /run
+      - /run/lock
