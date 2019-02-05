@@ -20,7 +20,7 @@ namespace stub {
 class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
-    DeviceAgent(Engine* engine);
+    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(

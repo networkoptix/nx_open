@@ -36,9 +36,9 @@ Engine::~Engine()
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* /*deviceInfo*/, Error* /*outError*/)
+    const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
-    return new DeviceAgent(this);
+    return new DeviceAgent(this, deviceInfo);
 }
 
 void Engine::initCapabilities()

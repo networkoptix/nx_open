@@ -21,15 +21,20 @@ namespace analytics {
 class PrintPrefixMaker
 {
 public:
-    std::string makePrintPrefix(const std::string& overridingPrintPrefix, const IEngine* engine)
+    std::string makePrintPrefix(
+        const std::string& overridingPrintPrefix,
+        const IEngine* engine,
+        const IDeviceInfo* deviceInfo)
     {
         NX_KIT_ASSERT(engine);
         NX_KIT_ASSERT(engine->plugin());
         NX_KIT_ASSERT(engine->plugin()->name());
+        NX_KIT_ASSERT(deviceInfo);
 
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
-        return std::string("[") + engine->plugin()->name() + " DeviceAgent] ";
+        return std::string("[") + engine->plugin()->name()
+            + " DeviceAgent " + deviceInfo->id() + "] ";
     }
 
 private:
@@ -43,10 +48,11 @@ private:
 
 VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
     IEngine* engine,
+    const IDeviceInfo* deviceInfo,
     bool enableOutput,
     const std::string& printPrefix)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, engine)),
+    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, engine, deviceInfo)),
     m_engine(engine)
 {
     NX_PRINT << "Created " << this;

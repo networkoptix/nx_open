@@ -25,8 +25,8 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(Engine* engine):
-    VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
+    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
     m_objectId(nx::sdk::UuidHelper::randomUuid())
 {
 }

@@ -44,6 +44,7 @@ protected:
      */
     VideoFrameProcessingDeviceAgent(
         IEngine* engine,
+        const IDeviceInfo* deviceInfo,
         bool enableOutput,
         const std::string& printPrefix = "");
 
