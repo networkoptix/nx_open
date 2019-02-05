@@ -100,4 +100,4 @@ nx::sql::AsyncSqlQueryExecutor& KeyValueDao::queryExecutor()
     return *m_queryExecutor;
 }
 
-} // namespace nx::clusterdb::map::dao::rdb
+} // namespace nx::clusterdb::map::dao
