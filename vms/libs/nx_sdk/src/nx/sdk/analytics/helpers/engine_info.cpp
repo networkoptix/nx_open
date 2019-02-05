@@ -6,7 +6,7 @@ namespace analytics {
 
 const char* EngineInfo::id() const
 {
-    return m_name.c_str();
+    return m_id.c_str();
 }
 
 const char* EngineInfo::name() const
