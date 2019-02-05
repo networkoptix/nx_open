@@ -26,6 +26,7 @@ enum TunnelMethod
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
+static constexpr char kTunnelTag[] = "/HttpTunnelingTest";
 
 template<typename TunnelMethodMask>
 class HttpTunneling:
@@ -38,9 +39,9 @@ public:
             nullptr)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
-            [this](const nx::utils::Url& baseUrl)
+            [this](const std::string& tag, const nx::utils::Url& baseUrl)
             {
-                return m_localFactory.create(baseUrl);
+                return m_localFactory.create(tag, baseUrl);
             });
 
         enableTunnelMethods(TunnelMethodMask::value);
@@ -60,7 +61,7 @@ protected:
     {
         startHttpServer();
 
-        m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient = std::make_unique<Client>(m_baseUrl, kTunnelTag);
     }
 
     void stopTunnelingServer()
@@ -331,7 +332,7 @@ protected:
 
         givenTunnellingServer();
 
-        m_initialTopTunnelTypeId = tunnelClientFactory().topTunnelTypeId();
+        m_initialTopTunnelTypeId = tunnelClientFactory().topTunnelTypeId(kTunnelTag);
     }
 
     void givenSuccessfulValidator()
@@ -359,7 +360,7 @@ protected:
 
     void andTunnelTypePrioritiesChanged()
     {
-        ASSERT_NE(m_initialTopTunnelTypeId, tunnelClientFactory().topTunnelTypeId());
+        ASSERT_NE(m_initialTopTunnelTypeId, tunnelClientFactory().topTunnelTypeId(kTunnelTag));
     }
 
 private:

@@ -29,7 +29,9 @@ public:
     /**
      * @param baseTunnelUrl Path must be equal to that passed to Server().
      */
-    Client(const nx::utils::Url& baseTunnelUrl);
+    Client(
+        const nx::utils::Url& baseTunnelUrl,
+        const std::string& userTag = "");
 
     /**
      * TunnelValidator type is instantiated when needed as
