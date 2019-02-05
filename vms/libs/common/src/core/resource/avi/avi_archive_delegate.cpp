@@ -448,7 +448,6 @@ bool QnAviArchiveDelegate::open(
         if (!m_IOContext)
         {
             close();
-            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
         m_formatContext->pb = m_IOContext;
@@ -460,14 +459,12 @@ bool QnAviArchiveDelegate::open(
         if (!m_initialized)
         {
             close();
-            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
 
         if (!initMetadata())
         {
             close();
-            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
 

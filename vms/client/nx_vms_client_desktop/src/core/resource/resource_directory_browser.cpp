@@ -325,14 +325,8 @@ void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
     // - file has been removed
     // - file has been renamed. Just the same as to be removed
 
-    if (!QFileInfo::exists(path)) //< File does not exist means resource should be deleted.
+    if (!QFileInfo::exists(path))
     {
-        QnResourcePool* pool = resourcePool();
-        QnResourcePtr res = pool->getResourceByUrl(path);
-        if (res)
-        {
-            pool->removeResource(res);
-        }
         QnMutexLocker lock(&m_cacheMutex);
         m_resourceCache.remove(path);
         m_fsWatcher.removePath(path);
@@ -351,7 +345,9 @@ void QnResourceDirectoryBrowser::at_trackResources(const QnResourceList& resourc
             m_resourceCache.insert(url, ptr);
         }
         else
+        {
             skipped++;
+        }
     }
     // Add file to watch. It properly handles duplicate paths.
     m_fsWatcher.addPaths(paths);

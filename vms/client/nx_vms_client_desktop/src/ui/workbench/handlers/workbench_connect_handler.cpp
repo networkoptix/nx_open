@@ -34,6 +34,7 @@
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <client_core/client_core_settings.h>
 #include <client/desktop_client_message_processor.h>
@@ -1100,6 +1101,11 @@ void QnWorkbenchConnectHandler::clearConnection()
         if (layout->hasFlags(Qn::local) && !layout->isFile())  //do not remove exported layouts
             resourcesToRemove.push_back(layout);
     }
+
+
+    const auto aviResources = resourcePool()->getResources<QnAviResource>();
+    std::copy_if(aviResources.cbegin(), aviResources.cend(), std::back_inserter(resourcesToRemove),
+        [](auto aviResource) { return aviResource->getStatus() != Qn::Online; });
 
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
