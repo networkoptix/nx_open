@@ -193,7 +193,6 @@ QDebug operator<<(QDebug dbg, QnWorkbenchConnectHandler::PhysicalState state)
     return dbg.space();
 }
 
-
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -269,7 +268,6 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                 default:
                     NX_ASSERT(false, "Unhandled connection state");
             }
-
 
             /* Check if we need to log out if logged in under this user. */
             QString currentLogin = commonModule()->currentUrl().userName();
@@ -736,14 +734,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
             /* We can get here during disconnect process */
             if (auto connection = commonModule()->ec2Connection())
             {
-                connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                connection->makeMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
                     info.data,
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);
 
             }
         });
-
 
     auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
@@ -1044,7 +1041,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
         // This code is also returned if we are downloading compatibility version
         case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
-            if (!applauncher::api::checkOnline(commonModule()->engineVersion(), false))
+            if (!applauncher::api::checkOnline(false))
                 break;
             // Fall through
         case Qn::SuccessConnectionResult:
@@ -1116,7 +1113,7 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     cameraUserAttributesPool()->clear();
     mediaServerUserAttributesPool()->clear();
-    propertyDictionary()->clear(idList);
+    resourcePropertyDictionary()->clear(idList);
     statusDictionary()->clear(idList);
 
     licensePool()->reset();

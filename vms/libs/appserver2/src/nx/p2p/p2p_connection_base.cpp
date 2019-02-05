@@ -378,7 +378,7 @@ ConnectionBase::State ConnectionBase::state() const
 
 void ConnectionBase::setState(State state)
 {
-    if (!NX_ASSERT(state != m_state))
+    if (state == m_state)
         return;
 
     NX_ASSERT(m_state != State::Error, "State 'Error' is final and should not be changed");

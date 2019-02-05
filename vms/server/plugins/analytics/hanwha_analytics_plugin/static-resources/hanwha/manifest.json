@@ -1,5 +1,5 @@
 {
-    "capabilities": "deviceModelDependent",
+    "capabilities": "deviceDependent",
     "eventTypes": [
         {
             "id": "nx.hanwha.FaceDetection",
@@ -107,7 +107,7 @@
             "description": "Dry contact input has been %1",
             "positiveState": "activated",
             "negativeState": "deactivated",
-            "flags": "stateDependent"
+            "flags": "stateDependent|hidden"
         },
         {
             "id": "nx.hanwha.MotionDetection",

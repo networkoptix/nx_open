@@ -30,157 +30,157 @@ void OldEcConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
     NX_ASSERT(false, "Should never get here");
 }
 
-AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
+AbstractResourceManagerPtr OldEcConnection::makeResourceManager(const Qn::UserAccessData &)
 {
     return AbstractResourceManagerPtr();
 }
 
-AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserAccessData &)
+AbstractMediaServerManagerPtr OldEcConnection::makeMediaServerManager(const Qn::UserAccessData &)
 {
     return AbstractMediaServerManagerPtr();
 }
 
-AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserAccessData &)
+AbstractCameraManagerPtr OldEcConnection::makeCameraManager(const Qn::UserAccessData &)
 {
     return AbstractCameraManagerPtr();
 }
 
-AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserAccessData &)
+AbstractLicenseManagerPtr OldEcConnection::makeLicenseManager(const Qn::UserAccessData &)
 {
     return AbstractLicenseManagerPtr();
 }
 
-AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserAccessData &)
+AbstractEventRulesManagerPtr OldEcConnection::makeEventRulesManager(const Qn::UserAccessData &)
 {
     return {};
 }
 
-AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
+AbstractUserManagerPtr OldEcConnection::makeUserManager(const Qn::UserAccessData &)
 {
     return AbstractUserManagerPtr();
 }
 
-AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
+AbstractLayoutManagerPtr OldEcConnection::makeLayoutManager(const Qn::UserAccessData &)
 {
     return AbstractLayoutManagerPtr();
 }
 
-AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData&)
+AbstractLayoutTourManagerPtr OldEcConnection::makeLayoutTourManager(const Qn::UserAccessData&)
 {
     return AbstractLayoutTourManagerPtr();
 }
 
-AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
+AbstractVideowallManagerPtr OldEcConnection::makeVideowallManager(const Qn::UserAccessData &)
 {
     return AbstractVideowallManagerPtr();
 }
 
-AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserAccessData &)
+AbstractWebPageManagerPtr OldEcConnection::makeWebPageManager(const Qn::UserAccessData &)
 {
     return AbstractWebPageManagerPtr();
 }
 
-AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserAccessData &)
+AbstractStoredFileManagerPtr OldEcConnection::makeStoredFileManager(const Qn::UserAccessData &)
 {
     return AbstractStoredFileManagerPtr();
 }
 
-AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager(const Qn::UserAccessData &)
+AbstractUpdatesManagerPtr OldEcConnection::makeUpdatesManager(const Qn::UserAccessData &)
 {
     return AbstractUpdatesManagerPtr();
 }
 
-AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
+AbstractMiscManagerPtr OldEcConnection::makeMiscManager(const Qn::UserAccessData &)
 {
     return AbstractMiscManagerPtr();
 }
 
-AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserAccessData &)
+AbstractDiscoveryManagerPtr OldEcConnection::makeDiscoveryManager(const Qn::UserAccessData &)
 {
     return AbstractDiscoveryManagerPtr();
 }
 
-AbstractAnalyticsManagerPtr OldEcConnection::getAnalyticsManager(const Qn::UserAccessData&)
+AbstractAnalyticsManagerPtr OldEcConnection::makeAnalyticsManager(const Qn::UserAccessData&)
 {
     return AbstractAnalyticsManagerPtr();
 }
 
-    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+    AbstractLicenseNotificationManagerPtr OldEcConnection::licenseNotificationManager()
 {
     return AbstractLicenseNotificationManagerPtr();
 }
 
-AbstractTimeNotificationManagerPtr OldEcConnection::getTimeNotificationManager()
+AbstractTimeNotificationManagerPtr OldEcConnection::timeNotificationManager()
 {
     return AbstractTimeNotificationManagerPtr();
 }
 
-AbstractResourceNotificationManagerPtr OldEcConnection::getResourceNotificationManager()
+AbstractResourceNotificationManagerPtr OldEcConnection::resourceNotificationManager()
 {
     return AbstractResourceNotificationManagerPtr();
 }
 
-AbstractMediaServerNotificationManagerPtr OldEcConnection::getMediaServerNotificationManager()
+AbstractMediaServerNotificationManagerPtr OldEcConnection::mediaServerNotificationManager()
 {
     return AbstractMediaServerNotificationManagerPtr();
 }
 
-AbstractCameraNotificationManagerPtr OldEcConnection::getCameraNotificationManager()
+AbstractCameraNotificationManagerPtr OldEcConnection::cameraNotificationManager()
 {
     return AbstractCameraNotificationManagerPtr();
 }
 
-AbstractBusinessEventNotificationManagerPtr OldEcConnection::getBusinessEventNotificationManager()
+AbstractBusinessEventNotificationManagerPtr OldEcConnection::businessEventNotificationManager()
 {
     return AbstractBusinessEventNotificationManagerPtr();
 }
 
-AbstractUserNotificationManagerPtr OldEcConnection::getUserNotificationManager()
+AbstractUserNotificationManagerPtr OldEcConnection::userNotificationManager()
 {
     return AbstractUserNotificationManagerPtr();
 }
 
-AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
+AbstractLayoutNotificationManagerPtr OldEcConnection::layoutNotificationManager()
 {
     return AbstractLayoutNotificationManagerPtr();
 }
 
-AbstractLayoutTourNotificationManagerPtr OldEcConnection::getLayoutTourNotificationManager()
+AbstractLayoutTourNotificationManagerPtr OldEcConnection::layoutTourNotificationManager()
 {
     return AbstractLayoutTourNotificationManagerPtr();
 }
 
-AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
+AbstractWebPageNotificationManagerPtr OldEcConnection::webPageNotificationManager()
 {
     return AbstractWebPageNotificationManagerPtr();
 }
 
-AbstractDiscoveryNotificationManagerPtr OldEcConnection::getDiscoveryNotificationManager()
+AbstractDiscoveryNotificationManagerPtr OldEcConnection::discoveryNotificationManager()
 {
     return AbstractDiscoveryNotificationManagerPtr();
 }
 
-AbstractMiscNotificationManagerPtr OldEcConnection::getMiscNotificationManager()
+AbstractMiscNotificationManagerPtr OldEcConnection::miscNotificationManager()
 {
     return AbstractMiscNotificationManagerPtr();
 }
 
-AbstractUpdatesNotificationManagerPtr OldEcConnection::getUpdatesNotificationManager()
+AbstractUpdatesNotificationManagerPtr OldEcConnection::updatesNotificationManager()
 {
     return AbstractUpdatesNotificationManagerPtr();
 }
 
-AbstractStoredFileNotificationManagerPtr OldEcConnection::getStoredFileNotificationManager()
+AbstractStoredFileNotificationManagerPtr OldEcConnection::storedFileNotificationManager()
 {
     return AbstractStoredFileNotificationManagerPtr();
 }
 
-AbstractVideowallNotificationManagerPtr OldEcConnection::getVideowallNotificationManager()
+AbstractVideowallNotificationManagerPtr OldEcConnection::videowallNotificationManager()
 {
     return AbstractVideowallNotificationManagerPtr();
 }
 
-AbstractAnalyticsNotificationManagerPtr OldEcConnection::getAnalyticsNotificationManager()
+AbstractAnalyticsNotificationManagerPtr OldEcConnection::analyticsNotificationManager()
 {
     return AbstractAnalyticsNotificationManagerPtr();
 }

@@ -66,7 +66,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
             if (ownData != newData && source == ec2::NotificationSource::Remote)
             {
                 // If remote peer send update to our server then ignore it and resend our own data.
-                commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->save(
+                commonModule()->ec2Connection()->makeMediaServerManager(Qn::kSystemAccess)->save(
                     ownData,
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);
@@ -114,15 +114,15 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 {
     base_type::connectToConnection(connection);
 
-    connect(connection->getUpdatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateChunkReceived,
+    connect(connection->updatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateChunkReceived,
         this, &QnServerMessageProcessor::at_updateChunkReceived);
-    connect(connection->getUpdatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateInstallationRequested,
+    connect(connection->updatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateInstallationRequested,
         this, &QnServerMessageProcessor::at_updateInstallationRequested);
 
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
         this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
 
-    connect(connection->getMiscNotificationManager().get(),
+    connect(connection->miscNotificationManager().get(),
         &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
         this,
         [this](const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
@@ -141,8 +141,8 @@ void QnServerMessageProcessor::disconnectFromConnection(
     const ec2::AbstractECConnectionPtr& connection)
 {
     base_type::disconnectFromConnection(connection);
-    connection->getUpdatesNotificationManager()->disconnect(this);
-    connection->getMiscNotificationManager()->disconnect(this);
+    connection->updatesNotificationManager()->disconnect(this);
+    connection->miscNotificationManager()->disconnect(this);
 }
 
 void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, vms::api::PeerType peerType)
@@ -182,7 +182,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(
         auto connection = commonModule()->ec2Connection();
         if (connection)
         {
-            auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+            auto resourceManager = connection->makeResourceManager(Qn::kSystemAccess);
             resourceManager->setResourceStatusSync(resource->getId(), Qn::Online);
             resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
         }
@@ -273,7 +273,7 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         vms::api::MediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
         auto connection = commonModule()->ec2Connection();
-        connection->getMediaServerManager(Qn::kSystemAccess)->save(
+        connection->makeMediaServerManager(Qn::kSystemAccess)->save(
             apiServer,
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);
@@ -282,7 +282,7 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     {
         vms::api::StorageDataList apiStorages;
         ec2::fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
-        commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveStorages(
+        commonModule()->ec2Connection()->makeMediaServerManager(Qn::kSystemAccess)->saveStorages(
             apiStorages,
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);

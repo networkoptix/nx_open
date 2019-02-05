@@ -67,7 +67,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
 
-    QnCommonMessageProcessor* messageProcessor = qnCommonMessageProcessor;
+    QnCommonMessageProcessor* messageProcessor = commonModule()->messageProcessor();
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
@@ -118,7 +118,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             {
                 static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
 
-                const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+                const auto manager = connection->makeEventRulesManager(Qn::kSystemAccess);
                 nx::vms::api::EventActionData actionData;
                 ec2::fromResourceToApi(action, actionData);
                 manager->broadcastEventAction(actionData, this, fakeHandler);

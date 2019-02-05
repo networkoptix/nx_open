@@ -434,7 +434,7 @@ public:
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
-    
+
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
@@ -522,6 +522,8 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
+    std::pair<QString, QString> getRequestCredentials(
+        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;

@@ -113,7 +113,7 @@ QnCameraHistoryPool* QnCommonModuleAware::cameraHistoryPool() const
     return m_commonModule ? m_commonModule->cameraHistoryPool() : nullptr;
 }
 
-QnResourcePropertyDictionary* QnCommonModuleAware::propertyDictionary() const
+QnResourcePropertyDictionary* QnCommonModuleAware::resourcePropertyDictionary() const
 {
     NX_ASSERT(m_initialized);
     return m_commonModule ? m_commonModule->resourcePropertyDictionary() : nullptr;

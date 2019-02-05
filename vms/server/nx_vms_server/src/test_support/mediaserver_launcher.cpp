@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <test_support/utils.h>
 #include <transaction/message_bus_adapter.h>
+#include <nx/p2p/p2p_message_bus.h>
 
 namespace {
 
@@ -124,6 +125,26 @@ void MediaServerLauncher::prepareToStart()
         &MediaServerLauncher::started);
 
     m_firstStartup = false;
+
+    m_mediaServerProcess->setSetupModuleCallback(
+        [](QnMediaServerModule* server)
+    {
+        const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
+        server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
+        server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
+    });
+
+    connect(
+        m_mediaServerProcess.get(),
+        &MediaServerProcess::started,
+        this,
+        [this]()
+        {
+            setLowDelayIntervals();
+            m_processStartedPromise->set_value(true);
+        }, Qt::DirectConnection);
+
+    m_processStartedPromise = std::make_unique<nx::utils::promise<bool>>();
 }
 
 void MediaServerLauncher::run()
@@ -132,30 +153,33 @@ void MediaServerLauncher::run()
     m_mediaServerProcess->run();
 }
 
+void MediaServerLauncher::setLowDelayIntervals()
+{
+    const auto connection = serverModule()->ec2Connection();
+    auto bus = connection->messageBus()->dynamicCast<nx::p2p::MessageBus*>();
+    if (bus)
+    {
+        auto intervals = bus->delayIntervals();
+        intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
+        intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+        intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
+        bus->setDelayIntervals(intervals);
+    }
+}
+
 bool MediaServerLauncher::start()
 {
     prepareToStart();
-    m_mediaServerProcess->setSetupModuleCallback(
-        [](QnMediaServerModule* server)
-        {
-            const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
-            server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
-            server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
-        });
-
-    nx::utils::promise<bool> processStartedPromise;
-    auto future = processStartedPromise.get_future();
-
-    connect(
-        m_mediaServerProcess.get(),
-        &MediaServerProcess::started,
-        this,
-        [&processStartedPromise]() { processStartedPromise.set_value(true); },
-        Qt::DirectConnection);
     m_mediaServerProcess->start();
+    return waitForStarted();
+}
+
+bool MediaServerLauncher::waitForStarted()
+{
 
     //waiting for server to come up
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
+    auto future = m_processStartedPromise->get_future();
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
     if (result != std::future_status::ready)
         return false;

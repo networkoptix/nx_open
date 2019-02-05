@@ -2377,7 +2377,7 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            propertyDictionary()->saveParamsAsync(resource->getId());
+            resourcePropertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
 }
@@ -2566,7 +2566,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
             using namespace applauncher::api;
 
             /* Try to run applauncher if it is not running. */
-            if (!checkOnline(commonModule()->engineVersion()))
+            if (!checkOnline())
                 return false;
 
             const auto result = restartClient();

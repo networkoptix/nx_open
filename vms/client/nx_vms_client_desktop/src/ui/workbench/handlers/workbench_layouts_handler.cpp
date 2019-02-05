@@ -54,7 +54,6 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -175,7 +174,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             }
         });
 
-    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived,
+    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
         this, &LayoutsHandler::at_openLayoutAction_triggered);
 }
 
@@ -755,7 +754,6 @@ bool LayoutsHandler::closeLayouts(
         }
     }
 
-
     rollbackResources.append(saveableResources);
     saveableResources.clear();
     closeLayoutsInternal(resources, rollbackResources);
@@ -836,7 +834,6 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
 
         removeLayouts(existing);
     }
-
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());

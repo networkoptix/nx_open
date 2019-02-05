@@ -4,23 +4,6 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-void* MetadataTypes::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return this;
-    }
-
-    if (interfaceId == IID_MetadataTypes)
-    {
-        addRef();
-        return this;
-    }
-
-    return nullptr;
-}
-
 const IStringList* MetadataTypes::eventTypeIds() const
 {
     return &m_eventTypeIds;

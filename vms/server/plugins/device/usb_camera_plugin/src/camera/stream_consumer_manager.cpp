@@ -50,14 +50,14 @@ void PacketConsumerManager::removeConsumer(
         m_consumers.erase(m_consumers.begin() + index);
 }
 
-void PacketConsumerManager::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
+void PacketConsumerManager::pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
     for (auto& consumer: m_consumers)
     {
         auto consumerLocked = consumer.lock();
         if (consumerLocked == consumer.lock())
-            consumerLocked->givePacket(packet);
+            consumerLocked->pushPacket(packet);
     }
 
 }

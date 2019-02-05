@@ -8,7 +8,6 @@
 
 #include "settings.h"
 #include <plugins/resource/mdns/mdns_listener.h>
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/manager.h>
@@ -121,7 +120,7 @@ public:
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     QnResourcePool* resourcePool() const;
-    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
     nx::vms::server::RootFileSystem* rootFileSystem() const;
@@ -174,7 +173,6 @@ private:
     };
     std::unique_ptr<UniquePtrContext> m_context;
 
-    CommonPluginContainer m_pluginContainer;
     PluginManager* m_pluginManager = nullptr;
     nx::vms::server::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::vms::server::LicenseWatcher* m_licenseWatcher = nullptr;

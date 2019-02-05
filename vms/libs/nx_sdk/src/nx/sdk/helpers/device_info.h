@@ -3,15 +3,14 @@
 #include <string>
 
 #include <nx/sdk/i_device_info.h>
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 namespace nx {
 namespace sdk {
 
-class DeviceInfo: public nxpt::CommonRefCounter<IDeviceInfo>
+class DeviceInfo: public nx::sdk::RefCountable<IDeviceInfo>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual const char* id() const override;
     virtual const char* vendor() const override;
     virtual const char* model() const override;

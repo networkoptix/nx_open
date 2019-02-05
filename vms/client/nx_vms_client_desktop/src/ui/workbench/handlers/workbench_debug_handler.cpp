@@ -144,7 +144,7 @@ public:
         addButton("Applaucher control",
             [this]()
             {
-                (new QnApplauncherControlDialog(this, commonModule()->engineVersion()))->show();
+                (new QnApplauncherControlDialog(this))->show();
             });
 
         addButton("Animations control",
@@ -359,73 +359,6 @@ public:
                 addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cd}"), "Engine 1", plugin1);
                 addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98ce}"), "Engine 2", plugin1);
                 addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"), "Engine 3", plugin2);
-            });
-
-        addButton("Generate analytics manifests",
-            [this]()
-            {
-                auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
-                if (servers.empty())
-                    return;
-
-                int serverIndex = 0;
-
-                for (int i = 0; i < 5; ++i)
-                {
-                    nx::vms::api::analytics::EngineManifest manifest;
-                    for (int j = 0; j < 3; ++j)
-                    {
-                        nx::vms::api::analytics::EventType eventType;
-                        eventType.id = "";
-                        eventType.name = lm("Event %1").arg(j);
-                        manifest.eventTypes.push_back(eventType);
-                    }
-
-                    auto server = servers[serverIndex];
-                    auto manifests = server->analyticsDrivers();
-                    manifests.push_back(manifest);
-                    server->setAnalyticsDrivers(manifests);
-                    server->savePropertiesAsync();
-
-                    serverIndex = (serverIndex + 1) % servers.size();
-                }
-
-                for (auto server: servers)
-                {
-                    // TODO: #sivanov: Get rid of the term "driver".
-                    auto drivers = server->analyticsDrivers();
-
-                    // Some devices will not have an Engine.
-                    drivers.push_back(nx::vms::api::analytics::EngineManifest());
-
-                    for (auto camera: resourcePool()->getAllCameras(server, true))
-                    {
-                        const auto randomDriver = nx::utils::random::choice(drivers);
-                        QSet<QString> eventTypeIds;
-                        for (const auto& eventType: randomDriver.eventTypes)
-                            eventTypeIds.insert(eventType.id);
-
-                        camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
-
-                        camera->savePropertiesAsync();
-                    }
-                }
-            });
-
-        addButton("Clear analytics manifests",
-            [this]()
-            {
-                for (auto camera: resourcePool()->getAllCameras({}))
-                {
-                    camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
-                    camera->savePropertiesAsync();
-                }
-
-                for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
-                {
-                    server->setAnalyticsDrivers({});
-                    server->savePropertiesAsync();
-                }
             });
 
         for (auto [name, handler]: nx::utils::constKeyValueRange(debugActions()))

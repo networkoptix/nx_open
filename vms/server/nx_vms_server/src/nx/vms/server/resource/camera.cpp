@@ -34,6 +34,16 @@ Camera::Camera(QnMediaServerModule* serverModule):
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
 
+    connect(this, &Camera::groupIdChanged,
+        [this]()
+        {
+            NX_CRITICAL(!isInitializationInProgress(), "Initialization should fail");
+
+            const auto status = getStatus();
+            if (!NX_ASSERT(status != Qn::Online && status != Qn::Recording, status))
+                setStatus(Qn::Offline);
+        });
+
     connect(this, &QnResource::initializedChanged,
         [this]()
         {

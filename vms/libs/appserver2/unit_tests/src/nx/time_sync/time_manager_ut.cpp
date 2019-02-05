@@ -82,7 +82,6 @@ private:
     std::chrono::milliseconds m_rtt{0};
 };
 
-
 class TestSystemClock:
     public AbstractSystemClock
 {
@@ -172,7 +171,6 @@ public:
                     else if (globalSettings->primaryTimeServer().isNull())
                         globalSettings->setPrimaryTimeServer(commonModule->moduleGUID());
 
-
                     auto timeSyncManager = dynamic_cast<nx::vms::time_sync::ServerTimeSyncManager*>
                         (m_appserver->moduleInstance()->ecConnection()->timeSyncManager());
                     timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
@@ -210,7 +208,7 @@ public:
 
             nx::vms::api::MediaServerData apiServer;
             ec2::fromResourceToApi(server, apiServer);
-            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
+            ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
         return result;

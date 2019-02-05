@@ -159,7 +159,7 @@ void waitForMergeFinished(
         {
             auto connection = servers[i]->serverModule()->ec2Connection();
             nx::vms::api::SystemMergeHistoryRecordList mergeData;
-            connection->getMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
+            connection->makeMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
 
             auto itr = std::find_if(
                 mergeData.begin(), mergeData.end(),

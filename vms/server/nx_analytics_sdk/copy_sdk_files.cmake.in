@@ -11,8 +11,6 @@ set(copied_nx_kit_files @copied_nx_kit_files@)
 set(copied_nx_sdk_files @copied_nx_sdk_files@)
 set(copied_nx_sdk_src_nx_origin @copied_nx_sdk_src_nx_origin@)
 set(copied_nx_sdk_src_nx_files @copied_nx_sdk_src_nx_files@)
-set(copied_nx_sdk_old_header_origin @copied_nx_sdk_old_header_origin@)
-set(copied_nx_sdk_old_header_files @copied_nx_sdk_old_header_files@)
 set(copied_sample_origin @copied_sample_origin@)
 set(copied_sample_files @copied_sample_files@)
 set(copied_sample_ut_origin @copied_sample_ut_origin@)
@@ -30,8 +28,6 @@ nx_copy_always(${copied_nx_kit_origin} "${copied_nx_kit_files}"
     ${target_dir}/nx_kit)
 nx_copy_always(${copied_nx_sdk_src_nx_origin} "${copied_nx_sdk_src_nx_files}"
     ${target_dir}/src/nx)
-nx_copy_always(${copied_nx_sdk_old_header_origin} "${copied_nx_sdk_old_header_files}"
-    ${target_dir}/src/plugins)
 nx_copy_always(${copied_sample_origin} "${copied_sample_files}"
     ${target_dir}/samples/stub_analytics_plugin/src)
 nx_copy_always(${copied_sample_ut_origin} "${copied_sample_ut_files}"

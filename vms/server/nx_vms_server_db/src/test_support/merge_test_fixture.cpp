@@ -93,7 +93,7 @@ nx::vms::api::SystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHis
     for (;;)
     {
         const auto errorCode =
-            peer(0).ecConnection()->getMiscManager(Qn::kSystemAccess)->
+            peer(0).ecConnection()->makeMiscManager(Qn::kSystemAccess)->
                 getSystemMergeHistorySync(&mergeHistory);
         if (errorCode != ErrorCode::ok)
             throw std::runtime_error(toString(errorCode).toStdString());

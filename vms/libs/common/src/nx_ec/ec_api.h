@@ -402,8 +402,6 @@ protected:
     virtual int removeLicense(const QnLicensePtr& license, impl::SimpleHandlerPtr handler) = 0;
 };
 
-
-
 class AbstractStoredFileNotificationManager: public QObject
 {
 Q_OBJECT
@@ -1000,52 +998,53 @@ public:
     virtual nx::vms::api::Timestamp getTransactionLogTime() const = 0;
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) = 0;
 
-    virtual AbstractResourceManagerPtr getResourceManager(
+    virtual AbstractResourceManagerPtr makeResourceManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractMediaServerManagerPtr getMediaServerManager(
+    virtual AbstractMediaServerManagerPtr makeMediaServerManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractCameraManagerPtr getCameraManager(
+    virtual AbstractCameraManagerPtr makeCameraManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractLicenseManagerPtr getLicenseManager(
+    virtual AbstractLicenseManagerPtr makeLicenseManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractEventRulesManagerPtr getEventRulesManager(
+    virtual AbstractEventRulesManagerPtr makeEventRulesManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractLayoutManagerPtr getLayoutManager(
+    virtual AbstractUserManagerPtr makeUserManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(
+    virtual AbstractLayoutManagerPtr makeLayoutManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractVideowallManagerPtr getVideowallManager(
+    virtual AbstractLayoutTourManagerPtr makeLayoutTourManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractStoredFileManagerPtr getStoredFileManager(
+    virtual AbstractVideowallManagerPtr makeVideowallManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractUpdatesManagerPtr getUpdatesManager(
+    virtual AbstractStoredFileManagerPtr makeStoredFileManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
+    virtual AbstractUpdatesManagerPtr makeUpdatesManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractWebPageManagerPtr getWebPageManager(
+    virtual AbstractMiscManagerPtr makeMiscManager(
+        const Qn::UserAccessData& userAccessData) = 0;
+    virtual AbstractDiscoveryManagerPtr makeDiscoveryManager(
+        const Qn::UserAccessData& userAccessData) = 0;
+    virtual AbstractWebPageManagerPtr makeWebPageManager(
+        const Qn::UserAccessData& userAccessData) = 0;
+    virtual AbstractAnalyticsManagerPtr makeAnalyticsManager(
         const Qn::UserAccessData& userAccessData) = 0;
 
-    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
-        const Qn::UserAccessData& userAccessData) = 0;
-
-    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() = 0;
-    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() = 0;
-    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() = 0;
-    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() = 0;
-    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() = 0;
-    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() = 0;
-    virtual AbstractUserNotificationManagerPtr getUserNotificationManager() = 0;
-    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() = 0;
-    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() = 0;
-    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() = 0;
-    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() = 0;
-    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() = 0;
-    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() = 0;
-    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
-    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
-    virtual AbstractAnalyticsNotificationManagerPtr getAnalyticsNotificationManager() = 0;
+    virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;
+    virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;
+    virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() = 0;
+    virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() = 0;
+    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() = 0;
+    virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() = 0;
+    virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() = 0;
+    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() = 0;
+    virtual AbstractMiscNotificationManagerPtr miscNotificationManager() = 0;
+    virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() = 0;
+    virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() = 0;
+    virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() = 0;
+    virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() = 0;
+    virtual AbstractTimeNotificationManagerPtr timeNotificationManager() = 0;
+    virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() = 0;
+    virtual AbstractUserNotificationManagerPtr userNotificationManager() = 0;
 
     virtual QnCommonModule* commonModule() const = 0;
 

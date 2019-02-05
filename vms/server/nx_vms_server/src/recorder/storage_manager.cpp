@@ -451,7 +451,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
-                    m_owner->propertyDictionary()->saveParams(storage->getId());
+                    m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
         }
 
@@ -664,8 +664,6 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
     }
-    if (sdb)
-        sdb->flushRecords();
     // merge chunks
     {
         QnMutexLocker lk(&m_mutexStorages);
@@ -1677,7 +1675,7 @@ void QnStorageManager::updateCameraHistory() const
 
     const ec2::AbstractECConnectionPtr& appServerConnection = ec2Connection();
 
-    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)
+    ec2::ErrorCode errCode = appServerConnection->makeCameraManager(Qn::kSystemAccess)
         ->setServerFootageDataSync(moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
@@ -1806,9 +1804,6 @@ void QnStorageManager::clearSpace(bool forced)
                             << endl;
         NX_VERBOSE(this, clearSpaceLogMessage);
     }
-
-    // 4. DB cleanup
-    storageDbPool()->flush();
 
     if (m_role != QnServer::StoragePool::Normal)
         return;
@@ -2098,7 +2093,7 @@ void QnStorageManager::clearCameraHistory()
     QList<QnCameraHistoryItem> itemsToRemove = cameraHistoryPool()->getUnusedItems(minTimes, commonModule()->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
-        ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
+        ec2::ErrorCode errCode = ec2Connection->makeCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
             cameraHistoryPool()->removeCameraHistoryItem(item);
     }
@@ -3001,7 +2996,6 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                     notMigratedChunks << chunk;
                 }
             }
-            storageDbPool()->flush();
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
                 writeCSVCatalog(catalogName, notMigratedChunks);

@@ -122,7 +122,6 @@ namespace {
             return defaultLessThan(left, right);
         }
 
-
         virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
         {
             // all rules should be visible if filter is empty
@@ -149,7 +148,6 @@ namespace {
                     auto role = userRolesManager()->userRole(id);
                     return role.name.contains(m_filterText, Qt::CaseInsensitive);
                 };
-
 
             bool anyCameraPassFilter = any_of(resourcePool()->getAllCameras(QnResourcePtr(), true), resourcePassText);
             vms::api::EventType eventType = idx.data(Qn::EventTypeRole).value<vms::api::EventType>();
@@ -196,7 +194,6 @@ namespace {
     };
 
 }   //anonymous namespace
-
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
@@ -401,7 +398,6 @@ void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
-
 void QnBusinessRulesDialog::showEvent( QShowEvent *event )
 {
     base_type::showEvent(event);
@@ -411,7 +407,6 @@ void QnBusinessRulesDialog::showEvent( QShowEvent *event )
     ui->tableView->setCurrentIndex(QModelIndex());
     ui->filterLineEdit->setFocus();
 }
-
 
 void QnBusinessRulesDialog::at_beforeModelChanged() {
     m_currentDetailsWidget->setModel(QnBusinessRuleViewModelPtr());
@@ -462,7 +457,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->resetBusinessRules(
+    commonModule()->ec2Connection()->makeEventRulesManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 }
 
@@ -594,7 +589,7 @@ bool QnBusinessRulesDialog::saveAll()
 
     // TODO: #GDM #Business replace with QnAppServerReplyProcessor
     foreach (const QnUuid& id, m_pendingDeleteRules) {
-        int handle = commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->deleteRule(
+        int handle = commonModule()->ec2Connection()->makeEventRulesManager(Qn::kSystemAccess)->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }

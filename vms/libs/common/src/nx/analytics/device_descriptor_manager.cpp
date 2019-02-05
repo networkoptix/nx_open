@@ -3,6 +3,8 @@
 #include <nx/analytics/properties.h>
 #include <nx/analytics/utils.h>
 
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 
@@ -156,6 +158,48 @@ std::set<EngineId> DeviceDescriptorManager::compatibleEngineIdsIntersection(
             std::inserter(currentIntersection, currentIntersection.end()));
 
         result.swap(currentIntersection);
+    }
+
+    return result;
+}
+
+std::set<QnUuid> DeviceDescriptorManager::enabledEngineIds(
+    const QnVirtualCameraResourceList& devices) const
+{
+    std::set<QnUuid> result;
+    std::set<QnUuid> deviceIds;
+    for (const auto& device: devices)
+    {
+        deviceIds.insert(device->getId());
+        const auto userEnabledEngines = device->userEnabledAnalyticsEngines();
+        result.insert(userEnabledEngines.cbegin(), userEnabledEngines.cend());
+    }
+
+    auto deviceDescriptors = fetchDescriptors(
+        m_deviceDescriptorContainer,
+        deviceIds,
+        kDeviceDescriptorTypeName);
+
+    std::map<QnUuid, bool> engineDeviceDependencyCache;
+    for (const auto& [deviceId, deviceDescriptor]: deviceDescriptors)
+    {
+        for (const auto& engineId: deviceDescriptor.compatibleEngineIds)
+        {
+            auto it = engineDeviceDependencyCache.find(engineId);
+            if (it == engineDeviceDependencyCache.cend())
+            {
+                const auto engineResource = resourcePool()
+                    ->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
+
+                if (!engineResource)
+                    continue;
+
+                engineDeviceDependencyCache[engineId] = engineResource->isDeviceDependent();
+            }
+
+            if (engineDeviceDependencyCache[engineId])
+                result.insert(engineId);
+        }
     }
 
     return result;

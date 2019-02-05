@@ -246,7 +246,7 @@ void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& to
 
     if (const auto connection = commonModule()->ec2Connection())
     {
-        int reqId = connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
+        int reqId = connection->makeLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
             [tour, stateManager](int reqId, ec2::ErrorCode errorCode)
             {
                 stateManager->removeSaveRequest(tour.id, reqId);
@@ -270,7 +270,7 @@ void LayoutToursHandler::removeTourFromServer(const QnUuid& tourId)
 {
     if (const auto connection = commonModule()->ec2Connection())
     {
-        connection->getLayoutTourManager(Qn::kSystemAccess)->remove(tourId, this,
+        connection->makeLayoutTourManager(Qn::kSystemAccess)->remove(tourId, this,
             [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
     }
 }

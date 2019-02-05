@@ -84,7 +84,7 @@ public:
         server->authenticator()->setLdapManager(std::make_unique<LdapManager>(server->commonModule()));
 
         auto ec2Connection = server->commonModule()->ec2Connection();
-        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->makeUserManager(Qn::kSystemAccess);
 
         userData.name = "Vasja pupkin@gmail.com";
         userData.id = guidFromArbitraryData(userData.name);
@@ -127,7 +127,7 @@ public:
     void addLocalUser(QString userName, QString password, bool isEnabled = true)
     {
         auto ec2Connection = server->commonModule()->ec2Connection();
-        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->makeUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
         userData.name = userName;
@@ -404,7 +404,7 @@ TEST_F(AuthenticationTest, cookieWrongPassword)
     // Check return code for wrong password
     testCookieAuth(
         "admin", "invalid password",
-        QnRestResult::InvalidParameter);
+        QnRestResult::CantProcessRequest);
 }
 
 TEST_F(AuthenticationTest, cookieCorrectPassword)

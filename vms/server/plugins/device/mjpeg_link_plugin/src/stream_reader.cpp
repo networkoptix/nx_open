@@ -333,7 +333,7 @@ bool StreamReader::waitForNextFrameTime()
     if (m_prevFrameClock != -1 &&
         // System time changed.
         !((m_prevFrameClock > currentTime)
-            || (currentTime - m_prevFrameClock > m_frameDurationMSec))) 
+            || (currentTime - m_prevFrameClock > m_frameDurationMSec)))
     {
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
         if (msecToSleep > 0)

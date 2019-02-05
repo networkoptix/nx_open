@@ -15,7 +15,7 @@ TEST(RestoreServerDbRecord, restoreOwnServerInDatabase)
     ec2::Ec2ThreadPool::instance()->setMaxThreadCount(1);
 
     auto connection = launcher.serverModule()->ec2Connection();
-    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+    auto serverManager = connection->makeMediaServerManager(Qn::kSystemAccess);
 
     QnUuid ownGuid = launcher.serverModule()->commonModule()->moduleGUID();
     ASSERT_EQ(ec2::ErrorCode::ok, serverManager->removeSync(ownGuid));

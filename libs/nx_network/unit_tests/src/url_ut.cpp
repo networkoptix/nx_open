@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/nx_utils_ini.h>
 
 namespace nx {
 namespace network {
@@ -30,7 +30,7 @@ TEST(Url, joinPath)
 TEST(Url, logging)
 {
     nx::utils::Url url;
-    if (nx::utils::ini().displayUrlPasswordInLogs == 0)
+    if (!nx::utils::log::showPasswords())
     {
         url.setScheme("http");
         url.setHost("zorz.com");

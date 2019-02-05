@@ -600,7 +600,7 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
 
 QString hidePassword(const QString& urlStr)
 {
-    if (displayPasswordInLogs())
+    if (nx::utils::log::showPasswords())
         return urlStr;
 
     nx::utils::Url url(urlStr);
@@ -608,11 +608,6 @@ QString hidePassword(const QString& urlStr)
         url.toDisplayString();
 
     return urlStr;
-}
-
-bool displayPasswordInLogs()
-{
-    return nx::utils::ini().displayUrlPasswordInLogs;
 }
 
 } // namespace url

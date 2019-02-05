@@ -2,7 +2,6 @@
 
 #include <nx_ec/ec_api.h>
 
-
 namespace ec2 {
 
 //!Connection to old (python-based) EC. Does not provide any functionality, every method returns \a notImplemented error
@@ -14,38 +13,38 @@ public:
     virtual QnConnectionInfo connectionInfo() const override;
     virtual void updateConnectionUrl(const nx::utils::Url& url) override;
 
-    virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &) override;
-    virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
-    virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &) override;
-    virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &) override;
-    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &) override;
-    virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &) override;
-    virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
-    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
-    virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &) override;
-    virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &) override;
-    virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &) override;
-    virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
-    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
-    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
-    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserAccessData&) override;
+    virtual AbstractResourceManagerPtr makeResourceManager(const Qn::UserAccessData &) override;
+    virtual AbstractMediaServerManagerPtr makeMediaServerManager(const Qn::UserAccessData &) override;
+    virtual AbstractCameraManagerPtr makeCameraManager(const Qn::UserAccessData &) override;
+    virtual AbstractLicenseManagerPtr makeLicenseManager(const Qn::UserAccessData &) override;
+    virtual AbstractEventRulesManagerPtr makeEventRulesManager(const Qn::UserAccessData &) override;
+    virtual AbstractUserManagerPtr makeUserManager(const Qn::UserAccessData &) override;
+    virtual AbstractLayoutManagerPtr makeLayoutManager(const Qn::UserAccessData &) override;
+    virtual AbstractLayoutTourManagerPtr makeLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
+    virtual AbstractVideowallManagerPtr makeVideowallManager(const Qn::UserAccessData &) override;
+    virtual AbstractWebPageManagerPtr makeWebPageManager(const Qn::UserAccessData &) override;
+    virtual AbstractStoredFileManagerPtr makeStoredFileManager(const Qn::UserAccessData &) override;
+    virtual AbstractUpdatesManagerPtr makeUpdatesManager(const Qn::UserAccessData &) override;
+    virtual AbstractMiscManagerPtr makeMiscManager(const Qn::UserAccessData &) override;
+    virtual AbstractDiscoveryManagerPtr makeDiscoveryManager(const Qn::UserAccessData &) override;
+    virtual AbstractAnalyticsManagerPtr makeAnalyticsManager(const Qn::UserAccessData&) override;
 
-    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
-    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
-    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() override;
-    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() override;
-    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() override;
-    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
-    virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
-    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
-    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() override;
-    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
-    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
-    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
-    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
-    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
-    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
-    virtual AbstractAnalyticsNotificationManagerPtr getAnalyticsNotificationManager() override;
+    virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
+    virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
+    virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() override;
+    virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() override;
+    virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() override;
+    virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() override;
+    virtual AbstractUserNotificationManagerPtr userNotificationManager() override;
+    virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() override;
+    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() override;
+    virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
+    virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
+    virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
+    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() override;
+    virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
+    virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
+    virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() override;
 
     virtual void addRemotePeer(
         const QnUuid& id,
@@ -55,7 +54,6 @@ public:
 
     virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
-
 
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;

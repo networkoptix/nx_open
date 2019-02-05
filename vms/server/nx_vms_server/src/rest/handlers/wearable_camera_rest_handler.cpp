@@ -122,7 +122,7 @@ int QnWearableCameraRestHandler::executeAdd(
     apiCamera.url = lit("wearable:///") + apiCamera.physicalId;
 
     ec2::ErrorCode code = owner->commonModule()->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
+        ->makeCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
     if (code != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
@@ -140,7 +140,7 @@ int QnWearableCameraRestHandler::executeAdd(
     }
 
     owner->commonModule()->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync({apiAttributes});
+        ->makeCameraManager(Qn::kSystemAccess)->saveUserAttributesSync({apiAttributes});
     // We don't care about return code here as wearable camera is already added.
 
     QnWearableCameraReply reply;
@@ -430,4 +430,3 @@ QnWearableUploadManager* QnWearableCameraRestHandler::uploadManager(QnJsonRestRe
         lit("QnWearableUploadManager is not initialized."));
     return nullptr;
 }
-

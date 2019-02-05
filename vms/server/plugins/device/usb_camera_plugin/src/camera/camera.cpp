@@ -183,14 +183,6 @@ std::string Camera::ffmpegUrl() const
     return m_discoveryManager->getFfmpegUrl(m_cameraInfo.uid);
 }
 
-std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
-{
-    std::vector<AVCodecID> ffmpegCodecList;
-    for (const auto & nxCodecID : kVideoCodecPriorityList)
-        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecId(nxCodecID));
-    return ffmpegCodecList;
-}
-
 const nxcip::CameraInfo& Camera::info() const
 {
     //return m_cameraManager->info();
@@ -203,11 +195,11 @@ std::string Camera::toString() const
     static const std::string suffix = " }";
 
     return
-        prefix 
-        + "name: " + m_cameraInfo.modelName 
-        + ", uid: " + m_cameraInfo.uid 
+        prefix
+        + "name: " + m_cameraInfo.modelName
+        + ", uid: " + m_cameraInfo.uid
         + ", video:" + ffmpegUrl()
-        + ", audio: " + m_cameraInfo.auxiliaryData 
+        + ", audio: " + m_cameraInfo.auxiliaryData
         + suffix;
 }
 
@@ -228,7 +220,7 @@ CodecParameters Camera::getDefaultVideoParameters()
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = 
+        int maxBitrate =
             device::video::getMaxBitrate(ffmpegUrl().c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,

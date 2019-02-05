@@ -7,14 +7,6 @@
 namespace nx {
 namespace sdk {
 
-void* StringMap::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == interfaceId)
-        return this;
-
-    return nullptr;
-}
-
 void StringMap::addItem(const std::string& key, const std::string& value)
 {
     NX_KIT_ASSERT(!key.empty());

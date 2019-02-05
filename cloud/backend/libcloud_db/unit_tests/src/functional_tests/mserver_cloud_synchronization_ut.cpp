@@ -65,7 +65,7 @@ protected:
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
-                ->getResourceManager(Qn::kSystemAccess)
+                ->makeResourceManager(Qn::kSystemAccess)
                 ->saveSync(paramList));
     }
 
@@ -187,7 +187,7 @@ TEST_P(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
             ASSERT_EQ(
                 ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
-                ->getUserManager(Qn::kSystemAccess)->removeSync(account2VmsData.id));
+                ->makeUserManager(Qn::kSystemAccess)->removeSync(account2VmsData.id));
 
             // Waiting for user to disappear in cloud.
             waitForUserToDisappearFromCloud(account2VmsData.email.toStdString());
@@ -263,7 +263,7 @@ TEST_P(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_local
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
-                ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
+                ->makeUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
         appserver2()->moduleInstance()->ecConnection()->addRemotePeer(
             ::ec2::kCloudPeerId, nx::vms::api::PeerType::cloudServer, cdbEc2TransactionUrl());
@@ -283,7 +283,7 @@ TEST_P(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_local
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
-                ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
+                ->makeUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
         waitForCloudAndVmsToSyncUsers();
     }

@@ -417,7 +417,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
     if (action->getToggleState() == vms::api::EventState::active)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
-    propertyDictionary()->saveParams(mediaServer->getId());
+    resourcePropertyDictionary()->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -795,7 +795,7 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
     }
 
     auto aggregationInfo = aggregatedData.action->aggregationInfo();
-    aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo());
+    aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo(), /*oneRecordPerKey*/ true);
     aggregatedData.action->setAggregationInfo(aggregationInfo);
 
     return false; //< Don't write action to log so far.
@@ -825,7 +825,6 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     {
         NX_DEBUG(this, lit("Failed to send aggregated email"));
     }
-
 
     aggregatedActionIter->action.clear();
     aggregatedActionIter->periodicTaskID = 0;

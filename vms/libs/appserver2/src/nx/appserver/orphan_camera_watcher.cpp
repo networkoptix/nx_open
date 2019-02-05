@@ -13,7 +13,6 @@
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace appserver {
 
@@ -99,7 +98,7 @@ void OrphanCameraWatcher::update()
 
     for (const QnUuid& CameraId: longlivedOrphanCameras)
     {
-        ec2::AbstractCameraManagerPtr cameraManagerPtr = connectionPtr->getCameraManager(Qn::kSystemAccess);
+        ec2::AbstractCameraManagerPtr cameraManagerPtr = connectionPtr->makeCameraManager(Qn::kSystemAccess);
         cameraManagerPtr->remove(CameraId, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         currentOrphanCameras.erase(CameraId);
     }

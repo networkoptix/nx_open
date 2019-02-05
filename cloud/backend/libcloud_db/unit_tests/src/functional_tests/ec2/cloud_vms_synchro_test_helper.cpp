@@ -102,7 +102,7 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
 
     // Removing cloud users
     vms::api::UserDataList users;
-    if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+    if (m_appserver2.moduleInstance()->ecConnection()->makeUserManager(Qn::kSystemAccess)
             ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
@@ -112,7 +112,7 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
     {
         if (!user.isCloud)
             continue;
-        if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+        if (m_appserver2.moduleInstance()->ecConnection()->makeUserManager(Qn::kSystemAccess)
                 ->removeSync(user.id) != ::ec2::ErrorCode::ok)
         {
             return api::ResultCode::unknownError;
@@ -297,7 +297,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
-            ->getUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
+            ->makeUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
 }
 
 void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
@@ -389,7 +389,7 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearLocally(const QnUuid&
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
-            ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+            ->makeUserManager(Qn::kSystemAccess)->getUsersSync(&users));
 
         const auto userIter = std::find_if(
             users.cbegin(), users.cend(),
@@ -418,7 +418,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
-            ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+            ->makeUserManager(Qn::kSystemAccess)->getUsersSync(&users));
 
     const auto userIter = std::find_if(
         users.cbegin(), users.cend(),
@@ -454,7 +454,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
-            ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(userData.id, &kvPairs));
+            ->makeResourceManager(Qn::kSystemAccess)->getKvPairsSync(userData.id, &kvPairs));
 
     const auto fullNameIter = std::find_if(
         kvPairs.cbegin(), kvPairs.cend(),
@@ -561,7 +561,7 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
-            ->getUserManager(Qn::kSystemAccess)->getUsersSync(&vmsUsers));
+            ->makeUserManager(Qn::kSystemAccess)->getUsersSync(&vmsUsers));
 
     vmsUsers.erase(
         vmsUsers.begin(),
@@ -621,7 +621,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
-            ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(adminUserId, &systemSettings));
+            ->makeResourceManager(Qn::kSystemAccess)->getKvPairsSync(adminUserId, &systemSettings));
     for (const auto systemSetting: systemSettings)
     {
         if (systemSetting.name == nx::settings_names::kNameSystemName)
@@ -736,7 +736,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMedi
 bool Ec2MserverCloudSynchronization::findAdminUserId(QnUuid* const id)
 {
     vms::api::UserDataList users;
-    if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+    if (m_appserver2.moduleInstance()->ecConnection()->makeUserManager(Qn::kSystemAccess)
         ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
     {
         return false;

@@ -58,11 +58,11 @@ void QnDesktopCameraDeleter::deleteQueuedResources()
         /* If the camera is placed on the layout, also remove the layout. */
         for (const auto& layout: getLayoutsWithResource(camera->getId()))
         {
-            commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->remove(
+            commonModule()->ec2Connection()->makeLayoutManager(Qn::kSystemAccess)->remove(
                 layout->getId(), this, [] {});
         }
 
-        commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->remove(
+        commonModule()->ec2Connection()->makeCameraManager(Qn::kSystemAccess)->remove(
             camera->getId(), this, [] {});
     }
     m_queuedToDelete.clear();
@@ -77,6 +77,5 @@ void QnDesktopCameraDeleter::updateQueue()
             m_queuedToDelete << camera;
     }
 }
-
 
 #endif

@@ -81,9 +81,9 @@ void P2pMessageBusTestBase::createData(
         }
     }
     auto connection = server->moduleInstance()->commonModule()->ec2Connection();
-    auto userManager = connection->getUserManager(Qn::kSystemAccess);
-    auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
-    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+    auto userManager = connection->makeUserManager(Qn::kSystemAccess);
+    auto cameraManager = connection->makeCameraManager(Qn::kSystemAccess);
+    auto resourceManager = connection->makeResourceManager(Qn::kSystemAccess);
 
     for (const auto& user: users)
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(user));

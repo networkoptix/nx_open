@@ -14,9 +14,7 @@ namespace ffmpeg {
 class Packet
 {
 public:
-    Packet(
-        AVCodecID codecId,
-        AVMediaType mediaType);
+    Packet(AVCodecID codecId, AVMediaType mediaType);
     ~Packet();
 
     int size() const;
@@ -25,7 +23,7 @@ public:
     int flags() const;
     int64_t pts() const;
     int64_t dts() const;
-    AVPacket * packet() const;
+    AVPacket* packet() const;
 
     void initialize();
     void unreference();
@@ -38,6 +36,8 @@ public:
     void setTimestamp(uint64_t millis);
 
     bool keyPacket() const;
+
+    void copy(AVPacket& source);
 
 private:
     AVCodecID m_codecId = AV_CODEC_ID_NONE;

@@ -12,7 +12,6 @@
 
 #include <ui/workbench/workbench_context.h>
 
-
 using namespace nx;
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
@@ -55,7 +54,7 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
     ec2::fromResourceToApi(rule, params);
 
     // TODO: #GDM SafeMode
-    int handle = commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->save(
+    int handle = commonModule()->ec2Connection()->makeEventRulesManager(Qn::kSystemAccess)->save(
         params,
         this,
         [this, rule](int handle, ec2::ErrorCode errorCode)

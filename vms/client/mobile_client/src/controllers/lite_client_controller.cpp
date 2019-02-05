@@ -191,7 +191,7 @@ void QnLiteClientController::stopLiteClient()
     message.videowallGuid = d->serverId;
 
     const auto connection = commonModule()->ec2Connection();
-    const auto videowallManager = connection->getVideowallManager(Qn::kSystemAccess);
+    const auto videowallManager = connection->makeVideowallManager(Qn::kSystemAccess);
     videowallManager->sendControlMessage(message, this, []{});
 }
 

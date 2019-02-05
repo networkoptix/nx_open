@@ -3,10 +3,11 @@
 #include <string>
 #include <functional>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/i_utility_provider.h>
 #include <nx/sdk/error.h>
-
 #include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include "engine.h"
 
@@ -18,7 +19,7 @@ namespace analytics {
  * Base class for a typical implementation of an Analytics Plugin. Hides many technical details of
  * the Analytics Plugin SDK, but may limit plugin capabilities - use only when suitable.
  */
-class Plugin: public nxpt::CommonRefCounter<IPlugin>
+class Plugin: public RefCountable<IPlugin>
 {
 public:
     using CreateEngine = std::function<IEngine*(IPlugin* plugin)>;
@@ -35,21 +36,15 @@ public:
 
     virtual ~Plugin() override;
 
-    nxpl::PluginInterface* pluginContainer() const { return m_pluginContainer; }
+    const Ptr<IUtilityProvider>& utilityProvider() const { return m_utilityProvider; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
 
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
     virtual const char* name() const override;
-
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
-    virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
-
+    virtual void setUtilityProvider(IUtilityProvider* utilityProvider) override;
     virtual const IString* manifest(Error* outError) const override;
-
     virtual IEngine* createEngine(Error* outError) override;
 
 private:
@@ -57,7 +52,7 @@ private:
     const std::string m_jsonManifest;
 
     CreateEngine m_createEngine;
-    nxpl::PluginInterface* m_pluginContainer;
+    Ptr<IUtilityProvider> m_utilityProvider;
 };
 
 } // namespace analytics

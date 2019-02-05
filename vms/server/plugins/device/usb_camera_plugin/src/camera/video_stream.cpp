@@ -167,7 +167,7 @@ void VideoStream::run()
             continue;
 
         m_fpsCounter.update(std::chrono::milliseconds(m_timeProvider->millisSinceEpoch()));
-        m_packetConsumerManager.givePacket(packet);
+        m_packetConsumerManager.pushPacket(packet);
     }
     uninitialize();
 }
@@ -227,7 +227,7 @@ AVCodecParameters* VideoStream::getCodecParameters()
 {
     if (!m_inputFormat)
         return nullptr;
-    AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
+    AVStream* stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
     if (!stream)
         return nullptr;
 
@@ -301,21 +301,20 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
 
 std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 {
-    auto packet = std::make_shared<ffmpeg::Packet>(
-        m_inputFormat->videoCodecId(),
-        AVMEDIA_TYPE_VIDEO);
+    auto packetTemp = std::make_shared<ffmpeg::Packet>(
+        m_inputFormat->videoCodecId(), AVMEDIA_TYPE_VIDEO);
 
     int result;
     if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
     {
         using namespace std::chrono_literals;
-        result = m_inputFormat->readFrameNonBlock(packet->packet(), 1000ms);
+        result = m_inputFormat->readFrameNonBlock(packetTemp->packet(), 1000ms);
         if (result == AVERROR(EAGAIN))
             result = AVERROR(EIO); //< Treating a one second timeout as an io error.
     }
     else
     {
-        result = m_inputFormat->readFrame(packet->packet());
+        result = m_inputFormat->readFrame(packetTemp->packet());
     }
 
     checkIoError(result); // < Need to reset m_ioError if readFrame was successful.
@@ -327,6 +326,9 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
             m_terminated = true;
         return nullptr;
     }
+    auto packet = std::make_shared<ffmpeg::Packet>(
+        m_inputFormat->videoCodecId(), AVMEDIA_TYPE_VIDEO);
+    packet->copy(*(packetTemp->packet()));
 
 #ifdef _WIN32
     // Dshow input format does not set h264 key packet flag correctly, so do it manually
@@ -400,7 +402,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
 
     // Then a match with similar aspect ratio whose resolution and fps are higher than requested
     float aspectRatio = (float) params.resolution.width / params.resolution.height;
-    for (const auto & resolution : resolutionList)
+    for (const auto& resolution: resolutionList)
     {
         if (aspectRatio == resolution.aspectRatio())
         {
@@ -418,7 +420,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
     }
 
     // Any resolution or fps higher than requested
-    for (const auto & resolution : resolutionList)
+    for (const auto& resolution: resolutionList)
     {
         bool actualResolutionGreater = resolution.width * resolution.height >=
             params.resolution.width * params.resolution.height;

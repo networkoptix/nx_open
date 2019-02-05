@@ -316,7 +316,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
         nx::vms::api::EventActionData actionData;
         ec2::fromResourceToApi(action, actionData);
 
-        connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
+        connection->makeEventRulesManager(Qn::kSystemAccess)->sendEventAction(
             actionData,
             module->getParentId(),
             this,
