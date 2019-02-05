@@ -113,7 +113,7 @@ protected:
         ASSERT_EQ(m_randomPair.value, m_fetchedValue);
     }
 
-    void whenRemoveKeyValuePair()
+    void whenRemoveKey()
     {
         m_db->dataManager().remove(m_randomPair.key,
             [this](map::ResultCode result)
@@ -125,17 +125,17 @@ protected:
         waitForCallback();
     }
 
-    void whenRemoveNonExistentKeyValuePair()
+    void whenRemoveNonExistentKey()
     {
-        m_randomPair.key += "mangledKey";
-        whenRemoveKeyValuePair();
+        m_randomPair.key = "mangledKey";
+        whenRemoveKey();
     }
 
     void andValueIsNotInDatabase()
     {
         whenFetchValue();
         // Fetch operation should still succeed with empty string if the key is not present.
-        thenOperationSucceeded();
+        thenOperationFailed(map::ResultCode::notFound);
         andFetchedValueIsEmpty();
     }
 
@@ -207,35 +207,35 @@ TEST_F(Database, fetches_key_value_pair)
 TEST_F(Database, removes_key_value_pair)
 {
     givenDatabaseWithRandomKeyValuePair();
-    whenRemoveKeyValuePair();
+    whenRemoveKey();
 
     thenOperationSucceeded();
     andValueIsNotInDatabase();
 }
 
-TEST_F(Database, fetching_non_existent_value_succeeds_with_empty_string)
+TEST_F(Database, fails_to_fetch_non_existent_value)
 {
     givenEmptyDatabase();
     whenFetchValue();
 
-    thenOperationSucceeded();
+    thenOperationFailed(map::ResultCode::notFound);
     andFetchedValueIsEmpty();
 }
 
-TEST_F(Database, removing_non_existent_value_succeeds)
+TEST_F(Database, nothing_happens_when_removing_non_existent_key)
 {
     givenDatabaseWithRandomKeyValuePair();
-    whenRemoveNonExistentKeyValuePair();
+    whenRemoveNonExistentKey();
 
     thenOperationSucceeded();
 }
 
-TEST_F(Database, rejects_saving_duplicate_key)
+TEST_F(Database, nothing_happens_when_saving_duplicate_key)
 {
     givenRandomKeyValuePair();
     whenSaveSameKeyValuePairTwice();
 
-    thenOperationFailed(map::ResultCode::logicError);
+    thenOperationSucceeded();
 }
 
 TEST_F(Database, rejects_save_with_empty_key)
@@ -257,7 +257,7 @@ TEST_F(Database, rejects_fetch_with_empty_string)
 TEST_F(Database, rejects_remove_with_empty_string)
 {
     givenKeyValuePairWithEmptyKey();
-    whenRemoveKeyValuePair();
+    whenRemoveKey();
 
     thenOperationFailed(map::ResultCode::logicError);
 }
