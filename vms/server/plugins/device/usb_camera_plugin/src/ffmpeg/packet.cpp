@@ -95,6 +95,12 @@ bool Packet::keyPacket() const
     return m_packet->flags & AV_PKT_FLAG_KEY;
 }
 
+void Packet::copy(AVPacket& source)
+{
+    av_packet_free(&m_packet);
+    m_packet = av_packet_clone(&source);
+}
+
 } // namespace ffmpeg
 } // namespace usb_cam
 } // namespace nx
