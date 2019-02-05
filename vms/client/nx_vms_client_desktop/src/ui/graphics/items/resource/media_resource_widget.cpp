@@ -448,7 +448,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
         {
             if (const auto reader = display()->archiveReader())
             {
-                const auto timestampUSec = data.toLongLong();
+                const auto timestampUSec = data.toLongLong() * 1000;
                 reader->jumpTo(timestampUSec, 0);
             }
             break;
