@@ -3227,6 +3227,34 @@
                     }
                 }
             }
+        },
+        {
+            "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27",
+            "keys": [
+                "Dahua|DH-SD50225U*", "DH-SD50225U*|Dahua",
+                "Dahua|DH-SD59225U*", "DH-SD59225U*|Dahua"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [0, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 1],
+                        "logical": [1, 2.5, 4.06, 7.5, 10.63, 14.38, 15, 16.25],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
