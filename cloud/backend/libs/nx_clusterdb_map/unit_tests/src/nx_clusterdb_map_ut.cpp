@@ -134,7 +134,6 @@ protected:
     void andValueIsNotInDatabase()
     {
         whenFetchValue();
-        // Fetch operation should still succeed with empty string if the key is not present.
         thenOperationFailed(map::ResultCode::notFound);
         andFetchedValueIsEmpty();
     }
