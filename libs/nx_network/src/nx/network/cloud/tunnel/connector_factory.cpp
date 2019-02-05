@@ -11,8 +11,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-//static int s_cloudConnectTypeMask = (int)ConnectType::all;
-static int s_cloudConnectTypeMask = (int)ConnectType::all & ~(int)ConnectType::udpHp;
+static int s_cloudConnectTypeMask = (int)ConnectType::all;
 
 using namespace std::placeholders;
 
