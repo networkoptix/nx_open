@@ -403,10 +403,10 @@ void QnAviArchiveDelegate::fixG726Bug()
 }
 
 bool QnAviArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractArchiveIntegrityWatcher *archiveIntegrityWatcher)
+    const QnResourcePtr& resource,
+    AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
-    QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
+    QnMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
     m_archiveIntegrityWatcher = archiveIntegrityWatcher;
     m_resource = resource;
