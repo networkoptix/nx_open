@@ -5,20 +5,21 @@
 namespace nx {
 namespace usb_cam {
 
-class NativeStreamReader: public StreamReaderPrivate
+class NativeStreamReader: public AbstractStreamReader
 {
 public:
-    NativeStreamReader(int encoderIndex, const std::shared_ptr<Camera>& camera);
-    virtual ~NativeStreamReader();
+    NativeStreamReader(const std::shared_ptr<Camera>& camera);
 
-    virtual int getNextData(nxcip::MediaDataPacket** packet) override;
+    virtual int processPacket(
+        const std::shared_ptr<ffmpeg::Packet>& source,
+        std::shared_ptr<ffmpeg::Packet>& result) override;
 
     virtual void setFps(float fps) override;
     virtual void setResolution(const nxcip::Resolution& resolution) override;
     virtual void setBitrate(int bitrate) override;
 
 private:
-    std::shared_ptr<ffmpeg::Packet> nextPacket();
+    std::shared_ptr<Camera> m_camera;
 };
 
 } // namespace usb_cam

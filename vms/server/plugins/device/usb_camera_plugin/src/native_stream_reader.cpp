@@ -9,34 +9,20 @@
 namespace nx {
 namespace usb_cam {
 
-NativeStreamReader::NativeStreamReader(int encoderIndex, const std::shared_ptr<Camera>& camera):
-    StreamReaderPrivate(encoderIndex, camera)
+NativeStreamReader::NativeStreamReader(const std::shared_ptr<Camera>& camera):
+    m_camera(camera)
 {
     CodecParameters codecParams = camera->defaultVideoParameters();
-    m_camera->videoStream()->setResolution(codecParams.resolution);
-    m_camera->videoStream()->setFps(codecParams.fps);
-    m_camera->videoStream()->setBitrate(codecParams.bitrate);
+    camera->videoStream()->setResolution(codecParams.resolution);
+    camera->videoStream()->setFps(codecParams.fps);
+    camera->videoStream()->setBitrate(codecParams.bitrate);
 }
 
-NativeStreamReader::~NativeStreamReader()
+int NativeStreamReader::processPacket(
+    const std::shared_ptr<ffmpeg::Packet>& source, std::shared_ptr<ffmpeg::Packet>& result)
 {
-    m_avConsumer->interrupt();
-}
-
-int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
-{
-    *lpPacket = nullptr;
-
-    ensureConsumerAdded();
-
-    auto packet = nextPacket();
-
-    if (!packet)
-        return handleNxError();
-
-    *lpPacket = toNxPacket(packet.get()).release();
-
-    return nxcip::NX_NO_ERROR;
+    result = source;
+    return 0;
 }
 
 void NativeStreamReader::setFps(float fps)
@@ -51,19 +37,6 @@ void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 void NativeStreamReader::setBitrate(int bitrate)
 {
     m_camera->videoStream()->setBitrate(bitrate);
-}
-
-std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
-{
-    while (!shouldStop())
-    {
-        auto popped = m_avConsumer->pop();
-        if (!popped)
-            continue;
-
-        return popped;
-    }
-    return nullptr;
 }
 
 } // namespace usb_cam

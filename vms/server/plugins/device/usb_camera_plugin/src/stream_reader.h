@@ -22,18 +22,27 @@ extern "C" {
 
 namespace nx::usb_cam {
 
-class StreamReaderPrivate;
+class AbstractStreamReader
+{
+public:
+    virtual ~AbstractStreamReader() = default;
+    virtual int processPacket(
+        const std::shared_ptr<ffmpeg::Packet>& source,
+        std::shared_ptr<ffmpeg::Packet>& result) = 0;
+    virtual void setFps(float fps) = 0;
+    virtual void setResolution(const nxcip::Resolution& resolution) = 0;
+    virtual void setBitrate(int bitrate) = 0;
+};
 
 class StreamReader: public nxcip::StreamReader
 {
 public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
-        int encoderIndex,
         const std::shared_ptr<Camera>& camera,
         bool forceTranscoding);
 
-    virtual ~StreamReader() = default;
+    virtual ~StreamReader();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual int addRef() const override;
@@ -47,32 +56,18 @@ public:
     virtual void setBitrate(int bitrate);
 
 private:
+    std::shared_ptr<ffmpeg::Packet> nextPacket();
+    void ensureConsumerAdded();
+    void removeConsumer();
+    bool interrupted();
+    int handleNxError();
+    bool shouldStop() const;
+
+    std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
+
+private:
     nxpt::CommonRefManager m_refManager;
-    std::unique_ptr<StreamReaderPrivate> m_streamReader;
-};
-
-class StreamReaderPrivate
-{
-public:
-    StreamReaderPrivate(
-        int encoderIndex,
-        const std::shared_ptr<Camera>& camera);
-
-    virtual ~StreamReaderPrivate();
-
-    virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
-    virtual void interrupt();
-
-    virtual void setFps(float fps) = 0;
-    virtual void setResolution(const nxcip::Resolution& resolution) = 0;
-    virtual void setBitrate(int bitrate) = 0;
-
-    virtual void ensureConsumerAdded();
-
-protected:
-    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(150);
-    static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(2000000);
-
+    std::unique_ptr<AbstractStreamReader> m_streamReader;
     int m_encoderIndex;
     std::shared_ptr<Camera> m_camera;
     std::shared_ptr<BufferedPacketConsumer> m_avConsumer;
@@ -82,13 +77,6 @@ protected:
     std::atomic_bool m_videoConsumerAdded = false;
     std::atomic_bool m_audioConsumerAdded = false;
     std::atomic_bool m_interrupted = false;
-
-protected:
-    std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
-    void removeConsumer();
-    bool interrupted();
-    int handleNxError();
-    bool shouldStop() const;
 };
 
 } // namespace usb_cam::nx

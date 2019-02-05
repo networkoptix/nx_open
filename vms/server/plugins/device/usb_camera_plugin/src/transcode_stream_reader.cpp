@@ -4,18 +4,11 @@
 
 namespace nx::usb_cam {
 
-TranscodeStreamReader::TranscodeStreamReader(
-    int encoderIndex, const std::shared_ptr<Camera>& camera)
-    :
-    StreamReaderPrivate(encoderIndex, camera)
+TranscodeStreamReader::TranscodeStreamReader(const std::shared_ptr<Camera>& camera):
+    m_camera(camera)
 {
-    m_codecParams = camera->defaultVideoParameters(); //< TODO make default secondary prarms
+    m_codecParams = camera->defaultVideoParameters(); //< TODO make default secondary params
     m_transcoder.setTimeGetter([camera]() -> int64_t { return camera->millisSinceEpoch(); } );
-}
-
-TranscodeStreamReader::~TranscodeStreamReader()
-{
-    m_transcoder.uninitialize();
 }
 
 int TranscodeStreamReader::initializeTranscoder()
@@ -27,19 +20,29 @@ int TranscodeStreamReader::initializeTranscoder()
     return m_transcoder.initialize(decoderCodecPar, m_codecParams);
 }
 
-int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
+int TranscodeStreamReader::processPacket(
+    const std::shared_ptr<ffmpeg::Packet>& source, std::shared_ptr<ffmpeg::Packet>& result)
 {
-    *lpPacket = nullptr;
+    if (source->mediaType() == AVMEDIA_TYPE_AUDIO)
+    {
+        result = source;
+        return 0;
+    }
 
-    ensureConsumerAdded();
+    int status = 0;
+    if (m_encoderNeedsReinitialization)
+    {
+        status = initializeTranscoder();
+        if (status < 0)
+            return status;
+        m_encoderNeedsReinitialization = false;
+    }
 
-    auto packet = nextPacket();
-    if (!packet)
-        return handleNxError();
+    status = m_transcoder.transcode(source.get(), result);
+    if (status < 0)
+        return status;
 
-    *lpPacket = toNxPacket(packet.get()).release();
-
-    return nxcip::NX_NO_ERROR;
+    return status;
 }
 
 void TranscodeStreamReader::setFps(float fps)
@@ -68,41 +71,6 @@ void TranscodeStreamReader::setBitrate(int bitrate)
         m_codecParams.bitrate = bitrate;
         m_encoderNeedsReinitialization = true;
     }
-}
-
-std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket()
-{
-    while (!shouldStop())
-    {
-        auto popped =  m_avConsumer->pop();
-        if (!popped)
-            continue;
-
-        if (popped->mediaType() == AVMEDIA_TYPE_AUDIO)
-            return popped;
-
-        if (m_encoderNeedsReinitialization)
-        {
-            if (initializeTranscoder() < 0)
-                return nullptr;
-
-            m_encoderNeedsReinitialization = false;
-        }
-
-        std::shared_ptr<ffmpeg::Packet> encoded;
-        int status = m_transcoder.transcode(popped.get(), encoded);
-        if (status < 0)
-        {
-            m_camera->setLastError(status);
-            return nullptr;
-        }
-
-        if (!encoded)
-            continue;
-
-        return encoded;
-    }
-    return nullptr;
 }
 
 } // namespace usb_cam::nx
