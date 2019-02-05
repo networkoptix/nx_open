@@ -49,6 +49,13 @@ protected:
         waitForCallback();
     }
 
+    void whenSaveSameKeyValuePairTwice()
+    {
+        whenSaveKeyValuePair();
+        thenOperationSucceeded();
+        whenSaveKeyValuePair();
+    }
+
     void thenOperationSucceeded()
     {
         ASSERT_EQ(map::ResultCode::ok, m_result);
@@ -83,6 +90,11 @@ protected:
         m_randomPair.value = randomString();
     }
 
+    void givenAnotherRandomKeyValuePair()
+    {
+        givenRandomKeyValuePair();
+    }
+
     void whenFetchValue()
     {
         m_db->dataManager().get(m_randomPair.key,
@@ -111,6 +123,12 @@ protected:
             });
 
         waitForCallback();
+    }
+
+    void whenRemoveNonExistentKeyValuePair()
+    {
+        m_randomPair.key += "mangledKey";
+        whenRemoveKeyValuePair();
     }
 
     void andValueIsNotInDatabase()
@@ -204,6 +222,22 @@ TEST_F(Database, fetching_non_existent_value_succeeds_with_empty_string)
     andFetchedValueIsEmpty();
 }
 
+TEST_F(Database, removing_non_existent_value_succeeds)
+{
+    givenDatabaseWithRandomKeyValuePair();
+    whenRemoveNonExistentKeyValuePair();
+
+    thenOperationSucceeded();
+}
+
+TEST_F(Database, rejects_saving_duplicate_key)
+{
+    givenRandomKeyValuePair();
+    whenSaveSameKeyValuePairTwice();
+
+    thenOperationFailed(map::ResultCode::logicError);
+}
+
 TEST_F(Database, rejects_save_with_empty_key)
 {
     givenKeyValuePairWithEmptyKey();
@@ -227,7 +261,5 @@ TEST_F(Database, rejects_remove_with_empty_string)
 
     thenOperationFailed(map::ResultCode::logicError);
 }
-
-
 
 } // namespace nx::clusterdb::map::test

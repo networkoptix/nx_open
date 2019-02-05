@@ -27,6 +27,8 @@ ResultCode toResultCode(nx::sql::DBResult dbResult)
         case DBResult::cancelled:
             return ResultCode::cancelled;
         case DBResult::retryLater:
+            return ResultCode::retryLater;
+        case DBResult::uniqueConstraintViolation:
             return ResultCode::uniqueConstraintViolation;
         case DBResult::connectionError:
             return ResultCode::connectionError;
@@ -159,9 +161,12 @@ DataManager::FetchResult DataManager::getFromDb(
     if (key.empty())
         return FetchResult(nx::sql::DBResult::logicError, std::nullopt);
 
-    return FetchResult(
-        nx::sql::DBResult::ok,
-        m_keyValueDao->get(queryContext, key));
+    auto value = m_keyValueDao->get(queryContext, key);
+    auto result = value.has_value()
+        ? nx::sql::DBResult::ok
+        : nx::sql::DBResult::notFound;
+
+    return FetchResult(result, value);
 }
 
 nx::sql::DBResult DataManager::removeFromDb(
