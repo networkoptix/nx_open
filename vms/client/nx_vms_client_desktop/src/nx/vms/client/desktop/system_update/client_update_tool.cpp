@@ -14,14 +14,12 @@
 
 namespace nx::vms::client::desktop {
 
-bool requestInstalledVersions(
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    QList<nx::utils::SoftwareVersion>* versions)
+bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline(engineVersion))
+    if (!checkOnline())
         return false;
 
     const auto result = applauncher::api::getInstalledVersions(versions);
@@ -72,7 +70,7 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
         {
             std::set<nx::utils::SoftwareVersion> output;
             QList<nx::utils::SoftwareVersion> versions;
-            if (requestInstalledVersions(commonModule()->engineVersion(), &versions))
+            if (requestInstalledVersions(&versions))
             {
                 for (const auto& version: versions)
                     output.insert(version);
@@ -415,7 +413,7 @@ bool ClientUpdateTool::isDownloadComplete() const
 bool ClientUpdateTool::installUpdate()
 {
     // Try to run applauncher if it is not running.
-    if (!applauncher::api::checkOnline(commonModule()->engineVersion()))
+    if (!applauncher::api::checkOnline())
     {
         NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
         setApplauncherError("applauncher is offline");
@@ -493,10 +491,7 @@ bool ClientUpdateTool::isInstallComplete() const
 
     bool installed = false;
     using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::isVersionInstalled(
-        m_updateVersion,
-        commonModule()->engineVersion(),
-        &installed);
+    Result result = applauncher::api::isVersionInstalled(m_updateVersion, &installed);
 
     switch (result)
     {
@@ -531,7 +526,7 @@ bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version
 bool ClientUpdateTool::restartClient()
 {
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::api::checkOnline(commonModule()->engineVersion()))
+    if (!applauncher::api::checkOnline())
         return false;
 
     using Result = applauncher::api::ResultType::Value;

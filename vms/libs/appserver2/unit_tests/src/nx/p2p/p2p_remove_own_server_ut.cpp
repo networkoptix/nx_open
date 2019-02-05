@@ -71,7 +71,7 @@ public:
     void whenOneServerForgetsAnother()
     {
         auto connection = m_servers[0]->moduleInstance()->ecConnection();
-        auto manager = connection->getMediaServerManager(Qn::kSystemAccess);
+        auto manager = connection->makeMediaServerManager(Qn::kSystemAccess);
         manager->removeSync(m_servers[1]->moduleInstance()->commonModule()->moduleGUID());
     }
 
@@ -96,7 +96,6 @@ public:
         ASSERT_TRUE(result);
     }
 };
-
 
 TEST_F(P2pSpecialTransactionTest, two_servers_still_abel_to_reconnect_when_one_server_forgets_another_while_offline)
 {

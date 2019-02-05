@@ -137,7 +137,7 @@ QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString& u
 void QnServerUpdateTool::sendReply(int code)
 {
     NX_VERBOSE(this, lit("Update chunk reply [id = %1, code = %2].").arg(m_updateId).arg(code));
-    ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
+    ec2Connection()->makeUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
                 m_updateId, moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 
@@ -207,7 +207,6 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString& updateId,
         this,
         lm("Update chunk [id = %1, offset = %2, size = %3].")
             .arg(updateId).arg(offset).arg(data.size()));
-
 
     if (m_bannedUpdates.contains(updateId))
     {

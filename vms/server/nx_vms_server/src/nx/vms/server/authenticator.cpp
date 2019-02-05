@@ -7,8 +7,8 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/match/wildcard.h>
-#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
@@ -158,7 +158,7 @@ Qn::AuthResult Authenticator::verifyPassword(
         return Qn::Auth_WrongLogin;
 
     NX_VERBOSE(this, "Check %1 password '%2' for correctness...", user,
-        nx::utils::ini().displayUrlPasswordInLogs ? password : QString('???'));
+        nx::utils::log::showPasswords() ? password : QString("******"));
 
     // TODO: Refactor and use direct checks instead of full HTTP authorization.
     namespace http = nx::network::http;
@@ -852,7 +852,7 @@ void Authenticator::updateUserHashes(const QnUserResourcePtr& userResource, cons
 
     nx::vms::api::UserData userData;
     ec2::fromResourceToApi(userResource, userData);
-    commonModule()->ec2Connection()->getUserManager(Qn::kSystemAccess)->save(
+    commonModule()->ec2Connection()->makeUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),

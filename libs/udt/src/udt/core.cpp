@@ -231,7 +231,6 @@ CUDT::~CUDT()
     delete m_pCC;
     delete m_pPeerAddr;
     delete m_pSNode;
-    delete m_pRNode;
 }
 
 CSndQueue& CUDT::sndQueue()
@@ -587,11 +586,6 @@ void CUDT::open()
     m_pSNode->timestamp = 1;
     m_pSNode->locationOnHeap = -1;
 
-    if (!m_pRNode)
-        m_pRNode = new CRNode();
-    m_pRNode->socket = shared_from_this();
-    m_pRNode->timestamp = 1;
-
     m_iRTT = 10 * m_iSYNInterval;
     m_iRTTVar = m_iRTT >> 1;
     m_ullCPUFrequency = CTimer::getCPUFrequency();
@@ -887,7 +881,6 @@ POST_CONNECT:
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     // acknowledge the management module.
@@ -987,7 +980,6 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     //send the response to the peer, see listen() for more discussions about this

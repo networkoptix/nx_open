@@ -144,7 +144,7 @@ int QnConfigureRestHandler::execute(
         if (data.wholeSystem)
         {
             auto connection = owner->commonModule()->ec2Connection();
-            auto manager = connection->getMiscManager(owner->accessRights());
+            auto manager = connection->makeMiscManager(owner->accessRights());
             manager->changeSystemId(
                 data.localSystemId,
                 data.sysIdTime,
@@ -238,7 +238,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
     auto connection = owner->commonModule()->ec2Connection();
-    auto manager = connection->getMediaServerManager(accessRights);
+    auto manager = connection->makeMediaServerManager(accessRights);
     auto errCode = manager->saveSync(apiServer);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)

@@ -58,6 +58,8 @@ public:
      */
     bool start();
 
+    bool waitForStarted();
+
     /**
      * Start media server. Don't wait while it's being started. Server started at separate thread.
      */
@@ -78,6 +80,7 @@ public:
 signals:
     void started();
 private:
+    void setLowDelayIntervals();
     void prepareToStart();
     void fillDefaultSettings();
 
@@ -91,4 +94,5 @@ private:
     std::map<std::string, QString> m_settings;
     std::vector<std::string> m_cmdOptions;
     QnUuid m_serverGuid;
+    std::unique_ptr<nx::utils::promise<bool>> m_processStartedPromise;
 };

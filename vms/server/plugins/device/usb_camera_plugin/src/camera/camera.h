@@ -49,15 +49,9 @@ public:
     nxpl::TimeProvider * const timeProvider() const;
 
     const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
-
     CodecParameters defaultVideoParameters() const;
-
     std::string ffmpegUrl() const;
-
-    std::vector<AVCodecID> ffmpegCodecPriorityList();
-
     const nxcip::CameraInfo& info() const;
-
     std::string toString() const;
 
 private:

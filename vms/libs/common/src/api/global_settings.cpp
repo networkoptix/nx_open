@@ -259,7 +259,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
     m_ldapSearchTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         ldapSearchTimeoutS, ldapSearchTimeoutSDefault, this);
 
-
     AdaptorList result;
     result
         << m_ldapUriAdaptor
@@ -1180,7 +1179,7 @@ void QnGlobalSettings::synchronizeNow()
     if (!m_admin)
         return;
 
-    propertyDictionary()->saveParamsAsync(m_admin->getId());
+    resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
 bool QnGlobalSettings::resynchronizeNowSync()
@@ -1190,7 +1189,7 @@ bool QnGlobalSettings::resynchronizeNowSync()
         NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
-        propertyDictionary()->markAllParamsDirty(m_admin->getId());
+        resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId());
     }
     return synchronizeNowSync();
 }
@@ -1204,7 +1203,7 @@ bool QnGlobalSettings::synchronizeNowSync()
     NX_ASSERT(m_admin, "Invalid sync state");
     if (!m_admin)
         return false;
-    return propertyDictionary()->saveParams(m_admin->getId());
+    return resourcePropertyDictionary()->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)

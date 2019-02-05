@@ -158,7 +158,6 @@ namespace detail
             return result;
         }
 
-
         // --------- get methods ---------------------
 
         template <class T1, class T2>
@@ -229,7 +228,6 @@ namespace detail
             QMap<int, QVariant> fields;
         };
 
-
         friend class ::ec2::QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QnReadWriteLock& getMutex() { return m_mutex; }
@@ -287,7 +285,7 @@ namespace detail
 
         //getCamerasEx
         ErrorCode doQueryNoLock(const QnCameraDataExQuery& query,
-			nx::vms::api::CameraDataExList& cameraList);
+            nx::vms::api::CameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::MediaServerDataList& serverList);

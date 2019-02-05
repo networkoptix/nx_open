@@ -160,7 +160,7 @@ protected:
         runtimeData.peer.persistentId = commonModule->dbId();
         runtimeData.peer.peerType = nx::vms::api::PeerType::server;
 
-        connection->getMiscManager(Qn::kSystemAccess)
+        connection->makeMiscManager(Qn::kSystemAccess)
             ->saveRuntimeInfo(
                 runtimeData,
                 ec2::DummyHandler::instance(),
@@ -233,7 +233,7 @@ protected:
                 for (auto& server: m_servers)
                 {
                     auto connection = server->moduleInstance()->commonModule()->ec2Connection();
-                    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+                    auto resourceManager = connection->makeResourceManager(Qn::kSystemAccess);
 
                     auto resourceId = cameras[cameraIndex]->getId();
                     cameraIndex = (cameraIndex + 1) % cameras.size();

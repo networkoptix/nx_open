@@ -570,7 +570,7 @@ void QnRecordingManager::at_checkLicenses()
         qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
-            auto errCode = ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
+            auto errCode = ec2Connection()->makeMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
             if (errCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(licenseOverflowTime);
         }
@@ -605,7 +605,7 @@ void QnRecordingManager::at_checkLicenses()
         qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
         {
-            auto errorCode = ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
+            auto errorCode = ec2Connection()->makeMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
             if (errorCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(0);
         }
@@ -645,7 +645,7 @@ void QnRecordingManager::disableLicensesIfNeed()
             nx::vms::api::CameraAttributesDataList apiAttributes;
             ec2::fromResourceListToApi(userAttributes, apiAttributes);
 
-            ec2::ErrorCode errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);
+            ec2::ErrorCode errCode =  ec2Connection()->makeCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);
             if (errCode != ec2::ErrorCode::ok)
             {
                 NX_WARNING(this, "Can't turn off recording for camera: %1. Error: %2",

@@ -18,7 +18,6 @@
 
 #include <atomic>
 
-
 namespace nx {
 namespace p2p {
 namespace test {
@@ -154,7 +153,7 @@ public:
         cameraData.physicalId = QString("cam3");
         cameraData.name = m_servers[0]->moduleInstance()->endpoint().toString();
         m_camera3Id = cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId); /*guidFromArbitraryData(QString("cam3"))*/
-        ec2::ErrorCode err = getConnection(m_servers[0])->getCameraManager(Qn::kSystemAccess)->addCameraSync(cameraData);
+        ec2::ErrorCode err = getConnection(m_servers[0])->makeCameraManager(Qn::kSystemAccess)->addCameraSync(cameraData);
         ASSERT_EQ(err, ec2::ErrorCode::ok);
         /*
                 S1      S2           S1      S2
@@ -218,7 +217,7 @@ public:
     {
 
         //server2 needs to know, that server0 is stopped, so we call removeSync
-        ec2::ErrorCode err = getConnection(m_servers[2])->getMediaServerManager(Qn::kSystemAccess)->removeSync(getUuid(m_servers[0]));
+        ec2::ErrorCode err = getConnection(m_servers[2])->makeMediaServerManager(Qn::kSystemAccess)->removeSync(getUuid(m_servers[0]));
         ASSERT_EQ(err, ec2::ErrorCode::ok);
 
         m_servers[0]->stop();
@@ -237,7 +236,7 @@ public:
         {
             //this is request to database, instead of pool? so it's wrong
             //ec2::ApiCameraDataList cameraList[3];
-            //getConnection(m_servers[2])->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList[2]);
+            //getConnection(m_servers[2])->makeCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList[2]);
             //return cameraList[2].empty();
 
             //this is correct request

@@ -16,13 +16,13 @@ namespace nx::network::http::tunneling::detail {
  * Settings for automatic tunnel type restoration.
  */
 
-constexpr auto kEveryTunnelTypeWeight = 1;
+static constexpr auto kEveryTunnelTypeWeight = 1;
 /** With every tunnel failure, 20 seconds are added to that tunnel type retry period. */
-constexpr auto kTunnelTypeSinkDepth = 20;
+static constexpr auto kTunnelTypeSinkDepth = 20;
 /** Effectively, maximum tunnel type retry period. */
-constexpr auto kMaxTunnelTypeSinkDepth = 600;
+static constexpr auto kMaxTunnelTypeSinkDepth = 600;
 // Depth units per second.
-constexpr auto kTunnelTypeRestoreSpeed = 1;
+static constexpr auto kTunnelTypeRestoreSpeed = 1;
 
 ClientFactory::ClientFactory():
     base_type([this](auto&&... args) { return defaultFactoryFunction(std::move(args)...); }),
@@ -34,6 +34,13 @@ ClientFactory::ClientFactory():
     registerClientType<GetPostTunnelClient>();
     registerClientType<ExperimentalTunnelClient>();
     registerClientType<SslTunnelClient>();
+}
+
+int ClientFactory::topTunnelTypeId() const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    return m_tunnelTypeSelector.topItem();
 }
 
 void ClientFactory::clear()

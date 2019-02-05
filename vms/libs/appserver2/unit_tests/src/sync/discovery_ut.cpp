@@ -57,7 +57,7 @@ protected:
         const auto connection = module->ecConnection();
         ASSERT_NE(nullptr, connection);
 
-        const auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+        const auto resourceManager = connection->makeResourceManager(Qn::kSystemAccess);
         ASSERT_NE(nullptr, resourceManager);
 
         QList<QnResourceTypePtr> resourceTypeList;
@@ -88,7 +88,7 @@ protected:
         information.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         module->commonModule()->setModuleInformation(information);
 
-        auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+        auto serverManager = connection->makeMediaServerManager(Qn::kSystemAccess);
         ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
     }
 

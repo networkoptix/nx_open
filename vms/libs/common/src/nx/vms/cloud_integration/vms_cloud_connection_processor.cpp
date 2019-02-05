@@ -369,7 +369,7 @@ bool VmsCloudConnectionProcessor::insertCloudOwner(
 
     const auto resultCode =
         m_commonModule->ec2Connection()
-        ->getUserManager(Qn::kSystemAccess)->saveSync(userData);
+        ->makeUserManager(Qn::kSystemAccess)->saveSync(userData);
     if (resultCode != ec2::ErrorCode::ok)
     {
         NX_WARNING(this, lm("Error inserting cloud owner to the local DB. %1").arg(resultCode));

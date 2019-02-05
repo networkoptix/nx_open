@@ -105,7 +105,7 @@ Appserver2MessageProcessor::Appserver2MessageProcessor(QObject* parent):
                 return;
 
             auto connection = commonModule()->ec2Connection();
-            auto manager = connection->getResourceManager(Qn::kSystemAccess);
+            auto manager = connection->makeResourceManager(Qn::kSystemAccess);
             manager->setResourceStatusSync(resource->getId(), resource->getStatus());
         });
 }
@@ -137,7 +137,7 @@ void Appserver2MessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(mServer, apiServer);
     auto connection = commonModule()->ec2Connection();
-    connection->getMediaServerManager(Qn::kSystemAccess)->save(
+    connection->makeMediaServerManager(Qn::kSystemAccess)->save(
         apiServer,
         ec2::DummyHandler::instance(),
         &ec2::DummyHandler::onRequestDone);

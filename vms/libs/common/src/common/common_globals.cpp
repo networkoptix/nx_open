@@ -121,20 +121,38 @@ QString toErrorMessage(AuthResult value)
 {
     switch (value)
     {
+        case Auth_OK:
+            NX_ASSERT(false, "This value is not an error.");
+            break;
+
+        case Auth_WrongLogin:
+        case Auth_WrongInternalLogin:
+        case Auth_WrongDigest:
+        case Auth_WrongPassword:
+            return "Wrong username or password.";
+
         case Auth_PasswordExpired:
             return "The password is expired. Please, contact your system administrator.";
+
         case Auth_LDAPConnectError:
             return "The LDAP server is not accessible. Please, try again later.";
+
         case Auth_CloudConnectError:
             return nx::network::AppInfo::cloudName()
                 + " is not accessible yet. Please, try again later.";
+
         case Auth_DisabledUser:
             return "The user is disabled. Please, contact your system administrator.";
+
         case Auth_LockedOut:
-            return "User is locked out due to several failed attempts. Please, try again later.";
-        default:
-            return "Wrong username or password.";
+            return "The user is locked out due to several failed attempts. Please, try again later.";
+
+        case Auth_Forbidden:
+        case Auth_InvalidCsrfToken:
+            return "This authorization method is forbidden. Please, contact your system administrator.";
     }
+
+    return lm("Internal server error (%1). Please, contact your system administrator.").arg(value);
 }
 
 QString toString(MediaStreamEvent value)

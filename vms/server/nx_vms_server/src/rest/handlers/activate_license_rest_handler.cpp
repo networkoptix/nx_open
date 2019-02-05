@@ -99,7 +99,6 @@ struct LicenseKey
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((LicenseKey), (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseKey, (json), (licenseKey))
 
-
 int QnActivateLicenseRestHandler::executePost(const QString& /*path*/,
     const QnRequestParams& /*params*/, const QByteArray& body, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
@@ -114,7 +113,6 @@ int QnActivateLicenseRestHandler::executePost(const QString& /*path*/,
     return activateLicense(licenseKeyStruct.licenseKey, result, owner);
 }
 
-
 // WARNING: Deprecated!
 int QnActivateLicenseRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
@@ -128,7 +126,6 @@ int QnActivateLicenseRestHandler::executeGet(const QString& /*path*/, const QnRe
 
     return activateLicense(licenseKey, result, owner);
 }
-
 
 int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
@@ -184,7 +181,7 @@ int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     ec2::AbstractECConnectionPtr connect = owner->commonModule()->ec2Connection();
     QnLicenseList licenses;
     licenses << license;
-    auto licenseManager = connect->getLicenseManager(owner->accessRights());
+    auto licenseManager = connect->makeLicenseManager(owner->accessRights());
 
     const ec2::ErrorCode errorCode = licenseManager->addLicensesSync(licenses);
     if (errorCode == ec2::ErrorCode::forbidden)

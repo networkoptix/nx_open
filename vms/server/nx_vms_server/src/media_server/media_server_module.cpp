@@ -358,7 +358,7 @@ void QnMediaServerModule::stop()
     resourceDiscoveryManager()->stop();
 
     m_licenseWatcher->stop();
-    m_resourceSearchers->stop();
+    m_resourceSearchers->clear();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -512,7 +512,7 @@ QnResourcePool* QnMediaServerModule::resourcePool() const
     return commonModule()->resourcePool();
 }
 
-QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+QnResourcePropertyDictionary* QnMediaServerModule::resourcePropertyDictionary() const
 {
     return commonModule()->resourcePropertyDictionary();
 }

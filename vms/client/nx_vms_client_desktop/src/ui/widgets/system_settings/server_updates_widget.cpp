@@ -640,7 +640,7 @@ bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& vers
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline(commonModule()->engineVersion()))
+    if (!checkOnline())
         return false;
 
     const auto result = applauncher::api::restartClient(version);

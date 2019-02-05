@@ -299,7 +299,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
+    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr &businessAction)
         {
             if (businessAction->actionType() != vms::api::ActionType::executePtzPresetAction)

@@ -42,41 +42,40 @@ public:
         QueryProcessorType* queryProcessor);
     virtual ~BaseEc2Connection();
 
-    virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
-    virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
+    virtual AbstractResourceManagerPtr makeResourceManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractMediaServerManagerPtr makeMediaServerManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractCameraManagerPtr makeCameraManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractLicenseManagerPtr makeLicenseManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractEventRulesManagerPtr makeEventRulesManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractUserManagerPtr makeUserManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractLayoutManagerPtr makeLayoutManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractLayoutTourManagerPtr makeLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
+    virtual AbstractVideowallManagerPtr makeVideowallManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractWebPageManagerPtr makeWebPageManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractStoredFileManagerPtr makeStoredFileManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractUpdatesManagerPtr makeUpdatesManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractMiscManagerPtr makeMiscManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractDiscoveryManagerPtr makeDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractAnalyticsManagerPtr makeAnalyticsManager(
         const Qn::UserAccessData &userAccessData) override;
 
-
-    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
-    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
-    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() override;
-    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() override;
-    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() override;
-    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
-    virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
-    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
-    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() override;
-    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
-    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
-    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
-    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
-    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
-    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
+    virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
+    virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
+    virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() override;
+    virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() override;
+    virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() override;
+    virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() override;
+    virtual AbstractUserNotificationManagerPtr userNotificationManager() override;
+    virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() override;
+    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() override;
+    virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
+    virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
+    virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
+    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() override;
+    virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
+    virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
     virtual AbstractAnalyticsNotificationManagerPtr
-        getAnalyticsNotificationManager() override;
+        analyticsNotificationManager() override;
 
     virtual QnCommonModule* commonModule() const override;
 
@@ -208,7 +207,7 @@ void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 }
 
 template<class QueryProcessorType>
-AbstractResourceManagerPtr BaseEc2Connection<QueryProcessorType>::getResourceManager(
+AbstractResourceManagerPtr BaseEc2Connection<QueryProcessorType>::makeResourceManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnResourceManager<QueryProcessorType>>(
@@ -217,13 +216,13 @@ AbstractResourceManagerPtr BaseEc2Connection<QueryProcessorType>::getResourceMan
 
 template<class QueryProcessorType>
 AbstractResourceNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getResourceNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::resourceNotificationManager()
 {
     return m_resourceNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaServerManager(
+AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::makeMediaServerManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnMediaServerManager<QueryProcessorType>>(
@@ -232,13 +231,13 @@ AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaSer
 
 template<class QueryProcessorType>
 AbstractMediaServerNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getMediaServerNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::mediaServerNotificationManager()
 {
     return m_mediaServerNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractCameraManagerPtr BaseEc2Connection<QueryProcessorType>::getCameraManager(
+AbstractCameraManagerPtr BaseEc2Connection<QueryProcessorType>::makeCameraManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnCameraManager<QueryProcessorType>>(
@@ -247,13 +246,13 @@ AbstractCameraManagerPtr BaseEc2Connection<QueryProcessorType>::getCameraManager
 
 template<class QueryProcessorType>
 AbstractCameraNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getCameraNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::cameraNotificationManager()
 {
     return m_cameraNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractLicenseManagerPtr BaseEc2Connection<QueryProcessorType>::getLicenseManager(
+AbstractLicenseManagerPtr BaseEc2Connection<QueryProcessorType>::makeLicenseManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnLicenseManager<QueryProcessorType>>(
@@ -262,13 +261,13 @@ AbstractLicenseManagerPtr BaseEc2Connection<QueryProcessorType>::getLicenseManag
 
 template<class QueryProcessorType>
 AbstractLicenseNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getLicenseNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::licenseNotificationManager()
 {
     return m_licenseNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRulesManager(
+AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::makeEventRulesManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<EventRulesManager<QueryProcessorType>>(
@@ -277,13 +276,13 @@ AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRule
 
 template<class QueryProcessorType>
 AbstractBusinessEventNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getBusinessEventNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::businessEventNotificationManager()
 {
     return m_businessEventNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager(
+AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::makeUserManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnUserManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
@@ -291,20 +290,20 @@ AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager(
 
 template<class QueryProcessorType>
 AbstractUserNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getUserNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::userNotificationManager()
 {
     return m_userNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager(
+AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::makeLayoutManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnLayoutManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
 }
 
 template<class QueryProcessorType>
-AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutTourManager(
+AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::makeLayoutTourManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnLayoutTourManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
@@ -312,20 +311,20 @@ AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutTou
 
 template<class QueryProcessorType>
 AbstractLayoutNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getLayoutNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::layoutNotificationManager()
 {
     return m_layoutNotificationManager;
 }
 
 template<class QueryProcessorType>
 AbstractLayoutTourNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getLayoutTourNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::layoutTourNotificationManager()
 {
     return m_layoutTourNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallManager(
+AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::makeVideowallManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnVideowallManager<QueryProcessorType>>(
@@ -334,7 +333,7 @@ AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallM
 
 template<typename QueryProcessorType>
 AbstractVideowallNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getVideowallNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::videowallNotificationManager()
 {
     return m_videowallNotificationManager;
 }
@@ -346,7 +345,7 @@ QnCommonModule* BaseEc2Connection<QueryProcessorType>::commonModule() const
 }
 
 template<class QueryProcessorType>
-AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager(
+AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::makeWebPageManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnWebPageManager<QueryProcessorType>>(
@@ -355,13 +354,13 @@ AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManag
 
 template<class QueryProcessorType>
 AbstractWebPageNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getWebPageNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::webPageNotificationManager()
 {
     return m_webPageNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::getStoredFileManager(
+AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::makeStoredFileManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnStoredFileManager<QueryProcessorType>>(
@@ -370,20 +369,20 @@ AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::getStoredFil
 
 template<typename QueryProcessorType>
 AbstractStoredFileNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getStoredFileNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::storedFileNotificationManager()
 {
     return m_storedFileNotificationManager;
 }
 
 template<class QueryProcessorType>
 AbstractUpdatesNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getUpdatesNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::updatesNotificationManager()
 {
     return m_updatesNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManager(
+AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::makeUpdatesManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnUpdatesManager<QueryProcessorType>>(
@@ -391,7 +390,7 @@ AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManag
 }
 
 template<class QueryProcessorType>
-AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager(
+AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::makeMiscManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnMiscManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
@@ -399,13 +398,13 @@ AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager(
 
 template<class QueryProcessorType>
 AbstractMiscNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getMiscNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::miscNotificationManager()
 {
     return m_miscNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryManager(
+AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::makeDiscoveryManager(
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnDiscoveryManager<QueryProcessorType>>(
@@ -414,20 +413,20 @@ AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryM
 
 template<class QueryProcessorType>
 AbstractDiscoveryNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getDiscoveryNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::discoveryNotificationManager()
 {
     return m_discoveryNotificationManager;
 }
 
 template<class QueryProcessorType>
 AbstractTimeNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::timeNotificationManager()
 {
     return m_timeNotificationManager;
 }
 
 template<class QueryProcessorType>
-AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsManager(
+AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::makeAnalyticsManager(
     const Qn::UserAccessData &userAccessData)
 {
     return std::make_shared<AnalyticsManager<QueryProcessorType>>(
@@ -436,7 +435,7 @@ AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsM
 
 template<class QueryProcessorType>
 AbstractAnalyticsNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getAnalyticsNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::analyticsNotificationManager()
 {
     return m_analyticsNotificationManager;
 }

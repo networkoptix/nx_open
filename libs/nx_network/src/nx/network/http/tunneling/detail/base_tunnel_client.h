@@ -67,10 +67,11 @@ public:
 
     virtual const Response& response() const = 0;
 
+    ClientFeedbackFunction takeFeedbackFunction();
+
 protected:
     const nx::utils::Url m_baseTunnelUrl;
     std::unique_ptr<AsyncClient> m_httpClient;
-    ClientFeedbackFunction m_clientFeedbackFunction;
     OpenTunnelCompletionHandler m_completionHandler;
     std::unique_ptr<network::AbstractStreamSocket> m_connection;
 
@@ -85,6 +86,9 @@ protected:
     bool resetConnectionAttributes();
 
     void reportSuccess();
+
+private:
+    ClientFeedbackFunction m_clientFeedbackFunction;
 };
 
 } // namespace detail

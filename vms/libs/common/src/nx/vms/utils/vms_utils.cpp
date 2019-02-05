@@ -51,7 +51,7 @@ bool configureLocalPeerAsPartOfASystem(
     // add foreign users
     for (const auto& user : data.foreignUsers)
     {
-        if (const auto result = connection->getUserManager(Qn::kSystemAccess)->saveSync(user);
+        if (const auto result = connection->makeUserManager(Qn::kSystemAccess)->saveSync(user);
             result != ec2::ErrorCode::ok)
         {
             NX_DEBUG(typeid(VmsUtilsFunctionsTag), lm("Failed to save user %1. %2")
@@ -61,7 +61,7 @@ bool configureLocalPeerAsPartOfASystem(
     }
 
     // add foreign resource params
-    if (const auto result = connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams);
+    if (const auto result = connection->makeResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams);
         result != ec2::ErrorCode::ok)
     {
         NX_DEBUG(typeid(VmsUtilsFunctionsTag),
@@ -100,7 +100,7 @@ bool configureLocalPeerAsPartOfASystem(
     server->setAuthKey(QnUuid::createUuid().toString());
     nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
-    if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
+    if (connection->makeMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
     {
         NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to update server auth key while configuring system");
     }
@@ -108,7 +108,7 @@ bool configureLocalPeerAsPartOfASystem(
     if (!data.foreignServer.id.isNull())
     {
         // add foreign server to pass auth if admin user is disabled
-        if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
+        if (connection->makeMediaServerManager(Qn::kSystemAccess)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
         {
             NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to add foreign server while configuring system");
         }
@@ -209,7 +209,7 @@ bool updateUserCredentials(
     if (apiOldUser == apiUser)
         return true; //< Nothing to update.
 
-    auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
+    auto errCode = connection->makeUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)
     {
