@@ -1,31 +1,32 @@
 #include "database.h"
 
+#include "dao/key_value_dao.h"
+
 namespace nx::clusterdb::map {
 
-// TODO: This should be passed to m_syncEngine
-// to allow connections with this guid only.
+namespace {
+
 static constexpr char kKeyValueDbApplicationId[] = "118e2785-d05c-4ab9-b1e0-6d74324dada3";
+
+static constexpr char kSystemId[] = "c484573f-8b0d-4458-b86c-1da31188884b";
+
+} // namespace
 
 Database::Database(
     const Settings& settings,
     nx::sql::AsyncSqlQueryExecutor* dbManager)
     :
-    //m_settings(settings),
-    //m_dbManager(dbManager),
-    m_moduleId(QnUuid::createUuid()), //< TODO: moduleId should be persistent.
+    m_systemId(kSystemId),
     m_syncEngine(
         kKeyValueDbApplicationId,
-        m_moduleId,
+        m_systemId,
         settings.dataSyncEngineSettings,
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         dbManager),
     m_structureUpdater(dbManager),
-    m_dataManager(dbManager),
+    m_keyValueDao(dbManager),
+    m_dataManager(&m_syncEngine, &m_keyValueDao, kSystemId),
     m_eventProvider(dbManager)
-{
-}
-
-Database::~Database()
 {
 }
 

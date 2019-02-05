@@ -4,7 +4,7 @@ namespace nx::sql { class AsyncSqlQueryExecutor; }
 
 namespace nx::clusterdb::map {
 
-class EventProvider
+class NX_KEY_VALUE_DB_API EventProvider
 {
 public:
     EventProvider(nx::sql::AsyncSqlQueryExecutor* dbManager);

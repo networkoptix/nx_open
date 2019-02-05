@@ -1,18 +1,37 @@
 #pragma once
 
-#include <string>
-
-#include <nx/sql/query_context.h>
+#include <nx/sql/types.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/clusterdb/engine/command.h>
 
-namespace nx::sql { class AsyncSqlQueryExecutor; }
+#include "key_value_pair.h"
+
+namespace nx::sql {
+
+class QueryContext;
+class AsyncSqlQueryExecutor;
+
+}
+
+namespace nx::clusterdb::engine { class SyncronizationEngine; }
 
 namespace nx::clusterdb::map {
+
+namespace dao { class KeyValueDao; }
 
 enum class ResultCode
 {
     ok = 0,
-    error,
+    statementError,
+    ioError,
+    notFound,
+    cancelled,
+    retryLater,
+    uniqueConstraintViolation,
+    connectionError,
+    logicError,
+    endOfData,
+    unknownError
 };
 
 using UpdateCompletionHander = nx::utils::MoveOnlyFunc<void(ResultCode)>;
@@ -23,54 +42,83 @@ using UpdateCompletionHander = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 using LookupCompletionHander =
     nx::utils::MoveOnlyFunc<void(ResultCode, std::string /*value*/)>;
 
-class DataManager
+class NX_KEY_VALUE_DB_API DataManager
 {
 public:
-    DataManager(nx::sql::AsyncSqlQueryExecutor* dbManager);
+    DataManager(
+        nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
+        dao::KeyValueDao* keyValueDao,
+        const std::string& systemId);
+    ~DataManager();
 
     /**
      * Inserts/updates key/value pair.
      */
-    void set(
+    void save(
         const std::string& key,
         const std::string& value,
-        UpdateCompletionHander completionHander);
+        UpdateCompletionHander completionHandler);
 
+    /**
+     * Removes a key/value pair.
+     */
     void remove(
         const std::string& key,
-        UpdateCompletionHander completionHander);
+        UpdateCompletionHander completionHandler);
 
+    /**
+     * Retrieves the value for the given key.
+     */
     void get(
         const std::string& key,
-        LookupCompletionHander completionHander);
+        LookupCompletionHander completionHandler);
+
+private:
+    using FetchResult = std::pair<nx::sql::DBResult, std::optional<std::string>>;
 
     /**
      * Inserts/updates key/value within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
      */
-    void set(
+    nx::sql::DBResult saveToDb(
         nx::sql::QueryContext* queryContext,
         const std::string& key,
         const std::string& value);
 
     /**
+     * Retrieves the value for the given key within an existing transaction.
+     * If transaction is rolled back, no data will be sent to remove peers.
+     */
+    FetchResult getFromDb(nx::sql::QueryContext* queryContext, const std::string& key);
+
+    /**
      * Removes elements within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
      */
-    void remove(
+    nx::sql::DBResult removeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& key);
 
     /**
-     * Find element within existing transaction.
-     * @return std::nullopt if no value found. Value otherwise.
+     * Synchronizes incoming save operation from another node
      */
-    std::optional<std::string> get(
+    nx::sql::DBResult incomingSave(
         nx::sql::QueryContext* queryContext,
-        const std::string& key);
+        const std::string& systemId,
+        nx::clusterdb::engine::Command<KeyValuePair> command);
+
+    /**
+     * Synchronizes incoming remove operation from another node
+     */
+    nx::sql::DBResult incomingRemove(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        nx::clusterdb::engine::Command<Key> command);
 
 private:
-    //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
+    nx::clusterdb::engine::SyncronizationEngine* m_syncEngine = nullptr;
+    dao::KeyValueDao* m_keyValueDao = nullptr;
+    std::string m_systemId;
 };
 
 } // namespace nx::clusterdb::map

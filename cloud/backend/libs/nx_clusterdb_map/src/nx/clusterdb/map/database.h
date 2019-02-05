@@ -4,6 +4,7 @@
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/uuid.h>
 
+#include "dao/key_value_dao.h"
 #include "dao/structure_updater.h"
 #include "data_manager.h"
 #include "event_provider.h"
@@ -20,7 +21,6 @@ public:
     Database(
         const Settings& settings,
         nx::sql::AsyncSqlQueryExecutor* dbManager);
-    ~Database();
 
     void registerHttpApi(
         const std::string& pathPrefix,
@@ -30,11 +30,10 @@ public:
     EventProvider& eventProvider();
 
 private:
-    //const Settings& m_settings;
-    //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
-    const QnUuid m_moduleId;
+    const QnUuid m_systemId;
     nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
-    dao::rdb::StructureUpdater m_structureUpdater;
+    dao::StructureUpdater m_structureUpdater;
+    dao::KeyValueDao m_keyValueDao;
     DataManager m_dataManager;
     EventProvider m_eventProvider;
 };
