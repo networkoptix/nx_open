@@ -279,14 +279,14 @@ signals:
     void painted();
     void aspectRatioChanged();
     void aboutToBeDestroyed();
-    void optionsChanged();
+    void optionsChanged(Options changedOptions, QPrivateSignal);
     void zoomRectChanged();
     void zoomTargetWidgetChanged();
     void frameDistinctionColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
     void displayInfoChanged();
-    void selectionStateChanged(SelectionState state);
+    void selectionStateChanged(SelectionState state, QPrivateSignal);
     void placeholderPixmapChanged();
 
 protected:
