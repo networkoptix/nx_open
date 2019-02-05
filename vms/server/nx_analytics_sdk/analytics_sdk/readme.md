@@ -18,12 +18,11 @@ way, and may generate metadata - events and objects (rectangles on a frame) - wh
 Server to be stored in its database and visualized in the Client.
 
 From the developers' point of view, an Analytics Plugin is a dynamic library (`.dll` on Windows,
-`.so` on Linux) which exports a single `extern "C"` function referred to as the Entry Function.
-Such function is a factory for objects inherited from a dedicated SDK abstract class (in other
-words, implementing a dedicated interface) `class nx::sdk::Analytics::IPlugin`
-(`src/nx/sdk/analytics/i_plugin.h`), derived from `class nx::sdk::IPlugin`
-(`src/nx/sdk/i_plugin.h`). This base interface also defines the name and the prototype of the Entry
-Function.
+`.so` on Linux) which exports a single `extern "C"` entry point function. Such function is a
+factory for objects inherited from a dedicated SDK abstract class (in other words, implementing a
+dedicated interface) `class nx::sdk::Analytics::IPlugin` (`src/nx/sdk/analytics/i_plugin.h`),
+derived from `class nx::sdk::IPlugin` (`src/nx/sdk/i_plugin.h`). This base interface also defines
+the name and the prototype of the entry point function.
 
 To make it possible to develop plugins using a different C++ compiler (e.g. with an incompatible
 ABI) rather than the one used to compile Nx Witness VMS, or potentially in languages other than
