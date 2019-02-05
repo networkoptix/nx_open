@@ -70,7 +70,7 @@ void ServerTimeSyncManager::start()
     initializeTimeFetcher();
     m_connection = commonModule()->ec2Connection();
     connect(
-        m_connection->getTimeNotificationManager().get(),
+        m_connection->timeNotificationManager().get(),
         &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
         this,
         [this]()
@@ -92,7 +92,7 @@ void ServerTimeSyncManager::stop()
     }
 
     if (m_connection)
-        disconnect(m_connection->getTimeNotificationManager().get());
+        disconnect(m_connection->timeNotificationManager().get());
 }
 
 void ServerTimeSyncManager::initializeTimeFetcher()
@@ -200,7 +200,7 @@ void ServerTimeSyncManager::saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs)
 
     // TODO: Avoid passing `this` in async callback.
     const auto logTag = nx::utils::log::Tag(this);
-    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
+    connection->makeMiscManager(Qn::kSystemAccess)->saveMiscParam(
         deltaData,
         this,
         [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
@@ -278,7 +278,7 @@ void ServerTimeSyncManager::updateTime()
 void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
 {
     vms::api::MiscData deltaData;
-    auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
+    auto miscManager = connection->makeMiscManager(Qn::kSystemAccess);
     auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
     if (dbResult != ec2::ErrorCode::ok)
     {

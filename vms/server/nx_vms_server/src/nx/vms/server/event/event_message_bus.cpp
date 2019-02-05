@@ -38,7 +38,7 @@ int EventMessageBus::deliverAction(const vms::event::AbstractActionPtr& action, 
     ec2::fromResourceToApi(action, actionData);
 
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    int handle = ec2Connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
+    int handle = ec2Connection->makeEventRulesManager(Qn::kSystemAccess)->sendEventAction(
         actionData, dstPeer, this, &EventMessageBus::at_DeliverActionFinished);
 
     QnMutexLocker lock(&m_mutex);

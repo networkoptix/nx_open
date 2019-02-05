@@ -54,7 +54,7 @@ protected:
 
             int index0 = i % 2;
             auto connection = m_servers[index0]->moduleInstance()->commonModule()->ec2Connection();
-            auto userManager = connection->getUserManager(Qn::kSystemAccess);
+            auto userManager = connection->makeUserManager(Qn::kSystemAccess);
             userManager->save(
                 users, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }

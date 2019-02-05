@@ -533,7 +533,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
                 updateMode();
             };
         snapshotManager()->save(layout, callback);
-        propertyDictionary()->saveParamsAsync(layout->getId());
+        resourcePropertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
     {
@@ -741,7 +741,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     {
         apiMessage.videowallGuid = index.videowall()->getId();
         apiMessage.instanceGuid = index.uuid();
-        connection2()->getVideowallManager(Qn::kSystemAccess)->sendControlMessage(apiMessage, this, [] {});
+        connection2()->makeVideowallManager(Qn::kSystemAccess)->sendControlMessage(apiMessage, this, [] {});
     }
 }
 
@@ -1658,7 +1658,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
     for (const QnVideoWallItem &item : videoWall->items()->getItems())
     {
         message.instanceGuid = item.uuid;
-        connection2()->getVideowallManager(Qn::kSystemAccess)->sendControlMessage(message, this, [] {});
+        connection2()->makeVideowallManager(Qn::kSystemAccess)->sendControlMessage(message, this, [] {});
     }
 }
 
@@ -1770,7 +1770,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
         message.videowallGuid = item.videowall()->getId();
         message.instanceGuid = item.uuid();
-        connection2()->getVideowallManager(Qn::kSystemAccess)->sendControlMessage(message, this, [] {});
+        connection2()->makeVideowallManager(Qn::kSystemAccess)->sendControlMessage(message, this, [] {});
     }
 }
 
@@ -2882,7 +2882,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(QnWorkbenchLayout *layout, st
     {
         nx::vms::api::VideowallData apiVideowall;
         ec2::fromResourceToApi(videowall, apiVideowall);
-        connection2()->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,
+        connection2()->makeVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,
             [this, callback](int reqID, ec2::ErrorCode errorCode)
         {
             callback(reqID, errorCode);

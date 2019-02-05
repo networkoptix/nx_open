@@ -38,7 +38,7 @@ void EventRulesWatcher::handleRulesReset(const nx::vms::event::RuleList& rules)
     if (!connection)
         return;
 
-    const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+    const auto manager = connection->makeEventRulesManager(Qn::kSystemAccess);
     nx::vms::api::EventRuleDataList receivedRules;
     if (manager->getEventRulesSync(&receivedRules) != ec2::ErrorCode::ok)
         return;
@@ -59,5 +59,3 @@ void EventRulesWatcher::handleConnectionChanged()
 } // namespace mobile
 } // namespace client
 } // namespace mobile
-
-

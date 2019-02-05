@@ -327,7 +327,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode =
-                        connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
+                        connect->makeCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if (errorCode != ec2::ErrorCode::ok)
                         NX_WARNING(this, "Can't add camera to ec2. %1",ec2::toString(errorCode));
                     existCamRes->saveProperties();

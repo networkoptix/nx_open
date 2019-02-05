@@ -2377,7 +2377,7 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            propertyDictionary()->saveParamsAsync(resource->getId());
+            resourcePropertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
 }

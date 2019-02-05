@@ -852,7 +852,7 @@ void Authenticator::updateUserHashes(const QnUserResourcePtr& userResource, cons
 
     nx::vms::api::UserData userData;
     ec2::fromResourceToApi(userResource, userData);
-    commonModule()->ec2Connection()->getUserManager(Qn::kSystemAccess)->save(
+    commonModule()->ec2Connection()->makeUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),

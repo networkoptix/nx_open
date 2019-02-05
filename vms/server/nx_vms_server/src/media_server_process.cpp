@@ -673,7 +673,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         ec2::ErrorCode rez;
         nx::vms::api::StorageDataList storages;
 
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
+        while ((rez = ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
             QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
@@ -735,7 +735,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             nx::vms::api::IdDataList idList;
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
-            if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
+            if (ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
                 qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
             commonModule()->resourcePool()->removeResources(storagesToRemove);
         }
@@ -780,7 +780,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
     while (servers.empty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
+        ec2::ErrorCode rez = ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
         if (rez == ec2::ErrorCode::ok)
             break;
 
@@ -810,7 +810,7 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
 
-    ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
+    ec2::ErrorCode rez = ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -834,7 +834,7 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
 
     nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
-    rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
+    rez = ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -852,7 +852,7 @@ void MediaServerProcess::saveStorages(
     ec2::fromResourceListToApi(storages, apiStorages);
 
     ec2::ErrorCode rez;
-    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages))
+    while((rez = ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages))
         != ec2::ErrorCode::ok && !needToStop())
     {
         NX_WARNING(this) << "Call to change server's storages failed. Reason: " << rez;
@@ -1014,7 +1014,7 @@ MediaServerProcess::~MediaServerProcess()
 
 void MediaServerProcess::initResourceTypes()
 {
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    auto manager = m_ec2Connection->makeResourceManager(Qn::kSystemAccess);
     while (!needToStop())
     {
         QList<QnResourceTypePtr> resourceTypeList;
@@ -1187,7 +1187,7 @@ void MediaServerProcess::updateAddressesList()
     if (server != prevValue)
     {
         auto mediaServerManager =
-            commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
+            commonModule()->ec2Connection()->makeMediaServerManager(Qn::kSystemAccess);
         mediaServerManager->save(server, this, &MediaServerProcess::at_serverSaved);
     }
 
@@ -1271,7 +1271,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
 
             nx::vms::api::MediaServerData apiServer;
             ec2::fromResourceToApi(server, apiServer);
-            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
+            ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
         if (server->setProperty(ResourcePropertyKey::Server::kPublicIp,
@@ -3076,7 +3076,7 @@ void MediaServerProcess::moveHandlingCameras()
     }
 
     auto errCode = commonModule()->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)
+        ->makeCameraManager(Qn::kSystemAccess)
         ->addCamerasSync(camerasToUpdate);
 
     if (errCode != ec2::ErrorCode::ok)
@@ -3513,7 +3513,7 @@ void MediaServerProcess::stopObjects()
     safeDisconnect(commonModule(), this);
     safeDisconnect(commonModule()->runtimeInfoManager(), this);
     if (m_ec2Connection)
-        safeDisconnect(m_ec2Connection->getTimeNotificationManager().get(), this);
+        safeDisconnect(m_ec2Connection->timeNotificationManager().get(), this);
     safeDisconnect(m_ec2Connection.get(), this);
     safeDisconnect(m_updatePiblicIpTimer.get(), this);
     m_updatePiblicIpTimer.reset();
@@ -4001,7 +4001,7 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
                 const bool kCleanupTransactionLog = true;
 
                 errCode = commonModule()->ec2Connection()
-                    ->getMiscManager(Qn::kSystemAccess)
+                    ->makeMiscManager(Qn::kSystemAccess)
                     ->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
 
                 if (errCode != ec2::ErrorCode::ok)
@@ -4020,7 +4020,7 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
     {
         const bool kCleanupDbObjects = true;
         const bool kCleanupTransactionLog = true;
-        auto miscManager = m_ec2Connection->getMiscManager(Qn::kSystemAccess);
+        auto miscManager = m_ec2Connection->makeMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 }
@@ -4169,7 +4169,7 @@ void MediaServerProcess::loadResourceParamsData()
         "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
     };
 
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    auto manager = m_ec2Connection->makeResourceManager(Qn::kSystemAccess);
 
     using namespace nx::vms::api;
     QString source;
@@ -4520,7 +4520,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
-        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this,
+        appServerConnection->makeUserManager(Qn::kSystemAccess)->save(userData, password, this,
             [this, userId]( int /*reqID*/, ec2::ErrorCode /*errorCode*/)
             {
                 m_updateUserRequests.remove(userId);

@@ -227,7 +227,7 @@ bool CloudConnectionManager::removeCloudUsers()
     for (const auto& user: usersToRemove)
     {
         const auto errCode = commonModule()->ec2Connection()
-            ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
+            ->makeUserManager(Qn::kSystemAccess)->removeSync(user->getId());
         NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)
         {

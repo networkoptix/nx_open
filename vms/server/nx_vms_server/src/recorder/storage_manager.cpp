@@ -451,7 +451,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
-                    m_owner->propertyDictionary()->saveParams(storage->getId());
+                    m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
         }
 
@@ -1675,7 +1675,7 @@ void QnStorageManager::updateCameraHistory() const
 
     const ec2::AbstractECConnectionPtr& appServerConnection = ec2Connection();
 
-    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)
+    ec2::ErrorCode errCode = appServerConnection->makeCameraManager(Qn::kSystemAccess)
         ->setServerFootageDataSync(moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
@@ -2093,7 +2093,7 @@ void QnStorageManager::clearCameraHistory()
     QList<QnCameraHistoryItem> itemsToRemove = cameraHistoryPool()->getUnusedItems(minTimes, commonModule()->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
-        ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
+        ec2::ErrorCode errCode = ec2Connection->makeCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
             cameraHistoryPool()->removeCameraHistoryItem(item);
     }

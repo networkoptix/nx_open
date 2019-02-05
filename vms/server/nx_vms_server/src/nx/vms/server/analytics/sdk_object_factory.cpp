@@ -54,7 +54,7 @@ PluginManager* getPluginManager(QnMediaServerModule* serverModule)
     return pluginManager;
 }
 
-ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* serverModule)
+ec2::AbstractAnalyticsManagerPtr makeAnalyticsManager(QnMediaServerModule* serverModule)
 {
     if (!serverModule)
     {
@@ -76,7 +76,7 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
         return nullptr;
     }
 
-    auto analyticsManager = ec2Connection->getAnalyticsManager(Qn::kSystemAccess);
+    auto analyticsManager = ec2Connection->makeAnalyticsManager(Qn::kSystemAccess);
     if (!analyticsManager)
     {
         NX_ASSERT(false, "Can't access the analytics manager");
@@ -124,7 +124,7 @@ bool SdkObjectFactory::initPluginResources()
     if (!pluginManager)
         return false;
 
-    auto analyticsManager = getAnalyticsManager(serverModule());
+    auto analyticsManager = makeAnalyticsManager(serverModule());
     if (!analyticsManager)
         return false;
 
@@ -218,7 +218,7 @@ bool SdkObjectFactory::initPluginResources()
 
 bool SdkObjectFactory::initEngineResources()
 {
-    auto analyticsManager = getAnalyticsManager(serverModule());
+    auto analyticsManager = makeAnalyticsManager(serverModule());
     if (!analyticsManager)
         return false;
 

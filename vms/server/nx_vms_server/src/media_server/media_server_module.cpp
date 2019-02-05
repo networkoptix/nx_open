@@ -512,7 +512,7 @@ QnResourcePool* QnMediaServerModule::resourcePool() const
     return commonModule()->resourcePool();
 }
 
-QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+QnResourcePropertyDictionary* QnMediaServerModule::resourcePropertyDictionary() const
 {
     return commonModule()->resourcePropertyDictionary();
 }

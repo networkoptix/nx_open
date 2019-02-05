@@ -121,7 +121,7 @@ public:
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     QnResourcePool* resourcePool() const;
-    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
     nx::vms::server::RootFileSystem* rootFileSystem() const;

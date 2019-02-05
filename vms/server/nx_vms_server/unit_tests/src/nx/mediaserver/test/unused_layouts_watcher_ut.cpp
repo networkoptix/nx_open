@@ -13,7 +13,7 @@ namespace test {
 QStringList readFiles(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
 {
     QStringList outputData;
-    auto fileManager = ec2Connection->getStoredFileManager(Qn::kSystemAccess);
+    auto fileManager = ec2Connection->makeStoredFileManager(Qn::kSystemAccess);
     fileManager->listDirectorySync(Qn::kWallpapersFolder, &outputData);
     return outputData;
 }
@@ -30,10 +30,10 @@ TEST(UnusedLayoutsWatcherTest, main)
     apiLayout.id = QnUuid::createUuid();
     apiLayout.backgroundImageFilename = lit("file1.jpg");
 
-    auto layoutManager = ec2Connection->getLayoutManager(Qn::kSystemAccess);
+    auto layoutManager = ec2Connection->makeLayoutManager(Qn::kSystemAccess);
     ASSERT_EQ(ec2::ErrorCode::ok, layoutManager->saveSync(apiLayout));
 
-    auto fileManager = ec2Connection->getStoredFileManager(Qn::kSystemAccess);
+    auto fileManager = ec2Connection->makeStoredFileManager(Qn::kSystemAccess);
     fileManager->addStoredFileSync(lit("%1/file1.jpg").arg(Qn::kWallpapersFolder), QByteArray());
     fileManager->addStoredFileSync(lit("%1/file2.jpg").arg(Qn::kWallpapersFolder), QByteArray());
 

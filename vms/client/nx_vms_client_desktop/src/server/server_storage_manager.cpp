@@ -69,7 +69,6 @@ QnServerStorageManager::RequestKey::RequestKey(const QnMediaServerResourcePtr &s
     , pool(pool)
 {}
 
-
 QnServerStorageManager::QnServerStorageManager( QObject *parent )
     : base_type(parent)
 {
@@ -87,7 +86,6 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
     {
         checkStoragesStatus(getServerForResource(resource));
     };
-
 
     auto resourceAdded = [this, checkStoragesStatusInternal](const QnResourcePtr &resource)
     {
@@ -236,7 +234,6 @@ void QnServerStorageManager::checkStoragesStatus( const QnMediaServerResourcePtr
     sendBackupRequest(server);
 }
 
-
 // TODO: #GDM SafeMode
 void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages )
 {
@@ -247,7 +244,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
-    conn->getMediaServerManager(Qn::kSystemAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
+    conn->makeMediaServerManager(Qn::kSystemAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
     {
         Q_UNUSED(reqID);
         if (error != ec2::ErrorCode::ok)
@@ -267,7 +264,7 @@ void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids 
     if (!conn)
         return;
 
-    conn->getMediaServerManager(Qn::kSystemAccess)->removeStorages(ids, this, [] {});
+    conn->makeMediaServerManager(Qn::kSystemAccess)->removeStorages(ids, this, [] {});
     invalidateRequests();
 }
 
@@ -501,4 +498,3 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         emit serverProtocolsChanged(requestKey.server, replyProtocols);
     }
 }
-

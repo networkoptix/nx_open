@@ -302,22 +302,22 @@ void QnRoutingManagementWidget::applyChanges() {
                 if (ignored.contains(url))
                     ign = ignored.take(url);
 
-                connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->makeDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             } else {
                 ignored.remove(url);
-                connection->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->makeDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             }
         }
         for (auto it = ignored.begin(); it != ignored.end(); ++it) {
             nx::utils::Url url = it.key();
 
             if (it.value())
-                connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->makeDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             else {
                 if (autoUrls.contains(url))
-                    connection->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                    connection->makeDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
                 else
-                    connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                    connection->makeDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             }
         }
     }

@@ -40,7 +40,7 @@ int QnCurrentUserRestHandler::executeGet(
 
     ec2::AbstractECConnectionPtr ec2Connection = owner->commonModule()->ec2Connection();
     nx::vms::api::UserDataList users;
-    ec2::ErrorCode errCode = ec2Connection->getUserManager(accessRights)->getUsersSync(&users);
+    ec2::ErrorCode errCode = ec2Connection->makeUserManager(accessRights)->getUsersSync(&users);
     if (errCode !=  ec2::ErrorCode::ok)
     {
         if (errCode == ec2::ErrorCode::forbidden)
