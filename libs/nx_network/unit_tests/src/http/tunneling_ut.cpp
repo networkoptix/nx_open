@@ -338,17 +338,13 @@ protected:
     void givenSuccessfulValidator()
     {
         m_expectedResult = ResultCode::ok;
-        tunnelingClient().setTunnelValidator<TestValidator>(
-            m_expectedResult,
-            &m_validationResults);
+        setTunnelValidator();
     }
 
     void givenFailingValidator()
     {
         m_expectedResult = ResultCode::ioError;
-        tunnelingClient().setTunnelValidator<TestValidator>(
-            m_expectedResult,
-            &m_validationResults);
+        setTunnelValidator();
     }
 
     void andValidationIsCompleted()
@@ -367,6 +363,18 @@ private:
     int m_initialTopTunnelTypeId = -1;
     nx::utils::SyncQueue<ResultCode> m_validationResults;
     ResultCode m_expectedResult = ResultCode::ok;
+
+    void setTunnelValidator()
+    {
+        tunnelingClient().setTunnelValidatorFactory(
+            [this](auto tunnel)
+            {
+                return std::make_unique<TestValidator>(
+                    std::move(tunnel),
+                    m_expectedResult,
+                    &m_validationResults);
+            });
+    }
 };
 
 TEST_F(HttpTunnelingValidation, validation_is_performed)

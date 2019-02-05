@@ -15,6 +15,10 @@
 
 namespace nx::network::http::tunneling {
 
+using TunnelValidatorFactoryFunc =
+    std::function<std::unique_ptr<AbstractTunnelValidator>(
+        std::unique_ptr<AbstractStreamSocket> /*tunnel*/)>;
+
 /**
  * Establishes connection to nx::network::http::tunneling::Server listening same request path.
  * For description of tunneling methods supported see nx::network::http::tunneling::Server.
@@ -33,29 +37,7 @@ public:
         const nx::utils::Url& baseTunnelUrl,
         const std::string& userTag = "");
 
-    /**
-     * TunnelValidator type is instantiated when needed as
-     * TunnelValidator(tunnelConnection, std::forward<Args>(args)...);
-     */
-    template<typename TunnelValidator, typename... Args>
-    // requires std::is_base_of<AbstractTunnelValidator, TunnelValidator>::value
-    void setTunnelValidator(Args&&... args)
-    {
-        m_validatorFactory =
-            [args = std::make_tuple(std::forward<Args>(args)...)](
-                std::unique_ptr<AbstractStreamSocket> tunnel) mutable
-            {
-                // TODO: #ak Simplify in c++20 using perfect forwarding.
-                return std::apply(
-                    [tunnel = std::move(tunnel)](auto&&... args) mutable
-                    {
-                        return std::make_unique<TunnelValidator>(
-                            std::move(tunnel),
-                            std::forward<decltype(args)>(args)...);
-                    },
-                    std::move(args));
-            };
-    }
+    void setTunnelValidatorFactory(TunnelValidatorFactoryFunc func);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -70,8 +52,7 @@ protected:
 private:
     const nx::utils::Url m_baseTunnelUrl;
     std::unique_ptr<detail::BaseTunnelClient> m_actualClient;
-    std::function<std::unique_ptr<AbstractTunnelValidator>(
-        std::unique_ptr<AbstractStreamSocket> /*tunnel*/)> m_validatorFactory;
+    TunnelValidatorFactoryFunc m_validatorFactory;
     OpenTunnelCompletionHandler m_completionHandler;
     OpenTunnelResult m_lastResult;
     std::unique_ptr<AbstractTunnelValidator> m_validator;

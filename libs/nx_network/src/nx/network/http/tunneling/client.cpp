@@ -16,6 +16,11 @@ Client::Client(
     m_actualClient->bindToAioThread(getAioThread());
 }
 
+void Client::setTunnelValidatorFactory(TunnelValidatorFactoryFunc func)
+{
+    m_validatorFactory = std::move(func);
+}
+
 void Client::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
