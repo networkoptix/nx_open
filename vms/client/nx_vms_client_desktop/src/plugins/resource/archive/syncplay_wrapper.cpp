@@ -527,7 +527,6 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 
             if (bufferingTime != (qint64)AV_NOPTS_VALUE)
                 d->bufferingTime = bufferingTime;
             break;
-            break;
         }
     }
 }

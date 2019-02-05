@@ -199,7 +199,6 @@ endif()
 #add_subdirectory(_dw_vca_controller)
 #add_subdirectory(_dw_mtt_controller)
 
-add_subdirectory(doc)
 add_subdirectory(vms)
 
 if(withTests)
@@ -222,6 +221,10 @@ if(withClouds)
         add_custom_target(cloud-frontend DEPENDS cloud_portal)
         add_dependencies(cloud cloud-frontend)
     endif()
+endif()
+
+if(withDocumentation)
+    add_subdirectory(doc)
 endif()
 
 nx_save_known_files()
