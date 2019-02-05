@@ -81,20 +81,18 @@ OutputRedirector::OutputRedirector()
             (wNameWithExt.substr(wNameWithExt.size() - exeExt.size()) == exeExt)
                 ? wNameWithExt.substr(0, wNameWithExt.size() - exeExt.size())
                 : wNameWithExt;
-        const std::string name = 
+        const std::string name =
             std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
         LocalFree(argv);
+        return name;
     #elif defined(__APPLE__)
-        const auto name = processName();
+        return processName();
     #else //< Assuming Linux-like OS.
         std::ifstream inputStream("/proc/self/cmdline");
         std::string path;
         std::getline(inputStream, path);
-        std::string path_s = path;//< Needed because basename() changes the string.
-        const std::string name = path_s.empty() ? "" : basename(&path_s[0]);
+        return path.empty() ? "" : basename(&path[0]);
     #endif
-
-    return name;
 }
 
 #if !defined(NX_OUTPUT_REDIRECTOR_DISABLED)
