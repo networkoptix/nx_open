@@ -81,7 +81,8 @@ QString filename(
 
 QString filename(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource,
-    const QString& postfix)
+    const QString& postfix,
+    bool useEngineId)
 {
     if (!NX_ASSERT(engineResource))
         return QString();
@@ -90,7 +91,12 @@ QString filename(
     if (!NX_ASSERT(!libName.isEmpty()))
         return QString();
 
-    return libName + "_engine" + postfix;
+    QString result = libName + "_engine";
+    if (useEngineId)
+        result += "_" + engineResource->getId().toSimpleString();
+
+    result += postfix;
+    return result;
 }
 
 QString buildFilename(const QString& libName, const QString& postfix)
@@ -120,6 +126,21 @@ QString debugFilesDirectoryPath(const QString& path)
     }
 
     return directory.absolutePath();
+}
+
+nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFileInternal(
+    const QString& settingsFilename)
+{
+    if (settingsFilename.isEmpty())
+        return nullptr;
+
+    if (!NX_ASSERT(pluginsIni().analyticsEngineSettingsPath[0]))
+        return nullptr;
+
+    const QDir dir(debugFilesDirectoryPath(pluginsIni().analyticsEngineSettingsPath));
+    return loadSettingsFromFile(
+        "Engine settings",
+        dir.absoluteFilePath(settingsFilename));
 }
 
 } // namespace
@@ -180,17 +201,30 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
 nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
-    const auto settingsFilename = filename(engine, kSettingsFilenamePostfix);
-    if (settingsFilename.isEmpty())
-        return nullptr;
+    nx::sdk::Ptr<nx::sdk::IStringMap> settings;
+    QString settingsFilename = filename(engine, kSettingsFilenamePostfix, /*useEngineId*/ true);
 
-    if (!NX_ASSERT(pluginsIni().analyticsEngineSettingsPath[0]))
-        return nullptr;
+    NX_DEBUG(
+        NX_SCOPE_TAG,
+        "Trying to load engine settings from an engine-specific (%1) file for the Engine %2",
+        settingsFilename,
+        engine);
 
-    const QDir dir(debugFilesDirectoryPath(pluginsIni().analyticsEngineSettingsPath));
-    return loadSettingsFromFile(
-        "Engine settings",
-        dir.absoluteFilePath(settingsFilename));
+    settings = loadEngineSettingsFromFileInternal(settingsFilename);
+    if (!settings)
+    {
+        settingsFilename = filename(engine, kSettingsFilenamePostfix, /*useEngineId*/ false);
+
+        NX_DEBUG(
+            NX_SCOPE_TAG,
+            "Trying to load engine settings from a generic file (%1) for the Engine %2",
+            settingsFilename,
+            engine);
+
+        settings = loadEngineSettingsFromFileInternal(settingsFilename);
+    }
+
+    return settings;
 }
 
 QString nameOfFileToDumpDataTo(
@@ -199,11 +233,11 @@ QString nameOfFileToDumpDataTo(
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
     const QString& postfix)
 {
-    if (device && engine)
+    if (device && engine) //< filename to dump something related to a DeviceAgent
         return filename(device, engine, postfix);
-    else if (engine)
-        return filename(engine, postfix);
-    else if (plugin)
+    else if (engine) //< filename to dump something related to an Engine
+        return filename(engine, postfix, /*useEngineId*/ true);
+    else if (plugin) //< filename to dump something related to a Plugin
         return buildFilename(pluginLibName(plugin), postfix);
 
     NX_ASSERT(false, "Incorrect parameters");
