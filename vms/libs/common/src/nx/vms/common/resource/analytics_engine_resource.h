@@ -27,6 +27,7 @@ public:
 
     virtual QVariantMap settingsValues() const;
     virtual void setSettingsValues(const QVariantMap& values);
+    virtual QString idForToStringFromPtr() const override;
 
     AnalyticsPluginResourcePtr plugin() const;
 

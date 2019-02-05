@@ -50,6 +50,11 @@ void AnalyticsEngineResource::setSettingsValues(const QVariantMap& values)
         QString::fromUtf8(QJsonDocument(QJsonObject::fromVariantMap(values)).toJson()));
 }
 
+QString AnalyticsEngineResource::idForToStringFromPtr() const
+{
+    return lm("[%1 %2]").args(getName(), getId());
+}
+
 AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
 {
     auto common = commonModule();
