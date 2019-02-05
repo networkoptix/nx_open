@@ -416,10 +416,12 @@ bool QnAviArchiveDelegate::open(
         QString url = m_resource->getUrl();
         if (m_storage == nullptr)
         {
-            m_storage = QnStorageResourcePtr(
-                resource->commonModule()->storagePluginFactory()->createStorage(
-                    resource->commonModule(),
-                    url));
+            const auto commonModule = resource->commonModule();
+            if (!commonModule)
+                return false;
+
+            m_storage = QnStorageResourcePtr(commonModule->storagePluginFactory()->createStorage(
+                resource->commonModule(), url));
 
             // Stepa: Dirty hack, but I don't know how to do it another way in current architecture.
             auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
