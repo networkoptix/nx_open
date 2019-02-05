@@ -2110,11 +2110,11 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
-	{
+    {
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 
         if (const auto archiveDelegate = d->display()->archiveReader()->getArchiveDelegate())
-		{
+        {
             const auto protocol = archiveDelegate->protocol();
             switch (protocol)
             {
@@ -2123,17 +2123,17 @@ QString QnMediaResourceWidget::calculateDetailsText() const
                     hqLqString += " (N)";
                     break;
 
-				case nx::network::cloud::Protocol::relay:
+                case nx::network::cloud::Protocol::relay:
                     // relayed connection (aka proxy).
                     hqLqString += " (P)";
                     break;
 
-				default:
+                default:
                     // Regular connection.
                     break;
             }
-		}
-	}
+        }
+    }
 
     static const int kDetailsTextPixelSize = 11;
 
