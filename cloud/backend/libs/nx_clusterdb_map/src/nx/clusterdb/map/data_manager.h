@@ -19,7 +19,7 @@ namespace nx::clusterdb::map {
 
 namespace dao { class KeyValueDao; }
 
-enum class ResultCode
+enum ResultCode
 {
     ok = 0,
     statementError,
