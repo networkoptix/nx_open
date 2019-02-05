@@ -60,7 +60,6 @@ target_compile_definitions(nx_kit
     INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
 
-
 set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
 if(nxKitWithTests)
     enable_testing()
