@@ -378,7 +378,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 Qn::CR_SecondaryLiveVideo, /*save*/ false);
         }
 
-        camera->setEnabledAnalyticsEngines(state.analytics.enabledEngines());
+        camera->setUserEnabledAnalyticsEngines(state.analytics.enabledEngines());
     }
 
     if (state.devicesDescription.isWearable == CombinedValue::All)

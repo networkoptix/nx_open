@@ -3726,19 +3726,6 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
-void HanwhaResource::setSupportedAnalyticsEventTypeIds(
-    QnUuid engineId, QSet<QString> supportedEvents)
-{
-    QSet<QString> externalEvents;
-    for (const auto& eventTypeId: supportedEvents)
-    {
-        if (eventTypeId != kHanwhaInputPortEventTypeId)
-            externalEvents.insert(eventTypeId);
-    }
-
-    base_type::setSupportedAnalyticsEventTypeIds(engineId, externalEvents);
-}
-
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(
     qint64 startTimeMs,
     qint64 endTimeMs,

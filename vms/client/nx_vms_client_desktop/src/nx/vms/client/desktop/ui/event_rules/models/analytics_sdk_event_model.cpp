@@ -85,7 +85,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                 const auto eventTypeDescriptor =
                     eventTypeDescriptorManager.descriptor(eventTypeId);
 
-                if (!eventTypeDescriptor)
+                if (!eventTypeDescriptor || eventTypeDescriptor->isHidden())
                     continue;
 
                 addItem(

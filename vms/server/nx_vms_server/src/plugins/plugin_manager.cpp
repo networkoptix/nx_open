@@ -10,10 +10,11 @@
 
 #include <nx/utils/log/log.h>
 
-#include <camera/camera_plugin.h>
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/i_engine.h>
+#include <plugins/plugin_api.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/i_plugin.h>
+#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/vms/server/plugins/utility_provider.h>
 
 #include "plugins_ini.h"
 
@@ -27,8 +28,9 @@ static QStringList stringToList(const QString& s)
     return list;
 }
 
-PluginManager::PluginManager(QObject* parent, nxpl::PluginInterface* pluginContainer):
-    QObject(parent), m_pluginContainer(pluginContainer)
+PluginManager::PluginManager(QObject* parent):
+    QObject(parent),
+    m_utilityProvider(new nx::vms::server::plugins::UtilityProvider())
 {
 }
 
@@ -36,9 +38,6 @@ PluginManager::~PluginManager()
 {
     for (auto& qtPlugin: m_qtPlugins)
         qtPlugin->unload();
-
-    for (auto& nxPlugin: m_nxPlugins)
-        nxPlugin->releaseRef();
 }
 
 /**
@@ -174,7 +173,7 @@ bool PluginManager::loadNxPlugin(
 {
     QLibrary lib(filename);
     // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
-    // named functions of server (the loading side). In Linux it is no so by default.
+    // named functions of the Server (the loading side). In Linux it is not so by default.
     QLibrary::LoadHints hints = lib.loadHints();
     hints |= QLibrary::DeepBindHint;
     lib.setLoadHints(hints);
@@ -185,53 +184,69 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    // TODO: Find a better solution. Needed to check that libName equals IPlugin::name().
-    bool isAnalyticsPlugin = false;
-
-    auto entryPoint = (nxpl::Plugin::EntryPoint) lib.resolve("createNXPluginInstance");
-    if (entryPoint == nullptr)
+    if (const auto entryPoint = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
+        lib.resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
-        entryPoint = (nxpl::Plugin::EntryPoint) lib.resolve("createNxAnalyticsPlugin");
-        if (entryPoint)
-            isAnalyticsPlugin = true;
-    }
-    if (entryPoint == nullptr)
-    {
-        NX_ERROR(this, "Failed to load Nx plugin [%1]: "
-            "Neither createNXPluginInstance() nor createNxAnalyticsPlugin() functions found",
-            filename);
-        lib.unload();
-        return false;
-    }
+        // Old entry point found: currently, this is a Storage or Camera plugin.
 
-    nxpl::PluginInterface* obj = entryPoint();
-    if (!obj)
-    {
-        NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null", filename);
-        lib.unload();
-        return false;
-    }
-
-    NX_WARNING(this, "Loaded Nx plugin [%1]", filename);
-    m_nxPlugins.push_back(obj);
-
-    if (const auto pluginObj = queryInterfacePtr<nxpl::Plugin>(obj, nxpl::IID_Plugin))
-    {
-        if (isAnalyticsPlugin && pluginObj->name() != libName)
+        const auto plugin = entryPoint();
+        if (!plugin)
         {
-            NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
-                pluginObj->name(), libName);
+            NX_ERROR(this, "Failed to load Nx old SDK plugin [%1]: entry function returned null",
+                filename);
+            lib.unload();
+            return false;
+        }
+        m_nxPlugins.emplace_back(reinterpret_cast<IRefCountable*>(plugin));
+        NX_WARNING(this, "Loaded Nx old SDK plugin [%1]", filename);
+
+        if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
+        {
+            // Pass Mediaserver settings (aka "roSettings") to the plugin.
+            if (!settingsHolder.isEmpty())
+                plugin1->setSettings(settingsHolder.array(), settingsHolder.size());
         }
 
-        // Pass Mediaserver settings (aka "roSettings") to the plugin.
-        if (!settingsHolder.isEmpty())
-            pluginObj->setSettings(settingsHolder.array(), settingsHolder.size());
+        if (const auto plugin2 = queryInterfacePtr<nxpl::Plugin2>(plugin, nxpl::IID_Plugin2))
+        {
+            plugin2->setPluginContainer(
+                reinterpret_cast<nxpl::PluginInterface*>(m_utilityProvider.get()));
+        }
     }
-
-    if (const auto plugin2Obj = queryInterfacePtr<nxpl::Plugin2>(obj, nxpl::IID_Plugin2))
+    else if (const auto entryPointFunc = reinterpret_cast<IPlugin::EntryPointFunc>(
+        lib.resolve(IPlugin::kEntryPointFuncName)))
     {
-        if (m_pluginContainer)
-            plugin2Obj->setPluginContainer(m_pluginContainer);
+        // New entry point found: currently, this is an Analytics plugin.
+
+        const auto plugin = toPtr(entryPointFunc());
+        if (!plugin)
+        {
+            NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null",
+                filename);
+            lib.unload();
+            return false;
+        }
+        m_nxPlugins.emplace_back(plugin);
+        NX_WARNING(this, "Loaded Nx plugin [%1]", filename);
+
+        if (queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
+        {
+            if (plugin->name() != libName)
+            {
+                NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
+                    plugin->name(), libName);
+            }
+        }
+
+        plugin->setUtilityProvider(m_utilityProvider.get());
+    }
+    else
+    {
+        NX_ERROR(this, "Failed to load Nx plugin [%1]: "
+            "Neither %2(), nor the old SDK's %3() functions found",
+            filename, IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName);
+        lib.unload();
+        return false;
     }
 
     emit pluginLoaded();

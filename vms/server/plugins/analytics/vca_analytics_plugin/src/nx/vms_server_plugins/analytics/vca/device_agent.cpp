@@ -203,21 +203,6 @@ DeviceAgent::~DeviceAgent()
     NX_PRINT << "VCA DeviceAgent destroyed.";
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<DeviceAgent*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 void DeviceAgent::treatMessage(int size)
 {
     std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');

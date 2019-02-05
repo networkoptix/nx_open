@@ -274,28 +274,27 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
 
-    QSet<QnUuid> enabledEngines;
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
-    for (const auto& camera: cameras)
-        enabledEngines += camera->enabledAnalyticsEngines();
+    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(q->commonModule());
+    const auto enabledEngines = deviceDescriptorManager.enabledEngineIds(cameras);
 
     if (!objectTypeDescriptors.empty())
     {
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
-            if (enabledEngines.contains(engineId))
+            if (enabledEngines.find(engineId) != enabledEngines.cend())
                 engineById[engineId].name = engineDescriptor.name;
         }
 
-        for (const auto&[eventTypeId, objectTypeDescriptor]: objectTypeDescriptors)
+        for (const auto&[objectTypeId, objectTypeDescriptor]: objectTypeDescriptors)
         {
             for (const auto& scope: objectTypeDescriptor.scopes)
             {
-                if (enabledEngines.contains(scope.engineId))
+                if (enabledEngines.find(scope.engineId) != enabledEngines.cend())
                 {
                     engineById[scope.engineId].objectTypes
-                        .emplace(eventTypeId, objectTypeDescriptor);
+                        .emplace(objectTypeId, objectTypeDescriptor);
                 }
             }
         }
@@ -322,7 +321,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
                 currentMenu = m_objectTypeMenu->addMenu(engineName);
             }
 
-            for (const auto& [eventTypeId, objectTypeDescriptor]: engine.objectTypes)
+            for (const auto& [objectTypeId, objectTypeDescriptor]: engine.objectTypes)
             {
                 addMenuAction(currentMenu,
                     objectTypeDescriptor.name,

@@ -1,11 +1,8 @@
 #include "engine.h"
 
-#include <array>
-#include <fstream>
 #include <string>
 
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 
@@ -18,6 +15,7 @@
 #include "device_agent.h"
 
 namespace nx::vms_server_plugins::analytics::axis {
+
 namespace {
 
 const QString kAxisVendor("axis");
@@ -44,21 +42,6 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         }
     }
     m_parsedManifest = QJson::deserialized<EngineManifest>(m_jsonManifest);
-}
-
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
 void Engine::setSettings(const IStringMap* /*settings*/)
@@ -149,6 +132,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 namespace {
 
 static const std::string kLibName = "axis_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 {
     "id": "nx.axis",
@@ -161,7 +145,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

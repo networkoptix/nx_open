@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/sdk/interface.h>
+
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/i_metadata.h>
@@ -9,18 +11,13 @@ namespace sdk {
 namespace analytics {
 
 /**
- * Each class that implements IObjectMetadata interface should properly handle this GUID in its
- * queryInterface().
- */
-static const nxpl::NX_GUID IID_ObjectMetadata =
-    {{0x0f,0xf4,0xa4,0x6f,0xfd,0x08,0x4f,0x4a,0x97,0x88,0x16,0xa0,0x8c,0xd6,0x4a,0x29}};
-
-/**
  * A single object detected on the scene.
  */
-class IObjectMetadata: public IMetadata
+class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 {
 public:
+    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadata"); }
+
     /**
      * Bounding box of an object detected in a video frame.
      */

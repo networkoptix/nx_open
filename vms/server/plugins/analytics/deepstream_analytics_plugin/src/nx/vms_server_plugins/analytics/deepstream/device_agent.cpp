@@ -38,28 +38,6 @@ DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine
     m_pipeline->start();
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<IDeviceAgent*>(this);
-    }
-
-    if (interfaceId == IID_ConsumingDeviceAgent)
-    {
-        addRef();
-        return static_cast<IConsumingDeviceAgent*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 void DeviceAgent::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received  settings:";
@@ -100,7 +78,7 @@ Error DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
-    if (!queryInterfacePtr<ICompressedVideoPacket>(dataPacket, IID_CompressedVideoPacket))
+    if (!queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
         return Error::noError;
 
     NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();

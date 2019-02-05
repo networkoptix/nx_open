@@ -2,7 +2,7 @@
 
 #include <QtCore/QByteArray>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
@@ -15,14 +15,12 @@ namespace analytics {
 namespace dw_mtt {
 
 /** Plugin for work with DWMTT-camera. */
-class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
+class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
 
     virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 

@@ -10,17 +10,6 @@ PluginEvent::PluginEvent(Level level, std::string caption, std::string descripti
 {
 }
 
-void* PluginEvent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == nxpl::IID_PluginInterface)
-        return this;
-
-    if (interfaceId == nx::sdk::IID_PluginEvent)
-        return this;
-
-    return nullptr;
-}
-
 IPluginEvent::Level PluginEvent::level() const
 {
     return m_level;

@@ -28,8 +28,6 @@ file(GLOB_RECURSE copied_nx_kit_files ${copied_nx_kit_origin}/*)
 set(copied_nx_sdk_src_dir ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src)
 set(copied_nx_sdk_src_nx_origin ${copied_nx_sdk_src_dir}/nx)
 file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
-set(copied_nx_sdk_old_header_origin ${copied_nx_sdk_src_dir}/plugins)
-file(GLOB_RECURSE copied_nx_sdk_old_header_files ${copied_nx_sdk_old_header_origin}/*)
 
 # Collect source files for the sample - Stub Analytics Plugin.
 set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin)
@@ -96,7 +94,6 @@ add_custom_command(OUTPUT ${zip_file}
         ${copied_static_files}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_files}
-        ${copied_nx_sdk_old_header_files}
         ${copied_sample_files}
         ${copied_sample_ut_files}
 )
