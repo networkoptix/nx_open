@@ -1309,10 +1309,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
-    QString user;
-    QString password;
-
-    std::tie(user, password) = getRequestCredentials(server);
+    const auto [user, password] =  getRequestCredentials(server);
 
     auto videoWallGuid = commonModule()->videowallGuid();
     if (!videoWallGuid.isNull())
