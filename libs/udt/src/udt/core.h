@@ -490,7 +490,7 @@ private: // synchronization: mutexes and conditions
     pthread_mutex_t m_RecvDataLock;              // lock associated to m_RecvDataCond
 
     pthread_mutex_t m_SendLock;                  // used to synchronize "send" call
-    pthread_mutex_t m_RecvLock;                  // used to synchronize "recv" call
+    std::mutex m_RecvLock;                  // used to synchronize "recv" call
 
     void initSynch();
     void destroySynch();
