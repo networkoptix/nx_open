@@ -1,5 +1,7 @@
 #include "simple_motion_search_list_model.h"
 
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
 #include <camera/loaders/caching_camera_data_loader.h>
