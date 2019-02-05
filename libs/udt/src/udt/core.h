@@ -108,6 +108,7 @@ public: //API
     static int listen(UDTSOCKET u, int backlog);
     static UDTSOCKET accept(UDTSOCKET u, sockaddr* addr, int* addrlen);
     static int connect(UDTSOCKET u, const sockaddr* name, int namelen);
+    static int shutdown(UDTSOCKET u, int how);
     static int close(UDTSOCKET u);
     static int getpeername(UDTSOCKET u, sockaddr* name, int* namelen);
     static int getsockname(UDTSOCKET u, sockaddr* name, int* namelen);
@@ -145,7 +146,7 @@ public: // internal API
     bool connected() const { return m_bConnected; }
     bool listening() const { return m_bListening; }
     bool shutdown() const { return m_bShutdown; }
-    
+
     int decrementBrokenCounter() { return m_iBrokenCounter--; }
 
     void setIsClosing(bool val);
@@ -155,7 +156,6 @@ public: // internal API
     bool broken() const;
 
     CSNode* sNode() { return m_pSNode; }
-    CRNode* rNode() { return m_pRNode; }
 
     int payloadSize() const { return m_iPayloadSize; }
 
@@ -188,7 +188,7 @@ public: // internal API
     CRcvQueue& rcvQueue();
 
     void setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer);
-    
+
     CSndBuffer* sndBuffer() { return m_pSndBuffer; }
     CRcvBuffer* rcvBuffer() { return m_pRcvBuffer; }
 
@@ -259,6 +259,8 @@ public: // internal API
     //    None.
 
     void connect(const sockaddr* peer, CHandShake* hs);
+
+    int shutdown(int how);
 
     // Functionality:
     //    Close the opened UDT entity.
@@ -488,7 +490,7 @@ private: // synchronization: mutexes and conditions
     pthread_mutex_t m_RecvDataLock;              // lock associated to m_RecvDataCond
 
     pthread_mutex_t m_SendLock;                  // used to synchronize "send" call
-    pthread_mutex_t m_RecvLock;                  // used to synchronize "recv" call
+    std::mutex m_RecvLock;                  // used to synchronize "recv" call
 
     void initSynch();
     void destroySynch();
@@ -544,7 +546,6 @@ private: // for UDP multiplexer
     sockaddr* m_pPeerAddr = nullptr;    // peer address
     uint32_t m_piSelfIP[4];             // local UDP IP address
     CSNode* m_pSNode = nullptr;         // node information for UDT list used in snd queue
-    CRNode* m_pRNode = nullptr;         // node information for UDT list used in rcv queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll

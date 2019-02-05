@@ -1,6 +1,7 @@
 #include "login_session.h"
 
 #include <nx/network/url/url_builder.h>
+#include <nx/network/http/http_types.h>
 
 QnLoginSession::QnLoginSession():
     id(QnUuid::createUuid().toString())
@@ -25,7 +26,7 @@ QnLoginSession QnLoginSession::fromVariant(const QVariantMap& variant)
     session.id = QnUuid::fromStringSafe(variant[lit("sessionId")].toString());
     session.systemName = variant[lit("systemName")].toString();
     session.url = nx::network::url::Builder()
-        .setScheme(lit("http"))
+        .setScheme(nx::network::http::kSecureUrlSchemeName)
         .setHost(variant[lit("address")].toString())
         .setPort(variant.value(lit("port"), -1).toInt())
         .setUserName(variant[lit("user")].toString())

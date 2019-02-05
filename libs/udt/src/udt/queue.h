@@ -230,13 +230,12 @@ private:
 
 struct CRNode
 {
+    UDTSOCKET socketId = -1;
     std::weak_ptr<CUDT> socket;
     uint64_t timestamp = 0;
 
     CRNode* prev = nullptr;
     CRNode* next = nullptr;
-
-    bool onList = false;    // if the node is already on the list
 };
 
 class CRcvUList
@@ -258,27 +257,25 @@ public:
 
     // Functionality:
     //    Remove the UDT instance from the list.
-    // Parameters:
-    //    1) [in] u: pointer to the UDT instance
     // Returned value:
     //    None.
 
-    void remove(std::shared_ptr<CUDT> u);
+    void remove(CRNode* node);
 
     // Functionality:
     //    Move the UDT instance to the end of the list, if it already exists; otherwise, do nothing.
-    // Parameters:
-    //    1) [in] u: pointer to the UDT instance
     // Returned value:
     //    None.
 
-    void update(std::shared_ptr<CUDT> u);
+    void update(UDTSOCKET socketId);
 
 public:
+    // TODO: #ak Replace this double-linked list implementation with std container.
     CRNode* m_nodeListHead = nullptr;        // the head node
 
 private:
     CRNode* m_nodeListTail = nullptr;        // the last node
+    std::map<UDTSOCKET, CRNode*> m_socketIdToNode;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -311,9 +308,9 @@ public:
         int ipVersion,
         const sockaddr* addr,
         uint64_t ttl);
-    
+
     void remove(const UDTSOCKET& id);
-    
+
     std::shared_ptr<CUDT> getByAddr(
         const sockaddr* addr,
         UDTSOCKET& id) const;
@@ -425,7 +422,7 @@ public:
         int ipVersion,
         const sockaddr* addr,
         uint64_t ttl);
-    
+
     void removeConnector(const UDTSOCKET& id);
 
     void addNewEntry(const std::weak_ptr<CUDT>& u);
@@ -463,7 +460,7 @@ private:
 private:
     std::mutex m_LSLock;
     // pointer to the (unique, if any) listening UDT entity
-    std::weak_ptr<ServerSideConnectionAcceptor> m_listener;   
+    std::weak_ptr<ServerSideConnectionAcceptor> m_listener;
     // The list of sockets in rendezvous mode
     std::unique_ptr<CRendezvousQueue> m_pRendezvousQueue;
 
