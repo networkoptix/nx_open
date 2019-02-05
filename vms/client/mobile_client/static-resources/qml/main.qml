@@ -16,7 +16,7 @@ ApplicationWindow
 
     readonly property bool hasNavigationBar: getNavigationBarHeight()
 
-    // QtBug-??? workaround. For some reason at the new devices with iOS 12+
+    // Qt bug workaround. For some reason on the new devices with iOS 12+
     // Qt.inputMethod.visible hangs with wrong value. It is "true" even if
     // keyboard is hidden. But Qt.inputMethod.anchorRectangle always has corret value
     // and is presented if keyboard is visible (otherwise it is empty).

@@ -110,11 +110,10 @@ public:
                 transaction.get(),
                 transactionHash))
         {
-            NX_DEBUG(
-                QnLog::EC2_TRAN_LOG.join(this),
-                lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
-                    .arg(systemId).arg(CommandDescriptor::name).arg(transaction.get())
-                    .arg(CommandDescriptor::hash(transaction.get().params)));
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+                lm("systemId %1. Command (%2, hash %3) is skipped")
+                    .args(systemId, engine::toString(transaction.header()),
+                        CommandDescriptor::hash(transaction.get().params)));
 
             // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
             return nx::sql::DBResult::cancelled;

@@ -628,7 +628,7 @@ protected:
     void thenRequestHasBeenRedirectedToProperEndpoint()
     {
         ASSERT_EQ(
-            network::http::StatusCode::found,
+            network::http::StatusCode::temporaryRedirect,
             m_httpClient.response()->statusLine.statusCode);
 
         const auto expectedLocationUrl = network::url::Builder()

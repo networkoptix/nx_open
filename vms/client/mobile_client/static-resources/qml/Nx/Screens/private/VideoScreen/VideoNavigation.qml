@@ -548,22 +548,22 @@ Item
                 visible: opacity > 0
                 opacity: 0
 
-                property bool invisible:
+                property bool shouldBeVisible:
                 {
                     var currentTime = (new Date()).getTime()
                     var futurePosition = position > currentTime
                     var canViewArchive = videoNavigation.canViewArchive
-                    return (d.liveMode || futurePosition) && canViewArchive
-                        || videoScreenController.resourceHelper.isWearableCamera;
+                    return canViewArchive && !d.liveMode && !futurePosition
+                        && !videoScreenController.resourceHelper.isWearableCamera
                 }
 
                 readonly property real position: videoScreenController.mediaPlayer.position
                 onPositionChanged: updateOpacity()
-                onInvisibleChanged: updateOpacity()
+                onShouldBeVisibleChanged: updateOpacity()
 
                 function updateOpacity()
                 {
-                    opacity = invisible ? 0 : 1
+                    opacity = shouldBeVisible ? 1 : 0
                 }
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }

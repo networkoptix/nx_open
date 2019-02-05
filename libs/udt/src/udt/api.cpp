@@ -709,6 +709,16 @@ void CUDTUnited::connect_complete(const UDTSOCKET u)
     s->m_Status = CONNECTED;
 }
 
+int CUDTUnited::shutdown(const UDTSOCKET u, int how)
+{
+    std::shared_ptr<CUDTSocket> s = locate(u);
+
+    if (nullptr == s)
+        throw CUDTException(5, 4, 0);
+
+    return s->m_pUDT->shutdown(how);
+}
+
 int CUDTUnited::close(const UDTSOCKET u)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
@@ -1161,11 +1171,8 @@ void CUDTUnited::checkBrokenSockets()
         }
 
         // timeout 1 second to destroy a socket AND it has been removed from RcvUList
-        if ((CTimer::getTime() - j->second->m_TimeStamp > 1000000) &&
-            ((nullptr == j->second->m_pUDT->rNode()) || !j->second->m_pUDT->rNode()->onList))
-        {
+        if (CTimer::getTime() - j->second->m_TimeStamp > 1000000)
             tbr.push_back(j->first);
-        }
     }
 
     // move closed sockets to the ClosedSockets structure
@@ -1599,6 +1606,24 @@ int CUDT::connect(UDTSOCKET u, const sockaddr* name, int namelen)
     catch (bad_alloc&)
     {
         s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        return ERROR;
+    }
+    catch (...)
+    {
+        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        return ERROR;
+    }
+}
+
+int CUDT::shutdown(UDTSOCKET u, int how)
+{
+    try
+    {
+        return s_UDTUnited->shutdown(u, how);
+    }
+    catch (CUDTException e)
+    {
+        s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
     }
     catch (...)
@@ -2144,6 +2169,11 @@ UDTSOCKET accept(UDTSOCKET u, struct sockaddr* addr, int* addrlen)
 int connect(UDTSOCKET u, const struct sockaddr* name, int namelen)
 {
     return CUDT::connect(u, name, namelen);
+}
+
+int shutdown(UDTSOCKET u, int how)
+{
+    return CUDT::shutdown(u, how);
 }
 
 int close(UDTSOCKET u)

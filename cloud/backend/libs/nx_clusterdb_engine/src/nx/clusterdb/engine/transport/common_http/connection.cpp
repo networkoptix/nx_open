@@ -60,6 +60,8 @@ CommonHttpConnection::CommonHttpConnection(
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
+    m_baseTransactionTransport->setReceivedTransactionsQueueControlEnabled(false);
+
     bindToAioThread(m_baseTransactionTransport->getAioThread());
     m_baseTransactionTransport->setState(
         ::ec2::QnTransactionTransportBase::ReadyForStreaming);
@@ -226,6 +228,12 @@ void CommonHttpConnection::forwardTransactionToProcessor(
     VmsTransportHeader transportHeader)
 {
     NX_CRITICAL(isInSelfAioThread());
+
+    // NOTE: Transport sequence MUST be valid for compatibility with VMS <= 3.2.
+    // Although, it is not used by this implementation.
+    if (m_prevReceivedTransportSequence)
+        NX_ASSERT(transportHeader.sequence > *m_prevReceivedTransportSequence);
+    m_prevReceivedTransportSequence = transportHeader.sequence;
 
     if (!m_gotTransactionEventHandler)
         return;

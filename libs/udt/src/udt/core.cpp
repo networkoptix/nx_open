@@ -231,7 +231,6 @@ CUDT::~CUDT()
     delete m_pCC;
     delete m_pPeerAddr;
     delete m_pSNode;
-    delete m_pRNode;
 }
 
 CSndQueue& CUDT::sndQueue()
@@ -268,7 +267,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
     CGuard sendguard(m_SendLock);
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     switch (optName)
     {
@@ -587,11 +586,6 @@ void CUDT::open()
     m_pSNode->timestamp = 1;
     m_pSNode->locationOnHeap = -1;
 
-    if (!m_pRNode)
-        m_pRNode = new CRNode();
-    m_pRNode->socket = shared_from_this();
-    m_pRNode->timestamp = 1;
-
     m_iRTT = 10 * m_iSYNInterval;
     m_iRTTVar = m_iRTT >> 1;
     m_ullCPUFrequency = CTimer::getCPUFrequency();
@@ -887,7 +881,6 @@ POST_CONNECT:
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     // acknowledge the management module.
@@ -987,7 +980,6 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     //send the response to the peer, see listen() for more discussions about this
@@ -999,6 +991,24 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     response.m_iID = m_PeerID;
     sndQueue().sendto(peer, response);
     delete[] buffer;
+}
+
+int CUDT::shutdown(int /*how*/)
+{
+    m_bBroken = true;
+
+    // signal a waiting "recv" call if there is any data available
+#ifndef _WIN32
+    pthread_mutex_lock(&m_RecvDataLock);
+    if (m_bSynRecving)
+        pthread_cond_signal(&m_RecvDataCond);
+    pthread_mutex_unlock(&m_RecvDataLock);
+#else
+    if (m_bSynRecving)
+        SetEvent(m_RecvDataCond);
+#endif
+
+    return 0;
 }
 
 void CUDT::close()
@@ -1090,7 +1100,7 @@ void CUDT::close()
 
     // waiting all send and recv calls to stop
     CGuard sendguard(m_SendLock);
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     // CLOSED.
     m_bOpened = false;
@@ -1214,7 +1224,7 @@ int CUDT::recv(char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     if (0 == m_pRcvBuffer->getRcvDataSize())
     {
@@ -1392,7 +1402,7 @@ int CUDT::recvmsg(char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     if (m_bBroken || isClosing())
     {
@@ -1580,7 +1590,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
     if (size <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     int64_t torecv = size;
     int unitsize = block;
@@ -1728,7 +1738,6 @@ void CUDT::initSynch()
     pthread_mutex_init(&m_RecvDataLock, NULL);
     pthread_cond_init_monotonic(&m_RecvDataCond);
     pthread_mutex_init(&m_SendLock, NULL);
-    pthread_mutex_init(&m_RecvLock, NULL);
     pthread_mutex_init(&m_AckLock, NULL);
 #else
     m_SendBlockLock = CreateMutex(NULL, false, NULL);
@@ -1736,7 +1745,6 @@ void CUDT::initSynch()
     m_RecvDataLock = CreateMutex(NULL, false, NULL);
     m_RecvDataCond = CreateEvent(NULL, false, false, NULL);
     m_SendLock = CreateMutex(NULL, false, NULL);
-    m_RecvLock = CreateMutex(NULL, false, NULL);
     m_AckLock = CreateMutex(NULL, false, NULL);
 #endif
 }
@@ -1749,7 +1757,6 @@ void CUDT::destroySynch()
     pthread_mutex_destroy(&m_RecvDataLock);
     pthread_cond_destroy(&m_RecvDataCond);
     pthread_mutex_destroy(&m_SendLock);
-    pthread_mutex_destroy(&m_RecvLock);
     pthread_mutex_destroy(&m_AckLock);
 #else
     CloseHandle(m_SendBlockLock);
@@ -1757,7 +1764,6 @@ void CUDT::destroySynch()
     CloseHandle(m_RecvDataLock);
     CloseHandle(m_RecvDataCond);
     CloseHandle(m_SendLock);
-    CloseHandle(m_RecvLock);
     CloseHandle(m_AckLock);
 #endif
 }
@@ -1776,17 +1782,15 @@ void CUDT::releaseSynch()
     pthread_mutex_lock(&m_RecvDataLock);
     pthread_cond_signal(&m_RecvDataCond);
     pthread_mutex_unlock(&m_RecvDataLock);
-
-    pthread_mutex_lock(&m_RecvLock);
-    pthread_mutex_unlock(&m_RecvLock);
 #else
     SetEvent(m_SendBlockCond);
     WaitForSingleObject(m_SendLock, INFINITE);
     ReleaseMutex(m_SendLock);
     SetEvent(m_RecvDataCond);
-    WaitForSingleObject(m_RecvLock, INFINITE);
-    ReleaseMutex(m_RecvLock);
 #endif
+
+    m_RecvLock.lock();
+    m_RecvLock.unlock();
 }
 
 void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int size)
