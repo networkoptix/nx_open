@@ -272,7 +272,7 @@ bool VivotekResource::setVivotekParameter(
 }
 
 nx::vms::server::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
+    MotionStreamType streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
     using namespace nx::vms::server::resource;

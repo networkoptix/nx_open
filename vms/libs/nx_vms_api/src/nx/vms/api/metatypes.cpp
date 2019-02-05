@@ -49,10 +49,9 @@
 #include "data/analytics_data.h"
 
 #include "types/access_rights_types.h"
+#include "types/motion_types.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 void Metatypes::initialize()
 {
@@ -110,6 +109,8 @@ void Metatypes::initialize()
     qRegisterMetaType<MiscDataList>();
     qRegisterMetaType<ModuleInformation>();
     qRegisterMetaType<ModuleInformationWithAddresses>();
+    qRegisterMetaType<MotionType>();
+    qRegisterMetaType<MotionStreamType>();
     qRegisterMetaType<QList<ModuleInformation>>();
     qRegisterMetaType<QList<ModuleInformationWithAddresses>>();
     qRegisterMetaType<P2pStatisticsData>();
@@ -152,6 +153,4 @@ void Metatypes::initialize()
     qRegisterMetaType<WebPageData>();
 };
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api

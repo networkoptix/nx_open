@@ -806,13 +806,6 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);
@@ -914,9 +907,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
 void HanwhaResource::initMediaStreamCapabilities()
 {
-    m_capabilities.streamCapabilities[Qn::StreamIndex::primary] =
+    m_capabilities.streamCapabilities[MotionStreamType::primary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
-    m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
+    m_capabilities.streamCapabilities[MotionStreamType::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
         ResourcePropertyKey::kMediaCapabilities,
@@ -2517,14 +2510,12 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
         .streamCapabilities
-        .value(role == Qn::ConnectionRole::CR_LiveVideo
-            ? Qn::StreamIndex::primary
-            : Qn::StreamIndex::secondary);
+        .value(toStreamIndex(role));
 
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }

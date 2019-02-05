@@ -20,7 +20,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionTypes,
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MotionStreamType, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionStreamType,
-    (nx::vms::api::MotionStreamType::automatic, "auto")
+    (nx::vms::api::MotionStreamType::undefined, "")
     (nx::vms::api::MotionStreamType::primary, "primary")
     (nx::vms::api::MotionStreamType::secondary, "secondary")
-    (nx::vms::api::MotionStreamType::edge, "edge"))
+    )
