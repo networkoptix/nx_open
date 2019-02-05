@@ -376,6 +376,13 @@ bool UdtSocket<InterfaceToImplement>::setIpv6Only(bool /*val*/)
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::udt;
+    return true;
+}
+
+template<typename InterfaceToImplement>
 AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 {
     NX_ASSERT(!isClosed());

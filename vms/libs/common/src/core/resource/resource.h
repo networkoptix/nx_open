@@ -60,6 +60,12 @@ public:
     virtual Qn::ResourceStatus getStatus() const;
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
 
+    bool isOnline() const { return isOnline(getStatus()); }
+    static bool isOnline(Qn::ResourceStatus status)
+    {
+        return status == Qn::Online || status == Qn::Recording;
+    }
+
     //!this function is called if resource changes state from offline to online or so
     /*!
         \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false

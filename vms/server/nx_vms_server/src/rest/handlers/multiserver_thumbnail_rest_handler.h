@@ -9,19 +9,19 @@
 
 class QnCommonModule;
 
-class QnMultiserverThumbnailRestHandler: 
+class QnMultiserverThumbnailRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnMultiserverThumbnailRestHandler(
         QnMediaServerModule* serverModule,
         const QString& path = QString());
     virtual int executeGet(
-        const QString& path, 
-        const QnRequestParamList& params, 
-        QByteArray& result, 
-        QByteArray& contentType, 
+        const QString& path,
+        const QnRequestParamList& params,
+        QByteArray& result,
+        QByteArray& contentType,
         const QnRestConnectionProcessor *processor) override;
 
     // todo: remove ownerPort from params

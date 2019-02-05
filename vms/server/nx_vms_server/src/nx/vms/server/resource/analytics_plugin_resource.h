@@ -12,7 +12,7 @@ namespace nx::vms::server::resource {
 
 class AnalyticsPluginResource:
     public nx::vms::common::AnalyticsPluginResource,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using base_type = nx::vms::common::AnalyticsPluginResource;
 

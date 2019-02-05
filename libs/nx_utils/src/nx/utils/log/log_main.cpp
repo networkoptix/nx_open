@@ -57,18 +57,19 @@ public:
     std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const
     {
         QnMutexLocker lock(&m_mutex);
+        if (exactMatch)
+        {
+            const Filter filter(tag);
+            auto it = m_loggersByFilters.find(filter);
+            return it == m_loggersByFilters.cend()
+                ? m_mainLogger
+                : it->second;
+        }
+		
         for (auto& it: m_loggersByFilters)
         {
-            if (exactMatch)
-            {
-                if (it.first.toString() == tag.toString())
-                    return it.second;
-            }
-            else
-            {
-                if (it.first.accepts(tag))
-                    return it.second;
-            }
+            if (it.first.accepts(tag))
+                return it.second;
         }
 
         return m_mainLogger;

@@ -10,7 +10,7 @@
 
 class QnUserRolesManager:
     public QObject,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;

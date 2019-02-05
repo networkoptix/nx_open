@@ -257,18 +257,22 @@ void QnModbusClient::disconnect()
 }
 
 ModbusResponse QnModbusClient::writeSingleHoldingRegister(
-    quint16 registerAddress,
-    const QByteArray& data,
+    quint16 /*registerAddress*/,
+    const QByteArray& /*data*/,
     bool* outStatus)
 {
-    ModbusResponse response;
+    NX_ASSERT(false, "ModbusClient::writeSingleHoldingRegister not implemented");
 
-    Q_ASSERT_X(false, "ModbusClient::writeSingleHoldingRegister", "Not implemented");
-
-    return response;
+    *outStatus = false;
+    return {};
 }
 
-ModbusResponse QnModbusClient::readDiscreteInputs(quint16 startAddress, quint16 inputCount, bool* outStatus)
+QString QnModbusClient::idForToStringFromPtr() const
+{
+    return m_endpoint.toString();
+}
+
+ModbusResponse QnModbusClient::readDiscreteInputs(quint16 /*startAddress*/, quint16 /*inputCount*/, bool* outStatus)
 {
     NX_ASSERT(false, "QnModbusClient::readDiscreteInputs not implemented.");
 
@@ -296,7 +300,7 @@ ModbusResponse QnModbusClient::readCoils(
     return doModbusRequest(request, outStatus);
 }
 
-ModbusResponse QnModbusClient::writeCoils(quint16 startCoilAddress, const QByteArray& data, bool *outStatus)
+ModbusResponse QnModbusClient::writeCoils(quint16 /*startCoilAddress*/, const QByteArray& /*data*/, bool *outStatus)
 {
     NX_ASSERT(false, "QnModbusClient::writeCoils not implemented.");
 
@@ -304,7 +308,7 @@ ModbusResponse QnModbusClient::writeCoils(quint16 startCoilAddress, const QByteA
     return ModbusResponse();
 }
 
-ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus)
+ModbusResponse QnModbusClient::readInputRegisters(quint16 /*startRegister*/, quint16 /*registerCount*/, bool* outStatus)
 {
     NX_ASSERT(false, "QnModbusClient::readInputRegisters not implemented.");
 

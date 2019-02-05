@@ -54,6 +54,7 @@ struct ResourceThumbnailProvider::Private
         else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
             nx::api::CameraImageRequest cameraRequest(camera, request);
+            cameraRequest.streamSelectionMode = streamSelectionMode;
             baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
         }
         else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
@@ -92,6 +93,7 @@ struct ResourceThumbnailProvider::Private
 
     QScopedPointer<ImageProvider> baseProvider;
     nx::api::ResourceImageRequest request;
+    nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode;
 };
 
 ResourceThumbnailProvider::ResourceThumbnailProvider(
@@ -139,6 +141,24 @@ void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageReque
         emit sizeHintChanged(sizeHint());
         emit statusChanged(status());
     }
+}
+
+nx::api::CameraImageRequest::StreamSelectionMode
+    ResourceThumbnailProvider::streamSelectionMode() const
+{
+    return d->streamSelectionMode;
+}
+
+void ResourceThumbnailProvider::setStreamSelectionMode(
+    nx::api::CameraImageRequest::StreamSelectionMode value) const
+{
+    if (d->streamSelectionMode == value)
+        return;
+
+    d->streamSelectionMode = value;
+
+    if (d->request.resource.dynamicCast<QnVirtualCameraResource>())
+        d->updateRequest(d->request);
 }
 
 QImage ResourceThumbnailProvider::image() const

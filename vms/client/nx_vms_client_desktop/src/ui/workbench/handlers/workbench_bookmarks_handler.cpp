@@ -218,7 +218,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         return;
 
     bookmark.creatorId = context()->user()->getId();
-    bookmark.creationTime() = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
     dialog->submitData(bookmark);
     NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())

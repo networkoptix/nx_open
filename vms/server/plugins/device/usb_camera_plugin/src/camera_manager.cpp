@@ -5,6 +5,7 @@
 
 #include <nx/utils/url.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/app_info.h>
 
 #include "discovery_manager.h"
 #include "native_media_encoder.h"
@@ -26,7 +27,7 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
             nxcip::BaseCameraManager::cameraTimeCapability)
 {
     m_pluginRef->addRef();
-    if (m_camera->hasAudio())
+    if (!nx::utils::AppInfo::isRaspberryPi() && m_camera->hasAudio())
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
 }
 

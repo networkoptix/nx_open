@@ -40,8 +40,6 @@ set(ios.group_identifier "group.com.xccelo.xstreammobile")
 set(ios.sign.identity "iPhone Distribution: Xccelo GmbH (23H86XY72Z)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.xccelo.xstream2")
 set(mac.protocol_handler_bundle.identifier "com.xccelo.protocol_handler")
 

@@ -18,7 +18,7 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    StreamFpsSharingMethod TimePeriodContent SystemComponent
+    StreamFpsSharingMethod TimePeriodContent
     ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
@@ -354,12 +354,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TimePeriodContentCount
     };
 
-    enum SystemComponent {
-        ServerComponent,
-        ClientComponent,
-        AnyComponent
-    };
-
 using StreamQuality = nx::vms::api::StreamQuality;
 
     enum class BitrateControl {
@@ -480,6 +474,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
+    QString toErrorMessage(AuthResult value);
 
     using FailoverPriority = nx::vms::api::FailoverPriority;
 

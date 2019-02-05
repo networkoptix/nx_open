@@ -40,8 +40,6 @@ set(ios.group_identifier "group.com.telstrabusinessandenterprise")
 set(ios.sign.identity "iPhone Distribution: Telstra Software Group PTY LTD (P82Y83AYW9)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.telstra.telstra2")
 set(mac.protocol_handler_bundle.identifier "com.telstra.protocol_handler")
 

@@ -27,7 +27,7 @@ QSize updateDstSize(const QnVirtualCameraResource* camera,
     const CLVideoDecoderOutput& outFrame,
     nx::api::ImageRequest::AspectRatio aspectRatio);
 
-class QnGetImageHelper: public nx::vms::server::ServerModuleAware
+class QnGetImageHelper: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnGetImageHelper(QnMediaServerModule* serverModule);

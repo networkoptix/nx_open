@@ -37,14 +37,19 @@ QString toString(ConnectionBase::State value)
 {
     switch (value)
     {
+    case ConnectionBase::State::NotDefined:
+        return "NotDefined";
     case ConnectionBase::State::Connecting:
-        return lm("Connecting");
+        return "Connecting";
     case ConnectionBase::State::Connected:
-        return lm("Connected");
+        return "Connected";
     case ConnectionBase::State::Error:
-        return lm("Error");
+        return "Error";
+    case ConnectionBase::State::Unauthorized:
+        return "Unauthorized";
     default:
-        return lm("Unknown");
+        NX_ASSERT(false, "Unknown enum value");
+        return "Unknown";
     }
 }
 
@@ -182,6 +187,11 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
         .arg(toString(state()))
         .arg(reason));
     setState(newState);
+}
+
+QString ConnectionBase::idForToStringFromPtr() const
+{
+    return remotePeer().id.toString();
 }
 
 void ConnectionBase::onHttpClientDone()
@@ -354,6 +364,7 @@ void ConnectionBase::startConnection()
 
 void ConnectionBase::startReading()
 {
+    NX_VERBOSE(this, "Connection Starting reading, state [%1]", state());
     using namespace std::placeholders;
     m_p2pTransport->readSomeAsync(
         &m_readBuffer,
@@ -367,11 +378,15 @@ ConnectionBase::State ConnectionBase::state() const
 
 void ConnectionBase::setState(State state)
 {
-    if (state != m_state)
-    {
-        m_state = state;
-        emit stateChanged(weakPointer(), state);
-    }
+    if (!NX_ASSERT(state != m_state))
+        return;
+
+    NX_ASSERT(m_state != State::Error, "State 'Error' is final and should not be changed");
+    NX_VERBOSE(this,
+        "Connection State change: [%1] -> [%2]",
+        toString(m_state), toString(state));
+    m_state = state;
+    emit stateChanged(weakPointer(), state);
 }
 
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)

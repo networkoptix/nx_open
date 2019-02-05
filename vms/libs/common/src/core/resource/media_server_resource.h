@@ -25,7 +25,7 @@ class AsyncHttpClientPtr;
 
 class QnMediaServerResource:
     public QnResource,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

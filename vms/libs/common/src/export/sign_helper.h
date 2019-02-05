@@ -18,7 +18,7 @@ static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::
 class SPSUnit;
 class PPSUnit;
 
-class QnSignHelper: public QObject, public QnCommonModuleAware
+class QnSignHelper: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;

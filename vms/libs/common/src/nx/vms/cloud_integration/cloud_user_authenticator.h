@@ -30,7 +30,7 @@ class CloudUserInfoPool;
  */
 class CloudUserAuthenticator:
     public auth::AbstractUserDataProvider,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
 public:
     /**

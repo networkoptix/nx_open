@@ -7,7 +7,7 @@
 
 typedef QMap<QString, QString> QnResourcePropertyList;
 
-class QnResourcePropertyDictionary: public QObject, public QnCommonModuleAware
+class QnResourcePropertyDictionary: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

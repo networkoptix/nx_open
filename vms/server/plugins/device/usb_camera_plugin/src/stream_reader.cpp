@@ -45,12 +45,12 @@ StreamReader::StreamReader(
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0)
+    if ( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0)
     {
         addRef();
         return this;
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0)
+    if ( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -109,7 +109,7 @@ StreamReaderPrivate::StreamReaderPrivate(
 StreamReaderPrivate::~StreamReaderPrivate()
 {
     m_avConsumer->interrupt();
-    removeAudioConsumer();
+    removeConsumer();
 }
 
 void StreamReaderPrivate::interrupt()
@@ -126,6 +126,12 @@ void StreamReaderPrivate::ensureConsumerAdded()
     {
         m_camera->audioStream()->addPacketConsumer(m_avConsumer);
         m_audioConsumerAdded = true;
+    }
+
+    if (!m_videoConsumerAdded)
+    {
+        m_camera->videoStream()->addPacketConsumer(m_avConsumer);
+        m_videoConsumerAdded = true;
     }
 }
 
@@ -149,16 +155,13 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
     return nxPacket;
 }
 
-void StreamReaderPrivate::removeAudioConsumer()
+void StreamReaderPrivate::removeConsumer()
 {
     m_camera->audioStream()->removePacketConsumer(m_avConsumer);
     m_audioConsumerAdded = false;
-}
 
-void StreamReaderPrivate::removeConsumer()
-{
-    removeVideoConsumer();
-    removeAudioConsumer();
+    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
+    m_videoConsumerAdded = false;
 }
 
 bool StreamReaderPrivate::interrupted()
@@ -185,7 +188,7 @@ int StreamReaderPrivate::handleNxError()
     return nxcip::NX_OTHER_ERROR;
 }
 
-bool StreamReaderPrivate::shouldStopWaitingForData() const
+bool StreamReaderPrivate::shouldStop() const
 {
     return m_interrupted || m_camera->ioError();
 }

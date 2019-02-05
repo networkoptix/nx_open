@@ -32,7 +32,7 @@ SYSTEM_USER=$COMPANY_NAME
 
 function is_local_addr {
     local hostname=$1;
-    local addr=$(gethostip -d $hostname)
+    local addr=$(gethostip $hostname -d)
 
     if [ $? -ne 0 ]; then
     addr=$hostname
@@ -85,6 +85,14 @@ function display_complete_setup_hint {
     fi
 }
 
+if [ $(which systemctl) ]
+then
+    # Systemd has a recursion problem with forwarding init.d script.
+    # The script in init.d is for Ubuntu < 16.04 (with Upstart initialization system).
+    [ -f "/etc/init.d/$COMPANY_NAME-mediaserver" ] && rm "/etc/init.d/$COMPANY_NAME-mediaserver"
+    [ -f "/etc/init.d/$COMPANY_NAME-root-tool" ] && rm "/etc/init.d/$COMPANY_NAME-root-tool"
+fi
+
 # This is necessary because changed configuration options should take effect
 # immediately.
 
@@ -103,13 +111,13 @@ case "$1" in
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
             if is_local_addr "$ECS_HOST"; then
-                $CFG_HELPER -d appserverHost
-                $CFG_HELPER -d appserverPort
-                $CFG_HELPER -d appserverLogin
-                $CFG_HELPER -d appserverPassword
+                $CFG_HELPER appserverHost -d
+                $CFG_HELPER appserverPort -d
+                $CFG_HELPER appserverLogin -d
+                $CFG_HELPER appserverPassword -d
             else
                 $CFG_HELPER pendingSwitchToClusterMode "yes"
-                $CFG_HELPER -d appserverPassword
+                $CFG_HELPER appserverPassword -d
             fi
         fi
 
@@ -179,11 +187,6 @@ systemctl disable apport >/dev/null 2>&1 || true
 service apport stop >/dev/null 2>&1 || true
 
 if [ $(which systemctl) ]; then
-    # Systemd has a recursion problem with forwarding init.d script.
-    # The script in init.d is for Ubuntu < 16.04 (with Upstart initialization system).
-    [ -f "/etc/init.d/$COMPANY_NAME-mediaserver" ] && rm "/etc/init.d/$COMPANY_NAME-mediaserver"
-    [ -f "/etc/init.d/$COMPANY_NAME-root-tool" ] && rm "/etc/init.d/$COMPANY_NAME-root-tool"
-
     # Systemd requires explicit enabling of the service to start it on boot.
     systemctl enable $COMPANY_NAME-root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?

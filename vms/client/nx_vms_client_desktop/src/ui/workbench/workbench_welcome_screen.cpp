@@ -193,6 +193,14 @@ void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
     action(action::EscapeHotkeyAction)->setEnabled(true);
 }
 
+void QnWorkbenchWelcomeScreen::changeEvent(QEvent* event)
+{
+    if (event->type() == QEvent::PaletteChange)
+        m_view->setColor(palette().color(QPalette::Window));
+
+    base_type::changeEvent(event);
+}
+
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
 {
     return qnCloudStatusWatcher->cloudLogin();
@@ -416,7 +424,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 }
 
 void QnWorkbenchWelcomeScreen::connectToCloudSystem(
-    const QString& systemId, 
+    const QString& systemId,
     const QString& serverUrl)
 {
     if (!isLoggedInToCloud())

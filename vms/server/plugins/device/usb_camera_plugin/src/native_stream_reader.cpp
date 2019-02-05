@@ -58,40 +58,17 @@ void NativeStreamReader::setBitrate(int bitrate)
     m_camera->videoStream()->setBitrate(bitrate);
 }
 
-void NativeStreamReader::ensureConsumerAdded()
-{
-    if (!m_audioConsumerAdded)
-        StreamReaderPrivate::ensureConsumerAdded();
-
-    if(! m_videoConsumerAdded)
-    {
-        m_camera->videoStream()->addPacketConsumer(m_avConsumer);
-        m_videoConsumerAdded = true;
-    }
-}
-
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
-    if (m_camera->audioEnabled() && !m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
-        return nullptr;
-
-    for (;;)
+    while (!shouldStop())
     {
-        auto popped = m_avConsumer->popOldest(kWaitTimeout);
+        auto popped = m_avConsumer->pop();
         if (!popped)
-        {
-            if (shouldStopWaitingForData())
-                return nullptr;
             continue;
-        }
+
         return popped;
     }
-}
-
-void NativeStreamReader::removeVideoConsumer()
-{
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
-    m_videoConsumerAdded = false;
+    return nullptr;
 }
 
 } // namespace usb_cam

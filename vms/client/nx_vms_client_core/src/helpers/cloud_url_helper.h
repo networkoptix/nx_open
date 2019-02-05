@@ -23,6 +23,7 @@ public:
     Q_INVOKABLE QUrl restorePasswordUrl() const;
     Q_INVOKABLE QUrl faqUrl() const;
     Q_INVOKABLE QUrl viewSystemUrl() const;
+    Q_INVOKABLE QUrl armPolicyUrl() const;
 
     Q_INVOKABLE QUrl makeUrl(const QString& path = QString(), bool auth = true) const;
 

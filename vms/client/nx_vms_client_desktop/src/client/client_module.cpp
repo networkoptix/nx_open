@@ -101,7 +101,6 @@
 #include <nx/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/resource_widget_pixmap_cache.h>
-#include <nx/vms/client/desktop/layout_templates/layout_template_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
@@ -402,13 +401,13 @@ void QnClientModule::initSingletons()
     commonModule->store(clientSettings.release());
     commonModule->store(clientInstanceManager.release());
 
-    initRuntimeParams();
+    initRuntimeParams(commonModule, m_startupParameters);
 
     // Shortened initialization if run in self-update mode.
     if (m_startupParameters.selfUpdateMode)
         return;
 
-    commonModule->store(new ApplauncherGuard());
+    commonModule->store(new ApplauncherGuard(commonModule));
 
     // Depends on nothing.
     commonModule->store(new QnClientShowOnceSettings());
@@ -473,7 +472,6 @@ void QnClientModule::initSingletons()
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
-    commonModule->store(new LayoutTemplateManager());
     commonModule->store(new ObjectDisplaySettings());
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
@@ -484,7 +482,9 @@ void QnClientModule::initSingletons()
     registerResourceDataProviders();
 }
 
-void QnClientModule::initRuntimeParams()
+void QnClientModule::initRuntimeParams(
+    QnCommonModule* commonModule,
+    const QnStartupParameters& startupParams)
 {
     if (!m_startupParameters.engineVersion.isEmpty())
     {
@@ -492,7 +492,7 @@ void QnClientModule::initRuntimeParams()
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
-            qnStaticCommon->setEngineVersion(version);
+            commonModule->setEngineVersion(version);
         }
     }
 

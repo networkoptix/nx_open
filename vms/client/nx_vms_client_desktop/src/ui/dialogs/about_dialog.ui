@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>341</width>
-    <height>409</height>
+    <width>349</width>
+    <height>437</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -230,17 +230,44 @@
         <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
+        <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
          <property name="topMargin">
           <number>6</number>
          </property>
          <property name="bottomMargin">
           <number>6</number>
          </property>
-         <item>
-          <widget class="QLabel" name="supportEmailLabel">
+         <property name="verticalSpacing">
+          <number>4</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="customerSupportTitleLabel">
+           <property name="text">
+            <string>Customer Support</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="customerSupportLabel">
            <property name="text">
             <string notr="true">&lt;Support email placeholder&gt;</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="armSupportTitleLabel">
+           <property name="text">
+            <string>ARM support policy</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="armSupportLabel">
+           <property name="text">
+            <string notr="true">&lt;ARM support placeholder&gt;</string>
            </property>
            <property name="openExternalLinks">
             <bool>true</bool>

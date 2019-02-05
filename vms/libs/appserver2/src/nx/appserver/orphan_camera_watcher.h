@@ -15,7 +15,7 @@ namespace nx {
 namespace appserver {
 
 /** Monitor cameras without parent server and remove them.*/
-class OrphanCameraWatcher : public QObject, public QnCommonModuleAware
+class OrphanCameraWatcher : public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QnCommonModuleAware;

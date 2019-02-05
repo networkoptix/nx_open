@@ -14,7 +14,7 @@ namespace nx::vms::server::analytics {
 
 class DeviceAgentHandler:
     public QObject,
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public nx::sdk::analytics::IDeviceAgent::IHandler
 {
     Q_OBJECT

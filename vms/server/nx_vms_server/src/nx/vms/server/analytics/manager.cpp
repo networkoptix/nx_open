@@ -231,8 +231,7 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
     if (!NX_ASSERT(device))
         return;
 
-    const auto deviceStatus = device->getStatus();
-    if (deviceStatus == Qn::Online || deviceStatus == Qn::Recording)
+    if (device->isOnline())
     {
         updateCompatibilityWithEngines(device);
         updateEnabledAnalyticsEngines(device);

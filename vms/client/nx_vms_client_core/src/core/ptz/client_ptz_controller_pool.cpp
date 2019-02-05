@@ -7,19 +7,12 @@
 
 #include <core/resource_management/resource_pool.h>
 
-QnClientPtzControllerPool::QnClientPtzControllerPool(QObject *parent /*= NULL*/)
-    : base_type(parent)
+QnClientPtzControllerPool::QnClientPtzControllerPool(QObject* parent):
+    base_type(parent)
 {
-    /* Auto-update presets when camera goes online. */
-    connect(resourcePool(), &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
-	    {
-	        cacheCameraPresets(resource.dynamicCast<QnVirtualCameraResource>());
-	    });
-
-
-    /* Controller may potentially be created with delay. */
-    connect(this, &QnPtzControllerPool::controllerChanged, this,
-        &QnClientPtzControllerPool::cacheCameraPresets);
+    // Controller may potentially be created with delay.
+    connect(this, &QnPtzControllerPool::controllerChanged,
+        this, &QnClientPtzControllerPool::cacheCameraPresets);
 }
 
 void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) {
@@ -37,8 +30,24 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) 
 
             if (auto controller = this->controller(camera))
                 emit controller->changed(Qn::CapabilitiesPtzField);
-
         });
+
+    connect(camera, &QnResource::propertyChanged, this,
+        [this](const QnResourcePtr& resource, const QString& key)
+        {
+            const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+            if (!NX_ASSERT(camera))
+                return;
+
+            if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
+                || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType)
+            {
+                cacheCameraPresets(camera);
+            }
+        });
+
+    connect(camera, &QnResource::statusChanged,
+        this, &QnClientPtzControllerPool::cacheCameraPresets);
 
     cacheCameraPresets(camera);
 }
@@ -62,10 +71,7 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
 void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
 {
     const auto camera = resource.dynamicCast<nx::vms::client::core::Camera>();
-    if (!camera || !camera->isPtzSupported())
-        return;
-
-    if (camera->getStatus() != Qn::Online)
+    if (!camera || !camera->isPtzSupported() || !camera->isOnline())
         return;
 
     auto controller = this->controller(camera);

@@ -75,12 +75,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         }
 
         QString uniqueId = camera->getUniqueId();
-        if( camera->hasFlags(Qn::search_upd_only) && !resourcePool()->getResourceByUniqueId(uniqueId))
-            continue;   //ignoring newly discovered camera
+        if (camera->hasFlags(Qn::search_upd_only) && !resourcePool()->getResourceByUniqueId(uniqueId))
+            continue;   //< ignoring newly discovered camera
 
         addNewCamera(camera);
     }
-
 }
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)

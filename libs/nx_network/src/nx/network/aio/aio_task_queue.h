@@ -4,8 +4,6 @@
 #include <deque>
 #include <memory>
 
-#include <QtCore/QElapsedTimer>
-
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_pollset.h"
@@ -250,7 +248,6 @@ public:
     std::size_t postedCallCount() const;
 
 private:
-    QElapsedTimer m_monotonicClock;
     // TODO #ak: use cyclic array here to minimize allocations
     /**
      * NOTE: This variable can be accessed within aio thread only.

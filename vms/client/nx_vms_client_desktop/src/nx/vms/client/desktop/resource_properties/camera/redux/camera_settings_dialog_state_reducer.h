@@ -12,7 +12,6 @@ public:
     using State = CameraSettingsDialogState;
     using ScheduleTasks = State::RecordingSettings::ScheduleTasks;
 
-    static State applyChanges(State state);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setGlobalPermissions(State state, GlobalPermissions value);

@@ -205,6 +205,31 @@ void initialize(Manager* manager, Action* root)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission);
 
+    factory(NotificationsTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("N"))
+        .text(ContextMenu::tr("Switch to Notifications tab"));
+
+    factory(MotionTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("M"))
+        .text(ContextMenu::tr("Switch to Motion tab"));
+
+    factory(BookmarksTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("B"))
+        .text(ContextMenu::tr("Switch to Bookmarks tab"));
+
+    factory(EventsTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("E"))
+        .text(ContextMenu::tr("Switch to Events tab"));
+
+    factory(ObjectsTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("O"))
+        .text(ContextMenu::tr("Switch to Objects tab"));
+
     /* Context menu actions. */
 
     factory(FitInViewAction)
@@ -1079,7 +1104,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Show Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Show Motion"), new NoArchiveCondition())
-        .shortcut(lit("A"))
         .condition(ConditionWrapper(new SmartSearchCondition(false))
             && !condition::isLayoutTourReviewMode());
 
@@ -1088,7 +1112,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Hide Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Hide Motion"), new NoArchiveCondition())
-        .shortcut(lit("A"))
         .condition(ConditionWrapper(new SmartSearchCondition(true))
             && !condition::isLayoutTourReviewMode());
 
@@ -1101,8 +1124,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
-        .shortcut(lit("A"))
-        .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition())
             && !condition::isLayoutTourReviewMode());
 

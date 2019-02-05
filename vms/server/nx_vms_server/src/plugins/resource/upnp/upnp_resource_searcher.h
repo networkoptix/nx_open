@@ -10,7 +10,6 @@
 
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-
 class QnMediaServerModule;
 
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
@@ -65,7 +64,6 @@ private:
     QnMediaServerModule* m_serverModule = nullptr;
 };
 
-
 //!\a QnUpnpResourceSearcher-compatible wrapper for \a UPNPSearchHandler
 class QnUpnpResourceSearcherAsync
 :
@@ -77,14 +75,17 @@ public:
 
     //!Implementation of QnAbstractNetworkResourceSearcher::findResources
     virtual QnResourceList findResources() override;
+
+    //!Implementation of UPNPSearchHandler::processPacket
+    virtual bool isEnabled() const override;
+
     //!Implementation of UPNPSearchHandler::processPacket
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const nx::network::SocketAddress& discoveredDevAddress,
         const nx::network::upnp::DeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo ) override;
+        const QByteArray& xmlDevInfo) override;
 
-    virtual bool isEnabled() const override;
 protected:
     /*!
         \param discoveryAddr Local interface address, device has been discovered on
@@ -97,7 +98,8 @@ protected:
         const nx::network::SocketAddress& deviceEndpoint,
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
-        QnResourceList& result ) = 0;
+        QnResourceList& result) = 0;
+
 private:
     QnResourceList m_resList;
     QnMutex m_mutex;

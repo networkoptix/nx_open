@@ -315,6 +315,9 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!previewProvider)
         previewProvider.reset(new ResourceThumbnailProvider(request));
 
+    previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
+        .value<nx::api::CameraImageRequest::StreamSelectionMode>());
+
     widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
 }

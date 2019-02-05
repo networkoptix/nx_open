@@ -121,6 +121,8 @@
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/network/cloud/protocol_type.h>
+
 using namespace std::chrono;
 
 using namespace nx;
@@ -367,7 +369,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     d->analyticsController->setAnalyticsMetadataProvider(d->analyticsMetadataProvider);
 
     at_camDisplay_liveChanged();
-    at_ptzButton_toggled(false);
+    setPtzMode(false);
     at_imageEnhancementButton_toggled(item->imageEnhancement().enabled);
     updateIconButton();
 
@@ -834,7 +836,7 @@ void QnMediaResourceWidget::createButtons()
             /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
             /* internal id */ Qn::PtzButton,
             /* statistics key */ "media_widget_area_zoom",
-            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+            /* handler */ &QnMediaResourceWidget::setPtzMode);
     }
     else
     {
@@ -846,7 +848,7 @@ void QnMediaResourceWidget::createButtons()
             /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
             /* internal id */ Qn::PtzButton,
             /* statistics key */ "media_widget_ptz",
-            /* handler */ &QnMediaResourceWidget::at_ptzButton_toggled);
+            /* handler */ &QnMediaResourceWidget::setPtzMode);
     }
 
     createActionAndButton(
@@ -1095,10 +1097,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
 {
     QnGlNativePainting::begin(m_renderer->glContext(), painter);
 
-    qreal opacity = effectiveOpacity();
-    if (options().testFlag(InvisibleWidgetOption))
-        opacity = 0.0;
-
+    const qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
     if (!opaque || (base_type::resource()->flags() & Qn::still_image))
@@ -1698,9 +1697,6 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect)
 {
-    if (options().testFlag(InvisibleWidgetOption))
-        return;
-
     const auto timestamp = m_renderer->lastDisplayedTimestamp(channel);
 
     if (options().testFlag(DisplayMotion))
@@ -2077,6 +2073,20 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         emit motionSearchModeEnabled(motionSearchEnabled);
     }
 
+    if (changedFlags.testFlag(ControlPtz))
+    {
+        const bool switchedToPtzMode = options().testFlag(ControlPtz);
+        if (switchedToPtzMode)
+        {
+            titleBar()->rightButtonsBar()->setButtonsChecked(
+				Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+            titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, true);
+
+            // TODO: #gdm evil hack! Won't work if SYNC is off and this item is not selected.
+            action(action::JumpToLiveAction)->trigger();
+        }
+    }
+
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -2100,7 +2110,30 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
+	{
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
+
+        if (const auto archiveDelegate = d->display()->archiveReader()->getArchiveDelegate())
+		{
+            const auto protocol = archiveDelegate->protocol();
+            switch (protocol)
+            {
+                case nx::network::Protocol::udt:
+                    // aka UDP hole punching.
+                    hqLqString += " (N)";
+                    break;
+
+				case nx::network::cloud::Protocol::relay:
+                    // relayed connection (aka proxy).
+                    hqLqString += " (P)";
+                    break;
+
+				default:
+                    // Regular connection.
+                    break;
+            }
+		}
+	}
 
     static const int kDetailsTextPixelSize = 11;
 
@@ -2494,19 +2527,6 @@ void QnMediaResourceWidget::at_screenshotButton_clicked()
     menu()->trigger(action::TakeScreenshotAction, this);
 }
 
-void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
-{
-    bool ptzEnabled = checked && d->canControlPtz();
-
-    setOption(ControlPtz, ptzEnabled);
-    setOption(DisplayCrosshair, ptzEnabled);
-    if (checked)
-    {
-        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
-        action(action::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
-    }
-}
-
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
 {
     auto params = item()->dewarpingParams();
@@ -2613,7 +2633,6 @@ void QnMediaResourceWidget::updateFisheye()
 
     const bool showFisheyeOverlay = fisheyeEnabled && !isZoomWindow();
     setOption(ControlPtz, showFisheyeOverlay);
-    setOption(DisplayCrosshair, showFisheyeOverlay);
     setOption(DisplayDewarped, fisheyeEnabled);
 
     if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
@@ -2642,7 +2661,7 @@ void QnMediaResourceWidget::updateFisheye()
     const bool hasPtz = titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton;
     const bool ptzEnabled = titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton;
     if (hasPtz && ptzEnabled)
-        at_ptzButton_toggled(true);
+        setPtzMode(true);
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio()
@@ -2839,6 +2858,12 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
 {
     return (titleBar()->rightButtonsBar()->checkedButtons() & Qn::MotionSearchButton) != 0;
+}
+
+void QnMediaResourceWidget::setPtzMode(bool value)
+{
+    const bool ptzEnabled = value && d->canControlPtz();
+    setOption(ControlPtz, ptzEnabled);
 }
 
 QnSpeedRange QnMediaResourceWidget::speedRange() const

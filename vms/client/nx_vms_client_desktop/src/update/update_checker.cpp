@@ -8,10 +8,15 @@
 #include <update/update_info.h>
 #include <utils/common/app_info.h>
 
-QnUpdateChecker::QnUpdateChecker(const QUrl& url, QObject* parent):
+QnUpdateChecker::QnUpdateChecker(
+    const QUrl& url,
+    QObject* parent,
+    const nx::vms::api::SoftwareVersion& engineVersion)
+    :
     QObject(parent),
     m_networkAccessManager(new QNetworkAccessManager(this)),
-    m_url(url)
+    m_url(url),
+    m_engineVersion(engineVersion)
 {
 }
 
@@ -39,11 +44,8 @@ void QnUpdateChecker::at_networkReply_finished()
     map = map.value(QnAppInfo::customizationName()).toMap();
 
     QString currentRelease = map.value(lit("current_release")).toString();
-    if (qnStaticCommon->engineVersion() > nx::utils::SoftwareVersion(currentRelease))
-    {
-        currentRelease = qnStaticCommon->engineVersion().toString(
-            nx::utils::SoftwareVersion::MinorFormat);
-    }
+    if (m_engineVersion > nx::utils::SoftwareVersion(currentRelease))
+        currentRelease = m_engineVersion.toString(nx::utils::SoftwareVersion::MinorFormat);
 
     if (currentRelease.isEmpty())
         return;

@@ -48,18 +48,9 @@ public:
             });
 
         connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
-            [this]()
-            {
-                const auto resource = this->q->navigator()->currentResource();
+            &Private::updateResourceButton);
 
-                m_resourceButton->setIcon(resource.dynamicCast<QnSecurityCamResource>()
-                    ? qnSkin->icon("text_buttons/camera.png")
-                    : qnSkin->icon("text_buttons/video.png"));
-
-                setResourceName(resource.dynamicCast<QnMediaResource>()
-                    ? resource->getName()
-                    : tr("none"));
-            });
+        updateResourceButton();
     }
 
     QList<QRegion> filterRegions() const
@@ -82,10 +73,23 @@ public:
     }
 
 private:
-    void setResourceName(const QString& value)
+    void updateResourceButton()
     {
-        m_resourceButton->setText(QString::fromWCharArray(L"%1 \x2013 %2")
-            .arg(tr("Current media"), value));
+        static const QString kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
+
+        const auto resource = q->navigator()->currentResource();
+        const bool isMedia = resource.dynamicCast<QnMediaResource>();
+
+        // Camera icon and text is the default option (even if there is no media selected).
+        const bool isCamera = resource.dynamicCast<QnSecurityCamResource>() || !isMedia;
+
+        m_resourceButton->setIcon(isCamera
+            ? qnSkin->icon("text_buttons/camera.png")
+            : qnSkin->icon("text_buttons/video.png"));
+
+        const QString name = resource ? resource->getName() : tr("none");
+        const QString title = isCamera ? tr("Current camera") : tr("Current media");
+        m_resourceButton->setText(kTemplate.arg(title, name));
     }
 
 private:

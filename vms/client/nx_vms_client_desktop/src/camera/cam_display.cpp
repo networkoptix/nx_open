@@ -458,7 +458,8 @@ int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
 {
     if (isForcedBufferingEnabled())
     {
-        constexpr int kMillisecondsPerFrame = 10; //< Should be enough for every camera so far.
+        // TODO Add warning when buffer size not enought to fill required duration.
+        constexpr int kMillisecondsPerFrame = 2; //< Should be enough for every camera so far.
         return (int) forcedVideoBufferLength().count() / kMillisecondsPerFrame;
     }
 
@@ -2070,7 +2071,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->toResource()->getStatus() == Qn::Online || m_resource->toResource()->getStatus() == Qn::Recording;
+    return m_resource->toResource()->isOnline();
 }
 
 QnAspectRatio QnCamDisplay::overridenAspectRatio() const

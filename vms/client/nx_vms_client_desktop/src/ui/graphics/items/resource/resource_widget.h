@@ -53,33 +53,42 @@ class QnResourceWidget:
 public:
     enum Option
     {
-        DisplayActivity             = 0x00001,   /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelection            = 0x00002,   /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x00004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        /** Whether the paused overlay icon should be displayed. */
+        DisplayActivity = 1 << 0,
 
-        DisplayMotionSensitivity    = 0x00010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x00020,   /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x00040,   /**< Whether info panel is to be displayed. */
-        DisplayDewarped             = 0x00080,   /**< Whether the video is to be dewarped. */
+        /** Whether selected / not selected state should be displayed. */
+        DisplaySelection = 1 << 1,
 
-        ControlPtz                  = 0x00100,   /**< Whether PTZ state can be controlled with mouse. */
-        ControlZoomWindow           = 0x00200,   /**< Whether zoom windows can be created by dragging the mouse. */
+        // TODO: #Elric this flag also handles smart search, separate!
+        /** Whether motion is to be displayed. */
+        DisplayMotion = 1 << 2,
 
-        WindowRotationForbidden     = 0x01000,
-        WindowResizingForbidden     = 0x02000,
-        SyncPlayForbidden           = 0x04000,   /**< Whether SyncPlay is forbidden for this widget. */
-        InfoOverlaysForbidden       = 0x08000,
+        /** Whether info panel is to be displayed. */
+        DisplayInfo = 1 << 3,
 
-        FullScreenMode              = 0x10000,
-        ActivityPresence            = 0x20000,
+        /** Whether the video is to be dewarped. */
+        DisplayDewarped = 1 << 4,
 
-        AlwaysShowName              = 0x40000,
+        /** Whether PTZ state can be controlled. */
+        ControlPtz = 1 << 5,
 
-        AnalyticsModeMaster         = 0x80000,   /**< item is an analytics mode master. */
-        AnalyticsModeSlave          = 0x100000,  /**< item is an analytics mode slave. */
+        /** Whether zoom windows can be created by dragging the mouse. */
+        ControlZoomWindow = 1 << 6,
 
-        InvisibleWidgetOption       = 0x200000,  //< Do not show this widget on the scene.
+        WindowRotationForbidden = 1 << 7,
+        WindowResizingForbidden = 1 << 8,
+
+        FullScreenMode = 1 << 9,
+        ActivityPresence = 1 << 10,
+
+        AlwaysShowName = 1 << 11,
+
+        // TODO: #gdm Remove these flags together with legacy camera settings.
+        DisplayMotionSensitivity = 1 << 12,
+        InfoOverlaysForbidden = 1 << 13,
+        SyncPlayForbidden = 1 << 14,
     };
+
     Q_DECLARE_FLAGS(Options, Option)
 
     enum AspectRatioFlag

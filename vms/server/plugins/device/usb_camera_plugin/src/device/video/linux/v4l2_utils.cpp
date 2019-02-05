@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 #include "device/video/rpi/rpi_utils.h"
 #include "udev_utils.h"
@@ -201,18 +202,18 @@ std::vector<DeviceData> getDeviceList()
 
         int nameIndex = 0;
         auto it = duplicateCameras.find(name);
-        if(it == duplicateCameras.end())
+        if (it == duplicateCameras.end())
             duplicateCameras.emplace(name, 0);
         else
             nameIndex = ++it->second;
 
         std::string uniqueId;
-        if(rpi::isRpi() && rpi::isMmalCamera(name))
+        if (nx::utils::AppInfo::isRaspberryPi() && rpi::isMmalCamera(name))
             uniqueId = rpi::getMmalUniqueId();
         else
             uniqueId = getDeviceUniqueId(devicePath);
 
-        if(uniqueId.empty())
+        if (uniqueId.empty())
             uniqueId = std::to_string(nameIndex) + "-" + name;
 
         deviceList.push_back(DeviceData(name, devicePath, uniqueId));
@@ -263,7 +264,7 @@ std::vector<ResolutionData> getResolutionList(
         };
 
     DeviceInitializer initializer(devicePath);
-    if(initializer.fileDescriptor == -1)
+    if (initializer.fileDescriptor == -1)
     {
         int error = errno;
         NX_V4L2_LOG("failed to open %1, %2:", devicePath, strerror(error));
@@ -341,7 +342,7 @@ void setBitrate(
     ecs.count = 1;
     ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
 
-    if(ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs) != 0)
+    if (ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs) != 0)
     {
         int error = errno;
         NX_V4L2_LOG("ioctl() failed: %1", strerror(error));

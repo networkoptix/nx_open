@@ -12,7 +12,7 @@
 
 class QnAdamResource:
     public nx::vms::server::resource::Camera,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
     struct PortTimerEntry

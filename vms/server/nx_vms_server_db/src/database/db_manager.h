@@ -92,7 +92,7 @@ namespace detail
     :
         public QObject,
         public QnDbHelper,
-        public QnCommonModuleAware
+        public /*mixin*/ QnCommonModuleAware
     {
         Q_OBJECT
 

@@ -16,7 +16,6 @@
 #include "ffmpeg/frame.h"
 #include "codec_parameters.h"
 #include "fps_counter.h"
-#include "timestamp_mapper.h"
 #include "stream_consumer_manager.h"
 #include "abstract_stream_consumer.h"
 
@@ -62,8 +61,6 @@ public:
 
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-    void addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
-    void removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
 
     void setFps(float fps);
     void setResolution(const nxcip::Resolution& resolution);
@@ -78,6 +75,8 @@ public:
      * Queries hardware for the camera name to determine if the camera is plugged in.
      */
     bool pluggedIn() const;
+
+    AVCodecParameters* getCodecParameters();
 
 private:
     enum CameraState
@@ -96,27 +95,8 @@ private:
     std::atomic<CameraState> m_streamState = csOff;
 
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
-    std::unique_ptr<ffmpeg::Codec> m_decoder;
-    bool m_skipUntilNextKeyPacket = true;
-
-    /**
-     * Some cameras crash the plugin if they are uninitialized while there are still packets and 
-     * frames allocated. These variables are given to allocated packets and frames to keep track of 
-     * the amount of frames and packets still waiting to be consumed. uninitialize() blocks until
-     * both reach 0. All pointers to a packet or frame should be kept for as short as possible, 
-     * assigning nullptr where possible to release decerement the count.
-     */
-    std::shared_ptr<std::atomic_int> m_packetCount;
-
-    /**
-     * See m_packetCount
-     */
-    std::shared_ptr<std::atomic_int> m_frameCount;
-
-    TimestampMapper m_timestamps;
 
     mutable std::mutex m_mutex;
-    FrameConsumerManager m_frameConsumerManager;
     PacketConsumerManager m_packetConsumerManager;
 
     mutable std::mutex m_threadStartMutex;
@@ -141,11 +121,7 @@ private:
     void uninitialize();
     int initializeInputFormat();
     void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
-    int initializeDecoder();
     std::shared_ptr<ffmpeg::Packet> readFrame();
-    std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
-    int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
-
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
     void setCameraState(CameraState cameraState);

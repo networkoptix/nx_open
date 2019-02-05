@@ -27,7 +27,6 @@ public:
     virtual ~TranscodeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** lpPacket ) override;
-    virtual void interrupt() override;
 
     virtual void setFps(float fps) override;
     virtual void setResolution(const nxcip::Resolution& resolution) override;
@@ -94,9 +93,10 @@ private:
     };
 
 private:
-    CodecParameters m_codecParams;
-    std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
+    TimestampMapper m_decoderTimestamps;
+    std::unique_ptr<ffmpeg::Codec> m_decoder;
 
+    CodecParameters m_codecParams;
     int m_initCode = 0;
 
     std::unique_ptr<ffmpeg::Codec> m_encoder;
@@ -108,24 +108,21 @@ private:
 
     TimestampMapper m_timestamps;
 
-    uint64_t m_lastVideoPts = 0;
-    uint64_t m_lastTimestamp = 0;
-    uint64_t m_timePerFrame = 0;
+    int64_t m_lastTimestamp = 0;
+    int64_t m_timePerFrame = 0;
 
 private:
+    int initializeDecoder();
+    std::shared_ptr<ffmpeg::Frame> decode(const ffmpeg::Packet * packet);
+
     bool shouldDrop(const ffmpeg::Frame * frame);
     void transcode(const std::shared_ptr<ffmpeg::Frame>& frame);
-    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame);
+    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Packet * frame);
     int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
-
-    bool waitForTimespan(
-        const std::chrono::milliseconds& timespan,
-        const std::chrono::milliseconds& timeout);
 
     std::shared_ptr<ffmpeg::Packet> nextPacket();
 
     bool ensureEncoderInitialized();
-    void ensureConsumerAdded() override;
     void uninitialize();
     int initializeVideoEncoder();
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
@@ -136,18 +133,16 @@ private:
     void uninitializeScaleContext();
     int reinitializeScaleContext(const ScaleParameters& scaleParams);
     ScaleParameters getNewestScaleParameters(const AVFrame * frame) const;
-    
+
     /**
      * Scale @param frame, modifying the preallocated @param outFrame whose size and format are
      * expected to have already been set.
-     * 
+     *
      * @param[in] frame - the input frame
      * @return Ffmpeg error code, 0 on success negative value on failure
      */
     int scale(const AVFrame * frame);
     void calculateTimePerFrame();
-
-    virtual void removeVideoConsumer() override;
 };
 
 } // namespace usb_cam

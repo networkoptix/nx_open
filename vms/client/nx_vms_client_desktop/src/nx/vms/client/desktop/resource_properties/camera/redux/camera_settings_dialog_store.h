@@ -34,7 +34,6 @@ public:
     const CameraSettingsDialogState& state() const;
 
     // Actions.
-    void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
     void setGlobalPermissions(GlobalPermissions value);

@@ -1329,7 +1329,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 
         QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
         int copySize = 0;
-        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording))
+        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && QnResource::isOnline(status))
         {
             const Qn::StreamIndex streamIndex =
                 (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
