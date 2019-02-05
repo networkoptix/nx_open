@@ -68,7 +68,7 @@ protected:
 
     void givenEmptyDatabase()
     {
-        randomizeKeyValuePair();
+        givenRandomKeyValuePair();
         // Don't insert random pair.
     }
 
@@ -139,12 +139,6 @@ private:
         m_queryExecutor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(
             dbConnectionOptions());
         return m_queryExecutor->init();
-    }
-
-    void randomizeKeyValuePair()
-    {
-        m_randomPair.key = randomString();
-        m_randomPair.value = randomString();
     }
 
     void waitForCallback()
