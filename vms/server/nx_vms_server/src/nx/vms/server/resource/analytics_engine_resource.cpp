@@ -97,7 +97,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
             this,
             QString::fromStdString(nx::sdk::toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
-            analytics::debug_helpers::filename(
+            analytics::debug_helpers::nameOfFileToDumpDataTo(
                 QnVirtualCameraResourcePtr(),
                 toSharedPointer(this),
                 nx::vms::server::resource::AnalyticsPluginResourcePtr(),

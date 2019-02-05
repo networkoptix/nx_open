@@ -193,7 +193,7 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
         dir.absoluteFilePath(settingsFilename));
 }
 
-QString filename(
+QString nameOfFileToDumpDataTo(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
@@ -210,7 +210,7 @@ QString filename(
     return QString();
 }
 
-QString filename(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix)
+QString nameOfFileToDumpDataTo(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix)
 {
     if (!NX_ASSERT(plugin))
         return QString();

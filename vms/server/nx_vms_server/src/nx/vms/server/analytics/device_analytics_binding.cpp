@@ -257,7 +257,7 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
             this,
             QString::fromStdString(toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
-            debug_helpers::filename(
+            debug_helpers::nameOfFileToDumpDataTo(
                 m_device,
                 m_engine,
                 nx::vms::server::resource::AnalyticsPluginResourcePtr(),
