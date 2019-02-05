@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <chrono>
 
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
 #include <api/server_rest_connection.h>

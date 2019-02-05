@@ -2,6 +2,10 @@
 All data models are context-aware classes that connect to signals of various client components
 and update data accordingly.
 
+Item models may depend on *QtCore* and *QtGui* modules. From *QtWidgets* they can use only QMenu and
+QAction, as currently they return an item menu data (Qn::ContextMenuRole) as a shared pointer
+to QMenu. In the future it might be refactored to completely remove *QtWidgets* dependency.
+
 [SystemHealthListModel]: @ref nx::vms::client::desktop::SystemHealthListModel
 [ProgressListModel]: @ref nx::vms::client::desktop::ProgressListModel
 [EventListModel]: @ref nx::vms::client::desktop::EventListModel

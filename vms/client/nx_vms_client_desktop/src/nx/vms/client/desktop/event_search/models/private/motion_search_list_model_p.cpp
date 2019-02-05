@@ -1,6 +1,9 @@
 #include "motion_search_list_model_p.h"
 
 #include <QtCore/QTimer>
+
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
 #include <api/helpers/chunks_request_data.h>
