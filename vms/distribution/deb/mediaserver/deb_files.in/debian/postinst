@@ -121,6 +121,8 @@ case "$1" in
             fi
         fi
 
+        [ ! -d "$BASE_DIR/var" ] && mkdir -p "$BASE_DIR/var"
+
         if [ -z "$UPGRADING" ]
         then
             PORT="$($CFG_HELPER port)"
