@@ -65,10 +65,8 @@ void QnClientMetaTypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     nx::vms::client::core::initializeMetaTypes();
 

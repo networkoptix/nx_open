@@ -57,10 +57,8 @@ void Metatypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     // Fully qualified namespaces are not needed here but are mandatory in all signal declarations.
 
