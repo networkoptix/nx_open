@@ -252,7 +252,7 @@ bool SdkObjectFactory::initEngineResources()
     for (const auto& entry: engineDataByPlugin)
     {
         const auto& engineList = entry.second;
-        for (const auto& engine : engineList)
+        for (const auto& engine: engineList)
         {
             analyticsManager->saveSync(engine);
             auto engineResource = resourcePool()
