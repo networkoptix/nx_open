@@ -95,7 +95,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     std::unique_ptr<AbstractStreamSocket> tcpSock)
 :
     QnResourceConsumer(res),
-    m_RtpSession(/*shouldGuessAuthDigest*/ false, std::move(tcpSock)),
+    m_RtpSession(QnRtspClient::Config(), std::move(tcpSock)),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),

@@ -165,6 +165,11 @@ class QnRtspClient: public QObject
     Q_OBJECT;
 public:
     //typedef QMap<int, QScopedPointer<QnRtspIoDevice> > RtpIoTracks;
+    struct Config
+    {
+        bool shouldGuessAuthDigest = false;
+        bool backChannelAudioOnly = false;
+    };
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
@@ -271,7 +276,7 @@ public:
     typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
     QnRtspClient(
-        bool shouldGuessAuthDigest,
+        const Config& config,
         std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
 
     ~QnRtspClient();
@@ -434,6 +439,8 @@ private:
     QByteArray nptPosToString(qint64 posUsec) const;
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
+
+    Config m_config;
 
     // 'initialization in order' block
     unsigned int m_csec;
