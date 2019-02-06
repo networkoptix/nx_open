@@ -1945,7 +1945,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             .arg(SystemError::getLastOSErrorText()));
         return false;
     }
-    QString localAddress = sock->getLocalAddress().address.toString();
+    std::string localAddress = sock->getLocalAddress().address.toStdString();
 
     QAuthenticator auth = getAuth();
 
@@ -1957,20 +1957,16 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         m_timeDrift);
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
-    char buf[512];
-
-    //providing local gsoap server url
     _oasisWsnB2__Subscribe request;
+    std::string address = std::string("http://") + localAddress + std::string(":")
+        + std::to_string(QnSoapServer::instance()->port())
+        + QnSoapServer::instance()->path().toStdString();
+    request.ConsumerReference.Address = address.data();
 
-    sprintf(buf, "http://%s:%d%s", localAddress.toLatin1().data(),
-        QnSoapServer::instance()->port(), QnSoapServer::instance()->path().toLatin1().data());
-
-    request.ConsumerReference.Address = buf;
-
-    //setting InitialTerminationTime (if supported)
-    sprintf(buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT);
-    std::string initialTerminationTime(buf);
-    request.InitialTerminationTime = &initialTerminationTime;
+    std::string duration = std::string("PT")
+        + std::to_string(DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT)
+        + std::string("S");
+    request.InitialTerminationTime = &duration;
 
     //creating filter
     //oasisWsnB2__FilterType topicFilter;
@@ -2062,8 +2058,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     m_eventMonitorType = emtNotification;
 
-    NX_DEBUG(this, lit("Successfully registered in NotificationProducer. endpoint %1")
-        .arg(QString::fromLatin1(soapWrapper.endpoint())));
+    NX_DEBUG(this, "Successfully registered in NotificationProducer. endpoint %1",
+        QString(soapWrapper.endpoint()));
     return true;
 }
 

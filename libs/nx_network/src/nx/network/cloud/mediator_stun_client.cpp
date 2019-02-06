@@ -1,5 +1,7 @@
 #include "mediator_stun_client.h"
 
+#include <nx/network/stun/client_connection_validator.h>
+#include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/url/url_builder.h>
 
 #include "mediator_endpoint_provider.h"
@@ -8,13 +10,22 @@
 namespace nx::hpm::api {
 
 MediatorStunClient::MediatorStunClient(
-    MediatorEndpointProvider* endpointProvider,
-    std::unique_ptr<nx::network::stun::AbstractAsyncClient> stunClient)
+    AbstractAsyncClient::Settings settings,
+    MediatorEndpointProvider* endpointProvider)
     :
-    base_type(std::move(stunClient)),
+    base_type(
+        [settings]()
+        {
+            using namespace nx::network::stun;
+
+            auto client = std::make_unique<AsyncClientWithHttpTunneling>(settings);
+            client->setTunnelValidatorFactory([](auto connection) {
+                return std::make_unique<ClientConnectionValidator>(std::move(connection)); });
+            return client;
+        }()),
     m_endpointProvider(endpointProvider)
 {
-    bindToAioThread(delegate().getAioThread());
+    bindToAioThread(m_endpointProvider ? m_endpointProvider->getAioThread() : getAioThread());
 
     base_type::setOnConnectionClosedHandler(
         [this](auto&&... args) { handleConnectionClosure(std::forward<decltype(args)>(args)...); });
