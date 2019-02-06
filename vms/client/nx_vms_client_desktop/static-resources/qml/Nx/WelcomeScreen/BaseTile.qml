@@ -414,13 +414,7 @@ Item
                     showBackground: false;
 
                     backgroundColor: tileArea.color;
-                    onClicked:
-                    {
-                        if (control.isConnectable)
-                            context.moveToBack(control.localId)
-                        else
-                            context.hideSystem(control.systemId, control.localId);
-                    }
+                    onClicked: context.hideSystem(control.systemId, control.localId);
                 }
 
                 Loader
