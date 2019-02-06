@@ -105,6 +105,8 @@ private:
         readyInstall,
         /** Some servers are installing an update. */
         installing,
+        /** Some servers are installing an update, but it took too long. */
+        installingStalled,
         /** Installation process is complete. */
         complete,
     };

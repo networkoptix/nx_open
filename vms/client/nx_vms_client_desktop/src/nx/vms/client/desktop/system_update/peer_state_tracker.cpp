@@ -453,6 +453,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyRestart:
             m_clientItem->statusMessage = "Client is ready to install and restart";
             m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
         case State::installing:
