@@ -657,6 +657,18 @@ void QnRtspClient::parseSDP()
     }
     if (sdpTrack->isValid())
         m_sdpTracks << sdpTrack;
+
+    m_sdpTracks.erase(std::remove_if(
+        m_sdpTracks.begin(), m_sdpTracks.end(),
+        [this](const QSharedPointer<SDPTrackInfo>& track)
+        {
+            if (m_config.backChannelAudioOnly && track->trackType != TrackType::TT_AUDIO)
+                return true; //< Remove non audio tracks for back audio channel.
+            return m_config.backChannelAudioOnly != track->isBackChannel;
+        }),
+        m_sdpTracks.end());
+
+
     updateTrackNum();
 
 }
