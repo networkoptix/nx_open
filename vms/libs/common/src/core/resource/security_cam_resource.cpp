@@ -383,12 +383,12 @@ void QnSecurityCamResource::setMotionStreamIndex(MotionStreamIndex value)
 bool QnSecurityCamResource::isRemoteArchiveMotionDetectionEnabled() const
 {
     const QString valueStr = getProperty(kRemoteArchiveMotionDetectionKey);
-    return !valueStr.isEmpty() && QnLexical::deserialized<bool>(valueStr, false);
+    return valueStr.isEmpty() || QnLexical::deserialized<bool>(valueStr, true);
 }
 
 void QnSecurityCamResource::setRemoteArchiveMotionDetectionEnabled(bool value)
 {
-    const QString valueStr = value ? QnLexical::serialized(value) : QString();
+    const QString valueStr = value ? QString() : QnLexical::serialized(value);
     setProperty(kRemoteArchiveMotionDetectionKey, valueStr);
 }
 
