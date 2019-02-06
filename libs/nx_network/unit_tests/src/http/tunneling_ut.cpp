@@ -154,9 +154,9 @@ private:
     std::unique_ptr<Client> m_tunnelingClient;
     detail::ClientFactory m_localFactory;
     detail::ClientFactory::Function m_clientFactoryBak;
-    std::unique_ptr<TestHttpServer> m_httpServer;
     nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
+    std::unique_ptr<TestHttpServer> m_httpServer;
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
