@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/tunneling/base_tunnel_validator.h>
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/tunneling/detail/client_factory.h>
@@ -291,9 +292,9 @@ INSTANTIATE_TYPED_TEST_CASE_P(Ssl, HttpTunneling, SslMethodMask);
 namespace {
 
 class TestValidator:
-    public AbstractTunnelValidator
+    public BaseTunnelValidator
 {
-    using base_type = AbstractTunnelValidator;
+    using base_type = BaseTunnelValidator;
 
 public:
     TestValidator(
