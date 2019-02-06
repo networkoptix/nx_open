@@ -166,7 +166,7 @@ import * as Hls from 'hls.js';
                                 case 'Webkit':
                                 default:
                                     if (weHaveHls) {
-                                        if (($window.jscd.browser === 'Safari' || $window.jscd.os === 'iOS') && canPlayNatively('hls')) {
+                                        if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
                                             return 'native-hls';
                                         }
                                         if (jsHlsSupported) {
@@ -279,7 +279,6 @@ import * as Hls from 'hls.js';
                                 });
                                 
                                 scope.vgApi.addEventListener('timeupdate', function (event) {
-                                    scope.loading = false;
                                     var video = event.srcElement || event.originalTarget;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
