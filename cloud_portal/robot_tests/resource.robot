@@ -6,12 +6,13 @@ Library           NoptixLibrary/
 Resource          variables.robot
 Resource          ${variables_file}
 
+
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
-${docker}    false
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox
+${docker}    true
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
 
 *** Keywords ***
 Open Browser and go to URL
@@ -34,7 +35,7 @@ Docker Open Browser
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     ${chrome_options}=    Set Chrome Options
     Create Webdriver    Chrome    chrome_options=${chrome_options}
-    Sleep    20
+    #Sleep    20
     Go to    ${url}
 
 Set Chrome Options
@@ -231,6 +232,9 @@ Verify In System
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
+    [timeout]    5 minutes
+    ${console}    Get Browser Log
+    Log    ${console}
     Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
 
 Wait Until Elements Are Visible
