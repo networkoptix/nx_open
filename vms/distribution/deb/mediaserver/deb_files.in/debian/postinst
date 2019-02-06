@@ -96,13 +96,8 @@ fi
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-if [ $(which systemctl) ]; then
-    systemctl stop $COMPANY_NAME-mediaserver || true
-    systemctl stop $COMPANY_NAME-root-tool || true
-else
-    service $COMPANY_NAME-mediaserver stop || true
-    service $COMPANY_NAME-root-tool stop || true
-fi
+service $COMPANY_NAME-mediaserver stop || true
+service $COMPANY_NAME-root-tool stop || true
 
 case "$1" in
     configure)
