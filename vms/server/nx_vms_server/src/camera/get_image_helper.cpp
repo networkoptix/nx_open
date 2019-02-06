@@ -19,22 +19,27 @@
 #include <nx/utils/log/log_main.h>
 #include "media_server/media_server_module.h"
 
+using MotionStreamType = nx::vms::api::MotionStreamType;
+
 namespace {
 
 static constexpr int kMaxGopLen = 100;
 
 static constexpr int kRoundFactor = 4;
 
-static Qn::StreamIndex oppositeStreamIndex(Qn::StreamIndex streamIndex)
+static MotionStreamType oppositeStreamIndex(MotionStreamType streamIndex)
 {
     switch (streamIndex)
     {
-        case Qn::StreamIndex::primary: return Qn::StreamIndex::secondary;
-        case Qn::StreamIndex::secondary: return Qn::StreamIndex::primary;
-        case Qn::StreamIndex::undefined: break;
+        case MotionStreamType::primary:
+            return MotionStreamType::secondary;
+        case MotionStreamType::secondary:
+            return MotionStreamType::primary;
+        default:
+            break;
     }
     NX_ASSERT(false, lm("Unsupported StreamIndex %1").args(streamIndex));
-    return Qn::StreamIndex::undefined; //< Fallback for the failed assertion.
+    return MotionStreamType::undefined; //< Fallback for the failed assertion.
 }
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
@@ -130,13 +135,13 @@ QSize updateDstSize(
 
 CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     const nx::api::CameraImageRequest& request,
-    Qn::StreamIndex streamIndex,
+    MotionStreamType streamIndex,
     QnAbstractArchiveDelegate* archiveDelegate,
     int preferredChannel,
     bool& isOpened) const
 {
-    if (!NX_ASSERT(streamIndex == Qn::StreamIndex::primary
-        || streamIndex == Qn::StreamIndex::secondary))
+    if (!NX_ASSERT(streamIndex == MotionStreamType::primary
+        || streamIndex == MotionStreamType::secondary))
     {
         return nullptr;
     }
@@ -285,7 +290,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     QnVideoCameraPtr camera,
-    Qn::StreamIndex streamIndex,
+    MotionStreamType streamIndex,
     qint64 timestampUs,
     int preferredChannel,
     nx::api::ImageRequest::RoundMethod roundMethod) const
@@ -314,7 +319,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
-    Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
+    MotionStreamType streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
 {
     NX_VERBOSE(this, "%1()", __func__);
 
@@ -363,9 +368,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
  * @return Sequence from an I-frame to the desired frame. Can be null but not empty.
  */
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
-    Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
+    MotionStreamType streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
 {
-    const MediaQuality stream = (streamIndex == Qn::StreamIndex::primary)
+    const MediaQuality stream = (streamIndex == MotionStreamType::primary)
         ? MEDIA_Quality_High
         : MEDIA_Quality_Low;
     if (!camera->liveCache(stream))
@@ -491,7 +496,7 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
     return result;
 }
 
-Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
+MotionStreamType QnGetImageHelper::determineStreamIndex(
     const nx::api::CameraImageRequest &request) const
 {
     NX_VERBOSE(this, "%1(%2)", __func__, request.streamSelectionMode);
@@ -503,34 +508,34 @@ Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
         {
             #if defined(EDGE_SERVER)
                 // On edge, we always try to use the secondary stream first.
-                return Qn::StreamIndex::secondary;
+                return MotionStreamType::secondary;
             #endif
 
             const auto secondaryResolution =
-                request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
+                request.camera->streamInfo(MotionStreamType::secondary).getResolution();
             if ((request.size.width() <= 0 && request.size.height() <= 0)
                 || request.size.width() > secondaryResolution.width()
                 || request.size.height() > secondaryResolution.height())
             {
-                return Qn::StreamIndex::primary;
+                return MotionStreamType::primary;
             }
 
-            return Qn::StreamIndex::secondary;
+            return MotionStreamType::secondary;
         }
-        case StreamSelectionMode::forcedPrimary: return Qn::StreamIndex::primary;
-        case StreamSelectionMode::forcedSecondary: return Qn::StreamIndex::secondary;
+        case StreamSelectionMode::forcedPrimary: return MotionStreamType::primary;
+        case StreamSelectionMode::forcedSecondary: return MotionStreamType::secondary;
         case StreamSelectionMode::sameAsAnalytics:
-            return ini().analyzeSecondaryStream ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
+            return ini().analyzeSecondaryStream ? MotionStreamType::secondary : MotionStreamType::primary;
         case StreamSelectionMode::sameAsMotion:
             return request.camera->motionStreamIndex().index;
     }
 
     NX_ASSERT(false);
-    return Qn::StreamIndex::undefined;
+    return MotionStreamType::undefined;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
-    Qn::StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const
+    MotionStreamType streamIndex, const nx::api::CameraImageRequest& request) const
 {
     NX_VERBOSE(this, "%1(%2, %3 us, roundMethod: %4) BEGIN",
         __func__, streamIndex, request.usecSinceEpoch, request.roundMethod);
@@ -549,7 +554,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
     bool isOpened = false;
 
-    if (streamIndex == Qn::StreamIndex::secondary)
+    if (streamIndex == MotionStreamType::secondary)
         archiveDelegate->setQuality(MEDIA_Quality_Low, true, QSize());
 
     QList<QnAbstractImageFilterPtr> filterChain;

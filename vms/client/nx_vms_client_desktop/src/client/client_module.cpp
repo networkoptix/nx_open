@@ -51,6 +51,7 @@
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/resource_directory_browser.h>
+#include <core/resource/local_resource_status_watcher.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
@@ -669,6 +670,7 @@ void QnClientModule::initLocalResources()
     }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
+    commonModule->store(new QnLocalResourceStatusWatcher());
 }
 
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const

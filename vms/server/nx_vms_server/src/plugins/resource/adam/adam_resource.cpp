@@ -40,13 +40,6 @@ QString QnAdamResource::getDriverName() const
     return kManufacture;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 {
     QUrl url(getUrl());

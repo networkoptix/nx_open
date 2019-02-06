@@ -434,7 +434,8 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
     return CameraDiagnostics::NoErrorResult();
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDriver(
+	MotionStreamType streamIndex)
 {
     using namespace nx::vms::server::resource;
 
@@ -451,7 +452,7 @@ nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabili
             key.resolution = resolution;
 
             nx::media::CameraStreamCapability capabilities;
-            if (streamIndex == Qn::StreamIndex::secondary)
+            if (streamIndex == MotionStreamType::secondary)
                 capabilities.maxFps = m_maxSecondaryFps[resolution];
             result.insert(key, capabilities);
         }
@@ -605,7 +606,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         return CameraDiagnostics::CameraInvalidParams(
             lit("Resolution list is empty"));
     }
-    m_resolutionList[(int) Qn::StreamIndex::primary] = availResolutions;
+    m_resolutionList[(int) MotionStreamType::primary] = availResolutions;
 
     if (dualStreaming)
     {
@@ -625,7 +626,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         int maxSecondaryRes =
             SECONDARY_STREAM_MAX_RESOLUTION.width()
             * SECONDARY_STREAM_MAX_RESOLUTION.height();
-        m_resolutionList[(int) Qn::StreamIndex::secondary] = availResolutions;
+        m_resolutionList[(int) MotionStreamType::secondary] = availResolutions;
     }
 
     // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
@@ -711,7 +712,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
 CameraDiagnostics::Result QnActiResource::detectMaxFpsForSecondaryCodec()
 {
-    const auto& resolutionList = m_resolutionList[(int)Qn::StreamIndex::secondary];
+    const auto& resolutionList = m_resolutionList[(int)MotionStreamType::secondary];
     for (const auto& codec: m_availableEncoders)
     {
         for (const auto& resolution: resolutionList)

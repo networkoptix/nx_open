@@ -145,7 +145,8 @@ QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemI
 
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers,
-    const std::set<nx::utils::SoftwareVersion>& clientVersions)
+    const std::set<nx::utils::SoftwareVersion>& clientVersions,
+    bool checkClient)
 {
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
@@ -221,18 +222,21 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (nx::utils::SoftwareVersion(clientVersionRaw) != contents.getVersion())
         alreadyInstalled = false;
 
-    auto systemInfo = QnAppInfo::currentSystemInformation();
-    if (nx::update::findPackage(
-            commonModule->moduleGUID(),
-            commonModule->engineVersion(),
-            systemInfo,
-            contents.info,
-            true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)
-        != nx::update::FindPackageResult::ok)
+    if (checkClient)
     {
-        NX_ERROR(typeid(UpdateContents))
-            << "verifyUpdateManifest(" << contents.info.version
-            << ") error while trying to find client package:" << errorMessage;
+        auto systemInfo = QnAppInfo::currentSystemInformation();
+        if (nx::update::findPackage(
+                commonModule->moduleGUID(),
+                commonModule->engineVersion(),
+                systemInfo,
+                contents.info,
+                true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)
+            != nx::update::FindPackageResult::ok)
+        {
+            NX_ERROR(typeid(UpdateContents))
+                << "verifyUpdateManifest(" << contents.info.version
+                << ") error while trying to find client package:" << errorMessage;
+        }
     }
 
     QSet<QnUuid> allServers;
@@ -341,7 +345,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
-    if (!contents.clientPackage.isValid())
+    if (checkClient && !contents.clientPackage.isValid())
     {
         QString clientVersion = nx::utils::AppInfo::applicationVersion();
         if (targetVersion > nx::utils::SoftwareVersion(clientVersion)

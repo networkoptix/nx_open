@@ -21,8 +21,6 @@ public:
     virtual void setHostAddress(const QString &ip) override;
     virtual bool needCheckIpConflicts() const override { return false; }
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

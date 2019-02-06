@@ -59,13 +59,6 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnArchiveCamResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnArchiveCamResource::initializeCameraDriver()
 {
     return CameraDiagnostics::LiveVideoIsNotSupportedResult();

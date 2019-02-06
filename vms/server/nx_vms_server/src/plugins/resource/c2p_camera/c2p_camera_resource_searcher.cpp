@@ -29,13 +29,6 @@ protected:
     {
         return CameraDiagnostics::NoErrorResult();
     }
-
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex)
-    {
-        return {};
-    }
-
 };
 
 using QnC2pCameraResourcePtr = QnSharedResourcePointer<QnC2pCameraResource>;

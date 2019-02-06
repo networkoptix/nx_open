@@ -814,6 +814,27 @@ Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& c
         internalCallback, targetThread);
 }
 
+Handle ServerConnection::updateActionFinish(bool skipActivePeers,
+    std::function<void (Handle, bool)>&& callback, QThread* targetThread)
+{
+    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
+        {
+            if (callback)
+                callback(handle, success);
+        };
+
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    QnRequestParamList params;
+    if (skipActivePeers)
+        params.insert("ignorePendingPeers", "true");
+
+    return executePost<EmptyResponseType>(lit("/ec2/finishUpdate"),
+        params,
+        contentType, QByteArray(),
+        internalCallback, targetThread);
+}
+
 Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
     std::function<void (Handle, bool)>&& callback,
     QThread* targetThread)

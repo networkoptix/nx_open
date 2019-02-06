@@ -59,7 +59,7 @@ public:
     void cleanCameraIssues();
 
     CameraMediaStreams mediaStreams() const;
-    CameraMediaStreamInfo streamInfo(Qn::StreamIndex index = Qn::StreamIndex::primary) const;
+    CameraMediaStreamInfo streamInfo(MotionStreamType index = MotionStreamType::primary) const;
 
     virtual QnAspectRatio aspectRatio() const;
 

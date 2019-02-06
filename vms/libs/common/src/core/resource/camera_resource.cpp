@@ -204,13 +204,13 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(Qn::StreamIndex index) const
+CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(MotionStreamType index) const
 {
     const auto streams = mediaStreams().streams;
     auto stream = std::find_if(streams.cbegin(), streams.cend(),
         [index](const CameraMediaStreamInfo& stream)
         {
-            return (Qn::StreamIndex) stream.encoderIndex == index;
+            return stream.getEncoderIndex() == index;
         });
     if (stream != streams.cend())
         return *stream;
@@ -231,12 +231,12 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
     // changed on the fly and a camera may not have a primary stream. In this case natural
     // secondary stream AS should be used.
-    const auto stream = streamInfo(Qn::StreamIndex::primary);
+    const auto stream = streamInfo(MotionStreamType::primary);
     QSize size = stream.getResolution();
     if (size.isEmpty())
     {
         // Trying to use size from secondary stream
-        const auto secondary = streamInfo(Qn::StreamIndex::secondary);
+        const auto secondary = streamInfo(MotionStreamType::secondary);
         size = secondary.getResolution();
     }
 
@@ -352,8 +352,9 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
         auto secondStreamIter = std::find_if(
             supportedMediaStreams.streams.begin(),
             supportedMediaStreams.streams.end(),
-            [](const CameraMediaStreamInfo& mediaInfo) {
-                return (Qn::StreamIndex) mediaInfo.encoderIndex == Qn::StreamIndex::secondary;
+            [](const CameraMediaStreamInfo& mediaInfo) 
+		    {
+                return mediaInfo.getEncoderIndex() == MotionStreamType::secondary;
             });
         if (secondStreamIter != supportedMediaStreams.streams.end())
         {

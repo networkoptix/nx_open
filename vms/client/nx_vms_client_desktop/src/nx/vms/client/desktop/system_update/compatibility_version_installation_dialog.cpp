@@ -146,7 +146,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         case ClientUpdateTool::State::readyInstall:
             finalProgress = 90;
             // TODO: We should wrap it inside some thread. This call can be long.
-            m_private->clientUpdateTool->installUpdate();
+            m_private->clientUpdateTool->installUpdateAsync();
             break;
         case ClientUpdateTool::State::installing:
             setMessage(tr("Installing"));

@@ -155,10 +155,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         return CameraDiagnostics::NoErrorResult();
 
     const Qn::ConnectionRole role = getRole();
-
-    const auto encoderIndex = role == Qn::CR_LiveVideo
-        ? Qn::StreamIndex::primary
-        : Qn::StreamIndex::secondary;
+    const auto encoderIndex = QnSecurityCamResource::toStreamIndex(role);
 
     nxcip::CameraMediaEncoder* intf = NULL;
     int result = m_camManager.getEncoder( (int) encoderIndex, &intf );

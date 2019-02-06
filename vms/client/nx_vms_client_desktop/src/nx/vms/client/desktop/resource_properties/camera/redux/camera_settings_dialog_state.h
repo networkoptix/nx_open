@@ -160,8 +160,9 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
-        UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
+        UserEditableMultiple<vms::api::MotionStreamType> forcedMotionStreamType;
         CombinedValue motionStreamOverridden = CombinedValue::None;
+        UserEditableMultiple<bool> remoteMotionDetectionEnabled;
 
         static constexpr int kDefaultRtspPort = 554;
         UserEditableMultiple<int> customMediaPort;

@@ -339,12 +339,12 @@ public:
 
     virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
         onvifXsd__VideoEncoderConfiguration& encoder,
-        Qn::StreamIndex streamIndex,
+        MotionStreamType streamIndex,
         const QnLiveStreamParams& params);
 
     virtual CameraDiagnostics::Result sendVideoEncoder2ToCameraEx(
         onvifXsd__VideoEncoder2Configuration& encoder,
-        Qn::StreamIndex streamIndex,
+        MotionStreamType streamIndex,
         const QnLiveStreamParams& params);
 
     virtual int suggestBitrateKbps(
@@ -367,12 +367,12 @@ public:
 
     void updateVideoEncoder1(
         onvifXsd__VideoEncoderConfiguration& encoder,
-        Qn::StreamIndex streamIndex,
+        MotionStreamType streamIndex,
         const QnLiveStreamParams& streamParams);
 
     void updateVideoEncoder2(
         onvifXsd__VideoEncoder2Configuration& encoder,
-        Qn::StreamIndex streamIndex,
+        MotionStreamType streamIndex,
         const QnLiveStreamParams& streamParams);
 
     SoapTimeouts onvifTimeouts() const;
@@ -386,7 +386,7 @@ protected:
     void setAudioCodec(AUDIO_CODEC c);
 
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
+        MotionStreamType streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         DeviceSoapWrapper& deviceSoapWrapper,
@@ -482,7 +482,7 @@ private:
     void fillStreamCapabilityLists(const QList<VideoEncoderCapabilities>& capabilitiesList);
 
     VideoEncoderCapabilities findVideoEncoderCapabilities(
-        SupportedVideoEncoding encoding, Qn::StreamIndex streamIndex);
+        SupportedVideoEncoding encoding, MotionStreamType streamIndex);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;

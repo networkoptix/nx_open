@@ -97,6 +97,8 @@ private:
 
     void updateDeviceDependentActions();
 
+    QString currentDeviceText() const;
+
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;
