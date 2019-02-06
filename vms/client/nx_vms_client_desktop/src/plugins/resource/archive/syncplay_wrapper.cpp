@@ -13,6 +13,8 @@
 #include "core/resource/resource.h"
 #include <core/resource/security_cam_resource.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
 
@@ -122,6 +124,15 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 }
 
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
+{
+    if (nx::vms::client::desktop::ini().compatibilityIsMediaPaused)
+        return isMediaPausedUncached();
+
+    Q_D(const QnArchiveSyncPlayWrapper);
+    return d->paused || d->readers.empty();
+}
+
+bool QnArchiveSyncPlayWrapper::isMediaPausedUncached() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QnMutexLocker lock( &d->timeMutex );
