@@ -25,7 +25,7 @@ MediatorStunClient::MediatorStunClient(
         }()),
     m_endpointProvider(endpointProvider)
 {
-    bindToAioThread(delegate().getAioThread());
+    bindToAioThread(m_endpointProvider ? m_endpointProvider->getAioThread() : getAioThread());
 
     base_type::setOnConnectionClosedHandler(
         [this](auto&&... args) { handleConnectionClosure(std::forward<decltype(args)>(args)...); });
