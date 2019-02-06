@@ -244,8 +244,8 @@ public:
     Option<bool> authenticationEnabled{this, "authenticationEnabled", true, ""};
     Option<QByteArray> authKey{this, "authKey", "", ""};
     Option<qint64> forceStopRecordingTime{this, "forceStopRecordingTime",
-        60 * 24 * 30,
-        "Stop camera recording timeout if not enough license. Value in minutes. By default it's 30"
+        60 * 60 * 24 * 30,
+        "Stop camera recording timeout if not enough license. Value in seconds. By default it's 30"
         " days.",
         [this](const qint64& value)
         {
