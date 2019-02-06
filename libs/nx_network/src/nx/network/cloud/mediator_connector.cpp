@@ -30,9 +30,8 @@ MediatorConnector::MediatorConnector(const std::string& cloudHost):
     auto stunClientSettings = s_stunClientSettings;
     stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
     m_stunClient = std::make_shared<MediatorStunClient>(
-        m_mediatorEndpointProvider.get(),
-        std::make_unique<network::stun::AsyncClientWithHttpTunneling>(
-            stunClientSettings));
+        std::move(stunClientSettings),
+        m_mediatorEndpointProvider.get());
 
     bindToAioThread(getAioThread());
 
