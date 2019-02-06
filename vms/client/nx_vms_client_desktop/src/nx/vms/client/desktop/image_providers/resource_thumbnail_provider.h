@@ -33,7 +33,7 @@ public:
     void setRequestData(const nx::api::ResourceImageRequest& data);
 
     nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode() const;
-    void setStreamSelectionMode(nx::api::CameraImageRequest::StreamSelectionMode value) const;
+    void setStreamSelectionMode(nx::api::CameraImageRequest::StreamSelectionMode value);
 
 protected:
     virtual void doLoadAsync() override;
