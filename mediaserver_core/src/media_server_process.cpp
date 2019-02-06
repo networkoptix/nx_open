@@ -3080,8 +3080,8 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
 
     // DW requested to accept professional licenses on their BlackJack MINI, see VMS-12693.
     // This code should be removed as soon as we accept professional licenses on all arm devices.
-    //if ((serverFlags & Qn::SF_ArmServer) && !isDwBlackJackMini())
-    //    serverFlags |= Qn::SF_RequiresEdgeLicense;
+    if ((serverFlags & Qn::SF_ArmServer) && !isDwBlackJackMini())
+        serverFlags |= Qn::SF_RequiresEdgeLicense;
 
     if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
         serverFlags |= Qn::SF_SupportsTranscoding;
