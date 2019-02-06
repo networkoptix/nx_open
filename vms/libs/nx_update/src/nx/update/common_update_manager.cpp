@@ -24,7 +24,7 @@ CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
 void CommonUpdateManager::connectToSignals()
 {
     connect(
-        globalSettings(), &QnGlobalSettings::updateInformationChanged,
+        globalSettings(), &QnGlobalSettings::targetUpdateInformationChanged,
         this, &CommonUpdateManager::onGlobalUpdateSettingChanged, Qt::QueuedConnection);
 
     connect(
@@ -133,6 +133,9 @@ void CommonUpdateManager::cancel()
 
 void CommonUpdateManager::finish()
 {
+    commonModule()->globalSettings()->setInstalledUpdateInformation(
+        commonModule()->globalSettings()->targetUpdateInformation());
+    commonModule()->globalSettings()->synchronizeNowSync();
     startUpdate("{}");
 }
 
@@ -143,7 +146,7 @@ void CommonUpdateManager::onGlobalUpdateSettingChanged()
 
 void CommonUpdateManager::startUpdate(const QByteArray& content)
 {
-    commonModule()->globalSettings()->setUpdateInformation(content);
+    commonModule()->globalSettings()->setTargetUpdateInformation(content);
     commonModule()->globalSettings()->synchronizeNowSync();
 }
 
@@ -262,7 +265,7 @@ update::FindPackageResult CommonUpdateManager::findPackage(
         commonModule()->moduleGUID(),
         commonModule()->engineVersion(),
         QnAppInfo::currentSystemInformation(),
-        globalSettings()->updateInformation(),
+        globalSettings()->targetUpdateInformation(),
         runtimeInfoManager()->localInfo().data.peer.isClient(),
         nx::network::SocketGlobals::cloud().cloudHost(),
         !globalSettings()->cloudSystemId().isEmpty(),
@@ -273,7 +276,7 @@ update::FindPackageResult CommonUpdateManager::findPackage(
 bool CommonUpdateManager::deserializedUpdateInformation(update::Information* outUpdateInformation,
     const QString& caller) const
 {
-    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->targetUpdateInformation(),
         outUpdateInformation, nullptr);
 
     if (deserializeResult != nx::update::FindPackageResult::ok)
@@ -321,14 +324,14 @@ void CommonUpdateManager::setUpdateInformation(const update::Information& update
     QByteArray serializedUpdateInformation;
 
     QJson::serialize(updateInformation, &serializedUpdateInformation);
-    globalSettings()->setUpdateInformation(serializedUpdateInformation);
+    globalSettings()->setTargetUpdateInformation(serializedUpdateInformation);
     globalSettings()->synchronizeNowSync();
 }
 
 bool CommonUpdateManager::updateLastInstallationRequestTime()
 {
     nx::update::Information updateInformation;
-    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->updateInformation(),
+    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->targetUpdateInformation(),
         &updateInformation, nullptr);
 
     if (deserializeResult != nx::update::FindPackageResult::ok)
