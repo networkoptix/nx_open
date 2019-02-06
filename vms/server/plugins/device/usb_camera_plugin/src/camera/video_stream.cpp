@@ -140,19 +140,15 @@ void VideoStream::tryToStartIfNotStarted()
 void VideoStream::start()
 {
     stop();
-
     m_terminated = false;
     m_videoThread = std::thread(&VideoStream::run, this);
 }
 
 void VideoStream::stop()
 {
-    if (!m_terminated)
-    {
-        m_terminated = true;
-        if (m_videoThread.joinable())
-            m_videoThread.join();
-    }
+    m_terminated = true;
+    if (m_videoThread.joinable())
+        m_videoThread.join();
 }
 
 void VideoStream::run()
