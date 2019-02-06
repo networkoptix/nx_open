@@ -497,23 +497,33 @@ TEST_F(QnLicenseUsageHelperTest, checkStartLicenseOverlapping)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-/** Test for start licenses on the arm servers. */
-TEST_F(QnLicenseUsageHelperTest, checkStartLicensesArmActivating)
+TEST_F(QnLicenseUsageHelperTest, checkEdgeLicensesArmActivating)
 {
-    /* Nor professional nor starter licenses should not be active on arm server. */
     setArmMode();
-    addLicenses(Qn::LC_Start, 8);
-    addLicenses(Qn::LC_Professional, 8);
+    addLicenses(Qn::LC_Edge, 1);
 
     addRecordingCameras(Qn::LC_Professional, 1, true);
-
-    ASSERT_FALSE(m_helper->isValid());
-
-    addLicenses(Qn::LC_Edge, 1);
     ASSERT_TRUE(m_helper->isValid());
 }
 
-/** Test for io licenses on the arm servers. */
+TEST_F(QnLicenseUsageHelperTest, checkStartLicensesArmActivating)
+{
+    setArmMode();
+    addLicenses(Qn::LC_Start, 8);
+
+    addRecordingCameras(Qn::LC_Professional, 1, true);
+    ASSERT_FALSE(m_helper->isValid());
+}
+
+TEST_F(QnLicenseUsageHelperTest, checkProLicensesArmActivating)
+{
+    setArmMode();
+    addLicenses(Qn::LC_Professional, 8);
+
+    addRecordingCameras(Qn::LC_Professional, 1, true);
+    ASSERT_TRUE(m_helper->isValid());
+}
+
 TEST_F(QnLicenseUsageHelperTest, checkIoLicensesArmActivating)
 {
     setArmMode();
