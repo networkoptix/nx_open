@@ -92,7 +92,8 @@ void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>&
 {
     std::lock_guard<std::mutex> lock(m_threadStartMutex);
     m_packetConsumerManager.addConsumer(consumer);
-    tryToStartIfNotStarted();
+    if (pluggedIn() && m_terminated)
+        start();
 }
 
 void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
@@ -126,15 +127,6 @@ std::string VideoStream::ffmpegUrlPlatformDependent() const
 #else
         ffmpegUrl();
 #endif
-}
-
-void VideoStream::tryToStartIfNotStarted()
-{
-    if (m_terminated)
-    {
-        if (pluggedIn())
-            start();
-    }
 }
 
 void VideoStream::start()
@@ -374,7 +366,7 @@ void VideoStream::setBitrate(int bitrate)
 
 CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParameters& params) const
 {
-    std::vector<device::video::ResolutionData>resolutionList;
+    std::vector<device::video::ResolutionData> resolutionList;
 
     // Assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())
