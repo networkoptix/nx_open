@@ -1,5 +1,7 @@
 #include "client_connection_validator.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::network::stun {
 
 ClientConnectionValidator::ClientConnectionValidator(
@@ -24,6 +26,9 @@ void ClientConnectionValidator::validate(
     post(
         [this, handler = std::move(handler)]() mutable
         {
+            NX_VERBOSE(this, "Validating STUN connection to %1",
+                m_messagePipeline.socket()->getForeignAddress());
+
             m_completionHandler = std::move(handler);
 
             sendBindingRequest();
@@ -68,6 +73,9 @@ void ClientConnectionValidator::sendBindingRequest()
 void ClientConnectionValidator::processConnectionClosure(
     SystemError::ErrorCode reasonCode)
 {
+    NX_DEBUG(this, "Failed to validate STUN connection to %1. %2",
+        m_messagePipeline.socket()->getForeignAddress(), SystemError::toString(reasonCode));
+
     m_messagePipeline.pleaseStopSync();
 
     if (m_completionHandler)
