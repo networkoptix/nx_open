@@ -161,6 +161,11 @@ def save_unrevisioned_records(product, context, language, data_structures,
             new_record_value = request_data[data_structure_name]
             try:
                 new_record_value = json.loads(new_record_value)
+                if data_structure.type == DataStructure.DATA_TYPES.array and type(new_record_value) != list:
+                    raise ValueError
+                elif data_structure.type == DataStructure.DATA_TYPES.object and type(new_record_value) != dict:
+                    raise ValueError
+
                 new_record_value = json.dumps(new_record_value, indent=4)
             except ValueError:
                 upload_errors.append((data_structure_name, "Json was incorrectly formatted."))
