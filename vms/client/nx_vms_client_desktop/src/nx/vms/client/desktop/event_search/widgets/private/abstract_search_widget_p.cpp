@@ -444,19 +444,9 @@ void AbstractSearchWidget::Private::setupCameraSelection()
             const auto updateButtonText =
                 [this](Cameras cameras)
                 {
-                    const auto currentCameraName =
-                        [this]()
-                        {
-                            const auto camera = m_mainModel->cameraSet()->singleCamera();
-                            return camera
-                                ? camera->getName()
-                                : tr("none", "No currently selected camera");
-                        };
-
                     const auto text = m_cameraSelectionActions[cameras]->text();
-
                     ui->cameraSelectionButton->setText(cameras == Cameras::current
-                        ? QString::fromWCharArray(L"%1 \x2013 %2").arg(text, currentCameraName())
+                        ? currentDeviceText()
                         : text);
                 };
 
@@ -557,6 +547,20 @@ void AbstractSearchWidget::Private::setupCameraSelection()
                 this, updateCurrentCameraName);
         });
 }
+
+QString AbstractSearchWidget::Private::currentDeviceText() const
+{
+    static const auto kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
+
+    const auto camera = m_mainModel->cameraSet()->singleCamera();
+    if (!camera)
+        return kTemplate.arg(tr("Current camera"), tr("none", "No currently selected camera"));
+
+    const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+        QnCameraDeviceStringSet("<unused>", tr("Current camera"), tr("Current device")), camera);
+
+    return kTemplate.arg(baseText, camera->getName());
+};
 
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
