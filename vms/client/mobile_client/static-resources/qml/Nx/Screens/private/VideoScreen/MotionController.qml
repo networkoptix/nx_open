@@ -28,8 +28,7 @@ Item
         if (!allowDrawing || !d.customInitialPoint)
             return
 
-        d.selectionRoi.start(true)
-        handleLongPressed()
+        d.selectionRoi.start(function() { handleLongPressed() })
     }
 
     function clearCustomRoi()

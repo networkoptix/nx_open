@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import QtGraphicalEffects 1.0
 import Nx.Core.Items 1.0
+import "utils.js" as Utils
 
 Item
 {
@@ -24,18 +25,15 @@ Item
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
     // Shows preloader
-    function start(immediate)
+    function start(completionCallback)
     {
-        if (immediate)
-            d.preloader = true
-        else
-            startDelayTimer.restart()
+        d.startCompletionCallback = completionCallback
+        d.preloader = true
     }
 
     // Shows selection
     function show()
     {
-        startDelayTimer.stop()
         d.visible = true
         d.preloader = false
     }
@@ -43,18 +41,8 @@ Item
     // Hides whatever it shows.
     function hide()
     {
-        startDelayTimer.stop()
         d.preloader = false
         d.visible = false
-    }
-
-    Timer
-    {
-        id: startDelayTimer
-
-        interval: 200
-        repeat: false
-        onTriggered: d.preloader = true
     }
 
     RoiSelectionPreloader
@@ -73,6 +61,20 @@ Item
 
         centerPoint: d.endMarkerPoint
         visible: opacity > 0
+
+        onExpandingFinishedChanged:
+        {
+            if (!expandingFinished || !d.startCompletionCallback)
+                return
+
+            Utils.executeLater(
+                function()
+                {
+                    d.startCompletionCallback()
+                    d.startCompletionCallback = undefined
+                },
+                parent)
+        }
     }
 
     Rectangle
@@ -123,6 +125,7 @@ Item
     {
         id: d
 
+        property var startCompletionCallback
         property bool visible: false
         property bool preloader: false
         readonly property int shadowRadius: 1
