@@ -1,6 +1,8 @@
 #include "label_selection_manager.h"
 
+#include <QtCore/QPointer>
 #include <QtGui/QClipboard>
+#include <QtGui/QFocusEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QContextMenuEvent>
 #include <QtWidgets/QApplication>
@@ -41,6 +43,35 @@ protected:
                 const auto focusLabel = qobject_cast<QLabel*>(QApplication::focusWidget());
                 if (focusLabel && focusLabel != label)
                     focusLabel->clearFocus();
+
+                break;
+            }
+
+            // Select all text (on mouse release) if an unfocused label was left-clicked.
+            case QEvent::FocusIn:
+            {
+                const auto focusEvent = static_cast<QFocusEvent*>(event);
+                if (!focusEvent->gotFocus())
+                    break;
+
+                m_lastFocusedLabel = focusEvent->reason() == Qt::MouseFocusReason ? label : nullptr;
+                break;
+            }
+
+            case QEvent::MouseButtonRelease:
+            {
+                const auto mouseEvent = static_cast<QMouseEvent*>(event);
+                const bool selectAll = m_lastFocusedLabel && m_lastFocusedLabel == label
+                    && mouseEvent->button() == Qt::LeftButton && label->selectedText().isEmpty();
+
+                m_lastFocusedLabel = nullptr;
+                if (!selectAll)
+                    break;
+
+                const auto textControl = getTextControl(label);
+                const auto linkText = textControl->anchorAt(mouseEvent->pos());
+                if (linkText.isEmpty())
+                    setFullSelection(textControl);
 
                 break;
             }
@@ -104,6 +135,9 @@ private:
         cursor.select(QTextCursor::Document);
         textControl->setTextCursor(cursor);
     }
+
+private:
+    QPointer<QLabel> m_lastFocusedLabel;
 };
 
 //-------------------------------------------------------------------------------------------------
