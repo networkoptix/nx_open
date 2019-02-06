@@ -249,7 +249,6 @@ int VideoStream::initializeInputFormat()
         return result;
 
     m_inputFormat = std::move(inputFormat);
-
     return 0;
 }
 
