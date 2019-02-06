@@ -28,7 +28,7 @@
 
                     alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
                     alertsMaxCount: 5,
-                    minSystemsToSearch: 9, //We need at least 9 system to enable search
+                    minSystemsToSearch: 9, // We need at least 9 system to enable search
                     maxSystemsForHeader: 6, // Dropdown at the top is limited in terms of number of cameras to display
 
                     redirectAuthorised: '/systems', // Page for redirecting all authorised users
@@ -230,10 +230,11 @@
                         nativeTimeout: 60 * 1000,
                         playerReadyTimeout: 100,
                         endOfArchiveTime: 30 * 1000,
-                        chunksToCheckFatal: 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+                        chunksToCheckFatal: 30, // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+                        skipFramesRenderingTimeline: true
                     },
                     permissions: {
-                        canViewRelease: "can_view_release"
+                        canViewRelease: 'can_view_release'
                     },
                     globalEditServersPermissions: 'GlobalAdminPermission',
                     globalViewArchivePermission: 'GlobalViewArchivePermission',

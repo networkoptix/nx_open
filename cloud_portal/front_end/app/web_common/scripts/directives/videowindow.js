@@ -26,8 +26,8 @@ import * as Hls from 'hls.js';
     var flashPlayer = '';
     
     angular.module('nxCommon')
-        .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'configService',
-            function ($interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, configService) {
+        .directive('videowindow', ['$rootScope', '$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'configService',
+            function ($rootScope, $interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, configService) {
                 
                 const CONFIG = configService.config;
                 
@@ -166,7 +166,7 @@ import * as Hls from 'hls.js';
                                 case 'Webkit':
                                 default:
                                     if (weHaveHls) {
-                                        if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
+                                        if (($window.jscd.browser === 'Safari' || $window.jscd.os === 'iOS') && canPlayNatively('hls')) {
                                             return 'native-hls';
                                         }
                                         if (jsHlsSupported) {
@@ -279,6 +279,7 @@ import * as Hls from 'hls.js';
                                 });
                                 
                                 scope.vgApi.addEventListener('timeupdate', function (event) {
+                                    scope.loading = false;
                                     var video = event.srcElement || event.originalTarget;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
@@ -307,6 +308,7 @@ import * as Hls from 'hls.js';
                                         scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
                                         
                                         scope.vgApi.addEventListener('timeupdate', function (event) {
+                                            scope.loading = false;
                                             var video = event.srcElement || event.originalTarget;
                                             scope.vgUpdateTime({
                                                 $currentTime: video.currentTime,
@@ -324,6 +326,8 @@ import * as Hls from 'hls.js';
                                             // I experienced a missing event "loadeddata" (WebM?)
                                             // this is to continue playing -- TT
                                             scope.loading = false;
+                                            
+                                            $rootScope.$emit('nx.player.playing');
                                         });
                                         
                                         scope.vgApi.addEventListener('waiting', function (event) {

@@ -2,7 +2,7 @@
     
     'use strict';
     
-    function CameraViewInformer(configService, languageService) {
+    function CameraViewInformer($rootScope, configService, languageService) {
     
         const CONFIG = configService.config;
         const LANG = languageService.lang;
@@ -30,6 +30,7 @@
                 scope.alertType = null;
                 
                 //check for flag
+                
                 for (var key in scope.flags) {
                     if (key !== 'status' && scope.flags[key]) {
                         scope.alertType = key;
@@ -59,6 +60,12 @@
                 updateTpl(scope);
                 
             }, true);
+    
+            $rootScope.$on('nx.player.playing', function () {
+                // Ensure Safari will hide the informer
+                // probable cause: Event misalignment
+                scope.condition = false;
+            });
         }
         
         return {
@@ -73,7 +80,7 @@
         };
     }
     
-    CameraViewInformer.$inject = ['configService', 'languageService'];
+    CameraViewInformer.$inject = ['$rootScope', 'configService', 'languageService'];
     
     angular
         .module('nxCommon')
