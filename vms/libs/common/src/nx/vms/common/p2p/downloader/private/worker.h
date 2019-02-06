@@ -109,6 +109,7 @@ private:
     void pleaseStopUnsafe();
     bool haveChunksToDownloadUnsafe();
     virtual qint64 delayMs() const;
+    bool hasNotDownloadingChunks() const;
 
 protected:
     FileInformation fileInformation() const;
