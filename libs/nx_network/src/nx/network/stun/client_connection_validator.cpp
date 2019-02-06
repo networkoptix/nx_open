@@ -61,6 +61,9 @@ void ClientConnectionValidator::processMessage(Message /*message*/)
     m_connection = m_messagePipeline.takeSocket();
     m_messagePipeline.pleaseStopSync();
 
+    NX_VERBOSE(this, "STUN connection to %1 has been validated",
+        m_connection->getForeignAddress());
+
     nx::utils::swapAndCall(m_completionHandler, http::tunneling::ResultCode::ok);
 }
 
