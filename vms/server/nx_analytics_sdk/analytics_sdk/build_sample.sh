@@ -30,7 +30,8 @@ case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
     CYGWIN*|MINGW*)
         if [[ $(which cmake) == /usr/bin/* ]] # Cygwin's cmake is on PATH.
         then
-            echo "WARNING: In Cygwin/MinGW, gcc instead of MSVC may work, but is not supported.\n"
+            echo "WARNING: In Cygwin/MinGW, gcc instead of MSVC may work, but is not supported."
+            echo ""
         else # Assuming Windows-native cmake is on PATH.
             GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
             SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows-native cmake requires Windows path.
@@ -52,7 +53,7 @@ ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.s
 if [ ! -f "$ARTIFACT" ]
 then
     echo "ERROR: Failed to build plugin."
-    exit 42
+    exit 64
 fi
 
 echo ""
