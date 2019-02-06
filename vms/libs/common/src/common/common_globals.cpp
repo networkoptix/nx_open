@@ -122,7 +122,7 @@ QString toErrorMessage(AuthResult value)
     switch (value)
     {
         case Auth_OK:
-            NX_ASSERT(false, "This value is not an error.");
+            NX_ASSERT(false, "This value is not an error");
             break;
 
         case Auth_WrongLogin:
@@ -152,6 +152,7 @@ QString toErrorMessage(AuthResult value)
             return "This authorization method is forbidden. Please, contact your system administrator.";
     }
 
+    NX_ASSERT(false, lm("Unhandled value: %1").arg(value));
     return lm("Internal server error (%1). Please, contact your system administrator.").arg(value);
 }
 

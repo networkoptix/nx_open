@@ -30,7 +30,7 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         "Enable assertions for heavy conditions.");
 
     NX_INI_FLAG(kShowPasswordsInLogs, showPasswordsInLogs,
-        "Enable displaying of URL password field in the logs");
+        "Show passwords in the log messages.");
 };
 
 NX_UTILS_API Ini& ini();

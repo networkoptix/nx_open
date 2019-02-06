@@ -620,7 +620,7 @@ bool Authenticator::isLoginLockedOut(
 
     NX_VERBOSE(this, "User '%1' from %2 is locked out for about %3", name, address,
         std::chrono::duration_cast<std::chrono::seconds>(
-            ipIt->second.failures.front() + m_lockoutOptions->accountTime - now));
+            ipIt->second.failures.front() + m_lockoutOptions->lockoutTime - now));
 
     return true;
 }
