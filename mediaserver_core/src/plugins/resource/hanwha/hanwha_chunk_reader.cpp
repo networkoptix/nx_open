@@ -21,6 +21,7 @@ namespace {
 static const int kMaxAllowedChannelNumber = 64;
 static const nx::Buffer kStartTimeParamName("StartTime");
 static const nx::Buffer kEndTimeParamName("EndTime");
+static const nx::Buffer kTypeParamName("Type");
 static const QString kOverlappedIdListParameter = lit("OverlappedIDList");
 
 static const std::chrono::seconds kUpdateChunksDelay(60);
@@ -588,15 +589,18 @@ bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 current
     }
     else if (fieldName == kEndTimeParamName)
     {
-        const auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
+        m_lastParsedEndTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
+    }
+    else if (fieldName == kTypeParamName)
+    {
         if (m_lastParsedStartTimeMs > currentTimeMs)
         {
             NX_DEBUG(this, lm("Ignore period [%1, %2] from future on channel %3")
-                .args(m_lastParsedStartTimeMs, endTimeMs, channelNumber));
+                .args(m_lastParsedStartTimeMs, m_lastParsedEndTimeMs, channelNumber));
             return false;
         }
 
-        QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
+        QnTimePeriod timePeriod(m_lastParsedStartTimeMs, m_lastParsedEndTimeMs - m_lastParsedStartTimeMs);
         if (m_startTimeUs == AV_NOPTS_VALUE || chunks.isEmpty())
             m_startTimeUs = timePeriod.startTimeMs * 1000;
 
@@ -610,7 +614,11 @@ bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 current
         {
             QnTimePeriodList periods;
             periods << timePeriod;
-            QnTimePeriodList::overwriteTail(chunks, periods, timePeriod.startTimeMs);
+            if (fieldValue == "Normal")
+                QnTimePeriodList::overwriteTail(chunks, periods, timePeriod.startTimeMs);
+            else
+                QnTimePeriodList::unionTimePeriods(chunks, periods);
+
         }
     }
 
