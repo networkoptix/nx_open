@@ -282,6 +282,14 @@ import * as Hls from 'hls.js';
                                     var video = event.srcElement || event.originalTarget;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
+    
+                                scope.vgApi.addEventListener('playing', function (event) {
+                                    // I experienced a missing event "loadeddata" (WebM?)
+                                    // this is to continue playing -- TT
+                                    scope.loading = false;
+        
+                                    $rootScope.$emit('nx.player.playing');
+                                });
                                 
                                 scope.vgApi.addEventListener('ended', function (event) {
                                     scope.vgUpdateTime({$currentTime: null, $duration: null});

@@ -145,24 +145,21 @@ angular.module('nxCommon')
                 animations.splice(animations.indexOf(animation),1);
             });
 
-            // scopes.forEach(function(scope){
-            //     scope.$apply();
-            // });
+            scopes.forEach(function(scope){
+                scope.$apply();
+            });
         }
         
-        var skipframes = false;
         function animationFunction(digestContext){
             if(!animationRunning) {
                 return;
             }
     
-            if (!CONFIG.webclient.skipFramesRenderingTimeline || !skipframes) {
-                process();
-                if (typeof (animationHandler) !== 'undefined' && animationHandler !== null && animationHandler !== false) {
-                    animationHandler();
-                }
+            
+            process();
+            if (typeof (animationHandler) !== 'undefined' && animationHandler !== null && animationHandler !== false) {
+                animationHandler();
             }
-            skipframes = !skipframes;
             
             /*if(defaultScope.$root.$$phase && !digestContext ){
                 console.error('wrong phase',defaultScope.$root.$$phase);
@@ -171,10 +168,12 @@ angular.module('nxCommon')
                 defaultScope.$apply();
             }*/
             if(updationLimit!==0) {
-                window.animationFrame(animationFunction);
-                if (updationLimit) {
-                    updationLimit--;
-                }
+                setTimeout(function () {
+                    window.animationFrame(animationFunction);
+                    if (updationLimit) {
+                        updationLimit--;
+                    }
+                });
             }
         }
         return {
