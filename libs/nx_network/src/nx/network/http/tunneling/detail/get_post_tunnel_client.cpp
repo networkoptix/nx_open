@@ -42,6 +42,7 @@ const Response& GetPostTunnelClient::response() const
 void GetPostTunnelClient::openDownChannel()
 {
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    m_httpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
         m_httpClient->setResponseReadTimeout(*m_timeout);

@@ -22,6 +22,16 @@ void BaseTunnelClient::bindToAioThread(
         m_connection->bindToAioThread(aioThread);
 }
 
+void BaseTunnelClient::setCustomHeaders(HttpHeaders headers)
+{
+    m_customHeaders = std::move(headers);
+}
+
+const HttpHeaders& BaseTunnelClient::customHeaders() const
+{
+    return m_customHeaders;
+}
+
 void BaseTunnelClient::stopWhileInAioThread()
 {
     m_httpClient.reset();

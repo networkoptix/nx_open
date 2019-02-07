@@ -2,7 +2,7 @@
 
 #include "relay_api_basic_client.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API ClientOverHttpUpgrade:
     public BasicClient
@@ -23,4 +23,4 @@ public:
         OpenRelayConnectionHandler handler) override;
 };
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail
