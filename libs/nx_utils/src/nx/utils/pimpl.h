@@ -4,37 +4,35 @@
 
 namespace nx::utils {
 
-// Const-aware pointer to implementation.
+// Const-aware pointer to a private implementation.
 template<typename T>
 class PImpl final
 {
-    using value_type = std::remove_reference_t<T>;
-    using const_value_type = const value_type;
-
 public:
-    explicit PImpl(value_type* ptr): m_ptr(ptr) {}
+    explicit PImpl(T* ptr): m_ptr(ptr) {}
     ~PImpl() = default;
 
     PImpl() = delete;
+    PImpl(nullptr_t) = delete;
     PImpl(const PImpl&) = delete;
     PImpl(PImpl&&) = delete;
     PImpl& operator=(const PImpl&) = delete;
     PImpl& operator=(PImpl&&) = delete;
 
-    const_value_type* get() const { return m_ptr.get(); }
-    value_type* get() { return m_ptr.get(); }
+    const T* get() const { return m_ptr.get(); }
+    T* get() { return m_ptr.get(); }
 
-    const_value_type* data() const { return get(); }
-    value_type* data() { return get(); }
+    const T* data() const { return get(); }
+    T* data() { return get(); }
 
-    const_value_type* operator->() const { return get(); }
-    value_type* operator->() { return get(); }
+    const T* operator->() const { return get(); }
+    T* operator->() { return get(); }
 
-    const_value_type& operator*() const { return *get(); }
-    value_type& operator*() { return *get(); }
+    const T& operator*() const { return *get(); }
+    T& operator*() { return *get(); }
 
 private:
-    const std::unique_ptr<value_type> m_ptr;
+    const std::unique_ptr<T> m_ptr;
 };
 
 } // namespace nx::utils
