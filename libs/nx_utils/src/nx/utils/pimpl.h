@@ -13,7 +13,7 @@ public:
     ~PImpl() = default;
 
     PImpl() = delete;
-    PImpl(nullptr_t) = delete;
+    PImpl(std::nullptr_t) = delete;
     PImpl(const PImpl&) = delete;
     PImpl(PImpl&&) = delete;
     PImpl& operator=(const PImpl&) = delete;
