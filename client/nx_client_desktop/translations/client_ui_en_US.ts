@@ -1540,6 +1540,11 @@
         <source>Search Filter</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Search Timeout (s)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
