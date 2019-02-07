@@ -288,17 +288,16 @@ void QnRtspClient::parseSDP(const QByteArray& data)
         if (!media.rtpmap.codecName.isEmpty())
             m_sdpTracks.emplace_back(media, this, m_transport, media.serverPort);
     }
-    if (m_config.backChannelAudioOnly)
+
+    m_sdpTracks.erase(std::remove_if(
+        m_sdpTracks.begin(), m_sdpTracks.end(),
+        [this](const QnRtspClient::SDPTrackInfo& track)
     {
-        m_sdpTracks.erase(std::remove_if(
-            m_sdpTracks.begin(), m_sdpTracks.end(),
-            [](const QnRtspClient::SDPTrackInfo& track)
-            {
-                return !track.sdpMedia.sendOnly
-                    || track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Audio;
-            }),
-            m_sdpTracks.end());
-    }
+        if (m_config.backChannelAudioOnly && track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Audio)
+            return true; //< Remove non audio tracks for back audio channel.
+        return m_config.backChannelAudioOnly != track.sdpMedia.sendOnly;
+    }),
+        m_sdpTracks.end());
 }
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
