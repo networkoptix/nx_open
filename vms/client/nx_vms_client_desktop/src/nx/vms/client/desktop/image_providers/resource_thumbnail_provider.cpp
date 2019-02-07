@@ -39,7 +39,7 @@ struct ResourceThumbnailProvider::Private
 
         const auto flags = resource->flags();
 
-        if (true)//flags.testFlag(Qn::server))
+        if (flags.testFlag(Qn::server))
             return {ProviderType::image, "item_placeholders/videowall_server_placeholder.png"};
 
         if (flags.testFlag(Qn::web_page))
