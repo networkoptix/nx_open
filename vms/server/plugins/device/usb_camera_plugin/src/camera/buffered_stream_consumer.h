@@ -2,9 +2,10 @@
 
 #include "abstract_stream_consumer.h"
 
-#include <condition_variable>
-#include <mutex>
 #include <atomic>
+#include <condition_variable>
+#include <deque>
+#include <mutex>
 
 namespace nx::usb_cam {
 
