@@ -2,7 +2,7 @@
 
 #include <nx/utils/type_utils.h>
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 ClientOverHttpConnect::ClientOverHttpConnect(
     const nx::utils::Url& baseUrl,
@@ -86,4 +86,4 @@ void ClientOverHttpConnect::processBeginListeningResponse(
         httpClient->takeSocket());
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

@@ -18,7 +18,7 @@ class AbstractClientTypeHolder
 public:
     virtual ~AbstractClientTypeHolder() = default;
 
-    virtual void registerType(api::ClientFactory* factory) const = 0;
+    virtual void registerType(api::detail::ClientFactory* factory) const = 0;
     virtual bool isSameType(api::AbstractClient* client) const = 0;
 };
 
@@ -27,7 +27,7 @@ class ClientTypeHolder:
     public AbstractClientTypeHolder
 {
 public:
-    virtual void registerType(api::ClientFactory* factory) const override
+    virtual void registerType(api::detail::ClientFactory* factory) const override
     {
         factory->registerClientType<T>();
     }
@@ -217,7 +217,7 @@ protected:
 
 private:
     const nx::utils::Url m_relayUrl;
-    api::ClientFactory m_factory;
+    api::detail::ClientFactory m_factory;
     std::unique_ptr<api::AbstractClient> m_client;
     std::deque<std::unique_ptr<AbstractClientTypeHolder>> m_clientTypes;
     int m_operationalClientTypeId = -1;

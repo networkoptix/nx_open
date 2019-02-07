@@ -7,7 +7,7 @@
 
 #include "relay_api_http_paths.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 ClientOverHttpUpgrade::ClientOverHttpUpgrade(
     const nx::utils::Url& baseUrl,
@@ -71,4 +71,4 @@ void ClientOverHttpUpgrade::openConnectionToTheTargetHost(
             });
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

@@ -11,7 +11,7 @@ class RelayApiClientOverHttpUpgradeTypeSet:
     using base_type = BasicRelayApiClientTestFixture;
 
 public:
-    using Client = ClientOverHttpUpgrade;
+    using Client = detail::ClientOverHttpUpgrade;
 
     void initializeHttpServer(
         nx::network::http::TestHttpServer* httpServer,

@@ -6,7 +6,7 @@
 
 #include "relay_api_basic_client.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API ClientOverHttpTunnel:
     public BasicClient
@@ -68,4 +68,4 @@ private:
         const network::http::tunneling::Client& tunnelingClient);
 };
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

@@ -68,7 +68,7 @@ protected:
     {
         using namespace nx::cloud::relay;
 
-        auto relayClient = api::ClientFactory::instance().create(relayUrl());
+        auto relayClient = api::detail::ClientFactory::instance().create(relayUrl());
 
         for (;;)
         {

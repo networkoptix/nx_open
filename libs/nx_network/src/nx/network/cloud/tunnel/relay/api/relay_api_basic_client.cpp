@@ -7,7 +7,7 @@
 
 #include "relay_api_http_paths.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 BasicClient::BasicClient(
     const nx::utils::Url& baseUrl,
@@ -138,4 +138,4 @@ void BasicClient::giveFeedback(ResultCode resultCode)
         m_feedbackFunction(resultCode);
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

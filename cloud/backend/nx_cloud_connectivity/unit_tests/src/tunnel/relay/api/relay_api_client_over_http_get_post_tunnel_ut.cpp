@@ -9,7 +9,7 @@ class RelayApiClientOverHttpGetPostTunnelTypeSet:
     public BasicRelayApiClientTestFixture
 {
 public:
-    using Client = ClientOverHttpGetPostTunnel;
+    using Client = detail::ClientOverHttpGetPostTunnel;
 
     ~RelayApiClientOverHttpGetPostTunnelTypeSet()
     {

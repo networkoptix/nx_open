@@ -8,7 +8,7 @@
 
 #include "relay_api_client.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API BasicClient:
     public AbstractClient
@@ -243,4 +243,4 @@ void BasicClient::executeRequest(
         });
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

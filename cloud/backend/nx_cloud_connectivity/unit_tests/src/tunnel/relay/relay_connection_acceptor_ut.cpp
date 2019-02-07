@@ -23,7 +23,7 @@ public:
     RelayTest()
     {
         m_factoryFunctionBak =
-            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+            nx::cloud::relay::api::detail::ClientFactory::instance().setCustomFunc(
                 [this](auto&&... args) { return createClient(std::move(args)...); });
 
         setKeepAliveReported(true);
@@ -33,7 +33,7 @@ public:
     {
         if (m_factoryFunctionBak)
         {
-            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+            nx::cloud::relay::api::detail::ClientFactory::instance().setCustomFunc(
                 std::move(*m_factoryFunctionBak));
             m_factoryFunctionBak = std::nullopt;
         }
@@ -98,7 +98,7 @@ private:
     nx::network::http::TestHttpServer m_testHttpServer;
     nx::utils::Url m_relayServerUrl;
     api::BeginListeningResponse m_beginListeningResponse;
-    std::optional<nx::cloud::relay::api::ClientFactory::Function> m_factoryFunctionBak;
+    std::optional<nx::cloud::relay::api::detail::ClientFactory::Function> m_factoryFunctionBak;
 
     void processIncomingConnection(
         nx::network::http::RequestContext requestContext,
@@ -135,7 +135,7 @@ private:
     std::unique_ptr<nx::cloud::relay::api::AbstractClient> createClient(
         const nx::utils::Url& relayUrl)
     {
-        return std::make_unique<nx::cloud::relay::api::ClientOverHttpUpgrade>(
+        return std::make_unique<nx::cloud::relay::api::detail::ClientOverHttpUpgrade>(
             relayUrl, nullptr);
     }
 };

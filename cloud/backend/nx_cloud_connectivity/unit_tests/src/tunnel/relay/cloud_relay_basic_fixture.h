@@ -31,7 +31,7 @@ protected:
     void resetClientFactoryToDefault();
 
 private:
-    boost::optional<nx::cloud::relay::api::ClientFactory::Function>
+    boost::optional<nx::cloud::relay::api::detail::ClientFactory::Function>
         m_clientFactoryBak;
 
     std::unique_ptr<nx::cloud::relay::api::AbstractClient>

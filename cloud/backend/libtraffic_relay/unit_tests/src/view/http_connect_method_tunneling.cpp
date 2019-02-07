@@ -104,7 +104,7 @@ private:
     {
         addRelayInstance();
 
-        m_relayClient = std::make_unique<api::ClientOverHttpConnect>(
+        m_relayClient = std::make_unique<api::detail::ClientOverHttpConnect>(
             relay().basicUrl(), nullptr);
     }
 

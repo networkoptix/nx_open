@@ -11,8 +11,8 @@ namespace nx::cloud::relay::test {
 #define DETAIL_INSTANTIATE_RELAY_METHOD_TESTS(ClientSideClass, ServerSideClass, StructName, CaseName) \
     struct StructName \
     { \
-        using ClientSideApiClient = api::ClientSideClass; \
-        using ServerSideApiClient = api::ServerSideClass; \
+        using ClientSideApiClient = api::detail::ClientSideClass; \
+        using ServerSideApiClient = api::detail::ServerSideClass; \
     }; \
     \
     INSTANTIATE_TYPED_TEST_CASE_P( \

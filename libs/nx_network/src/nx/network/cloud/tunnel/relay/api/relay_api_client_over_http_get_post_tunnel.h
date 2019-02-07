@@ -9,7 +9,7 @@
 #include "detail/get_post_tunnel_context.h"
 #include "relay_api_client_over_http_upgrade.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API ClientOverHttpGetPostTunnel:
     public ClientOverHttpUpgrade
@@ -61,4 +61,4 @@ private:
     void reportSuccess(Tunnels::iterator tunnelCtxIter);
 };
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

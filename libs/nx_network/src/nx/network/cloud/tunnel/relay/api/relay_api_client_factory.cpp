@@ -6,7 +6,7 @@
 
 #include "relay_api_client_over_http_tunnel.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 ClientFactory::ClientFactory():
     base_type([this](auto&&... args) { return defaultFactoryFunction(std::move(args)...); })
@@ -52,4 +52,4 @@ void ClientFactory::processClientFeedback(int typeId, ResultCode resultCode)
     }
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

@@ -5,7 +5,7 @@
 namespace nx::cloud::relay::api {
 
 Client::Client(const nx::utils::Url& baseUrl):
-    m_actualClient(ClientFactory::instance().create(baseUrl))
+    m_actualClient(detail::ClientFactory::instance().create(baseUrl))
 {
     bindToAioThread(getAioThread());
 }

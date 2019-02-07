@@ -8,7 +8,7 @@
 
 #include "relay_api_http_paths.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 // TODO: Make this timeout configurable.
 // And configure it properly when connecting!
@@ -160,4 +160,4 @@ api::ResultCode ClientOverHttpTunnel::getResultCode(
         &tunnelingClient.response());
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

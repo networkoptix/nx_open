@@ -10,7 +10,7 @@
 
 #include "relay_api_client.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 using ClientFactoryFunction =
     std::unique_ptr<AbstractClient>(const nx::utils::Url& baseUrl);
@@ -63,4 +63,4 @@ private:
     void processClientFeedback(int typeId, ResultCode resultCode);
 };
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail
