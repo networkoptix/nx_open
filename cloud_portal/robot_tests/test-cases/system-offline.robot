@@ -167,7 +167,7 @@ does not show Share button to viewer, advanced viewer, live viewer
     \  Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \  Log Out
 
-should show "your system" for owner and "owner's name" for non-owners
+should show (your system) for owner and (owner's name) for non-owners
     [tags]    C41881    Threaded
     Log in to AutoTests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']

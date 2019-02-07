@@ -285,7 +285,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
 
-should show "your system" for owner and "owner's name" for non-owners
+should show (your system) for owner and (owner's name) for non-owners
     [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']

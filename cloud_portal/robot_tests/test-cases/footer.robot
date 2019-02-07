@@ -24,7 +24,7 @@ About page is correctly displayed
     Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
 
-Known limitations". Support link is clickable and lead to the proper site
+Known limitations Support link is clickable and lead to the proper site
     [tags]    C41543    Threaded
     Wait Until Element Is Visible    ${FOOTER KNOWN LIMITS LINK}
     Click Link    ${FOOTER KNOWN LIMITS LINK}
