@@ -206,7 +206,7 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
 
     NX_DEBUG(
         NX_SCOPE_TAG,
-        "Trying to load engine settings from an engine-specific (%1) file for the Engine %2",
+        "Trying to load Engine settings from an engine-specific (%1) file for the Engine %2",
         settingsFilename,
         engine);
 
@@ -217,7 +217,7 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
 
         NX_DEBUG(
             NX_SCOPE_TAG,
-            "Trying to load engine settings from a generic file (%1) for the Engine %2",
+            "Trying to load Engine settings from a generic file (%1) for the Engine %2",
             settingsFilename,
             engine);
 

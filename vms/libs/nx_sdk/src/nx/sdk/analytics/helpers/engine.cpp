@@ -31,9 +31,9 @@ public:
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
 
-        std::string printPrefix = std::string("[") + plugin->name() + " Engine";
+        std::string printPrefix = std::string("[") + plugin->name() + "_engine";
         if (engineInfo)
-            printPrefix += std::string(" ") + engineInfo->id();
+            printPrefix += std::string("_") + engineInfo->id();
 
         printPrefix += "] ";
         return printPrefix;

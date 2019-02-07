@@ -138,7 +138,6 @@ const IString* Engine::manifest(Error* error) const
 
 void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    // Do nothing.
 }
 
 void Engine::setSettings(const IStringMap* settings)

@@ -33,8 +33,9 @@ public:
 
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
+
         return std::string("[") + engine->plugin()->name()
-            + " DeviceAgent " + deviceInfo->id() + "] ";
+            + "_device_" + deviceInfo->id() + "] ";
     }
 
 private:

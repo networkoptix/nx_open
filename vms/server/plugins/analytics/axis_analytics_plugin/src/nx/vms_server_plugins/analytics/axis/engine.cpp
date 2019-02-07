@@ -46,7 +46,6 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
 void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    // Do nothing.
 }
 
 void Engine::setSettings(const IStringMap* /*settings*/)

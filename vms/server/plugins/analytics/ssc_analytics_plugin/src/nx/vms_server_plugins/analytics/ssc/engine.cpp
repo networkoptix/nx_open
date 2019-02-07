@@ -274,7 +274,6 @@ void Engine::configureSerialPort(QSerialPort* port, const QString& name, int ind
 
 void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    // Do nothing.
 }
 
 void Engine::setSettings(const IStringMap* settings)
