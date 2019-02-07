@@ -61,6 +61,12 @@ HintButton::HintButton(QWidget* parent):
         });
 }
 
+HintButton::HintButton(const QString& hint, QWidget* parent):
+    HintButton(parent)
+{
+    setHint(hint);
+}
+
 HintButton* HintButton::hintThat(QGroupBox* groupBox)
 {
     auto result = new HintButton(groupBox);
