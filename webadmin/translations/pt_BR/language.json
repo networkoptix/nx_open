@@ -20,7 +20,7 @@
     "settings": {
         "tabs": {
             "server": "Servidor",
-            "system": "System",
+            "system": "Sistema",
             "device": "Dispositivo"
         },
         "confirmRestart": "Reiniciar o servidor?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Não é seguro usar uma porta inferior a 1025. O servidor pode não estar acessível. Continuar mesmo assim?",
         "confirmDisconnectFromCloud": "Desligar o sistema de {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Todos os utilizadores da Cloud serão apagados.</span><br><br>O Sistema estará acessível através da rede local com conta de administrador local.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "O Sistema foi desconectado de {{CLOUD_NAME}} com sucesso",
         "confirmDisconnectFromSystem": "Desanexar servidor do sistema actual",
         "confirmDisconnectFromSystemAction": "Desanexar",
@@ -77,10 +77,10 @@
         "enableEdgeRecording": "Ativar gravação de borda",
         "eventLogPeriodDays": "Período do log de eventos (dias)",
         "hanwhaDeleteProfilesOnInitIfNeeded": "Excluir perfis de câmera no ini se necessário",
-        "ldapAdminDn": "LDAP admin DN",
+        "ldapAdminDn": "DN de administrador LDAP",
         "ldapSearchBase": "Base de pesquisa LDAP",
         "ldapSearchFilter": "Filtro de pesquisa LDAP",
-        "ldapUri": "LDAP URI",
+        "ldapUri": "URI do LDAP",
         "localSystemId": "ID do sistema local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Diferença máxima entre o tempo sincronizado e o da Internet (milissegundos)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Diferença máxima entre tempo sincronizado e local (milissegundos)",

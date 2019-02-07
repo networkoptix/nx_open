@@ -43,8 +43,8 @@
                 <uib-tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Actualizar</a>
-                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Abrir em nova janela</a>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary"> Atualizar </a>
+                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default"> Abrir em uma nova janela </a>
                 </uib-tab>
             </uib-tabset>
         </div>

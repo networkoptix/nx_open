@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation>Unknown realm.</translation>
+      <translation type="unfinished">Unknown realm.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation>Invalid nonce.</translation>
+      <translation type="unfinished">Invalid nonce.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -99,7 +99,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <source>System (%1)</source>

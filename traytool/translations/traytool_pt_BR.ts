@@ -59,11 +59,11 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation>Server has been stopped</translation>
+      <translation>O servidor parou</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation>Server has been started</translation>
+      <translation>Servidor foi iniciado</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
@@ -71,47 +71,47 @@
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation>Show Server Log</translation>
+      <translation>Mostrar log do servidor</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation>Start Server</translation>
+      <translation>Iniciar Servidor</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation>Stop Server</translation>
+      <translation>Parar Servidor</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Server Web Page</translation>
+      <translation>Página Web do Servidor</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation>stopped</translation>
+      <translation>parado</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation>starting</translation>
+      <translation>iniciando</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation>stopping</translation>
+      <translation>parando</translation>
     </message>
     <message>
       <source>started</source>
-      <translation>started</translation>
+      <translation>iniciado</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation>resuming</translation>
+      <translation>retomando</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation>paused</translation>
+      <translation>pausado</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation>pausing</translation>
+      <translation>pausando</translation>
     </message>
   </context>
 </TS>

@@ -894,7 +894,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Экспорт закладок...</translation>
     </message>
   </context>
   <context>
@@ -5601,7 +5601,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Экспорт закладок...</translation>
     </message>
   </context>
   <context>
@@ -8760,7 +8760,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Несколько закладок можно экспортировать только как раскладку.</translation>
     </message>
   </context>
   <context>

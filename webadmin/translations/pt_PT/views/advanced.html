@@ -1,12 +1,12 @@
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1>Definições avançadas do servidor</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Aviso! </b> Quaisquer alterações nesta página podem fazer com que o servidor funcione incorrectamente.
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Armazenamento</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -16,10 +16,10 @@
                         URL
                     </th>
                     <th width="200">
-                        Free Space
+                        Espaço livre
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Espaço reservado
                     </th>
                     <th >
                     </th>
@@ -40,7 +40,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} de {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -67,14 +67,14 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
+ placeholder="Espaço reservado"/>
                             <div class="input-group-addon">Gb</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="Espaço reservado"/>
                             <div class="input-group-addon">Gb</div>
                         </div>
                     </td>
@@ -86,7 +86,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="Use para escrever"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,25 +103,25 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            Nenhuma unidade de armazenamento principal foi seleccionada para escrita - o vídeo não será gravado neste servidor.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            A quantidade de espaço reservado é maior que o espaço livre restante. As gravações actuais podem ser removidas para libertar algum espaço.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Corrigir todas as definições destacadas para gravá-lo</div>
 
         <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Gravar</button>
         <button class="btn btn-warning" ng-click="cancel()">Cancelar</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Definições de Log</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
-            <label class="col-sm-4">Main log level</label>
+            <label class="col-sm-4">Nível do Log principal</label>
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
+                    <option value="NONE">Nenhum: log desactivado.</option>
                     <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
                     <option value="ERROR">Error: Log errors only.</option>
                     <option value="WARNING">Warning: Log warnings and errors.</option>

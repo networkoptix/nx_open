@@ -5,22 +5,22 @@
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation>Searching servers in your local network...</translation>
+      <translation>Procurando servidores em sua rede local...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation>No servers found</translation>
+      <translation>Nenhum servidor encontrado</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</translation>
+      <translation>Verifique sua conexão de rede ou pressione &quot;Conectar-se ao servidor&quot; para inserir o endereço de servidor conhecido</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation>Click to setup</translation>
+      <translation>Clique para configurar</translation>
     </message>
   </context>
   <context>
@@ -31,7 +31,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <source>Save password</source>
@@ -57,34 +57,34 @@
     <name>SystemTile</name>
     <message>
       <source>SAFE MODE</source>
-      <translation>SAFE MODE</translation>
+      <translation>MODO DE SEGURANÇA</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>INCOMPATIBLE</translation>
+      <translation>INCOMPATÍVEL</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>OFF-LINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>UNREACHABLE</translation>
+      <translation>INACESSÍVEL</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation>New Server</translation>
+      <translation>Novo Servidor</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation>Nada encontrado</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>You have no access to %1. Some features could be unavailable.</translation>
+      <translation>Você não tem acesso a %1. Alguns recursos podem estar indisponíveis.</translation>
     </message>
     <message>
       <source>Loading...</source>

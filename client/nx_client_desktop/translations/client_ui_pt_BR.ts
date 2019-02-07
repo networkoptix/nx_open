@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation>System Servers</translation>
+      <translation>Servidores do sistema</translation>
     </message>
   </context>
   <context>
@@ -57,7 +57,7 @@
     <message>
       <location/>
       <source>Gamma</source>
-      <translation>Gamma</translation>
+      <translation>Gama</translation>
     </message>
     <message>
       <location/>
@@ -85,12 +85,12 @@
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation>Double Buffering</translation>
+      <translation>Buffer Duplo</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>Maximum Live Buffer Length</translation>
+      <translation>Comprimento máximo do buffer ativo</translation>
     </message>
     <message>
       <location/>
@@ -105,17 +105,17 @@
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation>Reset All Warnings</translation>
+      <translation>Redefinir todos os avisos</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>A exibição de Gráficos Intel HD pode enfrentar problemas se o desfoque estiver ativado. Recomendamos que deixe a opção como está.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation>Disable blur</translation>
+      <translation>Desativar desfoque</translation>
     </message>
   </context>
   <context>
@@ -267,7 +267,7 @@
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>All servers are offline. Audit data is not available.</translation>
+      <translation>Todos os servidores estão offline. Dados de auditoria não estão disponíveis.</translation>
     </message>
   </context>
   <context>
@@ -295,17 +295,17 @@
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation>Bitrate limitation could lead to backup failure.</translation>
+      <translation>A limitação da taxa de bits pode levar à falha de backup.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation>Finish</translation>
+      <translation>Terminar</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation>Start</translation>
+      <translation>Começar</translation>
     </message>
   </context>
   <context>
@@ -313,7 +313,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation>Backup Settings</translation>
+      <translation>Configurações de backup</translation>
     </message>
     <message>
       <location/>
@@ -328,7 +328,7 @@
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation>Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Só será feito o backup de mais gravações. Processo de backup irá ignorar o material existente.</translation>
     </message>
     <message>
       <location/>
@@ -338,12 +338,12 @@
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation>Backup Archive From</translation>
+      <translation>Arquivo de backup de</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation>Backup Quality</translation>
+      <translation>Qualidade de backup</translation>
     </message>
   </context>
   <context>
@@ -432,7 +432,7 @@
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation>List of tags divided by commas</translation>
+      <translation>Lista de tags divididas por vírgulas</translation>
     </message>
   </context>
   <context>
@@ -488,7 +488,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>At</translation>
+      <translation>Nas</translation>
     </message>
   </context>
   <context>
@@ -506,7 +506,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Regras de Evento</translation>
     </message>
     <message>
       <location/>
@@ -584,12 +584,12 @@
     <message>
       <location/>
       <source>Start IP</source>
-      <translation>Start IP</translation>
+      <translation>Ip Inicial</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation>End IP</translation>
+      <translation>Ip Final</translation>
     </message>
     <message>
       <location/>
@@ -604,7 +604,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
@@ -614,7 +614,7 @@
     <message>
       <location/>
       <source>Scan</source>
-      <translation>Scan</translation>
+      <translation>Varredura</translation>
     </message>
     <message>
       <location/>
@@ -675,12 +675,12 @@
     <message>
       <location/>
       <source>Force motion detection for stream:</source>
-      <translation>Force motion detection for stream:</translation>
+      <translation>Forçar detecção de movimento para o fluxo:</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation>Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Aviso! Predefinições de câmera nativas não estarão disponíveis.</translation>
     </message>
     <message>
       <location/>
@@ -715,7 +715,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Secondary Stream</translation>
+      <translation>Fluxo Secundário</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Tipo de predefinição PTZ preferida:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Nativo</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Esta câmera suporta pan e tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Esta câmera suporta zoom</translation>
     </message>
   </context>
   <context>
@@ -796,7 +796,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation>Add Device...</translation>
+      <translation>Adicionar dispositivo...</translation>
     </message>
   </context>
   <context>
@@ -877,12 +877,12 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation>Activate License...</translation>
+      <translation>Ativar Licença...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation>Show Quality</translation>
+      <translation>Mostrar Qualidade</translation>
     </message>
     <message>
       <location/>
@@ -892,7 +892,7 @@
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation>Copying Schedule</translation>
+      <translation>Programação de cópia</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>Panic Mode:</translation>
+      <translation>Modo de pânico:</translation>
     </message>
     <message>
       <location/>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>Change password</translation>
+      <translation>Mudar senha</translation>
     </message>
   </context>
   <context>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Stay logged in</translation>
+      <translation>Permanecer logado</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Regras do Evento...</translation>
     </message>
   </context>
   <context>
@@ -1067,17 +1067,17 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation>Content type</translation>
+      <translation>Tipo de conteúdo</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <location/>
@@ -1193,7 +1193,7 @@
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation>Fisheye Dewarping</translation>
+      <translation>Dewarping Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -1203,17 +1203,17 @@
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation>Mount Angle Correction:</translation>
+      <translation>Correção do ângulo de montagem:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation>Y Offset</translation>
+      <translation>Deslocamento Y</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>X Offset</translation>
+      <translation>Deslocamento X</translation>
     </message>
     <message>
       <location/>
@@ -1223,7 +1223,7 @@
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation>Ellipticity</translation>
+      <translation>Elipticidade</translation>
     </message>
   </context>
   <context>
@@ -1249,7 +1249,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>Misc</translation>
+      <translation>Outros</translation>
     </message>
     <message>
       <location/>
@@ -1279,17 +1279,17 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation>Local Media Folders</translation>
+      <translation>Pastas de mídia locais</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation>Audio Input</translation>
+      <translation>Entrada de áudio</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation>First Source</translation>
+      <translation>Primeira Fonte</translation>
     </message>
     <message>
       <location/>
@@ -1299,12 +1299,12 @@
     <message>
       <location/>
       <source>Second Source</source>
-      <translation>Second Source</translation>
+      <translation>Segunda Fonte</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation>Run Application when PC Boots up</translation>
+      <translation>Executar aplicativo quando o PC inicializa</translation>
     </message>
   </context>
   <context>
@@ -1317,7 +1317,7 @@
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation>Backup and Restore</translation>
+      <translation>Backup e Restauração</translation>
     </message>
   </context>
   <context>
@@ -1330,12 +1330,12 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation>Aspect Ratio</translation>
+      <translation>Proporção da tela</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation>Rotation</translation>
+      <translation>Rotação</translation>
     </message>
   </context>
   <context>
@@ -1386,7 +1386,7 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation>No image</translation>
+      <translation>Sem imagem</translation>
     </message>
   </context>
   <context>
@@ -1518,27 +1518,27 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>Server URL</translation>
+      <translation>URL Servidor</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation>Admin DN</translation>
+      <translation>Administrador DN</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation>Search Base</translation>
+      <translation>Base de pesquisa</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation>Search Filter</translation>
+      <translation>Filtro de pesquisa</translation>
     </message>
   </context>
   <context>
@@ -1561,12 +1561,12 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation>Role to assign to imported users</translation>
+      <translation>Função para atribuir a usuários importados</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation>Disable imported users</translation>
+      <translation>Desativar usuários importados</translation>
     </message>
   </context>
   <context>
@@ -1630,12 +1630,12 @@
     <message>
       <location/>
       <source>Details...</source>
-      <translation>Details...</translation>
+      <translation>Detalhes...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation>The software is licensed to</translation>
+      <translation>O software está licenciado para</translation>
     </message>
   </context>
   <context>
@@ -1648,7 +1648,7 @@
     <message>
       <location/>
       <source>License issues:</source>
-      <translation>License issues:</translation>
+      <translation>Problemas de licença:</translation>
     </message>
   </context>
   <context>
@@ -1686,7 +1686,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation>Internet Activation</translation>
+      <translation>Ativação pela Internet</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Invalid License Key</translation>
+      <translation>Chave de licença inválida</translation>
     </message>
     <message>
       <location/>
@@ -1719,7 +1719,7 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation>Activate License...</translation>
+      <translation>Ativar Licença...</translation>
     </message>
   </context>
   <context>
@@ -1755,7 +1755,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <location/>
@@ -1765,7 +1765,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
@@ -1813,7 +1813,7 @@
     <message>
       <location/>
       <source>Mode</source>
-      <translation>Mode</translation>
+      <translation>Modo</translation>
     </message>
     <message>
       <location/>
@@ -1823,7 +1823,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>Show additional info in tree</translation>
+      <translation>Mostrar informações adicionais na árvore</translation>
     </message>
     <message>
       <location/>
@@ -1833,7 +1833,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Tour cycle</translation>
+      <translation>Ciclo de tour</translation>
     </message>
     <message>
       <location/>
@@ -1846,7 +1846,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation>Do not show this message again</translation>
+      <translation>Não mostrar esta mensagem novamente</translation>
     </message>
   </context>
   <context>
@@ -1864,7 +1864,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
     <message>
       <location/>
@@ -1925,7 +1925,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation>Play to users</translation>
+      <translation>Play para os usuários</translation>
     </message>
   </context>
   <context>
@@ -1943,7 +1943,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation>Force Acknowledgment</translation>
+      <translation>Forçar reconhecimento</translation>
     </message>
   </context>
   <context>
@@ -1961,7 +1961,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Events</translation>
+      <translation>Eventos</translation>
     </message>
   </context>
   <context>
@@ -2004,7 +2004,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation>Preview</translation>
+      <translation>Visualizar</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation>Preview</translation>
+      <translation>Visualizar</translation>
     </message>
   </context>
   <context>
@@ -2053,7 +2053,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation>Choose a specific build</translation>
+      <translation>Escolha uma compilação específica</translation>
     </message>
   </context>
   <context>
@@ -2061,7 +2061,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <translation>Marcador</translation>
     </message>
   </context>
   <context>
@@ -2069,7 +2069,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation>Installing Compatibility Version...</translation>
+      <translation>Instalando versão de compatibilidade...</translation>
     </message>
   </context>
   <context>
@@ -2082,7 +2082,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
     <message>
       <location/>
@@ -2100,7 +2100,7 @@
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation>Enable tile interface</translation>
+      <translation>Ativar interface do bloco</translation>
     </message>
   </context>
   <context>
@@ -2108,12 +2108,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>Log in</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Stay logged in</translation>
+      <translation>Permanecer logado</translation>
     </message>
   </context>
   <context>
@@ -2139,7 +2139,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
     <message>
       <location/>
@@ -2154,7 +2154,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>The new System will have password and name from System:</translation>
+      <translation>O novo sistema terá senha e nome do sistema:</translation>
     </message>
   </context>
   <context>
@@ -2213,7 +2213,7 @@
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Removing this connection option could lead to System malfunction.</translation>
+      <translation>Remover esta opção de conexão pode levar a um mau funcionamento do sistema.</translation>
     </message>
   </context>
   <context>
@@ -2236,22 +2236,22 @@
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation>Updating to...</translation>
+      <translation>Atualizando para...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation>Link copied</translation>
+      <translation>Link copiado</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation>You have the latest version installed</translation>
+      <translation>Você tem a última versão instalada</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Applying System updates at the end of the week is not recommended.</translation>
+      <translation>A aplicação de atualizações do sistema no final da semana não é recomendada.</translation>
     </message>
   </context>
   <context>
@@ -2287,7 +2287,7 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation>Search users</translation>
+      <translation>Pesquisar usuários</translation>
     </message>
     <message>
       <location/>
@@ -2297,7 +2297,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation>Disable</translation>
+      <translation>Desativar</translation>
     </message>
     <message>
       <location/>
@@ -2307,7 +2307,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Edit Roles...</translation>
+      <translation>Editar Funções...</translation>
     </message>
   </context>
   <context>
@@ -2447,7 +2447,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
     </message>
     <message>
       <location/>
@@ -2513,7 +2513,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation>Speak to users</translation>
+      <translation>Fale com os usuários</translation>
     </message>
   </context>
   <context>
@@ -2559,7 +2559,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation>Porto</translation>
     </message>
   </context>
   <context>
@@ -2706,7 +2706,7 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware</translation>
+      <translation>Firmware:</translation>
     </message>
     <message>
       <location/>
@@ -2721,12 +2721,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
@@ -2848,7 +2848,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation>Available to</translation>
+      <translation>Disponível para</translation>
     </message>
     <message>
       <location/>
@@ -2858,7 +2858,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation>Icon</translation>
+      <translation>Ícone</translation>
     </message>
   </context>
   <context>
@@ -2866,12 +2866,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation>Current Statistics</translation>
+      <translation>Estatísticas atuais</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation>Forecast for Full Storage Usage</translation>
+      <translation>Previsão para uso de armazenamento completo</translation>
     </message>
     <message>
       <location/>
@@ -2881,7 +2881,7 @@
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation>Server is offline. Statistics are not available.</translation>
+      <translation>Servidor está offline. Estatísticas não estão disponíveis.</translation>
     </message>
   </context>
   <context>
@@ -2904,27 +2904,27 @@
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation>Storage Locations</translation>
+      <translation>Locais de armazenamento</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation>Reindex Archive</translation>
+      <translation>Reindexar Arquivo</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation>Reindex Backup</translation>
+      <translation>Reindexar Backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation>Backup Archive</translation>
+      <translation>Arquivo de backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation>Backup Settings...</translation>
+      <translation>Configurações de backup...</translation>
     </message>
   </context>
   <context>
@@ -2955,12 +2955,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Entrar:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
   </context>
   <context>
@@ -2968,22 +2968,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>Roles</translation>
+      <translation>Função</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation>Show all users</translation>
+      <translation>Mostrar todos os usuários</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation>Select Users</translation>
+      <translation>Selecionar usuários</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation>Nothing matches your search.</translation>
+      <translation>Nada corresponde à sua pesquisa.</translation>
     </message>
   </context>
   <context>
@@ -3052,12 +3052,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation>System Time</translation>
+      <translation>Hora do sistema</translation>
     </message>
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation>Sync time with the Internet</translation>
+      <translation>Sincronizar tempo com a Internet</translation>
     </message>
   </context>
   <context>
@@ -3065,7 +3065,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Timestamp</translation>
+      <translation>Marca Temporal</translation>
     </message>
     <message>
       <location/>
@@ -3088,7 +3088,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>Change Password...</translation>
+      <translation>Mudar senha...</translation>
     </message>
   </context>
   <context>
@@ -3106,7 +3106,7 @@
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation>Delete Role</translation>
+      <translation>Excluir Função</translation>
     </message>
   </context>
   <context>
@@ -3114,12 +3114,12 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation>User Roles</translation>
+      <translation>Funções do usuário</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation>New role</translation>
+      <translation>Nova função</translation>
     </message>
     <message>
       <location/>
@@ -3137,17 +3137,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>User Type</translation>
+      <translation>Tipo de usuário</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation>Role</translation>
+      <translation>Função</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Edit Roles...</translation>
+      <translation>Editar Funções...</translation>
     </message>
   </context>
   <context>

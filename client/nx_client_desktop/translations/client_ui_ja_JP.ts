@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>PTZプリセットタイプ：</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>システム</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>ネイティブ</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>このカメラはパンとチルトをサポートします</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>このカメラはズームをサポートしています</translation>
     </message>
   </context>
   <context>

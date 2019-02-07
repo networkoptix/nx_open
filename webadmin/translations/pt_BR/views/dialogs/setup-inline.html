@@ -120,7 +120,7 @@
                  ng-click="settings.chooseCloudSystem = true">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-cloud"></span></div>
-                <h3>Cloud</h3>
+                <h3>Nuvem</h3>
                 <p>
                     Disponível a partir de qualquer lugar <br>
                     Requer conexão com a Internet
@@ -175,13 +175,13 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="Senha" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Stay logged in
+                Permanecer logado
             </labe>
         </div>
 
@@ -302,13 +302,13 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Login" required>
+                   placeholder="Entrar" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Password" required>
+                   placeholder="Senha" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
@@ -373,7 +373,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>O sistema está pronto para uso</h2>
-    <p>Login</p>
+    <p>Entrar</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Definições de partilha e da conta</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="abrir {{Config.cloud.productName}}"
@@ -395,7 +395,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Guardar as definições e reinicar o dispositivo</button>
+        <button class="btn btn-primary" ng-click="retry()">Guardar as definições e reiniciar o dispositivo</button>
     </p>
 </div>
 
@@ -425,7 +425,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
+    <h2>Não é possível conectar-se a {{Config.cloud.productName}}</h2>
     <p class="master-description">
         Verifique a ligação à internet.
     </p>
@@ -437,7 +437,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
+    <h2>Não é possível conectar-se a {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -472,9 +472,9 @@
         <div class="col-xs-6">
             <div class="text-center"><b>Usando a aplicação {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">Porta</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Entrar</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Senha</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>
