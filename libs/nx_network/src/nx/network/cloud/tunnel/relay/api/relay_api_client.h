@@ -74,7 +74,7 @@ class NX_NETWORK_API Client:
 public:
     Client(const nx::utils::Url& baseUrl);
 
-    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread);
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void beginListening(
         const std::string& peerName,
