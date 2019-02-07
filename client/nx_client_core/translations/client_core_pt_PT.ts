@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="pt-PT" sourcelanguage="en" version="2.1">
   <context>
     <name>QnCloudResultInfo</name>
     <message>
@@ -29,7 +28,7 @@
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation type="unfinished">Unknown realm.</translation>
+      <translation>Reino desconhecido.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -37,7 +36,7 @@
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation type="unfinished">Invalid nonce.</translation>
+      <translation>Nonce inválido.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -99,7 +98,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>System (%1)</source>

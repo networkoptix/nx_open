@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="pt-PT" sourcelanguage="en" version="2.1">
   <context>
     <name>CloseButton</name>
     <message>
@@ -230,7 +229,7 @@
   <context>
     <name>QCocoaTheme</name>
     <message>
-      <source>Don&apos;t Save</source>
+      <source>Don't Save</source>
       <translation>Não guardar</translation>
     </message>
   </context>
@@ -314,25 +313,25 @@ Pressione ESC para cancelar</translation>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
-      <source>What&apos;s This?</source>
+      <source>What's This?</source>
       <translation>O que é isto?</translation>
     </message>
   </context>
@@ -340,7 +339,7 @@ Pressione ESC para cancelar</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -568,14 +567,14 @@ Por favor verifique o nome do ficheiro.</translation>
       <translation>Apagar</translation>
     </message>
     <message>
-      <source>&apos;%1&apos; is write protected.
+      <source>'%1' is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; está protegido contra escrita.
+      <translation>'%1' está protegido contra escrita.
 Quer apagar mesmo assim?</translation>
     </message>
     <message>
-      <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>Tem a certeza de que deseja apagar &apos;%1&apos;?</translation>
+      <source>Are you sure you want to delete '%1'?</source>
+      <translation>Tem a certeza de que deseja apagar '%1'?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -619,7 +618,7 @@ Quer apagar mesmo assim?</translation>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>Alias</translation>
     </message>
     <message>
       <source>Shortcut</source>
@@ -667,23 +666,23 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
       <translation>Nome do ficheiro inválido</translation>
     </message>
     <message>
-      <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt;O nome &quot;%1&quot; não pode ser usado.&lt;/b&gt;&lt;p&gt;Tente usar outro nome, com menos caracteres ou sem pontuação.</translation>
+      <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+      <translation>&lt;b&gt;O nome "%1" não pode ser usado.&lt;/b&gt;&lt;p&gt;Tente usar outro nome, com menos caracteres ou sem pontuação.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -717,14 +716,14 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 byte(s)</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation type="unfinished">&amp;OK</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -747,8 +746,8 @@ Quer apagar mesmo assim?</translation>
     <name>QGuiApplication</name>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
-      <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+      <translation>LTR</translation>
     </message>
   </context>
   <context>
@@ -835,7 +834,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>%1, ...</source>
-      <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
+      <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
       <translation type="unfinished">%1, ...</translation>
     </message>
   </context>
@@ -882,7 +881,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Help</source>
@@ -893,7 +892,7 @@ Quer apagar mesmo assim?</translation>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Save</source>
@@ -1052,7 +1051,7 @@ Quer apagar mesmo assim?</translation>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation type="unfinished">Desktop</translation>
+      <translation>Desktop</translation>
     </message>
     <message>
       <source>Documents</source>
@@ -1096,7 +1095,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>Cache</translation>
     </message>
     <message>
       <source>Shared Data</source>
@@ -1104,7 +1103,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>Tempo de execução</translation>
     </message>
     <message>
       <source>Configuration</source>
@@ -1137,7 +1136,7 @@ Quer apagar mesmo assim?</translation>
   <context>
     <name>QWhatsThisAction</name>
     <message>
-      <source>What&apos;s This?</source>
+      <source>What's This?</source>
       <translation>O que é isto?</translation>
     </message>
   </context>
