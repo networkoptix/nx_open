@@ -44,7 +44,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
         return result;
     }
@@ -58,7 +58,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
 
 }
 
-QString QnPlAxisResourceSearcher::manufacture() const
+QString QnPlAxisResourceSearcher::manufacturer() const
 {
     return QnPlAxisResource::MANUFACTURE;
 }
@@ -128,11 +128,11 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
-    QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
@@ -274,13 +274,13 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         }
     }
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return local_results; // model forced by ONVIF
 
     QnPlAxisResourcePtr resource (new QnPlAxisResource(m_serverModule));
 
-    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
     if (rt.isNull())
         return local_results;
 
@@ -408,7 +408,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             QnPlAxisResourcePtr resource (new QnPlAxisResource(m_serverModule));
 
-            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
+            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), firstResource->getName());
             if (rt.isNull())
                 return;
 

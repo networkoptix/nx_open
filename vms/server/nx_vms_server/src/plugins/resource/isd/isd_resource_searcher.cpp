@@ -68,7 +68,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceType
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     result = QnVirtualCameraResourcePtr(new QnPlIsdResource(serverModule()));
@@ -78,7 +78,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceType
     return result;
 }
 
-QString QnPlISDResourceSearcher::manufacture() const
+QString QnPlISDResourceSearcher::manufacturer() const
 {
     return QnPlIsdResource::MANUFACTURE;
 }
@@ -102,7 +102,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
     else
     {
         QList<QnResourcePtr> resList;
-        auto resData = dataPool()->data(manufacture(), lit("*"));
+        auto resData = dataPool()->data(manufacturer(), lit("*"));
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             ResourceDataKey::kPossibleDefaultCredentials);
 
@@ -242,9 +242,9 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), name);
     if (rt.isNull()) {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
+        rt = qnResTypePool->getResourceTypeId(manufacturer(), kIsdDefaultResType);
         if (rt.isNull())
         {
             NX_ASSERT(false, lm("No resource type for %1").arg(name));
@@ -252,10 +252,10 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         }
     }
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
-        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
+        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacturer(), name));
         return QList<QnResourcePtr>();
     }
 
@@ -299,7 +299,7 @@ void QnPlISDResourceSearcher::cleanupSpaces(QString& rowWithSpaces) const
 
 bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString& model) const
 {
-    if (vendorName.toUpper().startsWith(manufacture()))
+    if (vendorName.toUpper().startsWith(manufacturer()))
     {
         return true;
     }
@@ -395,10 +395,10 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     if (auto existingRes = serverModule()->resourcePool()->getResourceByMacAddress( smac ) )
         cameraAuth = existingRes->getAuth();
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), name);
     if (rt.isNull())
     {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
+        rt = qnResTypePool->getResourceTypeId(manufacturer(), kIsdDefaultResType);
         if (rt.isNull())
         {
             NX_ASSERT(false, lm("No resource type for %1").arg(name));
@@ -406,10 +406,10 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         }
     }
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
-        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
+        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacturer(), name));
         return QnResourcePtr();
     }
 
@@ -436,7 +436,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     }
     else
     {
-        auto resData = dataPool()->data(manufacture(), name);
+        auto resData = dataPool()->data(manufacturer(), name);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             ResourceDataKey::kPossibleDefaultCredentials);
 
@@ -483,7 +483,7 @@ bool QnPlISDResourceSearcher::processPacket(
     }
     else
     {
-        auto resData = dataPool()->data(manufacture(), model);
+        auto resData = dataPool()->data(manufacturer(), model);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             ResourceDataKey::kPossibleDefaultCredentials);
 
@@ -527,10 +527,10 @@ void QnPlISDResourceSearcher::createResource(
     QnResourceList& result )
 {
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), devInfo.modelName);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), devInfo.modelName);
     if (rt.isNull())
     {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
+        rt = qnResTypePool->getResourceTypeId(manufacturer(), kIsdDefaultResType);
         if (rt.isNull())
         {
             NX_ASSERT(false, lm("No resource type for %1").arg(devInfo.modelName));
@@ -549,10 +549,10 @@ void QnPlISDResourceSearcher::createResource(
     auto isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
     auto vendor = isDW ? kDwFullVendorName :
         (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
-            manufacture() :
+            manufacturer() :
             devInfo.manufacturer;
 
-    auto name = (vendor == manufacture()) ?
+    auto name = (vendor == manufacturer()) ?
         lit("ISD-") + devInfo.modelName :
         devInfo.modelName;
 

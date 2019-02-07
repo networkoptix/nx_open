@@ -90,11 +90,11 @@ QnResourcePtr OnvifResourceSearcher::createResource(
         return result;
     }
 
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacturer(
         serverModule(),
         resourceType->getName() == QString("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
-        : resourceType->getName()); //< We use name instead of manufacture on purpose.
+        : resourceType->getName()); //< We use name instead of manufacturer on purpose.
     if (!result)
         return result; //< Not found.
 
@@ -106,7 +106,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(
     return result;
 }
 
-QString OnvifResourceSearcher::manufacture() const
+QString OnvifResourceSearcher::manufacturer() const
 {
     return QnPlOnvifResource::MANUFACTURE;
 }

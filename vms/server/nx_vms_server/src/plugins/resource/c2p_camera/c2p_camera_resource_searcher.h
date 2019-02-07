@@ -16,7 +16,7 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;

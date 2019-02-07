@@ -14,7 +14,7 @@ namespace
 {
     const QString kOnvifResourceTypeName("ONVIF");
 
-    const QString kManufacture("PelcoOptera");
+    const QString kManufacturer("PelcoOptera");
     const QString kOpteraDefaultLogin("admin");
     const QString kOpteraDefaultPassword("admin");
 

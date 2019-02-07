@@ -16,7 +16,7 @@ public:
     QnDesktopResourceSearcher(QnAbstractDesktopResourceSearcherImpl* impl, QObject* parent = nullptr);
     virtual ~QnDesktopResourceSearcher();
 
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
 
     virtual QnResourceList findResources() override;
 

@@ -333,13 +333,13 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 
     const QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
 
-    if (resType && resType->getManufacture() == lit("VMAX"))
+    if (resType && resType->getManufacturer() == lit("VMAX"))
         return Qn::LC_VMAX;
 
     if (isDtsBased())
         return Qn::LC_Bridge;
 
-    if (resType && resType->getManufacture() == lit("NetworkOptix"))
+    if (resType && resType->getManufacturer() == lit("NetworkOptix"))
         return Qn::LC_Free;
 
     /**
@@ -947,7 +947,7 @@ QString QnSecurityCamResource::getVendor() const
     //SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
     //
     //QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
-    //return resourceType ? resourceType->getManufacture() : QString(); //estimated value
+    //return resourceType ? resourceType->getManufacturer() : QString(); //estimated value
 }
 
 void QnSecurityCamResource::setVendor(const QString& value)

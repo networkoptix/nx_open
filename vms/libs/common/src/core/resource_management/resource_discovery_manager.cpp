@@ -123,13 +123,13 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnAbstractResourceSearcher* QnResourceDiscoveryManager::searcherByManufacture(
-    const QString& manufacture) const
+QnAbstractResourceSearcher* QnResourceDiscoveryManager::searcherByManufacturer(
+    const QString& manufacturer) const
 {
     QnMutexLocker lock(&m_searchersListMutex);
     for (const auto& searcher: m_searchersList)
     {
-        if (searcher && searcher->manufacture() == manufacture)
+        if (searcher && searcher->manufacturer() == manufacturer)
             return searcher;
     }
 
@@ -466,7 +466,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             timer.restart();
             QnResourceList lst = searcher->search();
             NX_DEBUG(this, lit("Searcher %1 took %2 ms to find %3 resources").
-                arg(searcher->manufacture())
+                arg(searcher->manufacturer())
                 .arg(timer.elapsed())
                 .arg(lst.size()));
 
@@ -479,7 +479,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 // Do not allow drivers to add cameras which are supposed to be added by different
                 // drivers.
                 if( camRes &&
-                    !commonModule()->cameraDriverRestrictionList()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
+                    !commonModule()->cameraDriverRestrictionList()->driverAllowedForCamera( searcher->manufacturer(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
                     continue;
@@ -766,9 +766,9 @@ void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSea
 #endif
 
         //no lower_bound, since QSet is built on top of hash
-        if( disabledVendorsForAutoSearch.contains(searcher->manufacture()+lit("=partial")) )
+        if( disabledVendorsForAutoSearch.contains(searcher->manufacturer()+lit("=partial")) )
             discoveryMode = DiscoveryMode::partiallyEnabled;
-        else if( disabledVendorsForAutoSearch.contains(searcher->manufacture()) )
+        else if( disabledVendorsForAutoSearch.contains(searcher->manufacturer()) )
             discoveryMode = DiscoveryMode::disabled;
         else if( disabledVendorsForAutoSearch.contains(lit("all=partial")) )
             discoveryMode = DiscoveryMode::partiallyEnabled;

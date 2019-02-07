@@ -45,7 +45,7 @@ QnActiResourceSearcher::QnActiResourceSearcher(QnMediaServerModule* serverModule
     base_type(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
     nx::vms::server::ServerModuleAware(serverModule)
 {
-    m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
+    m_resTypeId = qnResTypePool->getResourceTypeId(manufacturer(), QLatin1String("ACTI_COMMON"));
 }
 
 QnActiResourceSearcher::~QnActiResourceSearcher()
@@ -109,7 +109,7 @@ QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid& resourceTypeI
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     result = QnVirtualCameraResourcePtr(new QnActiResource(serverModule()));
@@ -119,7 +119,7 @@ QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid& resourceTypeI
 
 }
 
-QString QnActiResourceSearcher::manufacture() const
+QString QnActiResourceSearcher::manufacturer() const
 {
     return QnActiResource::MANUFACTURE;
 }
@@ -174,7 +174,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
         return result;
     }
 
-    auto resourceData = dataPool()->data(manufacture(), devInfo.info.modelName);
+    auto resourceData = dataPool()->data(manufacturer(), devInfo.info.modelName);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return result;
 
@@ -265,7 +265,7 @@ bool QnActiResourceSearcher::processPacket(
 {
     QnResourceList result;
     const bool isNx = isNxDevice(devInfo);
-    if (!devInfo.manufacturer.toUpper().startsWith(manufacture()) && !isNx)
+    if (!devInfo.manufacturer.toUpper().startsWith(manufacturer()) && !isNx)
         return false;
 
     nx::network::upnp::DeviceInfo devInfoCopy(devInfo);
@@ -371,7 +371,7 @@ void QnActiResourceSearcher::createResource(
         return;
 
     const bool isNx = isNxDevice(devInfo);
-    QnResourceData resourceData = dataPool()->data(manufacture(), devInfo.modelName);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), devInfo.modelName);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return;
 

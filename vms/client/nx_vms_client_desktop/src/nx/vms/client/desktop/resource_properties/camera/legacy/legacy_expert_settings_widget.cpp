@@ -490,7 +490,7 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
 
 bool LegacyExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
     QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
-    return cameraType && cameraType->getManufacture() == lit("ArecontVision");
+    return cameraType && cameraType->getManufacturer() == lit("ArecontVision");
 }
 
 bool LegacyExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const

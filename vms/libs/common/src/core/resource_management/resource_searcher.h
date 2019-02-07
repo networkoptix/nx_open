@@ -75,7 +75,7 @@ public:
      * \returns                         Name of the manufacturer for the resources this searcher adds.
      *                                  For example, 'AreconVision' or 'IQInVision'.
      */
-    virtual QString manufacture() const = 0;
+    virtual QString manufacturer() const = 0;
 
     /** \returns                        Whether this factory generates virtual resources such as desktop cameras. */
     virtual bool isVirtualResource() const { return false; }

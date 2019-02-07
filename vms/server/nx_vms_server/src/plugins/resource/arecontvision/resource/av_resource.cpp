@@ -509,7 +509,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMed
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
-    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
+    if (resourceType.isNull() || (resourceType->getManufacturer() != MANUFACTURE))
     {
         NX_ERROR(typeid(QnPlAreconVisionResource), lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()));
         return 0;

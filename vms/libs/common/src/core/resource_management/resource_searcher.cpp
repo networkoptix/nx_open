@@ -62,7 +62,7 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
     if (resourceType.isNull())
         return false;
 
-    return resourceType->getManufacture() == manufacture();
+    return resourceType->getManufacturer() == manufacturer();
 }
 
 QnAbstractFileResourceSearcher::QnAbstractFileResourceSearcher(QnCommonModule* commonModule):

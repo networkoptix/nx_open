@@ -37,7 +37,7 @@ public:
     /** Implementation of QnResourceFactory::createResource */
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) override;
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
     /** Implementation of QnAbstractNetworkResourceSearcher::checkHostAddr */
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,

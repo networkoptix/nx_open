@@ -22,7 +22,7 @@ public:
 
     virtual void pleaseStop() override;
 
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
 
     virtual QnResourceList findResources() override;
 

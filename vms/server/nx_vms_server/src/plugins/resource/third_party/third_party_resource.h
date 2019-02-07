@@ -38,7 +38,7 @@ public:
     virtual bool ping() override;
     //!Implementation of QnNetworkResource::mergeResourcesIfNeeded
     virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
-    //!Implementation of QnSecurityCamResource::manufacture
+    //!Implementation of QnSecurityCamResource::manufacturer
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

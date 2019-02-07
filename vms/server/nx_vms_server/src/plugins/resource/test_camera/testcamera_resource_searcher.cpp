@@ -94,7 +94,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             {
                 QnTestCameraResourcePtr resource (new QnTestCameraResource(serverModule()));
                 QString model = QLatin1String(QnTestCameraResource::kModel);
-                QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
+                QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), model);
                 if (rt.isNull())
                     continue;
 
@@ -138,9 +138,9 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufature " << resourceType->getManufacturer() << " != " << manufacturer();
         return result;
     }
 
@@ -152,7 +152,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
 
 }
 
-QString QnTestCameraResourceSearcher::manufacture() const
+QString QnTestCameraResourceSearcher::manufacturer() const
 {
     return QLatin1String(QnTestCameraResource::kManufacturer);
 }
