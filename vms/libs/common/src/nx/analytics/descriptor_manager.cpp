@@ -15,14 +15,12 @@ DescriptorManager::DescriptorManager(QnCommonModule* commonModule):
     m_groupDescriptorManager(commonModule),
     m_eventTypeDescriptorManager(commonModule),
     m_objectTypeDescriptorManager(commonModule),
-    m_actionTypeDescriptorManager(commonModule),
     m_deviceDescriptorManager(commonModule)
 {
 }
 
 void DescriptorManager::clearRuntimeInfo()
 {
-    m_actionTypeDescriptorManager.clearRuntimeInfo();
     m_deviceDescriptorManager.clearRuntimeInfo();
 }
 
@@ -44,8 +42,6 @@ void DescriptorManager::updateFromEngineManifest(
     m_eventTypeDescriptorManager.updateFromEngineManifest(
         pluginId, engineId, engineName, manifest);
     m_objectTypeDescriptorManager.updateFromEngineManifest(
-        pluginId, engineId, engineName, manifest);
-    m_actionTypeDescriptorManager.updateFromEngineManifest(
         pluginId, engineId, engineName, manifest);
 }
 

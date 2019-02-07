@@ -50,7 +50,6 @@ private:
     GroupDescriptorManager m_groupDescriptorManager;
     EventTypeDescriptorManager m_eventTypeDescriptorManager;
     ObjectTypeDescriptorManager m_objectTypeDescriptorManager;
-    ActionTypeDescriptorManager m_actionTypeDescriptorManager;
     DeviceDescriptorManager m_deviceDescriptorManager;
 };
 

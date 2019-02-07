@@ -422,7 +422,7 @@ void AnalyticsSearchWidget::Private::executePluginAction(
         return;
 
     const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
-    const auto actionDescriptor = descriptorManager.descriptor(engineId, actionTypeId);
+    const auto actionDescriptor = descriptorManager.descriptor(actionTypeId);
     if (!actionDescriptor)
         return;
 
