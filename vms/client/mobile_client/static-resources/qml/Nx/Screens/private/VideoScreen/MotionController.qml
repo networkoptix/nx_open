@@ -2,7 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Core.Items 1.0
 import nx.client.core 1.0
-
+import "utils.js" as Utils
 Item
 {
     id: controller
@@ -26,7 +26,7 @@ Item
     onAllowDrawingChanged:
     {
         if (allowDrawing && d.customInitialPoint && d.selectionRoi)
-            d.selectionRoi.start()
+            Utils.executeLater(function() { d.selectionRoi.start() }, this)
     }
 
     function clearCustomRoi()
@@ -185,13 +185,20 @@ Item
     {
         if (drawingRoi)
         {
-            d.customFirstPoint = d.customInitialPoint
-            d.customSecondPoint = d.customInitialPoint
-            d.selectionRoi.show()
-            if (d.customRoi)
-                d.customRoi.hide()
+            // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
+            // Since it's value depends on MotionRoi state, we have to use executeLater to
+            // break direct dependencies and avoid binding loop.
+            Utils.executeLater(
+                function()
+                {
+                    d.customFirstPoint = d.customInitialPoint
+                    d.customSecondPoint = d.customInitialPoint
+                    d.selectionRoi.show()
+                    if (d.customRoi)
+                        d.customRoi.hide()
 
-            makeShortVibration()
+                    makeShortVibration()
+                }, this)
         }
         else
         {

@@ -18,7 +18,7 @@ function executeDelayed(callback, delay, parent)
         }
 
     var timer = new TimerCreator()
-    timer.interval = 100;
+    timer.interval = delay;
     timer.repeat = false;
     timer.triggered.connect(
         function()

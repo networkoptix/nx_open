@@ -1,7 +1,6 @@
 import QtQuick 2.6
 import QtGraphicalEffects 1.0
 import Nx.Core.Items 1.0
-import "utils.js" as Utils
 
 Item
 {
@@ -25,9 +24,8 @@ Item
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
     // Shows preloader
-    function start(completionCallback)
+    function start()
     {
-        d.startCompletionCallback = completionCallback
         d.preloader = true
     }
 
@@ -61,20 +59,6 @@ Item
 
         centerPoint: d.endMarkerPoint
         visible: opacity > 0
-
-        onExpandingFinishedChanged:
-        {
-            if (!expandingFinished || !d.startCompletionCallback)
-                return
-
-            Utils.executeLater(
-                function()
-                {
-                    d.startCompletionCallback()
-                    d.startCompletionCallback = undefined
-                },
-                parent)
-        }
     }
 
     Rectangle
@@ -125,7 +109,6 @@ Item
     {
         id: d
 
-        property var startCompletionCallback
         property bool visible: false
         property bool preloader: false
         readonly property int shadowRadius: 1
