@@ -23,6 +23,11 @@ void Client::setTimeout(std::chrono::milliseconds timeout)
     m_actualClient->setTimeout(timeout);
 }
 
+void Client::setCustomHeaders(HttpHeaders headers)
+{
+    m_actualClient->setCustomHeaders(std::move(headers));
+}
+
 void Client::openTunnel(
     OpenTunnelCompletionHandler completionHandler)
 {

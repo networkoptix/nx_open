@@ -28,13 +28,14 @@ enum TunnelMethod
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
 
 class HttpTunneling:
-    public ::testing::TestWithParam<int /*Tunnel methods mask*/>
+    public ::testing::TestWithParam<int /*Tunnel methods mask*/>,
+    private TunnelAuthorizer<>
 {
 public:
     HttpTunneling():
         m_tunnelingServer(
             std::bind(&HttpTunneling::saveServerTunnel, this, std::placeholders::_1),
-            nullptr)
+            this)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
             [this](const nx::utils::Url& baseUrl)
@@ -74,6 +75,13 @@ protected:
         m_timeout = timeout;
     }
 
+    void addSomeCustomHttpHeadersToTheClient()
+    {
+        m_customHeaders.emplace("H1", "V1.1");
+        m_customHeaders.emplace("H1", "V1.2");
+        m_customHeaders.emplace("H2", "V2");
+    }
+
     void givenSilentTunnellingServer()
     {
         stopTunnelingServer();
@@ -87,6 +95,8 @@ protected:
     void whenRequestTunnel()
     {
         m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient->setCustomHeaders(m_customHeaders);
+
         if (m_timeout)
             m_tunnelingClient->setTimeout(*m_timeout);
         else
@@ -123,7 +133,7 @@ protected:
     void thenTunnelIsNotEstablished()
     {
         m_prevClientTunnelResult = m_clientTunnels.pop();
-        
+
         ASSERT_NE(SystemError::noError, m_prevClientTunnelResult.sysError);
         ASSERT_EQ(nullptr, m_prevClientTunnelResult.connection);
     }
@@ -131,6 +141,27 @@ protected:
     void andResultCodeIs(SystemError::ErrorCode expected)
     {
         ASSERT_EQ(expected, m_prevClientTunnelResult.sysError);
+    }
+
+    void andCustomHeadersAreReportedToTheServer()
+    {
+        for (const auto& header: m_customHeaders)
+        {
+            bool found = false;
+
+            const auto headerRange =
+                m_lastOpenTunnelRequestReceivedByServer.headers.equal_range(header.first);
+            for (auto it = headerRange.first; it != headerRange.second; ++it)
+            {
+                if (it->second == header.second)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            ASSERT_TRUE(found);
+        }
     }
 
 private:
@@ -141,10 +172,20 @@ private:
     std::unique_ptr<TestHttpServer> m_httpServer;
     nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
+    http::HttpHeaders m_customHeaders;
+    http::Request m_lastOpenTunnelRequestReceivedByServer;
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
     std::optional<std::chrono::milliseconds> m_timeout;
+
+    virtual void authorize(
+        const RequestContext* requestContext,
+        CompletionHandler completionHandler) override
+    {
+        m_lastOpenTunnelRequestReceivedByServer = requestContext->request;
+        completionHandler(StatusCode::ok);
+    }
 
     void startHttpServer()
     {
@@ -165,7 +206,7 @@ private:
 
         if (tunnelMethodMask & TunnelMethod::getPost)
             m_localFactory.registerClientType<detail::GetPostTunnelClient>();
-        
+
         if (tunnelMethodMask & TunnelMethod::connectionUpgrade)
             m_localFactory.registerClientType<detail::ConnectionUpgradeTunnelClient>();
 
@@ -243,9 +284,18 @@ TEST_P(HttpTunneling, timeout_supported)
     givenSilentTunnellingServer();
 
     whenRequestTunnel();
-    
+
     thenTunnelIsNotEstablished();
     andResultCodeIs(SystemError::timedOut);
+}
+
+TEST_P(HttpTunneling, custom_http_headers_are_transferred)
+{
+    addSomeCustomHttpHeadersToTheClient();
+    whenRequestTunnel();
+
+    thenTunnelIsEstablished();
+    andCustomHeadersAreReportedToTheServer();
 }
 
 //-------------------------------------------------------------------------------------------------
