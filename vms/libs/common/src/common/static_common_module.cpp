@@ -11,6 +11,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
+#include <utils/media/ffmpeg_initializer.h>
 
 #include "common_meta_types.h"
 
@@ -37,6 +38,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
     instance<QnLongRunnablePool>();
+    instance<QnFfmpegInitializer>();
     nx::network::SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost);
 
     // Providing mediaserver-specific way of validating peer id.

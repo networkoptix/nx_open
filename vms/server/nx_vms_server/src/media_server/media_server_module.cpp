@@ -21,7 +21,6 @@
 
 #include <translation/translation_manager.h>
 
-#include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
 
@@ -189,8 +188,6 @@ QnMediaServerModule::QnMediaServerModule(
         soapServer->start();
     }
 #endif //ENABLE_ONVIF
-
-    store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
     {
