@@ -95,7 +95,6 @@ void ListeningPeerConnectionWatcher::onReadCompletion(
         (sysErrorCode != SystemError::noError &&
             nx::network::socketCannotRecoverFromError(sysErrorCode)))
     {
-        m_connection.reset();
         nx::utils::swapAndCall(
             m_connectionClosedHandler,
             isConnectionClosed ? SystemError::connectionReset : sysErrorCode);
