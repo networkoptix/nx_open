@@ -6,11 +6,19 @@
 
 namespace nx::network::http::tunneling {
 
-Client::Client(const nx::utils::Url& baseTunnelUrl):
+Client::Client(
+    const nx::utils::Url& baseTunnelUrl,
+    const std::string& userTag)
+    :
     m_baseTunnelUrl(baseTunnelUrl),
-    m_actualClient(detail::ClientFactory::instance().create(baseTunnelUrl))
+    m_actualClient(detail::ClientFactory::instance().create(userTag, baseTunnelUrl))
 {
     m_actualClient->bindToAioThread(getAioThread());
+}
+
+void Client::setTunnelValidatorFactory(TunnelValidatorFactoryFunc func)
+{
+    m_validatorFactory = std::move(func);
 }
 
 void Client::bindToAioThread(aio::AbstractAioThread* aioThread)

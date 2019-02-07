@@ -15,8 +15,8 @@ class MediatorStunClient:
 public:
     MediatorStunClient(AbstractAsyncClient::Settings settings):
         base_type(
-            /*MediatorEndpointProvider*/ nullptr,
-            std::make_unique<nx::network::stun::AsyncClient>(std::move(settings)))
+            std::move(settings),
+            /*MediatorEndpointProvider*/ nullptr)
     {
     }
 };

@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/tunneling/base_tunnel_validator.h>
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/tunneling/detail/client_factory.h>
@@ -26,6 +27,7 @@ enum TunnelMethod
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
+static constexpr char kTunnelTag[] = "/HttpTunnelingTest";
 
 template<typename TunnelMethodMask>
 class HttpTunneling:
@@ -38,9 +40,9 @@ public:
             nullptr)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
-            [this](const nx::utils::Url& baseUrl)
+            [this](const std::string& tag, const nx::utils::Url& baseUrl)
             {
-                return m_localFactory.create(baseUrl);
+                return m_localFactory.create(tag, baseUrl);
             });
 
         enableTunnelMethods(TunnelMethodMask::value);
@@ -60,7 +62,7 @@ protected:
     {
         startHttpServer();
 
-        m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient = std::make_unique<Client>(m_baseUrl, kTunnelTag);
     }
 
     void stopTunnelingServer()
@@ -152,9 +154,9 @@ private:
     std::unique_ptr<Client> m_tunnelingClient;
     detail::ClientFactory m_localFactory;
     detail::ClientFactory::Function m_clientFactoryBak;
-    std::unique_ptr<TestHttpServer> m_httpServer;
     nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
+    std::unique_ptr<TestHttpServer> m_httpServer;
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
@@ -290,9 +292,9 @@ INSTANTIATE_TYPED_TEST_CASE_P(Ssl, HttpTunneling, SslMethodMask);
 namespace {
 
 class TestValidator:
-    public AbstractTunnelValidator
+    public BaseTunnelValidator
 {
-    using base_type = AbstractTunnelValidator;
+    using base_type = BaseTunnelValidator;
 
 public:
     TestValidator(
@@ -331,23 +333,19 @@ protected:
 
         givenTunnellingServer();
 
-        m_initialTopTunnelTypeId = tunnelClientFactory().topTunnelTypeId();
+        m_initialTopTunnelTypeId = tunnelClientFactory().topTunnelTypeId(kTunnelTag);
     }
 
     void givenSuccessfulValidator()
     {
         m_expectedResult = ResultCode::ok;
-        tunnelingClient().setTunnelValidator<TestValidator>(
-            m_expectedResult,
-            &m_validationResults);
+        setTunnelValidator();
     }
 
     void givenFailingValidator()
     {
         m_expectedResult = ResultCode::ioError;
-        tunnelingClient().setTunnelValidator<TestValidator>(
-            m_expectedResult,
-            &m_validationResults);
+        setTunnelValidator();
     }
 
     void andValidationIsCompleted()
@@ -359,13 +357,25 @@ protected:
 
     void andTunnelTypePrioritiesChanged()
     {
-        ASSERT_NE(m_initialTopTunnelTypeId, tunnelClientFactory().topTunnelTypeId());
+        ASSERT_NE(m_initialTopTunnelTypeId, tunnelClientFactory().topTunnelTypeId(kTunnelTag));
     }
 
 private:
     int m_initialTopTunnelTypeId = -1;
     nx::utils::SyncQueue<ResultCode> m_validationResults;
     ResultCode m_expectedResult = ResultCode::ok;
+
+    void setTunnelValidator()
+    {
+        tunnelingClient().setTunnelValidatorFactory(
+            [this](auto tunnel)
+            {
+                return std::make_unique<TestValidator>(
+                    std::move(tunnel),
+                    m_expectedResult,
+                    &m_validationResults);
+            });
+    }
 };
 
 TEST_F(HttpTunnelingValidation, validation_is_performed)
