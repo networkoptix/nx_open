@@ -6,11 +6,11 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/url/url_builder.h>
 
-#include "relay_api_http_paths.h" 
+#include "../relay_api_http_paths.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
-// TODO: Make this timeout configurable. 
+// TODO: Make this timeout configurable.
 // And configure it properly when connecting!
 static constexpr auto kTimeout = std::chrono::seconds(11);
 
@@ -160,4 +160,4 @@ api::ResultCode ClientOverHttpTunnel::getResultCode(
         &tunnelingClient.response());
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

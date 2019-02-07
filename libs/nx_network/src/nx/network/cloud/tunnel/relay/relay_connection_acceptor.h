@@ -30,7 +30,7 @@ public:
 
     virtual void connectToOriginator(
         ReverseConnectionCompletionHandler handler) override;
-    
+
     virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) override;
 

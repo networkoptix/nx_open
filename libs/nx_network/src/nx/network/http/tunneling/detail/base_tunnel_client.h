@@ -43,6 +43,9 @@ public:
 
     virtual const Response& response() const = 0;
 
+    void setCustomHeaders(HttpHeaders headers);
+    const HttpHeaders& customHeaders() const;
+
 protected:
     const nx::utils::Url m_baseTunnelUrl;
     std::unique_ptr<AsyncClient> m_httpClient;
@@ -61,6 +64,9 @@ protected:
     bool resetConnectionAttributes();
 
     void reportSuccess();
+
+private:
+    HttpHeaders m_customHeaders;
 };
 
 } // namespace nx::network::http::tunneling::detail
