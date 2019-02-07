@@ -375,7 +375,7 @@ void QnSecurityCamResource::setMotionStreamIndex(MotionStreamIndex value)
 {
     const QString valueStr = (value.isForced || value.index == MotionStreamType::undefined)
         ? QnLexical::serialized(value.index)
-		: QString();
+        : QString();
     setProperty(kForcedMotionStreamKey, valueStr);
     m_cachedMotionStreamIndex.reset();
 }
@@ -773,7 +773,7 @@ QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionS
 
     const auto selectedMotionStream = preferMotionOnPrimaryStream
         ? MotionStreamType::primary
-		: MotionStreamType::secondary;
+        : MotionStreamType::secondary;
 
     return {selectedMotionStream, /*isForced*/ false};
 }

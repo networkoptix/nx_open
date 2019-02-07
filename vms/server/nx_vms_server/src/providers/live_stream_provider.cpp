@@ -294,7 +294,7 @@ bool QnLiveStreamProvider::needAnalyzeMotion()
             return motionStreamIndex == nx::vms::api::MotionStreamType::primary;
         case Qn::CR_SecondaryLiveVideo:
             return motionStreamIndex == nx::vms::api::MotionStreamType::secondary;
-		default:
+        default:
             break;
     }
 

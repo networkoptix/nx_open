@@ -122,8 +122,8 @@ private:
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution(MotionStreamType encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution(MotionStreamType encoderNumber, 
-		const nxcip::Resolution& desiredResolution ) const;
+    nxcip::Resolution getNearestResolution(MotionStreamType encoderNumber,
+        const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);
 };

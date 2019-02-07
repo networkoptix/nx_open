@@ -47,7 +47,6 @@ QString QSizeToJsonApiResolution(QSize resolution)
 
 } // namespace
 
-
 CproApiClient::CproApiClient(QnDigitalWatchdogResource* resource):
     m_resource(resource)
 {
@@ -72,7 +71,7 @@ bool CproApiClient::updateVideoConfig()
 }
 
 boost::optional<QStringList> CproApiClient::getSupportedVideoCodecs(
-	nx::vms::api::MotionStreamType streamIndex)
+    nx::vms::api::MotionStreamType streamIndex)
 {
     auto stream = indexOfStream(streamIndex);
     if (stream == -1)
@@ -214,8 +213,8 @@ nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoC
 
 bool JsonApiClient::sendStreamParams(
     int channelNumber,
-	nx::vms::api::MotionStreamType streamIndex,
-	const QnLiveStreamParams& streamParams)
+    nx::vms::api::MotionStreamType streamIndex,
+    const QnLiveStreamParams& streamParams)
 {
     NX_ASSERT(streamIndex != nx::vms::api::MotionStreamType::undefined);
 

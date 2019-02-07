@@ -136,4 +136,4 @@ private:
     bool m_eof;
 };
 
-#endif	//_FS_FILE_H_
+#endif //_FS_FILE_H_

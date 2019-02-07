@@ -38,7 +38,6 @@ const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
 const QByteArray QnRtspClient::kPauseCommand("PAUSE");
 const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
 
-
 RtspTransport rtspTransportFromString(const QString& value)
 {
     auto upperValue = value.toUpper().trimmed();
@@ -1118,7 +1117,7 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
                     NX_WARNING(this, lit("Error reading RTSP response from %1. %2").
                         arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()));
                 }
-                return false;	//error occured or connection closed
+                return false; //< error occurred or connection closed
             }
             m_responseBufferLen += bytesRead;
         }

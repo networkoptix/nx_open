@@ -24,18 +24,18 @@ TEST_P(MotionStreamTypeLexicalTest, assertParsedCorrectly)
     ASSERT_EQ(value.toStdString(), output[0]);
 
     for (const auto& sampleOutput: output)
-	{
+    {
         const auto parsed = QnLexical::deserialized<MotionStreamType>(
-			QString::fromStdString(sampleOutput),
-			MotionStreamType::undefined);
+            QString::fromStdString(sampleOutput),
+            MotionStreamType::undefined);
         ASSERT_EQ(input, parsed);
-	}
+    }
 }
 
 // Vector defines list of values, which must be correctly deserialized.
 // First value is the correct serialization value.
 std::vector<MotionStreamTypeData> motionStreamTestData = {
-	{MotionStreamType::undefined, {"", "-1", "some_strange_string"}},
+    {MotionStreamType::undefined, {"", "-1", "some_strange_string"}},
     {MotionStreamType::primary, {"primary", "0"}},
     {MotionStreamType::secondary, {"secondary", "1"}}
 };

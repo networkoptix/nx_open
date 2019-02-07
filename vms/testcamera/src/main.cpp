@@ -75,16 +75,13 @@ void showUsage(char* exeName)
     qDebug() << "--fps value                Force FPS to the given positive integer value";
 }
 
-
 int main(int argc, char *argv[])
 {
-	nx::kit::OutputRedirector::ensureOutputRedirection();
+    nx::kit::OutputRedirector::ensureOutputRedirection();
 
     QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
     QCoreApplication::setApplicationName("Nx Witness Test Camera");
     QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
-
-
 
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
