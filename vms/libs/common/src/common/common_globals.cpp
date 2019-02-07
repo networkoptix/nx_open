@@ -15,7 +15,6 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TTHeaderFlag)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortTypes)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
@@ -173,18 +172,6 @@ QString toString(MediaStreamEvent value)
         default:
             return lit("Unknown error");
     }
-}
-
-QString toString(StreamIndex value)
-{
-    switch (value)
-    {
-        case StreamIndex::undefined: return "undefined";
-        case StreamIndex::primary: return "primary";
-        case StreamIndex::secondary: return "secondary";
-    }
-    NX_ASSERT(false, lm("Unexpected value %1").arg((int) value));
-    return lm("unexpected_value_%1").arg((int) value);
 }
 
 QString toString(ResourceStatus status)

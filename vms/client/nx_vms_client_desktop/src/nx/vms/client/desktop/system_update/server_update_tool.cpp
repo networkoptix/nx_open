@@ -10,6 +10,7 @@
 #include <core/resource_management/incompatible_server_watcher.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
 #include <utils/update/update_utils.h>
 
 #include <client/client_settings.h>
@@ -179,12 +180,18 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo(
         auto result = promise->get_future();
         // Requesting remote update info.
         connection->getUpdateInfo(
-            [promise = std::move(promise)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
+            [promise = std::move(promise), tool=QPointer<ServerUpdateTool>(this)](bool success,
+                rest::Handle /*handle*/, const nx::update::Information& response)
             {
                 UpdateContents contents;
                 if (success)
                 {
                     contents.info = response;
+                    if (tool)
+                    {
+                        tool->m_timeStartedInstall = response.lastInstallationRequestTime;
+                        tool->m_serversAreInstalling = response.participants.toSet();
+                    }
                 }
                 contents.sourceType = nx::update::UpdateSourceType::mediaservers;
                 promise->set_value(contents);
@@ -575,11 +582,12 @@ void ServerUpdateTool::stopUpload()
 
 bool ServerUpdateTool::verifyUpdateManifest(
     UpdateContents& contents,
-    const std::set<nx::utils::SoftwareVersion>& clientVersions) const
+    const std::set<nx::utils::SoftwareVersion>& clientVersions,
+    bool checkClient) const
 {
     NX_ASSERT(m_stateTracker);
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions);
+    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions, checkClient);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
@@ -687,7 +695,8 @@ void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
 
 ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
 {
-    return Clock::now() - m_timeStartedInstall;
+    auto delta = qnSyncTime->currentMSecsSinceEpoch() - m_timeStartedInstall;
+    return std::chrono::milliseconds(delta);
 }
 
 void ServerUpdateTool::requestStopAction()
@@ -705,6 +714,13 @@ void ServerUpdateTool::requestStopAction()
     for (const auto& file: m_activeDownloads)
         m_downloader->deleteFile(file.first);
     m_activeDownloads.clear();
+    m_stateTracker->clearState();
+}
+
+void ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+        connection->updateActionFinish(skipActivePeers, {});
     m_stateTracker->clearState();
 }
 
@@ -748,10 +764,10 @@ void ServerUpdateTool::requestInstallAction(
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_remoteUpdateStatus = {};
 
-    m_timeStartedInstall = Clock::now();
+    m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
     m_serversAreInstalling.clear();
 
-    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
+    auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
             if (!success)
                 NX_ERROR(typeid(ServerUpdateTool)) << "requestInstallAction() - response success=false";
@@ -763,6 +779,18 @@ void ServerUpdateTool::requestInstallAction(
     {
         if (auto handle = connection->updateActionInstall(targets, callback, thread()))
             m_requestingInstall.insert(handle);
+
+        // Requesting remote update info.
+        connection->getUpdateInfo(
+            [tool=QPointer<ServerUpdateTool>(this)](bool success,
+                rest::Handle /*handle*/, const nx::update::Information& response)
+            {
+                if (success && tool)
+                {
+                    tool->m_timeStartedInstall = response.lastInstallationRequestTime;
+                    tool->m_serversAreInstalling = response.participants.toSet();
+                }
+            });
     }
 }
 
@@ -771,7 +799,7 @@ void ServerUpdateTool::requestModuleInformation()
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         auto callback =
-            [tool=QPointer(this)](
+            [tool = QPointer(this)](
                 bool success, rest::Handle /*handle*/,
                 const QList<nx::vms::api::ModuleInformation>& response)
             {
@@ -822,7 +850,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
     {
         using UpdateStatusAll = std::vector<nx::update::Status>;
 
-        auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
+        auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
             {
                 if (tool)
                     tool->atUpdateStatusResponse(success, handle, response);
@@ -836,7 +864,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
         // Requesting remote update info.
         handle = connection->getUpdateInfo(
-            [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
             {
                 if (!tool)
                     return;
@@ -858,7 +886,7 @@ std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpda
     {
         using UpdateStatusAll = std::vector<nx::update::Status>;
         connection->getUpdateStatus(
-            [promise, tool=QPointer<ServerUpdateTool>(this)](
+            [promise, tool = QPointer<ServerUpdateTool>(this)](
                  bool success, rest::Handle handle, const UpdateStatusAll& response)
             {
                 if (tool)
@@ -1032,7 +1060,12 @@ QUrl generateUpdatePackageUrl(
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
     auto changeset = contents.info.version;
-    nx::utils::SoftwareVersion targetVersion = useLatest ? nx::utils::SoftwareVersion() : contents.getVersion();
+    nx::utils::SoftwareVersion targetVersion = useLatest
+        ? nx::utils::SoftwareVersion()
+        : contents.getVersion();
+    bool noFullVersion = false;
+    // Checking if version has only build number.
+    contents.info.version.toInt(&noFullVersion);
 
     QUrlQuery query;
 
@@ -1043,10 +1076,11 @@ QUrl generateUpdatePackageUrl(
     }
     else
     {
-        QString key = QString::number(targetVersion.build());
+        QString key = noFullVersion ? changeset : QString::number(targetVersion.build());
         QString password = passwordForBuild(key);
-        qDebug() << "Generated password" << password << "for key" << key;
-        query.addQueryItem("version", targetVersion.toString());
+        // Changeset will contain either full version like "4.0.0.28340",
+        // or only build number like "28340".
+        query.addQueryItem("version", changeset);
         query.addQueryItem("password", password);
     }
 

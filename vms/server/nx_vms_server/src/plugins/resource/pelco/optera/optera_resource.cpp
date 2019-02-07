@@ -75,12 +75,6 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
-{
-    return base_type::getStreamCapabilityMapFromDriver(streamIndex);
-}
-
 CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);

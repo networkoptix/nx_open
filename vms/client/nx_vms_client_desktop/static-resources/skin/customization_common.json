@@ -938,6 +938,14 @@
         }
     },
 
+    "QnWorkbenchWelcomeScreen": {
+        "palette": {
+            "default": {
+                "window": "dark3"
+            }
+        }
+    },
+
     "nx::vms::client::desktop::HintButton": {
         "palette": {
             "default": {

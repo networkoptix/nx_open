@@ -270,7 +270,7 @@ QnMediaServerModule::QnMediaServerModule(
         nullptr,
         this));
 
-    m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
+    m_pluginManager = store(new PluginManager(this));
     m_pluginManager->loadPlugins(roSettings());
 
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));

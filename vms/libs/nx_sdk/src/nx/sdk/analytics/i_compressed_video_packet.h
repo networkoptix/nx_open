@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/sdk/interface.h>
+
 #include "i_compressed_media_packet.h"
 
 namespace nx {
@@ -7,18 +9,13 @@ namespace sdk {
 namespace analytics {
 
 /**
- * Each class that implements ICompressedVideoPacket interface should properly handle this GUID in
- * its queryInterface method
- */
-static const nxpl::NX_GUID IID_CompressedVideoPacket =
-    {{0xB6,0x39,0xE4,0x68,0x0D,0x95,0x49,0x76,0xA7,0xC3,0x68,0x4B,0xCC,0x4D,0x90,0xB9}};
-
-/**
  * Represents a single video frame.
  */
-class ICompressedVideoPacket: public ICompressedMediaPacket
+class ICompressedVideoPacket: public Interface<ICompressedVideoPacket, ICompressedMediaPacket>
 {
 public:
+    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::ICompressedVideoPacket"); }
+
     /**
      * @return Width of video frame in pixels.
      */

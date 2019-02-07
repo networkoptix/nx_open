@@ -33,7 +33,10 @@ DeviceAgent::DeviceAgent(Engine* engine):
 
 DeviceAgent::~DeviceAgent()
 {
-    m_terminated.store(true);
+    {
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_terminated = true;
+    }
     m_pluginEventGenerationLoopCondition.notify_all();
     if (m_pluginEventThread)
         m_pluginEventThread->join();
@@ -234,9 +237,13 @@ void DeviceAgent::processPluginEvents()
         // Sleep until the next event needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether
         // the timeout has occurred) and spurious wake-ups are ignored.
-        static const std::chrono::seconds kPluginEventGenerationPeriod{10};
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-        m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+        {
+            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            if (m_terminated)
+                break;
+            static const std::chrono::seconds kPluginEventGenerationPeriod{5};
+            m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+        }
     }
 }
 

@@ -2,9 +2,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 enum class EventReason;
 enum class EventState;
@@ -21,9 +19,7 @@ enum class DayOfWeek;
 enum class BackupType;
 enum class UserRole;
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api
 
 #define NX_VMS_API_DECLARE_TYPE(type) \
     QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::type, (metatype)(lexical)(debug), NX_VMS_API)

@@ -4083,7 +4083,6 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
-        qobject_cast<QLabel*>(widget) ||
         isNonEditableComboBox(widget))
     {
         if (widget->focusPolicy() != Qt::NoFocus)

@@ -64,11 +64,6 @@ QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider()
     return nullptr;
 }
 
-StreamCapabilityMap QnWearableCameraResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex /*streamIndex*/)
-{
-    return StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnWearableCameraResource::initializeCameraDriver()
 {
     return CameraDiagnostics::NoErrorResult();

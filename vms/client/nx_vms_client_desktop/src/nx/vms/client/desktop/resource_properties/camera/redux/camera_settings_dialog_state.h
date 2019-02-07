@@ -27,12 +27,6 @@ namespace nx::vms::client::desktop {
 
 struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 {
-    enum class GeneralTabAlert
-    {
-        // For wearable cameras MD will work only during upload.
-        wearableMotionDetection,
-    };
-
     enum class RecordingHint
     {
         // Brush was changed (mode, fps, quality).
@@ -127,21 +121,21 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     struct CombinedProperties
     {
-        CombinedValue isDtsBased = CombinedValue::None;;
-        CombinedValue isWearable = CombinedValue::None;;
-        CombinedValue isIoModule = CombinedValue::None;;
-        CombinedValue isArecontCamera = CombinedValue::None;;
-        CombinedValue supportsAudio = CombinedValue::None;;
-        CombinedValue supportsVideo = CombinedValue::None;;
-        CombinedValue isAudioForced = CombinedValue::None;;
-        CombinedValue hasMotion = CombinedValue::None;;
-        CombinedValue hasDualStreamingCapability = CombinedValue::None;;
-        CombinedValue hasRemoteArchiveCapability = CombinedValue::None;;
-        CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;;
-        CombinedValue canForcePtzCapabilities = CombinedValue::None;;
-        CombinedValue supportsMotionStreamOverride = CombinedValue::None;;
-        CombinedValue hasCustomMediaPortCapability = CombinedValue::None;;
-        CombinedValue supportsRecording = CombinedValue::None;;
+        CombinedValue isDtsBased = CombinedValue::None;
+        CombinedValue isWearable = CombinedValue::None;
+        CombinedValue isIoModule = CombinedValue::None;
+        CombinedValue isArecontCamera = CombinedValue::None;
+        CombinedValue supportsAudio = CombinedValue::None;
+        CombinedValue supportsVideo = CombinedValue::None;
+        CombinedValue isAudioForced = CombinedValue::None;
+        CombinedValue hasMotion = CombinedValue::None;
+        CombinedValue hasDualStreamingCapability = CombinedValue::None;
+        CombinedValue hasRemoteArchiveCapability = CombinedValue::None;
+        CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;
+        CombinedValue canForcePtzCapabilities = CombinedValue::None;
+        CombinedValue supportsMotionStreamOverride = CombinedValue::None;
+        CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
+        CombinedValue supportsRecording = CombinedValue::None;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
@@ -166,8 +160,9 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
-        UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
+        UserEditableMultiple<vms::api::MotionStreamType> forcedMotionStreamType;
         CombinedValue motionStreamOverridden = CombinedValue::None;
+        UserEditableMultiple<bool> remoteMotionDetectionEnabled;
 
         static constexpr int kDefaultRtspPort = 554;
         UserEditableMultiple<int> customMediaPort;
@@ -238,7 +233,6 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     UserEditableMultiple<bool> audioEnabled;
 
-    std::optional<GeneralTabAlert> generalTabAlert;
     std::optional<RecordingHint> recordingHint;
     std::optional<RecordingAlert> recordingAlert;
     std::optional<MotionAlert> motionAlert;

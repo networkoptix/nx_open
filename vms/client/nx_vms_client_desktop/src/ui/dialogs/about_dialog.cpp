@@ -111,28 +111,36 @@ void QnAboutDialog::generateServersReport()
 {
     const auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
 
-    QnResourceList servers;
+    QnMediaServerResourceList servers;
     QStringList report;
-    for (const auto& data: watcher->mismatchData())
+    for (const auto& data: watcher->components())
     {
-        if (data.component != Qn::ServerComponent)
+        if (data.component != QnWorkbenchVersionMismatchWatcher::Component::server)
             continue;
 
-        QnMediaServerResourcePtr server = data.resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
+        NX_ASSERT(data.server);
+        if (!data.server)
             continue;
 
         QString version = L'v' + data.version.toString();
         QString serverText = lit("%1: %2")
-            .arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl), version);
+            .arg(QnResourceDisplayInfo(data.server).toString(Qn::RI_WithUrl), version);
         report << serverText;
-        servers << server;
+        servers << data.server;
     }
 
     this->m_serversReport = report.join(lit("<br/>"));
 
     m_serverListModel->setResources(servers);
     ui->serversGroupBox->setVisible(!servers.empty());
+
+    const bool hasArmServers = std::any_of(servers.cbegin(), servers.cend(),
+		[](const QnMediaServerResourcePtr& server)
+        {
+            return QnMediaServerResource::isArmServer(server);
+        });
+    ui->armSupportLabel->setVisible(hasArmServers);
+    ui->armSupportTitleLabel->setVisible(hasArmServers);
 }
 
 void QnAboutDialog::retranslateUi()
@@ -196,15 +204,6 @@ void QnAboutDialog::retranslateUi()
     // simple check if phone is provided
     else if (!supportAddress.isEmpty() && !supportAddress.startsWith(lit("+")))
         supportLink = makeHref(supportAddress);
-
-    const auto makeTitleLabel =
-        [](QLabel* label)
-        {
-            label->setText(QString("<b>%1</b>:").arg(label->text()));
-        };
-
-    makeTitleLabel(ui->customerSupportTitleLabel);
-    makeTitleLabel(ui->armSupportTitleLabel);
 
     ui->customerSupportLabel->setText(supportLink);
 

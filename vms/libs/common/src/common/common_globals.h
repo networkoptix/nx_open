@@ -18,11 +18,11 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    StreamFpsSharingMethod TimePeriodContent SystemComponent
+    StreamFpsSharingMethod TimePeriodContent
     ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction MediaStreamEvent StreamIndex
+    RebuildAction BackupAction MediaStreamEvent
     ResourceStatus StatusChangeReason
     Permission UserRole ConnectionResult
     ,
@@ -352,12 +352,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnalyticsContent,
 
         TimePeriodContentCount
-    };
-
-    enum SystemComponent {
-        ServerComponent,
-        ClientComponent,
-        AnyComponent
     };
 
 using StreamQuality = nx::vms::api::StreamQuality;
@@ -712,15 +706,6 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     };
     QString toString(MediaStreamEvent value);
 
-    enum class StreamIndex
-    {
-        undefined = -1,
-        primary = 0,
-        secondary = 1
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
-    QString toString(StreamIndex value);
-
     enum StorageStatus
     {
         none = 0,
@@ -774,7 +759,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::MediaStreamEvent)(Qn::StreamIndex)
+    (Qn::MediaStreamEvent)
     ,
     (metatype)(lexical)
 )

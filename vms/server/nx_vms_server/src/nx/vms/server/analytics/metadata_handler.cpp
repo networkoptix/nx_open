@@ -3,7 +3,6 @@
 #include <nx/kit/debug.h>
 #include <nx/utils/log/log.h>
 
-#include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
@@ -55,15 +54,13 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     }
 
     bool handled = false;
-    if (const auto eventsPacket = queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
-        IID_EventMetadataPacket))
+    if (const auto eventsPacket = queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
     {
         handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
-        IID_ObjectMetadataPacket))
+    if (const auto objectsPacket = queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
     {
         handleObjectMetadataPacket(objectsPacket);
         handled = true;

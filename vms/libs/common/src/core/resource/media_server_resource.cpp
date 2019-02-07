@@ -26,7 +26,6 @@
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 
-#include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -49,15 +48,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     m_serverFlags(vms::api::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
-        &m_mutex ),
-    m_analyticsDriversCache(
-        [this]()
-        {
-            return QJson::deserialized<QList<nx::vms::api::analytics::EngineManifest>>(
-                getProperty(ResourcePropertyKey::kAnalyticsDriversParamName).toUtf8());
-        },
-        &m_mutex
-    )
+        &m_mutex )
 {
     setTypeId(nx::vms::api::MediaServerData::kResourceTypeId);
     addFlags(Qn::server | Qn::remote);
@@ -83,8 +74,6 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr& /*res*/, con
 {
     if (key == QnMediaResource::panicRecordingKey())
         m_panicModeCache.reset();
-    else if (key == ResourcePropertyKey::kAnalyticsDriversParamName)
-        m_analyticsDriversCache.reset();
 }
 
 void QnMediaServerResource::at_cloudSettingsChanged()
@@ -98,7 +87,6 @@ void QnMediaServerResource::at_cloudSettingsChanged()
 void QnMediaServerResource::resetCachedValues()
 {
     m_panicModeCache.reset();
-    m_analyticsDriversCache.reset();
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -597,18 +585,6 @@ nx::vms::api::ModuleInformationWithAddresses
     nx::vms::api::ModuleInformationWithAddresses information = getModuleInformation();
     ec2::setModuleInformationEndpoints(information, getAllAvailableAddresses());
     return information;
-}
-
-QList<nx::vms::api::analytics::EngineManifest> QnMediaServerResource::analyticsDrivers() const
-{
-    return m_analyticsDriversCache.get();
-}
-
-void QnMediaServerResource::setAnalyticsDrivers(
-    const QList<nx::vms::api::analytics::EngineManifest>& drivers)
-{
-    QString value = QString::fromUtf8(QJson::serialized(drivers));
-    setProperty(ResourcePropertyKey::kAnalyticsDriversParamName, value);
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)

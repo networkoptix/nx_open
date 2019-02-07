@@ -12,7 +12,9 @@ namespace api {
 /*!
     \note Application may be installed for all users and for current user only, so checking existance of directory with name equal to version is not enough
 */
-ResultType::Value isVersionInstalled(nx::utils::SoftwareVersion version, bool* const installed);
+ResultType::Value isVersionInstalled(
+    const nx::utils::SoftwareVersion& version,
+    bool* const installed);
 
 //!Retrieves a list of the installed versions
 ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
@@ -20,7 +22,9 @@ ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versio
     Send the required version to the applauncher, close the current instance of the client.
     \return \a ResultType::ok if request has been performed successfully, otherwise - error code
 */
-ResultType::Value restartClient(nx::utils::SoftwareVersion version = {}, const QString& auth = {});
+ResultType::Value restartClient(
+    nx::utils::SoftwareVersion version = {},
+    const QString& auth = {});
 
 bool checkOnline(bool runWhenOffline = true);
 

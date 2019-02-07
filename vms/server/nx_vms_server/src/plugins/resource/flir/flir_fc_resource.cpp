@@ -48,13 +48,6 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
-nx::vms::server::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result FcResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);

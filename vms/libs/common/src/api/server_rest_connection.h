@@ -417,6 +417,10 @@ public:
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
+    Handle updateActionFinish(bool skipActivePeers,
+        std::function<void (Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
     Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);

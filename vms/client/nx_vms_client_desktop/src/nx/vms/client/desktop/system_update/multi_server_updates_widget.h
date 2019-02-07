@@ -105,6 +105,8 @@ private:
         readyInstall,
         /** Some servers are installing an update. */
         installing,
+        /** Some servers are installing an update, but it took too long. */
+        installingStalled,
         /** Installation process is complete. */
         complete,
     };
@@ -121,7 +123,7 @@ private:
 
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
-    void checkForInternetUpdates();
+    void checkForInternetUpdates(bool initial = false);
 
     /**
      * Describes all possible display modes for update version.

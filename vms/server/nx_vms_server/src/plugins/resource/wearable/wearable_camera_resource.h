@@ -20,8 +20,6 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

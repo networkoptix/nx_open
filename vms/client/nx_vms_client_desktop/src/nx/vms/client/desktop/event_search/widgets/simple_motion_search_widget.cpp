@@ -5,6 +5,8 @@
 #include <QtWidgets/QAction>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/common/read_only.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -48,18 +50,9 @@ public:
             });
 
         connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
-            [this]()
-            {
-                const auto resource = this->q->navigator()->currentResource();
+            &Private::updateResourceButton);
 
-                m_resourceButton->setIcon(resource.dynamicCast<QnSecurityCamResource>()
-                    ? qnSkin->icon("text_buttons/camera.png")
-                    : qnSkin->icon("text_buttons/video.png"));
-
-                setResourceName(resource.dynamicCast<QnMediaResource>()
-                    ? resource->getName()
-                    : tr("none"));
-            });
+        updateResourceButton();
     }
 
     QList<QRegion> filterRegions() const
@@ -82,10 +75,42 @@ public:
     }
 
 private:
-    void setResourceName(const QString& value)
+    void updateResourceButton()
     {
-        m_resourceButton->setText(QString::fromWCharArray(L"%1 \x2013 %2")
-            .arg(tr("Current media"), value));
+        static const auto kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
+
+        const auto resource = q->navigator()->currentResource();
+        const bool isMedia = resource.dynamicCast<QnMediaResource>();
+
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        const bool isCamera = camera || !isMedia;
+
+        m_resourceButton->setIcon(isCamera
+            ? qnSkin->icon("text_buttons/camera.png")
+            : qnSkin->icon("text_buttons/video.png"));
+
+        // TODO: #vkutin Think how to avoid code duplication with AbstractSearchWidget::Private.
+        if (resource)
+        {
+            const auto name = resource->getName();
+            if (isCamera)
+            {
+                const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+                    QnCameraDeviceStringSet("<unused>", tr("Current camera"), tr("Current device")),
+                    camera);
+
+                m_resourceButton->setText(kTemplate.arg(baseText, name));
+            }
+            else
+            {
+                m_resourceButton->setText(kTemplate.arg(tr("Current media"), name));
+            }
+        }
+        else
+        {
+            m_resourceButton->setText(kTemplate.arg(tr("Current camera"),
+                tr("none", "No currently selected camera")));
+        }
     }
 
 private:

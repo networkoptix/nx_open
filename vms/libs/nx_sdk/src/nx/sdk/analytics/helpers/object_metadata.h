@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
+
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/i_object_metadata.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
@@ -12,11 +13,9 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class ObjectMetadata: public nxpt::CommonRefCounter<IObjectMetadata>
+class ObjectMetadata: public RefCountable<IObjectMetadata>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
     virtual const char* typeId() const override;
     virtual float confidence() const override;
     virtual Uuid id() const override;
@@ -36,9 +35,7 @@ public:
 
 private:
     std::string m_typeId;
-
     float m_confidence = 1.0;
-
     Uuid m_id;
     std::string m_subtype;
     std::vector<Attribute> m_attributes;

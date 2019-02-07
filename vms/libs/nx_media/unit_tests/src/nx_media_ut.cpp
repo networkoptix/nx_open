@@ -242,13 +242,13 @@ private:
 
         for (const auto& stream: mediaStreams().streams)
         {
-            if (stream.getEncoderIndex() == Qn::StreamIndex::primary) //< High
+            if (stream.getEncoderIndex() == nx::vms::api::MotionStreamType::primary) //< High
             {
                 NX_DEBUG(this, lit("Camera High stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
                     .arg(stream.codec));
             }
-            else if (stream.getEncoderIndex() == Qn::StreamIndex::secondary) //< Low
+            else if (stream.getEncoderIndex() == nx::vms::api::MotionStreamType::secondary) //< Low
             {
                 NX_DEBUG(this, lit("Camera Low stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
