@@ -47,7 +47,12 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } //anonymous namespace
 
-const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty("userEnabledAnalyticsEngines");
+const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
+    "userEnabledAnalyticsEngines");
+
+const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
+    "compatibleAnalyticsEngines");
+
 const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
     "deviceAgentsSettingsValuesProperty");
 
@@ -57,7 +62,10 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
     m_lastIssueTimer(),
-    m_cachedUserEnabledAnalyticsEngines([this] { return calculateEnabledAnalyticsEngines(); }, &m_cacheMutex)
+    m_cachedUserEnabledAnalyticsEngines(
+        [this]() { return calculateEnabledAnalyticsEngines(); }, &m_cacheMutex),
+    m_cachedCompatibleAnalyticsEngines(
+        [this]() { return calculateCompatibleAnalyticsEngines(); }, &m_cacheMutex)
 {
     connect(
         this,
@@ -66,9 +74,16 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
         [&](auto& resource, auto& key)
         {
             if (key == kUserEnabledAnalyticsEnginesProperty)
+            {
                 m_cachedUserEnabledAnalyticsEngines.reset();
+                emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
+            }
 
-            emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
+            if (key == kCompatibleAnalyticsEnginesProperty)
+            {
+                m_cachedCompatibleAnalyticsEngines.reset();
+                emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
+            }
         });
 }
 
@@ -555,13 +570,42 @@ QSet<QnUuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
 
 void QnVirtualCameraResource::setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines)
 {
-    setProperty(kUserEnabledAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
+    setProperty(
+        kUserEnabledAnalyticsEnginesProperty,
+        QString::fromUtf8(QJson::serialized(engines)));
+}
+
+const QSet<QnUuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const
+{
+    return m_cachedCompatibleAnalyticsEngines.get();
+}
+
+nx::vms::common::AnalyticsEngineResourceList
+    QnVirtualCameraResource::compatibleAnalyticsEngineResources()
+{
+    const auto resPool = resourcePool();
+    if (!resPool)
+        return {};
+
+    return resPool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
+        compatibleAnalyticsEngines());
+}
+
+void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines)
+{
+    setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 
 QSet<QnUuid> QnVirtualCameraResource::calculateEnabledAnalyticsEngines()
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
+}
+
+QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines()
+{
+    return QJson::deserialized<QSet<QnUuid>>(
+        getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
 }
 
 QHash<QnUuid, QVariantMap> QnVirtualCameraResource::deviceAgentSettingsValues() const
