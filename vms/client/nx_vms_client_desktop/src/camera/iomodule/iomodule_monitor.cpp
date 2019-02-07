@@ -90,8 +90,13 @@ bool QnIOModuleMonitor::open()
     requestUrl.setQuery(query);
 
     QnRoute route = commonModule()->router()->routeTo(server->getId());
-    if (!route.gatewayId.isNull()) {
-        NX_ASSERT(!route.addr.isNull());
+    if (!route.gatewayId.isNull())
+    {
+        if (route.addr.isNull())
+        {
+            NX_WARNING(this, "Can't detect server IP address to open IO monitor connection.");
+            return false; //< Client is not connected to the server now.
+        }
         requestUrl.setHost(route.addr.address.toString());
         requestUrl.setPort(route.addr.port);
     }
