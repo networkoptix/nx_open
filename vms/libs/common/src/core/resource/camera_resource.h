@@ -116,7 +116,7 @@ protected:
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 
-    QSet<QnUuid> calculateEnabledAnalyticsEngines();
+    QSet<QnUuid> calculateUserEnabledAnalyticsEngines();
 
     QSet<QnUuid> calculateCompatibleAnalyticsEngines();
 

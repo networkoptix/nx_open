@@ -63,7 +63,7 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     m_issueCounter(0),
     m_lastIssueTimer(),
     m_cachedUserEnabledAnalyticsEngines(
-        [this]() { return calculateEnabledAnalyticsEngines(); }, &m_cacheMutex),
+        [this]() { return calculateUserEnabledAnalyticsEngines(); }, &m_cacheMutex),
     m_cachedCompatibleAnalyticsEngines(
         [this]() { return calculateCompatibleAnalyticsEngines(); }, &m_cacheMutex)
 {
@@ -596,7 +596,7 @@ void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& 
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateEnabledAnalyticsEngines()
+QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines()
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
