@@ -149,9 +149,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     QnClientVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
-
-    if (!(widget->options() & QnResourceWidget::SyncPlayForbidden))
-        camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
+    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
 
     m_counter->increment();
     connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));

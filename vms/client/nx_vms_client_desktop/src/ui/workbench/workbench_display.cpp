@@ -1151,10 +1151,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
-    if (options)
-        widget->setOptions(widget->options() | options);
-
     synchronize(widget, false);
     bringToFront(widget);
 

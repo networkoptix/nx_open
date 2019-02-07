@@ -1894,21 +1894,7 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, 
 void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect)
 {
     ensureMotionSensitivity();
-
-    if (options() & DisplayMotionSensitivity)
-    {
-        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount);
-        for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; ++i)
-        {
-            QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : QColor(Qt::darkRed);
-            color.setAlphaF(kMotionRegionAlpha);
-            QPainterPath path = m_motionSensitivity[channel].getRegionBySensPath(i);
-            paintFilledRegionPath(painter, rect, path, color, Qt::black);
-        }
-
-        paintMotionSensitivityIndicators(painter, channel, rect);
-    }
-    else if (m_motionSensitivity.size() > channel)
+    if (m_motionSensitivity.size() > channel)
     {
         paintFilledRegionPath(painter,
             rect,
@@ -1984,9 +1970,6 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
 
     if (isZoomWindow())
         return Qn::MainWindow_MediaItem_ZoomWindows_Help;
-
-    if (options().testFlag(DisplayMotionSensitivity))
-        return Qn::CameraSettings_Motion_Help;
 
     if (options().testFlag(DisplayMotion))
         return Qn::MainWindow_MediaItem_SmartSearch_Help;

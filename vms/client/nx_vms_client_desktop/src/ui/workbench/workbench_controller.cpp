@@ -1495,23 +1495,6 @@ void QnWorkbenchController::at_zoomedToggle_deactivated() {
 void QnWorkbenchController::updateCurrentLayoutInstruments()
 {
     const auto layout = workbench()->currentLayout();
-
-    const auto isMotionWidget = layout->flags().testFlag(QnLayoutFlag::MotionWidget);
-    if (isMotionWidget)
-    {
-        m_moveInstrument->setEnabled(false);
-        m_resizingInstrument->setEnabled(false);
-        m_wheelZoomInstrument->setEnabled(false);
-        m_handScrollInstrument->setEnabled(false);
-        m_itemLeftClickInstrument->setEnabled(false);
-        m_itemRightClickInstrument->setEnabled(false);
-        m_rubberBandInstrument->setEnabled(false);
-        m_sceneClickInstrument->setEnabled(false);
-        m_gridAdjustmentInstrument->setEnabled(false);
-        return;
-    }
-
-
     const auto resource = layout->resource();
     if (!resource)
     {
