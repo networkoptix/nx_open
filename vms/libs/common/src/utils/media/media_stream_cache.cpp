@@ -16,6 +16,7 @@
 
 #include "detail/media_stream_cache_detail.h"
 
+#include <nx/utils/log/log.h>
 
 using namespace std;
 
@@ -83,10 +84,12 @@ MediaStreamCache::MediaStreamCache(
             cacheSizeMillis,
             maxCacheSizeMillis))
 {
+    NX_VERBOSE(this, "New");
 }
 
 MediaStreamCache::~MediaStreamCache()
 {
+    NX_VERBOSE(this, "Delete");
 }
 
 //!Implementation of QnAbstractMediaDataReceptor::canAcceptData
