@@ -2,18 +2,16 @@
 
 #include <string>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/i_plugin_event.h>
 
 namespace nx {
 namespace sdk {
 
-class PluginEvent: public nxpt::CommonRefCounter<IPluginEvent>
+class PluginEvent: public RefCountable<IPluginEvent>
 {
 public:
     PluginEvent(Level level, std::string caption, std::string description);
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual Level level() const override;
     virtual const char* caption() const override;

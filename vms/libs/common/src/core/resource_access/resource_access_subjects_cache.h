@@ -11,7 +11,7 @@
 
 class QnResourceAccessSubjectsCache:
     public Connective<QObject>,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

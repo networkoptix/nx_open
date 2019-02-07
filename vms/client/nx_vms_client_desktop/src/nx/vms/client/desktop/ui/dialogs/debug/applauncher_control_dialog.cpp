@@ -8,7 +8,8 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
+QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent)
+    :
     base_type(parent, Qt::Window),
     ui(new Ui::ApplauncherControlDialog)
 {
@@ -20,9 +21,6 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
         [this]
         {
             nx::utils::SoftwareVersion v(ui->checkVersionlineEdit->text());
-            if (v.isNull())
-                v = qnStaticCommon->engineVersion();
-
             bool isInstalled = false;
             auto errCode = isVersionInstalled(v, &isInstalled);
 

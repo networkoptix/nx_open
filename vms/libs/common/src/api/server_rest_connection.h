@@ -79,8 +79,8 @@ struct ServerConnectionBase::Result<QByteArray>
  */
 class ServerConnection:
     public QObject,
-    public QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ QnCommonModuleAware,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public ServerConnectionBase
 {
     Q_OBJECT
@@ -417,7 +417,11 @@ public:
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
-    Handle updateActionInstall(
+    Handle updateActionFinish(bool skipActivePeers,
+        std::function<void (Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
@@ -434,7 +438,7 @@ public:
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
-    
+
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
@@ -522,6 +526,8 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
+    std::pair<QString, QString> getRequestCredentials(
+        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;

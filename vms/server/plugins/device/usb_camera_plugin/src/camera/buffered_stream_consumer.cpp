@@ -1,5 +1,7 @@
 #include "buffered_stream_consumer.h"
 
+#include <nx/utils/log/log.h>
+
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 
@@ -7,17 +9,17 @@ namespace nx::usb_cam {
 
 namespace {
 
-static constexpr std::chrono::milliseconds kBufferMaxTimeSpan(3000);
+static constexpr int kBufferMaxSize(1024 * 1024 * 8); // 8 MB.
 
 }
 
-//-------------------------------------------------------------------------------------------------
-// BufferedPacketConsumer
-
-void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
+void BufferedPacketConsumer::pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    if (m_buffer.timespan() > kBufferMaxTimeSpan)
+    if (m_bufferSizeBytes > kBufferMaxSize)
+    {
+        NX_WARNING(this, "USB camera %1 error: buffer overflow!", m_cameraId);
         flush();
+    }
 
     if (packet->mediaType() == AVMEDIA_TYPE_VIDEO && m_dropUntilNextVideoKeyPacket)
     {
@@ -25,100 +27,43 @@ void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& p
             return;
         m_dropUntilNextVideoKeyPacket = false;
     }
-
-    m_buffer.insert(packet->timestamp(), packet);
+    push(packet);
 }
 
 void BufferedPacketConsumer::flush()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_dropUntilNextVideoKeyPacket = true;
+    m_bufferSizeBytes = 0;
     m_buffer.clear();
 }
 
-std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::popOldest(
-    const std::chrono::milliseconds& timeout)
+void BufferedPacketConsumer::push(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    return m_buffer.popOldest(timeout);
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_buffer.emplace_back(packet);
+    m_bufferSizeBytes += packet->size();
+    m_wait.notify_all();
 }
 
-std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::peekOldest(
-    const std::chrono::milliseconds& timeout)
+std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::pop()
 {
-    return m_buffer.peekOldest(timeout);
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_wait.wait(lock, [this]() { return m_interrupted || !m_buffer.empty(); });
+    if (m_buffer.empty())
+        return nullptr;
+
+    std::shared_ptr<ffmpeg::Packet> packet = m_buffer.front();
+    m_buffer.pop_front();
+    m_bufferSizeBytes -= packet->size();
+    return packet;
 }
 
 void BufferedPacketConsumer::interrupt()
 {
-    m_buffer.interrupt();
-}
-
-bool BufferedPacketConsumer::waitForTimespan(
-    const std::chrono::milliseconds& timespan,
-    const std::chrono::milliseconds& timeout)
-{
-    return m_buffer.waitForTimespan(timespan, timeout);
-}
-
-std::chrono::milliseconds BufferedPacketConsumer::timespan() const
-{
-    return m_buffer.timespan();
-}
-
-size_t BufferedPacketConsumer::size() const
-{
-    return m_buffer.size();
-}
-
-bool BufferedPacketConsumer::empty() const
-{
-    return m_buffer.empty();
-}
-
-std::vector<uint64_t> BufferedPacketConsumer::timestamps() const
-{
-    return m_buffer.timestamps();
-}
-
-//-------------------------------------------------------------------------------------------------
-// BufferedVideoFrameConsumer
-
-void BufferedVideoFrameConsumer::flush()
-{
-    m_buffer.clear();
-}
-
-void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
-{
-    if (m_buffer.timespan() > kBufferMaxTimeSpan)
-        flush();
-
-    m_buffer.insert(frame->timestamp(), frame);
-}
-
-std::shared_ptr<ffmpeg::Frame> BufferedVideoFrameConsumer::popOldest(
-    const std::chrono::milliseconds& timeout)
-{
-    return m_buffer.popOldest(timeout);
-}
-
-void BufferedVideoFrameConsumer::interrupt()
-{
-    m_buffer.interrupt();
-}
-
-size_t BufferedVideoFrameConsumer::size() const
-{
-    return m_buffer.size();
-}
-
-bool BufferedVideoFrameConsumer::empty() const
-{
-    return m_buffer.empty();
-}
-
-std::vector<uint64_t> BufferedVideoFrameConsumer::timestamps() const
-{
-    return m_buffer.timestamps();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_interrupted = true;
+    m_wait.notify_all();
 }
 
 } // namespace nx::usb_cam

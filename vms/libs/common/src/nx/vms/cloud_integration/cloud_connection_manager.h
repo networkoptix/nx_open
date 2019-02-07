@@ -43,8 +43,8 @@ signals:
 
 class CloudConnectionManager:
     public AbstractCloudConnectionManager,
-    public Qn::EnableSafeDirectConnection,
-    public QnCommonModuleAware
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

@@ -79,21 +79,6 @@ Engine::~Engine()
     NX_PRINT << "Destroyed " << this;
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<IEngine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 void Engine::setSettings(const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
@@ -174,6 +159,7 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 
 void Engine::assertPluginCasted(void* plugin) const
 {
+    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
     NX_KIT_ASSERT(plugin,
         "nx::sdk::analytics::Engine " + nx::kit::utils::toString(this)
         + " has m_plugin of incorrect runtime type " + typeid(*m_plugin).name());

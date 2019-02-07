@@ -69,7 +69,6 @@ QnServerStorageManager::RequestKey::RequestKey(const QnMediaServerResourcePtr &s
     , pool(pool)
 {}
 
-
 QnServerStorageManager::QnServerStorageManager( QObject *parent )
     : base_type(parent)
 {
@@ -87,7 +86,6 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
     {
         checkStoragesStatus(getServerForResource(resource));
     };
-
 
     auto resourceAdded = [this, checkStoragesStatusInternal](const QnResourcePtr &resource)
     {
@@ -235,7 +233,6 @@ void QnServerStorageManager::checkStoragesStatus( const QnMediaServerResourcePtr
     sendArchiveRebuildRequest(server, QnServerStoragesPool::Backup);
     sendBackupRequest(server);
 }
-
 
 // TODO: #GDM SafeMode
 void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages )
@@ -501,4 +498,3 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         emit serverProtocolsChanged(requestKey.server, replyProtocols);
     }
 }
-

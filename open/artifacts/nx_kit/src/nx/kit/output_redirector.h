@@ -32,7 +32,7 @@ public:
     void operator=(const OutputRedirector&) = delete;
 
     static const OutputRedirector& getInstance();
-	
+
     /**
      * Call from anywhere in the code of the executable that links with this library.
      *

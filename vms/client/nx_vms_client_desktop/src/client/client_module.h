@@ -15,6 +15,7 @@ class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
 class QnCameraDataManager;
+class QnCommonModule;
 
 namespace nx::vms::client::desktop {
 
@@ -52,7 +53,7 @@ private:
     static void initMetaInfo();
     static void initSurfaceFormat();
     void initSingletons();
-    void initRuntimeParams();
+    void initRuntimeParams(const QnStartupParameters& startupParams);
     void initLog();
     void initNetwork();
     void initSkin();

@@ -284,30 +284,6 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
 
-        auto forcedMotionStreamProperty = camera->getProperty(QnMediaResource::motionStreamKey());
-        if (forcedMotionStreamProperty != mdPolicy && camCnt > 0)
-            sameMdPolicies = false;
-        mdPolicy = forcedMotionStreamProperty;
-
-        if (!forcedMotionStreamProperty.isEmpty())
-        {
-            if (forcedMotionStreamProperty == QnMediaResource::primaryStreamValue())
-            {
-                forcedMotionStreamIndex = kPrimaryStreamMdIndex;
-            }
-            else if (forcedMotionStreamProperty == QnMediaResource::secondaryStreamValue()
-                && forcedMotionStreamIndex != kPrimaryStreamMdIndex)
-            {
-                forcedMotionStreamIndex = kSecondaryStreamMdIndex;
-            }
-            else if(forcedMotionStreamProperty == QnMediaResource::edgeStreamValue()
-                && forcedMotionStreamIndex != kPrimaryStreamMdIndex
-                && forcedMotionStreamIndex != kSecondaryStreamMdIndex)
-            {
-                forcedMotionStreamIndex = kEdgeStreamMdIndex;
-            }
-        }
-
         if (canSwitchPresetTypes(camera))
         {
             ++supportBothPresetTypeCount;
@@ -372,25 +348,6 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         ui->comboBoxTransport->setCurrentText(rtpTransport);
     else
         ui->comboBoxTransport->setCurrentIndex(-1);
-
-    ui->comboBoxForcedMotionStream->clear();
-    ui->comboBoxForcedMotionStream->addItem(tr("Primary"), QnMediaResource::primaryStreamValue());
-
-    if (m_hasDualStreaming)
-        ui->comboBoxForcedMotionStream->addItem(tr("Secondary"), QnMediaResource::secondaryStreamValue());
-
-    if (m_hasRemoteArchiveCapability)
-        ui->comboBoxForcedMotionStream->addItem(tr("Edge"), QnMediaResource::edgeStreamValue());
-
-    bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
-
-    check_box_utils::setupTristateCheckbox(
-        ui->checkBoxForceMotionDetection,
-        sameMdPolicies,
-        gotForcedMotionStream);
-
-    ui->comboBoxForcedMotionStream->setCurrentIndex(
-         gotForcedMotionStream ? forcedMotionStreamIndex : kPrimaryStreamMdIndex);
 
     ui->checkBoxForceMotionDetection->setEnabled(allCamerasSupportForceMotion);
 
@@ -499,23 +456,6 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
             camera->setProperty(QnMediaResource::rtpTransportKey(), txt);
         }
 
-        auto mdPolicyCheckState = ui->checkBoxForceMotionDetection->checkState();
-        if (mdPolicyCheckState == Qt::Unchecked)
-        {
-            camera->setProperty(QnMediaResource::motionStreamKey(), QString());
-        }
-        else if (mdPolicyCheckState == Qt::Checked)
-        {
-            auto index = ui->comboBoxForcedMotionStream->currentIndex();
-            if (index >= 0)
-            {
-                auto mdPolicy = ui->comboBoxForcedMotionStream->itemData(index).toString();
-
-                if (isMdPolicyAllowedForCamera(camera, mdPolicy))
-                    camera->setProperty(QnMediaResource::motionStreamKey(), mdPolicy);
-            }
-        }
-
         const auto preferredPtzPresetTypeIndex = ui->preferredPtzPresetTypeComboBox->currentIndex();
         if (preferredPtzPresetTypeIndex != -1 && canSwitchPresetTypes(camera))
         {
@@ -550,18 +490,12 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
 
 bool LegacyExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
     QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
-    return cameraType && cameraType->getManufacture() == lit("ArecontVision");
+    return cameraType && cameraType->getManufacturer() == lit("ArecontVision");
 }
 
 bool LegacyExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
 {
-    const bool hasDualStreaming  = camera->hasDualStreamingInternal();
-    const bool hasRemoteArchive = camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
-
-    return mdPolicy.isEmpty() //< Do not force MD policy
-        || mdPolicy == QnMediaResource::primaryStreamValue()
-        || (mdPolicy == QnMediaResource::secondaryStreamValue() && hasDualStreaming)
-        || (mdPolicy == QnMediaResource::edgeStreamValue() && hasRemoteArchive);
+    return false;
 }
 
 int LegacyExpertSettingsWidget::generateFreeLogicalId() const

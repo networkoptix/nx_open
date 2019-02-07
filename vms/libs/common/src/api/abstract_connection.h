@@ -105,7 +105,7 @@ private:
 
 
 
-class QnAbstractConnection: public Connective<QObject>, public QnCommonModuleAware
+class QnAbstractConnection: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

@@ -89,14 +89,14 @@ double VC1SequenceHeader::getFPS() {
         return 0;
     double fps = time_base_den / (double) time_base_num;
     //if (fps > 25.0 && pulldown)
-    //	fps /= 1.25;
+    //    fps /= 1.25;
     return fps;
 }
 
 bool VC1SequenceHeader::setFPS(double value)
 {
     //if (value < 25.0 && pulldown)
-    //	value *= 1.25;
+    //    value *= 1.25;
     int nr, dr;
     if (m_fpsFieldBitVal > 0) {
         int time_scale = (uint32_t)(value +0.5)  * 1000;

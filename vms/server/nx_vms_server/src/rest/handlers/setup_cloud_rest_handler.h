@@ -9,7 +9,7 @@ namespace nx { namespace vms { namespace cloud_integration { class CloudManagerG
 
 class QnSetupCloudSystemRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

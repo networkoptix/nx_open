@@ -181,7 +181,7 @@ static constexpr std::chrono::milliseconds kErrorResetTimeout(1);
 void AioThread::run()
 {
     initSystemThreadId();
-    NX_DEBUG(this, QLatin1String("AIO thread started"));
+    NX_DEBUG(this, "AIO thread started");
 
     while (!needToStop())
     {
@@ -241,7 +241,7 @@ void AioThread::run()
             continue;
     }
 
-    NX_DEBUG(this, QLatin1String("AIO thread stopped"));
+    NX_DEBUG(this, "AIO thread stopped");
 }
 
 bool AioThread::getSocketTimeout(

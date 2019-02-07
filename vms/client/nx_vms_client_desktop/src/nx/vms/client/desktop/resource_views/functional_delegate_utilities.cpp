@@ -32,7 +32,8 @@ QVariant resourceVersionAccessor(const QnResourcePtr& ptr, int role)
 CustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context, QObject* parent)
 {
     auto watcher = context->instance<QnWorkbenchVersionMismatchWatcher>();
-    const auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    const auto latestMsVersion = watcher->latestVersion(
+		QnWorkbenchVersionMismatchWatcher::Component::server);
 
     auto delegate = new CustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(

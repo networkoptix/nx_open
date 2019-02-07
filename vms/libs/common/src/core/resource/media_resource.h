@@ -80,11 +80,6 @@ public:
     static QString rtpTransportKey();
     static QString panicRecordingKey();
     static QString dynamicVideoLayoutKey();
-    static QString motionStreamKey();
-
-    static QString primaryStreamValue();
-    static QString secondaryStreamValue();
-    static QString edgeStreamValue();
 
     static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
 

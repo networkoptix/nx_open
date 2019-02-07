@@ -13,7 +13,7 @@ typedef QnMultiserverRequestContext<QnChunksRequestData> QnChunksRequestContext;
 
 class QnMultiserverChunksRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     static const QString kUrlPath;
@@ -27,7 +27,6 @@ public:
     MultiServerPeriodDataList loadDataSync(
         const QnChunksRequestData& request,
         const QnRestConnectionProcessor* owner) const;
-
 
     static MultiServerPeriodDataList mergeDataWithSameId(
         const MultiServerPeriodDataList& periodList,

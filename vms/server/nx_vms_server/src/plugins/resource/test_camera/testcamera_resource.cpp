@@ -18,13 +18,6 @@ QString QnTestCameraResource::getDriverName() const
     return QLatin1String(kManufacturer);
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnTestCameraResource::initializeCameraDriver()
 {
     return CameraDiagnostics::NoErrorResult();

@@ -51,7 +51,7 @@ const Response& ConnectionUpgradeTunnelClient::response() const
 
 void ConnectionUpgradeTunnelClient::processOpenTunnelResponse()
 {
-    if (!m_httpClient->hasRequestSucceeded() || 
+    if (!m_httpClient->hasRequestSucceeded() ||
         m_httpClient->response()->statusLine.statusCode != StatusCode::switchingProtocols)
     {
         return cleanUpFailedTunnel();

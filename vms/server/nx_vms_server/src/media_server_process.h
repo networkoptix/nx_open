@@ -117,6 +117,7 @@ public:
     bool enableMultipleInstances() const { return m_enableMultipleInstances; }
     void initStaticCommonModule();
     void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
+    bool installUpdateRequestReceived() const { return m_installUpdateRequestReceived; }
 
 signals:
     void started();
@@ -153,7 +154,7 @@ private:
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    
+
     void registerRestHandlers(
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
@@ -245,6 +246,7 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
+
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -291,4 +293,6 @@ private:
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
     std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
+
+    std::atomic<bool> m_installUpdateRequestReceived{false};
 };

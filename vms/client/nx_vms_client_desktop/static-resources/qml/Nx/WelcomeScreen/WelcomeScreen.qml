@@ -6,11 +6,9 @@ import Nx.Models 1.0;
 
 import com.networkoptix.qml 1.0;
 
-Rectangle
+Item
 {
     id: control;
-
-    color: ColorTheme.window;
 
     readonly property bool active: Window.visibility !== Window.Hidden
 

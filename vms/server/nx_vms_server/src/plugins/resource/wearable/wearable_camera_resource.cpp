@@ -4,7 +4,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
-const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
+const QString QnWearableCameraResource::kManufacturer = lit("WEARABLE_CAMERA");
 using namespace nx::vms::server::resource;
 
 QnWearableCameraResource::QnWearableCameraResource(QnMediaServerModule* serverModule):
@@ -32,7 +32,7 @@ CameraDiagnostics::Result QnWearableCameraResource::initInternal()
 
 QString QnWearableCameraResource::getDriverName() const
 {
-    return kManufacture;
+    return kManufacturer;
 }
 
 void QnWearableCameraResource::setStatus(Qn::ResourceStatus, Qn::StatusChangeReason reason)
@@ -62,11 +62,6 @@ QnConstResourceAudioLayoutPtr QnWearableCameraResource::getAudioLayout(
 QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider()
 {
     return nullptr;
-}
-
-StreamCapabilityMap QnWearableCameraResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex /*streamIndex*/)
-{
-    return StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnWearableCameraResource::initializeCameraDriver()

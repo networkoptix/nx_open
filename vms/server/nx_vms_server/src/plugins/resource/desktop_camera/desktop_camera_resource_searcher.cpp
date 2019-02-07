@@ -54,7 +54,7 @@ QnDesktopCameraResourceSearcher::~QnDesktopCameraResourceSearcher()
 {
 }
 
-QString QnDesktopCameraResourceSearcher::manufacture() const
+QString QnDesktopCameraResourceSearcher::manufacturer() const
 {
     return QnDesktopCameraResource::MANUFACTURE;
 }
@@ -178,7 +178,7 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid& reso
     if (!resourceType)
         return result;
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     result = QnVirtualCameraResourcePtr(new QnDesktopCameraResource(serverModule()));

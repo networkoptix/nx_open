@@ -33,6 +33,7 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
+#include <core/resource/avi/avi_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
@@ -495,9 +496,13 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (node->resourceFlags().testFlag(Qn::local))
         {
-            if (isLoggedIn)
-                return m_rootNodes[NodeType::localResources];
-            return rootNode;
+            const auto resource = node->resource();
+            if (resource->getStatus() == Qn::Online)
+            {
+                if (isLoggedIn)
+                    return m_rootNodes[NodeType::localResources];
+                return rootNode;
+            }
         }
         return bastardNode;
     }
@@ -1025,6 +1030,16 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
             {
                 for (auto node: m_nodesByResource.value(webPage))
                     node->updateIcon();
+            });
+    }
+
+    if (const auto aviResource = resource.dynamicCast<QnAviResource>())
+    {
+        connect(aviResource, &QnWebPageResource::statusChanged, this,
+            [this, aviResource]()
+            {
+                for (auto node: m_nodesByResource.value(aviResource))
+                    updateNodeParent(node);
             });
     }
 

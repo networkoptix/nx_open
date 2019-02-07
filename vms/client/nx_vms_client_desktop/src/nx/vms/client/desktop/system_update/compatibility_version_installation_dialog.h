@@ -3,10 +3,10 @@
 #include <QtWidgets/QDialog>
 
 #include <utils/common/connective.h>
-#include <update/updates_common.h>
 #include <ui/dialogs/common/dialog.h>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 
 class QnMediaServerUpdateTool;
 struct QnConnectionInfo;
@@ -16,7 +16,6 @@ class QnCompatibilityVersionInstallationDialog;
 }
 
 namespace nx::update { struct UpdateContents; }
-namespace nx::vms::client::desktop { class ClientUpdateTool; }
 
 // TODO: #dklychkov rename class in 2.4
 class CompatibilityVersionInstallationDialog:
@@ -24,10 +23,12 @@ class CompatibilityVersionInstallationDialog:
 {
     Q_OBJECT
     using base_type = Connective<QnDialog>;
+    using UpdateContents = nx::update::UpdateContents;
 
 public:
     CompatibilityVersionInstallationDialog(
-        const QnConnectionInfo& connectionInfo, QWidget* parent = nullptr);
+        const QnConnectionInfo& connectionInfo, QWidget* parent,
+        const nx::vms::api::SoftwareVersion& engineVersion);
     virtual ~CompatibilityVersionInstallationDialog();
 
     // Mirroring some states from ClientUpdateTool.
@@ -49,18 +50,27 @@ public:
 
 protected:
     int installUpdate();
-    void atUpdateStateChanged(int state, int progress);
-    void atAutoRestartChanged(int state);
-    void atReceivedUpdateContents(const nx::update::UpdateContents& contents);
+    void processUpdateContents(const nx::update::UpdateContents& contents);
     void setMessage(const QString& message);
 
+protected:
+    // Event handlers
+    void atUpdateCurrentState();
+    void atUpdateStateChanged(int state, int progress);
+    void atAutoRestartChanged(int state);
+
+protected:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
 
     nx::utils::SoftwareVersion m_versionToInstall;
-    std::shared_ptr<nx::vms::client::desktop::ClientUpdateTool> m_clientUpdateTool;
     // Timer for checking current status and timeouts.
     std::unique_ptr<QTimer> m_statusCheckTimer;
 
     InstallResult m_installationResult = InstallResult::initial;
     bool m_autoInstall = true;
+    const nx::vms::api::SoftwareVersion m_engineVersion;
+
+private:
+    struct Private;
+    std::unique_ptr<Private> m_private;
 };

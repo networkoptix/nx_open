@@ -114,15 +114,15 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 {
     base_type::connectToConnection(connection);
 
-    connect(connection->getUpdatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateChunkReceived,
+    connect(connection->updatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateChunkReceived,
         this, &QnServerMessageProcessor::at_updateChunkReceived);
-    connect(connection->getUpdatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateInstallationRequested,
+    connect(connection->updatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateInstallationRequested,
         this, &QnServerMessageProcessor::at_updateInstallationRequested);
 
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
         this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
 
-    connect(connection->getMiscNotificationManager().get(),
+    connect(connection->miscNotificationManager().get(),
         &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
         this,
         [this](const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
@@ -141,8 +141,8 @@ void QnServerMessageProcessor::disconnectFromConnection(
     const ec2::AbstractECConnectionPtr& connection)
 {
     base_type::disconnectFromConnection(connection);
-    connection->getUpdatesNotificationManager()->disconnect(this);
-    connection->getMiscNotificationManager()->disconnect(this);
+    connection->updatesNotificationManager()->disconnect(this);
+    connection->miscNotificationManager()->disconnect(this);
 }
 
 void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, vms::api::PeerType peerType)

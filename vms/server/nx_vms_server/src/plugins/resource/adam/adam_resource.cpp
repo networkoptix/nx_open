@@ -17,7 +17,7 @@
 #include "adam_modbus_io_manager.h"
 #include <nx/utils/timer_manager.h>
 
-const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
+const QString QnAdamResource::kManufacturer(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule)
@@ -37,14 +37,7 @@ QnAdamResource::~QnAdamResource()
 
 QString QnAdamResource::getDriverName() const
 {
-    return kManufacture;
-}
-
-nx::vms::server::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
+    return kManufacturer;
 }
 
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()

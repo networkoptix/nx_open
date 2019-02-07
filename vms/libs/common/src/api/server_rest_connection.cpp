@@ -36,6 +36,8 @@
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/api/data/peer_data.h>
+#include <common/static_common_module.h>
 
 using namespace nx;
 
@@ -812,7 +814,28 @@ Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& c
         internalCallback, targetThread);
 }
 
-Handle ServerConnection::updateActionInstall(
+Handle ServerConnection::updateActionFinish(bool skipActivePeers,
+    std::function<void (Handle, bool)>&& callback, QThread* targetThread)
+{
+    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
+        {
+            if (callback)
+                callback(handle, success);
+        };
+
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    QnRequestParamList params;
+    if (skipActivePeers)
+        params.insert("ignorePendingPeers", "true");
+
+    return executePost<EmptyResponseType>(lit("/ec2/finishUpdate"),
+        params,
+        contentType, QByteArray(),
+        internalCallback, targetThread);
+}
+
+Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
     std::function<void (Handle, bool)>&& callback,
     QThread* targetThread)
 {
@@ -823,8 +846,15 @@ Handle ServerConnection::updateActionInstall(
                 callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    QString peerList;
+    for (const auto& peer: participants)
+    {
+        if (!peerList.isEmpty())
+            peerList += ",";
+        peerList += peer.toString();
+    }
     return executePost<EmptyResponseType>(lit("/api/installUpdate"),
-        QnRequestParamList(),
+        QnRequestParamList{{ lit("peers"), peerList }},
         contentType, QByteArray(), internalCallback, targetThread);
 }
 
@@ -1255,6 +1285,27 @@ QnUuid ServerConnection::getServerId() const
     return m_serverId;
 }
 
+std::pair<QString, QString> ServerConnection::getRequestCredentials(
+    const QnMediaServerResourcePtr& targetServer) const
+{
+    using namespace nx::vms::api;
+    const auto localPeerType = qnStaticCommon->localPeerType();
+    if (PeerData::isClient(localPeerType))
+    {
+        const auto ecUrl = commonModule()->ec2Connection()->connectionInfo().ecUrl;
+        return std::make_pair(ecUrl.userName(), ecUrl.password());
+    }
+
+    const auto targetServerAuthCredentials =
+        std::make_pair(targetServer->getId().toString(), targetServer->getAuthKey());
+
+    if (PeerData::isServer(localPeerType))
+        return targetServerAuthCredentials;
+
+    NX_ASSERT(false, "Not an expected peer type");
+    return targetServerAuthCredentials;
+}
+
 nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     nx::network::http::Method::ValueType method,
     const QUrl& url,
@@ -1279,14 +1330,8 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
-    QString user = connection->connectionInfo().ecUrl.userName();
-    QString password = connection->connectionInfo().ecUrl.password();
-    if (user.isEmpty() || password.isEmpty())
-    {
-        // if auth is not known, use server auth key
-        user = server->getId().toString();
-        password = server->getAuthKey();
-    }
+    const auto [user, password] =  getRequestCredentials(server);
+
     auto videoWallGuid = commonModule()->videowallGuid();
     if (!videoWallGuid.isNull())
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());

@@ -34,6 +34,7 @@
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <client_core/client_core_settings.h>
 #include <client/desktop_client_message_processor.h>
@@ -193,7 +194,6 @@ QDebug operator<<(QDebug dbg, QnWorkbenchConnectHandler::PhysicalState state)
     return dbg.space();
 }
 
-
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -269,7 +269,6 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                 default:
                     NX_ASSERT(false, "Unhandled connection state");
             }
-
 
             /* Check if we need to log out if logged in under this user. */
             QString currentLogin = commonModule()->currentUrl().userName();
@@ -371,7 +370,9 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto status = silent
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindowWidget());
+        : QnConnectionDiagnosticsHelper::validateConnection(
+            connectionInfo, errorCode, mainWindowWidget(),
+            commonModule()->engineVersion());
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
     NX_DEBUG(this, lm("handleConnectReply: connection status %1").arg(status));
 
@@ -742,7 +743,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
             }
         });
 
-
     auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
     commonModule()->setReadOnly(connection->connectionInfo().ecDbReadOnly);
@@ -1033,7 +1033,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
     // TODO: Should enter 'updating' mode
 
     auto status =  QnConnectionDiagnosticsHelper::validateConnection(
-        connectionInfo, errorCode, mainWindowWidget());
+        connectionInfo, errorCode, mainWindowWidget(), commonModule()->engineVersion());
 
     switch (status)
     {
@@ -1102,6 +1102,11 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
+
+    const auto aviResources = resourcePool()->getResources<QnAviResource>();
+    std::copy_if(aviResources.cbegin(), aviResources.cend(), std::back_inserter(resourcesToRemove),
+        [](auto aviResource) { return aviResource->getStatus() != Qn::Online; });
+
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 
@@ -1114,7 +1119,7 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     cameraUserAttributesPool()->clear();
     mediaServerUserAttributesPool()->clear();
-    propertyDictionary()->clear(idList);
+    resourcePropertyDictionary()->clear(idList);
     statusDictionary()->clear(idList);
 
     licensePool()->reset();

@@ -48,7 +48,7 @@ public:
         PostProcessList postProcList;
     };
 
-    TransactionExecutor(QnDbManager* db): m_db(db)
+    TransactionExecutor(QnDbManager* db): QnLongRunnable("TransactionExecutorThread"), m_db(db)
     {
         start();
     }
@@ -251,8 +251,7 @@ public:
         const Qn::UserAccessData &userAccessData)
         :
         m_owner(owner),
-        m_db(owner->getDb(), userAccessData),
-        m_auditManager(nullptr)
+        m_db(owner->getDb(), userAccessData)
     {
     }
 
@@ -934,11 +933,6 @@ public:
     }
 
 private:
-    ServerQueryProcessorAccess* m_owner;
-    QnDbManagerAccess m_db;
-    ECConnectionAuditManager* m_auditManager;
-    QnAuthSession m_authSession;
-
     template<typename DataType>
     QnTransaction<DataType> createTransaction(
         ApiCommand::Value command,
@@ -948,6 +942,12 @@ private:
         transaction.historyAttributes.author = m_db.userAccessData().userId;
         return transaction;
     }
+
+private:
+    ServerQueryProcessorAccess* m_owner = nullptr;
+    QnDbManagerAccess m_db;
+    ECConnectionAuditManager* m_auditManager = nullptr;
+    QnAuthSession m_authSession;
 };
 
 template<class T>

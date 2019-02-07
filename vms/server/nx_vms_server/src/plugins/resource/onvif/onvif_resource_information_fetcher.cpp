@@ -193,7 +193,7 @@ void OnvifResourceInformationFetcher::findResources(
     }
 
     auto info = originalInfo;
-    m_hookChain.applyHooks(serverModule()->commonModule()->dataPool(), &info);
+    m_hookChain.applyHooks(serverModule()->commonModule()->resourceDataPool(), &info);
 
     QString mac = info.mac;
     if (isMacAlreadyExists(info.uniqId, result) || isMacAlreadyExists(mac, result)) {
@@ -202,7 +202,7 @@ void OnvifResourceInformationFetcher::findResources(
 
     //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
     //    int n = 0;
-    auto dataPool = serverModule()->commonModule()->dataPool();
+    auto dataPool = serverModule()->commonModule()->resourceDataPool();
     if (needIgnoreCamera(dataPool, QUrl(endpoint).host(), info.manufacturer, info.name))
         return;
 
@@ -234,7 +234,7 @@ void OnvifResourceInformationFetcher::findResources(
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
         soapWrapper.fetchLoginPassword(serverModule()->commonModule(), info.manufacturer, info.name);
 
-    if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
+    if (!existResource && discoveryMode == DiscoveryMode::partiallyEnabled)
         return; //ignoring unknown cameras
 
     if (m_shouldStop)
@@ -284,7 +284,7 @@ void OnvifResourceInformationFetcher::findResources(
         if (!extInfo.mac.isEmpty())
             mac = extInfo.mac;
 
-        auto dataPool = serverModule()->commonModule()->dataPool();
+        auto dataPool = serverModule()->commonModule()->resourceDataPool();
         if (needIgnoreCamera(dataPool, QUrl(endpoint).host(), manufacturer, model))
             return;
     }
@@ -362,14 +362,14 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
-    auto resData = serverModule()->commonModule()->dataPool()->data(manufacturer, model);
+    auto resData = serverModule()->commonModule()->resourceDataPool()->data(manufacturer, model);
     auto manufacturerAlias = resData.value<QString>(ResourceDataKey::kOnvifVendorSubtype);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
     bool doNotAddVendorToDeviceName = resData.value<bool>(ResourceDataKey::kDoNotAddVendorToDeviceName);
 
-    QnPlOnvifResourcePtr resource = createOnvifResourceByManufacture(serverModule(), manufacturerAlias);
+    QnPlOnvifResourcePtr resource = createOnvifResourceByManufacturer(serverModule(), manufacturerAlias);
     if (!resource)
         return resource;
 
@@ -425,12 +425,12 @@ QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& respo
              : QString::fromStdString(response.SerialNumber));
 }
 
-QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacturer(
     QnMediaServerModule* serverModule,
-    const QString& manufacture)
+    const QString& manufacturer)
 {
     QnPlOnvifResourcePtr resource;
-    const QString lowerCaseManufacture = manufacture.toLower();
+    const QString lowerCaseManufacture = manufacturer.toLower();
 
     if (lowerCaseManufacture.contains("digital watchdog")
         || lowerCaseManufacture.contains("digital_watchdog")
@@ -465,7 +465,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource(serverModule));
 
-    resource->setVendor( manufacture );
+    resource->setVendor(manufacturer);
 
     return resource;
 }

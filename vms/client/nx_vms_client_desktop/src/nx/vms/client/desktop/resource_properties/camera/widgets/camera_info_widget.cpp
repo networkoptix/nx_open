@@ -85,7 +85,7 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 {
     const bool singleCamera = state.isSingleCamera();
     const bool singleNonWearableCamera = singleCamera
-        && state.devicesDescription.isWearable == CameraSettingsDialogState::CombinedValue::None;
+        && state.devicesDescription.isWearable == CombinedValue::None;
 
     ui->nameLabel->setVisible(singleCamera);
 
@@ -110,13 +110,13 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->multipleNameLabel->setText(
         QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount));
 
-    ui->modelLabel->setText(single.model);
-    ui->modelDetailLabel->setText(single.model);
-    ui->vendorLabel->setText(single.vendor);
-    ui->vendorDetailLabel->setText(single.vendor);
-    ui->macAddressLabel->setText(single.macAddress);
-    ui->firmwareLabel->setText(single.firmware);
-    ui->cameraIdLabel->setText(single.id);
+    ui->modelLabel->setText(single.model.trimmed());
+    ui->modelDetailLabel->setText(ui->modelLabel->text());
+    ui->vendorLabel->setText(single.vendor.trimmed());
+    ui->vendorDetailLabel->setText(ui->vendorLabel->text());
+    ui->macAddressLabel->setText(single.macAddress.trimmed());
+    ui->firmwareLabel->setText(single.firmware.trimmed());
+    ui->cameraIdLabel->setText(single.id.trimmed());
 
     ui->ipAddressLabel->setText(single.ipAddress);
     ui->ipAddressDetailLabel->setText(single.ipAddress);

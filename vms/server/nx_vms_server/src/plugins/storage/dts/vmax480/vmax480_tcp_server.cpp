@@ -67,7 +67,6 @@ void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, int channel, 
     d->socket->send(data);
 }
 
-
 void QnVMax480ConnectionProcessor::vMaxDisconnect()
 {
     Q_D(QnVMax480ConnectionProcessor);
@@ -123,7 +122,6 @@ void QnVMax480ConnectionProcessor::vMaxRemoveChannel(int channel)
     if (newMask == d->openedChannels)
         return;
     d->openedChannels = newMask;
-
 
     VMaxParamList params;
     params["channel"] = QString::number(channel).toUtf8();
@@ -369,6 +367,7 @@ QnVMax480Server::QnVMax480Server(QObject* /*parent*/):
         QHostAddress(QLatin1String("127.0.0.1")),
         0)
 {
+    setObjectName("QnVMax480Server::QnTcpListener");
     start();
 }
 
@@ -402,7 +401,6 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
     }
     return fetcher;
 }
-
 
 QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)

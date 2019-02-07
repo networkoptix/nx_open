@@ -1,6 +1,7 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
+#include <nx/sdk/interface.h>
+
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_plugin_event.h>
@@ -15,13 +16,6 @@ namespace analytics {
 class IPlugin; //< Forward declaration for the parent object.
 
 /**
- * Each class that implements Engine interface should properly handle this GUID in its
- * queryInterface().
- */
-static const nxpl::NX_GUID IID_Engine =
-    {{0x4c,0x7b,0xf8,0xbf,0xac,0xf7,0x45,0x72,0x98,0x91,0xaa,0x7e,0xa0,0x56,0xea,0xb5}};
-
-/**
  * Main interface for an Analytics Engine instance. The instances are created by a Mediaserver via
  * calling analytics::IPlugin::createEngine() typically on Mediaserver start (or when a new Engine
  * is created by the system administrator), and destroyed (via releaseRef()) on Mediaserver
@@ -33,9 +27,11 @@ static const nxpl::NX_GUID IID_Engine =
  * All methods are guaranteed to be called without overlappings, even if from different threads,
  * thus, no synchronization is required for the implementation.
  */
-class IEngine: public nxpl::PluginInterface
+class IEngine: public Interface<IEngine>
 {
 public:
+    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine"); }
+
     class IHandler
     {
     public:

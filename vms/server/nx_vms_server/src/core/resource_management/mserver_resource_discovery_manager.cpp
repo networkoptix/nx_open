@@ -41,9 +41,21 @@ static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
+template<class ResourcePointer>
+QString netResourceString(const ResourcePointer& res)
+{
+    return QString("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4")
+        .arg(res->getUrl())
+        .arg(res->getHostAddress())
+        .arg(res->getMAC().toString())
+        .arg(res->getUniqueId());
+}
+
 } // namespace
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule):
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(
+    QnMediaServerModule* serverModule)
+    :
     QnResourceDiscoveryManager(serverModule->commonModule()),
     m_serverModule(serverModule)
 {
@@ -67,7 +79,8 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServ
 
     connect(
         this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
-        serverModule->eventConnector(), &nx::vms::server::event::EventConnector::at_cameraDisconnected);
+        serverModule->eventConnector(),
+        &nx::vms::server::event::EventConnector::at_cameraDisconnected);
     m_serverOfflineTimeout = serverModule->settings().redundancyTimeout() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_startupTimer.restart();
@@ -89,30 +102,33 @@ void QnMServerResourceDiscoveryManager::stop()
 QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& resourceTypeId,
     const QnResourceParams& params)
 {
-    QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
-    if( res )
+    QnResourcePtr res = QnResourceDiscoveryManager::createResource(resourceTypeId, params);
+    if (res)
         return res;
 
     const QnResourceTypePtr& resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    if( !resourceType )
+    if (!resourceType)
         return res;
-    return QnResourcePtr(new DataOnlyCameraResource( resourceTypeId ));   //found resource type, but could not find factory. Disabled discovery?
+
+    // Found resource type, but could not find factory. Disabled discovery?
+    return QnResourcePtr(new DataOnlyCameraResource(resourceTypeId));
 }
 
 static void printInLogNetResources(const QnResourceList& resources)
 {
-    for(const QnResourcePtr& res: resources)
+    for (const QnResourcePtr& res: resources)
     {
         const QnNetworkResource* netRes = dynamic_cast<const QnNetworkResource*>(res.data());
         if (!netRes)
             continue;
 
         NX_INFO(typeid(QnMServerResourceDiscoveryManager),
-            lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()));
+            "%1 %2", netRes->getHostAddress(), netRes->getName());
     }
 }
 
-void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCamResourcePtr>& foreignResources)
+void QnMServerResourceDiscoveryManager::sortForeignResources(
+    QList<QnSecurityCamResourcePtr>& foreignResources)
 {
     const QnUuid ownGuid = commonModule()->moduleGUID();
     std::sort(foreignResources.begin(), foreignResources.end(),
@@ -155,28 +171,35 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             m_tmpForeignResources.push_back(ResourceList());
         m_tmpForeignResources[foreignResourceIndex].clear();
 
-        // Check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras.
+        // Check foreign resources several times in case if camera is discovered not quite stable.
+        // It will improve redundant priority for foreign cameras.
         for (auto itr = resources.begin(); itr != resources.end();)
         {
             QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
-            if (!camRes) {
+            if (!camRes)
+            {
                 ++itr;
                 continue;
             }
-            QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
-            if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
+            QnSecurityCamResourcePtr existRes =
+                resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
+
+            if (existRes && existRes->hasFlags(Qn::foreigner)
+                && !existRes->hasFlags(Qn::desktop_camera))
             {
                 NX_VERBOSE(this,
-                    lm("filter resource %1 because it is foreign. It will be checked later.").arg(NetResString(existRes)));
+                    "Filter resource %1 because it is foreign. It will be checked later.",
+                    netResourceString(existRes));
                 m_tmpForeignResources[foreignResourceIndex].insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
-            else {
+            else
+            {
                 ++itr;
             }
         }
-        if (m_tmpForeignResources.size() == RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
-            m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
+        if (m_tmpForeignResources.size() == RETRY_COUNT_FOR_FOREIGN_RESOURCES
+            && m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
             // Exclude duplicates.
             ResourceList foreignResourcesMap;
@@ -186,13 +209,13 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     foreignResourcesMap.insert(itr.key(), itr.value());
             }
 
-            // Sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order.
+            // Sort foreign resources to add more important cameras first: check if it is
+            // own cameras, then check failOver priority order.
             auto foreignResources = foreignResourcesMap.values();
             sortForeignResources(foreignResources);
             for (const auto& res: foreignResources)
             {
-                NX_VERBOSE(this,
-                    lm("Add foreign resource %1 to check").arg(NetResString(res)));
+                NX_VERBOSE(this, "Add foreign resource %1 to check", netResourceString(res));
                 resources << res;
             }
         }
@@ -211,21 +234,18 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (needToStop())
             return false;
 
-        NX_VERBOSE(this, lit("%1 processing %2 resources")
-                .arg(FL1(Q_FUNC_INFO))
-                .arg(resources.size()));
+        NX_VERBOSE(this, "%1 processing %2 resources", Q_FUNC_INFO, resources.size());
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
-        if (!newNetRes) {
+        if (!newNetRes)
+        {
             // TODO: #rvasilenko please make sure we can safely continue here
             //it = resources.erase(it); // do not need to investigate OK resources
             ++it;
             continue;
         }
 
-        NX_VERBOSE(this, lit("%1 Processing resource %2")
-                .arg(FL1(Q_FUNC_INFO))
-                .arg(NetResString(newNetRes)));
+        NX_VERBOSE(this, "%1 Processing resource %2", Q_FUNC_INFO, netResourceString(newNetRes));
 
         QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
@@ -245,8 +265,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         {
             if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
             {
-                NX_VERBOSE(this, lit("Can't take foreign resource %1 now").arg(NetResString(newNetRes)));
-                it = resources.erase(it); // do not touch foreign resource
+                NX_VERBOSE(this, "Can't take foreign resource %1 now", netResourceString(newNetRes));
+                it = resources.erase(it); //< do not touch foreign resource
                 continue;
             }
         }
@@ -267,10 +287,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnUuid newTypeId = newNetRes->getTypeId();
             bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
 
-            NX_VERBOSE(this, lm("%1 Found existing cam res %2 for new resource %3")
-                    .arg(FL1(Q_FUNC_INFO))
-                    .arg(NetResString(rpNetRes))
-                    .arg(NetResString(newNetRes)));
+            NX_VERBOSE(this, "%1 Found existing cam res %2 for new resource %3",
+                    Q_FUNC_INFO,
+                    netResourceString(rpNetRes),
+                    netResourceString(newNetRes));
 
             newNetRes->setPhysicalId(rpNetRes->getUniqueId());
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
@@ -280,7 +300,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     //preserving "manuallyAdded" flag
                     const bool isDiscoveredManually = newCamRes->isManuallyAdded();
                     newNetRes->update(existCamRes);
-                    newCamRes->setManuallyAdded( isDiscoveredManually );
+                    newCamRes->setManuallyAdded(isDiscoveredManually);
                     NX_ASSERT(newNetRes->resourcePool() == nullptr);
                     newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
@@ -289,24 +309,27 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     if (updateTypeId)
                         newNetRes->setTypeId(newTypeId);
 
-                    NX_VERBOSE(this, lm("Add foreign resource %1 to search list")
-                        .arg(NetResString(rpNetRes)));
+                    NX_VERBOSE(this,
+                        "Add foreign resource %1 to search list",
+                        netResourceString(rpNetRes));
 
                     extraResources << newNetRes;
                 }
                 else
                 {
-                    NX_VERBOSE(this, lm("Merge existing resource with searched resource %1")
-                        .arg(NetResString(rpNetRes)));
+                    NX_VERBOSE(this,
+                        "Merge existing resource with searched resource %1",
+                        netResourceString(rpNetRes));
 
                     nx::vms::api::CameraData apiCamera;
                     ec2::fromResourceToApi(existCamRes, apiCamera);
                     apiCamera.id = nx::vms::api::CameraData::physicalIdToId(apiCamera.physicalId);
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
-                    const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
-                    if( errorCode != ec2::ErrorCode::ok )
-                        NX_WARNING(this, QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)));
+                    const ec2::ErrorCode errorCode =
+                        connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
+                    if (errorCode != ec2::ErrorCode::ok)
+                        NX_WARNING(this, "Can't add camera to ec2. %1",ec2::toString(errorCode));
                     existCamRes->saveProperties();
                 }
             }
@@ -324,7 +347,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ========================= send conflict info =====================
-    for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin();
+        itr != ipsList.end(); ++itr)
     {
         if (hasIpConflict(itr.value()))
         {
@@ -345,14 +369,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
 
-    // ==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing
+    // If resource is not discovered last minute and we do not record it and do not see live
+    // than readers are not running.
     if (searchType == SearchType::Full)
         markOfflineIfNeeded(discoveredResources);
-    // ======================
 
     bool foundSmth = !resources.isEmpty();
     if (foundSmth)
-        NX_INFO(this, lit("After excluding existing resources we've got %1 new resources:").arg(resources.size()));
+    {
+        NX_INFO(this,
+            "After excluding existing resources we've got %1 new resources:", resources.size());
+    }
 
     printInLogNetResources(resources);
     ++m_discoveryCounter;
@@ -402,7 +429,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
 
     std::vector<QnManualCameraInfo> newCameras;
     {
-        QnMutexLocker lock( &m_searchersListMutex );
+        QnMutexLocker lock(&m_searchersListMutex);
         const auto camera = resource.dynamicCast<QnSecurityCamResource>();
         if (!camera || !camera->isManuallyAdded())
             return;
@@ -428,8 +455,8 @@ void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr &
     m_manualCameraByUniqueId.remove(resource->getUniqueId());
     m_recentlyDeleted << resource->getUniqueId();
 
-    NX_DEBUG(this, lm("Manual camera %1 is deleted on %2")
-        .args(resource->getUniqueId(), resource->getUrl()));
+    NX_DEBUG(this, "Manual camera %1 is deleted on %2",
+        resource->getUniqueId(), resource->getUrl());
 }
 
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)
@@ -445,7 +472,9 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
         if (!camera || !camera->needCheckIpConflicts())
             continue;
 
-        QString groupId = camera->getGroupId().isEmpty() ? camera->getPhysicalId() : camera->getGroupId();
+        QString groupId = camera->getGroupId().isEmpty()
+            ? camera->getPhysicalId()
+            : camera->getGroupId();
         cameraGroups << groupId;
         portList << QUrl(camera->getUrl()).port();
 
@@ -455,7 +484,11 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
         if (!camera->isManuallyAdded())
             return true; //< Conflict detected
         if (portList.size() < cameraGroups.size())
-            return true; //< For manually added cameras it is allowed to have several cameras with same IP but different ports.
+        {
+            // For manually added cameras it is allowed to have several cameras
+            // with same IP but different ports.
+            return true;
+        }
     }
 
     return false;
@@ -471,13 +504,11 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (!netRes)
             continue;
 
-        if (res->hasFlags(Qn::server_live_cam)) // if this is camera from mediaserver on the client
+        if (res->hasFlags(Qn::server_live_cam)) //< this is camera from mediaserver on the client
             continue;
 
-        if( res->hasFlags(Qn::foreigner) )      //this camera belongs to some other mediaserver
-        {
+        if (res->hasFlags(Qn::foreigner)) //< this camera belongs to some other mediaserver
             continue;
-        }
 
         QDateTime ldt = netRes->getLastDiscoveredTime();
         QDateTime currentT = qnSyncTime->currentDateTime();
@@ -492,7 +523,8 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && camRes->isLicenseUsed()))
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
+                    || (camRes && camRes->isLicenseUsed()))
                 {
                     if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -501,17 +533,21 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
-                } else
+                }
+                else
                 {
                     NX_VERBOSE(this,
-                        lm("Mark resource %1 as offline because it doesn't response to discovery any more.").arg(NetResString(camRes)));
+                        "Mark resource %1 as offline"
+                        " because it doesn't response to discovery any more.",
+                        netResourceString(camRes));
 
                     res->setStatus(Qn::Offline);
                     m_resourceDiscoveryCounter[uniqId] = 0;
                 }
             }
         }
-        else {
+        else
+        {
             m_resourceDiscoveryCounter[uniqId] = 0;
             m_disconnectSended[uniqId] = false;
         }
@@ -521,7 +557,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkResourcePtr& rpNetRes)
 {
     if (!rpNetRes->isInitialized() && !rpNetRes->hasFlags(Qn::foreigner))
-        rpNetRes->initAsync(false); // wait for initialization
+        rpNetRes->initAsync(false); //< wait for initialization
 }
 
 bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
@@ -549,14 +585,14 @@ bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
     if (it != knownCameraChannels.end())
         return true;
 
-    NX_VERBOSE(this, lm("Other channels of resource '%1' belong to other servers, do nothing."),
-        NetResString(newCameraResource));
+    NX_VERBOSE(this, "Other channels of resource '%1' belong to other servers, do nothing.",
+        netResourceString(newCameraResource));
     return false;
 }
 
 void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
 {
-    if (m_runNumber%50 != 0)
+    if (m_runNumber % 50 != 0)
         return;
 
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());

@@ -67,8 +67,9 @@ void callSaveUserAsync(
     const nx::vms::api::UserData& user,
     const QString& newPassword)
 {
-    //after successfull call completion users.front()->getPassword() is empty, so saving it here
-    const bool updatePassword = queryProcessor->userName() == user.name && !newPassword.isEmpty();
+    // After successfull call completion users.front()->getPassword() is empty, so saving it here.
+    const bool updatePassword = !newPassword.isEmpty()
+        && queryProcessor->userName().toLower() == user.name.toLower();
     queryProcessor->getAccess(userAccessData).processUpdateAsync(
         ApiCommand::saveUser, user,
         [updatePassword, handler, reqID, user, newPassword](ec2::ErrorCode errorCode)

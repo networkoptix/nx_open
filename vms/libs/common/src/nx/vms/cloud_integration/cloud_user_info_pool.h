@@ -78,7 +78,7 @@ public:
 
 class CloudUserInfoPoolSupplier:
     public QObject,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public AbstractCloudUserInfoPoolSupplier
 {
     Q_OBJECT

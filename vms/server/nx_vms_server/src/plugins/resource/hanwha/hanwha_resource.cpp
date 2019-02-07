@@ -806,13 +806,6 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);
@@ -914,9 +907,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
 void HanwhaResource::initMediaStreamCapabilities()
 {
-    m_capabilities.streamCapabilities[Qn::StreamIndex::primary] =
+    m_capabilities.streamCapabilities[MotionStreamType::primary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
-    m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
+    m_capabilities.streamCapabilities[MotionStreamType::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
         ResourcePropertyKey::kMediaCapabilities,
@@ -1457,18 +1450,14 @@ CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
     if (ptzTargetChannel == -1 || ptzTargetChannel == getChannel())
         return CameraDiagnostics::NoErrorResult();
 
+    const auto groupId = getGroupId();
     const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
-    const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
-    if (isCalibrated)
+    if (!groupId.isEmpty() && calibratedChannels && calibratedChannels->count(getChannel()))
     {
-        const auto id = physicalIdForChannel(getGroupId(), ptzTargetChannel);
+        const auto id = physicalIdForChannel(groupId, ptzTargetChannel);
         NX_DEBUG(this, "Set PTZ target id: %1", id);
         setProperty(ResourcePropertyKey::kPtzTargetId, id);
-
-        // TODO: Remove this workaround when client fixes a bug:
-        //     Absolute move and viewport is not accessible if continious move is not supportd.
-        //
-        // m_ptzCapabilities[core::ptz::Type::operational] |= Ptz::ContinuousPanTiltCapabilities;
+        m_ptzCapabilities[core::ptz::Type::operational] &= Ptz::ViewportPtzCapability;
     }
     else
     {
@@ -2521,14 +2510,12 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
         .streamCapabilities
-        .value(role == Qn::ConnectionRole::CR_LiveVideo
-            ? Qn::StreamIndex::primary
-            : Qn::StreamIndex::secondary);
+        .value(toStreamIndex(role));
 
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
@@ -3090,6 +3077,7 @@ boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterI
 
 void HanwhaResource::updateToChannel(int value)
 {
+    NX_VERBOSE(this, "Update to channel %1", value);
     QUrl url(getUrl());
     QUrlQuery query(url.query());
     query.removeQueryItem("channel");
@@ -3727,19 +3715,6 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
         return new HanwhaArchiveDelegate(toSharedPointer().dynamicCast<HanwhaResource>());
 
     return nullptr;
-}
-
-void HanwhaResource::setSupportedAnalyticsEventTypeIds(
-    QnUuid engineId, QSet<QString> supportedEvents)
-{
-    QSet<QString> externalEvents;
-    for (const auto& eventTypeId: supportedEvents)
-    {
-        if (eventTypeId != kHanwhaInputPortEventTypeId)
-            externalEvents.insert(eventTypeId);
-    }
-
-    base_type::setSupportedAnalyticsEventTypeIds(engineId, externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(

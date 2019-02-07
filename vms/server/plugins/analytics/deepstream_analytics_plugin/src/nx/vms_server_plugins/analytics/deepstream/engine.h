@@ -6,11 +6,13 @@
 #include <functional>
 #include <chrono>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/i_time_utility_provider.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -19,15 +21,13 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace deepstream {
 
-class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::IEngine>
+class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 
@@ -59,10 +59,7 @@ private:
     nx::sdk::analytics::Plugin* const m_plugin;
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
-    std::unique_ptr<
-        nxpl::TimeProvider,
-        std::function<void(nxpl::TimeProvider*)>> m_timeProvider;
-
+    nx::sdk::Ptr<nx::sdk::ITimeUtilityProvider> m_timeUtilityProvider;
     nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;
 };
 

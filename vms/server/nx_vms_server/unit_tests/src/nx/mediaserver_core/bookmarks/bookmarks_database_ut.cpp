@@ -156,6 +156,16 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     ASSERT_TRUE(result[1].tags.contains("tag2"));
 
     result.clear();
+    filter.sparsing.minVisibleLengthMs = 101ms;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(0, result.size());
+
+    result.clear();
+    filter.sparsing.minVisibleLengthMs = 100ms;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+
+    result.clear();
     filter.text = "tag2";
     serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(1, result.size());

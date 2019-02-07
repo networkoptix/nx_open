@@ -115,10 +115,8 @@ void QnCommonMetaTypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();

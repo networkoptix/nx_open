@@ -36,7 +36,7 @@ using PostBody = QnCameraSettingsRestHandlerPostBody;
 struct QnCameraSettingsRestHandlerPostBody
 {
     QString cameraId;
-    QMap<QString, QString> paramValues; //< NOTE: Fusion does not support QMap.
+    QMap<QString, QString> paramValues;
 };
 #define QnCameraSettingsRestHandlerPostBody_Fields (cameraId)(paramValues)
 
@@ -306,7 +306,7 @@ int QnCameraSettingsRestHandler::executePost(
     const auto postBody = QJson::deserialized<PostBody>(body, PostBody(), &success);
     if (!success)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, "Invalid Json object provided");
+        result.setError(QnJsonRestResult::InvalidParameter, "Invalid JSON object provided");
         return nx::network::http::StatusCode::ok;
     }
 

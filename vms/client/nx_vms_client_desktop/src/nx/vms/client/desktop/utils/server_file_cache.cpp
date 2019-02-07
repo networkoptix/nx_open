@@ -107,7 +107,6 @@ qint64 ServerFileCache::maximumFileSize() {
     return ::maximumFileSize;
 }
 
-
 // -------------- File List loading methods -----
 
 void ServerFileCache::getFileList() {
@@ -197,7 +196,6 @@ void ServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, const
 
 // -------------- Uploading methods ----------------
 
-
 void ServerFileCache::uploadFile(const QString &filename) {
     if (!isConnectedToServer()) {
         emit delayedFileUploaded(filename, OperationResult::disconnected);
@@ -229,7 +227,6 @@ void ServerFileCache::uploadFile(const QString &filename) {
                 &ServerFileCache::at_fileUploaded );
     m_uploading.insert(handle, filename);
 }
-
 
 void ServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode ) {
     if (!m_uploading.contains(handle))

@@ -13,12 +13,12 @@
     #include <atlstr.h>
     #include <codecvt>
     #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
-#elif defined(__linux__)
-    #include <libgen.h>
-    #include <memory.h>
 #elif defined(__APPLE__)
     #include <libgen.h>
     #include <crt_externs.h>
+#else //< Assuming Linux-like OS.
+    #include <libgen.h>
+    #include <memory.h>
 #endif
 
 #include "ini_config.h"
@@ -35,7 +35,6 @@ OutputRedirector::OutputRedirector()
     redirectStdoutAndStderrIfNeeded();
 }
 
-
 /*static*/ void OutputRedirector::ensureOutputRedirection()
 {
     // Should be empty. The only purpose for it is to ensure that the linker will not optimize away
@@ -49,9 +48,11 @@ OutputRedirector::OutputRedirector()
     return redirector;
 }
 
-/*static*/ void OutputRedirector::redirectStdoutAndStderrIfNeeded(const char* overridingLogFilesDir/* = nullptr*/)
+/*static*/ void OutputRedirector::redirectStdoutAndStderrIfNeeded(
+    const char* overridingLogFilesDir /*= nullptr*/)
 {
-    const std::string logFilesDir = overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
+    const std::string logFilesDir =
+        overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
 
     const std::string processName = getProcessName();
 
@@ -67,20 +68,7 @@ OutputRedirector::OutputRedirector()
 
 /*static*/ std::string OutputRedirector::getProcessName()
 {
-    #if defined(__linux__)
-        std::ifstream inputStream("/proc/self/cmdline");
-        std::string path;
-        std::getline(inputStream, path);
-        // Needed because basename() changes the string.
-        char* const path_s = strdup(path.c_str());
-        const std::string name = (strlen(path_s) == 0) ? "" : basename(path_s);
-        free(path_s);
-    #elif defined(__APPLE__)
-        // Needed because basename() changes the string.
-        char* const path_s = strdup((*_NSGetArgv())[0]);
-        const std::string name = (strlen(path_s) == 0) ? "" : basename(path_s);
-        free(path_s);
-    #elif defined(_WIN32)
+    #if defined(_WIN32)
         int argc;
         LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
         if (!argv)
@@ -90,13 +78,22 @@ OutputRedirector::OutputRedirector()
         const std::wstring wNameWithExt =
             wPath.substr((lastSeparatorPos == std::wstring::npos) ? 0 : (lastSeparatorPos + 1));
         const std::wstring exeExt = L".exe";
-        const std::wstring wName = (wNameWithExt.substr(wNameWithExt.size() - exeExt.size()) == exeExt)
+        const std::wstring wName =
+            (wNameWithExt.substr(wNameWithExt.size() - exeExt.size()) == exeExt)
             ? wNameWithExt.substr(0, wNameWithExt.size() - exeExt.size())
             : wNameWithExt;
-        const std::string name = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
+        const std::string name =
+            std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
         LocalFree(argv);
-    #else
-        #error "Not supported target OS"
+    #elif defined(__APPLE__)
+        std::string path_s{(*_NSGetArgv())[0]}; //< Needed because basename() changes the string.
+        const std::string name = path_s.empty() ? "" : basename(&path_s[0]);
+    #else //< Assuming Linux-like OS.
+        std::ifstream inputStream("/proc/self/cmdline");
+        std::string path;
+        std::getline(inputStream, path);
+        std::string path_s = path; //< Needed because basename() changes the string.
+        const std::string name = path_s.empty() ? "" : basename(&path_s[0]);
     #endif
 
     return name;

@@ -27,45 +27,15 @@ Plugin::~Plugin()
     NX_PRINT << "Destroyed " << m_name << "[" << this << "]";
 }
 
-void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_Plugin)
-    {
-        addRef();
-        return static_cast<IPlugin*>(this);
-    }
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 const char* Plugin::name() const
 {
     return m_name.c_str();
 }
 
-void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void Plugin::setUtilityProvider(IUtilityProvider* utilityProvider)
 {
-    // Here roSettings are passed from Server. Currently, they are not used by analytics plugins,
-    // thus, do nothing.
-}
-
-void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
-{
-    m_pluginContainer = pluginContainer;
+    utilityProvider->addRef();
+    m_utilityProvider.reset(utilityProvider);
 }
 
 const IString* Plugin::manifest(nx::sdk::Error* outError) const

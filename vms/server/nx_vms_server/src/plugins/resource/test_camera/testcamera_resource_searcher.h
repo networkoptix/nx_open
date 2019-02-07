@@ -13,20 +13,22 @@ class QnMediaServerModule;
 
 class QnTestCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
 public:
     QnTestCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnTestCameraResourceSearcher();
 
-    QnResourceList findResources(void);
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
-    // return the manufacture of the server
-    virtual QString manufacture() const;
+    virtual QString manufacturer() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QnResourceList findResources() override;
+
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 private:
 

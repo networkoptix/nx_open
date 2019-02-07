@@ -112,6 +112,9 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &BookmarkSearchWidget::updateAllowance);
+
+    connect(model(), &AbstractSearchListModel::isOnlineChanged,
+        this, &BookmarkSearchWidget::updateAllowance);
 }
 
 BookmarkSearchWidget::~BookmarkSearchWidget()
@@ -137,7 +140,8 @@ QString BookmarkSearchWidget::itemCounterText(int count) const
 
 bool BookmarkSearchWidget::calculateAllowance() const
 {
-    return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
+    return model()->isOnline()
+        && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
 }
 
 } // namespace nx::vms::client::desktop

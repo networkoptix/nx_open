@@ -737,7 +737,7 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
 
 int QnRtspDataConsumer::copyLastGopFromCamera(
     QnVideoCameraPtr camera,
-    Qn::StreamIndex streamIndex,
+    nx::vms::api::MotionStreamType streamIndex,
     qint64 skipTime,
     bool iFramesOnly)
 {

@@ -94,7 +94,7 @@ bool isSignatureMatch(
 static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         /*allowedForArm*/ 1, false),
     LicenseTypeInfo(Qn::LC_Analog,          "analog",        /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_Professional,    "digital",                         0, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Professional,    "digital",       /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
     LicenseTypeInfo(Qn::LC_Edge,            "edge",          /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          /*allowedForArm*/ 1, false),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", /*allowedForArm*/ 1, false),

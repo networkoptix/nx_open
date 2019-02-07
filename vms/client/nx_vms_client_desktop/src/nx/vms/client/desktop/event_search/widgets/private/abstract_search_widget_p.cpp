@@ -334,7 +334,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 {
     ui->timeSelectionButton->setSelectable(false);
     ui->timeSelectionButton->setDeactivatable(true);
-    ui->timeSelectionButton->setIcon(qnSkin->icon("text_buttons/rapid_review.png"));
+    ui->timeSelectionButton->setIcon(qnSkin->icon("text_buttons/calendar.png"));
 
     auto timeMenu = q->createDropdownMenu();
     auto addMenuAction =
@@ -444,19 +444,9 @@ void AbstractSearchWidget::Private::setupCameraSelection()
             const auto updateButtonText =
                 [this](Cameras cameras)
                 {
-                    const auto currentCameraName =
-                        [this]()
-                        {
-                            const auto camera = m_mainModel->cameraSet()->singleCamera();
-                            return camera
-                                ? camera->getName()
-                                : tr("none", "No currently selected camera");
-                        };
-
                     const auto text = m_cameraSelectionActions[cameras]->text();
-
                     ui->cameraSelectionButton->setText(cameras == Cameras::current
-                        ? QString::fromWCharArray(L"%1 \x2013 %2").arg(text, currentCameraName())
+                        ? currentDeviceText()
                         : text);
                 };
 
@@ -558,6 +548,20 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
+QString AbstractSearchWidget::Private::currentDeviceText() const
+{
+    static const auto kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
+
+    const auto camera = m_mainModel->cameraSet()->singleCamera();
+    if (!camera)
+        return kTemplate.arg(tr("Current camera"), tr("none", "No currently selected camera"));
+
+    const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+        QnCameraDeviceStringSet("<unused>", tr("Current camera"), tr("Current device")), camera);
+
+    return kTemplate.arg(baseText, camera->getName());
+};
+
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
@@ -568,19 +572,22 @@ EventRibbon* AbstractSearchWidget::Private::view() const
     return ui->ribbon;
 }
 
-
 bool AbstractSearchWidget::Private::isAllowed() const
 {
-    return m_isAllowed;
+    if (!m_isAllowed.has_value())
+        q->updateAllowance();
+
+    NX_ASSERT(m_isAllowed.has_value());
+    return *m_isAllowed;
 }
 
 void AbstractSearchWidget::Private::setAllowed(bool value)
 {
-    if (m_isAllowed == value)
+    if (m_isAllowed.has_value() && *m_isAllowed == value)
         return;
 
     m_isAllowed = value;
-    emit q->allowanceChanged(m_isAllowed, {});
+    emit q->allowanceChanged(*m_isAllowed, {});
 }
 
 void AbstractSearchWidget::Private::goToLive()

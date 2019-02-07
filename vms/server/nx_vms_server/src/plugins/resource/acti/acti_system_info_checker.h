@@ -10,7 +10,7 @@
 
 class QnActiSystemInfoChecker:
     public QObject,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
